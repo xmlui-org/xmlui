@@ -1,4 +1,4 @@
-import { ApiInterceptorDefinition } from "@nsoftware-com/xmlui";
+import { ApiInterceptorDefinition } from "xmlui";
 
 const mock: ApiInterceptorDefinition = {
   type: "db",

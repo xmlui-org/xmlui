@@ -1,4 +1,4 @@
-import { startApp } from "@nsoftware-com/xmlui";
+import { startApp } from "xmlui";
 export const runtime = import.meta.glob(`/src/**`, { eager: true });
 startApp(runtime);
 

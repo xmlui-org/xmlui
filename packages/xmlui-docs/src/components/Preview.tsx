@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from "react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import ReactDOM, { Root } from "react-dom/client";
 import { parseFromEditorText } from "../utils/helpers";
-import { CompoundComponentDef, ComponentLike } from "@nsoftware-com/xmlui";
+import { CompoundComponentDef, ComponentLike } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
 import { useTheme } from "nextra-theme-docs";
 

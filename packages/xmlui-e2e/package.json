@@ -9,7 +9,7 @@
     "test-ui": "npm run test -- --ui"
   },
   "dependencies": {
-    "@nsoftware-com/xmlui": "*"
+    "xmlui": "*"
   },
   "devDependencies": {
     "@playwright/test": "1.43.1",

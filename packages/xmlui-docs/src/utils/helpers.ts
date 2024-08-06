@@ -1,6 +1,6 @@
 import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { UemlHelper } from "@src/parsers/ueml/UemlHelper";
-import { UemlNode } from "@nsoftware-com/xmlui/src/parsers/ueml/ueml-tree";
+import { UemlNode } from "@src/parsers/ueml/ueml-tree";
 import { decompress } from "@/src/components/utils";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { PlaygroundState } from "@/src/state/store";

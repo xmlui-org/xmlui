@@ -1,4 +1,4 @@
-import { ApiInterceptorDefinition } from "@nsoftware-com/xmlui";
+import { ApiInterceptorDefinition } from "xmlui";
 
 const today = new Date();
 today.setHours(23, 59, 59, 999);

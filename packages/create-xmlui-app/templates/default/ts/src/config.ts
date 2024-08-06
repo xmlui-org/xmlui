@@ -1,4 +1,4 @@
-import type { StandaloneAppDescription } from "@nsoftware-com/xmlui";
+import type { StandaloneAppDescription } from "xmlui";
 
 const App: StandaloneAppDescription = {
   name: "Tutorial",

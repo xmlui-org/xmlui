@@ -1,6 +1,6 @@
-import { StandaloneApp } from "@nsoftware-com/xmlui";
-import type { StandaloneAppDescription } from "@nsoftware-com/xmlui";
-import "@nsoftware-com/xmlui/index.scss";
+import { StandaloneApp } from "xmlui";
+import type { StandaloneAppDescription } from "xmlui";
+import "xmlui/index.scss";
 
 declare global {
   interface Window {

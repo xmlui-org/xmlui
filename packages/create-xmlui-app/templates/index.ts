@@ -61,7 +61,7 @@ export const installTemplate = async ({ appName, root, packageManager, template,
      * Default dependencies.
      */
     dependencies: {
-      "@nsoftware-com/xmlui": pkg.version,
+      "xmlui": pkg.version,
     },
   };
 

@@ -207,7 +207,7 @@ So far, you have used the default app logo offered by XMLUI. It is time to chang
 2. Open the `config.ts` file (from the `src` folder); it contains some resource definitions:
 
 ```ts copy {6-8} filename="config.ts"
-import type { StandaloneAppDescription } from "@nsoftware-com/xmlui";
+import type { StandaloneAppDescription } from "xmlui";
 
 const App: StandaloneAppDescription = {
   name: "Tutorial",
@@ -223,7 +223,7 @@ export default App;
 Change the `logo` resource to the new file, `todo-logo.svg`:
 
 ```ts copy {7} filename="config.ts"
-import type { StandaloneAppDescription } from "@nsoftware-com/xmlui";
+import type { StandaloneAppDescription } from "xmlui";
 
 const App: StandaloneAppDescription = {
   name: "Tutorial",
