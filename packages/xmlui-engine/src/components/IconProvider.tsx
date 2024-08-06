@@ -1,0 +1,314 @@
+import type { ReactNode } from "react";
+import type React from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { IconRegistryContext } from "@components/IconRegistryContext";
+import {
+  FiAlertOctagon,
+  FiCheckCircle,
+  FiChevronDown,
+  FiChevronUp,
+  FiClipboard,
+  FiDownload,
+  FiFolder,
+  FiGrid,
+  FiHardDrive,
+  FiHelpCircle,
+  FiKey,
+  FiLock,
+  FiRefreshCcw,
+  FiSlash,
+  FiStar,
+  FiUpload,
+  FiUser,
+  FiUserMinus,
+  FiUserPlus,
+  FiUsers,
+  FiX,
+} from "react-icons/fi";
+import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
+import {
+  BsArrowDownShort,
+  BsArrowLeftShort,
+  BsArrowRightShort,
+  BsArrowUpShort,
+  BsChatDots,
+  BsChevronDown,
+  BsChevronRight,
+  BsHash,
+  BsReply,
+  BsSquare,
+  BsSquareFill,
+  BsSquareHalf,
+} from "react-icons/bs";
+import { GrDocumentConfig, GrEmoji, GrNext, GrPrevious } from "react-icons/gr";
+import { IoChatboxOutline, IoCubeOutline, IoPencil, IoSwapVertical } from "react-icons/io5";
+import { MdOutlineDriveFileRenameOutline, MdOutlinePalette } from "react-icons/md";
+import { RiAttachment2, RiMessage2Line, RiStickyNoteLine } from "react-icons/ri";
+import { VscDebugStart, VscDebugStop, VscSplitHorizontal, VscSplitVertical } from "react-icons/vsc";
+import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
+import { HiOutlinePaintBrush } from "react-icons/hi2";
+import { TfiReload } from "react-icons/tfi";
+import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
+import { IconBaseProps } from "@components/Icon/Icon";
+import { ApiIcon } from "@components/Icon/ApiIcon";
+import { AttachmentIcon } from "@components/Icon/Attach";
+import { BindingIcon } from "@components/Icon/Binding";
+import { BoardIcon } from "@components/Icon/BoardIcon";
+import { BoxIcon } from "@components/Icon/BoxIcon";
+import { CheckIcon } from "@components/Icon/CheckIcon";
+import { ChevronLeftIcon } from "@components/Icon/ChevronLeft";
+import { ChevronRightIcon } from "@components/Icon/ChevronRight";
+import { CodeFileIcon } from "@components/Icon/CodeFileIcon";
+import { CodeSandboxIcon } from "@components/Icon/CodeSandbox";
+import { CompactListIcon } from "@components/Icon/CompactListIcon";
+import { ContentCopyIcon } from "@components/Icon/ContentCopyIcon";
+import { DatabaseIcon } from "@components/Icon/DatabaseIcon";
+import { DocFileIcon } from "@components/Icon/DocFileIcon";
+import { DocIcon } from "@components/Icon/DocIcon";
+import { DotMenuHorizontalIcon } from "@components/Icon/DotMenuHorizontalIcon";
+import { DotMenuIcon } from "@components/Icon/DotMenuIcon";
+import { EmailIcon } from "@components/Icon/EmailIcon";
+import { EmptyFolderIcon } from "@components/Icon/EmptyFolderIcon";
+import { ExpressionIcon } from "@components/Icon/ExpressionIcon";
+import { FillPlusCircleIcon } from "@components/Icon/FillPlusCricleIcon";
+import { FilterIcon } from "@components/Icon/FilterIcon";
+import { FolderIcon } from "@components/Icon/FolderIcon";
+import { GlobeIcon } from "@components/Icon/GlobeIcon";
+import { HomeIcon } from "@components/Icon/HomeIcon";
+import { HyperLinkIcon } from "@components/Icon/HyperLinkIcon";
+import { ImageFileIcon } from "@components/Icon/ImageFileIcon";
+import { LinkIcon } from "@components/Icon/LinkIcon";
+import { ListIcon } from "@components/Icon/ListIcon";
+import { LooseListIcon } from "@components/Icon/LooseListIcon";
+import { MoonIcon } from "@components/Icon/MoonIcon";
+import { MoreOptionsIcon } from "@components/Icon/MoreOptionsIcon";
+import { PDFIcon } from "@components/Icon/PDFIcon";
+import { PenIcon } from "@components/Icon/PenIcon";
+import { PhoneIcon } from "@components/Icon/PhoneIcon";
+import { PhotoIcon } from "@components/Icon/PhotoIcon";
+import { PlusIcon } from "@components/Icon/PlusIcon";
+import { SearchIcon } from "@components/Icon/SearchIcon";
+import { ShareIcon } from "@components/Icon/ShareIcon";
+import { SunIcon } from "@components/Icon/SunIcon";
+import { TrashIcon } from "@components/Icon/TrashIcon";
+import { TxtIcon } from "@components/Icon/TxtIcon";
+import { UnknownFileIcon } from "@components/Icon/UnknownFileIcon";
+import { UnlinkIcon } from "@components/Icon/UnlinkIcon";
+import { UserIcon } from "@components/Icon/UserIcon";
+import { WarningIcon } from "@components/Icon/WarningIcon";
+import { XlsIcon } from "@components/Icon/XlsIcon";
+import { ErrorIcon } from "@components/Icon/ErrorIcon";
+
+type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
+
+type IconRegistryEntry = {
+  renderer: IconRenderer<any>;
+};
+
+type CustomSvgIcon = {
+  attributes: Record<string, any>;
+  name: string;
+};
+export type IconRegistry = {
+  getRegisteredIconNames: () => Array<string>;
+  lookupIconRenderer: (name: string) => IconRegistryEntry | undefined;
+  ensureCustomSvgIcon: (resourceName: string) => Promise<void>;
+  customSvgs: Record<string, CustomSvgIcon>;
+};
+
+const pool = new Map<string, IconRegistryEntry>();
+
+function registerIconRenderer(name: string | string[], renderer: IconRenderer<any>) {
+  if (typeof name === "object") {
+    name.forEach((n) => {
+      pool.set(n, { renderer });
+    });
+  } else {
+    pool.set(name, { renderer });
+  }
+}
+
+registerIconRenderer("assign", (props: IconBaseProps) => <FiUser {...props} />);
+registerIconRenderer("arrowup", (props: IconBaseProps) => <BsArrowUpShort {...props} />);
+registerIconRenderer("arrowright", (props: IconBaseProps) => <BsArrowRightShort {...props} />);
+registerIconRenderer("hamburger", (props: IconBaseProps) => <AiOutlineMenu {...props} />);
+registerIconRenderer("send", (props: IconBaseProps) => <AiOutlineSend {...props} />);
+registerIconRenderer("users", (props: IconBaseProps) => <FiUsers {...props} />);
+registerIconRenderer("refresh", (props: IconBaseProps) => <FiRefreshCcw {...props} />);
+registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {...props} />);
+registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
+registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
+registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => <DotMenuHorizontalIcon {...props} />);
+registerIconRenderer("noresult", (props: IconBaseProps) => <FiSlash {...props} />);
+registerIconRenderer("crm", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
+registerIconRenderer("chat", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
+registerIconRenderer("pencil", (props: IconBaseProps) => <IoPencil {...props} />);
+registerIconRenderer("cube", (props: IconBaseProps) => <IoCubeOutline {...props} />);
+registerIconRenderer("apps", (props: IconBaseProps) => <FiGrid {...props} />);
+registerIconRenderer("permissions", (props: IconBaseProps) => <FiKey {...props} />);
+registerIconRenderer("close", (props: IconBaseProps) => <FiX {...props} />);
+registerIconRenderer("star", (props: IconBaseProps) => <FiStar {...props} />);
+registerIconRenderer("help", (props: IconBaseProps) => <FiHelpCircle {...props} />);
+registerIconRenderer("compactlist", (props: IconBaseProps) => <CompactListIcon {...props} />);
+registerIconRenderer("copy", (props: IconBaseProps) => <ContentCopyIcon {...props} />);
+registerIconRenderer("move", (props: IconBaseProps) => <FiClipboard {...props} />);
+registerIconRenderer("rename", (props: IconBaseProps) => <MdOutlineDriveFileRenameOutline {...props} />);
+registerIconRenderer("hyperlink", (props: IconBaseProps) => <HyperLinkIcon {...props} />);
+registerIconRenderer("globe", (props: IconBaseProps) => <GlobeIcon {...props} />);
+registerIconRenderer("link", (props: IconBaseProps) => <LinkIcon {...props} />);
+registerIconRenderer("looseList", (props: IconBaseProps) => <LooseListIcon {...props} />);
+registerIconRenderer("options", (props: IconBaseProps) => <MoreOptionsIcon {...props} />);
+registerIconRenderer("search", (props: IconBaseProps) => <SearchIcon {...props} />);
+registerIconRenderer("filter", (props: IconBaseProps) => <FilterIcon {...props} />);
+registerIconRenderer("trash", (props: IconBaseProps) => <TrashIcon {...props} />);
+registerIconRenderer("pen", (props: IconBaseProps) => <PenIcon {...props} />);
+registerIconRenderer("email", (props: IconBaseProps) => <EmailIcon {...props} />);
+registerIconRenderer("phone", (props: IconBaseProps) => <PhoneIcon {...props} />);
+registerIconRenderer("home", (props: IconBaseProps) => <HomeIcon {...props} />);
+registerIconRenderer("user", (props: IconBaseProps) => <UserIcon {...props} />);
+registerIconRenderer("exit", (props: IconBaseProps) => <RxExit {...props} />);
+registerIconRenderer("adduser", (props: IconBaseProps) => <FiUserPlus {...props} />);
+registerIconRenderer("userminus", (props: IconBaseProps) => <FiUserMinus {...props} />);
+registerIconRenderer("plus", (props: IconBaseProps) => <PlusIcon {...props} />);
+registerIconRenderer("plus-circle", (props: IconBaseProps) => <AiOutlinePlusCircle {...props} />);
+registerIconRenderer("filledplus", (props: IconBaseProps) => <FillPlusCircleIcon {...props} />);
+registerIconRenderer("chevronright", (props: IconBaseProps) => <ChevronRightIcon {...props} />);
+registerIconRenderer("chevronleft", (props: IconBaseProps) => <ChevronLeftIcon {...props} />);
+registerIconRenderer("checkmark", (props: IconBaseProps) => <CheckIcon {...props} />);
+registerIconRenderer("valid", (props: IconBaseProps) => <FiCheckCircle {...props} />);
+registerIconRenderer("info", (props: IconBaseProps) => <FiAlertOctagon {...props} />);
+registerIconRenderer("error", (props: IconBaseProps) => <ErrorIcon {...props} />);
+registerIconRenderer("warning", (props: IconBaseProps) => <WarningIcon {...props} />);
+registerIconRenderer("board", (props: IconBaseProps) => <BoardIcon {...props} />);
+registerIconRenderer("list", (props: IconBaseProps) => <ListIcon {...props} />);
+registerIconRenderer("folder", (props: IconBaseProps) => <FolderIcon {...props} />);
+registerIconRenderer("folder-outline", (props: IconBaseProps) => <FiFolder {...props} />);
+registerIconRenderer("emptyfolder", (props: IconBaseProps) => <EmptyFolderIcon {...props} />);
+registerIconRenderer("pdf", (props: IconBaseProps) => <PDFIcon {...props} />);
+registerIconRenderer("txt", (props: IconBaseProps) => <TxtIcon {...props} />);
+registerIconRenderer("doc" || "docx", (props: IconBaseProps) => <DocIcon {...props} />);
+registerIconRenderer("doc-outline", (props: IconBaseProps) => <DocFileIcon {...props} />);
+registerIconRenderer("conf", (props: IconBaseProps) => <GrDocumentConfig {...props} />);
+registerIconRenderer("code", (props: IconBaseProps) => <CodeFileIcon {...props} />);
+registerIconRenderer("codesandbox", (props: IconBaseProps) => <CodeSandboxIcon {...props} />);
+registerIconRenderer("box", (props: IconBaseProps) => <BoxIcon {...props} />);
+registerIconRenderer(["xls", "xlsx"], (props: IconBaseProps) => <XlsIcon {...props} />);
+registerIconRenderer(["jpg", "jpeg", "png", "webp", "svg", "gif", "tif", "ppt", "pptx"], (props: IconBaseProps) => (
+  <ImageFileIcon {...props} />
+));
+registerIconRenderer("unknownfile", (props: IconBaseProps) => <UnknownFileIcon {...props} />);
+registerIconRenderer("photo", (props: IconBaseProps) => <PhotoIcon {...props} />);
+registerIconRenderer("previous", (props: IconBaseProps) => <GrPrevious {...props} />);
+registerIconRenderer("next", (props: IconBaseProps) => <GrNext {...props} />);
+registerIconRenderer("like", (props: IconBaseProps) => <AiOutlineLike {...props} />);
+registerIconRenderer("reply", (props: IconBaseProps) => <BsReply {...props} />);
+registerIconRenderer("attach", (props: IconBaseProps) => <AttachmentIcon {...props} />);
+registerIconRenderer("attach2", (props: IconBaseProps) => <RiAttachment2 {...props} />);
+registerIconRenderer("emoji", (props: IconBaseProps) => <GrEmoji {...props} />);
+registerIconRenderer("message", (props: IconBaseProps) => <RiMessage2Line {...props} />);
+registerIconRenderer("upload", (props: IconBaseProps) => <FiUpload {...props} />);
+registerIconRenderer("split-vertical", (props: IconBaseProps) => <VscSplitVertical {...props} />);
+registerIconRenderer("split-horizontal", (props: IconBaseProps) => <VscSplitHorizontal {...props} />);
+registerIconRenderer("swap", (props: IconBaseProps) => <IoSwapVertical {...props} />);
+registerIconRenderer("download", (props: IconBaseProps) => <FiDownload {...props} />);
+registerIconRenderer("note", (props: IconBaseProps) => <RiStickyNoteLine {...props} />);
+registerIconRenderer("binding", (props: IconBaseProps) => <BindingIcon {...props} />);
+registerIconRenderer("database", (props: IconBaseProps) => <DatabaseIcon {...props} />);
+registerIconRenderer("unlink", (props: IconBaseProps) => <UnlinkIcon {...props} />);
+registerIconRenderer("api", (props: IconBaseProps) => <ApiIcon {...props} />);
+registerIconRenderer("expression", (props: IconBaseProps) => <ExpressionIcon {...props} />);
+registerIconRenderer("chat", (props: IconBaseProps) => <BsChatDots {...props} />);
+registerIconRenderer("hash", (props: IconBaseProps) => <BsHash {...props} />);
+registerIconRenderer("drive", (props: IconBaseProps) => <FiHardDrive {...props} />);
+registerIconRenderer("lock", (props: IconBaseProps) => <FiLock {...props} />);
+registerIconRenderer("start", (props: IconBaseProps) => <VscDebugStart {...props} />);
+registerIconRenderer("stop", (props: IconBaseProps) => <VscDebugStop {...props} />);
+registerIconRenderer("restart", (props: IconBaseProps) => <TfiReload {...props} />);
+registerIconRenderer("duplicate", (props: IconBaseProps) => <HiOutlineDuplicate {...props} />);
+registerIconRenderer("connect", (props: IconBaseProps) => <RxLightningBolt {...props} />);
+registerIconRenderer("cog", (props: IconBaseProps) => <HiOutlineCog {...props} />);
+registerIconRenderer("sun", (props: IconBaseProps) => <SunIcon {...props} />);
+registerIconRenderer("moon", (props: IconBaseProps) => <MoonIcon {...props} />);
+registerIconRenderer("share", (props: IconBaseProps) => <ShareIcon {...props} />);
+registerIconRenderer("new-window", (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
+registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);
+registerIconRenderer("palette", (props: IconBaseProps) => <MdOutlinePalette {...props} />);
+
+// --- IDE extras (temporary)
+registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {...props} />);
+registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
+registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
+registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
+registerIconRenderer("chevronright", (props: IconBaseProps) => <BsChevronRight {...props} />);
+
+export function IconProvider({ children }: { children: ReactNode }) {
+  const getRegisteredIconNames = useCallback(() => {
+    return Array.from(pool.keys());
+  }, []);
+
+  const lookupIconRenderer = useCallback((name: string): IconRegistryEntry | undefined => {
+    return pool.get(name);
+  }, []);
+
+  const [customSvgs, setCustomSvgs] = useState<Record<string, { name: string; attributes: Record<string, any> }>>({});
+  const attachedResources = useRef<Record<string, boolean>>({});
+  const spriteRootRef = useRef<SVGSVGElement>(null);
+
+  const ensureCustomSvgIcon = useCallback(async (resourceUrl: string) => {
+    if (attachedResources.current[resourceUrl]) {
+      return;
+    }
+    const icon = await (await fetch(resourceUrl)).text();
+    const div = document.createElement("div");
+    div.style.display = "none";
+    div.innerHTML = icon;
+
+    const attrs: Record<string, any> = {};
+    for (let i = 0; i < div.children[0].attributes.length; i++) {
+      const attr = div.children[0].attributes[i];
+      if (attr.nodeName !== "class") {
+        attrs[attr.nodeName] = attr.nodeValue;
+      }
+    }
+
+    Object.keys(attrs).forEach((key) => {
+      div.children[0].removeAttribute(key);
+    });
+
+    const d = document.createElementNS("http://www.w3.org/2000/svg", "symbol");
+    d.innerHTML = div.children[0].innerHTML;
+    d.id = resourceUrl;
+    d.setAttributeNS(null, "viewBox", attrs["viewBox"]);
+
+    if (!attachedResources.current[resourceUrl]) {
+      spriteRootRef.current!.appendChild(d);
+      attachedResources.current[resourceUrl] = true;
+    }
+    const customIcon = {
+      name: resourceUrl,
+      attributes: attrs,
+    };
+    setCustomSvgs((prev) => {
+      return {
+        ...prev,
+        [resourceUrl]: customIcon,
+      };
+    });
+  }, []);
+
+  const contextValue = useMemo(() => {
+    return {
+      getRegisteredIconNames,
+      lookupIconRenderer,
+      ensureCustomSvgIcon,
+      customSvgs,
+    };
+  }, [customSvgs, ensureCustomSvgIcon, getRegisteredIconNames, lookupIconRenderer]);
+
+  return (
+    <IconRegistryContext.Provider value={contextValue}>
+      {children}
+      <svg style={{ display: "none" }} ref={spriteRootRef}></svg>
+    </IconRegistryContext.Provider>
+  );
+}

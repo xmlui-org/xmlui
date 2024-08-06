@@ -1,0 +1,26 @@
+<VStack gap="1rem" padding="1rem">
+  <HStack gap="1rem">
+    <Button label="solid/primary" variant="solid" themeColor="primary" />
+    <Button label="outlined/primary" variant="outlined" themeColor="primary" />
+    <Button label="ghost/primary" variant="ghost" themeColor="primary" />
+  </HStack>
+  <HStack gap="1rem">
+    <Button label="solid/secondary" variant="solid" themeColor="secondary" />
+    <Button label="outlined/secondary" variant="outlined" themeColor="secondary" />
+    <Button label="ghost/secondary" variant="ghost" themeColor="secondary" />
+  </HStack>
+  <HStack gap="1rem">
+    <Button label="solid/attention" variant="solid" themeColor="attention" />
+  </HStack>
+  <HStack gap="1rem">
+    <Button icon="drive" label="extra-small" size="xs" />
+    <Button icon="drive" label="small" size="sm" />
+    <Button icon="drive" label="medium" size="md" />
+    <Button icon="drive" label="large" size="lg" />
+  </HStack>
+  <HStack>
+    <Badge value="This is a badge (not a button)" />
+  </HStack>
+  <H2>This is a Heading 2</H2>
+<Text>Some text and an email icon&nbsp;<Icon name="email"/></Text>
+</VStack>

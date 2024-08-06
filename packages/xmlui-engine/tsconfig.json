@@ -1,0 +1,38 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "paths": {
+      "@abstractions/*": ["./src/abstractions/*"],
+      "@core/*": ["./src/core/*"],
+      "@components-core/*": ["./src/components-core/*"],
+      "@components/*": ["./src/components/*"],
+      "@parsers/*": ["./src/parsers/*"]
+    }
+  },
+  "include": [
+    "src",
+    "tests",
+    "index.ts"
+  ],
+  "exclude": ["ests"]
+}

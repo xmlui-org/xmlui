@@ -1,0 +1,110 @@
+# Avatar
+
+The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.
+
+## Props
+
+### `name`
+
+This property sets the name value the avatar uses to display initials.
+
+```ueml copy
+<Avatar name="John, Doe" />
+```
+
+<Playground
+  previewOnly
+  height={60}
+  name="Example: name"
+  app={`
+      <Avatar name="John, Doe" />
+  `}
+/>
+
+### `size`
+
+This property defines the display size of the avatar.
+The default size is `sm`.
+
+| Value | Description              |
+| :---- | :----------------------- |
+| `xs`  | Extra small size         |
+| `sm`  | Small size               |
+| `md`  | Medium size              |
+| `lg`  | Large size               |
+
+```ueml copy
+<HStack gap="1rem" >
+  <Avatar name="Dorothy Ellen Fuller" />
+  <Avatar name="Xavier Schiller" size="xs" />
+  <Avatar name="Sebastien Moore" size="sm" />
+  <Avatar name="Molly Dough" size="md" />
+  <Avatar name="Lynn Gilbert" size="lg" />
+</HStack>
+```
+
+<Playground
+  previewOnly
+  height={108}
+  name="Example: size"
+  app={`
+    <HStack gap="1rem" >
+      <Avatar name="Dorothy Ellen Fuller" />
+      <Avatar name="Xavier Schiller" size="xs" />
+      <Avatar name="Sebastien Moore" size="sm" />
+      <Avatar name="Molly Dough" size="md" />
+      <Avatar name="Lynn Gilbert" size="lg" />
+    </HStack>
+  `}
+/>
+
+### `url`
+
+This property specifies the URL of the image to display in the avatar.
+
+<Playground
+  previewOnly
+  height={80}
+  name="Example: url"
+  app={`
+      <Avatar url="https://i.pravatar.cc/100" size="md" />
+  `}
+/>
+
+## Events
+
+### `click`
+
+This event is triggered when the avatar is clicked.
+
+```ueml copy
+<HStack gap="1rem" verticalAlignment="center">   
+  <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+    Click the avatar!
+</HStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: click"
+  app={`
+    <HStack gap="1rem" verticalAlignment="center">   
+      <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+      Click the avatar!
+    </HStack>
+  `}
+  height={80}
+/>
+
+## Styling
+
+The `Avatar` component uses these theme variables to customize its appearance:
+
+- `color-bg`
+- `color-border`
+- `color-text`
+- `font-weight`
+- `radius`
+- `shadow`
+- `style-border`
+- `thickness-border`

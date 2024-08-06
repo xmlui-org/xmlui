@@ -1,0 +1,28 @@
+<VStack>
+  <HStack padding="1.5rem" gap="1.5rem">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow" >
+        shadow
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-md">
+        shadow-md
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-xxl">
+        shadow-xxl
+      </Stack>
+  </HStack>
+  <HStack padding="1.5rem" gap="1.5rem">
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread">
+        shadow-spread
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread-2">
+        shadow-spread-2
+      </Stack>
+
+      <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow-spread-2-xl">
+        shadow-spread-2-xl
+      </Stack>
+</HStack>
+</VStack>

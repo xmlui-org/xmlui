@@ -1,0 +1,44 @@
+%-PROP-START autoFocus
+
+```ueml copy
+<HStack padding="0.5rem">
+  <EmojiSelector autoFocus="true" />
+</HStack>
+```
+
+<Playground
+  name="Example: autoFocus"
+  previewOnly
+  height={380}
+  app={`
+  <HStack padding="0.5rem">
+    <EmojiSelector autoFocus="true" />
+  </HStack>
+  `}
+/>
+
+%-PROP-END
+
+%-EVENT-START select
+
+```ueml copy /onSelect="(emoji) => { selected = emoji }"/
+<HStack var.selected="" gap="1rem">
+  <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+  <Text value="Selected emoji: {selected}" />
+</HStack>
+```
+
+<Playground
+  name="Example: select"
+  previewOnly
+  height={380}
+  app={`
+  <HStack var.selected="" gap="0.5rem">
+    <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+    <Text value="Selected emoji: {selected}" />
+  </HStack>
+  `}
+/>
+
+%-EVENT-END
+

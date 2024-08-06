@@ -1,0 +1,28 @@
+# CHStack
+
+`CHStack` is a specialized, shorthand version for the regular [Stack](./Stack) component that has a horizontal orientation with its contents centered.
+
+See also: [HStack](./HStack.mdx), [VStack](./VStack.mdx), [CVStack](./CVStack.mdx).
+
+```ueml copy
+<CHStack padding="1rem" backgroundColor="cyan">
+  <Stack height="32px" width="32px" backgroundColor="red" />
+  <Stack height="32px" width="32px" backgroundColor="blue" />
+  <Stack height="32px" width="32px" backgroundColor="green" />
+</CHStack>
+```
+
+<Playground
+  name="Example: CHStack"
+  previewOnly={true}
+  height={80}
+  app={`
+    <CHStack padding="1rem" backgroundColor="cyan">
+      <Stack height="32px" width="32px" backgroundColor="red" />
+      <Stack height="32px" width="32px" backgroundColor="blue" />
+      <Stack height="32px" width="32px" backgroundColor="green" />
+    </CHStack>
+  `}
+/>
+
+> **Note**: You cannot change the orientation of `CHStack` from horizontal to vertical by setting the `orientation` prop, as the engine ignores that setting.

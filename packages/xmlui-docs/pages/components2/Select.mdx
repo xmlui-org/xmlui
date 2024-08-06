@@ -1,0 +1,489 @@
+# Select
+
+The `Select` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.
+The dropdown list displays the labels while 
+XMLUI stores the selected value for further use when the user selects a particular item.
+
+## Using `Select`
+
+The component accepts `Option` components as children defining a particular option's label-value pair.
+`Option` requires a `value` property and while also having a `label` that is displayed in the list.
+If the `label` is not specified `value` is shown.
+
+```ueml copy
+<Select>
+  <Option value="opt1" label="first"/>
+  <Option value="opt2" label="second"/>
+  <Option value="opt3" label="third"/>
+</Select>
+```
+
+<Playground
+  previewOnly
+  name="Example: using Select"
+  height={170}
+  app={`
+    <Select>
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  `}
+/>
+
+## Context Variables
+
+### `$item`
+
+This context variable acts as a template for an item in the list.
+Access attributes of the item using the dot notation.
+
+For an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didchange) event.
+
+## Props
+
+### `emptyListTemplate`
+
+This optional property provides the ability to customize what is displayed when the list of options is empty.
+
+Click on the second field to see the custom empty list indicator.
+
+```ueml copy {9-11}
+<VStack gap="$space-1">
+  <VStack gap="$space-0_5">
+    <Text value="Default:" />
+    <Select />
+  </VStack>
+  <VStack gap="$space-0_5">
+    <Text value="Custom:" />
+    <Select>
+      <prop name="emptyListTemplate">
+        <Text variant="strong" value="Nothing to see here!" />
+      </prop>
+    </Select>
+  </VStack>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: emptyListTemplate"
+  height={220}
+  app={`
+    <VStack gap="$space-1">
+      <VStack gap="$space-0_5rem">
+        <Text value="Default:" />
+        <Select />
+      </VStack>
+      <VStack gap="$space-0_5rem">
+        <Text value="Custom:" />
+        <Select>
+          <prop name="emptyListTemplate">
+            <Text variant="strong" value="Nothing to see here!" />
+          </prop>
+        </Select>
+      </VStack>
+    </VStack>
+  `}
+/>
+
+### `enabled`
+
+Indicates whether the input field is enabled (`true`) or disabled (`false`).
+The default value is `true`.
+
+```ueml copy
+<Select enabled="false" />
+```
+
+<Playground
+  previewOnly
+  name="Example: enabled"
+  height={60}
+  app={`
+    <Select enabled="false" />
+  `}
+/>
+
+### `initialValue`
+
+The initial value displayed in the input field.
+If the value is not in the list, it will be ignored.
+
+```ueml copy
+<Select initialValue="opt3">
+  <Option value="opt1" label="first"/>
+  <Option value="opt2" label="second"/>
+  <Option value="opt3" label="third"/>
+</Select>
+```
+
+<Playground
+  previewOnly
+  name="Example: initialValue"
+  height={170}
+  app={`
+    <Select initialValue="opt3">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  `}
+/>
+
+### `optionTemplate`
+
+This property enables the customization of list items.
+To access the attributes of a list item use the 
+`$item`
+ keyword.
+
+```ueml copy
+<Select>
+  <prop name="optionTemplate">
+    <HStack verticalAlignment="center" gap="$space-0_5">
+      <Icon name="info" />
+      <Text value="{$item.label}" variant="strong" />
+    </HStack>
+  </prop>
+  <Option value="opt1" label="first"/>
+  <Option value="opt2" label="second"/>
+  <Option value="opt3" label="third"/>
+</Select>
+```
+
+<Playground
+  previewOnly
+  name="Example: optionTemplate"
+  height={170}
+  app={`
+    <Select>
+      <prop name="optionTemplate">
+        <HStack verticalAlignment="center" gap="$space-0_5">
+          <Icon name="info" />
+          <Text value="{$item.label}" variant="strong" />
+        </HStack>
+      </prop>
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  `}
+/>
+
+### `placeholder`
+
+The placeholder is displayed in place of the selected value in the input field.
+
+```ueml copy
+<Select placeholder="Please select an item">
+  <Option value="opt1" label="first"/>
+  <Option value="opt2" label="second"/>
+  <Option value="opt3" label="third"/>
+</Select>
+```
+
+<Playground
+  previewOnly
+  name="Example: placeholder"
+  height={170}
+  app={`
+    <Select placeholder="Please select an item">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  `}
+/>
+
+### `validationStatus`
+
+With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
+This results in a visual indication of a status change (reacting to form field validation).
+
+| Value     | Description                                           |
+| :-------- | :---------------------------------------------------- |
+| `valid`   | Visual indicator for an input that is accepted        |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error`   | Visual indicator for an input that produced an error  |
+
+```ueml copy
+<VStack gap="$space-0_5rem">
+  <Select />
+  <Select validationStatus="valid" />
+  <Select validationStatus="warning" />
+  <Select validationStatus="error" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: validationStatus"
+  height={200}
+  app={`<VStack gap="$space-0_5">
+  <Select />
+  <Select validationStatus="valid" />
+  <Select validationStatus="warning" />
+  <Select validationStatus="error" />
+</VStack>`}
+/>
+
+## API
+
+### `focus`
+
+This API method focuses the input field.
+
+```ueml copy /onClick="inputControl.focus()"/
+<VStack padding="$space-1" gap="$space-0_5">
+  <Button label="Focus Input" onClick="inputControl.focus()" />
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: focus()"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <Button label="Focus Input" onClick="inputControl.focus()" />
+    <Select id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  </VStack>
+  `}
+/>
+
+### `setValue`
+
+This API method programmatically sets the value of the field.
+The same rules apply as for the [`initialValue`](#initialvalue) property.
+
+```ueml copy 
+<VStack gap="$space-0_5">
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+  <HStack gap="$space-0_5">
+    <Button 
+      label="Select 2nd Item" 
+      onClick="inputControl.setValue('opt2')" />
+    <Button 
+      label="Remove Selection" 
+      onClick="inputControl.setValue('')" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  height={110}
+  name="Example: value() and setValue()"
+  app={`
+  <VStack gap="$space-0_5">
+    <Select id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+    <HStack gap="$space-0_5">
+      <Button 
+        label="Select 2nd Item" 
+        onClick="inputControl.setValue('opt2')" />
+      <Button 
+        label="Remove Selection" 
+        onClick="inputControl.setValue('')" />
+    </HStack>
+  </VStack>
+  `}
+/>
+
+## Events
+
+### `didChange`
+
+This event fires when the selected item list changes.
+
+```ueml copy /onDidChange="(newItem) => newValue = newItem"/
+<VStack padding="$space-1" gap="$space-0_5">
+  <var name="newValue" value="" />
+  <Text value="{newValue}" />
+  <Select onDidChange="(newItem) => newValue = newItem">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: didChange"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <var name="newValue" value="" />
+    <Text value="{newValue}" />
+    <Select onDidChange="(newItem) => newValue = newItem">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  </VStack>
+  `}
+/>
+
+### `gotFocus`
+
+This event fires when the component is focused.
+
+```ueml copy {5-6}
+<VStack padding="$space-1" gap="$space-0_5">
+  <var name="isFocused" value="{false}" />
+  <Text value="Input control is focused: {isFocused}" />
+  <Select
+    onGotFocus="isFocused = true"
+    onLostFocus="isFocused = false"
+  >
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: gotFocus/lostFocus"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <var name="isFocused" value="{false}" />
+    <Text value="Input control is focused: {isFocused}" />
+    <Select
+      onGotFocus="isFocused = true"
+      onLostFocus="isFocused = false"
+    >
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  </VStack>
+  `}
+/>
+
+### `lostFocus`
+
+This event fires when the component loses focus.
+
+See the example in the [gotFocus event section](#gotfocus).
+
+## Styling
+
+The `Select` component uses these theme variables:
+
+- `min-height-Select`
+
+These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
+If the status segment is omitted, the style will be applied to all statuses.
+
+- `radius-Select-|status|`
+- `font-size-Select-|status|`
+- `color-placeholder-Select-|status|`
+- `thickness-border-Select-|status|`
+
+- `thickness-outline-Select-|status|--focus`
+- `color-outline-Select-|status|--focus`
+- `style-outline-Select-|status|--focus`
+- `offset-outline-Select-|status|--focus`
+
+```json copy
+"radius-Select-default": "10px",
+"color-placeholder-Select-error": "crimson"
+```
+
+In addition to the validation statuses,
+the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
+
+- `color-border-Select-|status|--|interact|`
+- `color-bg-Select-|status|--|interact|`
+- `shadow-Select-|status|--|interact|`
+- `color-text-Select-|status|--|interact|`
+
+```json copy
+"color-bg-Select-default--disabled": "gray",
+"color-text-Select-error--active": "lightcoral"
+```
+
+Theme variables to set the dropdown menu styles:
+
+- `color-bg-menu-Select`
+- `shadow-menu-Select`
+- `radius-menu-Select`
+- `color-text-indicator-Select`
+
+Theme variables to set the selection styles in a dropdown menu:
+
+- `color-text-value-Select`
+- `color-bg-value-Select`
+
+Theme variables to set the styles of an unselected item:
+
+- `color-bg-item-Select--hover`
+- `color-bg-item-Select--active`
+- `color-text-item-Select--disabled`
+
+### Example
+
+```json copy
+"radius-Select": "30px",
+"color-placeholder-Select": "red",
+"thickness-border-Select": "4px"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={90}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-Select": "30px",
+        "color-placeholder-Select": "red",
+        "thickness-border-Select": "4px",
+      },
+    },
+  ]}
+  app={`<Select placeholder="Please select an option" />`}
+/>
+
+To style all input controls not just this component, use `Input` instead of the `Select` segment:
+
+```
+color-border-Input: "#0033FF"
+```
+
+`Input` affects the following controls:
+
+- [`Checkbox`](./Checkbox.mdx)
+- [`NumberBox`](./NumberBox.mdx)
+- [`RadioGroupOption`](./RadioGroupOption.mdx)
+- [`Switch`](./Switch.mdx)
+- [`TextArea`](./TextArea.mdx)
+- [`TextBox`](./TextBox.mdx)
+- [`MultiSelect`](./MultiSelect.mdx)
+- [`MultiCombobox`](./MultiCombobox.mdx)
+
+See [custom themes](../learning/themes/overview.mdx) for styling details.

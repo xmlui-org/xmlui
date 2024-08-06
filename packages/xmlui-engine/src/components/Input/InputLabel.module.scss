@@ -1,0 +1,16 @@
+@use "@components-core/theming/themes" as t;
+
+.inputLabel {
+  cursor: pointer;
+  color: t.$color-text-subtitle;
+  padding-bottom: t.$space-1;
+
+  &.disabled {
+    cursor: not-allowed;
+    color: t.$color-text--disabled;
+  }
+}
+
+.required {
+  color: t.$color-text-InputLabel-required;
+}

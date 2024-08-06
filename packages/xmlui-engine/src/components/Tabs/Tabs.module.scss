@@ -1,0 +1,124 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "Tabs";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-bg-Tabs: createThemeVar("color-bg-Tabs");
+$color-border-Tabs: createThemeVar("color-border-Tabs");
+$thickness-border-Tabs: createThemeVar("thickness-border-Tabs");
+$color-border-active-Tabs: createThemeVar("color-border-active-Tabs");
+$color-bg-trigger-Tabs: createThemeVar("color-bg-trigger-Tabs");
+$color-bg-trigger-Tabs--hover: createThemeVar("color-bg-trigger-Tabs--hover");
+
+.tabs {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  background-color: $color-bg-Tabs;
+  overflow: auto;
+
+  &[data-orientation='horizontal'] {
+    flex-direction: row;
+  }
+
+  &[data-orientation='vertical'] {
+    flex-direction: column;
+  }
+}
+
+.filler {
+  flex: 1 1 auto;
+
+  &[data-orientation='horizontal'] {
+    border-right-width: $thickness-border-Tabs;
+    border-right-style: solid;
+    border-right-color: $color-border-Tabs;
+  }
+
+  &[data-orientation='vertical'] {
+    border-bottom-width: $thickness-border-Tabs;
+    border-bottom-style: solid;
+    border-bottom-color: $color-border-Tabs;
+  }
+}
+
+
+.tabTrigger {
+  //flex: 1 1 auto;
+  font-family: inherit;
+  background-color: $color-bg-trigger-Tabs;
+  padding: t.$space-4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  user-select: none;
+  border-color: transparent;
+
+  &:hover {
+    background-color: $color-bg-trigger-Tabs--hover;
+  }
+
+  &[data-orientation='horizontal'] {
+    border-right-width: $thickness-border-Tabs;
+    border-right-style: solid;
+    border-right-color: $color-border-Tabs;
+
+    &[data-state='active'] {
+      border-right-width: $thickness-border-Tabs;
+      border-right-style: solid;
+      border-right-color: $color-border-active-Tabs;
+    }
+  }
+
+  &[data-orientation='vertical'] {
+    border-bottom-width: $thickness-border-Tabs;
+    border-bottom-style: solid;
+    border-bottom-color: $color-border-Tabs;
+
+    &[data-state='active'] {
+      border-bottom-width: $thickness-border-Tabs;
+      border-bottom-style: solid;
+      border-bottom-color: $color-border-active-Tabs;
+    }
+  }
+
+  &:hover {
+    cursor: pointer;
+  }
+}
+
+.tabsList {
+  overflow: hidden;
+  display: flex;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+
+  &[data-orientation='horizontal'] {
+    flex-direction: column;
+  }
+
+  &[data-orientation='vertical'] {
+    flex-direction: row;
+  }
+}
+
+.tabsList:hover {
+  overflow: auto;
+}
+
+.tabsContent {
+  flex-grow: 1;
+  outline: none;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars)
+}

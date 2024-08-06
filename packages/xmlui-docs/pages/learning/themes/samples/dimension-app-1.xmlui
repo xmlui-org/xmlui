@@ -1,0 +1,6 @@
+<Fragment>
+  <H3 backgroundColor="cyan">This is a heading</H3>
+  <Text backgroundColor="magenta">Before button</Text>
+  <Button label="Click me!" backgroundColor="green"/>
+  <Text backgroundColor="magenta">After button</Text>
+</Fragment>

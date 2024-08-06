@@ -1,0 +1,86 @@
+# Working with the XMLUI Code
+
+We suggest using VS Code (https://code.visualstudio.com/download) as your development environment when working with XMLUI. To work with GitHub, you may need to install GIT-SCM (https://www.git-scm.com/downloads).
+
+VS Code has built-in Git support, so in this article, we suppose you're using VS Code.
+
+> **Note**: You can install GUI tools for GitHub if you prefer them. Our recommendation is GitHub Desktop (https://desktop.github.com/)
+
+## Preparing your Dev Environment
+
+1. Make sure Node.js LTS is installed on your machine (https://nodejs.org/en/download).
+2. Ensure VS Code (and Git support) is installed on your machine.
+3. Clone the projects GitHub repository from here: https://github.com/nsoftware-com/albacrm
+
+```text
+cd <folder for your source code repositories>
+git clone https://github.com/nsoftware-com/albacrm.git
+```
+
+4. Go to the project folder and install package dependencies:
+
+```
+cd albacrm
+npm install
+```
+
+5. You can test the installation with these commands:
+
+```
+cd client/packages/CallbackDrive
+npm start
+```
+
+The last package starts the CallbackDrive app in the dev env (it does not need an actual backend, as it uses one running in the browser). Open the app's link (http://localhost:5173/) in the browser, and the Callback Drive app's UI will start.
+
+
+## Adding Your Contribution
+
+The XMLUI team members create a separate code branch for every feature, bug fix, documentation article, etc., they work on. When they are ready to put their work item back into the repo, they test that work (we have automatic tests and some E2E tests for that purpose).
+
+The merging of a work item happens with PRs (Pull Requests). When a PR has been merged back, we immediately delete the working branch of that PR from the repo.
+
+The repo's `master` branch is protected, so you cannot push your changes directly; PR is the only way to merge your contribution.
+
+### Git Local and Remote Repositories
+
+While you work with Git, you have a local repository on your machine, as you installed the dev env by cloning the remote repository stored in GitHub.
+
+When you merge your contribution, you push back the changes to the remote (central) repository. Though we delete the branch from the remote repo after the successful merge, the local feature branch remains on your machine; you must delete it manually.
+
+### Starting a New Work Item
+
+1. Check out the `master` branch.
+2. Pull the potential changes for `master` to ensure you work with the latest version.
+3. Create a new local branch for the new work item. Use the `<your GitHub id>\<some-short-feature-name>` naming convention so we can see in the central repo that you work on a particular item.
+
+At this point, you are ready to add your contribution to the particular work item.
+
+### Elaborating Your Work Item
+
+Remember that your work is stored only on your machine in a local repository; it is not saved automatically. So, commit and push frequently.
+
+Commit means that you put back your changes to the current working branch. When you commit, you have to define a commit message. Adding a meaningful message can be as short as "wip" or longer. Generally, we try adding more info, like "wip: displaying drive list works".
+
+> **Note**: We are not delicate on commit messages. However, we are on  PR titles. When you're about to push back the last commit before a PR, use a meaningful commit message.
+
+Pushing your branch to the GitHub repo means you have a backup of your contribution. Should your local machine break down, you still have a copy of your contributions.
+
+### Merging Your Work
+
+When ready with your work item, you can commit and push the latest changes, then create a PR:
+1. Go to GitHub (using the current repository) and select the Pull Request tab, then New Pull Request
+2. Set (leave) the base branch to `master` and set the compare branch to your branch with the new work to merge back.
+
+> **Note**: If you use the GitHub Desktop with the **Branch | Create Pull Request** menu command, the tool automatically sets up your "base" and "compare" branches.
+
+
+3. GitHub immediately checks if your branch can be merged to `master`. If so, it displays an "Able to merge" message; otherwise, "Can't merge".
+4. If it is able to make the merge, click Create Pull Request, and specify a self-explaining title with an optional description. Click Create Pull Request.
+
+At this point, your PR is ready for review and merge.
+
+> **Note**: While you are not experienced with the project source code and our practices, please notify István or Gergő, who will review and merge your PR.
+
+
+

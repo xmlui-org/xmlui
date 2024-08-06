@@ -1,0 +1,292 @@
+import type { CSSProperties} from "react";
+import type React from "react";
+import { useMemo, useRef } from "react";
+import styles from "./Text.module.scss";
+import classnames from "@components-core/utils/classnames";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { createComponentRenderer } from "@components-core/renderers";
+import { parseScssVar } from "@components-core/theming/themeVars";
+import { desc } from "@components-core/descriptorHelper";
+import { getMaxLinesStyle } from "@components-core/utils/css-utils";
+
+// =====================================================================================================================
+// React Text component definition
+
+const TextVariantKeys = [
+  "abbr", // use <abbr>
+  "cite", // use <cite>
+  "code", // use <code>
+  "codefence", // use uniquely styled <![CDATA[
+  "deleted", // use <del>
+  "inserted", // use <ins>
+  "keyboard", // use <kbd>,
+  "marked", // use <mark>
+  "sample", // use <samp>
+  "sub", // use <sub>
+  "sup", // use <sup>
+  "var", // use <var>
+  "strong", // use <strong> element for content that is of greater importance (used in Markdown)
+  "em", // use <em> element changes the meaning of a sentence - as spoken emphasis does (used in Markdown)
+  "mono", // use monospace font with <![CDATA[
+  "title", // Title text in the particular context
+  "subtitle", // Subtitle text in the particular context
+  "small", // Small text in the particular context
+  "caption", // Caption text in the particular context
+  "placeholder", // Placeholder text in the particular context 
+  "paragraph", // use <p>  
+] as const;
+
+type TextVariant = typeof TextVariantKeys[number];
+
+const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
+  abbr: "abbr",
+  cite: "cite",
+  code: "code",
+  codefence: "pre",
+  deleted: "del",
+  inserted: "ins",
+  keyboard: "kbd",
+  marked: "mark",
+  sample: "samp",
+  sub: "sub",
+  sup: "sup",
+  var: "var",
+  mono: "pre",
+  strong: "strong",
+  em: "em",
+  title: "span",
+  subtitle: "span",
+  small: "span",
+  caption: "span",
+  placeholder: "span",
+  paragraph: "p",
+};
+
+type TextVariantMapping =
+  | "abbr"
+  | "cite"
+  | "code"
+  | "del"
+  | "ins"
+  | "kbd"
+  | "mark"
+  | "samp"
+  | "sub"
+  | "sup"
+  | "var"
+  | "pre"
+  | "strong"
+  | "em"
+  | "span"
+  | "p";
+
+const AbbreviationKeys = ["title"] as const;
+type Abbreviation = {
+  title?: string;
+};
+
+const InsertedKeys = ["cite", "dateTime"] as const;
+type Inserted = {
+  cite?: string;
+  dateTime?: string;
+};
+
+const VariantPropsKeys = [...AbbreviationKeys, ...InsertedKeys] as const;
+type VariantProps = Abbreviation | Inserted;
+
+type TextProps = {
+  uid?: string;
+  children: React.ReactNode;
+  variant?: TextVariant;
+  maxLines?: number;
+  preserveLinebreaks?: boolean;
+  noEllipsis?: boolean;
+  layout?: CSSProperties;
+  [variantSpecificProps: string]: any;
+};
+
+export const Text = ({
+  uid,
+  variant,
+  maxLines = 0,
+  layout,
+  children,
+  preserveLinebreaks,
+  noEllipsis = false,  
+  ...variantSpecificProps
+}: TextProps) => {
+  const ref: React.MutableRefObject<HTMLElement | null> = useRef<HTMLElement>(null);
+
+  const Element = useMemo(() => {
+    if (!variant || !TextVariantElement[variant]) return "div";     //todo illesg, could be a span?
+    return TextVariantElement[variant];
+  }, [variant]);
+
+  return (
+    <>
+      <Element
+        {...variantSpecificProps}
+        ref={(node: HTMLElement | null) => {
+          if (!node) return;
+          ref.current = node;
+        }}
+        className={classnames([
+          styles.text,
+          styles[variant || "default"],
+          {
+            [styles.truncateOverflow]: maxLines > 0,
+            [styles.preserveLinebreaks]: preserveLinebreaks,
+            [styles.noEllipsis]: noEllipsis
+          },
+        ])}
+        style={{
+          ...layout,
+          ...getMaxLinesStyle(maxLines),
+        }}
+      >
+        {children}
+      </Element>
+    </>
+  );
+};
+
+// =====================================================================================================================
+// XMLUI Text component definition
+
+/**
+ * The \`Text\` component displays textual information in a number of optional styles and variants.
+ * 
+ * You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
+ */
+export interface TextComponentDef extends ComponentDef<"Text"> {
+  props: {
+    /**
+     * The text to be displayed. This value can also be set via nesting the text into the `Text` component.
+     * @descriptionRef 
+     */
+    value?: string;
+    /**
+     * Optional string value that provides named presets for text variants with a unique combination
+     * of font style, weight, size, color and other parameters.
+     * @descriptionRef 
+     */
+    variant?: TextVariant;
+    /**
+     * This property determines the maximum number of lines the component can wrap to.
+     * If there is no space to display all the contents,
+     * the component displays up to as many lines as specified in this property.
+     * @descriptionRef 
+     */
+    maxLines?: number;
+    /**
+     * This property indicates if linebreaks should be preserved when displaying text.
+     * By default, its value is set to \`false\`.
+     * @descriptionRef 
+     */
+    preserveLinebreaks?: boolean;
+    /**
+     * This property indicates whether an ellipsis should be displayed when the text is cropped (\`true\`) or not (\`false\`).
+     * By default, its value is set to \`false\`.
+     * @descriptionRef 
+     */
+    noEllipsis?: boolean;
+  };
+}
+
+const metadata: ComponentDescriptor<TextComponentDef> = {
+  displayName: "Text",
+  description: "Display a text with several variants (styles)",
+  props: {
+    value: desc("The text to display in the component - can be empty"),
+    variant: desc("Indicates the styling of the Text component, see stylesheet for details"),
+    maxLines: desc("Limits the number of lines the component can use"),
+    preserveLinebreaks: desc("Allow preserving linebreak information?"),
+    noEllipsis: desc("Indicates if ellipsis should be hidden from the end of the text"),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    "border-radius-Text": "$radius",
+    "style-border-Text": "solid",
+    "thickness-border-Text": "$space-0",
+    "font-weight-Text-abbr": "$font-weight-bold",
+    "transform-Text-abbr": "uppercase",
+    "font-size-Text-secondary": "$color-text-secondary",
+    "font-style-Text-cite": "italic",
+    "font-family-Text-code": "$font-family-monospace",
+    "font-size-Text-code": "$font-size-small",
+    "thickness-border-Text-code": "1px",
+    "padding-horizontal-Text-code": "$space-1",
+    "line-decoration-Text-deleted": "line-through",
+    "line-decoration-Text-inserted": "underline",
+    "font-family-Text-keyboard": "$font-family-monospace",
+    "font-size-Text-keyboard": "$font-size-small",
+    "font-weight-Text-keyboard": "$font-weight-bold",
+    "thickness-border-Text-keyboard": "1px",
+    "padding-horizontal-Text-keyboard": "$space-1",
+    "font-family-Text-sample": "$font-family-monospace",
+    "font-size-Text-sample": "$font-size-small",
+    "font-size-Text-sup": "$font-size-smaller",
+    "align-vertical-Text-sup": "super",
+    "font-size-Text-sub": "$font-size-smaller",
+    "align-vertical-Text-sub": "sub",
+    "font-style-Text-var": "italic",
+    "font-family-Text-mono": "$font-family-monospace",
+    "font-size-Text-title": "$font-size-large",
+    "font-size-Text-subtitle": "$font-size-medium",
+    "font-size-Text-small": "$font-size-small",
+    "letter-spacing-Text-caption": "0.05rem",
+    "font-size-Text-placeholder": "$font-size-small",
+    "font-family-Text-codefence": "$font-family-monospace",
+    "padding-horizontal-Text-codefence": "$space-3",
+    "padding-vertical-Text-codefence": "$space-2",
+    "padding-vertical-Text-paragraph": "$space-1",
+    light: {
+      "color-bg-Text-code": "$color-surface-100",
+      "color-border-Text-code": "$color-surface-200",
+      "color-bg-Text-keyboard": "$color-surface-200",
+      "color-border-Text-keyboard": "$color-surface-300",
+      "color-bg-Text-marked": "yellow",
+      "color-Text-placeholder": "$color-surface-500",
+      "color-bg-Text-codefence": "$color-primary-100",
+      "color-Text-codefence": "$color-surface-900",
+    },
+    dark: {
+      "color-bg-Text-code": "$color-surface-800",
+      "color-border-Text-code": "$color-surface-700",
+      "color-bg-Text-keyboard": "$color-surface-800",
+      "color-border-Text-keyboard": "$color-surface-700",
+      "color-bg-Text-marked": "orange",
+      "color-Text-placeholder": "$color-surface-500",
+      "color-bg-Text-codefence": "$color-primary-800",
+      "color-Text-codefence": "$color-surface-200",
+    },
+  },
+};
+
+export const textComponentRenderer = createComponentRenderer<TextComponentDef>(
+  "Text",
+  ({ node, extractValue, layoutCss, renderChild }) => {
+    const { variant, maxLines, preserveLinebreaks, noEllipsis, value, ...variantSpecific } = node.props;
+
+    const variantSpecificProps: VariantProps = Object.fromEntries(
+      Object.entries(variantSpecific)
+        .filter(([key, _]) => VariantPropsKeys.includes(key as any))
+        .map(([key, value]) => [key, extractValue(value)])
+    );
+
+    return (
+      <Text
+        variant={extractValue(variant)}
+        maxLines={extractValue.asOptionalNumber(maxLines)}
+        layout={layoutCss}
+        preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
+        noEllipsis={extractValue.asOptionalBoolean(noEllipsis, false)}
+        {...variantSpecificProps}
+      >
+        {extractValue.asDisplayText(value) || renderChild(node.children)}
+      </Text>
+    );
+  },
+  metadata
+);

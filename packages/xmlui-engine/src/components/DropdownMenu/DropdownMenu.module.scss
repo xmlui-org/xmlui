@@ -1,0 +1,60 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+.DropdownMenuContent,
+.DropdownMenuSubContent {
+  background-color: createThemeVar("color-bg-DropdownMenu");
+  border-radius: createThemeVar("radius-DropdownMenu");
+  min-width: createThemeVar("min-width-DropdownMenu");
+  box-shadow: createThemeVar("shadow-DropdownMenu");
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+.DropdownMenuItem,
+.DropdownMenuSubTrigger {
+  background-color: createThemeVar("color-bg-MenuItem");
+  color: createThemeVar("color-MenuItem");
+  font-family: createThemeVar("font-family-MenuItem");
+  display: flex;
+  border: 0;
+  width: 100%;
+  gap: createThemeVar("gap-MenuItem");
+  font-size: createThemeVar("font-size-MenuItem");
+  padding: createThemeVar("padding-vertical-MenuItem"); 
+  padding-inline: createThemeVar("padding-horizontal-MenuItem"); //t.$space-3;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  outline: none;
+
+  &:hover, &[data-highlighted] {
+    background-color: createThemeVar("color-bg-MenuItem--hover");
+    color: createThemeVar("color-MenuItem--hover");
+  }
+
+  .wrapper {
+    flex: 1;
+  }
+}
+
+.DropdownMenuSeparator {
+  margin-top: createThemeVar("margin-top-MenuSeparator");
+  margin-bottom: createThemeVar("margin-bottom-MenuSeparator");
+  width: createThemeVar("width-MenuSeparator");
+  height: createThemeVar("height-MenuSeparator");
+  background-color: createThemeVar("color-MenuSeparator");
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

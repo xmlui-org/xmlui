@@ -1,0 +1,28 @@
+@use "@components-core/theming/themes" as t;
+
+.from, .to{
+  display: none;
+}
+
+//combined with https://tobiasahlin.com/blog/previous-sibling-css-has/
+//.from ~ *:has(~ .to) {
+  //background-color: red;
+  //--nsoftware-color-bg-Button-primary: red !important;
+  //--nsoftware-color-bg-Button-primary-solid: red;
+  //--nsoftware-color-bg-TextBox-default: red;
+//}
+
+
+.baseRootComponent {
+  width: 100%;
+  position: relative;
+  height: inherit;
+  font-family: t.$font-family;
+  background-color: t.$color-bg;
+  font-size: t.$font-size;
+  font-weight: t.$font-weight;
+  color: t.$color-text-primary;
+  overflow: auto;
+  direction: t.$direction;
+  font-feature-settings: t.$font-feature-settings;
+}

@@ -1,0 +1,559 @@
+import colorValues from "./samples/color-values.xmlui";
+
+# Common Visual Property Units
+
+This article describes common values that you can use in layout properties.
+
+## Alignment values
+
+Position a child component within its parent to the start according to the current content direction.
+
+|Value|Description|
+|---|---|
+|start|Position child component at the start|
+|center|Position child component in the center|
+|end|Position child component at the end|
+
+```ueml copy {3, 7, 11, 16, 17}
+<VStack gap=".2rem">
+  <HStack width="300" backgroundColor="cyan"
+    horizontalAlignment="start">
+    <Text>This is a text aligned to left</Text>
+  </HStack>
+  <HStack width="300" backgroundColor="cyan"
+    horizontalAlignment="center">
+    <Text>This is a text aligned to left</Text>
+  </HStack>
+  <HStack width="300" backgroundColor="cyan"
+    horizontalAlignment="end">
+    <Text>This is a text aligned to left</Text>
+  </HStack>
+  <VStack height="100"
+    backgroundColor="cyan" 
+    verticalAlignment="end" 
+    horizontalAlignment="center">
+    <Stack width="36" height="36" backgroundColor="red" />
+  </VStack>
+</VStack>
+```
+
+<Playground
+    previewOnly
+    name="Alignment values"
+    app={`
+    <VStack gap=".2rem">
+      <HStack width="300" backgroundColor="cyan"
+        horizontalAlignment="start">
+        <Text>This is a text aligned to left</Text>
+      </HStack>
+      <HStack width="300" backgroundColor="cyan"
+        horizontalAlignment="center">
+        <Text>This is a text aligned to left</Text>
+      </HStack>
+      <HStack width="300" backgroundColor="cyan"
+        horizontalAlignment="end">
+        <Text>This is a text aligned to left</Text>
+      </HStack>
+      <VStack height="100"
+        backgroundColor="cyan" 
+        verticalAlignment="end" 
+        horizontalAlignment="center">
+        <Stack width="36" height="36" backgroundColor="red" />
+      </VStack>
+    </VStack>
+  `}
+    height={200}
+/>
+
+## Boolean Values
+
+You can represent the `true` and `false` values with multiple keywords:
+
+|Value|Description|
+|---|---|
+|true|Use a particular style feature. Accepted keywords: `true`, `yes`, or `on`.|
+|true|Do not use a particular style feature. Accepted keywords: `false`, `no`, or `off`.|
+
+## Border Values
+
+When you specify the border of a component, you can use these three border properties:
+- **Border width**. The stroke [width](../reference/styling/common-units/#size-values) to draw the border.
+- **Border style**. The border [style pattern](../reference/styling/common-units/#border-style-values) to apply.
+- **Border color**. The [color](../reference/styling/common-units/#color-values) of the border.
+You must specify at least one of these properties to display a border. You can specify the border properties in any order; however, you can specify a property only once. All of these border specifications are correct:
+
+```text
+1px solid blue
+3px
+dashed 4px #f0cccc
+#f0cccc 4 dashed
+#f0f dotted
+```
+
+## Border Rounding
+
+You can define border rounding values to round the corners of a component's outer border edge. You can set a single radius to make circular corners or two radii to make elliptical ones. Radius values use the [size value](#size-values) syntax and semantics.
+
+When you specify multiple radii, the first value determines the horizontal rounding, and the second the vertical rounding.
+
+<Playground
+    previewOnly
+    name="Border styles"
+    app={`
+    <FlowLayout gap="8" padding="8">
+      <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px"><Text value="20px" /></CVStack>
+      <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px 40px"><Text value="20px 40px" /></CVStack>
+      <CVStack width="25%" height="64" border="solid 4px #202020" radius="25% 20px"><Text value="25% 20px" /></CVStack>
+      <CVStack width="25%" height="64" border="solid 4px #202020" radius="50%"><Text value="50%" /></CVStack>
+    </FlowLayout>
+  `}
+    height={80}
+/>
+
+## Border Style Values
+
+The engine supports these border style values:
+
+| Value | Description |
+|-|-|
+| `dashed` | Displays a series of short square-ended dashes or line segments. |
+| `dotted` | Displays a series of rounded dots. |
+| `double` | Displays two straight lines that add up to the pixel size defined by the border width. |
+| `groove` | Displays a border with a carved appearance. It is the opposite of `ridge`. |
+| `inset` | Displays a border that makes the element appear embedded. It is the opposite of `outset`. |
+| `ouset` | Displays a border that makes the element appear embossed. It is the opposite of `inset`. |
+| `ridge` | Displays a border with an extruded appearance. It is the opposite of `groove`. |
+| `solid` | Displays a single, straight, solid line. |
+
+<Playground
+    previewOnly
+    name="Border styles"
+    app={`
+    <FlowLayout padding="8" gap="8">
+      <CVStack width="25%" height="64" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
+      <CVStack width="25%" height="64" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
+      <CVStack width="25%" height="64" border="double 8px #202020"><Text value="double" /></CVStack>
+      <CVStack width="25%" height="64" border="groove 8px #202020"><Text value="groove" /></CVStack>
+      <CVStack width="25%" height="64" border="inset 8px #202020"><Text value="inset" /></CVStack>
+      <CVStack width="25%" height="64" border="outset 8px #202020"><Text value="outset" /></CVStack>
+      <CVStack width="25%" height="64" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
+      <CVStack width="25%" height="64" border="solid 8px #202020"><Text value="solid" /></CVStack>
+    </FlowLayout>
+  `}
+    height={164}
+/>
+
+## Color Values
+
+The engine accepts several color value types:
+- **Hexadecimal RGB/RGBA color definitions**. You can specify color values with RGB or ARGB codes using a `#` prefix and 3, 4, 6, or 8 hexadecimal digits.
+- **The `rgb` function**. Use the `rgb` function with three arguments representing the red, green, and blue components. Each component can be specified as a value between 0 and 255 or as a percentage value between 0% and 100%. You must use the same value type for all colors (numeric value or percentage); they cannot be mixed.
+- **The `rgba` function**. Use the `rgba` function with four arguments. The first three arguments represent the color channels (see the `rgb` function). The alpha channel can have a percentage value (0% - 100%) or a float number between 0 and 1.
+- **The `hsl` function**. Describe a color with the `hsl` function with three arguments representing the Hue angle (units are `deg`, `rad`, `grad`, or `turn`), the Saturation percentage (0% - 100%), and the Lightness percentage(0% - 100%).
+- **The `hsla` function**. Describe a color with the `hsla` function with three arguments representing the H, S, and L values (see `hsl`) and the alpha channel (a percentage value (0% - 100%) or a float number between 0 and 1).
+- **Named colors**. You can use standard CSS color names (all lowercase letters). See the [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color) for more details.
+
+<Playground
+    previewOnly
+    name="Color values"
+    app={colorValues}
+    height={550}
+/>
+
+## Cursor Values
+
+This type of value sets the mouse cursor, if any, to show when the mouse pointer is over a particular component.
+
+### General
+
+|Value|Description|
+|-|-|
+|`auto`|The engine will determine the cursor to display based on the current context.|
+|`default`|The platform-dependent default cursor. Typically, an arrow.|
+|`none`|No cursor is rendered.|
+
+### Links and Status
+
+|Value|Description|
+|-|-|
+|`context‑menu`|A context menu is available.|
+|`help`|Help information is available.|
+|`pointer`|The cursor is a pointer that indicates a link. Typically, it is an image of a pointing hand.|
+|`progress`|The program is busy in the background, but the user can still interact with the interface (in contrast to `wait`).|
+|`wait`|The program is busy, and the user can't interact with the interface (in contrast to `progress`). Sometimes an image of an hourglass or a watch.|
+
+### Selection
+
+|Value|Description|
+|-|-|
+|`cell`|The table cell or set of cells can be selected.|
+|`crosshair`|Cross cursor, often used to indicate selection in a bitmap.|
+|`text`|The text can be selected. Typically, the shape of an I-beam.|
+|`vertical‑text`|The vertical text can be selected. Typically, the shape of a sideways I-beam.|
+
+### Drag and Drop
+
+|Value|Description|
+|-|-|
+|`alias`|An alias or shortcut is to be created.|
+|`copy`|Something is to be copied.|
+|`move`|Something is to be moved.|
+|`no‑drop`|An item may not be dropped at the current location. [Firefox bug 275173](https://bugzil.la/275173): On Windows and macOS, no-drop is the same as not-allowed.|
+|`not‑allowed`|The requested action will not be carried out.|
+|`grab`|Something can be grabbed (dragged to be moved).|
+|`grabbing`|Something is being grabbed (dragged to be moved).|
+
+### Resizing and Scrolling
+
+|Value|Description|
+|-|-|
+|`all‑scroll`|Something can be scrolled in any direction (panned). [Firefox bug 275174](https://bugzil.la/275174): On Windows, all-scroll is the same as move.|
+|`col‑resize`|The item/column can be resized horizontally. Often rendered as arrows pointing left and right with a vertical bar separating them.|
+|`row‑resize`|The item/row can be resized vertically. Often rendered as arrows pointing up and down with a horizontal bar separating them.|
+|`n‑resize`, `e‑resize`, `s‑resize`, `w‑resize`, `ne‑resize`, `nw‑resize`, `se‑resize`, `sw‑resize`, `ew‑resize`, `ns‑resize`, `nesw‑resize`, `nwse‑resize`|Some edge is to be moved. For example, the `se‑resize` cursor is used when the movement starts from the south-east corner of the box. In some environments, an equivalent bidirectional resize cursor is shown. For example, `n‑resize` and `s‑resize` are the same as `ns‑resize`.|
+
+### Zooming
+
+|Value|Description|
+|-|-|
+|`zoom‑in`, `zoom‑out`|Something can be zoomed (magnified) in or out.|
+
+### Cursor Examples
+
+Move the mouse over the rectangles in the following example to check what the cursor looks like.
+
+<Playground
+    previewOnly
+    name="Cursor values"
+    app={`
+    <VStack gap="8">
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="auto" border="solid 1 #202020">auto</CVStack>
+        <CVStack width="20%" height="36" cursor="default" border="solid 1 #202020">default</CVStack>
+        <CVStack width="20%" height="36" cursor="none" border="solid 1 #202020">none</CVStack>
+      </FlowLayout>
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="context-menu" border="solid 1 #202020">context-menu</CVStack>
+        <CVStack width="20%" height="36" cursor="help" border="solid 1 #202020">help</CVStack>
+        <CVStack width="20%" height="36" cursor="pointer" border="solid 1 #202020">pointer</CVStack>
+        <CVStack width="20%" height="36" cursor="progress" border="solid 1 #202020">progress</CVStack>
+        <CVStack width="20%" height="36" cursor="wait" border="solid 1 #202020">wait</CVStack>
+      </FlowLayout>
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="cell" border="solid 1 #202020">cell</CVStack>
+        <CVStack width="20%" height="36" cursor="crosshair" border="solid 1 #202020">crosshair</CVStack>
+        <CVStack width="20%" height="36" cursor="text" border="solid 1 #202020">text</CVStack>
+        <CVStack width="20%" height="36" cursor="vertical-text" border="solid 1 #202020">vertical-text</CVStack>
+      </FlowLayout>
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="alias" border="solid 1 #202020">alias</CVStack>
+        <CVStack width="20%" height="36" cursor="copy" border="solid 1 #202020">copy</CVStack>
+        <CVStack width="20%" height="36" cursor="move" border="solid 1 #202020">move</CVStack>
+        <CVStack width="20%" height="36" cursor="no-drop" border="solid 1 #202020">no-drop</CVStack>
+        <CVStack width="20%" height="36" cursor="not-allowed" border="solid 1 #202020">not-allowed</CVStack>
+        <CVStack width="20%" height="36" cursor="grab" border="solid 1 #202020">grab</CVStack>
+        <CVStack width="20%" height="36" cursor="grabbing" border="solid 1 #202020">grabbing</CVStack>
+      </FlowLayout>
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="alt-scroll" border="solid 1 #202020">all-scroll</CVStack>
+        <CVStack width="20%" height="36" cursor="col-resize" border="solid 1 #202020">col-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="row-resize" border="solid 1 #202020">row-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="n-resize" border="solid 1 #202020">n-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="e-resize" border="solid 1 #202020">e-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="s-resize" border="solid 1 #202020">s-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="w-resize" border="solid 1 #202020">w-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="ne-resize" border="solid 1 #202020">ne-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="nw-resize" border="solid 1 #202020">nw-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="se-resize" border="solid 1 #202020">se-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="sw-resize" border="solid 1 #202020">sw-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="ew-resize" border="solid 1 #202020">ew-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="ns-resize" border="solid 1 #202020">ns-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="nesw-resize" border="solid 1 #202020">nesw-resize</CVStack>
+        <CVStack width="20%" height="36" cursor="nwse-resize" border="solid 1 #202020">nwse-resize</CVStack>
+      </FlowLayout>
+      <FlowLayout padding="8" gap="8">
+        <CVStack width="20%" height="36" cursor="zoom-in" border="solid 1 #202020">zoom-in</CVStack>
+        <CVStack width="20%" height="36" cursor="zoom-out" border="solid 1 #202020">zoom-out</CVStack>
+      </FlowLayout>
+    </VStack>
+  `}
+    height={500}
+/>
+
+## Font Family Values
+
+Font family values are a prioritized list of one or more font family names and/or generic family names. Multiple names should be separated by commas. Font family names containing whitespace should be quoted.
+These are the generic family names:
+
+|Name|Description|
+|-|-|
+|`serif`| Glyphs have finishing strokes, flared or tapering ends, or have actual serifed endings. |
+|`sans-serif`| Glyphs have stroke endings that are plain. |
+|`monospace`| All glyphs have the same fixed width. |
+|`cursive`| Glyphs in cursive fonts generally have either joining strokes or other cursive characteristics beyond those of italic typefaces. The glyphs are partially or completely connected, and the result looks more like handwritten pen or brush writing than printed letter work. |
+|`fantasy`| fantasy fonts are primarily decorative fonts that contain playful representations of characters. |
+|`system-ui`| Glyphs are taken from the default user interface font on a given platform. Because typographic traditions vary widely across the world, this generic is provided for typefaces that don't map cleanly into the other generics. |
+|`ui-serif`| The default user interface serif font. |
+|`ui-sans-serif`| The default user interface sans-serif font. |
+|`ui-monospace`| The default user interface monospace font. |
+|`ui-rounded`| The default user interface font that has rounded features. |
+|`math`| This is for the particular stylistic concerns of representing mathematics: superscript and subscript, brackets that cross several lines, nesting expressions, and double struck glyphs with distinct meanings. |
+|`emoji`| Fonts that are specifically designed to render emoji. |
+|`fangsong`| A particular style of Chinese characters that are between serif-style Song and cursive-style Kai forms. This style is often used for government documents. |
+
+
+> **Note**: A generic font family should be the last item in the list of font family names.
+
+Examples:
+
+```text
+Helvetica
+"Times New Roman"
+Bookville, "Times New Roman", serif
+```
+
+## Font Weight Values
+
+Font weight values set the font's weight (or boldness); the available values depend on the currently selected font family.
+
+Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..., 900) are conventionally used. You can use a few identifiers to specify the font weights:
+
+|Value|Description|
+|-|-|
+|`normal`| Normal font weight. Same as `400`. |
+|`bold`| Bold font weight. Same as `700`. |
+|`lighter`| One relative font weight lighter than the parent element. |
+|`bolder`| One relative font weight heavier than the parent element. |
+
+## Orientation
+
+Describes the orientation a particular component renders its content (child components).
+
+|Value|Description|
+|:---|:---|
+|vertical|Lays out its content (children) vertically (in a column)|
+|horizontal|Lays out its content (children) horizontally (in a row)|
+
+<Playground
+    previewOnly
+    name="Orientation"
+    app={`
+      <HStack gap="2rem" height="100%">
+        <VStack width="140px" gap="10px" backgroundColor="cyan">
+          <H4>vertical</H4>
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+        </VStack>
+        <HStack width="240px" gap="10px" backgroundColor="cyan">
+          <H4>horizontal</H4>
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+        </HStack>
+      </HStack>`}
+    height={200}
+/>
+
+## Overflow Values
+
+A component may not fit into the viewport its parent provides. An overflow value specifies the engine's strategy in such a case.
+
+|Value|Description|
+|-|-|
+|`visible`| (**default**) Overflow content is not clipped and may be visible outside the element's padding box. |
+|`hidden`| Overflow content is clipped at the element's padding box. There are no scroll bars, and the clipped content is not visible (i.e., clipped content is hidden), but the content still exists. |
+|`scroll`| Overflow content is clipped at the element's padding box, and overflow content can be scrolled into view using scroll bars. |
+
+## Shadow Values
+
+You can define shadow values with one or more shadow effects. If you use more than one effect, you must separate them with a comma. A shadow effect is composed of these parts:
+
+- Horizontal offset of the effect
+- Vertical offset of the effect
+- Blur radius
+- Spread radius
+- Optional color
+
+The first up to four [size value](#size-values) segments are followed by the optional [color value](#color-values).
+
+You can use two, three, or four size values.
+
+- If only two values are given, the engine interprets them as the horizontal and vertical offsets.
+- If a third value is given, it is interpreted as a blur radius.
+- If a fourth value is given, it is interpreted as a spread radius.
+
+When you prefix the shadow value with `inset`, it changes the shadow from an outer box shadow to an inner box shadow (as if the content is pressed into the box).
+
+<Playground
+    previewOnly
+    name="Shadow Values"
+    app={`
+    <FlowLayout gap="24">
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="12px 12px 5px orangered" >
+        <Text>12px 12px 5px orangered</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="inset 12px 12px 5px #808080" >
+        <Text>inset 12px 12px 5px orangered</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="16px 8px green" >
+        <Text>16px 8px green</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="-8px -6px green" >
+        <Text>"inset 12px 12px 5px orangered"</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="16px 8px 12px blue" >
+        <Text>16px 8px 12px blue</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="16px 8px 8px 4px blue" >
+        <Text>16px 8px 8px 4px blue</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="12px 12px 5px orangered, inset 8px 6px green" >
+        <Text>12px 12px 5px orangered, inset 8px 6px green</Text>
+      </Stack>
+      <Stack margin="16" padding="16" border="2px solid #202020"
+        shadow="8px 4px 2px blue, -8px -6px green" >
+        <Text>12px 12px 5px blue, -8px -6px green</Text>
+      </Stack>    </FlowLayout>
+  `}
+    height={360}
+/>
+
+## Size Values
+
+Size values are composed of a numeric value and an optional unit. Here are a few examples:
+
+```text
+12px
+0.25rem
+50%
+0
+125mm
+```
+
+UI Engine uses these units with the CSS semantics:
+
+| Unit | Description |
+|-|-|
+| `cm` | Centimeters (1cm = 37.8px = 25.2/64in) |
+| `mm` | Millimeters (1mm = 1/10th of 1cm) |
+| `in` | Inches (1in = 2.54cm = 96px) |
+| `pc` | Picas (1pc = 1/6th of 1in) |
+| `pt` | Points (1pt = 1/72nd of 1in) |
+| `px` | Pixels (1px = 1/96th of 1in) |
+| `em` | Relative to the font size of the parent component, in the case of typographical properties (like the font size), and font size of the element itself, in the case of other properties like (width). |
+| `ex` | x-height (the height of a normal lowercase "x") of the element's font. |
+| `ch` | The advance measure (width) of the glyph "0" of the element's font. |
+| `ch` | The advance measure (width) of the glyph "0" of the element's font. |
+| `rem` | Font size of the root element. |
+| `vw` | 1% of the viewport's width. |
+| `vh` | 1% of the viewport's height. |
+| `vmin` | 1% of the viewport's smaller dimension. |
+| `vmax` | 1% of the viewport's smaller dimension. |
+| `%` | The percentage value is relative to the parent container's viewport size offered for the particular child element. |
+| `*` | Start sizing: The size weight used when calculating the dimension of the particular child element. The base of the calculation is the remaining space size in the parent's viewport. | 
+
+## Text Alignment Values
+
+This value sets the horizontal alignment of the inline-rendered content (e.g., text) inside its block-rendered parent.
+
+|Value|Description|
+|-|-|
+| `start` | The same as `left` if direction is left-to-right and `right` if direction is right-to-left. |
+| `end` | The same as `right` if direction is left-to-right and `left` if direction is right-to-left. |
+| `left` | The inline contents are aligned to the left edge of the line box. |
+| `right` | The inline contents are aligned to the right edge of the line box. |
+| `center` | The inline contents are centered within the line box. |
+| `justify` | The inline contents are justified. Text should be spaced to line up its left and right edges to the left and right edges of the line box, except for the last line. |
+
+<Playground
+    previewOnly
+    name="Text Alignment Values"
+    app={`
+      <VStack gap="8" verticalMargin="8" verticalPadding="8" width="600" margin="auto" backgroundColor="#eee">
+        <Text textAlign="left">This is a long text with several words (left)</Text>
+        <Text textAlign="right">This is a long text with several words (right)</Text>
+        <Text textAlign="center">This is a long text with several words (center)</Text>
+        <Text textAlign="justify">This is a long, long,long, long, long, long, long, very long text with several words that do not fit into a single line (justify). Last line is not justified.</Text>
+      </VStack>
+  `}
+    height={180}
+/>
+
+## Text Decoration Values
+
+A text decoration value is composed of these segments:
+
+- **color**. The color of the decoration
+- **line**. The kind of decoration used
+- **style**. The line style to use
+
+You can use one, two, or three segments when specifying the text decoration. They can be in any order; however, one segment type can be used only once.
+
+These are the available line values:
+
+|Value|Description|
+|-|-|
+|`underline`| Each line of text has a decorative line beneath it. |
+|`overline`| Each line of text has a decorative line above it. |
+|`line-through`| Each line of text has a decorative line going through its middle. |
+
+You can use these style values:
+
+|Value|Description|
+|-|-|
+|`solid`| Draws a single line. |
+|`double`| Draws a double line. |
+|`dotted`| Draws a dotted line. |
+|`dashed`| Draws a dashed line. |
+|`wavy`| Draws a wavy line. |
+
+<Playground
+    previewOnly
+    name="Setting text properties"
+    app={`
+  <VStack margin="8" gap="8">
+    <Text textDecoration="underline">underline</Text>
+    <Text textDecoration="red wavy underline">red wavy underline</Text>
+    <Text textDecoration="line-through">line-through</Text>
+    <Text textDecoration="line-through orange">line-through orange</Text>
+    <Text textDecoration="double line-through blue">double line-through blue</Text>
+    <Text textDecoration="overline">overline</Text>
+    <Text textDecoration="dotted overline #808080">dotted overline #808080</Text>
+  </VStack>
+  `}
+    height={240}
+/>
+
+## Text Transform Values
+
+This value specifies how to capitalize a component's text. It can be used to make text appear in all-uppercase or all-lowercase, or with each word capitalized.
+
+|Value|Description|
+|-|-|
+|`none`| Converts the first letter of each word to uppercase. Other characters remain unchanged (they retain their original case as written in the element's text) |
+|`capitalize`| Draws a double line. |
+|`uppercase`| Converts all characters to uppercase. |
+|`lowercase`| Converts all characters to lowercase. |
+|`full-width`| Forces the writing of a character — mainly ideograms and Latin scripts — inside a square, allowing them to be aligned in the usual East Asian scripts (like Chinese or Japanese). |
+|`full-size-kana`| Generally used for ruby annotation text, the keyword converts all small Kana characters to the equivalent full-size Kana, to compensate for legibility issues at the small font sizes typically used in ruby. |
+
+## User Select Values
+
+These values control whether the user can select text.
+
+|Value|Description|
+|-|-|
+|`none`| The text of the component and its children is not selectable. |
+|`auto`| Automatically determines the value. |
+|`text`| The text can be selected by the user. |
+|`all`| The content of the component shall be selected atomically: If a selection would contain part of the component, then the selection must contain the entire component, including all its children. If a double-click or context-click occurs in sub-components, the highest ancestor with this value will be selected. |
+|`contains`| Enables selection to start within the component; however, the selection will be contained by the bounds of that component. |
+

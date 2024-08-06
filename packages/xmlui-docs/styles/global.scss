@@ -1,0 +1,47 @@
+@import 'nextra-theme-docs/style.css';
+
+:root {
+  --nextra-primary-hue: 212deg;
+  --nextra-primary-saturation: 100%;
+  --nextra-navbar-height: 4rem;
+  --nextra-menu-height: 3.75rem;
+  --nextra-banner-height: 2.5rem;
+
+  --syntax-token-component: #FF5C00;
+  --syntax-token-delimiter-angle: #66748E;
+  --syntax-token-attribute-name: #BB8700;
+  --syntax-token-equal-sign: #7A27EC;
+  --syntax-token-string: #027700;
+  --syntax-token-script: #02A1A1;
+  --syntax-token-helper: #005AE1;
+  --syntax-token-comment: #4E4E4E;
+  --syntax-token-escape: #00B248;
+  --syntax-token-constant: #708C00;
+  --syntax-token-cdata: #079CF1;
+  --syntax-token-delimiter-curly: #000000;
+  --syntax-token-text: #677FFC;
+}
+
+:is(html[class~=dark]) {
+  --syntax-token-component: #FD9433;
+  --syntax-token-delimiter-angle: #97A7C5;
+  --syntax-token-attribute-name: #FFD706;
+  --syntax-token-equal-sign: #B078FF;
+  --syntax-token-string: #59C759;
+  --syntax-token-script: #78DBDB;
+  --syntax-token-helper: #80A6F8;
+  --syntax-token-comment: #CFCFCF;
+  --syntax-token-escape: #61F69D;
+  --syntax-token-constant: #BAF80A;
+  --syntax-token-cdata: #5CC1F9;
+  --syntax-token-delimiter-curly: #FFFFFF;
+  --syntax-token-text: #868FFF;
+}
+
+html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+  height: 100%;
+}

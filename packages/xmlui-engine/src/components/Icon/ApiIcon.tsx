@@ -1,0 +1,1 @@
+import Icon from "./svg/api.svg?react";import type {IconBaseProps} from "./Icon";export const ApiIcon = (props: IconBaseProps) => <Icon {...props}/>

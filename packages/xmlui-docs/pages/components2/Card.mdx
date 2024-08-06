@@ -1,0 +1,253 @@
+# Card
+
+The `Card` component is a container for cohesive elements, often rendered visually as a card.
+
+## Using Card
+
+`Card` is a container; it does not have any explicit properties.
+You can nest the card's content into the `<Card>` tag:
+
+```ueml copy
+<Stack padding="1rem">
+  <Card maxWidth="300px">
+    <HStack verticalAlignment="center" gap="0.5rem">
+      <Icon name="info" />
+      <Text value="Information" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
+</Stack>
+```
+
+<Playground
+  name="Example: using Card"
+  previewOnly
+  app={`
+    <Stack padding="1rem">
+      <Card maxWidth="200px">
+        <HStack verticalAlignment="center" gap="0.5rem">
+          <Icon name="info" />
+          <Text value="Information" variant="strong" />
+        </HStack>
+        <Text value="This is an example text" />
+      </Card>
+    </Stack>
+  `}
+/>
+
+There are also prestyled properties one can make use of, detailed in the [Props section](#props).
+Prestyled elements always appear above other children.
+
+```ueml copy
+<Stack padding="1rem">
+  <Card
+    avatarUrl="https://i.pravatar.cc/100"
+    title="Example Title"
+    subTitle="Predefined subtitle"
+    maxWidth="300px"
+  >
+    <HStack gap="1rem" verticalAlignment="center">
+      <Icon name="info"/>
+      This is a card
+    </HStack>
+  </Card>
+</Stack>
+```
+
+<Playground
+  name="Example: using Card with prestyled elements"
+  previewOnly
+  app={`
+    <Stack padding="1rem">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="Example Title"
+        subTitle="Predefined subtitle"
+        maxWidth="300px"
+      >
+        <HStack gap="1rem" verticalAlignment="center">
+          <Icon name="info"/>
+          This is a card
+        </HStack>
+      </Card>
+    </Stack>
+  `}
+/>
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Props
+
+### `avatarUrl`
+
+This property specifies the URL of the image to display in the avatar.
+
+### `linkTo`
+
+The `linkTo` wraps the title in a `Link` component that is clickable to navigate.
+
+### `showAvatar`
+
+Show the avatar (`true`) or not (`false`).
+If no [`avatarUrl`](#avatarurl) is specified then the Avatar will show the first letters of the [`title`](#title).
+
+Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
+
+```ueml copy /showAvatar="true"/
+<Stack padding="1rem" gap="1rem">
+  <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
+  <Card maxWidth="300px" showAvatar="true" title="Example Card" />
+  <Card maxWidth="300px" showAvatar="true" />
+</Stack>
+```
+
+<Playground
+  name="Example: showAvatar"
+  previewOnly
+  app={`
+    <Stack padding="1rem" gap="1rem">
+      <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
+      <Card maxWidth="300px" showAvatar="true" title="Example Card" />
+      <Card maxWidth="300px" showAvatar="true" />
+    </Stack>
+  `}
+/>
+
+### `subTitle`
+
+This prop sets the prestyled subtitle.
+
+```ueml copy /subTitle="Example Subtitle"/
+<Stack padding="1rem">
+  <Card maxWidth="300px" subTitle="Example Subtitle" />
+</Stack>
+```
+
+<Playground
+  name="Example: subTitle"
+  previewOnly
+  app={`
+    <Stack padding="1rem">
+      <Card maxWidth="300px" subTitle="Example Subtitle" />
+    </Stack>
+  `}
+/>
+
+### `title`
+
+This prop sets the prestyled title.
+
+```ueml copy
+<Stack padding="1rem">
+  <Card maxWidth="300px" title="Example Title" />
+</Stack>
+```
+
+<Playground
+  name="Example: title"
+  previewOnly
+  app={`
+    <Stack padding="1rem">
+      <Card maxWidth="300px" title="Example Title" />
+    </Stack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+### `click`
+
+This event is triggered when the `Card` is clicked.
+
+```ueml copy
+<Stack padding="1rem">
+  <Card maxWidth="300px" onClick="window.alert('Clicked!')">
+    <HStack verticalAlignment="center" gap="0.5rem">
+      <Icon name="info" />
+      <Text value="Information" variant="strong" />
+    </HStack>
+    <Text value="This is an example text" />
+  </Card>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: click"
+  app={`
+    <Stack padding="1rem">
+      <Card maxWidth="300px" onClick="window.alert('Clicked!')">
+        <HStack verticalAlignment="center" gap="0.5rem">
+          <Icon name="info" />
+          <Text value="Information" variant="strong" />
+        </HStack>
+        <Text value="This is an example text" />
+      </Card>
+    </Stack>
+  `}
+/>
+
+## Styling
+
+The `Card` component uses these theme variables to customize its appearance:
+
+- `border-Card`
+- `color-bg-Card`
+- `color-border-Card`
+- `padding-Card`
+- `padding-horizontal-Card`
+- `padding-vertical-Card`
+- `radius-Card`
+- `shadow-Card`
+- `style-border-Card`
+- `thickness-border-Card`
+
+The following theme definition changes the visual appearance of the card:
+
+```json
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-bg-Card": "$color-surface-200",
+    "radius-Card": "4px",
+    "color-border-Card": "$color-surface-600",
+    "thickness-border-Card": "2px",
+    "padding-horizontal-Card": "2rem"
+  }
+}
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  defaultTheme="custom"
+  themes={[{
+    id: "custom",
+    name: "Custom Theme",
+    themeVars: {
+      "color-bg-Card": "$color-surface-200",
+      "radius-Card": "4px",
+      "color-border-Card": "$color-surface-600",
+      "thickness-border-Card": "2px",
+      "padding-horizontal-Card": "2rem"
+    }
+  }]}
+  app={`
+    <Stack padding="1rem">
+      <Card maxWidth="240px">
+        <HStack verticalAlignment="center" gap="0.5rem">
+          <Icon name="info" />
+          <Text value="Information" variant="strong" />
+        </HStack>
+        <Text value="This is an example text" />
+      </Card>
+    </Stack>
+  `}
+/>

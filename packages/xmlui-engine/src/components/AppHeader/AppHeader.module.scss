@@ -1,0 +1,97 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "AppHeader";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- Theme vars for paddings and borders
+$themeVars: t.appendPaddingVars($themeVars, $component) !global;
+$themeVars: t.appendPaddingVars($themeVars, "logo-#{$component}") !global;
+$themeVars: t.appendBorderVars($themeVars, $component) !global;
+
+// --- Other
+$padding-horizontal-AppHeader: createThemeVar("padding-horizontal-#{$component}");
+$width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
+
+.header {
+  position: relative;
+  height: createThemeVar("height-#{$component}");
+  box-sizing: content-box;
+  background-color: createThemeVar("color-bg-AppHeader");
+
+  @include t.borderVars($themeVars, $component);
+}
+
+.headerInner {
+  height: 100%;
+  flex: 1;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  max-width: createThemeVar("max-content-width-AppHeader");
+  padding-inline: $padding-horizontal-AppHeader;
+  padding-top: createThemeVar("padding-vertical-#{$component}");
+  padding-bottom: createThemeVar("padding-vertical-#{$component}");
+
+  &.full {
+    max-width: 100%;
+  }
+  width: 100%;
+  margin: 0 auto;
+}
+
+.childrenWrapper {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  align-items: center;
+}
+
+.logoContainer:not(:empty) {
+  flex-shrink: 0;
+  display: flex;
+  width: $width-logo-AppHeader;
+  height: 100%;
+  align-items: center;
+
+  @include  t.paddingVars($themeVars, "logo-#{$component}");
+}
+
+.rightItems {
+  height: 100%;
+  &:not(:empty) {
+    padding-left: t.$space-4;
+  }
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.appHub {
+  text-decoration: none;
+  margin-right: t.$space-4;
+  width: 40px;
+  padding: t.$space-2;
+  color: t.$color-text-subtitle;
+  cursor: pointer;
+  &:hover {
+    color: t.$color-text-secondary;
+  }
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

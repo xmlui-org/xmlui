@@ -1,0 +1,8 @@
+{
+  "name": "xmlui-root",
+  "version": "1.0.0",
+  "description": "Root folder of XMLUI",
+  "workspaces": [
+    "./packages/*"
+  ]
+}

@@ -1,0 +1,66 @@
+# Page
+
+The `Page` component encapsulates the partial UI to display when the user visits a particular navigation target within the UI. This component is to be used within a `Pages` instance.
+
+## Props
+
+### `url`
+
+This property sets the URL of the content. When the app navigates to the URL, the content of the matching `Page` instance is displayed.
+
+The following example demonstrates using this property:
+
+```ueml copy {8,10,11,13,14,16}
+<App layout="condensed">
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Page 1" to="/page1"/>
+    <NavLink label="Page 2" to="/page2"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/page1">
+      Page 1
+    </Page>
+    <Page url="/page2">
+      Page 2
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: url"
+  height={150}
+  app={`
+    <App layout="condensed">
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavLink label="Page 1" to="/page1"/>
+        <NavLink label="Page 2" to="/page2"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="/page1">
+          Page 1
+        </Page>
+        <Page url="/page2">
+          Page 2
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not provide event handlers to any system or user event.
+
+## Styling
+
+The `Page` component does not support styling.

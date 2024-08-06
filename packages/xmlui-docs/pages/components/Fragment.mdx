@@ -1,0 +1,108 @@
+# Fragment
+
+The `Fragment` component allows you to group components without actually using a container component.
+It can be considered as a pseudo-component,
+since the components inside are actually children of the component one level higher in the component tree.
+
+The `Fragment` is often used in situations where a component expects a single child,
+but you have a list of components and have no wish to wrap them in an actual container.
+
+## Using `Fragment`
+
+```ueml copy
+<Fragment>
+  <H3 value="Item #1" />
+  <H3 value="Item #2" />
+  <H3 value="Item #3" />
+</Fragment>
+```
+
+<Playground
+  name="Example: using Fragment"
+  previewOnly
+  app={`
+  <Fragment>
+    <H3 value="Item #1" />
+    <H3 value="Item #2" />
+    <H3 value="Item #3" />
+  </Fragment>
+  `}
+/>
+
+## Props
+
+This component does not have any properties.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+No theme variables are available for this component.
+
+Note that general component styling (i.e. background color, font size, etc.) is also not available for the `Fragment`:
+
+```ueml copy
+<Fragment>
+  "Fragment Grouping"
+  <Fragment backgroundColor="pink">
+    <H3 value="Item #1" />
+    <H3 value="Item #2" />
+    <H3 value="Item #3" />
+  </Fragment>
+  "Regular Container"
+  <Stack backgroundColor="pink">
+    <H3 value="Item #1" />
+    <H3 value="Item #2" />
+    <H3 value="Item #3" />
+  </Stack>    
+</Fragment>
+```
+
+<Playground
+  name="Example: styling Fragment"
+  previewOnly
+  app={`
+  <Fragment>
+    "Fragment Grouping"
+    <Fragment backgroundColor="pink">
+      <H3 value="Item #1" />
+      <H3 value="Item #2" />
+      <H3 value="Item #3" />
+    </Fragment>
+    "Regular Container"
+    <Stack backgroundColor="pink">
+      <H3 value="Item #1" />
+      <H3 value="Item #2" />
+      <H3 value="Item #3" />
+    </Stack>    
+  </Fragment>
+  `}
+/>
+
+However, styling the parent of the `Fragment` affects its children:
+
+```ueml copy
+<Stack backgroundColor="pink" gap="1rem">
+  <Fragment>
+    <H3 value="Item #1" />
+    <H3 value="Item #2" />
+    <H3 value="Item #3" />
+  </Fragment>
+</Stack>
+```
+
+<Playground
+  name="Example: using Fragment"
+  previewOnly
+  app={`
+  <Stack backgroundColor="pink" gap="1rem">
+    <Fragment>
+      <H3 value="Item #1" />
+      <H3 value="Item #2" />
+      <H3 value="Item #3" />
+    </Fragment>
+  </Stack>
+  `}
+/>

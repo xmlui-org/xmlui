@@ -1,0 +1,12 @@
+<VStack gap=".4rem">
+  <HStack>
+    <Stack width="20%" height="36px" backgroundColor="red" />
+    <Stack width="60%" height="36px" backgroundColor="green" />
+    <Stack width="20%" height="36px" backgroundColor="blue" />
+  </HStack>
+  <HStack gap="1rem">
+    <Stack width="20%" height="36px" backgroundColor="red" />
+    <Stack width="33.3%" height="36px" backgroundColor="green" />
+    <Stack width="20%" height="36px" backgroundColor="blue" />
+  </HStack>
+</VStack>

@@ -1,0 +1,1 @@
+import Icon from "./svg/expression.svg?react";import type {IconBaseProps} from "./Icon";export const ExpressionIcon = (props: IconBaseProps) => <Icon {...props}/>

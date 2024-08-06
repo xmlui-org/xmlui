@@ -1,0 +1,187 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$radius-NavLink: createThemeVar("radius-NavLink");
+$color-bg-NavLink: createThemeVar("color-bg-NavLink");
+$color-bg-NavLink--hover: createThemeVar("color-bg-NavLink--hover");
+$color-bg-NavLink--hover--active: createThemeVar("color-bg-NavLink--hover--active");
+$color-bg-NavLink--active: createThemeVar("color-bg-NavLink--active");
+$color-bg-NavLink--pressed: createThemeVar("color-bg-NavLink--pressed");
+$color-bg-NavLink--pressed--active: createThemeVar("color-bg-NavLink--pressed--active");
+$padding-horizontal-NavLink: createThemeVar("padding-horizontal-NavLink");
+$padding-vertical-NavLink: createThemeVar("padding-vertical-NavLink");
+$font-size-NavLink: createThemeVar("font-size-NavLink");
+$color-text-NavLink: createThemeVar("color-text-NavLink");
+$color-text-NavLink--hover: createThemeVar("color-text-NavLink--hover");
+$color-text-NavLink--active: createThemeVar("color-text-NavLink--active");
+$color-text-NavLink--hover--active: createThemeVar("color-text-NavLink--hover--active");
+$color-text-NavLink--pressed: createThemeVar("color-text-NavLink--pressed");
+$color-text-NavLink--pressed--active: createThemeVar("color-text-NavLink--pressed--active");
+$color-icon-NavLink: createThemeVar("color-icon-NavLink");
+$font-weight-NavLink: createThemeVar("font-weight-NavLink");
+$font-weight-NavLink--pressed: createThemeVar("font-weight-NavLink--pressed");
+$font-weight-NavLink--active: createThemeVar("font-weight-NavLink--active");
+$radius-indicator-NavLink: createThemeVar("radius-indicator-NavLink");
+$thickness-indicator-NavLink: createThemeVar("thickness-indicator-NavLink");
+$color-indicator-NavLink: createThemeVar("color-indicator-NavLink");
+$color-indicator-NavLink--hover: createThemeVar("color-indicator-NavLink--hover");
+$color-indicator-NavLink--active: createThemeVar("color-indicator-NavLink--active");
+$color-indicator-NavLink--pressed: createThemeVar("color-indicator-NavLink--pressed");
+
+$transition: color 0.1s, background-color 0.1s;
+
+.base {
+  // --- These padding properties are intentionally kept separated. Do not collapse them!
+  padding: $padding-vertical-NavLink $padding-horizontal-NavLink;
+  //t.useVar($padding-all-navLink, t.$space-2 t.$space-4);
+  border: none;
+  outline: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  font-size: $font-size-NavLink;
+  font-weight: $font-weight-NavLink;
+  position: relative;
+  transition: $transition;
+  border-radius: $radius-NavLink;
+  color: $color-text-NavLink;
+  background-color: $color-bg-NavLink;
+  flex-shrink: 0;
+  white-space: nowrap;
+
+  .icon {
+    color: $color-icon-NavLink;
+  }
+
+  * {
+    color: $color-text-NavLink;
+  }
+
+  &.includeHoverIndicator {
+    &:after {
+      transition: $transition;
+      position: absolute;
+      left: 0.1em;
+      right: 0.1em;
+      bottom: 0;
+      height: $thickness-indicator-NavLink;
+      border-radius: $radius-indicator-NavLink;
+      background-color: $color-indicator-NavLink;
+      content: "";
+    }
+  }
+
+  &:hover.displayActive,
+  &:focus-visible {
+    color: $color-text-NavLink--hover;
+    background-color: $color-bg-NavLink--hover;
+    * {
+      color: $color-text-NavLink--hover;
+    }
+    &:after {
+      background-color: $color-indicator-NavLink--hover;
+    }
+  }
+
+
+  &:focus-visible{
+    outline-width: createThemeVar('thickness-outline-NavLink--focus');
+    outline-color: createThemeVar('color-outline-NavLink--focus');
+    outline-style: createThemeVar('style-outline-NavLink--focus');
+    outline-offset: createThemeVar('offset-outline-NavLink--focus');
+  }
+
+  &[role='menuitem']{           //e.g. inside a navGroup, for hover it focuses the item, so it's always visible, that's why we have this selector here
+    outline: none;
+    &:not(:hover):focus-visible{
+      outline-width: createThemeVar('thickness-outline-NavLink--focus');
+      outline-color: createThemeVar('color-outline-NavLink--focus');
+      outline-style: createThemeVar('style-outline-NavLink--focus');
+      outline-offset: createThemeVar('offset-outline-NavLink--focus');
+    }
+  }
+
+  &:active.displayActive {
+    color: $color-text-NavLink--pressed;
+    background-color: $color-bg-NavLink--pressed;
+    font-weight: $font-weight-NavLink--pressed;
+    * {
+      font-weight: $font-weight-NavLink--pressed;
+      color: $color-text-NavLink--pressed;
+    }
+    &:after {
+      background-color: $color-indicator-NavLink--pressed;
+    }
+  }
+
+  &.navItemActive {
+    color: $color-text-NavLink--active;
+    background-color: $color-bg-NavLink--active;
+    * {
+      font-weight: $font-weight-NavLink--active;
+      color: $color-text-NavLink--active;
+    }
+    & > * {
+      z-index: 1;
+    }
+    &:hover {
+      color: $color-text-NavLink--hover--active;
+      background-color: $color-bg-NavLink--hover--active;
+      * {
+        color: $color-text-NavLink--hover--active;
+      }
+    }
+    &:after {
+      z-index: 0;
+      background-color: $color-indicator-NavLink--active;
+    }
+
+    &:active {
+      color: $color-text-NavLink--pressed--active;
+      background-color: $color-bg-NavLink--pressed--active;
+      font-weight: $font-weight-NavLink--pressed;
+      * {
+        font-weight: $font-weight-NavLink--pressed;
+        color: $color-text-NavLink--pressed--active;
+      }
+      &:after {
+        background-color: $color-indicator-NavLink--pressed;
+      }
+    }
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    color: t.$color-text--disabled;
+  }
+
+  &.vertical {
+    &:after {
+      top: 0;
+      bottom: 0;
+      left: 0;
+      right: auto;
+      width: $thickness-indicator-NavLink;
+      height: auto;
+      border-radius: $radius-indicator-NavLink;
+    }
+  }
+
+  &.indented {
+    padding-left: 2.4em;
+    flex-shrink: 0;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

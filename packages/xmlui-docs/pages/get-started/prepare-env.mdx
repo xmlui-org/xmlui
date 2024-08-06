@@ -1,0 +1,59 @@
+# Prepare the Environment
+
+> **Note**: When XMLUI is publicly released, it will be immediately available in the npmjs.org package registry, and the steps described here will be unnecessary.
+
+The fundamental packages of this tutorial, `@nsoftware-com/xmlui` and `@nsoftware-com/create-xmlui-app` are released to the private GitHub registry of /n software. You have to set up a GitHub access token and add a few settings to your computer to use this private registry as a source of NPM packages.
+
+## Creating a GitHub Access Token
+
+You must have a GitHub account bound to the nsoftware-com organization in GitHub. If you do not have an account, sign up to GitHub by visiting https://github.com/. Ask the administrator to add you if you are not bound to the nsoftware-com organization.
+
+When you have an appropriate GitHub account, you can create an access token with these steps:
+
+1. Login to GitHub
+2. Click your profile photo in the upper-right corner of any page, then click **Settings**.
+3. In the left sidebar, click **Developer settings**.
+4. Click **Personal access tokens | Tokens (classic)**.
+5. Click **Generate new token | Generate new token (classic)**.
+6. GitHub may ask you to confirm your password.
+7. Under Token name, enter a name for the token.
+8. Under Expiration, select an expiration for the token.
+9. Optionally, under Description, add a note describing the token's purpose.
+10. In the **Select Scopes** section, check the **read:packages** flag (under **write:packages**). You need this permission to read the private NPM repository.
+11. Click **Generate token**.
+
+If you selected an organization as the resource owner and the organization requires approval for fine-grained personal access tokens. Your token will be marked as pending until an organization administrator reviews it. Your token will only be able to read public resources until it is approved. If you are an owner of the organization, your request is automatically approved.
+
+GitHub will show your generated access token only once. **Copy it to the clipboard and save it, for you will need it in the next step**. When you visit your personal tokens next time, you will see the new token listed with its name; however, you won't be able to see its contents.
+
+## Configuring Private NPM Repo Access
+
+You must set up and configure your environment to let the NPM-related commands access the nsoftware-com private repository to find packages:
+
+1. Create an `.npmrc` file in the root of your home (user) folder. If this file exists, use the existing file. Add or append this content to the file:
+
+```
+@nsoftware-com:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken={YOUR_TOKEN}
+```
+
+> **Note**: Check this article to find your home directory on the operating system you use for developing your XMLUI app: [Home directory](https://en.wikipedia.org/wiki/Home_directory)
+
+2. Replace "\{YOUR_TOKEN}" with the GitHub access token you created in the previous step.
+
+> **Note**: Should you forget to save the token, visit the list of personal tokens in GitHub, select the newly created one, and click **Regenerate token**. Take o note of the new value; use it instead of "\{YOUR_TOKEN}".
+
+## Testing the NPM Repo Access
+
+After the configuration, you can check the environment setup with these steps:
+
+1. Start a command prompt and select a working folder within your home (user) folder.
+2. Execute this command:
+
+```
+npx @nsoftware-com/create-xmlui-app
+```
+
+3. When the utility starts, it displays an `Ok to proceed? (y)` question. Press Enter.
+4. The `npx` utility installs the `@nsoftware-com/create-xmlui-app` and immediately starts it.
+5. The utility displays a `What is your project named?` question. If you are here, the NPM repo success is successful. Press Ctrl+C to terminate the utility.

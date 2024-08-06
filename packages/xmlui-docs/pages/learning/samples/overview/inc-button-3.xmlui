@@ -1,0 +1,6 @@
+<Component name="IncButton">
+  <Button label="Click to increment: {count}">
+    <var name=count value={0} />
+    <event name=click value="count++; $events.incremented(count)" />
+  </Button>
+</Component>

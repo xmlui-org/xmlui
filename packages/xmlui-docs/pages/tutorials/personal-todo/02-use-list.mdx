@@ -1,0 +1,232 @@
+
+# Display Data in a List
+
+At the end of the previous article, you fetched data from the emulated backend and displayed it as a JSON structure to test the backend. In this article, you will learn how to use data-aware components to display data.
+
+## Using a Data Source
+
+With XMLUI, fetching data from a REST API is straightforward. Many components have a `datasource` property, which accepts a URL pointing to the API retrieving data. These components manage all aspects of the fetch operation.
+
+Replace the `Page` tag with the `/tasks` URL to use the following contents:
+
+```ueml copy {3} filename="Main.xmlui"
+<!-- Omitted -->
+<Page url="/tasks">
+  <List datasource="/api/tasks" />
+</Page>
+<!-- Omitted -->
+```
+
+If the app is not running yet, run it with `npm start` and open the URL displayed in the console. The code snipped you have just added displays some task data when you click the `To Dos` menu:
+
+> **Note**: The development environment uses the hot module reloading (HMR) feature. When changing the part of the app that communicates with the emulated backend, HMR may display error messages in a toast. In such a case, ignore those messages and refresh the browser page.
+
+<br/>
+<Image alt="Default task list" src="/resources/images/get-started/default-task-list.png" />
+
+The `List` component does not know anything about the semantics and structure of the data. Unless you provide some hints (or a sophisticated description) of the UI to display a particular data item, `List` will display a simple layout selecting a field as a title and another as a subtitle.
+
+The default layout is excellent for experimenting, but in a current application, you need better UX.
+
+## Customizing the List
+
+The list component is versatile and provides several services, making it easy to customize the layout. In this section, you will change the outlook of list items. Before doing so, let's check the task data structure stored in the backend. A task record has these fields (columns):
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | number | The unique identifier of the task |
+| `title` | string | The short title of the task |
+| `topicId` | number | The identifier of the topic the task belongs to |
+| `description` | string | The detailed description of the task |
+| `createdDate` | string | The creation date of the task |
+| `dueDate` | string | The due date of the task |
+| `completed` | boolean | The completion status of the task |
+| `completedDate` | string | The completion date of the task |
+| `assignedTo` | number | The ID of the person this task is assigned to |
+
+The default display of the list uses the `title` and then `topicId` fields. If you do not like the default view of an item, you can modify the template used to show a particular item. Modify the `List` component's definition to use a different template:
+
+```ueml copy {3-5} filename="Main.xmlui"
+<!-- Omitted -->
+<List datasource="/api/tasks">
+  <prop name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.description}" />
+  </prop>
+</List>
+<!-- Omitted -->
+```
+
+<br/>
+<Image alt="Template with Card" src="/resources/images/get-started/template-with-card.png" />
+
+The code utilizes the `Card` component, a simple container to display cohesive data, such as record fields. This component has a predefined layout we can leverage through the `title` and `subTitle` fields. Take note of the `$item` identifier; it represents the current item the template should display. So `$item.title` and `$item.subTitle` are the fields of the current item.
+
+## Adding and Formatting Fields
+
+Let's change the layout of the items to something more attractive and helpful. Modify the `itemTemplate` as in the following code snippet:
+
+```ueml copy {4-15} filename="Main.xmlui"
+<!-- Omitted -->
+<List datasource="/api/tasks">
+  <prop name="itemTemplate">
+    <Card>
+      <HStack gap="$space-4" verticalAlignment="center">
+        <Checkbox id="completedSelector" initialValue="{$item.completed}" />
+        <VStack width="*">
+          <Text variant="strong">{$item.title}</Text>
+          <Text>{$item.description}</Text>
+        </VStack>
+        <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
+          <Text>{smartFormatDate($item.dueDate)}</Text>
+        </HStack>
+      </HStack>
+    </Card>
+  </prop>
+</List>
+<!-- Omitted -->
+```
+
+Here, you add a checkbox indicating the completeness of a particular item. You align the item's title and description in a column with two rows and display the `dueDate` field aligned right in the item's row:
+
+<br/>
+<Image alt="Test API" src="/resources/images/get-started/detailed-template.png" />
+
+> **Note**: The code leverages several `HStack` (horizontal stack) and `VStack` (vertical stack) component instances to establish the layout. You can learn more about them in the [Layout Components](/learning/using-components/layout-components) article.
+
+## Extracting a Reusable component
+
+The item template of a task row is getting bigger and bigger. In the future, you will extend this template by displaying other task properties and adding a context menu to initiate task-related actions. The template is within the `Main.xmlui` file, and as it will involve more functionality, that file will be crowded and lose its easy-to-read nature.
+
+It is the best time to extract the item template of the list into a separate component. With the following steps, you will refactor the app:
+
+1. Create a new file, `TaskRow.xmlui`, in the `components` folder within `src.` By convention, custom components created within the app go into the `components` folder.
+2. Type this code into `TaskRow.xmlui` to declare a reusable component:
+
+```ueml copy filename="TaskRow.xmlui"
+<Component name="TaskRow">
+</Component>
+```
+
+3. Move the item template from the `Main.xmlui` file to the `TaskRow.xmlui` file:
+
+```ueml copy {2-13} filename="TaskRow.xmlui"
+<Component name="TaskRow">
+  <Card>
+    <HStack gap="$space-4" verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$item.completed}" />
+      <VStack width="*">
+        <Text variant="strong">{$item.title}</Text>
+        <Text>{$item.description}</Text>
+      </VStack>
+      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
+        <Text>{smartFormatDate($item.dueDate)}</Text>
+      </HStack>
+    </HStack>
+  </Card>
+</Component>
+```
+
+4. Go back to the `Main.xmlui` file and replace the item template with the new `TaskRow` component:
+
+```ueml copy filename="Main.xmlui"
+<!-- Omitted -->
+<List datasource="/api/tasks">
+  <prop name="itemTemplate">
+    <TaskRow item="{$item}" />
+  </prop>
+</List>
+<!-- Omitted -->
+```
+
+We still need to finish. The last code snippet passed the item to display (`$item`)  to the `TaskRow` component. However, `TaksRow` does not use this data. Go back to `TaskRow.xmlui`, and replace all occurrences of `$item` there to `$props.item`. This change instructs the component to use the value passed in its `item` property instead of `$item` (as `$item` does not have a valid meaning within the component):
+
+```ueml copy /$props.item/ filename="TaskRow.xmlui"
+<Component name="TaskRow">
+  <Card>
+    <HStack gap="$space-4" verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$props.item.completed}" />
+      <VStack width="*">
+        <Text variant="strong">{$props.item.title}</Text>
+        <Text>{$props.item.description}</Text>
+      </VStack>
+      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
+        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      </HStack>
+    </HStack>
+  </Card>
+</Component>
+```
+
+The app should work as before; however, now, it uses an extracted component.
+
+## Adding a Badge
+
+In the app's database, each task can be assigned a category. The available categories are stored in the database, each topic with this structure:
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `id` | number | The unique identifier of the topic |
+| `name` | string | The name of the topic |
+| `color` | string | The color of the topic |
+
+XMLUI has a `Badge` component that can be set up to use a color map (name and color pairs). When you pass a value to a `Bagde`, it uses the color map to set up the component's background. In this section, you will add a `Badge` displaying the topic associated with a particular task:
+
+1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List`; identify it as `topics. You can refer to the fetched value with `topics.value`; pass it to `TaskRow` in the `topicsList` property. This `Datasource` component will fetch all topic data from the backend. XMLUI will know when this request should be fired to fetch the data. Update the `TaskRow` component by setting the `topics` property:
+
+```ueml copy {2, 5} filename="Main.xmlui"
+<Page url="/tasks">
+  <Datasource id="topics" url="/api/topics" />
+  <List datasource="/api/tasks">
+    <prop name="itemTemplate">
+      <TaskRow item="{$item}" topics="{topics.value}" />
+    </prop>
+  </List>
+</Page>
+```
+
+2. Create a new `TaskRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `TaskRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `TaskRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
+
+```javascript copy filename="TaskRow.xmlui.xs"
+// Topic record of the item
+var topic = $props.topics.find(t => t.id === $props.item.topicId);
+
+// Create a color map for all topics
+var topicsColorMap = $props.topics.reduce((acc, topic) => {
+  return {...acc, [topic.name]:  topic.color };
+}, {});
+```
+
+- The `topic` variable contains the topic record associated with the item. The variable has an undefined value if the item does not have a topic.
+- The `topicsColorMap` variable converts the list of topic records into a hash object (using the same semantics as JavaScript) with the topic name and color value pairs.
+
+3. Add a `Badge` component to the `TaskRow` definition and wire it up with the current item:
+
+```ueml copy {10} filename="TaskRow.xmlui"
+<Component name="TaskRow">
+  <Card>
+    <HStack gap="$space-4" verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$props.item.completed}" />
+      <VStack width="*">
+        <Text variant="strong">{$props.item.title}</Text>
+        <Text>{$props.item.description}</Text>
+      </VStack>
+      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
+        <Badge when="{topic}" value="{topic.name}" colorMap="{topicsColorMap}"/>
+        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      </HStack>
+    </HStack>
+  </Card>
+</Component>
+```
+
+- `when` is a Boolean property influencing when the component should be rendered (and displayed). If there is no topic associated with a particular task, the badge is not displayed.
+- `value` means the text to display in the badge; it is set to the topic's name.
+- `colormap` declares the mapping of values to background colors.
+
+Now, running the app will display the topics of task items:
+
+<br/>
+<Image alt="Badges" src="/resources/images/get-started/items-and-badges.png" />
+
+In the following article, you will learn to display filtered data.
+

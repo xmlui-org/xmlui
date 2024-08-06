@@ -1,0 +1,14 @@
+<Component name="TodoItems">
+  <List maxHeight="300" items="{$props.items}" borderTop="$items-border">
+    <prop name="itemTemplate">
+      <HStack verticalAlignment="center" gap="1rem" width="100%"
+              padding="$container-padding" borderBottom="$items-border">
+        <Checkbox initialValue="{$item.checked}" onDidChange="$events.checkItem($item.id)" />
+        <Text value="{$item.value}" fontSize="24" color="{$item.checked ? '$secondary-text-color' : undefined}" />
+        <SpaceFiller />
+        <Button size="xs" variant="ghost" themeColor="secondary" icon="close"
+                width="22" padding="0" onClick="$events.removeItem($item.id)" />
+      </HStack>
+    </prop>
+  </List>
+</Component>

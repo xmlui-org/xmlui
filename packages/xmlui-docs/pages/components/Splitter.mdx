@@ -1,0 +1,262 @@
+# Splitter
+
+A `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
+These sections are identified by their name: the primary and secondary section.
+The sections are divided by a draggable and stylable divider.
+
+See also: [HSplitter](./HSplitter), [VSplitter](./VSplitter).
+
+## Props
+
+Most properties of the `Splitter` focus on the primary section, such as sizing.
+
+### `floating`
+
+Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged.
+The default value is `false`, so the resizer is visible.
+
+```ueml copy /floating="true"/
+<Splitter height="100%" floating="true">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: floating"
+  app={`
+  <Splitter height="100%" floating="true">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `initialPrimarySize`
+
+This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
+
+```ueml copy /initialPrimarySize="40%"/
+<Splitter height="100%" initialPrimarySize="40%">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: initialPrimarySize"
+  app={`
+  <Splitter height="100%" initialPrimarySize="40%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `maxPrimarySize`
+
+This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
+
+```ueml copy /maxPrimarySize="80%"/
+<Splitter height="100%" maxPrimarySize="80%">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: maxPrimarySize"
+  app={`
+  <Splitter height="100%" maxPrimarySize="80%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `minPrimarySize`
+
+This property sets the minimum size the primary section can have.
+
+```ueml copy /minPrimarySize="40px"/
+<Splitter height="100%" minPrimarySize="40px">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: minPrimarySize"
+  app={`
+  <Splitter height="100%" minPrimarySize="40px">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `orientation`
+
+Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`),
+or vertically by placing the sections next to each other (`horizontal`).
+The default value is `vertical`.
+
+```ueml copy /orientation="horizontal"/
+<Splitter height="100%" orientation="horizontal">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: orientation"
+  app={`
+  <Splitter height="100%" orientation="horizontal">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `splitterTemplate`
+
+The divider can be customized using XMLUI components via this property.
+
+```ueml copy {2-4}
+<Splitter height="100%">
+  <prop name="splitterTemplate">
+    <ContentSeparator backgroundColor="green" height="4px" />
+  </prop>
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: splitterTemplate"
+  app={`
+  <Splitter height="100%">
+    <prop name="splitterTemplate">
+      <ContentSeparator backgroundColor="green" height="4px" />
+    </prop>
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+### `swapped`
+
+This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
+
+```ueml copy /swapped="true"/
+<Splitter height="100%" swapped="true">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={150}
+  name="Example: swapped"
+  app={`
+  <Splitter height="100%" swapped="true">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+`}
+/>
+
+## Events
+
+### resize
+
+This event fires when the component is resized.
+(Fired when? at the start, during the whole time or when mouse button is released?)
+
+```ueml copy
+<Splitter height="100%" onResize="console.log('resized')">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</Splitter>
+```
+
+<Playground
+  previewOnly
+  height={200}
+  name="Example: resize"
+  app={`
+  <Stack height="100%" var.counter="{0}">
+    <Splitter onResize="counter++">
+      <Stack backgroundColor="lightblue" height="100%">
+        <Text value="Resize event called {counter} number of times" />
+      </Stack>
+      <Stack backgroundColor="darksalmon" height="100%" />
+    </Splitter>
+  </Stack>
+`}
+/>
+
+## Styling
+
+The `Splitter` component provides these theme variables for appearance customization:
+
+- `border-Splitter`
+- `color-bg-Splitter`
+- `color-bg-resizer-Splitter`
+- `color-border-Splitter`
+- `cursor-resizer-horizontal-Splitter`
+- `cursor-resizer-vertical-Splitter`
+- `padding-Splitter`
+- `radius-Splitter`
+- `shadow-Splitter`
+- `style-border-Splitter`
+- `thickness-border-Splitter`
+- `thickness-resizer-Splitter`
+
+```json copy
+"cursor-resizer-horizontal-Splitter": "grab",
+"cursor-resizer-vertical-Splitter": "grab",
+"thickness-resizer-Splitter": "4px",
+"color-bg-resizer-Splitter": "#2319e0"
+```
+
+<Playground
+  previewOnly
+  name="Example: styling"
+  height={150}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "cursor-resizer-horizontal-Splitter": "grab",
+        "cursor-resizer-vertical-Splitter": "grab",
+        "thickness-resizer-Splitter": "4px",
+        "color-bg-resizer-Splitter": "#2319e0"
+      },
+    },
+  ]}
+  app={`
+  <Splitter height="100%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+  `}
+/>
+
+

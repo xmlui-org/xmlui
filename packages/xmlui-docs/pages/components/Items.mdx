@@ -1,0 +1,129 @@
+# Items
+
+The `Items` component maps sequential data items into component instances, representing each data item as a particular component following the items' sequence.
+
+> **Note**: `Items` is not a container! It does not wrap its items into a container; it renders the affected elements.
+
+## Using `Items`
+
+The `Items` component does not use virtualization; it maps each data item into a component. Thus, passing many items to a component instance will use many resources and slow your app.
+If you plan to work with many items (more than a few dozen), use the [`List`](./List) and [`Table`](./Table) components.
+
+### Inline Data
+
+You can set the list of data entries to render through the `items` property, as the following sample shows. The nested child component defines a template to display each data entry conveyed by `items`: In the template, you can refer to the particular entry with the `$item` identifier:
+
+```ueml copy
+<VStack padding="1rem" gap="0.5rem">
+  <Items items="{[
+      { idx: 1, value: 'One lion' },
+      { idx: 2, value: 'Two monkeys' },
+      { idx: 3, value: 'Three rabbits' },
+    ]}">
+    <Text>{$item.idx} - {$item.value}</Text>
+  </Items>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: inline data"
+  app={`
+    <VStack padding="1rem" gap="0.5rem">
+      <Items items="{[
+        { idx: 1, value: 'One lion' },
+        { idx: 2, value: 'Two monkeys' },
+        { idx: 3, value: 'Three rabbits' },
+      ]}">
+        <Text>{$item.idx} - {$item.value}</Text>
+      </Items>
+    </VStack>
+  `}
+  height={120}
+/>
+
+### Data Binding
+
+You can use API binding to get the data to display with `Items`:
+
+```ueml
+<VStack padding="1rem" gap="0.5rem">
+  <Items>
+    <prop name="items">
+      <ApiBinding url="https://api.spacexdata.com/v3/rockets"/>
+    </prop>
+    <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
+  </Items>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: inline data"
+  app={`
+    <VStack padding="1rem" gap="0.5rem">
+      <Items>
+        <prop name="items">
+          <ApiBinding url="https://api.spacexdata.com/v3/rockets"/>
+        </prop>
+        <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
+      </Items>
+    </VStack>
+  `}
+  height={380}
+/>
+
+## Context Variables
+
+### `$item`
+
+This property represents the value of the current iteration item.
+
+## Props
+
+### `items`
+
+This property holds a list of data items this component renders.
+
+### `reverse`
+
+This property indicates that the data items should be rendered in reverse order.
+
+```ueml copy
+<VStack padding="1rem" gap="0.5rem">
+  <Items items="{[
+    { idx: 1, value: 'One lion' },
+    { idx: 2, value: 'Two monkeys' },
+    { idx: 3, value: 'Three rabbits' },
+    ]}" 
+    reverse="true">
+    <Text>{$item.idx} - {$item.value}</Text>
+  </Items>
+</VStack>
+```
+
+<Playground
+    previewOnly
+    name="Example: inline data"
+    app={`
+    <VStack padding="1rem" gap="0.5rem">
+      <Items items="{[
+        { idx: 1, value: 'One lion' },
+        { idx: 2, value: 'Two monkeys' },
+        { idx: 3, value: 'Three rabbits' },
+        ]}" 
+        reverse="true">
+        <Text>{$item.idx} - {$item.value}</Text>
+      </Items>
+    </VStack>
+  `}
+    height={120}
+/>
+
+## Events
+
+This component does not provide event handlers to any system or user event.
+
+## Styling
+
+The `Items` component does not support styling. You should style the container component you use to wrap `Items`, and you can also style the individual items.

@@ -1,0 +1,188 @@
+# Global Functions and Variables
+
+XMLUI offers dozens of global functions and properties for use in XMLScript code. This document provides a detailed description of them.
+
+## Date Utilities
+
+### `formatDate`
+
+```ts
+function formatDate(date: string | Date): string;
+```
+
+Format the specified value's date part into a local date string (according to the machine's local settings).
+
+### `formatDateTime`
+
+```ts
+function formatDateTime(date: string | Date): string;
+```
+
+Format the specified value part into a local date and time string (according to the machine's local settings).
+
+### `formatDateWithoutYear`
+
+```ts
+function formatDateWithoutYear(date: string | Date): string;
+```
+
+Format the specified value's date part (without year) into a local date string (according to the machine's local settings).
+
+### `formatTime`
+
+```ts
+function formatTime(date: string | Date): string;
+```
+
+Format the specified value's time part into a local date string (according to the machine's local settings).
+
+### `formatTimeWithoutSeconds`
+
+```ts
+function formatTimeWithoutSeconds(date: string | Date): string;
+```
+
+Format the specified value's time part (without seconds) into a local date string (according to the machine's local settings).
+
+### `getDate`
+
+```ts
+function function getDate(date?: string | number | Date): Date;
+```
+
+Create a date from the specified input value. If no input is provided, return the current date and time.
+
+### `getDateUntilNow`
+
+```ts
+function function getDateUntilNow(date?: string | number | Date): string;
+```
+
+Calculates the difference between the current date and the provided one and returns it in a human-readable form, such as "1 month", "2 weeks", etc.
+
+### `isoDateString`
+
+```ts
+function isoDateString(date?: string): string;
+```
+
+This function converts the input string into a date value and returns the ISO 8601 string representation of the date. It can pass dates between the UI and backend APIs in a standard format.
+
+### `isToday`
+
+```ts
+function isToday(date?: string | number | Date): boolean;
+```
+
+This function checks if the specified date is today.
+
+### `isTomorrow`
+
+```ts
+function isTomorrow(date?: string | number | Date): boolean;
+```
+
+This function checks if the specified date is tomorrow.
+
+### `isYesterday`
+
+```ts
+function isYesterday(date?: string | number | Date): boolean;
+```
+
+This function checks if the specified date is yesterday.
+
+### `smartFormatDate`
+
+```ts
+function function smartFormatDateTime(date?: string | number | Date): string;
+```
+
+This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDate` would. Special values returned:
+- No date value provided: "-"
+- The date is today: returns only the date value with `formatDate`
+- The date is this week: return the relative time difference, such as "last Monday"
+
+### `smartFormatDateTime`
+
+```ts
+function function smartFormatDateTime(date?: string | number | Date): string;
+```
+
+This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDateTime` would. Special values returned:
+- No date value provided: "-"
+- The date is today: returns only the time value with `formatTime`
+- The date is this week: return the relative time difference, such as "last Monday at 2:00 AM"
+
+## File Utilities
+
+### `formatFileSizeInBytes`
+
+```ts
+function formatFileSizeInBytes(size?: number): string;
+```
+
+Returns the specified file size in a compact form, such as "112 B", "2.0 KiB", "23.4 KiB", "2.3 MiB", etc.
+
+### `getFileExtension`
+
+```ts
+function getFileExtension(filename: string, mimetype?: string): string;
+```
+
+Returns the type of the specified file. 
+- If only `filename` is specified, return the extension inferred from the file name. 
+- If only `mime-type` is specified, it returns the type inferred from the type name.
+- If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
+- Otherwise, it returns undefined.
+
+## Various Functions
+
+### `capitalize`
+
+```ts
+function capitalize(string?: string): string;
+```
+
+Converts the first character of string to upper case and the remaining to lower case.
+
+### `confirm`
+
+```ts
+function confirm(message: string): boolean;
+```
+
+Instructs the browser to display a dialog with an optional message, and to wait until the user either confirms or cancels the dialog. It returns a boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
+
+### `defaultTo`
+
+```ts
+function defaultTo(value: any, defaultValue: any): any;
+```
+
+Provides a fallback value (`defaultValue`) if the specified `value` is null or undefined.
+
+### `handleError`
+
+```ts
+function handleError(errorObj: any): void;
+```
+
+Displays an error toast with a message. If the provided `errorObj` is a string, it uses it as a message; otherwise, it displays "Something went wrong."
+
+### `navigate`
+
+```ts
+function navigate(url: string): void;
+```
+
+Navigate to the specified URL.
+
+### `pluralize`
+
+```ts
+function pluralize(value: number, singular: string, plural: string);
+```
+
+When the value is equal to one, returns `singular`; otherwise, `plural.`
+

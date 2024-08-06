@@ -1,0 +1,34 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "Footer";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- Theme vars for paddings
+$themeVars: t.appendPaddingVars($themeVars, $component) !global;
+
+// --- Other theme vars
+$color-bg-Footer: createThemeVar("color-bg-#{$component}");
+
+.wrapper {
+  width: 100%;
+  display: flex;
+  min-height: 0;
+  height: createThemeVar("height-#{$component}");
+  flex-direction: row;
+  padding: createThemeVar("padding-#{$component}");
+  background-color: $color-bg-Footer;
+  font-size: createThemeVar("font-size-#{$component}");
+  align-items: createThemeVar("vertical-alignment-#{$component}");
+  max-width: createThemeVar("max-content-width-Footer");
+  margin: 0 auto;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

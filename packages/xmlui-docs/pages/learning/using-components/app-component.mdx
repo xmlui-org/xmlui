@@ -1,0 +1,792 @@
+import xmluiLogo from "./samples/xmlui-logo.svg";
+import horizontal from "./samples/horizontal.xmlui";
+import horizontalSticky from "./samples/horizontal-sticky.xmlui";
+import condensed from "./samples/condensed.xmlui";
+import condensedSticky from "./samples/condensed-sticky.xmlui";
+import vertical from "./samples/vertical.xmlui";
+import verticalSticky from "./samples/vertical-sticky.xmlui";
+import verticalFullHeader from "./samples/vertical-full-header.xmlui";
+
+# The App Component
+
+XMLUI has a component, `App`, which gives you a flying start when creating a new application. With `App`, your application immediately has a boilerplate for your app's essential UI parts, including headers, navigation, content, and others.
+
+Instead of starting with a fixed layout, you can choose from a set of predefined ones. Moreover, you can change the app layout run time or through configuration. `App` provides several scroll strategies (according to the selected layout) and a responsive layout according to the available viewport width.
+
+## Layout Placeholders
+
+The `App` component creates its layout by combining several components into an integrated UI. You can provide these constituent parts (each of them is optional) to let `App` organize them:
+
+- Logo
+- Application header
+- Navigation panel
+- Navigation-aware main content panel
+- Footer
+
+In the markup, `App` has placeholders to define the particular parts of the UI:
+
+```ueml copy
+<App>
+  <AppHeader>
+    <!-- Here comes the header -->
+  </AppHeader>
+  <NavPanel>
+    <!-- Define the app's navigation menu here -->
+  </NavPanel>
+  <Pages>
+    <!-- Define the navigation-aware content here -->
+  </Pages>
+  <Footer>
+    <!-- This is a placeholder for the footer -->
+  </Footer>
+  <!-- Any other content to render -->
+</App>
+```
+
+You can use these placeholder components:
+
+- `AppHeader`: The content of this placeholder describes the app's header template. If the application has a logo, it automatically inserts that into the header.
+- `NavPanel`: This section describes a hierarchical structure representing the app's main menu.
+- `Pages`: lists the individual UI parts (pages) the application navigates to (according to the selected menu item or programmatically).
+- `Footer`: `App` uses the section's contents as the footer.
+
+When all placeholders are empty (like in the previous sample markup), `App` renders an empty header and an empty main content section below the empty header:
+
+<Playground
+    previewOnly={true}
+    name="Example: App with empty layout elements"
+    height={150}
+    app={`
+    <App>
+      <AppHeader>
+        <!-- Here comes the header -->
+      </AppHeader>
+      <NavPanel>
+        <!-- Define the app's navigation menu here -->
+      </NavPanel>
+      <Pages>
+        <!-- Define the navigation-aware content here -->
+      </Pages>
+      <Footer>
+        <!-- This is a placeholder for the footer -->
+      </Footer>
+      <!-- Any other content to render -->
+    </App>
+  `}
+/>
+
+You can set the application logo in the app's manifest file:
+
+```json
+{
+  "name": "Logo sample",
+  "resources": {
+    "logo": "resources/xmlui-logo.svg"
+  }
+}
+```
+
+When the engine finds a logo in the app's manifest, it displays it in its header. So, the previous markup displays this UI after setting the logo resource:
+
+<Playground
+    previewOnly={true}
+    name="Example: App with empty layout elements and logo"
+    resources={{ logo: xmluiLogo }}
+    height={150}
+    app={`
+    <App>
+      <AppHeader>
+        <!-- Here comes the header -->
+      </AppHeader>
+      <NavPanel>
+        <!-- Define the app's navigation menu here -->
+      </NavPanel>
+      <Pages>
+        <!-- Define the navigation-aware content here -->
+      </Pages>
+      <Footer>
+        <!-- This is a placeholder for the footer -->
+      </Footer>
+      <!-- Any other content to render -->
+    </App>
+  `}
+/>
+
+### Placeholder Usage
+
+Each layout placeholder is optional. If you leave any of these placeholders, the app component does not render the particular app section. You can change the order of the placeholder; for example, declare an app footer before the header and change the definition order of these sections.
+
+Also, XMLUI considers any content added within the `App` tag but outside the layout placeholders as part of the main contents.
+
+Look at this example:
+
+```ueml copy
+<App>
+  <CVStack backgroundColor="palegoldenrod" height="50%">
+    Welcome to my humble app!
+  </CVStack>
+  <Footer>
+    <Stack padding="0.2rem">This is my footer</Stack>
+  </Footer>
+  <CVStack backgroundColor="lightskyblue" height="50%">
+    This is a content outside the placeholders
+  </CVStack>
+</App>
+```
+
+This markup declares only a footer placeholder. The two `<CVStack>` sections represent the main content. XMLUI renders this app, putting the main content and the footer in their expected place:
+
+<Playground
+  previewOnly={true}
+  name="Example: App with content outside of placeholders"
+  height={150}
+  app={`
+    <App>
+      <CVStack backgroundColor="palegoldenrod" height="50%">
+        Welcome to my humble app!
+      </CVStack>
+      <Footer>
+        <Stack padding="0.2rem">This is my footer</Stack>
+      </Footer>
+      <CVStack backgroundColor="lightskyblue" height="50%">
+        This is a content outside the placeholders
+      </CVStack>
+    </App>
+  `}
+/>
+
+### Multiple Placeholders
+
+You can use multiple layout placeholders. The app component renders their content in the order they are declared within `App`:
+
+```ueml copy
+<App layout="horizontal">
+  <AppHeader />
+  This is my app's main content
+  <Footer>
+    This is my footer #1.
+  </Footer>
+  <Footer>
+    This is my second footer.
+  </Footer>
+</App>
+```
+
+This markup displays both footers:
+
+<Playground
+  previewOnly={true}
+  name="Example: App with multiple footers"
+  height={180}
+  app={`
+    <App layout="horizontal">
+      <AppHeader />
+      This is my app's main content
+      <Footer>
+        This is my footer #1.
+      </Footer>
+      <Footer>
+        This is my second footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### How Placeholders Work
+
+Placeholders are flexible constructs. You do not need to put them directly into `App`. The XMLUI engine finds them in the children hierarchy of the `App` component. For example, you can create your custom footer as a reusable component:
+
+```ueml copy
+<Component name="CustomFooter">
+  <Footer>
+    <Stack padding="0.2rem">
+      *** {$props.label ?? "(No footer)"} ***
+    </Stack>
+  </Footer>
+</Component>
+```
+
+If you add a `CustomFooter` component to the app, the engine displays your footer at the bottom, as you expect:
+
+```ueml copy
+<App layout="horizontal">
+  <AppHeader />
+  This is my app's main content
+  <CustomFooter label="My custom footer" />
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: App with a custom footer"
+  height={150}
+  components={[
+    `
+      <Component name="CustomFooter">
+        <Footer>
+          <Stack padding="0.2rem">
+            *** {$props.label ?? "(No footer)"} ***
+          </Stack>
+        </Footer>
+      </Component>
+    `,
+  ]}
+  app={`
+    <App layout="horizontal">
+      <AppHeader />
+      This is my app's main content
+      <CustomFooter label="My custom footer" />
+    </App>
+  `}
+/>
+
+You can even create a custom component with a header, a footer, and even some contribution to the main content:
+
+```ueml
+<Component name="MyAppContribution">
+  <Footer>
+    This is my footer
+  </Footer>
+  <AppHeader>
+    MyApp
+  </AppHeader>
+  <ChildrenSlot />
+</Component>
+```
+
+> **Note**: The `ChildrenSlot` component is a special placeholder within a reusable component's definition. It marks where the components nested into the reusable ones will be injected.
+
+The following example utilizes `MyAppContribution`:
+
+```ueml copy
+<App layout="horizontal">
+  This goes to the main content
+  <MyAppContribution>
+    <CVStack backgroundColor="lightskyblue" height="50%">
+      My special contribution to App
+    </CVStack>
+  </MyAppContribution>
+</App>
+```
+
+Observe that XMLUI puts every piece in its place:
+
+<Playground
+  previewOnly={true}
+  name="Example: Component with multiple placeholders"
+  height={200}
+  components={[
+    `
+      <Component name="MyAppContribution">
+        <Footer>
+            This is my footer
+        </Footer>
+        <AppHeader>
+            MyApp
+        </AppHeader>
+        <ChildrenSlot />
+      </Component>
+    `,
+  ]}
+  app={`
+    <App layout="horizontal">
+      This goes to the main content
+      <MyAppContribution>
+        <CVStack backgroundColor="lightskyblue" height="50%">
+          My special contribution to App
+        </CVStack>
+      </MyAppContribution>
+    </App>
+  `}
+/>
+
+**How does the engine render `App` and its layout placeholders?**
+
+The `App` component creates a separate portal for each layout placeholder. When the engine is about to render the content within a layout placeholder, it transposes that from its current place (where it would be rendered without a wrapping placeholder) into the corresponding portal of `App`. As the portal may already contain elements, the transposed elements are appended to the existing ones.
+
+Let's flatten out the structure of the previous example by replacing `MyContribution` with its content:
+
+```ueml copy
+<App layout="horizontal">
+  This goes to the main content <!-- Goes to the main content portal (1) -->
+  <MyAppContribution>
+    <Footer>
+      This is my footer         <!-- Goes to the footer portal -->
+    </Footer>
+    <AppHeader>
+      MyApp                     <!-- Goes to the header portal -->
+    </AppHeader>
+    <CVStack>                   <!-- Goes to the main content portal (2) -->
+      backgroundColor="lightskyblue" 
+      height="50%">
+      My special contribution to App
+     </CVStack>
+   </MyAppContribution>
+</App>
+```
+
+Thus, the layout is the same as if the `App` had the following structure:
+
+```ueml
+<App layout="horizontal">
+  <AppHeader>
+    MyApp
+  <AppHeader>
+  This goes to the main content
+  <CVStack>
+    backgroundColor="lightskyblue" 
+    height="50%">
+    My special contribution to App
+   </CVStack>
+  <Footer>
+    This is my footer
+  </Footer>
+</App>
+
+```
+
+## Layout Variants
+
+The `App` component can render several layouts determining the location and behavior of app sections. You can set the layout in several ways:
+
+- You can use the `layout` prop of the `App` component to set it to one of the predefined values.
+- You can set the `layout` property through a binding expression and change its value according to user action (selection).
+- You can use the `layout` theme variable to define the layout for a particular theme. This way, you can define layout-aware application themes.
+
+> **Note**: The samples of this article use the `layout` property to set the current application layout.
+
+### Horizontal Layout
+
+XMLUI supports several layouts that organize the app's navigation sections (header, menu structure) horizontally in a row. These variants are the following:
+
+- `horizontal`: This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page.
+- `horizontal-sticky`: Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. When you scroll vertically, only the main content scrolls; the header and footer stay docked.
+- `condensed`: Similar to `horizontal`. However, the header and the navigation bar are in a single header block. If you do not define the layout explicitly, XMLUI defaults this variant.
+- `condensed-sticky`: Similar to `horizontal-sticky`. However, the header and the navigation bar are in a single header block.
+
+To get acquainted with these layouts, the samples below show different layout settings with this markup:
+
+```ueml copy
+<App>
+  <AppHeader/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="About" to="/about"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <List datasource="https://api.spacexdata.com/v3/history">
+        <prop name="itemTemplate">
+          <Card title="{$item.title}" subTitle="{$item.details}"/>
+        </prop>
+      </List>
+    </Page>
+    <Page url="/About">
+      <Text value="About this app" />
+    </Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+Also, the samples set an application logo.
+
+#### `horizontal`
+
+The navigation panel displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'horizontal' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={horizontal}
+/>
+
+#### `horizontal-sticky`
+
+The navigation panel displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'horizontal-sticky' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={horizontalSticky}
+/>
+
+#### `condensed`
+
+The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'condensed' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={condensed}
+/>
+
+#### `condensed-sticky`
+
+The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'condensed-sticky' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={condensedSticky}
+/>
+
+### Vertical Layout
+
+XMLUI supports several layouts that display the app's navigation sections (header, menu structure) vertically in a column to the left of the main content area. These variants are the following:
+
+- `vertical`: The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header.
+- `vertical-sticky`: Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header.
+- `vertical-full-header`: Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom.
+
+The following vertical layout examples use the same markup as the horizontal ones.
+
+#### `vertical`
+
+Here, the app logo and the menu are docked to the left. On the right, the header, the main content, and the footer scroll with the app. Observe the empty app header! Now, the logo is moved to above the navigation panel.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'vertical' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={vertical}
+/>
+
+#### `vertical-sticky`
+
+This layout is similar to the previous (`horizontal`) one. However, the app header sticks to the top of the main content (to the right), while the footer docks to the bottom.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'vertical-sticky' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={verticalSticky}
+/>
+
+#### `vertical-full-header`
+
+This layout docks the app header to the top and the footer to the bottom. The navigation panel and the main content share the remaining area. When you scroll, only the main content moves; the other sections stick to the app's window.
+
+<Playground
+  previewOnly={true}
+  name="Example: 'vertical-full-header' layout"
+  height={350}
+  resources={{ logo: xmluiLogo }}
+  app={verticalFullHeader}
+  defaultTheme="custom"
+  themes={[
+    {
+      name: "Custom Theme",
+      id: "custom",
+      themeVars: {
+        layout: "vertical-full-header",
+      },
+    },
+  ]}
+/>
+
+## Logo
+
+The `App` component checks the app manifest for a logo definition. If it finds a logo resource, it displays that logo, provided you explicitly define an `AppHeader` placeholder.
+
+## The `AppHeader`
+
+The `AppHeader` placeholder declares the UI patch to display in the app's header. If the app defines a logo, the `App` component displays that logo in the header (to the left) and the content within the `AppHeader`. Be aware that the header's appearance depends on the app's layout.
+
+### No `AppHeader`
+
+When the `App` does not contain an `AppHeader` placeholder, the app does not display a header in any layout mode:
+
+```ueml copy
+<App layout="horizontal">
+  <CVStack backgroundColor="palegoldenrod" height="100%">
+    MAIN CONTENT
+  </CVStack>
+  <Footer>
+    This is my app footer.
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: No AppHeader"
+  height={150}
+  app={`
+    <App layout="horizontal">
+      <prop name="logoTemplate">
+        (Logo)
+      </prop>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### Empty `AppHeader`
+
+If the `App` contains an `AppHeader` empty placeholder, it displays an empty header unless you define a logo. The following example does not define a logo, so the header remains empty:
+
+```ueml copy
+<App layout="condensed">
+  <AppHeader/>
+  <CVStack backgroundColor="palegoldenrod" height="100%">
+    MAIN CONTENT
+  </CVStack>
+  <Footer>
+    This is my app footer.
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Empty AppHeader"
+  height={150}
+  app={`
+    <App layout="condensed">
+      <AppHeader/>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### Empty `AppHeader` with Logo
+
+If the `App` contains an `AppHeader` empty placeholder but defines a logo in the app manifest, the header displays the logo. The following example uses the same app markup as the previous one; however, it defines a logo in the manifest:
+
+```ueml copy
+<App layout="condensed">
+  <AppHeader/>
+  <CVStack backgroundColor="palegoldenrod" height="100%">
+    MAIN CONTENT
+  </CVStack>
+  <Footer>
+    This is my app footer.
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Empty AppHeader"
+  height={150}
+  resources={{ logo: xmluiLogo }}
+  app={`
+    <App layout="condensed">
+      <AppHeader/>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### Explicit `AppHeader` (no Logo)
+
+When the `AppHeader` section contains a definition, the `App` component displays that in the header:
+
+```ueml copy
+<App layout="condensed">
+  <AppHeader>
+    <H1>AcmeApp</H1>
+  </AppHeader>
+  <CVStack backgroundColor="palegoldenrod" height="100%">
+    MAIN CONTENT
+  </CVStack>
+  <Footer>
+    This is my app footer.
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Explicit AppHeader (no logo)"
+  height={150}
+  app={`
+    <App layout="condensed">
+      <AppHeader>
+        <H1>AcmeApp</H1>
+      </AppHeader>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### Explicit `AppHeader` (with Logo)
+
+If the app has a logo (either in the app manifest or in a template), the header displays the logo to the left and the explicit header next to the logo. The following example uses the same markup as the previous one with a logo resource definition in the app manifest:
+
+<Playground
+  previewOnly={true}
+  name="Example: Explicit AppHeader (with logo)"
+  height={150}
+  resources={{ logo: xmluiLogo }}
+  app={`
+    <App layout="horizontal-sticky">
+      <AppHeader>
+        <H1>AcmeApp</H1>
+      </AppHeader>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+### Declaring a Custom Logo
+
+The `AppHeader` component placeholder has a property, `logoTemplate`, which you can use to define your custom logo:
+
+```ueml copy
+<App>
+  <AppHeader>
+    <prop name="logoTemplate">
+      <HStack>
+        <Stack width="16" height="16" backgroundColor="purple" />
+        <Stack width="16" height="16" backgroundColor="green" />
+      </HStack>
+    </prop>
+    <H1>AcmeApp</H1>
+  </AppHeader>
+  <CVStack backgroundColor="palegoldenrod" height="100%">
+    MAIN CONTENT
+  </CVStack>
+  <Footer>
+    This is my app footer.
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Explicit AppHeader (with logo)"
+  height={150}
+  resources={{ logo: xmluiLogo }}
+  app={`
+    <App>
+      <AppHeader>
+        <prop name="logoTemplate">
+          <HStack>
+            <Stack width="16" height="16" backgroundColor="purple" />
+            <Stack width="16" height="16" backgroundColor="green" />
+          </HStack>
+        </prop>
+        <H1>AcmeApp</H1>
+      </AppHeader>
+      <CVStack backgroundColor="palegoldenrod" height="100%">
+        MAIN CONTENT
+      </CVStack>
+      <Footer>
+        This is my app footer.
+      </Footer>
+    </App>
+  `}
+/>
+
+## Navigation
+
+The `App` component has two placeholders that help you create the app's navigation structure. The `NavPanel` lets you define the available navigation links (menu commands); `Pages` lists the UI elements that represent a particular navigation target.
+
+The links and the targets are bound through URLs. When the user selects a navigation link (menu command), XMLUI ensures that the matching UI part is displayed as the main content.
+
+<Playground
+  previewOnly={true}
+  name="Example: Navigation"
+  height={250}
+  app={`
+    <App layout="horizontal-sticky">
+      <AppHeader><H1>MyTravel App</H1></AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" />
+        <NavLink label="Flights" to="/flights" />
+        <NavLink label="Hotels" to="/hotels" />
+        <NavLink label="Car Rentals" to="/cars/123" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/flights">Flights Page</Page>
+        <Page url="/hotels">Hotels Page</Page>
+        <Page url="/cars/:id">Car Rentals Page {$routeParams.id}</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+## The `Footer`
+
+With the `<Footer>` placeholder, you can define the markup part that should be displayed as an application footer, such as in this example:
+
+```ueml copy
+<App>
+  <AppHeader>
+    <H3>AcmeDrive</H3>
+  </AppHeader>
+  <Footer>
+    Powered by XMLUI
+    <SpaceFiller />
+    <Icon name="drive" />
+  </Footer>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Footer"
+  height={150}
+  app={`
+    <App>
+      <AppHeader>
+        <H3>AcmeDrive</H3>
+      </AppHeader>
+      <Footer>
+        Powered by XMLUI
+        <SpaceFiller />
+        <Icon name="drive" />
+      </Footer>
+    </App>
+  `}
+/>
+
+## Responsiveness
+
+The navigation bar is hidden inside a drawer which can be opened using a hamburger menu.
+
+> **DEV NOTE**: The Playground app is only affected by screen size not the available space (media query is used instead of container query). Thus, We can't show the responsiveness.
+
+## Styling
+
+_TBD_
+
+## Issues

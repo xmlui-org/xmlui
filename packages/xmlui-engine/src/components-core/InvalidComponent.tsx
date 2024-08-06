@@ -1,0 +1,53 @@
+import React from "react";
+
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+
+import styles from "./InvalidComponent.module.scss";
+import { EMPTY_ARRAY } from "@components-core/constants";
+
+/**
+ * Represents the properties of InvalidComponent
+ */
+type Props = {
+  /**
+   * Errors found while validating component prperties
+   */
+  errors?: string[];
+
+  /**
+   * The definition of the component validated
+   */
+  node: ComponentDef;
+
+  /**
+   * Component children to render with the error message
+   */
+  children: React.ReactNode;
+};
+
+/**
+ * The function renders a message that includes issues found when rendering a particular component
+ */
+function InvalidComponent({ errors = EMPTY_ARRAY, node, children }: Props) {
+  return (
+    <>
+      <div className={styles.errorOverlay}>
+        <div className={styles.title}>
+          <span>
+            <b>{node.type}</b> component problems:
+          </span>
+        </div>
+        <ul className={styles.errorItems}>
+          {errors.map((error: string, i) => (
+            <li className={styles.errorItem} key={i}>
+              {error}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {children}
+    </>
+  );
+}
+
+export default InvalidComponent;

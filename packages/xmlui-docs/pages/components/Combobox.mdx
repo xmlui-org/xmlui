@@ -1,0 +1,21 @@
+# Combobox
+
+A `Combobox` is a component that combines the features of a dropdown list and an input field.
+
+_TBD_
+
+<Playground
+  name="Select app"
+  horizontal={true}
+  height={500}
+  app={`
+  <VStack>
+    <Text value="Selected ID: {myCombo.value}"/>
+    <Combobox id="myCombo">
+      <Option label="Option 1" value="1" />
+      <Option label="Option 2" value="2" />
+      <Option label="Option 3" value="3" />
+    </Combobox>
+  </VStack>
+`}
+/>

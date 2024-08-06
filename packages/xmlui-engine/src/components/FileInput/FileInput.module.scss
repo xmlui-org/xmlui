@@ -1,0 +1,34 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- The FileInput component uses a TextBox and a Button. We do not allow separately customize the 
+// --- FileInput theme, only through the TextBox and Button themes.
+
+.container {
+  gap: t.$space-2;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-start;
+}
+
+.textBoxWrapper{
+  width: 100%;
+  border-radius: t.$radius;
+  min-height: fit-content;
+}
+
+.button {
+  flex-shrink: 0;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

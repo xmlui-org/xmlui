@@ -1,0 +1,15 @@
+node_modules
+.vs
+.idea
+__tmp
+__setup
+__deploy
+tools/binary/nsis/CrmEngine.exe
+yarn-error.log
+CrmEngine.ClientApi/CoreModule.zip
+CrmEngine.ClientApi/.config
+tools/nsis/CrmEngine.exe
+data/setup/*.create.sql
+data/setup/*.data.sql
+published
+.DS_Store

@@ -1,0 +1,53 @@
+name: Release CBFS client
+
+#based on this article https://patriksvensson.se/posts/2020/03/creating-release-artifacts-with-github-actions
+
+on:
+  push:
+    tags:
+      - "cbfs-v*.*.*"
+      
+jobs:
+  release:
+    name: cbfs-release
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        
+      - name: cache node modules
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+          
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: npm install client
+        run: npm i
+        working-directory: client
+
+      - name: npm install cbfs
+        run: npm i
+        working-directory: client/packages/CBFSServer
+        
+      - name: build cbfs package
+        shell: bash
+        run: |
+          # Define some variables for things we need
+          tag=$(git describe --tags --abbrev=0)
+          VITE_APP_VERSION=$tag npm run release-prod
+        working-directory: client/packages/CBFSServer      
+    
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "client/packages/CBFSServer/ui.zip"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

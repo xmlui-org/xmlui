@@ -1,0 +1,70 @@
+%-DESC-START
+
+## Using `SelectionStore`
+
+A `SelectionStore` instance is a mediator between a component that can manage a list of selected items and the external context.
+The wrapped component can report its selection state (which items are currently selected);
+so that the external context can access and manage the selection state through the component's API.
+
+## Selection-Aware Components
+
+Some components know they are wrapped with a `SelectionStore` and manage their current selection state through it.
+For example, the following sample `SelectionStore` wraps a `Table` with its `rowsSelectable` property set to true.
+Whenever the user changes the selection state of a particular row, the `SelectionStore` updates its state accordingly.
+
+```ueml copy
+<VStack padding="$space-1">
+  <H3>Rockets {rockets.value.length ? "(" + rockets.value.length + " selected)" : ""}</H3>
+  <HStack gap="$space-0_5">
+    <Button label="Select First" onClick="rockets.setSelectedRowIds([rockets.value?.[0]?.id])" />
+    <Button label="Refresh Table" onClick="rockets.refreshSelection()" />
+    <Button label="Clear Selection" onClick="rockets.clearSelection()" />
+  </HStack>
+  <SelectionStore id="rockets">
+    <Table 
+      width="100%" 
+      rowsSelectable="{true}" 
+      datasource="https://api.spacexdata.com/v3/rockets" 
+      height="300px">
+      <TableColumnDef header="Image" size="80px">
+        <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
+      </TableColumnDef>
+      <TableColumnDef canSort="true" bindTo="country"/>
+      <TableColumnDef canSort="true" bindTo="company"/>
+    </Table>
+  </SelectionStore>
+</VStack>
+```
+
+The UI refreshes the number of selected items as you check or uncheck the rows in the following table:
+
+<Playground
+  name="Example: using SelectionStore"
+  previewOnly
+  height={400}
+  app={`
+  <VStack padding="$space-1">
+    <H3>Rockets {rockets.value.length ? "(" + rockets.value.length + " selected)" : ""}</H3>
+    <HStack gap="$space-0_5">
+      <Button label="Select First" onClick="if (rockets.value?.length) rockets.setSelectedRowIds([rockets.value[0].id])" />
+      <Button label="Refresh Table" onClick="rockets.refreshSelection()" />
+      <Button label="Clear Selection" onClick="rockets.clearSelection()" />
+    </HStack>
+    <SelectionStore id="rockets">
+      <Table 
+        width="100%" 
+        rowsSelectable="{true}" 
+        datasource="https://api.spacexdata.com/v3/rockets" 
+        height="300px">
+        <TableColumnDef header="Image" size="80px">
+          <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
+        </TableColumnDef>
+        <TableColumnDef canSort="true" bindTo="country"/>
+        <TableColumnDef canSort="true" bindTo="company"/>
+      </Table>
+    </SelectionStore>
+  </VStack>
+  `}
+/>
+
+%-DESC-END

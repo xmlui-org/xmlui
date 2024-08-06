@@ -1,0 +1,375 @@
+# Filter Data
+
+In the previous article, you created and customized a list of tasks. That list displayed all tasks retrieved from the database. However, you often want to display only a subset of tasks, such as overdue tasks. In this article, you will learn how you can filter data.
+
+Technically, you have two different options for data filtering in a client-server scenario:
+- You call a particular API with the filter condition to retrieve only the requested data.
+- You get the data from the backend and filter it on the client side.
+
+> **Note**: You may combine these two options: query some pre-filtered data from the backend and apply further filtering in the UI.
+
+In this article, you will implement the filtering functionality with both options.
+
+## Create Filter Pages
+
+Add a few new menu functions with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/tasks` URL representing all tasks to `/tasks/all`. Set up each page to display only the related filter's name:
+
+```ueml copy {7-11, 15, 23-26} filename="Main.xmlui"
+<App layout="vertical-full-header">
+  <AppHeader>
+    <Text variant="title">Personal Todo App</Text>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="All Tasks" to="/tasks/all" />
+    <NavLink label="Overdue" to="/tasks/overdue"/>
+    <NavLink label="Today" to="/tasks/today"/>
+    <NavLink label="Upcoming" to="/tasks/upcoming"/>
+    <NavLink label="Completed" to="/tasks/completed"/>
+  </NavPanel>
+  <Pages>
+    <Page url="/">Dashboard</Page>
+    <Page url="/tasks/all">
+      <Datasource id="topics" url="/api/topics" />
+      <List datasource="/api/tasks">
+        <prop name="itemTemplate">
+          <TaskRow item="{$item}" topicsList="{topics.value}" />
+        </prop>
+      </List>
+    </Page>
+    <Page url="/tasks/overdue">Overdue</Page>
+    <Page url="/tasks/today">Today</Page>
+    <Page url="/tasks/upcoming">Upcoming</Page>
+    <Page url="/tasks/completed">Completed</Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+The URLs specified at a particular `NavLink` tag will navigate to the page determined by the matching `Page` tag. For example, selecting the Overdue menu item displays this UI:
+
+<br/>
+<Image alt="Task menus" src="/resources/images/get-started/task-menus.png" />
+
+## Filter on the Client
+
+First, let's focus on filtering the data on the client side. In this scenario, you fetch all data from the backend but filter it before assigning it to the displayed list. All lists use the same logic; the only difference is how they filter the task data. 
+
+### A Reusable `Tasks` Component
+
+Let's extract this functionality into a new component that receives a filtering function:
+
+Create a new file, `Tasks.xmlui` in the `components` folder, and add this content:
+
+```ueml copy filename="Tasks.xmlui"
+<Component name="Tasks">
+  <Datasource id="topics" url="/api/topics" />
+  <Datasource id="tasks" url="/api/tasks" />
+    <List items="{tasks.value.filter($props.predicate)}">
+      <prop name="itemTemplate">
+        <TaskRow item="{$item}" topics="{topics.value}" />
+      </prop>
+    </List>
+</Component>
+```
+
+The `Tasks` component declares a new `Datasource` to fetch all tasks from the backend. Recall that previously, you set the `data source` property of the `List` to bind it to the fetched data. You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`. Instead, filter the tasks accordingly by using a predicate function (passed in the `predicate` component property).
+
+Update all `Page` tags in the `Main.xmlui` file to use the new `Tasks` component:
+
+```ueml copy {5, 8, 11, 14,17} filename="Main.xmlui"
+<!-- Omitted -->
+<Pages>
+  <Page url="/">Dashboard</Page>
+  <Page url="/tasks/all">
+    <Tasks predicate="{t => true}"/>
+  </Page>
+  <Page url="/tasks/overdue">
+    <Tasks predicate="{t => true}"/>
+  </Page>
+  <Page url="/tasks/today">
+    <Tasks predicate="{t => true}"/>
+  </Page>
+  <Page url="/tasks/upcoming">
+    <Tasks predicate="{t => true}"/>
+  </Page>
+  <Page url="/tasks/completed">
+    <Tasks predicate="{t => true}"/>
+  </Page>
+</Pages>
+<!-- Omitted -->
+```
+
+In this code, you use the same predicate, `t => true`, for each `Tasks` independently from the desired filtering. As it is evident, this predicate will match with every task, so using `Tasks` with the `t => true` predicate will represent all tasks.
+
+Now, when you visit any of the task-related menu functions, the UI displays all tasks.
+
+<br/>
+<Image alt="Task predicates" src="/resources/images/get-started/task-predicates.png" />
+
+
+Though tasks still need to be filtered, the new structure makes it easy. To implement a particular filter, you pass the appropriate predicate function to the `Task` component.
+
+### Update Predicates
+
+Let's finish the job and create the appropriate predicates! 
+
+Create a new `Main.xmlui.xs` file in the `src` folder. As you learned earlier, this is a code-behind file for `Main.xmlui`. Add this function definition to the file:
+
+```javascript copy filename="Main.xmlui.xs"
+function getSection(task) {
+  if (task.completed) return 'Completed';
+  if (!task.dueDate) return 'No Due Date';
+  if (isToday(task.dueDate)) return 'Today';
+  return (getDate(task.dueDate) < getDate()) 
+    ? 'Overdue' 
+    : 'Upcoming'
+}
+```
+
+This function returns one of these section values of the input task: `Completed`, `No Due Date`, `Today`, `Overdue`, or `Upcoming`.
+
+Change the `predicate` properties of `Tasks` components in `Main.xmlui`:
+
+```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
+<!-- Omitted -->
+<Pages>
+  <Page url="/">Dashboard</Page>
+  <Page url="/tasks/all">
+    <Tasks predicate="{t => true}" />
+  </Page>
+  <Page url="/tasks/overdue">
+    <Tasks predicate="{t => getSection(t) === 'Overdue'}" />
+  </Page>
+  <Page url="/tasks/today">
+    <Tasks predicate="{t => getSection(t) === 'Today'}" />
+  </Page>
+  <Page url="/tasks/upcoming">
+    <Tasks predicate="{t => getSection(t) === 'Upcoming'}" />
+  </Page>
+  <Page url="/tasks/completed">
+    <Tasks predicate="{t => getSection(t) === 'Completed'}" />
+  </Page>
+</Pages>
+<!-- Omitted -->
+```
+
+Now, the task list filtering works as expected. When you check the list of overdue tasks, it contains only those tasks belonging to that category.
+
+<br/>
+<Image alt="Overdue tasks" src="/resources/images/get-started/task-overdue.png" />
+
+### Display Task Counts
+
+From a UX point of view, it would be excellent to display the number of tasks in a particular category with the menu items to indicate, for example, that today we have two tasks to complete.
+
+This feature requires a different approach: you cannot postpone getting a particular task category count while the user selects that category in the menu; we must query it when the app starts.
+
+These are the changes you carry out to implement this feature:
+
+1. Create a `Datasource` within the main component.
+2. Add variables that keep the records in a particular task category.
+3. Update the `Tasks` component to use those variables in the data source.
+4. Extend the menu item labels with task counts.
+
+#### Create a `Datasource`
+
+Navigate to the `Main.xmlui` file and add this `Datasource` declaration:
+
+```ueml copy {4} filename="Main.xmlui"
+<AppHeader>
+  <Text variant="title">Personal Todo App</Text>
+</AppHeader>
+<Datasource id="tasks" url="/api/tasks" />
+<NavPanel>
+  <!-- Omitted -->
+</NavPanel>
+<!-- Omitted -->
+```
+
+You can access the current data under this `Datasource` using the `tasks.value` expression (`tasks` identifies the `Datasource`, `value` represents the fetched data).
+
+#### Add Task Category Variables
+
+Add these variable definitions to the `Main.xmlui.xs` file:
+
+```javascript copy filename="Main.xmlui.xs"
+var allTasks = tasks.value.filter(t => true);
+var overdueTasks = tasks.value.filter(t => getSection(t) === "Overdue");
+var todayTasks = tasks.value.filter(t => getSection(t) === "Today");
+var upcomingTasks = tasks.value.filter(t => getSection(t) === "Upcoming");
+var completedTasks = tasks.value.filter(t => getSection(t) === "Completed");
+```
+
+Each variable represents a particular task category. XMLUI variables are reactive variables: whenever a dependency on the right side (after the equal sign) of the variable definition changes, the engine re-evaluates the variable's values and ensures that all dependent objects, including the UI, are updated.
+
+These variable definitions cause the engine to recalculate all task categories whenever the tasks in the data source change.
+
+#### Update the `Tasks` Component
+
+You moved the `Datasource` component to the main component, so you no longer need it in `Tasks`.  You will pass the tasks to display in the `data` property (see `$props.data`) of `Tasks`:
+
+```ueml copy filename="Tasks.xmlui"
+<Component name="Tasks">
+  <Datasource id="topics" url="/api/topics" />
+    <List items="{$props.data}">
+      <prop name="itemTemplate">
+        <TaskRow item="{$item}" topics="{topics.value}" />
+      </prop>
+    </List>
+</Component>
+```
+
+Update the occurrences of `Tasks` in `Main.xmlui` to pass the variables in `data`:
+
+```ueml copy {4, 7, 10, 13, 16} filename="Main.xmlui"
+<!-- Omitted -->
+<Pages>
+  <Page url="/">Dashboard</Page>
+  <Page url="/tasks/all">
+    <Tasks data="{allTasks}" />
+  </Page>
+  <Page url="/tasks/overdue">
+    <Tasks data="{overdueTasks}" />
+  </Page>
+  <Page url="/tasks/today">
+    <Tasks data="{todayTasks}" />
+  </Page>
+  <Page url="/tasks/upcoming">
+    <Tasks data="{upcomingTasks}" />
+  </Page>
+  <Page url="/tasks/completed">
+    <Tasks data="{completedTasks}" />
+  </Page>
+</Pages>
+<!-- Omitted -->
+```
+
+#### Extend the Menu Item Labels
+
+Only one step remains: extend the `NavItem` labels with the expressions to display the task counts:
+
+```ueml copy {4-8} filename="Main.xmlui"
+<!-- Omitted -->
+<NavPanel>
+  <NavLink label="Dashboard" to="/" />
+  <NavLink label="All Tasks ({allTasks.length})" to="/tasks/all" />
+  <NavLink label="Overdue ({overdueTasks.length})" to="/tasks/overdue"/>
+  <NavLink label="Today ({todayTasks.length})" to="/tasks/today"/>
+  <NavLink label="Upcoming ({upcomingTasks.length})" to="/tasks/upcoming"/>
+  <NavLink label="Completed ({completedTasks.length})" to="/tasks/completed"/>
+</NavPanel>
+<!-- Omitted -->
+```
+
+When you run the app, it displays the task counts in the menu item labels:
+
+<br/>
+<Image alt="Completed tasks" src="/resources/images/get-started/task-counts.png" />
+
+## Filter on the Server
+
+So far, the app has used a single API endpoint, `/api/tasks` to receive all task records. However, the API has other endpoints to get filtered data, as the following URLs suggest:
+
+- `/api/tasks/overdue`
+- `/api/tasks/today`
+- `/api/tasks/upcoming`
+- `/api/tasks/completed`
+
+In this section, you will change the code to get filtered task data from the backend.
+
+### Update `Tasks`
+
+Change the definition of the `Tasks` component by removing the `Datasource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
+
+```ueml copy {3} filename="Tasks.xmlui"
+<Component name="Tasks">
+  <Datasource id="topics" url="/api/topics" />
+    <List datasource="/api/tasks/{$props.filter}">
+      <prop name="itemTemplate">
+        <TaskRow item="{$item}" topics="{topics.value}" />
+      </prop>
+    </List>
+</Component>
+```
+
+> **Note**: If the changes are not complete, the app will stop working and display error messages. Ignore them; they will go away soon.
+
+The predicates you used with client-side filtering are now within the backend's logic. When you invoke a particular `/api/tasks/<filterTag>` endpoint, the backend will apply the proper filtering. The `Tasks` component receives its filter tag through the `filter` property.
+
+### Update Filter Tags
+
+Remove the `Datasource` tag from `Main.xmlui`, as you no longer need to invoke the `/api/tasks` endpoint.
+
+Change the `Main.xmlui` file to use the filter tags instead of predicates:
+
+```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
+<!-- Omitted -->
+<Pages>
+  <Page url="/">Dashboard</Page>
+  <Page url="/tasks/all">
+    <Tasks filter=""/>
+  </Page>
+  <Page url="/tasks/overdue">
+    <Tasks filter="overdue" />
+  </Page>
+  <Page url="/tasks/today">
+    <Tasks filter="today" />
+  </Page>
+  <Page url="/tasks/upcoming">
+    <Tasks filter="upcoming" />
+  </Page>
+  <Page url="/tasks/completed">
+    <Tasks filter="completed" />
+  </Page>
+</Pages>
+<!-- Omitted -->
+```
+
+Now, the app gets the task information filtered in the backend. To make sure the previous error messages (due to the incomplete app) go away, refresh the app in the browser:
+
+<br/>
+<Image alt="Completed tasks" src="/resources/images/get-started/filter-completed.png" />
+
+### Update Task Counts
+
+You can see that the menu items show "(undefined)" instead of the current task count. This situation resulted from removing the `DataSource` from `Main.xmlui`, which was used to calculate task counts.
+
+The API has an endpoint, `/api/taskcounts`, retrieving the task category counts in an object with properties `all`, `overdue`, `today`, `upcoming`, and `completed`, each representing a particular task category.
+
+Add a new `Datasource` to the `Main.xmlui` file to fetch the task counts:
+
+```ueml copy {4} filename="Main.xmlui"
+<AppHeader>
+  <Text variant="title">Personal Todo App</Text>
+</AppHeader>
+<Datasource id="taskcounts" url="/api/taskcounts" />
+<NavPanel>
+  <!-- Omitted -->
+</NavPanel>
+<!-- Omitted -->
+```
+
+Update the menu item labels to use the task counts retrieved from the server:
+
+```ueml copy {4-8} filename="Main.xmlui"
+<!-- Omitted -->
+<NavPanel>
+  <NavLink label="Dashboard" to="/" />
+  <NavLink label="All Tasks ({taskcounts.value.all})" to="/tasks/all" />
+  <NavLink label="Overdue ({taskcounts.value.overdue})" to="/tasks/overdue"/>
+  <NavLink label="Today ({taskcounts.value.today})" to="/tasks/today"/>
+  <NavLink label="Upcoming ({taskcounts.value.upcoming})" to="/tasks/upcoming"/>
+  <NavLink label="Completed ({taskcounts.value.completed})" to="/tasks/completed"/>
+</NavPanel>
+<!-- Omitted -->
+```
+
+When you run the app, the task counts are displayed in the menu item labels:
+
+With this step, the task counts are displayed again:
+
+<br/>
+<Image alt="Completed tasks" src="/resources/images/get-started/task-counts.png" />
+
+Now that you learned how to retrieve and filter data on the client or the backend site, it is time to add a few polishing steps to the app. The following article will show you those steps.

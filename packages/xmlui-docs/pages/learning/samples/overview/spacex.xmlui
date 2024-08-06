@@ -1,0 +1,10 @@
+<List>
+  <prop name=items>
+    <Datasource url="https://api.spacexdata.com/v3/history"/>
+  </prop>
+  <prop name=itemTemplate>
+    <HStack verticalPadding=.2rem>
+      <Card title="{$item.title}" subTitle="{$item.details.substring(0, 100)}"/>
+    </HStack>
+  </prop>
+</List>

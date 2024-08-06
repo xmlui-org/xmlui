@@ -1,0 +1,137 @@
+# Badge
+
+The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Props
+
+### `colorMap`
+
+The `Badge` component supports the mapping of a list of colors using the `value` prop as the key.
+Provide the component with a list or key-value pairs in two ways:
+
+1. Only change the background color
+
+```ueml copy {2}
+<Stack>
+  <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+  <Badge value="important" colorMap="{simpleColorMap}" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={40}
+  name="Example: only background color"
+  app={`<Stack var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
+    <Badge value="important" colorMap="{simpleColorMap}" />
+</Stack>
+`}
+/>
+
+2. Change the background and label color
+
+```ueml copy {4-7}
+<Stack>
+  <var name="simpleColorMap"
+    value="{
+      {
+        important: { label: 'red', background: 'pink' },
+        unimportant: { label: 'black', background: 'gray' }
+      }
+    }"
+  />
+  <Badge value="important" colorMap="{simpleColorMap}" />
+  <Badge value="unimportant" colorMap="{simpleColorMap}" />
+  <Badge value="other" colorMap="{simpleColorMap}" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={120}
+  name="Example: background and label color"
+  app={`
+  <Stack gap="0.5rem">
+    <var name="simpleColorMap" 
+    value="{ { important: { label: 'red', background: 'pink' }, unimportant: { label: 'black', background: 'gray' } } }" />
+    <Badge value="important" colorMap="{simpleColorMap}" />
+    <Badge value="unimportant" colorMap="{simpleColorMap}" />
+    <Badge value="other" colorMap="{simpleColorMap}" />
+  </Stack>
+  `}
+/>
+
+### `value`
+
+The text that the component displays.
+
+```ueml copy
+<Badge value="Example badge" />
+```
+
+<Playground
+  previewOnly
+  height={40}
+  name="Example: value"
+  app={`<Badge value="Example badge" />`}
+/>
+
+### `variant`
+
+Modifies the shape of the component.
+Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
+
+```ueml copy
+<Badge value="Example badge" variant="badge" />
+<Badge value="Example pill" variant="pill" />
+```
+
+<Playground
+  previewOnly
+  height={90}
+  name="Example: variant"
+  app={`
+  <Stack gap="1rem">
+    <Badge value="Example badge" variant="badge" />
+    <Badge value="Example pill" variant="pill" />
+  </Stack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `Badge` component uses these theme variables to customize its appearance:
+
+- `color-bg-Badge`
+- `color-text-Badge`
+
+There are also variant specific styling options:
+
+### `badge`
+
+- `radius-Badge`
+- `font-size-Badge`
+- `font-weight-Badge`
+- `padding-Badge`
+- `padding-horizontal-Badge`
+- `padding-vertical-Badge`
+
+### `pill`
+
+- `font-size-Badge-pill`
+- `font-weight-Badge-pill`
+- `padding-Badge-pill`
+- `padding-horizontal-Badge-pill`
+- `padding-vertical-Badge-pill`

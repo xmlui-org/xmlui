@@ -1,0 +1,324 @@
+# Create a Dashboard
+
+Though you created a Dashboard page when starting with this tutorial, that page still displays a placeholder. It is time to create a dashboard with a few indicative numbers and fancy charts.
+
+## A Rudimentary Dashboard
+
+The dashboard will display indicative numbers of significant task counts. You will show them in boxes, and when you click any of them, it will navigate to the list of corresponding task items.
+
+Create a new file, `Dashboard.xmlui` within the `components` folder:
+
+```ueml copy filename="Dashboard.xmlui"
+<Component name="Dashboard" var.counts="{$props.taskCountsSource.value}">
+  <H2>Overdue: {counts.overdue}</H2>
+  <H2>Today: {counts.today}</H2>
+  <H2>Upcoming: {counts.upcoming}</H2>
+  <H2>Completed: {counts.completed}</H2>
+</Component>
+```
+
+The `Dashboard` component accepts a data source in its `taskCountsSource` property and utilizes it to extract the significant numbers to display. Use the new component instead of the placeholder text within `Main.xmlui`:
+
+```ueml copy {5} filename="Main.xmlui"
+<App layout="vertical-full-header">
+  <!-- Omitted -->
+  <Pages>
+    <Page url="/">
+      <Dashboard taskCountsSource="{taskcounts}"/>
+    </Page>
+    <!-- Omitted -->
+</App>
+```
+
+Earlier, you already created a `Datasource` with the `taskcounts` ID, which retrieves several counters in an object. Here, you can reuse this data source. 
+
+When you navigate to the Dashboard page, it displays a few numeric information:
+
+<br/>
+<Image alt="Rudimentary dashboard" src="/resources/images/get-started/rudimentary-dashboard.png" />
+
+## Cards with Numbers
+
+This view needs to look more exciting and helpful. Create a card that highlights the significant counters! Start with the `InfoCard` component, adding the `InfoCard.xmlui` file to the `components` folder:
+
+```ueml copy filename="InfoCard.xmlui"
+<Component name="InfoCard">
+  <Card height="{$props.height}">
+    <H4 value="{$props.title}"/>
+    <CVStack width="100%">
+      <H1 color="{$props.color}">
+        {$props.isLoading ? "..." : $props.value}
+      </H1>
+    </CVStack>
+  </Card>
+</Component>
+```
+`InforCard` allows you to set its title text, color, and number to display. 
+
+Change the dashboard to use the `InfoCard` component:
+
+```ueml copy filename="Dashboard.xmlui"
+<Component name="Dashboard" 
+  var.counts="{$props.taskCountsSource.value}"
+  var.isLoading="{$props.taskCountsSource.inProgress}">
+  <VStack padding="$space-4" verticalPadding="$space-6" gap="$space-6">
+    <FlowLayout gap="$space-4">
+      <InfoCard 
+        width="25%" title="Overdue" 
+        isLoading="{isLoading}" 
+        value="{counts.overdue}" 
+        color="$color-danger" />
+      <InfoCard 
+        width="25%" 
+        title="Today" 
+        isLoading="{isLoading}" 
+        value="{counts.today}" 
+        color="$color-warning" />
+      <InfoCard 
+        width="25%" 
+        title="Upcoming" 
+        isLoading="{isLoading}" 
+        value="{counts.upcoming}" />
+      <InfoCard 
+        width="25%" 
+        title="Completed" 
+        isLoading="{isLoading}" 
+        value="{counts.completed}"
+        color="$color-valid" />
+    </FlowLayout>
+  </VStack>
+</Component>
+```
+
+Each `InfoCard` displays its associated value. Their wrapping `Flowlayout` ensures each of them will use 25% of the available width:
+
+<br/>
+<Image alt="Dashboard numbers" src="/resources/images/get-started/dashboard-numbers.png" />
+
+## Adding Navigation
+
+The dashboard is just a summary of essential counters. To look behind them, you want to navigate to the list of corresponding tasks.
+
+Prepare the `InfoCard` component to receive a `link` property and navigate to that link when its surface is clicked:
+
+```ueml copy {3} filename="InfoCard.xmlui"
+<Component name="InfoCard">
+  <Card height="{$props.height}"
+    onClick="{Actions.navigate('/tasks/' + $props.link)}">
+    <H4 value="{$props.title}"/>
+    <CVStack width="100%">
+      <H1 fontSize="3em" color="{$props.color}">
+        {$props.isLoading ? "..." : $props.value}
+      </H1>
+    </CVStack>
+  </Card>
+</Component>
+```
+
+The `Actions.navigate` method visits the specified link. Remember, the `<NavPanel>` section of `Main.xmlui` contains the links in the menu; all of them start with `/tasks.`
+
+Set the `link` property's value for each `InfoCard` in the dashboard:
+
+```ueml copy {9, 15, 22, 28} filename="Dashboard.xmlui"
+<Component name="Dashboard" 
+  var.counts="{$props.taskCountsSource.value}"
+  var.isLoading="{$props.taskCountsSource.inProgress}">
+  <VStack padding="$space-4" verticalPadding="$space-6" gap="$space-6">
+    <FlowLayout gap="$space-4">
+      <InfoCard 
+        width="25%" title="Overdue" 
+        isLoading="{isLoading}" 
+        link="overdue"
+        value="{counts.overdue}" 
+        color="$color-danger" />
+      <InfoCard 
+        width="25%" 
+        title="Today" 
+        link="today"
+        isLoading="{isLoading}" 
+        value="{counts.today}" 
+        color="$color-warning" />
+      <InfoCard 
+        width="25%" 
+        title="Upcoming" 
+        link="upcoming"
+        isLoading="{isLoading}" 
+        value="{counts.upcoming}" />
+      <InfoCard 
+        width="25%" 
+        title="Completed" 
+        link="completed"
+        isLoading="{isLoading}" 
+        value="{counts.completed}"
+        color="$color-valid" />
+    </FlowLayout>
+  </VStack>
+</Component>
+```
+
+When you click a dashboard item, the UI logic will take you to the corresponding task list.
+
+## Recent Tasks
+
+It would be great to see the recently added tasks on the dashboard. In this section, you will add a table displaying the last ten tasks added in descending order.
+
+Update the `Dashboard.xmlui` file by appending a new `Card` component after the last `InfoCard`:
+
+```ueml copy {5-15} filename="Dashboard.xmlui"
+<Component name="Dashboard" 
+  var.counts="{$props.taskCountsSource.value}"
+  var.isLoading="{$props.taskCountsSource.inProgress}">
+      <!-- Omitted -->
+      <Card width="50%" height="350px">
+        <H4>Recent Tasks</H4>
+        <Table datasource="/api/tasks-recent" height="240">
+          <TableColumnDef header="Topic" width="80">
+            <Text>{$item.topicId}</Text>
+          </TableColumnDef>
+          <TableColumnDef header="Title" width="*">
+            <Text maxLines="1">{$item.title}</Text>
+          </TableColumnDef>
+        </Table>
+      </Card>
+    </FlowLayout>
+  </VStack>
+</Component>
+```
+
+This code renders a `Card` (the same layout container type used within `InfoCard`) and a `Table` bound to the `GET /api/tasks-recent` endpoint. The `Table` has two column definition items (`TableColumDef`) to name the columns to display in the table:
+
+<br/>
+<Image alt="Initial table" src="/resources/images/get-started/initial-table.png" />
+
+Topic IDs do not give you a hint about a topic. It would be great if the first column displayed the topic's name with a color badge as the task list.
+
+Create a new component, `TopicBadge.xmlui` (within the `components` folder):
+
+```ueml copy filename="TopicBadge.xmlui"
+<Component name="TopicBadge">
+  <Datasource id="topics" url="/api/topics" />
+  <Badge when="{topic.id}" value="{topic.name}" colorMap="{topicsColorMap}"/>
+</Component>
+```
+
+Add a code-behind file, `TopicBadge.xmlui.xs`, to the new component using the similar technique you learned in the [Adding Badge](./02-use-list/#adding-a-badge) section:
+
+```js copy filename="TopicBadge.xmlui.xs"
+var topic = topics.value.find(t => t.id === $props.topicId);
+ 
+// Create a color map for all topics
+var topicsColorMap = topics.value.reduce((acc, topic) => {
+  return {...acc, [topic.name]:  topic.color };
+}, {});
+```
+
+Change the `Text` element within the first `TableColumnDef` to the new `TopicBadge` element and update the width of the Topic column:
+
+```ueml copy {8-9} filename="Dashboard.xmlui"
+<Component name="Dashboard" 
+  var.counts="{$props.taskCountsSource.value}"
+  var.isLoading="{$props.taskCountsSource.inProgress}">
+      <!-- Omitted -->
+      <Card width="50%" height="350px">
+        <H4>Recent Tasks</H4>
+        <Table datasource="/api/tasks-recent" height="*">
+          <TableColumnDef header="Topic" width="180">
+            <TopicBadge topicId="{$item.topicId}" />
+          </TableColumnDef>
+          <TableColumnDef header="Title" width="*">
+            <Text maxLines="1">{$item.title}</Text>
+          </TableColumnDef>
+        </Table>
+      </Card>
+    </FlowLayout>
+  </VStack>
+</Component>
+```
+
+<br/>
+<Image alt="Table with badge" src="/resources/images/get-started/table-with-badge.png" />
+
+The new `TopicBadge` component can replace the previous markup to display the topics in `TaskRow.xmlui`. Earlier, you used this markup:
+
+```ueml copy {5} filename="TaskRow.xmlui"
+<Component name="TaskRow">
+  <Card>
+    <!-- Omitted -->
+      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
+        <Badge when="{topic}" value="{topic.name}" colorMap="{topicsColorMap}"/>
+        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      </HStack>
+    <!-- Omitted -->  
+  </Card>
+</Component>
+```
+
+You can change the highlighted line to use a `TopicBadge`:
+
+```ueml copy
+<TopicBadge topicId="{$props.item.topicId}" />
+```
+
+You do not need the `topics` Datasource in `Tasks,` and `TaskRow` no longer utilizes it. You can remove the highlighted lines from `Tasks.xmlui`:
+
+```ueml copy {2, 13} filename="Tasks.xmlui"
+<Component name="Tasks">
+  <Datasource id="topics" url="/api/topics" />
+  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
+    <!-- Omitted -->
+      <List 
+        items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+        defaultSections="{$props.filter === 'all'
+          ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+        sectionBy="section">
+        <prop name="itemTemplate">
+          <TaskRow 
+            item="{$item}" 
+            topics="{topics.value}" 
+            onEditClicked="(selected) taskForm.open('edit', $item)" />
+        </prop>
+        <!-- Omitted -->
+      </List>
+    </VStack>
+    <TaskForm id="taskForm" />
+</Component>
+```
+
+> **Note**: The task list will work correctly even if you do not delete those lines. Nonetheless, they execute an unnecessary query.
+
+## Adding a PieChart
+
+XMLUI ships with a few chart types; one is `PieChart`. You can easily add a chart with data, as the following example shows:
+
+```ueml copy {7-9} filename="Dashboard.xmlui"
+<Component name="Dashboard" 
+  var.counts="{$props.taskCountsSource.value}"
+  var.isLoading="{$props.taskCountsSource.inProgress}">
+  <VStack padding="$space-4" verticalPadding="$space-6" gap="$space-6">
+    <FlowLayout gap="$space-4">
+      <!-- Omitted -->
+      <Card width="50%" height="350px">
+        <PieChart datasource="/api/charts/tasks-summary" height="*" width="100%" />
+      </Card>
+    </FlowLayout>
+  </VStack>
+</Component>
+```
+
+In this code snippet, you get the data from the backend using the `/API/charts/tasks-summary` URL, which provides the information in a format accepted by the `PieChart` component. 
+
+Here is a sample of this data structure:
+
+```json
+[
+  { "id": "Overdue", "value": 12 },
+  { "id": "Today", "value": 2 },
+  { "id": "Upcoming", "value": 5 },
+  { "id": "Completed", "value": 7 }
+]
+```
+
+When you refresh the app, it displays the pie chart:
+
+<br/>
+<Image alt="PieChart" src="/resources/images/get-started/piechart.png" />

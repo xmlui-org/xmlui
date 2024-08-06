@@ -1,0 +1,420 @@
+# Data Manipulation with ApiAction
+
+## Introduction
+
+In this tutorial, you will learn how to manipulate data on the backend using the `ApiAction` component.
+
+This tutorial assumes you already completed either the [Personal Todo App](./personal-todo/00-introduction.mdx) or [Your First XMLUI App](./first-app.mdx) tutorials.
+Both provide foundational knowledge this tutorial will build upon.
+
+For a detailed rundown of the available props, events and API for the `ApiAction` component see the [`ApiAction` reference docs](../components/ApiAction.mdx).
+
+A companion tutorial is also available that deals with data loading titled [`Data Fetching with Datasource`](./working-with-datasources.mdx).
+
+## Environment Setup
+
+> **Note**: If you have the development environment already set up, you can skip this section.
+
+Details on the XMLUI development environment setup is covered [in this article](../get-started/prepare-env).
+
+## Project Setup
+
+> **Note**: If you have the project already generated with boilerplate code, you can skip this section.
+
+Setting up the project with the default boilerplate code is covered [in this article](../get-started/prepare-env). Name your app "apiaction-tutorial"
+
+## Emulating a Backend
+
+The app will use a backend to store, retrieve and modify data. However, there is no need to create an actual backend.
+Instead, you will add an emulated backend with a REST interface to the app using the built-in tooling capabilities of XMLUI.
+
+Follow these steps to add the emulated backend to the app:
+
+1. Download the [api.ts](/resources/files/tutorials/datasource/api.ts "download") file containing the backend's implementation.
+2. Copy this file (`api.ts`) into the `src` folder.
+
+> **Note**: XMLUI uses an emulation deeply integrated with the browser's networking layer.
+> You can use the browser's development tools to check the contents of the requests and responses as if the app was communicating with an actual backend.
+
+The tutorial will cover interacting with a shopping list: adding and removing items, modifying existing ones, etc.
+To display the shopping list and test whether the emulated backend is working, copy the following into the `Main.xmlui` file removing the existing boilerplate code:
+
+```ueml copy filename="Main.xmlui"
+<App layout="vertical-full-header">
+  <AppHeader>
+    <Text variant="title">ApiAction Tutorial</Text>
+  </AppHeader>
+  <Pages>
+    <Page url="/">
+      <List datasource="/api/shopping-list" />
+    </Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+After starting the app with `npm start`, you can open your browser and navigate to the `http://localhost:5173/` (or a different one displayed in the console). The app displays a list:
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/display-1.png" />
+
+The "/api/shopping-list" endpoint returns a list of items which have the following attributes:
+
+| Attribute | Type    |
+| :-------- | :------ |
+| id        | number  |
+| name      | string  |
+| quantity  | number  |
+| unit      | string  |
+| category  | string  |
+| inPantry  | boolean |
+
+As you go along this tutorial, you will interact with this list of data and can see the changes in real time.
+
+> **Note:** You are using the same emulated backend API as the one in the [`Datasource` tutorial](./working-width-datasources.mdx).
+
+## Adding Items
+
+The first operation you will learn is creating new items and saving them on the backend. 
+
+The easiest way to do so is to create a `Button` component that will send some wired-in data to the backend when clicked:
+
+```ueml copy filename="Main.xmlui" {3-18}
+<!-- Omitted -->
+<Page url="/">
+  <Button label="Add New">
+    <event name="click">
+      <ApiAction
+        url="/api/shopping-list"
+        method="post"
+        body="{{
+          name: 'Bacon',
+          quantity: 150,
+          unit: 'grams',
+          category: 'meat',
+          inPantry: false,
+        }}"
+        completedNotificationMessage="New item added"
+      />
+    </event>
+  </Button>
+  <List datasource="/api/shopping-list" />
+</Page>
+<!-- Omitted -->
+```
+
+The button `click` event handler contains an `ApiAction` component that sends the predefined data in its `body` property to the backend.
+
+It uses a `POST` HTTP method while calling the same API endpoint we used to list the groceries in the [Data Display section](#data-display).
+Also, note that you did not need to specify the ID of the new shopping item since the backend will take care of that.
+
+Run the app and click the Add New button. When the new data item has been added to the inventory, the UI displays a toast with the success message:
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/add-success.png" width="224px" />
+
+When you scroll down to the bottom of the list, the newly added item is there:
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/new-item-added.png" />
+
+In the real world, a form would be used to enter new data. Working with forms is a topic covered in the [Using Forms](../learning/using-components/forms) article.
+
+## Deleting Items
+
+Adding a delete feature ensures unwanted shopping items can be removed. Change the item template of the `List` to display a Delete button to the right of each item with `ApiAction` set up to the URL that carries out the delete operation:
+
+```ueml copy filename="Main.xmlui"
+<!-- Omitted -->
+<List datasource="/api/shopping-list">
+  <prop name="itemTemplate">
+    <Card>
+      <HStack verticalAlignment="center" gap="0.5rem">
+        <VStack>
+          <Text value="{$item.name}" variant="strong" />
+          <Text value="{$item.quantity} {$item.unit}" />
+        </VStack>
+        <SpaceFiller />
+        <Button icon="trash">
+          <event name="click">
+            <ApiAction
+              url="/api/shopping-list/{$item.id}"
+              method="delete"
+              completedNotificationMessage="Item {$item.name} removed" />
+          </event>
+        </Button>
+      </HStack>
+    </Card>
+  </prop>
+</List>
+<!-- Omitted -->
+```
+This ApiAction (according to REST conventions) uses the `delete` method and includes the ID of the item to delete in its URL.
+
+When you click the list's first item's (Carrots) delete button, the backend removes those items and confirms the success. The removed item is no longer in the list:
+
+<br/>
+<Image alt="Deleting Items" src="/resources/images/apiaction-tutorial/item-deleted.png" />
+
+## Confirmation
+
+In most cases, you only want the users to delete items after confirmation. `ApiAction` allows you to display a confirmation dialog by setting a few properties. Add the highlighted lines to `ApiAction`:
+
+```ueml copy filename="Main.xmlui" {11-13}
+<!-- Omitted -->
+<Card>
+  <HStack verticalAlignment="center" gap="0.5rem">
+    <!-- Omitted -->
+    <SpaceFiller />
+    <Button icon="trash">
+      <event name="click">
+        <ApiAction
+          url="/api/shopping-list/{$item.id}"
+          method="delete"
+          confirmTitle="Delete Grocery Item"
+          confirmMessage="Are you sure you want to remove '{$item.name}' from your shopping list?"
+          confirmButtonLabel="Yes!"
+          completedNotificationMessage="Item {$item.name} removed" />
+      </event>
+    </Button>
+  </HStack>
+</Card>
+<!-- Omitted -->
+```
+
+With this simple change, you need to confirm the deletion of an item; otherwise, `ApiAction` ignores invoking the requested backend API and, thus, does not delete the item:
+
+<br/>
+<Image alt="Confirmation Dialog" src="/resources/images/apiaction-tutorial/confirm-delete.png" />
+
+## Updating Items
+
+It is also easy to use `ApiAction` to update data items. Update the markup according to the highlighted code to display a textbox with the item name and a button to save name changes:
+
+```ueml copy filename="Main.xmlui" {5, 7-15}
+<!-- Omitted -->
+<Card>
+  <HStack verticalAlignment="center" gap="0.5rem">
+    <VStack>
+      <TextBox id="itemName" initialValue="{$item.name}" />
+      <Text value="{$item.quantity} {$item.unit}" />
+      <Button label="Change Name">
+        <event name="click">
+          <ApiAction
+            url="/api/shopping-list/{$item.id}"
+            method="put"
+            body="{{ name: itemName.value }}"
+            completedNotificationMessage="Item with ID {$item.id} updated" />
+        </event>
+      </Button>
+    </VStack>
+    <SpaceFiller />
+    <!-- Omitted -->
+  </HStack>
+</Card>
+<!-- Omitted -->
+```
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/item-updated.png" />
+
+## Query Parameters
+
+You can add query parameters to `ApiAction` using the `queryParams` property.
+
+In the following example, the `POST /api/shopping-list` endpoint accepts a `highlight` query parameter, which indicates that the name of the newly added item should be highlighted (converted to all uppercase and added three exclamation marks for demonstration purposes):
+
+```ueml copy filename="Main.xmlui" {15}
+<!-- Omitted -->
+<Page url="/">
+  <Button label="Add New">
+    <event name="click">
+      <ApiAction
+        url="/api/shopping-list"
+        method="post"
+        body="{{
+          name: 'Bacon',
+          quantity: 150,
+          unit: 'grams',
+          category: 'meat',
+          inPantry: false,
+        }}"
+        queryParams="{{ highlight: true }}"
+        completedNotificationMessage="New item added" />
+    </event>
+  </Button>
+  <List datasource="/api/shopping-list">
+    <!-- Omitted -->
+  </List>
+</Page>
+<!-- Omitted -->
+```
+When you click the Add New button, `ApiAction` will send a POST request with the `/api/shopping-list?highlight=true` URL, and the backend converts the name accordingly:
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/apiaction-param.png" />
+
+The `queryParam` property accepts a hash object with key and value pairs. Instead of using the JavaScript object literal syntax, you can use the XMLUI syntax to write the same object in a different way:
+
+```ueml copy {12-14} filename="Main.xmlui"
+<ApiAction
+  url="/api/shopping-list"
+  method="post"
+  body="{{
+    name: 'Bacon',
+    quantity: 150,
+    unit: 'grams',
+    category: 'meat',
+    inPantry: false,
+  }}"
+  completedNotificationMessage="New item added">
+  <prop name="queryParams">
+    <field name="highlight" value="false"/>
+  </prop>
+</ApiAction>
+```
+
+## Adding Headers
+
+Several APIs require particular request headers to execute the operation. In such cases, you can use the `header` property of `ApiAction`.
+
+In the following example, the backend requires a header named `x-api-key` with the value of "1111" when you call `POST /api/shopping-list-headers` method (to authenticate the client); otherwise, it does not add a new item to the inventory:
+
+```ueml copy filename="Main.xmlui" {7}
+<!-- Omitted -->
+<Page url="/">
+  <Button label="Add New">
+    <event name="click">
+      <ApiAction
+        url="/api/shopping-list-headers"
+        headers="{{ 'x-api-key': '1111' }}"
+        method="post"
+        body="{{
+          name: 'Bacon',
+          quantity: 150,
+          unit: 'grams',
+          category: 'meat',
+          inPantry: false,
+        }}"
+      />
+    </event>
+  </Button>
+  <List datasource="/api/shopping-list">
+    <!-- Omitted -->
+  </List>
+</Page>
+<!-- Omitted -->
+```
+
+Clicking the Add New button works like in the previous examples. The request passes the expected "1111" API key to the backend, which accepts the client request.
+
+Change the API key to something else, such as "2222". Clicking the Add New button now results in an error, since the API refuses the request:
+
+<br/>
+<Image alt="Adding Items" src="/resources/images/apiaction-tutorial/missing-api-key.png" />
+
+> **Note**: The `headers` property accepts key and value pairs, so you can use the XMLUI syntax with the `<field>` helper tag here, too, as you did in the query parameters example.
+
+## Reacting to Events
+
+The `ApiAction` component has several event handlers that the UI can utilize to perform additional activities, such as changing the UI.
+
+In the following example, the UI will follow the state of the request and display a corresponding message. Add the `requestState` variable and the text messages to the markup:
+
+```ueml copy filename="Main.xmlui" {2, 7-9}
+<!-- Omitted -->
+<Card var.requestState="none">
+  <HStack verticalAlignment="center" gap="0.5rem">
+    <VStack>
+      <!-- Omitted -->
+    </VStack>
+    <Text when="{requestState === 'loading'}" value="Name change pending..." color="orange" />
+    <Text when="{requestState === 'success'}" value="Name change successful!" color="green" />
+    <Text when="{requestState === 'error'}" value="Could not change name." color="red" />
+    <SpaceFiller />
+    <!-- Omitted -->
+  </HStack>
+</Card>
+<!-- Omitted -->
+```
+
+Finally, add the event handlers to the `ApiAction` component and update the `url` prop to target a demonstration version (running slower) of the endpoint previously used:
+  
+
+```ueml copy filename="Main.xmlui" {5, 8-10}
+<!-- Omitted -->
+<Button label="Change Name">
+  <event name="click">
+    <ApiAction
+      url="/api/shopping-list-slow/{$item.id}"
+      method="put"
+      body="{{ name: itemName.value }}"
+      onBeforeRequest="requestState = 'loading'"
+      onSuccess="requestState = 'success'"
+      onError="requestState = 'error'"
+      completedNotificationMessage="Item with ID {$item.id} updated" />
+  </event>
+</Button>
+<!-- Omitted -->
+```
+
+You can observe the backend processing the message:
+
+<br/>
+<Image alt="Loading" src="/resources/images/apiaction-tutorial/data-progress.png" />
+
+Here, the user successfully updated the item name:
+
+<br/>
+<Image alt="Success" src="/resources/images/apiaction-tutorial/data-success.png" />
+
+Passing the "error" text to the backend produces an error for demonstration purposes:
+
+<br/>
+<Image alt="Error" src="/resources/images/apiaction-tutorial/data-error.png" />
+
+## Feedback in Toasts
+
+The XMLUI framework has a built-in notification system that shows request information and status. The `ApiAction` component has two properties that display notifications. You already used the `completedNotificationMessage` property to pop up a toast when an action has been completed. There is another property, `inProgressNotificationMessage`, that is displayed while an action is being executed. If you do not set it (by default, it is empty), no in-progress notifications are shown.
+
+The following example provides functionality similar to the previous example with event handlers. However, instead of event handlers, it uses notification messages:
+
+
+```ueml copy filename="Main.xmlui" {13-14}
+<!-- Omitted -->
+<Card>
+  <HStack verticalAlignment="center" gap="0.5rem">
+    <VStack>
+      <TextBox id="itemName" initialValue="{$item.name}" />
+      <Text value="{$item.quantity} {$item.unit}" />
+      <Button label="Change Name">
+        <event name="click">
+          <ApiAction
+            url="/api/shopping-list-slow/{$item.id}"
+            method="put"
+            body="{{ name: itemName.value }}"
+            inProgressNotificationMessage="Name change pending..."
+            completedNotificationMessage="Name change successful!"
+          />
+        </event>
+      </Button>
+    </VStack>
+    <SpaceFiller />
+    <!-- Omitted -->
+</Card>
+<!-- Omitted -->
+```
+
+This is how it looks like while the request is being made:
+
+<br/>
+<Image alt="Loading" src="/resources/images/apiaction-tutorial/change-in-progress.png" />
+
+Here, the user successfully updated the item name:
+
+<br/>
+<Image alt="Success" src="/resources/images/apiaction-tutorial/change-completed.png" />
+
+> **Note**: When `ApiAction` raises an error, it will display the error message.
+
+> **Note**: You can use the data in the API response when displaying feedback. See [`completedNotificationMessage`](../components/ApiAction/#completednotificationmessage) and [`errorNotificationMessage`](../components/ApiAction/#errornotificationmessage) in the `ApiAction` reference documentation for more information.

@@ -1,0 +1,30 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-bg-ContentSeparator: createThemeVar("color-bg-ContentSeparator");
+$size-ContentSeparator: createThemeVar("size-ContentSeparator");
+
+.separator {
+  background-color: $color-bg-ContentSeparator;
+
+  &.horizontal {
+    height: $size-ContentSeparator;
+    width: 100%;
+  }
+
+  &.vertical {
+    width: $size-ContentSeparator;
+    height: 100%;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

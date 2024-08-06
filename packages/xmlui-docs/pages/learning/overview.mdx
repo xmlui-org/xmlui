@@ -1,0 +1,256 @@
+# Overview
+
+The quickest way to get acquainted with the XMLUI's straightforward way of app building is to try our tutorials, starting with the Todo App Tutorial.
+
+## The XMLUI Approach
+
+XMLUI is designed to create apps with concise but straightforward markup. While most web UI frameworks uniquely mix HTML, CSS, and JavaScript, XMLUI focuses on simplicity.
+
+**XMLUI markup + XMLUI script => Functioning XMLUI app**
+
+The framework builds the UI with a rich set of components using only a few programming concepts, such as variables, expressions, and event handlers. Data and APIs are first-class citizens of XMLUI, and you can use them declaratively without the need to care about infrastructure details like fetching data from a URL, awaiting results, and many others.
+
+XMLUI encourages you to create reusable components within your app and utilize them as quickly as the built-in ones.
+
+## XMLUI Concepts
+
+XMLUI works with a few concepts. You can read this documentation without having a crystal-clear understanding of them. However, in this article, you can pick up valuable details that will help you shorten the learning process.
+
+### Components
+
+**XMLUI creates applications from its building blocks, _components_. A component is an element responsible for displaying its UI and providing some behavior responding to user interactions and system events.**
+
+You refer to a component with an XMLUI tag using the component name:
+
+```ueml copy
+<Button label="I'm a button, you can click me" />
+```
+
+### Properties
+
+**Components may have _properties_ that determine how they display and behave.**
+
+In the previous markup, `label` is a property of the `Button` component; it sets the label to display with the button.
+
+<Playground
+  previewOnly={true}
+  name="Example: Component properties"
+  height={60}
+  horizontal={true}
+  app={`
+    <Button label="I'm a button, you can click me" />
+  `}
+/>
+
+### Event Handlers
+
+**Components can react to user interactions and events by declaring _event handlers_.**
+
+When a particular event happens, XMLUI fires the component's related event handler:
+
+```ueml copy
+<Button label="Click me!" onClick="window.alert('You clicked me!')" />
+```
+
+XMLUI fires the `click` event as the user clicks the button. The engine executes the event handler associated with the `onClick` attribute as a response to the event, which displays a dialog in the browser.
+
+<Playground
+  previewOnly={true}
+  name="Example: Event handlers"
+  height={60}
+  horizontal={true}
+  app={`
+    <Button label="Click me!" onClick="window.alert('You clicked me!')" />
+  `}
+/>
+
+The event handler code is defined in a scripting language (XMLUI Script) resembling JavaScript and following similar semantics.
+
+### Variables
+
+**Components store their internal state according to their implementation. You can use _variables_ to add custom state values to a particular component.**
+
+In this example, a button counts how many times the user has clicked it and displays its info in the label.
+
+```ueml copy
+<Button var.count="{0}" label="Click count: {count}" onClick="count++" />
+```
+
+The `var.count` attribute initializes a variable named `count` to zero. The `onClick` event handler increments this variable every time the user clicks the button and displays it in the label.
+
+<Playground
+  previewOnly={true}
+  name="Example: Variables"
+  height={60}
+  horizontal={true}
+  app={`
+    <Button var.count="{0}" label="Click count: {count}" onClick="count++" />
+  `}
+/>
+
+The variables created with the component are stored within the particular component's state and are available within the component and its children.
+
+### Expressions
+
+**XMLUI makes using variables and other calculated values in _expressions_ easy.**
+
+You can use expressions in property and variable values. The engine recognizes them as wrapped between curly braces, such as `{count}` in the previous example's `label` property value:
+
+```ueml copy {3}
+<Button
+  var.count="{0}"
+  label="Click count: {count}"
+  onClick="count++" />
+```
+
+### Component Hierarchy
+
+**Each component may _nest other components_ in an arbitrary depth to establish a hierarchy.**
+
+Each component can decide what to do (how to render) its nested child components. For example, a button displays its children within its viewport:
+
+```ueml copy {2-6}
+<Button>
+  <VStack horizontalAlignment="center" padding="1rem" >
+    Displays a
+    <Icon name="trash" />
+    trash icon
+  </VStack>
+</Button>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Button with nesting"
+  height={130}
+  horizontal={true}
+  app={`
+    <Button>
+      <VStack horizontalAlignment="center" padding="1rem" >
+        Displays a
+        <Icon name="trash" />
+        trash icon
+      </VStack>
+    </Button>
+  `}
+/>
+
+The `Items` component behaves differently; it uses child items as a template to map each value passed in its `items` property:
+
+```ueml copy {2-4}
+<VStack>
+  <Items items="{[1, 2, 3, 4]}">
+    <Text>Level {$item}</Text>
+  </Items>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Items with nesting"
+  height={110}
+  horizontal={true}
+  app={`
+    <VStack>
+     <Items items="{[1, 2, 3, 4]}">
+       <Text>Level {$item}</Text>
+     </Items>
+    </VStack>
+  `}
+/>
+
+### UI Refresh
+
+**XMLUI refreshes the UI when it observes some _state change_ within the app's component hierarchy. It is smart enough to refresh only the part of the app's viewport affected by the change.**
+
+XMLUI uses this approach (rendering loop) to display and refresh the UI of the app:
+
+1. The engine follows the component hierarchy, collects (evaluates) the initial property values, and renders the app's initial UI.
+2. The engine waits for state changes coming from user interactions or system events. While there are no state changes, there are no UI refreshes.
+3. XMLUI detects state changes (single or multiple). It re-renders the affected components internally and then updates the UI of those components where the new UI differs from the old one.
+4. The loop starts again with Step 2.
+
+### Functional Components
+
+**XMLUI provides components, _functional components_, that do not render any UI; they provide some services that other elements may use.**
+
+The `ChangeListener` is one of the functional components. It detects value changes and fires an event in response. For example, the following sample uses a `ChangeListener` to observe when a list changes; the event handler recalculates the sum of items in the list.
+
+```ueml copy {5-8}
+<VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
+  <Button
+    label="Add new random item to a list"
+    onClick="{list.push(Math.random())}" />
+  <ChangeListener
+    listenTo="{list.length}"
+    throttleWaitInMs="3000"
+    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+  <Text>{toDisplay}</Text>
+</VStack>
+```
+
+`ChangeListener` has a helpful feature. You can define a throttle time: should multiple changes be detected within that interval, the component will raise only a single `changed` event. So, when you click the button several times quickly, the list sum is updated only once every 3 seconds.
+
+<Playground
+  previewOnly
+  name="Example: Functional components - ChangeListener"
+  app={`
+    <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
+      <Button 
+         label="Add new random item to a list" 
+         onClick="{list.push(Math.random())}" />
+      <ChangeListener
+        listenTo="{list.length}"
+        throttleWaitInMs="3000"
+        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+      <Text>{toDisplay}</Text>
+    </VStack>
+  `}
+  height={120}
+/>
+
+### Reusable Components
+
+**XMLUI makes it easy to create your custom components and reuse them later within the app.**
+
+These reusable components use the same semantics as the built-in ones; they have properties, event handlers, and can have children. The following markup defines a reusable component named `IncButton` and allows setting its label through a `label` property:
+
+```ueml copy
+<Component name="IncButton">
+  <Button
+    label="{$props.label ?? '(no label)'}: {count}" var.count="{0}"
+    onClick="count++" />
+</Component>
+```
+
+You can use the `IncButton` name in an XMLUI tag to refer to this reusable component. The following example uses three instances:
+
+```ueml
+<VStack gap="0.5rem">
+  <IncButton label="I can increment" />
+  <IncButton />
+  <IncButton label="Just like me" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: Reusable components - IncButton"
+  components={[
+    `
+      <Component name="IncButton">
+        <Button 
+          label="{$props.label ?? '(no label)'}: {count}" var.count="{0}" 
+          onClick="count++" />
+      </Component>
+    `,
+  ]}
+  app={`
+    <VStack gap="0.5rem">
+      <IncButton label="I can increment" />
+      <IncButton />
+      <IncButton label="Just like me" />
+    </VStack>
+    `}
+  height={160}
+/>

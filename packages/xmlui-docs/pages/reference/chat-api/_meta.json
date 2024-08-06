@@ -1,0 +1,4 @@
+{
+  "chat-server": "Chat Server API",
+  "persistence-layer": "Chat Persistence Layer API"
+}

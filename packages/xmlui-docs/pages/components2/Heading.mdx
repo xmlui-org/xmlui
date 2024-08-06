@@ -1,0 +1,220 @@
+# Heading
+
+The `Heading` component displays titles and section headers.
+
+> **Note**: `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+
+For the shorthand versions see their reference page: [H1](
+./H1
+), [H2](
+./H2
+), [H3](
+./H3
+), [H4](
+./H4
+), [H5](
+./H5
+), [H6](
+./H6
+).
+
+<Playground
+  previewOnly
+  name="Example: Headings with levels"
+  height={400}
+  app={`
+  <VStack>
+    <Heading level="h1" value="Heading Level 1" />
+    <Text>Text following H1</Text>    
+    <Heading level="h2" value="Heading Level 2" />
+    <Text>Text following H2</Text>    
+    <Heading level="h3" value="Heading Level 3" />
+    <Text>Text following H3</Text>    
+    <Heading level="h4" value="Heading Level 4" />
+    <Text>Text following H4</Text>    
+    <Heading level="h5" value="Heading Level 5" />
+    <Text>Text following H5</Text>    
+    <Heading level="h6" value="Heading Level 6" />
+    <Text>Text following H6</Text>    
+  </VStack>
+  `}
+/>
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Props
+
+### `level`
+
+This property sets the visual significance (level) of the heading.
+
+| Value | Description                                           |
+| :---- | :---------------------------------------------------- |
+| `h1`  | **(default)** Equivalent to the `<h1 />` HTML element |
+| `h2`  | Equivalent to the `<h2 />` HTML element               |
+| `h3`  | Equivalent to the `<h3 />` HTML element               |
+| `h4`  | Equivalent to the `<h4 />` HTML element               |
+| `h5`  | Equivalent to the `<h5 />` HTML element               |
+| `h6`  | Equivalent to the `<h6 />` HTML element               |
+
+For a visual example, see the component description.
+
+### `maxLines`
+
+This property determines the maximum number of lines the component can wrap to.
+If there is not enough space for all of the text,
+the component wraps the text up to as many lines as specified.
+
+```ueml copy
+<H2 
+  maxWidth="160" 
+  backgroundColor="blue"
+  value="A long heading text that will likely overflow" maxLines="2" />
+```
+
+<Playground
+  previewOnly
+  name="Example: maxLines"
+  height={90}
+  app={`
+  <H2 
+    maxWidth="160" 
+    backgroundColor="blue"
+    value="A long heading text that will likely overflow" maxLines="2" />
+  `}
+/>
+
+### `noEllipsis`
+
+This property indicates whether an ellipsis should be displayed when the heading text is cropped.
+
+```ueml copy {4}
+<VStack width="200" gap="0.5rem">
+  <H3 
+    backgroundColor="blue" 
+    maxLines="1"
+    noEllipsis="true">
+    Though this long text does is about to crop!
+  </H3>
+  <H3 
+    backgroundColor="blue" 
+    maxLines="1">
+    Though this long text does is about to crop!
+  </H3>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: noEllipsis"
+  height={100}
+  horizontal
+  app={`
+  <VStack width="200" gap="0.5rem">
+    <H3
+      backgroundColor="blue" 
+      maxLines="1"
+      noEllipsis="true">
+      Though this long text does is about to crop!
+    </H3>
+    <H3 
+      backgroundColor="blue" 
+      maxLines="1">
+      Though this long text does is about to crop!
+    </H3>
+  </VStack>
+  `}
+/>
+
+### `preserveLinebreaks`
+
+This property indicates whether linebreaks should be preserved when displaying text.
+
+```ueml copy {5}
+<HStack gap="1rem">
+  <H3
+    width="200"
+    backgroundColor="blue"
+    preserveLinebreaks="true"
+    value="(preserve) This long text
+with several line breaks
+        does not fit into a viewport with a 200-pixel width." />
+  <H3
+    width="200"
+    backgroundColor="blue"
+    value="(do not preserve) This long text
+with several line breaks
+        does not fit into a viewport with a 200-pixel width." />
+  </HStack>
+```
+You can observe the effect of using `preserveLinebreaks`:
+
+<Playground
+  previewOnly
+  name="Example: preserveLinebreaks"
+  height={160}
+  horizontal
+  app={`
+  <HStack gap="1rem">
+    <H3
+      width="200"
+      backgroundColor="blue"
+      preserveLinebreaks="true"
+      value="(preserve) This long text
+  with several line breaks
+          does not fit into a viewport with a 200-pixel width." />
+    <H3
+      width="200"
+      backgroundColor="blue"
+      value="(do not preserve) This long text
+  with several line breaks
+          does not fit into a viewport with a 200-pixel width." />
+  </HStack>
+  `}
+/>
+
+> **Note**: Remember to use the `value` property of `Heading`.
+> Linebreaks are converted to spaces when nesting the text in the `Heading` component.
+
+### `value`
+
+This property determines the text displayed in the heading. 
+`Heading` also accepts nested text instead of specifying the 
+`value`
+.
+If both `value` and a nested text are used, the `value` will be displayed.
+
+```ueml copy
+<VStack>
+  <Heading value="This is level 3 (value)" level="h3" />
+  <Heading level="h3">This is level 3 (child)</Heading>
+  <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  height={140}
+  name="Example: value"
+  app={`
+  <VStack>
+    <Heading value="This is level 3 (value)" level="h3" />
+    <Heading level="h3">This is level 3 (child)</Heading>
+    <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+  </VStack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+This component does not have any styles.

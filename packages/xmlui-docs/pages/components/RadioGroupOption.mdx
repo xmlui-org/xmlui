@@ -1,0 +1,106 @@
+# RadioGroupOption
+
+The `RadioGroupOption` component defines a single option that can be used within a [`RadioGroup`](./RadioGroup).
+
+## Props
+
+### `enabled`
+
+This property indicates whether the component accepts user inputs (`true`) or not (`false`). The default value is `true`.
+
+
+```ueml copy {2-3}
+<RadioGroup initialValue="first">
+  <RadioGroupOption value="first" enabled="false" />
+  <RadioGroupOption value="second" enabled="true" />
+</RadioGroup>
+```
+
+<Playground
+  previewOnly
+  name="Example: enabled"
+  height={52}
+  app={`
+    <RadioGroup initialValue="first">
+      <RadioGroupOption value="first" enabled="false" />
+      <RadioGroupOption value="second" enabled="true" />
+    </RadioGroup>
+  `}
+/>
+
+### `label`
+
+Provides a label for a particular option. If not provided, the control falls back to display the value as the label.
+
+```ueml copy /label="Custom Label"/
+<RadioGroup>
+  <RadioGroupOption value="first" label="Custom Label" />
+  <RadioGroupOption value="no-label" />
+</RadioGroup>
+```
+
+<Playground
+  previewOnly
+  name="Example: label"
+  height={50}
+  app={`
+    <RadioGroup>
+      <RadioGroupOption value="first" label="Custom Label" />
+      <RadioGroupOption value="no-label" />
+    </RadioGroup>
+  `}
+/>
+
+### `value`
+
+Denotes the actual value that can be selected in a [`RadioGroup`](./RadioGroup.mdx) by this component.
+
+```ueml copy /value="first"/
+<RadioGroup>
+  <RadioGroupOption value="first" />
+</RadioGroup>
+```
+
+<Playground
+  previewOnly
+  name="Example: value"
+  height={32}
+  app={`
+    <RadioGroup>
+      <RadioGroupOption value="first" />
+    </RadioGroup>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `RadioGroupOption` component uses these theme variables to customize its appearance:
+
+- `font-size-RadioGroupOption`
+- `font-weight-RadioGroupOption`
+- `gap-RadioGroupOption`
+- `color-bg-RadioGroupOption-default`
+- `color-bg-checked-RadioGroupOption-default`
+- `color-bg-checked-RadioGroupOption-error`
+- `color-bg-checked-RadioGroupOption-warning`
+- `color-bg-checked-RadioGroupOption-success`
+- `color-bg-checked-RadioGroupOption--disabled`
+- `color-border-RadioGroupOption-default`
+- `color-border-RadioGroupOption-default--hover`
+- `color-border-RadioGroupOption-default--active`
+- `color-border-RadioGroupOption--disabled`
+- `color-border-RadioGroupOption-error`
+- `color-border-RadioGroupOption-warning`
+- `color-border-RadioGroupOption-success`
+- `color-text-RadioGroupOption-default`
+- `color-text-RadioGroupOption-error`
+- `color-text-RadioGroupOption-warning`
+- `color-text-RadioGroupOption-success`
+- `color-text-RadioGroupOption--disabled`
+- `thickness-border-RadioGroupOption`
+
+See [custom themes](/learning/themes/overview.mdx) for styling details.

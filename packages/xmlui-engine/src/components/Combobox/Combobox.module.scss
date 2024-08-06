@@ -1,0 +1,158 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Combobox";
+
+// --- CSS properties of a particular Select variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+
+  font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+
+  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+
+  &:has(.comboboxInput:focus-visible){
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+  }
+
+  &:hover {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+  }
+
+  .placeholder {
+    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+  }
+}
+
+$min-height: createThemeVar("Input:min-height-#{$componentName}");
+
+.comboboxToggleButton {
+  padding-left: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  flex-direction: row;
+  width: 100%;
+  min-height: $min-height;
+  border-width: 1px;
+  border-style: solid;
+  transition: background-color ease-in .1s;
+  overflow: hidden;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+  &.warning {
+    @include variant("warning");
+  }
+  &.valid {
+    @include variant("success");
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: createThemeVar("Input:color-bg-Combobox--disabled");
+    color: createThemeVar("Input:color-text-Combobox--disabled");
+    border-color: createThemeVar("Input:color-border-Combobox--disabled");
+
+    .indicator, .comboboxInput {
+      cursor: not-allowed;
+    }
+  }
+
+  .comboboxInput {
+    padding: 0.5em;
+    font-size: inherit;
+    color: inherit;
+    border: 0;
+    outline: none;
+    background-color: transparent;
+    width: 100%;
+  }
+
+  .indicator {
+    color: createThemeVar("Input:color-text-indicator-Combobox");
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 32px;
+    width: 32px;
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+    margin: 0;
+  }
+}
+
+.comboboxMenu {
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  transition: height 0.2s ease;
+  height: fit-content;
+  max-height: 200px;
+  box-shadow: createThemeVar("Input:shadow-menu-Combobox");
+  background-color: createThemeVar("Input:color-bg-menu-Combobox");
+  border-radius: createThemeVar("Input:radius-menu-Combobox");
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  .item {
+    display: flex;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    padding-inline: 1em;
+    align-items: center;
+    cursor: pointer;
+
+    .empty {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.itemActive, &[data-highlighted], &:hover:not(.itemDisabled) {
+      background-color: createThemeVar("Input:color-bg-item-Combobox--hover");
+    }
+
+    &.itemSelected {
+      background-color: createThemeVar("Input:color-bg-item-Combobox--active");
+    }
+
+    &.itemDisabled {
+      cursor: not-allowed;
+      color: createThemeVar("Input:color-text-item-Combobox--disabled");
+      font-style: italic;
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

@@ -1,0 +1,1345 @@
+# Layout Components
+
+XMLUI uses a few fundamental components to provide a particular layout when rendering child elements. In this article, you will learn about these components.
+
+Layout components can nest other layout components in arbitrary depths. This arrangement allows the creation of complex app and component layouts.
+
+## Sizing and Placement
+
+Layout containers use a particular strategy to render their child components; part of their strategy is to set the children's dimensions.
+Child components may declare one or more of these [dimensions](./layout/#component-width-and-height): `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
+
+A child can declare one of these kind of values for a specific dimension:
+
+- **No value**. The container determines the default size of the child element according to its logic.
+- **Container-independent size value**. All sizes except percentage (`%`) and star sizes (`*`) belong to this category. The container respects the child's requested size.
+- **Percentage size**. The container calculates the child's requested size as a percentage of the parent viewport's corresponding dimension.
+- **Star size**. The child provides a weight the parent container utilizes when distributing the _remaining space_ among its children. The remaining space is the parent viewport's size minus the sum sizes of child components within the first two categories (no value, container-independent size value).
+
+While rendering the child components within the parent's viewport, specific components may overflow the provided viewport size. The layout container's strategy determines how to display (or hide) the exceeding child components.
+
+All layout container renders their children in declaration order; they consider the current page direction (left-to-right or right-to-left).
+
+## Stack
+
+The `Stack` component is an essential layout container. It renders its child items horizontally or vertically according to its `orientation` property, optionally providing some gap between child components.
+
+### Stack Orientation
+
+You can assign the `horizontal` or `vertical` values to the `Stack` component's `orientation` property to declare its rendering orientation. The default value is `vertical`. Here are a few examples:
+
+#### Vertical Stack (by Default)
+
+```ueml copy
+<Stack>
+  <Text>Text #1</Text>
+  <Text>Text #2</Text>
+  <Text>Text #3</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack (by default)"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack>
+      <Text>Text #1</Text>
+      <Text>Text #2</Text>
+      <Text>Text #3</Text>
+    </Stack>
+  `}
+/>
+
+#### Vertical Stack (Explicit)
+
+```ueml copy {1}
+<Stack orientation="vertical">
+  <Text>Text #1</Text>
+  <Text>Text #2</Text>
+  <Text>Text #3</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack (explicit)"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical">
+      <Text>Text #1</Text>
+      <Text>Text #2</Text>
+      <Text>Text #3</Text>
+    </Stack>
+  `}
+/>
+
+#### Horizontal Stack with Inline Children
+
+A horizontal stack simply puts its child elements in the same line according to the current rendering direction (left-to-right or right-to-left).
+
+> **Note**: `Text` is an inline component
+
+```ueml copy {1}
+<Stack orientation="horizontal">
+  <Text>Text #1</Text>
+  <Text>Text #2</Text>
+  <Text>Text #3</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack (inline children)"
+  height={40}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text>Text #1</Text>
+      <Text>Text #2</Text>
+      <Text>Text #3</Text>
+    </Stack>
+  `}
+/>
+
+#### Horizontal Stack with Block Children
+
+The horizontal stack changes the rendering of block components; it displays them as if they were inline components.
+
+> **Note**: `H1`, `H2`, ..., `H6` are block components.
+
+```ueml copy {1}
+<Stack orientation="horizontal">
+  <H3>Heading 3</H3>
+  <H2>Heading 2</H2>
+  <H4>Heading 4</H4>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack (block children)"
+  height={40}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <H3>Heading 3</H3>
+      <H2>Heading 2</H2>
+      <H4>Heading 4</H4>
+    </Stack>
+  `}
+/>
+
+### Children with Unspecified Dimensions
+
+If you do not assign any dimension to a child component, the `Stack` uses the default size according to its orientation. With horizontal, the width and height of the child are the space the child component requires to display its content. However, with vertical orientation, the width is the available stack width.
+
+The following examples set the child elements' `backgroundColor` property to indicate their entire screen estate.
+
+```ueml copy
+<Stack orientation="horizontal">
+  <Text backgroundColor="cyan">Text #1</Text>
+  <Text backgroundColor="yellow">Text #2</Text>
+  <Text backgroundColor="lightgreen">Text #3</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with unspecified child dimensions"
+  height={40}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text backgroundColor="cyan">Text #1</Text>
+      <Text backgroundColor="yellow">Text #2</Text>
+      <Text backgroundColor="lightgreen">Text #3</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical">
+  <Text backgroundColor="cyan">Text #1</Text>
+  <Text backgroundColor="yellow">Text #2</Text>
+  <Text backgroundColor="lightgreen">Text #3</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with unspecified child dimensions"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical">
+      <Text backgroundColor="cyan">Text #1</Text>
+      <Text backgroundColor="yellow">Text #2</Text>
+      <Text backgroundColor="lightgreen">Text #3</Text>
+    </Stack>
+  `}
+/>
+
+### Children with Fixed Dimensions
+
+When you explicitly assign fixed dimensions to a child component, the `Stack` respects the assigned dimension value.
+
+> **Note**: Any sizes explicit percentage and star sizes are considered fixed.
+
+The following examples set the child elements' `backgroundColor` property to indicate their entire screen estate.
+
+#### Both Dimensions Fixed
+
+The following samples use children where both dimensions are fixed.
+
+```ueml copy
+<Stack orientation="horizontal">
+  <Text backgroundColor="cyan" width="72" height="36">72 x 36</Text>
+  <Text backgroundColor="yellow" width="144" height="72">144 x 72</Text>
+  <Text backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with fixed dimensions"
+  height={100}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text backgroundColor="cyan" width="72" height="36">72 x 36</Text>
+      <Text backgroundColor="yellow" width="144" height="72">144 x 72</Text>
+      <Text backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical">
+  <Text backgroundColor="cyan" width="72" height="36">72 x 36</Text>
+  <Text backgroundColor="yellow" width="144" height="72">144 x 72</Text>
+  <Text backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vartical Stack with fixed dimensions"
+  height={170}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical">
+      <Text backgroundColor="cyan" width="72" height="36">72 x 36</Text>
+      <Text backgroundColor="yellow" width="144" height="72">144 x 72</Text>
+      <Text backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
+    </Stack>
+  `}
+/>
+
+#### Orientation-Wise Dimension Fixed
+
+The stack respects (and keeps) the fixed dimension and calculates the dimension perpendicular to the orientation according to these rules:
+
+- `horizontal`: All children's height will be the same as the highest in the stack (after a particular child's content is rendered).
+- `vertical`: The width of children is the stack's available width.
+
+```ueml copy
+<Stack orientation="horizontal">
+  <Text backgroundColor="cyan" width="72">W: 72</Text>
+  <Text backgroundColor="yellow" width="144">W: 144</Text>
+  <Text backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with fixed widths"
+  height={160}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text backgroundColor="cyan" width="72">W: 72</Text>
+      <Text backgroundColor="yellow" width="144">W: 144</Text>
+      <Text backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical">
+  <Text backgroundColor="cyan" height="36">H: 36</Text>
+  <Text backgroundColor="yellow" height="72">H: 72</Text>
+  <Text backgroundColor="lightgreen" height="48">H: 48 + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with fixed heights"
+  height={168}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical">
+      <Text backgroundColor="cyan" height="36">H: 36</Text>
+      <Text backgroundColor="yellow" height="72">H: 72</Text>
+      <Text backgroundColor="lightgreen" height="48">H: 48 + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+#### Orientation-Perpendicular Dimension Fixed
+
+The stack respects (and keeps) the fixed dimension and calculates orientation-wise dimension as in the case of unspecified dimensions.
+
+```ueml copy
+<Stack orientation="horizontal">
+  <Text backgroundColor="cyan" height="72">H: 72</Text>
+  <Text backgroundColor="yellow" height="112">H: 112</Text>
+  <Text backgroundColor="lightgreen" height="48">W: 48 + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with fixed heights"
+  height={120}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text backgroundColor="cyan" height="72">H: 72</Text>
+      <Text backgroundColor="yellow" height="112">H: 112</Text>
+      <Text backgroundColor="lightgreen" height="48">W: 48 + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical">
+  <Text backgroundColor="cyan" width="72">W: 72</Text>
+  <Text backgroundColor="yellow" width="144">W: 144</Text>
+  <Text backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with fixed width"
+  height={200}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical">
+      <Text backgroundColor="cyan" width="72">W: 72</Text>
+      <Text backgroundColor="yellow" width="144">W: 144</Text>
+      <Text backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+### Percentage Size
+
+You can define the orientation-wise dimension of children with percentage values. In this case, the stack calculates the particular dimension as the specified percentage of the available stack dimension. If you specify the orientation-perpendicular dimension with a percentage value, the stack ignores it (as if it were unspecified).
+
+The stack must have an explicit height to allow percentage sizes to work with vertical stack orientation; otherwise, percentage heights are ignored.
+
+> **Note**: The following samples set the stack background to light gray to indicate the stack's screen estate.
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" width="20%">W: 20%</Text>
+  <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text backgroundColor="lightgreen" width="20%">W: 20% + long, long, long text</Text>
+</Stack>
+```
+
+Here, the three children occupy the 90% (20% + 50% + 20%) or the available stack width.
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with percentage widths"
+  height={60}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" width="20%">W: 20%</Text>
+      <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text backgroundColor="lightgreen" width="20%">W: 20% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical" height="180" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" height="20%">H: 20%</Text>
+  <Text backgroundColor="yellow" height="50%">H: 50%</Text>
+  <Text backgroundColor="lightgreen" height="20%">H: 20% + long, long, long text</Text>
+</Stack>
+```
+
+Here, the three children occupy the 90% (20% + 50% + 20%) or the available stack height (explicitly set).
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with percentage heights"
+  height={190}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" height="180" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" height="20%">H: 20%</Text>
+      <Text backgroundColor="yellow" height="50%">H: 50%</Text>
+      <Text backgroundColor="lightgreen" height="20%">H: 20% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+#### Fully Filled Stack
+
+When the sum of the percentage-sized children is equal to 100%, the stack is fully filled:
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" width="20%">W: 20%</Text>
+  <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text backgroundColor="lightgreen" width="30%">W: 30% + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack (fully filled)"
+  height={30}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" width="20%">W: 20%</Text>
+      <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text backgroundColor="lightgreen" width="30%">W: 30% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical" height="180" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" height="20%">H: 20%</Text>
+  <Text backgroundColor="yellow" height="50%">H: 50%</Text>
+  <Text backgroundColor="lightgreen" height="30%">H: 20% + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack (fully filled)"
+  height={190}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" height="180" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" height="20%">H: 20%</Text>
+      <Text backgroundColor="yellow" height="50%">H: 50%</Text>
+      <Text backgroundColor="lightgreen" height="30%">H: 20% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+#### Overflow
+
+When the sum of percentage sizes exceeds 100%, the stack overflows and (unless specified otherwise) displays a scrollbar to reach the invisible contents.
+
+> **Note**: Overflow may occur with every size type depending on the actual children rendered in the stack.
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" width="30%">W: 30%</Text>
+  <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text backgroundColor="lightgreen" width="40%">W: 40% + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with percentage widths and overflow"
+  height={50}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" width="30%">W: 30%</Text>
+      <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text backgroundColor="lightgreen" width="40%">W: 40% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical" height="180" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" height="30%">H: 30%</Text>
+  <Text backgroundColor="yellow" height="60%">H: 60%</Text>
+  <Text backgroundColor="lightgreen" height="20%">H: 20% + long, long, long text</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with percentage sizes and overflow"
+  height={180}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" height="180" backgroundColor="lightgray">
+      <Text backgroundColor="cyan" height="30%">H: 30%</Text>
+      <Text backgroundColor="yellow" height="60%">H: 60%</Text>
+      <Text backgroundColor="lightgreen" height="20%">H: 20% + long, long, long text</Text>
+    </Stack>
+  `}
+/>
+
+### Star Size
+
+Stack support star sizing with weights to distribute space among child components. Star sizing works with the _remaining_ space in a stack, which is, by definition, the available space of the stack minus the sum size of components with fixed size.
+
+In the following example, three children are in the horizontal stack. The first is 100px wide; the others divide the remaining space in 3* to 1* proportion. Thus, the second (yellow) column is three times as wide as the third (green).
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text backgroundColor="cyan" width="100">W: 100</Text>
+  <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+  <Text backgroundColor="lightgreen" width="*">W: *</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with star sizing"
+  height={50}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal">
+      <Text backgroundColor="cyan" width="100">W: 100</Text>
+      <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+      <Text backgroundColor="lightgreen" width="*">W: *</Text>
+    </Stack>
+  `}
+/>
+
+In the following example, we have two horizontal stacks. The first is twice as wide as the second. You can observe that the first column has the same size (100 pixels), while the remaining columns fill the remaining space.
+
+```ueml copy
+<VStack gap="0.5rem">
+  <Stack orientation="horizontal" width="600px">
+    <Text backgroundColor="cyan" width="100">W: 100</Text>
+    <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+    <Text backgroundColor="lightgreen" width="*">W: *</Text>
+  </Stack>
+  <Stack orientation="horizontal" width="300px">
+    <Text backgroundColor="cyan" width="100">W: 100</Text>
+    <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+    <Text backgroundColor="lightgreen" width="*">W: *</Text>
+  </Stack>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with star sizing #2"
+  height={60}
+  horizontal={true}
+  app={`
+    <Stack gap="0.5rem">
+      <Stack orientation="horizontal" width="600px">
+        <Text backgroundColor="cyan" width="100">W: 100</Text>
+        <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+        <Text backgroundColor="lightgreen" width="*">W: *</Text>
+      </Stack>
+      <Stack orientation="horizontal" width="300px">
+        <Text backgroundColor="cyan" width="100">W: 100</Text>
+        <Text backgroundColor="yellow" width="3*">W: 3*</Text>
+        <Text backgroundColor="lightgreen" width="*">W: *</Text>
+      </Stack>
+    </Stack>
+  `}
+/>
+
+Star sizing works with vertical stacks, too, with the same semantics as horizontal stacks:
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with star sizing"
+  height={250}
+  horizontal={true}
+  app={`
+    <Stack gap="0.5rem" orientation="horizontal">
+      <Stack orientation="vertical" height="240px" width="100">
+        <Text backgroundColor="cyan" height="40">H: 40</Text>
+        <Text backgroundColor="yellow" height="3*">H: 3*</Text>
+        <Text backgroundColor="lightgreen" height="*">H: *</Text>
+      </Stack>
+      <Stack orientation="vertical" height="120px" width="100">
+        <Text backgroundColor="cyan" height="40">H: 40</Text>
+        <Text backgroundColor="yellow" height="3*">H: 3*</Text>
+        <Text backgroundColor="lightgreen" height="*">H: *</Text>
+      </Stack>
+    </Stack>
+  `}
+/>
+
+### Stack with Paddings
+
+When you apply paddings, the available space of the Stack is decreased with the size of the corresponding paddings. The following example uses a stack with horizontal and vertical paddings and three children that fill the available space.
+
+```ueml copy {2}
+<Stack orientation="horizontal" backgroundColor="lightgray"
+  horizontalPadding="4rem" verticalPadding="1rem">
+  <Text backgroundColor="cyan" width="25%">W: 25%</Text>
+  <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text backgroundColor="lightgreen" width="25%">W: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with paddings"
+  height={68}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray"
+      horizontalPadding="4rem" verticalPadding="1rem">
+      <Text backgroundColor="cyan" width="25%">W: 25%</Text>
+      <Text backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text backgroundColor="lightgreen" width="25%">W: 25%</Text>
+    </Stack>
+  `}
+/>
+
+The stack has a light gray background, indicating the padded area. Of course, the same concept works with vertical stacks:
+
+```ueml copy {3}
+<Stack orientation="vertical" backgroundColor="lightgray"
+  height="240"
+  horizontalPadding="4rem" verticalPadding="1rem">
+  <Text backgroundColor="cyan" height="25%">H: 25%</Text>
+  <Text backgroundColor="yellow" height="50%">H: 50%</Text>
+  <Text backgroundColor="lightgreen" height="25%">H: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with paddings"
+  height={250}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" backgroundColor="lightgray"
+      height="240"
+      horizontalPadding="4rem" verticalPadding="1rem">
+      <Text backgroundColor="cyan" height="25%">W: 25%</Text>
+      <Text backgroundColor="yellow" height="50%">W: 50%</Text>
+      <Text backgroundColor="lightgreen" height="25%">W: 25%</Text>
+    </Stack>
+  `}
+/>
+
+### Items with Paddings
+
+Setting paddings in nested items does not change their rendering.
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+  <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal stack, items have paddings"
+  height={68}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+      <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+    </Stack>
+  `}
+/>
+
+```ueml copy
+<Stack orientation="vertical" backgroundColor="lightgray">
+  <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+  <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical stack, items have paddings"
+  height={160}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" backgroundColor="lightgray">
+      <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+      <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+    </Stack>
+  `}
+/>
+
+### Items with Margins
+
+Item margins are not considered as spacing between items; the `Stack` does not calculate with them when sizing the item. Margins may cause overflow with percentage sizing, as the following sample indicates:
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text margin="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+  <Text margin="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+  <Text margin="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal stack, items with margins"
+  height={68}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text margin="12" backgroundColor="cyan" width="25%">W: 25%</Text>
+      <Text margin="12" backgroundColor="yellow" width="50%">W: 50%</Text>
+      <Text margin="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
+    </Stack>
+  `}
+/>
+
+However, with star sizing, when spaces are not considered during the size calculation, they work without overflow:
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray">
+  <Text margin="12" backgroundColor="cyan" width="*">W: 25%</Text>
+  <Text margin="12" backgroundColor="yellow" width="2*">W: 50%</Text>
+  <Text margin="12" backgroundColor="lightgreen" width="*">W: 25%</Text>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal stack, items with margins"
+  height={68}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray">
+      <Text margin="12" backgroundColor="cyan" width="*">W: * (25%)</Text>
+      <Text margin="12" backgroundColor="yellow" width="3*">W: 2* (50%)</Text>
+      <Text margin="12" backgroundColor="lightgreen" width="2*">W: * (25%)</Text>
+    </Stack>
+  `}
+/>
+
+### Stack with Gaps
+
+You can define gaps (with the `gap` property) between the child components of a stack; they can use the size units the same way as the children.
+
+```ueml copy {2}
+<Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+  gap="2rem">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with gaps"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+      gap="2rem">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+```ueml copy {2}
+<Stack orientation="vertical" backgroundColor="lightgray" padding="1rem"
+  gap="2rem">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with gaps"
+  height={216}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" backgroundColor="lightgray" padding="1rem"
+      gap="2rem">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+#### Gaps and Percentage Sizing
+
+**Unlike paddings, gaps are omitted when calculating the _available space_ of a particular stack dimension**. A significant consequence of using gaps is that you must consider gap size when using percentage sizes. The following example shows what happens when you use three percentage-sized children (sum width is 100%) with and without gaps:
+
+```ueml copy
+<Stack gap="0.5rem">
+  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+    gap="2rem">
+    <Stack backgroundColor="red" height="36" width="25%" />
+    <Stack backgroundColor="green" height="36" width="50%" />
+    <Stack backgroundColor="blue" height="36" width="25%" />
+  </Stack>
+  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
+    <Stack backgroundColor="red" height="36" width="25%" />
+    <Stack backgroundColor="green" height="36" width="50%" />
+    <Stack backgroundColor="blue" height="36" width="25%" />
+  </Stack>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with and without gaps"
+  height={180}
+  horizontal={true}
+  app={`
+    <Stack gap="0.5rem">
+      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+        gap="2rem">
+        <Stack backgroundColor="red" height="36" width="25%" />
+        <Stack backgroundColor="green" height="36" width="50%" />
+        <Stack backgroundColor="blue" height="36" width="25%" />
+      </Stack>
+      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
+        <Stack backgroundColor="red" height="36" width="25%" />
+        <Stack backgroundColor="green" height="36" width="50%" />
+        <Stack backgroundColor="blue" height="36" width="25%" />
+      </Stack>
+    </Stack>
+  `}
+/>
+
+While the second stack (with no gaps) is rendered as expected, the first one overflows with the size of the two gaps applied.
+
+#### Gaps and Star Sizing
+
+You can resolve the overflow issue with gaps and percentage sizing. To remove the overflow issue, you should use star sizing as in the following example:
+
+```ueml copy
+<Stack gap="0.5rem">
+  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+    gap="2rem">
+    <Stack backgroundColor="red" height="36" width="*" />
+    <Stack backgroundColor="green" height="36" width="*" />
+    <Stack backgroundColor="blue" height="36" width="*" />
+    <Stack backgroundColor="purple" height="36" width="*" />
+  </Stack>
+  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
+    <Stack backgroundColor="red" height=36 width="*" />
+    <Stack backgroundColor="green" height=36 width="*" />
+    <Stack backgroundColor="blue" height=36 width="*" />
+    <Stack backgroundColor="purple" height=36 width="*" />
+  </Stack>
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with and without gaps"
+  height={180}
+  horizontal={true}
+  app={`
+    <Stack gap="0.5rem">
+      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
+        gap="2rem">
+        <Stack backgroundColor="red" height="36" width="*" />
+        <Stack backgroundColor="green" height="36" width="*" />
+        <Stack backgroundColor="blue" height="36" width="*" />
+        <Stack backgroundColor="purple" height="36" width="*" />
+      </Stack>
+      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
+        <Stack backgroundColor="red" height="36" width="*" />
+        <Stack backgroundColor="green" height="36" width="*" />
+        <Stack backgroundColor="blue" height="36" width="*" />
+        <Stack backgroundColor="purple" height="36" width="*" />
+      </Stack>
+    </Stack>
+  `}
+/>
+
+### Rendering Direction
+
+The Stack component respects the reading direction set for the browser. If that is from right to left, the Stack renders its children accordingly.
+
+The following example shows how a language with the right-to-left reading renders the Stack (look at the `direction` property's `rtl` value):
+
+```ueml copy {2}
+<Stack orientation="horizontal" padding="1rem" gap="1rem"
+  direction="rtl">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with right to left reading direction"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" padding="1rem" gap="1rem"
+      direction="rtl">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+The Stack has a property, `reverse`, which you can use to reverse the rendering order suggested by the current reading direction. While the `direction` value affects only the horizontal stack, the `reverse` value affects the vertical one, too.
+
+```ueml copy {2}
+<Stack orientation="horizontal" padding="1rem" gap="1rem"
+  reverse="true">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with the reverse flag"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" padding="1rem" gap="1rem"
+      reverse="true">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+```ueml copy {2}
+<Stack orientation="vertical" padding="1rem" gap="1rem"
+  reverse="true">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with the reverse flag"
+  height={180}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" padding="1rem" gap="1rem"
+      reverse="true">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+### Content Wrapping
+
+The Stack has a `wrapContent` property to start a new line (or column) when the subsequent child to render would overflow.
+
+In the following example, the fourth child does not fit in the first line entirely, so it overflows:
+
+```ueml copy {2}
+<Stack orientation="horizontal" padding="1rem" gap="1rem">
+  <Stack backgroundColor="red" height="36" width="25%" />
+  <Stack backgroundColor="green" height="36" width="40%" />
+  <Stack backgroundColor="blue" height="36" width="20%" />
+  <Stack backgroundColor="purple" height="36" width="30%" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with overflow"
+  height={90}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" padding="1rem" gap="1rem">
+      <Stack backgroundColor="red" height="36" width="25%" />
+      <Stack backgroundColor="green" height="36" width="40%" />
+      <Stack backgroundColor="blue" height="36" width="20%" />
+      <Stack backgroundColor="purple" height="36" width="30%" />
+    </Stack>
+  `}
+/>
+
+By setting the `wrapContent` flag, the forth child gets into a new line:
+
+```ueml copy {2}
+<Stack orientation="horizontal" padding="1rem" gap="1rem"
+  wrapContent="true">
+  <Stack backgroundColor="red" height="36" width="25%" />
+  <Stack backgroundColor="green" height="36" width="40%" />
+  <Stack backgroundColor="blue" height="36" width="20%" />
+  <Stack backgroundColor="purple" height="36" width="30%" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with content wrapping"
+  height={120}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" padding="1rem" gap="1rem"
+      wrapContent="true">
+      <Stack backgroundColor="red" height="36" width="25%" />
+      <Stack backgroundColor="green" height="36" width="40%" />
+      <Stack backgroundColor="blue" height="36" width="20%" />
+      <Stack backgroundColor="purple" height="36" width="30%" />
+    </Stack>
+  `}
+/>
+
+> **Note**: Content wrapping is unavailable with the vertical stack.
+
+### Content Alignment
+
+With the `horizontalAlignment` and `verticalAlignment` properties, you can define the corresponding alignment of children within a stack.
+
+```ueml copy {2}
+<Stack orientation="horizontal" gap="1rem"
+  horizontalAlignment="center">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with centered contents"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" gap="1rem"
+      horizontalAlignment="center">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+```ueml copy {2}
+<Stack orientation="vertical" gap="1rem"
+  horizontalAlignment="end">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Verical Stack with right-aligned contents"
+  height={180}
+  horizontal={true}
+  app={`
+    <Stack orientation="vertical" gap="1rem"
+      horizontalAlignment="end">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </Stack>
+  `}
+/>
+
+```ueml copy {2}
+<Stack orientation="horizontal" gap="1rem"
+  verticalAlignment="center">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="72" width="36" />
+  <Stack backgroundColor="blue" height="48" width="36" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with vertically centered contents"
+  height={80}
+  horizontal={true}
+  app={`
+    <Stack orientation="horizontal" gap="1rem"
+      verticalAlignment="center">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="72" width="36" />
+      <Stack backgroundColor="blue" height="48" width="36" />
+    </Stack>
+  `}
+/>
+
+## Stack Variants
+
+There are some frequent uses of Stack; we provide separate components for them to avoid repeating `Stack` with the same property values. These components can be considered as shortcuts to `<Stack>` with some default properties.
+
+### CHStack
+
+It is a shorthand version of `Stack` with a horizontal orientation with its contents centered.
+
+```ueml copy {2-4}
+<Stack
+  orientation="horizontal"
+  verticalAlignment="center"
+  horizontalAlignment="center"
+/>
+```
+
+**Here is an example**:
+
+```ueml copy
+<CHStack height="100" width="200" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="72" width="36" />
+  <Stack backgroundColor="blue" height="48" width="36" />
+</CHStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="CHStack example"
+  height={120}
+  horizontal={true}
+  app={`
+    <CHStack height="100" width="200" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="72" width="36" />
+      <Stack backgroundColor="blue" height="48" width="36" />
+    </CHStack>
+  `}
+/>
+
+### CVStack
+
+It is a shorthand version of `Stack` with a vertical orientation with its contents centered.
+
+```ueml copy {2-4}
+<Stack
+  orientation="vertical"
+  verticalAlignment="center"
+  horizontalAlignment="center"
+/>
+```
+
+**Here is an example**:
+
+```ueml copy
+<CVStack height="200" width="100" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="72" />
+  <Stack backgroundColor="blue" height="36" width="48" />
+</CVStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="CVStack example"
+  height={220}
+  horizontal={true}
+  app={`
+    <CVStack height="200" width="100" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="72" />
+      <Stack backgroundColor="blue" height="36" width="48" />
+    </CVStack>
+  `}
+/>
+
+### HStack
+
+It is a shorthand version of `Stack` with a horizontal orientation.
+
+```ueml copy {2}
+<Stack
+  orientation="horizontal"
+/>
+```
+
+**Here is an example**:
+
+```ueml copy
+<HStack height="100" width="200" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="72" width="36" />
+  <Stack backgroundColor="blue" height="48" width="36" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="CHStack example"
+  height={120}
+  horizontal={true}
+  app={`
+    <HStack height="100" width="200" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="72" width="36" />
+      <Stack backgroundColor="blue" height="48" width="36" />
+    </HStack>
+  `}
+/>
+
+### VStack
+
+It is a shorthand version of `Stack` with a vertical orientation.
+
+```ueml copy {2}
+<Stack
+  orientation="vertical"
+/>
+```
+
+**Here is an example**:
+
+```ueml copy
+<VStack height="100" width="200" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="72" width="36" />
+  <Stack backgroundColor="blue" height="48" width="36" />
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="CHStack example"
+  height={220}
+  horizontal={true}
+  app={`
+    <VStack height="200" width="100" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="72" />
+      <Stack backgroundColor="blue" height="36" width="48" />
+    </VStack>
+  `}
+/>
+
+## FlowLayout
+
+The `FlowLayout` component resembles a horizontal stack by way of content wrapping.
+It implements the same behavior: automatically breaking overflowing components into a new line.
+Besides this behavior, it adds some quality of life features when sizing components:
+
+- **Percentage sizing**: `FlowLayout` considers the gaps between child elements when using percentage sizing, unlike `Stack`.
+- **Responsiveness**: `FlowLayout` resizes percentage-sized children on mobile devices.
+
+<Playground
+  previewOnly={true}
+  name="FlowLayout"
+  height={120}
+  horizontal={true}
+  app={`
+    <FlowLayout padding="1rem" gap="1rem">
+      <Stack backgroundColor="red" height="36" width="25%" />
+      <Stack backgroundColor="green" height="36" width="40%" />
+      <Stack backgroundColor="blue" height="36" width="20%" />
+      <Stack backgroundColor="purple" height="36" width="30%" />
+    </FlowLayout>
+  `}
+/>
+
+### Aligned Percentage Sizing
+
+An overflow can occur when you render multiple children in a row while using percentage sizing and gaps.
+The following sample (similar to the one above with the Stack) demonstrates such a situation:
+
+```ueml copy
+<Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem" gap="1rem">
+  <Stack backgroundColor="red" height="36" width="25%" />
+  <Stack backgroundColor="green" height="36" width="50%" />
+  <Stack backgroundColor="blue" height="36" width="25%" />
+</Stack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with percentage widths and overflow"
+  height={100}
+  horizontal={true}
+  app={`
+      <Stack orientation="horizontal" backgroundColor="lightgray" 
+        padding="1rem" gap="1rem">
+        <Stack backgroundColor="red" height="36" width="25%" />
+        <Stack backgroundColor="green" height="36" width="50%" />
+        <Stack backgroundColor="blue" height="36" width="25%" />
+      </Stack>  
+    `}
+/>
+
+The FlowLayout component handles this sizing issue by adjusting the child component dimensions accounting for the gaps:
+
+```ueml copy
+<FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+  <Stack backgroundColor="red" height="36" width="25%" />
+  <Stack backgroundColor="green" height="36" width="50%" />
+  <Stack backgroundColor="blue" height="36" width="25%" />
+</FlowLayout>
+```
+
+<Playground
+  previewOnly={true}
+  name="FlowLayout children with 100% combined widths"
+  height={100}
+  horizontal={true}
+  app={`
+      <FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+        <Stack backgroundColor="red" height="36" width="25%" />
+        <Stack backgroundColor="green" height="36" width="50%" />
+        <Stack backgroundColor="blue" height="36" width="25%" />
+      </FlowLayout>  
+  `}
+/>
+
+### Size Capping
+
+The FlowLayout component caps the size of items exceeding the available width:
+
+```ueml copy {2}
+<FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+  <Stack backgroundColor="red" height="36" width="1000000rem" />
+  <Stack backgroundColor="green" height="36" width="50%" />
+  <Stack backgroundColor="blue" height="36" width="25%" />
+</FlowLayout>
+```
+
+Note how the extreme width of the first child is capped to the space available for the FlowLayout, while the other children's sizes remain unmodified:
+
+<Playground
+  previewOnly={true}
+  name="FlowLayout with sum of 100% percentage widths"
+  height={150}
+  horizontal={true}
+  app={`
+      <FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+        <Stack backgroundColor="red" height="36" width="1000000rem" />
+        <Stack backgroundColor="green" height="36" width="50%" />
+        <Stack backgroundColor="blue" height="36" width="25%" />
+      </FlowLayout>  
+  `}
+/>
+
+### Responsive Sizing
+
+_TBD: We should document this section after laying down the main principles of managing responsiveness._

@@ -1,0 +1,244 @@
+%-DESC-START
+
+You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
+
+```ueml copy
+<DropdownMenu label="DropdownMenu">
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuSeparator />
+  <SubMenuItem label="Submenu">
+    <MenuItem>Submenu Item 1</MenuItem>
+    <MenuItem>Submenu Item 2</MenuItem>
+  </SubMenuItem>
+</DropdownMenu>
+```
+
+Try this dropdown menu:
+
+<Playground
+  name="Example: Using DropdownMenu"
+  previewOnly
+  height={240}
+  app={`
+    <VStack padding="1rem">
+      <DropdownMenu label="DropdownMenu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuSeparator />
+        <SubMenuItem label="Submenu">
+          <MenuItem>Submenu Item 1</MenuItem>
+          <MenuItem>Submenu Item 2</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    </VStack>
+  `}
+/>
+
+%-DESC-END
+
+%-PROP-START alignment
+
+This property allows you to determine the alignment of the displayed menu items:
+- `start`: Menu items are aligned to the start of the trigger component (default).
+- `end`: Menu items are aligned to the end of the trigger component.
+
+```ueml copy {9}
+<HStack padding="1rem" gap="2rem">
+  <DropdownMenu label="Start-aligned menu">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+  <DropdownMenu 
+    label="End-aligned menu" 
+    alignment="end">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</HStack>
+```
+
+<Playground
+  name="Example: alignment"
+  previewOnly
+  height={200}
+  app={`
+    <HStack padding="1rem" gap="2rem">
+      <DropdownMenu label="Start-aligned menu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+      <DropdownMenu label="End-aligned menu" alignment="end">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+    </HStack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START triggerTemplate
+
+```ueml copy {2-4}
+<DropdownMenu label="(ignored)">
+  <prop name="triggerTemplate">
+    <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+  </prop>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+</DropdownMenu>
+```
+
+<Playground
+  name="Example: triggerTemplate"
+  previewOnly
+  height={200}
+  app={`
+  <VStack padding="1rem">
+    <DropdownMenu label="(ignored)">
+      <prop name="triggerTemplate">
+        <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+      </prop>
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+  </VStack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START enabled
+
+```ueml copy {3, 11}
+<HStack padding="1rem" gap="2rem">
+  <DropdownMenu
+    enabled="true"
+    label="Enabled Dropdown"
+  >
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+  <DropdownMenu
+    enabled="false"
+    label="Disabled Dropdown" 
+  >
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</HStack>
+```
+
+<Playground
+  name="Example: enabled"
+  previewOnly
+  height={200}
+  app={`
+  <HStack padding="1rem" gap="2rem">
+    <DropdownMenu
+      enabled="true"
+      label="Enabled Dropdown"
+    >
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+    <DropdownMenu
+      enabled="false"
+      label="Disabled Dropdown" 
+    >
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+  </HStack>
+  `}
+/>
+
+%-PROP-END
+
+%-EVENT-START willOpen
+
+```ueml copy {6}
+<VStack padding="1rem" gap="2rem">
+  <var name="counter" value="{0}" />
+  <Text value="Number of times the dropdown was opened: {counter}" />
+  <DropdownMenu
+    label="Dropdown"
+    onWillOpen="counter += 1"
+  >
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</VStack>
+```
+
+<Playground
+  name="Example: willOpen"
+  previewOnly
+  height={200}
+  app={`
+  <VStack padding="1rem" gap="2rem">
+    <var name="counter" value="{0}" />
+    <Text value="Number of times the dropdown was opened: {counter}" />
+    <DropdownMenu
+      label="Dropdown"
+      onWillOpen="counter += 1"
+    >
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+  </VStack>
+  `}
+/>
+
+%-EVENT-END
+
+%-API-START close
+
+```ueml copy {3}
+<DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+  <EmojiSelector
+    onSelect="(reaction) => { emojiDropDown.close(); }"
+    autoFocus="true"
+  />
+</DropdownMenu>
+```
+
+<Playground
+  name="Example: close"
+  previewOnly
+  height={200}
+  app={`
+  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+    <EmojiSelector
+      onSelect="(reaction) => { emojiDropDown.close(); }"
+      autoFocus="true"
+    />
+  </DropdownMenu>
+  `}
+/>
+
+%-API-END
+
+%-STYLE-START
+
+The `DropdownMenu` component uses these theme variables to customize its appearance:
+
+- `color-bg-DropdownMenu`
+- `min-width-DropdownMenu`
+- `radius-DropdownMenu`
+- `shadow-DropdownMenu`
+
+%-STYLE-END

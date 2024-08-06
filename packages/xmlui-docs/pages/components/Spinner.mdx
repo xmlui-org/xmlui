@@ -1,0 +1,66 @@
+# Spinner
+
+A `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
+While it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.
+
+## Using the `Spinner`
+
+```ueml
+<HStack padding="1rem">
+    <Spinner />
+</HStack>
+```
+
+<Playground
+  name="Example: default Spinner"
+  previewOnly={true}
+  height={72}
+  app={`<HStack padding="1rem">
+    <Spinner />
+</HStack>
+  `}
+/>
+
+## Props
+
+This component does not have any properties.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+- `color-border-Spinner`
+- `size-Spinner`
+- `thickness-Spinner`
+
+### Custom Style
+
+```
+"size-Spinner": "3rem",
+"thickness-Spinner": "12px",
+"color-border-Spinner": "red"
+```
+
+<Playground
+  name="Example: custom Spinner"
+  previewOnly={true}
+  height={80}
+  app={`<HStack padding="1rem">
+    <Spinner />
+</HStack>
+  `}
+  defaultTheme="custom"
+  themes={[
+      {
+          id: "custom",
+          name: "Custom Theme",
+          themeVars: {
+              "size-Spinner": "3rem",
+              "thickness-Spinner": "8px",
+              "color-border-Spinner": "red",
+          }
+      }  
+  ]}
+/>

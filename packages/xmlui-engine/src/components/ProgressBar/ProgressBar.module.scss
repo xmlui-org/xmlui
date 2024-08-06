@@ -1,0 +1,36 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-bg-ProgressBar: createThemeVar("color-bg-ProgressBar");
+$color-indicator-ProgressBar: createThemeVar("color-indicator-ProgressBar");
+$radius-ProgressBar: createThemeVar("radius-ProgressBar");
+$radius-indicator-ProgressBar: createThemeVar("radius-indicator-ProgressBar");
+$thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
+
+.wrapper {
+  background-color: $color-bg-ProgressBar;
+  border-radius: $radius-ProgressBar;
+  overflow: hidden;
+  position: relative;
+  height: $thickness-ProgressBar;
+}
+
+.bar {
+  position: absolute;
+  background-color: $color-indicator-ProgressBar;
+  border-radius: $radius-indicator-ProgressBar;
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

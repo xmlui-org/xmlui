@@ -1,0 +1,22 @@
+{
+  "name": "@nsoftware/e2e",
+  "private": true,
+  "version": "0.0.0",
+  "scripts": {
+    "start": "xmlui start",
+    "build": "xmlui build --build-mode=INLINE_ALL --withMock --withHostingMetaFiles",
+    "test": "playwright test",
+    "test-ui": "npm run test -- --ui"
+  },
+  "dependencies": {
+    "@nsoftware-com/xmlui": "*"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.43.1",
+    "cross-env": "7.0.3",
+    "serve": "14.2.0"
+  },
+  "msw": {
+    "workerDirectory": "public"
+  }
+}

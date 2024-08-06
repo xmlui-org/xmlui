@@ -1,0 +1,94 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-text-Link: createThemeVar("color-text-Link");
+$color-text-Link--active: createThemeVar("color-text-Link--active");
+$color-text-Link--hover: createThemeVar("color-text-Link--hover");
+$color-text-Link--hover--active: createThemeVar("color-text-Link--hover--active");
+$font-weight-Link: createThemeVar("font-weight-HyperLink");
+$font-weight-Link--active: createThemeVar("font-weight-Link--active");
+$color-decoration-Link: createThemeVar("color-decoration-Link");
+$offset-decoration-Link: createThemeVar("offset-decoration-Link");
+$line-decoration-Link: createThemeVar("line-decoration-Link");
+$style-decoration-Link: createThemeVar("style-decoration-Link");
+$thickness-decoration-Link: createThemeVar("thickness-decoration-Link");
+
+.container {
+  flex-shrink: 0;
+  color: $color-text-Link;
+  font-weight: $font-weight-Link;
+  cursor: pointer;
+  text-decoration: none;
+  width: fit-content;
+  max-width: 100%;
+  height: fit-content;
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+
+  &.active {
+    color: $color-text-Link--active;
+    font-weight: $font-weight-Link--active;
+  }
+
+  &.disabled{
+    pointer-events: none;
+  }
+
+  &:not(.disabled){
+    &:hover {
+      color: $color-text-Link--hover;
+    }
+
+    &:focus-visible{
+      outline-width: createThemeVar('thickness-outline-Link--focus');
+      outline-color: createThemeVar('color-outline-Link--focus');
+      outline-style: createThemeVar('style-outline-Link--focus');
+      outline-offset: createThemeVar('offset-outline-Link--focus');
+    }
+
+    &.active {
+      &:hover {
+        color: $color-text-Link--hover--active;
+      }
+    }
+  }
+}
+
+.iconWrapper {
+  padding: t.$space-0_5;
+  line-height: 0;
+}
+
+.inner {
+  max-width: 100%;
+}
+
+.container:not(.active) {
+    text-underline-offset: $offset-decoration-Link;
+    &:not([disabled]) {
+      &:hover {
+        text-decoration-line: $line-decoration-Link;
+        text-decoration-color: $color-decoration-Link;
+        text-decoration-style: $style-decoration-Link;
+        text-decoration-thickness: $thickness-decoration-Link;
+      }
+      &:active {
+        text-decoration-line: $line-decoration-Link;
+        text-decoration-color: $color-decoration-Link;
+        text-decoration-style: $style-decoration-Link;
+        text-decoration-thickness: $thickness-decoration-Link;
+      }
+    }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

@@ -1,0 +1,88 @@
+# SelectionStore
+
+`SelectionStore` is a non-visual component that may wrap components (items) and manage their selection state (for further actions).
+
+## Using `SelectionStore`
+
+A `SelectionStore` instance is a mediator between a component that can manage a list of selected items and the external context. The wrapped component can report its selection state (which items are currently selected); the external context can access and manage the selection state through the component API.
+
+### Selection-Aware Components
+
+Some components know they are wrapped with a `SelectionStore` and manage their current selection state through it. For example, the following sample `SelectionStore` wraps a `Table` with its `rowsSelectable` property set to true. Whenever the user changes the selection state of a particular row, the `SelectionStore` updates its state accordingly.
+
+```ueml copy
+<VStack>
+  <H3>Rockets {rockets.value.length ? "(" + rockets.value.length + " selected)" : ""}</H3>
+  <SelectionStore id="rockets">
+    <Table 
+      width="100%" 
+      rowsSelectable="{true}" 
+      datasource="https://api.spacexdata.com/v3/rockets" 
+      height="300px">
+      <TableColumnDef header="Image" size="80px">
+        <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
+      </TableColumnDef>
+      <TableColumnDef canSort="true" bindTo="country"/>
+      <TableColumnDef canSort="true" bindTo="company"/>
+    </Table>
+  </SelectionStore>
+</VStack>
+```
+
+The UI refreshes the number of selected items as you check or uncheck the rows in the following table:
+
+<Playground
+  name="Example: Using SelectionStore"
+  previewOnly={true}
+  height={380}
+  app={`
+    <Card>
+      <H3>Rockets {rockets.value.length ? "(" + rockets.value.length + " selected)" : ""}</H3>
+      <ChangeListener listenTo="{rockets.value}" onDidChange="({newValue}) => console.log(rockets.value)" />
+      <SelectionStore id="rockets">
+        <Table 
+          width="100%" 
+          rowsSelectable="{true}" 
+          datasource="https://api.spacexdata.com/v3/rockets" 
+          height="300px">
+          <TableColumnDef header="Image" size="80px">
+            <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
+          </TableColumnDef>
+          <TableColumnDef canSort="true" bindTo="country"/>
+          <TableColumnDef canSort="true" bindTo="company"/>
+        </Table>
+      </SelectionStore>
+    </Card>
+`}
+/>
+
+## Props
+
+### `idKey`
+
+The selected items in the selection store should have a unique ID to use as an unambiguous key to a particular item. This property names that property within a selected (selectable) object that functions as the unique ID. By default, it is `"id"`.
+
+## API
+
+### `clearSelection`
+
+This method clears the selection store by unselecting all previously selected items.
+
+### `refreshSelection`
+
+This method refreshes the selection by passing all underlying items as the method's `allItems` parameter. The store calculates the intersection of the selected item IDs in its context and the item IDs in `allItems`.
+As a result, the selection store will release the items that are not in `allItems` anymore.
+
+### `setSelectedRowIds`
+
+This method returns an array holding the unique IDs of the selected items (according to the store's state).
+
+### `value`
+
+## Events
+
+This component does not provide event handlers to any system or user event.
+
+## Styling
+
+The `SelectionStore` component does not support styling.

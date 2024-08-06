@@ -1,0 +1,78 @@
+# Create The App
+
+If you have already successfully prepared your XMLUI development environment (it is quick and straightforward, as described in [this article](../prepare-env)), you are ready to start creating the Personal Todo app.
+
+## Create the Boilerplate App
+
+> **Note**: If you have the project already generated with boilerplate code, you can skip this section.
+
+Setting up the project with the default boilerplate code is covered [in this article](../get-started/prepare-env).
+
+## Create the App's Structure
+
+The default app uses a horizontal layout with several menu functions. The initial version of the Personal Todo app will contain only two information pages, one for a dashboard and another for displaying tasks. You can modify the default app structure in a few steps.
+
+The `Main.xmlui` file (within the `src` folder) is the app's primary file. Inside this file, you define the app with markup that may refer to built-in XMLUI components and your custom app components (which you will place into the `components` folder later).
+
+Open the `Main.xmlui` file in your IDE and change its contents to the following:
+
+```ueml copy filename="Main.xmlui"
+<App layout="vertical-full-header">
+  <AppHeader>
+    <Text variant="title">Personal Todo App</Text>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="To Dos" to="/tasks" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Dashboard</Page>
+    <Page url="/tasks">To Dos</Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+The dev web server runs your app in HMR (Hot Module Reload) mode. Thus, you do not need to stop and restart the server when you change the code; the server observes the change and automatically refreshes the view. As a result of the `Main.xmlui` change, you will see a new app:
+
+<br/>
+<Image alt="Initial P2DO" src="/resources/images/get-started/personal-todo-initial.png" />
+
+The `App` component represents the entire app. It provides several layout placeholders you can fill with content. Its `layout` attribute determines how the placeholders are combined into a working app; this value determines the layout and some subtle app behavior details.
+
+- The `vertical-full-header` layout docks the app header to the top and the footer to the bottom. The navigation panel and the main content share the remaining area.
+- The `AppHeader` placeholder defines the app's header (title) to display. In the header, you see a logo from the app's resources.
+- XMLUI uses URLs for in-app navigation. The two `NavLink` components within `NavPanel` declare the app's simple menu structure. Each `NavLink` has a `to` attribute with the corresponding target URL.
+- The `NavLink` counterpart is the two `Page` components within `Pages`. They describe the "page" that will load when a particular menu item is selected. In this phase, these just display their names.
+
+The app does not use any custom component (yet). We do not need the ones in the component folder, so delete the `ApiAware.xmlui`, `Home.xmlui`, `IncButton.xmlui`, and `PagePanel.xmlui` from there but keep the `components` folder.
+
+## Adding an Emulated Backend
+
+The app will use a backend to retrieve and store data. However, due to XMLUI's tools, you do not need to create and install an actual backend
+while developing it. Instead, you will add a makeshift backend with the REST interface of the app, which will emulate the production backend.
+
+Follow these steps to add the emulated backend to the app:
+
+1. Download the [api.ts](/resources/files/tutorials/p2do/api.ts "download") file containing the backend's implementation.
+2. Copy this file (`api.ts`) into the `src` folder.
+
+Test the emulated backend by adding code that triggers invoking an endpoint. Replace the `Page` tag with the `/tasks` URL with this one:
+
+```ueml copy {3-4} filename="Main.xmlui"
+<!-- Omitted -->
+<Page url="/tasks">
+  <Datasource id="tasks" url="/api/tasks" />
+  <Text variant="codefence">{JSON.stringify(tasks.value, null, 2)}</Text>
+</Page>
+<!-- Omitted -->
+```
+
+Turn back to the app running in the browser. If you happen to have stopped it, ignite it again with `npm start`. Click the "To Dos" menu item; it will trigger fetching the topic data from the backend and display it on the screen in JSON:
+
+<br/>
+<Image alt="Test API" src="/resources/images/get-started/test-emulated-api.png" />
+
+> **Note**: XMLUI uses an emulation deeply integrated with the browser's networking layer. You can use the browser's development tools to check the contents of the requests and responses as if the app were invoking an actual backend.
+
+In the following article, you will learn how to display data fetched from the backend.

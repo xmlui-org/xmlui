@@ -1,0 +1,7 @@
+<Component name="IncButton">
+  <var name=count value={0} />
+  <Button label="Click to increment: {count}">
+    <event name=click value="count++" />
+  </Button>
+  <api name=setValue value="v => count = v" />
+</Component>

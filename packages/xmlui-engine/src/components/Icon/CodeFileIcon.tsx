@@ -1,0 +1,1 @@
+import CodeFile from "./svg/code-file.svg?react";import type {IconBaseProps} from "./Icon";export const CodeFileIcon = (props: IconBaseProps) => <CodeFile {...props} />

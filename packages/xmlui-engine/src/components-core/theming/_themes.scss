@@ -1,0 +1,524 @@
+@use "sass:string";
+@use "sass:meta";
+@use "sass:map";
+@use "sass:list";
+
+/*
+ * This file contains all CSS variables AppEngine uses for styling the UI, including individual visual components.
+ *
+ * We use a subset of these CSS variables in themes.
+ */
+
+// =====================================================================================================================
+// We index all theme variables with this prefix to make a distinction from variables defined in other custom themes.
+// Probably we should now use "weblets" instead of nsoftware
+$THEME-VAR-PREFIX: nsoftware;
+
+/*
+ * This function creates a CSS variable name by combining the prefix and the argument variable name
+ */
+@function createVar($componentVariable) {
+  @return var(--#{$THEME-VAR-PREFIX}-#{$componentVariable});
+}
+
+@function countSubstring($string, $delimiter: null) {
+  @if (meta.type-of($string) != "string") {
+    @return -1;
+  }
+  $list: ();
+  $length: string.length($string);
+
+  $count: 0;
+
+  $index: string.index($string, $delimiter);
+
+  $temp: $string;
+  @while $index != null {
+    $count: $count + 1;
+    $temp: string.slice($temp, $index + 1);
+    $index: string.index($temp, $delimiter);
+  }
+
+  @return $count;
+}
+
+/*
+ * This function allows other CSS modules to get the value of the CSS variable specified in $componentVariable.
+ Optionally, you can provide a $fallbackValue to set the variable's value if that is not defined.
+ */
+@function useVarInner($componentVariable, $fallbackValue: false) {
+  @if $fallbackValue {
+    $num: countSubstring($componentVariable, "var(");
+    @if ($num <= 1) {
+      @return var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
+    }
+    //we offset with the number of 'vars' in the $componentVariable, because we have to offset backwards for the closing parenthesis
+    // typically when in a useVar we have a hVar as the first argument
+    $offset: -2;
+    @if ($num > 1) {
+      $offset: (-1 * $num) - 1;
+    }
+    //@if(string.index(#{$fallbackValue}, 'font-size-small')) {
+    //  @debug 'original: ' + #{$componentVariable} + ", varcount: " + $num;
+    //  @debug 'concatet:' + var(#{str-slice($componentVariable, 5, -2)}, #{$fallbackValue});
+    //  @debug 'concat 2:' + var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue});
+    //}
+    @return string.unquote(
+      "var(#{str-slice($componentVariable, 5, $offset)}, #{$fallbackValue}#{str-slice($componentVariable, $offset + 1)}"
+    );
+  } @else {
+    @return $componentVariable;
+  }
+}
+
+@function reverse($list, $recursive: false) {
+  $result: ();
+
+  @for $i from length($list) * -1 through -1 {
+    @if type-of(nth($list, abs($i))) == list and $recursive {
+      $result: append($result, reverse(nth($list, abs($i)), $recursive));
+    } @else {
+      $result: append($result, nth($list, abs($i)));
+    }
+  }
+
+  @return $result;
+}
+
+@function useVar($vars...) {
+  $ret: false;
+  @each $var in reverse($vars) {
+    $ret: useVarInner($var, $ret);
+  }
+  @return $ret;
+}
+
+@function remove-nth($list, $index) {
+  $result: null;
+
+  @if type-of($index) != number {
+    @warn "$index: #{quote($index)} is not a number for `remove-nth`.";
+  } @else if $index == 0 {
+    @warn "List index 0 must be a non-zero integer for `remove-nth`.";
+  } @else if abs($index) > length($list) {
+    @warn "List index is #{$index} but list is only #{length($list)} item long for `remove-nth`.";
+  } @else {
+    $result: ();
+    $index: if($index < 0, length($list) + $index + 1, $index);
+
+    @for $i from 1 through length($list) {
+      @if $i != $index {
+        $result: append($result, nth($list, $i));
+      }
+    }
+  }
+
+  @return $result;
+}
+
+@function generate-combinations($list, $used: ()) {
+  $result: ();
+
+  @each $item in $list {
+    @if not index($used, $item) {
+      $result: append($result, $item, comma);
+      $used: append($used, $item, comma);
+
+      @if length($list) > 1 {
+        $rest: remove-nth($list, index($list, $item));
+        $combinations: generate-combinations($rest, $used);
+
+        @each $combination in $combinations {
+          $result: append($result, join($item, $combination), comma);
+        }
+      }
+    }
+  }
+
+  @return $result;
+}
+
+@function compare($string-a, $string-b) {
+  @return str-length($string-a) > str-length($string-b);
+}
+
+@function quick-sort($list) {
+  $less: ();
+  $equal: ();
+  $large: ();
+
+  @if length($list) > 1 {
+    $seed: nth($list, ceil(calc(length($list) / 2)));
+
+    @each $item in $list {
+      @if $item == $seed {
+        $equal: append($equal, $item, list-separator($list));
+      } @else if compare($item, $seed) {
+        $less: append($less, $item, list-separator($list));
+      } @else if not compare($item, $seed) {
+        $large: append($large, $item, list-separator($list));
+      }
+    }
+
+    @return join(join(quick-sort($less), $equal), quick-sort($large));
+  }
+
+  @return $list;
+}
+
+@function capitalize($string) {
+  @return to-upper-case(str-slice($string, 1, 1)) + str-slice($string, 2);
+}
+
+@function createHVar($attribute, $component, $traits: (), $states: (), $fallback: false) {
+  $stateCombinations: generate-combinations($states);
+  $sortedStateCombinations: ();
+  @each $stateComb in $stateCombinations {
+    $result: "";
+    @each $st in $stateComb {
+      $result: #{$result}--#{$st};
+    }
+    $sortedStateCombinations: append($sortedStateCombinations, $result);
+  }
+  $sortedStateCombinations: append($sortedStateCombinations, "");
+  $sortedStateCombinations: quick-sort($sortedStateCombinations);
+
+  $traitCombinations: generate-combinations($traits);
+  $sortedTraitCombinations: ();
+  @each $traitComb in $traitCombinations {
+    $result: "";
+    @each $st in $traitComb {
+      $result: #{$result}-#{$st};
+    }
+    $sortedTraitCombinations: append($sortedTraitCombinations, $result);
+  }
+  $sortedTraitCombinations: append($sortedTraitCombinations, "");
+  $sortedTraitCombinations: quick-sort($sortedTraitCombinations);
+
+  //@debug "trait combs: #{$sortedTraitCombinations}";
+  //@debug "state combs: #{$sortedStateCombinations}";
+
+  $base: #{$attribute}-#{capitalize($component)};
+  $vars: ();
+
+  @each $stateComb in $sortedStateCombinations {
+    @each $traitComb in $sortedTraitCombinations {
+      $vars: append($vars, createVar(#{$base}#{$traitComb}#{$stateComb}));
+    }
+  }
+  @if ($fallback != false) {
+    $vars: append($vars, $fallback);
+  }
+
+  @return useVar($vars...);
+}
+
+@function str-split($string, $separator) {
+  // empty array/list
+  $split-arr: ();
+  // first index of separator in string
+  $index: str-index($string, $separator);
+  // loop through string
+  @while $index != null {
+    // get the substring from the first character to the separator
+    $item: str-slice($string, 1, $index - 1);
+    // push item to array
+    $split-arr: append($split-arr, $item);
+    // remove item and separator from string
+    $string: str-slice($string, $index + 1);
+    // find new index of separator
+    $index: str-index($string, $separator);
+  }
+  // add the remaining string to list (the last item)
+  $split-arr: append($split-arr, $string);
+
+  @return $split-arr;
+}
+
+@function appendThemeVar($themeVars, $componentVariable) {
+  $split: str-split($componentVariable, ":");
+  $varName: list.nth($split, -1);
+  $cssVar: createVar($varName);
+  $themeVars: map.set($themeVars, #{$componentVariable}, $cssVar);
+  @return $themeVars;
+}
+
+@function getThemeVar($themeVars, $componentVariable) {
+  @return map.get($themeVars, $componentVariable);
+}
+
+@function json-stringify($var) {
+  $var-type: type-of($var);
+  $encode-func-name: "_encode-#{$var-type}";
+
+  @if (function-exists($encode-func-name)) {
+    $encode-func: get-function($encode-func-name);
+
+    @return call($encode-func, $var);
+  }
+
+  @return $var; // strings and booleans don't need to be modified
+}
+
+@function stringify($var) {
+  @return '"#{$var}"';
+}
+
+@function _encode-string($string) {
+  @return stringify($string);
+}
+
+@function _encode-number($number) {
+  @if (unitless($number)) {
+    @return $number;
+  }
+
+  @return stringify($number);
+}
+
+@function _encode-null($string) {
+  @return "null";
+}
+
+@function _encode-color($color) {
+  @return stringify($color);
+}
+
+@function _encode-list($list) {
+  @return _encode-iterable($list);
+}
+
+@function _encode-map($map) {
+  @return _encode-iterable($map);
+}
+
+@function _encode-iterable($iterable) {
+  $is-list: type-of($iterable) == "list";
+  $is-map: type-of($iterable) == "map";
+
+  $str: "";
+  $opening-bracket: if($is-list, "[", "{");
+  $closing-bracket: if($is-list, "]", "}");
+
+  @each $key, $value in $iterable {
+    $entry-string: "";
+
+    @if ($is-list) {
+      $entry-string: json-stringify($key);
+    } @else if ($is-map) {
+      $entry-string: stringify($key) + ": " + json-stringify($value);
+    }
+
+    $str: $str + ", " + $entry-string;
+  }
+
+  $str: str-slice($str, 3); // remove leading ', ' from ', entry1, entry2'
+
+  @return $opening-bracket + $str + $closing-bracket;
+}
+
+// =====================================================================================================================
+// Helper functions for theme variables
+
+@function appendPaddingVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "padding-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-vertical-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-top-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-bottom-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-left-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-right-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "padding-#{$subject}") !global;
+  @return $tmp;
+}
+
+@function appendBorderVars($themeVars, $subject) {
+  $tmp: appendThemeVar($themeVars, "color-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-horizontal-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-vertical-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-left-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-left-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-left-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-right-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-right-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-right-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-top-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-top-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-top-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-bottom-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-bottom-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-bottom-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "color-border-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "thickness-border-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "style-border-#{$subject}") !global;
+  $tmp: appendThemeVar($tmp, "radius-#{$subject}") !global;
+  @return $tmp;
+}
+
+@mixin paddingVars($themeVars, $subject) {
+  padding: getThemeVar($themeVars, "padding-#{$subject}");
+}
+
+@mixin borderVars($themeVars, $subject) {
+  border-radius: getThemeVar($themeVars, "radius-#{$subject}");
+  border-width: getThemeVar($themeVars, "thickness-border-#{$subject}");
+  border-style: getThemeVar($themeVars, "style-border-#{$subject}");
+  border-color: getThemeVar($themeVars, "color-border-#{$subject}");
+  border-top-width: getThemeVar($themeVars, "thickness-border-top-#{$subject}");
+  border-top-style: getThemeVar($themeVars, "style-border-top-#{$subject}");
+  border-top-color: getThemeVar($themeVars, "color-border-top-#{$subject}");
+  border-bottom-width: getThemeVar($themeVars, "thickness-border-bottom-#{$subject}");
+  border-bottom-style: getThemeVar($themeVars, "style-border-bottom-#{$subject}");
+  border-bottom-color: getThemeVar($themeVars, "color-border-bottom-#{$subject}");
+  border-left-width: getThemeVar($themeVars, "thickness-border-left-#{$subject}");
+  border-left-style: getThemeVar($themeVars, "style-border-left-#{$subject}");
+  border-left-color: getThemeVar($themeVars, "color-border-left-#{$subject}");
+  border-right-width: getThemeVar($themeVars, "thickness-border-right-#{$subject}");
+  border-right-style: getThemeVar($themeVars, "style-border-right-#{$subject}");
+  border-right-color: getThemeVar($themeVars, "color-border-right-#{$subject}");
+}
+
+// =====================================================================================================================
+// CSS variables for miscellaneous shadows
+$shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-xxl: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+
+$shadow-spread: 0px 0px 30px rgba(0, 0, 0, 0.1);
+$shadow-spread-2: -6px -4px 40px 10px rgba(0, 0, 0, 0.1);
+$shadow-spread-2-xl: -6px -4px 40px 18px rgba(0, 0, 0, 0.1);
+
+// CSS variables describing spacing between UI elements
+$space-0: createVar(space-0);
+$space-0_5: createVar(space-0_5);
+$space-1: createVar(space-1);
+$space-1_5: createVar(space-1_5);
+$space-2: createVar(space-2);
+$space-2_5: createVar(space-2_5);
+$space-3: createVar(space-3);
+$space-3_5: createVar(space-3_5);
+$space-4: createVar(space-4);
+$space-5: createVar(space-5);
+$space-6: createVar(space-6);
+$space-7: createVar(space-7);
+$space-8: createVar(space-8);
+$space-9: createVar(space-9);
+$space-10: createVar(space-10);
+$space-11: createVar(space-11);
+$space-12: createVar(space-12);
+$space-14: createVar(space-14);
+$space-16: createVar(space-16);
+$space-20: createVar(space-20);
+$space-24: createVar(space-24);
+$space-28: createVar(space-28);
+$space-32: createVar(space-32);
+$space-36: createVar(space-36);
+$space-40: createVar(space-40);
+$space-44: createVar(space-44);
+$space-48: createVar(space-48);
+$space-52: createVar(space-52);
+$space-56: createVar(space-56);
+$space-60: createVar(space-60);
+$space-64: createVar(space-64);
+$space-72: createVar(space-72);
+$space-80: createVar(space-80);
+$space-96: createVar(space-96);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Generic style variables
+
+$color-text-primary: createVar(color-text-primary);
+$color-bg-primary: createVar(color-bg-primary);
+$color-text-attention: createVar(color-text-attention);
+$color-bg-attention: createVar(color-bg-attention);
+$color-text-subtitle: createVar(color-text-subtitle);
+$color-bg-primary: createVar(color-bg-primary);
+$color-bg-secondary: createVar(color-bg-secondary);
+$color-bg-Input-default: createVar(color-bg-Input-default);
+$color-text--disabled: createVar(color-text--disabled);
+$color-bg--disabled: createVar(color-bg--disabled);
+$color-border--disabled: createVar(color-border--disabled);
+$color-bg--selected: createVar(color-bg--selected);
+$font-family: useVar(createVar(font-family), createVar(font-family));
+$font-size-tiny: createVar(font-size-tiny);
+$font-size-smaller: createVar(font-size-smaller);
+$font-size-small: createVar(font-size-small);
+$font-size-normal: createVar(font-size-normal);
+$font-size-medium: createVar(font-size-medium);
+$font-size-large: createVar(font-size-large);
+
+$color-bg-overlay: createVar(color-bg-overlay);
+$color-info: createVar(color-info);
+$color-valid: createVar(color-valid);
+$color-warning: createVar(color-warning);
+$color-error: createVar(color-error);
+
+$color-border: createVar(color-border);
+
+$max-content-width: createVar(max-content-width);
+$direction: createVar(direction);
+
+$font-feature-settings: createVar(font-feature-settings);
+
+$color-outline--focus: createVar(color-outline--focus);
+$thickness-outline--focus: createVar(thickness-outline--focus);
+$style-outline--focus: createVar(style-outline--focus);
+$offset-outline--focus: createVar(offset-outline--focus);
+$focus-outline: $thickness-outline--focus $style-outline--focus $color-outline--focus;
+
+$media-max-width-phone: createVar(media-max-width-phone);
+$media-max-width-tablet: createVar(media-max-width-tablet);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Dropdown style variables
+
+$color-bg-dropdown-item: createVar(color-bg-dropdown-item);
+$color-bg-dropdown-item--active: createVar(color-bg-dropdown-item--active);
+$color-border-dropdown-item: createVar(color-border-dropdown-item);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Tree style variables
+$color-bg-tree-row--selected--before: createVar(color-bg-tree-row--selected--before);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Input border style variables
+
+$color-border-Input-default: createVar(color-border-Input-default);
+$color-border-Input-default--hover: createVar(color-border-Input-default--hover);
+$color-border-Input-default--success: createVar(color-border-Input-default--success);
+$color-border-Input-default--warning: createVar(color-border-Input-default--warning);
+$color-border-Input-default--error: createVar(color-border-Input-default--error);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// InputLabel style variables
+
+$color-text-InputLabel-required: createVar(color-text-InputLabel-required);
+
+// ---------------------------------------------------------------------------------------------------------------------
+// formItem style variables
+$color-text-FormItemLabel: createVar(color-text-FormItemLabel);
+$font-size-FormItemLabel: createVar(font-size-FormItemLabel);
+$font-weight-FormItemLabel: createVar(font-weight-FormItemLabel);
+
+//----------------------------------------------------------------------------------------------------------------------
+// Tab style variables
+
+$color-primary-500: createVar(color-primary-500);
+$color-danger-500: createVar(color-danger-500);
+
+$color-bg: createVar(color-bg);
+
+$color-text-secondary: createVar(color-text-secondary);
+
+$font-weight-light: createVar(font-weight-light);
+$font-weight-normal: createVar(font-weight-normal);
+$font-weight-medium: createVar(font-weight-medium);
+$font-weight-bold: createVar(font-weight-bold);
+
+$radius: createVar(radius);
+
+// body
+$font-size: createVar(font-size);
+$font-weight: createVar(font-weight);

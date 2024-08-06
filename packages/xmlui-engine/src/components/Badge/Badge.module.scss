@@ -1,0 +1,60 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-bg-Badge: createThemeVar('color-bg-Badge');
+$radius-Badge: createThemeVar('radius-Badge');
+$color-text-Badge: createThemeVar('color-text-Badge');
+$font-size-Badge: createThemeVar('font-size-Badge');
+$font-size-Badge-pill: createThemeVar('font-size-Badge-pill');
+$font-weight-Badge: createThemeVar('font-weight-Badge');
+$font-weight-Badge-pill: createThemeVar('font-weight-Badge-pill');
+$padding-horizontal-Badge: createThemeVar('padding-horizontal-Badge');
+$padding-vertical-Badge: createThemeVar('padding-vertical-Badge');
+$padding-Badge: createThemeVar('padding-Badge');
+$padding-horizontal-Badge-pill: createThemeVar('padding-horizontal-Badge-pill');
+$padding-vertical-Badge-pill: createThemeVar('padding-vertical-Badge-pill');
+$padding-Badge-pill: createThemeVar('padding-Badge-pill');
+
+.badge {
+  display: inline-block;
+  width: fit-content;
+  vertical-align: top;
+  padding: $padding-Badge;
+  min-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  font-weight: $font-weight-Badge;
+
+  background-color: $color-bg-Badge;
+  color: $color-text-Badge;
+  border-radius: $radius-Badge;
+  font-size: $font-size-Badge;
+}
+
+.pill {
+  display: inline-block;
+  width: fit-content;
+  vertical-align: top;
+  padding: $padding-Badge-pill;
+  min-width: fit-content;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: $font-weight-Badge-pill;
+
+  background-color: $color-bg-Badge;
+  color: $color-text-Badge;
+  border-radius: 9999px;
+  font-size: $font-size-Badge-pill;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

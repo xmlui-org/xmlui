@@ -1,0 +1,532 @@
+import data from "../../examples/list-component-data";
+
+# How-To: Layout
+
+The [Layout Components](/learning/using-components/layout-components/) article explains the fundamentals of `Stack` and `FlowLayout` (and their derivatives), which are the primary layout components in XMLUI.
+
+In this article, you will learn more subtle details to help you establish well-controlled layouts.
+
+## Setting component height
+
+If you set an explicit height (with the `height` layout property), the component will use that height; otherwise, it accommodates its content (children) height. Check these examples:
+
+```ueml copy
+<VStack backgroundColor="cyan" padding="1rem">
+  This is some text within a Stack
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: VStack with implicit height"
+  height={80}
+  app={`
+    <VStack backgroundColor="cyan" padding="1rem">
+      This is some text within a Stack
+    </VStack>
+  `}
+/>
+
+```ueml copy /height="160px"/
+<VStack height="160px" backgroundColor="cyan" padding="1rem">
+  This is some text within a Stack
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: VStack with *explicit* height"
+  height={180}
+  app={`
+    <VStack height="160px" backgroundColor="cyan" padding="1rem">
+      This is some text within a Stack
+    </VStack>
+  `}
+/>
+
+Check how the stack height changed (the cyan background) between the two examples!
+
+When you explicitly set the height of a container (e.g., `Stack`) and the content is bigger, the content will overflow from the container:
+
+```ueml copy /height="40px"/
+<VStack height="40px" backgroundColor="cyan" padding="1rem">
+  <H2>This is some text within a Stack</H2>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: VStack with content overflow"
+  height={80}
+  app={`
+    <VStack height="40px" backgroundColor="cyan" padding="1rem">
+      <H2>This is some text within a Stack</H2>
+    </VStack>
+  `}
+/>
+
+## Setting vertical alignment
+
+A stack can align its contents vertically to the start (the default alignment), the end (bottom), or the center. However, these alignments seem to be ignored if the stack does not have an explicit size! In this case, the stack's height is the same as its contents, so all vertical alignments (start, end, and center) will display the child component as it is.
+
+The following sample demonstrates this:
+
+```ueml copy /verticalAlignment="center"/
+<VStack verticalAlignment="center" backgroundColor="cyan" padding="1rem">
+  This is some text within a Stack
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: VStack with implicit height and vertical alignment"
+  height={80}
+  app={`
+    <VStack verticalAlignment="center" backgroundColor="cyan" padding="1rem">
+      This is some text within a Stack
+    </VStack>
+  `}
+/>
+
+With an explicit size, you will see the effect of `verticalAlignment`:
+
+<Playground
+  previewOnly
+  name="Example: VStack with *explicit* height and vertical alignment"
+  height={180}
+  app={`
+    <VStack verticalAlignment="center" height="160px" backgroundColor="cyan" padding="1rem">
+      This is some text within a Stack
+    </VStack>
+  `}
+/>
+
+## Setting vertical alignment with nested components
+
+When you nest components into each other, the vertical alignment may produce surprising effects. Though you expect something else, they produce the effect because you may forget explicit sizing.
+
+Here is an example using a Table. The unexpected result is when you click the `Clear data`, as the "Nothing here!" text appears at the top of the table's placeholder, though you use this definition for `noDataTemplate`:
+
+```ueml copy /height="100%"/ /verticalAlignment="center"/
+<prop name="noDataTemplate">
+  <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
+    Nothing here!
+  </VStack>
+</prop>
+```
+
+Click the Clear data (and the Reload data) buttons to check the issue:
+
+<Playground
+  previewOnly
+  name="Example: issue with vertical alignment in nested components"
+  height={380}
+  app={`
+    <VStack
+      backgroundColor="cyan"
+      height="100%"
+      padding="1rem"
+      gap="0.5rem"
+      var.tableData='{${JSON.stringify(data)}}'
+      var.savedData='{${JSON.stringify(data)}}'
+    >
+      <HStack gap="0.5rem">
+        <Button onClick="tableData = []">Clear data</Button>
+        <Button onClick="tableData = savedData">Reload data</Button>
+      </HStack>
+      <Table data='{tableData}' backgroundColor="lightgreen">
+        <TableColumnDef bindTo="name"/>
+        <TableColumnDef bindTo="quantity"/>
+        <TableColumnDef bindTo="unit"/>
+        <prop name="noDataTemplate">
+          <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
+            Nothing here!
+          </VStack>
+        </prop>
+      </Table>
+    </VStack>
+  `}
+/>
+
+When you look at the markup, you can see that the outermost `VStack` has an explicit height, set to "100%":
+
+```ueml copy /height="100%"/
+<VStack
+  backgroundColor="cyan"
+  height="100%"
+  padding="1rem"
+  gap="0.5rem"
+  var.tableData='{${JSON.stringify(data)}}'
+  var.savedData='{${JSON.stringify(data)}}'
+>
+  <HStack gap="0.5rem">
+    <Button onClick="tableData = []">Clear data</Button>
+    <Button onClick="tableData = savedData">Reload data</Button>
+  </HStack>
+  <Table data='{tableData}' backgroundColor="lightgreen">
+    <TableColumnDef bindTo="name"/>
+    <TableColumnDef bindTo="quantity"/>
+    <TableColumnDef bindTo="unit"/>
+    <prop name="noDataTemplate">
+      <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
+        Nothing here!
+      </VStack>
+    </prop>
+  </Table>
+</VStack>
+```
+
+The cause of the issue is that the `noDataTemplate` is within the `Table` component. A `Table` is a layout container, too; it arranges its children (data rows). Vertical content alignment works the same way as described earlier. If you do not set the table height to an explicit size, the height of the `noDataTemplate` container is based on the contents. When the table displays the empty content template, the height is the line height of the "Nothing here!" text.
+
+You can quickly fix this issue by specifying the table height explicitly:
+
+```ueml /height="*"/
+<Table data='{tableData}' height="*" backgroundColor="lightgreen">
+  <!-- Unchanged -->
+</Table>
+```
+
+Check this out; now the `noDataTemplate` is rendered as expected:
+
+<Playground
+  previewOnly
+  name="Example: fix the issue with vertical alignment in nested components"
+  height={240}
+  app={`
+    <VStack
+      backgroundColor="cyan"
+      height="100%"
+      padding="1rem"
+      gap="0.5rem"
+      var.tableData='{${JSON.stringify(data)}}'
+      var.savedData='{${JSON.stringify(data)}}'
+    >
+      <HStack gap="0.5rem">
+        <Button onClick="tableData = []">Clear data</Button>
+        <Button onClick="tableData = savedData">Reload data</Button>
+      </HStack>
+      <Table data='{tableData}' height="*" backgroundColor="lightgreen">
+        <TableColumnDef bindTo="name"/>
+        <TableColumnDef bindTo="quantity"/>
+        <TableColumnDef bindTo="unit"/>
+        <prop name="noDataTemplate">
+          <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
+            Nothing here!
+          </VStack>
+        </prop>
+      </Table>
+    </VStack>
+  `}
+/>
+
+> **Remember**: The "*" is start sizing. It means that the container should stretch itself to its parent's remaining (available) size. Using 100% would mean the entire parent (`VStack`) height and not just the available.
+
+## Apps with non-scrolling layout
+
+When you create an app, the main content, by default, does not have an explicit size. According to what you learned about component height in the previous sections, the main content's height is always the total height of its children. This setup allows the main content to become infinitely long.
+
+Check out these two examples, each of them using main content with implicit height (the main content's `VStack` does not specify its height):
+
+> **Note**: The samples do not have an app header and footer for simplicity.
+
+```ueml copy
+<App>
+  <VStack verticalAlignment="center" backgroundColor="cyan">
+    <H3>Main content</H3>
+  </VStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: implicit main content height #1"
+  height={60}
+  app={`
+    <App>
+      <VStack verticalAlignment="center" backgroundColor="cyan">
+        <H3>Main content</H3>
+      </VStack>
+    </App>
+  `}
+/>
+
+The second example adds a 400px height stack, increasing the height of the main content. As the app's viewport is not tall enough to display the main content entirely, it provides a vertical scrollbar:
+
+```ueml copy
+<App>
+  <VStack verticalAlignment="center" backgroundColor="cyan">
+    <H3>Main content</H3>
+    <VStack height="400px">
+      (height: 400px)
+    </VStack>
+  </VStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: implicit main content height #2"
+  height={240}
+  app={`
+    <App>
+      <VStack verticalAlignment="center" backgroundColor="cyan">
+        <H3>Main content</H3>
+        <VStack height="400px">
+          (height: 400px)
+        </VStack>
+      </VStack>
+    </App>
+  `}
+/>
+
+Let's assume you want to create an app that stretches its main area to the entire viewport and splits it into two equally sized vertical panels, each occupying 50% of the available screen estate:
+
+```ueml copy
+<App>
+  <VStack height="50%" backgroundColor="cyan">
+    <H3>Upper panel</H3>
+  </VStack>
+  <VStack height="50%" backgroundColor="lightgreen">
+    <H3>Lower panel</H3>
+  </VStack>
+</App>
+```
+
+However, the result differs from what you expect; the main content does not fill the available viewport:
+
+<Playground
+  previewOnly
+  name="Example: 50%-50% panels (wrong)"
+  height={240}
+  app={`
+    <App>
+      <VStack height="50%" backgroundColor="cyan">
+        <H3>Upper panel</H3>
+      </VStack>
+      <VStack height="50%" backgroundColor="lightgreen">
+        <H3>Lower panel</H3>
+      </VStack>
+    </App>
+  `}
+/>
+
+Moreover, any of these changes will not help:
+
+**Potential resolution #1**: Set the `App` height to 100%:
+
+```ueml copy /height="100%"/
+<App height="100%">
+  <-- Unchanged -->
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: 50%-50% panels with 100% App height (wrong)"
+  height={240}
+  app={`
+    <App height="100%">
+      <VStack height="50%" backgroundColor="cyan">
+        <H3>Upper panel</H3>
+      </VStack>
+      <VStack height="50%" backgroundColor="lightgreen">
+        <H3>Lower panel</H3>
+      </VStack>
+    </App>
+  `}
+/>
+
+**Potential resolution #2**: Wrap the two panels into a `VStack` with 100% height:
+
+```ueml copy /height="100%"/
+<App>
+  <VStack height="100%">
+    <VStack height="50%" backgroundColor="cyan">
+      <H3>Upper panel</H3>
+    </VStack>
+    <VStack height="50%" backgroundColor="lightgreen">
+      <H3>Lower panel</H3>
+    </VStack>
+  </VStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: 50%-50% panels with 100% VStack (wrong)"
+  height={240}
+  app={`
+    <App>
+      <VStack height="100%">
+        <VStack height="50%" backgroundColor="cyan">
+          <H3>Upper panel</H3>
+        </VStack>
+        <VStack height="50%" backgroundColor="lightgreen">
+          <H3>Lower panel</H3>
+        </VStack>
+      </VStack>
+    </App>
+  `}
+/>
+
+None of the potential resolutions work. The reason is in the way `App` (as a layout container) works: it ignores its explicit height to handle all available [layout modes](/components/App/#layout) (including the "sticky" layouts) consistently.
+
+How do we solve this issue? How can you create an app with its main content fill the available viewport? The `App` component is prepared for this situation. Setting its `scrollWholePage` property to `false` turns off scrolling the main contents; moreover, the main content fills the viewport's available space:
+
+```ueml copy /scrollWholePage="false"/
+<App scrollWholePage="false">
+  <VStack height="50%" backgroundColor="cyan">
+    <H3>Upper panel</H3>
+  </VStack>
+  <VStack height="50%" backgroundColor="lightgreen">
+    <H3>Lower panel</H3>
+  </VStack>
+</App>
+```
+
+Check the modified app:
+
+<Playground
+  previewOnly
+  name="Example: 50%-50% panels with 100% VStack (correct)"
+  height={240}
+  app={`
+    <App scrollWholePage="false">
+      <VStack height="50%" backgroundColor="cyan">
+        <H3>Upper panel</H3>
+      </VStack>
+      <VStack height="50%" backgroundColor="lightgreen">
+        <H3>Lower panel</H3>
+      </VStack>
+    </App>
+  `}
+/>
+
+You can use `AppHeader` and `Footer` with the non-scrolling layout, too; the 50%-50% split between the main content's panels still works:
+
+```ueml copy {2, 9}
+<App scrollWholePage="false">
+  <AppHeader><H1>MyApp</H1></AppHeader>
+  <VStack height="50%" backgroundColor="cyan">
+    <H3>Upper panel</H3>
+  </VStack>
+  <VStack height="50%" backgroundColor="lightgreen">
+    <H3>Lower panel</H3>
+  </VStack>
+  <Footer>Powered by XMLUI</Footer>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: 50%-50% panels with 100% VStack (correct)"
+  height={300}
+  app={`
+    <App scrollWholePage="false">
+      <AppHeader><H1>MyApp</H1></AppHeader>
+      <VStack height="50%" backgroundColor="cyan">
+        <H3>Upper panel</H3>
+      </VStack>
+      <VStack height="50%" backgroundColor="lightgreen">
+        <H3>Lower panel</H3>
+      </VStack>
+      <Footer>Powered by XMLUI</Footer>
+    </App>
+  `}
+/>
+
+## Desktop-like layout with resizable panels
+
+You can easily create complex layouts with a few layout containers within `App`, as the following sample demonstrates:
+
+```ueml copy
+<App scrollWholePage="false">
+  <Theme thickness-resizer-Splitter="4px" color-bg-resizer-Splitter="blue">
+    <VStack height="100%">
+      <!-- Custom header -->
+      <HStack height="$space-10" horizontalPadding="$space-4" verticalAlignment="center"
+        backgroundColor="lightblue">
+        MenuBar
+        <SpaceFiller />
+        <Icon name="close" />
+      </HStack>
+      <!-- Main content -->
+      <HSplitter height="*" floating="true" initialPrimarySize="25%" minPrimarySize="10%"
+        maxPrimarySize="90">
+        <VStack height="100%" backgroundColor="cyan">
+          <H3>Left panel</H3>
+        </VStack>
+        <VSplitter height="100%" initialPrimarySize="20%" floating="true">
+          <VStack height="100%" backgroundColor="lightcoral">
+            <H3>Upper right panel</H3>
+          </VStack>
+          <VStack height="100%" backgroundColor="lightyellow">
+            <H3>Lower right panel</H3>
+          </VStack>
+        </VSplitter>
+      </HSplitter>
+      <!-- Custom footer -->
+      <HStack height="$space-10" horizontalPadding="$space-4" verticalAlignment="center"
+        backgroundColor="lightblue">
+        StatusBar
+      </HStack>
+    </VStack>
+  </Theme>
+</App>
+```
+
+Try the example! When you move the mouse to the boundary between the panels, you can drag the splitters to resize them.
+
+<Playground
+  previewOnly
+  name="Example: desktop-like layout with resizable panels"
+  height={300}
+  app={`
+    <App scrollWholePage="false">
+      <Theme thickness-resizer-Splitter="4px" color-bg-resizer-Splitter="blue">
+        <VStack height="100%">
+          <!-- Custom header -->
+          <HStack
+            height="$space-10"
+            horizontalPadding="$space-4"
+            verticalAlignment="center"
+            backgroundColor="lightblue"
+          >
+            MenuBar
+            <SpaceFiller />
+            <Icon name="close"/>
+          </HStack>
+          <!-- Main content -->
+          <HSplitter
+            height="*"
+            floating="true"
+            initialPrimarySize="25%"
+            minPrimarySize="10%"
+            maxPrimarySize="90%"
+          >
+            <VStack height="100%" backgroundColor="cyan">
+              <H3>Left panel</H3>
+            </VStack>
+            <VSplitter height="100%" initialPrimarySize="20%" floating="true">
+              <VStack height="100%" backgroundColor="lightcoral">
+                <H3>Upper right panel</H3>
+              </VStack>
+              <VStack height="100%" backgroundColor="lightyellow">
+                <H3>Lower right panel</H3>
+              </VStack>
+            </VSplitter>
+          </HSplitter>
+          <!-- Custom footer -->
+          <HStack
+            height="$space-10"
+            horizontalPadding="$space-4"
+            verticalAlignment="center"
+            backgroundColor="lightblue"
+          >
+            StatusBar
+          </HStack>
+        </VStack>
+      </Theme>
+    </App>
+  `}
+/>

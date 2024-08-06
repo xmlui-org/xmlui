@@ -1,0 +1,169 @@
+# Your First XMLUI App
+
+> **Note**: While XMLUI is not released publicly, you must configure your local environment to download NPM packages from the private repository of /n software on GitHub. This [article](./prepare-env) describes the configuration steps.
+
+## Using the `create-xmlui-app` tool
+
+Developing an XMLUI app is faster with a prepared development environment. XMLUI ships with a tool, the `create-xmlui-app` utility, a standard Node command line app. It creates the development environment in a few seconds.
+
+Before using it, prepare a directory in your preferred workspace to play with XMLUI. Each app you create will go into a separate folder.
+
+> **Note**: You can use XMLUI with your favorite code editor. In our tutorial, we use VS Code (https://code.visualstudio.com/download)
+
+### Customize VS Code
+
+XMLUI has a VS Code extension that provides syntax highlighting for markup files (and other helpful features). Go to the Extensions tab in the VS Code activity bar and search for XMLUI:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/xmlui-tools.png" width={362} />
+
+Click Install to add XMLUI Tools to the VS Code extensions. In a few seconds, the toolset is ready. Open the `IncButton.xmlui` file from the `components` folder to see that the code editor supports syntax highlighting:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/syntax-highlighting.png" />
+
+
+### Create the Boilerplate Code
+
+1. Open a command line tool (it may be the Terminal window in VS Code) and select your preferred working directory with the `cd` command.
+2. Execute this command to download and start `create-xmlui-app`
+
+```bash
+npx @nsoftware-com/create-xmlui-app@latest
+```
+
+The `npx` utility (part of the Node toolset) will download the `create-xmlui-app` package. Before installing it to your machine, it asks for a confirmation:
+
+```
+Need to install the following package:
+  @nsoftware-com/create-xmlui-app@<version>
+Ok to proceed? (y)
+```
+
+(Here, `<version>` is the current version of the package). Press enter or `y` to go on; `n` to abandon.
+
+1. After the package download (a few seconds), it starts and asks for your project name. Press Enter to accept the `my-app` default name or specify one. In this tutorial, we use the `my-first-app` project name.
+2. You can optionally initialize a Git repo with your project. Press Enter (sign no Git repo) to go on.
+3. The utility installs the `@nsoftware-com/xmlui` package, the only direct dependency you need to develop XMLUI apps. That package will pull its dependencies automatically. After the download (it may take one or two minutes the first time), the tool sets up your XMLUI development project.
+4. The project you created goes into its separate folder within the working folder from which you ran the `create-xmlui-app` command.
+
+### The Boilerplate Structure
+
+Open the newly created `my-first-app` (use your project's name) folder in VS Code. You will see this structure:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/boilerplate-structure.png" width={315} />
+
+The `index.html` file wraps your entire app served with a web server. The `package.json` and `package-lock.json` are the standard Node package descriptor files.
+
+Your primary focus is the `src` folder holding the application source code. Here, the `Main.xmlui` file contains the application's root component definition and may refer to other app components (besides the built-in XMLUI components). The app-specific components are in the `src/components` folder.
+
+The `config.ts` file describes a few configuration values, such as the application's name to display, its logo, the default theme, URLs to access backends, etc. When you build the app, this file is turned into a configuration file you can change according to your production environment.
+
+The `public` folder contains the static resources (such as images, logos, fonts, etc) your app uses.
+
+## Starting the App
+
+The newly generated app is ready to run. Execute the `npm start` command to execute it. In VS Code, use the terminal window (Terminal | New Terminal); it will automatically set your working folder to the app's root.
+```
+> my-first-app@0.1.0 start
+> xmlui start
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+```
+
+Click the link displayed (http://localhost:5173/) to open the app in your default browser. (In VS Code, you need to click the Ctrl or Cmd button when clicking, depending on your OS).
+
+Your app starts:
+
+<br/>
+<Image alt="App start" src="/resources/images/get-started/app-start.png" />
+
+Try the menu items, and they show you some cool features of XMLUI! Soon, you will learn about each code snippet that implements a particular feature.
+
+When you ran the app with `npm start`, the toolset started it in a development environment setup with _Hot Module Reloading =HRM)_. This nifty feature lets you modify your app and see changes on the fly.
+
+Open the `Main.xml` file in VS Code, and modify the `<Footer>` section at the bottom by changing the `Powered by XMLUI` text to something else:
+
+```ueml
+<Footer>
+  Powered by XMLUI -- I modified it!!!
+</Footer>
+```
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/app-modified.png" />
+
+## Extend the App
+
+Try how easy it is to extend the working app. You do not even have to stop the running app! Create a new file in the `components` folder named `MyBoxes.xmlui`, and copy this contents to it:
+
+```ueml copy
+<Component name="MyBoxes">
+  <HStack padding="1rem" gap="1rem">
+    <Stack width="48" height="48" backgroundColor="red" />
+    <Stack width="48" height="48" backgroundColor="green" />
+    <Stack width="48" height="48" backgroundColor="blue" />
+  </HStack>
+</Component>
+```
+
+This code declares a reusable component named `MyBoxes`. We add this component to the menu with a few steps:
+
+1. Open the `Main.xmlui` file and navigate to the `<NavPanel>` section. It contains several `<NavLink>` child items, each representing a menu item that can navigate to its corresponding UI page. Append a new one:
+
+```ueml copy {7}
+<!-- ... -->
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Simple" to="/simple" />
+    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="Composable" to="/composable" />
+    <NavLink label="My Boxes" to="/myboxes" />
+  </NavPanel>
+<!-- ... -->
+```
+
+2. Scroll down to the `<Pages>` section, which contains `<Page>` items. These items declare how the UI belonging to a particular navigation link should display.
+3. Append a new `<Page>` item to the bottom of the `<Pages>` section:
+
+```ueml copy {3-5}
+  <Pages>
+    <!-- Previous <Page> tags omitted -->
+    <Page url="/myboxes">
+      <MyBoxes />
+    </Page>
+  </Pages>
+```
+
+Return to the browser and click the `My Boxes` item in the menu. You will see the newly added component works:
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/app-with-boxes.png" />
+
+## Building and Deploying the App
+
+Use the `npm run build` command to create a distribution folder. This command builds the app and creates a `dist` folder within your app folder. You can copy the content of this folder into your web server static files folder to serve the app.
+
+To test the build locally, run the `npm run preview` command. Similarly to `npm start`, it spins up a local web server and displays its URL you can use in the browser:
+
+```text {6}
+$ npm run preview
+
+> my-first-app@0.1.0 preview
+> xmlui preview
+
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+```
+
+> **Note**: This preview does not use HMR, so changing your app's code won't refresh the app in your browser, as it uses the files from the `dist` folder. If you have not built your app, the preview will display `Cannot /GET` as an indication of a 404 (Not Found) response status.
+
+Executing the `npm run build-prod` creates an optimized build with a flat distribution folder. Instead of grouping the app files into folders, every build file is directly within `dist`.
+
+> **Note**: You can use the `npm run preview` command to test the result of the production build.
+
+Use the `npm run release-ci` command to build a zipped distribution file ready for continuous integration. This command builds the same `dist` folder as `npm run build-prod` and adds a `ui.zip` file to the app folder.
+
+> **Note**: You can use the `npm run preview` command to test the result of the CI build. However, it will use the `dist` folder, not the `ui.zip` file.

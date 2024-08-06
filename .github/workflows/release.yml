@@ -1,0 +1,69 @@
+name: Release binaries
+
+#based on this article https://patriksvensson.se/posts/2020/03/creating-release-artifacts-with-github-actions
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+env:
+  DOTNET_VERSION: '6.0.x'
+  
+jobs:
+  release:
+    name: release
+    strategy:
+      matrix:
+        kind: [ 'linux', 'windows', 'macOS' ]
+        include:
+          - kind: linux
+            os: ubuntu-latest
+            target: linux-x64
+          - kind: windows
+            os: windows-latest
+            target: win-x64
+          - kind: macOS
+            os: macos-latest
+            target: osx-x64
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: cache node modules
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}  
+
+      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Build
+        shell: bash
+        run: |
+          # Define some variables for things we need
+          tag=$(git describe --tags --abbrev=0)
+          release_name="CRM-engine-$tag-${{ matrix.target }}"
+          
+          # Build everything
+          dotnet publish CrmEngine.ClientApi/CrmEngine.ClientApi.csproj -c Release --runtime "${{ matrix.target }}" --self-contained -p:PublishSingleFile=true -o "$release_name"
+          
+          # Pack files
+          if [ "${{ matrix.target }}" == "win-x64" ]; then
+            7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          else
+            tar czvf "${release_name}.tar.gz" "$release_name"
+          fi
+          
+          # Delete output directory
+          rm -r "$release_name"          
+    
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "CRM-engine-*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

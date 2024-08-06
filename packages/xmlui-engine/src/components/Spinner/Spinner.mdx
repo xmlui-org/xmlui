@@ -1,0 +1,119 @@
+%-DESC-START
+
+## Using the `Spinner`
+
+```ueml copy
+<HStack padding="$space-1">
+  <Spinner />
+</HStack>
+```
+
+<Playground
+  name="Example: using Spinner"
+  previewOnly
+  height={72}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner />
+  </HStack>
+  `}
+/>
+
+%-DESC-END
+
+%-PROP-START delay
+
+Use the buttons to toggle between the two `Spinners`.
+
+```ueml copy {8-9}
+<VStack padding="$space-1" gap="$space-1">
+  <var name="noDelay" value="{true}" />
+  <var name="yesDelay" value="{false}" />
+  <HStack gap="$space-0_5">
+    <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
+    <Button label="1000milsec delay" onClick="noDelay = false; yesDelay = true;" />
+  </HStack>
+  <Spinner when="{noDelay}" delay="0" />
+  <Spinner when="{yesDelay}" delay="1000" />
+</VStack>
+```
+
+<Playground
+  name="Example: delay"
+  previewOnly
+  height={140}
+  app={`
+  <VStack padding="$space-1" gap="$space-1">
+    <var name="noDelay" value="{true}" />
+    <var name="yesDelay" value="{false}" />
+    <HStack gap="$space-0_5">
+      <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
+      <Button label="1000milsec delay" onClick="noDelay = false; yesDelay = true;" />
+    </HStack>
+    <Spinner when="{noDelay}" delay="0" />
+    <Spinner when="{yesDelay}" delay="1000" />
+  </VStack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START fullScreen
+
+```ueml copy
+<HStack padding="$space-1">
+  <Spinner fullScreen="true" />
+</HStack>
+```
+
+<Playground
+  name="Example: fullScreen"
+  previewOnly
+  height={72}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner fullScreen="true" />
+  </HStack>
+  `}
+/>
+
+%-PROP-END
+
+%-STYLE-START
+
+The `Spinner` has the following theme variables:
+
+- `color-border-Spinner`
+- `size-Spinner`
+- `thickness-Spinner`
+
+```json copy
+"size-Spinner": "3rem",
+"thickness-Spinner": "12px",
+"color-border-Spinner": "red"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={80}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner />
+  </HStack>
+  `}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "size-Spinner": "3rem",
+        "thickness-Spinner": "8px",
+        "color-border-Spinner": "red",
+      }
+    }  
+  ]}
+/>
+
+%-STYLE-END

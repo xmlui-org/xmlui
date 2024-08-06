@@ -1,0 +1,26 @@
+# H5
+
+The `H5` component is a shorthand version of the `Heading` element with its `level` property set to "h5".
+
+See also: [Heading](./Heading), [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H6](./H6).
+
+```ueml copy
+<H5 value="This is a H5 text" />
+```
+
+<Playground
+  name="H5 example"
+  previewOnly
+  height={100}
+  app={`
+  <Stack>
+    <H5 value="This is a H5 text" />
+  </Stack>
+  `}
+/>
+
+## Styling
+
+The `H5` component inherits its visual style from the `Heading` component.
+Using the `H5` component specifier, you can override the inherited theme variable values.
+For example, the `color-text-H5` theme variable sets the text color of `H5` while keeping the color of all other headings.

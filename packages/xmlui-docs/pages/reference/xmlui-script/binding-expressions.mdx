@@ -1,0 +1,339 @@
+# XMLUI Expressions
+
+Binding expressions are an essential part of the XMLUI's programmability. With them, you can reactively bind components with others: whenever something changes, the engine catches the change and refreshes all related components in the UI.
+
+```ueml copy
+<Button label="Click to increment: {count}" var.count={0} onClick=count++ />
+```
+
+The following component definition uses a binding expression in the `<Button>` components `label` property:
+
+```
+"Click to increment: {count}"
+```
+
+The binding expression part is `{count}`, which uses an expression's (`count`) current value to display the label text.
+
+The component uses another binding expression to declare the `count` variable with its initial value of zero:
+
+```
+var.count={0}
+```
+
+When the user clicks the button, the `count++` event handler increments the value of `count`; the engine observes this change and refreshes the `<Button>` component's UI, as that leverages the current value of `count`.
+
+## Property and Variable Values
+
+When the engine evaluates a property or variable value, it searches that value string for binding expressions. If there are one or more, the engine evaluates those and replaces them with their values.
+
+Here are a few examples:
+
+```js
+"I can see the light"
+"{6*7}"
+"The universal answer is {6*7}"
+"This is {3*4} apples in {Math.sqrt(4)} groups."
+```
+
+The first line is a plain string, while the second is a plain binding expression. However, the third and fourth lines mix binding expressions with string literals. The engine accepts and understands all of these values.
+
+You can use binding expressions in the following places within the markup:
+- In the values of the `<vars>` section of components
+- In property values (property attributes or in the `<props>` section of components)
+- In the `when` attribute of components.
+
+You cannot use binding expressions in property, variable, or event names.
+
+### Examples
+
+**Simple Binding Expression**
+
+Let's harness the `value` property with a binding expression in the following component definition,
+which defines a `H3`:
+
+```ueml copy
+<H3 value="{6*7}"/>
+```
+
+Here, `{6*7}` is a binding expression. When the app renders the `H3` component, it will display 42 as the value of the evaluated binding expression.
+
+<Playground
+  previewOnly
+  name="Simple binding expression"
+  app={`<H3 value="{6*7}"/>`}
+  height={36}
+/>
+
+**Binding Expressions Mixed with String Literals**
+
+All of the property values here contain binding expressions mixed with string literals:
+
+```ueml copy
+<Fragment>
+  <H3 value="I saw {6*7} camels." />
+  <H3 value="This is {3*4} apples in {Math.sqrt(4)} groups." />
+  <H3 value="   {Math.pow(Math.sqrt(4), 2)}   " />
+</Fragment>
+```
+
+<Playground
+  previewOnly
+  name="Binding expression mixed with string literals"
+  app={`
+    <Fragment>
+      <H3 value="I saw {6*7} camels." />
+      <H3 value="This is {3*4} apples in {Math.sqrt(4)} groups." />
+      <H3 value="   {Math.pow(Math.sqrt(4), 2)}   " />
+    </Fragment>
+    `}
+  height={88}
+/>
+
+## Expression Evaluation
+
+The XMLUI handles all values, including numbers, strings, Booleans, `null`, `undefined`, `NaN`, `Infinity`, arrays, and objects with exactly the same semantics as JavaScript does. The engine uses the same operator semantics.
+
+The only exceptions are the `a.b` (member access), `a[b]` (calculated member access), and `a(...)` (function invocation) operators that use the optional member access (`a?.b`), optional calculated member access (`a?.[b]`), and optional function invocation (`a?.(...)`) semantics.
+
+### Sync and Async Evaluation
+
+The scripting engine is smart about using sync and async evaluation. It tries to evaluate all expressions synchronously, assuming their evaluation will be done quickly. The engine may observe that some of the evaluation involves an async operation. In that case, the evaluation turns into an async evaluation, and the engine awaits the result. Users do not have to know how it happens; they just get the operation result.
+
+However, the engine has a few constraints on which content the sync and async evaluation modes can be used.
+
+When evaluating the initial value of variables or setting and changing property values, the engine expects sync evaluation, as it needs the initial values instantly to render the UI. Thus, if the initial variable evaluation contains async parts, the engine raises an error message.
+
+When executing event handlers, the engine allows async execution. It tries to use sync mode for expression evaluation (unless an async function is invoked). However, it executes statements asynchronously to keep the UI responsive.
+
+## Syntax Definition
+
+Binding expressions follow the syntax of JavaScript expressions. Thus, if you know JavaScript, you can immediately
+write binding expressions. The operators and other syntax elements are very close to other "curly-brace" programming
+languages, such as C, C++, Java, and C# (and many others), so you'll get the hang of it in seconds.
+
+The JavaScript syntax nature of binding expressions is crucial not just because of the notations. In the binding
+expressions, you can use all objects available in the global namespace of JavaScript, including the `Math` object, the fundamental types like `Number`, `String`, `Date`, and many
+others.
+
+You can use these elements in XMLUI binding expressions:
+- Identifiers
+- Literals
+  - Numbers
+  - Strings
+  - Boolean values (`false` and `true`)
+  - `null` and `undefined`
+  - Array literals
+  - Object literals
+- Operators
+
+### Identifiers
+
+XMLUI identifiers may start with one of these characters: `$`, `_`, `#`, `@`, or any English alphabet letters (from `a` to `z` and from `A` to `Z`). The continuation characters can be of the same set as the start character; however, `#` is not allowed, and you can also use decimal digits (from `0` to `9`). Other characters (such as Unicode letters, symbols, or emojis) are not allowed in identifiers.
+
+> **Note**: Be aware XMLUI uses slightly different identifier syntax than JavaScript.
+
+Here are a few examples of valid identifiers:
+
+```js
+saveButton
+$item
+$saveCommand
+_a123
+```
+
+### Literals
+
+You can use the same numbers (integers and floating-point numbers) as in JavaScript, and also the `NaN` value
+(not-a-number) and `Infinity` (the result coming from a divide by zero).
+
+Array and object literals also allow you the same syntax as in JavaScript. Here are a few samples:
+
+```js
+[1, 2, 3] // An array of three numbers
+["Hello", "World", 42, true] // An array of four values
+{a: 1, b: 2, c: 3} // An object with three properties
+{
+  hey: 123,
+  ho: false,
+  hi: 123.e-2,
+  what: NaN,
+  is: ["this", "object-like"],
+  thing: {
+      that: null,
+      seems: "completely",
+      stupid: "?"
+  }
+} // A compound object literal
+```
+
+Strings allow the same characters as JavaScript, including inline Unicode and the following escape characters:
+
+- `\b`: Backspace
+- `\f`: Form Feed
+- `\n`: New Line
+- `\r`: Carriage Return
+- `\t`: Horizontal Tabulator
+- `\v`: Vertical Tabulator
+- `\S`: Non-breaking Space
+- `\\`: Backslash
+- `\'`: Single quote
+- `\"`: Double quote
+- `\xhh`: Hexadecimal character (here, `hh` represents two hexadecimal digits).
+- `\uhhhh`: Unicode code point between `U+0000` and `U+FFFF` (here `hhhh` represents four hexadecimal digits).
+- `\u{hHHHHH}`: Unicode code point between `U+0000` and `U+10FFFF` (here `hHHHHH` represents one to six hexadecimal
+digits).
+
+### Operators
+
+You can use most of the JavaScript operators in XMLUI scripts. Here, you can read the list of them; the operators are grouped according to their precedence, starting with the highest one:
+
+#### Precedence group #1
+
+- **Grouping**: `( … )`, for example `(6 * 7)`
+
+#### Precedence group #2
+
+- **Member access**:  `… . …`, for example `a.b`
+- **Computed member access**: `… […]`, for example `a[b]`
+- **Function call**: `… (…)`, for example `addItem(a, b, c)`
+- **Optional chaining**: `… ?. …`, for example: `prop?.value`
+
+#### Precedence group #3
+
+- **Postfix increment**: `… ++`, for example: `counter++`
+- **Postfix decrement**: `… --`, for example: `counter--`
+
+#### Precedence group #4
+
+- **Logical NOT**: `! …`, for example `!value`
+- **Bitwise NOT**: `~ …`, for example `~bits`
+- **Unary plus**: `+ …`, for example `+b`
+- **Unary negation**: `- …`, for example `-b`
+- **Prefix increment**: `++ …`, for example: `++counter`
+- **Prefix decrement**: `-- …`, for example: `--counter`
+- **Type query**: `typeof …`, for example `typeof myValue`
+- **Property delete**: `delete …`, for example `delete a.prop`
+
+#### Precedence group #5
+
+- **Exponentiation**: `… ** …`, for example, `2 ** 3`. (This operator has a right-to-left associativity.)
+
+#### Precedence group #6
+
+- **Multiplication**: `… * …`, for example `a * 12`
+- **Division**: `… / …`, for example `a / b`,
+- **Remainder**: `… % …` for example `value % 2`
+
+#### Precedence group #7
+
+- **Addition**: `… + …`, for example, `a + b`
+- **Subtraction**: `… - …`, for example: `present - absent`
+
+#### Precedence group #8
+
+- **Bitwise left shift**: `… << …`, for example `value << 3`
+- **Bitwise right shift**: `… >> …`, for example `other >> 2`
+- **Bitwise unsigned shift**: `… >>> …`, for example `value >>> b`
+
+#### Precedence group #9
+
+- **Less than**: `… < …`, for example `a < b`
+- **Less than or equal**: `… <= …`, for example `a <= b`
+- **Greater than**: `… > …`, for example `a > b`
+- **Greater than or equal**: `… >= …`, for example `a >= b`
+- **Inclusion test**: `… in …`, for example `a in [1, 2, 3]`
+
+#### Precedence group #10
+
+- **Equality**: `… == …`, for example `"2" == 2`
+- **Inequality**: `… != …`, for example `"2" != a`
+- **Strict equality**: `… === …`, for example `"2" === 2`
+- **Inequality**: `… !== …`, for example `"2" !== a`
+
+#### Precedence group #11
+
+- **Bitwise AND**: `… & …`, for example `apple & pear`
+
+#### Precedence group #12
+
+- **Bitwise XOR**: `… ^ …`, for example `sprite ^ mask`
+
+#### Precedence group #13
+
+- **Bitwise OR**: `… | …`, for example `walnut | peanut`
+
+#### Precedence group #14
+
+- **Logical AND**: `… && …`, for example `x && y`
+
+#### Precedence group #15
+
+- **Logical OR**: `… || …`, for example `me || you`
+- **Nullish coalescing operator**: `… ?? …`, for example `value ?? ""`
+
+#### Precedence group #16
+
+- **Assignment**: `… = …`, for example, `i = 2`
+- **Addition assignment**: `… += …`, for example, `i += 1`
+- **Subtraction assignment**: `… -= …`, for example, `i -= 1`
+- **Exponentiation assignment**: `… **= …`, for example, `i **= 3`
+- **Multiplication assignment**: `… *= …`, for example, `i *= 2`
+- **Division assignment**: `… /= …`, for example, `i /= 4`
+- **Remainder assignment**: `… *= …`, for example, `i %= 16`
+- **Bitwise left shift assignment**: `… <<= …`, for example, `i <<= 1`
+- **Bitwise right shift assignment**: `… >>= …`, for example, `i >>= 4`
+- **Bitwise unsigned right shift assignment**: `… >>>= …`, for example, `i >>>= 8`
+- **Conditional (ternary) operator**: `… ? … : …`, for example `a % 2 ? "off" : "on"`
+- **Arrow function**: `… => …`, for example, `(a, b) => a * b`
+- **Spread**: `... …`, for example, `... [1, 2, 3]`
+
+#### Precedence group #17
+
+- **Comma/Sequence**: `… , …`, for example: `a, b, c, other`
+
+> Note that you cannot use these JavaScript operators with binding expressions: `new`, `void`, `await`, `instanceof`, assigment operators (none
+of them), `yield`, and `yield*`.
+
+### Arrow Functions
+
+The XMLUI allows you to define arrow functions. Though you can define arrow functions in attribute or property values, the only place where it is useful is in a variable declaration as the initial variable value.
+
+Arrow functions have the same syntax as in JavaScript. Here are a few examples:
+
+```js
+() => Math.sqrt(Math.PI);
+```
+
+This arrow function has no arguments. It retrieves the square root of PI.
+
+```js
+(a, b) => Math.sqrt(a ** 2 + b ** 2);
+```
+
+This arrow function calculates the hypotenuse of a right-angled triangle from its leg dimensions. It has two arguments, `a` and `b`, the leg dimensions.
+
+```javascript
+(n) => {
+  let sum = 0;
+  for (let i = 1; i < n; i++) sum += i;
+  return sum;
+}
+```
+
+This arrow function uses statements to calculate the sum of numbers from one to the given `n`. As it has a body (and not just a single expression), it uses the `return` statement to retrieve the result.
+
+Arrow function arguments support the destructure pattern. You can learn more about them [here](./script-language#destructuring).
+
+Here is an example:
+
+```js
+({x, y}) => x ** 2 + y ** 2;
+```
+
+Assuming you assigned the arrow function to the `myCalc` variable, this is how you can invoke it from an event handler:
+
+```js
+const coords = { x: 12, y: -23 };
+// ...
+myCalc(coords);
+```

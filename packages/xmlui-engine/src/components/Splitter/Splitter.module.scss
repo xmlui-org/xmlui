@@ -1,0 +1,106 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$padding-Splitter: createThemeVar("padding-Splitter");
+$shadow-Splitter: createThemeVar("shadow-Splitter");
+$color-bg-Splitter: createThemeVar("color-bg-Splitter");
+$radius-Splitter: createThemeVar("radius-Splitter");
+$color-border-Splitter: createThemeVar("color-border-Splitter");
+$thickness-border-Splitter: createThemeVar("thickness-border-Splitter");
+$style-border-Splitter: createThemeVar("style-border-Splitter");
+$border-Splitter: createThemeVar("border-Splitter");
+$color-bg-resizer-Splitter: createThemeVar("color-bg-resizer-Splitter");
+$thickness-resizer-Splitter: createThemeVar("thickness-resizer-Splitter");
+$cursor-resizer-horizontal-Splitter: createThemeVar("cursor-resizer-horizontal-Splitter");
+$cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Splitter");
+
+.splitter {
+  overflow: hidden;
+  position: relative;
+  flex-wrap: nowrap;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  box-shadow: $shadow-Splitter;
+  padding: $padding-Splitter;
+  background-color: $color-bg-Splitter;
+  border-radius: $radius-Splitter;
+  border: $border-Splitter $style-border-Splitter $color-border-Splitter;
+
+  &.vertical {
+    flex-direction: column;
+  }
+
+  &.horizontal {
+    flex-direction: row;
+  }
+}
+
+.panel {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.primaryPanel {
+  flex-shrink: 0;
+  flex-grow: 0;
+  overflow: hidden;
+}
+
+.secondaryPanel {
+  flex: 1;
+}
+
+.resizer {
+  overflow: hidden;
+  background-color: t.useVar($color-bg-resizer-Splitter, transparent);
+
+  &.vertical {
+    cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+    width: 100%;
+    height: t.useVar($thickness-resizer-Splitter, 5px);
+  }
+
+  &.horizontal {
+    cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+    width: t.useVar($thickness-resizer-Splitter, 5px);
+    height: 100%;
+  }
+}
+
+.floatingResizer {
+  position: absolute;
+  z-index: 1000;
+  opacity: 0;
+  overflow: hidden;
+  transition: opacity 0.2s;
+  background-color: t.useVar($color-bg-resizer-Splitter, transparent);
+
+  &.vertical {
+    cursor: t.useVar($cursor-resizer-vertical-Splitter, ns-resize);
+    width: 100%;
+    height: t.useVar($thickness-resizer-Splitter, 5px);
+    transform: translateY(-50%);
+  }
+
+  &.horizontal {
+    cursor: t.useVar($cursor-resizer-horizontal-Splitter, ew-resize);
+    width: t.useVar($thickness-resizer-Splitter, 5px);
+    height: 100%;
+    transform: translateX(-50%);
+  }
+}
+
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

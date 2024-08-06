@@ -1,0 +1,76 @@
+import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import { UemlHelper } from "@src/parsers/ueml/UemlHelper";
+import { UemlNode } from "@nsoftware-com/xmlui/src/parsers/ueml/ueml-tree";
+import { decompress } from "@/src/components/utils";
+import { ThemeDefinition } from "@components-core/theming/abstractions";
+import { PlaygroundState } from "@/src/state/store";
+import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
+import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
+import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
+
+export function parseFromEditorText(value: string = "") {
+  try {
+    return parseXmlUiMarkup(value);
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
+}
+
+export function serialize(component: ComponentDef | CompoundComponentDef): string {
+  if (component) {
+    const xh = new UemlHelper();
+    try {
+      const node = xh.transformComponentDefinition(component) as UemlNode;
+      return xh.serialize(node, { prettify: true });
+    } catch (e) {
+      console.log(e);
+      return "";
+    }
+  }
+  return "";
+}
+
+export async function decompressData(source: string) {
+  const base64 = decodeURIComponent(source);
+  const compressed = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  return await decompress(compressed);
+}
+
+export const builtInThemes: Array<ThemeDefinition> = [
+  { ...SolidThemeDefinition, name: "Base" },
+  { ...XmlUiThemeDefinition, name: "Tabler" },
+];
+
+export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
+  status: "idle",
+  options: {
+    orientation: "horizontal",
+    swapped: false,
+    content: "app",
+    previewMode: false,
+    id: 0,
+    language: "ueml",
+  },
+  text: "",
+  appDescription: {
+    config: {
+      name: "",
+      globals: {},
+      resources: {},
+      themes: [],
+    },
+    components: [],
+    app: "",
+  },
+  originalAppDescription: {
+    config: {
+      name: "",
+      globals: {},
+      resources: {},
+      themes: [],
+    },
+    components: [],
+    app: "",
+  },
+};

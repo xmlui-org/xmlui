@@ -1,0 +1,86 @@
+# AppHeader
+
+`AppHeader` is a placeholder within `App` to define a custom application header.
+
+> **Note**: You can learn more details about using this component [here](../learning/app-component).
+
+## Props
+
+### `logoTemplate`
+
+This property defines the template to use for the logo. With this property, you can construct your custom logo instead of using a single image.
+
+```ueml copy {2-8}
+<App>
+  <AppHeader>
+    <prop name="logoTemplate">
+      <H3>
+        <Icon name="drive" />
+        DriveDiag
+      </H3>
+    </prop>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Page 1" to="/page1"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text value="Home" />
+    </Page>
+    <Page url="/page1">
+      <Text value="Page 1" />
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+    previewOnly={true}
+    name="Example: logoTemplate"
+    horizontal={true}
+    height={150}
+    app={`
+    <App>
+      <AppHeader>
+      <prop name="logoTemplate">
+         <H3>
+           <Icon name="drive" />
+           DriveDiag
+         </H3>
+      </prop>
+      </AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavLink label="Page 1" to="/page1"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+        <Page url="/">
+          <Text value="Home" />
+        </Page>
+        <Page url="/page1">
+          <Text value="Page 1" />
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+## Events
+
+This component does not provide event handlers to any system or user event.
+
+## Styling
+
+The `AppHeader` component uses these theme variables to customize its appearance:
+
+- `color-bg-AppHeader`: sets the background color of the header
+- `padding` (including all `padding` variants, such as `padding-left` and others)
+- `color-border` (including all `color-border` variants, such as `color-border-left` and others)
+- `style-border` (including all `style-border` variants, such as `style-border-left` and others)
+- `thickness-border` (including all `thickness-border` variants, such as `thickness-border-left` and others)
+
+The `AppHeader` component allows these theme variables to customize the logo within the header:
+
+- `padding-logo-AppHeader` (including all `padding` variants, such as `padding-left-logo-AppHeader` and others)
+- `width-logo-AppHeader`: sets the width of the displayed logo

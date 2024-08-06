@@ -1,0 +1,2133 @@
+# Chat API Definition
+
+This article describes the syntax and semantics of the Chat API the Chat Server should implement.
+
+This document lists the API endpoints and shows their API interceptor code as a sample for seamlessly implementing a backend the UI seamlessly works with.
+
+## Overview of the Chat Functionality
+
+The current version of the chat UI provides simple chat functionality that includes the following:
+
+- Direct (private) communication between two or more users through a specified direct channel
+- Sending, editing, and deleting messages
+- Replying to a particular message
+- Following read and unread messages, indicating the count of unread messages on a particular communication channel
+- Attaching files to messages (up to 16MBytes per attachment)
+- Adding, updating, and removing user reactions (such as like, dislike, etc.) through emojis
+- Inviting users to a channel
+- Removing users from a channel
+- Creating topic-specific channels
+- Handling virtually infinite long message history
+
+The Chat UI builds its semantics on the following domain model you can find in the description of the [Persistence Layer Object API](/reference/200_Chat_Server/readme#conceptual-model).
+
+## Known Design Issues
+
+Managing users (and integrating the Chat Server) with external systems should still be designed. The following open questions should be answered:
+
+- How will the Chat UI obtain a token or other information about the authorized user?
+- Should the Chat UI recognize that a new user is added to the system while the chat app runs?
+- Should the Chat UI recognize that a user has been removed (or inactivated) in the system while the chat app runs?
+- Are the user data details we store in the conceptual model OK? Should we store and use other data (or hold some unnecessary)?
+
+## Semantics
+
+This article defines not only the syntax of its endpoints but also shares the implementation semantics of each endpoint.
+
+Our UI framework has a unique feature, _API Interceptors_, which allows the UI to utilize a browser-embedded emulated backend. This interceptor goes through the network layer of the browser. Thus, the UI code perceives it invokes an actual backend through the network; we can even analyze the network requests and responses.
+
+The browser-embedded backend uses IndexDb to store the data.
+
+Each endpoint definition contains its current API Interceptor code written in a language resembling JavaScript. You can consider it as interpreted JavaScript code. The language has a few peculiarities (and lacks a few JavaScript features). Here are the significant differences:
+
+- The framework language's IDs may start with `#` and `@`.
+- A few JavaScript operators (such as `new`, `void`) are not implemented.
+- You can define functions as arrow functions.
+
+The API Interceptor uses several helper methods that are used in multiple endpoints. These are grouped into namespace objects:
+
+- `Converters`: These methods transform data records into DTOs.
+- `MessageRepository`: This namespace collects methods related to message operations.
+- `ChannelRepository`: This namespace collects methods related to channel operations.
+- `Assertions`: These methods help validate input parameters of requests.
+- `Utils`: Various helper methods
+- `Events`: These methods represent the events of the persistence layer object API. The code raises these events through the persistence layer object's `fire<eventName>` method.
+- `$pushService`: Represents a push notification service used with long polling. This virtual service uses activity feeds stored in the database (through invoking the persistence layer API).
+
+In the [Library](#library) section of this article, you can look at the implementation of these helpers.
+
+The endpoint implementation's code works with a few intrinsic objects, the IDs of which start with `#`. Here is a short introduction to them.
+
+#### $db
+
+This object is a simple database manager service (using the browser-based IndexDb). When you meet this object, it always refers to some database operation.
+
+The Chat Server uses the [Persistence Layer Object API](/reference/200_Chat_Server/readme#conceptual-model); you will find references to `$db` only in implementing that API.
+
+You can access the database's tables through `$db`. For example, you can execute channel record operations with `$db.$channels`.
+
+#### $authService
+
+This object represents a service managing user authentication-related operations like login, user cookie token access, etc.
+
+#### $env
+
+You can use this object to access server-side environment properties and methods. For example, many endpoints use this service to query the current timestamp, like in this example:
+
+```ts
+const sentTime = $env.getDate().toISOString();
+```
+
+#### $loggedInUser
+
+This object represents information about the logged-in user. The current code uses only the `id` property of the user, such as in this example:
+
+```ts
+const unreadCount = Utils.getUnreadCount(channel.id, $loggedInUser.id);
+```
+
+In the future (after completing the design of user authentication and authorization), we may use other user-related properties.
+
+#### $pathParams
+
+You can retrieve the path parameter values of the current request with this object. For example, this is how you can read the `channelId` value from the `/channels/:channelId` URI:
+
+```ts
+const { channelId } = $pathParams;
+```
+
+#### $queryParams
+
+You can retrieve the query parameter values of the current request with this object. For example, this is how you can read the `before` query parameter's value from the `/channels/1234/messages?before=543` URI:
+
+```ts
+const { before } = $queryParams;
+```
+
+#### $requestHeaders
+
+An API endpoint can access the request headers through this object. For example, this code snippet retrieves the client transaction identifier (we use in activity feeds):
+
+```ts
+const clientTxId = $requestHeaders["ue-client-tx-id"];
+```
+
+#### $requestBody
+
+An API endpoint can access the entire request body through this object.
+
+#### $cookies
+
+This object represents the cookies in the request object.
+
+## API Endpoints
+
+The Chat API expects a backend to implement a set of API endpoints described in this section. These endpoints were designed with UI in mind: using minimal handshakes between the UI and the backend and still providing responsiveness and easy mapping of retrieved data to UI elements.
+
+Each endpoint definition describes the request parameters (including path and query parameters, the request body, optional request header items), the response status code, and the optional response body.
+
+We use the response status code with this semantics:
+
+- `200: OK`. GET requests with the result in the response body.
+- `201: Created`. Used with requests creating new data sent back in the response body.
+- `202: Accepted`. Used with requests updating data; the modified data is sent back in the response body.
+- `204: No content`. Used in requests that update or delete data but not send back any content.
+- `400: Bad request`: Validation error; some input arguments in the request body were invalid. The response body contains a text about the concrete validation issue.
+- `401: Unauthorized`: There is no logged-in user.
+- `403: Forbidden`: The logged-in tries to execute an operation that is not available in the current context.
+- `500: Internal Server Error`: The issues from bugs or errors raised by the (custom) persistence layer.
+
+Each message may result in status codes `401` or `500`; thus, we do not list them separately.
+
+### GET `/users/me`
+
+The Chat API's functionality (most API endpoints) assumes that there is a logged-in user. The token (or other information that identifies the logged-in user) is passed into the request header (the "how" should be clarified). This endpoint returns the information about the logged-in user.
+
+**Endpoint**: GET `/users/me`
+
+**Response**: [User DTO](#user-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```js
+Converters.convertUser($db.$users.byId($loggedInUser.id))
+```
+
+### GET `/users`
+
+This endpoint returns the data of all active users.
+
+**Endpoint**: GET `/users`
+
+**Response**: [UserArray DTO](#userarray-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```js
+const plo = getPloObject();
+plo.fireListUsers();
+return Converters.convertUsers(plo.users);
+```
+
+### GET `/channels`
+
+This endpoint returns all channels where the currently logged-in user is an active member.
+
+**Endpoint**: GET `/channels`
+
+**Response**: [ChannelArray DTO](#channelarray-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```js
+const plo = getPloObject();
+plo.fireListUserChannels({ userId: $loggedInUser.id });
+return Converters.convertChannels(plo.channels);
+```
+
+### GET `/channels/:channelId`
+
+This endpoint returns the specified channel's data.
+
+**Endpoint**: GET `/channels/:channelId`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to get
+
+**Response**: [Channel DTO](#channel-dto)
+
+**Status Codes**: 200, 400
+
+**Endpoint semantics**:
+
+```js
+Converters.convertChannel(Assertions.ensureChannel($pathParams.channelId));
+```
+
+### DELETE `/channels/:channelId`
+
+This endpoint deletes the logged-in user from the specified channel.
+
+**Endpoint**: DELETE `/channels/:channelId`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to delete the logged-in user from
+
+**Response**: Empty
+
+**Status Codes**:
+
+- 204: The channel has been deleted
+- 403 (the logged-in user is not a member of the specified channel),
+- 404 (the channel cannot be found)
+
+**Endpoint semantics**:
+
+```ts
+const {channelId} = $pathParams;
+const userId = $loggedInUser.id
+        
+Assertions.ensureMemberOfChannel(channelId);  
+
+// --- Read the channel data        
+const plo = getPloObject();
+        
+// --- Read the current user's membership data
+plo.fireReadChannelMember({ channelId, userId });
+const member = plo.getChannelMember();
+        
+if (!member.removed) {
+  // --- Time to remove the user
+  pol.fireUpdateChannelMember({
+    channelId,
+    userId,
+    creator: member.creator,
+    roles: member.roles,
+    historyScope: member.historyScope,
+    removed: true,
+    restricted: member.restricted,
+    lastModifiedTime: $env.getDate().toISOString(),
+    lastReadMessageId: member.lastReadMessageId
+  });
+  const systemEvent = {
+    channelId: channelId,
+    sentTime: $env.getDate().toISOString(),
+    systemEvent: JSON.stringify({
+      type: "MEMBER_REMOVED_FROM_CHANNEL",
+      userId,
+      initiatorId: userId
+    })
+  };
+          
+  // --- Create a system event about removing the user
+  plo.fireSendMessage(systemEvent);
+  plo.fireReadMessage({ messageId: systemEvent.sentMessageId });
+  const inserted = plo.getMessage();
+          
+  // --- Notify the channel about the change  
+  $pushService.publishEvent({
+    topic: "channel_" + inserted.channelId,
+    type: "MessageCreated",
+    createdTime: $env.getDate().toISOString(),
+    clientTxId: $requestHeaders['x-ue-client-tx-id'],
+    payload: JSON.stringify({
+      messageId: inserted.id 
+    })  
+  });
+}   
+```
+
+### PUT `/channels/:channelId`
+
+This endpoint updates the specified channel's attributes and retrieves the data of the modified channel.
+
+**Endpoint**: PUT `/channels/:channelId`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to edit
+
+**Request**: [EditChannel DTO](#editchannel-dto)
+
+**Response**: [Channel DTO](#channel-dto)
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const channelId = $pathParams.channelId;
+const { type, name, description } = $requestBody; 
+const plo = getPloObject();
+        
+// --- Get the original channel
+plo.fireReadChannel({ channelId });
+const oldName = plo.getChannel().name;
+        
+// --- Update the channel
+plo.fireEditChannel({ 
+  id: channelId,
+  name,
+  description
+});
+       
+// --- Create a system event about the channel renaming
+const systemEvent = {
+  channelId: channelId,
+  sentTime: $env.getDate().toISOString(),
+  systemEvent: JSON.stringify({
+    type: "CHANNEL_RENAMED",
+    newName: name,
+    oldName: oldName,
+    initiatorId: $loggedInUser.id
+  })
+};
+plo.fireSendMessage(systemEvent);
+plo.fireReadMessage({ messageId: systemEvent.sentMessageId });
+const inserted = plo.getMessage();
+        
+// --- The logged-in user already read the message
+plo.fireMarkAsLastRead({ messageId: inserted.id, userId: $loggedInUser.id });
+        
+// --- Notify the channel about the change
+$pushService.publishEvent({
+  topic: "channel_" + inserted.channelId,
+  type: "MessageCreated",
+  createdTime: $env.getDate().toISOString(),
+    clientTxId: $requestHeaders['x-ue-client-tx-id'],
+    payload: JSON.stringify({
+    messageId: inserted.id 
+  })  
+});
+        
+// --- Retrieve channel members, notify the renaming user's about the change        
+const channelDto = Converters.convertChannel($db.$channels.byId(channelId));
+plo.fireListChannelMembers({channelId});
+const members = plo.channelMembers.filter(m => !m.removed);
+members.forEach((member) => {
+  $pushService.publishEvent({
+    topic: "user_" + member.userId,
+    type: "ChannelUpdated",
+    createdTime: $env.getDate().toISOString(),
+    clientTxId: $requestHeaders['x-ue-client-tx-id'],
+    payload: JSON.stringify({
+      channelId: channelId
+    })
+  });
+});
+        
+// --- Done.
+return channelDto;
+```
+
+### GET `/channels/:channelId/notifications`
+
+The UI receives notifications about channel events through the long polling API endpoint. Catching a channel notification allows the UI to refresh itself.
+
+**Endpoint**: GET `/channels/:channelId/notifications`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to watch for notifications
+
+**Response**: [ActivityFeed DTO](#activityfeed-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```ts
+Assertions.ensureMemberOfChannel($pathParams.channelId);
+return $pushService.waitForEvent("channel_" + $pathParams.channelId, $queryParams.lastEventId);
+```
+
+### GET `/channels/:channelId/notifications`
+
+The UI receives notifications about user-related events through the long polling API endpoint. Catching a user notification allows the UI to refresh itself.
+
+**Endpoint**: GET `/channels/:channelId/notifications`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to watch for notifications
+
+**Response**: [ActivityFeed DTO](#activityfeed-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```ts
+$pushService.waitForEvent("user_" + $loggedInUser.id, $queryParams.lastEventId);
+```
+
+### GET `/channels/:channelId/messages`
+
+This endpoint retrieves a message segment from the specified channel. The UI uses this method to query the visible segment of the channel history to implement virtually infinite scrolling.
+
+**Endpoint**: GET `/channels/:channelId/messages`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to get the messages from
+
+**Query parameters**:
+
+- `before`: [integer] Optional. It signs the ID of the first message to get the specified window of messages **sent before** the message with this ID. The messages should be retrieved in descending order by their IDs.
+- `after`: [integer] Optional. It signs the ID of the first message to get the specified window of messages **sent after** the message with this ID. The messages should be retrieved in ascending order by their IDs.
+- `inclusive`: [boolean] Optional. This flag signs (the `true` value) that the message with the ID specified in `before` or `after` should be retrieved in the query. The `false` value signs that those messages should be skipped (default: false).
+- `count`: [integer] Optional. The maximum number of messages to return in the queried segment (by default, 50)
+
+Remark: The `before` or the `after` query parameters are mutually exclusive; one of them should contain a non-empty value.
+
+**Response**: [MessageArray DTO](#messagearray-dto)
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```ts
+const { before, after, inclusive, count } = $queryParams;
+const { channelId } = $pathParams;
+        
+Assertions.ensureMemberOfChannel(channelId);
+
+// --- Handle default values
+const normalizedBefore = (before === undefined && after === undefined) 
+  ? Number.MAX_VALUE 
+  : before === undefined 
+    ? 0 
+    : parseInt(before, 10);
+const normalizedAfter =  after === undefined ? 0 : parseInt(after, 10);
+
+// --- Get a PLO instance
+const plo = getPloObject();
+        
+// --- Invoke the ListChannelMessages event
+plo.fireListChannelMessages({
+  channelId: channelId, 
+  before: normalizedBefore, 
+  after: normalizedAfter, 
+  inclusive: !!inclusive, 
+  count: parseInt(count || 25, 10)
+});
+        
+// --- At this point, all messages are collected by the event handler,
+// --- Let's get them from the PLO
+const orderedMessages = normalizedBefore !== 0 
+  ? plo.messages.reverse() 
+  : plo.messages;
+          
+// --- Convert message records to message DTOs    
+return Converters.convertMessages(orderedMessages);
+```
+
+### POST `/messages`
+
+This endpoint sends a new message according to the request body parameters.
+
+**Endpoint**: POST `/messages`
+
+**Request**: [NewMessage DTO](#newmessage-dto)
+
+**Response**: [Message DTO](#message-dto)
+
+**Status Codes**: 201
+
+**Endpoint semantics**:
+
+```ts
+const { channelId, contentType, contents, systemEvent, replyToMessageId, attachedFileIds } = $requestBody;
+
+// --- Test channel existence
+const channel = Assertions.ensureMemberOfChannel(channelId);
+
+// --- Prepare the message to send
+const messageToSend = {
+  channelId: channel.id,
+  contentType,
+  contents,
+  systemEvent,
+  sentBy: $loggedInUser.id,
+  sentTime: $env.getDate().toISOString(),
+  replyTo: replyToMessageId ? parseInt(replyToMessageId, 10) : undefined,
+  attachmentIds: attachedFileIds.join(" ")
+}
+
+// --- Send the new message and fetch it again
+const plo = getPloObject();
+plo.fireSendMessage(messageToSend);
+plo.fireMarkAsLastRead({ messageId: messageToSend.sentMessageId, userId: $loggedInUser.id });
+plo.fireReadMessage({ messageId: messageToSend.sentMessageId });
+const messageSent = plo.getMessage();
+
+// --- Get the entire message and send notification about the creation
+$pushService.publishEvent({
+  topic: "channel_" + channel.id,
+  type: "MessageCreated",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+    messageId: messageSent.id 
+  })  
+});
+
+// --- Notify all channel members about the change
+const messageDto = Converters.convertMessage(messageSent);
+plo.fireListChannelMembers({ channelId: channel.id });
+const members = plo.channelMembers.filter(m => !m.removed);
+members.forEach((member) => {
+  $pushService.publishEvent({
+    topic: "user_" + member.userId,
+    type: "ChannelUnreadCountChanged",
+    createdTime: $env.getDate().toISOString(),
+    clientTxId: $requestHeaders['x-ue-client-tx-id'],
+    payload: JSON.stringify({ 
+     channelId: channel.id,
+     count: Utils.getUnreadCount(channel.id, member.userId),
+     lastMessageId: messageSent.id
+    })
+  });
+});
+
+// --- Done.        
+return messageDto;
+```
+
+### PUT `/messages/:messageId`
+
+This endpoint updates the attributes of an already sent message.
+
+**Endpoint**: PUT `/messages/:messageId`
+
+**Path parameters**:
+
+- `messageId`: The unique ID of the message to edit
+
+**Request**: [EditMessage DTO](#editmessage-dto)
+
+**Response**: [Message DTO](#message-dto)
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const messageId = $pathParams.messageId;
+const message = Assertions.ensureMessage(messageId);
+const { contentType, contents, attachedFileIds } = $requestBody; 
+
+// --- Update the message
+const plo = getPloObject();
+plo.fireEditMessage({ 
+  messageId, 
+  contentType, 
+  contents, 
+  lastEditedTime: $env.getDate().toISOString(), 
+  attachmentIds: attachedFileIds.join(" ")
+});
+
+// --- Get the modified message and send notification
+$pushService.publishEvent({
+  topic: "channel_" + message.channelId,
+  type: "MessageUpdated",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+    messageId: messageId
+  })
+});
+
+// --- Done.
+return Converters.convertMessage(MessageRepository.findById(messageId));
+```
+
+### DELETE `/messages/:messageId`
+
+This endpoint marks the specified message as withdrawn.
+
+**Endpoint**: DELETE `/messages/:messageId`
+
+**Path parameters**:
+
+- `messageId`: The unique ID of the message to withdraw
+
+**Response**: [Message DTO](#message-dto)
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const messageId = $pathParams.messageId;
+const message = Assertions.ensureMessage(messageId);
+
+// --- Withdraw the message
+const plo = getPloObject();
+plo.fireWithdrawMessage({
+  messageId,
+  withdrawnTime: $env.getDate().toISOString()
+});
+
+// --- Send a notification to the channel about withdrawal
+$pushService.publishEvent({
+  topic: "channel_" + message.channelId,
+  type: "MessageDeleted",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+    messageId: messageId
+  })
+});
+
+// --- Done.
+return Converters.convertMessage(MessageRepository.findById(messageId));
+```
+
+### PUT `/messages/:messageId/read`
+
+This endpoint marks the specified message as the last one read by the logged-in user.
+
+**Endpoint**: PUT `/messages/:messageId/read`
+
+**Path parameters**:
+
+- `messageId`: Specifies the unique ID of the message to mark as the last read. The engine will mark the message as the last read (by the logged-in user) in the message's channel.
+
+**Response**: Empty
+
+**Status Codes**: 204
+
+**Endpoint semantics**:
+
+```ts
+const messageId = $pathParams.messageId;
+const userId = $loggedInUser.id;
+const message = Assertions.ensureMessage(messageId);
+const channelId = message.channelId;
+Assertions.ensureMemberOfChannel(channelId);
+
+// --- Mark the message as read
+const plo = getPloObject();
+plo.fireMarkAsLastRead({ messageId, userId });
+
+// --- Send a notification to the channel according to the change
+$pushService.publishEvent({
+  topic: "channel_" + channelId,
+  type: "MessagesRead",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({ userId, lastReadMessageId: messageId })
+});
+
+// --- Notify the user (to ensure that all the other opened browsers are updated)
+$pushService.publishEvent({
+  topic: "user_" + userId,
+  type: "ChannelUnreadCountChanged",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({ 
+   channelId: channelId + '',
+   count: Utils.getUnreadCount(channelId, userId)
+  })
+});
+```
+
+### POST `/channels/direct`
+
+This endpoint creates a new direct channel with the specified members.
+
+**Endpoint**: POST `/channels/direct`
+
+**Request**: [CreateChannel DTO](#createchannel-dto)
+
+**Response**: [Channel DTO](#channel-dto)
+
+**Status Codes**: 201
+
+**Endpoint semantics**:
+
+```ts
+const { memberIds } = $requestBody;
+const intMemberIds = memberIds.map(memberId => parseInt(memberId, 10));
+
+// --- Check existing direct channel for the users
+const plo = getPloObject();
+plo.fireListDirectChannels({memberIds: [...intMemberIds, $loggedInUser.id].join(" ")});
+const matchingDirectChannels = plo.channels;
+
+if (matchingDirectChannels.length > 0) {
+  if (matchingDirectChannels.length === 1) {
+    return Converters.convertChannel(matchingDirectChannels[0])
+  } else {
+    matchingDirectChannels.forEach((ch) => {
+      // --- Invoke the ListChannelMessages event
+      plo.fireListChannelMessages({
+        channelId: ch.id, 
+        before: Number.MAX_VALUE, 
+        after: 0,
+        inclusive: false, 
+        count: 25
+      });
+    });
+    
+    const latestMessage = {
+      id: 0
+    };
+     
+    plo.messages.forEach((msg) => {
+      if (msg.id > latestMessage.id) {
+        latestMessage = msg;
+      }
+    });            
+    return Converters.convertChannel(matchingDirectChannels.find(ch => ch.id === latestMessage.channelId));            
+  }
+} else {
+  // --- Create the channel
+  const eventArgs = { 
+    type: "direct", 
+  };
+  plo.fireCreateChannel(eventArgs);
+
+  // --- Add the current user as channel creator
+  const channelId = eventArgs.channelId;
+  plo.fireInsertChannelMember({
+    channelId,
+    userId: $loggedInUser.id,
+    creator: true
+  })
+
+  // --- Invite the other users
+  if (intMemberIds) {
+    intMemberIds.forEach(m => {
+      plo.fireInsertChannelMember({
+        channelId,
+        userId: m,
+        creator: false
+      })
+    });
+  }
+
+  // --- Read back channel data to create the DTO
+  plo.fireReadChannel({ channelId });
+  const channelDto = Converters.convertChannel(plo.getChannel());
+  
+  // --- Notify users
+  for (const member of intMemberIds) {
+    $pushService.publishEvent({
+      topic: "user_" + member,
+      type: "ChannelCreated",
+      createdTime: $env.getDate().toISOString(),
+      clientTxId: $requestHeaders['x-ue-client-tx-id'],
+      payload: JSON.stringify({
+        channelId: channel.id
+      })
+    });
+  }
+     
+  // --- Done
+  return channelDto;  
+}     
+```
+
+### POST `/channels`
+
+This endpoint creates a new public (topic-specific) channel with the specified name and members.
+
+**Endpoint**: POST `/channels`
+
+**Request**: [CreateChannel DTO](#createchannel-dto)
+
+**Response**: [Channel DTO](#channel-dto)
+
+**Status Codes**: 201
+
+**Endpoint semantics**:
+
+```ts
+// --- Validate input parameters
+const { name, memberIds } = $requestBody;
+if (name === undefined || name.length === 0) {
+  throw Error('Channel without name is not permitted')
+}
+  
+const plo = getPloObject();
+
+// --- Create the channel
+const eventArgs = { 
+  name, 
+  type: "public", 
+};
+plo.fireCreateChannel(eventArgs);
+
+// --- Add the current user as channel creator
+const channelId = eventArgs.channelId;
+plo.fireInsertChannelMember({
+  channelId,
+  userId: $loggedInUser.id,
+  creator: true
+})
+
+// --- Invite the other users
+if (memberIds) {
+  memberIds.forEach(m => {
+    plo.fireInsertChannelMember({
+      channelId,
+      userId: m,
+      creator: false
+    })
+  });
+}
+
+// --- Read back channel data to create the DTO
+plo.fireReadChannel({ channelId: eventArgs.channelId});
+const channelDto = Converters.convertChannel(plo.getChannel());
+return channelDto; 
+```
+
+### POST `/channels/:channelId/members`
+
+This endpoint adds new members to a particular channel. If the member has not previously been a member of the channel, it is added; otherwise, it is activated.
+
+**Endpoint**: POST `/channels/:channelId/members`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to add the user as a member
+
+**Request**: [NewMembers DTO](#newmembers-dto)
+
+**Response**: Empty
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const { channelId } = $pathParams;
+const { memberIds, includeHistory } = $requestBody;
+
+Assertions.ensureMemberOfChannel(channelId);
+
+// --- Invite the passed members 
+const plo = getPloObject();
+const intMemberIds = memberIds.map(userId => parseInt(userId, 10));
+intMemberIds.forEach((userId) => {
+  plo.fireReadChannelMember({ channelId, userId })
+  const existing = plo.getChannelMember();
+  if (!existing) {
+    // --- New member, never was in the channel
+    plo.fireInsertChannelMember({ 
+      channelId, 
+      userId: userId, 
+      creator: false, 
+    });
+  } else {
+    // --- Activate removed member
+    existing.removed = false;
+    existing.lastModifiedTime = $env.getDate().toISOString()
+    plo.fireUpdateChannelMember(existing);
+  }
+})
+
+// --- Create a system event about the invitation
+const systemEvent = {
+  channelId: channelId,
+  sentTime: $env.getDate().toISOString(),
+  systemEvent: JSON.stringify({
+    type: "MEMBERS_ADDED_TO_CHANNEL",
+    userIds: intMemberIds,
+    initiatorId: $loggedInUser.id
+  })
+};
+plo.fireSendMessage(systemEvent);
+plo.fireReadMessage({ messageId: systemEvent.sentMessageId });
+const inserted = plo.getMessage();
+
+// --- The logged-in user already read the message
+plo.fireMarkAsLastRead({ messageId: inserted.id, userId: $loggedInUser.id });
+
+// --- Send a notification to the channel about the change
+$pushService.publishEvent({
+  topic: "channel_" + inserted.channelId,
+  type: "MessageCreated",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+    messageId: inserted.id
+  })
+});
+
+// --- Notify channel members about the change
+intMemberIds.forEach((userId)=>{
+  $pushService.publishEvent({
+    topic: "user_" + userId,
+    type: "ChannelCreated",
+    createdTime: $env.getDate().toISOString(),
+    clientTxId: $requestHeaders['x-ue-client-tx-id'],
+    payload: JSON.stringify({
+      channelId: channelId
+    })
+  });
+});
+```
+
+### DELETE `/channels/:channelId/members/:userId`
+
+This endpoint removes the specified user from a particular channel.
+
+**Endpoint**: DELETE `/channels/:channelId/members/:userId`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel to remove the member from
+- `userId`: The ID of the user to remove
+
+**Response**: Empty
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const {channelId, userId} = $pathParams;
+Assertions.ensureMemberOfChannel(channelId);        
+
+// --- Get channel members
+const plo = getPloObject();
+plo.fireReadChannelMember({ channelId, userId });
+const member = plo.getChannelMember();
+
+// --- Mark the member removed
+member.removed = true;
+// TODO update member's historyScope
+plo.fireUpdateChannelMember(member);
+
+// --- Create a system event about removing the member
+const systemEvent = {
+  channelId: channelId,
+  sentTime: $env.getDate().toISOString(),
+  systemEvent: JSON.stringify({
+    type: "MEMBER_REMOVED_FROM_CHANNEL",
+    userId: userId,
+    initiatorId: $loggedInUser.id
+  })
+};
+plo.fireSendMessage(systemEvent);
+
+// --- The logged-in user already read the message
+plo.fireReadMessage({ messageId: systemEvent.sentMessageId });
+const inserted = plo.getMessage();
+plo.fireMarkAsLastRead({ messageId: inserted.id, userId: $loggedInUser.id });
+
+// --- Notify the channel about the removed user        
+$pushService.publishEvent({
+  topic: "channel_" + inserted.channelId,
+  type: "MessageCreated",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+    messageId: inserted.id
+  })
+});
+```
+
+### POST `/channels/:channelId/typing`
+
+This endpoint sends a channel notification signing that the logged-in user is typing a message.
+
+**Endpoint**: POST `/channels/:channelId/typing`
+
+**Path parameters**:
+
+- `channelId`: The unique ID of the channel the logged-in user is typing a message
+
+**Response**: Empty
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+Assertions.ensureMemberOfChannel($pathParams.channelId);
+
+$pushService.publishEvent({
+  topic: "channel_" + $pathParams.channelId,
+  type: "UserTyping",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders['x-ue-client-tx-id'],
+  payload: JSON.stringify({
+   userId: $loggedInUser.id,
+  })
+});
+```
+
+### POST `/messages/:messageId/reactions`
+
+This endpoint adds or removes a user's reaction to a particular message.
+
+**Endpoint**: POST `/messages/:messageId/reactions`
+
+**Path parameters**:
+
+- `messageId`: Specifies the unique ID of the message to which the logged-in user adds a reaction.
+
+**Request**: [UserReaction DTO](#userreaction-dto)
+
+**Response**: [Message DTO](#message-dto)
+
+**Status Codes**: 202
+
+**Endpoint semantics**:
+
+```ts
+const messageId = $pathParams.messageId;
+const userId = $loggedInUser.id;
+
+// --- React to the message
+const plo = getPloObject();
+plo.fireReactToMessage({ messageId, userId, reaction: $requestBody.reaction });
+
+// --- Send a channel notification
+const message = Assertions.ensureMessage(messageId);
+const messageDto = Converters.convertMessage(message);
+$pushService.publishEvent({
+  topic: "channel_" + message.channelId,
+  type: "MessageUpdated",
+  createdTime: $env.getDate().toISOString(),
+  clientTxId: $requestHeaders["ue-client-tx-id"],
+  payload: JSON.stringify({
+    messageId: messageId,
+  }),
+});
+
+// --- Done
+return messageDto;
+```
+
+### POST `/attachments`
+
+This endpoint uploads a new file to be used as an attachment.
+
+**Endpoint**: POST `/attachments`
+
+**Request**: formData
+
+**Response**: `File` DTO
+
+**Status Codes**: 201
+
+**Endpoint semantics**:
+
+```ts
+// --- We accept only a single file
+const files = Object.values($requestBody);
+if (files.length !== 1) {
+  throw Error("nope");
+}
+
+// --- Store the file
+const plo = getPloObject();
+const toStore = files[0];
+const eventArgs = {
+  filename: toStore.name,
+  mimeType: toStore.type,
+  size: toStore.size,
+  uploadedTime: $env.getDate().toISOString(),
+  contents: toStore,
+};
+plo.fireUploadAttachment(eventArgs);
+
+// --- Retrieve the new file ID
+return eventArgs.uploadedAttachmentId;
+```
+
+### GET `/attachments/:fileId/content`
+
+This endpoint downloads a previously uploaded attachment.
+
+**Endpoint**: GET `/attachments/:fileId/content`
+
+**Path parameters**:
+
+- `fileId`: Specifies the unique ID of the file to download.
+
+**Response**: binary
+
+**Status Codes**: 200
+
+**Endpoint semantics**:
+
+```js
+const plo = getPloObject();
+plo.fireDownloadAttachment({ attachmentId: $pathParams.fileId})
+return plo.getContents();
+```
+
+## Data Transfer Objects
+
+### ActivityFeed DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/activity-feed.schema.json",
+  "title": "ActivityFeed",
+  "description": "An activity feed holding information about a channel or user notification",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the activity",
+      "type": "string"
+    },
+    "topic": {
+      "description": "The topic of the activity",
+      "type": "string"
+    },
+    "type": {
+      "description": "The type of the activity",
+      "type": "string"
+    },
+    "clientTxId": {
+      "description": "Optional client transaction ID",
+      "type": "string"
+    },
+    "payload": {
+      "description": "Data details about the activity (serialized to JSON)",
+      "type": "string"
+    },
+    "createdTime": {
+      "description": "The time the activity feed was created",
+      "type": "string"
+    }
+  },
+  "required": ["id", "topic", "type", "payload", "createdTime"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type ActivityFeed = {
+  id: string;
+  topic: string;
+  type: string;
+  clientTxId?: string;
+  payload: string;
+  createdTime: string;
+};
+```
+
+### Attachment DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/attachment.schema.json",
+  "title": "Attachment",
+  "description": "An attachment belonging to a message",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the attachment",
+      "type": "string"
+    },
+    "messageId": {
+      "description": "The ID of the message this attachment belongs to.",
+      "type": "string"
+    },
+    "mimeType": {
+      "description": "The mime type of the attachment",
+      "type": "string"
+    },
+    "name": {
+      "description": "The name of the attachment (as displayed in the UI). Usually, the uploaded attachment's filename.",
+      "type": "string"
+    },
+    "size": {
+      "description": "Attachment size",
+      "type": "number"
+    },
+    "uploadedTime": {
+      "description": "The timestamp of the attachment upload",
+      "type": "string"
+    }
+  },
+  "required": ["fileId", "name", "size", "uploadedTime"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type Attachment = {
+  fileId: string;
+  messageId?: string;
+  name: string;
+  mimeType?: string;
+  size: number;
+  uploadedTime: string;
+};
+```
+
+### AttachmentArray DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/attachment-array.schema.json",
+  "title": "AttachmentArray",
+  "description": "A list of attachments",
+  "type": "array",
+  "items": {
+    "ref$": "https://nsoftware.com/chat/atachment.schema.json"
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type AttachmentArray = Attachment[];
+```
+
+### Channel DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/channel.schema.json",
+  "title": "Channel",
+  "description": "A channel that holds together communication messages among users",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the channel",
+      "type": "string"
+    },
+    "type": {
+      "description": "The type of the channel (direct, public, private, etc.)",
+      "type": "string"
+    },
+    "name": {
+      "description": "Optional channel name to display",
+      "type": "string"
+    },
+    "description": {
+      "description": "Optional description of the channel",
+      "type": "string"
+    },
+    "unreadCount": {
+      "description": "Number of unread (by the logged-in user) channel messages",
+      "type": "number"
+    },
+    "isGroupChat": {
+      "description": "Is it a group chat? Currently, true, if there are more than two users in the channel. However, this definition may change in the future.",
+      "type": "boolean"
+    },
+    "members": {
+      "description": "Member users of the channel",
+      "type": "array",
+      "items": {
+        "ref$": "https://nsoftware.com/chat/channel-member.schema.json"
+      }
+    },
+    "lastMessage": {
+      "description": "The last message sent to the channel",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/message.schema.json"
+      }
+    }
+  },
+  "required": ["id", "type", "unreadCount", "isGroupChat", "members"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type Channel = {
+  id: number;
+  type: string;
+  name?: string;
+  description?: string;
+  unreadCount: number;
+  isGroupChat: boolean;
+  members: ChannelMember[];
+  lastMessage?: Message;
+};
+```
+
+### ChannelArray DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/channel-array.schema.json",
+  "title": "ChannelArray",
+  "description": "A list of channel objects",
+  "type": "array",
+  "items": {
+    "ref$": "https://nsoftware.com/chat/channel.schema.json"
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type ChannelArray = Channel[];
+```
+
+### ChannelMember DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/channel-member.schema.json",
+  "title": "ChannelMember",
+  "description": "A member of a particular channel",
+  "type": "object",
+  "properties": {
+    "channelId": {
+      "description": "Channel ID of the channel member",
+      "type": "string"
+    },
+    "userId": {
+      "description": "User ID of the channel member",
+      "type": "string"
+    },
+    "creator": {
+      "description": "Is this member the creator of the channel?",
+      "type": "boolean"
+    },
+    "user": {
+      "description": "The detailed information of the user",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/user.schema.json"
+      }
+    }
+  },
+  "required": ["channelId", "userId", "creator", "user"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type ChannelMember = {
+  channelId: string;
+  userId: string;
+  creator: boolean;
+  user: User;
+};
+```
+
+### CreateChannel DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/create-channel.schema.json",
+  "title": "CreateChannel",
+  "description": "Data of a public channel to create",
+  "type": "object",
+  "properties": {
+    "name": {
+      "description": "Name of the new channel",
+      "type": "string"
+    },
+    "memberIds": {
+      "description": "IDs of the channel's initial members",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["memberIds"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type CreateChannel = {
+  name: string;
+  memberIds: string[];
+};
+```
+
+### EditChannel DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/edit-channel.schema.json",
+  "title": "EditChannel",
+  "description": "A DTO with edited channel information",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of the channel (direct, public, private, etc.)",
+      "type": "string"
+    },
+    "name": {
+      "description": "Optional channel name to display",
+      "type": "string"
+    },
+    "description": {
+      "description": "Optional description of the channel",
+      "type": "string"
+    }
+  },
+  "required": ["type"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type EditChannel = {
+  type: string;
+  name?: string;
+  description?: string;
+};
+```
+
+### EditMessage DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/edit-message.schema.json",
+  "title": "EditMessage",
+  "description": "A DTO with edited message information",
+  "type": "object",
+  "properties": {
+    "contentType": {
+      "description": "The type of the content",
+      "type": "string"
+    },
+    "contents": {
+      "description": "Optional message content text",
+      "type": "string"
+    },
+    "attachedFileIds": {
+      "description": "Optional. Attachments sent with the edited message",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["contentType", "contents"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type EditMessage = {
+  contentType: string;
+  contents: string;
+  attachedFileIds?: string[];
+};
+```
+
+### Message DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/message.schema.json",
+  "title": "Message",
+  "description": "A message sent to a channel",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the message",
+      "type": "number"
+    },
+    "channelId": {
+      "description": "The channel the message has been sent to",
+      "type": "string"
+    },
+    "contentType": {
+      "description": "The type of the content",
+      "type": "string"
+    },
+    "contents": {
+      "description": "Optional message content text",
+      "type": "string"
+    },
+    "systemEvent": {
+      "description": "Optional system event",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/system-event.schema.json"
+      }
+    },
+    "sentBy": {
+      "description": "The sender user's ID",
+      "type": "string"
+    },
+    "senderUser": {
+      "description": "Detailed information of the sender user",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/user.schema.json"
+      }
+    },
+    "sentTime": {
+      "description": "The timestamp of sending the message. Empty for system events",
+      "type": "string"
+    },
+    "lastEditedTime": {
+      "description": "The timestamp of the last edit. If non-empty, this is an edited message.",
+      "type": "string"
+    },
+    "withdrawnTime": {
+      "description": "The timestamp of the last edit. If non-empty, this is a withdrawn message.",
+      "type": "string"
+    },
+    "replyTo": {
+      "description": "Optional. The original message this one is a reply to.",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/message.schema.json"
+      }
+    },
+    "attachments": {
+      "description": "Optional. Attachments sent with the message",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/attachment-array.schema.json"
+      }
+    },
+    "reactions": {
+      "description": "Optional. User reactions added to the message",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/user-reaction-array.schema.json"
+      }
+    },
+    "read": {
+      "description": "Is this message read by the logged-in user?",
+      "type": "boolean"
+    }
+  },
+  "required": ["id", "channelId", "contentType", "sentTime", "read"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type Message = {
+  id: number;
+  channelId: string;
+  contentType: string;
+  contents?: string;
+  systemEvent?: SystemEvent;
+  sentBy?: string;
+  senderUser: User;
+  sentTime: string;
+  lastEditedTime?: string;
+  withdrawnTime?: string;
+  replyTo?: Message;
+  attachments?: AttachmentInfo[];
+  reactions?: UserReaction[];
+  read: boolean;
+};
+```
+
+### MessageArray DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/message-array.schema.json",
+  "title": "MessageArray",
+  "description": "A list of message objects",
+  "type": "array",
+  "items": {
+    "ref$": "https://nsoftware.com/chat/message.schema.json"
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type MessageArray = Message[];
+```
+
+### NewMembers DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/new-members.schema.json",
+  "title": "NewMembers",
+  "description": "Information about new channel members",
+  "type": "object",
+  "properties": {
+    "includeHistory": {
+      "description": "Indicates if new users should see the channel history created before they joined",
+      "type": "boolean"
+    },
+    "memberIds": {
+      "description": "IDs of the channel's initial members",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["memberIds"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type NewMembers = {
+  includeHistory?: boolean;  
+  memberIds: string[];
+};
+```
+
+### NewMessage DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/new-message.schema.json",
+  "title": "NewMessage",
+  "description": "A DTO with new message information",
+  "type": "object",
+  "properties": {
+    "channelId": {
+      "description": "The channel the message has been sent to",
+      "type": "string"
+    },
+    "contentType": {
+      "description": "The type of the content",
+      "type": "string"
+    },
+    "contents": {
+      "description": "Optional message content text",
+      "type": "string"
+    },
+    "systemEvent": {
+      "description": "Optional system event text (serialized into JSON)",
+      "type": "string"
+    },
+    "replyToMessageId": {
+      "description": "Optional. The ID of the message this one is a reply to.",
+      "type": "number"
+    },
+    "attachedFileIds": {
+      "description": "Optional. Attachments sent with the message",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["channelId", "contentType"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type NewMessage = {
+  channelId: string;
+  contentType: string;
+  contents?: string;
+  systemEvent?: string;
+  replyToMessageId?: number;
+  attachedFileIds?: string[];
+};
+```
+
+### SystemEvent DTO
+
+This DTO is used in described a system event displayed in the channel history
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/system-event.schema.json",
+  "title": "User",
+  "description": "A system event to display in the channel history",
+  "type": "object",
+  "properties": {
+    "type": {
+      "description": "The type of the system event",
+      "type": "string"
+    },
+    "userIds": {
+      "description": "Full name of the user to display it in the UI",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "initiatorId": {
+      "description": "ID of the user initiating the system event",
+      "type": "string"
+    },
+    "users": {
+      "description": "Detailed information about the users (userIds)",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/user-array.schema.json"
+      }
+    },
+    "initiator": {
+      "description": "Detailed information about the initiator of the system event",
+      "type": {
+        "ref$": "https://nsoftware.com/chat/user.schema.json"
+      }
+    }
+  },
+  "required": ["type"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type SystemEvent = {
+  type: string;
+  userIds?:  string[];
+  initiatorId?: string;
+  users?: User[];
+  initiator?: User;
+};
+```
+
+### User DTO
+
+This DTO is used in operations retrieving user information.
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/user.schema.json",
+  "title": "User",
+  "description": "A user working with the Chat App",
+  "type": "object",
+  "properties": {
+    "id": {
+      "description": "The unique identifier of the user",
+      "type": "string"
+    },
+    "displayName": {
+      "description": "Full name of the user to display it in the UI",
+      "type": "string"
+    },
+    "firstName": {
+      "description": "First name of the user",
+      "type": "string"
+    },
+    "lastName": {
+      "description": "Last name of the user",
+      "type": "string"
+    },
+    "shortName": {
+      "description": "Short name of the user displayed in mentions and in group channels",
+      "type": "string"
+    },
+    "avatarUrl": {
+      "description": "URL to a resource for the user's avatar",
+      "type": "string"
+    },
+    "roles": {
+      "description": "Space-separated values of roles the user has about the Chat App",
+      "type": "string"
+    }
+  },
+  "required": ["id", "displayName", "firstName", "lastName", "shortName"]
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type User = {
+  id: string;
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  shortName: string;
+  avatarUrl?: string;
+  roles?: string;
+};
+```
+
+### UserArray DTO
+
+This DTO is used in operations retrieving a list of users.
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/user-array.schema.json",
+  "title": "UserArray",
+  "description": "A list of users",
+  "type": "array",
+  "items": {
+    "ref$": "https://nsoftware.com/chat/user.schema.json"
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type UserArray = User[];
+```
+
+### UnreadMessageInfo
+
+```ts
+unreadMessageInfo = {
+  channelId: "string",
+  unreadCount: "number",
+};
+```
+
+### UserReaction DTO
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/user-reaction.schema.json",
+  "title": "UserReaction",
+  "description": "A user's reaction to a particular message",
+  "type": "object",
+  "properties": {
+    "messageId": {
+      "description": "The ID of the message this reaction belongs to",
+      "type": "string"
+    },
+    "userId": {
+      "description": "Id of the reacting user",
+      "type": "string"
+    },
+    "reaction": {
+      "description": "The reaction of the logged-in user",
+      "type": "string"
+    }
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type UserReaction = {
+  messageId: number;
+  userId: string;
+  reaction: string,
+};
+```
+
+### UserReactionArray DTO
+
+This DTO is used in operations retrieving a list of users.
+
+#### JSON Schema Definition:
+
+```json
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://nsoftware.com/chat/user-reaction-array.schema.json",
+  "title": "UserReactionArray",
+  "description": "A list of user reactions",
+  "type": "array",
+  "items": {
+    "ref$": "https://nsoftware.com/chat/user-reaction.schema.json"
+  }
+}
+```
+
+#### TypeScript Type Definition
+
+```ts
+type UserReactionArray = UserReaction[];
+```
+
+## Library
+
+The Chat API interceptor operations use a library of helper methods to simplify the implementation. This section describes these methods.
+
+_This list of helper methods does not reflect the up-to-date state of the API interceptor._
+
+### Assertions.ensureChannel
+
+This method raises a 404 (Not Found) error if a particular channel does not exist in the database. Otherwise, it returns the channel record.
+
+**Semantics:**
+
+```ts
+(channelId) => {
+  const foundChannel = $db.$channels.byId(channelId);
+  if (!foundChannel) {
+    throw Errors.NotFound404("Channel not found");
+  }
+  return foundChannel;
+};
+```
+
+### Assertions.ensureCreatorOfMessage
+
+This method raises a 401 (Unauthorized) error if the logged-in user is not the specified message's creator (sender). Otherwise, it returns the message record.
+
+**Semantics:**
+
+```ts
+(messageId) => {
+  const foundMessage = Assertions.ensureMessage(messageId);
+  if (foundMessage.sentBy !== $loggedInUser.id) {
+    throw Errors.Unauthorized401("No access to message");
+  }
+  return foundMessage;
+};
+```
+
+### Assertions.ensureMemberOfChannel
+
+This method raises a 401 (Unauthorized) error if the logged-in user cannot access a particular channel. Otherwise, it returns the channel record.
+
+**Semantics:**
+
+```ts
+(channelId) => {
+  const channel = Assertions.ensureChannel(channelId);
+  if (channel.user1 !== $loggedInUser.id && channel.user2 !== $loggedInUser.id) {
+    throw Errors.Unauthorized401("No access to channel");
+  }
+  return channel;
+};
+```
+
+### Assertions.ensureMessage
+
+This method raises a 404 (Not Found) error if a particular message does not exist in the database. Otherwise, it returns the message record.
+
+**Semantics:**
+
+```ts
+(messageId) => {
+  const foundMessage = $db.$messages.byId(messageId);
+  if (!foundMessage) {
+    throw Errors.NotFound404("Message not found");
+  }
+  return foundMessage;
+};
+```
+
+### Converters.convertChannel
+
+This method creates a `channel` DTO from a channel record stored in the database.
+
+**Semantics:**
+
+```ts
+(channel) => {
+  return {
+    ...channel,
+    id: channel.id + "",
+    user1: Converters.convertUser($db.$users.byId(channel.user1)),
+    user2: Converters.convertUser($db.$users.byId(channel.user2)),
+    unreadCount: Utils.getUnreadCount(channel.id, $loggedInUser.id),
+  };
+};
+```
+
+### Converters.convertChannels
+
+This method creates a list of `channel` DTOs from a list of channel records stored in the database.
+
+**Semantics:**
+
+```ts
+(channels) => channels.map((channel) => Converters.convertChannel(channel));
+```
+
+### Converters.convertFile
+
+This method creates a `file` DTO from an attachment record stored in the database.
+
+**Semantics:**
+
+```ts
+(file) => ({
+  fileId: file.id,
+  name: file.name,
+  mimeType: file.mimeType,
+});
+```
+
+### Converters.convertFiles
+
+This method creates a list of `file` DTOs from a list of attachment records stored in the database.
+
+**Semantics:**
+
+```ts
+(files) => files.map((file) => Converters.convertFile(file));
+```
+
+### Converters.convertMessage
+
+This method creates a `message` DTO from a message record stored in the database.
+
+**Semantics:**
+
+```ts
+(message) => {
+  const replyTo = message.replyTo ? $db.$messages.byId(message.replyTo) : null;
+  // --- This shows the last read message ID on this channel for the logged-in user
+  const readInfo = $db.$readInfo.singleOrDefault(
+    (r) => r.channelId === message.channelId && r.userId === $loggedInUser.id
+  );
+  return {
+    ...message,
+    id: message.id + "",
+    senderUser: Converters.convertUser($db.$users.byId(message.sentBy)),
+    read: readInfo.lastReadMessageId >= message.id,
+    // --- We get the "replyTo" message DTO only in one depth
+    replyTo: replyTo ? Converters.convertMessage({ ...replyTo, replyTo: null }) : null,
+    reactions: $db.$reactions.whereAsArray((r) => r.messageId === message.id),
+    attachments: Converters.convertFiles($db.$attachments.whereAsArray((att) => att.messageId === message.id)),
+  };
+};
+```
+
+### Converters.convertMessages
+
+This method creates a list of `message` DTOs from a list of message records stored in the database.
+
+**Semantics:**
+
+```ts
+(messages) => messages.map((message) => Converters.convertMessage(message));
+```
+
+### Converters.convertUser
+
+This method creates a `User` DTO from a user record stored in the database.
+
+**Semantics:**
+
+```ts
+(user) => (user ? { ...user, id: user.id + "" } : null);
+```
+
+### Converters.convertUsers
+
+This method creates a list of `User` DTOs from a list of user records stored in the database.
+
+**Semantics:**
+
+```ts
+(users) => users.map((user) => Converters.convertUser(user));
+```
+
+### Utils.getUnreadCount
+
+This method gets the number of unread messages for a particular channel and user pair.
+
+**Semantics:**
+
+```ts
+(channelId, userId) => {
+  const readInfo = $db.$readInfo.singleOrDefault((r) => r.channelId === channelId && r.userId === userId);
+  const unread = $db.$messages.whereAsArray(
+    (m) => m.channelId == channelId && m.id > (readInfo.lastReadMessageId ?? 0) && m.sentBy !== userId
+  );
+  return unread.length;
+};
+```

@@ -1,0 +1,137 @@
+# DropdownMenu
+
+This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
+
+## Using `DropdownMenu`
+
+You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
+
+```ueml copy
+<DropdownMenu label="DropdownMenu">
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuSeparator />
+  <SubMenuItem label="Submenu">
+    <MenuItem>Submenu Item 1</MenuItem>
+    <MenuItem>Submenu Item 2</MenuItem>
+  </SubMenuItem>
+</DropdownMenu>
+```
+
+Try this dropdown menu:
+
+<Playground
+  name="Example: Using DropdownMenu"
+  previewOnly={true}
+  height={240}
+  app={`
+    <VStack padding="1rem">
+      <DropdownMenu label="DropdownMenu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuSeparator />
+        <SubMenuItem label="Submenu">
+          <MenuItem>Submenu Item 1</MenuItem>
+          <MenuItem>Submenu Item 2</MenuItem>
+        </SubMenuItem>
+      </DropdownMenu>
+    </VStack>
+  `}
+/>
+
+
+## Props
+
+### `alignment`
+
+This property allows you to determine the alignment of the displayed menu items:
+- `start`: Menu items are aligned to the start of the trigger component (default).
+- `end`: Menu items are aligned to the end of the trigger component.
+
+```ueml copy {9}
+<HStack padding="1rem" gap="2rem">
+  <DropdownMenu label="Start-aligned menu">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+  <DropdownMenu 
+    label="End-aligned menu" 
+    alignment="end">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</HStack>
+```
+
+<Playground
+  name="Example: alignment"
+  previewOnly={true}
+  height={200}
+  app={`
+    <HStack padding="1rem" gap="2rem">
+      <DropdownMenu label="Start-aligned menu">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+      <DropdownMenu label="End-aligned menu" alignment="end">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+    </HStack>
+  `}
+/>
+
+
+### `label`
+
+This property defines the label to display in the dropdown menu. If you define a custom trigger template, this property has no effect.
+
+### `triggerTemplate`
+
+This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`:
+
+```ueml copy {2-4}
+<DropdownMenu label="(ignored)">
+  <prop name="triggerTemplate">
+    <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+  </prop>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+</DropdownMenu>
+```
+
+<Playground
+  name="Example: triggerTemplate"
+  previewOnly={true}
+  height={200}
+  app={`
+    <VStack padding="1rem">
+      <DropdownMenu label="(ignored)">
+          <prop name="triggerTemplate">
+              <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+          </prop>
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+    </VStack>
+  `}
+/>
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `DropdownMenu` component uses these theme variables to customize its appearance:
+
+- `color-bg`
+- `min-width`
+- `radius`
+- `shadow`

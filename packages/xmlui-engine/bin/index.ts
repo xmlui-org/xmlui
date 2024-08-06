@@ -1,0 +1,81 @@
+#!/usr/bin/env node
+
+import { build } from "./build";
+import { start } from "./start";
+import { preview } from "./preview";
+import { argv } from "yargs";
+import AdmZip from "adm-zip";
+
+process.on("unhandledRejection", (err) => {
+  throw err;
+});
+const args = process.argv.slice(2);
+
+const scriptIndex = args.findIndex((x) => x === "build" || x === "eject" || x === "start" || x === "test");
+const script = scriptIndex === -1 ? args[0] : args[scriptIndex];
+
+async function zipDirectory(sourceDir: string, outPath: string = sourceDir) {
+  const zip = new AdmZip();
+  zip.addLocalFolder(sourceDir);
+  await zip.writeZipPromise(outPath);
+  console.log(`Zip file created: ${outPath}`);
+}
+
+async function zipDist() {
+  await zipDirectory(process.cwd() + "/dist", `${process.cwd()}/ui.zip`);
+}
+
+function dedupeArg(arg: any) {
+  if (Array.isArray(arg)) {
+    return arg[arg.length - 1];
+  }
+  return arg;
+}
+
+function getBoolArg(arg: any, defaultValue?: boolean | undefined) {
+  if (arg === undefined) {
+    return defaultValue;
+  }
+  return dedupeArg(arg) !== "false";
+}
+
+function getStringArg(arg: any, defaultValue: string | undefined) {
+  if (arg === undefined) {
+    return defaultValue;
+  }
+  return dedupeArg(arg);
+}
+
+switch (script) {
+  case "build": {
+    const { flatDist, prod, buildMode, withMock, withHostingMetaFiles, withRelativeRoot, withLegacyParser } =
+      argv as any;
+
+    build({
+      buildMode: getStringArg(buildMode, prod ? "CONFIG_ONLY" : undefined),
+      withMock: getBoolArg(withMock, prod ? false : undefined),
+      withHostingMetaFiles: getBoolArg(withHostingMetaFiles, prod ? false : undefined),
+      withRelativeRoot: getBoolArg(withRelativeRoot, prod ? true : undefined),
+      flatDist: getBoolArg(flatDist, prod ? true : undefined),
+      withLegacyParser: getBoolArg(withLegacyParser),
+    });
+    break;
+  }
+  case "start": {
+    const { port, withMock, withLegacyParser } = argv as any;
+    start({ port, withMock: getBoolArg(withMock), withLegacyParser: getBoolArg(withLegacyParser) });
+    break;
+  }
+  case "preview": {
+    preview();
+    break;
+  }
+  case "zip-dist": {
+    zipDist();
+    break;
+  }
+  default: {
+    console.log('Unknown script "' + script + '".');
+    console.log("Perhaps you need to update xmlui?");
+  }
+}

@@ -1,0 +1,31 @@
+# Boilerplate Setup
+
+Create a working folder for your XMLUI samples on your computer and open a command line prompt.
+Use the `cd` command to select the newly created directory.
+Execute the following command to create the boilerplate code for your app:
+
+```bash
+npx @nsoftware-com/create-xmlui-app@latest
+```
+
+> **Note**: You can create and develop this app with any code editor and command-line tool.
+> We suggest you use Visual Studio Code; XMLUI provides excellent tooling with syntax highlighting and other productivity features.
+>
+> In [this article](../first-app), you can learn how easy it is to use this tool.
+
+The `npx` utility (part of the Node.js toolset) downloads the `create-xmlui-app` package and asks for confirmation before installing it.
+Press enter or `y` to continue; `n` to stop.
+
+1. After the package download has completed (takes a few seconds), it asks for the project name. Type in a desired project name and press Enter.
+2. You can optionally initialize a Git repository for your project. Press Enter (indicating **no** Git repo) to continue without one.
+3. The utility installs the `@nsoftware-com/xmlui` package, the only direct dependency you need to develop XMLUI apps. This package will pull necessary dependencies automatically. After the download is complete (it may take one or two minutes the first time), the tool sets up your XMLUI development project.
+4. The project you created goes into its separate folder within the working folder from which you ran the `create-xmlui-app` command.
+5. Open the newly created project folder in your preferred IDE (e.g. VS Code). Remember that the app's code is within the folder you named inside your working directory. Next, run the `npm start` command to launch the app.
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/start-personal-todo-1.png" width={560} />
+
+6. The development web server starts. It builds the app in development mode and serves it on the `http://localhost:5173` URL by default. Navigate to this URL to view the default XMLUI app:
+
+<br/>
+<Image alt="App Starts" src="/resources/images/get-started/app-start.png" />

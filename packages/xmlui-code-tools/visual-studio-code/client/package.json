@@ -1,0 +1,23 @@
+{
+  "name": "vscode-xmlui-languageservice-client",
+  "description": "VSCode part of a language server",
+  "author": "Tamas Kapitany",
+  "license": "MIT",
+  "version": "0.0.8",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nsoftware-com/albacrm"
+  },
+  "engines": {
+    "vscode": "^1.85.0",
+    "node": "^18.17.1",
+    "npm": "^9.6.7"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.5",
+    "@types/vscode": "^1.85.0"
+  }
+}
