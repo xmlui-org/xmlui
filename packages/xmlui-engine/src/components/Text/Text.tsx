@@ -281,7 +281,7 @@ export const textComponentRenderer = createComponentRenderer<TextComponentDef>(
         maxLines={extractValue.asOptionalNumber(maxLines)}
         layout={layoutCss}
         preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
-        ellipses={extractValue.asOptionalBoolean(ellipses, false)}
+        ellipses={extractValue.asOptionalBoolean(ellipses, true)}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

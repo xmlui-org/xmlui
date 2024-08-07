@@ -40,7 +40,7 @@ test("greater level smaller font size", async ({ page }) => {
   expect(fontSizeH5).toBeGreaterThan(fontSizeH6);
 });
 
-test("Ellipse long heading", async ({ page }) => {
+test("Ellipses long heading", async ({ page }) => {
   const valueHeadingLong = "Though this long heading does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
@@ -68,7 +68,7 @@ test("Ellipse long heading", async ({ page }) => {
   await expect(page.getByTestId("headingLong")).toHaveCSS("text-overflow", "ellipsis");
 });
 
-test("No Ellipsis long heading", async ({ page }) => {
+test("No Ellipses long heading", async ({ page }) => {
   const valueHeadingLong = "Though this long heading does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
