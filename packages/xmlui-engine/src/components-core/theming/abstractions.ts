@@ -46,14 +46,14 @@ export type ThemeScope = {
 
   /**
    * This hash object stores the CSS theme variable names with their CSS values definition,
-   * like "--nsoftware-align-vertical-Text-sub": "sub";
-   * "--nsoftware-color-bg": "var(--nsoftware-color-surface-50)"
+   * like "--xmlui-align-vertical-Text-sub": "sub";
+   * "--xmlui-color-bg": "var(--xmlui-color-surface-50)"
    */
   themeStyles: Record<string, string>;
 
   /**
    * This hash object stores the theme variable names with their CSS values definition, like
-   * "align-vertical-Text-sub": "sub"; "color-bg": "var(--nsoftware-color-surface-50)".
+   * "align-vertical-Text-sub": "sub"; "color-bg": "var(--xmlui-color-surface-50)".
    */
   themeVars: Record<string, string>;
 

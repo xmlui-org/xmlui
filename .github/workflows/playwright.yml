@@ -27,12 +27,12 @@ jobs:
       run: npm install
     - name: npm install common package
       run: npm install
-      working-directory: client/packages/ui-engine  
+      working-directory: client/packages/xmlui-engine  
     - name: Install e2e dependencies
-      working-directory: client/packages/e2e
+      working-directory: client/packages/xmlui-e2e
       run: npm install      
     - name: Store Playwright's Version
-      working-directory: client/packages/e2e 
+      working-directory: client/packages/xmlui-e2e 
       run: |
         PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//')
         echo "Playwright's Version: $PLAYWRIGHT_VERSION"
@@ -44,19 +44,19 @@ jobs:
         path: ~/.cache/ms-playwright
         key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}  
     - name: build test bed
-      working-directory: client/packages/e2e
+      working-directory: client/packages/xmlui-e2e
       run: npm run build  
     - name: Install Playwright Browsers
-      working-directory: client/packages/e2e
+      working-directory: client/packages/xmlui-e2e
       if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      working-directory: client/packages/e2e
+      working-directory: client/packages/xmlui-e2e
       run: npm run test
     - uses: actions/upload-artifact@v3
       if: always()
       with:
         name: playwright-report
-        path: client/packages/e2e/playwright-report/
+        path: client/packages/xmlui-e2e/playwright-report/
         retention-days: 30
 

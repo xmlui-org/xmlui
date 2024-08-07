@@ -1,5 +1,5 @@
 {
-  "name": "@nsoftware/e2e",
+  "name": "xmlui-e2e",
   "private": true,
   "version": "0.0.0",
   "scripts": {

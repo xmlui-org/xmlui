@@ -164,9 +164,6 @@
     ]
   },
   "repository": {
-    "url": "https://github.com/nsoftware-com/albacrm.git"
-  },
-  "publishConfig": {
-    "@nsoftware-com:registry": "https://npm.pkg.github.com"
+    "url": "https://github.com/xmlui-com/xmlui.git"
   }
 }

@@ -4,15 +4,6 @@
   display: none;
 }
 
-//combined with https://tobiasahlin.com/blog/previous-sibling-css-has/
-//.from ~ *:has(~ .to) {
-  //background-color: red;
-  //--nsoftware-color-bg-Button-primary: red !important;
-  //--nsoftware-color-bg-Button-primary-solid: red;
-  //--nsoftware-color-bg-TextBox-default: red;
-//}
-
-
 .baseRootComponent {
   width: 100%;
   position: relative;

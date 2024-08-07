@@ -30,7 +30,7 @@ import { StyleInputStream } from "./StyleInputStream";
 import { StyleLexer } from "./StyleLexer";
 import { StyleTokenType } from "./tokens";
 
-export const THEME_VAR_PREFIX = "nsoftware";
+export const THEME_VAR_PREFIX = "xmlui";
 
 type StyleParserErrorMessage = {
   code: StyleErrorCodes;

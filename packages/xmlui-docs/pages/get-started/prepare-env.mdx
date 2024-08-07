@@ -2,11 +2,11 @@
 
 > **Note**: When XMLUI is publicly released, it will be immediately available in the npmjs.org package registry, and the steps described here will be unnecessary.
 
-The fundamental packages of this tutorial, `xmlui` and `@nsoftware-com/create-xmlui-app` are released to the private GitHub registry of /n software. You have to set up a GitHub access token and add a few settings to your computer to use this private registry as a source of NPM packages.
+The fundamental packages of this tutorial, `xmlui` and `create-xmlui-app` are released to the private GitHub registry of /n software. You have to set up a GitHub access token and add a few settings to your computer to use this private registry as a source of NPM packages.
 
 ## Creating a GitHub Access Token
 
-You must have a GitHub account bound to the nsoftware-com organization in GitHub. If you do not have an account, sign up to GitHub by visiting https://github.com/. Ask the administrator to add you if you are not bound to the nsoftware-com organization.
+You must have a GitHub account bound to the xmlui-com organization in GitHub. If you do not have an account, sign up to GitHub by visiting https://github.com/. Ask the administrator to add you if you are not bound to the xmlui-com organization.
 
 When you have an appropriate GitHub account, you can create an access token with these steps:
 
@@ -28,12 +28,12 @@ GitHub will show your generated access token only once. **Copy it to the clipboa
 
 ## Configuring Private NPM Repo Access
 
-You must set up and configure your environment to let the NPM-related commands access the nsoftware-com private repository to find packages:
+You must set up and configure your environment to let the NPM-related commands access the xmlui-com private repository to find packages:
 
 1. Create an `.npmrc` file in the root of your home (user) folder. If this file exists, use the existing file. Add or append this content to the file:
 
 ```
-@nsoftware-com:registry=https://npm.pkg.github.com
+@xmlui-com:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken={YOUR_TOKEN}
 ```
 
@@ -51,9 +51,9 @@ After the configuration, you can check the environment setup with these steps:
 2. Execute this command:
 
 ```
-npx @nsoftware-com/create-xmlui-app
+npx @xmlui-com/create-xmlui-app
 ```
 
 3. When the utility starts, it displays an `Ok to proceed? (y)` question. Press Enter.
-4. The `npx` utility installs the `@nsoftware-com/create-xmlui-app` and immediately starts it.
+4. The `npx` utility installs the `@xmlui-com/create-xmlui-app` and immediately starts it.
 5. The utility displays a `What is your project named?` question. If you are here, the NPM repo success is successful. Press Ctrl+C to terminate the utility.
