@@ -16,7 +16,11 @@ interface SpinnerProps {
 }
 
 // source https://loading.io/css/
-export function Spinner({ delay = 400, fullScreen = false, style }: SpinnerProps) {
+export function Spinner({
+  delay = 400,
+  fullScreen = false,
+  style,
+}: SpinnerProps) {
   const [pastDelay, setPastDelay] = useState(delay === 0);
 
   useEffect(() => {
@@ -65,7 +69,7 @@ export interface SpinnerComponentDef extends ComponentDef<"Spinner"> {
      * @descriptionRef
      */
     delay?: number;
-    /** 
+    /**
      * If set to \`true\`, the component will be rendered in a full screen container.
      * The default value is \`false\`.
      * @defaultValue \`false\`
@@ -92,14 +96,19 @@ const metadata: ComponentDescriptor<SpinnerComponentDef> = {
   },
 };
 
-export const spinnerComponentRenderer = createComponentRenderer<SpinnerComponentDef>(
-  "Spinner",
-  ({ node, layoutCss, extractValue }) => (
-    <Spinner
-      style={layoutCss}
-      delay={extractValue.asOptionalNumber(node.props.delay)}
-      fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
-    />
-  ),
-  metadata
-);
+export const spinnerComponentRenderer =
+  createComponentRenderer<SpinnerComponentDef>(
+    "Spinner",
+    ({ node, layoutCss, extractValue }) => {
+      delete layoutCss.width;
+      delete layoutCss.height;
+      return (
+        <Spinner
+          style={layoutCss}
+          delay={extractValue.asOptionalNumber(node.props.delay)}
+          fullScreen={extractValue.asOptionalBoolean(node.props.fullScreen)}
+        />
+      );
+    },
+    metadata
+  );

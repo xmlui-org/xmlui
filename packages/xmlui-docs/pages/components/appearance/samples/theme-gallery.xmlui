@@ -46,7 +46,7 @@
     <HStack gap="$space-4">
       <Avatar url="https://i.pravatar.cc/200" size="sm"/>
       <Avatar url="https://i.pravatar.cc/300" size="sm"/>
-      <Spinner />
+      <Spinner width="100px" />
     </HStack>
   </VStack>
 </Component>
