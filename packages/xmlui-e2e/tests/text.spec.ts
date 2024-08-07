@@ -133,7 +133,7 @@ test("Break long text", async ({ page }) => {
   expect(heightTextShort).toBeLessThan(heightTextLong);
 });
 
-test("Ellipse long text", async ({ page }) => {
+test("Ellipses long text", async ({ page }) => {
   const valueTextLong = "Though this long text does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>
@@ -161,7 +161,7 @@ test("Ellipse long text", async ({ page }) => {
   await expect(page.getByTestId("textLong")).toHaveCSS("text-overflow", "ellipsis");
 });
 
-test("No Ellipsis long text", async ({ page }) => {
+test("No Ellipses long text", async ({ page }) => {
   const valueTextLong = "Though this long text does not fit into a single line, please do not break it!";
   const entryPoint = `
   <Fragment>

@@ -296,7 +296,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       level={(extractValue.asOptionalString(level) ?? "h1") as HeadingLevel}
       maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(node.props.preserveLinebreaks, false)}
-      ellipses={extractValue.asOptionalBoolean(node.props.ellipses, false)}
+      ellipses={extractValue.asOptionalBoolean(node.props.ellipses, true)}
       layout={layoutCss}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
