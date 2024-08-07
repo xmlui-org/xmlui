@@ -1,6 +1,12 @@
 import type React from "react";
 
-import type { ThemeScope, AppThemes, ThemeTone, ThemeDefinition, FontDef } from "./abstractions";
+import type {
+  ThemeScope,
+  AppThemes,
+  ThemeTone,
+  ThemeDefinition,
+  FontDef,
+} from "./abstractions";
 import { ThemeToneKeys } from "./abstractions";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -13,12 +19,25 @@ import {
 } from "./transformThemeVars";
 import { normalizePath } from "@components-core/utils/misc";
 import { matchThemeVar } from "@components-core/theming/hvar";
-import { ThemeContext, ThemesContext } from "@components-core/theming/ThemeContext";
+import {
+  ThemeContext,
+  ThemesContext,
+} from "@components-core/theming/ThemeContext";
 import themeVars, { getVarKey } from "@components-core/theming/themeVars";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
-import { collectThemeChainByExtends, expandTheme } from "@components-core/theming/extendThemeUtils";
+import {
+  collectThemeChainByExtends,
+  expandTheme,
+} from "@components-core/theming/extendThemeUtils";
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
-import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
+import {
+  XmlUiBlueThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiThemeDefinition,
+} from "@components-core/theming/themes/xmlui";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
 
@@ -34,7 +53,11 @@ export function useCompiledTheme(
 
   const themeDefChain = useMemo(() => {
     if (activeTheme) {
-      return collectThemeChainByExtends(activeTheme, themes, componentDefaultThemeVars);
+      return collectThemeChainByExtends(
+        activeTheme,
+        themes,
+        componentDefaultThemeVars
+      );
     }
     return undefined;
   }, [activeTheme, componentDefaultThemeVars, themes]);
@@ -42,7 +65,11 @@ export function useCompiledTheme(
   const allResources = useMemo(() => {
     let mergedResources: ThemeDefinition["resources"] = {};
     themeDefChain?.forEach((theme) => {
-      mergedResources = { ...mergedResources, ...theme.resources, ...theme.tones?.[activeTone]?.resources };
+      mergedResources = {
+        ...mergedResources,
+        ...theme.resources,
+        ...theme.tones?.[activeTone]?.resources,
+      };
     });
     return {
       ...resources,
@@ -73,7 +100,10 @@ export function useCompiledTheme(
       if (resourceMap[resourceUrl]) {
         return resourceMap[resourceUrl];
       }
-      if (resourceUrl.startsWith("/") && resourceMap[resourceUrl.substring(1)]) {
+      if (
+        resourceUrl.startsWith("/") &&
+        resourceMap[resourceUrl.substring(1)]
+      ) {
         return resourceMap[resourceUrl.substring(1)];
       }
       return normalizePath(resourceUrl);
@@ -82,7 +112,8 @@ export function useCompiledTheme(
   );
 
   const fontLinks: Array<string> = useMemo(() => {
-    return (allFonts?.filter((theme) => typeof theme === "string") || []) as Array<string>;
+    return (allFonts?.filter((theme) => typeof theme === "string") ||
+      []) as Array<string>;
   }, [allFonts]);
 
   const themeDefChainVars = useMemo(() => {
@@ -91,13 +122,20 @@ export function useCompiledTheme(
     }
     let mergedThemeVars = {};
     themeDefChain?.forEach((theme) => {
-      mergedThemeVars = { ...mergedThemeVars, ...theme.themeVars, ...theme.tones?.[activeTone]?.themeVars };
+      mergedThemeVars = {
+        ...mergedThemeVars,
+        ...theme.themeVars,
+        ...theme.tones?.[activeTone]?.themeVars,
+      };
     });
 
     //we put the generated theme vars before the last item in the chain
     return [
       ...themeDefChain
-        .map((themeDef) => ({ ...themeDef.themeVars, ...themeDef.tones?.[activeTone]?.themeVars }))
+        .map((themeDef) => ({
+          ...themeDef.themeVars,
+          ...themeDef.tones?.[activeTone]?.themeVars,
+        }))
         .slice(0, themeDefChain.length - 1),
       {
         ...generateBaseSpacings(mergedThemeVars),
@@ -108,7 +146,8 @@ export function useCompiledTheme(
       {
         ...expandTheme({
           ...themeDefChain[themeDefChain.length - 1].themeVars,
-          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]?.themeVars,
+          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]
+            ?.themeVars,
         }),
       } || {},
     ];
@@ -123,10 +162,20 @@ export function useCompiledTheme(
 
     const resolvedThemeVarsFromChains: Record<string, string> = {};
 
-    new Set([...Object.keys(themeVars.themeVars), ...componentThemeVars]).forEach((themeVar) => {
+    new Set([
+      ...Object.keys(themeVars.themeVars),
+      ...componentThemeVars,
+    ]).forEach((themeVar) => {
       const result = matchThemeVar(themeVar, themeDefChainVars);
-      if (result && result.forValue && result.matchedValue && result.forValue !== result.matchedValue) {
-        resolvedThemeVarsFromChains[result.forValue] = `$${result.matchedValue}`;
+      if (
+        result &&
+        result.forValue &&
+        result.matchedValue &&
+        result.forValue !== result.matchedValue
+      ) {
+        resolvedThemeVarsFromChains[
+          result.forValue
+        ] = `$${result.matchedValue}`;
       }
     });
 
@@ -138,12 +187,14 @@ export function useCompiledTheme(
 
   const themeCssVars = useMemo(() => {
     const ret: Record<string, string> = {};
-    Object.entries(allThemeVarsWithResolvedHierarchicalVars).forEach(([key, value]) => {
-      const themeKey = `--${themeVars.keyPrefix}-${key}`;
-      if (value) {
-        ret[themeKey] = value;
+    Object.entries(allThemeVarsWithResolvedHierarchicalVars).forEach(
+      ([key, value]) => {
+        const themeKey = `--${themeVars.keyPrefix}-${key}`;
+        if (value) {
+          ret[themeKey] = value;
+        }
       }
-    });
+    );
     return ret;
   }, [allThemeVarsWithResolvedHierarchicalVars]);
 
@@ -185,7 +236,15 @@ export function useCompiledTheme(
   };
 }
 
-const builtInThemes: Array<ThemeDefinition> = [XmlUiThemeDefinition, SolidThemeDefinition ];
+const builtInThemes: Array<ThemeDefinition> = [
+  XmlUiThemeDefinition,
+  XmlUiBlueThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  SolidThemeDefinition,
+];
 
 // theme-overriding properties change.
 function ThemeProvider({
@@ -216,7 +275,18 @@ function ThemeProvider({
 
   const availableThemeIds = useMemo(() => {
     const customThemeUids = themes.map((theme) => theme.id);
-    return [...new Set([...customThemeUids, "solid", "xmlui"])];
+    return [
+      ...new Set([
+        ...customThemeUids,
+        "solid",
+        "xmlui",
+        "xmlui-blue",
+        "xmlui-green",
+        "xmlui-gray",
+        "xmlui-orange",
+        "xmlui-purple",
+      ]),
+    ];
   }, [themes]);
 
   const [activeThemeId, setActiveThemeId] = useState<string>(() => {
@@ -241,19 +311,28 @@ function ThemeProvider({
       foundTheme = themes.find((theme) => theme.id === activeThemeId);
     }
     if (!foundTheme) {
-      throw new Error(`Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`);
+      throw new Error(
+        `Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`
+      );
     }
     return foundTheme;
   }, [activeThemeId, availableThemeIds, themes]);
 
-  const { allThemeVarsWithResolvedHierarchicalVars, themeCssVars, getResourceUrl, getThemeVar } = useCompiledTheme(
+  const {
+    allThemeVarsWithResolvedHierarchicalVars,
+    themeCssVars,
+    getResourceUrl,
+    getThemeVar,
+  } = useCompiledTheme(
     activeTheme,
     activeThemeTone,
     themes,
     resources,
     resourceMap
   );
-  const [root, setRoot] = useState(typeof document === "undefined" ? undefined : document.body);
+  const [root, setRoot] = useState(
+    typeof document === "undefined" ? undefined : document.body
+  );
 
   const themeValue = useMemo(() => {
     const themeVal: AppThemes = {
@@ -270,7 +349,16 @@ function ThemeProvider({
       activeTheme,
     };
     return themeVal;
-  }, [activeTheme, activeThemeId, activeThemeTone, availableThemeIds, resourceMap, resources, root, themes]);
+  }, [
+    activeTheme,
+    activeThemeId,
+    activeThemeTone,
+    availableThemeIds,
+    resourceMap,
+    resources,
+    root,
+    themes,
+  ]);
 
   const currentThemeContextValue = useMemo(() => {
     const themeVal: ThemeScope = {
@@ -297,7 +385,9 @@ function ThemeProvider({
 
   return (
     <ThemesContext.Provider value={themeValue}>
-      <ThemeContext.Provider value={currentThemeContextValue}>{children}</ThemeContext.Provider>
+      <ThemeContext.Provider value={currentThemeContextValue}>
+        {children}
+      </ThemeContext.Provider>
     </ThemesContext.Provider>
   );
 }
@@ -312,7 +402,10 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
   });
   return ret;
 
-  function resolveThemeVarToCssVars(varName: string, theme: Record<string, string>) {
+  function resolveThemeVarToCssVars(
+    varName: string,
+    theme: Record<string, string>
+  ) {
     const value = theme[varName];
     if (typeof value === "string" && value.includes("$")) {
       return replaceThemeVar(value);

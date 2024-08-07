@@ -1,0 +1,52 @@
+<Component name="ThemeGallery">
+  <VStack padding="$space-4" gap="$space-3">
+    <HStack gap="$space-4">
+        <Button label="solid/primary" variant="solid" themeColor="primary"/>
+        <Button label="outlined/primary" variant="outlined" themeColor="primary"/>
+        <Button label="ghost/primary" variant="ghost" themeColor="primary"/>
+    </HStack>
+    <HStack gap="$space-4">
+        <Button label="solid/secondary" variant="solid" themeColor="secondary"/>
+        <Button label="outlined/secondary" variant="outlined" themeColor="secondary"/>
+        <Button label="ghost/secondary" variant="ghost" themeColor="secondary"/>
+    </HStack>
+    <HStack gap="$space-4">
+        <Button label="solid/attention" variant="solid" themeColor="attention"/>
+        <Button label="outlined/attention" variant="outlined" themeColor="attention"/>
+        <Button label="ghost/attention" variant="ghost" themeColor="attention"/>
+    </HStack>
+    <HStack gap="$space-4">
+        <Button label="disabled/solid" variant="solid" enabled="{false}"/>
+        <Button label="disabled/outlined" variant="outlined" enabled="{false}"/>
+        <Button label="disabled/ghost" variant="ghost" enabled="{false}"/>
+    </HStack>
+    <HStack gap="$space-4">
+       <Badge value="Badge"/>
+       <Badge value="Long Pill" variant="pill"/>
+    </HStack>
+    <HStack gap="$space-4">
+      <Checkbox initialValue="false" label="Set or clear me!"/>
+      <Checkbox initialValue="false" enabled="false" label="I'm not enabled"/>
+      <Switch initialValue="false" label="Toggle me!"/>
+      <Switch initialValue="true" enabled="false" label="I'm not enabled"/>
+    </HStack>
+    <FlowLayout gap="$space-4">
+      <TextBox width="50%" placeholder="John Smith"/>
+      <NumberBox width="50%" initialValue="{12345}"/>
+    </FlowLayout>
+    <FlowLayout gap="$space-2">
+      <Text width="33%" variant="abbr">This is (abbr)</Text>
+      <Text width="33%" variant="cite">This is (cite)</Text>
+      <Text width="33%" variant="code">This is (code)</Text>
+      <Text width="33%" variant="deleted">This is (deleted)</Text>
+      <Text width="33%" variant="inserted">This is (inserted)</Text>
+      <Text width="33%" variant="keyboard">This is (keyboard)</Text>
+    </FlowLayout>
+    <ProgressBar value="0.4"/>
+    <HStack gap="$space-4">
+      <Avatar url="https://i.pravatar.cc/200" size="sm"/>
+      <Avatar url="https://i.pravatar.cc/300" size="sm"/>
+      <Spinner />
+    </HStack>
+  </VStack>
+</Component>

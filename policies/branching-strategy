@@ -23,8 +23,7 @@ We tag the commit belonging to the release with a version number using the `v<ma
 
 ## Working on bug fixes
 
-1. If the bug belongs to the latest minor version, we fix the bug in a branch from `main`.
-2. Otherwise, we fix the bug in a branch from the bug report's version branch.
-3. We create a regression test displaying the reported bug -- unless it requires unnecessary overwhelming efforts.
-4. We fix the bug and check the fix with the regression test(s).
-5. We ensure that the fix (and its regression tests) are merged into the `main` branch.
+1. We fix the bug in a branch from `main`.
+2. We create a regression test displaying the reported bug -- unless it requires unnecessary overwhelming efforts.
+3. We fix the bug and check the fix with the regression test(s).
+4. We ensure that the fix (and its regression tests) are merged into the `main` branch.
