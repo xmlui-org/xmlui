@@ -7,6 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$color-text-secondary: createThemeVar("color-text-secondary");
 $color-bg-Table: createThemeVar("color-bg-Table");
 $color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
 $color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
@@ -50,7 +51,7 @@ $font-size-heading-Table: createThemeVar("font-size-heading-Table");
 .clickableHeader {
   width: 100%;
   height: fit-content;
-  color: t.useVar($color-text-heading-Table, t.$color-text-primary);
+  color: $color-text-heading-Table;
   background-color: transparent;
   border: none;
   transition: color 0.2s, background-color 0.2s;
@@ -86,14 +87,14 @@ $font-size-heading-Table: createThemeVar("font-size-heading-Table");
   gap: 0.5rem;
   align-items: center;
   text-transform: uppercase;
-  font-size: t.useVar($font-size-heading-Table, t.$font-size-smaller);
-  color: t.useVar($color-text-heading-Table, t.$color-text-secondary);
-  font-weight: t.useVar($font-weight-heading-Table, t.$font-weight-bold);
+  font-size: $font-size-heading-Table;
+  color: $color-text-heading-Table;
+  font-weight: $font-weight-heading-Table;
   padding: $padding-heading-Table;
 }
 
-.headerRow{
-  background-color: var(--xmlui-color-bg-heading-Table);
+.headerRow {
+  background-color: $color-bg-heading-Table;
 }
 
 .columnCell, .cell{
@@ -102,13 +103,6 @@ $font-size-heading-Table: createThemeVar("font-size-heading-Table");
 }
 
 .table {
-  //width: 100%;
-  //min-width: 100%;
-  //width: 100%;
-  //max-width: fit-content;
-  //table-layout: fixed;
-  //border-spacing: 0;
-  //border-collapse: collapse;
   display: block;
 
 
@@ -256,7 +250,7 @@ $font-size-heading-Table: createThemeVar("font-size-heading-Table");
 }
 
 .paginationLabel {
-  color: t.useVar(t.$color-text-secondary);
+  color: $color-text-secondary;
 }
 
 .paginationSelect {

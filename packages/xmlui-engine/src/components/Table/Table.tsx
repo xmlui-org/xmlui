@@ -855,6 +855,10 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     "style-outline-heading-Table--focus": "$style-outline--focus",
     "offset-outline-heading-Table--focus": "$offset-outline--focus",
 
+    "color-text-heading-Table": "$color-text-primary",
+    "font-size-heading-Table": "$font-size-smaller",
+    "font-weight-heading-Table": "$font-weight-bold",
+
     dark: {
       "color-bg-row-Table--hover": "$color-primary-900",
       "color-bg-selected-Table": "$color-primary-800",
