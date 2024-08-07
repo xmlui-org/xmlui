@@ -3,7 +3,7 @@ import { ApiInterceptorDefinition } from "xmlui";
 const mock: ApiInterceptorDefinition = {
   type: "db",
   config: {
-    database: "nSoftwareDataManipuliationTutorial",
+    database: "xmluiDataManipuliationTutorial",
     version: 1
   },
   apiUrl: "/api",

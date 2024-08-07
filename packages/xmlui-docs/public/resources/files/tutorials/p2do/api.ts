@@ -26,7 +26,7 @@ monthEarlier.setMonth(monthEarlier.getMonth() - 1);
 const mock: ApiInterceptorDefinition = {
   type: "db",
   config: {
-    database: "nSoftwareTodoApp",
+    database: "xmluiTodoApp",
     version: 1,
   },
   apiUrl: "/api",

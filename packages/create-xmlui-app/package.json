@@ -1,5 +1,5 @@
 {
-  "name": "@nsoftware-com/create-xmlui-app",
+  "name": "create-xmlui-app",
   "version": "0.4.0",
   "scripts": {
     "dev": "mkdir -p dist && cp -r templates/default dist/ && ncc build ./index.ts -w -o dist/",
@@ -30,9 +30,6 @@
     "node": ">=18.12.0"
   },
   "repository": {
-    "url": "https://github.com/nsoftware-com/albacrm.git"
-  },
-  "publishConfig": {
-    "@nsoftware-com:registry": "https://npm.pkg.github.com"
+    "url": "https://github.com/xmlui-com/xmlui.git"
   }
 }

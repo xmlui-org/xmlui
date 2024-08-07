@@ -275,32 +275,32 @@ describe("Style compiler", () => {
 
   it(`border (spec themeId) #1`, () => {
     const result = compileLayout({ border: "$myTheme solid 4px" }, themeVars);
-    expect(result.cssProps?.border).equal("var(--nsoftware-myTheme) 4px solid");
+    expect(result.cssProps?.border).equal("var(--xmlui-myTheme) 4px solid");
     expect(result.issues).equal(undefined);
   });
 
   it(`border (spec themeId) #2`, () => {
     const result = compileLayout({ border: "solid $myTheme 4px" }, themeVars);
-    expect(result.cssProps?.border).equal("var(--nsoftware-myTheme) 4px solid");
+    expect(result.cssProps?.border).equal("var(--xmlui-myTheme) 4px solid");
     expect(result.issues).equal(undefined);
   });
 
   it(`border (spec themeId) #3`, () => {
     const result = compileLayout({ border: "solid 4px $myTheme" }, themeVars);
-    expect(result.cssProps?.border).equal("var(--nsoftware-myTheme) 4px solid");
+    expect(result.cssProps?.border).equal("var(--xmlui-myTheme) 4px solid");
     expect(result.issues).equal(undefined);
   });
 
   it(`border (spec themeId) #4`, () => {
     const result = compileLayout({ border: "$myBorder 4px $myTheme" }, themeVars);
-    expect(result.cssProps?.border).equal("var(--nsoftware-myBorder) var(--nsoftware-myTheme) 4px");
+    expect(result.cssProps?.border).equal("var(--xmlui-myBorder) var(--xmlui-myTheme) 4px");
     expect(result.issues).equal(undefined);
   });
 
   it(`border (spec themeId) #5`, () => {
     const result = compileLayout({ border: "$myBorder $mySize $myTheme" }, themeVars);
     expect(result.cssProps?.border).equal(
-      "var(--nsoftware-myBorder) var(--nsoftware-mySize) var(--nsoftware-myTheme)"
+      "var(--xmlui-myBorder) var(--xmlui-mySize) var(--xmlui-myTheme)"
     );
     expect(result.issues).equal(undefined);
   });
@@ -324,26 +324,26 @@ describe("Style compiler", () => {
 
   it(`textDecoration (spec themeId) #1`, () => {
     const result = compileLayout({ textDecoration: "$myTheme wavy" }, themeVars);
-    expect(result.cssProps?.textDecoration).equal("var(--nsoftware-myTheme) wavy");
+    expect(result.cssProps?.textDecoration).equal("var(--xmlui-myTheme) wavy");
     expect(result.issues).equal(undefined);
   });
 
   it(`textDecoration (spec themeId) #2`, () => {
     const result = compileLayout({ textDecoration: "wavy $myTheme" }, themeVars);
-    expect(result.cssProps?.textDecoration).equal("var(--nsoftware-myTheme) wavy");
+    expect(result.cssProps?.textDecoration).equal("var(--xmlui-myTheme) wavy");
     expect(result.issues).equal(undefined);
   });
 
   it(`textDecoration (spec themeId) #3`, () => {
     const result = compileLayout({ textDecoration: "$myTheme wavy red" }, themeVars);
-    expect(result.cssProps?.textDecoration).equal("var(--nsoftware-myTheme) wavy red");
+    expect(result.cssProps?.textDecoration).equal("var(--xmlui-myTheme) wavy red");
     expect(result.issues).equal(undefined);
   });
 
   it(`textDecoration (spec themeId) #4`, () => {
     const result = compileLayout({ textDecoration: "$myTheme wavy $other" }, themeVars);
     expect(result.cssProps?.textDecoration).equal(
-      "var(--nsoftware-myTheme) var(--nsoftware-other) wavy"
+      "var(--xmlui-myTheme) var(--xmlui-other) wavy"
     );
     expect(result.issues).equal(undefined);
   });
@@ -351,7 +351,7 @@ describe("Style compiler", () => {
   it(`textDecoration (spec themeId) #5`, () => {
     const result = compileLayout({ textDecoration: "$myTheme $third $other" }, themeVars);
     expect(result.cssProps?.textDecoration).equal(
-      "var(--nsoftware-myTheme) var(--nsoftware-third) var(--nsoftware-other)"
+      "var(--xmlui-myTheme) var(--xmlui-third) var(--xmlui-other)"
     );
     expect(result.issues).equal(undefined);
   });
@@ -426,19 +426,19 @@ describe("Style compiler", () => {
 
   it(`radius (spec themeId) #1`, () => {
     const result = compileLayout({ radius: "$myTheme 25%" }, themeVars);
-    expect(result.cssProps?.borderRadius).equal("var(--nsoftware-myTheme) / 25%");
+    expect(result.cssProps?.borderRadius).equal("var(--xmlui-myTheme) / 25%");
     expect(result.issues).equal(undefined);
   });
 
   it(`radius (spec themeId) #2`, () => {
     const result = compileLayout({ radius: "25% $myTheme" }, themeVars);
-    expect(result.cssProps?.borderRadius).equal("25% / var(--nsoftware-myTheme)");
+    expect(result.cssProps?.borderRadius).equal("25% / var(--xmlui-myTheme)");
     expect(result.issues).equal(undefined);
   });
 
   it(`radius (spec themeId) #3`, () => {
     const result = compileLayout({ radius: "$myTheme $other" }, themeVars);
-    expect(result.cssProps?.borderRadius).equal("var(--nsoftware-myTheme) / var(--nsoftware-other)");
+    expect(result.cssProps?.borderRadius).equal("var(--xmlui-myTheme) / var(--xmlui-other)");
     expect(result.issues).equal(undefined);
   });
 

@@ -11,8 +11,7 @@
 
 // =====================================================================================================================
 // We index all theme variables with this prefix to make a distinction from variables defined in other custom themes.
-// Probably we should now use "weblets" instead of nsoftware
-$THEME-VAR-PREFIX: nsoftware;
+$THEME-VAR-PREFIX: xmlui;
 
 /*
  * This function creates a CSS variable name by combining the prefix and the argument variable name

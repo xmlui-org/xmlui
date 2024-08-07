@@ -12,34 +12,6 @@ env:
   NODE_VERSION: '18.x'
   
 jobs:
-#  integration-tests:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - uses: actions/checkout@v3
-#
-#      - name: Setup .NET Core SDK ${{ matrix.dotnet-version }}
-#        uses: actions/setup-dotnet@v2
-#        with:
-#          dotnet-version: ${{ env.DOTNET_VERSION }}
-#          
-#      - name: Install dependencies
-#        run: dotnet restore
-#        
-#      - name: Build
-#        run: dotnet build --configuration Release --no-restore
-#        
-#      - name: Start mysql
-#        run: |
-#          sudo systemctl start mysql.service
-#          mysql -h 127.0.0.1 -e "CREATE USER 'albacrm'@'localhost' IDENTIFIED BY 'albacrm2021';" --user=root --password=root
-#          mysql -h 127.0.0.1 -e "CREATE DATABASE albacrmtest" --user=root --password=root
-#          mysql -h 127.0.0.1 -e "GRANT ALL PRIVILEGES ON *.* TO 'albacrm'@'localhost';" --user=root --password=root
-#          mysql -h 127.0.0.1 -e "FLUSH PRIVILEGES;" --user=root --password=root
-#          mysql -h 127.0.0.1 -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));" --user=root --password=root
-#        
-#      - name: Test
-#        run: dotnet test --no-restore --verbosity normal
-        
   client-tests:
     runs-on: ubuntu-latest
     steps:
@@ -58,12 +30,11 @@ jobs:
           
       - name: npm install client
         run: npm install
-        working-directory: client
 
       - name: npm install common package
         run: npm install
-        working-directory: client/packages/ui-engine  
+        working-directory: packages/xmlui-engine  
         
       - name: run tests in common package
         run: npm run test
-        working-directory: client/packages/ui-engine          
+        working-directory: packages/xmlui-engine          

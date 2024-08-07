@@ -17,9 +17,9 @@ type Props = {
 export const HelperText = ({ text = "", status, style }: Props) => {
   const renderStatusIcon = () => {
     if (status === "warning") {
-      return <WarningIcon color="var(--nsoftware-color-warning)" />;
+      return <WarningIcon color="var(--xmlui-color-warning)" />;
     } else if (status === "error") {
-      return <ErrorIcon color="var(--nsoftware-color-error)" />;
+      return <ErrorIcon color="var(--xmlui-color-error)" />;
     }
   };
 

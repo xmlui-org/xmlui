@@ -53,7 +53,6 @@ const theme = {
 };
 
 export function getVarKey(varName: string) {
-  // var(--nsoftware-media-max-width-phone)
   if (keyPrefix) {
     return `--${keyPrefix}-${varName}`;
   }

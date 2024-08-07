@@ -1251,7 +1251,7 @@ describe("Style compiler", () => {
 
   it(`radiusBottomRight (theme ID)`, () => {
     const result = compileLayout({ radiusBottomRight: "$myValue1 $myValue2" }, { myValue1: "3px", myValue2: "4px" });
-    expect(result.cssProps?.borderBottomRightRadius).equal("var(--nsoftware-myValue1) / var(--nsoftware-myValue2)");
+    expect(result.cssProps?.borderBottomRightRadius).equal("var(--xmlui-myValue1) / var(--xmlui-myValue2)");
   });
 
   it(`Default size unit is px`, () => {
