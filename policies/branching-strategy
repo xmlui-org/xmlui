@@ -1,0 +1,30 @@
+# Branching Strategy
+
+We follow a simplified version of git-flow and keep it as simple as possible. We only change this workflow when we have a strong enough motive.
+
+## Working on stories, tasks, and other work items
+
+1. We create a new branch for each work item with the name `<team-member>/<workitem>`, where `<team-member>` is the GitHub ID of the member working on the particular item.
+2. Before we commit to the branch, we test the changes locally:
+    - The `xmlui-engine` build should be successful.
+    - All xmlui unit tests should completes successfully.
+    - The `xmlui-e2e` tests are successful.
+    - The `xmlui-docs` build completes successfully.
+3. We merge the work item's branch with  PR (executing the same check with GitHub actions).
+4. After the successful PR merge, we remove the work item's branch from the repo.
+
+## Working on features
+
+We create the work item branch from `main` until some circumstances require otherwise.
+
+## Creating new releases
+
+We tag the commit belonging to the release with a version number using the `v<major>.<minor>.<patch>` tag format.
+
+## Working on bug fixes
+
+1. If the bug belongs to the latest minor version, we fix the bug in a branch from `main`.
+2. Otherwise, we fix the bug in a branch from the bug report's version branch.
+3. We create a regression test displaying the reported bug -- unless it requires unnecessary overwhelming efforts.
+4. We fix the bug and check the fix with the regression test(s).
+5. We ensure that the fix (and its regression tests) are merged into the `main` branch.
