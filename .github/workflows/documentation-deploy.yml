@@ -3,8 +3,8 @@ name: Documentation CI/CD
 on:
   push:
     paths:
-      - client/packages/docs/**
-    branches: [ master ]
+      - packages/xmlui-docs/**
+    branches: [ main ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -24,25 +24,24 @@ jobs:
         with:
           node-version: '18.x'
 
-      - name: npm install client
+      - name: npm install
         run: npm i
-        working-directory: client
 
       - name: npm install @napi-rs
         run: npm i @napi-rs/simple-git-linux-x64-gnu
-        working-directory: client/packages/xmlui-docs
+        working-directory: packages/xmlui-docs
 
       - name: npm install docs
         run: npm i
-        working-directory: client/packages/xmlui-docs
+        working-directory: packages/xmlui-docs
 
       - name: build docs package
         shell: bash
         run: npm run release-ci
-        working-directory: client/packages/xmlui-docs
+        working-directory: packages/xmlui-docs
       - name: 'Run Azure webapp deploy action using publish profile credentials'
         uses: azure/webapps-deploy@v2
         with:
-          package: "client/packages/xmlui-docs/ui.zip"
+          package: "packages/xmlui-docs/ui.zip"
           app-name: ncrm
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PLAYGROUND }}
