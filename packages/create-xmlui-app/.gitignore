@@ -22,10 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-/test-results/
-/playwright-report/
-/playwright/.cache/
 
-.env.local
 .env.production
 
