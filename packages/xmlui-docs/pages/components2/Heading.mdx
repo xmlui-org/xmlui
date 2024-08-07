@@ -46,6 +46,50 @@ This component does not have any context variables.
 
 ## Props
 
+### `ellipses`
+
+This property indicates whether ellipses should be displayed (`true`)
+when the heading text is cropped or not (`false`).
+The default value is `true`.
+
+```ueml copy {4}
+<VStack width="200" gap="0.5rem">
+  <H3 
+    backgroundColor="blue" 
+    maxLines="1"
+    ellipses="false">
+    Though this long text does is about to crop!
+  </H3>
+  <H3 
+    backgroundColor="blue" 
+    maxLines="1">
+    Though this long text does is about to crop!
+  </H3>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: ellipses"
+  height={100}
+  horizontal
+  app={`
+  <VStack width="200" gap="0.5rem">
+    <H3
+      backgroundColor="blue" 
+      maxLines="1"
+      ellipses="false">
+      Though this long text does is about to crop!
+    </H3>
+    <H3 
+      backgroundColor="blue" 
+      maxLines="1">
+      Though this long text does is about to crop!
+    </H3>
+  </VStack>
+  `}
+/>
+
 ### `level`
 
 This property sets the visual significance (level) of the heading.
@@ -83,48 +127,6 @@ the component wraps the text up to as many lines as specified.
     maxWidth="160" 
     backgroundColor="blue"
     value="A long heading text that will likely overflow" maxLines="2" />
-  `}
-/>
-
-### `noEllipsis`
-
-This property indicates whether an ellipsis should be displayed when the heading text is cropped.
-
-```ueml copy {4}
-<VStack width="200" gap="0.5rem">
-  <H3 
-    backgroundColor="blue" 
-    maxLines="1"
-    noEllipsis="true">
-    Though this long text does is about to crop!
-  </H3>
-  <H3 
-    backgroundColor="blue" 
-    maxLines="1">
-    Though this long text does is about to crop!
-  </H3>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: noEllipsis"
-  height={100}
-  horizontal
-  app={`
-  <VStack width="200" gap="0.5rem">
-    <H3
-      backgroundColor="blue" 
-      maxLines="1"
-      noEllipsis="true">
-      Though this long text does is about to crop!
-    </H3>
-    <H3 
-      backgroundColor="blue" 
-      maxLines="1">
-      Though this long text does is about to crop!
-    </H3>
-  </VStack>
   `}
 />
 

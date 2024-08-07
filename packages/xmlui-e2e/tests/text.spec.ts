@@ -173,7 +173,7 @@ test("No Ellipsis long text", async ({ page }) => {
       width="200" 
       backgroundColor="cyan"
       maxLines="1"
-      noEllipsis="true">
+      ellipses="false">
       ${valueTextLong}
     </Text>
   </Fragment>

@@ -101,7 +101,7 @@ type TextProps = {
   variant?: TextVariant;
   maxLines?: number;
   preserveLinebreaks?: boolean;
-  noEllipsis?: boolean;
+  ellipses?: boolean;
   layout?: CSSProperties;
   [variantSpecificProps: string]: any;
 };
@@ -113,7 +113,7 @@ export const Text = ({
   layout,
   children,
   preserveLinebreaks,
-  noEllipsis = false,  
+  ellipses = true,  
   ...variantSpecificProps
 }: TextProps) => {
   const ref: React.MutableRefObject<HTMLElement | null> = useRef<HTMLElement>(null);
@@ -137,7 +137,7 @@ export const Text = ({
           {
             [styles.truncateOverflow]: maxLines > 0,
             [styles.preserveLinebreaks]: preserveLinebreaks,
-            [styles.noEllipsis]: noEllipsis
+            [styles.noEllipsis]: !ellipses
           },
         ])}
         style={{
@@ -186,11 +186,11 @@ export interface TextComponentDef extends ComponentDef<"Text"> {
      */
     preserveLinebreaks?: boolean;
     /**
-     * This property indicates whether an ellipsis should be displayed when the text is cropped (\`true\`) or not (\`false\`).
-     * By default, its value is set to \`false\`.
+     * This property indicates whether ellipses should be displayed when the text is cropped (\`true\`) or not (\`false\`).
+     * By default, its value is set to \`true\`.
      * @descriptionRef 
      */
-    noEllipsis?: boolean;
+    ellipses?: boolean;
   };
 }
 
@@ -202,7 +202,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     variant: desc("Indicates the styling of the Text component, see stylesheet for details"),
     maxLines: desc("Limits the number of lines the component can use"),
     preserveLinebreaks: desc("Allow preserving linebreak information?"),
-    noEllipsis: desc("Indicates if ellipsis should be hidden from the end of the text"),
+    ellipses: desc("Indicates if ellipsis should be hidden from the end of the text"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -267,7 +267,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
 export const textComponentRenderer = createComponentRenderer<TextComponentDef>(
   "Text",
   ({ node, extractValue, layoutCss, renderChild }) => {
-    const { variant, maxLines, preserveLinebreaks, noEllipsis, value, ...variantSpecific } = node.props;
+    const { variant, maxLines, preserveLinebreaks, ellipses, value, ...variantSpecific } = node.props;
 
     const variantSpecificProps: VariantProps = Object.fromEntries(
       Object.entries(variantSpecific)
@@ -281,7 +281,7 @@ export const textComponentRenderer = createComponentRenderer<TextComponentDef>(
         maxLines={extractValue.asOptionalNumber(maxLines)}
         layout={layoutCss}
         preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
-        noEllipsis={extractValue.asOptionalBoolean(noEllipsis, false)}
+        ellipses={extractValue.asOptionalBoolean(ellipses, false)}
         {...variantSpecificProps}
       >
         {extractValue.asDisplayText(value) || renderChild(node.children)}

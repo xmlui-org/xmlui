@@ -30,7 +30,7 @@ export type HeadingProps = {
   layout?: CSSProperties;
   maxLines?: number;
   preserveLinebreaks?: boolean;
-  noEllipsis?: boolean;
+  ellipses?: boolean;
   title?: string;
   className?: string;
 };
@@ -44,7 +44,7 @@ export const Heading = ({
   title,
   maxLines = 0,
   preserveLinebreaks,  
-  noEllipsis = false,
+  ellipses = true,
   className,
 }: HeadingProps) => {
   const Element = level?.toLowerCase() as HeadingLevel;
@@ -56,7 +56,7 @@ export const Heading = ({
       className={classnames(styles.heading, styles[Element], className || "", {
         [styles.truncateOverflow]: maxLines > 0,
         [styles.preserveLinebreaks]: preserveLinebreaks,
-        [styles.noEllipsis]: noEllipsis,
+        [styles.noEllipsis]: !ellipses,
       })}
     >
       {children}
@@ -100,10 +100,12 @@ export interface HeadingComponentDef extends ComponentDef<"Heading"> {
      */
     preserveLinebreaks?: boolean;
     /** 
-     * This property indicates whether an ellipsis should be displayed when the heading text is cropped.
+     * This property indicates whether ellipses should be displayed (\`true\`)
+     * when the heading text is cropped or not (\`false\`).
+     * The default value is \`true\`.
      * @descriptionRef
      * */
-    noEllipsis?: boolean;
+    ellipses?: boolean;
   };
 }
 
@@ -127,7 +129,7 @@ const headingMetadata: ComponentDescriptor<HeadingComponentDef> = {
     value: desc(VALUE_DESC),
     level: desc("The heading level as described in HTML, indicates the heading size and importance"),
     maxLines: desc(LINE_CLAMP_DESC),
-    noEllipsis: desc(NO_ELLIPSIS_DESC),
+    ellipses: desc(NO_ELLIPSIS_DESC),
     preserveLinebreaks: desc(PRESERVE_DESC),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -294,7 +296,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       level={(extractValue.asOptionalString(level) ?? "h1") as HeadingLevel}
       maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(node.props.preserveLinebreaks, false)}
-      noEllipsis={extractValue.asOptionalBoolean(node.props.noEllipsis, false)}
+      ellipses={extractValue.asOptionalBoolean(node.props.ellipses, false)}
       layout={layoutCss}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}

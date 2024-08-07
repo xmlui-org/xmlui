@@ -31,16 +31,17 @@ This property determines the maximum number of lines the component can wrap to. 
   `}
 />
 
-### `noEllipsis`
+### `ellipses`
 
-This property indicates whether an ellipsis should be displayed when the text is cropped.
+This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
+By default, its value is set to `true`.
 
 ```ueml copy {4}
 <VStack width="200" gap="0.5rem">
   <Text
     backgroundColor="cyan"
     maxLines="1"
-    noEllipsis="true">
+    ellipses="false">
     Though this long text does is about to crop!
   </Text>
   <Text
@@ -61,7 +62,7 @@ This property indicates whether an ellipsis should be displayed when the text is
       <Text 
         backgroundColor="cyan" 
         maxLines="1"
-        noEllipsis="true">
+        ellipses="false">
         Though this long text does is about to crop!
       </Text>
       <Text 

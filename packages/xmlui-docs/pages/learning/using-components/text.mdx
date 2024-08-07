@@ -355,14 +355,14 @@ You can set the `maxLines` property of a `Text` instance to 1 to avoid breaking 
   `}
 />
 
-If you do want to hide the ellipses, set the `noEllipses` property to `true`:
+If you do want to hide the ellipses, set the `ellipses` property to `false`:
 
 ```ueml copy {5}
 <Text 
   width="200" 
   backgroundColor="cyan"
   maxLines="1"
-  noEllipsis="true">
+  ellipses="false">
   Though this long text does not fit into a single line, please do not break it!
 </Text>
 ```
@@ -377,7 +377,7 @@ If you do want to hide the ellipses, set the `noEllipses` property to `true`:
       width="200" 
       backgroundColor="cyan"
       maxLines="1"
-      noEllipsis="true">
+      ellipses="false">
       Though this long text does not fit into a single line, please do not break it!
     </Text>
   `}
@@ -411,7 +411,7 @@ You can use the `maxLines` property to set the maximum number of lines to displa
   `}
 />
 
-> **Note**: Remember, you can use the `noEllipsis` prop to remove the ellipsis from the end of the cropped text.
+> **Note**: Remember, you can use the `ellipses` prop to remove the ellipses from the end of the cropped text.
 
 ### Preserving Linebreaks
 
