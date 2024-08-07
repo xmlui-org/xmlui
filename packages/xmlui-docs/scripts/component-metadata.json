@@ -1,6 +1,6 @@
 [
   {
-    "description": "The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,\n`App` allows you to display your preferred layout.\n\n> **Note**: You can learn more details about using this component [here](\n../learning/using-components/app-component\n).",
+    "description": "The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,\r\n`App` allows you to display your preferred layout.\r\n\r\n> **Note**: You can learn more details about using this component [here](\n../learning/using-components/app-component\n).",
     "descriptionRef": "./App/App.mdx",
     "componentFolder": "App",
     "displayName": "App",
@@ -32,7 +32,7 @@
     }
   },
   {
-    "description": "`AppHeader` is a placeholder within `App` to define a custom application header.\n\n> **Note**: You can learn more details about using this component [here](\n../learning/using-components/app-component\n).",
+    "description": "`AppHeader` is a placeholder within `App` to define a custom application header.\r\n\r\n> **Note**: You can learn more details about using this component [here](\n../learning/using-components/app-component\n).",
     "descriptionRef": "./AppHeader/AppHeader.mdx",
     "componentFolder": "AppHeader",
     "displayName": "AppHeader",
@@ -116,7 +116,7 @@
     }
   },
   {
-    "description": "As its name suggests, this component places a bookmark into its parent component's view. The \ncomponent has an \n`id`\n that you can use in links to navigate (scroll to) the bookmark's location.",
+    "description": "As its name suggests, this component places a bookmark into its parent component's view. The \r\ncomponent has an \n`id`\n that you can use in links to navigate (scroll to) the bookmark's location.",
     "descriptionRef": "./Bookmark/Bookmark.mdx",
     "componentFolder": "Bookmark",
     "displayName": "Bookmark",
@@ -125,7 +125,7 @@
     "events": {},
     "props": {
       "id": {
-        "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to\nthis component's location.",
+        "description": "The unique identifier of the bookmark. You can use this identifier in links to navigate to\r\nthis component's location.",
         "descriptionRef": "./Bookmark/Bookmark.mdx?id",
         "defaultValue": ""
       }
@@ -246,7 +246,7 @@
     }
   },
   {
-    "description": "`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value \n(component property, state, etc.) changes.",
+    "description": "`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value \r\n(component property, state, etc.) changes.",
     "descriptionRef": "./ChangeListener/ChangeListener.mdx",
     "componentFolder": "ChangeListener",
     "displayName": "ChangeListener",
@@ -273,7 +273,7 @@
     }
   },
   {
-    "description": "The `Checkbox` component allows users to make binary choices, typically between checked or unchecked.\nIt consists of a small box that can be toggled on or off by clicking on it.\n\nTo bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](\n../learning/using-components/forms\n).",
+    "description": "The `Checkbox` component allows users to make binary choices, typically between checked or unchecked.\r\nIt consists of a small box that can be toggled on or off by clicking on it.\r\n\r\nTo bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](\n../learning/using-components/forms\n).",
     "descriptionRef": "./Checkbox/Checkbox.mdx",
     "componentFolder": "Checkbox",
     "displayName": "Checkbox",
@@ -334,7 +334,7 @@
         "defaultValue": ""
       },
       "labelId": {
-        "description": "You can specify the identifier of a component acting as its label. When you click the label, \nthe component behaves as you clicked it.",
+        "description": "You can specify the identifier of a component acting as its label. When you click the label, \r\nthe component behaves as you clicked it.",
         "descriptionRef": "./Checkbox/Checkbox.mdx?labelId",
         "defaultValue": ""
       },
@@ -354,7 +354,7 @@
         "defaultValue": ""
       },
       "validationStatus": {
-        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\", \nor \"valid\".",
+        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\", \r\nor \"valid\".",
         "descriptionRef": "./Checkbox/Checkbox.mdx?validationStatus",
         "defaultValue": ""
       }
@@ -367,7 +367,7 @@
     "displayName": "CHStack"
   },
   {
-    "description": "A `ContentSeparator` is a component that divides or separates content visually within a layout.\nIt serves as a visual cue to distinguish between different sections or groups of content,\nhelping to improve readability and organization.",
+    "description": "A `ContentSeparator` is a component that divides or separates content visually within a layout.\r\nIt serves as a visual cue to distinguish between different sections or groups of content,\r\nhelping to improve readability and organization.",
     "descriptionRef": "./ContentSeparator/ContentSeparator.mdx",
     "componentFolder": "ContentSeparator",
     "displayName": "ContentSeparator",
@@ -405,7 +405,7 @@
         "defaultValue": ""
       },
       "value": {
-        "description": "You can query this read-only API property to get the input component's current value.\n\nSee an example in the `setValue` API method.",
+        "description": "You can query this read-only API property to get the input component's current value.\r\n\r\nSee an example in the `setValue` API method.",
         "descriptionRef": "./DatePicker/DatePicker.mdx?value",
         "defaultValue": ""
       }
@@ -423,7 +423,7 @@
         "defaultValue": ""
       },
       "lostFocus": {
-        "description": "This event is triggered when the `DatePicker` loses focus.\n\n(See the example in the [`gotFocus`](#gotfocus) event section.)",
+        "description": "This event is triggered when the `DatePicker` loses focus.\r\n\r\n(See the example in the [`gotFocus`](#gotfocus) event section.)",
         "descriptionRef": "./DatePicker/DatePicker.mdx?lostFocus",
         "defaultValue": ""
       }
@@ -435,7 +435,7 @@
         "defaultValue": ""
       },
       "disabledDates": {
-        "description": "This optional property determines which dates are disabled and unselectable.\nThe property accepts a list of dates in string format the same way as the `initialValue` does.",
+        "description": "This optional property determines which dates are disabled and unselectable.\r\nThe property accepts a list of dates in string format the same way as the `initialValue` does.",
         "descriptionRef": "./DatePicker/DatePicker.mdx?disabledDates",
         "defaultValue": ""
       },
@@ -445,7 +445,7 @@
         "defaultValue": ""
       },
       "fromDate": {
-        "description": "This optional property indicates the start of the range of selectable dates.\nThe property accepts a date in string format the same way as the `initialValue` does.",
+        "description": "This optional property indicates the start of the range of selectable dates.\r\nThe property accepts a date in string format the same way as the `initialValue` does.",
         "descriptionRef": "./DatePicker/DatePicker.mdx?fromDate",
         "defaultValue": ""
       },
@@ -470,7 +470,7 @@
         "defaultValue": ""
       },
       "toDate": {
-        "description": "This optional property indicates the end of the range of selectable dates.\nThe property accepts a date in string format the same way as the `initialValue` does.",
+        "description": "This optional property indicates the end of the range of selectable dates.\r\nThe property accepts a date in string format the same way as the `initialValue` does.",
         "descriptionRef": "./DatePicker/DatePicker.mdx?toDate",
         "defaultValue": ""
       },
@@ -480,20 +480,20 @@
         "defaultValue": ""
       },
       "weekStartsOn": {
-        "description": "Determines on which day the week starts denoted by integers.\nThe week starts on Sunday by default.",
+        "description": "Determines on which day the week starts denoted by integers.\r\nThe week starts on Sunday by default.",
         "descriptionRef": "./DatePicker/DatePicker.mdx?weekStartsOn",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "This component represents a dropdown menu with a trigger.\nWhen the user clicks the trigger, the dropdown menu displays its items.",
+    "description": "This component represents a dropdown menu with a trigger.\r\nWhen the user clicks the trigger, the dropdown menu displays its items.",
     "descriptionRef": "./DropdownMenu/DropdownMenu.mdx",
     "componentFolder": "DropdownMenu",
     "displayName": "DropdownMenu",
     "api": {
       "close": {
-        "description": "The `close` command closes the dropdown.\n\nOpen the dropdown menu and click on any of the menu items to close the menu.",
+        "description": "The `close` command closes the dropdown.\r\n\r\nOpen the dropdown menu and click on any of the menu items to close the menu.",
         "descriptionRef": "./DropdownMenu/DropdownMenu.mdx?close",
         "defaultValue": ""
       }
@@ -518,7 +518,7 @@
         "defaultValue": ""
       },
       "label": {
-        "description": "This property defines the label to display in the dropdown menu.\nIf you define a custom trigger template, this property has no effect.",
+        "description": "This property defines the label to display in the dropdown menu.\r\nIf you define a custom trigger template, this property has no effect.",
         "descriptionRef": "./DropdownMenu/DropdownMenu.mdx?label",
         "defaultValue": ""
       },
@@ -530,7 +530,7 @@
     }
   },
   {
-    "description": "The \n`EmojiSelector`\n component provides users with a graphical interface to browse,\nsearch and select emojis to insert into text fields, messages, or other forms of communication.",
+    "description": "The \n`EmojiSelector`\n component provides users with a graphical interface to browse,\r\nsearch and select emojis to insert into text fields, messages, or other forms of communication.",
     "descriptionRef": "./EmojiSelector/EmojiSelector.mdx",
     "componentFolder": "EmojiSelector",
     "displayName": "EmojiSelector",
@@ -568,7 +568,7 @@
         "defaultValue": ""
       },
       "value": {
-        "description": "By setting an ID for the component, you can refer to the value of the field if set.\nIf no value is set, the value will be undefined.",
+        "description": "By setting an ID for the component, you can refer to the value of the field if set.\r\nIf no value is set, the value will be undefined.",
         "descriptionRef": "./FileInput/FileInput.mdx?value",
         "defaultValue": ""
       }
@@ -608,7 +608,7 @@
         "defaultValue": ""
       },
       "buttonIcon": {
-        "description": "This property accepts an icon name.\nThe framework will render an icon if it recognizes the icon name.",
+        "description": "This property accepts an icon name.\r\nThe framework will render an icon if it recognizes the icon name.",
         "descriptionRef": "./FileInput/FileInput.mdx?buttonIcon",
         "defaultValue": ""
       },
@@ -633,7 +633,7 @@
         "defaultValue": ""
       },
       "directory": {
-        "description": "This boolean property indicates whether the component allows selecting directories (`true`)\nor files only (`false`).\nThe default value is `false`.",
+        "description": "This boolean property indicates whether the component allows selecting directories (`true`)\r\nor files only (`false`).\r\nThe default value is `false`.",
         "descriptionRef": "./FileInput/FileInput.mdx?directory",
         "defaultValue": "`false`"
       },
@@ -648,7 +648,7 @@
         "defaultValue": ""
       },
       "multiple": {
-        "description": "This boolean property enables to add not just one (`false`), but multiple files to the field (`true`).\nThis is done either by dragging onto the field\nor by selecting multiple files in the browser menu after clicking the input field button.",
+        "description": "This boolean property enables to add not just one (`false`), but multiple files to the field (`true`).\r\nThis is done either by dragging onto the field\r\nor by selecting multiple files in the browser menu after clicking the input field button.",
         "descriptionRef": "./FileInput/FileInput.mdx?multiple",
         "defaultValue": ""
       },
@@ -685,7 +685,7 @@
     }
   },
   {
-    "description": "The `FileUploadDropZone` component allows users to upload files to a web application by dragging \nand dropping files from their local file system onto a designated area within the UI.",
+    "description": "The `FileUploadDropZone` component allows users to upload files to a web application by dragging \r\nand dropping files from their local file system onto a designated area within the UI.",
     "descriptionRef": "./FileUploadDropZone/FileUploadDropZone.mdx",
     "componentFolder": "FileUploadDropZone",
     "displayName": "FileUploadDropZone",
@@ -693,7 +693,7 @@
     "contextVars": {},
     "events": {
       "upload": {
-        "description": "This component accepts files for upload but does not perform the actual operation. It fires the \n`upload` event and passes the list files to upload in the method's argument. You can use the \npassed file information to implement the upload (according to the protocol your backend supports).\n\nEach item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).",
+        "description": "This component accepts files for upload but does not perform the actual operation. It fires the \r\n`upload` event and passes the list files to upload in the method's argument. You can use the \r\npassed file information to implement the upload (according to the protocol your backend supports).\r\n\r\nEach item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).",
         "descriptionRef": "./FileUploadDropZone/FileUploadDropZone.mdx?upload",
         "defaultValue": ""
       }
@@ -710,14 +710,14 @@
         "defaultValue": ""
       },
       "text": {
-        "description": "With this property, you can change the default text (\"Drop files here\") to display when \nfiles are dragged over the drop zone.",
+        "description": "With this property, you can change the default text (\"Drop files here\") to display when \r\nfiles are dragged over the drop zone.",
         "descriptionRef": "./FileUploadDropZone/FileUploadDropZone.mdx?text",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "This layout component is used to position content in rows with an auto wrapping feature:\nif the length of the items exceed the available space the layout will wrap into a new line.\n\nFor details on how to work with `FlowLayout` (like sizing children), see \n[this guide](\n../learning/using-components/layout-components.mdx#flowlayout\n).",
+    "description": "This layout component is used to position content in rows with an auto wrapping feature:\r\nif the length of the items exceed the available space the layout will wrap into a new line.\r\n\r\nFor details on how to work with `FlowLayout` (like sizing children), see \r\n[this guide](\n../learning/using-components/layout-components.mdx#flowlayout\n).",
     "descriptionRef": "./FlowLayout/FlowLayout.mdx",
     "componentFolder": "FlowLayout",
     "displayName": "FlowLayout",
@@ -748,7 +748,7 @@
     }
   },
   {
-    "description": "The `Footer` is a component that acts as the footer within \n`App`\n.\n> **Note**: Learn more about using this component [here](\n../learning/app-component\n).",
+    "description": "The `Footer` is a component that acts as the footer within \n`App`\n.\r\n> **Note**: Learn more about using this component [here](\n../learning/app-component\n).",
     "descriptionRef": "./Footer/Footer.mdx",
     "componentFolder": "Footer",
     "displayName": "Footer",
@@ -758,7 +758,7 @@
     "props": {}
   },
   {
-    "description": "An XMLUI \n`Form`\n is a fundamental component that displays user interfaces that allow users to input\n(or change) data and submit it to the app (a server) for further processing.\n\nYou can learn more about this component in the [Using Forms](/learning/using-components/forms/)\narticle.",
+    "description": "An XMLUI \n`Form`\n is a fundamental component that displays user interfaces that allow users to input\r\n(or change) data and submit it to the app (a server) for further processing.\r\n\r\nYou can learn more about this component in the [Using Forms](/learning/using-components/forms/)\r\narticle.",
     "descriptionRef": "./Form/Form.mdx",
     "componentFolder": "Form",
     "displayName": "Form",
@@ -794,7 +794,7 @@
         "defaultValue": ""
       },
       "itemLabelBreak": {
-        "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow\nthe available label width.",
+        "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow\r\nthe available label width.",
         "descriptionRef": "./Form/Form.mdx?itemLabelBreak",
         "defaultValue": ""
       },
@@ -814,26 +814,26 @@
         "defaultValue": ""
       },
       "subject": {
-        "description": "This property sets the initial value of the form's data structure. The form infrastructure\nuses this value to set the initial state of form items within the form.",
+        "description": "This property sets the initial value of the form's data structure. The form infrastructure\r\nuses this value to set the initial state of form items within the form.",
         "descriptionRef": "./Form/Form.mdx?subject",
         "defaultValue": ""
       },
       "swapCancelAndSave": {
-        "description": "By default, the Cancel button is to the left of the Save button. Set this property to\n`true` to swap them or `false` to keep their original location.",
+        "description": "By default, the Cancel button is to the left of the Save button. Set this property to\r\n`true` to swap them or `false` to keep their original location.",
         "descriptionRef": "./Form/Form.mdx?swapCancelAndSave",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "A \n`FormItem`\n component represents a single input element within a \n`Form`\n. The value within\nthe \n`FormItem`\n may be associated with a particular property within the encapsulating \n`Form`\n component's\ndata.\n\nYou can learn more about this component in the [Using Forms](\n../learning/using-components/forms.mdx\n)\narticle.",
+    "description": "A \n`FormItem`\n component represents a single input element within a \n`Form`\n. The value within\r\nthe \n`FormItem`\n may be associated with a particular property within the encapsulating \n`Form`\n component's\r\ndata.\r\n\r\nYou can learn more about this component in the [Using Forms](\n../learning/using-components/forms.mdx\n)\r\narticle.",
     "descriptionRef": "./FormItem/FormItem.mdx",
     "componentFolder": "FormItem",
     "displayName": "FormItem",
     "api": {},
     "contextVars": {
       "$setValue": {
-        "description": "This function can be invoked to set the `FormItem` instance's value. The function has a\nsingle argument, the new value to set.",
+        "description": "This function can be invoked to set the `FormItem` instance's value. The function has a\r\nsingle argument, the new value to set.",
         "descriptionRef": "./FormItem/FormItem.mdx?$setValue",
         "defaultValue": ""
       },
@@ -843,7 +843,7 @@
         "defaultValue": ""
       },
       "$value": {
-        "description": "The context variable represents the current value of the `FormItem`. It can be used in\nexpressions and code snippets within the `FormItem` instance.",
+        "description": "The context variable represents the current value of the `FormItem`. It can be used in\r\nexpressions and code snippets within the `FormItem` instance.",
         "descriptionRef": "./FormItem/FormItem.mdx?$value",
         "defaultValue": ""
       }
@@ -887,7 +887,7 @@
         "defaultValue": ""
       },
       "labelBreak": {
-        "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow\nthe available label width.",
+        "description": "This boolean value indicates if the label can be split into multiple lines if it would overflow\r\nthe available label width.",
         "descriptionRef": "./FormItem/FormItem.mdx?labelBreak",
         "defaultValue": ""
       },
@@ -987,7 +987,7 @@
         "defaultValue": ""
       },
       "syncToValidation": {
-        "description": "This boolean property indicates if the following validation properties should override the\nunderlying controls' properties (by default, `true`):\n- `maxLength` --> Set the `maxTextLength` property value of `Text` or `TextArea` if\nthat value is not defined.\n- `minValue` --> Set the `min` property value of `NumberBox`.\n- `maxValue` --> Set the `max` property value of `NumberBox`.",
+        "description": "This boolean property indicates if the following validation properties should override the\r\nunderlying controls' properties (by default, `true`):\r\n- `maxLength` --> Set the `maxTextLength` property value of `Text` or `TextArea` if\r\nthat value is not defined.\r\n- `minValue` --> Set the `min` property value of `NumberBox`.\r\n- `maxValue` --> Set the `max` property value of `NumberBox`.",
         "descriptionRef": "./FormItem/FormItem.mdx?syncToValidation",
         "defaultValue": ""
       },
@@ -1004,7 +1004,7 @@
     }
   },
   {
-    "description": "The `FormSection` is a component that groups cohesive elements together within a \n`Form`\n.\nThis grouping is indicated visually:\nthe child components of the `FormSection` are placed in a [`FlowLayout`](\n./FlowLayout.mdx\n) component.\n\nSee the `FlowLayout` reference documentation for details on sizing children.",
+    "description": "The `FormSection` is a component that groups cohesive elements together within a \n`Form`\n.\r\nThis grouping is indicated visually:\r\nthe child components of the `FormSection` are placed in a [`FlowLayout`](\n./FlowLayout.mdx\n) component.\r\n\r\nSee the `FlowLayout` reference documentation for details on sizing children.",
     "descriptionRef": "./FormSection/FormSection.mdx",
     "componentFolder": "FormSection",
     "displayName": "FormSection",
@@ -1013,7 +1013,7 @@
     "events": {},
     "props": {
       "columnGap": {
-        "description": "This optional property is used to customize the gap between the columns of the `FormSection`.\nThe default column gap size is `3rem`.",
+        "description": "This optional property is used to customize the gap between the columns of the `FormSection`.\r\nThe default column gap size is `3rem`.",
         "descriptionRef": "./FormSection/FormSection.mdx?columnGap",
         "defaultValue": ""
       },
@@ -1023,12 +1023,12 @@
         "defaultValue": ""
       },
       "headingLevel": {
-        "description": "Customize the level of the heading using this property.\nAll regular heading levels are supported in the h1-h6 range.\nThe default level is `h3`.",
+        "description": "Customize the level of the heading using this property.\r\nAll regular heading levels are supported in the h1-h6 range.\r\nThe default level is `h3`.",
         "descriptionRef": "./FormSection/FormSection.mdx?headingLevel",
         "defaultValue": ""
       },
       "headingWeight": {
-        "description": "Customize the weight of the heading using this property.\nThis property is canonical to the\n[font-weight](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight) CSS rule.\nAvailable weights are also determined by the chosen font for the heading.",
+        "description": "Customize the weight of the heading using this property.\r\nThis property is canonical to the\r\n[font-weight](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight) CSS rule.\r\nAvailable weights are also determined by the chosen font for the heading.",
         "descriptionRef": "./FormSection/FormSection.mdx?headingWeight",
         "defaultValue": ""
       },
@@ -1038,17 +1038,17 @@
         "defaultValue": ""
       },
       "infoFontSize": {
-        "description": "This property is used to customize the font size of the [`info`](#info) text.\nIt is set to `0.8rem` by default.",
+        "description": "This property is used to customize the font size of the [`info`](#info) text.\r\nIt is set to `0.8rem` by default.",
         "descriptionRef": "./FormSection/FormSection.mdx?infoFontSize",
         "defaultValue": ""
       },
       "paddingBottom": {
-        "description": "**NOTE:** This property might be redundant.\n\nSets the bottom padding of the component.\nThe default size is `1rem`.",
+        "description": "**NOTE:** This property might be redundant.\r\n\r\nSets the bottom padding of the component.\r\nThe default size is `1rem`.",
         "descriptionRef": "./FormSection/FormSection.mdx?paddingBottom",
         "defaultValue": ""
       },
       "rowGap": {
-        "description": "This optional property is used to customize the gap between the rows of the `FormSection`.\nThe default row gap size is `1rem`.",
+        "description": "This optional property is used to customize the gap between the rows of the `FormSection`.\r\nThe default row gap size is `1rem`.",
         "descriptionRef": "./FormSection/FormSection.mdx?rowGap",
         "defaultValue": ""
       }
@@ -1091,7 +1091,7 @@
     "displayName": "H6"
   },
   {
-    "description": "The `Heading` component displays titles and section headers.\n\n> **Note**: `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).\n\nFor the shorthand versions see their reference page: [H1](\n./H1\n), [H2](\n./H2\n), [H3](\n./H3\n), [H4](\n./H4\n), [H5](\n./H5\n), [H6](\n./H6\n).",
+    "description": "The `Heading` component displays titles and section headers.\r\n\r\n> **Note**: `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).\r\n\r\nFor the shorthand versions see their reference page: [H1](\n./H1\n), [H2](\n./H2\n), [H3](\n./H3\n), [H4](\n./H4\n), [H5](\n./H5\n), [H6](\n./H6\n).",
     "descriptionRef": "./Heading/Heading.mdx",
     "componentFolder": "Heading",
     "displayName": "Heading",
@@ -1099,19 +1099,19 @@
     "contextVars": {},
     "events": {},
     "props": {
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed (`true`)\r\nwhen the heading text is cropped or not (`false`).\r\nThe default value is `true`.",
+        "descriptionRef": "./Heading/Heading.mdx?ellipses",
+        "defaultValue": ""
+      },
       "level": {
         "description": "This property sets the visual significance (level) of the heading.",
         "descriptionRef": "./Heading/Heading.mdx?level",
         "defaultValue": ""
       },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to.\nIf there is not enough space for all of the text,\nthe component wraps the text up to as many lines as specified.",
+        "description": "This property determines the maximum number of lines the component can wrap to.\r\nIf there is not enough space for all of the text,\r\nthe component wraps the text up to as many lines as specified.",
         "descriptionRef": "./Heading/Heading.mdx?maxLines",
-        "defaultValue": ""
-      },
-      "noEllipsis": {
-        "description": "This property indicates whether an ellipsis should be displayed when the heading text is cropped.",
-        "descriptionRef": "./Heading/Heading.mdx?noEllipsis",
         "defaultValue": ""
       },
       "preserveLinebreaks": {
@@ -1120,7 +1120,7 @@
         "defaultValue": ""
       },
       "value": {
-        "description": "This property determines the text displayed in the heading. \n`Heading` also accepts nested text instead of specifying the \n`value`\n.\nIf both `value` and a nested text are used, the `value` will be displayed.",
+        "description": "This property determines the text displayed in the heading. \r\n`Heading` also accepts nested text instead of specifying the \n`value`\n.\r\nIf both `value` and a nested text are used, the `value` will be displayed.",
         "descriptionRef": "./Heading/Heading.mdx?value",
         "defaultValue": ""
       }
@@ -1185,7 +1185,7 @@
     "displayName": "HStack"
   },
   {
-    "description": "This component is the representation of an icon.\nIt is a small visual element, which is used to graphically represent functions, features,\nor types of content within a user interface.",
+    "description": "This component is the representation of an icon.\r\nIt is a small visual element, which is used to graphically represent functions, features,\r\nor types of content within a user interface.",
     "descriptionRef": "./Icon/Icon.mdx",
     "componentFolder": "Icon",
     "displayName": "Icon",
@@ -1194,17 +1194,17 @@
     "events": {},
     "props": {
       "fallback": {
-        "description": "This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.\nWorks the same way as the [`name`](#name) property.",
+        "description": "This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.\r\nWorks the same way as the [`name`](#name) property.",
         "descriptionRef": "./Icon/Icon.mdx?fallback",
         "defaultValue": ""
       },
       "name": {
-        "description": "This string property specifies the name of the icon to display.\nAll icons have unique names and identifying the name is case-sensitive.\nThe engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.\nNothing is displayed if the icon name is not found in the registry.",
+        "description": "This string property specifies the name of the icon to display.\r\nAll icons have unique names and identifying the name is case-sensitive.\r\nThe engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.\r\nNothing is displayed if the icon name is not found in the registry.",
         "descriptionRef": "./Icon/Icon.mdx?name",
         "defaultValue": ""
       },
       "size": {
-        "description": "This property defines the size of the `Icon`.\nNote that setting the `height` and/or the `width` of the component will override this property.",
+        "description": "This property defines the size of the `Icon`.\r\nNote that setting the `height` and/or the `width` of the component will override this property.",
         "descriptionRef": "./Icon/Icon.mdx?size",
         "defaultValue": ""
       }
@@ -1226,12 +1226,12 @@
     },
     "props": {
       "alt": {
-        "description": "This property specifies an alternate text for the image.\nThis is useful in two cases: \n1. Accessibility: screen readers read the prop value to users so they know what the image is about.\n2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).",
+        "description": "This property specifies an alternate text for the image.\r\nThis is useful in two cases: \r\n1. Accessibility: screen readers read the prop value to users so they know what the image is about.\r\n2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).",
         "descriptionRef": "./Image/Image.mdx?alt",
         "defaultValue": ""
       },
       "aspectRatio": {
-        "description": "Corresponds to the `aspect-ratio` CSS style property.\nThis property sets a preferred aspect ratio for the image,\nwhich will be used in the calculation of auto sizes and some other layout functions.",
+        "description": "Corresponds to the `aspect-ratio` CSS style property.\r\nThis property sets a preferred aspect ratio for the image,\r\nwhich will be used in the calculation of auto sizes and some other layout functions.",
         "descriptionRef": "./Image/Image.mdx?aspectRatio",
         "defaultValue": ""
       },
@@ -1241,7 +1241,7 @@
         "defaultValue": ""
       },
       "lazyLoad": {
-        "description": "Corresponds to the `loading` attribute of the `img` element.\nThis attribute specifies if the image should be loaded lazily (`true`) or eager (`false`).\nLazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).\nThe default value is eager (`false`).",
+        "description": "Corresponds to the `loading` attribute of the `img` element.\r\nThis attribute specifies if the image should be loaded lazily (`true`) or eager (`false`).\r\nLazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).\r\nThe default value is eager (`false`).",
         "descriptionRef": "./Image/Image.mdx?lazyLoad",
         "defaultValue": ""
       },
@@ -1253,7 +1253,7 @@
     }
   },
   {
-    "description": "The `Items` component maps sequential data items into component instances,\nrepresenting each data item as a particular component.\n\n> **Note**: `Items` is not a container! It does not wrap its items into a container; it merely renders the its children.",
+    "description": "The `Items` component maps sequential data items into component instances,\r\nrepresenting each data item as a particular component.\r\n\r\n> **Note**: `Items` is not a container! It does not wrap its items into a container; it merely renders the its children.",
     "descriptionRef": "./Items/Items.mdx",
     "componentFolder": "Items",
     "displayName": "Items",
@@ -1327,7 +1327,7 @@
     }
   },
   {
-    "description": "The `List` component is a robust layout container that renders associated data items as a \nlist of components. `List` is virtualized; it renders only items that are visible in the \nviewport.",
+    "description": "The `List` component is a robust layout container that renders associated data items as a \r\nlist of components. `List` is virtualized; it renders only items that are visible in the \r\nviewport.",
     "descriptionRef": "./List/List.mdx",
     "componentFolder": "List",
     "displayName": "List",
@@ -1469,7 +1469,7 @@
     }
   },
   {
-    "description": "`Markdown` displays plain text styled using markdown syntax.\n\nThe `Markdown` component does not have properties. You must provide the text to display \nnested between an opening and a closing tag \n`<Markdown>`\n.",
+    "description": "`Markdown` displays plain text styled using markdown syntax.\r\n\r\nThe `Markdown` component does not have properties. You must provide the text to display \r\nnested between an opening and a closing tag \n`<Markdown>`\n.",
     "descriptionRef": "./Markdown/Markdown.mdx",
     "componentFolder": "Markdown",
     "displayName": "Markdown",
@@ -1485,12 +1485,12 @@
     "displayName": "ModalDialog",
     "api": {
       "close": {
-        "description": "This method is used to close the `ModalDialog`.\nInvoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.\n\nSee the [`With Imperative API`](#with-imperative-api) subsection for an example.\n\n> For the event of the same name, see `close` under the `Event` section.",
+        "description": "This method is used to close the `ModalDialog`.\r\nInvoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.\r\n\r\nSee the [`With Imperative API`](#with-imperative-api) subsection for an example.\r\n\r\n> For the event of the same name, see `close` under the `Event` section.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?close",
         "defaultValue": ""
       },
       "open": {
-        "description": "This method is used to open the `ModalDialog`.\nInvoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.\n\nSee the [`With Imperative API`](#with-imperative-api) subsection for an example.\n\n> For the event of the same name, see `open` under the `Event` section.",
+        "description": "This method is used to open the `ModalDialog`.\r\nInvoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.\r\n\r\nSee the [`With Imperative API`](#with-imperative-api) subsection for an example.\r\n\r\n> For the event of the same name, see `open` under the `Event` section.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?open",
         "defaultValue": ""
       }
@@ -1498,29 +1498,29 @@
     "contextVars": {},
     "events": {
       "close": {
-        "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.\n\n> For the API method of the same name, see `close` under the `Api` section.",
+        "description": "This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.\r\n\r\n> For the API method of the same name, see `close` under the `Api` section.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?close",
         "defaultValue": ""
       },
       "open": {
-        "description": "This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).\n\n> For the API method of the same name, see `open` under the `Api` section.",
+        "description": "This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).\r\n\r\n> For the API method of the same name, see `open` under the `Api` section.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?open",
         "defaultValue": ""
       }
     },
     "props": {
       "closeButtonVisible": {
-        "description": "Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.\nThe default value is `true`.",
+        "description": "Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.\r\nThe default value is `true`.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?closeButtonVisible",
         "defaultValue": ""
       },
       "fullScreen": {
-        "description": "Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).\nThe default value is `false`.",
+        "description": "Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).\r\nThe default value is `false`.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?fullScreen",
         "defaultValue": ""
       },
       "isInitiallyOpen": {
-        "description": "This property sets whether the modal dialog appears open (`true`) or not (`false`)\nwhen the page is it is defined on is rendered.\nThe default value is `false`.",
+        "description": "This property sets whether the modal dialog appears open (`true`) or not (`false`)\r\nwhen the page is it is defined on is rendered.\r\nThe default value is `false`.",
         "descriptionRef": "./ModalDialog/ModalDialog.mdx?isInitiallyOpen",
         "defaultValue": ""
       },
@@ -1532,7 +1532,7 @@
     }
   },
   {
-    "description": "The `MultiCombobox` component is essentially a [`ComboBox`](\n./ComboBox.mdx\n) that enables the selection of multiple elements\nfrom a list either by typing in the field or by clicking list elements in the dropdown.\nThese elements are then displayed in the field and can be removed as necessary.",
+    "description": "The `MultiCombobox` component is essentially a [`ComboBox`](\n./ComboBox.mdx\n) that enables the selection of multiple elements\r\nfrom a list either by typing in the field or by clicking list elements in the dropdown.\r\nThese elements are then displayed in the field and can be removed as necessary.",
     "descriptionRef": "./MultiCombobox/MultiCombobox.mdx",
     "componentFolder": "MultiCombobox",
     "displayName": "MultiCombobox",
@@ -1545,7 +1545,7 @@
     },
     "contextVars": {
       "$item": {
-        "description": "This context variable acts as a template for an item in the list.\nAccess attributes of the item using the dot notation.\n\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`change`](#change) event.",
+        "description": "This context variable acts as a template for an item in the list.\r\nAccess attributes of the item using the dot notation.\r\n\r\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`change`](#change) event.",
         "descriptionRef": "./MultiCombobox/MultiCombobox.mdx?$item",
         "defaultValue": ""
       }
@@ -1574,12 +1574,12 @@
         "defaultValue": ""
       },
       "emptyListTemplate": {
-        "description": "With this property, you can specify what should appear when the list is empty.\nThe template accepts any component definition.",
+        "description": "With this property, you can specify what should appear when the list is empty.\r\nThe template accepts any component definition.",
         "descriptionRef": "./MultiCombobox/MultiCombobox.mdx?emptyListTemplate",
         "defaultValue": ""
       },
       "enabled": {
-        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\nThe default value is `true`.",
+        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\r\nThe default value is `true`.",
         "descriptionRef": "./MultiCombobox/MultiCombobox.mdx?enabled",
         "defaultValue": ""
       },
@@ -1594,7 +1594,7 @@
         "defaultValue": ""
       },
       "initialValue": {
-        "description": "Specify a list of values that should be initially selected from the list.\nIf the value is not in the list, it will be ignored.",
+        "description": "Specify a list of values that should be initially selected from the list.\r\nIf the value is not in the list, it will be ignored.",
         "descriptionRef": "./MultiCombobox/MultiCombobox.mdx?initialValue",
         "defaultValue": ""
       },
@@ -1609,7 +1609,7 @@
         "defaultValue": ""
       },
       "startIcon": {
-        "description": "This property sets the icon the left side of the input field (in a left-to-right display).\nThe value must be a valid icon name, otherwise nothing will be rendered.",
+        "description": "This property sets the icon the left side of the input field (in a left-to-right display).\r\nThe value must be a valid icon name, otherwise nothing will be rendered.",
         "descriptionRef": "./MultiCombobox/MultiCombobox.mdx?startIcon",
         "defaultValue": ""
       },
@@ -1626,7 +1626,7 @@
     }
   },
   {
-    "description": "The `MultiSelect` component works the same way as the [`Select`](\n./Select.mdx\n)\ncomponent with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown.\nThese elements are then displayed in the field and can be removed as necessary.",
+    "description": "The `MultiSelect` component works the same way as the [`Select`](\n./Select.mdx\n)\r\ncomponent with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown.\r\nThese elements are then displayed in the field and can be removed as necessary.",
     "descriptionRef": "./MultiSelect/MultiSelect.mdx",
     "componentFolder": "MultiSelect",
     "displayName": "MultiSelect",
@@ -1639,7 +1639,7 @@
     },
     "contextVars": {
       "$item": {
-        "description": "This context variable acts as a template for an item in the list.\nAccess attributes of the item using the dot notation.\n\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didChange) event.",
+        "description": "This context variable acts as a template for an item in the list.\r\nAccess attributes of the item using the dot notation.\r\n\r\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didChange) event.",
         "descriptionRef": "./MultiSelect/MultiSelect.mdx?$item",
         "defaultValue": ""
       }
@@ -1663,12 +1663,12 @@
     },
     "props": {
       "emptyListTemplate": {
-        "description": "With this property, you can specify what should appear when the list is empty.\nThe template accepts any component definition.",
+        "description": "With this property, you can specify what should appear when the list is empty.\r\nThe template accepts any component definition.",
         "descriptionRef": "./MultiSelect/MultiSelect.mdx?emptyListTemplate",
         "defaultValue": ""
       },
       "enabled": {
-        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\nThe default value is `true`.",
+        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\r\nThe default value is `true`.",
         "descriptionRef": "./MultiSelect/MultiSelect.mdx?enabled",
         "defaultValue": ""
       },
@@ -1683,7 +1683,7 @@
         "defaultValue": ""
       },
       "initialValue": {
-        "description": "Specify a list of values that should be initially selected from the list.\nIf the value is not in the list, it will be ignored.",
+        "description": "Specify a list of values that should be initially selected from the list.\r\nIf the value is not in the list, it will be ignored.",
         "descriptionRef": "./MultiSelect/MultiSelect.mdx?initialValue",
         "defaultValue": ""
       },
@@ -1698,7 +1698,7 @@
         "defaultValue": ""
       },
       "startIcon": {
-        "description": "This property sets the icon the left side of the input field (in a left-to-right display).\nThe value must be a valid icon name, otherwise nothing will be rendered.",
+        "description": "This property sets the icon the left side of the input field (in a left-to-right display).\r\nThe value must be a valid icon name, otherwise nothing will be rendered.",
         "descriptionRef": "./MultiSelect/MultiSelect.mdx?startIcon",
         "defaultValue": ""
       },
@@ -1715,7 +1715,7 @@
     }
   },
   {
-    "description": "The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components).\nIt can be displayed as a submenu in the App's UI.",
+    "description": "The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components).\r\nIt can be displayed as a submenu in the App's UI.",
     "descriptionRef": "./NavGroup/NavGroup.mdx",
     "componentFolder": "NavGroup",
     "displayName": "NavGroup",
@@ -1736,7 +1736,7 @@
     }
   },
   {
-    "description": "The `NavLink` component defines a navigation target (app navigation menu item) within the app;\nit is associated with a particular in-app navigation target (or an external link).",
+    "description": "The `NavLink` component defines a navigation target (app navigation menu item) within the app;\r\nit is associated with a particular in-app navigation target (or an external link).",
     "descriptionRef": "./NavLink/NavLink.mdx",
     "componentFolder": "NavLink",
     "displayName": "NavLink",
@@ -1744,24 +1744,24 @@
     "contextVars": {},
     "events": {
       "click": {
-        "description": "This event is fired when the user clicks the link.\nWith an event handler, you can define how to respond to the user's clicks.",
+        "description": "This event is fired when the user clicks the link.\r\nWith an event handler, you can define how to respond to the user's clicks.",
         "descriptionRef": "./NavLink/NavLink.mdx?click",
         "defaultValue": ""
       }
     },
     "props": {
       "active": {
-        "description": "This property indicates if the particular navigation is an active link.\nAn active link has a particular visual appearance,\nprovided its [`displayActive`](#displayactive) property is set to `true`.",
+        "description": "This property indicates if the particular navigation is an active link.\r\nAn active link has a particular visual appearance,\r\nprovided its [`displayActive`](#displayactive) property is set to `true`.",
         "descriptionRef": "./NavLink/NavLink.mdx?active",
         "defaultValue": ""
       },
       "displayActive": {
-        "description": "This Boolean property indicates if the active state of a link should have a visual indication.\nSetting it to `false` removes the visual indication of an active link.\n\nThe default value is `true`.",
+        "description": "This Boolean property indicates if the active state of a link should have a visual indication.\r\nSetting it to `false` removes the visual indication of an active link.\r\n\r\nThe default value is `true`.",
         "descriptionRef": "./NavLink/NavLink.mdx?displayActive",
         "defaultValue": ""
       },
       "enabled": {
-        "description": "This property indicates whether the link is enabled (`true`) or not (`false`).\nDisabled links are greyed out.\nThe default value is (`true`).",
+        "description": "This property indicates whether the link is enabled (`true`) or not (`false`).\r\nDisabled links are greyed out.\r\nThe default value is (`true`).",
         "descriptionRef": "./NavLink/NavLink.mdx?enabled",
         "defaultValue": ""
       },
@@ -1781,19 +1781,19 @@
         "defaultValue": ""
       },
       "to": {
-        "description": "This property defines the URL of the link.\n\nFor examples, see the other property sections.",
+        "description": "This property defines the URL of the link.\r\n\r\nFor examples, see the other property sections.",
         "descriptionRef": "./NavLink/NavLink.mdx?to",
         "defaultValue": ""
       },
       "vertical": {
-        "description": "This property sets how the active status is displayed on the `NavLink` component.\nIf set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.",
+        "description": "This property sets how the active status is displayed on the `NavLink` component.\r\nIf set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.",
         "descriptionRef": "./NavLink/NavLink.mdx?vertical",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "`NavPanel` is a placeholder within \n`App`\n to define the app's navigation (menu) structure.\n\n> **Note**: You can learn more details about using this component [here](\n../learning/app-component\n).",
+    "description": "`NavPanel` is a placeholder within \n`App`\n to define the app's navigation (menu) structure.\r\n\r\n> **Note**: You can learn more details about using this component [here](\n../learning/app-component\n).",
     "descriptionRef": "./NavPanel/NavPanel.mdx",
     "componentFolder": "NavPanel",
     "displayName": "NavPanel",
@@ -1809,7 +1809,7 @@
     }
   },
   {
-    "description": "`NoResult` is a component that displays a visual indication that some data query (search) resulted \nin no (zero) items.",
+    "description": "`NoResult` is a component that displays a visual indication that some data query (search) resulted \r\nin no (zero) items.",
     "descriptionRef": "./NoResult/NoResult.mdx",
     "componentFolder": "NoResult",
     "displayName": "NoResult",
@@ -1835,7 +1835,7 @@
     }
   },
   {
-    "description": "A `NumberBox` component allows users to input numeric values: either integer\nor floating point numbers. It also accepts empty values, where the stored value\nwill be of type `null`.\n\nThe \n`NumberBox`\n is an input control component and is often used in forms.\nSee the [Using Forms](/learning/using-components/forms/) guide for details.",
+    "description": "A `NumberBox` component allows users to input numeric values: either integer\r\nor floating point numbers. It also accepts empty values, where the stored value\r\nwill be of type `null`.\r\n\r\nThe \n`NumberBox`\n is an input control component and is often used in forms.\r\nSee the [Using Forms](/learning/using-components/forms/) guide for details.",
     "descriptionRef": "./NumberBox/NumberBox.mdx",
     "componentFolder": "NumberBox",
     "displayName": "NumberBox",
@@ -1876,7 +1876,7 @@
     },
     "props": {
       "allowCopy": {
-        "description": "This boolean property indicates if the component's contents can be copied to the clipboard.\nDefault: `true`.",
+        "description": "This boolean property indicates if the component's contents can be copied to the clipboard.\r\nDefault: `true`.",
         "descriptionRef": "./NumberBox/NumberBox.mdx?allowCopy",
         "defaultValue": ""
       },
@@ -1916,7 +1916,7 @@
         "defaultValue": ""
       },
       "labelId": {
-        "description": "You can specify the identifier of a component acting as its label. When you click the label,\nthe component behaves as you clicked it.",
+        "description": "You can specify the identifier of a component acting as its label. When you click the label,\r\nthe component behaves as you clicked it.",
         "descriptionRef": "./NumberBox/NumberBox.mdx?labelId",
         "defaultValue": ""
       },
@@ -1978,7 +1978,7 @@
     }
   },
   {
-    "description": "`Option` is a non-visual component describing a selection option. Other components (such as `Select`,\n`Combobox`, and others) may use nested `Option` instances from which the user can select.",
+    "description": "`Option` is a non-visual component describing a selection option. Other components (such as `Select`,\r\n`Combobox`, and others) may use nested `Option` instances from which the user can select.",
     "descriptionRef": "./Option/Option.mdx",
     "componentFolder": "Option",
     "displayName": "Option",
@@ -2004,7 +2004,7 @@
     }
   },
   {
-    "description": "The `Page` component defines what content is displayed\nwhen the user navigates to a particular URL that is associated with the Page.\n\nExamples for the `Page` component can be found in the [`Pages`](\n./Pages.mdx\n) component documentation.",
+    "description": "The `Page` component defines what content is displayed\r\nwhen the user navigates to a particular URL that is associated with the Page.\r\n\r\nExamples for the `Page` component can be found in the [`Pages`](\n./Pages.mdx\n) component documentation.",
     "descriptionRef": "./Page/Page.mdx",
     "componentFolder": "Page",
     "displayName": "Page",
@@ -2020,7 +2020,7 @@
     }
   },
   {
-    "description": "A `PageMetaTitle` component allows setting up (or changing) the app title to display with the \ncurrent browser tab.",
+    "description": "A `PageMetaTitle` component allows setting up (or changing) the app title to display with the \r\ncurrent browser tab.",
     "descriptionRef": "./PageMetaTitle/PageMetaTitle.mdx",
     "componentFolder": "PageMetaTitle",
     "displayName": "PageMetaTitle",
@@ -2036,7 +2036,7 @@
     }
   },
   {
-    "description": "The `Pages` component is used as a container for [`Page`](\n./Page.mdx\n) components within an [`App`](\n./App.mdx\n).\nSee the [`Page` docs](\n./Page.mdx\n) for a short description.\n\nExamples for both components can be found here.",
+    "description": "The `Pages` component is used as a container for [`Page`](\n./Page.mdx\n) components within an [`App`](\n./App.mdx\n).\r\nSee the [`Page` docs](\n./Page.mdx\n) for a short description.\r\n\r\nExamples for both components can be found here.",
     "descriptionRef": "./Pages/Pages.mdx",
     "componentFolder": "Pages",
     "displayName": "Pages",
@@ -2084,7 +2084,7 @@
     }
   },
   {
-    "description": "`Queue` is a functional component (it renders no UI). It provides an API to enqueue elements and\ndefines events to process queued elements in a FIFO order.",
+    "description": "`Queue` is a functional component (it renders no UI). It provides an API to enqueue elements and\r\ndefines events to process queued elements in a FIFO order.",
     "descriptionRef": "./Queue/Queue.mdx",
     "componentFolder": "Queue",
     "displayName": "Queue",
@@ -2095,12 +2095,12 @@
         "defaultValue": ""
       },
       "enqueueItems": {
-        "description": "This method enqueues the array of items passed in the method parameter. The new items will be\nprocessed after the current queue items have been handled. The method retrieves an array of\nunique IDs, one for each new item. An item ID can be used later in other methods, such as\n`remove`.",
+        "description": "This method enqueues the array of items passed in the method parameter. The new items will be\r\nprocessed after the current queue items have been handled. The method retrieves an array of\r\nunique IDs, one for each new item. An item ID can be used later in other methods, such as\r\n`remove`.",
         "descriptionRef": "./Queue/Queue.mdx?enqueueItems",
         "defaultValue": ""
       },
       "getQueueLength": {
-        "description": "This method retrieves the current queue length. The queue contains only those items that are\nnot fully processed yet.",
+        "description": "This method retrieves the current queue length. The queue contains only those items that are\r\nnot fully processed yet.",
         "descriptionRef": "./Queue/Queue.mdx?getQueueLength",
         "defaultValue": ""
       },
@@ -2151,24 +2151,24 @@
     },
     "props": {
       "clearAfterFinish": {
-        "description": "This property indicates the completed items (successful or error) should be removed from the queue\nafter completion.",
+        "description": "This property indicates the completed items (successful or error) should be removed from the queue\r\nafter completion.",
         "descriptionRef": "./Queue/Queue.mdx?clearAfterFinish",
         "defaultValue": ""
       },
       "progressFeedback": {
-        "description": "This property defines the component template of the UI that displays progress information whenever\nthe queue's `progressReport` function in invoked.",
+        "description": "This property defines the component template of the UI that displays progress information whenever\r\nthe queue's `progressReport` function in invoked.",
         "descriptionRef": "./Queue/Queue.mdx?progressFeedback",
         "defaultValue": ""
       },
       "resultFeedback": {
-        "description": "This property defines the component template of the UI that displays result information when the\nqueue becomes empty after processing all queued items.",
+        "description": "This property defines the component template of the UI that displays result information when the\r\nqueue becomes empty after processing all queued items.",
         "descriptionRef": "./Queue/Queue.mdx?resultFeedback",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](\n./RadioGroupOption.mdx\n)\ncomponents) that allow users to select only one option from the group at a time.\n\n`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide\nfor details.",
+    "description": "The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](\n./RadioGroupOption.mdx\n)\r\ncomponents) that allow users to select only one option from the group at a time.\r\n\r\n`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide\r\nfor details.",
     "descriptionRef": "./RadioGroup/RadioGroup.mdx",
     "componentFolder": "RadioGroup",
     "displayName": "RadioGroup",
@@ -2179,7 +2179,7 @@
         "defaultValue": ""
       },
       "value": {
-        "description": "You can query this read-only API property to get the input component's current value.\n\nSee an example in the \n`setValue`\n API method.",
+        "description": "You can query this read-only API property to get the input component's current value.\r\n\r\nSee an example in the \n`setValue`\n API method.",
         "descriptionRef": "./RadioGroup/RadioGroup.mdx?value",
         "defaultValue": ""
       }
@@ -2219,7 +2219,7 @@
         "defaultValue": ""
       },
       "labelId": {
-        "description": "You can specify the identifier of a component acting as its label. When you click the label,\nthe component behaves as you clicked it.",
+        "description": "You can specify the identifier of a component acting as its label. When you click the label,\r\nthe component behaves as you clicked it.",
         "descriptionRef": "./RadioGroup/RadioGroup.mdx?labelId",
         "defaultValue": ""
       },
@@ -2239,7 +2239,7 @@
         "defaultValue": ""
       },
       "validationStatus": {
-        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\",\nor \"valid\".",
+        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\",\r\nor \"valid\".",
         "descriptionRef": "./RadioGroup/RadioGroup.mdx?validationStatus",
         "defaultValue": ""
       }
@@ -2268,7 +2268,7 @@
     }
   },
   {
-    "description": "`Redirect` is a component that immediately redirects the browser to the URL in its `to`\nproperty when it gets visible (its \n`when`\n property gets \n`true`\n). *The redirection works only\nwithin the app.*",
+    "description": "`Redirect` is a component that immediately redirects the browser to the URL in its `to`\r\nproperty when it gets visible (its \n`when`\n property gets \n`true`\n). *The redirection works only\r\nwithin the app.*",
     "descriptionRef": "./Redirect/Redirect.mdx",
     "componentFolder": "Redirect",
     "displayName": "Redirect",
@@ -2284,7 +2284,7 @@
     }
   },
   {
-    "description": "The `Select` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.\nThe dropdown list displays the labels while \nXMLUI stores the selected value for further use when the user selects a particular item.",
+    "description": "The `Select` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.\r\nThe dropdown list displays the labels while \r\nXMLUI stores the selected value for further use when the user selects a particular item.",
     "descriptionRef": "./Select/Select.mdx",
     "componentFolder": "Select",
     "displayName": "Select",
@@ -2295,14 +2295,14 @@
         "defaultValue": ""
       },
       "setValue": {
-        "description": "This API method programmatically sets the value of the field.\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
+        "description": "This API method programmatically sets the value of the field.\r\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
         "descriptionRef": "./Select/Select.mdx?setValue",
         "defaultValue": ""
       }
     },
     "contextVars": {
       "$item": {
-        "description": "This context variable acts as a template for an item in the list.\nAccess attributes of the item using the dot notation.\n\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didchange) event.",
+        "description": "This context variable acts as a template for an item in the list.\r\nAccess attributes of the item using the dot notation.\r\n\r\nFor an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didchange) event.",
         "descriptionRef": "./Select/Select.mdx?$item",
         "defaultValue": ""
       }
@@ -2319,7 +2319,7 @@
         "defaultValue": ""
       },
       "lostFocus": {
-        "description": "This event fires when the component loses focus.\n\nSee the example in the [gotFocus event section](#gotfocus).",
+        "description": "This event fires when the component loses focus.\r\n\r\nSee the example in the [gotFocus event section](#gotfocus).",
         "descriptionRef": "./Select/Select.mdx?lostFocus",
         "defaultValue": ""
       }
@@ -2331,17 +2331,17 @@
         "defaultValue": ""
       },
       "enabled": {
-        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\nThe default value is `true`.",
+        "description": "Indicates whether the input field is enabled (`true`) or disabled (`false`).\r\nThe default value is `true`.",
         "descriptionRef": "./Select/Select.mdx?enabled",
         "defaultValue": ""
       },
       "initialValue": {
-        "description": "The initial value displayed in the input field.\nIf the value is not in the list, it will be ignored.",
+        "description": "The initial value displayed in the input field.\r\nIf the value is not in the list, it will be ignored.",
         "descriptionRef": "./Select/Select.mdx?initialValue",
         "defaultValue": ""
       },
       "optionTemplate": {
-        "description": "This property enables the customization of list items.\nTo access the attributes of a list item use the \n`$item`\n keyword.",
+        "description": "This property enables the customization of list items.\r\nTo access the attributes of a list item use the \n`$item`\n keyword.",
         "descriptionRef": "./Select/Select.mdx?optionTemplate",
         "defaultValue": ""
       },
@@ -2351,14 +2351,14 @@
         "defaultValue": ""
       },
       "validationStatus": {
-        "description": "With this property, you can set the input control's validation status to \"none\", \"error\", \"warning\", or \"valid\".\nThis results in a visual indication of a status change (reacting to form field validation).",
+        "description": "With this property, you can set the input control's validation status to \"none\", \"error\", \"warning\", or \"valid\".\r\nThis results in a visual indication of a status change (reacting to form field validation).",
         "descriptionRef": "./Select/Select.mdx?validationStatus",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "The `SelectionStore` is a non-visual component that may wrap components (items)\nand manage their selection state to accommodate the usage of other actions.\n\nFor an example that covers all props, and API methods and values,\nsee the [`Selection-Aware Components`](#selection-aware-components) section.",
+    "description": "The `SelectionStore` is a non-visual component that may wrap components (items)\r\nand manage their selection state to accommodate the usage of other actions.\r\n\r\nFor an example that covers all props, and API methods and values,\r\nsee the [`Selection-Aware Components`](#selection-aware-components) section.",
     "descriptionRef": "./SelectionStore/SelectionStore.mdx",
     "componentFolder": "SelectionStore",
     "displayName": "SelectionStore",
@@ -2369,7 +2369,7 @@
         "defaultValue": ""
       },
       "refreshSelection": {
-        "description": "This method refreshes the selection by passing all underlying items as the method's \n`allItems`\n parameter.\nThe store calculates the intersection of the selected item IDs in its context and the item IDs in \n`allItems`\n.\nAs a result, the selection store will release the items that are not in \n`allItems`\n anymore.",
+        "description": "This method refreshes the selection by passing all underlying items as the method's \n`allItems`\n parameter.\r\nThe store calculates the intersection of the selected item IDs in its context and the item IDs in \n`allItems`\n.\r\nAs a result, the selection store will release the items that are not in \n`allItems`\n anymore.",
         "descriptionRef": "./SelectionStore/SelectionStore.mdx?refreshSelection",
         "defaultValue": ""
       },
@@ -2388,14 +2388,14 @@
     "events": {},
     "props": {
       "idKey": {
-        "description": "The selected items in the selection store needs to have a unique ID to use as an unambiguous key for that particular item.\nThis property uniquely identifies the selected object item via a given property.\nBy default, the key attribute is `\"id\"`.",
+        "description": "The selected items in the selection store needs to have a unique ID to use as an unambiguous key for that particular item.\r\nThis property uniquely identifies the selected object item via a given property.\r\nBy default, the key attribute is `\"id\"`.",
         "descriptionRef": "./SelectionStore/SelectionStore.mdx?idKey",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. \nIts behavior depends on the layout container in which it is used.",
+    "description": "The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. \r\nIts behavior depends on the layout container in which it is used.",
     "descriptionRef": "./SpaceFiller/SpaceFiller.mdx",
     "componentFolder": "SpaceFiller",
     "displayName": "SpaceFiller",
@@ -2405,7 +2405,7 @@
     "props": {}
   },
   {
-    "description": "The \n`Spinner`\n component is an animated indicator that represents a particular action in progress\nwithout a deterministic progress value.\nWhile it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.",
+    "description": "The \n`Spinner`\n component is an animated indicator that represents a particular action in progress\r\nwithout a deterministic progress value.\r\nWhile it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.",
     "descriptionRef": "./Spinner/Spinner.mdx",
     "componentFolder": "Spinner",
     "displayName": "Spinner",
@@ -2419,14 +2419,14 @@
         "defaultValue": ""
       },
       "fullScreen": {
-        "description": "If set to `true`, the component will be rendered in a full screen container.\nThe default value is `false`.",
+        "description": "If set to `true`, the component will be rendered in a full screen container.\r\nThe default value is `false`.",
         "descriptionRef": "./Spinner/Spinner.mdx?fullScreen",
         "defaultValue": "`false`"
       }
     }
   },
   {
-    "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.\nThese sections are identified by their name: primary and secondary.\nThe sections are divided by a draggable and styleable divider.\n\nMost properties of the component focus on the primary section (e.g. sizing).\n\nSee also: [`HSplitter`](\n./HSplitter.mdx\n), [`VSplitter`](\n./VSplitter.mdx\n).",
+    "description": "The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.\r\nThese sections are identified by their name: primary and secondary.\r\nThe sections are divided by a draggable and styleable divider.\r\n\r\nMost properties of the component focus on the primary section (e.g. sizing).\r\n\r\nSee also: [`HSplitter`](\n./HSplitter.mdx\n), [`VSplitter`](\n./VSplitter.mdx\n).",
     "descriptionRef": "./Splitter/Splitter.mdx",
     "componentFolder": "Splitter",
     "displayName": "Splitter",
@@ -2441,27 +2441,27 @@
     },
     "props": {
       "floating": {
-        "description": "Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged.\nThe default value is `false`, meaning the resizer is visible all the time.",
+        "description": "Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged.\r\nThe default value is `false`, meaning the resizer is visible all the time.",
         "descriptionRef": "./Splitter/Splitter.mdx?floating",
         "defaultValue": ""
       },
       "initialPrimarySize": {
-        "description": "This optional number property sets the initial size of the primary section.\nThe unit of the size value is in pixels or percentages.",
+        "description": "This optional number property sets the initial size of the primary section.\r\nThe unit of the size value is in pixels or percentages.",
         "descriptionRef": "./Splitter/Splitter.mdx?initialPrimarySize",
         "defaultValue": ""
       },
       "maxPrimarySize": {
-        "description": "This property sets the maximum size the primary section can have.\nThe unit of the size value is in pixels or percentages.",
+        "description": "This property sets the maximum size the primary section can have.\r\nThe unit of the size value is in pixels or percentages.",
         "descriptionRef": "./Splitter/Splitter.mdx?maxPrimarySize",
         "defaultValue": ""
       },
       "minPrimarySize": {
-        "description": "This property sets the minimum size the primary section can have.\nThe unit of the size value is in pixels or percentages.",
+        "description": "This property sets the minimum size the primary section can have.\r\nThe unit of the size value is in pixels or percentages.",
         "descriptionRef": "./Splitter/Splitter.mdx?minPrimarySize",
         "defaultValue": ""
       },
       "orientation": {
-        "description": "Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`),\nor vertically by placing the sections next to each other (`horizontal`).\nThe default value is `vertical`.",
+        "description": "Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`),\r\nor vertically by placing the sections next to each other (`horizontal`).\r\nThe default value is `vertical`.",
         "descriptionRef": "./Splitter/Splitter.mdx?orientation",
         "defaultValue": ""
       },
@@ -2471,14 +2471,14 @@
         "defaultValue": ""
       },
       "swapped": {
-        "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`)\nor secondary and primary (`true`) from left to right.",
+        "description": "This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`)\r\nor secondary and primary (`true`) from left to right.",
         "descriptionRef": "./Splitter/Splitter.mdx?swapped",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "`Stack` is a layout container displaying children in a horizontal or vertical stack.\n\nThe Stack component is the primary and most versatile building block for laying out content. It \ncan display its children horizontally or vertically, and it is possible to align its children \neasily along the horizontal and vertical axes.\n\nSee also: [HStack](\n./HStack\n), [VStack](\n./VStack\n), [CHStack](\n./CHStack\n), [CVStack](\n./CVStack\n).\n\n> **Note**: You can learn about the semantics and usage of layout container, including `Stack`, \n[here](/learning/layout-components).",
+    "description": "`Stack` is a layout container displaying children in a horizontal or vertical stack.\r\n\r\nThe Stack component is the primary and most versatile building block for laying out content. It \r\ncan display its children horizontally or vertically, and it is possible to align its children \r\neasily along the horizontal and vertical axes.\r\n\r\nSee also: [HStack](\n./HStack\n), [VStack](\n./VStack\n), [CHStack](\n./CHStack\n), [CVStack](\n./CVStack\n).\r\n\r\n> **Note**: You can learn about the semantics and usage of layout container, including `Stack`, \r\n[here](/learning/layout-components).",
     "descriptionRef": "./Stack/Stack.mdx",
     "componentFolder": "Stack",
     "displayName": "Stack",
@@ -2513,7 +2513,7 @@
         "defaultValue": ""
       },
       "orientation": {
-        "description": "An optional property that governs the Stack's [orientation](\n./appearance/common-units/#orientation\n)\n (whether the Stack lays out its children in a row or a column).\n\n`orientation` is an oft-used prop, there are shorthand versions of the Stack component: [\nHStack](\n./HStack\n) (`Stack` with horizontal orientation), [VStack](\n./VStack\n) (`Stack` with \nvertical orientation).",
+        "description": "An optional property that governs the Stack's [orientation](\n./appearance/common-units/#orientation\n)\r\n (whether the Stack lays out its children in a row or a column).\r\n\r\n`orientation` is an oft-used prop, there are shorthand versions of the Stack component: [\r\nHStack](\n./HStack\n) (`Stack` with horizontal orientation), [VStack](\n./VStack\n) (`Stack` with \r\nvertical orientation).",
         "descriptionRef": "./Stack/Stack.mdx?orientation",
         "defaultValue": ""
       },
@@ -2540,7 +2540,7 @@
     }
   },
   {
-    "description": "`StickyBox` is a component that \"sticks\" or remains fixed at the top or bottom position on the screen\nas the user scrolls.",
+    "description": "`StickyBox` is a component that \"sticks\" or remains fixed at the top or bottom position on the screen\r\nas the user scrolls.",
     "descriptionRef": "./StickyBox/StickyBox.mdx",
     "componentFolder": "StickyBox",
     "displayName": "StickyBox",
@@ -2556,7 +2556,7 @@
     }
   },
   {
-    "description": "The \n`Switch`\n component is a user interface element that allows users to toggle between two states: on and off.\nIt consists of a small rectangular or circular button that can be moved left or right to change its state.\nIt's analogous in function to the [\n`Checkbox`\n](\n./Checkbox.mdx\n).\n\nTo bind data to a \n`Switch`\n, use the XMLUI [Forms infrastructure](\n../learning/using-components/forms\n).",
+    "description": "The \n`Switch`\n component is a user interface element that allows users to toggle between two states: on and off.\r\nIt consists of a small rectangular or circular button that can be moved left or right to change its state.\r\nIt's analogous in function to the [\n`Checkbox`\n](\n./Checkbox.mdx\n).\r\n\nTo bind data to a \n`Switch`\n, use the XMLUI [Forms infrastructure](\n../learning/using-components/forms\n).",
     "descriptionRef": "./Switch/Switch.mdx",
     "componentFolder": "Switch",
     "displayName": "Switch",
@@ -2567,7 +2567,7 @@
         "defaultValue": ""
       },
       "value": {
-        "description": "You can query this read-only API property to query the switch's current value (`true`: checked,\n`false`: unchecked).\n\nSee an example in the \n`setValue`\n API method.",
+        "description": "You can query this read-only API property to query the switch's current value (`true`: checked,\r\n`false`: unchecked).\r\n\r\nSee an example in the \n`setValue`\n API method.",
         "descriptionRef": "./Switch/Switch.mdx?value",
         "defaultValue": ""
       }
@@ -2585,7 +2585,7 @@
         "defaultValue": ""
       },
       "lostFocus": {
-        "description": "This event is triggered when the \n`Switch`\n loses focus.\n\n(See the example above)",
+        "description": "This event is triggered when the \n`Switch`\n loses focus.\r\n\r\n(See the example above)",
         "descriptionRef": "./Switch/Switch.mdx?lostFocus",
         "defaultValue": ""
       }
@@ -2602,7 +2602,7 @@
         "defaultValue": ""
       },
       "initialValue": {
-        "description": "This property sets whether the switch should be displayed in the checked (`true`) or unchecked \n(`false`) state when it is displayed initially.",
+        "description": "This property sets whether the switch should be displayed in the checked (`true`) or unchecked \r\n(`false`) state when it is displayed initially.",
         "descriptionRef": "./Switch/Switch.mdx?initialValue",
         "defaultValue": ""
       },
@@ -2612,7 +2612,7 @@
         "defaultValue": ""
       },
       "labelId": {
-        "description": "You can specify the identifier of a component acting as its label. When you click the label, \nthe component behaves as you clicked it.",
+        "description": "You can specify the identifier of a component acting as its label. When you click the label, \r\nthe component behaves as you clicked it.",
         "descriptionRef": "./Switch/Switch.mdx?labelId",
         "defaultValue": ""
       },
@@ -2632,14 +2632,14 @@
         "defaultValue": ""
       },
       "validationStatus": {
-        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\", \nor \"valid\".",
+        "description": "With this property, you can set the checkbox's validation status to \"none\", \"error\", \"warning\", \r\nor \"valid\".",
         "descriptionRef": "./Switch/Switch.mdx?validationStatus",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "`Table` is a component displaying cells organized into rows and columns. `Table` is virtualized; it \nrenders only the visible cells (according to the current viewport).",
+    "description": "`Table` is a component displaying cells organized into rows and columns. `Table` is virtualized; it \r\nrenders only the visible cells (according to the current viewport).",
     "descriptionRef": "./Table/Table.mdx",
     "componentFolder": "Table",
     "displayName": "Table",
@@ -2689,7 +2689,7 @@
         "defaultValue": ""
       },
       "items": {
-        "description": "You can use `items` as an alias for the `data` property. When you bind the table to a data source \n(for example, you set the \n`data source`\n property to a URL to fetch the data from), `data` \nrepresents the information obtained from the API.\n\nBy convention, when you use direct data (set manually or assembled by code), you pass it in the \n`items` property.\n\nWhen both `items` and `data` are used, `items` has priority.",
+        "description": "You can use `items` as an alias for the `data` property. When you bind the table to a data source \r\n(for example, you set the \n`data source`\n property to a URL to fetch the data from), `data` \r\nrepresents the information obtained from the API.\r\n\r\nBy convention, when you use direct data (set manually or assembled by code), you pass it in the \r\n`items` property.\r\n\r\nWhen both `items` and `data` are used, `items` has priority.",
         "descriptionRef": "./Table/Table.mdx?items",
         "defaultValue": ""
       },
@@ -2731,7 +2731,7 @@
     }
   },
   {
-    "description": "The `TableColumnDef` component can be used within a `Table` to define a particular table column's \nvisual properties and data bindings.",
+    "description": "The `TableColumnDef` component can be used within a `Table` to define a particular table column's \r\nvisual properties and data bindings.",
     "descriptionRef": "./TableColumnDef/TableColumnDef.mdx",
     "componentFolder": "TableColumnDef",
     "displayName": "TableColumnDef",
@@ -2745,7 +2745,7 @@
         "defaultValue": ""
       },
       "canResize": {
-        "description": "This property indicates whether the user can resize the column. If set to `true`, the column can \nbe resized by dragging the column border. If set to `false`, the column cannot be resized. \nDouble-clicking the column border resets to the original size.",
+        "description": "This property indicates whether the user can resize the column. If set to `true`, the column can \r\nbe resized by dragging the column border. If set to `false`, the column cannot be resized. \r\nDouble-clicking the column border resets to the original size.",
         "descriptionRef": "./TableColumnDef/TableColumnDef.mdx?canResize",
         "defaultValue": ""
       },
@@ -2760,12 +2760,12 @@
         "defaultValue": ""
       },
       "maxWidth": {
-        "description": "Indicates the maximum width a particular column can have.  (See an example in the [`width` property]\n(#width) section below.)",
+        "description": "Indicates the maximum width a particular column can have.  (See an example in the [`width` property]\r\n(#width) section below.)",
         "descriptionRef": "./TableColumnDef/TableColumnDef.mdx?maxWidth",
         "defaultValue": ""
       },
       "minWidth": {
-        "description": "Indicates the minimum width a particular column can have. (See an example in the [`width` property]\n(#width) section below.)",
+        "description": "Indicates the minimum width a particular column can have. (See an example in the [`width` property]\r\n(#width) section below.)",
         "descriptionRef": "./TableColumnDef/TableColumnDef.mdx?minWidth",
         "defaultValue": ""
       },
@@ -2782,7 +2782,7 @@
     }
   },
   {
-    "description": "The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.\nThe label is displayed on the button associated with the content.",
+    "description": "The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.\r\nThe label is displayed on the button associated with the content.",
     "descriptionRef": "./Tabs/Tabs.mdx",
     "componentFolder": "Tabs",
     "displayName": "Tabs",
@@ -2796,7 +2796,7 @@
         "defaultValue": ""
       },
       "orientation": {
-        "description": "Indicates the orientation of the tabs.\nHorizontal orientation has the tab buttons layed out on the left side of the content panel.\nVertical orientation places the buttons at the top.\nThe default value is vertical.",
+        "description": "Indicates the orientation of the tabs.\r\nHorizontal orientation has the tab buttons layed out on the left side of the content panel.\r\nVertical orientation places the buttons at the top.\r\nThe default value is vertical.",
         "descriptionRef": "./Tabs/Tabs.mdx?orientation",
         "defaultValue": ""
       },
@@ -2808,7 +2808,7 @@
     }
   },
   {
-    "description": "The `Text` component displays textual information in a number of optional styles and variants.\n\nYou can learn more about this component in the [Working with Text](/learning/using-components/text) article.",
+    "description": "The `Text` component displays textual information in a number of optional styles and variants.\r\n\r\nYou can learn more about this component in the [Working with Text](/learning/using-components/text) article.",
     "descriptionRef": "./Text/Text.mdx",
     "componentFolder": "Text",
     "displayName": "Text",
@@ -2816,18 +2816,18 @@
     "contextVars": {},
     "events": {},
     "props": {
+      "ellipses": {
+        "description": "This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).\r\nBy default, its value is set to `true`.",
+        "descriptionRef": "./Text/Text.mdx?ellipses",
+        "defaultValue": ""
+      },
       "maxLines": {
-        "description": "This property determines the maximum number of lines the component can wrap to.\nIf there is no space to display all the contents,\nthe component displays up to as many lines as specified in this property.",
+        "description": "This property determines the maximum number of lines the component can wrap to.\r\nIf there is no space to display all the contents,\r\nthe component displays up to as many lines as specified in this property.",
         "descriptionRef": "./Text/Text.mdx?maxLines",
         "defaultValue": ""
       },
-      "noEllipsis": {
-        "description": "This property indicates whether an ellipsis should be displayed when the text is cropped (`true`) or not (`false`).\nBy default, its value is set to `false`.",
-        "descriptionRef": "./Text/Text.mdx?noEllipsis",
-        "defaultValue": ""
-      },
       "preserveLinebreaks": {
-        "description": "This property indicates if linebreaks should be preserved when displaying text.\nBy default, its value is set to `false`.",
+        "description": "This property indicates if linebreaks should be preserved when displaying text.\r\nBy default, its value is set to `false`.",
         "descriptionRef": "./Text/Text.mdx?preserveLinebreaks",
         "defaultValue": ""
       },
@@ -2837,14 +2837,14 @@
         "defaultValue": ""
       },
       "variant": {
-        "description": "Optional string value that provides named presets for text variants with a unique combination\nof font style, weight, size, color and other parameters.",
+        "description": "Optional string value that provides named presets for text variants with a unique combination\r\nof font style, weight, size, color and other parameters.",
         "descriptionRef": "./Text/Text.mdx?variant",
         "defaultValue": ""
       }
     }
   },
   {
-    "description": "`TextArea` is a component that provides a multiline text input area.\n\nThe `TextArea` is an input control component and is often used in forms.\nSee the [Using Forms](\n../learning/forms.mdx\n) guide for details.\n\nTo add new lines to the input field press `Shift` + `Enter`.",
+    "description": "`TextArea` is a component that provides a multiline text input area.\r\n\r\nThe `TextArea` is an input control component and is often used in forms.\r\nSee the [Using Forms](\n../learning/forms.mdx\n) guide for details.\r\n\r\nTo add new lines to the input field press `Shift` + `Enter`.",
     "descriptionRef": "./TextArea/TextArea.mdx",
     "componentFolder": "TextArea",
     "displayName": "TextArea",
@@ -2855,12 +2855,12 @@
         "defaultValue": ""
       },
       "setValue": {
-        "description": "This API method programmatically sets the value of the field.\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
+        "description": "This API method programmatically sets the value of the field.\r\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
         "descriptionRef": "./TextArea/TextArea.mdx?setValue",
         "defaultValue": ""
       },
       "value": {
-        "description": "By setting an ID for the component, you can refer to the value of the field if set.\nIf no value is set, the value will be undefined.",
+        "description": "By setting an ID for the component, you can refer to the value of the field if set.\r\nIf no value is set, the value will be undefined.",
         "descriptionRef": "./TextArea/TextArea.mdx?value",
         "defaultValue": ""
       }
@@ -2878,14 +2878,14 @@
         "defaultValue": ""
       },
       "lostFocus": {
-        "description": "This event is triggered when the \n`TextArea`\n loses focus.\n\nSee the example in the [gotFocus event section](#gotfocus).",
+        "description": "This event is triggered when the \n`TextArea`\n loses focus.\r\n\r\nSee the example in the [gotFocus event section](#gotfocus).",
         "descriptionRef": "./TextArea/TextArea.mdx?lostFocus",
         "defaultValue": ""
       }
     },
     "props": {
       "allowCopy": {
-        "description": "This boolean property indicates if the component's contents can be copied to the clipboard.\nDefault: `true`.",
+        "description": "This boolean property indicates if the component's contents can be copied to the clipboard.\r\nDefault: `true`.",
         "descriptionRef": "./TextArea/TextArea.mdx?allowCopy",
         "defaultValue": ""
       },
@@ -2895,12 +2895,12 @@
         "defaultValue": ""
       },
       "autoSize": {
-        "description": "If set to `true`, this boolean property enables the `TextArea`\nto resize automatically based on the number of lines inside it.",
+        "description": "If set to `true`, this boolean property enables the `TextArea`\r\nto resize automatically based on the number of lines inside it.",
         "descriptionRef": "./TextArea/TextArea.mdx?autoSize",
         "defaultValue": ""
       },
       "enabled": {
-        "description": "This property indicates whether the input can be written into (`true`) or not (`false`).\nThe default value is `true`.",
+        "description": "This property indicates whether the input can be written into (`true`) or not (`false`).\r\nThe default value is `true`.",
         "descriptionRef": "./TextArea/TextArea.mdx?enabled",
         "defaultValue": ""
       },
@@ -2910,7 +2910,7 @@
         "defaultValue": ""
       },
       "escResets": {
-        "description": "This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.\nThe default is `true`.",
+        "description": "This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.\r\nThe default is `true`.",
         "descriptionRef": "./TextArea/TextArea.mdx?escResets",
         "defaultValue": ""
       },
@@ -2920,7 +2920,7 @@
         "defaultValue": ""
       },
       "labelId": {
-        "description": "You can specify the identifier of a component acting as its label. When you click the label,\nthe component behaves as you clicked it.",
+        "description": "You can specify the identifier of a component acting as its label. When you click the label,\r\nthe component behaves as you clicked it.",
         "descriptionRef": "./TextArea/TextArea.mdx?labelId",
         "defaultValue": ""
       },
@@ -2972,7 +2972,7 @@
     }
   },
   {
-    "description": "The `TextBox` is an input component that allows users to input and edit textual data.\n\nIt can often be found in forms.\nSee the guide on [Using Forms](\n../learning/forms.mdx\n) for details.",
+    "description": "The `TextBox` is an input component that allows users to input and edit textual data.\r\n\r\nIt can often be found in forms.\r\nSee the guide on [Using Forms](\n../learning/forms.mdx\n) for details.",
     "descriptionRef": "./TextBox/TextBox.mdx",
     "componentFolder": "TextBox",
     "displayName": "TextBox",
@@ -2983,12 +2983,12 @@
         "defaultValue": ""
       },
       "setValue": {
-        "description": "This API method programmatically sets the value of the field.\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
+        "description": "This API method programmatically sets the value of the field.\r\nThe same rules apply as for the [`initialValue`](#initialvalue) property.",
         "descriptionRef": "./TextBox/TextBox.mdx?setValue",
         "defaultValue": ""
       },
       "value": {
-        "description": "By setting an ID for the component, you can refer to the value of the field if set.\nIf no value is set, the value will be undefined.",
+        "description": "By setting an ID for the component, you can refer to the value of the field if set.\r\nIf no value is set, the value will be undefined.",
         "descriptionRef": "./TextBox/TextBox.mdx?value",
         "defaultValue": ""
       }
@@ -3006,14 +3006,14 @@
         "defaultValue": ""
       },
       "lostFocus": {
-        "description": "This event is triggered when the `TextBox` loses focus.\n\nSee the example in the [gotFocus event section](#gotfocus).",
+        "description": "This event is triggered when the `TextBox` loses focus.\r\n\r\nSee the example in the [gotFocus event section](#gotfocus).",
         "descriptionRef": "./TextBox/TextBox.mdx?lostFocus",
         "defaultValue": ""
       }
     },
     "props": {
       "autoFocus": {
-        "description": "If this boolean prop is set to `true`, the `TextBox` will be focused when it appears on the UI.\nThe default is `false`.",
+        "description": "If this boolean prop is set to `true`, the `TextBox` will be focused when it appears on the UI.\r\nThe default is `false`.",
         "descriptionRef": "./TextBox/TextBox.mdx?autoFocus",
         "defaultValue": ""
       },
@@ -3023,7 +3023,7 @@
         "defaultValue": ""
       },
       "endIcon": {
-        "description": "This string prop enables the display of an icon\non the right side of the input field by providing a valid icon name (left-to-right display).",
+        "description": "This string prop enables the display of an icon\r\non the right side of the input field by providing a valid icon name (left-to-right display).",
         "descriptionRef": "./TextBox/TextBox.mdx?endIcon",
         "defaultValue": ""
       },
@@ -3058,7 +3058,7 @@
         "defaultValue": ""
       },
       "startIcon": {
-        "description": "This string prop enables the display of an icon\non the left side of the input field by providing a valid icon name (left-to-right display).",
+        "description": "This string prop enables the display of an icon\r\non the left side of the input field by providing a valid icon name (left-to-right display).",
         "descriptionRef": "./TextBox/TextBox.mdx?startIcon",
         "defaultValue": ""
       },
@@ -3075,7 +3075,7 @@
     }
   },
   {
-    "description": "The `Theme` component provides a way to define a particular theming context for its nested components.\nThe XMLUI framework uses `Theme` to define the default theming context for all of its child components.\nTheme variables and theme settings only work in this context.",
+    "description": "The `Theme` component provides a way to define a particular theming context for its nested components.\r\nThe XMLUI framework uses `Theme` to define the default theming context for all of its child components.\r\nTheme variables and theme settings only work in this context.",
     "descriptionRef": "./Theme/Theme.mdx",
     "componentFolder": "Theme",
     "displayName": "Theme",
@@ -3094,7 +3094,7 @@
         "defaultValue": ""
       },
       "tone": {
-        "description": "This property allows the setting of the current theme's tone.\nTone is either `light` or `dark`.\n\nThe default tone is `light`.",
+        "description": "This property allows the setting of the current theme's tone.\r\nTone is either `light` or `dark`.\r\n\r\nThe default tone is `light`.",
         "descriptionRef": "./Theme/Theme.mdx?tone",
         "defaultValue": ""
       }

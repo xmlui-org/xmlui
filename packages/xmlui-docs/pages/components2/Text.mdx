@@ -10,6 +10,52 @@ This component does not have any context variables.
 
 ## Props
 
+### `ellipses`
+
+This property indicates whether ellipses should be displayed when the text is cropped (`true`) or not (`false`).
+By default, its value is set to `true`.
+
+```ueml copy {4}
+<VStack width="200" gap="$space-0_5">
+  <Text
+    backgroundColor="cyan"
+    color="black"
+    maxLines="1"
+    ellipses="false">
+    Though this long text does is about to crop!
+  </Text>
+  <Text
+    backgroundColor="cyan"
+    color="black"
+    maxLines="1">
+    Though this long text does is about to crop!
+  </Text>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: ellipses"
+  height={80}
+  app={`
+  <VStack width="200" gap="$space-0_5">
+    <Text 
+      backgroundColor="cyan" 
+      color="black"
+      maxLines="1"
+      ellipses="false">
+      Though this long text does is about to crop!
+    </Text>
+    <Text 
+      backgroundColor="cyan" 
+      color="black"
+      maxLines="1">
+      Though this long text does is about to crop!
+    </Text>
+  </VStack>
+  `}
+/>
+
 ### `maxLines`
 
 This property determines the maximum number of lines the component can wrap to.
@@ -38,52 +84,6 @@ the component displays up to as many lines as specified in this property.
     value="A long text that will likely overflow" 
     maxLines="2"
   />
-  `}
-/>
-
-### `noEllipsis`
-
-This property indicates whether an ellipsis should be displayed when the text is cropped (`true`) or not (`false`).
-By default, its value is set to `false`.
-
-```ueml copy {4}
-<VStack width="200" gap="$space-0_5">
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1"
-    noEllipsis="true">
-    Though this long text does is about to crop!
-  </Text>
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1">
-    Though this long text does is about to crop!
-  </Text>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: noEllipsis"
-  height={80}
-  app={`
-  <VStack width="200" gap="$space-0_5">
-    <Text 
-      backgroundColor="cyan" 
-      color="black"
-      maxLines="1"
-      noEllipsis="true">
-      Though this long text does is about to crop!
-    </Text>
-    <Text 
-      backgroundColor="cyan" 
-      color="black"
-      maxLines="1">
-      Though this long text does is about to crop!
-    </Text>
-  </VStack>
   `}
 />
 

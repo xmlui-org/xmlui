@@ -137,14 +137,14 @@ You can observe the effect of using `preserveLinebreaks`:
 
 %-PROP-END
 
-%-PROP-START noEllipsis
+%-PROP-START ellipses
 
 ```ueml copy {4}
 <VStack width="200" gap="0.5rem">
   <H3 
     backgroundColor="blue" 
     maxLines="1"
-    noEllipsis="true">
+    ellipses="false">
     Though this long text does is about to crop!
   </H3>
   <H3 
@@ -157,7 +157,7 @@ You can observe the effect of using `preserveLinebreaks`:
 
 <Playground
   previewOnly
-  name="Example: noEllipsis"
+  name="Example: ellipses"
   height={100}
   horizontal
   app={`
@@ -165,7 +165,7 @@ You can observe the effect of using `preserveLinebreaks`:
     <H3
       backgroundColor="blue" 
       maxLines="1"
-      noEllipsis="true">
+      ellipses="false">
       Though this long text does is about to crop!
     </H3>
     <H3 

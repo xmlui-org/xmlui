@@ -80,7 +80,7 @@ test("No Ellipsis long heading", async ({ page }) => {
       width="200" 
       backgroundColor="cyan"
       maxLines="1"
-      noEllipsis="true">
+      ellipses="false">
       ${valueHeadingLong}
     </Heading>
   </Fragment>
