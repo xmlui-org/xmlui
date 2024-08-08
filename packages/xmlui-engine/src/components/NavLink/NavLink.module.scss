@@ -51,7 +51,7 @@ $transition: color 0.1s, background-color 0.1s;
   font-weight: $font-weight-NavLink;
   position: relative;
   transition: $transition;
-  border-radius: $radius-NavLink;
+  border-radius: $radius-indicator-NavLink;
   color: $color-text-NavLink;
   background-color: $color-bg-NavLink;
   flex-shrink: 0;
@@ -74,7 +74,6 @@ $transition: color 0.1s, background-color 0.1s;
       bottom: 0;
       height: $thickness-indicator-NavLink;
       border-radius: $radius-indicator-NavLink;
-      background-color: $color-indicator-NavLink;
       content: "";
     }
   }
@@ -125,6 +124,7 @@ $transition: color 0.1s, background-color 0.1s;
   &.navItemActive {
     color: $color-text-NavLink--active;
     background-color: $color-bg-NavLink--active;
+    font-weight: $font-weight-NavLink--active;
     * {
       font-weight: $font-weight-NavLink--active;
       color: $color-text-NavLink--active;
