@@ -32,6 +32,7 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Split
   background-color: $color-bg-Splitter;
   border-radius: $radius-Splitter;
   border: $border-Splitter $style-border-Splitter $color-border-Splitter;
+  user-select: none;
 
   &.vertical {
     flex-direction: column;
