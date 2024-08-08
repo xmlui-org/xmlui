@@ -9,7 +9,7 @@ $themeVars: ();
 
 $width-navPanel-App: createThemeVar("width-navPanel-App");
 $shadow-header-App: createThemeVar("shadow-header-App");
-$shadow-Pages-App: createThemeVar("shadow-Pages-App");
+$shadow-pages-App: createThemeVar("shadow-pages-App");
 $max-content-width-App: createThemeVar("max-content-width-App");
 $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
 
@@ -147,7 +147,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
   flex: 1;
   display: flex;
   flex-direction: column;
-  box-shadow: $shadow-Pages-App;
+  box-shadow: $shadow-pages-App;
 }
 
 .navPanelWrapper {

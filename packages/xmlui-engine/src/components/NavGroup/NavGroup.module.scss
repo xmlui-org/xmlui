@@ -7,6 +7,10 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$color-bg-dropdown-NavGroup: createThemeVar("color-bg-dropdown-NavGroup");
+$shadow-dropdown-NavGroup: createThemeVar("shadow-dropdown-NavGroup");
+$radius-dropdown-NavGroup: createThemeVar("radius-dropdown-NavGroup");
+
 .dropdownList {
   padding: 0;
   margin: 0;
@@ -14,13 +18,13 @@ $themeVars: ();
   top: 0;
   position: absolute;
   overflow-y: hidden;
-  background: createThemeVar("color-bg-dropdown-NavGroup");
+  background: $color-bg-dropdown-NavGroup;
   list-style: none;
   height: fit-content;
   transition: height 0.2s ease;
-  box-shadow: createThemeVar("shadow-dropdown-NavGroup");
+  box-shadow: $shadow-dropdown-NavGroup;
   min-width: 11rem;
-  border-radius: createThemeVar("radius-dropdown-NavGroup");
+  border-radius: $radius-dropdown-NavGroup;
 
   &:focus,
   &:focus-visible {
