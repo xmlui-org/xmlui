@@ -3,6 +3,7 @@
   "App": "App",
   "ApiAction": "ApiAction",
   "AppHeader": "AppHeader",
+  "AppState": "AppState",
   "Avatar": "Avatar",
   "Badge": "Badge",
   "Bookmark": "Bookmark",
