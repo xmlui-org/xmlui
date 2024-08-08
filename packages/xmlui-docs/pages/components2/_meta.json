@@ -1,6 +1,7 @@
 {
   "App": "App",
   "AppHeader": "AppHeader",
+  "AppState": "AppState",
   "Avatar": "Avatar",
   "Badge": "Badge",
   "BarChart": "BarChart",
