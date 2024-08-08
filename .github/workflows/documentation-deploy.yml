@@ -4,9 +4,7 @@ on:
   push:
     paths:
       - packages/xmlui-docs/**
-    # Stop deploying docs while the Azure creadentials are not fixed
-    # branches: [ main ]
-    branches: [ dummy ]
+    branches: [ main ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
