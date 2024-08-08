@@ -29,6 +29,7 @@ $color-bg-pagination-Table: createThemeVar("color-bg-pagination-Table");
 $color-text-heading-Table: createThemeVar("color-text-heading-Table");
 $font-weight-heading-Table: createThemeVar("font-weight-heading-Table");
 $font-size-heading-Table: createThemeVar("font-size-heading-Table");
+$transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
 .wrapper {
   width: 100%;
@@ -86,7 +87,7 @@ $font-size-heading-Table: createThemeVar("font-size-heading-Table");
   flex-direction: row;
   gap: 0.5rem;
   align-items: center;
-  text-transform: uppercase;
+  text-transform: $transform-text-heading-Table;
   font-size: $font-size-heading-Table;
   color: $color-text-heading-Table;
   font-weight: $font-weight-heading-Table;
