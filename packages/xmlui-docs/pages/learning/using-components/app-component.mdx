@@ -11,7 +11,7 @@ import verticalFullHeader from "./samples/vertical-full-header.xmlui";
 
 XMLUI has a component, `App`, which gives you a flying start when creating a new application. With `App`, your application immediately has a boilerplate for your app's essential UI parts, including headers, navigation, content, and others.
 
-Instead of starting with a fixed layout, you can choose from a set of predefined ones. Moreover, you can change the app layout run time or through configuration. `App` provides several scroll strategies (according to the selected layout) and a responsive layout according to the available viewport width.
+Instead of building the app layout from scratch, you can choose from a set of predefined ones. Moreover, you can change the app layout at run time or in the configuration. `App` provides several ways to scroll the content (according to the selected layout) and a responsiveness according to the available viewport width.
 
 ## Layout Placeholders
 
@@ -573,6 +573,12 @@ If the `App` contains an `AppHeader` empty placeholder, it displays an empty hea
 ### Empty `AppHeader` with Logo
 
 If the `App` contains an `AppHeader` empty placeholder but defines a logo in the app manifest, the header displays the logo. The following example uses the same app markup as the previous one; however, it defines a logo in the manifest:
+
+```json
+{
+  "logo": "xmlui-logo.svg"
+}
+```
 
 ```ueml copy
 <App layout="condensed">

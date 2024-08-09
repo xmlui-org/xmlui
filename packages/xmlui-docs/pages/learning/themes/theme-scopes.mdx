@@ -5,9 +5,11 @@ There are situations when your app wants to apply multiple themes for the same p
 Often, apps display their headers in a contrasting tone; when the app's body is in a light tone, the header is displayed in a dark:
 
 <Playground 
-  previewOnly={true} 
-  name="Multi-theme app" height={350} 
-app={`
+  previewOnly 
+  name="Multi-theme app"
+  height={350}
+  defaultTone="light" 
+  app={`
     <App layout="condensed-sticky">
       <Theme tone="dark">
         <AppHeader>

@@ -26,7 +26,7 @@ Properties accept expressions (often called _binding expressions_ in XMLUI) that
 
 The following sample uses _binding expressions_ to set the `value` property of a couple of `Text` components. The wrapping curly braces sign the engine that the content between `{` and `}` should be considered a binding expression. When initializing the property's value, the engine evaluates the binding expression and sets the property to the evaluated value:
 
-```ueml copy {4, 7}
+```ueml copy {4, 6}
 <VStack>
   <HStack>
     <Text value="Square root of 2 is:\xa0" />
@@ -248,9 +248,9 @@ When your code contains several variables and event handlers, you can declare th
 
 A code-behind file can contain only variable and function declarations. Variables can be used just as if they were declared inline; functions can be utilized as event handlers or helpers. **The code you declare in a code-behind file is visible in the entire component but not outside.**
 
-Here is a sample app with a code-behind file. The following is the app's markup in the **Main.xmlui** file:
+The following is a sample application with markup and a code-behind file:
 
-```ueml copy
+```ueml copy filename="Main.xmlui"
  <Button 
   label="Sum numbers from 1 to {endValue}!"
   onClick="sumAndDisplay" />
@@ -258,7 +258,7 @@ Here is a sample app with a code-behind file. The following is the app's markup 
 
 The markup references two identifiers, `endValue`, `sumAndDisplay`, in the **Main.xmlui.xs** code-behind file:
 
-```javascript
+```javascript copy filename="Main.xmlui.xs"
 var endValue = 123;
 
 function sumAndDisplay() {
@@ -301,15 +301,15 @@ In the markup, the `Button` component is bound with the `click` event handler ex
 
 XMLUI supports implicit event handler binding. When you name your functions following a particular naming convention, XMLUI binds an event handler with its corresponding code-behind function.
 
-In the following example, the button's ID is `myButton`. The markup (**Main.xmlui**) does not have any event handler declaration:
+In the following example, the button's ID is `myButton`. The markup does not have any event handler declaration:
 
-```ueml copy
+```ueml copy filename="Main.xmlui"
  <Button id="myButton" label="(Implicit) Sum numbers from 1 to {endValue}!" />
 ```
 
-The code-behind file (**Main.xmlui.xs**) declares a function with the `myButton_onClick` name:
+The code-behind file declares a function with the `myButton_onClick` name:
 
-```javascript /myButton_onClick/
+```javascript filename="Main.xmlui.xs" /myButton_onClick/
 var endValue = 234;
 
 function myButton_onClick() {
@@ -392,9 +392,7 @@ for (let i = 0; i < upperBound) {
 
 Component variables are those you declare in the markup with the `var.` prefix or code-behind files and `<script>` tags with the `var` keyword, such as in these examples:
 
-*(code-behind)*:
-
-```javascript /var endValue/
+```javascript filename="MyButton.xmlui.xs" /var endValue/
 var endValue = 234;
 
 function myButton_onClick() {
@@ -404,9 +402,7 @@ function myButton_onClick() {
 }
 ```
 
-*(markup)*:
-
-```ueml copy /var.count/
+```ueml copy filename="MyButton.xmlui" /var.count/
 <Button var.count="{0}" label="Click to increment: {count}" onClick="count++" />
 ```
 
@@ -519,7 +515,7 @@ This behavior has a significant consequence: you cannot use property values of v
 
 Property value declarations and variable initializations cannot use asynchronously running expressions, as the engine needs to have their explicit values to render components. For example, in the following markup, using the `delay()` function would raise an error with this message: "Promises (async function calls) are not allowed in binding expressions":
 
-```ueml copy {}
+```ueml copy
 <Text value="My value {delay(100), 123}" />
 ```
 
@@ -564,14 +560,14 @@ Each component has a unique identifier (assigned by the engine) used internally 
 
 When you use a component ID in a reusable component (like in the following example), that component ID cannot be seen from outside:
 
-```ueml copy 
+```ueml copy filename="TopicQuestion.xmlui"
 <Component name="TopicQuestion">
   <Checkbox id="topic" initialValue="true" label="Are you interested in this topic?" />
   <Text value="The checkbox above is {topic.value ? 'checked' : 'unchecked'}" />
 </Component>
 ```
 
-In this simple app using the `TopicQuestion` component, `VStack` cannot access the checkbox with the `topic` ID (as it is within `TopicComponent`). Thus, the `topic.value` expression will be evaluated as an undefined value, and the stack's background will remain transparent in the checked and unchecked states.
+In this simple app using the `TopicQuestion` component, `VStack` cannot access the checkbox with the `topic` ID (as it is within the `TopicQuestion` component). Thus, the `topic.value` expression will be evaluated as an undefined value, and the stack's background will remain transparent in the checked and unchecked states.
 
 ```ueml copy
 <VStack padding="1rem" gap="1rem" height="100%" 
@@ -601,7 +597,7 @@ In this simple app using the `TopicQuestion` component, `VStack` cannot access t
   `}
 />
 
-XMLUI allows you to refer to a component ID before declaring that component. Look again at the example using the `question` Checkbox:
+XMLUI also allows you to refer to a component ID before declaring that component. Look again at the example using the `question` Checkbox:
 
 ```ueml copy
 <VStack padding="1rem" gap="1rem" height="100%" 

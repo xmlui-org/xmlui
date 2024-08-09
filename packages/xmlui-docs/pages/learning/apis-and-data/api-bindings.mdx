@@ -1,11 +1,11 @@
-# API Bindings
+# Datasources
 
-A unique feature of XMLUI is the ability to natively bind properties to results from a web API (REST or REST-like) endpoint. For example, the following app retrieves data from the SpaceX API:
+A unique feature of XMLUI is the ability to natively bind properties to results from a web API (REST or REST-like) endpoint. For example, the following app retrieves data from the SpaceX public API:
 
 ```ueml copy {3}
 <List>
   <prop name=items>
-    <ApiBinding url="https://api.spacexdata.com/v3/history"/>
+    <Datasource url="https://api.spacexdata.com/v3/history"/>
   </prop>
   <prop name=itemTemplate>
     <Card title="{$item.title}" subTitle="{$item.details}"/>
@@ -13,19 +13,19 @@ A unique feature of XMLUI is the ability to natively bind properties to results 
 </List>
 ```
 
-`List` is a templated component working with an array of data specified in its `items` property. The highlighted markup line specifies an `ApiBinding` component that retrieves data from the endpoint specified in its `url` property and utilizes it to set `items`.
+`List` is a templated component working with an array of data specified in its `items` property. The highlighted markup line specifies a `Datasource` component that retrieves data from the endpoint specified in its `url` property and utilizes it to set `items`.
 
-The `ApiBinding` takes care of every tiny detail a data fetching operation requires, including sending the request, waiting for the response, refreshing the UI after extracting the date from the response, etc.
+The `Datasource` takes care of every tiny detail a data fetching operation requires, including sending the request, waiting for the response, refreshing the UI after extracting the data from the response, etc.
 
-Here is the app leveraging the markup above:
+Here is the app using the markup above:
 
 <Playground
     previewOnly
     name="Getting data from Spacex API"
     app={`
     <List>
-      <prop name="items">
-        <ApiBinding url="https://api.spacexdata.com/v3/history"/>
+      <prop name="data">
+        <Datasource url="https://api.spacexdata.com/v3/history"/>
       </prop>
       <prop name="itemTemplate">
         <Card title="{$item.title}" subTitle="{$item.details}"/>
@@ -35,28 +35,28 @@ Here is the app leveraging the markup above:
     height={300}
 />
 
-In this article, you will learn the powerful features `ApiBinding` provides for your apps.
+In this article, you will learn what powerful features `Datasource` provides for you to use.
 
-## ApiBinding Everywhere
+## Datasources Everywhere
 
-There are two ways you can use the `ApiBinding` component:
-- **Component properties**. When you attach an `ApiBinding` to a component property, the property value evaluation will trigger the API endpoint to run and retrieve data. When the data has been retrieved, the property value is set to the data received. It is up to the host component how it behaves (what it displays) in response to the property value change.
-- **Event handlers**. When you use an `ApiBinding` in an event handler, triggering the event will ignite, sending the request to the corresponding API endpoint. These requests generally make some modifications on the server side.
+There are two ways you can use the `Datasource` component:
+- **Component properties**. When you attach a `Datasource` to a component property, the property value evaluation will trigger the API endpoint to run and retrieve data. When the data has been retrieved, the property value is set to the data received. It is up to the host component how it behaves (what it displays) in response to the property value change.
+- **Event handlers**. When you use a `Datasource` in an event handler, triggering the event will ignite, sending the request to the corresponding API endpoint. These requests generally make some modifications on the server side.
 
-`ApiBinding` can handle file downloads and uploads, too.
+`Datasource` can handle file downloads and uploads, too.
 
-### `ApiBinding` with Component Properties
+### `Datasource` with Component Properties
 
-The introduction of this article already demonstrated a simple SpaceX data query where you bound an `ApiBinding` component with the `items` property of `List`.
+The introduction of this article already demonstrated a simple SpaceX data query where you bound an `Datasource` component with the `items` property of `List`.
 
-XMLUI does not have any restriction on which properties or event handlers you can use `ApiBinding`.
+XMLUI does not have any restriction on which properties or event handlers you can use `Datasource`.
 
-Though it has no value, you could use the `ApiBinding` above to set the `value` property of a `Text` component:
+Though it has no value, you can use the `Datasource` above to set the `value` property of a `Text` component:
 
 ```ueml copy {3}
 <Text>
   <prop name="value">
-    <ApiBinding url="https://api.spacexdata.com/v3/history"/>
+    <Datasource url="https://api.spacexdata.com/v3/history"/>
   </prop>
 </Text>
 ```
@@ -67,18 +67,18 @@ Though it has no value, you could use the `ApiBinding` above to set the `value` 
     app={`
     <Text>
       <prop name="value">
-        <ApiBinding url="https://api.spacexdata.com/v3/history"/>
+        <Datasource url="https://api.spacexdata.com/v3/history"/>
       </prop>
     </Text>
     `}
     height={100}
 />
 
-### `ApiBinding` with Event Handlers
+### `Datasource` with Event Handlers
 
-When you attach an `ApiBinding` to an event handler, triggering the event will send a request to the corresponding API endpoint.
+When you attach a `Datasource` to an event handler, triggering the event will send a request to the corresponding API endpoint.
 
-For example, in the following markup snippet, the `MyForm` component has a button with its `click` event utilizing `ApiBinding` to send a `DELETE` request to the `https://myApi.com/items/{selectedId}` endpoint replacing the `{selectedId}` binding expression with the value of `selectedId`:
+For example, in the following markup snippet, the `MyForm` component has a button with its `click` event utilizing `Datasource` to send a `DELETE` request to the `https://myApi.com/items/{selectedId}` endpoint replacing the `{selectedId}` binding expression with the value of `selectedId`:
 
 ```ueml copy
 <MyForm var.selectedId={-1}>
@@ -88,25 +88,25 @@ For example, in the following markup snippet, the `MyForm` component has a butto
   -->
   <Button label="Delete">
     <event name="click">
-      <ApiBinding method="delete" url="https://myApi.com/items/{selectedId}"/>
+      <Datasource method="delete" url="https://myApi.com/items/{selectedId}"/>
     </event>
   <Button>
 </MyForm>
 ```
 
-## How `ApiBinding` Works
+## How `Datasource` Works
 
-The primary value of `ApiBinding` is that it provides the entire infrastructure for executing requests, obtaining the response, processing the data, and handling potential errors. In your markup, you declare the endpoint to reach, and XMLUI manages the entire mechanism.
+The primary value of `Datasource` is that it provides the entire infrastructure for executing requests, obtaining the response, processing the data, and handling potential errors. In your markup, you declare the endpoint to reach, and XMLUI manages the entire mechanism.
 
 ### Sending a Request
 
-When you attach an `ApiBinding` to an event handler, the corresponding request is sent to the API endpoint when the event is triggered.
+When you attach an `Datasource` to an event handler, the corresponding request is sent to the API endpoint when the event is triggered.
 
-In the case of property-bound `ApiBinding` instances, the request is sent when the engine detects any of the properties of the corresponding `ApiBinding,` which influence the requested change due to some user or system events. Such events can be that the component leveraging the `ApiBinding` is about to display its UI for the first time or re-renders its UI due to some change.
+In the case of property-bound `Datasource` instances, the request is sent when the engine detects any of the properties of the corresponding `Datasource,` which influence the requested change due to some user or system events. Such events can be that the component leveraging the `Datasource` is about to display its UI for the first time or re-renders its UI due to some change.
 
 > **Note**: No new request is sent if non-request-influencing properties change.
 
-There are several `ApiBinding` properties to set up the attributes of the request to be sent.
+There are several `Datasource` properties to set up the attributes of the request to be sent.
 
 #### `url`
 
@@ -121,7 +121,7 @@ This property defines the request method (`get`, `post`, `put`, `delete`, etc.).
 You can set the query parameters to append to the URL. This property contains key and value pairs. Assume you set `queryParams` like in this example:
 
 ```ueml
-<ApiBinding
+<Datasource
   url="https://mycompany.com/api/books"
   queryParams="{ {genre: 'Fiction', filter: 'Asimov'} }"
 />
@@ -150,7 +150,7 @@ If you define both `body` and `rawBody` property, `rawBody` prevails.
 You can set the request headers with this property containing key and value pairs. The key is the header name; the value specifies the corresponding header value. Assume you set the property to these values:
 
 ```ueml
-<ApiBinding
+<Datasource
   url="https://mycompany.com/api/books"
   headers="{ {
     'Cache-Control': 'max-age=0', 
@@ -175,7 +175,7 @@ When it is time to execute a request, the engine assembles it according to the a
 
 When the response arrives from the endpoint, and its status indicates success, the engine processes it in a few steps:
 
-1. **Paging information extraction**. The `ApiBinding` component can be used in scenarios when data is retrieved in pages (windows). To extract paging information from the response, you can define two properties, `prevPageParamSelector` and `nextPageParamSelector`. The `ApiBinding` component stores these values and uses them for subsequent paged queries.
+1. **Paging information extraction**. The `Datasource` component can be used in scenarios when data is retrieved in pages (windows). To extract paging information from the response, you can define two properties, `prevPageParamSelector` and `nextPageParamSelector`. The `Datasource` component stores these values and uses them for subsequent paged queries.
 2. **Result extraction**. The complete response may wrap the data of interest with other information we want to ignore. The `resultSelector` property allows the specification of a selector to extract the primary information from the response.
 3. **Result transformation**. The result may need to be in the right format to display in the UI. The `transformResult` property lets you define a function that converts the data into a UI-suitable format.
 4. **Success handler invocation**. The engine fires the `onSuccess` event, passing the result to notify the UI about the successful request execution.
