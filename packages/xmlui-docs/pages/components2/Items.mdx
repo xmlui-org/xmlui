@@ -54,7 +54,7 @@ You can use also API bindings to display data:
 <VStack padding="1rem" gap="0.5rem">
   <Items>
     <prop name="items">
-      <ApiBinding url="https://api.spacexdata.com/v3/rockets"/>
+      <Datasource url="https://api.spacexdata.com/v3/rockets"/>
     </prop>
     <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
   </Items>
@@ -69,7 +69,7 @@ You can use also API bindings to display data:
   <VStack padding="1rem" gap="0.5rem">
     <Items>
       <prop name="items">
-        <ApiBinding url="https://api.spacexdata.com/v3/rockets"/>
+        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
       </prop>
       <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Items>
