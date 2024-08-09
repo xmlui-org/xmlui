@@ -14,6 +14,7 @@ $radius-indicator-ProgressBar: createThemeVar("radius-indicator-ProgressBar");
 $thickness-ProgressBar: createThemeVar("thickness-ProgressBar");
 
 .wrapper {
+  width: 100%;
   background-color: $color-bg-ProgressBar;
   border-radius: $radius-ProgressBar;
   overflow: hidden;
