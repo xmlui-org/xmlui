@@ -34,11 +34,13 @@ export function Spinner({
 
   const spinner = (
     <>
-      <div className={styles["lds-ring"]} style={style}>
-        <div></div>
-        <div></div>
-        <div></div>
-        <div></div>
+      <div style={style}>
+        <div className={styles["lds-ring"]}>
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
     </>
   );
@@ -101,7 +103,11 @@ export const spinnerComponentRenderer =
     "Spinner",
     ({ node, layoutCss, extractValue }) => {
       delete layoutCss.width;
+      delete layoutCss.minWidth;
+      delete layoutCss.maxWidth;
       delete layoutCss.height;
+      delete layoutCss.minHeight;
+      delete layoutCss.maxHeight;
       return (
         <Spinner
           style={layoutCss}

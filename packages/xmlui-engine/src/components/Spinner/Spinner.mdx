@@ -19,6 +19,8 @@
   `}
 />
 
+> **Note**: `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
+
 %-DESC-END
 
 %-PROP-START delay
@@ -31,7 +33,7 @@ Use the buttons to toggle between the two `Spinners`.
   <var name="yesDelay" value="{false}" />
   <HStack gap="$space-0_5">
     <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
-    <Button label="1000milsec delay" onClick="noDelay = false; yesDelay = true;" />
+    <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
   </HStack>
   <Spinner when="{noDelay}" delay="0" />
   <Spinner when="{yesDelay}" delay="1000" />
@@ -48,7 +50,7 @@ Use the buttons to toggle between the two `Spinners`.
     <var name="yesDelay" value="{false}" />
     <HStack gap="$space-0_5">
       <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
-      <Button label="1000milsec delay" onClick="noDelay = false; yesDelay = true;" />
+      <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
     </HStack>
     <Spinner when="{noDelay}" delay="0" />
     <Spinner when="{yesDelay}" delay="1000" />
@@ -69,7 +71,7 @@ Use the buttons to toggle between the two `Spinners`.
 <Playground
   name="Example: fullScreen"
   previewOnly
-  height={72}
+  height={200}
   app={`
   <HStack padding="$space-1">
     <Spinner fullScreen="true" />
