@@ -8,7 +8,7 @@ Your contributions are valuable and help us improve and grow.
 
 ## Code of Conduct
 
-Please adhere to our [Code of Conduct](./code-of-conduct). We expect all contributors to act respectfully and professionally, maintaining a positive and inclusive environment.
+We expect all contributors to act respectfully and professionally, maintaining a positive and inclusive environment.
 
 ## How to Contribute
 
