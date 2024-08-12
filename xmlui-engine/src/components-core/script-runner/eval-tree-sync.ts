@@ -35,8 +35,8 @@ import {
   isPromise,
 } from "./eval-tree-common";
 import { Parser } from "../../parsers/scripting/Parser";
-import { ensureMainThread } from "../../components-core/script-runner/process-statement-common";
-import { processDeclarations, processStatementQueue } from "../../components-core/script-runner/process-statement-sync";
+import { ensureMainThread } from "./process-statement-common";
+import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { isBannedFunction } from "./bannedFunctions";
 
 // --- The type of function we use to evaluate a (partial) expression tree

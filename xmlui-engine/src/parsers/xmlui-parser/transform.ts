@@ -1,12 +1,12 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { Node } from "./syntax-node";
-import type { ErrorCodes } from "../../parsers/ueml/ParserError";
+import type { ErrorCodes } from "../ueml/ParserError";
 import type { ModuleResolver } from "@components-core/script-runner/BindingTreeEvaluationContext";
 
 import { SyntaxKind } from "./syntax-kind";
-import { ParserError, errorMessages } from "../../parsers/ueml/ParserError";
-import { Parser } from "../../parsers/scripting/Parser";
-import { collectCodeBehindFromSource } from "../../parsers/scripting/code-behind-collect";
+import { ParserError, errorMessages } from "../ueml/ParserError";
+import { Parser } from "../scripting/Parser";
+import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { createEvalContext } from "../../components-core/script-runner/BindingTreeEvaluationContext";
 import { createScanner } from "./scanner";
 import { CharacterCodes } from "./CharacterCodes";

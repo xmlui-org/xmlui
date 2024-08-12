@@ -17,8 +17,8 @@ import {
   type OnStatementCompletedCallback,
   processStatementQueueAsync,
 } from "../script-runner/process-statement-async";
-import { reportEngineError } from "../../components-core/reportEngineError";
-import { ScriptParseError } from "../../components-core/EngineError";
+import { reportEngineError } from "../reportEngineError";
+import { ScriptParseError } from "../EngineError";
 
 /**
  * Parse the specified source code as event handler code

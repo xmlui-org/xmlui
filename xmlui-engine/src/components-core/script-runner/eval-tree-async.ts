@@ -29,7 +29,7 @@ import {
   OnStatementCompletedCallback,
   processDeclarationsAsync,
   processStatementQueueAsync,
-} from "../../components-core/script-runner/process-statement-async";
+} from "./process-statement-async";
 import {
   evalArrow,
   evalAssignmentCore,
@@ -42,7 +42,7 @@ import {
   evalUnaryCore,
   isPromise,
 } from "./eval-tree-common";
-import { ensureMainThread } from "../../components-core/script-runner/process-statement-common";
+import { ensureMainThread } from "./process-statement-common";
 import { getAsyncProxy } from "./asyncProxy";
 import { isBannedFunction } from "./bannedFunctions";
 

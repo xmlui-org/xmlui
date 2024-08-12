@@ -1,7 +1,7 @@
-import type { BindingTreeEvaluationContext } from "../../components-core/script-runner/BindingTreeEvaluationContext";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { BlockScope } from "../../abstractions/BlockScope";
-import type { LogicalThread } from "../../components-core/script-runner/LogicalThread";
-import type { LoopScope } from "../../components-core/script-runner/LoopScope";
+import type { LogicalThread } from "./LogicalThread";
+import type { LoopScope } from "./LoopScope";
 import type {
   ArrowExpression,
   EmptyStatement,
@@ -10,11 +10,11 @@ import type {
   Statement,
   TryStatement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { TryScope } from "../../components-core/script-runner/TryScope";
+import type { TryScope } from "./TryScope";
 import type { StatementQueueItem } from "./statement-queue";
 
 import { mapStatementsToQueueItems } from "./statement-queue";
-import { obtainClosures } from "../../components-core/script-runner/eval-tree-common";
+import { obtainClosures } from "./eval-tree-common";
 
 export function innermostLoopScope(thread: LogicalThread): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {

@@ -6,7 +6,7 @@ import type { VisitorState } from "../../parsers/scripting/tree-visitor";
 import { Parser } from "../../parsers/scripting/Parser";
 
 import { TokenType } from "../../abstractions/scripting/Token";
-import { visitLetConstDeclarations } from "../../components-core/script-runner/process-statement-async";
+import { visitLetConstDeclarations } from "./process-statement-async";
 import { visitNode } from "../../parsers/scripting/tree-visitor";
 import { errorMessages } from "../../parsers/scripting/ParserError";
 
