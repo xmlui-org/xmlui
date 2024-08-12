@@ -12,17 +12,17 @@
 
 ## Getting Started
 
-To get started with **xmlui**, simply clone the repository and follow the installation instructions in the [Documentation](#documentation).
+To get started with **xmlui**, simply clone the repository and follow the installation instructions in the [Your first app](https://ncrm.azurewebsites.net/get-started/first-app/) article.
 
 ## Documentation
 
-For detailed documentation, including installation instructions, usage guidelines, and API references, please visit the [Documentation](doc-url).
+For detailed documentation, including installation instructions, usage guidelines, and API references, please visit the [Documentation](https://ncrm.azurewebsites.net/).
 
 ## Contributing
 
 We welcome contributions to **xmlui**! If you have ideas for new features, suggestions, or find a bug, please open an issue on GitHub. Pull requests are also encouraged.
 
-Please read our [Contribution Guidelines](./policies/contribution-guidelines) before contributing.
+Please read our [Contribution Guidelines](./CONTRIBUTION) before contributing.
 
 ## Feature Requests
 
