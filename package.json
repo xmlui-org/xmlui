@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "Root folder of XMLUI",
   "workspaces": [
-    "./packages/*"
+    "./xmlui-engine",
+    "./create-xmlui-app",
+    "./xmlui-e2e",
+    "./xmlui-docs",
+    "./xmlui-code-tools"
   ]
 }
