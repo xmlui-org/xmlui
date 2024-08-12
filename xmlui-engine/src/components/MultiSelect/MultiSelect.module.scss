@@ -12,9 +12,12 @@ $componentName: "MultiSelect";
 // --- CSS properties of a particular MultiSelect variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+
   font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
 
-  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
