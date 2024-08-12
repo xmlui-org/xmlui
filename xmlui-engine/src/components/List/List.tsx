@@ -526,35 +526,128 @@ const DynamicHeightList = forwardRef(function DynamicHeightList(
  * The \`List\` component is a robust layout container that renders associated data items as a 
  * list of components. \`List\` is virtualized; it renders only items that are visible in the 
  * viewport.
+ * @descriptionRef
  */
 export interface ListComponentDef extends ComponentDef<"List"> {
   props: {
+    /** @internal */
     items: string | any[];
-    data?: string; //resolved datasource binding
+    /** 
+     * The component receives data via this property.
+     * The \`data\` prop is a list of items that the \`List\` can display.
+     * @descriptionRef
+     */
+    data?: string | string[];
+    /** 
+     * The \`loading\` prop delays the rendering of children until it is set to false,
+     * or the component receives usable list items via the [\`data\`](#data) prop.
+     * @descriptionRef
+     */
     loading?: string | boolean;
+    /** 
+     * This property limits the number of items displayed in the \`List\`.
+     * @descriptionRef
+     */
     limit?: number;
+    /**
+     * This prop pins the scroll position to either the \`top\` or the \`bottom\` of the list.
+     * @descriptionRef
+     */
     scrollAnchor?: "top" | "bottom";
+    /**
+     * This property set which attribute of the data is used to group or section the list items.
+     * If the attribute does not appear in the data items, it will be ignored.
+     * @descriptionRef
+     */
     sectionBy?: string;
+    /** 
+     * This prop enables the ordering of list items by specifying an attribute in the data.
+     * @descriptionRef
+     */
     orderBy?: string;
+    /** 
+     * The \`availableSections\` prop is an array of section names that the \`List\` will display.
+     * 
+     * Is this needed? Not clear what it does.
+     * @internal
+     */
     availableSections?: string[];
+    /**
+     * Enables the customization of how the sections or groups are displayed, similarly to the [\`itemTemplate\`](#itemtemplate).
+     * You can use the `$item` syntax to access an item section and map its individual attributes.
+     * @descriptionRef
+     */
     sectionTemplate: ComponentDef;
+    /**
+     * Enables the customization of how the the footer of each section or group id displayed.
+     * Combine with [\`sectionTemplate\`](#sectiontemplate) to customize sections.
+     * You can use the `$item` syntax to access an item section and map its individual attributes.
+     * @descriptionRef
+     */
     sectionFooterTemplate?: ComponentDef;
+    /** 
+     * This prop allows the customization of mapping data items to components.
+     * You can use the \`$item\` syntax to access an item and map its individual attributes.
+     * @descriptionRef
+     */
     itemTemplate: ComponentDef;
+    /**
+     * This prop displays the given component as a placeholder
+     * if the \`loader\` prop is false and the \`data\` items length is 0 or is not set.
+     * @descriptionRef
+     */
     emptyListTemplate?: ComponentDef;
+    /** 
+     * This property contains the current page information.
+     * Setting this property also enures the \`List\` uses pagination.
+     * 
+     * Issue: We don't use it anywhere. Need to reevaluate. (Datasource component manages same stuff)
+     * @internal
+     */
     pageInfo?: any;
+    /**
+     * Denotes which attribute of an item acts as the ID or key of the item.
+     * Default is \`"id"\`.
+     * @descriptionRef
+     */
     idKey?: string;
+    /**
+     * This prop scrolls to a specific item indicated by its index.
+     * 
+     * Issue: Currently not working 
+     * @descriptionRef
+     */
     selectedIndex?: number;
+    /** @internal */
     scrollPaddingStart?: number;
+    /** @internal */
     scrollPaddingEnd?: number;
+    /** 
+     * Issue: This is also a weird property. Need to reevaluate.
+     * @internal
+     */
     sectionsInitiallyExpanded?: boolean;
-    defaultSections?: [];
+    /**
+     * This property adds default sections for the \`List\` and displays the section headers
+     * even if no items fall into a particular section.
+     * @descriptionRef
+     */
+    defaultSections?: string[];
   };
   events: {
+    /** @internal */
     resetSelectedIndex: string;
+    /** @internal */
     requestFetchPrevPage: string;
+    /** @internal */
     requestFetchNextPage: string;
+    /** @internal */
     itemsLoaded: string;
   };
+  contextVars: {
+    /** This property represents the value of an item in the data list. */
+    "$item": any;
+  }
 }
 
 export const metadata: ComponentDescriptor<ListComponentDef> = {
@@ -621,7 +714,6 @@ function MemoizedSection({ node, renderChild, item }: { node: ComponentDef; item
 export const dynamicHeightListComponentRenderer = createComponentRenderer<ListComponentDef>(
   "List",
   ({ node, extractValue, renderChild, lookupAction, layoutCss, layoutContext, lookupEventHandler }) => {
-    // console.log(node);
     return (
       <DynamicHeightList
         layout={layoutCss}
