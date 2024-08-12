@@ -2,8 +2,9 @@
   "index": "Introduction",
   "get-started": "Get Started",
   "tutorials": "Tutorials",
-  "howto": "How-to Guides",
   "learning": "Learn XMLUI",
+  "howto": "How-to Guides",
   "components": "Components",
+  "styles-and-themes": "Styles and Themes",
   "tools": "Tools"
 }

@@ -42,26 +42,21 @@ XMLUI integrates with REST APIs out of the box. The following sample app demonst
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <prop name="itemTemplate">
-    <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </prop>
+  <Card title="{$item.title}" subTitle="{$item.details}"/>
 </List>
 ```
 
 The working app below uses these XMLUI features:
 - `<List>` is a component working with data (an array of items). It virtualizes items and renders only those visible in the UI.
 - List items result from a GET request from the `https://api.spacexdata.com/v3/history` API endpoint.
-- `itemTemplate` is a property of `List`. It defines how a particular data item is to be displayed.
-- `<RowItem>` is a simple component displaying a `title` and a `subtitle`. These titles are bound to the particular properties of the data item.
+- `<Card>` is a simple component displaying a `title` and a `subtitle`. These titles are bound to the particular properties of the data item.
 
 <Playground
     previewOnly
     name="Getting data from Spacex API"
     app={`
     <List datasource="https://api.spacexdata.com/v3/history">
-      <prop name="itemTemplate">
-        <Card title="{$item.title}" subTitle="{$item.details}"/>
-      </prop>
+      <Card title="{$item.title}" subTitle="{$item.details}"/>
     </List>
     `}
     height={300}
@@ -114,31 +109,17 @@ When you create an app, you can leverage your reusable components:
 
 You can change the visual appearance of an app by creating a new theme (from an existing one):
 
-```json
-{
-  "uid": "My custom theme",
-  "name": "myTheme",
-  "tone": "light",
-  "themeVars": {
-    "color-primary": "orangered",
-    "radius": "12px"  
-  }
-}
+```ueml copy {2,5}
+<VStack padding="1rem" gap="1rem">
+  <Theme color-primary="orangered" radius="12px">
+    <IncButton />
+    <IncButton label="Click me too" />
+  </Theme>
+  <IncButton label="And me" />
+</VStack>
 ```
 
-After you put this theme file into your app's folder (this is the complete theme definition), the new theme is ready to use with your app.
-- You specify an ID and a friendly name for your theme.
-- `tone` tells the theming engine you're about to use a light theme.
-- `themeVars` collects your updated theme variables with their new values.
-
-You update the app config file to add the new theme and use it as the default one:
-
-```json
-{
-  "themes": ["myTheme", "oldTheme"],
-  "defaultTheme": "myTheme"
-}
-```
+Here, the `<Theme>` tag wraps the first to `IncButton` components to change some of their theme properties, while the third button remains intact:
 
 <Playground
     previewOnly
@@ -149,25 +130,15 @@ You update the app config file to add the new theme and use it as the default on
       </Component>
     `]}
     app={`
-    <VStack padding="1rem" gap="1rem">
-      <IncButton />
-      <IncButton label="Click me too" />
-      <IncButton label="And me" />
-    </VStack>
+      <VStack padding="1rem" gap="1rem">
+        <Theme color-primary="orangered" radius="12px">
+          <IncButton />
+          <IncButton label="Click me too" />
+        </Theme>
+        <IncButton label="And me" />
+      </VStack>
     `}
     height={200}
-    defaultTheme="sample"
-    themes={[
-      {
-        name: "Sample",
-        id: "sample",
-        tone: "light",
-        themeVars: {
-          "color-primary": "orangered",
-          "radius": "12px"  
-        },
-      },
-    ]}
 />
 
 Get started with XMLUI today and create your first app!

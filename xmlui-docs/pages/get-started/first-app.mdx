@@ -1,27 +1,18 @@
 # Your First XMLUI App
 
-> **Note**: While XMLUI is not released publicly, you must configure your local environment to download NPM packages from the private repository of /n software on GitHub. This [article](./prepare-env) describes the configuration steps.
+XMLUI makes it easy to create apps. To get started, you need only a code editor, which can be as simple as a text editor. However, as you move on, you will work with multiple files, and managing them is easier with a tool created for that purpose. We recommend using VS Code as this free tool works on Windows, Mac, and Linux; XMLUI provides a tooling extension for Code.
 
-## Using the `create-xmlui-app` tool
+## A Single-File XMLUI App
+
+_TBD_
+
+## Using the create-xmlui-app Tool
 
 Developing an XMLUI app is faster with a prepared development environment. XMLUI ships with a tool, the `create-xmlui-app` utility, a standard Node command line app. It creates the development environment in a few seconds.
 
-Before using it, prepare a directory in your preferred workspace to play with XMLUI. Each app you create will go into a separate folder.
+> **Note**: If you do not have Node installed, visit the [official Noje.js download site](https://nodejs.org/en/download/prebuilt-installer) to get the latest version for your platform. We suggest you obtain and install the newest LTS version.
 
-> **Note**: You can use XMLUI with your favorite code editor. In our tutorial, we use VS Code (https://code.visualstudio.com/download)
-
-### Customize VS Code
-
-XMLUI has a VS Code extension that provides syntax highlighting for markup files (and other helpful features). Go to the Extensions tab in the VS Code activity bar and search for XMLUI:
-
-<br/>
-<Image alt="Boilerplate" src="/resources/images/get-started/xmlui-tools.png" width={362} />
-
-Click Install to add XMLUI Tools to the VS Code extensions. In a few seconds, the toolset is ready. Open the `IncButton.xmlui` file from the `components` folder to see that the code editor supports syntax highlighting:
-
-<br/>
-<Image alt="Boilerplate" src="/resources/images/get-started/syntax-highlighting.png" />
-
+Before using XMLUI, prepare a directory in your preferred workspace to play with the framework. Each app you create will go into a separate folder.
 
 ### Create the Boilerplate Code
 
@@ -49,12 +40,16 @@ Ok to proceed? (y)
 
 ### The Boilerplate Structure
 
-Open the newly created `my-first-app` (use your project's name) folder in VS Code. You will see this structure:
+Open the newly created `my-first-app` (use your project's name) folder in your coding tool. Using a simple text editor, utilize your operating system's file manager app to display the folder hierarchy. When you work with VS Code, you will see this structure:
 
 <br/>
 <Image alt="Boilerplate" src="/resources/images/get-started/boilerplate-structure.png" width={315} />
 
-The `index.html` file wraps your entire app served with a web server. The `package.json` and `package-lock.json` are the standard Node package descriptor files.
+The `index.html` file wraps your entire app served with a web server. 
+
+The `node_modules` folder stores the packages used with the XMLUI framework and the build tools, the utilities that will create the artifacts you can add to a web server to serve as static files at the end of the development process.
+
+The `package.json` and `package-lock.json` are the standard Node package descriptor files.
 
 Your primary focus is the `src` folder holding the application source code. Here, the `Main.xmlui` file contains the application's root component definition and may refer to other app components (besides the built-in XMLUI components). The app-specific components are in the `src/components` folder.
 
@@ -62,9 +57,26 @@ The `config.ts` file describes a few configuration values, such as the applicati
 
 The `public` folder contains the static resources (such as images, logos, fonts, etc) your app uses.
 
+### Customize VS Code
+
+XMLUI has a VS Code extension that provides syntax highlighting for markup files (and other helpful features). So, if you intend to use VS Code, it is worth getting XMLUI Tools. If you do not have VS Code, you can skip this section.
+
+Go to the Extensions tab in the VS Code activity bar and search for XMLUI:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/xmlui-tools.png" width={362} />
+
+Click Install to add XMLUI Tools to the VS Code extensions. In a few seconds, the toolset is ready.
+
+Open the `IncButton.xmlui` file from the `components` folder to see that the code editor supports syntax highlighting:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/syntax-highlighting.png" />
+
 ## Starting the App
 
 The newly generated app is ready to run. Execute the `npm start` command to execute it. In VS Code, use the terminal window (Terminal | New Terminal); it will automatically set your working folder to the app's root.
+
 ```
 > my-first-app@0.1.0 start
 > xmlui start
@@ -73,7 +85,7 @@ The newly generated app is ready to run. Execute the `npm start` command to exec
   ➜  Network: use --host to expose
 ```
 
-Click the link displayed (http://localhost:5173/) to open the app in your default browser. (In VS Code, you need to click the Ctrl or Cmd button when clicking, depending on your OS).
+Click the link displayed (http://localhost:5173/) to open the app in your default browser. (In VS Code, you need to press the Ctrl or Cmd button when clicking, depending on your OS).
 
 Your app starts:
 
@@ -82,7 +94,7 @@ Your app starts:
 
 Try the menu items, and they show you some cool features of XMLUI! Soon, you will learn about each code snippet that implements a particular feature.
 
-When you ran the app with `npm start`, the toolset started it in a development environment setup with _Hot Module Reloading =HRM)_. This nifty feature lets you modify your app and see changes on the fly.
+When you ran the app with `npm start`, the toolset started it in a development environment setup with _Hot Module Reloading (HRM)_. This nifty feature lets you modify your app and see changes on the fly.
 
 Open the `Main.xml` file in VS Code, and modify the `<Footer>` section at the bottom by changing the `Powered by XMLUI` text to something else:
 
