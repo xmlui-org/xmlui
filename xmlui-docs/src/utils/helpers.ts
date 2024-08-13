@@ -1,12 +1,12 @@
 import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { UemlHelper } from "@src/parsers/ueml/UemlHelper";
-import { UemlNode } from "@src/parsers/ueml/ueml-tree";
+import { XmlUiHelper } from "@src/parsers/xmlui-parser/xmlui-serializer";
 import { decompress } from "@/src/components/utils";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { PlaygroundState } from "@/src/state/store";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
+import { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
 
 export function parseFromEditorText(value: string = "") {
   try {
@@ -19,9 +19,9 @@ export function parseFromEditorText(value: string = "") {
 
 export function serialize(component: ComponentDef | CompoundComponentDef): string {
   if (component) {
-    const xh = new UemlHelper();
+    const xh = new XmlUiHelper();
     try {
-      const node = xh.transformComponentDefinition(component) as UemlNode;
+      const node = xh.transformComponentDefinition(component) as XmlUiNode;
       return xh.serialize(node, { prettify: true });
     } catch (e) {
       console.log(e);

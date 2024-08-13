@@ -31,9 +31,8 @@ export type ErrorCodes =
   | "U011"
   | "U012"
   | "U013"
-  | "U014"  
-  | "U015"  
-    
+  | "U014"
+  | "U015"
   | "T001"
   | "T002"
   | "T003"
@@ -56,7 +55,7 @@ export type ErrorCodes =
   | "T020"
   | "T021"
   | "T022"
-  | "T023"
+  | "T023";
 
 // Error message type description
 type ErrorText = Record<ErrorCodes, string>;
@@ -101,5 +100,5 @@ export const errorMessages: ErrorText = {
   T020: "Cannot mix nested components and non-component children",
   T021: "Invalid reusable component attribute '{0}'",
   T022: "The 'script' tag must not have any attribute",
-  T023: "A 'script' tag cannot nest other child nodes, only text"
+  T023: "A 'script' tag cannot nest other child nodes, only text",
 };

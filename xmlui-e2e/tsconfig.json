@@ -21,10 +21,10 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "paths": {
-      "@abstractions/*": ["../ui-engine/src/abstractions/*"],
-      "@components/*": ["../ui-engine/src/components/*"],
-      "@components-core/*": ["../ui-engine/src/components-core/*"],
-      "@parsers/*": ["../ui-engine/src/parsers/*"],
+      "@abstractions/*": ["../xmlui-engine/src/abstractions/*"],
+      "@components/*": ["../xmlui-engine/src/components/*"],
+      "@components-core/*": ["../xmlui-engine/src/components-core/*"],
+      "@parsers/*": ["../xmlui-engine/src/parsers/*"],
     }
   },
   "include": [
