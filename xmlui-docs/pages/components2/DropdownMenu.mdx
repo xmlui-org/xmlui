@@ -143,6 +143,16 @@ This property enables (`true`) or disables (`false`) the component.
 This property defines the label to display in the dropdown menu.
 If you define a custom trigger template, this property has no effect.
 
+### `triggerButtonThemeColor`
+
+This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no 
+effect when a custom trigger is defined with `triggerTemplate`.
+
+### `triggerButtonVariant`
+
+This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no 
+effect when a custom trigger is defined with `triggerTemplate`.
+
 ### `triggerTemplate`
 
 This property allows you to define a custom trigger instead of the default one provided by `DropdownMenu`.
@@ -253,6 +263,9 @@ This event fires when the `DropdownMenu` component is opened.
 The `DropdownMenu` component uses these theme variables to customize its appearance:
 
 - `color-bg-DropdownMenu`
+- `color-border-DropdownMenu-content`
 - `min-width-DropdownMenu`
 - `radius-DropdownMenu`
 - `shadow-DropdownMenu`
+- `style-border-DropdownMenu-content`
+- `thickness-border-DropdownMenu-content`
