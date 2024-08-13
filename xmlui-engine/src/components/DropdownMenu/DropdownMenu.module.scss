@@ -7,38 +7,69 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$color-bg-DropdownMenu: createThemeVar("color-bg-DropdownMenu");
+$radius-DropdownMenu: createThemeVar("radius-DropdownMenu");
+$shadow-DropdownMenu: createThemeVar("shadow-DropdownMenu");
+$color-border-DropdownMenu-content: createThemeVar(
+  "color-border-DropdownMenu-content"
+);
+$thickness-border-DropdownMenu-content: createThemeVar(
+  "thickness-border-DropdownMenu-content"
+);
+$style-border-DropdownMenu-content: createThemeVar(
+  "style-border-DropdownMenu-content"
+);
+$min-width-DropdowMenu: createThemeVar("min-width-DropdowMenu");
+$color-bg-MenuItem: createThemeVar("color-bg-MenuItem");
+$color-MenuItem: createThemeVar("color-MenuItem");
+$font-family-MenuItem: createThemeVar("font-family-MenuItem");
+$gap-MenuItem: createThemeVar("gap-MenuItem");
+$font-size-MenuItem: createThemeVar("font-size-MenuItem");
+$padding-vertical-MenuItem: createThemeVar("padding-vertical-MenuItem");
+$padding-horizontal-MenuItem: createThemeVar("padding-horizontal-MenuItem");
+$color-bg-MenuItem--hover: createThemeVar("color-bg-MenuItem--hover");
+$color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
+$margin-top-MenuSeparator: createThemeVar("margin-top-MenuSeparator");
+$margin-bottom-MenuSeparator: createThemeVar("margin-bottom-MenuSeparator");
+$width-MenuSeparator: createThemeVar("width-MenuSeparator");
+$height-MenuSeparator: createThemeVar("height-MenuSeparator");
+$color-MenuSeparator: createThemeVar("color-MenuSeparator");
+
 .DropdownMenuContent,
 .DropdownMenuSubContent {
-  background-color: createThemeVar("color-bg-DropdownMenu");
-  border-radius: createThemeVar("radius-DropdownMenu");
-  min-width: createThemeVar("min-width-DropdownMenu");
-  box-shadow: createThemeVar("shadow-DropdownMenu");
+  background-color: $color-bg-DropdownMenu;
+  border-radius: $radius-DropdownMenu;
+  min-width: $min-width-DropdowMenu;
+  box-shadow: $shadow-DropdownMenu;
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
+  border: $thickness-border-DropdownMenu-content
+    $style-border-DropdownMenu-content $color-border-DropdownMenu-content;
 }
 
 .DropdownMenuItem,
 .DropdownMenuSubTrigger {
-  background-color: createThemeVar("color-bg-MenuItem");
-  color: createThemeVar("color-MenuItem");
-  font-family: createThemeVar("font-family-MenuItem");
+  background-color: $color-bg-MenuItem;
+  color: $color-MenuItem;
+  font-family: $font-family-MenuItem;
   display: flex;
   border: 0;
   width: 100%;
-  gap: createThemeVar("gap-MenuItem");
-  font-size: createThemeVar("font-size-MenuItem");
-  padding: createThemeVar("padding-vertical-MenuItem"); 
-  padding-inline: createThemeVar("padding-horizontal-MenuItem"); //t.$space-3;
+  gap: $gap-MenuItem;
+  font-size: $font-size-MenuItem;
+  padding: $padding-vertical-MenuItem 0;
+  padding-inline: $padding-horizontal-MenuItem; //t.$space-3;
   cursor: pointer;
   align-items: center;
   justify-content: space-between;
   user-select: none;
   outline: none;
 
-  &:hover, &[data-highlighted] {
-    background-color: createThemeVar("color-bg-MenuItem--hover");
-    color: createThemeVar("color-MenuItem--hover");
+  &:hover,
+  &[data-highlighted] {
+    background-color: $color-bg-MenuItem--hover;
+    color: $color-MenuItem--hover;
   }
 
   .wrapper {
@@ -47,11 +78,11 @@ $themeVars: ();
 }
 
 .DropdownMenuSeparator {
-  margin-top: createThemeVar("margin-top-MenuSeparator");
-  margin-bottom: createThemeVar("margin-bottom-MenuSeparator");
-  width: createThemeVar("width-MenuSeparator");
-  height: createThemeVar("height-MenuSeparator");
-  background-color: createThemeVar("color-MenuSeparator");
+  margin-top: $margin-top-MenuSeparator;
+  margin-bottom: $margin-bottom-MenuSeparator;
+  width: $width-MenuSeparator;
+  height: $height-MenuSeparator;
+  background-color: $color-MenuSeparator;
 }
 
 // --- We export the theme variables to add them to the component renderer
