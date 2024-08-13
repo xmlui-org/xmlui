@@ -1,10 +1,10 @@
-import type { ModuleResolver } from "./BindingTreeEvaluationContext";
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
-import type { FunctionDeclaration, Statement } from "./source-tree";
+import type { FunctionDeclaration, Statement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
+import { ModuleResolver } from "@abstractions/scripting/modules";
 
 /**
  * Represents a parsed and resolved module

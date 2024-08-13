@@ -49,7 +49,7 @@ import type {
   VarStatement,
   WhileStatement,
   ImportedItem,
-} from "./source-tree";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { Lexer } from "./Lexer";
 import { ParserError, errorMessages } from "./ParserError";

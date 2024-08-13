@@ -7,7 +7,7 @@ import {
   Destructure,
   FunctionInvocationExpression,
   Identifier,
-} from "@parsers/scripting-exp/source-tree";
+} from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - arrow expressions", () => {
   it("No param", () => {

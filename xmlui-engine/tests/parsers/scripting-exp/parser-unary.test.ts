@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { UnaryExpression } from "@parsers/scripting-exp/source-tree";
+import { UnaryExpression } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - unary expressions", () => {
   const unaryCases = [

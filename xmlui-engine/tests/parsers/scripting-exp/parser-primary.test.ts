@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { Identifier } from "@parsers/scripting-exp/source-tree";
+import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - primary expressions", () => {
   it("null", () => {

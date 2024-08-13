@@ -1,6 +1,3 @@
-// TODO: It should be internal to the execution engine and not be part of the scripting
-// source tree
-
 // Represents a block scope
 export type BlockScope = {
   // --- Block-scoped variable values

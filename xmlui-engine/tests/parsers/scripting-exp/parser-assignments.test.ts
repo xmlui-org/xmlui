@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { BinaryExpression, AssignmentExpression } from "@parsers/scripting-exp/source-tree";
+import { BinaryExpression, AssignmentExpression } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - assignment expressions", () => {
   it("Assignment with binary expression", () => {
