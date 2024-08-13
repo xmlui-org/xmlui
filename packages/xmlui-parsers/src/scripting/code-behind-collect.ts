@@ -5,16 +5,16 @@ import type {
   Expression,
   FunctionDeclaration,
   Statement,
-} from "../../abstractions/scripting/ScriptingSourceTree";
+} from "../abstractions/scripting/ScriptingSourceTree";
 import {
   BindingTreeEvaluationContext, createEvalContext,
   ModuleResolver,
-} from "../../components-core/script-runner/BindingTreeEvaluationContext";
+} from "../script-runner/BindingTreeEvaluationContext.js";
 import type { VisitorState } from "./tree-visitor";
 
-import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule } from "../../components-core/script-runner/modules";
-import { obtainClosures } from "../../components-core/script-runner/eval-tree-common";
+import { visitNode } from "./tree-visitor.js";
+import { isModuleErrors, parseScriptModule } from "../script-runner/modules.js";
+import { obtainClosures } from "../script-runner/eval-tree-common.js";
 
 export const PARSED_MARK_PROP = "__PARSED__";
 

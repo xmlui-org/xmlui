@@ -16,6 +16,7 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
+import { RendererContext } from "@abstractions/RendererDefs";
 
 export type {
   ThemeDefinition,
@@ -27,6 +28,7 @@ export type {
   ApiInterceptorDefinition,
   //TODO review from here (added for playground)
   TreeNode, //TODO REMOVE
+  RendererContext,
 };
 export {
   StandaloneApp,

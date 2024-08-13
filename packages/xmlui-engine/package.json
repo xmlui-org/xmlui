@@ -2,6 +2,7 @@
   "name": "xmlui",
   "version": "0.4.0",
   "sideEffects": false,
+  "type": "module",
   "scripts": {
     "build": "tsc && vite build && tsc -p tsconfig.bin.json",
     "test": "vitest run",
@@ -30,9 +31,8 @@
     "@radix-ui/react-radio-group": "1.1.3",
     "@radix-ui/react-tabs": "1.1.0",
     "@radix-ui/react-visually-hidden": "1.0.3",
-    "@remix-run/react": "2.9.1",
-    "@tanstack/react-query": "4.32.6",
-    "@tanstack/react-query-devtools": "4.32.6",
+    "@remix-run/react": "2.11.1",
+    "@tanstack/react-query": "5.51.23",
     "@tanstack/react-table": "8.17.3",
     "@tanstack/react-virtual": "3.5.1",
     "@types/color": "3.0.6",
@@ -71,7 +71,7 @@
     "react-pdf": "5.7.2",
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.0.19",
-    "react-router-dom": "6.23.0",
+    "react-router-dom": "6.26.0",
     "react-select": "5.7.4",
     "react-textarea-autosize": "8.5.3",
     "react-virtualized-auto-sizer": "1.0.24",
@@ -141,6 +141,7 @@
     }
   },
   "main": "./src/index.ts",
+  "module": "./src/index.ts",
   "exports": {
     ".": {
       "import": "./src/index.ts",
