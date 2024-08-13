@@ -51,7 +51,6 @@ const metadata: ComponentDescriptor<FooterComponentDef> = {
   defaultThemeVars: {
     "color-bg-Footer": "$color-bg-AppHeader",
     "vertical-alignment-Footer": "center",
-    "max-content-width-Footer": "$max-content-width-App",
     ...paddingSubject("Footer", { horizontal: "$space-4", vertical: "$space-1" }),
     light: {
       // --- No light-specific theme vars

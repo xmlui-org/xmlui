@@ -337,7 +337,7 @@ function useStandalone(
       const config: StandaloneJsonConfig = await configResponse.json();
       const legacyXmlUiParser = config.globals?.legacyXmlUiParser;
 
-      const entryPointPromise = fetch(normalizePath("App.xmlui")!).then((value) => parseComponentResp(value, legacyXmlUiParser));
+      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value, legacyXmlUiParser));
       const themePromises = config.themes?.map((themePath) => {
         return fetch(normalizePath(themePath)!).then((value) => parseComponentResp(value, legacyXmlUiParser)) as Promise<ThemeDefinition>;
       });
@@ -378,7 +378,7 @@ function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
 
 let contentRoot: Root | null = null;
 
-export function startApp(runtime: any, components?: ComponentRendererDef[]) {
+export function startApp(runtime?: any, components?: ComponentRendererDef[]) {
   let rootElement: HTMLElement | null = document.getElementById("root");
   if(!rootElement){
     rootElement = document.createElement("div");
