@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evalBindingExpression } from "@parsers/scripting-exp/eval-tree-sync";
+import { evalBindingExpression } from "@components-core/script-runner-exp/eval-tree-sync";
 import { createEvalContext } from "./test-helpers";
 
 describe("Evaluate prefix/postfix expressions", () => {

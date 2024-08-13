@@ -8,7 +8,7 @@ import type {
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { BlockScope } from "../../abstractions/BlockScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 import { getIdentifierScope } from "./eval-tree-common";

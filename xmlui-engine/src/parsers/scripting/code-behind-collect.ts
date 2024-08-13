@@ -6,15 +6,11 @@ import type {
   FunctionDeclaration,
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type {
-  BindingTreeEvaluationContext,
-  ModuleResolver,
-} from "../../components-core/script-runner/BindingTreeEvaluationContext";
 import type { VisitorState } from "./tree-visitor";
+import type { ModuleResolver } from "@abstractions/scripting/modules";
 
 import { visitNode } from "./tree-visitor";
-import { isModuleErrors, parseScriptModule } from "../../components-core/script-runner/modules";
-import { obtainClosures } from "../../components-core/script-runner/eval-tree-common";
+import { isModuleErrors, obtainClosures, parseScriptModule } from "./modules";
 
 export const PARSED_MARK_PROP = "__PARSED__";
 
@@ -22,8 +18,7 @@ export const PARSED_MARK_PROP = "__PARSED__";
 export function collectCodeBehindFromSource(
   moduleName: string,
   source: string,
-  moduleResolver: ModuleResolver,
-  evalContext: BindingTreeEvaluationContext
+  moduleResolver: ModuleResolver
 ): CollectedDeclarations {
   const result: CollectedDeclarations = {
     vars: {},
@@ -87,7 +82,12 @@ export function collectCodeBehindFromSource(
       type: "ArrowE",
       args: stmt.args.slice(),
       statement: stmt.statement,
-      closureContext: obtainClosures(evalContext.mainThread!),
+      closureContext: obtainClosures({
+        childThreads: [],
+        blocks: [{ vars: {} }],
+        loops: [],
+        breakLabelValue: -1
+      }),
     } as ArrowExpression;
 
     // --- Remove the circular reference from the function to its closure context

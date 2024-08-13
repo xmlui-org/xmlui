@@ -1,6 +1,6 @@
 import { get } from "lodash-es";
 
-import type { ResolutionScope } from "./ResolutionScope";
+import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
 import type {
   ArrayDestructure,
   Expression,
@@ -8,7 +8,7 @@ import type {
   PropertyValue,
   Statement,
   VarDeclaration,
-} from "./source-tree";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 /**
  * Resolves identifier

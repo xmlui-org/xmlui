@@ -1,32 +1,33 @@
-import { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import { BlockScope } from "./BlockScope";
-import { obtainClosures } from "./eval-tree-common";
-import { LogicalThread } from "./LogicalThread";
-import { LoopScope } from "./LoopScope";
-import { ArrowExpression, FunctionDeclaration, LoopStatement, Statement, TryStatement } from "./source-tree";
-import { StatementQueueItem, StatementWithInfo, mapStatementsToQueueItems } from "./statement-queue";
-import { TryScope } from "./TryScope";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import type { BlockScope } from "@abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
+import type { LoopScope } from "@abstractions/scripting/LoopScope";
+import type { ArrowExpression, FunctionDeclaration, LoopStatement, Statement, TryStatement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { TryScope } from "@abstractions/scripting/TryScopeExp";
 
-export function innermostLoopScope(thread: LogicalThread): LoopScope {
+import { obtainClosures } from "./eval-tree-common";
+import { StatementQueueItem, StatementWithInfo, mapStatementsToQueueItems } from "./statement-queue";
+
+export function innermostLoopScope(thread: LogicalThreadExp): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {
     throw new Error("Missing loop scope");
   }
   return thread.loops[thread.loops.length - 1];
 }
 
-export function innermostBlockScope(thread: LogicalThread): BlockScope | undefined {
+export function innermostBlockScope(thread: LogicalThreadExp): BlockScope | undefined {
   if (!thread.blocks || thread.blocks.length === 0) return undefined;
   return thread.blocks[thread.blocks.length - 1];
 }
 
-export function innermostTryScope(thread: LogicalThread): TryScope {
+export function innermostTryScope(thread: LogicalThreadExp): TryScope {
   if (!thread.tryBlocks || thread.tryBlocks.length === 0) {
     throw new Error("Missing try scope");
   }
   return thread.tryBlocks[thread.tryBlocks.length - 1];
 }
 
-export function createLoopScope(thread: LogicalThread, continueOffset = 0): LoopScope {
+export function createLoopScope(thread: LogicalThreadExp, continueOffset = 0): LoopScope {
   thread.loops ??= [];
   const breakDepth = thread.blocks?.length ?? 0;
   const tryDepth = thread.tryBlocks?.length ?? 0;
@@ -41,7 +42,7 @@ export function createLoopScope(thread: LogicalThread, continueOffset = 0): Loop
   return loopScope;
 }
 
-export function releaseLoopScope(thread: LogicalThread, skipContinuation = true): void {
+export function releaseLoopScope(thread: LogicalThreadExp, skipContinuation = true): void {
   const loopScope = innermostLoopScope(thread);
   if (skipContinuation) {
     thread.loops?.pop();
@@ -85,7 +86,7 @@ export function provideLoopBody(
 }
 
 // --- Create a list of body statements according to the specified try statement scope
-export function createTryScope(thread: LogicalThread, tryStatement: TryStatement): TryScope {
+export function createTryScope(thread: LogicalThreadExp, tryStatement: TryStatement): TryScope {
   thread.tryBlocks ??= [];
   const loopScope: TryScope = {
     statement: tryStatement,
@@ -97,7 +98,7 @@ export function createTryScope(thread: LogicalThread, tryStatement: TryStatement
 }
 
 // --- Provide a body for the try block
-export function provideTryBody(thread: LogicalThread, tryScope: TryScope): StatementQueueItem[] {
+export function provideTryBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 
@@ -116,7 +117,7 @@ export function provideTryBody(thread: LogicalThread, tryScope: TryScope): State
 }
 
 // --- Provide a body for the catch block
-export function provideCatchBody(thread: LogicalThread, tryScope: TryScope): StatementQueueItem[] {
+export function provideCatchBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 
@@ -135,7 +136,7 @@ export function provideCatchBody(thread: LogicalThread, tryScope: TryScope): Sta
 }
 
 // --- Provide a body for the finally block
-export function provideFinallyBody(thread: LogicalThread, tryScope: TryScope): StatementQueueItem[] {
+export function provideFinallyBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 
@@ -164,7 +165,7 @@ export function provideFinallyErrorBody(tryScope: TryScope): StatementQueueItem[
 }
 
 // --- Ensure that the evaluation context has a main thread
-export function ensureMainThread(evalContext: BindingTreeEvaluationContext): LogicalThread {
+export function ensureMainThread(evalContext: BindingTreeEvaluationContext): LogicalThreadExp {
   if (!evalContext.mainThread) {
     evalContext.mainThread = {
       childThreads: [],
@@ -181,7 +182,7 @@ export function ensureMainThread(evalContext: BindingTreeEvaluationContext): Log
 }
 
 // --- Hoist function definitions to the innermost block scope
-export function hoistFunctionDeclarations(thread: LogicalThread, statements: Statement[]): void {
+export function hoistFunctionDeclarations(thread: LogicalThreadExp, statements: Statement[]): void {
   const block = innermostBlockScope(thread);
   if (!block) {
     throw new Error("Missing block scope");

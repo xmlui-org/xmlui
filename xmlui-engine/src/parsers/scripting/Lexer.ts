@@ -3,7 +3,7 @@ import { parseRegExpLiteral } from "@eslint-community/regexpp";
 import type { Token } from "../../abstractions/scripting/Token";
 
 import { TokenType } from "../../abstractions/scripting/Token";
-import { InputStream } from "./InputStream";
+import { InputStream } from "../common/InputStream";
 
 /**
  * This enum indicates the current lexer phase

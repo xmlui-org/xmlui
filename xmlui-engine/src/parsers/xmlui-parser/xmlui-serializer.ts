@@ -1,5 +1,5 @@
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import type { UemlAttribute, UemlComment, UemlElement, UemlFragment, UemlNode } from "./ueml-tree";
+import type { XmlUiAttribute, XmlUiComment, XmlUiElement, XmlUiFragment, XmlUiNode } from "./xmlui-tree";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -9,25 +9,25 @@ const attrBreakRegex = /[\r\n<>'"&]/;
 /**
  * Helper class for UEML serialization and parsing
  */
-export class UemlHelper {
+export class XmlUiHelper {
   /**
    * Serialize the specified XML fragment into a string
    * @param xml XML fragment to serialize
    * @param options Formatting options to use
    */
-  serialize(xml: UemlFragment, options?: UemlSerializationOptions): string {
+  serialize(xml: XmlUiFragment, options?: XmluiSerializationOptions): string {
     const fragment = Array.isArray(xml) ? xml : [xml];
     return serializeFragment(fragment, 0);
 
-    function serializeFragment(nodes: UemlNode[], depth: number): string {
+    function serializeFragment(nodes: XmlUiNode[], depth: number): string {
       return nodes.map((n) => serializeNode(n, depth)).join(options?.prettify ? "\n" + getIndent(depth) : "");
     }
 
-    function serializeNode(node: UemlNode, depth: number): string {
+    function serializeNode(node: XmlUiNode, depth: number): string {
       switch (node.type) {
-        case "UemlComment":
+        case "XmlUiComment":
           return serializeXmlComment(node, depth);
-        case "UemlElement":
+        case "XmlUiElement":
           return serializeXmlElement(node, depth);
         default:
           return "";
@@ -38,11 +38,11 @@ export class UemlHelper {
       return options?.prettify ? "".padEnd((options?.indents ?? 2) * depth, " ") : "";
     }
 
-    function serializeXmlComment(node: UemlComment, depth: number): string {
+    function serializeXmlComment(node: XmlUiComment, depth: number): string {
       return `${getIndent(depth)}<!--${node.text}-->`;
     }
 
-    function serializeXmlElement(node: UemlElement, depth: number): string {
+    function serializeXmlElement(node: XmlUiElement, depth: number): string {
       let elementStr = `${getIndent(depth)}<${nodeName()}`;
       const hasAttrs = (node.attributes?.length ?? 0) > 0;
       const hasChildren = (node.childNodes?.length ?? 0) > 0;
@@ -124,7 +124,7 @@ export class UemlHelper {
       }
     }
 
-    function serializeXmlAttribute(node: UemlAttribute): string {
+    function serializeXmlAttribute(node: XmlUiAttribute): string {
       // --- Handle valueless attributes
       if (node.value === undefined || node.value === null) {
         return `${nodeName()}`;
@@ -166,7 +166,7 @@ export class UemlHelper {
    * @param def Component definitions
    * @param options Transformation options
    */
-  transformComponentDefinition(def: ComponentDef | CompoundComponentDef, options?: UemlTransformOptions): UemlFragment {
+  transformComponentDefinition(def: ComponentDef | CompoundComponentDef, options?: XmlUiTransformOptions): XmlUiFragment {
     return (def as any).type
       ? this.transformSimpleComponentDefinition(def as ComponentDef, options)
       : this.transformCompoundComponentDefinition(def as CompoundComponentDef, options);
@@ -177,7 +177,7 @@ export class UemlHelper {
    * @param def Object definition
    * @param options Transformation options
    */
-  transformObject(def: Record<string, any>, options?: UemlTransformOptions): UemlNode[] | null {
+  transformObject(def: Record<string, any>, options?: XmlUiTransformOptions): XmlUiNode[] | null {
     const transformed = this.transformValue("Object", "", def, options);
     if (!transformed) {
       return null;
@@ -190,9 +190,9 @@ export class UemlHelper {
    * @param def Component definition
    * @param options Transformation options
    */
-  private transformSimpleComponentDefinition(def: ComponentDef, options?: UemlTransformOptions): UemlFragment {
-    const componentNode: UemlElement = {
-      type: "UemlElement",
+  private transformSimpleComponentDefinition(def: ComponentDef, options?: XmlUiTransformOptions): XmlUiFragment {
+    const componentNode: XmlUiElement = {
+      type: "XmlUiElement",
       name: def.type,
     };
 
@@ -225,12 +225,12 @@ export class UemlHelper {
         if (key.endsWith("Template") && (propValue as any).type) {
           // --- Consider this property holds a component
           componentNode.childNodes ??= [];
-          const propWrapper: UemlElement = {
-            type: "UemlElement",
+          const propWrapper: XmlUiElement = {
+            type: "XmlUiElement",
             name: "prop",
             attributes: [
               {
-                type: "UemlAttribute",
+                type: "XmlUiAttribute",
                 name: "name",
                 value: key,
               },
@@ -246,12 +246,12 @@ export class UemlHelper {
 
           // --- Handle null property value
           if (propValue === null) {
-            const nullPropElement: UemlElement = {
-              type: "UemlElement",
+            const nullPropElement: XmlUiElement = {
+              type: "XmlUiElement",
               name: "prop",
               attributes: [
                 {
-                  type: "UemlAttribute",
+                  type: "XmlUiAttribute",
                   name: "name",
                   value: key,
                 },
@@ -264,8 +264,8 @@ export class UemlHelper {
 
           // --- Extract prop if asked so, or if those are special, like "id", "when", or "testIs"
           if (key === "id" || key === "when" || key === "testId" || options?.extractProps) {
-            const idPropElement: UemlElement = {
-              type: "UemlElement",
+            const idPropElement: XmlUiElement = {
+              type: "XmlUiElement",
               name: "prop",
             };
             this.addProperty(idPropElement, key, propValue, options);
@@ -332,22 +332,22 @@ export class UemlHelper {
    */
   private transformCompoundComponentDefinition(
     def: CompoundComponentDef | string,
-    options?: UemlTransformOptions
-  ): UemlFragment {
+    options?: XmlUiTransformOptions
+  ): XmlUiFragment {
     if (typeof def === "string") {
       return {
-        type: "UemlElement",
+        type: "XmlUiElement",
         name: def,
-      } as UemlElement;
+      } as XmlUiElement;
     }
 
-    const nested: UemlFragment = this.transformSimpleComponentDefinition(def.component as ComponentDef, options);
-    const componentNode: UemlElement = {
-      type: "UemlElement",
+    const nested: XmlUiFragment = this.transformSimpleComponentDefinition(def.component as ComponentDef, options);
+    const componentNode: XmlUiElement = {
+      type: "XmlUiElement",
       name: COMPOUND_COMP_ID,
       attributes: [
         {
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name: "name",
           value: def.name,
         },
@@ -380,20 +380,20 @@ export class UemlHelper {
     nodeName: string,
     name: string | undefined,
     value: any,
-    options?: UemlTransformOptions
-  ): UemlElement | null {
+    options?: XmlUiTransformOptions
+  ): XmlUiElement | null {
     // --- Do not transform undefined elements
     if (value === undefined) return null;
 
     // --- Prepare the node with the value
-    const valueNode: UemlElement = {
-      type: "UemlElement",
+    const valueNode: XmlUiElement = {
+      type: "XmlUiElement",
       name: nodeName,
     };
     if (name) {
       valueNode.attributes = [
         {
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name: "name",
           value: name,
         },
@@ -416,7 +416,7 @@ export class UemlHelper {
       } else {
         valueNode.attributes ??= [];
         valueNode.attributes.push({
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name: "value",
           value: strValue,
           preserveSpaces,
@@ -431,7 +431,7 @@ export class UemlHelper {
         // --- Empty array
         valueNode.attributes ??= [];
         valueNode.attributes.push({
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name: "value",
           value: "{[]}",
         });
@@ -449,7 +449,7 @@ export class UemlHelper {
         // --- Empty object
         valueNode.attributes ??= [];
         valueNode.attributes.push({
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name: "value",
           value: "{{}}",
         });
@@ -474,9 +474,9 @@ export class UemlHelper {
    * @param value Value to transform
    * @param options Transformation options
    */
-  private transformObjectValue(name: string, value: any, options?: UemlTransformOptions): UemlNode {
-    const componentNode: UemlElement = {
-      type: "UemlElement",
+  private transformObjectValue(name: string, value: any, options?: XmlUiTransformOptions): XmlUiNode {
+    const componentNode: XmlUiElement = {
+      type: "XmlUiElement",
       name: name,
     };
 
@@ -493,7 +493,7 @@ export class UemlHelper {
    * @param value Element value
    * @param options Transformation options
    */
-  private addProperty(element: UemlElement, name: string, value: any, options?: UemlTransformOptions): void {
+  private addProperty(element: XmlUiElement, name: string, value: any, options?: XmlUiTransformOptions): void {
     switch (typeof value) {
       // --- We do not serialize undefined property values
       case "undefined":
@@ -501,7 +501,7 @@ export class UemlHelper {
       case "string":
         element.attributes ??= [];
         element.attributes.push({
-          type: "UemlAttribute",
+          type: "XmlUiAttribute",
           name,
           value: value?.toString(),
           preserveQuotes: options?.removeQuotes ?? false,
@@ -522,7 +522,7 @@ export class UemlHelper {
     }
   }
 
-  private addComponentElement(element: UemlElement, component: ComponentDef): void {
+  private addComponentElement(element: XmlUiElement, component: ComponentDef): void {
     element.childNodes ??= [];
     const childDef = this.transformComponentDefinition(component);
     if (Array.isArray(childDef)) {
@@ -541,11 +541,11 @@ export class UemlHelper {
    * @param options Transformation options
    */
   private addList(
-    element: UemlElement,
+    element: XmlUiElement,
     name: string,
     prefix: string,
     list: any[],
-    options?: UemlTransformOptions
+    options?: XmlUiTransformOptions
   ): void {
     const nodeName = `${prefix ? prefix + "." : ""}${name}`;
     element.childNodes ??= [];
@@ -553,14 +553,14 @@ export class UemlHelper {
       if (typeof item === "string") {
         // --- Special case, the item can be the text of an XML element
         element.childNodes!.push({
-          type: "UemlElement",
+          type: "XmlUiElement",
           name: nodeName,
           text: item,
           preserveSpaces: attrBreakRegex.test(item) || item !== item.trim() || item === "",
         });
       } else if (item === null) {
         element.childNodes!.push({
-          type: "UemlElement",
+          type: "XmlUiElement",
           name: nodeName,
         });
       } else {
@@ -581,8 +581,8 @@ export class UemlHelper {
    * @param list List with component items
    * @private
    */
-  private addComponentList(element: UemlElement, name: string, list: ComponentDef[]): void {
-    const children: UemlNode[] = [];
+  private addComponentList(element: XmlUiElement, name: string, list: ComponentDef[]): void {
+    const children: XmlUiNode[] = [];
     list.forEach((item) => {
       const fragment = this.transformSimpleComponentDefinition(item);
       if (Array.isArray(fragment)) {
@@ -591,8 +591,8 @@ export class UemlHelper {
         children.push(fragment);
       }
     });
-    const listElement: UemlElement = {
-      type: "UemlElement",
+    const listElement: XmlUiElement = {
+      type: "XmlUiElement",
       name,
       childNodes: children,
     };
@@ -604,7 +604,7 @@ export class UemlHelper {
 /**
  * Options to use with markup transformation from memory format to UEML structure
  */
-export type UemlTransformOptions = {
+export type XmlUiTransformOptions = {
   preserveLineBreaks?: boolean;
   preserveSpecialChars?: boolean;
   removeQuotes?: boolean;
@@ -612,7 +612,7 @@ export type UemlTransformOptions = {
   preferTextToValue?: boolean;
 };
 
-export type UemlSerializationOptions = {
+export type XmluiSerializationOptions = {
   // --- Should prettify the output?
   prettify?: boolean;
 

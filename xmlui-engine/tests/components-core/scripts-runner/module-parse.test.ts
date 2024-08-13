@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { isModuleErrors, parseScriptModule } from "@components-core/script-runner/modules";
 import { ModuleErrors, ScriptModule } from "@abstractions/scripting/ScriptingSourceTree";
+import { isModuleErrors, parseScriptModule } from "@parsers/scripting/modules";
 
 const ROOT_MODULE = "test";
 

@@ -4,23 +4,25 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import type {
+  RegisterComponentApiFn,
+  UpdateStateFn,
+} from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import styles from "@components/Combobox/Combobox.module.scss";
 import classnames from "@components-core/utils/classnames";
-import type { InputComponentDef, ValidationStatus } from "@components/Input/input-abstractions";
-import {
-  inputComponentEventDescriptors,
-  inputComponentPropertyDescriptors,
-} from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/Input/input-abstractions";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
+import {
+  SelectContext,
+  useSelectContextValue,
+} from "@components/Select/SelectContext";
 import { filterOptions } from "@components/component-utils";
 import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
@@ -68,11 +70,17 @@ export const Combobox = ({
   children,
 }: ComboboxProps) => {
   const { options, selectContextValue } = useSelectContextValue();
-  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(
+    null
+  );
   const [popperElement, setPopperElement] = useState<HTMLElement | null>(null);
-  const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: "bottom-start",
-  });
+  const { styles: popperStyles, attributes } = usePopper(
+    referenceElement,
+    popperElement,
+    {
+      placement: "bottom-start",
+    }
+  );
   const { root } = useTheme();
 
   const [searchValue, setSearchValue] = useState("");
@@ -83,26 +91,33 @@ export const Combobox = ({
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
 
-  const { isOpen, selectedItem, highlightedIndex, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } =
-    useCombobox({
-      // labelId: id,
-      // toggleButtonId: id,
-      onInputValueChange({ inputValue }) {
-        setSearchValue(inputValue || "");
-      },
-      items,
-      itemToString(item) {
-        return item ? item.label : "";
-      },
-      initialSelectedItem: options.find((item) => item.value === value) || null,
-      selectedItem: options.find((item) => item.value === value) || null,
-      onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
-        if (newSelectedItem) {
-          onInputChange(newSelectedItem);
-        }
-      },
-      isItemDisabled: (item) => item.disabled,
-    });
+  const {
+    isOpen,
+    selectedItem,
+    highlightedIndex,
+    getMenuProps,
+    getInputProps,
+    getItemProps,
+    getToggleButtonProps,
+  } = useCombobox({
+    // labelId: id,
+    // toggleButtonId: id,
+    onInputValueChange({ inputValue }) {
+      setSearchValue(inputValue || "");
+    },
+    items,
+    itemToString(item) {
+      return item ? item.label : "";
+    },
+    initialSelectedItem: options.find((item) => item.value === value) || null,
+    selectedItem: options.find((item) => item.value === value) || null,
+    onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
+      if (newSelectedItem) {
+        onInputChange(newSelectedItem);
+      }
+    },
+    isItemDisabled: (item) => item.disabled,
+  });
 
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(() => {
@@ -142,7 +157,9 @@ export const Combobox = ({
     if (observer?.current && current) {
       observer.current.unobserve(current);
     }
-    observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
+    observer.current = new ResizeObserver(() =>
+      setWidth((referenceElement as any).clientWidth)
+    );
     if (current && observer.current) {
       observer.current.observe(referenceElement as any);
     }
@@ -152,10 +169,14 @@ export const Combobox = ({
     <SelectContext.Provider value={selectContextValue}>
       {children}
       <div
-        className={classnames(styles.comboboxToggleButton, styles[validationStatus], {
-          //TODO expand styles[validationStatus]
-          [styles.disabled]: !enabled,
-        })}
+        className={classnames(
+          styles.comboboxToggleButton,
+          styles[validationStatus],
+          {
+            //TODO expand styles[validationStatus]
+            [styles.disabled]: !enabled,
+          }
+        )}
         ref={setReferenceElement}
       >
         <input
@@ -168,7 +189,11 @@ export const Combobox = ({
             id: id,
           })}
         />
-        <span aria-label="toggle menu" className={styles.indicator} {...getToggleButtonProps({ disabled: !enabled })}>
+        <span
+          aria-label="toggle menu"
+          className={styles.indicator}
+          {...getToggleButtonProps({ disabled: !enabled })}
+        >
           {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
         </span>
         <div {...getMenuProps()}>
@@ -190,7 +215,8 @@ export const Combobox = ({
                         key={index}
                         className={classnames(styles.item, styles.selectable, {
                           [styles.itemActive]: highlightedIndex === index,
-                          [styles.itemSelected]: selectedItem?.value === item.value,
+                          [styles.itemSelected]:
+                            selectedItem?.value === item.value,
                           [styles.itemDisabled]: item.disabled,
                         })}
                       >
@@ -220,13 +246,95 @@ export const Combobox = ({
 // ============================================================================
 // XMLUI Combobox definition
 
-type ComboboxComponentDef = InputComponentDef<"Combobox"> & {
+/**
+ * A \`Combobox\` is a component that combines the features of a dropdown list and an input field.
+ */
+export interface ComboboxComponentDef extends ComponentDef<"Combobox"> {
   props: {
-    options: Option[] | string[];
+    /**
+     * A placeholder text that is visible in the input field when its empty.
+     * @descriptionRef
+     */
+    placeholder?: string;
+    /** @internal */
+    value?: string | string[];
+    /**
+     * The initial value displayed in the input field.
+     * @descriptionRef
+     */
+    initialValue?: string | string[];
+    /**
+     * You can specify the identifier of a component acting as its label. When you click the label, 
+     * the component behaves as you clicked it.
+     */
+    labelId?: string;
+    /** 
+     * The maximum length of the input that the field accepts.
+     * @descriptionRef
+     */
+    maxLength?: number;
+    /**
+     * If this boolean prop is set to \`true\`, the \`Combobox\` will be focused when it appears on the UI.
+     * The default is \`false\`.
+     * @descriptionRef
+     */
+    autoFocus?: boolean;
+    /** 
+     * Set this property to \`true\` to indicate it must have a value before submitting the containing form. 
+     */
+    required?: boolean;
+    /**
+     * This boolean determines whether the input field can be modified or not.
+     * @descriptionRef
+     */
+    readOnly?: boolean;
+    /**
+     * Controls whether the input field is enabled (\`true\`) or disabled (\`false\`).
+     * @descriptionRef
+     */
+    enabled?: string | boolean;
+    /** 
+     * This prop is used to visually indicate status changes reacting to form field validation.
+     * @descriptionRef
+     */
+    validationStatus?: ValidationStatus;
+    /**
+     * You can define a template for the option items of the `Combobox`.
+     */
     optionTemplate?: ComponentDef;
+    /**
+     * With this property, you can define the template to display when the search list (after filtering) 
+     * contains no element.
+     * @descriptionRef
+     */
     emptyListTemplate?: ComponentDef;
   };
-};
+  events: {
+    /**
+     * This event is triggered after the user has changed the field value.
+     * @descriptionRef
+     */
+    didChange?: string;
+    /** 
+     * This event fires when the component is focused.
+     * @descriptionRef
+     */
+    gotFocus?: string;
+    /**
+     * This event fires when the component loses focus.
+     * 
+     * See the example in the [gotFocus event section](#gotfocus).
+     */
+    lostFocus?: string;
+  };
+  api: {
+    /**
+     * This API method focuses the input field.
+     * @descriptionRef
+     */
+    focus: () => void;
+  };
+}
 
 const defaultOptionRenderer = {
   type: "Text",
@@ -239,12 +347,25 @@ const metadata: ComponentDescriptor<ComboboxComponentDef> = {
   displayName: "Combobox",
   description: "A combobox component",
   props: {
-    ...inputComponentPropertyDescriptors,
-    options: desc("List of options to display"),
+    placeholder: desc("Placeholder text to sign the input is empty"),
+    value: desc("The current value to display"),
+    initialValue: desc("The initial value to display"),
+    labelId: desc("ID of the label attached to this input"),
+    maxLength: desc("The maximum length of the input text"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
+    // --- Adornment props
     optionTemplate: desc("Template to render each option"),
     emptyListTemplate: desc("Template to render when the list is empty"),
   },
-  events: inputComponentEventDescriptors,
+  events: {
+    didChange: desc("Triggered when the input value changes"),
+    gotFocus: desc("Triggered when the input gains focus"),
+    lostFocus: desc("triggered when the input has lost focus"),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "color-bg-menu-Combobox": "$color-bg-primary",
@@ -261,36 +382,46 @@ const metadata: ComponentDescriptor<ComboboxComponentDef> = {
   },
 };
 
-export const comboboxComponentRenderer = createComponentRenderer<ComboboxComponentDef>(
-  "Combobox",
-  ({ node, state, updateState, extractValue, renderChild, lookupAction, layoutCss, registerComponentApi }) => {
-    return (
-      <Combobox
-        layout={layoutCss}
-        value={state?.value}
-        initialValue={extractValue(node.props.initialValue)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        placeholder={extractValue.asOptionalString(node.props.placeholder)}
-        validationStatus={extractValue(node.props.validationStatus)}
-        updateState={updateState}
-        onChange={lookupAction(node.events?.change)}
-        onFocus={lookupAction(node.events?.gotFocus)}
-        onBlur={lookupAction(node.events?.lostFocus)}
-        registerComponentApi={registerComponentApi}
-        emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        optionRenderer={(item) => {
-          return (
-            <MemoizedItem
-              node={node.props.optionTemplate || defaultOptionRenderer}
-              item={item}
-              renderChild={renderChild}
-            />
-          );
-        }}
-      >
-        {renderChild(node.children)}
-      </Combobox>
-    );
-  },
-  metadata
-);
+export const comboboxComponentRenderer =
+  createComponentRenderer<ComboboxComponentDef>(
+    "Combobox",
+    ({
+      node,
+      state,
+      updateState,
+      extractValue,
+      renderChild,
+      lookupAction,
+      layoutCss,
+      registerComponentApi,
+    }) => {
+      return (
+        <Combobox
+          layout={layoutCss}
+          value={state?.value}
+          initialValue={extractValue(node.props.initialValue)}
+          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
+          placeholder={extractValue.asOptionalString(node.props.placeholder)}
+          validationStatus={extractValue(node.props.validationStatus)}
+          updateState={updateState}
+          onChange={lookupAction(node.events?.didChange)}
+          onFocus={lookupAction(node.events?.gotFocus)}
+          onBlur={lookupAction(node.events?.lostFocus)}
+          registerComponentApi={registerComponentApi}
+          emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+          optionRenderer={(item) => {
+            return (
+              <MemoizedItem
+                node={node.props.optionTemplate || defaultOptionRenderer}
+                item={item}
+                renderChild={renderChild}
+              />
+            );
+          }}
+        >
+          {renderChild(node.children)}
+        </Combobox>
+      );
+    },
+    metadata
+  );

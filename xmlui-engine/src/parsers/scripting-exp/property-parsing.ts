@@ -1,5 +1,5 @@
 import { Parser } from "./Parser";
-import { Expression, PropertyValue } from "./source-tree";
+import { Expression, PropertyValue } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 /**
  * This function parses a parameter string and splits them into string literal and binding expression sections

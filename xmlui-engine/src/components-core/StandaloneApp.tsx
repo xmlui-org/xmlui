@@ -13,9 +13,10 @@ import RootComponent from "@components-core/RootComponent";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { codeBehindFileExtension, componentFileExtension } from "../parsers/ueml/fileExtensions";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
+import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlui-parser/fileExtensions";
+
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -83,9 +84,9 @@ function StandaloneApp({
   );
 }
 
-async function parseComponentResp(response: Response, legacyXmlUiParser?: boolean) {
+async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
-    return parseXmlUiMarkup(await response.text(), undefined, !!legacyXmlUiParser);
+    return parseXmlUiMarkup(await response.text(), undefined);
   }
   return response.json();
 }
@@ -337,14 +338,14 @@ function useStandalone(
       const config: StandaloneJsonConfig = await configResponse.json();
       const legacyXmlUiParser = config.globals?.legacyXmlUiParser;
 
-      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value, legacyXmlUiParser));
+      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value));
       const themePromises = config.themes?.map((themePath) => {
-        return fetch(normalizePath(themePath)!).then((value) => parseComponentResp(value, legacyXmlUiParser)) as Promise<ThemeDefinition>;
+        return fetch(normalizePath(themePath)!).then((value) => parseComponentResp(value)) as Promise<ThemeDefinition>;
       });
 
       const componentPromises = config.components?.map((componentPath) => {
         return fetch(normalizePath(componentPath)!).then((value) =>
-          parseComponentResp(value, legacyXmlUiParser)
+          parseComponentResp(value)
         ) as Promise<CompoundComponentDef>;
       });
 

@@ -1,8 +1,7 @@
 import { dataToEsm } from "@rollup/pluginutils";
 import type { Plugin } from "vite";
 import { collectCodeBehindFromSource, removeCodeBehindTokensFromTree } from "../src/parsers/scripting/code-behind-collect";
-import { codeBehindFileExtension, componentFileExtension, moduleFileExtension } from "../src/parsers/ueml/fileExtensions";
-import { createEvalContext } from "../src/components-core/script-runner/BindingTreeEvaluationContext";
+import { codeBehindFileExtension, componentFileExtension, moduleFileExtension } from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
 import * as fs from "fs";
 import * as path from "path";
@@ -54,7 +53,7 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
       };
 
       if (xmluiExtension.test(id)) {
-        const componentDef = parseXmlUiMarkup(code, moduleResolver, pluginOptions.withLegacyParser);
+        const componentDef = parseXmlUiMarkup(code, moduleResolver);
 
         return {
           code: dataToEsm(componentDef),
@@ -67,8 +66,7 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
         const parser = new Parser(code);
         parser.parseStatements();
 
-        let evalContext = createEvalContext({});
-        let codeBehind = collectCodeBehindFromSource("Main", code, moduleResolver, evalContext);
+        let codeBehind = collectCodeBehindFromSource("Main", code, moduleResolver);
         removeCodeBehindTokensFromTree(codeBehind);
 
         // TODO: Add error handling.

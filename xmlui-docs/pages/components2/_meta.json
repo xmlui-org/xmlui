@@ -12,6 +12,7 @@
   "Card": "Card",
   "ChangeListener": "ChangeListener",
   "Checkbox": "Checkbox",
+  "Combobox": "Combobox",
   "ContentSeparator": "ContentSeparator",
   "DatePicker": "DatePicker",
   "DropdownMenu": "DropdownMenu",

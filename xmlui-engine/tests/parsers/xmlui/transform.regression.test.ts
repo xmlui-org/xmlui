@@ -1,60 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { UemlHelper } from "@parsers/ueml/UemlHelper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - regression", () => {
-  it("string child #1", () => {
-    const xh = new UemlHelper();
-    const cd = xh.transformComponentDefinition({
-      name: "EntryPoint",
-      component: {
-        type: "App",
-        children: ["AppHeader"],
-      } as unknown as ComponentDef,
-    });
-    expect(xh.serialize(cd)).equal('<Component name="EntryPoint"><App><AppHeader/></App></Component>');
-  });
-
-  it("string child #2", () => {
-    const xh = new UemlHelper();
-    const cd = xh.transformComponentDefinition({
-      name: "EntryPoint",
-      component: {
-        type: "App",
-        children: [
-          "AppHeader",
-          {
-            type: "Stack",
-          },
-        ],
-      } as unknown as ComponentDef,
-    });
-    expect(xh.serialize(cd)).equal('<Component name="EntryPoint"><App><AppHeader/><Stack/></App></Component>');
-  });
-
-  it("string child #3", () => {
-    const xh = new UemlHelper();
-    const cd = xh.transformComponentDefinition({
-      name: "EntryPoint",
-      component: {
-        type: "App",
-        children: [
-          "AppHeader",
-          {
-            type: "Stack",
-            props: {
-              orientation: "horizontal",
-            },
-          },
-        ],
-      } as unknown as ComponentDef,
-    });
-    expect(xh.serialize(cd)).equal(
-      '<Component name="EntryPoint"><App><AppHeader/><Stack orientation="horizontal"/></App></Component>'
-    );
-  });
-
   it("prop with multiple component #1", () => {
     const cd = transformSource(`
     <Table width="50%">

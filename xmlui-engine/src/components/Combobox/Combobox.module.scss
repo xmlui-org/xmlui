@@ -9,6 +9,8 @@ $themeVars: ();
 
 $componentName: "Combobox";
 
+$min-height: createThemeVar("Input:min-height-#{$componentName}");
+
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
   border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
@@ -41,7 +43,6 @@ $componentName: "Combobox";
   }
 }
 
-$min-height: createThemeVar("Input:min-height-#{$componentName}");
 
 .comboboxToggleButton {
   padding-left: 0.5rem;
@@ -88,6 +89,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     outline: none;
     background-color: transparent;
     width: 100%;
+    min-height: $min-height;
   }
 
   .indicator {
@@ -95,7 +97,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
+    height: $min-height;
     width: 32px;
     background-color: transparent;
     cursor: pointer;

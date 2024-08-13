@@ -303,9 +303,7 @@ function collect(source: string, modules: Record<string, string> = {}): Collecte
   const codeBehind = collectCodeBehindFromSource(
     ROOT_MODULE,
     source,
-    (parentModule: string, moduleName: string) => modules[moduleName] ?? null,
-    evalContext
-  );
+    (_: string, moduleName: string) => modules[moduleName] ?? null);
   removeCodeBehindTokensFromTree(codeBehind);
   return codeBehind;
 }

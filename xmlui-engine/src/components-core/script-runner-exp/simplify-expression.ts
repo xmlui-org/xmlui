@@ -14,7 +14,7 @@ import {
   UnaryExpression,
   ObjectLiteral,
   BinaryExpression,
-} from "./source-tree";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 export function simplifyExpression(expr?: Expression): Expression | undefined {
   let orig = expr;

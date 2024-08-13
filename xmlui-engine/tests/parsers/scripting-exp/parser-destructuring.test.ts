@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { ConstStatement, LetStatement } from "@parsers/scripting-exp/source-tree";
+import { ConstStatement, LetStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - destructuring", () => {
   it("let, object, empty", () => {

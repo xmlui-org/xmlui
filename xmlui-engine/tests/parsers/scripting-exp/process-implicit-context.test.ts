@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { processStatementQueue } from "@parsers/scripting-exp/process-statement-sync";
+import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { processStatementQueueAsync } from "@parsers/scripting-exp/process-statement-async";
+import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 
 describe("Process implicit context", () => {
   it("Implicit context #1", async () => {

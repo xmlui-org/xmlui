@@ -1,16 +1,22 @@
-import type { ValueResult } from "./BindingTreeEvaluationContext";
 import type { BlockScope } from "./BlockScope";
 import type { LoopScope } from "./LoopScope";
-import type { TryScope } from "./TryScope";
-import type { Expression } from "./source-tree";
+import type { TryScope } from "./TryScopeExp";
+import type { Expression } from "./ScriptingSourceTreeExp";
+
+// Result of evaluating a binding expression
+export type ValueResult = {
+  value: any;
+  valueScope?: any;
+  valueIndex?: number | string;
+};
 
 // Represents a logical thread instance
-export type LogicalThread = {
+export type LogicalThreadExp = {
   // --- Parent thread
-  parent?: LogicalThread;
+  parent?: LogicalThreadExp;
 
   // --- Child threads forked directly from this thread
-  childThreads: LogicalThread[];
+  childThreads: LogicalThreadExp[];
 
   // --- Optional cache for expression values
   valueCache?: Map<Expression, ValueResult>;

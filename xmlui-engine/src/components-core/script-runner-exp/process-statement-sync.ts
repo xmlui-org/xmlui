@@ -1,61 +1,57 @@
-import { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-
-import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
-import { LogicalThread } from "./LogicalThread";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { evalBinding, executeArrowExpressionSync } from "./eval-tree-sync";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import {
-  ensureMainThread,
   innermostBlockScope,
   innermostLoopScope,
   createLoopScope,
   provideLoopBody,
   releaseLoopScope,
+  ensureMainThread,
+  innermostTryScope,
   provideTryBody,
   createTryScope,
-  innermostTryScope,
-  provideFinallyBody,
   provideCatchBody,
+  provideFinallyBody,
   provideFinallyErrorBody,
   hoistFunctionDeclarations,
-  closing,
   toStatementItems,
+  closing,
   guard,
 } from "./process-statement-common";
 import type {
   ArrayDestructure,
   AssignmentExpression,
-  ConstStatement,
   Identifier,
-  LetStatement,
   Literal,
   ObjectDestructure,
   Statement,
   VarDeclaration,
-} from "./source-tree";
-import {
-  QueueInfo,
-  StatementQueue,
-  mapStatementsToQueueItems,
-  StatementQueueItem,
-  ProcessOutcome,
-  mapToItem,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type {
   StatementRunTimeInfo,
   StatementWithInfo,
+  QueueInfo,
+  StatementQueueItem,
+  ProcessOutcome} from "./statement-queue";
+import {
+  StatementQueue,
+  mapStatementsToQueueItems,
+  mapToItem
 } from "./statement-queue";
-import { LoopScope } from "./LoopScope";
-import { BlockScope } from "./BlockScope";
-import { StatementExecutionError, ThrowStatementError } from "@components-core/EngineError";
+import type { LoopScope } from "@abstractions/scripting/LoopScope";
+import type { BlockScope } from "@abstractions/scripting/BlockScope";
 import { reportEngineError } from "@components-core/reportEngineError";
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 
-type OnStatementCompletedCallback =
-  | ((evalContext: BindingTreeEvaluationContext, completedStatement: Statement) => Promise<void>)
-  | undefined;
+const SYNC_EVAL_TIMEOUT = 1000;
 
-// --- Helper function to process the entire queue asynchronously
-export async function processStatementQueueAsync(
+// --- Helper function to process the entire queue synchronously
+export function processStatementQueue(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
-): Promise<QueueInfo> {
+  thread?: LogicalThreadExp
+): QueueInfo {
   if (!thread) {
     // --- Create the main thread for the queue
     thread = ensureMainThread(evalContext);
@@ -63,6 +59,9 @@ export async function processStatementQueueAsync(
 
   // --- Hoist function declarations to the top scope
   hoistFunctionDeclarations(thread, statements);
+
+  // --- Set start tick to observe timeout
+  evalContext.startTick = new Date().valueOf();
 
   // --- Fill the queue with items
   const queue = new StatementQueue();
@@ -79,11 +78,10 @@ export async function processStatementQueueAsync(
   };
 
   // --- Consume the queue
-  let startTime = new Date().getTime();
-  while (queue.length > 0 && !evalContext.cancellationToken?.cancelled) {
-    // --- Allow time to break from infinite loops
-    if (evalContext.timeout && new Date().getTime() - startTime > evalContext.timeout) {
-      throw new Error("Script execution timeout");
+  while (queue.length > 0) {
+    // --- Check sync timeout
+    if (evalContext.startTick !== undefined && new Date().valueOf() - evalContext.startTick > SYNC_EVAL_TIMEOUT) {
+      throw new Error(`Sync evaluation timeout exceeded ${SYNC_EVAL_TIMEOUT} milliseconds`);
     }
 
     // --- Process the first item
@@ -93,10 +91,10 @@ export async function processStatementQueueAsync(
     let outcome: ProcessOutcome | undefined;
     try {
       // --- Sign that the statement is about to start
-      await evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
+      evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
 
       // --- Execute the statement
-      outcome = await processStatementAsync(queueItem!.statement, queueItem?.execInfo ?? {}, evalContext, thread);
+      outcome = processStatement(queueItem!.statement, queueItem!.execInfo ?? {}, evalContext, thread);
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
         // --- We have a try block to handle this error
@@ -136,7 +134,7 @@ export async function processStatementQueueAsync(
     }
 
     // --- Sign that the statement has been completed
-    await evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
+    evalContext?.onStatementCompleted?.(evalContext, queueItem!.statement);
 
     // --- Provide diagnostics
     if (queue.length > diagInfo.maxQueueLength) {
@@ -156,20 +154,18 @@ export async function processStatementQueueAsync(
 }
 
 /**
- * Process the specified statement asynchronously
+ * Process the specified statement synchronously
  * @param statement Statement to process
- * @param execInfo Execution information
  * @param evalContext Evaluation context used for processing
  * @param thread Logical thread to use for statement processing
- * @param onStatementCompleted
  * @returns Items to put back into the queue of statements
  */
-async function processStatementAsync(
+function processStatement(
   statement: Statement,
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
-): Promise<ProcessOutcome> {
+  thread: LogicalThreadExp
+): ProcessOutcome {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
   let clearToLabel: number | undefined;
@@ -240,7 +236,7 @@ async function processStatementAsync(
 
     case "ExprS":
       // --- Just evaluate it
-      const statementValue = await evalBindingAsync(statement.expr, evalContext, thread);
+      const statementValue = evalBinding(statement.expr, evalContext, thread);
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = statementValue;
       }
@@ -248,7 +244,7 @@ async function processStatementAsync(
 
     case "ArrowS":
       // --- Compile the arrow expression
-      const arrowFuncValue = await executeArrowExpression(
+      const arrowFuncValue = executeArrowExpressionSync(
         statement.expr,
         evalContext,
         thread,
@@ -265,7 +261,7 @@ async function processStatementAsync(
       if (!block) {
         throw new Error("Missing block scope");
       }
-      await processDeclarationsAsync(block, evalContext, thread, statement.decls);
+      processDeclarations(block, evalContext, thread, statement.decls);
       break;
     }
 
@@ -275,13 +271,13 @@ async function processStatementAsync(
       if (!block) {
         throw new Error("Missing block scope");
       }
-      await processDeclarationsAsync(block, evalContext, thread, statement.decls, true);
+      processDeclarations(block, evalContext, thread, statement.decls, true);
       break;
     }
 
     case "IfS":
       // --- Evaluate the condition
-      const condition = !!(await evalBindingAsync(statement.cond, evalContext, thread));
+      const condition = !!evalBinding(statement.cond, evalContext, thread);
       if (condition) {
         toUnshift = mapToItem(statement.thenB);
       } else if (statement.elseB) {
@@ -297,7 +293,7 @@ async function processStatementAsync(
       }
 
       // --- Store the return value
-      thread.returnValue = statement.expr ? await evalBindingAsync(statement.expr, evalContext, thread) : undefined;
+      thread.returnValue = statement.expr ? evalBinding(statement.expr, evalContext, thread) : undefined;
 
       // --- Check for try blocks
       if ((thread.tryBlocks ?? []).length > 0) {
@@ -325,7 +321,7 @@ async function processStatementAsync(
       let loopScope = execInfo.guard ? innermostLoopScope(thread) : createLoopScope(thread);
 
       // --- Evaluate the loop condition
-      const condition = !!(await evalBindingAsync(statement.cond, evalContext, thread));
+      const condition = !!evalBinding(statement.cond, evalContext, thread);
       if (condition) {
         toUnshift = provideLoopBody(loopScope!, statement, thread.breakLabelValue);
       } else {
@@ -343,7 +339,7 @@ async function processStatementAsync(
       }
 
       // --- Evaluate the loop condition
-      const condition = !!(await evalBindingAsync(statement.cond, evalContext, thread));
+      const condition = !!evalBinding(statement.cond, evalContext, thread);
       if (condition) {
         toUnshift = provideLoopBody(innermostLoopScope(thread), statement, thread.breakLabelValue);
       } else {
@@ -424,9 +420,7 @@ async function processStatementAsync(
 
         // --- Create a new block for the loop variables
         thread.blocks ??= [];
-        thread.blocks.push({
-          vars: {},
-        });
+        thread.blocks.push({ vars: {} });
 
         const guardStatement = guard(statement);
         if (statement.init) {
@@ -438,7 +432,7 @@ async function processStatementAsync(
         }
       } else {
         // --- Initialization already done. Evaluate the condition
-        if (!statement.cond || !!(await evalBindingAsync(statement.cond, evalContext, thread))) {
+        if (!statement.cond || evalBinding(statement.cond, evalContext, thread)) {
           // --- Stay in the loop, inject the body, the update expression, and the loop guard
           const loopScope = innermostLoopScope(thread);
 
@@ -463,7 +457,7 @@ async function processStatementAsync(
     case "ForInS":
       if (!execInfo.guard) {
         // --- Get the object keys
-        const keyedObject = await evalBindingAsync(statement.expr, evalContext, thread);
+        const keyedObject = evalBinding(statement.expr, evalContext, thread);
         if (keyedObject == undefined) {
           // --- Nothing to do, no object to traverse
           break;
@@ -503,7 +497,7 @@ async function processStatementAsync(
                   value: propValue,
                 } as Literal,
               } as AssignmentExpression;
-              await evalBindingAsync(assigmentExpr, evalContext, thread);
+              evalBinding(assigmentExpr, evalContext, thread);
               break;
             }
 
@@ -534,7 +528,7 @@ async function processStatementAsync(
           // --- The guard action's label is for "continue"
           loopScope.continueLabel = toUnshift[1].label;
         } else {
-          // --- The condition is not met, we're done. Remove the loop's scope from the evaluation context
+          // --- The for..in loop is complete. Remove the loop's scope from the evaluation context
           releaseLoopScope(thread);
         }
       }
@@ -543,7 +537,7 @@ async function processStatementAsync(
     case "ForOfS":
       if (!execInfo.guard) {
         // --- Get the object keys
-        const iteratorObject = await evalBindingAsync(statement.expr, evalContext, thread);
+        const iteratorObject = evalBinding(statement.expr, evalContext, thread);
         if (iteratorObject == null || typeof iteratorObject[Symbol.iterator] !== "function") {
           // --- The object is not an iterator
           throw new Error("Object in for..of is not iterable");
@@ -589,7 +583,7 @@ async function processStatementAsync(
                 value: propValue,
               } as Literal,
             } as AssignmentExpression;
-            await evalBindingAsync(assigmentExpr, evalContext, thread);
+            evalBinding(assigmentExpr, evalContext, thread);
             break;
           }
 
@@ -623,7 +617,7 @@ async function processStatementAsync(
       break;
 
     case "ThrowS": {
-      throw new ThrowStatementError(await evalBindingAsync(statement.expr, evalContext, thread));
+      throw new ThrowStatementError(evalBinding(statement.expr, evalContext, thread));
     }
 
     case "TryS": {
@@ -748,7 +742,7 @@ async function processStatementAsync(
         thread.blocks!.push({ vars: {} });
 
         // --- Evaluate the switch value
-        const switchValue = await evalBindingAsync(statement.expr, evalContext, thread);
+        const switchValue = evalBinding(statement.expr, evalContext, thread);
 
         // --- Find the matching label
         let matchingIndex = -1;
@@ -762,7 +756,7 @@ async function processStatementAsync(
           }
 
           // --- Check for matching case
-          const caseValue = await evalBindingAsync(currentCase.caseE, evalContext, thread);
+          const caseValue = evalBinding(currentCase.caseE, evalContext, thread);
           if (caseValue === switchValue) {
             matchingIndex = i;
             break;
@@ -796,28 +790,24 @@ async function processStatementAsync(
   return { toUnshift, clearToLabel };
 }
 
-/**
- * Funtion to process a visited ID
- */
-type IdDeclarationVisitor = (id: string) => void;
-
 // --- Process a variable declaration
-export async function processDeclarationsAsync(
+export function processDeclarations(
   block: BlockScope,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread,
+  thread: LogicalThreadExp,
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,
   baseValue = undefined
-): Promise<void> {
+): void {
   for (let i = 0; i < declarations.length; i++) {
     let value: any;
     const decl = declarations[i];
     if (useValue) {
       value = baseValue;
     } else if (decl.expr) {
-      value = await evalBindingAsync(decl.expr, evalContext, thread);
+      //TODO illesg here, functionInvocation for global function (e.g. window.confirm... )
+      value = evalBinding(decl.expr, evalContext, thread);
     }
     visitDeclaration(block, decl, value, addConst);
   }

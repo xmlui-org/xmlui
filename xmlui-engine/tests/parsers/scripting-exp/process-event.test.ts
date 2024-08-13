@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { ArrowExpressionStatement } from "@parsers/scripting-exp/source-tree";
-import { processStatementQueueAsync } from "@parsers/scripting-exp/process-statement-async";
+import { ArrowExpressionStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
 describe("Process statements", () => {

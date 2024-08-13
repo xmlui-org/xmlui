@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { ArrayLiteral, Expression, Identifier, Literal, ObjectLiteral } from "@parsers/scripting-exp/source-tree";
+import { ArrayLiteral, Expression, Identifier, Literal, ObjectLiteral } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { tokenTraits } from "@parsers/scripting-exp/TokenTrait";
 import { TokenType } from "@parsers/scripting-exp/TokenType";
 

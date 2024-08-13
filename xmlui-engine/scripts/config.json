@@ -62,6 +62,7 @@
     "src/components/Splitter/Splitter.tsx",
     "src/components/SpaceFiller/SpaceFiller.tsx",
     "src/components/Theme/Theme.tsx",
-    "src/components/AppState/AppState.tsx"
+    "src/components/AppState/AppState.tsx",
+    "src/components/Combobox/Combobox.tsx"
   ]
 }

@@ -4,7 +4,7 @@ import {
   CompoundPropertyValue,
   SingleExpressionValue,
   SinglePropertyValue,
-} from "@parsers/scripting-exp/source-tree";
+} from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { Parser } from "@parsers/scripting/Parser";
 
 describe("Parameter property parsing", () => {

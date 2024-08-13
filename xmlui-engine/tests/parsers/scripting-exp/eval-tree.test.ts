@@ -4,9 +4,9 @@ import { Parser } from "@parsers/scripting-exp/Parser";
 import {
   evalBinding,
   evalBindingExpression
-} from "@parsers/scripting-exp/eval-tree-sync";
+} from "@components-core/script-runner-exp/eval-tree-sync";
 import { createEvalContext } from "./test-helpers";
-import { evalBindingAsync } from "@parsers/scripting-exp/eval-tree-async";
+import { evalBindingAsync } from "@components-core/script-runner-exp/eval-tree-async";
 
 describe("Evaluate binding expression tree", () => {
   const literalCases = [

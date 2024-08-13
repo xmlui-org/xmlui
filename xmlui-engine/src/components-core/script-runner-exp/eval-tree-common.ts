@@ -1,5 +1,5 @@
-import type { BindingTreeEvaluationContext, ValueResult } from "./BindingTreeEvaluationContext";
-import type { LogicalThread } from "./LogicalThread";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import type { LogicalThreadExp, ValueResult } from "@abstractions/scripting/LogicalThreadExp";
 import type {
   ArrowExpression,
   AssignmentExpression,
@@ -12,16 +12,16 @@ import type {
   PostfixOpExpression,
   PrefixOpExpression,
   UnaryExpression,
-} from "./source-tree";
-import type { BlockScope } from "./BlockScope";
+} from "@abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "@abstractions/scripting/BlockScope";
 
 // --- Get the cached expression value
-export function getExprValue(expr: Expression, thread: LogicalThread): any {
+export function getExprValue(expr: Expression, thread: LogicalThreadExp): any {
   return thread?.valueCache?.get(expr)?.value;
 }
 
 // --- Set the cached expression value
-export function setExprValue(expr: Expression, value: any, thread: LogicalThread): void {
+export function setExprValue(expr: Expression, value: any, thread: LogicalThreadExp): void {
   thread.valueCache ??= new Map();
   thread.valueCache.set(expr, { value });
 }
@@ -32,7 +32,7 @@ export function isPromise(obj: any): obj is Promise<any> {
 }
 
 // --- Evaluates a literal value (sync & async context)
-export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThread): any {
+export function evalLiteral(thisStack: any[], expr: Literal, thread: LogicalThreadExp): any {
   setExprValue(expr, { value: expr.value }, thread);
   thisStack.push(expr.value);
   return expr.value;
@@ -44,7 +44,7 @@ type IdentifierScope = "global" | "app" | "localContext" | "block";
 function getIdentifierScope(
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
+  thread?: LogicalThreadExp
 ): { type?: IdentifierScope; scope: any } {
   let type: IdentifierScope | undefined;
   let scope: any;
@@ -56,7 +56,7 @@ function getIdentifierScope(
     type = "global";
   } else {
     // --- Iterate trough threads from the current to the parent
-    let currentThread: LogicalThread | undefined = thread ?? evalContext.mainThread;
+    let currentThread: LogicalThreadExp | undefined = thread ?? evalContext.mainThread;
     while (currentThread && !scope) {
       if (currentThread.blocks) {
         // --- Search the block-scopes
@@ -119,7 +119,7 @@ export function evalIdentifier(
   thisStack: any[],
   expr: Identifier,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   // --- Check the ID in the cache
   let value: any;
@@ -145,7 +145,7 @@ export function evalIdentifier(
 export function getRootIdScope(
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
+  thread?: LogicalThreadExp
 ): { type: IdentifierScope | undefined, name: string } | null {
   switch (expr.type) {
     case "IdE":
@@ -164,7 +164,7 @@ export function evalMemberAccessCore(
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
   const value =
@@ -189,7 +189,7 @@ export function evalCalculatedMemberAccessCore(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   const parentObj = getExprValue(expr.obj, thread)?.value;
   const memberObj = getExprValue(expr.member, thread)?.value;
@@ -214,7 +214,7 @@ export function evalUnaryCore(
   expr: UnaryExpression,
   thisStack: any[],
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   let value: any;
   const operand = getExprValue(expr.expr, thread);
@@ -257,7 +257,7 @@ export function evalBinaryCore(
   expr: BinaryExpression,
   thisStack: any[],
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   let value: any;
   const l = getExprValue(expr.left, thread)?.value;
@@ -352,7 +352,7 @@ export function evalAssignmentCore(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   const leftValue = getExprValue(expr.leftValue, thread);
   const newValue = getExprValue(expr.expr, thread)?.value;
@@ -440,7 +440,7 @@ export function evalPreOrPostCore(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): any {
   const operand = getExprValue(expr.expr, thread);
   if (!operand.valueScope || operand.valueIndex === undefined) {
@@ -473,7 +473,7 @@ export function evalPreOrPostCore(
 export function evalArrow(
   thisStack: any[],
   expr: ArrowExpression,
-  thread: LogicalThread
+  thread: LogicalThreadExp
 ): ArrowExpression {
   const lazyArrow = {
     ...expr,
@@ -485,7 +485,7 @@ export function evalArrow(
   return lazyArrow;
 }
 
-export function obtainClosures(thread: LogicalThread): BlockScope[] {
+export function obtainClosures(thread: LogicalThreadExp): BlockScope[] {
   const closures = thread.blocks?.slice(0) ?? [];
   return thread.parent ? [...obtainClosures(thread.parent), ...closures] : closures;
 }
@@ -495,7 +495,7 @@ export function obtainClosures(thread: LogicalThread): BlockScope[] {
  * @param id Identifier to test
  * @param thread Thread to use for evaluation
  */
-function isConstVar(id: string, thread: LogicalThread): boolean {
+function isConstVar(id: string, thread: LogicalThreadExp): boolean {
   // --- Start search the block context
   if (thread.blocks) {
     for (let idx = thread.blocks.length; idx >= 0; idx--) {
