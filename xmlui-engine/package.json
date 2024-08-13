@@ -7,8 +7,7 @@
     "test": "vitest run",
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
-    "get-metadata": "node scripts/get-meta.js",
-    "build-temp": "clean-package && npm run build && npm link && clean-package restore"
+    "get-metadata": "node scripts/get-meta.js"
   },
   "dependencies": {
     "@azure/msal-browser": "2.30.0",
