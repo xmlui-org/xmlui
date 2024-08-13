@@ -1,10 +1,5 @@
-import type { LogicalThread } from "./LogicalThread";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { ActionExecutionContext } from "@abstractions/ActionDefs";
-
-/**
- * A function that resolves a module name to the text of the module
- */
-export type ModuleResolver = (sourceModule: string, moduleName: string) => string | null;
 
 // This type represents the context in which binding expressions and statements should be evaluated
 export type BindingTreeEvaluationContext = {

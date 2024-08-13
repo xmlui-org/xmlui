@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { Destructure, FunctionDeclaration, Identifier } from "@parsers/scripting-exp/source-tree";
+import { Destructure, FunctionDeclaration, Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - arrow expressions", () => {
   it("No param", () => {

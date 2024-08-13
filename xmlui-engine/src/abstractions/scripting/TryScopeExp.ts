@@ -1,4 +1,4 @@
-import type { TryStatement } from "./source-tree";
+import type { TryStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 type ErrorProcessingPhase = "try" | "catch" | "finally" | "error" | "postFinally";
 type ErrorHandlerExitType = "break" | "continue" | "return";

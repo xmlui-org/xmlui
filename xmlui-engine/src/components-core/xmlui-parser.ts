@@ -1,4 +1,4 @@
-import { ModuleResolver } from "./script-runner/BindingTreeEvaluationContext";
+import { ModuleResolver } from "@abstractions/scripting/modules";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import type { Error } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";

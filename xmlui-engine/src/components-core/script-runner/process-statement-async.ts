@@ -13,9 +13,9 @@ import type {
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { QueueInfo, StatementQueueItem, ProcessOutcome } from "./statement-queue";
-import type { LogicalThread } from "./LogicalThread";
-import type { LoopScope } from "./LoopScope";
-import type { BlockScope } from "../../abstractions/BlockScope";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
 import {
@@ -790,68 +790,6 @@ async function processStatementAsync(
 
   // --- Done.
   return { toUnshift, clearToLabel };
-}
-
-/**
- * Funtion to process a visited ID
- */
-type IdDeclarationVisitor = (id: string) => void;
-
-/**
- * Visits all declarations in a let or const statement
- * @param declaration Declaration to process
- * @param visitor Function to call on each visited declaration
- */
-export function visitLetConstDeclarations(
-  declaration: LetStatement | ConstStatement,
-  visitor: IdDeclarationVisitor
-): void {
-  for (let i = 0; i < declaration.declarations.length; i++) {
-    let value: any;
-    const decl = declaration.declarations[i];
-    visitDeclaration(decl, visitor);
-  }
-
-  function visitDeclaration(varDecl: VarDeclaration, visitor: IdDeclarationVisitor): void {
-    // --- Process each declaration
-    if (varDecl.id) {
-      visitor(varDecl.id);
-    } else if (varDecl.arrayDestruct) {
-      visitArrayDestruct(varDecl.arrayDestruct, visitor);
-    } else if (varDecl.objectDestruct) {
-      visitObjectDestruct(varDecl.objectDestruct, visitor);
-    } else {
-      throw new Error("Unknown declaration specifier");
-    }
-  }
-
-  // --- Visits an array destructure declaration
-  function visitArrayDestruct(arrayD: ArrayDestructure[], visitor: IdDeclarationVisitor): void {
-    for (let i = 0; i < arrayD.length; i++) {
-      const arrDecl = arrayD[i];
-      if (arrDecl.id) {
-        visitor(arrDecl.id);
-      } else if (arrDecl.arrayDestruct) {
-        visitArrayDestruct(arrDecl.arrayDestruct, visitor);
-      } else if (arrDecl.objectDestruct) {
-        visitObjectDestruct(arrDecl.objectDestruct, visitor);
-      }
-    }
-  }
-
-  // --- Visits an object destructure declaration
-  function visitObjectDestruct(objectD: ObjectDestructure[], visitor: IdDeclarationVisitor): void {
-    for (let i = 0; i < objectD.length; i++) {
-      const objDecl = objectD[i];
-      if (objDecl.arrayDestruct) {
-        visitArrayDestruct(objDecl.arrayDestruct, visitor);
-      } else if (objDecl.objectDestruct) {
-        visitObjectDestruct(objDecl.objectDestruct, visitor);
-      } else {
-        visitor(objDecl.alias ?? objDecl.id!);
-      }
-    }
-  }
 }
 
 // --- Process a variable declaration

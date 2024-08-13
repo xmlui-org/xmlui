@@ -1,7 +1,7 @@
-import { LogicalThread } from "./LogicalThread";
-import { ActionExecutionContext } from "@abstractions/ActionDefs";
-import { ArrowExpression, Statement } from "./source-tree";
-import { BlockScope } from "./BlockScope";
+import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
+import type { ActionExecutionContext } from "@abstractions/ActionDefs";
+import type { ArrowExpression, Statement } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "@abstractions/scripting/BlockScope";
 
 /**
  * A function that resolves a module name to the text of the module
@@ -20,7 +20,7 @@ export type BindingTreeEvaluationContext = {
   appContext?: any;
 
   // --- The main execution thread;
-  mainThread?: LogicalThread;
+  mainThread?: LogicalThreadExp;
 
   // --- The cancellation token to signal the cancellation of an operation
   cancellationToken?: CancellationToken;
@@ -64,13 +64,6 @@ export type BindingTreeEvaluationContext = {
 
 // --- The type of non-local variable update
 type UpdateType = "assignment" | "pre-post" | "function-call";
-
-// Result of evaluating a binding expression
-export type ValueResult = {
-  value: any;
-  valueScope?: any;
-  valueIndex?: number | string
-};
 
 /**
  * A token that signals the cancellation of an operation

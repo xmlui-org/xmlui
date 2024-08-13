@@ -51,7 +51,7 @@ import type { Token } from "@abstractions/scripting/Token";
 import type { ScriptParserErrorMessage, ScriptParsingErrorCodes } from "@abstractions/scripting/ScriptParserError";
 
 import { TokenType } from "../../abstractions/scripting/Token";
-import { InputStream } from "./InputStream";
+import { InputStream } from "../common/InputStream";
 import { tokenTraits } from "./TokenTrait";
 import { Lexer } from "./Lexer";
 import { errorMessages, ParserError } from "./ParserError";

@@ -1,13 +1,12 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
-import type { ModuleResolver } from "@components-core/script-runner/BindingTreeEvaluationContext";
+import type { ModuleResolver } from "@abstractions/scripting/modules";
 
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
-import { createEvalContext } from "../../components-core/script-runner/BindingTreeEvaluationContext";
 import { CharacterCodes } from "./CharacterCodes";
 
 export const COMPOUND_COMP_ID = "Component";
@@ -337,9 +336,7 @@ export function nodeToComponentDef(
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
-
-      const evalContext = createEvalContext({});
-      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script, moduleResolver, evalContext);
+      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script, moduleResolver);
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         comp.scriptError = parser.errors;

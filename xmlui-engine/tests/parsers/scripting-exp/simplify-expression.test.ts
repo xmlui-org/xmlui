@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { simplifyExpression, simplifyStatement } from "@parsers/scripting-exp/simplify-expression";
-import { Identifier, Literal } from "@parsers/scripting-exp/source-tree";
+import { Identifier, Literal } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { simplifyExpression, simplifyStatement } from "@components-core/script-runner-exp/simplify-expression";
 
 describe("Parser - simplify expression", () => {
   const exprNoUpdateCases = [

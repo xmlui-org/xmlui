@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { processStatementQueueAsync } from "@parsers/scripting-exp/process-statement-async";
+import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 import buildProxy from "@components-core/container/buildProxy";
 

@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { processStatementQueueAsync } from "@parsers/scripting-exp/process-statement-async";
-import { processStatementQueue } from "@parsers/scripting-exp/process-statement-sync";
+import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
+import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
 import {createEvalContext, parseExpression, parseStatements} from "./test-helpers";
 
 describe("Process statements regression", () => {

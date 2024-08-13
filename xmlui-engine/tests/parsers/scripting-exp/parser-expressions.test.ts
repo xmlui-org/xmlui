@@ -8,7 +8,7 @@ import {
   PrefixOpExpression,
   SequenceExpression,
   SpreadExpression,
-} from "@parsers/scripting-exp/source-tree";
+} from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - miscellaneous expressions", () => {
   const sequenceCases = [

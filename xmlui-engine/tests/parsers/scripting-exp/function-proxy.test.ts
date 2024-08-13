@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { processStatementQueueAsync } from "@parsers/scripting-exp/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { ArrowExpressionStatement, ExpressionStatement } from "@parsers/scripting-exp/source-tree";
+import { ArrowExpressionStatement, ExpressionStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 
 describe("Function proxies", () => {
   it("Array.prototype.filter #1", async () => {
