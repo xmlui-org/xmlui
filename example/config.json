@@ -1,0 +1,12 @@
+{
+  "name": "XMLUI - Example",
+  "globals": {
+    "useHashBasedRouting": true
+  },
+  "components": [
+    "components/ApiAware.xmlui",
+    "components/PagePanel.xmlui",
+    "components/Home.xmlui",
+    "components/IncButton.xmlui"
+  ]
+}

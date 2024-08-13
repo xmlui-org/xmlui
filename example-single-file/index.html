@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/xmlui@0.4.1/dist/xmlui-standalone.umd.js"></script>
+    <script type="text/xmlui">
+        <App>
+            <AppHeader/>
+            <NavPanel>
+                <NavLink label="Home" to="/" icon="home"/>
+                <NavLink label="About" to="/about" />
+            </NavPanel>
+            <Pages>
+                <Page url="/">
+                    <Stack>
+                        <Text>Home</Text>
+                    </Stack>
+                </Page>
+                <Page url="/about">
+                    <Stack>
+                        <Text>About</Text>
+                    </Stack>
+                </Page>
+            </Pages>
+        </App>
+    </script>
+</head>
+<body>
+</body>
+</html>
