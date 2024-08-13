@@ -1,6 +1,5 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { ICustomOperations } from "./ICustomOperations";
-import type { LogicalThread } from "./LogicalThread";
 import type {
   ArrowExpression,
   AssignmentExpression,
@@ -14,12 +13,13 @@ import type {
   PrefixOpExpression,
   UnaryExpression,
 } from "@abstractions/scripting/ScriptingSourceTree";
-import type { BlockScope } from "@abstractions/BlockScope";
 
 import { customOperationsRegistry } from "./custom-operations-registry";
 import { isCustomUiData } from "./custom-ui-data";
 import { isConstVar } from "./eval-tree-async";
 import { CustomOperationType } from "./ICustomOperations";
+import { LogicalThread } from "@abstractions/scripting/LogicalThread";
+import { obtainClosures } from "../../parsers/scripting/modules";
 
 // --- Type guard to check for a Promise
 export function isPromise(obj: any): obj is Promise<any> {
@@ -571,9 +571,4 @@ export function evalArrow(thisStack: any[], expr: ArrowExpression, thread: Logic
   } as ArrowExpression;
   thisStack.push(lazyArrow);
   return lazyArrow;
-}
-
-export function obtainClosures(thread: LogicalThread): BlockScope[] {
-  const closures = thread.blocks?.slice(0) ?? [];
-  return thread.parent ? [...obtainClosures(thread.parent), ...closures] : closures;
 }

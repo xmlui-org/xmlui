@@ -1,4 +1,4 @@
-import type { BlockScope } from "@abstractions/BlockScope";
+import type { BlockScope } from "./BlockScope";
 import type { LoopScope } from "./LoopScope";
 import type { TryScope } from "./TryScope";
 

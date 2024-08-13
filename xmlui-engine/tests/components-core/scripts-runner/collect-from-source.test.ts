@@ -300,7 +300,5 @@ function collect(source: string, modules: Record<string, string> = {}): Collecte
   return collectCodeBehindFromSource(
     ROOT_MODULE,
     source,
-    (parentModule: string, moduleName: string) => modules[moduleName] ?? null,
-    evalContext
-  );
+    (parentModule: string, moduleName: string) => modules[moduleName] ?? null);
 }

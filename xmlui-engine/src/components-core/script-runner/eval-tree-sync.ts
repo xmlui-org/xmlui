@@ -1,6 +1,6 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { ICustomOperations } from "./ICustomOperations";
-import type { LogicalThread } from "./LogicalThread";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type {
   ArrayLiteral,
   ArrowExpression,
@@ -20,7 +20,7 @@ import type {
   UnaryExpression,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { BlockScope } from "../../abstractions/BlockScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import {
   evalArrow,

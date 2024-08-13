@@ -10,7 +10,7 @@ import type {
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { QueueInfo } from "../script-runner/statement-queue";
 import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
-import type { LogicalThread } from "../script-runner/LogicalThread";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 
 import { Parser } from "../../parsers/scripting/Parser";
 import {
