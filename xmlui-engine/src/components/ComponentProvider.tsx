@@ -113,6 +113,7 @@ import { mapComponentRenderer } from "@components/Map/Map";
 import { tabsComponentRenderer } from "@components/Tabs/Tabs";
 import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
 import { appStateComponentRenderer } from "@components/AppState/AppState";
+import { pageHeaderRenderer } from "./PageHeader/PageHeader";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -307,6 +308,8 @@ export class ComponentRegistry {
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
+
+    this.registerCompoundComponentRenderer(pageHeaderRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
