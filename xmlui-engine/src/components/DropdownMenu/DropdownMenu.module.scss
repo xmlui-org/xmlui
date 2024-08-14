@@ -28,7 +28,11 @@ $font-size-MenuItem: createThemeVar("font-size-MenuItem");
 $padding-vertical-MenuItem: createThemeVar("padding-vertical-MenuItem");
 $padding-horizontal-MenuItem: createThemeVar("padding-horizontal-MenuItem");
 $color-bg-MenuItem--hover: createThemeVar("color-bg-MenuItem--hover");
+$color-bg-MenuItem--active: createThemeVar("color-bg-MenuItem--active");
+$color-bg-MenuItem--active--hover: createThemeVar("color-bg-MenuItem--active--hover");
 $color-MenuItem--hover: createThemeVar("color-MenuItem--hover");
+$color-MenuItem--active: createThemeVar("color-MenuItem--active");
+$color-MenuItem--active--hover: createThemeVar("color-MenuItem--active--hover");
 $margin-top-MenuSeparator: createThemeVar("margin-top-MenuSeparator");
 $margin-bottom-MenuSeparator: createThemeVar("margin-bottom-MenuSeparator");
 $width-MenuSeparator: createThemeVar("width-MenuSeparator");
@@ -70,6 +74,16 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   &[data-highlighted] {
     background-color: $color-bg-MenuItem--hover;
     color: $color-MenuItem--hover;
+  }
+
+  &.active {
+    background-color: $color-bg-MenuItem--active;
+    color: $color-MenuItem--active;
+
+    &:hover {
+      background-color: $color-bg-MenuItem--active--hover;
+      color: $color-MenuItem--active--hover;
+    }
   }
 
   .wrapper {

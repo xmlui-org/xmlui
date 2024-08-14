@@ -15,6 +15,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import { desc } from "@components-core/descriptorHelper";
 import { Icon } from "@components/Icon/Icon";
 import { noop } from "@components-core/constants";
+import classnames from "@components-core/utils/classnames";
 
 // ====================================================================================================================
 // React DropdownMenu component implementation
@@ -210,6 +211,7 @@ type MenuItemProps = {
   label?: string;
   style?: CSSProperties;
   to?: string;
+  active?: boolean;
 };
 
 export function MenuItem({
@@ -219,13 +221,16 @@ export function MenuItem({
   style,
   icon,
   iconPosition = "start",
+  active = false,
 }: MenuItemProps) {
   const iconToLeft = iconPosition === "left" || iconPosition === "start";
 
   return (
     <ReactDropdownMenu.Item
       style={style}
-      className={styles.DropdownMenuItem}
+      className={classnames(styles.DropdownMenuItem, {
+        [styles.active]: active,
+      })}
       onClick={(event) => {
         event.stopPropagation();
         onClick(event);
@@ -241,19 +246,45 @@ export function MenuItem({
 // ====================================================================================================================
 // XMLUI MenuItem definition
 
-interface MenuItemDef extends ComponentDef<"MenuItem"> {
+/**
+ * This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the 
+ * [\`DropdownMenu\` component](./DropdownMenu) for using this component in menus.
+ * @descriptionRef
+ */
+export interface MenuItemComponentDef extends ComponentDef<"MenuItem"> {
   props: {
+    /**
+     * @descriptionRef
+     */
     iconPosition?: IconPosition;
+    /**
+     * This property names an optional icon to display with the menu item.
+     * @descriptionRef
+     */
     icon?: string;
+    /**
+     * This property defines the item's label.
+     * @descriptionRef
+     */
     label?: string;
+    /**
+     * This property defines the URL of the menu item. If this property is defined (and the \`click\` event 
+     * does not have an event handler), clicking the menu item navigates to this link.
+     * @descriptionRef
+     */
     to?: string;
+    /**
+     *This property indicates if the specified menu item is active.
+     * @descriptionRef
+     */
+    active?: boolean;
   };
   events: {
     click: string;
   };
 }
 
-const menuItemMetadata: ComponentDescriptor<MenuItemDef> = {
+const menuItemMetadata: ComponentDescriptor<MenuItemComponentDef> = {
   displayName: "MenuItem",
   description:
     "Represents a menu item within a DropDownMenu, clicking of which triggers an action",
@@ -274,13 +305,21 @@ const menuItemMetadata: ComponentDescriptor<MenuItemDef> = {
     "font-size-MenuItem": "inherit",
     "padding-vertical-MenuItem": "$space-2",
     "padding-horizontal-MenuItem": "$space-3",
-    "color-bg-MenuItem--hover": "$color-bg-dropdown-item--active",
+    "color-bg-MenuItem--hover": "$color-bg-dropdown-item--hover",
     "color-MenuItem--hover": "inherit",
     "gap-MenuItem": "$space-2",
+    "color-MenuItem--active": "$color-primary",
+    "color-bg-MenuItem--active": "$color-bg-dropdown-item--active",
+    light: {
+
+    },
+    dark: {
+
+    }
   },
 };
 
-export const menuItemRenderer = createComponentRenderer<MenuItemDef>(
+export const menuItemRenderer = createComponentRenderer<MenuItemComponentDef>(
   "MenuItem",
   ({
     node,
@@ -307,6 +346,7 @@ export const menuItemRenderer = createComponentRenderer<MenuItemDef>(
         style={layoutCss}
         iconPosition={extractValue(node.props.iconPosition)}
         icon={node.props?.icon && <Icon name={extractValue(node.props.icon)} />}
+        active={extractValue.asOptionalBoolean(node.props.active, false)}
       >
         {renderChild(node.children)}
       </MenuItem>

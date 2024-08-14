@@ -181,6 +181,10 @@ $themeVars: ();
   &.paragraph {
     @include textVariant("paragraph");
   }
+
+  &.subheading {
+    @include textVariant("subheading");
+  }
 }
 
 /*
