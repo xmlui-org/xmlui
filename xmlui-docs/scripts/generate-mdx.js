@@ -3,6 +3,102 @@ const path = require("path");
 const config = require("./config.json");
 const metadata = require("./component-metadata.json");
 
+/**
+ * Logger class.
+ * - severity indicates message importance
+ * - levels control what messages will be logged
+ */
+class Logger {
+  static severity = {
+    info: "info",
+    warning: "warning",
+    error: "error",
+  };
+
+  isValidSeverity(severity) {
+    return Object.keys(Logger.severity).includes(severity);
+  }
+
+  static levels = {
+    ...Logger.severity,
+    all: "all",
+  };
+
+  isValidLevel(level) {
+    return Object.keys(Logger.levels).includes(level);
+  }
+
+  defaultSeverity = Logger.severity.error;
+  defaultLogLevel = Logger.levels.all;
+
+  setLevels(...levels) {
+    levels = Array.from(new Set(levels));
+    let validLevels = levels.filter((level) => this.isValidLevel(level));
+    if (validLevels.length === 0) {
+      this._logError(
+        `No valid log levels provided. Using defaults: ${this.defaultLogLevel}.`
+      );
+      validLevels = [this.defaultLogLevel];
+    }
+
+    this.info = this._noop;
+    this.warn = this._noop;
+    this.error = this._noop;
+
+    if (validLevels.find((level) => level === Logger.levels.all)) {
+      this.info = this._logInfo;
+      this.warn = this._logWarning;
+      this.error = this._logError;
+      return;
+    }
+    for (const level of validLevels) {
+      this[level] = this[`_log${level.charAt(0).toUpperCase() + level.slice(1)}`];
+    }
+  }
+
+  log(severity = Logger.severity.info, ...args) {
+    if (!this.isValidSeverity(severity)) {
+      this.warn(
+        `Invalid log severity: ${severity}. Defaulting to message severity: ${this.defaultSeverity}.`
+      );
+      severity = this.defaultSeverity;
+    }
+    if (severity === Logger.severity.info) {
+      this.info(...args);
+    } else if (severity === Logger.severity.warning) {
+      this.warn(...args);
+    } else if (severity === Logger.severity.error) {
+      this.error(...args);
+    }
+  }
+
+  info(...args) {}
+  warn(...args) {}
+  error(...args) {}
+
+  _logInfo(...args) {
+    console.log("[INFO]", ...args);
+  }
+
+  _logWarning(...args) {
+    console.warn("[WARN]", ...args);
+  }
+
+  _logError(...args) {
+    console.error("[ERR]", ...args);
+  }
+
+  _noop(...args) {}
+}
+
+class ErrorWithSeverity extends Error {
+  constructor(message, severity = Logger.severity.error) {
+    super(message);
+    this.name = "ErrorWithSeverity";
+    this.severity = severity;
+  }
+}
+
 // Note: string concatenation is the fastest using `+=` in Node.js
 
 const IMPORTS = "imports";
@@ -35,31 +131,44 @@ const SECTION_DESCRIPTION_REF = "descriptionRef";
 
 // --- Script starts here
 
-const { sourceFolder, outFolder, examplesFolder, sectionNames } = handleConfig(config);
+const { sourceFolder, outFolder, examplesFolder, sectionNames } =
+  handleConfig(config);
+
+const logger = new Logger();
+logger.setLevels(Logger.levels.all);
 
 // Check for docs already in the output folder
-const docFiles = fs.readdirSync(outFolder).filter((file) => path.extname(file) === ".mdx");
-const componentNames = docFiles.map((file) => path.basename(file, path.extname(file))) || [];
+const docFiles = fs
+  .readdirSync(outFolder)
+  .filter((file) => path.extname(file) === ".mdx");
+const componentNames =
+  docFiles.map((file) => path.basename(file, path.extname(file))) || [];
 
 metadata.forEach((component) => {
   let result = "";
   let fileData = "";
   try {
     // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
-    fileData = readFileContents(path.join(sourceFolder, component.descriptionRef));
+    fileData = readFileContents(
+      path.join(sourceFolder, component.descriptionRef)
+    );
   } catch (error) {
-    if (error instanceof Error) {
-      console.error(error.message);
+    if (error instanceof ErrorWithSeverity) {
+      logger.log(error.severity, error.message);
     }
   }
 
   const parent = component.specializedFrom
-    ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
+    ? metadata.find(
+        (otherComponent) =>
+          otherComponent.displayName === component.specializedFrom
+      )
     : null;
 
   if (!!parent) {
     const parentDocs = `./${parent.displayName}.mdx`;
-    result += fileData || "There is no documentation for this component as of yet.";
+    result +=
+      fileData || "There is no documentation for this component as of yet.";
     result += `\n\n`;
     result += `The parent component documentation can be found [here](${parentDocs}).`;
   } else {
@@ -71,7 +180,11 @@ metadata.forEach((component) => {
 
     result += `# ${component.displayName}\n\n`;
 
-    result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
+    result += combineDescriptionAndDescriptionRef(
+      fileData,
+      component,
+      DESCRIPTION
+    );
     result += "\n\n";
 
     result += addContextVarsSection(fileData, component);
@@ -91,40 +204,54 @@ metadata.forEach((component) => {
   }
 
   try {
-    fs.writeFileSync(path.join(outFolder, `${component.displayName}.mdx`), result);
+    fs.writeFileSync(
+      path.join(outFolder, `${component.displayName}.mdx`),
+      result
+    );
     componentNames.push(component.displayName);
   } catch (error) {
-    console.error("Could not write mdx file: ", error?.message || "unknown error");
+    logger.error(
+      "Could not write mdx file: ",
+      error?.message || "unknown error"
+    );
   }
 });
 
 // Write the _meta.json file
 try {
-  const metaFileContents = Object.fromEntries(componentNames.sort().map((name) => [name, name]));
-  fs.writeFileSync(path.join(outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+  const metaFileContents = Object.fromEntries(
+    componentNames.sort().map((name) => [name, name])
+  );
+  fs.writeFileSync(
+    path.join(outFolder, "_meta.json"),
+    JSON.stringify(metaFileContents, null, 2)
+  );
 } catch (e) {
-  console.error("Could not write _meta file: ", e?.message || "unknown error");
+  logger.error("Could not write _meta file: ", e?.message || "unknown error");
 }
 
 // --- Helper functions
 
 function handleConfig(config) {
   const workingFolder = path.resolve(__dirname);
-  let { sourceFolderPath, outFolderPath, examplesFolderPath, sectionNames } = config;
+  let { sourceFolderPath, outFolderPath, examplesFolderPath, sectionNames } =
+    config;
 
   const _sourceFolder = path.resolve(workingFolder, sourceFolderPath);
   if (!fs.existsSync(_sourceFolder)) {
-    throw new Error(`Source folder ${_sourceFolder} does not exist.`);
+    throw new ErrorWithSeverity(`Source folder ${_sourceFolder} does not exist.`);
   }
 
-  const _outFolder = !outFolderPath ? workingFolder : path.resolve(workingFolder, outFolderPath);
+  const _outFolder = !outFolderPath
+    ? workingFolder
+    : path.resolve(workingFolder, outFolderPath);
   if (!fs.existsSync(_outFolder)) {
-    throw new Error(`Output folder ${_outFolder} does not exist.`);
+    throw new ErrorWithSeverity(`Output folder ${_outFolder} does not exist.`);
   }
 
   const _examplesFolder = path.relative(workingFolder, examplesFolderPath);
   if (!fs.existsSync(path.resolve(workingFolder, examplesFolderPath))) {
-    throw new Error(`Examples folder ${_examplesFolder} does not exist.`);
+    throw new ErrorWithSeverity(`Examples folder ${_examplesFolder} does not exist.`);
   }
 
   return {
@@ -147,7 +274,12 @@ function handleConfig(config) {
 function addImportsSection(data, component) {
   // This array is used in the transformer function
   const copyFilePaths = [];
-  const buffer = getSection(data, component[SECTION_DESCRIPTION_REF], IMPORTS, importPathTransformer);
+  const buffer = getSection(
+    data,
+    component[SECTION_DESCRIPTION_REF],
+    IMPORTS,
+    importPathTransformer
+  );
   return { buffer, copyFilePaths };
 
   // ---
@@ -172,7 +304,7 @@ function addImportsSection(data, component) {
     ];
     // We assume that removing the ;-s and/or the \n-s will leave an even number of parts: an import statement & an import path
     if (splitNormalized.length % 2 !== 0) {
-      throw new Error("Malformed import statement found in: ", component.displayName);
+      throw new ErrorWithSeverity("Malformed import statement found in: ", component.displayName, "Skipping imports", Logger.severity.warning);
     }
     const importStatements = [];
     const importPaths = [];
@@ -186,7 +318,12 @@ function addImportsSection(data, component) {
     for (let i = 0; i < importPaths.length; i++) {
       // NOTE: this is pretty restrictive, but works for now
       if (!importPaths[i].startsWith("./doc-resources")) {
-        console.error("Invalid import path: ", importPaths[i], " in ", component.displayName);
+        logger.error(
+          "Invalid import path: ",
+          importPaths[i],
+          " in ",
+          component.displayName
+        );
         continue;
       }
       const importFile = path.parse(importPaths[i]);
@@ -194,11 +331,18 @@ function addImportsSection(data, component) {
         .join(examplesFolder, component.displayName, importFile.base)
         .replaceAll(path.posix.sep, path.sep);
       // NOTE: need to use POSIX separators here regardless of platform
-      transformedStatements += `${importStatements[i]} "${transformedPath.replaceAll(path.sep, path.posix.sep)}";\n`;
+      transformedStatements += `${
+        importStatements[i]
+      } "${transformedPath.replaceAll(path.sep, path.posix.sep)}";\n`;
 
       // 3. Add the original and new import paths to an array to copy them later
       copyFilePaths.push({
-        oldPath: path.join(sourceFolder, component.displayName, importFile.dir, importFile.base),
+        oldPath: path.join(
+          sourceFolder,
+          component.displayName,
+          importFile.dir,
+          importFile.base
+        ),
         newPath: path.join(outFolder, transformedPath),
       });
     }
@@ -210,14 +354,21 @@ function addImportsSection(data, component) {
 function addContextVarsSection(data, component) {
   let buffer = `## ${sectionNames.contextVars}\n\n`;
 
-  if (!component.contextVars || Object.keys(component.contextVars ?? {}).length === 0) {
+  if (
+    !component.contextVars ||
+    Object.keys(component.contextVars ?? {}).length === 0
+  ) {
     return buffer + "This component does not have any context variables.";
   }
   Object.entries(component.contextVars)
     .sort()
     .forEach(([contextVarName, contextVar]) => {
       buffer += `### \`${contextVarName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(data, contextVar, CONTEXT_VARS);
+      buffer += combineDescriptionAndDescriptionRef(
+        data,
+        contextVar,
+        CONTEXT_VARS
+      );
       buffer += "\n\n";
     });
 
@@ -285,7 +436,11 @@ function addEventsSection(data, component) {
 
 function addStylesSection(data, component) {
   let buffer = `## ${sectionNames.styles}\n\n`;
-  const fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], STYLES);
+  const fileBuffer = getSection(
+    data,
+    component[SECTION_DESCRIPTION_REF],
+    STYLES
+  );
   buffer += fileBuffer || "This component does not have any styles.";
 
   return buffer;
@@ -304,8 +459,15 @@ function combineDescriptionAndDescriptionRef(
     descriptionBuffer = component[SECTION_DESCRIPTION];
   }
 
-  if (component.hasOwnProperty(SECTION_DESCRIPTION_REF) && component[SECTION_DESCRIPTION_REF]) {
-    fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], sectionId);
+  if (
+    component.hasOwnProperty(SECTION_DESCRIPTION_REF) &&
+    component[SECTION_DESCRIPTION_REF]
+  ) {
+    fileBuffer = getSection(
+      data,
+      component[SECTION_DESCRIPTION_REF],
+      sectionId
+    );
   }
 
   if (!descriptionBuffer && !fileBuffer) {
@@ -317,34 +479,47 @@ function combineDescriptionAndDescriptionRef(
   return descriptionBuffer || fileBuffer;
 }
 
-function getSection(data, sectionRef, sectionId, transformer = (contents) => contents) {
+function getSection(
+  data,
+  sectionRef,
+  sectionId,
+  transformer = (contents) => contents
+) {
   const separator = "?";
   const descRefParts = sectionRef.split(separator);
   const sectionName = descRefParts.length > 1 ? descRefParts[1] : "";
 
   try {
     if (!acceptSection(sectionId, sectionName)) {
-      throw new Error(`Invalid section name and ID: ${sectionName} and ${sectionId}`, { cause: "Invalid section" });
+      throw new ErrorWithSeverity(
+        `Invalid section name and ID: ${sectionName} and ${sectionId}`,
+        Logger.severity.warning
+      );
     }
     const sectionHeader = SECTION_DIRECTIVE_MAP[sectionId];
     if (!sectionHeader) {
-      throw new Error(`Unknown section ID: ${sectionId}`, { cause: "Unknown section" });
+      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, 
+        Logger.severity.warning
+      );
     }
 
-    const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${sectionName ? ` ${sectionName}` : ""}`;
+    const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${
+      sectionName ? ` ${sectionName}` : ""
+    }`;
     const endDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-END`;
     const contents = resolveSection(data, startDirective, endDirective);
-    /* if (!contents) {
-      console.warn(`Section is empty for section "${sectionId}"`);
-    } */
 
     return transformer(contents);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 
-function getSectionFromFile(sectionRef, sectionId, transformer = (contents) => contents) {
+function getSectionFromFile(
+  sectionRef,
+  sectionId,
+  transformer = (contents) => contents
+) {
   const separator = "?";
   const descRefParts = sectionRef.split(separator);
   const filePath = descRefParts[0];
@@ -353,37 +528,35 @@ function getSectionFromFile(sectionRef, sectionId, transformer = (contents) => c
 
   try {
     if (!fileExists(srcFilePath)) {
-      throw new Error(`File ${srcFilePath} does not exist.`, {
-        cause: "File does not exist",
-      });
+      throw new ErrorWithSeverity(`File ${srcFilePath} does not exist.`);
     }
     if (isDirectory(srcFilePath)) {
-      throw new Error(`File ${srcFilePath} is a directory, cannot be processed.`, {
-        cause: "File path is a directory",
-      });
+      throw new ErrorWithSeverity(`File ${srcFilePath} is a directory, cannot be processed.`);
     }
     if (!acceptSection(sectionId, sectionName)) {
-      throw new Error(`Invalid section name and ID: ${sectionName} and ${sectionId}`, { cause: "Invalid section" });
+      throw new ErrorWithSeverity(
+        `Invalid section name and ID: ${sectionName} and ${sectionId}`,
+        Logger.severity.warning
+      );
     }
     const sectionHeader = SECTION_DIRECTIVE_MAP[sectionId];
     if (!sectionHeader) {
-      throw new Error(`Unknown section ID: ${sectionId}`, { cause: "Unknown section" });
+      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, Logger.severity.warning);
     }
 
     const data = fs.readFileSync(srcFilePath, "utf8");
-    const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${sectionName ? ` ${sectionName}` : ""}`;
+    const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${
+      sectionName ? ` ${sectionName}` : ""
+    }`;
     const endDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-END`;
     const contents = resolveSection(data, startDirective, endDirective);
-    /* if (!contents) {
-      console.warn(`Section is empty for section "${sectionId}"`);
-    } */
 
     return transformer(contents);
   } catch (error) {
-    if (error instanceof Error && error.code === "ENOENT") {
-      console.error(`File ${srcFilePath} does not exist.`);
+    if (error instanceof ErrorWithSeverity && error.code === "ENOENT") {
+      logger.error(`File ${srcFilePath} does not exist.`);
     } else {
-      console.error(error);
+      logger.error(error);
     }
   }
 }
@@ -396,7 +569,9 @@ function acceptSection(sectionId, sectionName) {
 
 function resolveSection(data, startDirective, endDirective) {
   startDirective = startDirective.replaceAll("$", "\\$");
-  const match = data.match(new RegExp(`${startDirective}([\\s\\S]*?${endDirective})`, "i"));
+  const match = data.match(
+    new RegExp(`${startDirective}([\\s\\S]*?${endDirective})`, "i")
+  );
   if (!match || match?.length === 0) {
     return "";
   }
@@ -412,7 +587,9 @@ function resolveSection(data, startDirective, endDirective) {
 
 function trimSection(sectionLines) {
   const firstNonEmptyIdx = sectionLines.findIndex((line) => line.trim() !== "");
-  const lastNonEmptyIdx = sectionLines.findLastIndex((line) => line.trim() !== "");
+  const lastNonEmptyIdx = sectionLines.findLastIndex(
+    (line) => line.trim() !== ""
+  );
   return sectionLines.slice(firstNonEmptyIdx, lastNonEmptyIdx + 1);
 }
 
@@ -436,23 +613,23 @@ function copyImports(imports) {
       if (!!pathToNewFile && !fs.existsSync(pathToNewFile)) {
         fs.mkdirSync(pathToNewFile, { recursive: true });
       }
-      fs.copyFileSync(importPath.oldPath, importPath.newPath, fs.constants.COPYFILE_FICLONE);
+      fs.copyFileSync(
+        importPath.oldPath,
+        importPath.newPath,
+        fs.constants.COPYFILE_FICLONE
+      );
     });
   } catch (e) {
-    console.error("Could not copy file: ", e?.message || "unknown error");
+    logger.error("Could not copy file: ", e?.message || "unknown error");
   }
 }
 
 function readFileContents(filePath) {
   if (!fileExists(filePath)) {
-    throw new Error(`File ${filePath} does not exist.`, {
-      cause: "File does not exist",
-    });
+    throw new ErrorWithSeverity(`File ${filePath} does not exist.`, Logger.severity.warning);
   }
   if (fs.lstatSync(filePath).isDirectory()) {
-    throw new Error(`File ${filePath} is a directory, cannot be processed.`, {
-      cause: "File path is a directory",
-    });
+    throw new ErrorWithSeverity(`File ${filePath} is a directory, cannot be processed.`, Logger.severity.warning);
   }
 
   return fs.readFileSync(filePath, "utf8");
