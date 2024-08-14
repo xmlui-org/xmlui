@@ -1,6 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { Component, CSSProperties, ReactNode } from "react";
 import type { AppContextObject } from "./AppContextDefs";
-import type { ComponentDef, DynamicChildComponentDef } from "./ComponentDefs";
+import type { ComponentDef, CompoundComponentDef, DynamicChildComponentDef } from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ComponentDescriptor } from "./ComponentDescriptorDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
@@ -181,11 +181,18 @@ export type NonCssLayoutProps = {
   orientation?: string;
 };
 
-// This function renders a component definition into a React component
 /**
- *
+ * This function renders a component definition into a React component
  */
 export type ComponentRendererFn<T extends ComponentDef> = (context: RendererContext<T>) => ReactNode;
+
+/**
+ * This function renders a component definition into a React component
+ */
+export type CompoundComponentRendererInfo = {
+  compoundComponentDef: CompoundComponentDef;
+  hints?: ComponentDescriptor<any>;
+};
 
 /**
  * Components must be registered with a component registry so the engine can use them. This type

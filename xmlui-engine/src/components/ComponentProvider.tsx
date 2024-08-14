@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import { ComponentRendererDef } from "@abstractions/RendererDefs";
+import {
+  ComponentRendererDef,
+  CompoundComponentRendererInfo,
+} from "@abstractions/RendererDefs";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
@@ -55,7 +58,10 @@ import { dynamicHeightListComponentRenderer } from "@components/List/List";
 import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "@components/FormItem/FormItem";
-import { passwordInputComponentRenderer, textBoxComponentRenderer } from "@components/TextBox/TextBox";
+import {
+  passwordInputComponentRenderer,
+  textBoxComponentRenderer,
+} from "@components/TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "@components/Form/Form";
 import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
@@ -65,11 +71,17 @@ import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
 import { appRenderer } from "@components/App/App";
 import { navPanelRenderer } from "@components/NavPanel/NavPanel";
 import { pageRenderer, pagesRenderer } from "@components/Pages/Pages";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+} from "@abstractions/ComponentDefs";
 import { footerRenderer } from "@components/Footer/Footer";
 import { navGroupComponentRenderer } from "@components/NavGroup/NavGroup";
 import { logoComponentRenderer } from "@components/Logo/Logo";
-import { radioGroupOptionRenderer, radioGroupRenderer } from "@components/RadioGroup/RadioGroup";
+import {
+  radioGroupOptionRenderer,
+  radioGroupRenderer,
+} from "@components/RadioGroup/RadioGroup";
 import { childrenSlotHolder } from "@components-core/ChildrenSlot";
 import { fileInputRenderer } from "@components/FileInput/FileInput";
 import { chartRenderer } from "@components/Chart/Chart";
@@ -94,13 +106,19 @@ import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryCo
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
 import { tableColumnDefComponentRenderer } from "@components/TableColumnDef/TableColumnDef";
 import { optionComponentRenderer } from "@components/Option/Option";
-import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
+import type {
+  ActionFunction,
+  ActionRendererDef,
+} from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/ApiAction";
 import { downloadAction } from "@components-core/action/DownloadFileAction";
 import { uploadAction } from "@components-core/action/UploadAction";
 import { navigateAction } from "@components-core/action/NavigateAction";
 import { timedAction } from "@components-core/action/TimedAction";
-import type { LoaderRenderer, LoaderRendererDef } from "@components-core/abstractions/LoaderRenderer";
+import type {
+  LoaderRenderer,
+  LoaderRendererDef,
+} from "@components-core/abstractions/LoaderRenderer";
 import { apiLoaderRenderer } from "@components-core/loader/ApiLoader";
 import { externalDataLoaderRenderer } from "@components-core/loader/ExternalDataLoader";
 import { mockLoaderRenderer } from "@components-core/loader/MockLoaderRenderer";
@@ -114,6 +132,7 @@ import { tabsComponentRenderer } from "@components/Tabs/Tabs";
 import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
 import { appStateComponentRenderer } from "@components/AppState/AppState";
 import { pageHeaderRenderer } from "./PageHeader/PageHeader";
+import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -318,8 +337,8 @@ export class ComponentRegistry {
     contributes.components?.forEach((renderer) => {
       this.registerComponentRenderer(renderer);
     });
-    contributes.compoundComponents?.forEach((componentDef) => {
-      this.registerCompoundComponentRenderer(componentDef);
+    contributes.compoundComponents?.forEach((def) => {
+      this.registerCompoundComponentRenderer({ compoundComponentDef: def });
     });
 
     this.registerActionFn(apiAction);
@@ -354,7 +373,9 @@ export class ComponentRegistry {
     return Array.from(this.pool.keys());
   }
 
-  public lookupComponentRenderer(viewComponentType: string): ComponentRegistryEntry | undefined {
+  public lookupComponentRenderer(
+    viewComponentType: string
+  ): ComponentRegistryEntry | undefined {
     return this.pool.get(viewComponentType);
   }
 
@@ -367,7 +388,11 @@ export class ComponentRegistry {
     return this.loaders.get(type);
   }
 
-  private registerComponentRenderer({ type, renderer, metadata: hints }: ComponentRendererDef) {
+  private registerComponentRenderer({
+    type,
+    renderer,
+    metadata: hints,
+  }: ComponentRendererDef) {
     this.pool.set(type, { renderer, descriptor: hints });
     if (hints?.themeVars) {
       Object.keys(hints.themeVars).forEach((key) => this.themeVars.add(key));
@@ -377,7 +402,10 @@ export class ComponentRegistry {
     }
   }
 
-  private registerCompoundComponentRenderer(compoundComponentDef: CompoundComponentDef) {
+  private registerCompoundComponentRenderer({
+    compoundComponentDef,
+    hints,
+  }: CompoundComponentRendererInfo) {
     this.pool.set(compoundComponentDef.name, {
       renderer: (rendererContext: any) => {
         return (
@@ -391,9 +419,18 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
     });
+    if (hints?.themeVars) {
+      Object.keys(hints.themeVars).forEach((key) => this.themeVars.add(key));
+    }
+    if (hints?.defaultThemeVars) {
+      merge(this.defaultThemeVars, hints?.defaultThemeVars);
+    }
   }
 
-  private registerActionFn({ actionName: functionName, actionFn }: ActionRendererDef) {
+  private registerActionFn({
+    actionName: functionName,
+    actionFn,
+  }: ActionRendererDef) {
     this.actionFns.set(functionName, actionFn);
   }
 
@@ -410,8 +447,13 @@ export class ComponentRegistry {
 // This React component provides a context in which components can access the component registry. The
 // component takes care that child component are rendered only when the component registry is initialized
 // (filled with the definition of available components).
-export function ComponentProvider({ children, contributes }: ComponentProviderProps) {
-  const [componentRegistry, setComponentRegistry] = useState(() => new ComponentRegistry(contributes));
+export function ComponentProvider({
+  children,
+  contributes,
+}: ComponentProviderProps) {
+  const [componentRegistry, setComponentRegistry] = useState(
+    () => new ComponentRegistry(contributes)
+  );
   //sync up the changed contributes (HMR)
   useEffect(() => {
     setComponentRegistry(new ComponentRegistry(contributes));
@@ -422,6 +464,8 @@ export function ComponentProvider({ children, contributes }: ComponentProviderPr
   }, [contributes]);
 
   return (
-    <ViewComponentRegistryContext.Provider value={componentRegistry}>{children}</ViewComponentRegistryContext.Provider>
+    <ViewComponentRegistryContext.Provider value={componentRegistry}>
+      {children}
+    </ViewComponentRegistryContext.Provider>
   );
 }

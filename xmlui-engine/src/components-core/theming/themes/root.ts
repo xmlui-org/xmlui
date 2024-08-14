@@ -237,8 +237,9 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-bg--disabled": $colorSurface50,
         "color-bg--selected": $colorPrimary50,
         "color-bg-overlay": "rgba(0, 0, 0, 0.2)",
-        "color-bg-dropdown-item--hover": $colorSurface50,
-        "color-bg-dropdown-item--active": $colorSurface100,
+        "color-bg-dropdown-item--hover": $colorSurface100,
+        "color-bg-dropdown-item--active": $colorSurface200,
+        "color-bg-dropdown-item--active-hover": $colorSurface50,
         "color-bg-tree-row--selected--before": $colorPrimary50,
 
         // --- Various default colors

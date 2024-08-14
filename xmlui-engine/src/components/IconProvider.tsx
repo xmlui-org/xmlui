@@ -98,6 +98,8 @@ import { UserIcon } from "@components/Icon/UserIcon";
 import { WarningIcon } from "@components/Icon/WarningIcon";
 import { XlsIcon } from "@components/Icon/XlsIcon";
 import { ErrorIcon } from "@components/Icon/ErrorIcon";
+import { TrendingUpIcon } from "./Icon/TrendingUpIcon";
+import { TrendingDownIcon } from "./Icon/TrendingDownIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -233,6 +235,8 @@ registerIconRenderer("share", (props: IconBaseProps) => <ShareIcon {...props} />
 registerIconRenderer("new-window", (props: IconBaseProps) => <RxOpenInNewWindow {...props} />);
 registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {...props} />);
 registerIconRenderer("palette", (props: IconBaseProps) => <MdOutlinePalette {...props} />);
+registerIconRenderer("trending-up", (props: IconBaseProps) => <TrendingUpIcon {...props} />);
+registerIconRenderer("trending-down", (props: IconBaseProps) => <TrendingDownIcon {...props} />);
 
 // --- IDE extras (temporary)
 registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {...props} />);

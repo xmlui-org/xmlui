@@ -1,7 +1,5 @@
-import type {
-  ComponentDef,
-  CompoundComponentDef,
-} from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 /**
  * (Document it)
@@ -20,40 +18,47 @@ export interface PageHeaderComponentDef
   };
 }
 
-export const pageHeaderRenderer: CompoundComponentDef = {
-  name: "PageHeader",
-  component: {
-    type: "HStack",
-    props: {
-      gap: "$space-4",
-      verticalAlignment: "center",
+export const pageHeaderRenderer: CompoundComponentRendererInfo = {
+  compoundComponentDef: {
+    name: "PageHeader",
+    component: {
+      type: "HStack",
+      props: {
+        gap: "$gap-PageHeader",
+        verticalAlignment: "center",
+      },
+      children: [
+        {
+          type: "VStack",
+          children: [
+            {
+              type: "Text",
+              props: {
+                variant: "subheading",
+                when: "{$props.preTitle !== undefined}",
+                value: "{$props.preTitle}",
+              },
+            },
+            {
+              type: "H2",
+              props: {
+                value: "{$props.title}",
+              },
+            },
+          ],
+        },
+        {
+          type: "SpaceFiller",
+        },
+        {
+          type: "ChildrenSlot",
+        },
+      ],
     },
-    children: [
-      {
-        type: "VStack",
-        children: [
-          {
-            type: "Text",
-            props: {
-              variant: "subheading",
-              when: "{$props.preTitle !== undefined}",
-              value: "{$props.preTitle}",
-            },
-          },
-          {
-            type: "H2",
-            props: {
-              value: "{$props.title}",
-            },
-          },
-        ],
-      },
-      {
-        type: "SpaceFiller",
-      },
-      {
-        type: "ChildrenSlot",
-      },
-    ],
   },
+  hints: {
+    defaultThemeVars: {
+        "gap-PageHeader": "$space-4",
+    }
+  }
 };
