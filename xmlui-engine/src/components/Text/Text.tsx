@@ -249,6 +249,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "padding-vertical-Text-codefence": "$space-2",
     "padding-vertical-Text-paragraph": "$space-1",
     "font-size-Text-subheading": "$font-size-H6",
+    "font-weight-Text-subheading": "$font-weight-bold",
     "letter-spacing-Text-subheading": "0.04em",
     "transform-Text-subheading": "uppercase",
     "margin-top-Text-tableheading": "$space-1",

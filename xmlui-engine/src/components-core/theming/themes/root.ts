@@ -34,6 +34,9 @@ const {
 // --- Individual controls also add their component-specific default theme variable values.
 export const RootThemeDefinition: ThemeDefinition = {
   id: "root",
+  resources: {
+    "font.inter": "https://rsms.me/inter/inter.css"
+  },
   themeVars: {
     // --- The unit of measurement for all sizes/spaces
     "space-base": "0.25rem",
@@ -67,7 +70,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-primary": "$color-primary-500",
 
     // --- Secondary color shades (steel-bluish)
-    "color-secondary-50": "hsl(211.7,21.2%,96.9%)", 
+    "color-secondary-50": "hsl(211.7,21.2%,96.9%)",
     "color-secondary-100": "hsl(211.7,21.2%,93.7%)",
     "color-secondary-200": "hsl(211.7,21.2%,87.4%)",
     "color-secondary-300": "hsl(211.7,21.2%,81.1%)",
@@ -159,11 +162,12 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The sans-serif font set
     "font-family-sans-serif":
-      "-apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
-    
+      "'Inter Var', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
+
     // --- The monospace font set
-    "font-family-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
-    "font-feature-settings": "cv03, cv04, cv11",
+    "font-family-monospace":
+      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
     "media-max-width-phone": "420px",
@@ -171,10 +175,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The app's default radius value
     radius: "4px",
-    "color-outline--focus": 'rgba($color-primary-500-rgb, .5)',
-    "thickness-outline--focus": '2px',
-    "style-outline--focus": 'solid',
-    "offset-outline--focus": '0',
+    "color-outline--focus": "rgba($color-primary-500-rgb, .5)",
+    "thickness-outline--focus": "2px",
+    "style-outline--focus": "solid",
+    "offset-outline--focus": "0",
 
     // --- The app's default font family
     "font-family": "$font-family-sans-serif",
@@ -189,7 +193,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "font-size-tiny": "0.625rem",
 
     // --- The default font size
-    "font-size": "$font-size-small",
+    "font-size": "$font-size-normal",
 
     // --- Font used for body
     "font-weight": "$font-weight-normal",
@@ -199,8 +203,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Various predefined shadow values
     shadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
-    "shadow-md": "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
-    "shadow-xxl": "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
+    "shadow-md":
+      "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
+    "shadow-xxl":
+      "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
     "shadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
     "shadow-spread-2": "-6px -4px 40px 10px rgba(0, 0, 0, 0.1)",
     "shadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
@@ -209,7 +215,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "max-content-width": "1320px",
 
     "size-Icon": "1.25em",
-    
+
     "shadow-Avatar": "inset 0 0 0 1px rgba(4, 32, 69, 0.1)",
     "border-size-Avatar": "0px",
     "radius-Avatar": "4px",
@@ -271,7 +277,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
         // --- InputLabel is a React component, so we define its default theme variables here
         "color-text-InputLabel-required": $colorDanger600,
-      }
+      },
     },
     dark: {
       themeVars: {
@@ -318,7 +324,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
         // --- InputLabel is a React component, so we define its default theme variables here
         "color-text-InputLabel-required": $colorDanger400,
-      }
-    }
-  }
+      },
+    },
+  },
 };

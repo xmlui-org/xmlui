@@ -859,6 +859,7 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     "font-size-heading-Table": "$font-size-smaller",
     "font-weight-heading-Table": "$font-weight-bold",
     "transform-text-heading-Table": "uppercase",
+    "font-size-row-Table": "$font-size-small",
 
     dark: {
       "color-bg-row-Table--hover": "$color-primary-900",

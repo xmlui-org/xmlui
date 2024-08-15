@@ -43,6 +43,7 @@ export const pageHeaderRenderer: CompoundComponentRendererInfo = {
               type: "H2",
               props: {
                 value: "{$props.title}",
+                margin: "0",
               },
             },
           ],
@@ -58,7 +59,7 @@ export const pageHeaderRenderer: CompoundComponentRendererInfo = {
   },
   hints: {
     defaultThemeVars: {
-        "gap-PageHeader": "$space-4",
+        "gap-PageHeader": "$space-2",
     }
   }
 };

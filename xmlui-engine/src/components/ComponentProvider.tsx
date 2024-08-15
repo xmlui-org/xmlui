@@ -135,6 +135,8 @@ import { pageHeaderRenderer } from "./PageHeader/PageHeader";
 import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
 import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
 import { tableHeaderRenderer } from "./TableHeader/TableHeader";
+import { toolbarRenderer } from "./Toolbar/Toolbar";
+import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -336,6 +338,8 @@ export class ComponentRegistry {
     this.registerCompoundComponentRenderer(iconInfoCardRenderer);
     this.registerComponentRenderer(marginlessCardComponentRenderer);
     this.registerCompoundComponentRenderer(tableHeaderRenderer);
+    this.registerCompoundComponentRenderer(toolbarRenderer);
+    this.registerCompoundComponentRenderer(toolbarButtonRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

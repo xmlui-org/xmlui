@@ -2,6 +2,12 @@
 
 `Button` is an interactive element that triggers an action when clicked.
 
+Use the `Button` component to trigger various actions.
+
+## Context Variables
+
+This component does not have any context variables.
+
 ## Props
 
 ### `contentPosition`
@@ -61,34 +67,6 @@ The value of this property indicates if the button accepts actions (`true`) or d
       <Button label="I am enabled (by default)" />
       <Button label="I am enabled explicitly" enabled="true" />
       <Button label="I am not enabled" enabled="false" />
-    </HStack>
-  `}
-  horizontal={true}
-  height={60}
-/>
-
-### `gap`
-
-This property is an optional [size value](./appearance/common-units#size-values) to determine the gap between the icon and the label components (if both are set). The current theme determines the default value of this prop.
-
-```ueml copy
-<HStack gap="1rem" >
-  <Button icon="trash" label="default gap" />
-  <Button icon="trash" label="No gap" gap="0" />
-  <Button icon="trash" label="12px gap" gap="12px" />
-  <Button icon="trash" label="2rem gap" gap="2rem" />
-</HStack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Example: gap"
-  app={`
-    <HStack gap="1rem" >
-      <Button icon="trash" label="default gap" />
-      <Button icon="trash" label="No gap" gap="0" />
-      <Button icon="trash" label="12px gap" gap="12px" />
-      <Button icon="trash" label="2rem gap" gap="2rem" />
     </HStack>
   `}
   horizontal={true}
@@ -325,6 +303,10 @@ The value of this optional property determines the fundamental style of the butt
   `}
 />
 
+## API
+
+This component does not provide any API.
+
 ## Events
 
 ### `click`
@@ -389,6 +371,7 @@ The `Button` component uses these theme variables to customize its appearance:
 - `color-border`
 - `color-text`
 - `font-size`
+- `font-weight`
 - `radius`
 - `style-border`
 - `thickness-border`
