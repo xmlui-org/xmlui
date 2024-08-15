@@ -10,10 +10,11 @@ interface ErrorWithLineColInfo extends Error {
 
 export function parseXmlUiMarkup(
   source: string,
-  moduleResolver?: ModuleResolver
+  moduleResolver?: ModuleResolver,
 ) {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
+
   if (errors.length > 0) {
     const newlinePositions = [];
     for (let i = 0; i < source.length; ++i) {
@@ -24,7 +25,7 @@ export function parseXmlUiMarkup(
     const errorWithLines = addPositions(errors, newlinePositions);
     const errorMessages = errorWithLines
       .map(
-        (e) => `Error at line ${e.line}, column:${e.col}:\n   ${e.message}\n`
+        (e) => `Error at line ${e.line}, column:${e.col}:\n   ${e.message}\n`,
       )
       .join("\n");
     throw new Error(errorMessages);
@@ -34,7 +35,7 @@ export function parseXmlUiMarkup(
 
 function addPositions(
   errors: Error[],
-  newlinePositions: number[]
+  newlinePositions: number[],
 ): ErrorWithLineColInfo[] {
   if (newlinePositions.length === 0) {
     for (let err of errors) {
@@ -45,7 +46,8 @@ function addPositions(
   }
 
   for (let err of errors) {
-    for (let i = 0; i < newlinePositions.length; ++i) {
+    let i = 0;
+    for (; i < newlinePositions.length; ++i) {
       const newlinePos = newlinePositions[i];
       if (err.pos < newlinePos) {
         (err as ErrorWithLineColInfo).line = i + 1;
@@ -53,6 +55,11 @@ function addPositions(
           err.pos - (newlinePositions[i - 1] ?? 0) + 1;
         break;
       }
+    }
+    const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
+    if (err.pos >= lastNewlinePos) {
+      (err as ErrorWithLineColInfo).line = newlinePositions.length + 1;
+      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos +0;
     }
   }
   return errors as ErrorWithLineColInfo[];
