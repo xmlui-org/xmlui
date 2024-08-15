@@ -31,6 +31,8 @@ type DropdownMenuProps = {
   disabled?: boolean;
   triggerButtonVariant?: string;
   triggerButtonThemeColor?: string;
+  triggerButtonIcon?: string;
+  triggerButtonIconPosition?: IconPosition;
 };
 
 export function DropdownMenu({
@@ -44,6 +46,8 @@ export function DropdownMenu({
   disabled = false,
   triggerButtonVariant = "ghost",
   triggerButtonThemeColor = "primary",
+  triggerButtonIcon = "chevrondown",
+  triggerButtonIconPosition = "end",
 }: DropdownMenuProps) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
@@ -72,10 +76,12 @@ export function DropdownMenu({
           triggerTemplate
         ) : (
           <Button
-            icon={<Icon name="chevrondown" />}
+            icon={<Icon name={triggerButtonIcon} />}
+            iconPosition={triggerButtonIconPosition}
             type="button"
             variant={triggerButtonVariant as ButtonVariant}
             themeColor={triggerButtonThemeColor as ButtonThemeColor}
+            disabled={disabled}          
           >
             {label}
           </Button>
@@ -130,6 +136,14 @@ export interface DropdownMenuComponentDef extends ComponentDef<"DropdownMenu"> {
      * effect when a custom trigger is defined with \`triggerTemplate\`.
      */
     triggerButtonThemeColor?: string;
+    /**
+     * This property defines the icon to display on the trigger button.
+     */
+    triggerButtonIcon?: string;
+    /**
+     * This property defines the position of the icon on the trigger button.
+     */
+    triggerButtonIconPosition?: IconPosition;
   };
   events: {
     /**
@@ -192,6 +206,8 @@ export const dropdownMenuComponentRenderer =
           disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
           triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
           triggerButtonVariant={extractValue(node.props.triggerButtonVariant)}
+          triggerButtonIcon={extractValue(node.props.triggerButtonIcon)}
+          triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
         >
           {renderChild(node.children)}
         </DropdownMenu>

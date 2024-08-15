@@ -180,7 +180,7 @@ const h2Metadata: ComponentDescriptor<H2ComponentDef> = {
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "font-size-H2": "$font-size-medium",
-    "line-height-H2": "$line-height-relaxed",
+    "line-height-H2": "$line-height-snug",
     "margin-top-H2": "$space-2",
     "margin-bottom-H2": "$space-4",
     light: {

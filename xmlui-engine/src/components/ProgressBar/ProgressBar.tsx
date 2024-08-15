@@ -44,7 +44,7 @@ const metadata: ComponentDescriptor<ProgressBarComponentDef> = {
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "radius-ProgressBar": "$radius",
-    "radius-indicator-ProgressBar": "$radius",
+    "radius-indicator-ProgressBar": "0px",
     "thickness-ProgressBar": "$space-2",
     light: {
       "color-bg-ProgressBar": "$color-surface-200",

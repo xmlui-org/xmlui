@@ -206,10 +206,9 @@ const metadata: ComponentDescriptor<NavLinkComponentDef> = {
     "color-bg-NavLink": "transparent",
     "padding-horizontal-NavLink": "$space-4",
     "padding-vertical-NavLink": "$space-2",
-    "font-size-NavLink": "$font-size",
+    "font-size-NavLink": "$font-size-small",
     "font-weight-NavLink": "$font-weight-normal",
     "color-text-NavLink": "$color-text-primary",
-    "color-icon-NavLink": "$color-text-NavLink",
     "font-weight-NavLink--pressed": "$font-weight-normal",
     "thickness-indicator-NavLink": "$space-0_5",
 
@@ -220,6 +219,7 @@ const metadata: ComponentDescriptor<NavLinkComponentDef> = {
     "radius-indicator-NavLink": "$radius",
 
     light: {
+      "color-icon-NavLink": "$color-surface-500",
       "color-indicator-NavLink--active": "$color-primary-500",
       "color-indicator-NavLink--pressed": "$color-primary-500",
       "color-indicator-NavLink--hover": "$color-primary-600",
