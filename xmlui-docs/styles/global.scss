@@ -10,7 +10,7 @@
   --syntax-token-component: #cb5291;
   --syntax-token-delimiter-angle: #66748E;
   --syntax-token-attribute-name: #2d2d2d;
-  --syntax-token-equal-sign: #7A27EC;
+  --syntax-token-equal-sign: #2d2d2d;
   --syntax-token-string: #0074a9;
   --syntax-token-script: #02A1A1;
   --syntax-token-helper: #005AE1;
@@ -26,7 +26,7 @@
   --syntax-token-component: #f472b6;
   --syntax-token-delimiter-angle: #97A7C5;
   --syntax-token-attribute-name: #cbd5e1;
-  --syntax-token-equal-sign: #B078FF;
+  --syntax-token-equal-sign: #cbd5e1;
   --syntax-token-string: #7dd3fc;
   --syntax-token-script: #78DBDB;
   --syntax-token-helper: #80A6F8;
@@ -36,6 +36,112 @@
   --syntax-token-cdata: #5CC1F9;
   --syntax-token-delimiter-curly: #FFFFFF;
   --syntax-token-text: #f5f5ff;
+
+  ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li {
+    > a:hover, > button:hover {
+      background-color: #1c5aa02a;
+    }
+
+    > button > svg:hover {
+      background-color: #1c5aa02a;
+    }
+
+    &.active {
+      > a {
+        background-color: transparent;
+      }
+    }
+  }
+
+  aside.nextra-sidebar-container {
+    background-color: transparent;
+    border-right: 1px solid #313b491f;
+
+    div.nextra-scrollbar {
+      padding: 1.5rem;
+    }
+  }
+
+  h1 {
+    font-size: 1.875rem;
+    line-height: 2.2rem;
+    margin-top: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-top: 3rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+
+  article main {
+    padding-top: 2rem;
+  }
+
+  article main p {
+    margin-top: 1.25rem;
+  }
+}
+
+:is(html[class~=light]) {
+  ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li {
+    > a:hover, > button:hover {
+      background-color: #004ca30c;
+    }
+
+    > button > svg:hover {
+      background-color: #004ca30c;
+    }
+
+    &.active {
+      > a {
+        background-color: transparent;
+      }
+    }
+  }
+  
+  aside.nextra-sidebar-container {
+    background-color: #f8fafc;
+    border-right: 1px solid #313b491f;
+
+    div.nextra-scrollbar {
+      padding: 1.5rem;
+    }
+  }
+  
+  div.nextra-nav-container-blur {
+    box-shadow: 0 0 0 1px #313b491f;
+  }
+  
+  h1 {
+    font-size: 1.875rem;
+    line-height: 2.2rem;
+    margin-top: 2rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    margin-top: 3rem;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.75rem;
+  }
+  
+  article main {
+    padding-top: 2rem;
+  } 
+  
+  article main p {
+    margin-top: 1.25rem;
+  }
 }
 
 html,
@@ -44,8 +150,4 @@ body > div:first-child,
 div#__next,
 div#__next > div {
   height: 100%;
-}
-
-li.open.active > a {
-  background-color: red;
 }
