@@ -22,7 +22,7 @@ For detailed documentation, including installation instructions, usage guideline
 
 We welcome contributions to **xmlui**! If you have ideas for new features, suggestions, or find a bug, please open an issue on GitHub. Pull requests are also encouraged.
 
-Please read our [Contribution Guidelines](./CONTRIBUTION.md) before contributing.
+Please read our [Contribution Guidelines](./CONTRIBUTING.md) before contributing.
 
 ## Feature Requests
 

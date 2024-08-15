@@ -7,6 +7,6 @@
     "./create-xmlui-app",
     "./xmlui-e2e",
     "./xmlui-docs",
-    "./xmlui-code-tools"
+    "./tools/vscode"
   ]
 }
