@@ -33,7 +33,7 @@ import { stickyBoxComponentRenderer } from "@components/StickyBox/StickyBox";
 import { badgeComponentRenderer } from "@components/Badge/Badge";
 import { avatarComponentRenderer } from "@components/Avatar/Avatar";
 import { contentSeparatorComponentRenderer } from "@components/ContentSeparator/ContentSeparator";
-import { cardComponentRenderer } from "@components/Card/Card";
+import { cardComponentRenderer, marginlessCardComponentRenderer } from "@components/Card/Card";
 import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
 import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "@components/NoResult/NoResult";
@@ -132,7 +132,9 @@ import { tabsComponentRenderer } from "@components/Tabs/Tabs";
 import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
 import { appStateComponentRenderer } from "@components/AppState/AppState";
 import { pageHeaderRenderer } from "./PageHeader/PageHeader";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
+import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
+import { tableHeaderRenderer } from "./TableHeader/TableHeader";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -328,7 +330,12 @@ export class ComponentRegistry {
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
 
+    // --- Added after tabler-clone review
     this.registerCompoundComponentRenderer(pageHeaderRenderer);
+    this.registerCompoundComponentRenderer(trendLabelRenderer);
+    this.registerCompoundComponentRenderer(iconInfoCardRenderer);
+    this.registerComponentRenderer(marginlessCardComponentRenderer);
+    this.registerCompoundComponentRenderer(tableHeaderRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

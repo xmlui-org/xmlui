@@ -149,30 +149,32 @@
 
 %-PROP-START variant
 
-| Value         | Description                                                                          |
-| :------------ | :----------------------------------------------------------------------------------- |
-| `abbr`        | Represents an abbreviation or acronym                                                |
-| `caption`     | Represents the caption (or title) of a table                                         |
-| `cite`        | Is used to mark up the title of a cited work                                         |
-| `code`        | Represents a line of code                                                            |
-| `codefence`   | Handles the display of code blocks if combined with a `code` variant                 |
-| `deleted`     | Represents text that has been deleted                                                |
-| `em`          | Marks text to stress emphasis                                                        |
-| `inserted`    | Represents a range of text that has been added to a document                         |
-| `keyboard`    | Represents a span of text denoting textual user input from a keyboard or voice input |
-| `marked`      | Represents text which is marked or highlighted for reference or notation             |
-| `mono`        | Text using a mono style font family                                                  |
-| `paragraph`   | Represents a paragraph                                                               |
-| `placeholder` | Text that is mostly used as the placeholder style in input controls                  |
-| `sample`      | Represents sample (or quoted) output from a computer program                         |
-| `small`       | Represents side-comments and small print                                             |
-| `sub`         | Specifies inline text as subscript                                                   |
-| `strong`      | Contents have strong importance                                                      |
-| `subheading`  | Indicates that the text is the subtitle in a heading                                 |
-| `subtitle`    | Indicates that the text is the subtitle of some other content                        |
-| `sup`         | Specifies inline text as superscript                                                 |
-| `title`       | Indicates that the text is the title of some other content                           |
-| `var`         | Represents the name of a variable in a mathematical expression                       |
+| Value          | Description                                                                          |
+| :------------- | :----------------------------------------------------------------------------------- |
+| `abbr`         | Represents an abbreviation or acronym                                                |
+| `caption`      | Represents the caption (or title) of a table                                         |
+| `cite`         | Is used to mark up the title of a cited work                                         |
+| `code`         | Represents a line of code                                                            |
+| `codefence`    | Handles the display of code blocks if combined with a `code` variant                 |
+| `deleted`      | Represents text that has been deleted                                                |
+| `em`           | Marks text to stress emphasis                                                        |
+| `inserted`     | Represents a range of text that has been added to a document                         |
+| `keyboard`     | Represents a span of text denoting textual user input from a keyboard or voice input |
+| `marked`       | Represents text which is marked or highlighted for reference or notation             |
+| `mono`         | Text using a mono style font family                                                  |
+| `paragraph`    | Represents a paragraph                                                               |
+| `placeholder`  | Text that is mostly used as the placeholder style in input controls                  |
+| `sample`       | Represents sample (or quoted) output from a computer program                         |
+| `secondary`    | Represents a bit dimmed secondary text                                               |
+| `small`        | Represents side-comments and small print                                             |
+| `sub`          | Specifies inline text as subscript                                                   |
+| `strong`       | Contents have strong importance                                                      |
+| `subheading`   | Indicates that the text is the subtitle in a heading                                 |
+| `subtitle`     | Indicates that the text is the subtitle of some other content                        |
+| `sup`          | Specifies inline text as superscript                                                 |
+| `tableheading` | Indicates that the text is a table heading                                           |
+| `title`        | Indicates that the text is the title of some other content                           |
+| `var`          | Represents the name of a variable in a mathematical expression                       |
 
 <Playground
   name="Example: variant"
@@ -318,6 +320,24 @@
           This is an example text
         </Text>
       </HStack>
+      <HStack>
+        <Text width="150">subheading:</Text>
+        <Text variant="subheading">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">tableheading:</Text>
+        <Text variant="tableheading">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">secondary:</Text>
+        <Text variant="secondary">
+          This is an example text
+        </Text>
+      </HStack>
     </VStack>
   `}
 />
@@ -355,7 +375,7 @@ You must combine these property names with `Text` and the variant's name.
 For example, you can set a light green background for the `abbr` variant and add some horizontal padding
 with the following theme variables:
 
-``` json copy
+```json copy
 "color-bg-Text-abbr": "lightgreen",
 "padding-horizontal-Text-abbr": "8px"
 ```

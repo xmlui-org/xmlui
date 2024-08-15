@@ -5,7 +5,7 @@ import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
  * (Document it)
  */
 export interface PageHeaderComponentDef
-  extends ComponentDef<"PageHeaderSection"> {
+  extends ComponentDef<"PageHeader"> {
   props: {
     /**
      * @descriptionRef

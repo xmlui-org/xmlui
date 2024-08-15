@@ -35,7 +35,9 @@ const TextVariantKeys = [
   "caption", // Caption text in the particular context
   "placeholder", // Placeholder text in the particular context 
   "paragraph", // use <p>
-  "subheading", // use a H6 with same specific defaults
+  "subheading", // use a H6 with some specific defaults
+  "tableheading", // use a H3 with some specific defaults
+  "secondary", // use a secondary text style
 ] as const;
 
 type TextVariant = typeof TextVariantKeys[number];
@@ -63,6 +65,8 @@ const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
   placeholder: "span",
   paragraph: "p",
   subheading: "h6",
+  tableheading: "h6",
+  secondary: "span",
 };
 
 type TextVariantMapping =
@@ -247,6 +251,10 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "font-size-Text-subheading": "$font-size-H6",
     "letter-spacing-Text-subheading": "0.04em",
     "transform-Text-subheading": "uppercase",
+    "margin-top-Text-tableheading": "$space-1",
+    "margin-bottom-Text-tableheading": "$space-4",
+    "padding-horizontal-Text-tableheading": "$space-1",
+    "font-weight-Text-tableheading": "$font-weight-bold",
     light: {
       "color-bg-Text-code": "$color-surface-100",
       "color-border-Text-code": "$color-surface-200",
@@ -257,6 +265,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-bg-Text-codefence": "$color-primary-100",
       "color-Text-codefence": "$color-surface-900",
       "color-Text-subheading": "$color-text-secondary",
+      "color-Text-secondary": "$color-surface-400",
     },
     dark: {
       "color-bg-Text-code": "$color-surface-800",
@@ -268,6 +277,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-bg-Text-codefence": "$color-primary-800",
       "color-Text-codefence": "$color-surface-200",
       "color-Text-subheading": "$color-text-secondary",
+      "color-Text-secondary": "$color-surface-600",
     },
   },
 };
