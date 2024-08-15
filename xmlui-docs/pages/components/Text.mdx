@@ -4,32 +4,11 @@ The `Text` component displays textual information in a number of optional styles
 
 You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
 
+## Context Variables
+
+This component does not have any context variables.
+
 ## Props
-
-### `maxLines`
-
-This property determines the maximum number of lines the component can wrap to. If there is no space to display all the contents, the component displays up to as many lines as specified in this property.
-
-```ueml copy
-<Text
-  maxWidth="120"
-  backgroundColor="cyan"
-  value="A long text that will likely overflow "
-  maxLines="2" />
-```
-
-<Playground
-  previewOnly
-  name="Example: maxLines"
-  height={70}
-  app={`
-    <Text 
-      maxWidth="120"
-      backgroundColor="cyan"
-      value="A long text that will likely overflow " 
-      maxLines="2" />
-  `}
-/>
 
 ### `ellipses`
 
@@ -37,15 +16,17 @@ This property indicates whether ellipses should be displayed when the text is cr
 By default, its value is set to `true`.
 
 ```ueml copy {4}
-<VStack width="200" gap="0.5rem">
+<VStack width="200" gap="$space-0_5">
   <Text
     backgroundColor="cyan"
+    color="black"
     maxLines="1"
     ellipses="false">
     Though this long text does is about to crop!
   </Text>
   <Text
     backgroundColor="cyan"
+    color="black"
     maxLines="1">
     Though this long text does is about to crop!
   </Text>
@@ -53,36 +34,70 @@ By default, its value is set to `true`.
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Ignoring ellipses"
+  previewOnly
+  name="Example: ellipses"
   height={80}
-  horizontal={true}
   app={`
-    <VStack width="200" gap="0.5rem">
-      <Text 
-        backgroundColor="cyan" 
-        maxLines="1"
-        ellipses="false">
-        Though this long text does is about to crop!
-      </Text>
-      <Text 
-        backgroundColor="cyan" 
-        maxLines="1">
-        Though this long text does is about to crop!
-      </Text>
-    </VStack>
+  <VStack width="200" gap="$space-0_5">
+    <Text 
+      backgroundColor="cyan" 
+      color="black"
+      maxLines="1"
+      ellipses="false">
+      Though this long text does is about to crop!
+    </Text>
+    <Text 
+      backgroundColor="cyan" 
+      color="black"
+      maxLines="1">
+      Though this long text does is about to crop!
+    </Text>
+  </VStack>
+  `}
+/>
+
+### `maxLines`
+
+This property determines the maximum number of lines the component can wrap to.
+If there is no space to display all the contents,
+the component displays up to as many lines as specified in this property.
+
+```ueml copy
+<Text
+  maxWidth="120"
+  backgroundColor="cyan"
+  color="black"
+  value="A long text that will likely overflow"
+  maxLines="2"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: maxLines"
+  height={70}
+  app={`
+  <Text 
+    maxWidth="120"
+    backgroundColor="cyan"
+    color="black"
+    value="A long text that will likely overflow" 
+    maxLines="2"
+  />
   `}
 />
 
 ### `preserveLinebreaks`
 
 This property indicates if linebreaks should be preserved when displaying text.
+By default, its value is set to `false`.
 
 ```ueml copy {5}
-<HStack gap="1rem">
+<HStack gap="$space-1">
   <Text
     width="200"
     backgroundColor="cyan"
+    color="black"
     preserveLinebreaks="true"
     value="(preserve) This long text
     with several line breaks
@@ -90,24 +105,23 @@ This property indicates if linebreaks should be preserved when displaying text.
   <Text
     width="200"
     backgroundColor="cyan"
+    color="black"
     value="(do not preserve) This long text
     with several line breaks
             does not fit into a viewport with a 200-pixel width." />
  </HStack>
 ```
 
-You can observe the effect of using `preserveLinebreaks`:
-
 <Playground
-  previewOnly={true}
-  name="Example: Preserve whitespaces"
+  previewOnly
+  name="Example: preserveLinebreaks"
   height={180}
-  horizontal={true}
   app={`
-    <HStack gap="1rem">
+    <HStack gap="$space-1">
       <Text
         width="200"
         backgroundColor="cyan"
+        color="black"
         preserveLinebreaks="true"
         value="(preserve) This long text
     with several line breaks
@@ -115,6 +129,7 @@ You can observe the effect of using `preserveLinebreaks`:
       <Text
         width="200"
         backgroundColor="cyan"
+        color="black"
         value="(do not preserve) This long text
     with several line breaks
             does not fit into a viewport with a 200-pixel width." />
@@ -122,15 +137,20 @@ You can observe the effect of using `preserveLinebreaks`:
   `}
 />
 
-> **Note**: Remember to use the `value` property of `Text`. Linebreaks are converted to spaces when nesting the text into the `Text` component.
+> **Note**: Remember to use the `value` property of the `Text`.
+> Linebreaks are converted to spaces when nesting the text inside the `Text` component.
 
 ### `value`
 
-The text to be displayed. This value can be also set via the `children` props.
+The text to be displayed. This value can also be set via nesting the text into the 
+`Text`
+ component.
 
 ```ueml copy
-<Text value="An example text" />
-<Text>An example text</Text>
+<Stack gap="$space-1">
+  <Text value="An example text" />
+  <Text>An example text</Text>
+</Stack>
 ```
 
 <Playground
@@ -138,47 +158,50 @@ The text to be displayed. This value can be also set via the `children` props.
   height={80}
   name="Example: value"
   app={`
-<Stack gap="1rem">
+  <Stack gap="$space-1">
     <Text value="An example text" />
     <Text>An example text</Text>
-</Stack>
+  </Stack>
   `}
 />
 
 ### `variant`
 
-Optional string value that provides named presets for text variants with a unique combination of font style, weight, size, color and other parameters.
+Optional string value that provides named presets for text variants with a unique combination
+of font style, weight, size, color and other parameters.
 
-| Value         | Description                                                                          |
-| :------------ | :----------------------------------------------------------------------------------- |
-| `abbr`        | Represents an abbreviation or acronym                                                |
-| `caption`     | Represents the caption (or title) of a table                                         |
-| `cite`        | Is used to mark up the title of a cited work                                         |
-| `code`        | Represents a line of code                                                            |
-| `codefence`   | Handles the display of code blocks if combined with a `code` variant                 |
-| `deleted`     | Represents text that has been deleted                                                |
-| `em`          | Marks text to stress emphasis                                                        |
-| `inserted`    | Represents a range of text that has been added to a document                         |
-| `keyboard`    | Represents a span of text denoting textual user input from a keyboard or voice input |
-| `marked`      | Represents text which is marked or highlighted for reference or notation             |
-| `mono`        | Text using a mono style font family                                                  |
-| `paragraph`   | Represents a paragraph                                                               |
-| `placeholder` | Text that is mostly used as the placeholder style in input controls                  |
-| `sample`      | Represents sample (or quoted) output from a computer program                         |
-| `small`       | Represents side-comments and small print                                             |
-| `sub`         | Specifies inline text as subscript                                                   |
-| `subtitle`    | Indicates that the text is the subtitle of some other content                        |
-| `sup`         | Specifies inline text as superscript                                                 |
-| `strong`      | Contents have strong importance                                                      |
-| `title`       | Indicates that the text is the title of some other content                           |
-| `var`         | Represents the name of a variable in a mathematical expression                       |
+| Value          | Description                                                                          |
+| :------------- | :----------------------------------------------------------------------------------- |
+| `abbr`         | Represents an abbreviation or acronym                                                |
+| `caption`      | Represents the caption (or title) of a table                                         |
+| `cite`         | Is used to mark up the title of a cited work                                         |
+| `code`         | Represents a line of code                                                            |
+| `codefence`    | Handles the display of code blocks if combined with a `code` variant                 |
+| `deleted`      | Represents text that has been deleted                                                |
+| `em`           | Marks text to stress emphasis                                                        |
+| `inserted`     | Represents a range of text that has been added to a document                         |
+| `keyboard`     | Represents a span of text denoting textual user input from a keyboard or voice input |
+| `marked`       | Represents text which is marked or highlighted for reference or notation             |
+| `mono`         | Text using a mono style font family                                                  |
+| `paragraph`    | Represents a paragraph                                                               |
+| `placeholder`  | Text that is mostly used as the placeholder style in input controls                  |
+| `sample`       | Represents sample (or quoted) output from a computer program                         |
+| `small`        | Represents side-comments and small print                                             |
+| `sub`          | Specifies inline text as subscript                                                   |
+| `strong`       | Contents have strong importance                                                      |
+| `subheading`   | Indicates that the text is the subtitle in a heading                                 |
+| `subtitle`     | Indicates that the text is the subtitle of some other content                        |
+| `sup`          | Specifies inline text as superscript                                                 |
+| `tableheading` | Indicates that the text is a table heading                                           |
+| `title`        | Indicates that the text is the title of some other content                           |
+| `var`          | Represents the name of a variable in a mathematical expression                       |
 
 <Playground
   name="Example: variant"
-  previewOnly={true}
+  previewOnly
   height={400}
   app={`
-    <VStack gap="0.5rem" padding="1rem">
+    <VStack gap="$space-0_5" padding="$space-1">
       <HStack>
         <Text width="150">default:</Text>
         <Text>This is an example text</Text>
@@ -321,9 +344,17 @@ Optional string value that provides named presets for text variants with a uniqu
   `}
 />
 
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
 ## Styling
 
-The `Text` component uses these theme variables to customize its appearance:
+The `Text` component uses these theme variables:
 
 - `align-vertical`
 - `border-radius`
@@ -348,19 +379,21 @@ The `Text` component uses these theme variables to customize its appearance:
 - `thickness-decoration`
 - `transform`
 
-You must combine these property names with `Text` and the variant's name. For example, you can set a light green background for the `abbr` variant and add some horizontal padding with these theme variable settings:
+You must combine these property names with `Text` and the variant's name.
+For example, you can set a light green background for the `abbr` variant and add some horizontal padding
+with the following theme variables:
 
-```
+```json copy
 "color-bg-Text-abbr": "lightgreen",
 "padding-horizontal-Text-abbr": "8px"
 ```
 
 <Playground
   name="Example: styling the 'abbr' variant"
-  previewOnly={true}
+  previewOnly
   height={120}
   app={`
-    <VStack gap="0.5rem" padding="1rem">
+    <VStack gap="$space-0_5" padding="$space-1">
       <HStack>
         <Text width="150">default:</Text>
         <Text>This is an example text</Text>

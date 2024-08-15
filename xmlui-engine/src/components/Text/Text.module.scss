@@ -25,6 +25,8 @@ $themeVars: ();
   border-width: createThemeVar("thickness-border-Text-#{$variant}");
   border-style: createThemeVar("style-border-Text-#{$variant}");
   // --- Do not collapse these padding properties; they are intentionally expanded
+  margin-top: createThemeVar("margin-top-Text-#{$variant}");
+  margin-bottom: createThemeVar("margin-bottom-Text-#{$variant}");
   padding-left: createThemeVar("padding-horizontal-Text-#{$variant}");
   padding-right: createThemeVar("padding-horizontal-Text-#{$variant}");
   padding-top: createThemeVar("padding-vertical-Text-#{$variant}");
@@ -184,6 +186,14 @@ $themeVars: ();
 
   &.subheading {
     @include textVariant("subheading");
+  }
+
+  &.tableheading {
+    @include textVariant("tableheading");
+  }
+
+  &.secondary {
+    @include textVariant("secondary");
   }
 }
 
