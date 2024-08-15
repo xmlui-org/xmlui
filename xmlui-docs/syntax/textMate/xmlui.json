@@ -498,7 +498,7 @@
       "name":"String",
       "scope":"string",
       "settings":{
-        "foreground":"#5b8230"
+        "foreground":"#152dd0"
       }
     },
     {
@@ -592,7 +592,7 @@
       "scope":"entity.name.function",
       "settings":{
         "fontStyle":"",
-        "foreground":"#7eb233"
+        "foreground":"#242e74"
       }
     },
     {

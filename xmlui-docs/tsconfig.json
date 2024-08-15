@@ -49,7 +49,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src"
-  ],
+, "pages/_app.jsx"  ],
   "exclude": [
     "node_modules"
   ]
