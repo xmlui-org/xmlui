@@ -3,7 +3,7 @@ name: Documentation CI/CD
 on:
   push:
     paths:
-      - xmlui-docs/**
+      - docs/**
     branches: [ main ]
 jobs:
   build-and-deploy:
@@ -29,19 +29,19 @@ jobs:
 
       - name: npm install @napi-rs
         run: npm i @napi-rs/simple-git-linux-x64-gnu
-        working-directory: xmlui-docs
+        working-directory: docs
 
       - name: npm install docs
         run: npm i
-        working-directory: xmlui-docs
+        working-directory: docs
 
       - name: build docs package
         shell: bash
         run: npm run release-ci
-        working-directory: xmlui-docs
+        working-directory: docs
       - name: 'Run Azure webapp deploy action using publish profile credentials'
         uses: azure/webapps-deploy@v2
         with:
-          package: "xmlui-docs/ui.zip"
+          package: "docs/ui.zip"
           app-name: ncrm
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_PLAYGROUND }}

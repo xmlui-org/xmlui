@@ -1,6 +1,6 @@
 {
   "sourceFolderPath": "../src/components",
-  "outFolderPath": "../../xmlui-docs/scripts",
+  "outFolderPath": "../../docs/scripts",
   "entryPoints": [
     "src/components/Bookmark/Bookmark.tsx",
     "src/components/Button/Button.tsx",
