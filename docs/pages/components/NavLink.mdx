@@ -1,0 +1,346 @@
+# NavLink
+
+The `NavLink` component defines a navigation target (app menu element) within the app; it is associated with a particular in-app navigation target (or an external link).
+
+## Using NavLink
+
+### `NavLink` Appearance
+
+You can use the `label` and `icon` properties of a `NavLink` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `NavLink`:
+
+```ueml copy {6-14}
+<App layout="horizontal">
+  <AppHeader>
+    <H1>MyApp</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink to="/">
+       <Stack width="16" height="16" backgroundColor="purple" />
+       Home
+    </NavLink>
+    <NavLink to="/about">
+       <Stack width="16" height="16" backgroundColor="green" />
+       About
+    </NavLink>
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+    <Page url="/about">About</Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: custom NavLink content"
+  height={250}
+  app={`
+    <App layout="horizontal">
+      <AppHeader>
+        <H1>MyApp</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink to="/">
+           <Stack width="16" height="16" backgroundColor="purple" />
+           Home
+        </NavLink>
+        <NavLink to="/about">
+           <Stack width="16" height="16" backgroundColor="green" />
+           About
+        </NavLink>
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/about">About</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+### Actions
+
+By default, activating (clicking) a link moves to the target URL. However, you can declare a link that executes an explicit action responding to the `click` event:
+
+```ueml copy {7}
+<App layout="horizontal">
+  <AppHeader>
+    <H1>MyApp</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink to="/" label="Home" />
+    <NavLink label="Danger!" onClick="window.alert('Be careful with this action!')" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: custom NavLink action"
+  height={250}
+  app={`
+    <App layout="horizontal">
+      <AppHeader>
+        <H1>MyApp</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink to="/" label="Home" />
+        <NavLink label="Danger!" onClick="window.alert('Be careful with this action!')" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+## Properties
+
+### `active`
+
+This Boolean property indicates if the particular navigation is an active link. An active link has a particular visual appearance, provided its `displayActive` property is set to `true`.
+
+### `displayActive`
+
+This Boolean property indicates if the active state of a link should have a visual indication. Setting it to `false` removes the visual indication of an active link.
+
+### `enabled`
+
+This Boolean property indicates if the link is enabled (default: true).
+
+In the following app, the Hotels link is disabled:
+
+```ueml copy {8}
+<App  layout="horizontal">
+  <AppHeader>
+    <H1>MyTravel App</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" />
+    <NavLink label="Flights" to="/flights" />
+    <NavLink label="Hotels" to="/hotels" enabled="false" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+    <Page url="/flights">Flights Page</Page>
+    <Page url="/hotels">Hotels Page</Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: enabled"
+  height={250}
+  app={`
+    <App  layout="horizontal">
+      <AppHeader>
+        <H1>MyTravel App</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" />
+        <NavLink label="Flights" to="/flights" />
+        <NavLink label="Hotels" to="/hotels" enabled="false" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/flights">Flights Page</Page>
+        <Page url="/hotels">Hotels Page</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+### `icon`
+
+This property allows you to add an icon (specify the icon's name) to the navigation link.
+
+<Playground
+  previewOnly={true}
+  name="Example: icon"
+  height={250}
+  app={`
+    <App  layout="horizontal">
+      <AppHeader>
+        <H1>SuperDrive App</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home" />
+        <NavLink label="Drives" to="/drives" icon="drive" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/drives">Drives Page</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+### `label`
+
+This property sets the text to display with the `NavLink` component.
+
+### `target`
+
+This property specifies where to open the link represented by the `NavLink`. This property accepts the following values (in accordance with the HTML standard):
+
+| Value     | Description                                                   |
+| --------- | ------------------------------------------------------------- |
+| `_blank`  | Opens the link in a new window or tab                         |
+| `_self`   | Opens the link in the same frame as it was clicked (default)  |
+| `_parent` | Opens the link in the parent frame                            |
+| `_top`    | Opens the link in the full body of the current browser window |
+
+The following sample opens the About XMLUI link in a new tab:
+
+```ueml copy {7}
+<App layout="horizontal">
+  <AppHeader>
+    <H1>SuperDrive App</H1>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" />
+    <NavLink label="About XMLUI" to="https://ncrm.azurewebsites.net/" target="_blank" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Home</Page>
+    <Page url="/drives">Drives Page</Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: icon"
+  height={250}
+  app={`
+    <App layout="horizontal">
+      <AppHeader>
+        <H1>SuperDrive App</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" />
+        <NavLink label="About XMLUI" to="https://ncrm.azurewebsites.net/" target="_blank" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/drives">Drives Page</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+### `to`
+
+This property defines the URL of the link.
+
+### `vertical`
+
+This property indicates the `NavLink` component's active status with a visual appearance with a vertical indication (fits for a vertically aligned navigation link). Usually, you do not need to use this property. However, if you create your custom navigation menu component, you can sign a vertically rendered navigation link (menu) item with this property.
+
+## Events
+
+### `click`
+
+This event is fired when the user clicks the link. With an event handler, you can define how to respond to the user's click.
+
+The following sample displays a message and navigates to the "/status" link after closing the message window:
+
+<Playground
+  previewOnly={true}
+  name="Example: icon"
+  height={250}
+  app={`
+    <App layout="horizontal">
+      <AppHeader>
+        <H1>MyApp</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink to="/" label="Home" />
+        <NavLink label="Check my status" onClick="
+            window.alert('You will be redirected');
+            Actions.navigate('/status');
+        " />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/status">My Status</Page>
+      </Pages>  
+    </App>
+  `}
+/>
+
+## Styling
+
+The `Navlink` component uses these theme variables to customize its appearance:
+
+- `color-bg`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
+- `color-indicator`: (with these states: `--hover`, `--active`, `--pressed`)
+- `color-text`: (with these states: `--hover`, `--hover--active`, `--active`, `--pressed`, `--pressed-active`)
+- `color-icon`
+- `font-size`
+- `font-weight`: (with these states: `--active`, `--pressed`)
+- `padding-horizontal`
+- `padding-vertical`
+- `radius`
+- `radius-indicator`
+- `thickness-indicator`
+
+The theme variables ending with `indicator` set the indicator's visual properties that sign the link's active state.
+
+The following sample theme sets a few visual properties of `NavLink`. It changes the background color to show the hovered state and modifies the indicator's visual appearance. The theme displays the link with an extra bold font:
+
+```json
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-bg-NavLink--hover": "deepskyblue",
+    "color-bg-NavLink--pressed": "steelblue",
+    "color-bg-NavLink--active": "lightblue",
+    "color-bg-NavLink--hover--active": "deepskyblue",
+    "color-indicator-NavLink--active": "purple",
+    "thickness-indicator-NavLink": "4px",
+    "font-weight-NavLink": "900"
+  }
+}
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: styling"
+  height={250}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "color-bg-NavLink--hover": "deepskyblue",
+        "color-bg-NavLink--pressed": "steelblue",
+        "color-bg-NavLink--active": "lightblue",
+        "color-bg-NavLink--hover--active": "deepskyblue",
+        "color-indicator-NavLink--active": "purple",
+        "thickness-indicator-NavLink": "4px",
+        "font-weight-NavLink": "900",
+      },
+    },
+  ]}
+  app={`
+    <App  layout="horizontal">
+      <AppHeader>
+        <H1>SuperDrive App</H1>
+      </AppHeader>
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home" />
+        <NavLink label="Drives" to="/drives" icon="drive" />
+      </NavPanel>
+      <Pages>
+        <Page url="/">Home</Page>
+        <Page url="/drives">Drives Page</Page>
+      </Pages>  
+    </App>
+  `}
+/>

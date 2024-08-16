@@ -1,0 +1,492 @@
+# TextBox
+
+The `TextBox` is an input component that allows users to input and edit textual data.
+
+It can often be found in forms.
+See the guide on [Using Forms](
+../learning/forms.mdx
+) for details.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `autoFocus`
+
+If this boolean prop is set to `true`, the `TextBox` will be focused when it appears on the UI.
+The default is `false`.
+
+### `enabled`
+
+Controls whether the input field is enabled (`true`) or disabled (`false`).
+
+```ueml copy
+<TextBox enabled="false" />
+```
+
+<Playground
+  previewOnly
+  name="Example: enabled"
+  height={60}
+  app={`<TextBox enabled="false" />`}
+/>
+
+### `endIcon`
+
+This string prop enables the display of an icon
+on the right side of the input field by providing a valid icon name (left-to-right display).
+
+```ueml copy
+<TextBox endIcon="email" />
+```
+
+<Playground
+  previewOnly
+  name="Example: endIcon"
+  height={60}
+  app={`<TextBox endIcon="email" />`}
+/>
+
+It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+### `endText`
+
+This string prop enables the display of a custom string on the right side of the input field (left-to-right display).
+
+```ueml copy
+<TextBox endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: endText"
+  height={60}
+  app={`<TextBox endText=".com" />`}
+/>
+
+It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+### `initialValue`
+
+The initial value displayed in the input field.
+
+```ueml copy
+<TextBox initialValue="Example text" />
+```
+
+<Playground
+  previewOnly
+  name="Example: initialValue"
+  height={60}
+  app={`<TextBox initialValue="Example text" />`}
+/>
+
+### `maxLength`
+
+The maximum length of the input that the field accepts.
+
+Try to enter a longer value into the input field below.
+
+```ueml copy
+<TextBox maxLength="16" />
+```
+
+<Playground
+  previewOnly
+  name="Example: maxLength"
+  height={60}
+  app={`<TextBox maxLength="16" />`}
+/>
+
+### `placeholder`
+
+A placeholder text that is visible in the input field when its empty.
+
+```ueml copy
+<TextBox placeholder="This is a placeholder" />
+```
+
+<Playground
+  previewOnly
+  name="Example: placeholder"
+  height={60}
+  app={`<TextBox placeholder="This is a placeholder" />`}
+/>
+
+### `readOnly`
+
+This boolean determines whether the input field can be modified or not.
+
+```ueml copy
+<TextBox initialValue="Example text" readOnly="true" />
+```
+
+<Playground
+  previewOnly
+  name="Example: readOnly"
+  height={60}
+  app={`<TextBox initialValue="Example text" readOnly="true" />`}
+/>
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `startIcon`
+
+This string prop enables the display of an icon
+on the left side of the input field by providing a valid icon name (left-to-right display).
+
+```ueml copy
+<TextBox startIcon="hyperlink" />
+```
+
+<Playground
+  previewOnly
+  name="Example: startIcon"
+  height={60}
+  app={`<TextBox startIcon="hyperlink" />`}
+/>
+
+It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+### `startText`
+
+This string prop enables the display of a custom string on the left side of the input field (left-to-right display).
+
+```ueml copy
+<TextBox startText="www." />
+```
+
+<Playground
+  previewOnly
+  name="Example: startText"
+  height={60}
+  app={`<TextBox startText="www." />`}
+/>
+
+It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
+
+```ueml copy
+<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+### `validationStatus`
+
+This prop is used to visually indicate status changes reacting to form field validation.
+
+| Value     | Description                                           |
+| :-------- | :---------------------------------------------------- |
+| `valid`   | Visual indicator for an input that is accepted        |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error`   | Visual indicator for an input that produced an error  |
+
+```ueml copy
+<VStack gap="$space-0_5">
+  <TextBox />
+  <TextBox validationStatus="valid" />
+  <TextBox validationStatus="warning" />
+  <TextBox validationStatus="error" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: validationStatus"
+  height={200}
+  app={`
+  <VStack gap="$space-0_5">
+    <TextBox />
+    <TextBox validationStatus="valid" />
+    <TextBox validationStatus="warning" />
+    <TextBox validationStatus="error" />
+  </VStack>
+  `}
+/>
+
+## API
+
+### `focus`
+
+This API method focuses the input field.
+
+```ueml copy {2-3}
+<VStack gap="$space-0_5">
+  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+  <TextBox id="inputComponent" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: focus"
+  height={100}
+  app={`
+  <VStack gap="$space-0_5">
+    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+    <TextBox id="inputComponent" />
+  </VStack>
+  `}
+/>
+
+### `setValue`
+
+This API method programmatically sets the value of the field.
+The same rules apply as for the [`initialValue`](#initialvalue) property.
+
+```ueml copy {10}
+<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <TextBox 
+    id="inputField" 
+    readOnly="true" 
+    onDidChange="changes++"
+  />
+  <HStack gap="$space-1">
+    <Button 
+      label="Check" 
+      onClick="inputField.setValue('example ')"
+    />
+    <Text value="Number of changes: {changes}" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: setValue"
+  app={`
+  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+    <TextBox 
+      id="inputField" 
+      readOnly="true" 
+      onDidChange="changes++"
+    />
+    <HStack gap="$space-1">
+      <Button 
+        label="Check" 
+        onClick="inputField.setValue('example ')"
+      />
+      <Text value="Number of changes: {changes}" />
+    </HStack>
+  </VStack>
+  `}
+/>
+
+### `value`
+
+By setting an ID for the component, you can refer to the value of the field if set.
+If no value is set, the value will be undefined.
+
+In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
+
+```ueml copy {2-3}
+<VStack gap="$space-0_5">
+  <Text value="TextBox content length: {inputComponent.value.length}" />
+  <TextBox id="inputComponent" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: value"
+  height={100}
+  app={`
+  <VStack gap="$space-0_5">
+    <Text value="TextBox content length: {inputComponent.value.length}" />
+    <TextBox id="inputComponent" />
+  </VStack>
+  `}
+/>
+
+## Events
+
+### `didChange`
+
+This event is triggered after the user has changed the field value.
+
+Write in the input field and see how the `Text` underneath it is updated in parallel.
+
+```ueml copy {2}
+<VStack gap="$space-0_5" var.field="">
+  <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
+  <Text value="{field}" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: didChange"
+  height={100}
+  app={`
+  <VStack gap="$space-0_5" var.field="">
+    <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
+    <Text value="{field}" />
+  </VStack>
+  `}
+/>
+
+### `gotFocus`
+
+This event is triggered when the `TextBox` receives focus.
+
+Clicking on the `TextBox` in the example demo changes the label text.
+Note how clicking elsewhere resets the text to its original.
+
+```ueml copy {3-4}
+<TextBox
+  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+  onGotFocus="focused = true"
+  onLostFocus="focused = false"
+  var.focused="{false}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: gotFocus/lostFocus"
+  height={72}
+  app={`
+  <TextBox
+    initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+    onGotFocus="focused = true"
+    onLostFocus="focused = false"
+    var.focused="{false}"
+  />
+  `}
+/>
+
+### `lostFocus`
+
+This event is triggered when the `TextBox` loses focus.
+
+See the example in the [gotFocus event section](#gotfocus).
+
+## Styling
+
+The `TextBox` component uses these theme variables:
+
+These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
+If the status segment is omitted, the style will be applied to all validation statuses.
+
+- `radius-TextBox-|status|`
+- `thickness-border-TextBox-|status|`
+- `style-border-TextBox-|status|`
+- `font-size-TextBox-|status|`
+- `color-placeholder-TextBox-|status|`
+
+```json copy
+"radius-TextBox-default": "10px",
+"color-placeholder-TextBox-error": "crimson"
+```
+
+In addition to the validation statuses,
+the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
+
+- `color-border-TextBox-|status|--|interact|`
+- `color-bg-TextBox-|status|--|interact|`
+- `shadow-TextBox-|status|--|interact|`
+- `color-text-TextBox-|status|--|interact|`
+
+```json copy
+"color-bg-TextBox-default--hover": "gray",
+"color-text-TextBox-error--focus": "lightcoral"
+```
+
+The following variables are only used in the `focus` state:
+
+- `thickness-outline-TextBox-|status|--focus`
+- `color-outline-TextBox-|status|--focus`
+- `style-outline-TextBox-|status|--focus`
+- `offset-outline-TextBox-|status|--focus`
+
+These variables set the `disabled` state:
+
+- `color-bg-TextBox--disabled`
+- `color-text-TextBox--disabled`
+- `color-border-TextBox--disabled`
+
+### Example
+
+```json copy
+"radius-TextBox": "30px",
+"color-placeholder-TextBox-default": "blue"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={200}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-TextBox": "30px",
+        "color-placeholder-TextBox-default": "blue"
+      },
+    },
+  ]}
+  app={`<TextBox placeholder="I am a placeholder" />`}
+/>
+
+To style all input controls not just this component, replace the `TextBox` segment with `Input`:
+
+```
+color-border-Input: "#0033FF"
+```
+
+`Input` affects the following controls:
+
+- [`Checkbox`](./Checkbox.mdx)
+- [`NumberBox`](./NumberBox.mdx)
+- [`RadioGroupOption`](./RadioGroupOption.mdx)
+- [`Select`](./Select.mdx)
+- [`Switch`](./Switch.mdx)
+- [`TextArea`](./TextArea.mdx)
+- [`MultiSelect`](./MultiSelect.mdx)
+- [`MultiCombobox`](./MultiCombobox.mdx)
+
+See [custom themes](../learning/themes/overview.mdx) for styling details.

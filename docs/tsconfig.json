@@ -1,0 +1,56 @@
+{
+  "compilerOptions": {
+    "target": "es2015",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "noEmit": true,
+    "jsx": "preserve",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@src/*": [
+        "../xmlui-engine/src/*"
+      ],
+      "@abstractions/*": [
+        "../xmlui-engine/src/abstractions/*"
+      ],
+      "@components-core/*": [
+        "../xmlui-engine/src/components-core/*"
+      ],
+      "@components/*": [
+        "../xmlui-engine/src/components/*"
+      ]
+    },
+    "incremental": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src"
+, "pages/_app.jsx"  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

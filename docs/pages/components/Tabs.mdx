@@ -1,0 +1,225 @@
+# Tabs
+
+The `Tabs` component provides a tabbed layout where each tab has a clickable label and content.
+The label is displayed on the button associated with the content.
+
+The component accepts only `TabItem` components as children.
+Other child components will not be displayed.
+
+The `TabItem` component has a `label` prop to define the tab button label text.
+Content is provided to a tab via placing child components under the `TabItem`.
+
+```ueml copy
+<Tabs>
+  <TabItem label="Account">
+    <Text>Account</Text>
+  </TabItem>
+  <TabItem label="Stream">
+    <Text>Stream</Text>
+  </TabItem>
+  <TabItem label="Support">
+    <Text>Support</Text>
+  </TabItem>
+</Tabs>
+```
+
+<Playground
+  previewOnly
+  name="Example: how to use"
+  app={`
+  <Tabs>
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  `}
+  height={80}
+/>
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `activeTab`
+
+Indicates which tab index is active. The indexing starts from 0. The default value is 0 (aka the first tab from left to right).
+
+```ueml copy /activeTab="2"/
+<Tabs activeTab="2">
+  <TabItem label="Account">
+    <Text>Account</Text>
+  </TabItem>
+  <TabItem label="Stream">
+    <Text>Stream</Text>
+  </TabItem>
+  <TabItem label="Support">
+    <Text>Support</Text>
+  </TabItem>
+</Tabs>
+```
+
+<Playground
+  previewOnly
+  name="Example: activeTab"
+  app={`
+  <Tabs activeTab="2">
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  `}
+  height={80}
+/>
+
+### `orientation`
+
+Indicates the orientation of the tabs.
+Horizontal orientation has the tab buttons layed out on the left side of the content panel.
+Vertical orientation places the buttons at the top.
+The default value is vertical.
+
+```ueml copy /orientation="horizontal"/
+<Tabs orientation="horizontal">
+  <TabItem label="Account">
+    <Text>Account</Text>
+  </TabItem>
+  <TabItem label="Stream">
+    <Text>Stream</Text>
+  </TabItem>
+  <TabItem label="Support">
+    <Text>Support</Text>
+  </TabItem>
+</Tabs>
+```
+
+<Playground
+  previewOnly
+  name="Example: orientation"
+  app={`
+  <Tabs orientation="horizontal">
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  `}
+  height={160}
+/>
+
+### `tabTemplate`
+
+Defines how a tab button should look like.
+
+```ueml copy {2-4}
+<Tabs>
+  <prop name="tabTemplate">
+    <Button variant="outlined" label="{$item.label}" />
+  </prop>
+  <TabItem label="Account">
+    <Text>Account</Text>
+  </TabItem>
+  <TabItem label="Stream">
+    <Text>Stream</Text>
+  </TabItem>
+  <TabItem label="Support">
+    <Text>Support</Text>
+  </TabItem>
+</Tabs>
+```
+
+<Playground
+  previewOnly
+  name="Example: tabTemplate"
+  app={`
+  <Tabs>
+    <prop name="tabTemplate">
+      <Button variant="outlined" label="{$item.label}" />
+    </prop>
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  `}
+  height={80}
+/>
+
+## API
+
+This component does not have any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `Tabs` component uses these theme variables to customize its appearance:
+
+- `color-bg-Tabs`
+- `style-border-Tabs`
+- `color-border-Tabs`
+- `color-border-active-Tabs`
+- `thickness-border-Tabs`
+- `color-bg-trigger-Tabs`
+
+```json
+"color-bg-Tabs": "green",
+"thickness-border-Tabs": "6px",
+"color-border-Tabs": "gold"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={80}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "color-bg-Tabs": "green",
+        "thickness-border-Tabs": "6px",
+        "color-border-Tabs": "gold"
+      },
+    },
+  ]}
+  app={`
+  <Tabs>
+    <TabItem label="Account">
+      <Text>Account</Text>
+    </TabItem>
+    <TabItem label="Stream">
+      <Text>Stream</Text>
+    </TabItem>
+    <TabItem label="Support">
+      <Text>Support</Text>
+    </TabItem>
+  </Tabs>
+  `}
+/>

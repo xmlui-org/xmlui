@@ -42,9 +42,19 @@ export function Card({
     layout: { marginTop: 0, marginBottom: "4px" },
   };
   return (
-    <div className={classnames(styles.wrapper, { [styles.isClickable]: !!onClick })} style={style} onClick={onClick}>
+    <div
+      className={classnames(styles.wrapper, {
+        [styles.isClickable]: !!onClick,
+      })}
+      style={style}
+      onClick={onClick}
+    >
       {[title, subTitle, avatarUrl, showAvatar].some(Boolean) && (
-        <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "1rem" }}>
+        <Stack
+          orientation="horizontal"
+          verticalAlignment="center"
+          layout={{ gap: "1rem" }}
+        >
           {showAvatar && <Avatar url={avatarUrl} name={title} />}
           <Stack orientation="vertical">
             {linkTo ? (
@@ -88,7 +98,7 @@ export interface CardComponentDef extends ComponentDef<"Card"> {
   };
 }
 
-const metadata: ComponentDescriptor<CardComponentDef> = {
+const cardMetadata: ComponentDescriptor<CardComponentDef> = {
   displayName: "Card",
   description: "A component displaying its children in a card",
   props: {
@@ -97,7 +107,6 @@ const metadata: ComponentDescriptor<CardComponentDef> = {
     title: desc("A prestyled title"),
     subTitle: desc("A prestyled subtitle"),
     linkTo: desc("Optional link for the title"),
-    
   },
   events: {
     click: desc("The card is clicked"),
@@ -110,7 +119,8 @@ const metadata: ComponentDescriptor<CardComponentDef> = {
     "color-border-Card": "$color-border",
     "thickness-border-Card": "1px",
     "style-border-Card": "solid",
-    "border-Card": "$thickness-border-Card $style-border-Card $color-border-Card",
+    "border-Card":
+      "$thickness-border-Card $style-border-Card $color-border-Card",
     "radius-Cars": "$radius",
     "shadow-Card": "none",
     light: {
@@ -124,7 +134,7 @@ const metadata: ComponentDescriptor<CardComponentDef> = {
 
 export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
   "Card",
-  ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <Card
         style={layoutCss}
@@ -143,5 +153,60 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
       </Card>
     );
   },
-  metadata
+  cardMetadata
 );
+
+// =====================================================================================================================
+// XMLUI MarginlessCard component definition
+
+/**
+ * The \`MarginlessCard\` component is a `Card` with no margins at any edge.
+ */
+export interface MarginlessComponentDef extends ComponentDef<"MarginlessCard"> {
+  props: {
+    /** @descriptionRef */
+    title?: string;
+    /** @descriptionRef */
+    subTitle?: string;
+    /** @descriptionRef */
+    linkTo?: string;
+    /** @descriptionRef */
+    avatarUrl?: string;
+    /** @descriptionRef */
+    showAvatar?: boolean;
+  };
+  events: {
+    /** @descriptionRef */
+    click: string;
+  };
+}
+
+const marginlessCardMetadata = {
+  ...cardMetadata,
+  displayName: "MarginlessCard",
+};
+
+export const marginlessCardComponentRenderer =
+  createComponentRenderer<MarginlessComponentDef>(
+    "MarginlessCard",
+    ({ node, extractValue, renderChild, layoutCss }) => {
+      return (
+        <Card
+          style={{ ...layoutCss, padding: 0 }}
+          title={extractValue.asOptionalString(node.props.title)}
+          linkTo={extractValue.asOptionalString(node.props.linkTo)}
+          subTitle={extractValue.asOptionalString(node.props.subTitle)}
+          avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
+          showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
+        >
+          {renderChild(node.children, {
+            // Since the card is a flex container, it's children should behave the same as in a stack
+            // (e.g. starsizing works in this case)
+            type: "Stack",
+            orientation: "vertical",
+          })}
+        </Card>
+      );
+    },
+    marginlessCardMetadata
+  );

@@ -1,0 +1,95 @@
+# Datasource
+
+The `Datasource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching.
+To manipulate data on the backend, use the [`ApiAction`](./ApiAction.mdx) component.
+
+See examples on using the `Datasource` component in [this tutorial](../get-started/working-with-datasources.mdx).
+
+## API
+
+### `inProgress`
+
+This Boolean property indicates if a fetch operation is in progress. You can use the value of this property to decide what to display in the UI during this time (such as a progress ring, a "loading..." text, etc.).
+
+### `refetch`
+
+This method triggers the re-fetching of the data.
+
+### `value`
+
+This property represents the currently fetched data. Other components can obtain the data and process or display it through the `value` property.
+
+## Properties
+
+### `body`
+
+This property sets the request body. The object you pass here will be serialized to JSON when sending the request. Use the' rawBody' property to send another request body using its native format. When you define `body` and `rawBody`, the latest one prevails.
+
+### `completedNotificationMessage`
+
+This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
+
+```ueml copy
+ <Datasource
+  id="ds"
+  url="/api/shopping-list" 
+  completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
+```
+
+### `errorNotificationMessage`
+
+This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
+
+```ueml copy
+ <Datasource
+  id="ds"
+  method="post"
+  url="/api/shopping-list" 
+  errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
+```
+
+### `headers`
+
+You can define request header values as key and value pairs, where the key is the ID of the particular header and the value is that header's value.
+
+### `method`
+
+By default, data fetching uses the `get` operation method. You can change it by setting this property to other supported methods, such as `post`, `put`, and `delete`.
+
+### `nextPageParamSelector`
+
+When using `Datasource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
+
+### `pollIntervalInSeconds`
+
+By setting this property, you can define periodic data fetching. The `Datasource` component will refresh its data according to the time specified as seconds. When the data changes during the refresh, it will trigger the update mechanism of XMLUI and re-render the UI accordingly.
+
+### `prevPageParamSelector`
+
+When using `Datasource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object.
+
+### `queryParams`
+
+This property sets the query parameters for the request. The object you pass here will be serialized to a query string and appended to the URL. You can specify key and value pairs, where the key is the name of a particular query parameter, and the value is that parameter's value to send.
+
+### `rawBody`
+
+This property sets the request body to the value provided here without any conversion. Use the' body' property if you want the object sent in JSON. When you define `body` and `rawBody`, the latest one prevails.
+
+### `resultSelector`
+
+The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process. With this property, you can define a selector that extracts the data from the response body.
+
+### `url`
+
+This property represents the URL to fetch the data.
+
+## Events
+
+### `loaded`
+
+The component triggers this event when the fetch operation has been completed and the data is loaded. The argument of the event is the data loaded.
+
+## Styling
+
+The `Datasource` component does not support styling.

@@ -1,0 +1,76 @@
+# ThemeChangerButton
+
+`ThemeChangerButton` is a component that allows to switch between available themes.
+
+## Using the Component
+
+The component is a button that can be used the same way as a regular [`Button`](./Button.mdx).
+
+<Playground
+  name="Use case"
+  previewOnly
+  height={400}
+  app={`
+  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+    <ThemeChangerButton />
+  </Stack>
+  `}
+/>
+
+It automatically handles custom themes as well that are added to your project:
+
+**NOTE:** Issue arises if no tone suffix is provided in the theme ID (like `custom-light`).
+
+```json
+themes: {
+  [
+    {
+      id: "custom",
+      tone: "light",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-TextBox": "30px",
+        "color-adornment-TextBox": "red",
+        "thickness-border-TextBox": "4px"
+      }
+    }
+  ]
+}
+```
+
+<Playground
+  name="Example: custom theme"
+  previewOnly
+  height={400}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      tone: "light",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-TextBox": "30px",
+        "color-adornment-TextBox": "red",
+        "thickness-border-TextBox": "4px",
+      },
+    },
+  ]}
+  app={`
+  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+    <ThemeChangerButton />
+  </Stack>
+  `}
+/>
+
+## Properties
+
+This component does not have any properties.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+This component does not have any styling options.
+

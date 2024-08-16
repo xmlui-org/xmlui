@@ -34,7 +34,10 @@ const TextVariantKeys = [
   "small", // Small text in the particular context
   "caption", // Caption text in the particular context
   "placeholder", // Placeholder text in the particular context 
-  "paragraph", // use <p>  
+  "paragraph", // use <p>
+  "subheading", // use a H6 with some specific defaults
+  "tableheading", // use a H3 with some specific defaults
+  "secondary", // use a secondary text style
 ] as const;
 
 type TextVariant = typeof TextVariantKeys[number];
@@ -61,6 +64,9 @@ const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
   caption: "span",
   placeholder: "span",
   paragraph: "p",
+  subheading: "h6",
+  tableheading: "h6",
+  secondary: "span",
 };
 
 type TextVariantMapping =
@@ -79,7 +85,8 @@ type TextVariantMapping =
   | "strong"
   | "em"
   | "span"
-  | "p";
+  | "p"
+  | "h6";
 
 const AbbreviationKeys = ["title"] as const;
 type Abbreviation = {
@@ -241,6 +248,14 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "padding-horizontal-Text-codefence": "$space-3",
     "padding-vertical-Text-codefence": "$space-2",
     "padding-vertical-Text-paragraph": "$space-1",
+    "font-size-Text-subheading": "$font-size-H6",
+    "font-weight-Text-subheading": "$font-weight-bold",
+    "letter-spacing-Text-subheading": "0.04em",
+    "transform-Text-subheading": "uppercase",
+    "margin-top-Text-tableheading": "$space-1",
+    "margin-bottom-Text-tableheading": "$space-4",
+    "padding-horizontal-Text-tableheading": "$space-1",
+    "font-weight-Text-tableheading": "$font-weight-bold",
     light: {
       "color-bg-Text-code": "$color-surface-100",
       "color-border-Text-code": "$color-surface-200",
@@ -250,6 +265,8 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-Text-placeholder": "$color-surface-500",
       "color-bg-Text-codefence": "$color-primary-100",
       "color-Text-codefence": "$color-surface-900",
+      "color-Text-subheading": "$color-text-secondary",
+      "color-Text-secondary": "$color-surface-400",
     },
     dark: {
       "color-bg-Text-code": "$color-surface-800",
@@ -260,6 +277,8 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-Text-placeholder": "$color-surface-500",
       "color-bg-Text-codefence": "$color-primary-800",
       "color-Text-codefence": "$color-surface-200",
+      "color-Text-subheading": "$color-text-secondary",
+      "color-Text-secondary": "$color-surface-600",
     },
   },
 };

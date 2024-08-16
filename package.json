@@ -5,8 +5,8 @@
   "workspaces": [
     "./xmlui-engine",
     "./create-xmlui-app",
-    "./xmlui-e2e",
-    "./xmlui-docs",
-    "./xmlui-code-tools"
+    "./tests",
+    "./docs",
+    "./tools/vscode"
   ]
 }

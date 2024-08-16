@@ -9,6 +9,7 @@ $themeVars: ();
 
 $color-text-secondary: createThemeVar("color-text-secondary");
 $color-bg-Table: createThemeVar("color-bg-Table");
+$color-bg-row-Table: createThemeVar("color-bg-row-Table");
 $color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
 $color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
 $color-bg-selected-Table--hover: createThemeVar("color-bg-selected-Table--hover");
@@ -27,6 +28,8 @@ $style-border-cell-Table: createThemeVar("style-border-cell-Table");
 $border-cell-Table: createThemeVar("border-cell-Table");
 $color-bg-pagination-Table: createThemeVar("color-bg-pagination-Table");
 $color-text-heading-Table: createThemeVar("color-text-heading-Table");
+$font-weight-row-Table: createThemeVar("font-weight-row-Table");
+$font-size-row-Table: createThemeVar("font-size-row-Table");
 $font-weight-heading-Table: createThemeVar("font-weight-heading-Table");
 $font-size-heading-Table: createThemeVar("font-size-heading-Table");
 $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
@@ -168,6 +171,9 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
   }
 
   .row {
+    font-size: $font-size-row-Table;
+    font-weight: $font-weight-row-Table;
+    background-color: $color-bg-row-Table;
 
     &.selected {
       background-color: $color-bg-selected-Table;

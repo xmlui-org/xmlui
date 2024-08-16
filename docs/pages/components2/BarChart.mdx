@@ -1,0 +1,29 @@
+# BarChart
+
+The `BarChart` component represents a bar chart.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `data`
+
+This property is used to provide the component with data to display.
+The data itself needs to be an array of objects.
+
+NOTE: This does not seem to work, produces errors:
+
+<Playground
+  previewOnly
+  name="Example: data"
+  height={300}
+  app={`
+    <App>
+      <BarChart
+        data="{[ { stage: 'Prospecting', value: 231 } ]}"
+      />
+    </App>
+  `}
+/>

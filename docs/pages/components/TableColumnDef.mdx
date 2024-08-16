@@ -1,0 +1,179 @@
+import data from "../../examples/list-component-data";
+
+# TableColumnDef
+
+The `TableColumnDef` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
+
+## Properties
+
+Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
+
+### `bindTo`
+
+Indicates what part of the data to lay out in the column.
+
+```ueml copy {3}
+<Table data='{[...]}'>
+  <TableColumnDef bindTo="name"/>
+</Table>
+```
+
+<Playground
+  previewOnly
+  name="Example: bindTo"
+  height={300}
+  app={`<Table data='{${JSON.stringify(data)}}'>
+  <TableColumnDef bindTo="name" />
+</Table>`}
+/>
+
+### `canSort`
+
+This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
+The default value is `false`.
+
+Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
+
+```ueml copy /canSort/
+<Table data='{[...]}'>
+  <TableColumnDef canSort="true" bindTo="name" />
+  <TableColumnDef canSort="true" bindTo="quantity" />
+  <TableColumnDef canSort="false" bindTo="unit" />
+</Table>
+```
+
+<Playground
+  previewOnly
+  name="Example: canSort"
+  height={300}
+  app={`<Table data='{${JSON.stringify(data)}}'>
+    <TableColumnDef canSort="true" bindTo="name" />
+    <TableColumnDef canSort="true" bindTo="quantity" />
+    <TableColumnDef canSort="false" bindTo="unit" />
+</Table>`}
+/>
+
+### `header`
+
+Adds a label for a particular column
+
+```ueml copy {3-4}
+<Table data='{[...]}'>
+  <TableColumnDef header="Food Name" bindTo="name" />
+  <TableColumnDef header="Food Quantity" bindTo="quantity" />
+  <TableColumnDef bindTo="unit" />
+</Table>
+```
+
+<Playground
+  previewOnly
+  name="Example: header"
+  height={300}
+  app={`<Table data='{${JSON.stringify(data)}}'>
+    <TableColumnDef header="Food Name" bindTo="name" />
+    <TableColumnDef header="Food Quantity" bindTo="quantity" />
+    <TableColumnDef bindTo="unit" />
+</Table>`}
+/>
+
+### `minWidth`
+
+Indicates the minimum width a particular column can have. (See an example in the [`width` property](#width) section below.)
+
+### `maxWidth`
+
+Indicates the maximum width a particular column can have.  (See an example in the [`width` property](#width) section below.)
+
+### `pinTo`
+
+This property allows the column to be pinned to the `left` or right `edge` of the table, as the following example demonstrates:
+
+```ueml copy {2,6} /pinTo="left"/ /pinTo="right"/
+<Table data='{[...]}'>
+  <TableColumnDef bindTo="id" width="50" pinTo="left" />
+  <TableColumnDef bindTo="name" width="500" />
+  <TableColumnDef bindTo="quantity" width="300" />
+  <TableColumnDef bindTo="unit" width="300"/>
+  <TableColumnDef bindTo="category" width="100" pinTo="right"/>
+</Table>
+```
+Scroll the table contents horizontally to see how the pinned columns are displayed.
+
+<Playground
+  previewOnly
+  name="Example: pinTo"
+  height={200}
+  app={`
+    <Table data='{${JSON.stringify(data)}}' height="100%">
+      <TableColumnDef bindTo="id" width="50" pinTo="left" />
+      <TableColumnDef bindTo="name" width="500" />
+      <TableColumnDef bindTo="quantity" width="300" />
+      <TableColumnDef bindTo="unit" width="300"/>
+      <TableColumnDef bindTo="category" width="100" pinTo="right"/>
+    </Table>
+  `}
+/>
+
+### `template`
+
+This prop provides customization to render any sort of components in the cells of the column.
+Access the data's attributes via the `$item` in a binding expression.
+
+```ueml copy {3-5}
+<Table datasource="https://api.spacexdata.com/v3/rockets">
+    <TableColumnDef header="Image" size="140px">
+      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+    </TableColumnDef>
+    <TableColumnDef header="Name" bindTo="rocket_name"/>
+</Table>
+```
+
+<Playground
+  previewOnly
+  name="Example: template"
+  height={300}
+  app={`<Table datasource="https://api.spacexdata.com/v3/rockets">
+    <TableColumnDef header="Image" size="140px">
+      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+    </TableColumnDef>
+    <TableColumnDef header="Name" bindTo="rocket_name"/>
+</Table>`}
+/>
+
+### `width`
+
+This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*,` `2*`, etc.). You will get an error if you use any other unit (or value).
+
+The following example sets the second column to an absolute size (size pixels), while the first and third columns have star sizes:
+
+```ueml copy {3}
+<Table data='{[...]}'>
+  <TableColumnDef bindTo="name" canResize="true" width="3*" />
+  <TableColumnDef bindTo="quantity" width="100" minWidth="50px" maxWidth="500" />
+  <TableColumnDef bindTo="unit" width="*" />
+</Table>
+```
+
+Check what happens when you resize table columns:
+
+<Playground
+  previewOnly
+  name="Example: width"
+  height={200}
+  app={`
+    <Table data='{${JSON.stringify(data)}}'>
+      <TableColumnDef bindTo="name" canResize="true" width="3*" />
+      <TableColumnDef bindTo="quantity" width="100" minWidth="50px" maxWidth="500 px" />
+      <TableColumnDef bindTo="unit" width="*" />
+    </Table>
+  `}
+/>
+
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+Styling is done via the [`Table` component](./Table.mdx).

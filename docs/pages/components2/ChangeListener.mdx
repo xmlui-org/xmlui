@@ -1,0 +1,97 @@
+# ChangeListener
+
+`ChangeListener` is a functional component (it renders no UI) to trigger an action when a particular value 
+(component property, state, etc.) changes.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `listenTo`
+
+This property declares the value of the changes the component listens to.
+
+The following sample demonstrates using this property. Every time the user clicks the button, it adds a new random number to a list. The `ChangeListener` component watches the changes in the list's length. Whenever that value changes, the `didChange` event recalculates the sum of numbers in `list`.
+
+```ueml copy
+<VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
+  <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+  <ChangeListener
+    listenTo="{list.length}" 
+    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+  <Text>{toDisplay.toFixed(4)}</Text>
+</VStack>
+```
+
+<Playground
+    previewOnly
+    name="Example: listenTo"
+    app={`
+    <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
+      <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+      <ChangeListener
+        listenTo="{list.length}" 
+        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+      <Text>{toDisplay.toFixed(4)}</Text>
+    </VStack>
+  `}
+    height={120}
+/>
+
+### `throttleWaitInMs`
+
+This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
+
+The following example works like the previous one (in the `listen` prop's description). However, the user can reset or set the throttling time to 3 seconds. You can observe that while the throttling time is 3 seconds, multiple button clicks will refresh the accumulated value once within 3 seconds.
+
+```ueml copy
+<VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}" var.throttle="{0}">
+  <HStack gap="0.5rem">
+    <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+    <Button label="Reset throttling" onClick="throttle = 0" />
+    <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
+  </HStack> 
+  <ChangeListener
+    listenTo="{list.length}"
+    throttleWaitInMs="{throttle}"
+    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+  <Text>{toDisplay.toFixed(4)}</Text>
+</VStack>
+```
+<Playground
+    previewOnly
+    name="Example: listenTo"
+    app={`
+    <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}" var.throttle="{0}">
+      <HStack gap="0.5rem">
+        <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+        <Button label="Reset throttling" onClick="throttle = 0" />
+        <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
+      </HStack> 
+      <ChangeListener
+        listenTo="{list.length}"
+        throttleWaitInMs="{throttle}"
+        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+      <Text>{toDisplay.toFixed(4)}</Text>
+    </VStack>
+  `}
+    height={120}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+### `didChange`
+
+This event is fired when the component observes a value change (within the specified throttling interval). Define the event handler that responds to that change (as the previous samples demonstrate).
+
+The event argument is an object with `prevValue` and `newValue` properties that (as their name suggests) contain the previous and the new values.
+
+## Styling
+
+This component does not have any styles.

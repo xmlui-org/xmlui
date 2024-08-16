@@ -117,12 +117,12 @@ const metadata: ComponentDescriptor<LinkComponentDef> = {
     "offset-outline-Link--focus": "$offset-outline--focus",
 
     light: {
-      "color-text-Link": "$color-surface-950",
-      "color-text-Link--active": "$color-primary-700",
+      "color-text-Link": "$color-primary-500",
+      "color-text-Link--active": "$color-primary-500",
     },
     dark: {
-      "color-text-Link": "$color-surface-50",
-      "color-text-Link--active": "$color-primary-300",
+      "color-text-Link": "$color-primary-500",
+      "color-text-Link--active": "$color-primary-500",
     },
   },
 };

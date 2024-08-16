@@ -5,7 +5,7 @@
  * We are using custom tags that need to be registered in "tsdoc.json" located on the same level as the tsconfig.json file.
  *
  * On metadata extraction:
- * - All props, events, etc in the component metadata will be exported unless excluded using the @internal tag
+ * - All properties, events, etc in the component metadata will be exported unless excluded using the @internal tag
  * - A component metadata will be properly processed if the ComponentDef interface in the component file
  * is commented using the JSDoc syntax: /** something *\/
  * - We are currently using custom tags to handle descriptions coming from external mdx files (see @descriptionRef tag)
@@ -36,7 +36,7 @@ async function main() {
     // TypeDoc will detect the root of the project by looking for a tsconfig.json and checking its contents (& defaults)
     entryPoints,
     logLevel: "Info",
-    // This ensures we don't export props tagged with @internal
+    // This ensures we don't export properties tagged with @internal
     excludeInternal: true,
   });
   if (app.entryPoints.length === 0) {

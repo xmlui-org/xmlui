@@ -1,0 +1,51 @@
+# MenuSeparator
+
+This component defines a separator line to display between menu items. See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
+
+## Properties
+
+This component does not have any properties.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `MenuSeparator` component uses these theme variables to customize its appearance:
+- `color`
+- `height`
+- `margin-top`
+- `margin-bottom`
+- `width`
+
+The following sample demonstrates using a few of these theme variables to customize the appearance of a `MenuSeparator`:
+
+```ueml copy {1}
+<Theme color-MenuSeparator="purple" height-MenuSeparator="2px">
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuSeparator />
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</Theme>
+```
+
+<Playground
+  name="Example: Styling MenuSeparator"
+  previewOnly={true}
+  height={200}
+  app={`
+    <VStack padding="1rem">
+      <Theme color-MenuSeparator="purple" height-MenuSeparator="2px">
+        <DropdownMenu label="DropdownMenu">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuSeparator />
+          <MenuItem>Item 3</MenuItem>
+        </DropdownMenu>
+      </Theme>
+    </VStack>
+  `}
+/>
