@@ -38,15 +38,15 @@ Some of them set dimensions; others set colors or other style elements.
   `}
 />
 
-Layout properties are easy to use; adding simple property values can quickly change the visuals of a particular component. However, this ease comes at a high price: the more individual layout props there are, the more tedious the application maintenance is if you need to change the appearance of the app.
+Layout properties are easy to use; adding simple property values can quickly change the visuals of a particular component. However, this ease comes at a high price: the more individual layout properties there are, the more tedious the application maintenance is if you need to change the appearance of the app.
 
-For example, changing the dimensions of boxes in the code snippet above affects many values (all `width` and `height` props).
+For example, changing the dimensions of boxes in the code snippet above affects many values (all `width` and `height` properties).
 
 ## Reusable Components
 
 Reusable components may help such maintenance nightmares. You can extract the common style traits of individual components into a reusable component.
 
-To remove the pain of setting all `width` and `height` occurrences in the previous example (when using layout properties), define a reusable component, `MyBox` with the wired dimension values; however, allow them to receive props to set the border and color values:
+To remove the pain of setting all `width` and `height` occurrences in the previous example (when using layout properties), define a reusable component, `MyBox` with the wired dimension values; however, allow them to receive properties to set the border and color values:
 
 ```ueml copy
 <Component name="MyBox">
@@ -72,7 +72,7 @@ Now, with `MyBox`, the previous UI declaration is more straightforward:
 </HStack>
 ```
 
-Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Altering the `width` and `height` props within `MyBox` has its effect on all boxes:
+Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Altering the `width` and `height` properties within `MyBox` has its effect on all boxes:
 
 ```ueml copy {6}
 <Component name="MyBox">
@@ -119,7 +119,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
 
 XMLUI uses themes. A theme is a set of theme variables with their actual values; these influence the appearance of an app. A single app can be shipped with multiple themes; if configured, users can select their current theme from the available ones.
 
-You can extract the values of layout props into theme variables. For example, the hard-wired dimensions of `MyBox` can be put into theme variables:
+You can extract the values of layout properties into theme variables. For example, the hard-wired dimensions of `MyBox` can be put into theme variables:
 
 ```ueml copy {6-7}
 <Component name="MyBox">
