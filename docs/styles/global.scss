@@ -153,3 +153,7 @@ div#__next,
 div#__next > div {
   height: 100%;
 }
+
+body {
+  font-feature-settings: "cv03", "cv04", "cv11"
+}
