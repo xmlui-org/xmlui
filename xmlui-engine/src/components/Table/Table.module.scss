@@ -9,6 +9,7 @@ $themeVars: ();
 
 $color-text-secondary: createThemeVar("color-text-secondary");
 $color-bg-Table: createThemeVar("color-bg-Table");
+$color-bg-row-Table: createThemeVar("color-bg-row-Table");
 $color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
 $color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
 $color-bg-selected-Table--hover: createThemeVar("color-bg-selected-Table--hover");
@@ -172,6 +173,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
   .row {
     font-size: $font-size-row-Table;
     font-weight: $font-weight-row-Table;
+    background-color: $color-bg-row-Table;
 
     &.selected {
       background-color: $color-bg-selected-Table;

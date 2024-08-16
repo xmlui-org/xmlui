@@ -9,6 +9,9 @@ import {
 
 export const XmlUiThemeDefinition: ThemeDefinition = {
   id: "xmlui",
+  resources: {
+    "font.inter": "https://rsms.me/inter/inter.css"
+  },
 };
 
 export const XmlUiBlueThemeDefinition: ThemeDefinition = {
