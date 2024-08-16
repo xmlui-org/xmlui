@@ -1,14 +1,16 @@
 {
   "name": "xmlui",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "sideEffects": false,
   "scripts": {
-    "build": "tsc && vite build && tsc -p tsconfig.bin.json",
+    "build:bin": "tsc -p tsconfig.bin.json",
+    "build:xmlui": "vite build --mode lib",
+    "build:xmlui-standalone": "vite build --mode standalone",
+    "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui && npm run build:xmlui-standalone",
     "test": "vitest run",
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
-    "get-metadata": "node scripts/get-meta.js",
-    "build-temp": "clean-package && npm run build && npm link && clean-package restore"
+    "get-metadata": "node scripts/get-meta.js"
   },
   "dependencies": {
     "@azure/msal-browser": "2.30.0",
@@ -100,6 +102,7 @@
     "babel-loader": "8.2.5",
     "clean-package": "2.2.0",
     "eslint": "8.26.0",
+    "rimraf": "6.0.1",
     "rollup-plugin-visualizer": "5.8.3",
     "typedoc": "0.26.2",
     "typescript": "^5.5.4",

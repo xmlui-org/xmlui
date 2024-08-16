@@ -470,10 +470,6 @@ export function ComponentProvider({
     setComponentRegistry(new ComponentRegistry(contributes));
   }, [contributes]);
 
-  useEffect(() => {
-    setComponentRegistry(new ComponentRegistry(contributes));
-  }, [contributes]);
-
   return (
     <ViewComponentRegistryContext.Provider value={componentRegistry}>
       {children}
