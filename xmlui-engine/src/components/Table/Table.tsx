@@ -318,7 +318,7 @@ export const Table = ({
         enableMultiRowSelection ? (
           <Toggle
             {...{
-              className: styles.checkBoxWrapper,
+              className: classnames(styles.checkBoxWrapper),
               value: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
               onDidChange: (checked: any) => {
@@ -831,39 +831,47 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-bg-Table": "$color-bg-primary",
-    "color-bg-row-Table--hover": "$color-primary-50",
-    "color-bg-selected-Table": "$color-primary-100",
-    "color-bg-selected-Table--hover": "$color-bg-row-Table--hover",
-    "color-bg-heading-Table": "$color-bg-Table",
-    "color-bg-heading-Table--hover": "$color-surface-100",
-    "color-bg-heading-Table--active": "$color-surface-200",
-    "color-bg-pagination-Table": "$color-bg-Table",
-    "padding-horizontal-heading-Table": "$space-4",
+    "padding-horizontal-heading-Table": "$space-2",
     "padding-vertical-heading-Table": "$space-2",
     "padding-heading-Table": "$padding-vertical-heading-Table $padding-horizontal-heading-Table",
-    "padding-horizontal-cell-Table": "$space-4",
+    "padding-horizontal-cell-Table": "$space-2",
+    "padding-horizontal-cell-first-Table": "$space-5",
+    "padding-horizontal-cell-last-Table": "$space-5",
     "padding-vertical-cell-Table": "$space-2",
     "padding-cell-Table": "$padding-vertical-cell-Table $padding-horizontal-cell-Table",
-    "color-border-cell-Table": "$color-border",
     "thickness-border-cell-Table": "$space-0_5",
     "style-border-cell-Table": "solid",
     "border-cell-Table": "$thickness-border-cell-Table $style-border-cell-Table $color-border-cell-Table",
 
-    "color-outline-heading-Table--focus": "$color-outline--focus",
     "thickness-outline-heading-Table--focus": "$thickness-outline--focus",
     "style-outline-heading-Table--focus": "$style-outline--focus",
     "offset-outline-heading-Table--focus": "$offset-outline--focus",
 
-    "color-text-heading-Table": "$color-text-primary",
-    "font-size-heading-Table": "$font-size-smaller",
+    "font-size-heading-Table": "$font-size-tiny",
     "font-weight-heading-Table": "$font-weight-bold",
     "transform-text-heading-Table": "uppercase",
     "font-size-row-Table": "$font-size-small",
 
+    "color-bg-Table": "transparent",
+    "color-border-cell-Table": "$color-border",
+    "color-bg-selected-Table--hover": "$color-bg-row-Table--hover",
+    "color-bg-pagination-Table": "$color-bg-Table",
+    "color-outline-heading-Table--focus": "$color-outline--focus",
+
+    light: {
+      "color-bg-row-Table--hover": "$color-primary-50",
+      "color-bg-selected-Table": "$color-primary-100",
+      "color-bg-heading-Table--hover": "$color-surface-100",
+      "color-bg-heading-Table--active": "$color-surface-200",
+      "color-bg-heading-Table": "$color-surface-100",
+      "color-text-heading-Table": "$color-surface-500",
+    },
     dark: {
       "color-bg-row-Table--hover": "$color-primary-900",
       "color-bg-selected-Table": "$color-primary-800",
+      "color-bg-heading-Table--hover": "$color-surface-800",
+      "color-bg-heading-Table": "$color-surface-950",
+      "color-bg-heading-Table--active": "$color-surface-700",
     }
   },
 };

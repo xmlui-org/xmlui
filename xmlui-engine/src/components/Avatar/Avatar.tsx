@@ -93,11 +93,11 @@ const metadata: ComponentDescriptor<AvatarComponentDef> = {
 
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "radius-Avatar": "50%",
-    "thickness-border-Avatar": "1px",
+    "radius-Avatar": "4px",
+    "thickness-border-Avatar": "0px",
     "style-border-Avatar": "solid",
     "border-Avatar": "$thickness-border-Avatar $style-border-Avatar $color-border-Avatar",
-    "shadow-Avatar": "$shadow",
+    "shadow-Avatar": "inset 0 0 0 1px rgba(4,32,69,0.1)",
     "color-text-Avatar": "$color-text-secondary",
     "font-weight-Avatar": "$font-weight-bold",
     light: {

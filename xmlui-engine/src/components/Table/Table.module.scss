@@ -20,6 +20,8 @@ $padding-horizontal-heading-Table: createThemeVar("padding-horizontal-heading-Ta
 $padding-vertical-heading-Table: createThemeVar("padding-vertical-heading-Table");
 $padding-heading-Table: createThemeVar("padding-heading-Table");
 $padding-horizontal-cell-Table: createThemeVar("padding-horizontal-cell-Table");
+$padding-horizontal-cell-first-Table: createThemeVar("padding-horizontal-cell-first-Table");
+$padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-last-Table");
 $padding-vertical-cell-Table: createThemeVar("padding-vertical-cell-Table");
 $padding-cell-Table: createThemeVar("padding-cell-Table");
 $color-border-cell-Table: createThemeVar("color-border-cell-Table");
@@ -133,11 +135,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
     .columnCell:first-child {
       .headerContent {
-        padding-left: t.$space-5;
+        padding-left: $padding-horizontal-cell-first-Table;
       }
 
       > button {
-        padding-left: t.$space-5;
+        padding-left: $padding-horizontal-cell-first-Table;
 
         .headerContent {
           padding-left: 0;
@@ -147,11 +149,11 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
     .columnCell:last-child {
       .headerContent {
-        padding-right: t.$space-5;
+        padding-right: $padding-horizontal-cell-last-Table;
       }
 
       > button {
-        padding-right: t.$space-5;
+        padding-right: $padding-horizontal-cell-last-Table;
 
         .headerContent {
           padding-right: 0;
@@ -160,12 +162,12 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
     }
 
     .cell:first-child {
-      padding-left: t.$space-5;
+      padding-left: $padding-horizontal-cell-first-Table;
       border-left: 0;
     }
 
     .cell:last-child {
-      padding-right: t.$space-5;
+      padding-right: $padding-horizontal-cell-last-Table;
       border-right: 0;
     }
   }
