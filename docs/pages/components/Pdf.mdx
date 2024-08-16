@@ -1,23 +1,29 @@
 # Pdf
 
-The `Pdf` component provides a read-only preview of a particular PDF document's contents.
+The `Pdf` component provides a read-only preview of a pdf document's contents.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
 ### `src`
 
-This property defines the source URL of the PDF document stream to display.
+This property defines the source URL of the pdf document stream to display.
 
-<Playground
-  name="Example: using Pdf"
-  previewOnly={true}
-  height={160}
-  app={`
-    <VStack>
-      <Pdf src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" />
-    </VStack>
-  `}
-/>
+```ueml copy
+<VStack>
+  <Pdf src="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" />
+</VStack>
+```
+
+<br/>
+<Image alt="Dummy Pdf" src="/resources/images/pdf/dummy-pdf.jpg" width={560} />
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -25,4 +31,4 @@ This component does not have any events.
 
 ## Styling
 
-The `Pdf` component does not support styling.
+This component does not have any styles.

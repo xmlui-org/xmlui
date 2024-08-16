@@ -1,6 +1,6 @@
 # SpaceFiller
 
-`SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space.
+The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. 
 Its behavior depends on the layout container in which it is used.
 
 ## Using `SpaceFiller`
@@ -11,21 +11,23 @@ The `SpaceFiller` in a `Stack` component pushes the components after the `SpaceF
 
 ```ueml copy
 <HStack>
-    <Stack width="64" height="64" backgroundColor="red" />
-    <SpaceFiller />
-    <Stack width="64" height="64" backgroundColor="blue" />
+  <Stack width="64" height="64" backgroundColor="red" />
+  <SpaceFiller />
+  <Stack width="64" height="64" backgroundColor="blue" />
 </HStack>
 ```
 
 <Playground
-  name="Example: SpaceFiller in a Stack"
-  previewOnly={true}
+  name="Example: in a Stack"
+  previewOnly
   height={80}
-  app={`<HStack>
+  app={`
+  <HStack>
     <Stack width="64" height="64" backgroundColor="red" />
     <SpaceFiller />
     <Stack width="64" height="64" backgroundColor="blue" />
-</HStack>`}
+  </HStack>
+  `}
 />
 
 ### In `FlowLayout`
@@ -34,26 +36,36 @@ The `SpaceFiller` in a `FlowLayout` component acts as a line break for a row. Al
 
 ```ueml copy
 <FlowLayout>
-    <Stack width="20%" height="30" backgroundColor="red" />
-    <SpaceFiller />
-    <Stack width="20%" height="30" backgroundColor="blue" />
+  <Stack width="20%" height="30" backgroundColor="red" />
+  <SpaceFiller />
+  <Stack width="20%" height="30" backgroundColor="blue" />
 </FlowLayout>
 ```
 
 <Playground
-  name="Example: SpaceFiller in a FlowLayout"
-  previewOnly={true}
+  name="Example: in a FlowLayout"
+  previewOnly
   height={80}
-  app={`<FlowLayout>
+  app={`
+  <FlowLayout>
     <Stack width="20%" height="30" backgroundColor="red" />
     <SpaceFiller />
     <Stack width="20%" height="30" backgroundColor="blue" />
-</FlowLayout>`}
+  </FlowLayout>
+  `}
 />
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
 This component does not have any properties.
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -61,4 +73,4 @@ This component does not have any events.
 
 ## Styling
 
-This component does not have any styling options.
+This component does not have any styles.

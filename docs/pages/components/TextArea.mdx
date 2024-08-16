@@ -3,11 +3,22 @@
 `TextArea` is a component that provides a multiline text input area.
 
 The `TextArea` is an input control component and is often used in forms.
-See the [Using Forms](../learning/forms.mdx) guide for details.
+See the [Using Forms](
+../learning/forms.mdx
+) guide for details.
 
 To add new lines to the input field press `Shift` + `Enter`.
 
+## Context Variables
+
+This component does not have any context variables.
+
 ## Properties
+
+### `allowCopy`
+
+This boolean property indicates if the component's contents can be copied to the clipboard.
+Default: `true`.
 
 ### `autoFocus`
 
@@ -26,7 +37,8 @@ If this boolean prop is set to `true`, the `TextArea` input will be focused when
 
 ### `autoSize`
 
-If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
+If set to `true`, this boolean property enables the `TextArea`
+to resize automatically based on the number of lines inside it.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -89,6 +101,11 @@ See [Using Forms](../learning/forms.mdx) for details.
 </Form>`}
 />
 
+### `escResets`
+
+This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
+The default is `true`.
+
 ### `initialValue`
 
 The initial value displayed in the input field.
@@ -103,6 +120,15 @@ The initial value displayed in the input field.
   height={80}
   app={`<TextArea initialValue="Example text" />`}
 />
+
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label,
+the component behaves as you clicked it.
+
+### `maxLength`
+
+This property sets the maximum number of characters you can type into the component's text.
 
 ### `maxRows`
 
@@ -182,6 +208,10 @@ This boolean determines whether the input field can be written.
   app={`<TextArea initialValue="Example text" readOnly="{true}" />`}
 />
 
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
 ### `resize`
 
 This optional property specifies in which dimensions can the `TextArea` be resized by the user.
@@ -193,11 +223,15 @@ This optional property specifies in which dimensions can the `TextArea` be resiz
 | `vertical`   | Can only resize vertically    |
 | `both`       | Can resize in both dimensions |
 
+If you allow resizing, the `TextArea` turns off automatic sizing.
+
+When you allow vertical resizing, you can limit the sizable range according to `minRows` and `maxRows`. 
+
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
 ```ueml copy
 <VStack gap="0.5rem">
-    <TextArea resize="vertical" />
+    <TextArea resize="vertical" minRows="1" maxRows="8" />
     <TextArea resize="both" />
 </VStack>
 ```
@@ -206,7 +240,7 @@ Drag the small resize indicators at the bottom right on each of the controls in 
   previewOnly
   name="Example: resize"
   app={`<VStack gap="0.5rem">
-    <TextArea resize="vertical" />
+    <TextArea resize="vertical" minRows="1" maxRows="8" />
     <TextArea resize="both" />
 </VStack>`}
   height={300}
@@ -231,6 +265,8 @@ Specifies the number of lines or rows (and thus, its size) the component has.
 
 ### `validationStatus`
 
+With this property, you can set the checkbox's validation status to "none", "error", "warning", or "valid".
+
 This prop is used to visually indicate status changes reacting to form field validation.
 
 | Value     | Description                                           |
@@ -241,10 +277,10 @@ This prop is used to visually indicate status changes reacting to form field val
 
 ```ueml copy
 <VStack gap="0.5rem">
-    <TextArea />
-    <TextArea validationStatus="valid" />
-    <TextArea validationStatus="warning" />
-    <TextArea validationStatus="error" />
+  <TextArea />
+  <TextArea validationStatus="valid" />
+  <TextArea validationStatus="warning" />
+  <TextArea validationStatus="error" />
 </VStack>
 ```
 
@@ -252,61 +288,108 @@ This prop is used to visually indicate status changes reacting to form field val
   previewOnly
   name="Example: validationStatus"
   height={300}
-  app={`<VStack gap="0.5rem">
+  app={`
+  <VStack gap="0.5rem">
     <TextArea />
     <TextArea validationStatus="valid" />
     <TextArea validationStatus="warning" />
     <TextArea validationStatus="error" />
-</VStack>`}
+  </VStack>
+  `}
 />
 
 ## API
 
-### `value`
+### `focus`
 
-You can query this read-only API property to get the input component's current value.
+This API command triggers a focus event on the input field.
 
-See an example in the `setValue` API method.
-
-### `setValue`
-
-You can use this method to set the component's current value programmatically.
-
-```ueml copy {3, 9, 12}
-<VStack gap="0.5rem">
-    <TextArea
-      id="textarea"
-      readOnly="true"
-    />
-    <HStack gap="0.5rem">
-      <Button 
-        label="Add Text" 
-        onClick="textarea.setValue('This is an example')" />
-      <Button 
-        label="Remove Text" 
-        onClick="textarea.setValue('')" />
-    </HStack>
+```ueml copy {2-3}
+<VStack gap="$space-0_5">
+  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+  <TextArea id="inputComponent" />
 </VStack>
 ```
 
 <Playground
   previewOnly
-  name="Example: value and setValue"
-  height={140}
-  app={`<VStack gap="0.5rem">
-    <TextArea 
-      id="textarea"
-      readOnly="true"
+  name="Example: focus"
+  height={120}
+  app={`
+  <VStack gap="$space-0_5">
+    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+    <TextArea id="inputComponent" />
+  </VStack>
+  `}
+/>
+
+### `setValue`
+
+This API method programmatically sets the value of the field.
+The same rules apply as for the [`initialValue`](#initialvalue) property.
+
+```ueml copy {10}
+<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <TextArea 
+    id="inputField" 
+    readOnly="true" 
+    onDidChange="changes++"
+  />
+  <HStack gap="$space-1">
+    <Button 
+      label="Check" 
+      onClick="inputField.setValue('example ')"
     />
-    <HStack gap="0.5rem">
+    <Text value="Number of changes: {changes}" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: setValue"
+  app={`
+  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+    <TextArea 
+      id="inputField" 
+      readOnly="true" 
+      onDidChange="changes++"
+    />
+    <HStack gap="$space-1">
       <Button 
-        label="Add Text" 
-        onClick="textarea.setValue('This is an example')" />
-      <Button 
-        label="Remove Text" 
-        onClick="textarea.setValue('')" />
+        label="Check" 
+        onClick="inputField.setValue('example ')"
+      />
+      <Text value="Number of changes: {changes}" />
     </HStack>
-</VStack>`}
+  </VStack>
+  `}
+/>
+
+### `value`
+
+By setting an ID for the component, you can refer to the value of the field if set.
+If no value is set, the value will be undefined.
+
+In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
+
+```ueml copy {2-3}
+<HStack gap="$space-0_5">
+  <Text value="TextArea content length: {inputComponent.value.length}" />
+  <TextArea id="inputComponent" />
+</HStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: value"
+  height={60}
+  app={`
+  <HStack gap="$space-0_5">
+    <Text value="TextArea content length: {inputComponent.value.length}" />
+    <TextArea id="inputComponent" />
+  </HStack>
+  `}
 />
 
 ## Events
@@ -319,8 +402,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ```ueml copy {2}
 <VStack gap="0.5rem" var.field="">
-    <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text initialValue="{field}" />
+  <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+  <Text initialValue="{field}" />
 </VStack>
 ```
 
@@ -328,24 +411,29 @@ Write in the input field and see how the `Text` underneath it is updated in para
   previewOnly
   name="Example: didChange"
   height={100}
-  app={`<VStack gap="0.5rem" var.field="">
+  app={`
+  <VStack gap="0.5rem" var.field="">
     <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text initialValue="{field}" />
-</VStack>`}
+    <Text value="{field}" />
+  </VStack>
+  `}
 />
 
 ### `gotFocus`
 
-This event is triggered when the `TextArea` receives focus.
+This event is triggered when the 
+`TextArea`
+ receives focus.
+
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {3-4}
 <TextArea
-    initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-    onGotFocus="focused = true"
-    onLostFocus="focused = false"
-    var.focused="{false}"
+  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+  onGotFocus="focused = true"
+  onLostFocus="focused = false"
+  var.focused="{false}"
 />
 ```
 
@@ -353,40 +441,94 @@ Note how clicking elsewhere resets the text to the original.
   previewOnly
   name="Example: gotFocus/lostFocus"
   height={100}
-  app={`<TextArea
+  app={`
+  <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
     var.focused="{false}"
-/>
+  />
   `}
 />
 
 ### `lostFocus`
 
-This event is triggered when the `TextArea` loses focus.
+This event is triggered when the 
+`TextArea`
+ loses focus.
 
-(See the example above)
+See the example in the [gotFocus event section](#gotfocus).
 
 ## Styling
 
-The `TextArea` component uses these theme variables to customize its appearance:
+The `TextArea` component uses these theme variables.
 
-- `radius-Textarea`
-- `color-text-Textarea`
-- `color-bg-Textarea--disabled`
-- `thickness-border-Textarea`
-- `style-border-Textarea`
-- `color-border-Textarea--disabled`
-- `color-bg-Textarea--disabled`
-- `color-text-Textarea--disabled`
-- `color-border-Textarea-default`
-- `color-border-Textarea-error`
-- `color-border-Textarea-warning`
-- `color-border-Textarea-success`
-- `color-placeholder-Textarea`
+These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
+If the status segment is omitted, the style will be applied to all validation statuses.
 
-To style all input controls not just this component, use `Input` instead of the `TextArea` segment:
+- `radius-TextArea-|status|`
+- `thickness-border-TextArea-|status|`
+- `style-border-TextArea-|status|`
+- `font-size-TextArea-|status|`
+- `color-placeholder-TextArea-|status|`
+
+```json copy
+"radius-TextArea-default": "10px",
+"color-placeholder-TextArea-error": "crimson"
+```
+
+In addition to the validation statuses,
+the variables below are associated with styles for `hover` and `focus` interaction states denoted by `|interact|` in their signature:
+
+- `color-border-TextArea-|status|--|interact|`
+- `color-bg-TextArea-|status|--|interact|`
+- `shadow-TextArea-|status|--|interact|`
+- `color-text-TextArea-|status|--|interact|`
+
+```json copy
+"color-bg-TextArea-default--hover": "gray",
+"color-text-TextArea-error--focus": "lightcoral"
+```
+
+The following variables are only used in the `focus` state:
+
+- `thickness-outline-TextArea-|status|--focus`
+- `color-outline-TextArea-|status|--focus`
+- `style-outline-TextArea-|status|--focus`
+- `offset-outline-TextArea-|status|--focus`
+
+These variables set the `disabled` state:
+
+- `color-bg-TextArea--disabled`
+- `color-text-TextArea--disabled`
+- `color-border-TextArea--disabled`
+
+### Example
+
+```json copy
+"radius-TextArea": "30px",
+"color-placeholder-TextArea-default": "blue"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={200}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-TextArea": "30px",
+        "color-placeholder-TextArea-default": "blue"
+      },
+    },
+  ]}
+  app={`<TextArea placeholder="I am a placeholder" />`}
+/>
+
+To style all input controls not just this component, replace the `TextArea` segment with `Input`:
 
 ```
 color-border-Input: "#0033FF"
@@ -396,9 +538,11 @@ color-border-Input: "#0033FF"
 
 - [`Checkbox`](./Checkbox.mdx)
 - [`NumberBox`](./NumberBox.mdx)
-- [`RadioGroup`](./RadioGroup.mdx)
 - [`RadioGroupOption`](./RadioGroupOption.mdx)
+- [`Select`](./Select.mdx)
 - [`Switch`](./Switch.mdx)
 - [`TextBox`](./TextBox.mdx)
+- [`MultiSelect`](./MultiSelect.mdx)
+- [`MultiCombobox`](./MultiCombobox.mdx)
 
 See [custom themes](../learning/themes/overview.mdx) for styling details.

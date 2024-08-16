@@ -1,16 +1,22 @@
 # Theme
 
-This component allows defining a particular theming context for its nested components.
+The `Theme` component provides a way to define a particular theming context for its nested components.
+The XMLUI framework uses `Theme` to define the default theming context for all of its child components.
+Theme variables and theme settings only work in this context.
 
-When changing the theming context, you can change its tone or even specify individual theme variables to change the appearance of the nested contents.
+You can change the tone or even specify individual theme variables and change the appearance of nested contents in a theme.
+It is also possible to nest multiple `Theme` components to define multiple theming contexts.
+Contexts follow a specificity rule.
 
-You can learn more about the `Theme` component in the [Themes and Styles Overview](/learning/themes/overview/#style-scopes) article.
+Learn more about styling theming and theming context in [Themes and Styles Overview](../learning/themes/overview/#style-scopes).
 
-## Using Theme
+## Using `Theme`
 
-In contrast to other components, `Theme` allows the use of any property name to define the value of a particular theme variable. The component injects a theme variable using the particular property name. The theme variable will use the property value.
+In contrast to other components, `Theme` accepts theme variables as properties.
+You can define specific styles for components nested in `Theme` using these theme variables.
 
-The following sample sets the theme to a dark tone and sets several `ProgressBar`-related theme variables through `Theme` properties:
+The following example specifies a dark tone for the current theme
+and sets several theme variables to style the `ProgressBar` component:
 
 ```ueml copy {2-7}
 <Theme 
@@ -19,8 +25,9 @@ The following sample sets the theme to a dark tone and sets several `ProgressBar
   color-indicator-ProgressBar="purple"
   thickness-ProgressBar="12px"
   radius-indicator-ProgressBar="12px"
-  radius-Progressbar="4px">
-  <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
+  radius-Progressbar="4px"
+>
+  <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
     <ProgressBar value="0"/>
     <ProgressBar value="0.2"/>
     <ProgressBar value="0.6"/>
@@ -30,92 +37,62 @@ The following sample sets the theme to a dark tone and sets several `ProgressBar
 ```
 
 <Playground
-  name="Example: using Theme properties"
-  previewOnly={true}
+  name="Example: using Theme"
+  previewOnly
   height={130}
   app={`
-    <Theme 
-      tone="dark"
-      color-bg-ProgressBar="cyan"
-      color-indicator-ProgressBar="purple"
-      thickness-ProgressBar="12px"
-      radius-indicator-ProgressBar="12px"
-      radius-Progressbar="4px">
-      <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
-        <ProgressBar value="0"/>
-        <ProgressBar value="0.2"/>
-        <ProgressBar value="0.6"/>
-        <ProgressBar value="1.0"/>
-      </VStack>
-    </Theme>
-`}
-/>
-
-## Properties
-
-### `tone`
-
-This property allows switching the current theme's tone to another one, for example, from light to dark or vice versa.
-
-```ueml copy {2,8,9,15}
-<Fragment>
-  <Theme tone="dark">
-    <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary" >
-      <H3>Use dark tone:</H3>
+  <Theme 
+    tone="dark"
+    color-bg-ProgressBar="cyan"
+    color-indicator-ProgressBar="purple"
+    thickness-ProgressBar="12px"
+    radius-indicator-ProgressBar="12px"
+    radius-Progressbar="4px"
+  >
+    <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
       <ProgressBar value="0"/>
+      <ProgressBar value="0.2"/>
       <ProgressBar value="0.6"/>
+      <ProgressBar value="1.0"/>
     </VStack>
   </Theme>
-  <Theme tone="light">
-    <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
-      <H3>Use light tone:</H3>
-      <ProgressBar value="0"/>
-      <ProgressBar value="0.6"/>
-    </VStack>
-  </Theme>
-</Fragment>
-```
-
-<Playground
-  name="Example: tone"
-  previewOnly={true}
-  height={260}
-  app={`
-    <Fragment>
-      <Theme tone="dark">
-        <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary" >
-          <H3>Use dark tone:</H3>
-          <ProgressBar value="0"/>
-          <ProgressBar value="0.6"/>
-        </VStack>
-     </Theme>
-      <Theme tone="light">
-        <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
-          <H3>Use light tone:</H3>
-          <ProgressBar value="0"/>
-          <ProgressBar value="0.6"/>
-        </VStack>
-     </Theme>
-   </Fragment>
   `}
 />
 
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `root`
+
+This property indicates whether the component is at the root of the application.
+
+If so, it will set a number of important settings for the app:
+- what favicon to use
+- sets up font links
+- specifies the base css
+- sets up the root for the toast notification system
+
+Otherwise, the `Theme` component will just provide the theme context to its children.
+
 ### `themeId`
 
-This property allows switching to another theme using the specified theme identifier.
+This property specifies which theme to use by setting the theme's id.
 
-```ueml copy {2,8,9,15}
+```ueml copy {2,9}
 <Fragment>
-  <Theme themId="xmlui">
-    <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary" >
+  <Theme themeId="xmlui">
+    <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary" >
       <H3>Use tabler theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>
   </Theme>
   <Theme themeId="base-light">
-    <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
-      <H3>Use light tone:</H3>
+    <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
+      <H3>Use the light tone of the base theme:</H3>
       <ProgressBar value="0"/>
       <ProgressBar value="0.6"/>
     </VStack>
@@ -125,27 +102,81 @@ This property allows switching to another theme using the specified theme identi
 
 <Playground
   name="Example: themeId"
-  previewOnly={true}
+  previewOnly
   height={260}
   app={`
-    <Fragment>
-      <Theme themeId="xmlui" tone="dark">
-        <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary" >
-          <H3>Use table theme (dark):</H3>
-          <ProgressBar value="0"/>
-          <ProgressBar value="0.6"/>
-        </VStack>
-     </Theme>
-      <Theme themeId="solid">
-        <VStack padding="1rem" gap="1rem" backgroundColor="$color-bg-primary">
-          <H3>Use the base theme:</H3>
-          <ProgressBar value="0"/>
-          <ProgressBar value="0.6"/>
-        </VStack>
-     </Theme>
-   </Fragment>
+  <Fragment>
+    <Theme themeId="xmlui" tone="dark">
+      <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary" >
+        <H3>Use table theme (dark):</H3>
+        <ProgressBar value="0"/>
+        <ProgressBar value="0.6"/>
+      </VStack>
+    </Theme>
+    <Theme themeId="solid">
+      <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
+        <H3>Use the light tone of the base theme:</H3>
+        <ProgressBar value="0"/>
+        <ProgressBar value="0.6"/>
+      </VStack>
+    </Theme>
+  </Fragment>
   `}
 />
+
+### `tone`
+
+This property allows the setting of the current theme's tone.
+Tone is either `light` or `dark`.
+
+The default tone is `light`.
+
+```ueml copy {2,9}
+<Fragment>
+  <Theme tone="light">
+    <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary" >
+      <H3>Use the light tone of the base theme:</H3>
+      <ProgressBar value="0"/>
+      <ProgressBar value="0.6"/>
+    </VStack>
+  </Theme>
+  <Theme tone="dark">
+    <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
+      <H3>Use the dark tone of the base theme:</H3>
+      <ProgressBar value="0"/>
+      <ProgressBar value="0.6"/>
+    </VStack>
+  </Theme>
+</Fragment>
+```
+
+<Playground
+  name="Example: tone"
+  previewOnly
+  height={260}
+  app={`
+  <Fragment>
+    <Theme tone="light">
+      <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary" >
+        <H3>Use the light tone of the base theme:</H3>
+        <ProgressBar value="0"/>
+        <ProgressBar value="0.6"/>
+      </VStack>
+    </Theme>
+    <Theme tone="dark">
+      <VStack padding="$space-1" gap="$space-1" backgroundColor="$color-bg-primary">
+        <H3>Use the dark tone of the base theme:</H3>
+        <ProgressBar value="0"/>
+        <ProgressBar value="0.6"/>
+      </VStack>
+    </Theme>
+  </Fragment>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -153,4 +184,4 @@ This component does not have any events.
 
 ## Styling
 
-The `Theme` component is a styling wrapper that influences nested components' visual appearance. It cannot be styled.
+The `Theme` component is a styling wrapper that influences the nested components' visual appearance. It cannot be styled.

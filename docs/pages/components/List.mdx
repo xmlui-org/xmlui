@@ -1,13 +1,12 @@
-import data from "../../examples/list-component-data";
+import data from  "../../component-samples/List/list-component-data.js";
 
 # List
 
-The `List` component is a robust layout container that renders associated data items as a list of components.
-`List` is virtualized; it renders only items that are visible in the viewport.
+The `List` component is a robust layout container that renders associated data items as a 
+list of components. `List` is virtualized; it renders only items that are visible in the 
+viewport.
 
-## Properties
-
-In the following section the examples use the same data list:
+In the following examples all use the same list of data which looks like so:
 
 | Id   | Name    | Quantity | Unit   | Category   |
 | :--- | :------ | :------- | :----- | :--------- |
@@ -20,9 +19,18 @@ In the following section the examples use the same data list:
 
 The data is provided as JSON.
 
-### `availableSections`
+## Context Variables
+
+### `$item`
+
+This property represents the value of an item in the data list.
+
+## Properties
 
 ### `data`
+
+The component receives data via this property.
+The `data` prop is a list of items that the `List` can display.
 
 The component receives its data via this property.
 The `data` prop is an array of items that the `List` can display.
@@ -43,9 +51,53 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
 
 ### `defaultSections`
 
+This property adds default sections for the `List` and displays the section headers
+even if no items fall into a particular section.
+
+This property adds default sections for the `List` and displays the section headers even if no items fall into a particular section.
+
+Note the `meat` section header before all the others in the list below:
+
+> **Note:** For the `defaultSections` prop to work, the data must be sectioned using the [`sectionBy`](#sectionby) prop,
+> and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+
+```ueml copy {3}
+<List 
+  data='{${JSON.stringify(data)}}'
+  defaultSections="{['meat']}"
+  sectionBy="category"
+>
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: defaultSections"
+  height={400}
+  app={`
+  <List 
+    data='{${JSON.stringify(data)}}'
+    defaultSections="{['meat']}"
+    sectionBy="category"
+  >
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
 ### `emptyListTemplate`
 
-This prop displays the given component as a placeholder if the `loader` prop is false and the `data` items length is 0 or is not set.
+This prop displays the given component as a placeholder
+if the `loader` prop is false and the `data` items length is 0 or is not set.
 
 ```ueml copy
 <List>
@@ -74,9 +126,8 @@ This prop displays the given component as a placeholder if the `loader` prop is 
 
 ### `idKey`
 
-Denotes which attribute of an item acts as the ID or key of the item. Default is `"id"`.
-
-NOTE: Why is this useful?
+Denotes which attribute of an item acts as the ID or key of the item.
+Default is `"id"`.
 
 ```ueml /idKey="key"/
 <List idKey="key" data="{[...]}" />
@@ -92,7 +143,7 @@ NOTE: Why is this useful?
 ### `itemTemplate`
 
 This prop allows the customization of mapping data items to components.
-You can use the `$item` syntax to access an item and potentially map its individual attributes.
+You can use the `$item` syntax to access an item and map its individual attributes.
 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
 
@@ -137,7 +188,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 ### `limit`
 
-Limit the number of items displayed in the `List`.
+This property limits the number of items displayed in the `List`.
 
 ```ueml /limit="4"/
 <List limit="4" data="{[...]}" />
@@ -153,7 +204,7 @@ Limit the number of items displayed in the `List`.
 ### `loading`
 
 The `loading` prop delays the rendering of children until it is set to false,
-or the component receives usable list items via the `data` prop.
+or the component receives usable list items via the [`data`](#data) prop.
 
 ```ueml copy
 <List loading="true" />
@@ -168,9 +219,7 @@ or the component receives usable list items via the `data` prop.
 
 ### `orderBy`
 
-This prop provides access to order the list items according to an attribute in the data.
-
-NOTE: unintuitive to use, too JSON-like
+This prop enables the ordering of list items by specifying an attribute in the data.
 
 ```ueml /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
 <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data="{[...]}" />
@@ -183,76 +232,9 @@ NOTE: unintuitive to use, too JSON-like
   app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
 />
 
-### `pageInfo`
-
-This property contains the current page information which also enures the `List` uses pagination.
-It contains the following boolean attributes:
-
-| Attribute            | Description                          |
-| :------------------- | :------------------------------------|
-| `hasPrevPage`        | Does the list have a previous page   |
-| `hasNextPage`        | Does the list have a next page       |
-| `isFetchingPrevPage` | _TBD_                                |
-| `isFetchingNextPage` | _TBD_                                |
-
-### `sectionBy`
-
-NOTE: produces error, don't know why? Does it need a defaultSections prop? Why? Tried `defaultSections="{['category']}"` and did not work.
-
-{/*
-```ueml {2}
-<List
-    sectionBy="category"
-    data="{[...]}"
-/>
-```
-
-<Playground
-  previewOnly
-  name="Example: sectionBy"
-  height={400}
-  app={`<List
-    sectionBy="category"
-    data='{${JSON.stringify(data)}}'
-/>
-  `}
-/>
-*/}
-
-### `sectionFooterTemplate`
-
-NOTE: Can't make it work because sectionBy is hard to figure out how to use
-
-### `sectionsInitiallyExpanded`
-
-NOTE: Can't make it work because sectionBy is hard to figure out how to use
-
-### `sectionTemplate`
-
-NOTE: Can't make it work because sectionBy is hard to figure out how to use
-
-### `selectedIndex`
-
-This prop scrolls to a specific item indicated by its index. Note, that 
-
-NOTE: This is a specific use case. We could make it work with a different approach, though. Hard to understand and use.
-
-```ueml /selectedIndex="2"/
-<List selectedIndex="2" data="{[...]}" />
-```
-
-<Playground
-  previewOnly
-  name="Example: selectedIndex"
-  height={400}
-  app={`<List selectedIndex="2" data='{${JSON.stringify(data)}}' />`}
-/>
-
 ### `scrollAnchor`
 
-This prop places the scroll position to specific points in the list.
-
-Possible locations: `top`, `bottom`.
+This prop pins the scroll position to either the `top` or the `bottom` of the list.
 
 ```ueml /scrollAnchor="bottom"/
 <List scrollAnchor="bottom" data="{[...]}" />
@@ -265,63 +247,160 @@ Possible locations: `top`, `bottom`.
   app={`<List scrollAnchor="bottom" data='{${JSON.stringify(data)}}' />`}
 />
 
-### `scrollPaddingEnd`
+### `sectionBy`
 
-Adds padding to the bottom of the list which is also included in the scroll area.
+This property set which attribute of the data is used to group or section the list items.
+If the attribute does not appear in the data items, it will be ignored.
 
-```ueml {2}
-<List
-  scrollPaddingEnd="20"
-  scrollAnchor="bottom"
-  data="{[...]}"
-/>
+> **Note:** For the `sectionBy` prop to work, either a [`sectionTemplate`](#sectiontemplate)
+> or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+
+```ueml copy {3}
+<List 
+  data='{${JSON.stringify(data)}}'
+  defaultSections="{['meat']}"
+  sectionBy="category"
+>
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
 ```
 
 <Playground
   previewOnly
-  name="Example: scrollAnchor"
+  name="Example: sectionBy"
   height={400}
   app={`
-  <List
-    scrollPaddingEnd="20"
-    scrollAnchor="bottom"
+  <List 
     data='{${JSON.stringify(data)}}'
-  />
+    defaultSections="{['meat']}"
+    sectionBy="category"
+  >
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
   `}
 />
 
-### `scrollPaddingStart`
+### `sectionFooterTemplate`
 
-Adds padding to the top of the list which is also included in the scroll area.
+Enables the customization of how the the footer of each section or group id displayed.
+Combine with [`sectionTemplate`](#sectiontemplate) to customize sections.
+You can use the 
+`$item`
+ syntax to access an item section and map its individual attributes.
 
-```ueml /scrollPaddingStart="20"/
-<List scrollPaddingStart="20" data="{[...]}" />
+The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+An `$item` here looks like the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
+| sectionItems | The items filtered from the original data list that fall into this section.                                   |
+| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+
+```ueml copy {7-9}
+<List data='{${JSON.stringify(data)}}' sectionBy="category">
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+  <prop name="sectionFooterTemplate">
+    <ContentSeparator />
+  </prop>
+</List>
 ```
 
 <Playground
   previewOnly
-  name="Example: scrollPaddingStart"
+  name="Example: sectionFooterTemplate"
   height={400}
-  app={`<List scrollPaddingStart="20" data='{${JSON.stringify(data)}}' />`}
+  app={`
+  <List data='{${JSON.stringify(data)}}' sectionBy="category">
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+    <prop name="sectionFooterTemplate">
+      <ContentSeparator />
+    </prop>
+  </List>
+  `}
 />
 
-### `trackViewState`
+### `sectionTemplate`
 
-NOTE: Looks obsolete and pretty vague. No idea how to use it or what to use it for. 
+Enables the customization of how the sections or groups are displayed, similarly to the [`itemTemplate`](#itemtemplate).
+You can use the 
+`$item`
+ syntax to access an item section and map its individual attributes.
+
+The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+An `$item` here looks like the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
+| sectionItems | The items filtered from the original data list that fall into this section.                                   |
+| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+
+```ueml copy {2-6}
+<List data='{${JSON.stringify(data)}}' sectionBy="category">
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: sectionTemplate"
+  height={400}
+  app={`
+  <List data='{${JSON.stringify(data)}}' sectionBy="category">
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
+### `selectedIndex`
+
+This prop scrolls to a specific item indicated by its index.
+
+Issue: Currently not working
+
+```ueml /selectedIndex="5"/
+<List selectedIndex="5" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: selectedIndex"
+  height={400}
+  app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
+/>
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
-### `requestFetchNextPage`
-
-_TBD_
-
-### `requestFetchPrevPage`
-
-_TBD_
-
-### `resetSelectedIndex`
-
-_TBD_
+This component does not have any events.
 
 ## Styling
 

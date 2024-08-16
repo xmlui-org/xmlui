@@ -1,13 +1,19 @@
 # Icon
 
 This component is the representation of an icon.
-It is small visual element, which is used to represent certain functions, features, or types of content within a user interface.
+It is a small visual element, which is used to graphically represent functions, features,
+or types of content within a user interface.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
 ### `fallback`
 
-This optional property provides a way to handle situations when the original `name` does not denote a valid icon in the [icon registry]().
+This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.
+Works the same way as the [`name`](#name) property.
 
 ```ueml copy /fallback="trash"/
 <Icon name="noicon" fallback="trash" />
@@ -22,8 +28,10 @@ This optional property provides a way to handle situations when the original `na
 
 ### `name`
 
-This string property specifies the unique name of the icon to display; it is case-sensitive. The engine looks up the icon in its registry and determines the visual element the component will show.
-This property is required so that the `Icon` can show itself. Nothing is displayed if the specified icon is not found in the [icon registry]().
+This string property specifies the name of the icon to display.
+All icons have unique names and identifying the name is case-sensitive.
+The engine looks up the icon in its [registry]() and determines which icon is associated with the name that the component will show.
+Nothing is displayed if the icon name is not found in the registry.
 
 ```ueml copy /name/
 <HStack>
@@ -41,21 +49,23 @@ This property is required so that the `Icon` can show itself. Nothing is display
   name="Example: name"
   height={40}
   app={`
-    <HStack>
-      <Icon name="message" />
-      <Icon name="note" />
-      <Icon name="cog" />
-      <Icon name="start" />
-      <Icon name="some-non-existing-icon" />
-      <Icon name="some-non-existing-icon-with fallback" fallback="trash" />
-    </HStack>
-`}
+  <HStack>
+    <Icon name="message" />
+    <Icon name="note" />
+    <Icon name="cog" />
+    <Icon name="start" />
+    <Icon name="some-non-existing-icon" />
+    <Icon name="some-non-existing-icon-with fallback" fallback="trash" />
+  </HStack>
+  `}
 />
 
 ### `size`
 
-This property defines the display size of the `Icon`.
+This property defines the size of the `Icon`.
 Note that setting the `height` and/or the `width` of the component will override this property.
+
+The default size is `md`.
 
 | Value | Description               |
 | :---- | :------------------------ |
@@ -78,15 +88,20 @@ Note that setting the `height` and/or the `width` of the component will override
   previewOnly
   height={40}
   name="Example: size"
-  app={`<HStack gap="1rem" >
-  <Icon name="like" />
-  <Icon name="like" size="xs" />
-  <Icon name="like" size="sm" />
-  <Icon name="like" size="md" />
-  <Icon name="like" size="lg" />
-</HStack>
+  app={`
+  <HStack gap="1rem" >
+    <Icon name="like" />
+    <Icon name="like" size="xs" />
+    <Icon name="like" size="sm" />
+    <Icon name="like" size="md" />
+    <Icon name="like" size="lg" />
+  </HStack>
   `}
 />
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -100,28 +115,22 @@ The `Icon` component uses these theme variables:
 - `thickness-stroke-Icon`:
 
 ```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "size-Icon": "4rem",
-    "thickness-stroke-Icon": "10"
-  }
-}
+"size-Icon": "4rem",
+"thickness-stroke-Icon": "10"
 ```
 
 <Playground
-    name="Example: container children"
-    previewOnly={true}
-    height={140}
-    defaultTheme="custom"
-    themes={[{
-        id: "custom",
-        name: "Custom Theme",
-        themeVars: {
-          "size-Icon": "4rem",
-          "thickness-stroke-Icon": "5",
-        },
-    }]}
-    app={`<Icon name="like" />`}
+  name="Example: styling"
+  previewOnly
+  height={140}
+  defaultTheme="custom"
+  themes={[{
+    id: "custom",
+    name: "Custom Theme",
+    themeVars: {
+      "size-Icon": "4rem",
+      "thickness-stroke-Icon": "5",
+    },
+  }]}
+  app={`<Icon name="like" />`}
 />

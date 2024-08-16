@@ -9,14 +9,20 @@ See also: [Heading](./Heading), [H1](./H1), [H2](./H2), [H4](./H4), [H5](./H5), 
 ```
 
 <Playground
-    name="H3 sample"
-    previewOnly={true}
-    height={40}
-    app={`<Stack>
-  <H3 value="This is a H3 text" />
-</Stack>`}
+  name="H3 example"
+  previewOnly
+  height={100}
+  app={`
+  <Stack>
+    <H3 value="This is a H3 text" />
+  </Stack>
+  `}
 />
 
 ## Styling
 
-The `H3` component inherits its visual style from the `Heading` component. Using the `H3` component specifier, you can override the inherited theme variable values. For example, the `color-text-H3` theme variable sets the text color of `H3` while keeping the color of all other headings.
+The `H3` component inherits its visual style from the `Heading` component.
+Using the `H3` component specifier, you can override the inherited theme variable values.
+For example, the `color-text-H3` theme variable sets the text color of `H3` while keeping the color of all other headings.
+
+The parent component documentation can be found [here](./Heading.mdx).

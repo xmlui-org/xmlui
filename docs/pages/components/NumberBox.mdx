@@ -1,12 +1,24 @@
 # NumberBox
 
-A `NumberBox` component allows users to input numeric values: either integer or floating point numbers.
-It also accepts empty values, where the stored value will be of type `null`.
+A `NumberBox` component allows users to input numeric values: either integer
+or floating point numbers. It also accepts empty values, where the stored value
+will be of type `null`.
 
-The `NumberBox` is an input control component and is often used in forms.
+The 
+`NumberBox`
+ is an input control component and is often used in forms.
 See the [Using Forms](/learning/using-components/forms/) guide for details.
 
+## Context Variables
+
+This component does not have any context variables.
+
 ## Properties
+
+### `allowCopy`
+
+This boolean property indicates if the component's contents can be copied to the clipboard.
+Default: `true`.
 
 ### `autoFocus`
 
@@ -154,6 +166,15 @@ This boolean prop toggles whether the input field accepts integers only (`true`)
   `}
 />
 
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label,
+the component behaves as you clicked it.
+
+### `maxLength`
+
+This property sets the maximum number of characters you can type into the component's text.
+
 ### `maxValue`
 
 The maximum value the input field allows.
@@ -207,24 +228,6 @@ A placeholder text that is visible in the input field when its empty.
   app={`<NumberBox placeholder="This is a placeholder" />`}
 />
 
-### `step`
-
-This prop governs how big the step when clicking on the spinner of the field.
-The default stepping value is **1**.
-
-Note that only integers are allowed to be entered.
-
-```ueml copy
-<NumberBox initialValue="10" step="10" />
-```
-
-<Playground
-  previewOnly
-  name="Example: step"
-  height={60}
-  app={`<NumberBox initialValue="10" step="10" />`}
-/>
-
 ### `readOnly`
 
 If true, the component's value cannot be modified with user interactions.
@@ -240,6 +243,9 @@ If true, the component's value cannot be modified with user interactions.
   app={`<NumberBox initialValue="123" readOnly="true" />`}
 />
 
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `startIcon`
 
@@ -297,6 +303,23 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
 />
 
+### `step`
+
+This prop governs how big the step when clicking on the spinner of the field.
+The default stepping value is **1**.
+
+Note that only integers are allowed to be entered.
+
+```ueml copy
+<NumberBox initialValue="10" step="10" />
+```
+
+<Playground
+  previewOnly
+  name="Example: step"
+  height={60}
+  app={`<NumberBox initialValue="10" step="10" />`}
+/>
 
 ### `validationStatus`
 
@@ -347,11 +370,9 @@ By default, this property is set to `false`.
 
 ## API
 
-### `value`
+### `focus`
 
-You can query this read-only API property to get the input component's current value.
-
-See an example in the `setValue` API method.
+Invoke this method to set the focus to the component.
 
 ### `setValue`
 
@@ -393,6 +414,12 @@ You can use this method to set the component's current value programmatically.
   </HStack>
 </VStack>`}
 />
+
+### `value`
+
+You can query this read-only API property to get the input component's current value.
+
+See an example in the `setValue` API method.
 
 ## Events
 

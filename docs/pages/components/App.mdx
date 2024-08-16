@@ -1,22 +1,25 @@
-import horizontal from "./samples/App/horizontal.xmlui";
-import horizontalSticky from "./samples/App/horizontal-sticky.xmlui";
-import condensed from "./samples/App/condensed.xmlui";
-import condensedSticky from "./samples/App/condensed-sticky.xmlui";
-import vertical from "./samples/App/vertical.xmlui";
-import verticalSticky from "./samples/App/vertical-sticky.xmlui";
-import verticalFullHeader from "./samples/App/vertical-full-header.xmlui";
+import horizontal from  "../../component-samples/App/horizontal.xmlui";
+import horizontalSticky from  "../../component-samples/App/horizontal-sticky.xmlui";
+import condensed from  "../../component-samples/App/condensed.xmlui";
+import condensedSticky from  "../../component-samples/App/condensed-sticky.xmlui";
+import vertical from  "../../component-samples/App/vertical.xmlui";
+import verticalSticky from  "../../component-samples/App/vertical-sticky.xmlui";
+import verticalFullHeader from  "../../component-samples/App/vertical-full-header.xmlui";
 
 # App
 
-The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
+The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,
+`App` allows you to display your preferred layout.
 
-> **Note**: You can learn more details about using this component [here](../learning/app-component).
+> **Note**: You can learn more details about using this component [here](
+../learning/using-components/app-component
+).
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
-
-### `defaultRoute`
-
-This property sets the default route the app uses with navigation.
 
 ### `layout`
 
@@ -106,79 +109,134 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
   app={verticalFullHeader}
 />
 
-### `logoTemplate`
+For a detailed list on the different kinds of layouts available see [this short guide](../learning/using-components/app-component.mdx).
 
-This property defines the template to use for the logo. With this property, you can construct your custom logo instead of using a single image.
+### `loggedInUser`
 
-```ueml copy {2-6}
-<App layout="condensed">
-  <prop name="logoTemplate">
-     <H2>
-       <Icon name="email" />
-       My EMAIL App
-     </H2>
-  </prop>
+Stores information about the currently logged in user.
+Currently, there is no restriction on what the user data must look like.
+
+```ueml copy /loggedInUser="{{ name: 'Joe', token: '1234' }}"/
+<App loggedInUser="{{ name: 'Joe', token: '1234' }}">
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
-    <NavLink label="Page 1" to="/page1"/>
   </NavPanel>
   <Pages defaultRoute="/">
     <Page url="/">
-      <Text value="Home" />
-    </Page>
-    <Page url="/page1">
-      <Text value="Page 1" />
+      <Text value="User name: {loggedInUser.name}" />
+      <Text value="User token: {loggedInUser.token}" />
     </Page>
   </Pages>
 </App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: logoTemplate"
-  horizontal={true}
+  previewOnly
+  height={150}
+  name="Example: loggedInUser"
+  horizontal
+  app={`
+  <App loggedInUser="{{ name: 'Joe', token: '1234' }}">
+    <NavPanel>
+      <NavLink label="Home" to="/" icon="home"/>
+    </NavPanel>
+    <Pages defaultRoute="/">
+      <Page url="/">
+        <Text value="User name: {loggedInUser.name}" />
+        <Text value="User token: {loggedInUser.token}" />
+      </Page>
+    </Pages>
+  </App>
+  `}
+/>
+
+### `scrollWholePage`
+
+This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
+The default value is `true`.
+
+```ueml copy /scrollWholePage="false"/
+<App scrollWholePage="false">
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text>
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </Text>
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: scrollWholePage"
+  horizontal
   height={150}
   app={`
-    <App layout="condensed">
-      <prop name="logoTemplate">
-         <H2>
-           <Icon name="email" />
-           My EMAIL App
-         </H2>
-      </prop>
+    <App scrollWholePage="false">
       <NavPanel>
         <NavLink label="Home" to="/" icon="home"/>
-        <NavLink label="Page 1" to="/page1"/>
       </NavPanel>
       <Pages defaultRoute="/">
         <Page url="/">
-          <Text value="Home" />
-        </Page>
-        <Page url="/page1">
-          <Text value="Page 1" />
+          <Text>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+            Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+          </Text>
         </Page>
       </Pages>
     </App>
   `}
 />
 
-### `scrollWholePage`
+## API
 
-This boolean property specifies whether the whole page should scroll (true) or just the content area (false). The default is true.
+This component does not provide any API.
 
 ## Events
 
-This component does not provide event handlers to any system or user event.
+### `ready`
 
-## Styles
+This event fires when the `App` component finishes rendering on the page.
+Use it as `onReady` when inlining it on the component.
 
-The `App` component supports these theme variables:
+```ueml copy /onReady="isAppReady = true"/
+<App onReady="isAppReady = true">
+  <var name="isAppReady" value="{false}"/>
+  <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
+</App>
+```
 
-|Name|Description|
-|-|-|
-|`max‑content‑width‑App`|This theme variable defines the maximum [width](./appearance/common-units/#size-values) of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.|
-|`shadow‑header‑App`|This variable sets the [shadow](./appearance/common-units/#shadow-values) to display around the app's header.|
-|`shadow‑Pages‑App`|This variable sets the style of [shadow](./appearance/common-units/#shadow-values) to display around the app's navigation panel (menu).|
-|`width-navPanel-App`|This theme variable sets the [width](./appearance/common-units/#size-values) of the navigation panel (menu) when the app is displayed with one of the vertical layouts.|
+<Playground
+  previewOnly
+  height={150}
+  name="Example: ready"
+  horizontal
+  app={`
+  <App onReady="isAppReady = true">
+    <var name="isAppReady" value="{false}"/>
+    <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
+  </App>
+  `}
+/>
 
-> **Note**: There are other app-related components, such as [*`AppHeader`*](./AppHeader), [*`NavPanel`*](./NavPanel),  and [`Footer`](./Footer), that can be styled to establish the app's visual appearance.
+## Styling
+
+The `App` component has these theme variables:
+
+- `max‑content‑width‑App`: This theme variable defines the maximum [width](./appearance/common-units/#size-values) of the main content. If the main content is broader, the engine adds margins to keep the expected maximum size.
+- `shadow‑header‑App`: This variable sets the [shadow](./appearance/common-units/#shadow-values) to display around the app's header.
+- `shadow‑Pages‑App`: This variable sets the style of [shadow](./appearance/common-units/#shadow-values) to display around the app's navigation panel (menu).
+- `width-navPanel-App`: This theme variable sets the [width](./appearance/common-units/#size-values) of the navigation panel (menu) when the app is displayed with one of the vertical layouts.
+
+> **Note**: There are other app-related components,
+> such as [*`AppHeader`*](./AppHeader), [*`NavPanel`*](./NavPanel), and [`Footer`](./Footer),
+> that can be styled to establish the app's visual appearance.

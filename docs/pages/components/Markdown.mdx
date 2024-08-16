@@ -1,10 +1,11 @@
-import markdownApp from "./samples/Markdown/all-markdown-features.xmlui";
-
 # Markdown
 
 `Markdown` displays plain text styled using markdown syntax.
 
-The `Markdown` component does not have properties. You must provide the text to display nested between an opening and a closing tag `<Markdown>`.
+The `Markdown` component does not have properties. You must provide the text to display 
+nested between an opening and a closing tag 
+`<Markdown>`
+.
 
 ## Specifying the Text 
 
@@ -17,7 +18,67 @@ Indentation is also essential in Markdown. Start the markdown text in the first 
   previewOnly={false}
   horizontal={true}
   name="Example: setting text"
-  app={markdownApp}
+  app={`
+<App layout="horizontal-sticky" padding="1rem">
+  <Markdown>
+    <![CDATA[
+# My Adventure in Markdown Land
+
+## The Beginning
+
+In the bustling city of Markdownville, I embarked on a journey to discover the secrets of Markdown.
+My adventure started in the heart of the city, where the first rule of Markdown was inscribed in stone:
+
+"To create a heading, add number signs (#) in front of a word or phrase.
+The number of number signs you use should correspond to the heading level."
+
+Headings give hierarchy to text but sometimes **emphasizing something with bold is just enough**.
+
+If not bold, then simply *italic letters give visual diversity*.
+
+## Exploring Blockquotes
+
+As I journeyed further, I encountered blockquotes that spoke of the beauty of simplicity:
+
+> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between the paragraphs.
+> > Like so
+
+## The Power of Lists
+
+I also discovered the power of lists, which were as versatile as the inhabitants of Markdownville:
+
+- This is the first list item.
+- Here's the second list item.
+    - A subsection here would look great below the second list item.
+- And here's the third list item.
+
+I found that I can create ordered lists as well:
+
+1. The first item.
+2. The second item.
+3. Third item.
+
+## The Image
+
+Text is not the only thing I found through my journey. The power of images materialized in front of me:
+
+![Colors image](/resources/images/components/markdown/colors.png)
+
+## Navigating with Hyperlinks
+
+Hyperlinks, like signposts, marked other paths that branched off from the road I was treading:
+- [Source of all truth](https://github.com/xmlui-com/xmlui)
+- [Back to where we started](https://ncrm.azurewebsites.net/)
+
+## The Horizontal Rule
+
+In the quiet corners of Markdownville, I found the Horizontal Rule, a line that symbolizes the end of a section:
+
+***
+    ]]>
+  </Markdown>
+</App>  
+  `}
 />
 
 The `Markdown` component supports these syntax elements:
@@ -263,3 +324,23 @@ Different levels of nested lists will have different markers.
     },
   ]}
 />
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+This component does not have any properties.
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+This component does not have any styles.

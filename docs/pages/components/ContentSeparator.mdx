@@ -1,7 +1,12 @@
 # ContentSeparator
 
 A `ContentSeparator` is a component that divides or separates content visually within a layout.
-It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization.
+It serves as a visual cue to distinguish between different sections or groups of content,
+helping to improve readability and organization.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
@@ -33,17 +38,18 @@ See the demo for an example under [`size`](#size).
 ```
 
 <Playground
-    previewOnly
-    height={62}
-    name="Example: no vertical space"
-    app={`<Stack gap="0.5rem">
-  <HStack horizontalAlignment="center">
-    <ContentSeparator orientation="vertical" size="8px" backgroundColor="blue" />
-  </HStack>
-  <HStack horizontalAlignment="center" height="48px">
-    <ContentSeparator orientation="vertical" size="8px" backgroundColor="red" />
-  </HStack>
-</Stack>
+  previewOnly
+  height={62}
+  name="Example: no vertical space"
+  app={`
+  <Stack gap="0.5rem">
+    <HStack horizontalAlignment="center">
+      <ContentSeparator orientation="vertical" size="8px" backgroundColor="blue" />
+    </HStack>
+    <HStack horizontalAlignment="center" height="48px">
+      <ContentSeparator orientation="vertical" size="8px" backgroundColor="red" />
+    </HStack>
+  </Stack>
   `}
 />
 
@@ -105,7 +111,13 @@ Default is `1px`, depending on the orientation.
   `}
 />
 
-> **Note**: You can use the `width` and `height` layout properties to set the `ContentSeparator` dimensions. For the horizontal separator, you can set the `height` property; the vertical separator offers the `width` property instead of `size`. Nonetheless, we suggest you use the `size` property.
+> **Note**: You can use the `width` and `height` layout properties to set the `ContentSeparator` dimensions.
+> For the horizontal separator, you can set the `height` property; the vertical separator offers the `width` property instead of `size`.
+> Nonetheless, we suggest you use the `size` property.
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -119,14 +131,8 @@ The `ContentSeparator` component uses these theme variables to customize its app
 - `size-ContentSeparator`
 
 ```json
-{
-  "id": "custom",
-  "name": "Custom Theme",
-  "themeVars": {
-    "color-bg-ContentSeparator": "$color-primary-200",
-    "size-ContentSeparator": "6px",
-  },
-}
+"color-bg-ContentSeparator": "$color-primary-200",
+"size-ContentSeparator": "6px"
 ```
 
 <Playground
@@ -144,13 +150,14 @@ The `ContentSeparator` component uses these theme variables to customize its app
       },
     },
   ]}
-  app={`<Stack gap="0.5rem">
-  <HStack>
-    <ContentSeparator size="8px" radius="5px"/>
-  </HStack>
-  <HStack height="48px" horizontalAlignment="center">
-    <ContentSeparator orientation="vertical" size="8px"/>
-  </HStack>
-</Stack>
+  app={`
+  <Stack gap="0.5rem">
+    <HStack>
+      <ContentSeparator size="8px" radius="5px"/>
+    </HStack>
+    <HStack height="48px" horizontalAlignment="center">
+      <ContentSeparator orientation="vertical" size="8px"/>
+    </HStack>
+  </Stack>
   `}
 />
