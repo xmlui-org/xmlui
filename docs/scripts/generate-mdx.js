@@ -260,7 +260,7 @@ function handleConfig(config) {
     outFolder: _outFolder,
     examplesFolder: _examplesFolder,
     sectionNames: {
-      props: sectionNames?.props || "Props",
+      props: sectionNames?.props || "Properties",
       events: sectionNames?.events || "Events",
       styles: sectionNames?.styles || "Styling",
       api: sectionNames?.api || "API",
@@ -381,7 +381,7 @@ function addPropsSection(data, component) {
   let buffer = `## ${sectionNames.props}\n\n`;
 
   if (!component.props || Object.keys(component.props ?? {}).length === 0) {
-    return buffer + "This component does not have any props.";
+    return buffer + "This component does not have any properties.";
   }
   Object.entries(component.props)
     .sort()
