@@ -1,12 +1,17 @@
-import data from "../../examples/list-component-data";
+import data from  "../../component-samples/TableColumnDef/list-component-data.js";
 
 # TableColumnDef
 
-The `TableColumnDef` component can be used within a `Table` to define a particular table column's visual properties and data bindings.
-
-## Properties
+The `TableColumnDef` component can be used within a `Table` to define a particular table column's 
+visual properties and data bindings.
 
 Throught this documentation page the data used is the same that is found in the [`Table` component documentation](./Table.mdx#properties).
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
 
 ### `bindTo`
 
@@ -26,6 +31,12 @@ Indicates what part of the data to lay out in the column.
   <TableColumnDef bindTo="name" />
 </Table>`}
 />
+
+### `canResize`
+
+This property indicates whether the user can resize the column. If set to `true`, the column can 
+be resized by dragging the column border. If set to `false`, the column cannot be resized. 
+Double-clicking the column border resets to the original size.
 
 ### `canSort`
 
@@ -76,13 +87,15 @@ Adds a label for a particular column
 </Table>`}
 />
 
-### `minWidth`
-
-Indicates the minimum width a particular column can have. (See an example in the [`width` property](#width) section below.)
-
 ### `maxWidth`
 
-Indicates the maximum width a particular column can have.  (See an example in the [`width` property](#width) section below.)
+Indicates the maximum width a particular column can have.  (See an example in the [`width` property]
+(#width) section below.)
+
+### `minWidth`
+
+Indicates the minimum width a particular column can have. (See an example in the [`width` property]
+(#width) section below.)
 
 ### `pinTo`
 
@@ -114,32 +127,6 @@ Scroll the table contents horizontally to see how the pinned columns are display
   `}
 />
 
-### `template`
-
-This prop provides customization to render any sort of components in the cells of the column.
-Access the data's attributes via the `$item` in a binding expression.
-
-```ueml copy {3-5}
-<Table datasource="https://api.spacexdata.com/v3/rockets">
-    <TableColumnDef header="Image" size="140px">
-      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-    </TableColumnDef>
-    <TableColumnDef header="Name" bindTo="rocket_name"/>
-</Table>
-```
-
-<Playground
-  previewOnly
-  name="Example: template"
-  height={300}
-  app={`<Table datasource="https://api.spacexdata.com/v3/rockets">
-    <TableColumnDef header="Image" size="140px">
-      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-    </TableColumnDef>
-    <TableColumnDef header="Name" bindTo="rocket_name"/>
-</Table>`}
-/>
-
 ### `width`
 
 This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*,` `2*`, etc.). You will get an error if you use any other unit (or value).
@@ -169,6 +156,9 @@ Check what happens when you resize table columns:
   `}
 />
 
+## API
+
+This component does not provide any API.
 
 ## Events
 

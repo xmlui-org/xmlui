@@ -1,8 +1,12 @@
 # Form
 
-An XMLUI `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.
+An XMLUI 
+`Form`
+ is a fundamental component that displays user interfaces that allow users to input
+(or change) data and submit it to the app (a server) for further processing.
 
-You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
+You can learn more about this component in the [Using Forms](/learning/using-components/forms/)
+article.
 
 ## Context Variables
 
@@ -95,19 +99,42 @@ This example mimics a one-second search and turns off the submit button during t
 
 This property defines the label of the Cancel button, by default, "Cancel".
 
+### `itemLabelBreak`
+
+This boolean value indicates if the label can be split into multiple lines if it would overflow
+the available label width.
+
+### `itemLabelPosition`
+
+This property sets the position of the item label. The default value is `top`.
+
+### `itemLabelWidth`
+
+This property sets the width of the item label.
+
 ### `saveLabel`
 
 This property defines the label of the Save button, by default, "Save".
 
 ### `subject`
 
-This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
+This property sets the initial value of the form's data structure. The form infrastructure
+uses this value to set the initial state of form items within the form.
 
 ### `swapCancelAndSave`
 
-By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
+By default, the Cancel button is to the left of the Save button. Set this property to
+`true` to swap them or `false` to keep their original location.
+
+## API
+
+This component does not provide any API.
 
 ## Events
+
+### `reset`
+
+The form infrastructure fires this event when the form is reset.
 
 ### `submit`
 
@@ -141,12 +168,9 @@ The form infrastructure fires this event when the form is submitted. The event a
   `}
 />
 
-### `reset`
-
-The form infrastructure fires this event when the form is reset.
-
 ## Styling
 
 You can use these theme variables to style a `Form` component:
--`gap-Form`: the gap between the components directly nested into a form.
--`gap-buttonRow-Form`: the gap between the Cancel and Save buttons in the button row of a form.
+
+- `gap-Form`: the gap between the components directly nested into a form.
+- `gap-buttonRow-Form`: the gap between the Cancel and Save buttons in the button row of a form.

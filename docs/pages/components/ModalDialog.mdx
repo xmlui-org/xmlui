@@ -130,11 +130,16 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
   `}
 />
 
+## Context Variables
+
+This component does not have any context variables.
+
 ## Properties
 
 ### `closeButtonVisible`
 
-Shows or hides the visibility of the close button on the dialog. The default value is `true`.
+Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
+The default value is `true`.
 
 ```ueml copy /closeButtonVisible="false"/
 <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -183,6 +188,23 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
   `}
 />
 
+### `isInitiallyOpen`
+
+This property sets whether the modal dialog appears open (`true`) or not (`false`)
+when the page is it is defined on is rendered.
+The default value is `false`.
+
+```ueml copy {4}
+<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog
+    isInitiallyOpen="true"
+    id="dialog"
+    title="Example Dialog"
+  />
+</Stack>
+```
+
 ### `title`
 
 Provides a prestyled heading to display the intent of the dialog.
@@ -208,27 +230,33 @@ Provides a prestyled heading to display the intent of the dialog.
 
 ## API
 
-### `close()` [#api]
+### `close`
 
-This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component. See the [`With Imperative API`](#with-imperative-api) subsection for an example.
+This method is used to close the `ModalDialog`.
+Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
 
-> For the event of the same name, see [`close event`](#event).
+See the [`With Imperative API`](#with-imperative-api) subsection for an example.
 
-### `open()` [#api]
+> For the event of the same name, see `close` under the `Event` section.
 
-This method is used to open the `ModalDialog`. Invoke it using `modalId.open()` where `modalId` refers to a `ModalDialog` component. See the [`With Imperative API`](#with-imperative-api) subsection for an example.
+### `open`
 
-> For the event of the same name, see [`open event`](#event-1).
+This method is used to open the `ModalDialog`.
+Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
+
+See the [`With Imperative API`](#with-imperative-api) subsection for an example.
+
+> For the event of the same name, see `open` under the `Event` section.
 
 ## Events
 
-### `close` [#event]
+### `close`
 
 This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.
 
-In this example, the `close` event counts how many times you closed the dialog:
+> For the API method of the same name, see `close` under the `Api` section.
 
-> For the API method of the same name, see [`close API method`](#api-1).
+In this example, the `close` event counts how many times you closed the dialog:
 
 ```ueml copy {6-8}
 <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -263,9 +291,11 @@ Open and close the dialog several times to test that it changes the counter.
   `}
 />
 
-### `open` [#event]
+### `open`
 
 This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).
+
+> For the API method of the same name, see `open` under the `Api` section.
 
 In this example, the `open` event counts how many times you opened the dialog:
 
@@ -301,8 +331,6 @@ Open and close the dialog several times to test that it changes the counter.
   </Stack>
   `}
 />
-
-> For the API method of the same name, see [`open API method`](#api-2).
 
 ## Styling
 

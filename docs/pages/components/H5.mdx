@@ -9,14 +9,21 @@ See also: [Heading](./Heading), [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), 
 ```
 
 <Playground
-    name="H5 sample"
-    previewOnly={true}
-    height={40}
-    app={`<Stack>
-  <H5 value="This is a H5 text" />
-</Stack>`}
+  name="H5 example"
+  previewOnly
+  height={100}
+  app={`
+  <Stack>
+    <H5 value="This is a H5 text" />
+  </Stack>
+  `}
 />
 
 ## Styling
 
-The `H5` component inherits its visual style from the `Heading` component. Using the `H5` component specifier, you can override the inherited theme variable values. For example, the `color-text-H5` theme variable sets the text color of `H5` while keeping the color of all other headings.
+The `H5` component inherits its visual style from the `Heading` component.
+Using the `H5` component specifier, you can override the inherited theme variable values.
+For example, the `color-text-H5` theme variable sets the text color of `H5` while keeping the color of all other headings.
+
+
+The parent component documentation can be found [here](./Heading.mdx).

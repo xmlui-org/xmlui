@@ -1,39 +1,12 @@
 # DatePicker
 
-A `DatePicker` component allows users to select a date from a graphical calendar interface.
+The `DatePicker` component allows users to select a date from a graphical calendar interface.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
-
-### `enabled`
-
-Controls whether the input field is enabled (`true`) or disabled (`false`).
-
-```ueml copy
-<DatePicker enabled="false" />
-```
-
-<Playground
-  previewOnly
-  height={60}
-  name="Example: enabled"
-  app={`<DatePicker enabled="false" />`}
-/>
-
-### `fromDate`
-
-This optional property indicates the start of the range of selectable dates.
-The property accepts a date in string format the same way as the `initialValue` does.
-
-```ueml copy
-<DatePicker fromDate="05/24/2024" />
-```
-
-<Playground
-  previewOnly
-  height={60}
-  name="Example: fromDate"
-  app={`<DatePicker fromDate="05/24/2024" />`}
-/>
 
 ### `dateFormat`
 
@@ -80,6 +53,37 @@ The property accepts a list of dates in string format the same way as the `initi
   height={60}
   name="Example: disabledDates"
   app={`<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />`}
+/>
+
+### `enabled`
+
+Controls whether the input field is enabled (`true`) or disabled (`false`).
+
+```ueml copy
+<DatePicker enabled="false" />
+```
+
+<Playground
+  previewOnly
+  height={60}
+  name="Example: enabled"
+  app={`<DatePicker enabled="false" />`}
+/>
+
+### `fromDate`
+
+This optional property indicates the start of the range of selectable dates.
+The property accepts a date in string format the same way as the `initialValue` does.
+
+```ueml copy
+<DatePicker fromDate="05/24/2024" />
+```
+
+<Playground
+  previewOnly
+  height={60}
+  name="Example: fromDate"
+  app={`<DatePicker fromDate="05/24/2024" />`}
 />
 
 ### `initialValue`
@@ -220,16 +224,10 @@ The week starts on Sunday by default.
   previewOnly
   name="Example: weekStartsOn"
   height={60}
-  app={`<DatePicker weekStartsOn="9999" />`}
+  app={`<DatePicker weekStartsOn="1" />`}
 />
 
 ## API
-
-### `value`
-
-You can query this read-only API property to get the input component's current value.
-
-See an example in the `setValue` API method.
 
 ### `setValue`
 
@@ -271,6 +269,12 @@ You can use this method to set the component's current value programmatically.
     </HStack>
   </VStack>`}
 />
+
+### `value`
+
+You can query this read-only API property to get the input component's current value.
+
+See an example in the `setValue` API method.
 
 ## Events
 
@@ -330,9 +334,9 @@ Note how clicking elsewhere resets the text to the original.
 
 ### `lostFocus`
 
-This event is triggered when the `TextBox` loses focus.
+This event is triggered when the `DatePicker` loses focus.
 
-(See the example above)
+(See the example in the [`gotFocus`](#gotfocus) event section.)
 
 ## Styling
 
