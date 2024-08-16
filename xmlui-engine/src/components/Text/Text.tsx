@@ -215,10 +215,11 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
   defaultThemeVars: {
     "border-radius-Text": "$radius",
     "style-border-Text": "solid",
+    "font-size-Text": "$font-size-small",
     "thickness-border-Text": "$space-0",
     "font-weight-Text-abbr": "$font-weight-bold",
     "transform-Text-abbr": "uppercase",
-    "font-size-Text-secondary": "$color-text-secondary",
+    "font-size-Text-secondary": "$font-size-small",
     "font-style-Text-cite": "italic",
     "font-family-Text-code": "$font-family-monospace",
     "font-size-Text-code": "$font-size-small",

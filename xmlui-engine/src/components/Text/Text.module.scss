@@ -42,6 +42,7 @@ $themeVars: ();
   margin: 0;
   padding: 0;
   min-height: fit-content;
+  font-size: createThemeVar("font-size-Text");
 
   .text {
     //text inside text should be inline
