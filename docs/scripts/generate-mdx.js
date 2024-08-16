@@ -260,7 +260,7 @@ function handleConfig(config) {
     outFolder: _outFolder,
     examplesFolder: _examplesFolder,
     sectionNames: {
-      props: sectionNames?.props || "Props",
+      props: sectionNames?.props || "Properties",
       events: sectionNames?.events || "Events",
       styles: sectionNames?.styles || "Styling",
       api: sectionNames?.api || "API",
