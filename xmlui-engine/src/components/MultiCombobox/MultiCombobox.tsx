@@ -83,7 +83,7 @@ export const MultiCombobox = ({
   const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
   const { options, selectContextValue } = useSelectContextValue();
   const inputRef = useRef<HTMLInputElement>(null);
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLUListElement | null>(null);
   const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "bottom-start",
@@ -102,7 +102,7 @@ export const MultiCombobox = ({
   const items = useMemo(() => {
     return filterOptions(
       inputValue,
-      options.filter((option) => !value.includes(option.value))
+      options.filter((option) => !value.includes(option.value)),
     );
   }, [inputValue, options, value]);
 
@@ -198,7 +198,7 @@ export const MultiCombobox = ({
       updateState({ value: newValue });
       onDidChange(newValue);
     },
-    [onDidChange, updateState]
+    [onDidChange, updateState],
   );
 
   // --- Manage obtaining and losing the focus
@@ -244,7 +244,7 @@ export const MultiCombobox = ({
           className={classnames(styles.comboboxToggleButton, styles[validationStatus], {
             [styles.disabled]: !enabled,
           })}
-          ref={(el: any) => setReferenceElement(el)}
+          ref={setReferenceElement}
         >
           <div className={styles.selectedOptions}>
             <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
@@ -290,12 +290,12 @@ export const MultiCombobox = ({
                     placeholder: placeholder,
                     disabled: !enabled,
                     className: styles.comboboxInput,
-                  })
+                  }),
                 )}
               />
             </div>
           </div>
-          <div style={{display: "flex"}}>
+          <div style={{ display: "flex" }}>
             <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
             <button
               aria-label="toggle-menu"
@@ -345,7 +345,7 @@ export const MultiCombobox = ({
                   </li>
                 )}
               </ul>,
-              root
+              root,
             )}
         </div>
       </div>
@@ -548,5 +548,5 @@ export const multiComboboxComponentRenderer = createComponentRenderer<MultiCombo
       </MultiCombobox>
     );
   },
-  metadata
+  metadata,
 );
