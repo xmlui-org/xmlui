@@ -1,5 +1,5 @@
 export const blueThemeColors = {
-  // --- 
+  // ---
   "color-surface-50": "hsl(204,30.3%,98%)",
   "color-surface-100": "hsl(204,30.3%,95%)",
   "color-surface-200": "hsl(204,30.3%,83%)",
@@ -429,5 +429,179 @@ export const purpleThemeColors = {
   "color-success-800": "hsl(178, 100%, 28%)",
   "color-success-900": "hsl(178, 100%, 24%)",
   "color-success-950": "hsl(178, 100%, 20%)",
+  "color-success": "$color-success-500",
+};
+
+export const cyanThemeColors = {
+  // ---
+  "color-surface-50": "hsl(184, 15%, 95%)",
+  "color-surface-100": "hsl(184, 15%, 85%)",
+  "color-surface-200": "hsl(184, 15%, 75%)",
+  "color-surface-300": "hsl(184, 15%, 65%)",
+  "color-surface-400": "hsl(184, 15%, 55%)",
+  "color-surface-500": "hsl(184, 15%, 45%)", // #709A99
+  "color-surface-600": "hsl(184, 15%, 40%)",
+  "color-surface-700": "hsl(184, 15%, 35%)",
+  "color-surface-800": "hsl(184, 15%, 30%)",
+  "color-surface-900": "hsl(184, 15%, 25%)",
+  "color-surface-950": "hsl(184, 15%, 20%)",
+  "color-surface": "$color-surface-500",
+
+  // --- Primary color shades (bluish)
+  "color-primary-50": "hsl(180, 100%, 95%)",
+  "color-primary-100": "hsl(180, 100%, 85%)",
+  "color-primary-200": "hsl(180, 100%, 75%)",
+  "color-primary-300": "hsl(180, 100%, 65%)",
+  "color-primary-400": "hsl(180, 100%, 55%)",
+  "color-primary-500": "hsl(180, 100%, 45%)", // #00B5B5
+  "color-primary-600": "hsl(180, 100%, 40%)",
+  "color-primary-700": "hsl(180, 100%, 35%)",
+  "color-primary-800": "hsl(180, 100%, 30%)",
+  "color-primary-900": "hsl(180, 100%, 25%)",
+  "color-primary-950": "hsl(180, 100%, 20%)",
+  "color-primary": "$color-primary-500",
+
+  // --- Secondary color shades (steel-bluish)
+  "color-secondary-50": "hsl(226, 60%, 95%)",
+  "color-secondary-100": "hsl(226, 60%, 85%)",
+  "color-secondary-200": "hsl(226, 60%, 75%)",
+  "color-secondary-300": "hsl(226, 60%, 65%)",
+  "color-secondary-400": "hsl(226, 60%, 55%)",
+  "color-secondary-500": "hsl(226, 60%, 45%)", // #3450AC
+  "color-secondary-600": "hsl(226, 60%, 40%)",
+  "color-secondary-700": "hsl(226, 60%, 35%)",
+  "color-secondary-800": "hsl(226, 60%, 30%)",
+  "color-secondary-900": "hsl(226, 60%, 25%)",
+  "color-secondary-950": "hsl(226, 60%, 20%)",
+  "color-secondary": "$color-secondary-500",
+
+  // --- Warning color shades (orange shades)
+  "color-warn-50": "hsl(20, 100%, 95%)",
+  "color-warn-100": "hsl(20, 100%, 85%)",
+  "color-warn-200": "hsl(20, 100%, 75%)",
+  "color-warn-300": "hsl(20, 100%, 65%)",
+  "color-warn-400": "hsl(20, 100%, 55%)",
+  "color-warn-500": "hsl(20, 100%, 45%)", // #FE631E
+  "color-warn-600": "hsl(20, 100%, 40%)",
+  "color-warn-700": "hsl(20, 100%, 35%)",
+  "color-warn-800": "hsl(20, 100%, 30%)",
+  "color-warn-900": "hsl(20, 100%, 25%)",
+  "color-warn-950": "hsl(20, 100%, 20%)",
+  "color-warn": "$color-warn-500",
+
+  // --- Danger color shades (reddish)
+  "color-danger-50": "hsl(356, 100%, 95%)",
+  "color-danger-100": "hsl(356, 100%, 85%)",
+  "color-danger-200": "hsl(356, 100%, 75%)",
+  "color-danger-300": "hsl(356, 100%, 65%)",
+  "color-danger-400": "hsl(356, 100%, 55%)",
+  "color-danger-500": "hsl(356, 100%, 45%)", // #FD3D4B
+  "color-danger-600": "hsl(356, 100%, 40%)",
+  "color-danger-700": "hsl(356, 100%, 35%)",
+  "color-danger-800": "hsl(356, 100%, 30%)",
+  "color-danger-900": "hsl(356, 100%, 25%)",
+  "color-danger-950": "hsl(356, 100%, 20%)",
+  "color-danger": "$color-danger-600",
+  "color-attention": "$color-danger-500",
+
+  // --- Success color shades (greenish)
+  "color-success-50": "hsl(168, 80%, 95%)",
+  "color-success-100": "hsl(168, 80%, 85%)",
+  "color-success-200": "hsl(168, 80%, 75%)",
+  "color-success-300": "hsl(168, 80%, 65%)",
+  "color-success-400": "hsl(168, 80%, 55%)",
+  "color-success-500": "hsl(168, 80%, 45%)", // #0C846C
+  "color-success-600": "hsl(168, 80%, 40%)",
+  "color-success-700": "hsl(168, 80%, 35%)",
+  "color-success-800": "hsl(168, 80%, 30%)",
+  "color-success-900": "hsl(168, 80%, 25%)",
+  "color-success-950": "hsl(168, 80%, 20%)",
+  "color-success": "$color-success-500",
+};
+
+export const redThemeColors = {
+  // ---
+  "color-surface-50": "hsl(0, 0%, 95%)",
+  "color-surface-100": "hsl(0, 0%, 85%)",
+  "color-surface-200": "hsl(0, 0%, 75%)",
+  "color-surface-300": "hsl(0, 0%, 65%)",
+  "color-surface-400": "hsl(0, 0%, 55%)",
+  "color-surface-500": "hsl(0, 0%, 50%)", // #7F7F7F
+  "color-surface-600": "hsl(0, 0%, 40%)",
+  "color-surface-700": "hsl(0, 0%, 35%)",
+  "color-surface-800": "hsl(0, 0%, 30%)",
+  "color-surface-900": "hsl(0, 0%, 25%)",
+  "color-surface-950": "hsl(0, 0%, 20%)",
+  "color-surface": "$color-surface-500",
+
+  // --- Primary color shades
+  "color-primary-50": "hsl(354, 89%, 95%)",
+  "color-primary-100": "hsl(354, 89%, 85%)",
+  "color-primary-200": "hsl(354, 89%, 75%)",
+  "color-primary-300": "hsl(354, 89%, 65%)",
+  "color-primary-400": "hsl(354, 89%, 55%)",
+  "color-primary-500": "hsl(354, 89%, 45%)", // #F85367
+  "color-primary-600": "hsl(354, 89%, 40%)",
+  "color-primary-700": "hsl(354, 89%, 35%)",
+  "color-primary-800": "hsl(354, 89%, 30%)",
+  "color-primary-900": "hsl(354, 89%, 25%)",
+  "color-primary-950": "hsl(354, 89%, 20%)",
+  "color-primary": "$color-primary-500",
+
+  // --- Secondary color shades (steel-bluish)
+  "color-secondary-50": "hsl(210, 65%, 95%)",
+  "color-secondary-100": "hsl(210, 65%, 85%)",
+  "color-secondary-200": "hsl(210, 65%, 75%)",
+  "color-secondary-300": "hsl(210, 65%, 65%)",
+  "color-secondary-400": "hsl(210, 65%, 55%)",
+  "color-secondary-500": "hsl(210, 65%, 45%)", // #153F65
+  "color-secondary-600": "hsl(210, 65%, 40%)",
+  "color-secondary-700": "hsl(210, 65%, 35%)",
+  "color-secondary-800": "hsl(210, 65%, 30%)",
+  "color-secondary-900": "hsl(210, 65%, 25%)",
+  "color-secondary-950": "hsl(210, 65%, 20%)",
+  "color-secondary": "$color-secondary-500",
+
+  // --- Warning color shades (orange shades)
+  "color-warn-50": "hsl(36, 85%, 95%)",
+  "color-warn-100": "hsl(36, 85%, 85%)",
+  "color-warn-200": "hsl(36, 85%, 75%)",
+  "color-warn-300": "hsl(36, 85%, 65%)",
+  "color-warn-400": "hsl(36, 85%, 55%)",
+  "color-warn-500": "hsl(36, 85%, 45%)", // #EE901D
+  "color-warn-600": "hsl(36, 85%, 40%)",
+  "color-warn-700": "hsl(36, 85%, 35%)",
+  "color-warn-800": "hsl(36, 85%, 30%)",
+  "color-warn-900": "hsl(36, 85%, 25%)",
+  "color-warn-950": "hsl(36, 85%, 20%)",
+  "color-warn": "$color-warn-500",
+
+  // --- Danger color shades (reddish)
+  "color-danger-50": "hsl(356, 100%, 95%)",
+  "color-danger-100": "hsl(356, 100%, 85%)",
+  "color-danger-200": "hsl(356, 100%, 75%)",
+  "color-danger-300": "hsl(356, 100%, 65%)",
+  "color-danger-400": "hsl(356, 100%, 55%)",
+  "color-danger-500": "hsl(356, 100%, 45%)", // #E30010
+  "color-danger-600": "hsl(356, 100%, 40%)",
+  "color-danger-700": "hsl(356, 100%, 35%)",
+  "color-danger-800": "hsl(356, 100%, 30%)",
+  "color-danger-900": "hsl(356, 100%, 25%)",
+  "color-danger-950": "hsl(356, 100%, 20%)",
+  "color-danger": "$color-danger-600",
+  "color-attention": "$color-danger-500",
+
+  // --- Success color shades (greenish)
+  "color-success-50": "hsl(154, 80%, 95%)",
+  "color-success-100": "hsl(154, 80%, 85%)",
+  "color-success-200": "hsl(154, 80%, 75%)",
+  "color-success-300": "hsl(154, 80%, 65%)",
+  "color-success-400": "hsl(154, 80%, 55%)",
+  "color-success-500": "hsl(154, 80%, 45%)", // #0F7C54
+  "color-success-600": "hsl(154, 80%, 40%)",
+  "color-success-700": "hsl(154, 80%, 35%)",
+  "color-success-800": "hsl(154, 80%, 30%)",
+  "color-success-900": "hsl(154, 80%, 25%)",
+  "color-success-950": "hsl(154, 80%, 20%)",
   "color-success": "$color-success-500",
 };
