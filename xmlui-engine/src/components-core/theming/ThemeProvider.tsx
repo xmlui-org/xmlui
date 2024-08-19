@@ -32,10 +32,12 @@ import {
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import {
   XmlUiBlueThemeDefinition,
+  XmlUiCyanThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiOrangeThemeDefinition,
   XmlUiPurpleThemeDefinition,
+  XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
 } from "@components-core/theming/themes/xmlui";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
@@ -243,6 +245,8 @@ const builtInThemes: Array<ThemeDefinition> = [
   XmlUiGrayThemeDefinition,
   XmlUiOrangeThemeDefinition,
   XmlUiPurpleThemeDefinition,
+  XmlUiCyanThemeDefinition,
+  XmlUiRedThemeDefinition,
   SolidThemeDefinition,
 ];
 
@@ -285,6 +289,8 @@ function ThemeProvider({
         "xmlui-gray",
         "xmlui-orange",
         "xmlui-purple",
+        "xmlui-cyan",
+        "xmlui-red",
       ]),
     ];
   }, [themes]);
