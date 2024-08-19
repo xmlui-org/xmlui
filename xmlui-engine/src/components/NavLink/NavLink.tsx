@@ -69,7 +69,7 @@ export const NavLink = forwardRef(
 
     const styleObj = { ...sx, ...style };
 
-    const baseClasses = classnames(styles.base, {
+    const baseClasses = classnames(styles.content, styles.base, {
       [styles.disabled]: disabled,
       [styles.vertical]: safeVertical,
       [styles.includeHoverIndicator]: displayActive,
@@ -121,58 +121,58 @@ export const NavLink = forwardRef(
  */
 export interface NavLinkComponentDef extends ComponentDef<"NavLink"> {
   props: {
-    /** 
+    /**
      * This property sets the text to display with the \`NavLink\` component.
      * @descriptionRef
      */
     label?: string;
     /**
      * This property sets how the active status is displayed on the \`NavLink\` component.
-     * If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu. 
+     * If set to true, the indicator is displayed on the side which lends itself to a vertically aligned navigation menu.
      * @descriptionRef
      */
     vertical?: boolean;
-    /** 
+    /**
      * This property allows you to add an icon (specify the icon's name) to the navigation link.
      * @descriptionRef
      */
     icon?: string;
-    /** 
+    /**
      * This Boolean property indicates if the active state of a link should have a visual indication.
      * Setting it to \`false\` removes the visual indication of an active link.
-     * 
+     *
      * The default value is \`true\`.
      * @descriptionRef
      */
     displayActive?: string;
-    /** 
+    /**
      * This property defines the URL of the link.
-     * 
+     *
      * For examples, see the other property sections.
      */
     to: string;
-    /** 
+    /**
      * This property indicates whether the link is enabled (\`true\`) or not (\`false\`).
      * Disabled links are greyed out.
      * The default value is (\`true\`).
      * @descriptionRef
      */
     enabled?: boolean;
-    /** 
+    /**
      * This property indicates if the particular navigation is an active link.
      * An active link has a particular visual appearance,
      * provided its [\`displayActive\`](#displayactive) property is set to \`true\`.
      * @descriptionRef
      */
     active?: boolean;
-    /** 
+    /**
      * This property specifies how to open the clicked link.
      * @descriptionRef
      */
     target?: LinkTarget;
   };
   events: {
-    /** 
+    /**
      * This event is fired when the user clicks the link.
      * With an event handler, you can define how to respond to the user's clicks.
      * @descriptionRef
@@ -208,6 +208,7 @@ const metadata: ComponentDescriptor<NavLinkComponentDef> = {
     "padding-vertical-NavLink": "$space-2",
     "font-size-NavLink": "$font-size-small",
     "font-weight-NavLink": "$font-weight-normal",
+    "font-family-NavLink": "$font-family",
     "color-text-NavLink": "$color-text-primary",
     "font-weight-NavLink--pressed": "$font-weight-normal",
     "thickness-indicator-NavLink": "$space-0_5",

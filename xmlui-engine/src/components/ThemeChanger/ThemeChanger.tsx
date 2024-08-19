@@ -60,43 +60,22 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer<Theme
                         props: {
                           active: "true",
                           url: "/",
+                          label: "Home",
                         },
-                        children: [
-                          {
-                            type: "Text",
-                            props: {
-                              value: "Home",
-                            },
-                          },
-                        ],
                       },
                       {
                         type: "NavLink",
                         props: {
                           url: "/about",
+                          label: "About",
                         },
-                        children: [
-                          {
-                            type: "Text",
-                            props: {
-                              value: "About",
-                            },
-                          },
-                        ],
                       },
                       {
                         type: "NavLink",
                         props: {
                           url: "/contact",
+                          label: "Contact",
                         },
-                        children: [
-                          {
-                            type: "Text",
-                            props: {
-                              value: "Contact",
-                            },
-                          },
-                        ],
                       },
                     ],
                   },
