@@ -41,7 +41,9 @@ $themeVars: ();
   text-overflow: ellipsis;
   margin: 0;
   padding: 0;
+  font-family: createThemeVar("font-family-Text");
   min-height: fit-content;
+  font-weight: createThemeVar("font-weight-Text");
   font-size: createThemeVar("font-size-Text");
 
   .text {

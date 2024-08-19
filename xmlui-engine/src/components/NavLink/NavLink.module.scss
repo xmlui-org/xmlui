@@ -24,6 +24,7 @@ $color-text-NavLink--hover--active: createThemeVar("color-text-NavLink--hover--a
 $color-text-NavLink--pressed: createThemeVar("color-text-NavLink--pressed");
 $color-text-NavLink--pressed--active: createThemeVar("color-text-NavLink--pressed--active");
 $color-icon-NavLink: createThemeVar("color-icon-NavLink");
+$font-family-NavLink: createThemeVar("font-family-NavLink");
 $font-weight-NavLink: createThemeVar("font-weight-NavLink");
 $font-weight-NavLink--pressed: createThemeVar("font-weight-NavLink--pressed");
 $font-weight-NavLink--active: createThemeVar("font-weight-NavLink--active");
@@ -49,6 +50,7 @@ $transition: color 0.1s, background-color 0.1s;
   gap: t.$space-2;
   font-size: $font-size-NavLink;
   font-weight: $font-weight-NavLink;
+  font-family: $font-family-NavLink;
   position: relative;
   transition: $transition;
   border-radius: $radius-NavLink;

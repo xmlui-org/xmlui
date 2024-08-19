@@ -33,7 +33,7 @@ const TextVariantKeys = [
   "subtitle", // Subtitle text in the particular context
   "small", // Small text in the particular context
   "caption", // Caption text in the particular context
-  "placeholder", // Placeholder text in the particular context 
+  "placeholder", // Placeholder text in the particular context
   "paragraph", // use <p>
   "subheading", // use a H6 with some specific defaults
   "tableheading", // use a H3 with some specific defaults
@@ -120,7 +120,7 @@ export const Text = ({
   layout,
   children,
   preserveLinebreaks,
-  ellipses = true,  
+  ellipses = true,
   ...variantSpecificProps
 }: TextProps) => {
   const ref: React.MutableRefObject<HTMLElement | null> = useRef<HTMLElement>(null);
@@ -163,39 +163,39 @@ export const Text = ({
 
 /**
  * The \`Text\` component displays textual information in a number of optional styles and variants.
- * 
+ *
  * You can learn more about this component in the [Working with Text](/learning/using-components/text) article.
  */
 export interface TextComponentDef extends ComponentDef<"Text"> {
   props: {
     /**
      * The text to be displayed. This value can also be set via nesting the text into the `Text` component.
-     * @descriptionRef 
+     * @descriptionRef
      */
     value?: string;
     /**
      * Optional string value that provides named presets for text variants with a unique combination
      * of font style, weight, size, color and other parameters.
-     * @descriptionRef 
+     * @descriptionRef
      */
     variant?: TextVariant;
     /**
      * This property determines the maximum number of lines the component can wrap to.
      * If there is no space to display all the contents,
      * the component displays up to as many lines as specified in this property.
-     * @descriptionRef 
+     * @descriptionRef
      */
     maxLines?: number;
     /**
      * This property indicates if linebreaks should be preserved when displaying text.
      * By default, its value is set to \`false\`.
-     * @descriptionRef 
+     * @descriptionRef
      */
     preserveLinebreaks?: boolean;
     /**
      * This property indicates whether ellipses should be displayed when the text is cropped (\`true\`) or not (\`false\`).
      * By default, its value is set to \`true\`.
-     * @descriptionRef 
+     * @descriptionRef
      */
     ellipses?: boolean;
   };
@@ -221,6 +221,8 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "transform-Text-abbr": "uppercase",
     "font-size-Text-secondary": "$font-size-small",
     "font-style-Text-cite": "italic",
+    "font-family-Text": "$font-family",
+    "font-weight-Text": "$font-weight-normal",
     "font-family-Text-code": "$font-family-monospace",
     "font-size-Text-code": "$font-size-small",
     "thickness-border-Text-code": "1px",
