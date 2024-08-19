@@ -221,6 +221,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "transform-Text-abbr": "uppercase",
     "font-size-Text-secondary": "$font-size-small",
     "font-style-Text-cite": "italic",
+    "color-Text": "$color-text-primary",
     "font-family-Text": "$font-family",
     "font-weight-Text": "$font-weight-normal",
     "font-family-Text-code": "$font-family-monospace",

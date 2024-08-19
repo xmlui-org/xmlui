@@ -69,7 +69,7 @@ export const NavLink = forwardRef(
 
     const styleObj = { ...sx, ...style };
 
-    const baseClasses = classnames(styles.base, {
+    const baseClasses = classnames(styles.content, styles.base, {
       [styles.disabled]: disabled,
       [styles.vertical]: safeVertical,
       [styles.includeHoverIndicator]: displayActive,
