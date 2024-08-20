@@ -104,7 +104,7 @@ export const Combobox = ({
     itemToString(item) {
       return item ? item.label : "";
     },
-    isItemDisabled: (item) => item.disabled,
+    isItemDisabled: (item) => item?.disabled!,
     stateReducer(state, actionAndChanges) {
       const { changes, type } = actionAndChanges;
       switch (type) {
