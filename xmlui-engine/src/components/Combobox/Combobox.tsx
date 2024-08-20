@@ -34,7 +34,7 @@ type ComboboxProps = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   layout?: CSSProperties;
-  onChange?: (newValue: string) => void;
+  onDidChange?: (newValue: string) => void;
   onFocus?: () => void;
   onBlur?: () => void;
   validationStatus?: ValidationStatus;
@@ -60,7 +60,7 @@ export const Combobox = ({
   placeholder,
   updateState = noop,
   validationStatus = "none",
-  onChange = noop,
+  onDidChange = noop,
   onFocus = noop,
   onBlur = noop,
   registerComponentApi,
@@ -82,32 +82,65 @@ export const Combobox = ({
 
   const [searchValue, setSearchValue] = useState("");
   const items = useMemo(() => {
-    return filterOptions(searchValue, options);
+    return filterOptions(searchValue, options.filter((option) => !value.includes(option.value)));
   }, [options, searchValue]);
 
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
 
-  const { isOpen, selectedItem, highlightedIndex, getMenuProps, getInputProps, getItemProps, getToggleButtonProps } =
-    useCombobox({
-      // labelId: id,
-      // toggleButtonId: id,
-      onInputValueChange({ inputValue }) {
-        setSearchValue(inputValue || "");
-      },
-      items,
-      itemToString(item) {
-        return item ? item.label : "";
-      },
-      initialSelectedItem: options.find((item) => item.value === value) || null,
-      selectedItem: options.find((item) => item.value === value) || null,
-      onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
-        if (newSelectedItem) {
-          onInputChange(newSelectedItem);
-        }
-      },
-      isItemDisabled: (item) => item.disabled,
-    });
+  const {
+    isOpen,
+    selectedItem,
+    highlightedIndex,
+    getMenuProps,
+    getInputProps,
+    getItemProps,
+    getToggleButtonProps,
+    closeMenu,
+  } = useCombobox({
+    // labelId: id,
+    // toggleButtonId: id,
+    items,
+    itemToString(item) {
+      return item ? item.label : "";
+    },
+    isItemDisabled: (item) => item.disabled,
+    stateReducer(state, actionAndChanges) {
+      const { changes, type } = actionAndChanges;
+      switch (type) {
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.ItemClick:
+          return {
+            ...changes,
+            isOpen: true, // keep the menu open after selection.
+            highlightedIndex: 0,
+          };
+        default:
+          return changes;
+      }
+    },
+    onStateChange: ({ type, selectedItem: newSelectedItem, inputValue: newInputValue }) => {
+      switch (type) {
+        case useCombobox.stateChangeTypes.InputKeyDownEnter:
+        case useCombobox.stateChangeTypes.ItemClick:
+        case useCombobox.stateChangeTypes.InputBlur:
+          handleOnBlur();
+          if (newSelectedItem) {
+            onInputChange(newSelectedItem);
+          }
+          closeMenu();
+          break;
+        case useCombobox.stateChangeTypes.InputKeyDownArrowDown:
+        case useCombobox.stateChangeTypes.InputClick:
+        case useCombobox.stateChangeTypes.InputChange:
+          handleOnFocus();
+          setSearchValue(newInputValue || "");
+          break;
+        default:
+          break;
+      }
+    },
+  });
 
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(() => {
@@ -136,9 +169,9 @@ export const Combobox = ({
     (selectedOption: Option) => {
       const value = selectedOption.value;
       updateState({ value: value });
-      onChange(value);
+      onDidChange(value);
     },
-    [onChange, updateState],
+    [onDidChange, updateState],
   );
 
   useEffect(() => {
@@ -392,7 +425,7 @@ const metadata: ComponentDescriptor<ComboboxComponentDef> = {
 
 export const comboboxComponentRenderer = createComponentRenderer<ComboboxComponentDef>(
   "Combobox",
-  ({ node, state, updateState, extractValue, renderChild, lookupAction, layoutCss, registerComponentApi }) => {
+  ({ node, state, updateState, extractValue, renderChild, lookupEventHandler, layoutCss, registerComponentApi }) => {
     return (
       <Combobox
         layout={layoutCss}
@@ -402,9 +435,9 @@ export const comboboxComponentRenderer = createComponentRenderer<ComboboxCompone
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
         validationStatus={extractValue(node.props.validationStatus)}
         updateState={updateState}
-        onChange={lookupAction(node.events?.didChange)}
-        onFocus={lookupAction(node.events?.gotFocus)}
-        onBlur={lookupAction(node.events?.lostFocus)}
+        onDidChange={lookupEventHandler("didChange")}
+        onFocus={lookupEventHandler("gotFocus")}
+        onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         startIcon={extractValue.asOptionalString(node.props.startIcon)}
