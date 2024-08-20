@@ -90,6 +90,10 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     background-color: transparent;
     width: 100%;
     min-height: $min-height;
+
+    &::placeholder {
+      color: createThemeVar("Input:color-placeholder-Combobox");
+    }
   }
 
   .indicator {

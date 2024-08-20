@@ -100,6 +100,10 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
       background: transparent;
       border: 0;
       outline: 0;
+
+        &::placeholder {
+            color: createThemeVar("Input:color-placeholder-MultiCombobox");
+        }
     }
   }
 
