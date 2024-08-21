@@ -23,7 +23,6 @@
     "outDir": "dist/scripts",
     "paths": {
       "@abstractions/*": ["./src/abstractions/*"],
-      "@core/*": ["../ui-engine/src/core/*"],
       "@components-core/*": ["./src/components-core/*"],
       "@components/*": ["./src/components/*"],
     }
