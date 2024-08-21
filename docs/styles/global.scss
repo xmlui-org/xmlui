@@ -37,6 +37,21 @@
   --syntax-token-delimiter-curly: #FFFFFF;
   --syntax-token-text: #f5f5ff;
 
+  --color-background-secondary: #121b28;
+  --color-background-primary: #1e2734;
+
+  input[type="search"]:focus {
+    background-color: #121b28;
+  }
+
+  main {
+    background-color: var(--color-background-primary);
+  }
+
+  div.nextra-nav-container {
+    background-color: var(--color-background-primary);
+  }
+
   ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li {
     > a:hover, > button:hover {
       background-color: #1c5aa02a;
@@ -53,12 +68,28 @@
     }
   }
 
+  div.nextra-nav-container {
+    background-color: transparent !important;
+
+    div.nextra-nav-container-blur {
+      background-color: color-mix(in srgb, var(--color-background-primary), transparent 10%) !important;
+
+    }
+  }
+
   aside.nextra-sidebar-container {
-    background-color: transparent;
+    background-color: var(--color-background-secondary);
     border-right: 1px solid #313b491f;
+    overflow: visible;
+    mask-image: unset;
 
     div.nextra-scrollbar {
       padding: 1.5rem;
+    }
+
+    div.nextra-scrollbar + div {
+      background-color: #121b28;
+      box-shadow: none;
     }
   }
 
@@ -115,6 +146,12 @@
     div.nextra-scrollbar {
       padding: 1.5rem;
     }
+
+    div.nextra-scrollbar + div {
+      background-color: #f8fafc;
+      box-shadow: none;
+    }
+
   }
 
   div.nextra-nav-container-blur {
@@ -164,7 +201,6 @@
 }
 
 
-
 html,
 body,
 body > div:first-child,
@@ -175,4 +211,9 @@ div#__next > div {
 
 body {
   font-feature-settings: "cv03", "cv04", "cv11"
+}
+
+:is(html[class~=dark] .nextra-toc *) {
+  background-color: var(--color-background-primary) !important;
+  box-shadow: none !important;
 }

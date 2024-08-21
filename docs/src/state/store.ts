@@ -54,6 +54,7 @@ enum PlaygroundActionKind {
   APP_DESCRIPTION_INITIALIZED = "PlaygroundActionKind:APP_DESCRIPTION_INITIALIZED",
   OPTIONS_INITIALIZED = "PlaygroundActionKind:OPTIONS_INITIALIZED",
   ACTIVE_THEME_CHANGED = "PlaygroundActionKind:ACTIVE_THEME_CHANGED",
+  TONE_CHANGED = "PlaygroundActionKind:TONE_CHANGED",
 }
 
 type PlaygroundAction = {
@@ -62,6 +63,7 @@ type PlaygroundAction = {
     text?: string;
     appDescription?: AppDescription;
     options?: Options;
+    activeTone?: string;
     activeTheme?: string;
     content?: string;
     themes?: ThemeDefinition[];
@@ -75,6 +77,15 @@ export interface PlaygroundState {
   appDescription: AppDescription;
   originalAppDescription: AppDescription;
   options: Options;
+}
+
+export function toneChanged(activeTone: string) {
+  return {
+    type: PlaygroundActionKind.TONE_CHANGED,
+    payload: {
+      activeTone,
+    },
+  };
 }
 
 export function textChanged(text: string) {
@@ -221,6 +232,11 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           break;
         }
       }
+      break;
+    }
+    case PlaygroundActionKind.TONE_CHANGED: {
+      state.options.id = state.options.id + 1;
+      state.options.activeTone = action.payload.activeTone;
       break;
     }
     case PlaygroundActionKind.TEXT_CHANGED:
