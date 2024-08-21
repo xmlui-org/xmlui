@@ -28,6 +28,7 @@ type LoaderProps = {
   state: ContainerState;
   registerComponentApi: RegisterComponentApiFn;
   onLoaded?: (...args: any[]) => void;
+  onError?: (...args: any[]) => Promise<boolean>;
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
@@ -38,6 +39,7 @@ function DataLoader({
   state,
   registerComponentApi,
   onLoaded,
+  onError,
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
@@ -168,8 +170,17 @@ function DataLoader({
   );
 
   const error: LoaderErrorFn = useCallback(
-    (error) => {
+    async (error) => {
       loaderError(error);
+      if(onError){
+        const result = await onError(error);
+        if(result === false) {
+          if (loadingToastIdRef.current) {
+            toast.dismiss(loadingToastIdRef.current);
+          }
+          return;
+        }
+      }
       const errorMessage = extractParam(
         {
           ...stateRef.current.state,
@@ -191,7 +202,7 @@ function DataLoader({
         appContext.signError(error as Error);
       }
     },
-    [appContext, loader.props.errorNotificationMessage, loaderError]
+    [appContext, loader.props.errorNotificationMessage, loaderError, onError]
   );
 
   const pollIntervalInSeconds = extractParam(state, loader.props.pollIntervalInSeconds, appContext);
@@ -240,6 +251,7 @@ interface DataLoaderDef extends ComponentDef<"DataLoader"> {
   };
   events: {
     loaded?: string;
+    error?: string;
   };
 }
 
@@ -275,6 +287,7 @@ export const dataLoaderRenderer = createLoaderRenderer<DataLoaderDef>(
         loaderError={loaderError}
         registerComponentApi={registerComponentApi}
         onLoaded={lookupAction(loader.events?.loaded, { eventName: "loaded" })}
+        onError={lookupAction(loader.events?.error, { eventName: "error" })}
       />
     );
   },
