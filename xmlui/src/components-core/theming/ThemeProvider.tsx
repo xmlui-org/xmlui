@@ -1,0 +1,449 @@
+import type React from "react";
+
+import type {
+  ThemeScope,
+  AppThemes,
+  ThemeTone,
+  ThemeDefinition,
+  FontDef,
+} from "./abstractions";
+import { ThemeToneKeys } from "./abstractions";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  generateBaseFontSizes,
+  generateBaseSpacings,
+  generateBaseTones,
+  generateButtonTones,
+  resolveThemeVar,
+} from "./transformThemeVars";
+import { normalizePath } from "@components-core/utils/misc";
+import { matchThemeVar } from "@components-core/theming/hvar";
+import {
+  ThemeContext,
+  ThemesContext,
+} from "@components-core/theming/ThemeContext";
+import themeVars, { getVarKey } from "@components-core/theming/themeVars";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
+import {
+  collectThemeChainByExtends,
+  expandTheme,
+} from "@components-core/theming/extendThemeUtils";
+import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
+import {
+  XmlUiBlueThemeDefinition,
+  XmlUiCyanThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiRedThemeDefinition,
+  XmlUiThemeDefinition,
+} from "@components-core/theming/themes/xmlui";
+import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
+import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
+
+export function useCompiledTheme(
+  activeTheme: ThemeDefinition | undefined,
+  activeTone: ThemeTone,
+  themes: ThemeDefinition[] = EMPTY_ARRAY,
+  resources: Record<string, string> = EMPTY_OBJECT,
+  resourceMap: Record<string, string> = EMPTY_OBJECT
+) {
+  const componentRegistry = useComponentRegistry();
+  const { componentThemeVars, componentDefaultThemeVars } = componentRegistry;
+
+  const themeDefChain = useMemo(() => {
+    if (activeTheme) {
+      return collectThemeChainByExtends(
+        activeTheme,
+        themes,
+        componentDefaultThemeVars
+      );
+    }
+    return undefined;
+  }, [activeTheme, componentDefaultThemeVars, themes]);
+
+  const allResources = useMemo(() => {
+    let mergedResources: ThemeDefinition["resources"] = {};
+    themeDefChain?.forEach((theme) => {
+      mergedResources = {
+        ...mergedResources,
+        ...theme.resources,
+        ...theme.tones?.[activeTone]?.resources,
+      };
+    });
+    return {
+      ...resources,
+      ...mergedResources,
+    };
+  }, [themeDefChain, resources, activeTone]);
+
+  const allFonts = useMemo(() => {
+    const ret: Array<FontDef> = [];
+    Object.entries(allResources).forEach(([key, value]) => {
+      if (key.startsWith("font.")) {
+        ret?.push(value as FontDef);
+      }
+    });
+    return ret;
+  }, [allResources]);
+
+  const getResourceUrl = useCallback(
+    (resourceString?: string) => {
+      let resourceUrl = resourceString;
+      if (resourceString?.startsWith("resource:")) {
+        const resourceName = resourceString?.replace("resource:", "");
+        resourceUrl = allResources[resourceName] as string;
+      }
+      if (!resourceUrl) {
+        return resourceUrl;
+      }
+      if (resourceMap[resourceUrl]) {
+        return resourceMap[resourceUrl];
+      }
+      if (
+        resourceUrl.startsWith("/") &&
+        resourceMap[resourceUrl.substring(1)]
+      ) {
+        return resourceMap[resourceUrl.substring(1)];
+      }
+      return normalizePath(resourceUrl);
+    },
+    [allResources, resourceMap]
+  );
+
+  const fontLinks: Array<string> = useMemo(() => {
+    return (allFonts?.filter((theme) => typeof theme === "string") ||
+      []) as Array<string>;
+  }, [allFonts]);
+
+  const themeDefChainVars = useMemo(() => {
+    if (!themeDefChain?.length) {
+      return [];
+    }
+    let mergedThemeVars = {};
+    themeDefChain?.forEach((theme) => {
+      mergedThemeVars = {
+        ...mergedThemeVars,
+        ...theme.themeVars,
+        ...theme.tones?.[activeTone]?.themeVars,
+      };
+    });
+
+    //we put the generated theme vars before the last item in the chain
+    return [
+      ...themeDefChain
+        .map((themeDef) => ({
+          ...themeDef.themeVars,
+          ...themeDef.tones?.[activeTone]?.themeVars,
+        }))
+        .slice(0, themeDefChain.length - 1),
+      {
+        ...generateBaseSpacings(mergedThemeVars),
+        ...generateBaseFontSizes(mergedThemeVars),
+        ...generateBaseTones(mergedThemeVars),
+        ...generateButtonTones(mergedThemeVars),
+      },
+      {
+        ...expandTheme({
+          ...themeDefChain[themeDefChain.length - 1].themeVars,
+          ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]
+            ?.themeVars,
+        }),
+      } || {},
+    ];
+  }, [activeTone, themeDefChain]);
+
+  const allThemeVarsWithResolvedHierarchicalVars = useMemo(() => {
+    let mergedThemeVars: Record<string, string> = {};
+
+    themeDefChainVars?.forEach((theme) => {
+      mergedThemeVars = { ...mergedThemeVars, ...theme };
+    });
+
+    const resolvedThemeVarsFromChains: Record<string, string> = {};
+
+    new Set([
+      ...Object.keys(themeVars.themeVars),
+      ...componentThemeVars,
+    ]).forEach((themeVar) => {
+      const result = matchThemeVar(themeVar, themeDefChainVars);
+      if (
+        result &&
+        result.forValue &&
+        result.matchedValue &&
+        result.forValue !== result.matchedValue
+      ) {
+        resolvedThemeVarsFromChains[
+          result.forValue
+        ] = `$${result.matchedValue}`;
+      }
+    });
+
+    return resolveThemeVarsWithCssVars({
+      ...mergedThemeVars,
+      ...resolvedThemeVarsFromChains,
+    });
+  }, [componentThemeVars, themeDefChainVars]);
+
+  const themeCssVars = useMemo(() => {
+    const ret: Record<string, string> = {};
+    Object.entries(allThemeVarsWithResolvedHierarchicalVars).forEach(
+      ([key, value]) => {
+        const themeKey = `--${themeVars.keyPrefix}-${key}`;
+        if (value) {
+          ret[themeKey] = value;
+        }
+      }
+    );
+    return ret;
+  }, [allThemeVarsWithResolvedHierarchicalVars]);
+
+  const getThemeVar = useCallback(
+    (varName: string) => {
+      return resolveThemeVar(varName, allThemeVarsWithResolvedHierarchicalVars);
+    },
+    [allThemeVarsWithResolvedHierarchicalVars]
+  );
+
+  useEffect(() => {
+    allFonts.forEach(async (font) => {
+      if (typeof font !== "string") {
+        const resolvedSrc = getResourceUrl(font.src);
+        let src = `url(${resolvedSrc})`;
+        if (font.format) {
+          src = `${src} format('${font.format}')`;
+        }
+        const ff = new FontFace(font.fontFamily, src, {
+          weight: font.fontWeight,
+          style: font.fontStyle,
+          display: font.fontDisplay as any,
+        });
+        try {
+          const loadedFontFace = await ff.load();
+          document.fonts.add(loadedFontFace);
+        } catch (e) {
+          console.error("loading fonts failed", e);
+        }
+      }
+    });
+  }, [themeDefChain, getResourceUrl, allFonts]);
+  return {
+    getResourceUrl,
+    fontLinks,
+    allThemeVarsWithResolvedHierarchicalVars,
+    themeCssVars,
+    getThemeVar,
+  };
+}
+
+const builtInThemes: Array<ThemeDefinition> = [
+  XmlUiThemeDefinition,
+  XmlUiBlueThemeDefinition,
+  XmlUiGreenThemeDefinition,
+  XmlUiGrayThemeDefinition,
+  XmlUiOrangeThemeDefinition,
+  XmlUiPurpleThemeDefinition,
+  XmlUiCyanThemeDefinition,
+  XmlUiRedThemeDefinition,
+  SolidThemeDefinition,
+];
+
+// theme-overriding properties change.
+function ThemeProvider({
+  children,
+  themes: custThemes = EMPTY_ARRAY,
+  defaultTheme = "xmlui",
+  defaultTone = "light",
+  resources = EMPTY_OBJECT,
+  resourceMap = EMPTY_OBJECT,
+}: {
+  children?: React.ReactNode;
+  themes?: Array<ThemeDefinition>;
+  defaultTheme?: string;
+  defaultTone?: ThemeTone;
+  resources?: Record<string, string>;
+  resourceMap?: Record<string, string>;
+}) {
+  const [activeThemeTone, setActiveThemeTone] = useState<ThemeTone>(() => {
+    if (!defaultTone) {
+      return ThemeToneKeys[0];
+    }
+    return defaultTone;
+  });
+
+  const themes: Array<ThemeDefinition> = useMemo(() => {
+    return [...builtInThemes, ...custThemes];
+  }, [custThemes]);
+
+  const availableThemeIds = useMemo(() => {
+    const customThemeUids = themes.map((theme) => theme.id);
+    return [
+      ...new Set([
+        ...customThemeUids,
+        "solid",
+        "xmlui",
+        "xmlui-blue",
+        "xmlui-green",
+        "xmlui-gray",
+        "xmlui-orange",
+        "xmlui-purple",
+        "xmlui-cyan",
+        "xmlui-red",
+      ]),
+    ];
+  }, [themes]);
+
+  const [activeThemeId, setActiveThemeId] = useState<string>(() => {
+    if (!defaultTheme) {
+      return availableThemeIds[0];
+    }
+    return defaultTheme;
+  });
+
+  useIsomorphicLayoutEffect(() => {
+    //we sync the activeThemeId with the default theme (mostly for HMR)
+    if (defaultTheme && availableThemeIds.includes(defaultTheme)) {
+      setActiveThemeId(defaultTheme);
+    } else {
+      setActiveThemeId(availableThemeIds[0]);
+    }
+  }, [availableThemeIds, defaultTheme]);
+
+  const activeTheme: ThemeDefinition = useMemo(() => {
+    let foundTheme;
+    if (activeThemeId) {
+      foundTheme = themes.find((theme) => theme.id === activeThemeId);
+    }
+    if (!foundTheme) {
+      throw new Error(
+        `Theme ${activeThemeId} not found, available themes: ${availableThemeIds}`
+      );
+    }
+    return foundTheme;
+  }, [activeThemeId, availableThemeIds, themes]);
+
+  const {
+    allThemeVarsWithResolvedHierarchicalVars,
+    themeCssVars,
+    getResourceUrl,
+    getThemeVar,
+  } = useCompiledTheme(
+    activeTheme,
+    activeThemeTone,
+    themes,
+    resources,
+    resourceMap
+  );
+  const [root, setRoot] = useState(
+    typeof document === "undefined" ? undefined : document.body
+  );
+
+  const themeValue = useMemo(() => {
+    const themeVal: AppThemes = {
+      root,
+      setRoot,
+      themes,
+      resources,
+      resourceMap,
+      activeThemeId,
+      activeThemeTone,
+      setActiveThemeId,
+      setActiveThemeTone,
+      availableThemeIds,
+      activeTheme,
+    };
+    return themeVal;
+  }, [
+    activeTheme,
+    activeThemeId,
+    activeThemeTone,
+    availableThemeIds,
+    resourceMap,
+    resources,
+    root,
+    themes,
+  ]);
+
+  const currentThemeContextValue = useMemo(() => {
+    const themeVal: ThemeScope = {
+      root,
+      activeThemeId,
+      activeThemeTone: activeThemeTone,
+      activeTheme,
+      themeStyles: themeCssVars,
+      themeVars: allThemeVarsWithResolvedHierarchicalVars,
+      getResourceUrl,
+      getThemeVar,
+    };
+    return themeVal;
+  }, [
+    activeTheme,
+    activeThemeId,
+    activeThemeTone,
+    allThemeVarsWithResolvedHierarchicalVars,
+    getResourceUrl,
+    getThemeVar,
+    root,
+    themeCssVars,
+  ]);
+
+  return (
+    <ThemesContext.Provider value={themeValue}>
+      <ThemeContext.Provider value={currentThemeContextValue}>
+        {children}
+      </ThemeContext.Provider>
+    </ThemesContext.Provider>
+  );
+}
+
+function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
+  if (!theme) {
+    return {};
+  }
+  const ret: Record<string, string> = {};
+  Object.keys(theme).forEach((key) => {
+    ret[key] = resolveThemeVarToCssVars(key, theme);
+  });
+  return ret;
+
+  function resolveThemeVarToCssVars(
+    varName: string,
+    theme: Record<string, string>
+  ) {
+    const value = theme[varName];
+    if (typeof value === "string" && value.includes("$")) {
+      return replaceThemeVar(value);
+    }
+    return value;
+  }
+
+  function replaceThemeVar(input: string) {
+    const regex = /\$([a-zA-Z0-9_-]+)/gi;
+    let matches = input.matchAll(regex);
+
+    //we go from 1, because result[1] is the whole stuff
+    if (matches) {
+      let ret = input;
+      for (let match of matches) {
+        const varName = match[1];
+        if (varName) {
+          ret = ret.replace(match[0], `var(${getVarKey(varName)})`);
+        }
+      }
+      return ret;
+    }
+
+    // for (let i = 1; i < (result?.length || 0); i++) {
+    //   const varName = result?.[i];
+    //   if(varName){
+    //     return input.replace(regex, `var(${getVarKey(varName)})`);
+    //   }
+    // }
+
+    return input;
+  }
+}
+
+export default ThemeProvider;

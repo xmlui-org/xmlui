@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "description": "Root folder of XMLUI",
   "workspaces": [
-    "./xmlui-engine",
-    "./create-xmlui-app",
+    "./xmlui",
     "./tests",
     "./docs",
-    "./tools/vscode"
+    "./tools/vscode",
+    "./tools/create-app"
   ]
 }

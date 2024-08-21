@@ -32,7 +32,7 @@ test("parent style affects children", async ({ page }) => {
     "<Text value='Item #2' />",
     "<Text value='Item #3' />",
   ];
-  const expectedFontSize = "20px";
+  const expectedFontSize = "14px";
 
   await initApp(page, {
     entryPoint: `

@@ -1,12 +1,46 @@
 # MenuItem
 
-This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
+This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the 
+[`DropdownMenu` component](
+./DropdownMenu
+) for using this component in menus.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
+### `active`
+
+This property indicates if the specified menu item is active.
+
+```ueml copy /active="true"/
+<DropdownMenu label="DropdownMenu">
+  <MenuItem icon="drive" active="true">Item 1</MenuItem>
+  <MenuItem icon="trash">Item 2</MenuItem>
+  <MenuItem icon="email">Item 3</MenuItem>
+</DropdownMenu>
+```
+
+<Playground
+  name="Example: icon"
+  previewOnly={true}
+  height={200}
+  app={`
+    <VStack padding="1rem">
+      <DropdownMenu label="DropdownMenu">
+        <MenuItem icon="drive" active="true">Item 1</MenuItem>
+        <MenuItem icon="trash">Item 2</MenuItem>
+        <MenuItem icon="email">Item 3</MenuItem>
+      </DropdownMenu>
+    </VStack>
+  `}
+/>
+
 ### `icon`
 
-This property names an optional icon to display with the menu item:
+This property names an optional icon to display with the menu item.
 
 ```ueml copy {2-4}
 <DropdownMenu label="DropdownMenu">
@@ -30,7 +64,6 @@ This property names an optional icon to display with the menu item:
     </VStack>
   `}
 />
-
 
 ### `iconPosition`
 
@@ -69,7 +102,12 @@ This property defines the item's label.
 
 ### `to`
 
-This property defines the URL of the menu item. If this property is defined (and the `click` event does not have an event handler), clicking the menu item navigates to this link.
+This property defines the URL of the menu item. If this property is defined (and the `click` event 
+does not have an event handler), clicking the menu item navigates to this link.
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -101,7 +139,6 @@ If both properties are defined, `click` takes precedence.
     </VStack>
   `}
 />
-
 
 ## Styling
 

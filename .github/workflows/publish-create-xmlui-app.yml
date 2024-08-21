@@ -31,6 +31,6 @@ jobs:
       - run: npm ci
         working-directory: client
       - run: npm publish
-        working-directory: client/packages/create-ui-engine-app
+        working-directory: tools/create-app
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

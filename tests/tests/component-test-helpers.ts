@@ -1,6 +1,6 @@
 import { BrowserContext, Locator, Page } from "@playwright/test";
 import type { ComponentDef, StandaloneAppDescription } from "xmlui";
-import { parseXmlUiMarkup } from "../../xmlui-engine/src/components-core/xmlui-parser";
+import { parseXmlUiMarkup } from "../../xmlui/src/components-core/xmlui-parser";
 import type { ThemeDefinition } from "xmlui";
 
 type EntryPoint = string | Record<string, any>;

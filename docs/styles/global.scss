@@ -67,7 +67,7 @@
     line-height: 2.2rem;
     margin-top: 2rem;
   }
-  
+
   h2 {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -105,26 +105,28 @@
       }
     }
   }
-  
+
   aside.nextra-sidebar-container {
     background-color: #f8fafc;
     border-right: 1px solid #313b491f;
+    overflow: visible;
+    mask-image: unset;
 
     div.nextra-scrollbar {
       padding: 1.5rem;
     }
   }
-  
+
   div.nextra-nav-container-blur {
     box-shadow: 0 0 0 1px #313b491f;
   }
-  
+
   h1 {
     font-size: 1.875rem;
     line-height: 2.2rem;
     margin-top: 2rem;
   }
-  
+
   h2 {
     font-size: 1.5rem;
     line-height: 2rem;
@@ -136,15 +138,32 @@
     line-height: 1.75rem;
     margin-top: 3rem;
   }
-  
+
   article main {
     padding-top: 2rem;
-  } 
-  
+  }
+
   article main p {
     margin-top: 1.25rem;
   }
 }
+
+:is(html[class~=light]), :is(html[class~=dark]) {
+  aside.nextra-sidebar-container {
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 50vw;
+      z-index: -1;
+      background-color: inherit;
+    }
+  }
+}
+
+
 
 html,
 body,
@@ -152,4 +171,8 @@ body > div:first-child,
 div#__next,
 div#__next > div {
   height: 100%;
+}
+
+body {
+  font-feature-settings: "cv03", "cv04", "cv11"
 }

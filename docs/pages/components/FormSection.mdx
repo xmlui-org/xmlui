@@ -1,8 +1,18 @@
 # FormSection
 
-A `FormSection` is a component that groups cohesive elements together within a `Form`.
-This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component.
+The `FormSection` is a component that groups cohesive elements together within a 
+`Form`
+.
+This grouping is indicated visually:
+the child components of the `FormSection` are placed in a [`FlowLayout`](
+./FlowLayout.mdx
+) component.
+
 See the `FlowLayout` reference documentation for details on sizing children.
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
 
@@ -28,6 +38,82 @@ The default column gap size is `3rem`.
   <FormSection columnGap="1rem">
     <FormItem width="50%" label="Name" bindTo="" />
     <FormItem width="50%" label="Occupation" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+### `heading`
+
+This optional string property is used to provide a heading text for the section.
+
+```ueml copy /heading="Basic Heading"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: heading"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+### `headingLevel`
+
+Customize the level of the heading using this property.
+All regular heading levels are supported in the h1-h6 range.
+The default level is `h3`.
+
+```ueml copy /headingLevel="h1"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingLevel="h1">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: headingLevel"
+  previewOnly
+  height={260}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingLevel="h1">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+### `headingWeight`
+
+Customize the weight of the heading using this property.
+This property is canonical to the
+[font-weight](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight) CSS rule.
+Available weights are also determined by the chosen font for the heading.
+
+The default weight is `bold`.
+
+```ueml copy /headingWeight="normal"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingWeight="normal">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: headingWeight"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingWeight="normal">
+    <FormItem label="Input Field" bindTo="" />
   </FormSection>
 </Form>`}
 />
@@ -85,107 +171,6 @@ It is set to `0.8rem` by default.
 </Form>`}
 />
 
-### `heading`
-
-This optional string property is used to provide a heading text for the section.
-
-```ueml copy /heading="Basic Heading"/
-<Form padding="1rem">
-  <FormSection heading="Basic Heading">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>
-```
-
-<Playground
-  name="Example: heading"
-  previewOnly
-  height={240}
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
-
-### `headingLevel`
-
-Customize the level of the heading using this property.
-All regular heading levels are supported in the h1-h6 range.
-The default level is `h3`.
-
-```ueml copy /headingLevel="h1"/
-<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingLevel="h1">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>
-```
-
-<Playground
-  name="Example: headingLevel"
-  previewOnly
-  height={260}
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingLevel="h1">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
-
-### `headingWeight`
-
-Customize the weight of the heading using this property.
-This property is canonical to the [font-weight](https://developer.mozilla.org/en-US/docs/Web/CSS/font-weight) CSS rule.
-Available weights are also determined by the chosen font for the heading.
-
-The default weight is `bold`.
-
-```ueml copy /headingWeight="normal"/
-<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingWeight="normal">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>
-```
-
-<Playground
-  name="Example: headingWeight"
-  previewOnly
-  height={240}
-  app={`<Form padding="1rem">
-  <FormSection heading="Basic Heading" headingWeight="normal">
-    <FormItem label="Input Field" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
-
-### `rowGap`
-
-This optional property is used to customize the gap between the rows of the `FormSection`.
-The default row gap size is `1rem`.
-
-```ueml copy /rowGap="2rem"/
-<Form padding="1rem">
-  <FormSection rowGap="2rem">
-    <FormItem label="Name" bindTo="" />
-    <FormItem label="Occupation" bindTo="" />
-  </FormSection>
-</Form>
-```
-
-<Playground
-  name="Example: rowGap"
-  previewOnly
-  height={300}
-  app={`<Form padding="1rem">
-  <FormSection rowGap="2rem">
-    <FormItem label="Name" bindTo="" />
-    <FormItem label="Occupation" bindTo="" />
-  </FormSection>
-</Form>`}
-/>
-
 ### `paddingBottom`
 
 **NOTE:** This property might be redundant.
@@ -222,10 +207,40 @@ The default size is `1rem`.
 </Form>`}
 />
 
+### `rowGap`
+
+This optional property is used to customize the gap between the rows of the `FormSection`.
+The default row gap size is `1rem`.
+
+```ueml copy /rowGap="2rem"/
+<Form padding="1rem">
+  <FormSection rowGap="2rem">
+    <FormItem label="Name" bindTo="" />
+    <FormItem label="Occupation" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: rowGap"
+  previewOnly
+  height={300}
+  app={`<Form padding="1rem">
+  <FormSection rowGap="2rem">
+    <FormItem label="Name" bindTo="" />
+    <FormItem label="Occupation" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+## API
+
+This component does not provide any API.
+
 ## Events
 
 This component does not have any events.
 
 ## Styling
 
-This component does not have any styling options.
+This component does not have any styles.

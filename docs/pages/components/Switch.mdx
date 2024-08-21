@@ -1,12 +1,30 @@
 # Switch
 
-The `Switch` component is a user interface element that allows users to toggle between two states: on and off.
+The 
+`Switch`
+ component is a user interface element that allows users to toggle between two states: on and off.
 It consists of a small rectangular or circular button that can be moved left or right to change its state.
-It's analogous in function to the [`Checkbox`](./Checkbox.mdx).
+It's analogous in function to the [
+`Checkbox`
+](
+./Checkbox.mdx
+).
 
-To bind data to a `Switch`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+To bind data to a 
+`Switch`
+, use the XMLUI [Forms infrastructure](
+../learning/using-components/forms
+).
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
+
+### `autoFocus`
+
+Set this property to `true` to automatically get the focus when the component is displayed.
 
 ### `enabled`
 
@@ -48,6 +66,11 @@ it is `true` by default.
   `}
 />
 
+### `initialValue`
+
+This property sets whether the switch should be displayed in the checked (`true`) or unchecked 
+(`false`) state when it is displayed initially.
+
 ### `label`
 
 This property sets the label of the component.
@@ -70,6 +93,11 @@ This property sets the label of the component.
     </VStack>
   `}
 />
+
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, 
+the component behaves as you clicked it.
 
 ### `labelPosition`
 
@@ -100,6 +128,8 @@ Places the label at the `top`, `right`, `bottom`, or `left` of the `Switch`.
 
 ### `readOnly`
 
+Set this property to `true` to disallow changing the component value.
+
 If true, the value of the component cannot be modified.
 
 ```ueml copy
@@ -121,13 +151,16 @@ If true, the value of the component cannot be modified.
   `}
 />
 
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `validationStatus`
+
+With this property, you can set the checkbox's validation status to "none", "error", "warning", 
+or "valid".
+
 ## API
-
-### `value`
-
-You can query this read-only API property to query the switch's current value (`true`: checked, `false`: unchecked).
-
-See an example in the `setValue` API method.
 
 ### `setValue`
 
@@ -177,6 +210,15 @@ You can use this method to set the switch's current value programmatically (`tru
     </VStack>
   `}
 />
+
+### `value`
+
+You can query this read-only API property to query the switch's current value (`true`: checked,
+`false`: unchecked).
+
+See an example in the 
+`setValue`
+ API method.
 
 ## Events
 
@@ -241,7 +283,9 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 
 ### `lostFocus`
 
-This event is triggered when the `Switch` loses focus.
+This event is triggered when the 
+`Switch`
+ loses focus.
 
 (See the example above)
 

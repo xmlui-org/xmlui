@@ -1,6 +1,7 @@
 # Queue
 
-`Queue` is a functional component (it renders no UI). It provides an API to enqueue elements and defines events to process queued elements in a FIFO order.
+`Queue` is a functional component (it renders no UI). It provides an API to enqueue elements and
+defines events to process queued elements in a FIFO order.
 
 ## Using Queue
 
@@ -90,25 +91,32 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
 
 Try the app by clicking the button several times. Check how the queue processes the items and displays feedback.
 
-## Properties
-
-### `progressFeedback`
-
-This property defines the component template of the UI that displays progress information whenever the queue's `progressReport` function in invoked.
-
-### `resultFeedback`
-
-This property defines the component template of the UI that displays result information when the queue becomes empty after processing all queued items.
-
 ## Context Variables
 
 ### `$completedItems`
 
 A list containing the queue items that have been completed (fully processed).
 
+## Properties
+
+### `clearAfterFinish`
+
+This property indicates the completed items (successful or error) should be removed from the queue
+after completion.
+
+### `progressFeedback`
+
+This property defines the component template of the UI that displays progress information whenever
+the queue's `progressReport` function in invoked.
+
+### `resultFeedback`
+
+This property defines the component template of the UI that displays result information when the
+queue becomes empty after processing all queued items.
+
 ## API
 
-### `enqueueItem(item)`
+### `enqueueItem`
 
 This method enqueues the item passed in the method parameter. The new item will be processed after the current queue items have been handled. The method retrieves the unique ID of the newly added item; this ID can be used later in other methods, such as `remove`.
 
@@ -145,11 +153,19 @@ The following example stores and displays this item when a new item is put into 
     height={180}
 />
 
-### `enqueueItems(items)`
+### `enqueueItems`
 
-This method enqueues the array of items passed in the method parameter. The new items will be processed after the current queue items have been handled. The method retrieves an array of unique IDs, one for each new item. An item ID can be used later in other methods, such as `remove`.
+This method enqueues the array of items passed in the method parameter. The new items will be
+processed after the current queue items have been handled. The method retrieves an array of
+unique IDs, one for each new item. An item ID can be used later in other methods, such as
+`remove`.
 
-### `getQueuedItems()`
+### `getQueueLength`
+
+This method retrieves the current queue length. The queue contains only those items that are
+not fully processed yet.
+
+### `getQueuedItems`
 
 You can use this method to return the items in the queue. These items contain all entries not removed from the queue yet, including pending, in-progress, and completed items.
 
@@ -163,11 +179,7 @@ This method returns the items currently in the queue with their entire context. 
 
 > **Note**: When all items are processed, the queue removes the items and fires the `complete` event. When the event handler runs, the queue is empty, and `getQueuedItems` returns an empty list.
 
-### `getQueueLength()`
-
-This method retrieves the current queue length. The queue contains only those items that are not fully processed yet.
-
-### `remove(actionItemId)`
+### `remove`
 
 This method removes an item from the queue. The parameter of this method is the unique ID of the item returned from the `enqueueItem` (or `enqueueItems` method.
 
@@ -248,7 +260,6 @@ The following example emulates a file-processing application. When a file is abo
   `}
     height={300}
 />
-
 
 ## Events
 
@@ -544,8 +555,6 @@ Click the button several times and see how the number of skipped items increment
     height={180}
 />
 
-
 ## Styling
 
-The `Queue` component does not support styling.
-
+This component does not have any styles.

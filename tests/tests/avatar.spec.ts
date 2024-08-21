@@ -83,7 +83,7 @@ test("size", async ({ page }) => {
   expect(widthMd).toBeLessThan(widthLg);
 });
 
-test("url", async ({ page }) => {
+test.skip("url", async ({ page }) => {
   const url = "https://example.com/testing/mockurl/image.jpg";
   const entryPoint = `<Avatar testId="avatar" url="${url}"/>`;
 

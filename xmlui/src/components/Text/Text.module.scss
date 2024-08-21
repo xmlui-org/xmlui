@@ -1,0 +1,224 @@
+@use "@components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+@mixin textVariant($variant) {
+  font-family: createThemeVar("font-family-Text-#{$variant}");
+  font-size: createThemeVar("font-size-Text-#{$variant}");
+  font-weight: createThemeVar("font-weight-Text-#{$variant}");
+  font-style: createThemeVar("font-style-Text-#{$variant}");
+  font-stretch: createThemeVar("font-stretch-Text-#{$variant}");
+  text-decoration-line: createThemeVar('line-decoration-Text-#{$variant}');
+  text-decoration-color: createThemeVar('color-decoration-Text-#{$variant}');
+  text-decoration-style: createThemeVar('style-decoration-Text-#{$variant}');
+  text-decoration-thickness: createThemeVar('thickness-decoration-Text-#{$variant}');
+  text-underline-offset: createThemeVar('offset-decoration-Text-#{$variant}');
+  line-height: createThemeVar("line-height-Text-#{$variant}");
+  color: createThemeVar("color-Text-#{$variant}");
+  background-color: createThemeVar("color-bg-Text-#{$variant}");
+  border-radius: createThemeVar("border-radius-Text-#{$variant}");
+  border-color: createThemeVar("color-border-Text-#{$variant}");
+  border-width: createThemeVar("thickness-border-Text-#{$variant}");
+  border-style: createThemeVar("style-border-Text-#{$variant}");
+  // --- Do not collapse these padding properties; they are intentionally expanded
+  margin-top: createThemeVar("margin-top-Text-#{$variant}");
+  margin-bottom: createThemeVar("margin-bottom-Text-#{$variant}");
+  padding-left: createThemeVar("padding-horizontal-Text-#{$variant}");
+  padding-right: createThemeVar("padding-horizontal-Text-#{$variant}");
+  padding-top: createThemeVar("padding-vertical-Text-#{$variant}");
+  padding-bottom: createThemeVar("padding-vertical-Text-#{$variant}");
+  text-transform: createThemeVar("transform-Text-#{$variant}");
+  vertical-align: createThemeVar("align-vertical-Text-#{$variant}");
+  letter-spacing: createThemeVar("letter-spacing-Text-#{$variant}");
+}
+
+.text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+  padding: 0;
+  font-family: createThemeVar("font-family-Text");
+  color: createThemeVar("color-Text");
+  min-height: fit-content;
+  font-weight: createThemeVar("font-weight-Text");
+  font-size: createThemeVar("font-size-Text");
+
+  .text {
+    //text inside text should be inline
+    display: inline;
+  }
+
+  &.abbr {
+    @include textVariant("abbr");
+  }
+
+  &.cite {
+    @include textVariant("cite");
+  }
+
+  // For inline code
+  :not(.text.codefence) > &.code {
+    @include textVariant("code");
+  }
+
+  // For code blocks using <![CDATA[ + <code> tags
+  &.codefence:has(> .text.code) {
+    @include textVariant("codefence");
+  }
+
+  &.deleted {
+    @include textVariant("deleted");
+
+    // Based on accessibility concerns
+    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/del
+    &::before,
+    &::after {
+      clip-path: inset(100%);
+      clip: rect(1px, 1px, 1px, 1px);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+    &::before {
+      content: " [deletion start] ";
+    }
+    &::after {
+      content: " [deletion end] ";
+    }
+  }
+
+  &.inserted {
+    @include textVariant("inserted");
+
+    // Based on accessibility concerns
+    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/ins
+    &::before,
+    &::after {
+      clip-path: inset(100%);
+      clip: rect(1px, 1px, 1px, 1px);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+    &::before {
+      content: " [insertion start] ";
+    }
+    &::after {
+      content: " [insertion end] ";
+    }
+  }
+
+  // This is just a style placeholder
+  &.keyboard {
+    @include textVariant("keyboard");
+  }
+
+  &.marked {
+    @include textVariant("marked");
+
+    // Based on accessibility concerns
+    // Source: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/mark
+    &::before,
+    &::after {
+      clip-path: inset(100%);
+      clip: rect(1px, 1px, 1px, 1px);
+      height: 1px;
+      overflow: hidden;
+      position: absolute;
+      white-space: nowrap;
+      width: 1px;
+    }
+    &::before {
+      content: " [highlight start] ";
+    }
+    &::after {
+      content: " [highlight end] ";
+    }
+  }
+
+  &.mono {
+    @include textVariant("mono");
+  }
+
+  &.sample {
+    @include textVariant("sample");
+  }
+
+  &.sup {
+    @include textVariant("sup");
+  }
+
+  &.sub {
+    @include textVariant("sub");
+  }
+
+  &.var {
+    @include textVariant("var");
+  }
+
+  &.title {
+    @include textVariant("title");
+  }
+
+  &.subtitle {
+    @include textVariant("subtitle");
+  }
+
+  &.small {
+    @include textVariant("small");
+  }
+
+  &.caption {
+    @include textVariant("caption");
+  }
+
+  &.placeholder {
+    @include textVariant("placeholder");
+  }
+
+  &.paragraph {
+    @include textVariant("paragraph");
+  }
+
+  &.subheading {
+    @include textVariant("subheading");
+  }
+
+  &.tableheading {
+    @include textVariant("tableheading");
+  }
+
+  &.secondary {
+    @include textVariant("secondary");
+  }
+}
+
+/*
+This is a Chromium based solution that is supported by most modern browsers.
+See this source for details: https://css-tricks.com/line-clampin/
+*/
+.truncateOverflow {
+  overflow: hidden;
+  overflow-wrap: break-word;
+  white-space: nowrap;
+}
+
+.preserveLinebreaks {
+  white-space: pre-wrap;
+}
+
+.noEllipsis {
+  text-overflow: clip;
+}
+
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

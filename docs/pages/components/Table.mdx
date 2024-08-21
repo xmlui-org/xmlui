@@ -1,10 +1,9 @@
-import data from "../../examples/list-component-data";
+import data from  "../../component-samples/Table/list-component-data.js";
 
 # Table
 
-`Table` is a component displaying cells organized into rows and columns. `Table` is virtualized; it renders only the visible cells (according to the current viewport).
-
-## Properties
+`Table` is a component displaying cells organized into rows and columns. `Table` is virtualized; it 
+renders only the visible cells (according to the current viewport).
 
 In the following section the examples use this data list:
 
@@ -30,6 +29,12 @@ All samples use table columns with the following definition unless noted otherwi
 ```
 
 > **Note**: See the [`TableColumnDef` reference](./TableColumnDef) to learn more about table columns. 
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
 
 ### `autoFocus`
 
@@ -73,34 +78,6 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
   <TableColumnDef bindTo="name"/>
   <TableColumnDef bindTo="quantity"/>
   <TableColumnDef bindTo="unit"/>
-</Table>`}
-/>
-
-### `datasource`
-
-To provide the `Table` with data directly from an API, use the `datasource` prop.
-Here, the component displays rocket information coming from the official SpaceX API. 
-
-```ueml copy /datasource='https://api.spacexdata.com/v3/rockets'/
-<Table datasource='https://api.spacexdata.com/v3/rockets'>
-    <TableColumnDef header="Image" size="140px">
-      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-    </TableColumnDef>
-    <TableColumnDef canSort="true" bindTo="country"/>
-    <TableColumnDef canSort="true" bindTo="company"/>
-</Table>
-```
-
-<Playground
-  previewOnly
-  name="Example: datasource"
-  height={400}
-  app={`<Table datasource='https://api.spacexdata.com/v3/rockets'>
-    <TableColumnDef header="Image" size="140px">
-      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-    </TableColumnDef>
-    <TableColumnDef canSort="true" bindTo="country"/>
-    <TableColumnDef canSort="true" bindTo="company"/>
 </Table>`}
 />
 
@@ -198,9 +175,14 @@ This prop adds pagination controls to the `Table`.
 
 ### `items`
 
-You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `data source` property to a URL to fetch the data from), `data` represents the information obtained from the API.
+You can use `items` as an alias for the `data` property. When you bind the table to a data source 
+(for example, you set the 
+`data source`
+ property to a URL to fetch the data from), `data` 
+represents the information obtained from the API.
 
-By convention, when you use direct data (set manually or assembled by code), you pass it in the `items` property.
+By convention, when you use direct data (set manually or assembled by code), you pass it in the 
+`items` property.
 
 When both `items` and `data` are used, `items` has priority.
 
@@ -271,7 +253,6 @@ Note that this property only works if the [`isPaginated`](#ispaginated) prop is 
 This property defines a predicate function whose return value determines whether the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
 
 The following example disables all table rows where the item's quantity exceeds 6:
-
 
 ```ueml copy {2}
 <Table data='{[...]}' rowDisabledPredicate="true">
@@ -369,6 +350,10 @@ This property works together with the [`sortBy`](#sortby) prop.
     <TableColumnDef bindTo="unit"/>
 </Table>`}
 />
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
@@ -471,6 +456,8 @@ The `Table` component uses these theme variables to customize its appearance:
 - `padding-cell-Table`
 - `padding-heading-Table`
 - `padding-horizontal-cell-Table`
+- `padding-horizontal-cell-first-Table`
+- `padding-horizontal-cell-last-Table`
 - `padding-horizontal-heading-Table`
 - `padding-vertical-cell-Table`
 - `padding-vertical-heading-Table`

@@ -1,19 +1,27 @@
 # Splitter
 
-A `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
-These sections are identified by their name: the primary and secondary section.
-The sections are divided by a draggable and stylable divider.
+The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
+These sections are identified by their name: primary and secondary.
+The sections are divided by a draggable and styleable divider.
 
-See also: [HSplitter](./HSplitter), [VSplitter](./VSplitter).
+Most properties of the component focus on the primary section (e.g. sizing).
+
+See also: [`HSplitter`](
+./HSplitter.mdx
+), [`VSplitter`](
+./VSplitter.mdx
+).
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
-
-Most properties of the `Splitter` focus on the primary section, such as sizing.
 
 ### `floating`
 
 Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged.
-The default value is `false`, so the resizer is visible.
+The default value is `false`, meaning the resizer is visible all the time.
 
 ```ueml copy /floating="true"/
 <Splitter height="100%" floating="true">
@@ -31,12 +39,13 @@ The default value is `false`, so the resizer is visible.
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
 
 ### `initialPrimarySize`
 
-This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
+This optional number property sets the initial size of the primary section.
+The unit of the size value is in pixels or percentages.
 
 ```ueml copy /initialPrimarySize="40%"/
 <Splitter height="100%" initialPrimarySize="40%">
@@ -54,12 +63,13 @@ This optional number property sets the initial size of the primary section. The 
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
 
 ### `maxPrimarySize`
 
-This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
+This property sets the maximum size the primary section can have.
+The unit of the size value is in pixels or percentages.
 
 ```ueml copy /maxPrimarySize="80%"/
 <Splitter height="100%" maxPrimarySize="80%">
@@ -77,12 +87,13 @@ This property sets the maximum size the primary section can have. The unit of th
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
 
 ### `minPrimarySize`
 
 This property sets the minimum size the primary section can have.
+The unit of the size value is in pixels or percentages.
 
 ```ueml copy /minPrimarySize="40px"/
 <Splitter height="100%" minPrimarySize="40px">
@@ -100,7 +111,7 @@ This property sets the minimum size the primary section can have.
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
 
 ### `orientation`
@@ -125,7 +136,7 @@ The default value is `vertical`.
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
 
 ### `splitterTemplate`
@@ -159,7 +170,8 @@ The divider can be customized using XMLUI components via this property.
 
 ### `swapped`
 
-This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
+This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`)
+or secondary and primary (`true`) from left to right.
 
 ```ueml copy /swapped="true"/
 <Splitter height="100%" swapped="true">
@@ -177,21 +189,28 @@ This optional booelan property indicates whether the `Splitter` sections are lay
     <Stack backgroundColor="lightblue" height="100%" />
     <Stack backgroundColor="darksalmon" height="100%" />
   </Splitter>
-`}
+  `}
 />
+
+## API
+
+This component does not provide any API.
 
 ## Events
 
-### resize
+### `resize`
 
 This event fires when the component is resized.
-(Fired when? at the start, during the whole time or when mouse button is released?)
 
-```ueml copy
-<Splitter height="100%" onResize="console.log('resized')">
-  <Stack backgroundColor="lightblue" height="100%" />
-  <Stack backgroundColor="darksalmon" height="100%" />
-</Splitter>
+```ueml copy {2}
+<Stack height="100%" var.counter="{0}">
+  <Splitter onResize="counter++">
+    <Stack backgroundColor="lightblue" height="100%">
+      <Text value="Resize event called {counter} number of times" />
+    </Stack>
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </Splitter>
+</Stack>
 ```
 
 <Playground
@@ -207,12 +226,12 @@ This event fires when the component is resized.
       <Stack backgroundColor="darksalmon" height="100%" />
     </Splitter>
   </Stack>
-`}
+  `}
 />
 
 ## Styling
 
-The `Splitter` component provides these theme variables for appearance customization:
+The `Splitter` component provides these theme variables:
 
 - `border-Splitter`
 - `color-bg-Splitter`
@@ -258,5 +277,3 @@ The `Splitter` component provides these theme variables for appearance customiza
   </Splitter>
   `}
 />
-
-

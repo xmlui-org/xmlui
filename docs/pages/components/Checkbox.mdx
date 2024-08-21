@@ -3,9 +3,19 @@
 The `Checkbox` component allows users to make binary choices, typically between checked or unchecked.
 It consists of a small box that can be toggled on or off by clicking on it.
 
-To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
+To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](
+../learning/using-components/forms
+).
+
+## Context Variables
+
+This component does not have any context variables.
 
 ## Properties
+
+### `autoFocus`
+
+Set this property to `true` to automatically get the focus when the component is displayed.
 
 ### `enabled`
 
@@ -125,6 +135,11 @@ This property sets the label of the component.
   `}
 />
 
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, 
+the component behaves as you clicked it.
+
 ### `labelPosition`
 
 Places the label at the `top`, `right`, `bottom`, or `left` of the `Checkbox`.
@@ -154,34 +169,18 @@ Places the label at the `top`, `right`, `bottom`, or `left` of the `Checkbox`.
 
 ### `readOnly`
 
-If true, the value of the component cannot be modified.
+Set this property to `true` to disallow changing the component value.
 
-```ueml copy {3}
-<VStack margin="1rem" gap="0.5rem">
-  <Checkbox readOnly="true" label="Checked" initialValue="true" />
-  <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
-</VStack>
-```
+### `required`
 
-<Playground
-  previewOnly
-  name="Example: readOnly"
-  height={90}
-  app={`
-    <VStack margin="1rem" gap="0.5rem">
-      <Checkbox readOnly="true" label="Checked" initialValue="true" />
-      <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
-    </VStack>
-  `}
-/>
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `validationStatus`
+
+With this property, you can set the checkbox's validation status to "none", "error", "warning", 
+or "valid".
 
 ## API
-
-### `value`
-
-You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
-
-See an example in the `setValue` API method.
 
 ### `setValue`
 
@@ -231,6 +230,12 @@ You can use this method to set the checkbox's current value programmatically (`t
     </VStack>
   `}
 />
+
+### `value`
+
+You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
+
+See an example in the `setValue` API method.
 
 ## Events
 
