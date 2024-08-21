@@ -44,6 +44,7 @@ import {
   useIsInIFrame,
   useIsWindowFocused,
 } from "./utils/hooks";
+import {InspectorContext, InspectorProvider} from "@components-core/InspectorContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -387,6 +388,7 @@ const RootComponent = ({
           defaultTone={defaultTone}
           resources={resources}
         >
+          <InspectorProvider>
           <ConfirmationModalContextProvider>
             <RootContentComponent
               rootContainer={node as ContainerComponentDef}
@@ -396,6 +398,7 @@ const RootComponent = ({
               decorateComponentsWithTestId={decorateComponentsWithTestId}
             />
           </ConfirmationModalContextProvider>
+          </InspectorProvider>
         </ThemeProvider>
       </IconProvider>
     </HelmetProvider>
@@ -411,11 +414,11 @@ const RootComponent = ({
     <React.StrictMode>
       <ErrorBoundary node={node} location={"root-outer"}>
         <QueryClientProvider client={queryClient}>
-          {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
-          {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={baseName}>{dynamicChildren}</Router>
-          )}
-          {/*<ReactQueryDevtools initialIsOpen={true} />*/}
+            {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+            {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
+                <Router basename={baseName}>{dynamicChildren}</Router>
+            )}
+            {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>

@@ -43,7 +43,11 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
       node = itemRef.current;
     }
     Object.entries(props.attr).forEach(([key, value]) => {
-      node?.setAttribute(key, value);
+      if(value !== undefined){
+        node?.setAttribute(key, value);
+      } else {
+        node?.removeAttribute(key);
+      }
     });
   }, [parentElement, targetIndex, props.attr, props.allowOnlyRefdChild]);
 

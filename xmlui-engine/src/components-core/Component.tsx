@@ -1,4 +1,4 @@
-import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
+import {EventHandler, MutableRefObject, ReactElement, ReactNode} from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
@@ -24,8 +24,9 @@ import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
 import { useReferenceTrackedApi } from "./utils/hooks";
-import { InnerRendererContext } from "./abstractions/ComponentRenderer";
+import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./abstractions/containers";
+import {useInspector} from "@components-core/InspectorContext";
 
 // --- The available properties of Component
 type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
@@ -117,6 +118,7 @@ const Component = forwardRef(function Component(
   const componentRegistry = useComponentRegistry();
   const { getResourceUrl } = useTheme();
 
+  const inspectId = useInspector(safeNode, uid);
   // --- Memoizes component API registration
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
     (api) => {
@@ -276,9 +278,9 @@ const Component = forwardRef(function Component(
     // --- into the DOM object of the rendered React component.
     if (
       // --- The component has its "id" (internally, "uid") or "testId" property defined
-      (memoedNode.uid !== undefined || memoedNode.testId !== undefined) &&
-      // --- The app context indicates test mode
-      appContext?.decorateComponentsWithTestId &&
+      (memoedNode.uid !== undefined || memoedNode.testId !== undefined || inspectId !== undefined) &&
+      // // --- The app context indicates test mode
+      // appContext?.decorateComponentsWithTestId &&
       // --- The component is visual
       descriptor?.nonVisual !== true &&
       // --- The component is not opaque
@@ -287,9 +289,10 @@ const Component = forwardRef(function Component(
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = memoedNode.testId || memoedNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
+
       renderedNode = (
         <ComponentDecorator
-          attr={{ "data-testid": resolvedUid }}
+          attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
           allowOnlyRefdChild={isCompoundComponent || safeNode.type === "ModalDialog"}
           ref={ref}
         >
@@ -372,3 +375,4 @@ function componentStateChanged(uid: symbol, state: any) {
 
 
 export default Component;
+
