@@ -1,5 +1,3 @@
-import {ComponentDef, CompoundComponentDef, StandaloneAppDescription} from "xmlui";
-
 /**
  * Convert a string to its UTF-8 bytes and compress it.
  *

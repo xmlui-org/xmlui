@@ -79,6 +79,14 @@ export interface ComponentDef<T extends string = string> extends Scriptable {
    * property holds the name of state values to flow down to the direct child containers.
    */
   uses?: string[];
+
+  /**
+   * Arbitrary debug information that can be attached to a component definition.
+   * Current usage:
+   * - `debug: { source: { start: number, end: number } }` Ther start and end positions of of the source
+   *   belonging to the particular component definition.
+   */
+  debug?: Record<string, any>;
 }
 
 /**
