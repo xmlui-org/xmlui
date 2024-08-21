@@ -1111,6 +1111,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: 0,
         end: source.length,
+        fileId: 0,
       },
     });
   });
@@ -1130,6 +1131,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: source.indexOf("<Stack>") + "<Stack>".length,
         end: source.indexOf(innerComp) + innerComp.length,
+        fileId: 0,
       },
     });
   });
@@ -1141,6 +1143,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: 0,
         end: source.length,
+        fileId: 0,
       },
     });
   });
@@ -1153,6 +1156,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: 0,
         end: source.length,
+        fileId: 0,
       },
     });
 
@@ -1161,6 +1165,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: source.indexOf('<var name="other"'),
         end: source.indexOf("</Component"),
+        fileId: 0,
       },
     });
 
@@ -1170,6 +1175,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: source.indexOf(beforeStack) + beforeStack.length,
         end: source.indexOf("</Component>"),
+        fileId: 0,
       },
     });
   });
@@ -1181,6 +1187,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: 0,
         end: source.length,
+        fileId: 0,
       },
     });
 
@@ -1189,6 +1196,7 @@ describe("Ueml transform - child elements", () => {
       source: {
         start: source.indexOf("<Stack>") + "<Stack>".length,
         end: source.indexOf("<Button/>") + "<Button/>".length,
+        fileId: 0,
       },
     });
   });

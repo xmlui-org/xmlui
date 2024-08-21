@@ -18,7 +18,7 @@ export function transformSource(
     // return {errors}
     throw new Error(errors[0].message);
   }
-  return nodeToComponentDef(node, getText);
+  return nodeToComponentDef(node, getText, 0);
 }
 
 export function parseSource(source: string, printRes: boolean = false): ParseResult & { getText: GetText } {

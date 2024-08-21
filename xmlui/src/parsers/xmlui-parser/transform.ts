@@ -11,8 +11,7 @@ import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
-import { wrap } from "module";
-import { CompoundComponent } from "@components-core/CompoundComponent";
+import { GetText } from "./parser";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -30,7 +29,8 @@ interface TransformNode extends Node {
 
 export function nodeToComponentDef(
   node: Node,
-  originalGetText: (node: TransformNode) => string,
+  originalGetText: GetText,
+  fileId: number,
   moduleResolver: ModuleResolver = () => "",
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {
@@ -152,6 +152,7 @@ export function nodeToComponentDef(
           source: {
             start: node.start,
             end: node.end,
+            fileId,
           },
         },
       };
@@ -166,6 +167,7 @@ export function nodeToComponentDef(
         source: {
           start: element.start,
           end: element.end,
+          fileId,
         },
       };
 
@@ -186,6 +188,7 @@ export function nodeToComponentDef(
         source: {
           start: node.start,
           end: node.end,
+          fileId,
         },
       },
     };
