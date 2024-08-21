@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useReducer } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
-import { appDescriptionInitialized, optionsInitialized, PlaygroundContext, playgroundReducer } from "@/src/state/store";
+import { appDescriptionInitialized, optionsInitialized, PlaygroundContext, playgroundReducer, toneChanged } from "@/src/state/store";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
+import {useTheme} from "nextra-theme-docs";
 
 type PlaygroundProps = {
   name: string;
@@ -38,6 +39,8 @@ export const Playground = ({
   horizontal = false,
   allowStandalone = true,
 }: PlaygroundProps) => {
+  const { theme, systemTheme } = useTheme();
+
   useEffect(() => {
     if (app) {
       dispatch(
@@ -48,6 +51,7 @@ export const Playground = ({
             globals: {},
             resources,
             themes,
+            defaultTone,
             defaultTheme,
           },
           components,
@@ -70,6 +74,11 @@ export const Playground = ({
     }
     //TODO illesg, review (dep array?)!!!
   }, []);
+
+  useEffect(() => {
+    const nextraTone = theme === "system" ? systemTheme : theme;
+    dispatch(toneChanged(nextraTone!));
+  }, [theme, systemTheme]);
 
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
 

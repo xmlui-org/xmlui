@@ -6,13 +6,10 @@ import ReactDOM, { Root } from "react-dom/client";
 import { parseFromEditorText } from "../utils/helpers";
 import { CompoundComponentDef, ComponentLike } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
-import { useTheme } from "nextra-theme-docs";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
   const contentRootRef = useRef<Root | null>(null);
-  const { theme, systemTheme } = useTheme();
-  const nextraTone = theme === "system" ? systemTheme : theme;
   const { appDescription, options } = usePlayground();
 
   useEffect(() => {
@@ -32,19 +29,20 @@ export function Preview() {
             ...(appDescription.config?.globals || {}),
           }}
           defaultTheme={options.activeTheme || appDescription.config?.defaultTheme}
-          defaultTone={(options.activeTone || appDescription.config?.defaultTone || nextraTone) as ThemeTone}
+          defaultTone={(options.activeTone || appDescription.config?.defaultTone) as ThemeTone}
           contributes={{
             compoundComponents: appDescription.components.map((component: string) =>
-              parseFromEditorText(component)
+              parseFromEditorText(component),
             ) as CompoundComponentDef[],
             themes: appDescription.config?.themes,
           }}
           resources={appDescription.config?.resources}
         />
-      </ErrorBoundary>
+      </ErrorBoundary>,
     );
   }, [
     options.id,
+    options.activeTone,
     options.activeTheme,
     appDescription.app,
     appDescription.config,
@@ -53,9 +51,8 @@ export function Preview() {
     appDescription.config?.globals,
     appDescription.config.resources,
     appDescription.config?.defaultTheme,
+    appDescription.config?.defaultTone,
     appDescription.components,
-    options.activeTone,
-    nextraTone,
   ]);
   return (
     <div
