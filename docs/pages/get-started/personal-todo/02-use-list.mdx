@@ -171,7 +171,7 @@ In the app's database, each task can be assigned a category. The available categ
 
 XMLUI has a `Badge` component that can be set up to use a color map (name and color pairs). When you pass a value to a `Bagde`, it uses the color map to set up the component's background. In this section, you will add a `Badge` displaying the topic associated with a particular task:
 
-1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List`; identify it as `topics. You can refer to the fetched value with `topics.value`; pass it to `TaskRow` in the `topicsList` property. This `Datasource` component will fetch all topic data from the backend. XMLUI will know when this request should be fired to fetch the data. Update the `TaskRow` component by setting the `topics` property:
+1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List`; identify it as `topics`. You can refer to the fetched value with `topics.value`; pass it to `TaskRow` in the `topicsList` property. This `Datasource` component will fetch all topic data from the backend. XMLUI will know when this request should be fired to fetch the data. Update the `TaskRow` component by setting the `topics` property:
 
 ```ueml copy {2, 5} filename="Main.xmlui"
 <Page url="/tasks">

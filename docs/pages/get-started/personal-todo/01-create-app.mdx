@@ -1,12 +1,45 @@
 # Create The App
 
-If you have already successfully prepared your XMLUI development environment (it is quick and straightforward, as described in [this article](../prepare-env)), you are ready to start creating the Personal Todo app.
+You will use the `create-xmlui-app` tool to prepare the boilerplate code for this app. Follow these steps:
 
-## Create the Boilerplate App
+1. Open a command line tool (it may be the Terminal window in VS Code) and select your preferred working directory with the `cd` command.
+2. Execute this command to download and start `create-xmlui-app`:
 
-> **Note**: If you have the project already generated with boilerplate code, you can skip this section.
+```
+npx create-xmlui-app@latest
+```
 
-Setting up the project with the default boilerplate code is covered [in this article](../get-started/prepare-env).
+The `npx` utility (part of the Node toolset) will download the `create-xmlui-app` package. If you do not have the latest `create-xmlui-app` already installed, `npx` will download it after a confirmation:
+
+```
+Need to install the following package:
+  create-xmlui-app@<version>
+Ok to proceed? (y)
+```
+
+(Here, `<version>` is the current version of the package). Press enter or `y` to go on; `n` to abandon.
+
+1. After the package download (a few seconds), it starts and asks for your project name. Do not accept the default name; type `p2do` and use this name for the tutorial app.
+2. You can optionally initialize a Git repo with your project. Press Enter (sign no Git repo) to go on.
+3. The utility installs the `xmlui` package, the only direct dependency you need to develop XMLUI apps. That package will pull its dependencies automatically. After the download (it may take one or two minutes the first time), the tool sets up your XMLUI development project.
+4. The project you created goes into its separate folder within the working folder from which you ran the `create-xmlui-app` command.
+
+The newly generated P2DO app is ready to run. Select the `p2do` folder within your working folder and execute the `npm start` command to execute it. In VS Code, open the `p2do` fpéder, and then use the terminal window (Terminal | New Terminal); it will automatically set your working folder to the app's root.
+
+```
+> my-first-app@0.1.0 start
+> xmlui start
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+```
+
+Click the link displayed (http://localhost:5173/) to open the app in your default browser. (In VS Code, you need to press the Ctrl or Cmd button when clicking, depending on your OS).
+
+Your app starts:
+
+<br/>
+<Image alt="App start" src="/resources/images/get-started/app-start.png" />
 
 ## Create the App's Structure
 

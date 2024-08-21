@@ -46,7 +46,6 @@ function DataLoader({
 }: LoaderProps) {
   const appContext = useAppContext();
   const url = extractParam(state, loader.props.url, appContext);
-  const debounceTimeInMs = extractParam(state, loader.props.debounceTimeInMs, appContext);
   const queryParamsInner = useMemo(() => {
     return extractParam(state, loader.props.queryParams, appContext);
   }, [appContext, loader.props.queryParams, state]);
