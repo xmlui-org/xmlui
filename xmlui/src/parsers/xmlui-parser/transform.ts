@@ -12,6 +12,7 @@ import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
 import { wrap } from "module";
+import { CompoundComponent } from "@components-core/CompoundComponent";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -147,6 +148,12 @@ export function nodeToComponentDef(
       component = {
         name: compoundName.value,
         component: nestedComponent,
+        debug: {
+          source: {
+            start: node.start,
+            end: node.end,
+          },
+        },
       };
 
       if (api) {
@@ -157,8 +164,8 @@ export function nodeToComponentDef(
       }
       nestedComponent.debug = {
         source: {
-          start: node.start,
-          end: node.end,
+          start: element.start,
+          end: element.end,
         },
       };
 

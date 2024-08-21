@@ -1107,8 +1107,7 @@ describe("Ueml transform - child elements", () => {
   it("Compound component debug info", () => {
     const source = `<Component name='MyComp'><Stack /></Component>`;
     const cd = transformSource(source) as CompoundComponentDef;
-    const comp = cd.component as ComponentDef;
-    expect(comp.debug).toMatchObject({
+    expect(cd.debug).toMatchObject({
       source: {
         start: 0,
         end: source.length,
@@ -1138,8 +1137,7 @@ describe("Ueml transform - child elements", () => {
   it("Compound component debug info with vars", () => {
     const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>`;
     const cd = transformSource(source) as CompoundComponentDef;
-    const comp = cd.component as ComponentDef;
-    expect(comp.debug).toMatchObject({
+    expect(cd.debug).toMatchObject({
       source: {
         start: 0,
         end: source.length,
@@ -1150,11 +1148,19 @@ describe("Ueml transform - child elements", () => {
   it("Compound component debug info nested with vars", () => {
     const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack var.myVar="hi" ><Button /></Stack></Component>`;
     const cd = transformSource(source) as CompoundComponentDef;
-    const fragmentComp = cd.component as ComponentDef;
-    expect(fragmentComp.debug).toMatchObject({
+
+    expect(cd.debug).toMatchObject({
       source: {
         start: 0,
         end: source.length,
+      },
+    });
+
+    const fragmentComp = cd.component as ComponentDef;
+    expect(fragmentComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf('<var name="other"'),
+        end: source.indexOf("</Component"),
       },
     });
 
@@ -1163,7 +1169,7 @@ describe("Ueml transform - child elements", () => {
     expect(stackComp.debug).toMatchObject({
       source: {
         start: source.indexOf(beforeStack) + beforeStack.length,
-        end: source.indexOf("</Stack>") + "</Stack>".length,
+        end: source.indexOf("</Component>"),
       },
     });
   });
