@@ -115,6 +115,10 @@
     div.nextra-scrollbar {
       padding: 1.5rem;
     }
+    div.nextra-scrollbar + div {
+      background-color: #f8fafc !important;
+    }
+
   }
 
   div.nextra-nav-container-blur {
