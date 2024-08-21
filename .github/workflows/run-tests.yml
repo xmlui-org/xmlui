@@ -32,8 +32,8 @@ jobs:
 
       - name: build xmlui
         run: npm run build
-        working-directory: xmlui-engine
+        working-directory: xmlui
 
       - name: run unit tests
         run: npm run test
-        working-directory: xmlui-engine
+        working-directory: xmlui

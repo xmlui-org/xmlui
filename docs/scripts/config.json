@@ -1,5 +1,5 @@
 {
-  "sourceFolderPath": "../../xmlui-engine/src/components",
+  "sourceFolderPath": "../../xmlui/src/components",
   "outFolderPath": "../pages/components",
   "examplesFolderPath": "../component-samples"
 }
