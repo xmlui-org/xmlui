@@ -29,16 +29,16 @@
         "./*"
       ],
       "@src/*": [
-        "../xmlui-engine/src/*"
+        "../xmlui/src/*"
       ],
       "@abstractions/*": [
-        "../xmlui-engine/src/abstractions/*"
+        "../xmlui/src/abstractions/*"
       ],
       "@components-core/*": [
-        "../xmlui-engine/src/components-core/*"
+        "../xmlui/src/components-core/*"
       ],
       "@components/*": [
-        "../xmlui-engine/src/components/*"
+        "../xmlui/src/components/*"
       ]
     },
     "incremental": true
