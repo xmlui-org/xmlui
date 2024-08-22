@@ -1,4 +1,4 @@
-import type { CSSProperties} from "react";
+import {CSSProperties, forwardRef} from "react";
 import type React from "react";
 import { useMemo, useRef } from "react";
 import styles from "./Text.module.scss";
@@ -9,6 +9,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import { getMaxLinesStyle } from "@components-core/utils/css-utils";
+import {composeRefs} from "@radix-ui/react-compose-refs";
 
 // =====================================================================================================================
 // React Text component definition
@@ -104,7 +105,7 @@ type VariantProps = Abbreviation | Inserted;
 
 type TextProps = {
   uid?: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   variant?: TextVariant;
   maxLines?: number;
   preserveLinebreaks?: boolean;
@@ -113,7 +114,7 @@ type TextProps = {
   [variantSpecificProps: string]: any;
 };
 
-export const Text = ({
+export const Text = forwardRef(function Text({
   uid,
   variant,
   maxLines = 0,
@@ -122,8 +123,9 @@ export const Text = ({
   preserveLinebreaks,
   ellipses = true,
   ...variantSpecificProps
-}: TextProps) => {
-  const ref: React.MutableRefObject<HTMLElement | null> = useRef<HTMLElement>(null);
+}: TextProps, forwardedRef) {
+  const innerRef = useRef<HTMLElement>(null);
+  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
   const Element = useMemo(() => {
     if (!variant || !TextVariantElement[variant]) return "div";     //todo illesg, could be a span?
@@ -134,10 +136,7 @@ export const Text = ({
     <>
       <Element
         {...variantSpecificProps}
-        ref={(node: HTMLElement | null) => {
-          if (!node) return;
-          ref.current = node;
-        }}
+        ref={ref as any}
         className={classnames([
           styles.text,
           styles[variant || "default"],
@@ -156,7 +155,7 @@ export const Text = ({
       </Element>
     </>
   );
-};
+});
 
 // =====================================================================================================================
 // XMLUI Text component definition

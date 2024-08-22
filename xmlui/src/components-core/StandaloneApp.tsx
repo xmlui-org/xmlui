@@ -22,6 +22,7 @@ import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlu
 type StandaloneAppProps = {
   appDef?: StandaloneAppDescription;
   decorateComponentsWithTestId?: boolean;
+  debugEnabled?: boolean;
   runtime?: any;
   components?: ComponentRendererDef[];
 };
@@ -30,6 +31,7 @@ type StandaloneAppProps = {
 function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
+  debugEnabled = true,
   runtime,
   components: customComponents,
 }: StandaloneAppProps) {
@@ -55,6 +57,7 @@ function StandaloneApp({
     entryPoint,
     components,
     themes,
+    sources
   } = standaloneApp;
 
   return (
@@ -64,6 +67,7 @@ function StandaloneApp({
         decorateComponentsWithTestId={decorateComponentsWithTestId}
         node={entryPoint!}
         standalone={true}
+        debugEnabled={debugEnabled}
         // @ts-ignore
         baseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={{
@@ -74,6 +78,7 @@ function StandaloneApp({
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
         resourceMap={resourceMap}
+        sources={sources}
         contributes={{
           compoundComponents: components,
           components: customComponents,
@@ -110,6 +115,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
   let entryPointCodeBehind: CollectedDeclarations | undefined;
   let themes: Array<ThemeDefinition> = [];
   let apiInterceptor;
+  const sources = {};
 
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
@@ -122,7 +128,8 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
       if (key.endsWith(codeBehindFileExtension)) {
         entryPointCodeBehind = value.default;
       } else {
-        entryPoint = value.default;
+        entryPoint = value.default.component;
+        sources[value.default.file] = value.default.src;
       }
     }
     if (matchesFileName(key, "api")) {
@@ -132,7 +139,8 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
       if (key.endsWith(codeBehindFileExtension)) {
         codeBehindsByFileName[key] = value.default;
       } else {
-        componentsByFileName[key] = value.default;
+        componentsByFileName[key] = value.default.component;
+        sources[value.default.file] = value.default.src;
       }
     }
     if (matchesFolder(key, "themes")) {
@@ -177,6 +185,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     components: components,
     themes: config?.themes || themes,
     apiInterceptor: config?.apiInterceptor || apiInterceptor,
+    sources
   };
 }
 

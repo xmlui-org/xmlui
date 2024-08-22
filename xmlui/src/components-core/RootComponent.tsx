@@ -86,12 +86,14 @@ export type RootComponentProps = {
    */
   standalone?: boolean;
   decorateComponentsWithTestId?: boolean;
+  debugEnabled?: boolean;
 
   apiInterceptor?: ApiInterceptorDefinition;
 
   defaultTheme?: string;
   defaultTone?: ThemeTone;
   resourceMap?: Record<string, string>;
+  sources?: Record<string, string>;
 };
 
 // =====================================================================================================================
@@ -168,12 +170,14 @@ function RootContentComponent({
   globalProps,
   standalone,
   decorateComponentsWithTestId,
+  debugEnabled,
 }: {
   rootContainer: ContainerComponentDef;
   routerBaseName: string;
   globalProps?: GlobalProps;
   standalone?: boolean;
   decorateComponentsWithTestId?: boolean;
+  debugEnabled?: boolean;
 }) {
   const [localLoggedInUser, setLocalLoggedInUser] = useState(null);
   const componentRegistry = useComponentRegistry();
@@ -276,6 +280,7 @@ function RootContentComponent({
       routerBaseName,
       standalone,
       decorateComponentsWithTestId,
+      debugEnabled,
       activeThemeUid: activeThemeId,
       activeThemeTone: activeThemeTone,
       availableThemeUids: availableThemeIds,
@@ -365,10 +370,12 @@ const RootComponent = ({
   globalProps,
   standalone,
   decorateComponentsWithTestId,
+  debugEnabled,
   defaultTheme,
   defaultTone,
   resources,
   resourceMap,
+  sources
 }: RootComponentProps) => {
   if (previewMode) {
     //to prevent leaking the meta items to the parent document, if it lives in an iframe (e.g. docs)
@@ -388,7 +395,7 @@ const RootComponent = ({
           defaultTone={defaultTone}
           resources={resources}
         >
-          <InspectorProvider>
+          <InspectorProvider sources={sources}>
           <ConfirmationModalContextProvider>
             <RootContentComponent
               rootContainer={node as ContainerComponentDef}
@@ -396,6 +403,7 @@ const RootComponent = ({
               globalProps={globalProps}
               standalone={standalone}
               decorateComponentsWithTestId={decorateComponentsWithTestId}
+              debugEnabled={debugEnabled}
             />
           </ConfirmationModalContextProvider>
           </InspectorProvider>
@@ -430,6 +438,7 @@ function AppRoot({
   contributes,
   node,
   decorateComponentsWithTestId,
+  debugEnabled,
   defaultTheme,
   defaultTone,
   resources,
@@ -439,7 +448,9 @@ function AppRoot({
   previewMode,
   servedFromSingleFile,
   resourceMap,
+  sources
 }: RootComponentProps) {
+  console.log(sources);
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -476,12 +487,14 @@ function AppRoot({
         resources={resources}
         baseName={baseName}
         decorateComponentsWithTestId={decorateComponentsWithTestId}
+        debugEnabled={debugEnabled}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone}
         globalProps={globalProps}
         standalone={standalone}
         previewMode={previewMode}
         servedFromSingleFile={servedFromSingleFile}
+        sources={sources}
       />
     </ComponentProvider>
   );

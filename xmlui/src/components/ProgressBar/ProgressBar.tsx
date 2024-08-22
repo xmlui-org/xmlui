@@ -1,7 +1,7 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./ProgressBar.module.scss";
-import { CSSProperties } from "react";
+import {CSSProperties, forwardRef} from "react";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -14,13 +14,13 @@ interface Props {
   style: CSSProperties;
 }
 
-function ProgressBar({ value = 0, style }: Props) {
+const ProgressBar = forwardRef(function ProgressBar({ value = 0, style }: Props, ref) {
   return (
-    <div className={styles.wrapper} style={style}>
+    <div className={styles.wrapper} style={style} ref={ref as any}>
       <div style={{ width: `${value * 100}%` }} className={styles.bar} />
     </div>
   );
-}
+})
 
 // =====================================================================================================================
 // XMLUI ProgressBar component definition

@@ -1,0 +1,17 @@
+@use "@components-core/theming/themes" as themes;
+
+.wrapper{
+--syntax-token-component: #cb5291;
+--syntax-token-delimiter-angle: #66748E;
+--syntax-token-attribute-name: #2d2d2d;
+--syntax-token-equal-sign: #2d2d2d;
+--syntax-token-string: #0074a9;
+--syntax-token-script: #02A1A1;
+--syntax-token-helper: #005AE1;
+--syntax-token-comment: #4E4E4E;
+--syntax-token-escape: #00B248;
+--syntax-token-constant: #708C00;
+--syntax-token-cdata: #079CF1;
+--syntax-token-delimiter-curly: #000000;
+--syntax-token-text: #4e5fb3;
+}

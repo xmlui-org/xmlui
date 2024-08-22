@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import {CSSProperties, forwardRef} from "react";
 import type React from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
@@ -20,7 +20,8 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   layout?: CSSProperties;
 }
 
-export const Icon = ({ name, fallback, layout, className, ...restProps }: IconBaseProps) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const Icon = forwardRef(function Icon({ name, fallback, layout, className, ...restProps }: IconBaseProps, ref) {
   const lowerCaseIconName = name?.toLowerCase();
   const iconRegistry = useIconRegistry();
   const customIconUrl = useCustomIconUrl(name);
@@ -54,7 +55,7 @@ export const Icon = ({ name, fallback, layout, className, ...restProps }: IconBa
     );
   }
   return renderIcon ? renderIcon(computedProps) : null;
-};
+});
 
 function CustomIcon(props: IconBaseProps & { size?: string; url: string }) {
   const { url, width, height, name, style, className } = props;

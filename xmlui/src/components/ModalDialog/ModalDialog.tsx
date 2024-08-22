@@ -114,6 +114,11 @@ export const ModalDialog = React.forwardRef(
           })}>
             <Dialog.Content
               className={classnames(styles.content)}
+              onPointerDownOutside={(event)=>{
+                if(event.target instanceof HTMLElement && event.target.classList.contains('_debug-inspect-button')){    //we prevent the auto modal close on clicking the inspect button
+                  event.preventDefault();
+                }
+              }}
               ref={composedRef}
               style={style}
             >

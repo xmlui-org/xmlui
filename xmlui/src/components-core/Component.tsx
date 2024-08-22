@@ -1,12 +1,8 @@
-import {EventHandler, MutableRefObject, ReactElement, ReactNode} from "react";
+import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type {
-  LookupEventHandlerFn,
-  RegisterComponentApiFn,
-  RendererContext,
-} from "@abstractions/RendererDefs";
+import type { LookupEventHandlerFn, RegisterComponentApiFn, RendererContext } from "@abstractions/RendererDefs";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
@@ -26,7 +22,7 @@ import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
 import { useReferenceTrackedApi } from "./utils/hooks";
 import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./abstractions/containers";
-import {useInspector} from "@components-core/InspectorContext";
+import { useInspector } from "@components-core/InspectorContext";
 
 // --- The available properties of Component
 type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
@@ -43,7 +39,7 @@ function useEventHandler(eventName: string, lookupEvent: LookupEventHandlerFn, s
         onEvent(event);
       }
     },
-    [onEvent]
+    [onEvent],
   );
   return !onEvent ? undefined : eventHandler;
 }
@@ -93,7 +89,7 @@ const Component = forwardRef(function Component(
     childIndex,
     ...rest
   }: ComponentProps,
-  ref: React.ForwardedRef<any>
+  ref: React.ForwardedRef<any>,
 ) {
   // --- Memoizes the node object with a safe version that contains empty objects for props and events
   // --- were they no props or events defined
@@ -118,13 +114,13 @@ const Component = forwardRef(function Component(
   const componentRegistry = useComponentRegistry();
   const { getResourceUrl } = useTheme();
 
-  const inspectId = useInspector(safeNode, uid);
+  const { inspectId, refreshInspection } = useInspector(safeNode, uid);
   // --- Memoizes component API registration
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
     (api) => {
       registerComponentApi(uid, api);
     },
-    [registerComponentApi, uid]
+    [registerComponentApi, uid],
   );
 
   // --- Memoizes the state update function
@@ -132,7 +128,7 @@ const Component = forwardRef(function Component(
     (componentState: any) => {
       dispatch(componentStateChanged(uid, componentState));
     },
-    [dispatch, uid]
+    [dispatch, uid],
   );
 
   // --- Memoizes the action resolution by action definition value
@@ -140,7 +136,7 @@ const Component = forwardRef(function Component(
     (action, actionOptions) => {
       return lookupAction(action, uid, actionOptions);
     },
-    [lookupAction, uid]
+    [lookupAction, uid],
   );
 
   // --- Memoizes the lookupSyncCallback function's call
@@ -148,7 +144,7 @@ const Component = forwardRef(function Component(
     (action) => {
       return lookupSyncCallback(action, uid);
     },
-    [lookupSyncCallback, uid]
+    [lookupSyncCallback, uid],
   );
 
   // --- Memoizes event handler resolution by event name
@@ -157,7 +153,7 @@ const Component = forwardRef(function Component(
       const action = safeNode.events?.[eventName];
       return lookupAction(action, uid, { eventName, ...actionOptions });
     },
-    [lookupAction, safeNode.events, uid]
+    [lookupAction, safeNode.events, uid],
   );
 
   // --- Get the tracked APIs of the compomnent
@@ -174,7 +170,7 @@ const Component = forwardRef(function Component(
       const extractedUrl = valueExtractor(url);
       return getResourceUrl(extractedUrl);
     },
-    [getResourceUrl, valueExtractor]
+    [getResourceUrl, valueExtractor],
   );
 
   // --- Obtain the component renderer and descriptor from the component registry
@@ -185,7 +181,7 @@ const Component = forwardRef(function Component(
     (children, lc, rc) => {
       return renderChild(children, lc, rc || dynamicChildren);
     },
-    [renderChild, dynamicChildren]
+    [renderChild, dynamicChildren],
   );
 
   // --- Memoizes the node object with the resolved children. If the children contain a `ChildrenSlot`,
@@ -220,7 +216,7 @@ const Component = forwardRef(function Component(
   const apiBoundProps = useMemo(() => getApiBoundItems(safeNode.props, "Datasource"), [safeNode.props]);
   const apiBoundEvents = useMemo(
     () => getApiBoundItems(safeNode.events, "ApiAction", "DownloadAction", "UploadAction"),
-    [safeNode.events]
+    [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
   const mouseEventHandlers = useMouseEventHandlers(memoedLookupEventHandler, descriptor?.nonVisual || isApiBound);
@@ -278,9 +274,11 @@ const Component = forwardRef(function Component(
     // --- into the DOM object of the rendered React component.
     if (
       // --- The component has its "id" (internally, "uid") or "testId" property defined
-      (memoedNode.uid !== undefined || memoedNode.testId !== undefined || inspectId !== undefined) &&
+      ((appContext?.decorateComponentsWithTestId &&
+        (memoedNode.uid !== undefined || memoedNode.testId !== undefined)) ||
+        // --- The component has its "inspectId" property defined
+        (appContext?.debugEnabled && inspectId !== undefined)) &&
       // // --- The app context indicates test mode
-      // appContext?.decorateComponentsWithTestId &&
       // --- The component is visual
       descriptor?.nonVisual !== true &&
       // --- The component is not opaque
@@ -294,13 +292,14 @@ const Component = forwardRef(function Component(
         <ComponentDecorator
           attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
           allowOnlyRefdChild={isCompoundComponent || safeNode.type === "ModalDialog"}
+          onTargetMounted={safeNode.type === "ModalDialog" ? refreshInspection : undefined}
           ref={ref}
         >
           {cloneElement(
             renderedNode as ReactElement,
             {
               ...mergeProps({ ...(renderedNode as ReactElement).props, ...mouseEventHandlers }, rest),
-            } as any
+            } as any,
           )}
         </ComponentDecorator>
       );
@@ -373,6 +372,4 @@ function componentStateChanged(uid: symbol, state: any) {
   };
 }
 
-
 export default Component;
-
