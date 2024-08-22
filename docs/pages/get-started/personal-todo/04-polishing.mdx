@@ -63,11 +63,11 @@ Update the code of `Tasks` to add a `section` field to the task items:
 <Component name="Tasks">
   <Datasource id="topics" url="/api/topics" />
   <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <List items="{tasks.value.map(t => ({...t, section: getSection(t)}))}">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-    </List>
+  <List items="{tasks.value.map(t => ({...t, section: getSection(t)}))}">
+    <prop name="itemTemplate">
+      <TaskRow item="{$item}" topics="{topics.value}" />
+    </prop>
+  </List>
 </Component>
 ```
 
@@ -81,20 +81,20 @@ To display section information, add the `section` property to the `List` and def
 <Component name="Tasks">
   <Datasource id="topics" url="/api/topics" />
   <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <List 
-      items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
-      sectionBy="section">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-      <prop name="sectionTemplate">
-        <HStack horizontalPadding="$space-4" verticalPadding="$space-2">
-          <Text 
-            variant="subtitle" 
-            value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
-        </HStack>
-      </prop>
-    </List>
+  <List 
+    items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+    sectionBy="section">
+    <prop name="itemTemplate">
+      <TaskRow item="{$item}" topics="{topics.value}" />
+    </prop>
+    <prop name="sectionTemplate">
+      <HStack horizontalPadding="$space-4" verticalPadding="$space-2">
+        <Text 
+          variant="subtitle" 
+          value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
+      </HStack>
+    </prop>
+  </List>
 </Component>
 ```
 In the section template, you can utilize the `$item` property to access the section key and the items within that section.

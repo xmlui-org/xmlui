@@ -46,9 +46,9 @@ This view needs to look more exciting and helpful. Create a card that highlights
   <Card height="{$props.height}">
     <H4 value="{$props.title}"/>
     <CVStack width="100%">
-      <H1 color="{$props.color}">
+      <H2 color="{$props.color}" fontSize="4em">
         {$props.isLoading ? "..." : $props.value}
-      </H1>
+      </H2>
     </CVStack>
   </Card>
 </Component>
@@ -171,7 +171,7 @@ Update the `Dashboard.xmlui` file by appending a new `Card` component after the 
       <!-- Omitted -->
       <Card width="50%" height="350px">
         <H4>Recent Tasks</H4>
-        <Table datasource="/api/tasks-recent" height="240">
+        <Table datasource="/api/tasks-recent" height="*">
           <TableColumnDef header="Topic" width="80">
             <Text>{$item.topicId}</Text>
           </TableColumnDef>
@@ -214,7 +214,7 @@ var topicsColorMap = topics.value.reduce((acc, topic) => {
 
 Change the `Text` element within the first `TableColumnDef` to the new `TopicBadge` element and update the width of the Topic column:
 
-```ueml copy {8-9} filename="Dashboard.xmlui"
+```ueml copy {8-10} filename="Dashboard.xmlui"
 <Component name="Dashboard" 
   var.counts="{$props.taskCountsSource.value}"
   var.isLoading="{$props.taskCountsSource.inProgress}">
@@ -222,7 +222,7 @@ Change the `Text` element within the first `TableColumnDef` to the new `TopicBad
       <Card width="50%" height="350px">
         <H4>Recent Tasks</H4>
         <Table datasource="/api/tasks-recent" height="*">
-          <TableColumnDef header="Topic" width="180">
+          <TableColumnDef header="Topic" width="120px">
             <TopicBadge topicId="{$item.topicId}" />
           </TableColumnDef>
           <TableColumnDef header="Title" width="*">
