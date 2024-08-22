@@ -8,23 +8,23 @@ There are several ways to add data editing functionality to an app. In this arti
 
 ### Button for New Tasks
 
-Let's change the layout of the `Tasks` component to create a button above the list. When you click this button (in a next step), it will display the dialog for adding a new task item:
+Let's change the layout of the `Tasks` component to add a button above the list (and wrap the button and the list into a `VStack`). When you click this button, it will display the dialog for adding a new task item:
 
-```ueml copy filename="Tasks.xmlui"
+```ueml copy {4-10, 14} filename="Tasks.xmlui"
 <Component name="Tasks">
   <Datasource id="topics" url="/api/topics" />
   <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <VStack 
-      padding="$space-4"
-      verticalPadding="$space-6"
-      gap="$space-6">
-      <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
-        <Button icon="plus">New</Button>
-      </HStack>        
-      <List 
-        <!-- Unchanged -->
-      </List>
-    </VStack>
+  <VStack 
+    padding="$space-4"
+    verticalPadding="$space-6"
+    gap="$space-6">
+    <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
+      <Button icon="plus">New</Button>
+    </HStack>        
+    <List 
+      <!-- Unchanged -->
+    </List>
+  </VStack>
 </Component>
 ```
 
@@ -56,7 +56,7 @@ You add a context menu to each task item. This menu appears on the right side of
         </prop>
         <MenuItem label="Edit" />
         <MenuItem label="Delete" />
-    </DropdownMenu>
+      </DropdownMenu>
     </HStack>
   </Card>
 </Component>

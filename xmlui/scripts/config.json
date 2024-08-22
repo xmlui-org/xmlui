@@ -63,6 +63,8 @@
     "src/components/SpaceFiller/SpaceFiller.tsx",
     "src/components/Theme/Theme.tsx",
     "src/components/AppState/AppState.tsx",
-    "src/components/Combobox/Combobox.tsx"
+    "src/components/Combobox/Combobox.tsx",
+    "src/components/Datasource/Datasource.tsx",
+    "src/components/ApiAction/ApiAction.tsx"
   ]
 }

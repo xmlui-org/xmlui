@@ -1,5 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+} from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - child elements", () => {
@@ -13,19 +16,25 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("Comments ignored, whitespace collapsed", () => {
-    const cd = transformSource("<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect(cd.children![0].props!.value).equal(" text here");
   });
 
   it("Comments ignored ws between words collapsed", () => {
-    const cd = transformSource("<H1>hi  <!-- comment -->  there</H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>hi  <!-- comment -->  there</H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect(cd.children![0].props!.value).equal("hi there");
   });
 
   it("Comments ignored between words", () => {
-    const cd = transformSource("<H1>hi<!-- comment -->there</H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>hi<!-- comment -->there</H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect(cd.children![0].props!.value).equal("hithere");
   });
@@ -43,7 +52,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("string literal as child #3", () => {
-    const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDef;
+    const cd = transformSource(
+      '<Stack> "123 ""abc"   </Stack>',
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect(cd.children![0].props!.value).equal(' "123 ""abc" ');
   });
@@ -61,19 +72,25 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("string literal then CData as child", () => {
-    const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>'hi     ' <![CDATA[there]]></H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect(cd.children![0].props!.value).equal("hi there");
   });
 
   it("string literal #2 then CData as child", () => {
-    const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>'hi'    <![CDATA[there]]></H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect(cd.children![0].props!.value).equal("hithere");
   });
 
   it("string literal, text, CData as child", () => {
-    const cd = transformSource("<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect(cd.children![0].props!.value).equal("hi thereallpeople");
   });
@@ -102,9 +119,13 @@ describe("Ueml transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.children![0].props!.value).equal(" This is a text segment before a Button component. ");
+    expect(cd.children![0].props!.value).equal(
+      " This is a text segment before a Button component. ",
+    );
     expect(cd.children![1].type).equal("Button");
-    expect(cd.children![2].props!.value).equal(" This is a text segment after a Button and before an Icon ");
+    expect(cd.children![2].props!.value).equal(
+      " This is a text segment after a Button and before an Icon ",
+    );
     expect(cd.children![3].type).equal("Icon");
   });
 
@@ -147,13 +168,17 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("dotted var works #1", () => {
-    const cd = transformSource("<Stack var.myVar='123'></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack var.myVar='123'></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
 
   it("var with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><var name='myVar' value='123'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><var name='myVar' value='123'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
@@ -171,7 +196,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("var with name and text works #1", () => {
-    const cd = transformSource("<Stack><var name='myVar'>123</var></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><var name='myVar'>123</var></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
@@ -189,14 +216,16 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("vars with name results null", () => {
-    const cd = transformSource("<Stack><var name='myVar'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><var name='myVar'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal(null);
   });
 
   it("var becomes array #1", () => {
     const cd = transformSource(
-      "<Stack><var name='myVar' value='123'/><var name='myVar' value='234'/></Stack>"
+      "<Stack><var name='myVar' value='123'/><var name='myVar' value='234'/></Stack>",
     ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).deep.equal(["123", "234"]);
@@ -246,14 +275,18 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("implicit props with attr works #2", () => {
-    const cd = transformSource("<Stack myProp='123' other='234'/>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack myProp='123' other='234'/>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.props!.myProp).equal("123");
     expect(cd.props!.other).equal("234");
   });
 
   it("prop with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><prop name='myProp' value='123'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><prop name='myProp' value='123'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.props!.myProp).equal("123");
   });
@@ -271,7 +304,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("prop with name and text works #1", () => {
-    const cd = transformSource("<Stack><prop name='myProp'>123</prop></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><prop name='myProp'>123</prop></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     const prop = cd.props!.myProp as ComponentDef;
     expect(prop.type).equal("TextNode");
@@ -295,14 +330,16 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("prop with name results null", () => {
-    const cd = transformSource("<Stack><prop name='myProp' /></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><prop name='myProp' /></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.props!.myProp).equal(null);
   });
 
   it("prop becomes array #1", () => {
     const cd = transformSource(
-      "<Stack><prop name='myProp' value='123'/><prop name='myProp' value='234'/></Stack>"
+      "<Stack><prop name='myProp' value='123'/><prop name='myProp' value='234'/></Stack>",
     ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.props!.myProp).deep.equal(["123", "234"]);
@@ -316,7 +353,7 @@ describe("Ueml transform - child elements", () => {
       </prop>
     </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).deep.equal({ type: "Button" });
+    expect(cd.props!.myProp).toMatchObject({ type: "Button" });
   });
 
   it("prop with component #2", () => {
@@ -328,13 +365,18 @@ describe("Ueml transform - child elements", () => {
       </prop>
     </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).deep.equal([{ type: "Button" }, { type: "Text" }]);
+    expect(cd.props!.myProp).toMatchObject([
+      { type: "Button" },
+      { type: "Text" },
+    ]);
   });
 
   // --- Events
   it("events fails with compound component", () => {
     try {
-      transformSource("<Component name='MyComp'><Stack /><events/></Component>");
+      transformSource(
+        "<Component name='MyComp'><Stack /><events/></Component>",
+      );
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T009")).equal(true);
@@ -384,7 +426,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("event with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><event name='myEvent' value='doIt'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><event name='myEvent' value='doIt'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.events!.myEvent).equal("doIt");
   });
@@ -402,7 +446,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("event with name and text works #1", () => {
-    const cd = transformSource("<Stack><event name='myEvent'>doIt</event></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><event name='myEvent'>doIt</event></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.events!.myEvent).equal("doIt");
   });
@@ -420,7 +466,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("events with name results null", () => {
-    const cd = transformSource("<Stack><event name='myEvent'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><event name='myEvent'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.events!.myEvent).equal(null);
   });
@@ -454,7 +502,9 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("api with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><api name='set' value='do'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><api name='set' value='do'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.api!.set).equal("do");
   });
@@ -472,13 +522,17 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("api dotted attr works #1", () => {
-    const cd = transformSource("<Stack api.myApi='getCount()'></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack api.myApi='getCount()'></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.api!.myApi).equal("getCount()");
   });
 
   it("api with name and text works #1", () => {
-    const cd = transformSource("<Stack><api name='set'>do</api></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><api name='set'>do</api></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.api!.set).equal("do");
   });
@@ -496,14 +550,16 @@ describe("Ueml transform - child elements", () => {
   });
 
   it("api with name results null", () => {
-    const cd = transformSource("<Stack><api name='set'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><api name='set'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.api!.set).equal(null);
   });
 
   it("api becomes array #1", () => {
     const cd = transformSource(
-      "<Stack><api name='myApi' value='123'/><api name='myApi' value='234'/></Stack>"
+      "<Stack><api name='myApi' value='123'/><api name='myApi' value='234'/></Stack>",
     ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.api!.myApi).deep.equal(["123", "234"]);
@@ -642,7 +698,11 @@ describe("Ueml transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal([{ p1: "1", p2: "2" }, null, { p1: "3", p2: "4" }]);
+    expect(cd.props!.myProp.x).deep.equal([
+      { p1: "1", p2: "2" },
+      null,
+      { p1: "3", p2: "4" },
+    ]);
   });
 
   it("props with attr #5", () => {
@@ -671,7 +731,11 @@ describe("Ueml transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({ p1: "1", p2: "2", nx: { a1: "a", b1: "b" } });
+    expect(cd.props!.myProp.x).deep.equal({
+      p1: "1",
+      p2: "2",
+      nx: { a1: "a", b1: "b" },
+    });
   });
 
   it("props with nested attr #2", () => {
@@ -851,7 +915,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp'><Stack /><var name="myVar" value="123" /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Fragment",
@@ -875,7 +939,7 @@ describe("Ueml transform - child elements", () => {
         <var name="myVar" value="123" />
       </Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Fragment",
@@ -901,7 +965,7 @@ describe("Ueml transform - child elements", () => {
         <Text value="hello" />
       </Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Fragment",
@@ -927,7 +991,7 @@ describe("Ueml transform - child elements", () => {
         <api name="hello" value="console.log('hello')"/>
       </Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "AttachFileContainer",
       component: {
         type: "Text",
@@ -945,7 +1009,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()"><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       api: {
         getIt: "getIt()",
@@ -960,7 +1024,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()" api.other="other()"><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       api: {
         getIt: "getIt()",
@@ -976,7 +1040,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()"><api name="other" value="other()"/><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Stack",
@@ -992,7 +1056,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123"><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Stack",
@@ -1007,7 +1071,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123" var.other="{false}"><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         type: "Stack",
@@ -1023,7 +1087,7 @@ describe("Ueml transform - child elements", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>
     `) as ComponentDef;
-    expect(cd).deep.equal({
+    expect(cd).toMatchObject({
       name: "MyComp",
       component: {
         children: [
@@ -1040,10 +1104,122 @@ describe("Ueml transform - child elements", () => {
     });
   });
 
-  it("Compound component with vars #3", () => {
-    //const cd = transformSource(`<H1><Stack/><script>bla</script><var name="varname">3</var></H1>`) as ComponentDef;
-    const cd = transformSource(`<Fragment>hi there</Fragment>`) as ComponentDef;
+  it("Compound component debug info", () => {
+    const source = `<Component name='MyComp'><Stack /></Component>`;
+    const cd = transformSource(source) as CompoundComponentDef;
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: 0,
+      },
+    });
+  });
 
-    const a = 2;
+  it("Compound component debug info nested", () => {
+    const innerComp = `<Button label="hi"/>`;
+    const source = `
+      <Component name='MyComp'>
+        <Stack>
+          ${innerComp}
+        </Stack>
+      </Component>
+    `;
+    const cd = transformSource(source) as CompoundComponentDef;
+    const comp = cd.component as ComponentDef;
+    expect(comp.children[0].debug).toMatchObject({
+      source: {
+        start: source.indexOf("<Stack>") + "<Stack>".length,
+        end: source.indexOf(innerComp) + innerComp.length,
+        fileId: 0,
+      },
+    });
+  });
+
+  it("Compound component debug info with vars", () => {
+    const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>`;
+    const cd = transformSource(source) as CompoundComponentDef;
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: 0,
+      },
+    });
+  });
+
+  it("Compound component debug info nested with vars", () => {
+    const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack var.myVar="hi" ><Button /></Stack></Component>`;
+    const cd = transformSource(source) as CompoundComponentDef;
+
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: 0,
+      },
+    });
+
+    const fragmentComp = cd.component as ComponentDef;
+    expect(fragmentComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf('<var name="other"'),
+        end: source.indexOf("</Component"),
+        fileId: 0,
+      },
+    });
+
+    const stackComp = fragmentComp.children[0] as ComponentDef;
+    const beforeStack = '<var name="other" value="{false}" />';
+    expect(stackComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf(beforeStack) + beforeStack.length,
+        end: source.indexOf("</Component>"),
+        fileId: 0,
+      },
+    });
+  });
+
+  it("Debug info #1", () => {
+    const source = `<Stack><Button/></Stack>`;
+    const cd = transformSource(source) as ComponentDef;
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: 0,
+      },
+    });
+
+    const btnComp = cd.children[0] as ComponentDef;
+    expect(btnComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf("<Stack>") + "<Stack>".length,
+        end: source.indexOf("<Button/>") + "<Button/>".length,
+        fileId: 0,
+      },
+    });
+  });
+
+  it("Debug info #2", () => {
+    const source = `<Stack><Button/></Stack>`;
+    const FILE_ID = 123;
+    const cd = transformSource(source, FILE_ID) as ComponentDef;
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: FILE_ID,
+      },
+    });
+
+    const btnComp = cd.children[0] as ComponentDef;
+    expect(btnComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf("<Stack>") + "<Stack>".length,
+        end: source.indexOf("<Button/>") + "<Button/>".length,
+        fileId: FILE_ID,
+      },
+    });
   });
 });

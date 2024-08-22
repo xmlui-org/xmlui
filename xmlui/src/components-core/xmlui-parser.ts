@@ -10,6 +10,7 @@ interface ErrorWithLineColInfo extends Error {
 
 export function parseXmlUiMarkup(
   source: string,
+  fileId: number = 0,
   moduleResolver?: ModuleResolver,
 ) {
   const { parse, getText } = createXmlUiParser(source);
@@ -25,12 +26,12 @@ export function parseXmlUiMarkup(
     const errorWithLines = addPositions(errors, newlinePositions);
     const errorMessages = errorWithLines
       .map(
-        (e) => `Error at line ${e.line}, column:${e.col}:\n   ${e.message}\n`,
+        (e) => `Error at line: ${e.line}, column: ${e.col}:\n   ${e.message}\n`,
       )
       .join("\n");
     throw new Error(errorMessages);
   }
-  return nodeToComponentDef(node, getText, moduleResolver);
+  return nodeToComponentDef(node, getText, fileId, moduleResolver);
 }
 
 function addPositions(
@@ -59,7 +60,7 @@ function addPositions(
     const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
     if (err.pos >= lastNewlinePos) {
       (err as ErrorWithLineColInfo).line = newlinePositions.length + 1;
-      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos +0;
+      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos + 0;
     }
   }
   return errors as ErrorWithLineColInfo[];

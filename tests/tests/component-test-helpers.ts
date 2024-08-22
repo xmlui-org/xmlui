@@ -15,9 +15,9 @@ export type ThemeTestDesc = {
   dependsOnVars?: Record<string, string>;
 };
 
-function parseComponent(entryPoint: ComponentDef<any> | string, useLegacyParser = false) {
+function parseComponent(entryPoint: ComponentDef<any> | string) {
   if (typeof entryPoint === "string") {
-    return parseXmlUiMarkup(entryPoint, undefined, useLegacyParser);
+    return parseXmlUiMarkup(entryPoint);
   }
   return entryPoint;
 }

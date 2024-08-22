@@ -63,15 +63,15 @@ Update the code of `Tasks` to add a `section` field to the task items:
 <Component name="Tasks">
   <Datasource id="topics" url="/api/topics" />
   <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <List items="{tasks.value.map(t => ({...t, section: getSection(t)}))}">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-    </List>
+  <List items="{tasks.value.map(t => ({...t, section: getSection(t)}))}">
+    <prop name="itemTemplate">
+      <TaskRow item="{$item}" topics="{topics.value}" />
+    </prop>
+  </List>
 </Component>
 ```
 
-> **Note**: Here, the `items` property receives a list of items, each extended with the section information.
+> **Note**: Here, the `items` property of `List` receives a list of items, each extended with the section information.
 
 ### Defining sections
 
@@ -81,20 +81,20 @@ To display section information, add the `section` property to the `List` and def
 <Component name="Tasks">
   <Datasource id="topics" url="/api/topics" />
   <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <List 
-      items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
-      sectionBy="section">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-      <prop name="sectionTemplate">
-        <HStack horizontalPadding="$space-4" verticalPadding="$space-2">
-          <Text 
-            variant="subtitle" 
-            value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
-        </HStack>
-      </prop>
-    </List>
+  <List 
+    items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+    sectionBy="section">
+    <prop name="itemTemplate">
+      <TaskRow item="{$item}" topics="{topics.value}" />
+    </prop>
+    <prop name="sectionTemplate">
+      <HStack horizontalPadding="$space-4" verticalPadding="$space-2">
+        <Text 
+          variant="subtitle" 
+          value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
+      </HStack>
+    </prop>
+  </List>
 </Component>
 ```
 In the section template, you can utilize the `$item` property to access the section key and the items within that section.
@@ -156,7 +156,7 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 
 The order of sections displayed above could be more helpful with a different order. With the help of the `defaultSections` property of `List`, you can define the order of sections. Modify the `List` accordingly:
 
-```ueml copy filename="Tasks.xmlui"
+```ueml copy {4} filename="Tasks.xmlui"
 <!-- Omitted -->
 <List 
   items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
@@ -174,7 +174,7 @@ You can see the updated section order:
 
 ### Omitting Empty Sections
 
-By specifying the default sections, the filtered lists also display them. So when you visit a filtered list, such as Overdue, it displays the empty sections:
+By specifying the default sections, the filtered lists also display them. So when you visit a filtered list, such as Today, it displays the empty sections:
 
 <br/>
 <Image alt="empty sections" src="/resources/images/get-started/empty-sections.png" />
@@ -185,7 +185,7 @@ Modify the code to omit them whenever we display a filtered list:
 <!-- Omitted -->
 <List 
   items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultSections="{$props.filter === 'all'
+  defaultSections="{!$props.filter
     ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
   sectionBy="section">
   <!-- Omitted -->

@@ -117,6 +117,14 @@ export interface CompoundComponentDef extends Scriptable {
    * definition.
    */
   vars?: Record<string, any>;
+
+  /**
+   * Arbitrary debug information that can be attached to a component definition.
+   * Current usage:
+   * - `debug: { source: { start: number, end: number } }` Ther start and end positions of of the source
+   *   belonging to the particular component definition.
+   */
+  debug?: Record<string, any>;
 }
 
 /**
@@ -125,16 +133,16 @@ export interface CompoundComponentDef extends Scriptable {
 export type ComponentLike = ComponentDef | CompoundComponentDef;
 
 /**
- * Some components render their nested child components dynamically using the current context of 
- * their parents. For example, reusable components (`CompoundComponentDef`) have a `ChildrenSlot` 
- * placeholder that marks the location where the children should be rendered. Other component types 
- * (e.g., `ApiBoundComponent` and `ContainerComponent`) use this dynamic rendering, too. 
+ * Some components render their nested child components dynamically using the current context of
+ * their parents. For example, reusable components (`CompoundComponentDef`) have a `ChildrenSlot`
+ * placeholder that marks the location where the children should be rendered. Other component types
+ * (e.g., `ApiBoundComponent` and `ContainerComponent`) use this dynamic rendering, too.
  *
  * This interface represents this functionality.
  */
 export interface DynamicChildComponentDef extends ComponentDef {
   /**
-   * This property holds a function that can render a particular child or children into a specific 
+   * This property holds a function that can render a particular child or children into a specific
    * layout context.
    */
   renderChild: RenderChildFn;
