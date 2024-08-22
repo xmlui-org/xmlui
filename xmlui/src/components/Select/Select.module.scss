@@ -27,7 +27,7 @@ $componentName: "Select";
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
-  &:focus-visible{
+  &:focus-visible {
     outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
     outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
     outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
@@ -45,6 +45,7 @@ $componentName: "Select";
   width: 100%;
   border-style: solid;
   border-width: 1px;
+  outline: #00B248;
   transition: background-color ease-in 0.1s;
   overflow: hidden;
   position: relative;
@@ -54,9 +55,11 @@ $componentName: "Select";
   &.error {
     @include variant("error");
   }
+
   &.warning {
     @include variant("warning");
   }
+
   &.valid {
     @include variant("success");
   }
@@ -67,8 +70,10 @@ $componentName: "Select";
     color: createThemeVar("Input:color-text-Select--disabled");
     border-color: createThemeVar("Input:color-border-Select--disabled");
 
-    .indicator {
-      cursor: not-allowed;
+    .inputRoot {
+      .indicator, .input {
+        cursor: not-allowed;
+      }
     }
   }
 
@@ -100,7 +105,7 @@ $componentName: "Select";
   color: inherit;
   text-align: left;
   border: 0;
-  outline: none !important;
+  outline: none;
   background-color: transparent;
   width: 100%;
   padding: 0;
@@ -128,6 +133,7 @@ $componentName: "Select";
     padding-top: .5em;
     padding-bottom: .5em;
     padding-inline: 1em;
+    font-size: createThemeVar("Input:font-size-Select");
     align-items: center;
     user-select: none;
 

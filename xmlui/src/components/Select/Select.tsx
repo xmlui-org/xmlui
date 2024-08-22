@@ -150,19 +150,22 @@ export function Select({
   return (
     <SelectContext.Provider value={selectContextValue}>
       {children}
-      <div className={styles.selectContainer} style={layout} ref={(el: HTMLDivElement) => setReferenceElement(el)}>
+      <div style={layout} ref={(el: HTMLDivElement) => setReferenceElement(el)}
+           className={classnames(styles.selectContainer, styles[validationStatus], {
+             [styles.disabled]: !enabled,
+           })}>
         <div className={styles.inputRoot}>
           <input
             type="button"
             disabled={!enabled}
-            className={classnames(styles.input, styles[validationStatus], {
-              [styles.disabled]: !enabled,
+            className={classnames(styles.input, {
+              [styles.placeholder]: placeholder && !selectedItem,
             })}
+
             {...getToggleButtonProps()}
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
-            value={selectedItem?.label}
-            placeholder={placeholder}
+            value={selectedItem?.label || placeholder}
           />
           <span aria-label="toggle menu" className={styles.indicator}>
             {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
