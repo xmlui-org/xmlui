@@ -447,7 +447,7 @@ const metadata: ComponentDescriptor<AppComponentDef> = {
   defaultThemeVars: {
     "width-navPanel-App": "$space-72",
     "max-content-width-App": "$max-content-width",
-    "shadow-header-App": "$shadow-spread",
+    // "shadow-header-App": "$shadow-spread",
     "shadow-pages-App": "$shadow-spread",
     light: {
       // --- No light-specific theme vars

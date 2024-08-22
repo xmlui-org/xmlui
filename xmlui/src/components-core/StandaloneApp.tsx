@@ -91,9 +91,17 @@ function StandaloneApp({
 
 async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
-    return parseXmlUiMarkup(await response.text());
+    const code = await response.text();
+    const fileId = response.url;
+    return {
+      component: parseXmlUiMarkup(code, fileId),
+      src: code,
+      file: fileId,
+    }
   }
-  return response.json();
+  return {
+    component: await response.json()
+  };
 }
 
 function matchesFileName(path: string, fileName: string) {
@@ -345,7 +353,6 @@ function useStandalone(
       //default mode: process.env.VITE_BUILD_MODE === "ALL"
       const configResponse = await fetch(normalizePath("config.json")!);
       const config: StandaloneJsonConfig = await configResponse.json();
-      const legacyXmlUiParser = config.globals?.legacyXmlUiParser;
 
       const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value));
       const themePromises = config.themes?.map((themePath) => {
@@ -355,20 +362,27 @@ function useStandalone(
       const componentPromises = config.components?.map((componentPath) => {
         return fetch(normalizePath(componentPath)!).then((value) =>
           parseComponentResp(value)
-        ) as Promise<CompoundComponentDef>;
+        );
       });
 
-      let [entryPoint, components, themes] = await Promise.all([
+      const [entryPoint, components, themes] = await Promise.all([
         entryPointPromise,
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
 
+      const sources = {};
+      sources[entryPoint.file] = entryPoint.src;
+      components.forEach((component) => {
+          sources[component.file] = component.src;
+      });
+
       setStandaloneApp({
         ...config,
         themes,
-        components,
-        entryPoint,
+        sources,
+        components: components.map(comp => comp.component),
+        entryPoint: entryPoint.component,
       });
     })();
   }, [runtime, standaloneAppDef]);

@@ -205,7 +205,7 @@ const metadata: ComponentDescriptor<AppHeaderComponentDef> = {
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "height-AppHeader": "$space-16",
+    "height-AppHeader": "$space-14",
     "max-content-width-AppHeader": "$max-content-width-App",
     ...borderSubject("AppHeader", {
       bottom: {

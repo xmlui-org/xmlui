@@ -56,7 +56,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-surface": "$color-surface-500", // #24656
 
     // --- Primary color shades (bluish)
-    "color-primary-50": "hsl(212,71.9%,94.5%)",
+    "color-primary-50": "#f6f8fb",
     "color-primary-100": "hsl(212,71.9%,89.1%)",
     "color-primary-200": "hsl(212,71.9%,78.1%)",
     "color-primary-300": "hsl(212,71.9%,67.2%)",
@@ -220,7 +220,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "border-size-Avatar": "0px",
     "radius-Avatar": "4px",
 
-    "shadow-AppHeader": "none",
+    "shadow-header-App": "none",
     // "height-AppHeader": "3.5rem",
 
     "padding-horizontal-NavPanel-horizontal": "1rem",
@@ -244,7 +244,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-bg--selected": $colorPrimary50,
         "color-bg-overlay": "rgba(0, 0, 0, 0.2)",
         "color-bg-dropdown-item--hover": $colorSurface100,
-        "color-bg-dropdown-item--active": $colorSurface200,
+        "color-bg-dropdown-item--active": $colorSurface100,
         "color-bg-dropdown-item--active-hover": $colorSurface50,
         "color-bg-tree-row--selected--before": $colorPrimary50,
 
