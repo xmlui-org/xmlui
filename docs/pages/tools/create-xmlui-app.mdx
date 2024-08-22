@@ -22,7 +22,7 @@ cd <working-folder>
 You do not need to install the `create-ui-engine` tool; just use it with the help of the `npx` (Node Package eXecute) utility:
 
 ```text copy
-npx https://s3.eu-central-1.amazonaws.com/static.themohoz.com/create-xmlui-app-0.0.2.tgz
+npx create-xmlui-app@latest
 ```
 
 This command line downloads the tool from the npm package registry, installs it to a temporary location, and starts it.
@@ -40,7 +40,7 @@ After specifying these options, the utility creates a new folder within `<workin
 The utility creates a Node package with all files required to develop, run, and build it. The structure of the package is simple:
 
 <br/>
-<Image alt="Boilerplate" src="/resources/images/tools/boilerplate-structure.png" width={315} />
+<Image alt="Boilerplate" src="/resources/images/get-started/boilerplate-structure.png" width={416} />
 
 The `index.html` file wraps your entire app served with a web server. The `package.json` and `package-lock.json` are the standard Node package descriptor files.
 

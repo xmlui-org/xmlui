@@ -1,43 +1,28 @@
 # Data Fetching with Datasource
 
-## Introduction
-
 In this tutorial, you will learn how to load data from external sources using the `Datasource` component and the `datasource` property.
 
-This tutorial assumes you already completed either the [Personal Todo App](./personal-todo/00-introduction.mdx) or [Your First XMLUI App](../get-started/first-app.mdx) tutorials.
+This tutorial assumes you already completed either the [Personal Todo App](../get-started/personal-todo/00-introduction.mdx) or [Your First XMLUI App](../get-started/first-app.mdx) tutorials.
 Both provide foundational knowledge this tutorial will build upon.
 
 For a detailed rundown of the available properties, events and API for the `Datasource` component see the [`Datasource` reference docs](../components/Datasource.mdx).
 
 A companion tutorial is also available that deals with data manipulation titled [`Data Manipulation with ApiAction`](./working-with-apiactions.mdx).
 
-## Environment Setup
-
-> **Note**: If you have the development environment already set up, you can skip this section.
-
-Details on the XMLUI development environment setup is covered [in this article](../get-started/prepare-env).
-
-## Project Setup
-
-> **Note**: If you have the project already generated with boilerplate code, you can skip this section.
-
-Setting up the project with the default boilerplate code is covered [in this article](../get-started/boilerplate-setup). Name your app "datasource-tutorial".
+Use the `create-xmlui-app` tool (as you learned from the earlier tutorials). Name your app as you prefer (e.g., `ds-tutorial`). After creating the code, open the app in your code editor (VS Code).
 
 ## Emulating a Backend
 
-The app will use a backend to store, retrieve and modify data. However, there is no need to create an actual backend.
-Instead, you will add an emulated backend with a REST interface for the app using the built-in tooling capabilities of the XMLUI.
+The app will use a backend to store, retrieve and modify data. However, there is no need to create an actual backend. Instead, you will add an emulated backend with a REST interface for the app using the built-in tooling capabilities of the XMLUI.
 
 Follow these steps to add the emulated backend to the app:
 
 1. Download the [api.ts](/resources/files/tutorials/datasource/api.ts "download") file containing the backend's implementation.
 2. Copy this file (`api.ts`) into the `src` folder.
 
-> **Note**: XMLUI uses an emulation deeply integrated with the browser's networking layer.
-> You can use the browser's development tools to check the contents of the requests and responses as if the app was communicating with an actual backend.
+> **Note**: XMLUI uses an emulation deeply integrated with the browser's networking layer. You can use the browser's development tools to check the contents of the requests and responses as if the app was communicating with an actual backend.
 
-Test the backend by adding code that triggers an API endpoint.
-There is a specific `/test` endpoint which returns a simple response object:
+Test the backend by adding code that triggers an API endpoint. There is a specific `/test` endpoint which returns a simple response object:
 
 ```json
 {
@@ -58,37 +43,58 @@ To fetch this simple data, replace the contents of the `Main.xmlui` file with th
   <Pages>
     <Page url="/">
       <Datasource id="test" url="/api/test" />
-      <Text variant="strong">{test.value.message}</Text>
+      <H1>{test.value.message}</H1>
     </Page>
   </Pages>
   <Footer>Powered by XMLUI</Footer>
 </App>
 ```
 
-Return to the app running in the browser. If you happened to have stopped it, start it up again with `npm start`.
-Navigate to the home page which will fetch the message and display it on the UI in a `Text` component:
+Now run the app with `npm start`! The development web server starts and displays the local address (http://localhost:5173/, by default, unless the port is free; otherwise, it will be a different port). Open your browser with the displayed address:
 
 <br/>
 <Image alt="Test API" src="/resources/images/datasource-tutorial/test-message.png" />
 
-Now, you are ready to learn using the `Datasource` component. In subsequent sections, you will play with `Datasource` features. You will add more `Page` components to the `Pages` in each section demonstrating a particular trait.
+You are ready to learn using the `Datasource` component! In subsequent sections, you will play with `Datasource` features. You will add more `Page` components to the app in each section demonstrating a particular trait.
 
 ## Loading a List of Data
 
-Fetching data from an API can be easily done using XMLUI. Most XMLUI component have a property called `datasource` to conveniently handle data loading from an API.
-Components that can display a list of items (such as the [`List`](../components/List.mdx) or [`Table`](../components/Table.mdx)) make good use of this property.
+XMLUI can quickly fetch data from an API. Most XMLUI components have a `datasource` property to handle API data loading conveniently. This property is useful for components that can display a list of items (such as the [`List`](../components/List.mdx) or [`Table`](../components/Table.mdx)).
 
-You will use this `datasource` property to populate a `List` component with data.
-To do so, you will add the highlighted `NavLink` and `Page` components to the code in the Main.xmlui file:
+Add the highlighted `NavLink` and `Page` components to the code in the Main.xmlui file to populate the `List` component with data! For the sake of brevity, from now on, we omit the majority of the existing code and shorten the instructions like here:
 
 ```ueml copy filename="Main.xmlui" {2, 4-6}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Simple Data Load" to="/get-data" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/get-data">
   <List datasource="/api/shopping-list" />
 </Page>
 <!-- Omitted -->
+```
+
+This short form replaces the entire contents of the `Main.xmlui` file, which should be after following the instructions:
+
+```ueml copy filename="Main.xmlui" {7,14-16}
+<App layout="vertical-full-header">
+  <AppHeader>
+    <Text variant="title">Datasource Tutorial</Text>
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" />
+    <NavLink label="Simple Data Load" to="/get-data" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Datasource id="test" url="/api/test" />
+      <H1>{test.value.message}</H1>
+    </Page>
+    <Page url="/get-data">
+      <List datasource="/api/shopping-list" />
+    </Page>
+  </Pages>
+  <Footer>Powered by XMLUI</Footer>
+</App>
 ```
 
 When you select the Simple Data Load menu item (navigate to the `/get-data` page), it will show a list of grocery items:
@@ -108,6 +114,11 @@ Here, the URL points to the local "shopping-list" endpoint that returns a list o
 | unit      | string  |
 | category  | string  |
 | inPantry  | boolean |
+
+Change the content of the last inserted page to display the number of data items displayed:
+
+_TBD_
+
 
 ## Filtering Incoming Data
 
