@@ -15,7 +15,7 @@ import classnames from "@components-core/utils/classnames";
 import { usePopper } from "react-popper";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { createPortal } from "react-dom";
-import type { InputComponentDef, ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/Input/input-abstractions";
 import {
   inputComponentEventDescriptors,
   inputComponentPropertyDescriptors,
@@ -70,7 +70,7 @@ export function Select({
   children,
 }: SelectProps) {
   const { options, selectContextValue } = useSelectContextValue();
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLUListElement | null>(null);
   const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "bottom-start",
@@ -150,22 +150,24 @@ export function Select({
   return (
     <SelectContext.Provider value={selectContextValue}>
       {children}
-      <div className={styles.selectContainer} style={layout}>
-        <button
-          type="button"
-          disabled={!enabled}
-          className={classnames(styles.selectToggleButton, styles[validationStatus], {
-            [styles.disabled]: !enabled,
-          })}
-          {...getToggleButtonProps({ ref: (el: HTMLButtonElement) => setReferenceElement(el) })}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-        >
-          {selectedItem ? <span>{selectedItem.label}</span> : <span className={styles.placeholder}>{placeholder}</span>}
+      <div className={styles.selectContainer} style={layout} ref={(el: HTMLDivElement) => setReferenceElement(el)}>
+        <div className={styles.inputRoot}>
+          <input
+            type="button"
+            disabled={!enabled}
+            className={classnames(styles.input, styles[validationStatus], {
+              [styles.disabled]: !enabled,
+            })}
+            {...getToggleButtonProps()}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            value={selectedItem?.label}
+            placeholder={placeholder}
+          />
           <span aria-label="toggle menu" className={styles.indicator}>
             {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
           </span>
-        </button>
+        </div>
         <div {...getMenuProps()}>
           {isOpen &&
             root &&
@@ -204,7 +206,7 @@ export function Select({
                   </li>
                 )}
               </ul>,
-              root
+              root,
             )}
         </div>
       </div>
@@ -305,7 +307,7 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
 const defaultOptionRenderer = {
   type: "Text",
   props: {
-    value: "{$item.label} akakaka",
+    value: "{$item.label}",
   },
 };
 
@@ -326,6 +328,7 @@ const metadata: ComponentDescriptor<SelectComponentDef> = {
     "radius-menu-Select": "$radius",
     "color-bg-item-Select": "$color-bg-dropdown-item",
     "color-bg-item-Select--hover": "$color-bg-dropdown-item--active",
+    "min-height-Input": "39px",
     light: {
       "color-text-item-Select--disabled": "$color-surface-200",
     },
