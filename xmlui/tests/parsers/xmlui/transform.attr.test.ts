@@ -23,7 +23,9 @@ describe("Ueml transform - attributes", () => {
 
   it("Invalid attribute name fails #3", () => {
     try {
-      transformSource("<Component name='MyStack' invaAttr='a'><Stack /></Component>");
+      transformSource(
+        "<Component name='MyStack' invaAttr='a'><Stack /></Component>",
+      );
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T021")).equal(true);
@@ -32,11 +34,18 @@ describe("Ueml transform - attributes", () => {
 
   it("Invalid attribute name fails #4", () => {
     try {
-      transformSource("<Component invaAttr='a' name='MyStack'><Stack /></Component>");
+      transformSource(
+        "<Component invaAttr='a' name='MyStack'><Stack /></Component>",
+      );
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T021")).equal(true);
     }
+  });
+
+  it("key-only attr is true", () => {
+    const cd = transformSource("<Button enabled />") as ComponentDef;
+    expect(cd.props.enabled).equal("true");
   });
 
   it("uid works", () => {
