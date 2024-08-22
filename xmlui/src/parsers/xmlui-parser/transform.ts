@@ -1199,7 +1199,7 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
 
 function desugarKeyOnlyAttrs(attrs: Node[]) {
   for (let attr of attrs) {
-    if (attr.children!.length === 1) {
+    if (attr.children?.length === 1) {
       const eq = {
         kind: SyntaxKind.Equal,
       } as Node;
@@ -1207,7 +1207,7 @@ function desugarKeyOnlyAttrs(attrs: Node[]) {
         kind: SyntaxKind.StringLiteral,
         text: '"true"',
       } as TransformNode;
-      attr.children.push(eq, value);
+      attr.children!.push(eq, value);
     }
   }
 }
