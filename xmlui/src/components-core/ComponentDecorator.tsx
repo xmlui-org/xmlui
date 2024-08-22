@@ -27,8 +27,8 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
 
   const ref = useRef<HTMLDivElement>(null);
   const [itemNodeVisible, setItemNodeVisible] = useState(false);
-  const itemRef = useRef<HTMLElement>(null);
-  const itemRefCallback = useCallback((node) => {
+  const itemRef = useRef<HTMLElement | null>(null);
+  const itemRefCallback = useCallback((node: any) => {
     itemRef.current = node;
     setItemNodeVisible(node !== null);
   }, []);

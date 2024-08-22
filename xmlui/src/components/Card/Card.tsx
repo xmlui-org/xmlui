@@ -28,7 +28,7 @@ type Props = {
   onClick?: any;
 };
 
-export const Card = forwardRef<HTMLDivElement>(function Card(
+export const Card = forwardRef(function Card(
   { children, style, title, subTitle, linkTo, avatarUrl, showAvatar = !!avatarUrl || false, onClick }: Props,
   ref,
 ) {
@@ -38,7 +38,7 @@ export const Card = forwardRef<HTMLDivElement>(function Card(
   };
   return (
     <div
-      ref={ref}
+      ref={ref as any}
       className={classnames(styles.wrapper, {
         [styles.isClickable]: !!onClick,
       })}

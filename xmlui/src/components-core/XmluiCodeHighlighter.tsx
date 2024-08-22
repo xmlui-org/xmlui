@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HighlighterCore } from "@shikijs/core/types";
 import styles from "./XmluiCodeHighlighter.module.scss";
+import {useTheme} from "@components-core/theming/ThemeContext";
+import classnames from "classnames";
 
 let highlighter: HighlighterCore | null = null;
 
 function XmluiCodeHighlighter({ value }: { value: string }) {
+  const {activeThemeTone} = useTheme();
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
     async function load() {
@@ -24,7 +27,7 @@ function XmluiCodeHighlighter({ value }: { value: string }) {
   }, []);
 
   const html = useMemo(() => {
-    return !initialized
+    return (!initialized || !highlighter)
       ? ""
       : highlighter.codeToHtml(value, {
           lang: "xmlui",
@@ -48,13 +51,15 @@ function XmluiCodeHighlighter({ value }: { value: string }) {
   }, [initialized, value]);
 
   return (
-    <div className={styles.wrapper}>
       <div
-        dangerouslySetInnerHTML={{
-          __html: html,
-        }}
+          className={classnames(styles.wrapper, {
+            [styles.dark]: activeThemeTone === "dark",
+            [styles.light]: activeThemeTone === "light"
+          })}
+          dangerouslySetInnerHTML={{
+            __html: html,
+          }}
       />
-    </div>
   );
 }
 

@@ -77,10 +77,13 @@ export function InspectorProvider({
 }
 
 function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
-  const { sources } = useContext(InspectorContext);
+  const { sources } = useContext(InspectorContext)!;
   const value = useMemo(() => {
     const compSrc = props.node.debug?.source;
     if (!compSrc) {
+      return "";
+    }
+    if(!sources){
       return "";
     }
     const { start, end, fileId } = compSrc;
@@ -88,7 +91,7 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
 
     let dropEmptyLines = true;
     const prunedLines: Array<string> = [];
-    let trimBeginCount = null;
+    let trimBeginCount: number | undefined = undefined;
     slicedSrc.split("\n").forEach((line) => {
       if (line.trim() === "" && dropEmptyLines) {
         //drop empty lines from the beginning
@@ -97,7 +100,7 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
         dropEmptyLines = false;
         prunedLines.push(line);
         const startingWhiteSpaces = line.search(/\S|$/);
-        if (line.trim() !== "" && (trimBeginCount === null || startingWhiteSpaces < trimBeginCount)) {
+        if (line.trim() !== "" && (trimBeginCount === undefined || startingWhiteSpaces < trimBeginCount)) {
           trimBeginCount = startingWhiteSpaces;
         }
       }
@@ -143,7 +146,9 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
     setReferenceElement(htmlElement);
 
     function mouseenter() {
-      clearTimeout(timeoutRef.current);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
       setVisible(true);
     }
 
@@ -169,7 +174,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
 
   return (
     <>
-      {visible &&
+      {visible && !!root &&
         createPortal(
           <Button
             icon={<Icon name={"code"} />}
@@ -203,7 +208,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
 
 export function useInspector(node: ComponentDef, uid: symbol) {
   const context = useContext(InspectorContext);
-  const shouldInspect = node.props.inspect;
+  const shouldInspect = node.props?.inspect;
   const inspectId = useId();
   const refreshInspection = useCallback(() => {
     context?.refresh(inspectId);
