@@ -6,19 +6,15 @@ import { toDbgString } from "@parsers/xmlui-parser/utils";
 
 export function transformSource(
   source: string,
-  printSyntaxTree: boolean = false
+  fileId?: number
 ): ComponentDef | CompoundComponentDef | null {
   const { getText, parse } = createXmlUiParser(source);
   const { node, errors } = parse();
-  if (printSyntaxTree) {
-    console.log(toDbgString(node, getText));
-    console.log("errors: \n[\n" + errors.map((e) => e.message + ` @${e.pos}`).join(";\n") + "\n]\n");
-  }
   if (errors.length > 0) {
     // return {errors}
     throw new Error(errors[0].message);
   }
-  return nodeToComponentDef(node, getText, 0);
+  return nodeToComponentDef(node, getText, fileId ?? 0);
 }
 
 export function parseSource(source: string, printRes: boolean = false): ParseResult & { getText: GetText } {

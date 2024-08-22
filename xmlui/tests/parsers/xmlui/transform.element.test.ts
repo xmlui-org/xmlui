@@ -1180,7 +1180,7 @@ describe("Ueml transform - child elements", () => {
     });
   });
 
-  it("Debug info", () => {
+  it("Debug info #1", () => {
     const source = `<Stack><Button/></Stack>`;
     const cd = transformSource(source) as ComponentDef;
     expect(cd.debug).toMatchObject({
@@ -1197,6 +1197,28 @@ describe("Ueml transform - child elements", () => {
         start: source.indexOf("<Stack>") + "<Stack>".length,
         end: source.indexOf("<Button/>") + "<Button/>".length,
         fileId: 0,
+      },
+    });
+  });
+
+  it("Debug info #2", () => {
+    const source = `<Stack><Button/></Stack>`;
+    const FILE_ID = 123;
+    const cd = transformSource(source, FILE_ID) as ComponentDef;
+    expect(cd.debug).toMatchObject({
+      source: {
+        start: 0,
+        end: source.length,
+        fileId: FILE_ID,
+      },
+    });
+
+    const btnComp = cd.children[0] as ComponentDef;
+    expect(btnComp.debug).toMatchObject({
+      source: {
+        start: source.indexOf("<Stack>") + "<Stack>".length,
+        end: source.indexOf("<Button/>") + "<Button/>".length,
+        fileId: FILE_ID,
       },
     });
   });

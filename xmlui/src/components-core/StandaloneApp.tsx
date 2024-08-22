@@ -86,7 +86,7 @@ function StandaloneApp({
 
 async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
-    return parseXmlUiMarkup(await response.text(), undefined);
+    return parseXmlUiMarkup(await response.text());
   }
   return response.json();
 }
