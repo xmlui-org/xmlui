@@ -10,8 +10,8 @@ interface ErrorWithLineColInfo extends Error {
 
 export function parseXmlUiMarkup(
   source: string,
-  moduleResolver?: ModuleResolver,
   fileId: number = 0,
+  moduleResolver?: ModuleResolver,
 ) {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();

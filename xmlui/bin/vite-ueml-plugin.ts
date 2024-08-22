@@ -22,17 +22,6 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
   return {
     name: "vite:transform-ueml",
 
-    // async resolveId(source, importer, options){
-    //   console.log('resolveId', source, importer, options);
-    //   return null;
-    // },
-    // async load(id, options){
-    //   if (xmluiScriptExtension.test(id)) {
-    //     console.log('load ', id, options);
-    //   }
-    //   return null;
-    // },
-
     async transform(code: string, id: string, options) {
       const moduleResolver = (parentModule: string, moduleName: string) => {
         // --- Try with .xmlui.xs extension, and then with .xs.
@@ -52,8 +41,11 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
         }
       };
 
+      // --- Create a unique fileId for the file being processed.
+      const fileId = 0;
+
       if (xmluiExtension.test(id)) {
-        const componentDef = parseXmlUiMarkup(code, moduleResolver);
+        const componentDef = parseXmlUiMarkup(code, fileId, moduleResolver);
 
         return {
           code: dataToEsm(componentDef),
