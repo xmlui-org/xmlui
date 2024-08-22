@@ -2,12 +2,13 @@ import { createContext, useCallback, useContext, useEffect, useId, useMemo, useR
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
-import styles from "@components/Select/Select.module.scss";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { ModalDialog } from "@components/ModalDialog/ModalDialog";
-import { Text } from "@components/Text/Text";
 import classnames from "classnames";
 import XmluiCodeHighlighter from "@components-core/XmluiCodeHighlighter";
+import { Button } from "@components/Button/Button";
+import Icon from "@components/Icon/Icon";
+import styles from "./InspectorButton.module.scss";
 
 interface IInspectorContext {
   sources?: Record<string, string>;
@@ -75,17 +76,41 @@ export function InspectorProvider({
   );
 }
 
-function InspectModal(props: { onClose: () => void; value: ComponentDef }) {
-  const {sources} = useContext(InspectorContext);
-  console.log("SROUCE", sources["0"]);
-  console.log("SROUCES", sources);
+function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
+  const { sources } = useContext(InspectorContext);
+  const value = useMemo(() => {
+    const compSrc = props.node.debug?.source;
+    if (!compSrc) {
+      return "";
+    }
+    const { start, end, fileId } = compSrc;
+    const slicedSrc = sources[fileId].slice(start, end);
+
+    let dropEmptyLines = true;
+    const prunedLines: Array<string> = [];
+    let trimBeginCount = null;
+    slicedSrc.split("\n").forEach((line) => {
+      if (line.trim() === "" && dropEmptyLines) {
+        //drop empty lines from the beginning
+        return;
+      } else {
+        dropEmptyLines = false;
+        prunedLines.push(line);
+        const startingWhiteSpaces = line.search(/\S|$/);
+        if (line.trim() !== "" && (trimBeginCount === null || startingWhiteSpaces < trimBeginCount)) {
+          trimBeginCount = startingWhiteSpaces;
+        }
+      }
+    });
+    return prunedLines.map((line) => line.slice(trimBeginCount)).join("\n");
+  }, [props.node.debug?.source, sources]);
   return (
     <ModalDialog
       isInitiallyOpen={true}
       onClose={props.onClose}
       style={{ width: "auto", maxWidth: "100%", minWidth: 400 }}
     >
-      <XmluiCodeHighlighter value={Object.values(sources)[3]}/>
+      <XmluiCodeHighlighter value={value} />
     </ModalDialog>
   );
 }
@@ -100,7 +125,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
       {
         name: "offset",
         options: {
-          offset: [-10, -20],
+          offset: [0, -18],
         },
       },
     ],
@@ -131,7 +156,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
       }
       timeoutRef.current = window.setTimeout(() => {
         setVisible(false);
-      }, 300);
+      }, 100);
     }
 
     htmlElement.addEventListener("mouseenter", mouseenter);
@@ -146,8 +171,11 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
     <>
       {visible &&
         createPortal(
-          <button
-            className={classnames(styles.selectMenu, "_debug-inspect-button")}
+          <Button
+            icon={<Icon name={"code"} />}
+            variant={"ghost"}
+            size={"xs"}
+            className={classnames(styles.wrapper, "_debug-inspect-button")}
             ref={(el) => setPopperElement(el)}
             style={{ ...popperStyles.popper }}
             {...attributes.popper}
@@ -165,12 +193,10 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
             onClick={() => {
               setShowCode(true);
             }}
-          >
-            Show code
-          </button>,
+          />,
           root,
         )}
-      {showCode && <InspectModal onClose={() => setShowCode(false)} value={node} />}
+      {showCode && <InspectModal onClose={() => setShowCode(false)} node={node} />}
     </>
   );
 }

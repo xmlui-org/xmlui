@@ -32,7 +32,7 @@ type Props = {
   title?: string;
 } & Pick<
   React.HTMLAttributes<HTMLButtonElement>,
-  "onClick" | "onFocus" | "onBlur" | ButtonAria | "tabIndex" | "className"
+  "onClick" | "onFocus" | "onBlur" | "onMouseEnter" | "onMouseLeave" | ButtonAria | "tabIndex" | "className"
 >;
 
 export const Button = React.forwardRef(function Button(
