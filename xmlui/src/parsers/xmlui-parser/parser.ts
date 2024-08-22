@@ -1,7 +1,6 @@
 import type { Node } from "./syntax-node";
 import type { ScannerErrorCallback } from "./scanner";
 import type {
-  DiagnosticMessage,
   DiagnosticMessageFromScanner,
   GeneralDiagnosticMessage,
 } from "./diagnostics";
@@ -260,31 +259,26 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       SyntaxKind.OpenNodeStart,
     ];
     const attrFollow = attrListFollow.concat(SyntaxKind.Identifier);
+
     const attrIdent = peek();
+    const attrName = getText(attrIdent);
+    if (attrNames.includes(attrName)) {
+      errorAt(MakeErr.duplAttr(attrName), attrIdent.pos, attrIdent.end);
+    } else if (attrName[0] >= "A" && attrName[0] <= "Z") {
+      errorAt(MakeErr.uppercaseAttr(attrName), attrIdent.pos, attrIdent.end);
+    } else {
+      attrNames.push(attrName);
+    }
 
     startNode();
     bump(SyntaxKind.Identifier);
 
     if (eat(SyntaxKind.Equal)) {
-      if (eat(SyntaxKind.StringLiteral)) {
-        const attrName = getText(attrIdent);
-        if (attrNames.includes(attrName)) {
-          errorAt(MakeErr.duplAttr(attrName), attrIdent.pos, attrIdent.end);
-        } else if (attrName[0] >= "A" && attrName[0] <= "Z") {
-          errorAt(
-            MakeErr.uppercaseAttr(attrName),
-            attrIdent.pos,
-            attrIdent.end,
-          );
-        } else {
-          attrNames.push(attrName);
-        }
-      } else {
+      if (!eat(SyntaxKind.StringLiteral)) {
         errRecover(Diag_Attr_Value_Expected, attrFollow);
       }
-    } else {
-      errRecover(Diag_Eq_Token_Expected, attrFollow);
     }
+
     completeNode(SyntaxKind.AttributeNode);
   }
 
