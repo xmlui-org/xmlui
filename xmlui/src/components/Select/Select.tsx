@@ -215,9 +215,9 @@ export function Select({
 // ============================================================================
 // XMLUI Select definition
 
-/** 
+/**
  * The \`Select\` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.
- * The dropdown list displays the labels while 
+ * The dropdown list displays the labels while
  * XMLUI stores the selected value for further use when the user selects a particular item.
  * @descriptionRef
  */
@@ -238,7 +238,7 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
     /**
      * With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
      * This results in a visual indication of a status change (reacting to form field validation).
-     * @descriptionRef 
+     * @descriptionRef
      */
     validationStatus?: ValidationStatus;
     /**
@@ -254,7 +254,7 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
      * @descriptionRef
      */
     optionTemplate?: ComponentDef;
-    /** 
+    /**
      * This optional property provides the ability to customize what is displayed when the list of options is empty.
      * @descriptionRef
      */
@@ -266,14 +266,14 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
      * @descriptionRef
      */
     didChange?: string;
-    /** 
+    /**
      * This event fires when the component is focused.
      * @descriptionRef
      */
     gotFocus?: string;
     /**
      * This event fires when the component loses focus.
-     * 
+     *
      * See the example in the [gotFocus event section](#gotfocus).
      */
     lostFocus?: string;
@@ -295,17 +295,17 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
     /**
      * This context variable acts as a template for an item in the list.
      * Access attributes of the item using the dot notation.
-     * 
+     *
      * For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
      */
-    "$item": any; 
+    "$item": any;
   };
 }
 
 const defaultOptionRenderer = {
   type: "Text",
   props: {
-    value: "{$item.label}",
+    value: "{$item.label} akakaka",
   },
 };
 

@@ -41,25 +41,23 @@ $componentName: "Select";
   }
 }
 
-$min-height: createThemeVar("Input:min-height-#{$componentName}");
-
 .selectContainer {
   width: 100%;
 }
 
 .selectToggleButton {
-  padding-left: 0.5rem;
+  padding: t.$space-2;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
   display: flex;
   flex-direction: row;
   width: 100%;
-  min-height: $min-height;
   border-width: 1px;
   border-style: solid;
   transition: background-color ease-in .1s;
   overflow: hidden;
+  font-size: inherit;
   //user-select: text;
 
   @include variant("default");
@@ -90,12 +88,12 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 32px;
-    width: 32px;
     background-color: transparent;
     cursor: pointer;
     border: 0;
     margin: 0;
+    height: 100%;
+    width: auto;
   }
 }
 
@@ -116,9 +114,10 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   }
 
   .item {
+    font-size: createThemeVar("Input:font-size-Select");
     display: flex;
-    padding-top: 0.5em;
-    padding-bottom: 0.5em;
+    padding-top: .5em;
+    padding-bottom: .5em;
     padding-inline: 1em;
     align-items: center;
     user-select: none;
