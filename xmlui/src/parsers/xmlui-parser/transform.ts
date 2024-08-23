@@ -756,8 +756,10 @@ export function nodeToComponentDef(
     const hasComponentName = UCRegex.test(tagName);
     const shouldUseTextNodeElement = hasComponentName || tagName === "prop";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "api";
+    const attrs = getAttributes(node);
 
-    parseEscapeCharactersInAttrValues(getAttributes(node));
+    desugarKeyOnlyAttrs(attrs);
+    parseEscapeCharactersInAttrValues(attrs);
     parseEscapeCharactersInContent(childNodes);
 
     mergeConsecutiveTexts(childNodes, shouldCollapseWhitespace);
@@ -1193,4 +1195,19 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
       ...node.children!.slice(childrenListIdx),
     ],
   };
+}
+
+function desugarKeyOnlyAttrs(attrs: Node[]) {
+  for (let attr of attrs) {
+    if (attr.children?.length === 1) {
+      const eq = {
+        kind: SyntaxKind.Equal,
+      } as Node;
+      const value = {
+        kind: SyntaxKind.StringLiteral,
+        text: '"true"',
+      } as TransformNode;
+      attr.children!.push(eq, value);
+    }
+  }
 }

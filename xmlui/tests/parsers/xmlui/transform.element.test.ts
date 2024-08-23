@@ -135,7 +135,7 @@ describe("Ueml transform - child elements", () => {
       transformSource("<Component myns:name='MyComp'><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
-      expect(err.toString().includes("'='")).equal(true);
+      expect(err.toString().includes("identifier expected")).equal(true);
     }
   });
 

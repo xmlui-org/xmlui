@@ -6,9 +6,9 @@ import { parseSource } from "./xmlui";
 
 describe("Xmlui parser", () => {
   it("unexpected char", () => {
-    const { node, getText, errors } = parseSource('<A #/>');
+    const { node, getText, errors } = parseSource("<A #/>");
 
-    expect(errors.length).toEqual(1)
+    expect(errors.length).toEqual(1);
     expect(errors[0].code).toEqual(ErrCodes.invalidChar);
   });
 
@@ -36,7 +36,9 @@ describe("Xmlui parser", () => {
   });
 
   it("unterminated CData", () => {
-    const { node, getText, errors } = parseSource("<Stack> <![CDATA[hi there </Stack>");
+    const { node, getText, errors } = parseSource(
+      "<Stack> <![CDATA[hi there </Stack>",
+    );
     const rootElem = node.children![0];
     const childElements = rootElem.children[3];
     const child0 = childElements.children[0];
@@ -53,14 +55,16 @@ describe("Xmlui parser", () => {
     const { node, getText, errors } = parseSource("<![CDATA[hi there");
 
     //The end of file token is the '+1'
-    expect(node.children!.length).toEqual(2 + 1)
+    expect(node.children!.length).toEqual(2 + 1);
     expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
     expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
     expect(errors[0].code).toEqual(ErrCodes.untermCData);
   });
 
   it("unterminated script", () => {
-    const { node, getText, errors } = parseSource("<Stack> <script>hi there </Stack>");
+    const { node, getText, errors } = parseSource(
+      "<Stack> <script>hi there </Stack>",
+    );
     const rootElem = node.children![0];
     const childElements = rootElem.children[3];
 
@@ -279,6 +283,30 @@ describe("Xmlui parser", () => {
     expect(getText(attr0Value)).equal("`val\\r\\n`");
   });
 
+  it("Attribute key-only", () => {
+    const { node, getText, errors } = parseSource("<Stack attr/>");
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameId = nameNode.children[0];
+    const attrList = rootElem.children[2];
+    const attr0 = attrList.children[0];
+    const attr0Name = attr0.children[0];
+    const close = rootElem.children[3];
+
+    expect(errors.length).toEqual(0);
+
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameId)).equal("Stack");
+
+    expect(attr0.kind).toEqual(SyntaxKind.AttributeNode);
+    expect(attr0Name.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(attr0Name)).equal("attr");
+
+    expect(close.kind).toEqual(SyntaxKind.NodeClose);
+  });
+
   it("Attribute with dash works", () => {
     const { node, getText } = parseSource("<Stack my-style-attr='val' />");
     const rootElem = node.children![0];
@@ -299,11 +327,6 @@ describe("Xmlui parser", () => {
     expect(attr0Value.kind).toEqual(SyntaxKind.StringLiteral);
     expect(getText(attr0Name)).equal("my-style-attr");
     expect(getText(attr0Value)).equal("'val'");
-  });
-
-  it("Empty attribute does not work", () => {
-    const { errors } = parseSource("<Stack attr/>");
-    expect(errors[0].code).toEqual(ErrCodes.expEq);
   });
 
   it("Text works #1", () => {
@@ -342,7 +365,9 @@ describe("Xmlui parser", () => {
     expect(getText(child0)).equal("    hello    ");
   });
   it("Text works #3", () => {
-    const { node, getText } = parseSource("<Stack>  hello\r\n\rbello  </Stack>");
+    const { node, getText } = parseSource(
+      "<Stack>  hello\r\n\rbello  </Stack>",
+    );
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
@@ -418,7 +443,9 @@ describe("Xmlui parser - child nodes", () => {
   });
 
   it("comment separated text", () => {
-    const { node, getText } = parseSource(`<Stack>hello<!-- comment -->bello</Stack>`);
+    const { node, getText } = parseSource(
+      `<Stack>hello<!-- comment -->bello</Stack>`,
+    );
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
@@ -483,7 +510,9 @@ describe("Xmlui parser - child nodes", () => {
   });
 
   it("helper tags", () => {
-    const { node, getText } = parseSource("<Stack><prop name='myProp'>hello</prop></Stack>");
+    const { node, getText } = parseSource(
+      "<Stack><prop name='myProp'>hello</prop></Stack>",
+    );
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
@@ -557,41 +586,62 @@ describe("find token at pos", () => {
     const { node } = parseSource(selfCloseTag);
     const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 0)!;
     expect(chainBeforePos).toBeUndefined();
-    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.OpenNodeStart);
+    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(
+      SyntaxKind.OpenNodeStart,
+    );
   });
 
   it("after last token", () => {
     const { node } = parseSource(selfCloseTag);
-    const { chainAtPos, chainBeforePos } = findTokenAtPos(node, selfCloseTag.length)!;
-    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
-    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
+    const { chainAtPos, chainBeforePos } = findTokenAtPos(
+      node,
+      selfCloseTag.length,
+    )!;
+    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(
+      SyntaxKind.NodeClose,
+    );
+    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(
+      SyntaxKind.EndOfFileToken,
+    );
   });
 
   it("inside token", () => {
     const { node } = parseSource(selfCloseTag);
     const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 7)!;
     expect(chainBeforePos).toBeUndefined();
-    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.StringLiteral);
+    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(
+      SyntaxKind.StringLiteral,
+    );
   });
 
   it("between 2 tokens", () => {
     const { node } = parseSource(selfCloseTag);
     const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 4)!;
-    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
+    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(
+      SyntaxKind.Identifier,
+    );
     expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Equal);
   });
 
   it("between 2 tokens, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
     const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 3)!;
-    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.Identifier);
-    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.Identifier);
+    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(
+      SyntaxKind.Identifier,
+    );
+    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(
+      SyntaxKind.Identifier,
+    );
   });
 
   it("between token and Eof, at trivia", () => {
     const { node } = parseSource(selfCloseTag);
     const { chainAtPos, chainBeforePos } = findTokenAtPos(node, 10)!;
-    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(SyntaxKind.NodeClose);
-    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(SyntaxKind.EndOfFileToken);
+    expect(chainBeforePos?.[chainBeforePos.length - 1].kind).toBe(
+      SyntaxKind.NodeClose,
+    );
+    expect(chainAtPos?.[chainAtPos.length - 1].kind).toBe(
+      SyntaxKind.EndOfFileToken,
+    );
   });
 });
