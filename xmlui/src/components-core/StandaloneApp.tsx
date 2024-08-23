@@ -17,8 +17,8 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlui-parser/fileExtensions";
-import {Parser} from "@parsers/scripting/Parser";
-import {collectCodeBehindFromSource, removeCodeBehindTokensFromTree} from "@parsers/scripting/code-behind-collect";
+import {Parser} from "../parsers/scripting/Parser";
+import {collectCodeBehindFromSource, removeCodeBehindTokensFromTree} from "../parsers/scripting/code-behind-collect";
 
 
 // --- The properties of the standalone app

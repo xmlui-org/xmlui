@@ -78,7 +78,7 @@ export const AppHeader = ({
             onClick={toggleDrawer}
             icon={<Icon name={"hamburger"} />}
             variant={"ghost"}
-            style={{ color: "inherit" }}
+            style={{ color: "inherit", flexShrink: 0 }}
           />
         )}
         {(showLogo || !navPanelVisible) && (
