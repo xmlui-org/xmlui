@@ -274,7 +274,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     bump(SyntaxKind.Identifier);
 
     if (eat(SyntaxKind.Equal)) {
-      if (!eat(SyntaxKind.StringLiteral)) {
+      if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
         errRecover(Diag_Attr_Value_Expected, attrFollow);
       }
     }
