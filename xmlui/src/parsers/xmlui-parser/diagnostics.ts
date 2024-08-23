@@ -106,7 +106,7 @@ export const Diag_Tag_Identifier_Expected = {
 export const Diag_Attr_Value_Expected = {
   category: DiagnosticCategory.Error,
   code: ErrCodes.expAttrValue,
-  message: "An attribute value expected between quotes.",
+  message: "An attribute value expected.",
 } as const;
 
 export const Diag_Eq_Token_Expected = {

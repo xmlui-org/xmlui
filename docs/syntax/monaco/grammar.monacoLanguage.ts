@@ -22,7 +22,7 @@ export const UEMLGrammar: any = {
     defaultToken: "",
     tokenPostfix: ".ueml",
     ignoreCase: false,
-    identifier: /[a-zA-Z$_][-\w.:$]*/,
+    identifier: /[a-zA-Z$_][-\w.$]*/,
     tokenizer: {
       root: [
         { include: "@commentStart" },
@@ -164,7 +164,7 @@ export const UEMLGrammar: any = {
       ],
       attributeStart: [
         [
-          /(^|\s+)(@identifier)(\s*=\s*)(['\"`])/,
+          /(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(['\"`])/,
           [
             "",
             "attribute",
@@ -179,7 +179,16 @@ export const UEMLGrammar: any = {
           ],
         ],
         [
-          /(^|\s+)(@identifier)/,
+          /(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(@identifier)/,
+          [
+            "",
+            "attribute",
+            "operators",
+            "string"
+          ]
+        ],
+        [
+          /(^|\s+)(@identifier(?::@identifier)?)/,
           [
             "",
             "attribute"

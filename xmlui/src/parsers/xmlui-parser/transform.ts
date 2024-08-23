@@ -759,6 +759,7 @@ export function nodeToComponentDef(
     const attrs = getAttributes(node);
 
     desugarKeyOnlyAttrs(attrs);
+    desugarQuotelessAttrs(attrs, getText);
     parseEscapeCharactersInAttrValues(attrs);
     parseEscapeCharactersInContent(childNodes);
 
@@ -1208,6 +1209,14 @@ function desugarKeyOnlyAttrs(attrs: Node[]) {
         text: '"true"',
       } as TransformNode;
       attr.children!.push(eq, value);
+    }
+  }
+}
+function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
+  for (let attr of attrs) {
+const attrValue = (attr.children?.[2] as TransformNode)
+    if (attr.children?.[2]?.kind === SyntaxKind.Identifier) {
+      attrValue.text = '"' + getText(attrValue) + '"';
     }
   }
 }
