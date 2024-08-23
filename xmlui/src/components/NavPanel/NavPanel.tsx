@@ -1,4 +1,4 @@
-import React, { type ReactNode, useId, useRef } from "react";
+import React, { forwardRef, type ReactNode, useId, useRef } from "react";
 import styles from "./NavPanel.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -12,6 +12,7 @@ import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { createPortal } from "react-dom";
 import { getAppLayoutOrientation } from "@components/App/App";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 interface INavPanelContext {
   inDrawer: boolean;
@@ -51,19 +52,23 @@ function DrawerNavPanel({
   );
 }
 
-function NavPanel({
-  children,
-  style,
-  logoContent,
-  className,
-}: {
-  children: ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-  logoContent?: ReactNode;
-}) {
+const NavPanel = forwardRef(function NavPanel(
+  {
+    children,
+    style,
+    logoContent,
+    className,
+  }: {
+    children: ReactNode;
+    className?: string;
+    style?: React.CSSProperties;
+    logoContent?: ReactNode;
+  },
+  forwardedRef,
+) {
   const id = useId();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const ref = forwardedRef ? composeRefs(scrollContainerRef, forwardedRef) : scrollContainerRef;
   const appLayoutContext = useAppLayoutContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const showLogo = appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
@@ -89,7 +94,7 @@ function NavPanel({
           navPanelVisible &&
           createPortal(
             <div
-              ref={scrollContainerRef}
+              ref={ref}
               className={classnames(styles.wrapper, className, {
                 [styles.horizontal]: horizontal,
               })}
@@ -101,7 +106,7 @@ function NavPanel({
                 </div>
               </ScrollContext.Provider>
             </div>,
-            navPanelRoot
+            navPanelRoot,
           )}
         {drawerRoot &&
           drawerVisible &&
@@ -109,7 +114,7 @@ function NavPanel({
             <DrawerNavPanel className={className} style={style} logoContent={logoContent}>
               {children}
             </DrawerNavPanel>,
-            drawerRoot
+            drawerRoot,
           )}
       </>
     );
@@ -117,7 +122,7 @@ function NavPanel({
 
   return (
     <div
-      ref={scrollContainerRef}
+      ref={ref}
       className={classnames(styles.wrapper, className, {
         [styles.horizontal]: horizontal,
       })}
@@ -130,7 +135,7 @@ function NavPanel({
       </ScrollContext.Provider>
     </div>
   );
-}
+});
 
 // =====================================================================================================================
 // XMLUI NavPanel component definition
@@ -187,5 +192,5 @@ export const navPanelRenderer = createComponentRenderer<NavPanelComponentDef>(
       </NavPanel>
     );
   },
-  metadata
+  metadata,
 );

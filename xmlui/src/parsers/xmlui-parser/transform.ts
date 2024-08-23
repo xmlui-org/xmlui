@@ -30,7 +30,7 @@ interface TransformNode extends Node {
 export function nodeToComponentDef(
   node: Node,
   originalGetText: GetText,
-  fileId: number,
+  fileId: string | number,
   moduleResolver: ModuleResolver = () => "",
 ): ComponentDef | CompoundComponentDef | null {
   const getText = (node: TransformNode) => {

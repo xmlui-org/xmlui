@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, forwardRef, ReactNode} from "react";
 import { useEffect, useState } from "react";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -35,7 +35,7 @@ type DropdownMenuProps = {
   triggerButtonIconPosition?: IconPosition;
 };
 
-export function DropdownMenu({
+export const DropdownMenu = forwardRef(function DropdownMenu({
   triggerTemplate,
   children,
   label,
@@ -48,7 +48,7 @@ export function DropdownMenu({
   triggerButtonThemeColor = "primary",
   triggerButtonIcon = "chevrondown",
   triggerButtonIconPosition = "end",
-}: DropdownMenuProps) {
+}: DropdownMenuProps, ref) {
   const { root } = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -71,7 +71,7 @@ export function DropdownMenu({
         setOpen(isOpen);
       }}
     >
-      <ReactDropdownMenu.Trigger asChild disabled={disabled}>
+      <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any}>
         {triggerTemplate ? (
           triggerTemplate
         ) : (
@@ -98,7 +98,7 @@ export function DropdownMenu({
       </ReactDropdownMenu.Portal>
     </ReactDropdownMenu.Root>
   );
-}
+});
 
 // ====================================================================================================================
 // XMLUI DropdownMenu definition
@@ -179,7 +179,7 @@ const metadata: ComponentDescriptor<DropdownMenuComponentDef> = {
   defaultThemeVars: {
     "color-bg-DropdownMenu": "$color-bg-primary",
     "min-width-DropdownMenu": "160px",
-    "shadow-DropdownMenu": "$shadow-md",
+    "shadow-DropdownMenu": "$shadow-xl",
     "style-border-DropdownMenu-content": "solid",
   },
 };
@@ -318,7 +318,7 @@ const menuItemMetadata: ComponentDescriptor<MenuItemComponentDef> = {
     "color-bg-MenuItem": "$color-bg-dropdown-item",
     "color-MenuItem": "$color-text-primary",
     "font-family-MenuItem": "$font-family",
-    "font-size-MenuItem": "inherit",
+    "font-size-MenuItem": "$font-size-small",
     "padding-vertical-MenuItem": "$space-2",
     "padding-horizontal-MenuItem": "$space-3",
     "color-bg-MenuItem--hover": "$color-bg-dropdown-item--hover",

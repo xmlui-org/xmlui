@@ -3,7 +3,8 @@ import classnames from "@components-core/utils/classnames";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { CSSProperties, ReactNode } from "react";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { forwardRef } from "react";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import { Avatar } from "@components/Avatar/Avatar";
@@ -27,22 +28,17 @@ type Props = {
   onClick?: any;
 };
 
-export function Card({
-  children,
-  style,
-  title,
-  subTitle,
-  linkTo,
-  avatarUrl,
-  showAvatar = !!avatarUrl || false,
-  onClick,
-}: Props) {
+export const Card = forwardRef(function Card(
+  { children, style, title, subTitle, linkTo, avatarUrl, showAvatar = !!avatarUrl || false, onClick }: Props,
+  ref,
+) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
     layout: { marginTop: 0, marginBottom: "4px" },
   };
   return (
     <div
+      ref={ref as any}
       className={classnames(styles.wrapper, {
         [styles.isClickable]: !!onClick,
       })}
@@ -50,11 +46,7 @@ export function Card({
       onClick={onClick}
     >
       {[title, subTitle, avatarUrl, showAvatar].some(Boolean) && (
-        <Stack
-          orientation="horizontal"
-          verticalAlignment="center"
-          layout={{ gap: "1rem" }}
-        >
+        <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "1rem" }}>
           {showAvatar && <Avatar url={avatarUrl} name={title} />}
           <Stack orientation="vertical">
             {linkTo ? (
@@ -71,7 +63,7 @@ export function Card({
       {children}
     </div>
   );
-}
+});
 
 // =====================================================================================================================
 // XMLUI Card component definition
@@ -119,8 +111,7 @@ const cardMetadata: ComponentDescriptor<CardComponentDef> = {
     "color-border-Card": "$color-border",
     "thickness-border-Card": "1px",
     "style-border-Card": "solid",
-    "border-Card":
-      "$thickness-border-Card $style-border-Card $color-border-Card",
+    "border-Card": "$thickness-border-Card $style-border-Card $color-border-Card",
     "radius-Cars": "$radius",
     "shadow-Card": "none",
     light: {
@@ -153,7 +144,7 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
       </Card>
     );
   },
-  cardMetadata
+  cardMetadata,
 );
 
 // =====================================================================================================================
@@ -186,27 +177,26 @@ const marginlessCardMetadata = {
   displayName: "MarginlessCard",
 };
 
-export const marginlessCardComponentRenderer =
-  createComponentRenderer<MarginlessComponentDef>(
-    "MarginlessCard",
-    ({ node, extractValue, renderChild, layoutCss }) => {
-      return (
-        <Card
-          style={{ ...layoutCss, padding: 0 }}
-          title={extractValue.asOptionalString(node.props.title)}
-          linkTo={extractValue.asOptionalString(node.props.linkTo)}
-          subTitle={extractValue.asOptionalString(node.props.subTitle)}
-          avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
-          showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
-        >
-          {renderChild(node.children, {
-            // Since the card is a flex container, it's children should behave the same as in a stack
-            // (e.g. starsizing works in this case)
-            type: "Stack",
-            orientation: "vertical",
-          })}
-        </Card>
-      );
-    },
-    marginlessCardMetadata
-  );
+export const marginlessCardComponentRenderer = createComponentRenderer<MarginlessComponentDef>(
+  "MarginlessCard",
+  ({ node, extractValue, renderChild, layoutCss }) => {
+    return (
+      <Card
+        style={{ ...layoutCss, padding: 0 }}
+        title={extractValue.asOptionalString(node.props.title)}
+        linkTo={extractValue.asOptionalString(node.props.linkTo)}
+        subTitle={extractValue.asOptionalString(node.props.subTitle)}
+        avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
+        showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
+      >
+        {renderChild(node.children, {
+          // Since the card is a flex container, it's children should behave the same as in a stack
+          // (e.g. starsizing works in this case)
+          type: "Stack",
+          orientation: "vertical",
+        })}
+      </Card>
+    );
+  },
+  marginlessCardMetadata,
+);

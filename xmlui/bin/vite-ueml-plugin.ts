@@ -19,6 +19,7 @@ const moduleScriptExtension = new RegExp(`.${moduleFileExtension}$`);
  * Transform UEML files to JS objects.
  */
 export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugin {
+  let itemIndex = 0;
   return {
     name: "vite:transform-ueml",
 
@@ -41,14 +42,17 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
         }
       };
 
-      // --- Create a unique fileId for the file being processed.
-      const fileId = 0;
-
       if (xmluiExtension.test(id)) {
+        const fileId = "" + itemIndex++;
         const componentDef = parseXmlUiMarkup(code, fileId, moduleResolver);
+        const file = {
+          component: componentDef,
+          src: code,
+          file: fileId,
+        }
 
         return {
-          code: dataToEsm(componentDef),
+          code: dataToEsm(file),
           map: { mappings: "" },
         };
       }
@@ -58,7 +62,7 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
         const parser = new Parser(code);
         parser.parseStatements();
 
-        let codeBehind = collectCodeBehindFromSource("Main", code, moduleResolver);
+        const codeBehind = collectCodeBehindFromSource("Main", code, moduleResolver);
         removeCodeBehindTokensFromTree(codeBehind);
 
         // TODO: Add error handling.

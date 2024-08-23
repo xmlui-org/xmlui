@@ -199,6 +199,10 @@ $themeVars: ();
   &.secondary {
     @include textVariant("secondary");
   }
+
+  &.strong{
+    font-weight: t.$font-weight-bold;
+  }
 }
 
 /*

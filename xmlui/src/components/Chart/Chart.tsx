@@ -1,4 +1,4 @@
-import type { CSSProperties} from "react";
+import {CSSProperties, forwardRef} from "react";
 import React, { Suspense, useMemo } from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -117,7 +117,7 @@ type ChartProps = {
   showLegend?: boolean;
 };
 
-function Chart({
+const Chart = forwardRef(function Chart({
   type,
   labels,
   series,
@@ -126,7 +126,7 @@ function Chart({
   showAxisLabels = true,
   tooltipEnabled = true,
   showLegend = false,
-}: ChartProps) {
+}: ChartProps, ref) {
   const colors = useColors(
     {
       name: "color-primary-500",
@@ -177,13 +177,13 @@ function Chart({
 
   return (
     //   TODO illesg TEMP FLEX 1 STAR SIZING
-    <div style={{ ...style }} className={styles.wrapper}>
+    <div style={{ ...style }} className={styles.wrapper} ref={ref as any}>
       <Suspense>
-        <ApexChart options={options} type={type} series={series} height={"100%"} width={"100%"} />
+        {!!series && <ApexChart options={options} type={type} series={series} height={"100%"} width={"100%"} />}
       </Suspense>
     </div>
   );
-}
+});
 
 type ChartDef = ComponentDef<"Chart"> & {
   props: {

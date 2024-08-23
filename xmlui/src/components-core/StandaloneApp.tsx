@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactDOM, { Root } from "react-dom/client";
+import type { Root } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
@@ -16,12 +17,15 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlui-parser/fileExtensions";
+import {Parser} from "../parsers/scripting/Parser";
+import {collectCodeBehindFromSource, removeCodeBehindTokensFromTree} from "../parsers/scripting/code-behind-collect";
 
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
   appDef?: StandaloneAppDescription;
   decorateComponentsWithTestId?: boolean;
+  debugEnabled?: boolean;
   runtime?: any;
   components?: ComponentRendererDef[];
 };
@@ -30,6 +34,7 @@ type StandaloneAppProps = {
 function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
+  debugEnabled = true,
   runtime,
   components: customComponents,
 }: StandaloneAppProps) {
@@ -55,6 +60,7 @@ function StandaloneApp({
     entryPoint,
     components,
     themes,
+    sources
   } = standaloneApp;
 
   return (
@@ -64,6 +70,7 @@ function StandaloneApp({
         decorateComponentsWithTestId={decorateComponentsWithTestId}
         node={entryPoint!}
         standalone={true}
+        debugEnabled={debugEnabled}
         // @ts-ignore
         baseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={{
@@ -74,6 +81,7 @@ function StandaloneApp({
         defaultTone={defaultTone as ThemeTone}
         resources={resources}
         resourceMap={resourceMap}
+        sources={sources}
         contributes={{
           compoundComponents: components,
           components: customComponents,
@@ -86,9 +94,29 @@ function StandaloneApp({
 
 async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
-    return parseXmlUiMarkup(await response.text());
+    const code = await response.text();
+    const fileId = response.url;
+    return {
+      component: parseXmlUiMarkup(code, fileId),
+      src: code,
+      file: fileId,
+    }
   }
-  return response.json();
+  if(response.url.toLowerCase().endsWith(".xmlui.xs")){
+    const code = await response.text()
+    const parser = new Parser(code);
+    parser.parseStatements();
+
+    const codeBehind = collectCodeBehindFromSource("Main", code, ()=>{return ""});
+    removeCodeBehindTokensFromTree(codeBehind);
+    return {
+      codeBehind: codeBehind,
+      file: response.url,
+    };
+  }
+  return {
+    component: await response.json()
+  };
 }
 
 function matchesFileName(path: string, fileName: string) {
@@ -110,6 +138,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
   let entryPointCodeBehind: CollectedDeclarations | undefined;
   let themes: Array<ThemeDefinition> = [];
   let apiInterceptor;
+  const sources = {};
 
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
@@ -122,7 +151,8 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
       if (key.endsWith(codeBehindFileExtension)) {
         entryPointCodeBehind = value.default;
       } else {
-        entryPoint = value.default;
+        entryPoint = value.default.component;
+        sources[value.default.file] = value.default.src;
       }
     }
     if (matchesFileName(key, "api")) {
@@ -132,7 +162,8 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
       if (key.endsWith(codeBehindFileExtension)) {
         codeBehindsByFileName[key] = value.default;
       } else {
-        componentsByFileName[key] = value.default;
+        componentsByFileName[key] = value.default.component;
+        sources[value.default.file] = value.default.src;
       }
     }
     if (matchesFolder(key, "themes")) {
@@ -177,6 +208,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     components: components,
     themes: config?.themes || themes,
     apiInterceptor: config?.apiInterceptor || apiInterceptor,
+    sources
   };
 }
 
@@ -333,33 +365,73 @@ function useStandalone(
         return;
       }
 
+      // temp solution, needs refactor!!!
+
       //default mode: process.env.VITE_BUILD_MODE === "ALL"
       const configResponse = await fetch(normalizePath("config.json")!);
       const config: StandaloneJsonConfig = await configResponse.json();
-      const legacyXmlUiParser = config.globals?.legacyXmlUiParser;
 
       const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value));
       const themePromises = config.themes?.map((themePath) => {
-        return fetch(normalizePath(themePath)!).then((value) => parseComponentResp(value)) as Promise<ThemeDefinition>;
+        return fetch(normalizePath(themePath)!).then((value) => value.json()) as Promise<ThemeDefinition>;
       });
 
       const componentPromises = config.components?.map((componentPath) => {
         return fetch(normalizePath(componentPath)!).then((value) =>
           parseComponentResp(value)
-        ) as Promise<CompoundComponentDef>;
+        );
       });
 
-      let [entryPoint, components, themes] = await Promise.all([
+      const [loadedEntryPoint, loadedComponents, themes] = await Promise.all([
         entryPointPromise,
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
 
+      const sources = {};
+      const codeBehinds = {};
+      sources[loadedEntryPoint.file] = loadedEntryPoint.src;
+      loadedComponents.forEach((compWrapper) => {
+          if(compWrapper.file.endsWith(".xmlui.xs")){
+            codeBehinds[compWrapper.file] = compWrapper.codeBehind;
+          } else {
+            sources[compWrapper.file] = compWrapper.src;
+          }
+      });
+
+      const entryPointCodeBehind = codeBehinds[loadedEntryPoint.file + ".xs"];
+      const entryPointWithCodeBehind = {
+        ...loadedEntryPoint.component,
+        vars: {
+          ...entryPointCodeBehind?.vars,
+          ...loadedEntryPoint.component.vars,
+        },
+        functions: entryPointCodeBehind?.functions,
+        scriptError: entryPointCodeBehind?.moduleErrors,
+      }
+
+      const componentsWithCodeBehinds = loadedComponents.filter((compWrapper)=>!compWrapper.file.endsWith(".xmlui.xs")).map((compWrapper) => {
+        const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
+        return {
+          ...compWrapper.component,
+          component: {
+            ...compWrapper.component.component,
+            vars: {
+              ...compWrapper.component.component.vars,
+              ...componentCodeBehind?.vars,
+            },
+            functions: componentCodeBehind?.functions,
+            scriptError: componentCodeBehind?.moduleErrors,
+          },
+        };
+      });
+
       setStandaloneApp({
         ...config,
         themes,
-        components,
-        entryPoint,
+        sources,
+        components: componentsWithCodeBehinds,
+        entryPoint: entryPointWithCodeBehind,
       });
     })();
   }, [runtime, standaloneAppDef]);

@@ -1,0 +1,9 @@
+@use "@components-core/theming/themes" as themes;
+
+.wrapper{
+  opacity: 0.5;
+  &:hover{
+    opacity: 1;
+  }
+
+}
