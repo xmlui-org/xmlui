@@ -243,7 +243,6 @@ registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {.
 registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
 registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
 registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
-registerIconRenderer("chevronright", (props: IconBaseProps) => <BsChevronRight {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {
