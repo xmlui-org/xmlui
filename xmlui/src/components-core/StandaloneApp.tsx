@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import ReactDOM, { Root } from "react-dom/client";
+import type { Root } from "react-dom/client";
+import ReactDOM from "react-dom/client";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
@@ -16,6 +17,8 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlui-parser/fileExtensions";
+import {Parser} from "@parsers/scripting/Parser";
+import {collectCodeBehindFromSource, removeCodeBehindTokensFromTree} from "@parsers/scripting/code-behind-collect";
 
 
 // --- The properties of the standalone app
@@ -98,6 +101,18 @@ async function parseComponentResp(response: Response) {
       src: code,
       file: fileId,
     }
+  }
+  if(response.url.toLowerCase().endsWith(".xmlui.xs")){
+    const code = await response.text()
+    const parser = new Parser(code);
+    parser.parseStatements();
+
+    const codeBehind = collectCodeBehindFromSource("Main", code, ()=>{return ""});
+    removeCodeBehindTokensFromTree(codeBehind);
+    return {
+      codeBehind: codeBehind,
+      file: response.url,
+    };
   }
   return {
     component: await response.json()
@@ -350,13 +365,15 @@ function useStandalone(
         return;
       }
 
+      // temp solution, needs refactor!!!
+
       //default mode: process.env.VITE_BUILD_MODE === "ALL"
       const configResponse = await fetch(normalizePath("config.json")!);
       const config: StandaloneJsonConfig = await configResponse.json();
 
       const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value));
       const themePromises = config.themes?.map((themePath) => {
-        return fetch(normalizePath(themePath)!).then((value) => parseComponentResp(value)) as Promise<ThemeDefinition>;
+        return fetch(normalizePath(themePath)!).then((value) => value.json()) as Promise<ThemeDefinition>;
       });
 
       const componentPromises = config.components?.map((componentPath) => {
@@ -365,24 +382,56 @@ function useStandalone(
         );
       });
 
-      const [entryPoint, components, themes] = await Promise.all([
+      const [loadedEntryPoint, loadedComponents, themes] = await Promise.all([
         entryPointPromise,
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
 
       const sources = {};
-      sources[entryPoint.file] = entryPoint.src;
-      components.forEach((component) => {
-          sources[component.file] = component.src;
+      const codeBehinds = {};
+      sources[loadedEntryPoint.file] = loadedEntryPoint.src;
+      loadedComponents.forEach((compWrapper) => {
+          if(compWrapper.file.endsWith(".xmlui.xs")){
+            codeBehinds[compWrapper.file] = compWrapper.codeBehind;
+          } else {
+            sources[compWrapper.file] = compWrapper.src;
+          }
+      });
+
+      const entryPointCodeBehind = codeBehinds[loadedEntryPoint.file + ".xs"];
+      const entryPointWithCodeBehind = {
+        ...loadedEntryPoint.component,
+        vars: {
+          ...entryPointCodeBehind?.vars,
+          ...loadedEntryPoint.component.vars,
+        },
+        functions: entryPointCodeBehind?.functions,
+        scriptError: entryPointCodeBehind?.moduleErrors,
+      }
+
+      const componentsWithCodeBehinds = loadedComponents.filter((compWrapper)=>!compWrapper.file.endsWith(".xmlui.xs")).map((compWrapper) => {
+        const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
+        return {
+          ...compWrapper.component,
+          component: {
+            ...compWrapper.component.component,
+            vars: {
+              ...compWrapper.component.component.vars,
+              ...componentCodeBehind?.vars,
+            },
+            functions: componentCodeBehind?.functions,
+            scriptError: componentCodeBehind?.moduleErrors,
+          },
+        };
       });
 
       setStandaloneApp({
         ...config,
         themes,
         sources,
-        components: components.map(comp => comp.component),
-        entryPoint: entryPoint.component,
+        components: componentsWithCodeBehinds,
+        entryPoint: entryPointWithCodeBehind,
       });
     })();
   }, [runtime, standaloneAppDef]);
