@@ -841,7 +841,7 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     "padding-horizontal-cell-last-Table": "$space-5",
     "padding-vertical-cell-Table": "$space-2",
     "padding-cell-Table": "$padding-vertical-cell-Table $padding-horizontal-cell-Table",
-    "thickness-border-cell-Table": "$space-0_5",
+    "thickness-border-cell-Table": "1px",
     "style-border-cell-Table": "solid",
     "border-cell-Table": "$thickness-border-cell-Table $style-border-cell-Table $color-border-cell-Table",
 

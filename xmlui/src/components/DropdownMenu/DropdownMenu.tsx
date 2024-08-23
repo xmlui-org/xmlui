@@ -179,7 +179,7 @@ const metadata: ComponentDescriptor<DropdownMenuComponentDef> = {
   defaultThemeVars: {
     "color-bg-DropdownMenu": "$color-bg-primary",
     "min-width-DropdownMenu": "160px",
-    "shadow-DropdownMenu": "$shadow-md",
+    "shadow-DropdownMenu": "$shadow-xl",
     "style-border-DropdownMenu-content": "solid",
   },
 };
@@ -318,7 +318,7 @@ const menuItemMetadata: ComponentDescriptor<MenuItemComponentDef> = {
     "color-bg-MenuItem": "$color-bg-dropdown-item",
     "color-MenuItem": "$color-text-primary",
     "font-family-MenuItem": "$font-family",
-    "font-size-MenuItem": "inherit",
+    "font-size-MenuItem": "$font-size-small",
     "padding-vertical-MenuItem": "$space-2",
     "padding-horizontal-MenuItem": "$space-3",
     "color-bg-MenuItem--hover": "$color-bg-dropdown-item--hover",

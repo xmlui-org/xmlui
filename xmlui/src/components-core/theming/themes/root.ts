@@ -205,6 +205,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     shadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
     "shadow-md":
       "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
+    "shadow-xl": "0 16px 24px 2px rgba(0, 0, 0, 0.07), 0 6px 30px 5px rgba(0, 0, 0, 0.06), 0 8px 10px -5px rgba(0, 0, 0, 0.1)",
     "shadow-xxl":
       "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
     "shadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
@@ -257,7 +258,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         // --- Border colors
         "color-border": $colorSurface100,
         "color-border--disabled": $colorSurface200,
-        "color-border-dropdown-item": $colorSurface600,
+        "color-border-dropdown-item": $colorSurface200,
 
         // --- Text colors
         "color-text-primary": $colorSurface950,

@@ -1,4 +1,5 @@
-import {CSSProperties, forwardRef} from "react";
+import type {CSSProperties} from "react";
+import { forwardRef} from "react";
 import type React from "react";
 import { useMemo, useRef } from "react";
 import styles from "./Text.module.scss";
@@ -245,6 +246,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
     "font-size-Text-title": "$font-size-large",
     "font-size-Text-subtitle": "$font-size-medium",
     "font-size-Text-small": "$font-size-small",
+    "line-height-Text-small": "$line-height-tight",
     "letter-spacing-Text-caption": "0.05rem",
     "font-size-Text-placeholder": "$font-size-small",
     "font-family-Text-codefence": "$font-family-monospace",
@@ -269,7 +271,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-bg-Text-codefence": "$color-primary-100",
       "color-Text-codefence": "$color-surface-900",
       "color-Text-subheading": "$color-text-secondary",
-      "color-Text-secondary": "$color-surface-400",
+      "color-Text-secondary": "$color-text-secondary",
     },
     dark: {
       "color-bg-Text-code": "$color-surface-800",
@@ -281,7 +283,7 @@ const metadata: ComponentDescriptor<TextComponentDef> = {
       "color-bg-Text-codefence": "$color-primary-800",
       "color-Text-codefence": "$color-surface-200",
       "color-Text-subheading": "$color-text-secondary",
-      "color-Text-secondary": "$color-surface-600",
+      "color-Text-secondary": "$color-text-secondary",
     },
   },
 };

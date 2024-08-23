@@ -450,7 +450,6 @@ function AppRoot({
   resourceMap,
   sources
 }: RootComponentProps) {
-  console.log(sources);
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"

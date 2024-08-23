@@ -179,7 +179,7 @@ const Chart = forwardRef(function Chart({
     //   TODO illesg TEMP FLEX 1 STAR SIZING
     <div style={{ ...style }} className={styles.wrapper} ref={ref as any}>
       <Suspense>
-        <ApexChart options={options} type={type} series={series} height={"100%"} width={"100%"} />
+        {!!series && <ApexChart options={options} type={type} series={series} height={"100%"} width={"100%"} />}
       </Suspense>
     </div>
   );
