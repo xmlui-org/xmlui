@@ -102,7 +102,6 @@ When you select the Simple Data Load menu item (navigate to the `/get-data` page
 <br/>
 <Image alt="Using datasource prop" src="/resources/images/datasource-tutorial/list-items.png" />
 
-
 The `datasource` prop is used the same way as the `data` prop but its value is an URL instead of an inline list.
 Here, the URL points to the local "shopping-list" endpoint that returns a list of grocery items which look like so:
 
@@ -115,23 +114,16 @@ Here, the URL points to the local "shopping-list" endpoint that returns a list o
 | category  | string  |
 | inPantry  | boolean |
 
-Change the content of the last inserted page to display the number of data items displayed:
-
-_TBD_
-
-
 ## Filtering Incoming Data
 
-Not all data needs to be shown on the UI.
-Filtering a list of data after fetching it and passing it to the component to render is a common pattern.
-However, to do that, you have to use the `Datasource` component instead of the `datasource` property.
+A typical pattern involves filtering a list of data after fetching it and passing it to the component to render. However, you have to use the `Datasource` component instead of the `datasource` property to do that.
 
-In the `Main.xmlui` file, add the `Datasource` component and remove the `datasource` property from the `List`:
+In the `Main.xmlui` file, create a new page with a `Datasource` component and a `List` using the `data` property:
 
 ```ueml copy filename="Main.xmlui" {2, 4-7}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Filtering Data" to="/filter" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/filter">
   <Datasource id="filteredGroceries" url="/api/shopping-list" />
   <List data="{filteredGroceries.value}" />
@@ -139,9 +131,9 @@ In the `Main.xmlui` file, add the `Datasource` component and remove the `datasou
 <!-- Omitted -->
 ```
 
-This modification will still list the same data. However, it prepared the code to filter the data.
+The `Datasource` component manages the gritty-nitty details of fetching the data, which you can access through `value`. In this example, the ID of `Datasource` is `filteredGroceries`, so you can refer to the data from that source with `filteredGroceries.data`.
 
-Because the loaded data is just a list of objects, you can manipulate it like a regular Javascript array. Change the `data` property of `List`:
+This modification will still list the same data.You can manipulate it like a regular Javascript array. Change the `data` property of `List` to apply a filter condition:
 
 ```ueml copy filename="Main.xmlui" /.filter(item => !item.inPantry)/
 <!-- Omitted -->
@@ -162,9 +154,9 @@ The filtered list contains fewer items, only those for which the `inPantry` prop
 By default, the `List` has a loading spinner that is automatically rendered when data is loaded via the `datasource` prop. You can try it with this code:
 
 ```ueml copy filename="Main.xmlui" {2, 4-6}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Loading Indicators" to="/loading" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/loading">
   <List datasource="/api/shopping-list-slow" />
 </Page>
@@ -193,7 +185,7 @@ If you want the `List` to know that data fetching is in progress, use the `loadi
 
 The `loading` property is now bound to the `inProgress` property of the corresponding `Datasource`; while the data is being fetched, `inProgress` is `true`. Thus, the updated code displays the load indicator as in the previous example.
 
-If you filter the data from a `Datasource` (or do some other data transformation), this pattern helps display the progress indicator.
+> **Note**: XMLUI uses smart data caching. When you move to another menu and then back to "Loading Indicators", the data is immediately displayed as the app does not fetch it again from the backend. Instead, it utilizes the cached data. Refresh the browser to clear the cache and see the "in progress" effect again.
 
 ## Granular Data Selection
 
@@ -203,9 +195,9 @@ Luckily, the `Datasource` component provides a handy property called `resultSele
 Add the following lines highlighted below in the code block:
 
 ```ueml copy filename="Main.xmlui" {2, 4-7}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Granular Data Selection" to="/result-selector" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/result-selector">
   <Datasource id="selectedGroceries" url="/api/shopping-list-meta" />
   <List data="{selectedGroceries.value}" />
@@ -262,9 +254,9 @@ In the [Filtering Incoming Data](#filtering-incoming-data) section, you filtered
 Add a new route with the URL `/query-params`:
 
 ```ueml copy filename="Main.xmlui" {2, 4-7}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Using Query Parameters" to="/query-params" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/query-params">
   <Datasource id="queriedGroceries" url="/api/shopping-list-query" />
   <List data="{queriedGroceries.value}" />
@@ -306,9 +298,9 @@ In the following example, the backend requires a header named `x-api-key` to be 
 To add headers to the requests you make, start by adding a new `Page`:
 
 ```ueml copy filename="Main.xmlui" {2, 4-7}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Using Headers" to="/headers" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/headers">
   <Datasource id="groceriesWithHeaders" url="/api/shopping-list-headers" />
   <List data="{groceriesWithHeaders.value}" />
@@ -316,7 +308,7 @@ To add headers to the requests you make, start by adding a new `Page`:
 <!-- Omitted -->
 ```
 
-When you move to the newly added page, it does not display data, as the invoked API expects information in the `x-api-key` header. Modify the code to send this header:
+When you move to the newly added page, it does not display data (instead, it displays an error), as the invoked API expects information in the `x-api-key` header. Modify the code to send this header:
 
 ```ueml copy filename="Main.xmlui" /headers="{{ 'x-api-key': '0001' }}"/
 <!-- Omitted -->
@@ -334,6 +326,8 @@ When you move to the newly added page, it does not display data, as the invoked 
 <!-- Omitted -->
 ```
 
+Now, the app displays the data from the backend:
+
 <br/>
 <Image alt="Right Headers Sent" src="/resources/images/datasource-tutorial/data-with-header.png" />
 
@@ -347,9 +341,9 @@ This marks the currently displayed data as stale and enforces a new request to t
 Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respectively:
 
 ```ueml copy filename="Main.xmlui" {2, 4-7}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Refetching" to="/refetch" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/refetch">
   <Datasource id="refetchedGroceries" url="/api/shopping-list" />
   <List data="{refetchedGroceries.value}" />
@@ -383,7 +377,7 @@ You also need to increase the counter when the `refetch` is fired:
     label="Reload" 
     enabled="{!refetchedGroceries.inProgress}" 
     onClick="counter++; refetchedGroceries.refetch()" />
-  <Text value="#of refetch operations: {counter}" />
+  <Text variant="subtitle" value="#of refetch operations: {counter}" />
   <List data="{refetchedGroceries.value}" />
 </Page>
 <!-- Omitted -->
@@ -401,17 +395,9 @@ In this scenario, you will request data from the `/api/shopping-item-unconventio
 Add another `Page` and `NavLink` to the `Pages` and `NavPanel` components respectively:
 
 ```ueml copy filename="Main.xmlui" {2, 4}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Unconventional Endpoints" to="/unconventional" />
-<!-- Omitted -->
-<Page url="/unconventional" />
-<!-- Omitted -->
-```
-
-This time, you will request only the details of one item denoted by its ID:
-
-```ueml copy filename="Main.xmlui"
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/unconventional">
   <Datasource id="unconventionalItem" url="/api/shopping-item-unconventional" />
   <H2 value="Item with ID '{itemId}': {JSON.stringify(unconventionalItem.value, null, 2)}" />
@@ -419,8 +405,7 @@ This time, you will request only the details of one item denoted by its ID:
 <!-- Omitted -->
 ```
 
-Instead of fetching an item with the item's ID in the URL you have to send it in the request body.
-To do so, set the `method` property to `post` and the `body` property to provide the necessary information for the request: 
+However, this request will not work, as there is no GET endpoint for the specified URL. Let's modify the request to use a POST and pass the parameter of the request in its body:
 
 ```ueml copy filename="Main.xmlui" {2, 6-8}/
 <!-- Omitted -->
@@ -434,6 +419,7 @@ To do so, set the `method` property to `post` and the `body` property to provide
 </Page>
 <!-- Omitted -->
 ```
+> **Note**: The page defines the value of `itemId` with this attribute: `var.itemId="{10}"`, so the request will retrieve the item with an ID of 10:
 
 <br/>
 <Image alt="Handling Unconventional Endpoints" src="/resources/images/datasource-tutorial/unconventional-data.png" />
@@ -448,9 +434,9 @@ In this section you will modify the original `List` to load its content in pages
 First, add a new `Page` with a simple data list:
 
 ```ueml copy filename="Main.xmlui" {2, 4}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Paging" to="/pagination" />
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/pagination">
   <Datasource id="pagedGroceries" url="/api/shopping-list-pagination" />
   <List data="{pagedGroceries.value}" />
@@ -476,16 +462,12 @@ Next, you will set the page size in the request query parameters (`queryParams`)
 <!-- Omitted -->
 ```
 
-The `nextPageParamSelector` property indicates what part of the API response contains the next page information (e.g. a cursor or an item index).
-In this case, the API expects the last item's ID from the loaded datalist and responds with a slice of the original grocery list using the ID and the size.
+The `nextPageParamSelector` property indicates what part of the API response contains the next page information (e.g. a cursor or an item index). In this case, the API expects the last item's ID from the loaded datalist and responds with a slice of the original grocery list using the ID and the size.
 
 The `queryParams` will append two query parameters to the request URL:
-the first is the page size (`size`), the second is the item ID set in the `nextPageParamSelector` (accessed via `$pageParams.nextPageParam`).
-Note the special `$pageParams` expression that is provided by the `Datasource` component.
-It is there so that you can access information on the previous or next pages.
+the first is the page size (`size`), the second is the item ID set in the `nextPageParamSelector` (accessed via `$pageParams.nextPageParam`). Note the special `$pageParams` context variable that is provided by the `Datasource` component. It is there so that you can access information on the previous or next pages.
 
-One last thing is to create a trigger to keep fetching new pages.
-Add a `Button` component with the following `click` event and a `Text` component to display the number of loaded items:
+One last thing is to create a trigger to keep fetching new pages. Add a `Button` component with the following `click` event and a `Text` component to display the number of loaded items:
 
 ```ueml copy filename="Main.xmlui" {3-6}
 <!-- Omitted -->
@@ -525,23 +507,12 @@ By default, the component already checks for data changes, but using the polling
 
 In this section, you will set up polling to fetch a number of newly added grocery items added to the list of groceries by the mocked backend.
 
-Start by adding a new `Page`:
+Add a new `Page` and set the `pollIntervalInSeconds` property to the `Datasource` specifying a reasonably large re-fetch frequency to see it in action:
 
 ```ueml copy filename="Main.xmlui" {2, 4}
-<!-- Omitted -->
+<!-- Append this NavLink to the bottom of existing ones -->
 <NavLink label="Polling" to="/polling" />
-<!-- Omitted -->
-<Page url="/polling">
-  <Datasource id="polledGroceries" url="/api/shopping-list-polled" />
-  <List data="{polledGroceries.value}" />
-</Page>
-<!-- Omitted -->
-```
-
-Next, add the `pollIntervalInSeconds` property to the `Datasource` specifying a reasonable large refetch frequency to see it in action:
-
-```ueml copy filename="Main.xmlui" /pollIntervalInSeconds="3"/
-<!-- Omitted -->
+<!-- Append this Page as the last within Pages -->
 <Page url="/polling">
   <Datasource id="polledGroceries" url="/api/shopping-list-polled" pollIntervalInSeconds="3" />
   <List data="{polledGroceries.value}" />
@@ -555,3 +526,8 @@ This API emulates changes in the backend data. Thanks to the polling feature, ne
 
 <br/>
 <Image alt="Polling" src="/resources/images/datasource-tutorial/polling-1.png" />
+
+## Error Handling
+
+_TBD_
+
