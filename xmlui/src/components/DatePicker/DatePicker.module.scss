@@ -37,7 +37,6 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
 .datePicker {
   padding: .5rem .5rem .5rem 1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   cursor: pointer;
   flex-direction: row;
@@ -72,12 +71,14 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     }
   }
 
-  &::before {
-    content: "\00a0";
-    display: block;
-    height: 100%;
-    width: 100%;
-    visibility: hidden;
+  &.empty {
+    &::before {
+      content: "\00a0";
+      display: block;
+      height: 100%;
+      width: 100%;
+      visibility: hidden;
+    }
   }
 }
 

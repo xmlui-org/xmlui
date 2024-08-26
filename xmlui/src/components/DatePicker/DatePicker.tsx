@@ -199,7 +199,7 @@ export const DatePicker = ({
         setOpen(false);
       }
     },
-    [onDidChange, updateState, mode, dateFormat]
+    [onDidChange, updateState, mode, dateFormat],
   );
 
   return (
@@ -227,8 +227,10 @@ export const DatePicker = ({
             ) : (
               <>{format(selected.from, dateFormat)}</>
             )
-          ) : (
+          ) : placeholder ? (
             <span className={styles.placeholder}>{placeholder}</span>
+          ) : (
+            <span>&nbsp;</span>
           )}
         </button>
       </ReactDropdownMenu.Trigger>
@@ -364,7 +366,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
      * @descriptionRef
      */
     setValue?: (newValue: string | string[]) => void;
-  }
+  };
 }
 
 const metadata: ComponentDescriptor<DatePickerComponentDef> = {
@@ -424,5 +426,5 @@ export const datePickerComponentRenderer = createComponentRenderer<DatePickerCom
       />
     );
   },
-  metadata
+  metadata,
 );
