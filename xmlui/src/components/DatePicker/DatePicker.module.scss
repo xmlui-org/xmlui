@@ -15,9 +15,6 @@ $componentName: "DatePicker";
   border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
-
-  font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
-
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
   color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
@@ -50,6 +47,7 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
   border-style: solid;
   transition: background-color ease-in .1s;
   overflow: hidden;
+  font-size: createThemeVar("Input:font-size-DatePicker");
 
   @include variant("default");
 
@@ -72,6 +70,14 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
     .indicator, .datePickerInput {
       cursor: not-allowed;
     }
+  }
+
+  &::before {
+    content: "\00a0";
+    display: block;
+    height: 100%;
+    width: 100%;
+    visibility: hidden;
   }
 }
 
