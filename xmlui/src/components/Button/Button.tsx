@@ -238,7 +238,7 @@ const metadata: ComponentDescriptor<ButtonComponentDef> = {
       "color-bg-Button-primary-ghost--hover": "$color-primary-50",
       "color-bg-Button-primary-ghost--active": "$color-primary-100",
       "color-border-Button-secondary": "$color-secondary-100",
-      "color-bg-Button-secondary": "$color-secondary-50",
+      "color-bg-Button-secondary": "$color-secondary-500",
       "color-bg-Button-secondary--hover": "$color-secondary-400",
       "color-bg-Button-secondary--active": "$color-secondary-500",
       "color-bg-Button-secondary-outlined--hover": "$color-secondary-50",
