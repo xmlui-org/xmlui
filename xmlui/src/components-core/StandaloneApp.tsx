@@ -138,7 +138,8 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
   let entryPointCodeBehind: CollectedDeclarations | undefined;
   let themes: Array<ThemeDefinition> = [];
   let apiInterceptor;
-  const sources = {};
+
+  const sources: Record<string, string> = {};
 
   const componentsByFileName: Record<string, CompoundComponentDef> = {};
   const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
@@ -152,7 +153,9 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
         entryPointCodeBehind = value.default;
       } else {
         entryPoint = value.default.component;
-        sources[value.default.file] = value.default.src;
+        if (value.default.file) {
+          sources[value.default.file] = value.default.src;
+        }
       }
     }
     if (matchesFileName(key, "api")) {
@@ -388,14 +391,18 @@ function useStandalone(
         Promise.all(themePromises || []),
       ]);
 
-      const sources = {};
-      const codeBehinds = {};
-      sources[loadedEntryPoint.file] = loadedEntryPoint.src;
+      const sources: Record<string, string> = {};
+      const codeBehinds: any = {};
+      if (loadedEntryPoint.file) {
+        sources[loadedEntryPoint.file] = loadedEntryPoint.src;
+      }
       loadedComponents.forEach((compWrapper) => {
-          if(compWrapper.file.endsWith(".xmlui.xs")){
+          if(compWrapper?.file?.endsWith(".xmlui.xs")){
             codeBehinds[compWrapper.file] = compWrapper.codeBehind;
           } else {
-            sources[compWrapper.file] = compWrapper.src;
+            if (compWrapper.file) {
+              sources[compWrapper.file] = compWrapper.src;
+            }
           }
       });
 
@@ -410,7 +417,7 @@ function useStandalone(
         scriptError: entryPointCodeBehind?.moduleErrors,
       }
 
-      const componentsWithCodeBehinds = loadedComponents.filter((compWrapper)=>!compWrapper.file.endsWith(".xmlui.xs")).map((compWrapper) => {
+      const componentsWithCodeBehinds = loadedComponents.filter((compWrapper)=>!compWrapper?.file?.endsWith(".xmlui.xs")).map((compWrapper) => {
         const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
         return {
           ...compWrapper.component,

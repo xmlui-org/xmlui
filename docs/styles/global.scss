@@ -217,3 +217,8 @@ body {
   background-color: var(--color-background-primary) !important;
   box-shadow: none !important;
 }
+
+:is(html[class~=dark] input:focus-visible),
+:is(html[class~=light] input:focus-visible) {
+  box-shadow: none !important;
+}
