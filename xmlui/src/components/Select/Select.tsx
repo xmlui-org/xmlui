@@ -15,7 +15,7 @@ import classnames from "@components-core/utils/classnames";
 import { usePopper } from "react-popper";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { createPortal } from "react-dom";
-import type { InputComponentDef, ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/Input/input-abstractions";
 import {
   inputComponentEventDescriptors,
   inputComponentPropertyDescriptors,
@@ -70,7 +70,7 @@ export function Select({
   children,
 }: SelectProps) {
   const { options, selectContextValue } = useSelectContextValue();
-  const [referenceElement, setReferenceElement] = useState<HTMLButtonElement | null>(null);
+  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLUListElement | null>(null);
   const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
     placement: "bottom-start",
@@ -150,22 +150,27 @@ export function Select({
   return (
     <SelectContext.Provider value={selectContextValue}>
       {children}
-      <div className={styles.selectContainer} style={layout}>
-        <button
-          type="button"
-          disabled={!enabled}
-          className={classnames(styles.selectToggleButton, styles[validationStatus], {
-            [styles.disabled]: !enabled,
-          })}
-          {...getToggleButtonProps({ ref: (el: HTMLButtonElement) => setReferenceElement(el) })}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-        >
-          {selectedItem ? <span>{selectedItem.label}</span> : <span className={styles.placeholder}>{placeholder}</span>}
+      <div style={layout} ref={(el: HTMLDivElement) => setReferenceElement(el)}
+           className={classnames(styles.selectContainer, styles[validationStatus], {
+             [styles.disabled]: !enabled,
+           })}>
+        <div className={styles.inputRoot}>
+          <input
+            type="button"
+            disabled={!enabled}
+            className={classnames(styles.input, {
+              [styles.placeholder]: placeholder && !selectedItem,
+            })}
+
+            {...getToggleButtonProps()}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            value={selectedItem?.label || placeholder}
+          />
           <span aria-label="toggle menu" className={styles.indicator}>
             {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
           </span>
-        </button>
+        </div>
         <div {...getMenuProps()}>
           {isOpen &&
             root &&
@@ -204,7 +209,7 @@ export function Select({
                   </li>
                 )}
               </ul>,
-              root
+              root,
             )}
         </div>
       </div>
@@ -215,9 +220,9 @@ export function Select({
 // ============================================================================
 // XMLUI Select definition
 
-/** 
+/**
  * The \`Select\` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.
- * The dropdown list displays the labels while 
+ * The dropdown list displays the labels while
  * XMLUI stores the selected value for further use when the user selects a particular item.
  * @descriptionRef
  */
@@ -238,7 +243,7 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
     /**
      * With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
      * This results in a visual indication of a status change (reacting to form field validation).
-     * @descriptionRef 
+     * @descriptionRef
      */
     validationStatus?: ValidationStatus;
     /**
@@ -254,7 +259,7 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
      * @descriptionRef
      */
     optionTemplate?: ComponentDef;
-    /** 
+    /**
      * This optional property provides the ability to customize what is displayed when the list of options is empty.
      * @descriptionRef
      */
@@ -266,14 +271,14 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
      * @descriptionRef
      */
     didChange?: string;
-    /** 
+    /**
      * This event fires when the component is focused.
      * @descriptionRef
      */
     gotFocus?: string;
     /**
      * This event fires when the component loses focus.
-     * 
+     *
      * See the example in the [gotFocus event section](#gotfocus).
      */
     lostFocus?: string;
@@ -295,10 +300,10 @@ export interface SelectComponentDef extends ComponentDef<"Select"> {
     /**
      * This context variable acts as a template for an item in the list.
      * Access attributes of the item using the dot notation.
-     * 
+     *
      * For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
      */
-    "$item": any; 
+    "$item": any;
   };
 }
 
@@ -326,6 +331,7 @@ const metadata: ComponentDescriptor<SelectComponentDef> = {
     "radius-menu-Select": "$radius",
     "color-bg-item-Select": "$color-bg-dropdown-item",
     "color-bg-item-Select--hover": "$color-bg-dropdown-item--active",
+    "min-height-Input": "39px",
     light: {
       "color-text-item-Select--disabled": "$color-surface-200",
     },

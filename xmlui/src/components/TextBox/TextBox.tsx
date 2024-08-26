@@ -173,7 +173,7 @@ export const TextBox = ({
 
 /**
  * The \`TextBox\` is an input component that allows users to input and edit textual data.
- * 
+ *
  * It can often be found in forms.
  * See the guide on [Using Forms](../learning/forms.mdx) for details.
  */
@@ -191,7 +191,7 @@ export interface TextBoxComponentDef extends ComponentDef<"TextBox"> {
      * @descriptionRef
      */
     initialValue?: string | string[];
-    /** 
+    /**
      * The maximum length of the input that the field accepts.
      * @descriptionRef
      */
@@ -214,12 +214,12 @@ export interface TextBoxComponentDef extends ComponentDef<"TextBox"> {
      * @descriptionRef
      */
     enabled?: string | boolean;
-    /** 
+    /**
      * This prop is used to visually indicate status changes reacting to form field validation.
      * @descriptionRef
      */
     validationStatus?: ValidationStatus;
-    /** 
+    /**
      * This string prop enables the display of a custom string on the left side of the input field (left-to-right display).
      * @descriptionRef
      */
@@ -245,7 +245,7 @@ export interface TextBoxComponentDef extends ComponentDef<"TextBox"> {
   events: {
     /** @internal */
     change?: string;
-    /** 
+    /**
      * This event is triggered after the user has changed the field value.
      * @descriptionRef
      */

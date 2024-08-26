@@ -199,7 +199,7 @@ export const DatePicker = ({
         setOpen(false);
       }
     },
-    [onDidChange, updateState, mode, dateFormat]
+    [onDidChange, updateState, mode, dateFormat],
   );
 
   return (
@@ -227,8 +227,10 @@ export const DatePicker = ({
             ) : (
               <>{format(selected.from, dateFormat)}</>
             )
-          ) : (
+          ) : placeholder ? (
             <span className={styles.placeholder}>{placeholder}</span>
+          ) : (
+            <span>&nbsp;</span>
           )}
         </button>
       </ReactDropdownMenu.Trigger>
@@ -264,7 +266,7 @@ export const DatePicker = ({
 // ============================================================================
 // XMLUI DatePicker definition
 
-/** 
+/**
  * The \`DatePicker\` component allows users to select a date from a graphical calendar interface.
  */
 export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
@@ -276,7 +278,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
     placeholder?: string;
     /** @internal */
     value?: string | string[];
-    /** 
+    /**
      * The initial value displayed in the input field.
      * @descriptionRef
      */
@@ -295,27 +297,27 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
     allowCopy?: boolean;
     /**
      * Controls whether the input field is enabled (\`true\`) or disabled (\`false\`).
-     * @descriptionRef 
+     * @descriptionRef
      */
     enabled?: string | boolean;
-    /** 
+    /**
      * This prop is used to visually indicate status changes reacting to form field validation.
      * @descriptionRef
      */
     validationStatus?: ValidationStatus;
-    /** 
+    /**
      * This property determines whether the user can pick only one date (\`single\`) or a start and end date (\`range\`).
      * @descriptionRef
      */
     mode?: "single" | "range";
     /** @descriptionRef */
     dateFormat?: string;
-    /** 
+    /**
      * Either show the number of weeks (\`true\`) or not (\`false\`).
      * @descriptionRef
      */
     showWeekNumber?: boolean;
-    /** 
+    /**
      * Determines on which day the week starts denoted by integers.
      * The week starts on Sunday by default.
      * @descriptionRef
@@ -333,7 +335,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
      * @descriptionRef
      */
     toDate?: string;
-    /** 
+    /**
      * This optional property determines which dates are disabled and unselectable.
      * The property accepts a list of dates in string format the same way as the \`initialValue\` does.
      * @descriptionRef
@@ -345,9 +347,9 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
     didChange?: string;
     /** @descriptionRef */
     gotFocus?: string;
-    /** 
+    /**
      * This event is triggered when the \`DatePicker\` loses focus.
-     * 
+     *
      * (See the example in the [\`gotFocus\`](#gotfocus) event section.)
      */
     lostFocus?: string;
@@ -355,7 +357,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
   api: {
     /**
      * You can query this read-only API property to get the input component's current value.
-     * 
+     *
      * See an example in the \`setValue\` API method.
      */
     value?: string | string[];
@@ -364,7 +366,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
      * @descriptionRef
      */
     setValue?: (newValue: string | string[]) => void;
-  }
+  };
 }
 
 const metadata: ComponentDescriptor<DatePickerComponentDef> = {
@@ -424,5 +426,5 @@ export const datePickerComponentRenderer = createComponentRenderer<DatePickerCom
       />
     );
   },
-  metadata
+  metadata,
 );

@@ -90,7 +90,7 @@ export function MultiSelect({
       updateState({ value: newValue });
       onDidChange(newValue);
     },
-    [onDidChange, updateState]
+    [onDidChange, updateState],
   );
 
   const { getSelectedItemProps, getDropdownProps } = useMultipleSelection({
@@ -214,7 +214,11 @@ export function MultiSelect({
           <div className={styles.selectedOptions}>
             <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
             {value.length === 0 ? (
-              <span className={styles.placeholder}>{placeholder}</span>
+              placeholder ? (
+                <span className={styles.placeholder}>{placeholder}</span>
+              ) : (
+                <span>&nbsp;</span>
+              )
             ) : (
               options
                 .filter((option) => value.includes(option.value))
@@ -229,7 +233,7 @@ export function MultiSelect({
                       })}
                     >
                       <div className={styles.multiValueLabel}>{selectedItemForRender?.label}</div>
-                      <div
+                      <button
                         role="button"
                         className={classnames(styles.multiValueRemove, {
                           [styles.disabled]: !enabled,
@@ -241,14 +245,14 @@ export function MultiSelect({
                           }
                         }}
                       >
-                        &#10005;
-                      </div>
+                        <span>&#10005;</span>
+                      </button>
                     </div>
                   );
                 })
             )}
           </div>
-          <div style={{display: "flex"}}>
+          <div style={{ display: "flex" }}>
             <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
             <span aria-label="toggle menu" className={styles.indicator}>
               {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
@@ -293,7 +297,7 @@ export function MultiSelect({
                   </li>
                 )}
               </ul>,
-              root
+              root,
             )}
         </div>
       </div>
@@ -490,5 +494,5 @@ export const multiSelectComponentRenderer = createComponentRenderer<MultiSelectC
       </MultiSelect>
     );
   },
-  metadata
+  metadata,
 );
