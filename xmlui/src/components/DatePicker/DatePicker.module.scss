@@ -70,16 +70,6 @@ $min-height: createThemeVar("Input:min-height-#{$componentName}");
       cursor: not-allowed;
     }
   }
-
-  &.empty {
-    &::before {
-      content: "\00a0";
-      display: block;
-      height: 100%;
-      width: 100%;
-      visibility: hidden;
-    }
-  }
 }
 
 .datePickerMenu {
