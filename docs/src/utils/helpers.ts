@@ -38,8 +38,8 @@ export async function decompressData(source: string) {
 }
 
 export const builtInThemes: Array<ThemeDefinition> = [
-  { ...SolidThemeDefinition, name: "Base" },
-  { ...XmlUiThemeDefinition, name: "Tabler" },
+  { ...SolidThemeDefinition, name: "Solid" },
+  { ...XmlUiThemeDefinition, name: "Xmlui" },
 ];
 
 export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
