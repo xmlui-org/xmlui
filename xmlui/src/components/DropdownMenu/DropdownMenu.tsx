@@ -265,6 +265,8 @@ export function MenuItem({
 /**
  * This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the 
  * [\`DropdownMenu\` component](./DropdownMenu) for using this component in menus.
+ * 
+ * @componentFolder DropdownMenu
  * @descriptionRef
  */
 export interface MenuItemComponentDef extends ComponentDef<"MenuItem"> {
