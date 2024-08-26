@@ -56,7 +56,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-surface": "$color-surface-500", // #24656
 
     // --- Primary color shades (bluish)
-    "color-primary-50": "hsl(212,71.9%,94.5%)",
+    "color-primary-50": "#f6f8fb",
     "color-primary-100": "hsl(212,71.9%,89.1%)",
     "color-primary-200": "hsl(212,71.9%,78.1%)",
     "color-primary-300": "hsl(212,71.9%,67.2%)",
@@ -205,6 +205,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     shadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
     "shadow-md":
       "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
+    "shadow-xl": "0 16px 24px 2px rgba(0, 0, 0, 0.07), 0 6px 30px 5px rgba(0, 0, 0, 0.06), 0 8px 10px -5px rgba(0, 0, 0, 0.1)",
     "shadow-xxl":
       "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
     "shadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
@@ -220,7 +221,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "border-size-Avatar": "0px",
     "radius-Avatar": "4px",
 
-    "shadow-AppHeader": "none",
+    "shadow-header-App": "none",
     // "height-AppHeader": "3.5rem",
 
     "padding-horizontal-NavPanel-horizontal": "1rem",
@@ -244,7 +245,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-bg--selected": $colorPrimary50,
         "color-bg-overlay": "rgba(0, 0, 0, 0.2)",
         "color-bg-dropdown-item--hover": $colorSurface100,
-        "color-bg-dropdown-item--active": $colorSurface200,
+        "color-bg-dropdown-item--active": $colorSurface100,
         "color-bg-dropdown-item--active-hover": $colorSurface50,
         "color-bg-tree-row--selected--before": $colorPrimary50,
 
@@ -257,7 +258,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         // --- Border colors
         "color-border": $colorSurface100,
         "color-border--disabled": $colorSurface200,
-        "color-border-dropdown-item": $colorSurface600,
+        "color-border-dropdown-item": $colorSurface200,
 
         // --- Text colors
         "color-text-primary": $colorSurface950,

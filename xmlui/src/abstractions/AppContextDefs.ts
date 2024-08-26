@@ -89,6 +89,7 @@ export type AppContextObject = {
    */
   readonly standalone?: boolean;
   readonly decorateComponentsWithTestId?: boolean;
+  readonly debugEnabled?: boolean;
 
   readonly signError: (error: Error | string) => void;
   readonly toast: {

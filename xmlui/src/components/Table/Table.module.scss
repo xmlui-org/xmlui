@@ -117,7 +117,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
     flex-direction: row;
     border-bottom: $border-cell-Table;
     user-select: none;
-    background-color: inherit;
+    //background-color: inherit;
 
     .checkBoxWrapper {
       font-size: 1rem;

@@ -48,6 +48,11 @@ describe("Ueml transform - attributes", () => {
     expect(cd.props.enabled).equal("true");
   });
 
+  it("quoteless attr", () => {
+    const cd = transformSource("<Stack orientation=horizontal/>") as ComponentDef;
+    expect(cd.props.orientation).equal("horizontal");
+  });
+
   it("uid works", () => {
     const cd = transformSource("<Stack id='myStack' />") as ComponentDef;
     expect(cd.type).equal("Stack");

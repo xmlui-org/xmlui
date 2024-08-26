@@ -1,11 +1,13 @@
-import React, { type CSSProperties, useCallback, useEffect } from "react";
+import React, {type CSSProperties, forwardRef, useCallback, useEffect} from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import { ValidationStatus } from "@components/Input/input-abstractions";
-import { ItemWithLabel, LabelPosition } from "@components/FormItem/ItemWithLabel";
+import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { LabelPosition } from "@components/FormItem/ItemWithLabel";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 import { useEvent } from "@components-core/utils/misc";
+import {composeRefs} from "@radix-ui/react-compose-refs";
 
 type ToggleProps = {
   id?: string;
@@ -27,7 +29,7 @@ type ToggleProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const Toggle = ({
+export const Toggle = forwardRef(function Toggle ({
   id,
   initialValue = false,
   value = false,
@@ -45,15 +47,16 @@ export const Toggle = ({
   label,
   labelPosition = "right",
   registerComponentApi
-}: ToggleProps) => {
-  const ref = React.useRef<HTMLInputElement | null>(null);
+}: ToggleProps, forwardedRef) {
+  const innerRef = React.useRef<HTMLInputElement | null>(null);
+  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
   useEffect(() => {
     updateState({ value: initialValue });
   }, [initialValue, updateState]);
 
   const updateValue = useCallback((value: boolean) => {
-    if (ref.current?.checked === value) return;
+    if (innerRef.current?.checked === value) return;
     updateState({ value });
     onDidChange(value);
   }, [onDidChange, updateState]);
@@ -78,13 +81,13 @@ export const Toggle = ({
   }, [onBlur]);
 
   useEffect(() => {
-    if (typeof indeterminate === "boolean" && ref.current) {
-      ref.current.indeterminate = indeterminate;
+    if (typeof indeterminate === "boolean" && innerRef.current) {
+      innerRef.current.indeterminate = indeterminate;
     }
   }, [indeterminate]);
 
   const focus = useCallback(() => {
-    ref.current?.focus();
+    innerRef.current?.focus();
   }, []);
 
   const setValue = useEvent((newValue)=>{
@@ -132,4 +135,4 @@ export const Toggle = ({
       />
     </ItemWithLabel>
   );
-};
+});

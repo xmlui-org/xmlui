@@ -12,8 +12,11 @@ import {
 export const XmlUiThemeDefinition: ThemeDefinition = {
   id: "xmlui",
   resources: {
-    "font.inter": "https://rsms.me/inter/inter.css"
+    "font.inter": "https://rsms.me/inter/inter.css",
   },
+  themeVars: {
+    "shadow-header-App": "none"
+  }
 };
 
 export const XmlUiBlueThemeDefinition: ThemeDefinition = {

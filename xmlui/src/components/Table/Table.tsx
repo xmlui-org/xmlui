@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, forwardRef, ReactNode} from "react";
 import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
@@ -34,6 +34,7 @@ import produce from "immer";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "@components-core/utils/hooks";
+import {composeRefs} from "@radix-ui/react-compose-refs";
 
 // =====================================================================================================================
 // Helper types
@@ -125,7 +126,7 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
   };
 };
 
-export const Table = ({
+export const Table = forwardRef(({
   data = EMPTY_ARRAY,
   columns = EMPTY_ARRAY,
   isPaginated = false,
@@ -144,9 +145,10 @@ export const Table = ({
   autoFocus = false,
   hideHeader = false,
   children,
-}: TableProps) => {
+}: TableProps, forwardedRef) => {
   const [stableColumns, setStableColumns] = useState(columns);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
   const tableRef = useRef<HTMLTableElement>(null);
   const estimatedHeightRef = useRef<number | null>(null);
 
@@ -530,7 +532,7 @@ export const Table = ({
         className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
         tabIndex={-1}
         onKeyDown={onKeyDown}
-        ref={wrapperRef}
+        ref={ref}
         style={style}
       >
         {loading && !hasData && (
@@ -752,7 +754,7 @@ export const Table = ({
       {children}
     </TableContext.Provider>
   );
-};
+});
 
 // =====================================================================================================================
 // XMLUI Table component definition
@@ -839,7 +841,7 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     "padding-horizontal-cell-last-Table": "$space-5",
     "padding-vertical-cell-Table": "$space-2",
     "padding-cell-Table": "$padding-vertical-cell-Table $padding-horizontal-cell-Table",
-    "thickness-border-cell-Table": "$space-0_5",
+    "thickness-border-cell-Table": "1px",
     "style-border-cell-Table": "solid",
     "border-cell-Table": "$thickness-border-cell-Table $style-border-cell-Table $color-border-cell-Table",
 

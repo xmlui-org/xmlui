@@ -15,6 +15,7 @@ export type StandaloneAppDescription = {
   resourceMap?: Record<string, string>;
   globals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
+  sources?: Record<string, string>;
 };
 
 export type StandaloneJsonConfig = {

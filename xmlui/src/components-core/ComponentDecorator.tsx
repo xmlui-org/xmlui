@@ -1,4 +1,4 @@
-import React, { cloneElement, forwardRef, useEffect, useRef, useState } from "react";
+import React, { cloneElement, forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 // --- Describes the properties of the decorator component
@@ -8,23 +8,30 @@ interface DecoratorProps {
 
   // --- If true, only the ref'd child will have the attributes added
   allowOnlyRefdChild?: boolean;
+  onTargetMounted?: () => void;
 
   // --- The component to decorate
   children: React.ReactElement;
 }
 
 /**
- * This component decorates a React element's DOM node (through a React ref) with the specified 
+ * This component decorates a React element's DOM node (through a React ref) with the specified
  * attributes. We use this component to add test IDs to particular components.
  */
 const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
   const [parentElement, setParentElement] = useState<HTMLElement | null>(null);
-  
+  const { onTargetMounted } = props;
+
   // --- We wrap the component in a `Fragment`, if it has a parent element; otherwise, we use a `div`
   const Wrapper = parentElement ? React.Fragment : "div";
-  
+
   const ref = useRef<HTMLDivElement>(null);
-  const itemRef = useRef<HTMLElement>(null);
+  const [itemNodeVisible, setItemNodeVisible] = useState(false);
+  const itemRef = useRef<HTMLElement | null>(null);
+  const itemRefCallback = useCallback((node: any) => {
+    itemRef.current = node;
+    setItemNodeVisible(node !== null);
+  }, []);
   const targetIndex = useRef(0);
 
   // --- When the component mounts, we find the index of the component in its parent
@@ -43,14 +50,21 @@ const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
       node = itemRef.current;
     }
     Object.entries(props.attr).forEach(([key, value]) => {
-      node?.setAttribute(key, value);
+      if (value !== undefined) {
+        node?.setAttribute(key, value);
+      } else {
+        node?.removeAttribute(key);
+      }
     });
-  }, [parentElement, targetIndex, props.attr, props.allowOnlyRefdChild]);
+    if (itemNodeVisible) {
+      onTargetMounted?.();
+    }
+  }, [parentElement, targetIndex, props.attr, props.allowOnlyRefdChild, onTargetMounted, itemNodeVisible]);
 
   return (
     <Wrapper ref={parentElement ? undefined : ref}>
       {cloneElement(props.children, {
-        ref: forwardedRef ? composeRefs(itemRef, forwardedRef) : itemRef,
+        ref: forwardedRef ? composeRefs(itemRefCallback, forwardedRef) : itemRefCallback,
       })}
     </Wrapper>
   );

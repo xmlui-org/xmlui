@@ -1,4 +1,4 @@
-import type { CSSProperties, Dispatch, ReactNode, SetStateAction } from "react";
+import {CSSProperties, Dispatch, forwardRef, ReactNode, SetStateAction} from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 import styles from "./FlowLayout.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -39,7 +39,7 @@ const FlowLayoutContext = createContext<IFlowLayoutContext>({
   setNumberOfChildren: noop,
 });
 
-function FlowItemWrapper({ children, ...restProps }: FlowItemProps) {
+const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, ...restProps }: FlowItemProps, ref: any) {
   const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
@@ -102,7 +102,7 @@ function FlowItemWrapper({ children, ...restProps }: FlowItemProps) {
   }
   return (
     <>
-      <div style={outerWrapperStyle}>
+      <div style={outerWrapperStyle} ref={ref}>
         <div style={{ paddingRight: _columnGap }} className={styles.flowItem}>
           {children}
         </div>
@@ -110,7 +110,7 @@ function FlowItemWrapper({ children, ...restProps }: FlowItemProps) {
       {isStarSizing && <div className={styles.break} />}
     </>
   );
-}
+});
 
 type FlowLayoutProps = {
   style?: CSSProperties;

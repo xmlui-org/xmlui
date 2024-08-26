@@ -104,6 +104,37 @@ In the following code snippet, the `value` attribute of `<event>` contains three
 </Button>
 ```
 
+### Key-Only Attributes
+
+You can use attributes without a value. XMLUI considers them as attributes with the value of "true". These key-only attributes help represent the turned-on state of particular component properties.
+
+For example, you could use this markup to sign an active menu item:
+
+```ueml
+<MenuItem label="Open" active="true" />
+```
+
+With key-only attributes, you can make this markup more concise:
+
+```ueml
+<MenuItem label="Open" active />
+```
+### Quoteless Attributes
+
+You can omit quotes when defining an attribute value, provided the value does not contain whitespaces and its characters are letters, numbers, and one of these characters: dot (`.`), dash (`-`), underscore (`_`), and dollar sign (`$`).
+
+The following `Text` component's `value` is an expression that matches the "quoteless" criterium:
+
+```ueml
+<Text value="re-fetch" />
+```
+
+Thus, you can omit the double quotes when defining it:
+
+```ueml
+<Text value=re-fetch />
+```
+
 ## Entity References
 
 In XMLUI text and attribute values, you do not need to use entity references (such as `&amp;`, `&gt;`, and others. However, you may use them, and the XMLUI parser will understand them:
