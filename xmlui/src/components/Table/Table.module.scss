@@ -7,8 +7,9 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$color-text-secondary: createThemeVar("color-text-secondary");
+$color-text-pagination-Table: createThemeVar("color-text-pagination-Table");
 $color-bg-Table: createThemeVar("color-bg-Table");
+$color-text-Table: createThemeVar("color-text-Table");
 $color-bg-row-Table: createThemeVar("color-bg-row-Table");
 $color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
 $color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
@@ -110,7 +111,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
 .table {
   display: block;
-
+  color: $color-text-Table;
 
   .row, .headerRow {
     display: flex;
@@ -259,7 +260,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 }
 
 .paginationLabel {
-  color: $color-text-secondary;
+  color: $color-text-pagination-Table;
 }
 
 .paginationSelect {
