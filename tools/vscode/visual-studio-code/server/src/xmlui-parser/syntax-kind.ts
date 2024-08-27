@@ -40,9 +40,7 @@ export const enum SyntaxKind {
 }
 
 export function isTrivia(token: SyntaxKind): boolean {
-  return (
-    token >= SyntaxKind.CommentTrivia && token <= SyntaxKind.WhitespaceTrivia
-  );
+  return token >= SyntaxKind.CommentTrivia && token <= SyntaxKind.WhitespaceTrivia;
 }
 
 export function isInnerNode(token: SyntaxKind): boolean {
@@ -52,58 +50,58 @@ export function isInnerNode(token: SyntaxKind): boolean {
 export function getSyntaxKindStrRepr(kind: SyntaxKind): string {
   switch (kind) {
     case SyntaxKind.Unknown:
-      return 'Unknown';
+      return "Unknown";
     case SyntaxKind.EndOfFileToken:
-      return 'EndOfFileToken';
+      return "EndOfFileToken";
     case SyntaxKind.CommentTrivia:
-      return 'CommentTrivia';
+      return "CommentTrivia";
     case SyntaxKind.NewLineTrivia:
-      return 'NewLineTrivia';
+      return "NewLineTrivia";
     case SyntaxKind.WhitespaceTrivia:
-      return 'WhitespaceTrivia';
+      return "WhitespaceTrivia";
     case SyntaxKind.Identifier:
-      return 'Identifier';
+      return "Identifier";
     case SyntaxKind.OpenNodeStart:
-      return 'OpenNodeStart';
+      return "OpenNodeStart";
     case SyntaxKind.CloseNodeStart:
-      return 'CloseNodeStart';
+      return "CloseNodeStart";
     case SyntaxKind.NodeEnd:
-      return 'NodeEnd';
+      return "NodeEnd";
     case SyntaxKind.NodeClose:
-      return 'NodeClose';
+      return "NodeClose";
     case SyntaxKind.Colon:
-      return 'Colon';
+      return "Colon";
     case SyntaxKind.Equal:
-      return 'Equal';
+      return "Equal";
     case SyntaxKind.StringLiteral:
-      return 'StringLiteral';
+      return "StringLiteral";
     case SyntaxKind.CData:
-      return 'CData';
+      return "CData";
     case SyntaxKind.Script:
-      return 'Script';
+      return "Script";
     case SyntaxKind.AmpersandEntity:
-      return 'AmpersandEntity';
+      return "AmpersandEntity";
     case SyntaxKind.LessThanEntity:
-      return 'LessThanEntity';
+      return "LessThanEntity";
     case SyntaxKind.GreaterThanEntity:
-      return 'GreaterThanEntity';
+      return "GreaterThanEntity";
     case SyntaxKind.SingleQuoteEntity:
-      return 'SingleQuoteEntity';
+      return "SingleQuoteEntity";
     case SyntaxKind.DoubleQuoteEntity:
-      return 'DoubleQuoteEntity';
+      return "DoubleQuoteEntity";
     case SyntaxKind.ElementNode:
-      return 'ElementNode';
+      return "ElementNode";
     case SyntaxKind.AttributeNode:
-      return 'AttributeNode';
+      return "AttributeNode";
     case SyntaxKind.TextNode:
-      return 'TextNode';
+      return "TextNode";
     case SyntaxKind.ContentListNode:
-      return 'ContentListNode';
+      return "ContentListNode";
     case SyntaxKind.AttributeListNode:
-      return 'AttributeListNode';
+      return "AttributeListNode";
     case SyntaxKind.TagNameNode:
-      return 'TagNameNode';
+      return "TagNameNode";
     case SyntaxKind.ErrorNode:
-      return 'ErrorNode';
+      return "ErrorNode";
   }
 }

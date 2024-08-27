@@ -299,7 +299,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   /**
    * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode*/
   function errRecover(errCodeAndMsg: ErrResult, recoveryTokens: SyntaxKind[]) {
-    if (atAnyOf(recoveryTokens)|| at(SyntaxKind.EndOfFileToken)) {
+    if (atAnyOf(recoveryTokens) || at(SyntaxKind.EndOfFileToken)) {
       error(errCodeAndMsg);
       return;
     }

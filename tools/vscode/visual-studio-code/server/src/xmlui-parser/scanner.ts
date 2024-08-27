@@ -39,7 +39,7 @@ export function createScanner(
   textInitial?: string,
   onError?: ScannerErrorCallback,
   start?: number,
-  length?: number
+  length?: number,
 ): Scanner {
   let text = textInitial ?? "";
 
@@ -251,7 +251,7 @@ export function createScanner(
             }
             error(Diag_Unterminated_Comment);
             return (token = SyntaxKind.Unknown);
-          }  else if (
+          } else if (
             // --- <![CDATA[ section
             charCodeUnchecked(pos + 1) === CharacterCodes.exclamation &&
             charCodeUnchecked(pos + 2) === CharacterCodes.openBracket &&
@@ -285,19 +285,19 @@ export function createScanner(
             charCodeUnchecked(pos + 5) === CharacterCodes.p &&
             charCodeUnchecked(pos + 6) === CharacterCodes.t &&
             charCodeUnchecked(pos + 7) === CharacterCodes.greaterThan
-          ){
+          ) {
             pos += 8;
             while (pos < end) {
               if (
-            charCodeUnchecked(pos) === CharacterCodes.lessThan &&
-            charCodeUnchecked(pos + 1) === CharacterCodes.slash &&
-            charCodeUnchecked(pos + 2) === CharacterCodes.s &&
-            charCodeUnchecked(pos + 3) === CharacterCodes.c &&
-            charCodeUnchecked(pos + 4) === CharacterCodes.r &&
-            charCodeUnchecked(pos + 5) === CharacterCodes.i &&
-            charCodeUnchecked(pos + 6) === CharacterCodes.p &&
-            charCodeUnchecked(pos + 7) === CharacterCodes.t &&
-            charCodeUnchecked(pos + 8) === CharacterCodes.greaterThan
+                charCodeUnchecked(pos) === CharacterCodes.lessThan &&
+                charCodeUnchecked(pos + 1) === CharacterCodes.slash &&
+                charCodeUnchecked(pos + 2) === CharacterCodes.s &&
+                charCodeUnchecked(pos + 3) === CharacterCodes.c &&
+                charCodeUnchecked(pos + 4) === CharacterCodes.r &&
+                charCodeUnchecked(pos + 5) === CharacterCodes.i &&
+                charCodeUnchecked(pos + 6) === CharacterCodes.p &&
+                charCodeUnchecked(pos + 7) === CharacterCodes.t &&
+                charCodeUnchecked(pos + 8) === CharacterCodes.greaterThan
               ) {
                 pos += 9;
                 return (token = SyntaxKind.Script);
