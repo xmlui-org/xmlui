@@ -101,6 +101,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 }
 
 .headerRow {
+  height: 100%;
   background-color: $color-bg-heading-Table;
 }
 
