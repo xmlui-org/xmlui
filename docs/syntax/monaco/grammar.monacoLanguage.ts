@@ -64,7 +64,10 @@ export const UEMLGrammar: any = {
         [/[^<]/, ""],
       ],
       apiTagStart: [
-        [/(<)((?:[a-zA-Z_][\w\.\-]*?:)?)(api)/, ["delimiter.angle", "namespace", { token: "tag-helper", next: "@apiTag" }]],
+        [
+          /(<)((?:[a-zA-Z_][\w\.\-]*?:)?)(api)/,
+          ["delimiter.angle", "namespace", { token: "tag-helper", next: "@apiTag" }],
+        ],
       ],
       apiTag: [
         { include: "@commentStart" },
@@ -178,22 +181,8 @@ export const UEMLGrammar: any = {
             },
           ],
         ],
-        [
-          /(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(@identifier)/,
-          [
-            "",
-            "attribute",
-            "operators",
-            "string"
-          ]
-        ],
-        [
-          /(^|\s+)(@identifier(?::@identifier)?)/,
-          [
-            "",
-            "attribute"
-          ]
-        ]
+        [/(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(@identifier)/, ["", "attribute", "operators", "string"]],
+        [/(^|\s+)(@identifier(?::@identifier)?)/, ["", "attribute"]],
       ],
       singleQuotedString: [[/'/, "string", "@pop"], { include: "@textWithBindingExpr" }, [/[^']/, "string"]],
       doubleQuotedString: [[/"/, "string", "@pop"], { include: "@textWithBindingExpr" }, [/[^"]/, "string"]],
@@ -220,21 +209,8 @@ export const UEMLGrammar: any = {
         [/-->/, { token: "comment", next: "@pop" }],
         [/[<\-]/, "comment.content"],
       ],
-      escapeCharacter: [
-        [/\\S/, "string.escape"],
-        [/\\0/, "string.escape"],
-        [/\\'/, "string.escape"],
-        [/\\\"/, "string.escape"],
-        [/\\\\/, "string.escape"],
-        [/\\n/, "string.escape"],
-        [/\\r/, "string.escape"],
-        [/\\v/, "string.escape"],
-        [/\\t/, "string.escape"],
-        [/\\b/, "string.escape"],
-        [/\\$/, "string.escape"],
-        [/\\f/, "string.escape"],
-      ],
-      entity: [[/(&)((?:amp)|(?:lt)|(?:gt)|(?:quot)|(?:apos))(;)/, ["constant", "constant", "constant"]]],
+      escapeCharacter: [[/\\S/, "string.escape"]],
+      entity: [[/&(amp|lt|gt|quot|apos|nbsp);/, "string.escape"]],
     },
   },
 };

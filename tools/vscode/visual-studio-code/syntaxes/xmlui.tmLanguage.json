@@ -325,51 +325,7 @@
     "escapeCharacter": {
       "patterns": [
         {
-          "match": "\\\\S",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\0",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\'",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\\"",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\\\\\",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\n",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\r",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\v",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\t",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\b",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\\n",
-          "name": "constant.character.escape.xmlui"
-        },
-        {
-          "match": "\\\\f",
+          "match": "&(amp|gt|lt|apos|quot|nbsp);",
           "name": "constant.character.escape.xmlui"
         }
       ]
