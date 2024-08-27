@@ -760,8 +760,9 @@ export const Table = forwardRef(({
 // XMLUI Table component definition
 
 /**
- * \`Table\` is a component displaying cells organized into rows and columns. \`Table\` is virtualized; it 
- * renders only the visible cells (according to the current viewport).
+ * \`Table\` is a component that displays cells organized into rows and columns.
+ * The \`Table\` component is virtualized so it only renders visible cells.
+ * @descriptionRef
  */
 export interface TableComponentDef extends ComponentDef<"Table"> {
   props: {

@@ -6,7 +6,7 @@ import data from "./doc-resources/list-component-data.js";
 
 %-DESC-START
 
-In the following section the examples use this data list:
+In the following sections the examples use data with the structure outlined below:
 
 | Id   | Name    | Quantity | Unit   | Category   |
 | :--- | :------ | :------- | :----- | :--------- |
@@ -19,7 +19,8 @@ In the following section the examples use this data list:
 
 The data is provided as JSON. In the source code samples, the `data={[...]}` declaration represents the data above.
 
-All samples use table columns with the following definition unless noted otherwise (The `...` declaration nested into `<Table>` represents this column definition):
+All samples use table columns with the following definition unless noted otherwise
+(The `...` declaration nested into `<Table>` represents this column definition):
 
 ```ueml copy
 <Table data='{[...]}'>
@@ -73,11 +74,13 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
   previewOnly
   name="Example: data"
   height={300}
-  app={`<Table data='{${JSON.stringify(data)}}'>
-  <TableColumnDef bindTo="name"/>
-  <TableColumnDef bindTo="quantity"/>
-  <TableColumnDef bindTo="unit"/>
-</Table>`}
+  app={`
+  <Table data='{${JSON.stringify(data)}}'>
+    <TableColumnDef bindTo="name"/>
+    <TableColumnDef bindTo="quantity"/>
+    <TableColumnDef bindTo="unit"/>
+  </Table>`
+  }
 />
 
 %-PROP-END
@@ -89,11 +92,11 @@ Here, the component displays rocket information coming from the official SpaceX 
 
 ```ueml copy /datasource='https://api.spacexdata.com/v3/rockets'/
 <Table datasource='https://api.spacexdata.com/v3/rockets'>
-    <TableColumnDef header="Image" size="140px">
-      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-    </TableColumnDef>
-    <TableColumnDef canSort="true" bindTo="country"/>
-    <TableColumnDef canSort="true" bindTo="company"/>
+  <TableColumnDef header="Image" size="140px">
+    <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+  </TableColumnDef>
+  <TableColumnDef canSort="true" bindTo="country"/>
+  <TableColumnDef canSort="true" bindTo="company"/>
 </Table>
 ```
 
@@ -101,22 +104,29 @@ Here, the component displays rocket information coming from the official SpaceX 
   previewOnly
   name="Example: datasource"
   height={400}
-  app={`<Table datasource='https://api.spacexdata.com/v3/rockets'>
+  app={`
+  <Table datasource='https://api.spacexdata.com/v3/rockets'>
     <TableColumnDef header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
     </TableColumnDef>
     <TableColumnDef canSort="true" bindTo="country"/>
     <TableColumnDef canSort="true" bindTo="company"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
 
 %-PROP-START enableMultiRowSelection
 
-This boolean property indicates if you can select multiple rows in the table. By default, it is `true`. This property has effect only when the `rowsSelectable` property is set.
+This boolean property indicates whether you can select multiple rows in the table.
+This property only has an effect when the `rowsSelectable` property is set.
+Setting it to `false` limits selection to a single row.
 
-Set this property to `false` if you want to enable only one row selected:
+By default, the value of this property is `true`.
+
+> **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
+> It is merely for cosmetic reasons.
 
 ```ueml copy /enableMultiRowSelection="false"/
 <SelectionStore>
@@ -130,13 +140,15 @@ Set this property to `false` if you want to enable only one row selected:
   previewOnly
   name="Example: rowsSelectable"
   height={300}
-  app={`<SelectionStore id="tableData">
-  <Table data='{${JSON.stringify(data)}}' rowsSelectable="true" enableMultiRowSelection="false">
+  app={`
+  <SelectionStore id="tableData">
+    <Table data='{${JSON.stringify(data)}}' rowsSelectable="true" enableMultiRowSelection="false">
       <TableColumnDef bindTo="name"/>
       <TableColumnDef bindTo="quantity"/>
       <TableColumnDef bindTo="unit"/>
-  </Table>
-</SelectionStore>`}
+    </Table>
+  </SelectionStore>`
+  }
 />
 
 %-PROP-END
@@ -156,18 +168,20 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   previewOnly
   name="Example: headerHeight"
   height={320}
-  app={`<Table data='{${JSON.stringify(data)}}' headerHeight="60px">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' headerHeight="60px">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
 
 %-PROP-START hideHeader
 
-Toggle the header visibility using this prop. Set to `true` to hide the header.
+Toggle the header visibility using this property. Set it to `true` to hide the header.
 The default value is `false`.
 
 ```ueml copy /hideHeader="true"/
@@ -180,18 +194,20 @@ The default value is `false`.
   previewOnly
   name="Example: hideHeader"
   height={300}
-  app={`<Table data='{${JSON.stringify(data)}}' hideHeader="true">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' hideHeader="true">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
 
 %-PROP-START isPaginated
 
-This prop adds pagination controls to the `Table`.
+This property adds pagination controls to the `Table`.
 
 ```ueml copy /isPaginated="true"/
 <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
@@ -203,11 +219,13 @@ This prop adds pagination controls to the `Table`.
   previewOnly
   name="Example: isPaginated"
   height={240}
-  app={`<Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
@@ -215,6 +233,7 @@ This prop adds pagination controls to the `Table`.
 %-PROP-START loading
 
 This boolean property indicates if the component is fetching (or processing) data.
+This property is useful when data is loaded conditionally or receiving it takes some time.
 
 ```ueml copy
 <Table loading="true" />
@@ -245,11 +264,13 @@ A property to customize what to display if the table does not contain any data.
   previewOnly
   name="Example: noDataTemplate"
   height={60}
-  app={`<Table>
-  <prop name="noDataTemplate">
-    <Text value="No data loaded" variant="strong" padding="1rem" />
-  </prop>
-</Table>`}
+  app={`
+  <Table>
+    <prop name="noDataTemplate">
+      <Text value="No data loaded" variant="strong" padding="1rem" />
+    </prop>
+  </Table>`
+  }
 />
 
 %-PROP-END
@@ -259,7 +280,7 @@ A property to customize what to display if the table does not contain any data.
 Describes how big a page should be for pagination.
 Page sizes are only accepted in an array, even if the array contains one item.
 
-Note that this property only works if the [`isPaginated`](#ispaginated) prop is set to `true`.
+Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
 ```ueml copy /pageSizes="{[3, 6, 12]}"/
 <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
@@ -271,18 +292,21 @@ Note that this property only works if the [`isPaginated`](#ispaginated) prop is 
   previewOnly
   name="Example: pageSizes"
   height={300}
-  app={`<Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
 
 %-PROP-START rowDisabledPredicate
 
-This property defines a predicate function whose return value determines whether the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
+This property defines a predicate function with a return value that determines if the row should be disabled.
+The function retrieves the item to display and should return a Boolean-like value.
 
 The following example disables all table rows where the item's quantity exceeds 6:
 
@@ -295,7 +319,7 @@ The following example disables all table rows where the item's quantity exceeds 
 </Table>
 ```
 
-(Note that disabled items are rendered with a different color.)
+> **Note:** Disabled items are rendered with a different color.
 
 <Playground
   previewOnly
@@ -319,7 +343,7 @@ Indicates whether the rows are selectable (`true`) or not (`false`).
 The default value is `false`.
 
 > **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
-> It is for cosmetic reasons.
+> It is merely for cosmetic reasons.
 
 ```ueml copy /rowsSelectable="true"/
 <SelectionStore>
@@ -333,13 +357,15 @@ The default value is `false`.
   previewOnly
   name="Example: rowsSelectable"
   height={300}
-  app={`<SelectionStore id="tableData">
-  <Table data='{${JSON.stringify(data)}}' rowsSelectable="true">
+  app={`
+  <SelectionStore id="tableData">
+    <Table data='{${JSON.stringify(data)}}' rowsSelectable="true">
       <TableColumnDef bindTo="name"/>
       <TableColumnDef bindTo="quantity"/>
       <TableColumnDef bindTo="unit"/>
-  </Table>
-</SelectionStore>`}
+    </Table>
+  </SelectionStore>`
+  }
 />
 
 %-PROP-END
@@ -358,11 +384,13 @@ This property is used to determine which data attributes to sort by.
   previewOnly
   name="Example: sortBy"
   height={300}
-  app={`<Table data='{${JSON.stringify(data)}}' sortBy="quantity">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' sortBy="quantity">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
@@ -370,7 +398,7 @@ This property is used to determine which data attributes to sort by.
 %-PROP-START sortDirection
 
 The `sortDirection` determines the sort order to be `ascending` or `descending`.
-This property works together with the [`sortBy`](#sortby) prop.
+This property only works if the [`sortBy`](#sortby) property is also set.
 
 ```ueml copy /sortDirection="descending"/
 <Table data='{[...]}' sortBy="quantity" sortDirection="descending">
@@ -382,20 +410,24 @@ This property works together with the [`sortBy`](#sortby) prop.
   previewOnly
   name="Example: sortDirection"
   height={300}
-  app={`<Table data='{${JSON.stringify(data)}}' sortBy="quantity" sortDirection="descending">
+  app={`
+  <Table data='{${JSON.stringify(data)}}' sortBy="quantity" sortDirection="descending">
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-PROP-END
 
 %-EVENT-START sortingDidChange
 
-This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table changes to an unsorted display: it shows the data in the order of items.
+This event is fired when the table data sorting has changed.
+It has two arguments: the column's name and the sort direction.
+When the column name is empty, the table displays the data list as it received it.
 
-Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components, which enable custom ordering.
+Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
 
 ```ueml copy {4}
 <Stack var.sortedBy="" gap="1rem">
@@ -409,7 +441,7 @@ Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColum
 </Stack>
 ```
 
-Click on any of the column headers to trigger the event:
+Click on any of the column headers to trigger a new sorting:
 
 <Playground
   previewOnly
@@ -434,9 +466,9 @@ Click on any of the column headers to trigger the event:
 
 This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction.
 
-When the method returns a literal `false` value (and not any other falsy one), the method signs that sorting should be aborted.
+When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
 
-The following sample uses the `willSort` event to refuse the sort by the name column:
+The following example uses the `willSort` event to refuse sorting by name:
 
 ```ueml copy {4}
 <Stack var.sortedBy="" gap="1rem">
@@ -451,7 +483,9 @@ The following sample uses the `willSort` event to refuse the sort by the name co
 </Stack>
 ```
 
-Click on any of the column headers to trigger the event. Though the sorting is enabled in the `TableColumnnDef` of the name column, clicking that column header still does not sort (because `willSort` prevents it):
+Click on any of the column headers to trigger the event.
+Though sorting is enabled in the `TableColumnnDef` component of the "name" column via `canSort`,
+clicking that column header still does not sort because `willSort` prevents it:
 
 <Playground
   previewOnly
@@ -475,38 +509,60 @@ Click on any of the column headers to trigger the event. Though the sorting is e
 
 %-STYLE-START
 
-The `Table` component uses these theme variables to customize its appearance:
+The `Table` component uses the following theme variables.
+
+Overall Table theme variables:
+
+- `color-bg-Table`
+- `style-border-cell-Table`
+- `color-bg-pagination-Table`
+- `color-text-Table`
+- `color-text-pagination-Table`
+
+Row theme variables:
+
+- `color-bg-row-Table`
+- `color-bg-row-Table--hover`
+- `font-size-row-Table`
+- `font-weight-row-Table`
+
+Selected row theme variables:
+
+- `color-bg-selected-Table`
+- `color-bg-selected-Table--hover`
+
+Cell theme variables:
 
 - `border-cell-Table`
+- `color-border-cell-Table`
+- `thickness-border-cell-Table`
+- `padding-cell-Table`
+- `padding-horizontal-cell-Table`
+- `padding-vertical-cell-Table`
+- `padding-horizontal-cell-first-Table`
+- `padding-horizontal-cell-last-Table`
+
+Heading theme variables:
+
 - `color-bg-heading-Table`
 - `color-bg-heading-Table--hover`
 - `color-bg-heading-Table--active`
-- `color-bg-Table`
-- `color-bg-row-Table--hover`
-- `color-bg-pagination-Table`
-- `color-bg-selected-Table`
-- `color-bg-selected-Table--hover`
-- `color-border-cell-Table`
+- `color-text-heading-Table`
 - `font-size-heading-Table`
-- `font-size-row-Table`
 - `font-weight-heading-Table`
-- `font-weight-row-Table`
-- `padding-cell-Table`
 - `padding-heading-Table`
-- `padding-horizontal-cell-Table`
-- `padding-horizontal-cell-first-Table`
-- `padding-horizontal-cell-last-Table`
 - `padding-horizontal-heading-Table`
-- `padding-vertical-cell-Table`
 - `padding-vertical-heading-Table`
-- `style-border-cell-Table`
-- `thickness-border-cell-Table`
 - `transform-text-heading-Table`
+
+### Example
 
 ```json copy
 "color-bg-heading-Table": "#dbdbdb",
 "color-bg-Table": "#ededed",
-"padding-vertical-heading-Table": "1rem"
+"padding-vertical-heading-Table": "1rem",
+"color-text-Table": "black",
+"color-text-heading-Table": "black"
 ```
 
 <Playground
@@ -521,15 +577,19 @@ The `Table` component uses these theme variables to customize its appearance:
       themeVars: {
         "color-bg-heading-Table": "#c4c4c4",
         "color-bg-Table": "#ededed",
-        "padding-vertical-heading-Table": "1rem"
+        "padding-vertical-heading-Table": "1rem",
+        "color-text-Table": "black",
+        "color-text-heading-Table": "black"
       },
     },
   ]}
-  app={`<Table data='{${JSON.stringify(data)}}'>
+  app={`
+  <Table data='{${JSON.stringify(data)}}'>
     <TableColumnDef bindTo="name"/>
     <TableColumnDef bindTo="quantity"/>
     <TableColumnDef bindTo="unit"/>
-</Table>`}
+  </Table>`
+  }
 />
 
 %-STYLE-END
