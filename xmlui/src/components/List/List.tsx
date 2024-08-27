@@ -534,13 +534,13 @@ export interface ListComponentDef extends ComponentDef<"List"> {
     items: string | any[];
     /** 
      * The component receives data via this property.
-     * The \`data\` prop is a list of items that the \`List\` can display.
+     * The \`data\` property is a list of items that the \`List\` can display.
      * @descriptionRef
      */
     data?: string | string[];
     /** 
-     * The \`loading\` prop delays the rendering of children until it is set to false,
-     * or the component receives usable list items via the [\`data\`](#data) prop.
+     * The \`loading\` property delays the rendering of children until it is set to false,
+     * or the component receives usable list items via the [\`data\`](#data) property.
      * @descriptionRef
      */
     loading?: string | boolean;
@@ -550,7 +550,7 @@ export interface ListComponentDef extends ComponentDef<"List"> {
      */
     limit?: number;
     /**
-     * This prop pins the scroll position to either the \`top\` or the \`bottom\` of the list.
+     * This property pins the scroll position to either the \`top\` or the \`bottom\` of the list.
      * @descriptionRef
      */
     scrollAnchor?: "top" | "bottom";
@@ -561,14 +561,14 @@ export interface ListComponentDef extends ComponentDef<"List"> {
      */
     sectionBy?: string;
     /** 
-     * This prop enables the ordering of list items by specifying an attribute in the data.
+     * This property enables the ordering of list items by specifying an attribute in the data.
      * @descriptionRef
      */
     orderBy?: string;
     /** 
-     * The \`availableSections\` prop is an array of section names that the \`List\` will display.
+     * The \`availableSections\` property is an array of section names that the \`List\` will display.
      * 
-     * Is this needed? Not clear what it does.
+     * Issue: Is this needed? Not clear what it does.
      * @internal
      */
     availableSections?: string[];
@@ -586,14 +586,14 @@ export interface ListComponentDef extends ComponentDef<"List"> {
      */
     sectionFooterTemplate?: ComponentDef;
     /** 
-     * This prop allows the customization of mapping data items to components.
+     * This property allows the customization of mapping data items to components.
      * You can use the \`$item\` syntax to access an item and map its individual attributes.
      * @descriptionRef
      */
     itemTemplate: ComponentDef;
     /**
-     * This prop displays the given component as a placeholder
-     * if the \`loader\` prop is false and the \`data\` items length is 0 or is not set.
+     * This property displays the given component as a placeholder
+     * if the \`loader\` property is false and the \`data\` items length is 0 or is not set.
      * @descriptionRef
      */
     emptyListTemplate?: ComponentDef;
@@ -612,10 +612,10 @@ export interface ListComponentDef extends ComponentDef<"List"> {
      */
     idKey?: string;
     /**
-     * This prop scrolls to a specific item indicated by its index.
+     * This property scrolls to a specific item indicated by its index.
      * 
      * Issue: Currently not working 
-     * @descriptionRef
+     * @internal
      */
     selectedIndex?: number;
     /** @internal */
