@@ -5,6 +5,13 @@ import { SyntaxKind } from "@parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
 describe("Xmlui parser", () => {
+  it("only close node start", () => {
+    const { node, getText, errors } = parseSource("</");
+
+    expect(errors.length).toEqual(1);
+    expect(errors[0].code).toEqual(ErrCodes.expTagOpen);
+  });
+
   it("unexpected char", () => {
     const { node, getText, errors } = parseSource("<A #/>");
 
@@ -41,7 +48,6 @@ describe("Xmlui parser", () => {
     );
     const rootElem = node.children![0];
     const childElements = rootElem.children[3];
-    const child0 = childElements.children[0];
 
     expect(childElements.children!.length).toEqual(2);
     expect(childElements.children![0].kind).toEqual(SyntaxKind.ErrorNode);
@@ -57,7 +63,8 @@ describe("Xmlui parser", () => {
     //The end of file token is the '+1'
     expect(node.children!.length).toEqual(2 + 1);
     expect(node.children![0].kind).toEqual(SyntaxKind.ErrorNode);
-    expect(node.children![1].kind).toEqual(SyntaxKind.TextNode);
+    expect(node.children![1].kind).toEqual(SyntaxKind.ErrorNode);
+    expect(node.children![1].children![0].kind).toEqual(SyntaxKind.TextNode);
     expect(errors[0].code).toEqual(ErrCodes.untermCData);
   });
 
