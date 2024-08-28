@@ -25,10 +25,18 @@ export const Logo = ({ inDrawer, style, title }: { inDrawer?: boolean; style?: C
 // XMLUI Logo component definition
 
 /**
- * 
+ * The \`Logo\` component represents a logo or a brand symbol.
+ * Usually, you use this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).
+ * @descriptionRef
  */
 export interface LogoComponentDef extends ComponentDef<"Logo"> {
   props: {
+    /** 
+     * With this property, you can define a title placed horizontally after the logo itself.
+     * 
+     * Issue: this prop is redundant, why should I use this when there is a templating option or just place a Heading/Text after it?
+     * @internal
+     */
     title?: string;
   }
 }
