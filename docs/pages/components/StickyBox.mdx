@@ -1,6 +1,6 @@
 # StickyBox
 
-`StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen
+The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen
 as the user scrolls.
 
 ## Context Variables
@@ -11,7 +11,35 @@ This component does not have any context variables.
 
 ### `to`
 
-Position to anchor the sticky box (top, bottom).
+Position to anchor to the top or bottom.
+The default value is `top`.
+
+```ueml copy
+<VStack padding="$space-4" gap="$space-4">
+  <StickyBox to="top">
+    This part of the UI sticks to the top
+  </StickyBox>
+  <Stack backgroundColor="red" height="80px" width="100%" />
+  <Stack backgroundColor="green" height="80px" width="100%" />
+  <Stack backgroundColor="blue" height="80px" width="100%" />
+</VStack>
+```
+
+<Playground
+  name="Example: to"
+  previewOnly
+  height={160}
+  app={`
+  <VStack padding="$space-4" gap="$space-4">
+    <StickyBox to="top">
+      This part of the UI sticks to the top
+    </StickyBox>
+    <Stack backgroundColor="red" height="80px" width="100%" />
+    <Stack backgroundColor="green" height="80px" width="100%" />
+    <Stack backgroundColor="blue" height="80px" width="100%" />
+  </VStack>
+  `}
+/>
 
 ## API
 
@@ -23,4 +51,7 @@ This component does not have any events.
 
 ## Styling
 
-This component does not have any styles.
+The component uses the following theme variables:
+
+- `color-bg-StickyBox`
+
