@@ -17,7 +17,7 @@ type StickyBoxProps = {
   to: "top" | "bottom";
 };
 
-function StickyBox({ children, uid, layout, to }: StickyBoxProps) {
+function StickyBox({ children, uid, layout, to = "top" }: StickyBoxProps) {
   return (
     <div
       className={classnames(styles.wrapper, {
@@ -35,13 +35,18 @@ function StickyBox({ children, uid, layout, to }: StickyBoxProps) {
 // XMLUI StickyBox component definition
 
 /**
- * \`StickyBox\` is a component that "sticks" or remains fixed at the top or bottom position on the screen
- * as the user scrolls.
+ * **NOTE:** The \`StickyBox\` has a number of issues in the App component. Need to fix these before docs are updated.
+ * 
+ * The \`StickyBox\` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
+ * If used inside an [\`App\`](./App.mdx) component, the \`StickyBox\` will stick under the header and atop the footer -
+ * unless the \`scrollWholePage\` property is set, in which case the \`StickyBox\` will not stick at all.
  */
 export interface StickyBoxComponentDef extends ComponentDef<"StickyBox"> {
   props: {
     /**
-     * Position to anchor the sticky box (top, bottom).
+     * Position to anchor to the top or bottom.
+     * The default value is \`top\`.
+     * @descriptionRef
      */
     to?: string;
   };

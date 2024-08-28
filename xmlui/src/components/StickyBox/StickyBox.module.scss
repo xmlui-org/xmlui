@@ -13,11 +13,11 @@ $themeVars: ();
   background-color: createThemeVar("color-bg-StickyBox");
 
   &.top {
-    top: var(--header-height);
+    top: var(--header-height, 0);
   }
 
   &.bottom {
-    bottom: var(--footer-height);
+    bottom: var(--footer-height, 0);
   }
 }
 
