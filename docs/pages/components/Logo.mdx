@@ -2,15 +2,19 @@ import xmluiLogo from  "../../component-samples/Logo/xmlui-logo.svg";
 
 # Logo
 
-The `Logo` component represents an app's logo resource. Usually, you place this component in an `AppHeader`.
+The `Logo` component represents a logo or a brand symbol.
+Usually, you use this component in the [`AppHeader`](
+./AppHeader.mdx#logotemplate
+).
 
-You can learn more about the application layouts and using logos in the [App Component](/learning/using-components/app-component/) article.
+You can learn more about using logos in application layouts in the [App Component](/learning/using-components/app-component/) article.
 
 ## Using Logo
 
-The component checks the application manifest for a logo resource (SVG file). If found, the engine displays it in the viewport of the Logo component.
+The framework checks the application manifest for a logo resource (SVG file).
+If found, it loads and displays it in the Logo component.
 
-This sample shows the manifest of a simple app with a logo definition:
+This is a sample manifest that shows a logo definition:
 
 ```json copy {5}
 {
@@ -23,7 +27,9 @@ This sample shows the manifest of a simple app with a logo definition:
 }
 ```
 
-The following sample defines a new logo template that adds the "MyApp" title text before the logo. It uses the `Logo` component within the template definition:
+In the following example, you can see a custom logo definition in the `AppHeader` via templating.
+There is a `Heading` with the title text "MyApp" before the logo.
+It also uses the `Logo` component within the template definition:
 
 ```ueml copy {6}
 <App layout="horizontal">
@@ -52,7 +58,7 @@ The markup displays the app's logo:
 
 <Playground
   name="Example: using Logo"
-  previewOnly={true}
+  previewOnly
   height={200}
   resources={{ logo: xmluiLogo }}
   app={`
@@ -85,9 +91,7 @@ This component does not have any context variables.
 
 ## Properties
 
-### `title`
-
-No description provided.
+This component does not have any properties.
 
 ## API
 

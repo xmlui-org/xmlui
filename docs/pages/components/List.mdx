@@ -30,10 +30,10 @@ This property represents the value of an item in the data list.
 ### `data`
 
 The component receives data via this property.
-The `data` prop is a list of items that the `List` can display.
+The `data` property is a list of items that the `List` can display.
 
 The component receives its data via this property.
-The `data` prop is an array of items that the `List` can display.
+The `data` property is an array of items that the `List` can display.
 
 Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
@@ -58,7 +58,7 @@ This property adds default sections for the `List` and displays the section head
 
 Note the `meat` section header before all the others in the list below:
 
-> **Note:** For the `defaultSections` prop to work, the data must be sectioned using the [`sectionBy`](#sectionby) prop,
+> **Note:** For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
 > and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
@@ -96,8 +96,8 @@ Note the `meat` section header before all the others in the list below:
 
 ### `emptyListTemplate`
 
-This prop displays the given component as a placeholder
-if the `loader` prop is false and the `data` items length is 0 or is not set.
+This property displays the given component as a placeholder
+if the `loader` property is false and the `data` items length is 0 or is not set.
 
 ```ueml copy
 <List>
@@ -142,7 +142,7 @@ Default is `"id"`.
 
 ### `itemTemplate`
 
-This prop allows the customization of mapping data items to components.
+This property allows the customization of mapping data items to components.
 You can use the `$item` syntax to access an item and map its individual attributes.
 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
@@ -203,8 +203,8 @@ This property limits the number of items displayed in the `List`.
 
 ### `loading`
 
-The `loading` prop delays the rendering of children until it is set to false,
-or the component receives usable list items via the [`data`](#data) prop.
+The `loading` property delays the rendering of children until it is set to false,
+or the component receives usable list items via the [`data`](#data) property.
 
 ```ueml copy
 <List loading="true" />
@@ -219,7 +219,7 @@ or the component receives usable list items via the [`data`](#data) prop.
 
 ### `orderBy`
 
-This prop enables the ordering of list items by specifying an attribute in the data.
+This property enables the ordering of list items by specifying an attribute in the data.
 
 ```ueml /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
 <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data="{[...]}" />
@@ -234,7 +234,7 @@ This prop enables the ordering of list items by specifying an attribute in the d
 
 ### `scrollAnchor`
 
-This prop pins the scroll position to either the `top` or the `bottom` of the list.
+This property pins the scroll position to either the `top` or the `bottom` of the list.
 
 ```ueml /scrollAnchor="bottom"/
 <List scrollAnchor="bottom" data="{[...]}" />
@@ -252,7 +252,7 @@ This prop pins the scroll position to either the `top` or the `bottom` of the li
 This property set which attribute of the data is used to group or section the list items.
 If the attribute does not appear in the data items, it will be ignored.
 
-> **Note:** For the `sectionBy` prop to work, either a [`sectionTemplate`](#sectiontemplate)
+> **Note:** For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
 > or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
@@ -375,23 +375,6 @@ An `$item` here looks like the following:
     </prop>
   </List>
   `}
-/>
-
-### `selectedIndex`
-
-This prop scrolls to a specific item indicated by its index.
-
-Issue: Currently not working
-
-```ueml /selectedIndex="5"/
-<List selectedIndex="5" data="{[...]}" />
-```
-
-<Playground
-  previewOnly
-  name="Example: selectedIndex"
-  height={400}
-  app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
 />
 
 ## API

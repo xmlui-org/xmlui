@@ -192,7 +192,7 @@ export const FileInput = ({
 // ============================================================================
 // XMLUI FileInput component definition
 
-/** @descriptionRef */
+/** @internal */
 export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
   props: {
     /** @descriptionRef */
