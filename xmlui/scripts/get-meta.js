@@ -1,16 +1,29 @@
 /**
+ * --- Metadata Generator Script ---
+ * 
  * NOTE: Typedoc uses TSDoc and JSDoc under the hood to process tags.
+ * NOTE #2: TypeDoc generates a bunch of warnings indicating bad links in processed tsx files.
+ * Ignore these as the links are correct on the docs site.
+ * 
  * All TSDoc tags and most JSdoc tags are supported.
  *
  * We are using custom tags that need to be registered in "tsdoc.json" located on the same level as the tsconfig.json file.
  *
- * On metadata extraction:
+ * On metadata extraction and docs generation:
+ * - The script can regenerate specific component docs if the component names are provided as parameters
+ * e.g.: npm run get-metadata --entry Card
  * - All properties, events, etc in the component metadata will be exported unless excluded using the @internal tag
  * - A component metadata will be properly processed if the ComponentDef interface in the component file
- * is commented using the JSDoc syntax: /** something *\/
+ * is commented using the JSDoc syntax: \/** something *\/
+ * - The component names and thus external doc names are inferred from the component metadata definition,
+ * so IT IS IMPORTANT HOW YOU NAME THE COMPONENT DEFINITION, e.g. MarginlessCardComponentDef -> MarginlessCard
  * - We are currently using custom tags to handle descriptions coming from external mdx files (see @descriptionRef tag)
+ * - If no external mdx files are provided for a component, set the `descriptionRef` tag to `none`, i.e. @descriptionRef none
  * - When using special characters in the inline description (`, *, >, etc.) that are markdown-compliant,
  * use backticks (`\`) to escape them
+ * - Components that are specialized children of a more generic parent component (like H1 of Heading), the specialized form
+ * must be indicated using the @specialized tag: @specialized H1. If no explicit parameter is provided, the tag will use the filename
+ * to indicate the specialization
  */
 
 const TypeDoc = require("typedoc");
@@ -25,7 +38,7 @@ main().catch(console.error);
 // ------------------------------------------------------------------------
 
 async function main() {
-  const params = handleInutParams(process.argv);
+  const params = handleInputParams(process.argv);
   const parsedConfig = handleConfig(config);
   const mergedConfig = mergeParamsAndConfig(params, parsedConfig);
 
@@ -36,7 +49,7 @@ async function main() {
     // TypeDoc will detect the root of the project by looking for a tsconfig.json and checking its contents (& defaults)
     entryPoints,
     logLevel: "Info",
-    // This ensures we don't export properties tagged with @internal
+    // This ensures we don't export properties or components tagged with @internal
     excludeInternal: true,
   });
   if (app.entryPoints.length === 0) {
@@ -76,10 +89,10 @@ async function main() {
     for (const componentDefSubTree of filteredTree.children) {
       // The displayName is also used as the default folder name and the default description reference file name
       const displayName = getDisplayName(componentDefSubTree);
-      const genericParent = getSpecializedInfo(componentDefSubTree);
+      const genericParentInfo = getSpecializedInfo(componentDefSubTree);
 
-      const componentDefMetadata = genericParent
-        ? getSpecializedComponent(genericParent, displayName)
+      const componentDefMetadata = genericParentInfo
+        ? getSpecializedComponent(genericParentInfo, displayName)
         : getRegularComponent(componentDefSubTree, displayName);
       componentDefMetadata.displayName = displayName;
 
@@ -113,8 +126,10 @@ async function main() {
     // This tag indicates WHERE to look for external mdx files for this particular component, defaults to `sourceFolder`
     const componentFolder = getComponentFolder(tree) ?? displayName;
     // We are only interested in the first param after the tag itself, that is the reason for accessing [0]?.text (it may be empty)
-    const descriptionRefFileName = `${displayName}.mdx`;
-    const descriptionRef = getDescriptionRef(tree, componentFolder, descriptionRefFileName);
+    const descriptionRefFileFallback = `${displayName}.mdx`;
+    const descriptionRefFileName = getDescriptionRef(tree);
+    // If the keyword 'none' is set for the descriptionRef, there are no external mdx files
+    const descriptionRef = descriptionRefFileName === "none" ? "" : `./${componentFolder}/${descriptionRefFileName ?? descriptionRefFileFallback}`;
 
     return { description, descriptionRef, componentFolder };
   }
@@ -136,7 +151,6 @@ async function main() {
     
     const sourceFilePath = tree.sources[0]?.fileName;
     return path.basename(sourceFilePath, path.extname(sourceFilePath));
-    
   }
 
   function getDescription(tree) {
@@ -147,11 +161,8 @@ async function main() {
     return tree.comment?.blockTags?.find((tag) => tag.tag === "@componentFolder")?.content?.[0]?.text;
   }
 
-  function getDescriptionRef(tree, componentFolder, descriptionRefFileName) {
-    return `./${componentFolder}/${
-      tree.comment?.blockTags?.find((tag) => tag.tag === "@descriptionRef")?.content?.[0]?.text ??
-      descriptionRefFileName
-    }`;
+  function getDescriptionRef(tree) {
+    return tree.comment?.blockTags?.find((tag) => tag.tag === "@descriptionRef")?.content?.[0]?.text;
   }
 }
 
@@ -201,7 +212,7 @@ class AttributeGathererVisitor extends Visitor {
         if (child?.name)
           this.data.attributes[child.name] = {
             description: "",
-            descriptionRef: `${this.params?.descriptionRef}?${child.name}` ?? "",
+            descriptionRef: this.params?.descriptionRef ? `${this.params?.descriptionRef}?${child.name}` : "",
             defaultValue: "",
           };
         if (child?.comment) {
@@ -371,7 +382,7 @@ function handleConfig(config) {
   };
 }
 
-function handleInutParams(argv) {
+function handleInputParams(argv) {
   const params = {};
   for (let i = 2; i < argv.length; i++) {
     const [key, value] = argv[i].split("=");

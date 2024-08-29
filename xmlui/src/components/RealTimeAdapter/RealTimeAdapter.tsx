@@ -148,6 +148,7 @@ function RealTimeAdapter({ url, onEvent }: Props) {
 
 /**
  * \`RealTimeAdapter\` is a non-visual component that listens to real-time events through long-polling.
+ * @descriptionRef none
  */
 export interface RealTimeAdapterComponentDef extends ComponentDef<"RealTimeAdapter"> {
   props: {

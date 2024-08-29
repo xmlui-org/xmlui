@@ -150,34 +150,15 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
 // =====================================================================================================================
 // XMLUI MarginlessCard component definition
 
-/**
- * The \`MarginlessCard\` component is a `Card` with no margins at any edge.
- */
-export interface MarginlessComponentDef extends ComponentDef<"MarginlessCard"> {
-  props: {
-    /** @descriptionRef */
-    title?: string;
-    /** @descriptionRef */
-    subTitle?: string;
-    /** @descriptionRef */
-    linkTo?: string;
-    /** @descriptionRef */
-    avatarUrl?: string;
-    /** @descriptionRef */
-    showAvatar?: boolean;
-  };
-  events: {
-    /** @descriptionRef */
-    click: string;
-  };
-}
+/** @specialized */
+export type MarginlessCardComponentDef = Omit<CardComponentDef, "type"> & { type: "MarginlessCard" };
 
 const marginlessCardMetadata = {
   ...cardMetadata,
   displayName: "MarginlessCard",
 };
 
-export const marginlessCardComponentRenderer = createComponentRenderer<MarginlessComponentDef>(
+export const marginlessCardComponentRenderer = createComponentRenderer<MarginlessCardComponentDef>(
   "MarginlessCard",
   ({ node, extractValue, renderChild, layoutCss }) => {
     return (
