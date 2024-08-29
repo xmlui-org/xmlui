@@ -40,6 +40,7 @@ function StickyBox({ children, uid, layout, to = "top" }: StickyBoxProps) {
  * The \`StickyBox\` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls.
  * If used inside an [\`App\`](./App.mdx) component, the \`StickyBox\` will stick under the header and atop the footer -
  * unless the \`scrollWholePage\` property is set, in which case the \`StickyBox\` will not stick at all.
+ * @internal
  */
 export interface StickyBoxComponentDef extends ComponentDef<"StickyBox"> {
   props: {
