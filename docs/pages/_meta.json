@@ -1,10 +1,10 @@
 {
   "index": "Introduction",
-  "get-started": "Get Started",
+  "get-started": "Gettting Started",
   "tutorials": "Tutorials",
   "learning": "Learn XMLUI",
   "howto": "How-to Guides",
-  "components": "Component Reference",
-  "styles-and-themes": "Themes Reference",
+  "components": "Components",
+  "styles-and-themes": "Themes",
   "tools": "Tools"
 }
