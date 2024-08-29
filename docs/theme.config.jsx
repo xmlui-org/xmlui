@@ -2,8 +2,20 @@ import { Logo } from "./src/components/Logo";
 import { Playground } from "./src/components/Playground";
 import { StandalonePlayground } from "./src/components/StandalonePlayground";
 import { DocsImage } from "./src/components/DocsImage";
+import { useRouter } from "next/router";
 
 export default {
+  useNextSeoProps() {
+    const { asPath } = useRouter();
+    if (asPath !== "/") {
+      return {
+        titleTemplate: 'XMLUI Docs - %s'
+      };
+    }
+    return {
+      titleTemplate: 'XMLUI Docs'
+    };
+  },
   logo: Logo,
   components: {
     Playground,
