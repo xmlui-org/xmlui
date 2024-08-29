@@ -147,15 +147,19 @@ const componentNames =
 metadata.forEach((component) => {
   let result = "";
   let fileData = "";
-  try {
-    // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
-    fileData = readFileContents(
-      path.join(sourceFolder, component.descriptionRef)
-    );
-  } catch (error) {
-    if (error instanceof ErrorWithSeverity) {
-      logger.log(error.severity, error.message);
-    }
+
+  // descriptionRef is explicitly set to empty, which means there is no external doc file for this component
+  if (!!component.descriptionRef) {
+    try {
+      // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
+      fileData = readFileContents(
+        path.join(sourceFolder, component.descriptionRef)
+      );
+    } catch (error) {
+      if (error instanceof ErrorWithSeverity) {
+        logger.log(error.severity, error.message);
+      }
+    }      
   }
 
   const parent = component.specializedFrom

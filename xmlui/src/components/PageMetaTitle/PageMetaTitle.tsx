@@ -17,6 +17,7 @@ const PageMetaTitle = ({ title }: { title: string }) => {
 /**
  * A \`PageMetaTitle\` component allows setting up (or changing) the app title to display with the 
  * current browser tab.
+ * @descriptionRef none
  */
 export interface PageMetaTitleComponentDef extends ComponentDef<"PageMetaTitle"> {
   props: {

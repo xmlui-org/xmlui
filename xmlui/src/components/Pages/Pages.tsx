@@ -46,6 +46,7 @@ export function RouteWrapper({
  * when the user navigates to a particular URL that is associated with the Page.
  * 
  * Examples for the \`Page\` component can be found in the [\`Pages\`](./Pages.mdx) component documentation.
+ * @descriptionRef none
  */
 export interface PageComponentDef extends ComponentDef<"Page"> {
   props: {
