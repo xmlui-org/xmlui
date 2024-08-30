@@ -52,6 +52,11 @@
     background-color: var(--color-background-primary);
   }
 
+  .hover\:nx-text-primary-600:hover {
+    --tw-text-opacity: 1;
+    color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/var(--tw-text-opacity));
+}
+
   ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li {
     > a:hover, > button:hover {
       background-color: #1c5aa02a;
@@ -222,3 +227,10 @@ body {
 :is(html[class~=light] input:focus-visible) {
   box-shadow: none !important;
 }
+
+:is(html[class~=dark] div.nextra-nav-container nav a:first-of-type:hover),
+:is(html[class~=light] div.nextra-nav-container nav a:first-of-type:hover) {
+  opacity: 1 !important;
+}
+
+
