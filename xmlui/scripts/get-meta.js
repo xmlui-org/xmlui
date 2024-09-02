@@ -204,7 +204,7 @@ class AttributeGathererVisitor extends Visitor {
         const childName = child.name;
         this.data.attributes[childName] = {
           description: "",
-          descriptionRef: this.params?.descriptionRef ? `${this.params?.descriptionRef}?${child.name}` : "",
+          descriptionRef: this.params?.descriptionRef ? `${this.params?.descriptionRef}?${childName}` : "",
           defaultValue: "",
         };
 
@@ -218,7 +218,10 @@ class AttributeGathererVisitor extends Visitor {
         
         const attributeDescriptionRef = getDescriptionRef(child);
         const componentFolder = this.params?.componentFolder ?? "";
-        this.data.attributes[childName].descriptionRef = attributeDescriptionRef ?? `./${componentFolder}/${attributeDescriptionRef}`;
+        // Update descriptionRef if it is explicitly set in the metadata
+        if (attributeDescriptionRef) {
+          this.data.attributes[childName].descriptionRef = `./${componentFolder}/${attributeDescriptionRef}`;
+        }
       }
     }
   }
