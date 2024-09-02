@@ -24,12 +24,12 @@ Often, you use only small code snippets that explain themselves the best when th
 
 Properties accept expressions (often called _binding expressions_ in XMLUI) that can be combined with string segments.
 
-The following sample uses _binding expressions_ to set the `value` property of a couple of `Text` components. The wrapping curly braces sign the engine that the content between `{` and `}` should be considered a binding expression. When initializing the property's value, the engine evaluates the binding expression and sets the property to the evaluated value:
+The following sample uses _binding expressions_ to set the `value` property of a couple of `Text` components. The wrapping curly braces signal the engine that the content between `{` and `}` should be considered a binding expression. When initializing the property's value, the engine evaluates the binding expression and sets the property to the evaluated value:
 
 ```ueml copy {4, 6}
 <VStack>
   <HStack>
-    <Text value="Square root of 2 is:\xa0" />
+    <Text value="Square root of 2 is:&nbsp;" />
     <Text value="{Math.sqrt(2)}" />
   </HStack>
   <Text value="Square root of 5 is: {Math.sqrt(5)}" />
@@ -46,7 +46,7 @@ When rendering the app, the engine evaluates `Math.sqrt(2)` and `Math.sqrt(5)` a
   app={`
     <VStack>
       <HStack>
-        <Text value="Square root of 2 is:\xa0" />
+        <Text value="Square root of 2 is:&nbsp;" />
         <Text value="{Math.sqrt(2)}" />
       </HStack>
       <Text value="Square root of 5 is: {Math.sqrt(5)}" />
@@ -390,7 +390,7 @@ for (let i = 0; i < upperBound) {
 }
 ```
 
-Component variables are those you declare in the markup with the `var.` prefix or code-behind files and `<script>` tags with the `var` keyword, such as in these examples:
+Component variables are those you declare in the markup with the `var.` prefix or code-behind files and `<script>` tags with the `var` keyword, such as the highlighted variables in these examples:
 
 ```javascript filename="MyButton.xmlui.xs" /var endValue/
 var endValue = 234;

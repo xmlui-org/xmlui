@@ -94,12 +94,12 @@ The variables created with the component are stored within the particular compon
 
 **XMLUI makes using variables and other calculated values in _expressions_ easy.**
 
-You can use expressions in property and variable values. The engine recognizes them as wrapped between curly braces, such as `{count}` in the previous example's `label` property value:
+You can use expressions in property and variable values. The engine recognizes them as wrapped between curly braces, such as `{count}`. They are not limited to just variables. Here, you can see `{count + 10}` being used in the label. 
 
 ```ueml copy {3}
 <Button
   var.count="{0}"
-  label="Click count: {count}"
+  label="Click count: {count + 10}"
   onClick="count++" />
 ```
 

@@ -119,11 +119,11 @@ You can change the visual appearance of an app by creating a new theme (from an 
 </VStack>
 ```
 
-Here, the `<Theme>` tag wraps the first to `IncButton` components to change some of their theme properties, while the third button remains intact:
+Here, the `<Theme>` tag wraps the first two `IncButton` components to change some of their theme properties, while the third button remains intact:
 
 <Playground
     previewOnly
-    name="Reusable components"
+    name="Themed components"
     components={[`
       <Component name="IncButton">
         <Button label="{($props.label ?? 'Click me to increment') + ': ' + count}" var.count="{0}" onClick="count++" />
