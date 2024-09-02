@@ -152,19 +152,9 @@ async function main() {
     const sourceFilePath = tree.sources[0]?.fileName;
     return path.basename(sourceFilePath, path.extname(sourceFilePath));
   }
-
-  function getDescription(tree) {
-    return tree.comment?.summary?.map((s) => s.text).join("\n");
-  }
-
-  function getComponentFolder(tree) {
-    return tree.comment?.blockTags?.find((tag) => tag.tag === "@componentFolder")?.content?.[0]?.text;
-  }
-
-  function getDescriptionRef(tree) {
-    return tree.comment?.blockTags?.find((tag) => tag.tag === "@descriptionRef")?.content?.[0]?.text;
-  }
 }
+
+// --- Tree visitors
 
 class Visitor {
   params = {};
@@ -209,59 +199,35 @@ class AttributeGathererVisitor extends Visitor {
     super.visit(node);
     if (node.variant === "declaration" && node?.name === "__type" && !!node?.children) {
       for (const child of node.children) {
-        if (child?.name)
-          this.data.attributes[child.name] = {
-            description: "",
-            descriptionRef: this.params?.descriptionRef ? `${this.params?.descriptionRef}?${child.name}` : "",
-            defaultValue: "",
-          };
-        if (child?.comment) {
-          if (child?.comment?.summary) {
-            this.data.attributes[child.name].description += child.comment.summary.map((s) => s.text).join("\n");
-          }
-          if (child?.comment?.blockTags) {
-            for (const tag of child.comment.blockTags) {
-              if (tag.tag === "@defaultValue") {
-                this.data.attributes[child.name].defaultValue += tag.content[0].text.split("\n")[1];
-              }
-              if (tag.tag === "@descriptionRef" && tag.content[0]?.text) {
-                this.data.attributes[child.name].descriptionRef = `./${this.params?.componentFolder ?? ""}/${
-                  tag.content[0].text
-                }`;
-              }
-            }
-          }
+        if (!child?.name) continue;
+
+        const childName = child.name;
+        this.data.attributes[childName] = {
+          description: "",
+          descriptionRef: this.params?.descriptionRef ? `${this.params?.descriptionRef}?${childName}` : "",
+          defaultValue: "",
+        };
+
+        if (!child?.comment) continue;
+
+        const attributeDescription = getDescription(child) ?? "";
+        this.data.attributes[childName].description += attributeDescription;
+
+        const attributeDefaultValue = getDefaultValue(child);
+        this.data.attributes[childName].defaultValue += attributeDefaultValue?.split("\n")[1] ?? "";
+        
+        const attributeDescriptionRef = getDescriptionRef(child);
+        const componentFolder = this.params?.componentFolder ?? "";
+        // Update descriptionRef if it is explicitly set in the metadata
+        if (attributeDescriptionRef) {
+          this.data.attributes[childName].descriptionRef = `./${componentFolder}/${attributeDescriptionRef}`;
         }
       }
     }
   }
 }
 
-/**
- * Performs a depth-first search that traverses a given tree and calls an optional visitor object function
- * on each of the tree nodes. This is a recursive function.
- *
- * The optional visitor can return true to break the traversal.
- *
- * node: {
- *    name: the name of the folder/file (eg. "hello-app-engine")
- *    path: the path to the root of the given folder from the project root (eg. "src/apps/1_basic/samples/hello-app-engine")
- *    parent: parent node
- *    children: children file/folder names
- * }
- */
-function traverse(node, visitor) {
-  if (typeof visitor === "object" && visitor instanceof Visitor) {
-    const breakSign = visitor.visit(node);
-    if (breakSign) return;
-  }
-
-  if (!node.hasOwnProperty("children")) return;
-  if (!node?.children?.length) return;
-  for (const child of node.children) {
-    traverse(child, visitor);
-  }
-}
+// --- Tree traversal utilities
 
 function traverseAttribute(node, visitor) {
   if (typeof visitor === "object" && visitor instanceof Visitor) {
@@ -275,21 +241,6 @@ function traverseAttribute(node, visitor) {
     if (typeof value === "object" && value !== null) {
       traverseAttribute(value, visitor);
     }
-  }
-}
-
-function traverseWidthFirst(node, visitor) {
-  if (!node.hasOwnProperty("children")) return;
-  if (!node?.children?.length) return;
-
-  for (const child of node.children) {
-    if (typeof visitor === "object" && visitor instanceof Visitor) {
-      const breakSign = visitor.visit(child);
-      if (breakSign) return;
-    }
-  }
-  for (const child of node.children) {
-    traverseWidthFirst(child, visitor);
   }
 }
 
@@ -346,9 +297,81 @@ async function getRawTreeFromFile(app, data, workingFolder) {
   }
 }
 
+/**
+ * Performs a depth-first search that traverses a given tree and calls an optional visitor object function
+ * on each of the tree nodes. This is a recursive function.
+ *
+ * The optional visitor can return true to break the traversal.
+ *
+ * node: {
+ *    name: the name of the folder/file (eg. "hello-app-engine")
+ *    path: the path to the root of the given folder from the project root (eg. "src/apps/1_basic/samples/hello-app-engine")
+ *    parent: parent node
+ *    children: children file/folder names
+ * }
+ */
+/* function traverse(node, visitor) {
+  if (typeof visitor === "object" && visitor instanceof Visitor) {
+    const breakSign = visitor.visit(node);
+    if (breakSign) return;
+  }
+
+  if (!node.hasOwnProperty("children")) return;
+  if (!node?.children?.length) return;
+  for (const child of node.children) {
+    traverse(child, visitor);
+  }
+} */
+
+/* function traverseWidthFirst(node, visitor) {
+  if (!node.hasOwnProperty("children")) return;
+  if (!node?.children?.length) return;
+
+  for (const child of node.children) {
+    if (typeof visitor === "object" && visitor instanceof Visitor) {
+      const breakSign = visitor.visit(child);
+      if (breakSign) return;
+    }
+  }
+  for (const child of node.children) {
+    traverseWidthFirst(child, visitor);
+  }
+} */
+
 /* async function getRawTree(app, data, workingFolder) {
   return app.convert();
 } */
+
+// --- Tree helpers
+
+function getDescription(tree) {
+  return tree.comment?.summary?.map((s) => s.text).join("\n");
+}
+
+function getComponentFolder(tree) {
+  return tree.comment?.blockTags?.find((tag) => tag.tag === "@componentFolder")?.content?.[0]?.text;
+}
+
+function getDescriptionRef(tree) {
+  return tree.comment?.blockTags?.find((tag) => tag.tag === "@descriptionRef")?.content?.[0]?.text;
+}
+
+function getDefaultValue(tree) {
+  return tree.comment?.blockTags?.find((tag) => tag.tag === "@defaultValue")?.content?.[0]?.text;
+}
+
+function isInterfaceDef(node) {
+  return node?.variant === "declaration" && node.hasOwnProperty("children") && Array.isArray(node.children);
+}
+
+function isTypeDef(node) {
+  return (
+    node?.variant === "declaration" &&
+    node.hasOwnProperty("type") &&
+    typeof node.type === "object" &&
+    node.type !== null
+  );
+}
 
 function metadataToJson(data, outFolder) {
   const fileName = "component-metadata.json";
@@ -359,6 +382,8 @@ function metadataToJson(data, outFolder) {
     console.error(`Could not write ${fileName} file: ${e?.message || "unknown error"}`);
   }
 }
+
+// --- Config and input params helpers
 
 function handleConfig(config) {
   const workingFolder = path.resolve(__dirname);
@@ -418,17 +443,4 @@ function mergeParamsAndConfig(params, config) {
   }
 
   return mergedConfig;
-}
-
-function isInterfaceDef(node) {
-  return node?.variant === "declaration" && node.hasOwnProperty("children") && Array.isArray(node.children);
-}
-
-function isTypeDef(node) {
-  return (
-    node?.variant === "declaration" &&
-    node.hasOwnProperty("type") &&
-    typeof node.type === "object" &&
-    node.type !== null
-  );
 }
