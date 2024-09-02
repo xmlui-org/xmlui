@@ -1,0 +1,38 @@
+@use "@components-core/theming/themes" as t;
+
+.helper {
+  padding-top: t.$space-1;
+  padding-bottom: t.$space-1;
+  display: flex;
+  align-items: center;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.helperText {
+  font-size: t.$font-size-small;
+  color: t.$color-text-primary;
+}
+
+.valid {
+  .helperText {
+    margin-left: 0.25em;
+    color: t.$color-valid;
+  }
+}
+
+.error {
+  .helperText {
+    margin-left: 0.25em;
+    color: t.$color-error;
+  }
+}
+
+.warning {
+  .helperText {
+    margin-left: 0.25em;
+    color: t.$color-warning;
+  }
+}

@@ -1,0 +1,1 @@
+import React from "react";import {FiList} from "react-icons/fi";import type {IconBaseProps} from "./Icon";export const ListIcon = (props: IconBaseProps) => <FiList {...props}/>

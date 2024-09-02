@@ -1,0 +1,134 @@
+export interface GeneralDiagnosticMessage {
+  code: ErrCodes;
+  category: DiagnosticCategory;
+  message: string;
+}
+
+export type DiagnosticMessage = DiagnosticMessageFromScanner | DiagnosticMessageFromParser;
+
+export type DiagnosticMessageFromScanner =
+  | typeof Diag_Invalid_Character
+  | typeof Diag_Unterminated_String_Literal
+  | typeof Diag_Unterminated_Comment
+  | typeof Diag_Unterminated_CData
+  | typeof Diag_Unterminated_Script;
+
+type DiagnosticMessageFromParser =
+  | typeof Diag_End_Token_Expected
+  | typeof Diag_CloseNodeStart_Token_Expected
+  | typeof Diag_Tag_Identifier_Expected
+  | typeof Diag_Attr_Value_Expected
+  | typeof Diag_Eq_Token_Expected
+  | typeof Diag_OpenNodeStart_Token_Expected
+  | typeof Diag_End_Or_Close_Token_Expected
+  | typeof Diag_Attr_Identifier_Expected;
+
+export enum DiagnosticCategory {
+  Warning,
+  Error,
+  Suggestion,
+  Message,
+}
+
+export enum ErrCodes {
+  onlyOneElem = "U002",
+  expTagOpen = "U003",
+  expTagIdent = "U004",
+  expCloseStart = "U005",
+  expEndOrClose = "U006",
+  tagNameMismatch = "U007",
+  expEnd = "U008",
+  expAttrIdent = "U009",
+  expEq = "U010",
+  expAttrValue = "U011",
+  duplAttr = "U012",
+  uppercaseAttr = "U013",
+  invalidChar = "W001",
+  untermStr = "W002",
+  untermComment = "W007",
+  untermCData = "W008",
+  untermScript = "W009",
+}
+
+export function diagnosticCategoryName(d: { category: DiagnosticCategory }, lowerCase = true): string {
+  const name = DiagnosticCategory[d.category];
+  return lowerCase ? name.toLowerCase() : name;
+}
+
+export const Diag_Invalid_Character = {
+  code: ErrCodes.invalidChar,
+  category: DiagnosticCategory.Error,
+  message: "Invalid character.",
+} as const;
+
+export const Diag_Unterminated_String_Literal = {
+  code: ErrCodes.untermStr,
+  category: DiagnosticCategory.Error,
+  message: "Unterminated string literal.",
+} as const;
+
+export const Diag_Unterminated_Comment = {
+  code: ErrCodes.untermComment,
+  category: DiagnosticCategory.Error,
+  message: "Unterminated comment",
+} as const;
+
+export const Diag_Unterminated_CData = {
+  code: ErrCodes.untermCData,
+  category: DiagnosticCategory.Error,
+  message: "Unterminated CDATA section",
+} as const;
+
+export const Diag_Unterminated_Script = {
+  code: ErrCodes.untermScript,
+  category: DiagnosticCategory.Error,
+  message: "Unterminated script section",
+} as const;
+
+export const Diag_End_Token_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expEnd,
+  message: "A '>' token expected.",
+} as const;
+
+export const Diag_CloseNodeStart_Token_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expCloseStart,
+  message: "A '</' token expected.",
+} as const;
+
+export const Diag_Tag_Identifier_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expTagIdent,
+  message: "A tag identifier expected.",
+} as const;
+
+export const Diag_Attr_Value_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expAttrValue,
+  message: "An attribute value expected.",
+} as const;
+
+export const Diag_Eq_Token_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expEq,
+  message: "An '=' token expected.",
+} as const;
+
+export const Diag_OpenNodeStart_Token_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expTagOpen,
+  message: "A '<' token expected.",
+} as const;
+
+export const Diag_End_Or_Close_Token_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expEndOrClose,
+  message: `A '>' or '/>' token expected.`,
+} as const;
+
+export const Diag_Attr_Identifier_Expected = {
+  category: DiagnosticCategory.Error,
+  code: ErrCodes.expAttrIdent,
+  message: `An attribute identifier expected.`,
+} as const;

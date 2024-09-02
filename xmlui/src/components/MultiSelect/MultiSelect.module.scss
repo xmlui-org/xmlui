@@ -1,0 +1,189 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "MultiSelect";
+
+// --- CSS properties of a particular MultiSelect variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus-visible {
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+  }
+
+  .placeholder {
+    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+  }
+}
+
+.multiSelectContainer {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+}
+
+.selectToggleButton {
+  padding: t.$space-2;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  border-width: 1px;
+  border-style: solid;
+  transition: background-color ease-in .1s;
+  border-radius: 0.2em;
+  overflow: hidden;
+  font-size: createThemeVar("Input:font-size-MultiSelect");
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+
+  &.warning {
+    @include variant("warning");
+  }
+
+  &.valid {
+    @include variant("success");
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: createThemeVar("Input:color-bg-MultiSelect--disabled");
+    color: createThemeVar("Input:color-text-MultiSelect--disabled");
+    border-color: createThemeVar("Input:color-border-MultiSelect--disabled");
+
+    .indicator {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.selectedOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-direction: row;
+  font-size: inherit;
+
+  .multiValue {
+    font-size: inherit;
+    display: flex;
+    min-width: 0;
+    border-radius: 2px;
+    color: createThemeVar("Input:color-text-value-MultiSelect");
+    background-color: createThemeVar("Input:color-bg-value-MultiSelect");
+  }
+
+  .multiValueLabel {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    border-radius: 2px;
+    font-size: inherit;
+    padding: 0 3px;
+  }
+
+  .multiValueRemove {
+    padding: 0 4px;
+    border-radius: 2px;
+    display: flex;
+    cursor: pointer;
+    align-items: center;
+
+    &.disabled {
+      cursor: not-allowed;
+    }
+  }
+}
+
+.selectMenu {
+  padding: 0;
+  overflow-y: auto;
+  background-color: createThemeVar("Input:color-bg-menu-MultiSelect");
+  list-style: none;
+  transition: height 0.2s ease;
+  height: fit-content;
+  max-height: 200px;
+  width: 100%;
+  box-shadow: createThemeVar("Input:shadow-menu-MultiSelect");
+  border-radius: createThemeVar("Input:radius-menu-MultiSelect");
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.indicator {
+  color: createThemeVar("Input:color-text-indicator-MultiSelect");
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  cursor: pointer;
+  border: 0;
+  margin: 0;
+}
+
+.item {
+  display: flex;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  padding-inline: 1em;
+  align-items: center;
+  cursor: pointer;
+
+  .empty {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &.itemActive, &[data-highlighted], &:hover:not(.itemDisabled) {
+    background-color: createThemeVar("Input:color-bg-item-MultiSelect--hover");
+  }
+
+  &.itemSelected {
+    background-color: createThemeVar("Input:color-bg-item-MultiSelect--active");
+  }
+
+  &.itemDisabled {
+    cursor: not-allowed;
+    color: createThemeVar("Input:color-text-item-MultiSelect--disabled");
+    font-style: italic;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

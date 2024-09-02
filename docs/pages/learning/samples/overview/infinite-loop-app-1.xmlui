@@ -1,0 +1,5 @@
+<VStack gap=.2rem>
+  <InfiniteLoop />
+  <InfiniteLoop />
+  <InfiniteLoop />
+</VStack>

@@ -1,0 +1,29 @@
+# H6
+
+The `H6` component is a shorthand version of the `Heading` element with its `level` property set to "h6".
+
+See also: [Heading](./Heading), [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5).
+
+```ueml copy
+<H6 value="This is a H6 text" />
+```
+
+<Playground
+  name="H6 example"
+  previewOnly
+  height={100}
+  app={`
+  <Stack>
+    <H6 value="This is a H6 text" />
+  </Stack>
+  `}
+/>
+
+## Styling
+
+The `H6` component inherits its visual style from the `Heading` component.
+Using the `H6` component specifier, you can override the inherited theme variable values.
+For example, the `color-text-H6` theme variable sets the text color of `H6` while keeping the color of all other headings.
+
+
+The parent component documentation can be found [here](./Heading.mdx).

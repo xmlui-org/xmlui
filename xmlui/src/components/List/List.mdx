@@ -1,0 +1,455 @@
+%-IMPORT-START
+
+import data from "./doc-resources/list-component-data.js";
+
+%-IMPORT-END
+
+%-DESC-START
+
+In the following examples all use the same list of data which looks like so:
+
+| Id   | Name    | Quantity | Unit   | Category   |
+| :--- | :------ | :------- | :----- | :--------- |
+| 0    | Apples  | 5        | pieces | fruits     |
+| 1    | Bananas | 6        | pieces | fruits     |
+| 2    | Carrots | 100      | grams  | vegetables |
+| 3    | Spinach | 1        | bunch  | vegetables |
+| 4    | Milk    | 10       | liter  | diary      |
+| 5    | Cheese  | 200      | grams  | diary      |
+
+The data is provided as JSON.
+
+%-DESC-END
+
+%-PROP-START data
+
+The component receives its data via this property.
+The `data` property is an array of items that the `List` can display.
+
+Note how the `List` infers the given data and provides a simple layout for it.
+To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
+
+```ueml copy
+<List data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: data"
+  height={400}
+  app={`<List data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START defaultSections
+
+This property adds default sections for the `List` and displays the section headers even if no items fall into a particular section.
+
+Note the `meat` section header before all the others in the list below:
+
+> **Note:** For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
+> and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+
+```ueml copy {3}
+<List 
+  data='{${JSON.stringify(data)}}'
+  defaultSections="{['meat']}"
+  sectionBy="category"
+>
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: defaultSections"
+  height={400}
+  app={`
+  <List 
+    data='{${JSON.stringify(data)}}'
+    defaultSections="{['meat']}"
+    sectionBy="category"
+  >
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START emptyListTemplate
+
+```ueml copy
+<List>
+  <prop name="emptyListTemplate">
+    <Stack width="100%" horizontalAlignment="center">
+      <Text variant="strong" value="Empty..." />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: emptyListTemplate"
+  height={100}
+  app={`
+  <List>
+    <prop name="emptyListTemplate">
+      <Stack width="100%" horizontalAlignment="center">
+        <Text variant="strong" value="Empty..." />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START idKey
+
+```ueml /idKey="key"/
+<List idKey="key" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: idKey"
+  height={400}
+  app={`<List idKey="key" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START itemTemplate
+
+Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
+
+```ueml copy {2-12}
+<List data="{[...]}">
+  <prop name="itemTemplate">
+    <Card>
+      <HStack verticalAlignment="center" gap="0.5rem">
+        <Icon name="info" />
+        <Text value="{$item.name}" variant="strong" />
+      </HStack>
+      <HStack gap="0.5rem">
+        <Text value="{$item.quantity}" />
+        <Text value="{$item.unit}" variant="em" />
+      </HStack>
+    </Card>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: itemTemplate"
+  height={400}
+  app={`
+  <List data='{${JSON.stringify(data)}}'>
+    <prop name="itemTemplate">
+      <Card>
+        <HStack verticalAlignment="center" gap="0.5rem">
+          <Icon name="info" />
+          <Text value="{$item.name}" variant="strong" />
+        </HStack>
+        <HStack gap="0.5rem">
+          <Text value="{$item.quantity}" />
+          <Text value="{$item.unit}" variant="em" />
+        </HStack>
+      </Card>
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START limit
+
+```ueml /limit="4"/
+<List limit="4" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: limit"
+  height={400}
+  app={`<List limit="4" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START loading
+
+```ueml copy
+<List loading="true" />
+```
+
+<Playground
+  previewOnly
+  name="Example: loading"
+  height={60}
+  app={`<List loading="true" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START orderBy
+
+```ueml /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
+<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: orderBy"
+  height={400}
+  app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START pageInfo
+
+It contains the following boolean attributes:
+
+| Attribute            | Description                          |
+| :------------------- | :------------------------------------|
+| `hasPrevPage`        | Does the list have a previous page   |
+| `hasNextPage`        | Does the list have a next page       |
+| `isFetchingPrevPage` | _TBD_                                |
+| `isFetchingNextPage` | _TBD_                                |
+
+%-PROP-END
+
+%-PROP-START sectionBy
+
+> **Note:** For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
+> or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+
+```ueml copy {3}
+<List 
+  data='{${JSON.stringify(data)}}'
+  defaultSections="{['meat']}"
+  sectionBy="category"
+>
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: sectionBy"
+  height={400}
+  app={`
+  <List 
+    data='{${JSON.stringify(data)}}'
+    defaultSections="{['meat']}"
+    sectionBy="category"
+  >
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START sectionFooterTemplate
+
+The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+An `$item` here looks like the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
+| sectionItems | The items filtered from the original data list that fall into this section.                                   |
+| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+
+```ueml copy {7-9}
+<List data='{${JSON.stringify(data)}}' sectionBy="category">
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+  <prop name="sectionFooterTemplate">
+    <ContentSeparator />
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: sectionFooterTemplate"
+  height={400}
+  app={`
+  <List data='{${JSON.stringify(data)}}' sectionBy="category">
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+    <prop name="sectionFooterTemplate">
+      <ContentSeparator />
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START sectionTemplate
+
+The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+An `$item` here looks like the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
+| sectionItems | The items filtered from the original data list that fall into this section.                                   |
+| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+
+```ueml copy {2-6}
+<List data='{${JSON.stringify(data)}}' sectionBy="category">
+  <prop name="sectionTemplate">
+    <Stack padding="$space-2">
+      <Text variant="subtitle" value="{$item.sectionKey}" />
+    </Stack>
+  </prop>
+</List>
+```
+
+<Playground
+  previewOnly
+  name="Example: sectionTemplate"
+  height={400}
+  app={`
+  <List data='{${JSON.stringify(data)}}' sectionBy="category">
+    <prop name="sectionTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </Stack>
+    </prop>
+  </List>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START selectedIndex
+
+```ueml /selectedIndex="5"/
+<List selectedIndex="5" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: selectedIndex"
+  height={400}
+  app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START scrollAnchor
+
+```ueml /scrollAnchor="bottom"/
+<List scrollAnchor="bottom" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: scrollAnchor"
+  height={400}
+  app={`<List scrollAnchor="bottom" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-PROP-START scrollPaddingEnd
+
+Adds padding to the bottom of the list which is also included in the scroll area.
+
+```ueml {2}
+<List
+  scrollPaddingEnd="20"
+  scrollAnchor="bottom"
+  data="{[...]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: scrollAnchor"
+  height={400}
+  app={`
+  <List
+    scrollPaddingEnd="20"
+    scrollAnchor="bottom"
+    data='{${JSON.stringify(data)}}'
+  />
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START scrollPaddingStart
+
+Adds padding to the top of the list which is also included in the scroll area.
+
+```ueml /scrollPaddingStart="20"/
+<List scrollPaddingStart="20" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: scrollPaddingStart"
+  height={400}
+  app={`<List scrollPaddingStart="20" data='{${JSON.stringify(data)}}' />`}
+/>
+
+%-PROP-END
+
+%-EVENT-START requestFetchNextPage
+
+**Note:** Not used in code.
+
+%-EVENT-END
+
+%-EVENT-START requestFetchPrevPage
+
+**Note:** Not used in code.
+
+%-EVENT-END
+
+%-EVENT-START resetSelectedIndex
+
+**Note:** Not used in code.
+
+%-EVENT-END
+
+%-STYLE-START
+
+`List` is a layout container; its purpose is to render nested child components.
+`List` has no theme variables to change its visual appearance.
+
+%-STYLE-END

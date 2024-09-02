@@ -1,0 +1,206 @@
+%-PROP-START columnGap
+
+```ueml copy /columnGap="1rem"/
+<Form padding="1rem">
+  <FormSection columnGap="1rem">
+    <FormItem width="50%" label="Name" bindTo="" />
+    <FormItem width="50%" label="Occupation" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: columnGap"
+  previewOnly
+  height={220}
+  app={`<Form padding="1rem">
+  <FormSection columnGap="1rem">
+    <FormItem width="50%" label="Name" bindTo="" />
+    <FormItem width="50%" label="Occupation" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-STARt rowGap
+
+```ueml copy /rowGap="2rem"/
+<Form padding="1rem">
+  <FormSection rowGap="2rem">
+    <FormItem label="Name" bindTo="" />
+    <FormItem label="Occupation" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: rowGap"
+  previewOnly
+  height={300}
+  app={`<Form padding="1rem">
+  <FormSection rowGap="2rem">
+    <FormItem label="Name" bindTo="" />
+    <FormItem label="Occupation" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-START info
+
+```ueml copy /info="This is some information about a particular section."/
+<Form padding="1rem">
+  <FormSection info="This is some information about a particular section.">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: info"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection info="This is some information about a particular section.">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+
+%-PROP-START infoFontSize
+
+```ueml copy {4}
+<Form padding="1rem">
+  <FormSection
+    info="This is some information about a particular section."
+    infoFontSize="18px"
+  >
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: infoFontSize"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection
+    info="This is some information about a particular section."
+    infoFontSize="18px"
+  >
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-START heading
+
+```ueml copy /heading="Basic Heading"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: heading"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-START headingLevel
+
+```ueml copy /headingLevel="h1"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingLevel="h1">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: headingLevel"
+  previewOnly
+  height={260}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingLevel="h1">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-START headingWeight
+
+The default weight is `bold`.
+
+```ueml copy /headingWeight="normal"/
+<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingWeight="normal">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: headingWeight"
+  previewOnly
+  height={240}
+  app={`<Form padding="1rem">
+  <FormSection heading="Basic Heading" headingWeight="normal">
+    <FormItem label="Input Field" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END
+
+%-PROP-START paddingBottom
+
+```ueml copy /paddingBottom/
+<Form padding="1rem">
+  <FormSection paddingBottom="3rem" heading="Basic Info">
+    <FormItem width="50%" label="First Name" bindTo="" />
+    <FormItem width="50%" label="Last Name" bindTo="" />
+  </FormSection>
+  <FormSection paddingBottom="0" heading="Job Related">
+    <FormItem width="50%" label="Occupation" bindTo="" />
+    <FormItem width="50%" label="Job Description" bindTo="" />
+  </FormSection>
+</Form>
+```
+
+<Playground
+  name="Example: paddingBottom"
+  previewOnly
+  height={400}
+  app={`<Form padding="1rem">
+  <FormSection paddingBottom="3rem" heading="Basic Info">
+    <FormItem width="50%" label="First Name" bindTo="" />
+    <FormItem width="50%" label="Last Name" bindTo="" />
+  </FormSection>
+  <FormSection paddingBottom="0" heading="Job Related">
+    <FormItem width="50%" label="Occupation" bindTo="" />
+    <FormItem width="50%" label="Job Description" bindTo="" />
+  </FormSection>
+</Form>`}
+/>
+
+%-PROP-END

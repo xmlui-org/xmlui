@@ -1,0 +1,220 @@
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { isEqual } from "lodash-es";
+
+import type { ComponentApi, ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ColorDef} from "./css-utils";
+
+import { shallowCompare, useEvent } from "@components-core/utils/misc";
+import { useTheme } from "@components-core/theming/ThemeContext";
+import { EMPTY_OBJECT } from "@components-core/constants";
+import { getColors } from "./css-utils";
+
+/**
+ * This hook invokes a callback when the size of the specified DOM element changes.
+ * @param element A DOM element to watch for size changes
+ * @param callback The callback function to invoke on size changes
+ */
+export const useResizeObserver = (
+  element: React.MutableRefObject<Element | undefined | null>,
+  callback: ResizeObserverCallback
+) => {
+  const current = element?.current;
+  const observer = useRef<ResizeObserver>();
+
+  useEffect(() => {
+    // --- We are already observing old element
+    if (observer?.current && current) {
+      observer.current.unobserve(current);
+    }
+    observer.current = new ResizeObserver(callback);
+    if (element && element.current && observer.current) {
+      observer.current.observe(element.current);
+    }
+  }, [callback, current, element]);
+};
+
+/**
+ * This hook gets the previous state of the specified value (props, variable used in a React
+ * function).
+ *
+ * @see {@link https://blog.logrocket.com/accessing-previous-props-state-react-hooks/}
+ */
+export function usePrevious<T>(value: T): ReturnType<typeof useRef<T>>["current"] {
+  const ref = useRef<T>();
+  useEffect(() => {
+    ref.current = value;
+  }, [value]);
+  return ref.current;
+}
+
+/**
+ * This hook tests if the component is used within an iframe.
+ * @returns True, if the component is used within an iframe; otherwise, false.
+ */
+export function useIsInIFrame() {
+  return useMemo(() => {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }, []);
+}
+
+// --- Tests if the document has the focus
+const hasFocus = () => typeof document !== "undefined" && document.hasFocus();
+
+/**
+ * This hook tests if the window has the focus.
+ * @returns True, if the window has the focus; otherwise, false.
+ */
+export function useIsWindowFocused() {
+  const [focused, setFocused] = useState(hasFocus); // Focus for first render
+
+  useEffect(() => {
+    setFocused(hasFocus()); // Focus for additional renders
+
+    const onFocus = () => setFocused(true);
+    const onBlur = () => setFocused(false);
+
+    window.addEventListener("focus", onFocus);
+    window.addEventListener("blur", onBlur);
+
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
+  return focused;
+}
+
+/**
+ * This hook allows running media queries.
+ * @param query Media query to run
+ */
+export function useMediaQuery(query: string) {
+  const [matches, setMatches] = useState<boolean>(false);
+  useEffect(() => {
+    if (!window) {
+      setMatches(false);
+      return;
+    }
+
+    const matchMedia = window.matchMedia(query);
+    // Triggered at the first client-side load and if query changes
+    handleChange();
+
+    matchMedia.addEventListener("change", handleChange);
+    return () => {
+      matchMedia.removeEventListener("change", handleChange);
+    };
+
+    function handleChange() {
+      setMatches(matchMedia.matches);
+    }
+  }, [query]);
+
+  return matches;
+}
+
+/**
+ * This hook runs a callback function when a key is pressed in the document window.
+ * @param onDocumentKeydown Callback function to run
+ */
+export function useDocumentKeydown(onDocumentKeydown: (event: KeyboardEvent) => void) {
+  const onKeyDown = useEvent(onDocumentKeydown);
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
+}
+
+/**
+ * This hook runs a function when the corresponding component has been mounted.
+ * @param onMount
+ */
+export function useOnMount(onMount: any) {
+  const thizRef = useRef({ mountedFired: false });
+  useEffect(() => {
+    if (!thizRef.current.mountedFired) {
+      thizRef.current.mountedFired = true;
+      onMount?.();
+    }
+  }, [onMount]);
+}
+
+/**
+ * This hook memoizes the specified value. It uses a shallow comparison with the previously
+ * stored value when checking for changes. So, while a shallow comparison shows equality, it returns with the memoized value.
+ * @param value Value to memoize
+ */
+export function useShallowCompareMemoize<T extends Record<any, any> | undefined>(value: T) {
+  const ref = React.useRef<T>(value);
+  const signalRef = React.useRef<number>(0);
+
+  if (!shallowCompare(value, ref.current)) {
+    ref.current = value;
+    signalRef.current++;
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return React.useMemo(() => ref.current, [signalRef.current]);
+}
+
+/**
+ * This hook memoizes the specified value. When checking for changes, it uses a deep comparison
+ * with the previously stored value. So, while a deep comparison shows equality, it returns with
+ * the memoized value, even if value references differ.
+ * @param value Value to memoize
+ */
+export function useDeepCompareMemoize<T extends Record<any, any> | undefined>(value: T) {
+  const ref = React.useRef<T>(value);
+  const signalRef = React.useRef<number>(0);
+
+  if (!isEqual(value, ref.current)) {
+    ref.current = value;
+    signalRef.current += 1;
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  return React.useMemo(() => ref.current, [signalRef.current]);
+}
+
+export function useColors(...colorNames: (string | ColorDef)[]) {
+  const paramsRef = useRef(colorNames);
+  const { themeStyles } = useTheme();
+  const [colors, setColors] = useState(() => getColors(...paramsRef.current));
+  useEffect(() => {
+    setColors(getColors(...paramsRef.current));
+  }, [themeStyles]);
+
+  return colors;
+}
+
+export function useReferenceTrackedApi(componentState: ContainerState) {
+  return useShallowCompareMemoize(
+    useMemo(() => {
+      const ret: Record<string, ComponentApi> = {};
+      if (Reflect.ownKeys(componentState).length === 0) {
+        //skip containers with no registered apis
+        return EMPTY_OBJECT;
+      }
+      for (const componentApiKey of Object.getOwnPropertySymbols(componentState)) {
+        const value = componentState[componentApiKey];
+        if (componentApiKey.description) {
+          ret[componentApiKey.description] = value;
+        }
+      }
+      return ret;
+    }, [componentState])
+  );
+}
+
+/**
+ * This hook uses either useLayoutEffect or useEffect based on the environment
+ * (client-side or server-side).
+ */
+export const useIsomorphicLayoutEffect = typeof document !== "undefined" ? useLayoutEffect : useEffect;

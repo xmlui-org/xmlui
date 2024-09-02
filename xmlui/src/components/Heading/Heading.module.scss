@@ -1,0 +1,68 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+@mixin heading($level) {
+  color: createThemeVar('Heading:color-text-#{$level}');
+  letter-spacing: createThemeVar('Heading:letter-spacing-#{$level}');
+  font-family: createThemeVar('Heading:font-family-#{$level}');
+  font-weight: createThemeVar('Heading:font-weight-#{$level}');
+  font-size: createThemeVar('font-size-#{$level}'); // Intentionally omitting "Heading" inheritance
+  line-height: createThemeVar('line-height-#{$level}'); // Intentionally omitting "Heading" inheritance
+  margin-top: createThemeVar('margin-top-#{$level}'); // Intentionally omitting "Heading" inheritance
+  margin-bottom: createThemeVar('margin-bottom-#{$level}'); // Intentionally omitting "Heading" inheritance
+  text-decoration-line: createThemeVar('Heading:line-decoration-#{$level}');
+  text-decoration-color: createThemeVar('Heading:color-decoration-#{$level}');
+  text-decoration-style: createThemeVar('Heading:style-decoration-#{$level}');
+  text-decoration-thickness: createThemeVar('Heading:thickness-decoration-#{$level}');
+  text-underline-offset: createThemeVar('Heading:offset-decoration-#{$level}');
+}
+
+.heading {
+  &.h1 {
+    @include heading("H1");
+  }
+  &.h2 {
+    @include heading("H2");
+  }
+  &.h3 {
+    @include heading("H3");
+  }
+  &.h4 {
+    @include heading("H4");
+  }
+  &.h5 {
+    @include heading("H5");
+  }
+  &.h6 {
+    @include heading("H6");
+  }
+}
+
+/*
+This is a Chromium based solution that is supported by most modern browsers.
+See this source for details: https://css-tricks.com/line-clampin/
+*/
+.truncateOverflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preserveLinebreaks {
+  white-space: pre-wrap;
+}
+
+.noEllipsis {
+  text-overflow: clip;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

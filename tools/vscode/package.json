@@ -1,0 +1,8 @@
+{
+  "name": "language-support",
+  "version": "1.0.0",
+  "description": "Root folder of XMLUI language support",
+  "scripts": {
+    "fix-split": "node scripts/fix-split.js"
+  }
+}

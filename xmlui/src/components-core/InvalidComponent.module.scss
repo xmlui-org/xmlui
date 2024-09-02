@@ -1,0 +1,35 @@
+@use "@components-core/theming/themes" as themes;
+
+.errorOverlay {
+  background-color: rgba(255, 162, 162, 0.8);
+  inset: 0;
+  border-radius: 10px;
+  padding: 8px;
+  min-width: 200px;
+  min-height: fit-content;
+}
+
+.title {
+  span {
+    background-color: themes.$color-danger-500;
+    color: white;
+    font-weight: themes.$font-weight-normal;
+    border-radius: 4px;
+    padding-left: 4px;
+    padding-right: 8px;
+  }
+}
+
+.errorItems {
+  list-style: disc;
+}
+
+.errorItem {
+  background-color: themes.$color-danger-500;
+  font-weight: themes.$font-weight-bold;
+  border-radius: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+  margin-left: 18px;
+  color: white;
+}

@@ -1,0 +1,80 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "NavPanel";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$themeVars: t.appendBorderVars($themeVars, $component) !global;
+$color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
+$shadow-NavPanel: createThemeVar("shadow-#{$component}");
+$height-NavPanel: createThemeVar("height-AppHeader");
+$border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
+$max-content-width-NavPanel: createThemeVar("max-content-width-App");
+$padding-horizontal-NavPanel: createThemeVar("padding-horizontal-#{$component}");
+$padding-horizontal-logo-NavPanel: createThemeVar("padding-horizontal-logo-#{$component}");
+$padding-vertical-logo-NavPanel: createThemeVar("padding-vertical-logo-#{$component}");
+$margin-bottom-logo-NavPanel: createThemeVar("margin-bottom-logo-#{$component}");
+$padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
+
+.wrapper {
+  --footer-height: 0;     //temp solution, it's because of callbackDrive, settings stickyBox to the bottom (we'll have to introduce a smarter stickyBox)
+  height: 100%;
+  width: 100%;
+  flex-shrink: 0;
+  box-shadow: $shadow-NavPanel;
+  @include t.borderVars($themeVars, $component);
+
+  background-color: $color-bg-NavPanel;
+  overflow: auto;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &.horizontal{
+    border-right: 0;
+    box-shadow: none;
+    background-color: $color-bg-NavPanel;
+    height: $height-NavPanel;
+    border-bottom: $border-bottom-NavPanel;
+
+    .wrapperInner{
+      height: 100%;
+      flex-direction: row;
+      max-width: $max-content-width-NavPanel;
+      padding-inline: $padding-horizontal-NavPanel;
+      //align-items: center;
+      width: 100%;
+      margin: 0 auto;
+    }
+  }
+}
+
+.wrapperInner{
+  display: flex;
+  flex-direction: column;
+}
+
+
+.logoWrapper{
+  &:not(:empty){
+    flex-shrink: 0;
+    height: $height-NavPanel;
+    padding-top: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});
+    padding-bottom: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});
+    padding-inline: $padding-horizontal-logo-NavPanel;
+    margin-bottom: $margin-bottom-logo-NavPanel;
+  }
+
+  &.inDrawer{     //to make room for the close button
+    min-height: 40px;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

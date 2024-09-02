@@ -1,0 +1,493 @@
+%-DESC-START
+
+Use the `Button` component to trigger various actions.
+
+%-DESC-END
+
+%-PROP-START autoFocus
+
+%-PROP-END
+
+%-PROP-START contentPosition
+
+This optional value determines how the label and icon (or nested children) should be placed inside the Button component. Note that "start" and "end" positioning will be flipped if the layout is in a right-to-left writing system.
+
+| Value    | Description                                                  |
+| :------- | :----------------------------------------------------------- |
+| `center` | Place the content in the middle **(default)**                |
+| `start`  | Justify the content to the left (to the right if in **rtl**) |
+| `end`    | Justify the content to the right (to the left if in **ltr**) |
+
+```ueml copy
+<Stack gap="1rem">
+  <Button width="200px" icon="drive" label="Button" contentPosition="center" />
+  <Button width="200px" icon="drive" label="Button" contentPosition="start" />
+  <Button width="200px" icon="drive" label="Button" contentPosition="end" />
+  <Button width="200px" contentPosition="end">
+    This is a nested text
+  </Button>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={230}
+  name="Example: content position"
+  app={`
+    <Stack gap="1rem">
+      <Button width="200px" icon="drive" label="Button" contentPosition="center" />
+      <Button width="200px" icon="drive" label="Button" contentPosition="start" />
+      <Button width="200px" icon="drive" label="Button" contentPosition="end" />
+      <Button width="200px" contentPosition="end">
+        This is a nested text
+      </Button>
+    </Stack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START icon
+
+This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon (by its name). If no label is specified and an icon is set, the button displays only the icon.
+
+```ueml
+<HStack gap="1rem" >
+  <Button icon="drive" label="Let there be drive" />
+  <Button icon="drive" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: icon"
+  app={`
+    <HStack gap="1rem" >
+      <Button icon="drive" label="Let there be drive" />
+      <Button icon="drive" />
+    </HStack>
+  `}
+  horizontal={true}
+  height={60}
+/>
+
+%-PROP-END
+
+%-PROP-START iconPosition
+
+This optional string determines the location of the icon in the Button.
+
+| Value   | Description                                                                       |
+| :------ | :-------------------------------------------------------------------------------- |
+| `left`  | Place the icon on the left of the label **(default)**                             |
+| `right` | Place the icon on the right of the label                                          |
+| `start` | Place the icon at the start of the label (considering the current text direction) |
+| `end`   | Place the icon at the end of the label (considering the current text direction)   |
+
+```ueml
+<VStack gap="1rem">
+  <HStack gap="1rem">
+    <Button icon="drive" label="Left" />
+    <Button icon="drive" label="Right" iconPosition="right" />
+  </HStack>
+  <HStack gap="1rem">
+    <Button icon="drive" label="Start" iconPosition="start" />
+    <Button icon="drive" label="End" iconPosition="end" />
+  </HStack>
+  <HStack gap="1rem">
+    <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
+    <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: iconPosition"
+  app={`
+    <VStack gap="1rem">
+      <HStack gap="1rem">
+        <Button icon="drive" label="Left" />
+        <Button icon="drive" label="Right" iconPosition="right" />
+      </HStack>
+      <HStack gap="1rem">
+        <Button icon="drive" label="Start" iconPosition="start" />
+        <Button icon="drive" label="End" iconPosition="end" />
+      </HStack>
+      <HStack gap="1rem">
+        <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
+        <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
+      </HStack>
+    </VStack>
+  `}
+  horizontal={true}
+  height={180}
+/>
+
+%-PROP-END
+
+%-PROP-START label
+
+This property is an optional string to set a label for the button. If no label is specified and an icon is set, the button will modify its styling to look like a small icon button. When the button has nested children, it will display them and ignore the value of the `label` prop.
+
+```ueml copy
+<VStack gap="1rem" >
+  <Button label="I am the button label" />
+  <Button />
+  <Button label="I am the button label">
+    <Icon name="trash" />
+    I am a text nested into Button
+  </Button>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Button label"
+  app={`
+    <VStack gap="1rem" >
+      <Button label="I am the button label" />
+      <Button />
+      <Button label="I am the button label">
+        <Icon name="trash" />
+        I am a text nested into Button
+      </Button>
+    </VStack>
+  `}
+  horizontal={true}
+  height={148}
+/>
+
+%-PROP-END
+
+%-PROP-START type
+
+This optional string describes how the button behaves in an HTML context. You rarely need to set this property explicitly.
+
+| Value    | Description                                                                                                        |
+| :------- | :----------------------------------------------------------------------------------------------------------------- |
+| `button` | Regular behavior that only executes logic if explicitly determined. **(default)**                                  |
+| `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
+| `reset`  | Resets all the controls to their initial values. Using it is ill advised for UX reasons.                           |
+
+%-PROP-END
+
+%-PROP-START variant
+
+The value of this optional property determines the fundamental style of the button.
+
+| Value      | Description                                                                                                     |
+| ---------- | --------------------------------------------------------------------------------------------------------------- |
+| `solid`    | A button with a border and a filled background. **(default)**                                                   |
+| `outlined` | The button is displayed with a border and a transparent background.                                             |
+| `ghost`    | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+
+```ueml copy
+<HStack gap="1rem">
+  <Button label="default (solid)" />
+  <Button label="solid" variant="solid" />
+  <Button label="outlined" variant="outlined" />
+  <Button label="ghost" variant="ghost" />
+</HStack>
+```
+
+<Playground
+  previewOnly
+  height={60}
+  name="Example: variant"
+  app={`
+  <HStack gap="1rem">
+    <Button label="default (solid)" />
+    <Button label="solid" variant="solid" />
+    <Button label="outlined" variant="outlined" />
+    <Button label="ghost" variant="ghost" />
+  </HStack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START themeColor
+
+The value of this optional property sets the string to provide a color scheme for the Button.
+
+| Value       | Description                       |
+| :---------- | :-------------------------------- |
+| `primary`   | Primary theme color **(default)** |
+| `secondary` | Secondary theme color             |
+| `attention` | Attention state theme color       |
+
+```ueml copy
+<Stack orientation="horizontal" gap="10px">
+  <Button label="Button" themeColor="primary" />
+  <Button label="Button" themeColor="secondary" />
+  <Button label="Button" themeColor="attention" />
+</Stack>
+```
+
+<Playground
+    previewOnly
+    name="Example: theme colors"
+    app={`
+    <Stack orientation="horizontal" gap="10px">
+      <Button label="Button" themeColor="primary" />
+      <Button label="Button" themeColor="secondary" />
+      <Button label="Button" themeColor="attention" />
+    </Stack>`}
+    height={48}
+/>
+
+%-PROP-END
+
+%-PROP-START enabled
+
+The value of this property indicates if the button accepts actions (`true`) or does not react to them (`false`). The default value is `true`.
+
+```ueml copy
+<HStack gap="1rem" >
+  <Button label="I am enabled (by default)" />
+  <Button label="I am enabled explicitly" enabled="true" />
+  <Button label="I am not enabled" enabled="false" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: enabled"
+  app={`
+    <HStack gap="1rem" >
+      <Button label="I am enabled (by default)" />
+      <Button label="I am enabled explicitly" enabled="true" />
+      <Button label="I am not enabled" enabled="false" />
+    </HStack>
+  `}
+  horizontal={true}
+  height={60}
+/>
+
+%-PROP-END
+
+%-PROP-START size
+
+%-META:COMMENT Note: Section can have metadata - skip that
+%-META:COMMENT example:
+%-META:IMPORT data from "./data.json"
+
+This optional string property sets the component's size (via paddings).
+
+| Value | Description              |
+| :---- | :----------------------- |
+| `xs`  | Extra small size         |
+| `sm`  | Small size **(default)** |
+| `md`  | Medium size              |
+| `lg`  | Large size               |
+
+```ueml copy
+<Stack gap="4px">
+  <Stack orientation="horizontal" gap="10px">
+    <Button icon="drive" label="Button" size="xs" />
+    <Button icon="drive" label="Button" size="sm" />
+    <Button icon="drive" label="Button" size="md" />
+    <Button icon="drive" label="Button" size="lg" />
+  </Stack>
+  <Stack orientation="horizontal" gap="10px">
+    <Button label="Button" size="xs" />
+    <Button label="Button" size="sm" />
+    <Button label="Button" size="md" />
+    <Button label="Button" size="lg" />
+  </Stack>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={140}
+  name="Example: size"
+  app={`<Stack gap="4px">
+  <Stack orientation="horizontal" gap="10px">
+    <Button icon="drive" label="default" />
+    <Button icon="drive" label="extra-small" size="xs" />
+    <Button icon="drive" label="small" size="sm" />
+    <Button icon="drive" label="medium" size="md" />
+    <Button icon="drive" label="large" size="lg" />
+  </Stack>
+  <Stack orientation="horizontal" gap="10px">
+    <Button label="default" />
+    <Button label="extra-small" size="xs" />
+    <Button label="small" size="sm" />
+    <Button label="medium" size="md" />
+    <Button label="large" size="lg" />
+  </Stack>
+</Stack>`}
+/>
+
+%-PROP-END
+
+%-EVENT-START click
+
+This event is triggered when the button is clicked.
+
+```ueml copy
+<Button label="Click me!" onClick="window.alert('Button clicked')" />
+```
+
+<Playground
+  previewOnly
+  name="Example: click"
+  app={`
+    <Button label="Click me!" onClick="window.alert('Button clicked')" />
+  `}
+  height={60}
+/>
+
+%-EVENT-END
+
+%-EVENT-START gotFocus
+
+This event is triggered when the button has received the focus.
+
+```ueml copy
+<VStack gap="1rem" var.text="No event" >
+  <HStack gap="1rem" verticalAlignment="center" >
+    <Button label="First, click me!" 
+      onGotFocus="text = 'Focus received'" 
+      onLostFocus="text = 'Focus lost'" />
+    <Text value="Then, me!"/>
+  </HStack>
+  <Text value="{text}" />
+</VStack>
+```
+
+<Playground
+    previewOnly
+    name="Example: gotFocus/lostFocus"
+    app={`
+    <VStack gap="1rem" var.text="No event" >
+      <HStack gap="1rem" verticalAlignment="center" >
+        <Button label="First, click me!" onGotFocus="text = 'Focus received'" onLostFocus="text = 'Focus lost'" />
+        <Text value="Then, me!"/>
+      </HStack>
+      <Text value="{text}" />
+    </VStack>
+  `}
+    height={100}
+/>
+
+%-EVENT-END
+
+%-EVENT-START lostFocus
+
+This event is triggered when the button has lost the focus.
+
+(See the example above)
+
+%-EVENT-END
+
+%-STYLE-START
+
+The `Button` component uses these theme variables to customize its appearance:
+
+- `color-bg`
+- `color-border`
+- `color-text`
+- `font-size`
+- `font-weight`
+- `radius`
+- `style-border`
+- `thickness-border`
+- `shadow`
+
+`Button` provides are some unique behavior with styling:
+
+Outlined and ghost buttons have no background color unless active or hovered. As ghost buttons do not have a border, setting border-related theme variables does not affect ghost buttons.
+
+When you set a value for background-related variables, the `Button` component recalculates its background color tones toward the theme variable chain. Thus, using these variables may render different background colors than you expect with outlined and ghost buttons, as by default, they use background when they are active or hovered:
+
+```text
+color-bg-Button-solid
+color-bg-Button-outlined
+color-bg-Button-ghost
+color-bg-Button-primary-outlined
+color-bg-Button-primary-ghost
+color-bg-Button-secondary-outlined
+color-bg-Button-secondary-ghost
+color-bg-Button-attention-outlined
+color-bg-Button-attention-ghost
+```
+
+The `themeColor` and `variant` properties of `Button` are used within theme variables as traits; first the `themeColor`, and then the `variant` value. So, when setting theme variables, you can use these traits with `Button`:
+
+- `Button-solid`
+- `Button-outlined`,
+- `Button-ghost`,
+- `Button-primary`
+- `Button-secondary`,
+- `Button-attention`,
+- `Button-primary-solid`,
+- `Button-primary-outlined`,
+- `Button-primary-ghost`,
+- `Button-secondary-solid`,
+- `Button-secondary-outlined`,
+- `Button-secondary-ghost`,
+- `Button-attention-solid`,
+- `Button-attention-outlined`,
+- `Button-attention-ghost`,
+
+The paddings of buttons can be themed through these theme variables according to the specified size (no separate theme variables for `themeColor` and `variant`):
+
+- `padding-horizontal-xs-Button`
+- `padding-horizontal-sm-Button`
+- `padding-horizontal-md-Button`
+- `padding-horizontal-lg-Button`
+- `padding-vertical-xs-Button`
+- `padding-vertical-sm-Button`
+- `padding-vertical-md-Button`
+- `padding-vertical-lg-Button`
+
+The `Button` component handles these visual states:
+
+- `--active`
+- `--disabled`
+- `--focus`
+- `--hover`
+
+> **Note**: Using these states is restricted to color properties.
+
+### Fixed width and height
+
+Using a set of buttons with a fixed width or height is often helpful. So `Button` supports these theme variables:
+- `width-Button`
+- `height-Button`
+
+Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
+
+```ueml copy
+<HStack gap="1rem">
+  <Theme width-Button="120px">
+    <Button label="Short" />
+    <Button label="Longer" />
+    <Button label="Longest" />
+    <Button label="Disabled" enabled="false" />
+    <Button label="Outlined" variant="outlined" />
+  </Theme>
+</HStack>
+```
+
+<Playground
+    previewOnly
+    name="Example: Buttons with fixed width"
+    app={`
+    <HStack gap="1rem" padding="1rem">
+      <Theme width-Button="120px">
+        <Button label="Short" />
+        <Button label="Longer" />
+        <Button label="Longest" />
+        <Button label="Disabled" enabled="false" />
+        <Button label="Outlined" variant="outlined" />
+      </Theme>
+    </HStack>
+  `}
+    height={80}
+/>
+
+%-STYLE-END

@@ -1,0 +1,526 @@
+import spacingSizes from "./samples/spacing-sizes.xmlui";
+import shadowSizes from "./samples/shadow-sizes.xmlui";
+import swatch from "./samples/swatch.xmlui";
+import palette from "./samples/color-palette.xmlui";
+
+# Theme Variables
+
+Theme variables follow a naming convention that allows decode what components and visual traits they affect:
+
+```
+<propertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
+```
+
+In this convention, the `<ComponentId>` part is optional.
+
+- Those theme variables that do not use the `<ComponentId>` segment are _app-bound_ variables, for they define visuals that can be applied to the entire application, including multiple types of components.
+- The variables with a `<ComponentId>` segment are _component-bound_ variables, which influence only the component's appearance defined by the corresponding ID.
+
+The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
+
+- `color-text`: Text color 
+- `color-bg`: Background color
+- `color-bg-indicator`: The background color of the "indicator" part of a specific component. 
+- `text-size`: The size of the text
+- `line-height`: The height of a text line
+- `padding-horizontal`: The value declaring the horizontal padding space
+
+The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyName>`).
+
+For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
+
+- `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
+- `color-border-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
+
+The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
+
+- `hover`: The mouse is hovered over the component
+- `active`: The particular component is being activated by the user (for example, a user presses down the mouse button while over a button element)
+- `focus`: The particular element (e.g., a textbox) currently has the focus
+
+When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
+
+- `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
+- `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
+
+## Property Names
+
+XMLUI utilizes numerous visual properties you can use in place of `<propertyName>`. The following list summarizes their names and description:
+
+|Name|Description|
+|-|-|
+|`color‑bg`|The [color](./common-units/#color-values) of the component border|
+|`color‑border`|The [border color](./common-units/#color-values) of the component. It uses the same value for the left, top, right, and bottom borders.|
+|`color‑border‑bottom`|This value specifies the bottom [border color](./common-units/#color-values) of the component.|
+|`color‑border‑horizontal`|This value specifies the horizontal [border color](./common-units/#color-values) of the component. It uses the same value for the left and right borders.|
+|`color‑border‑left`|This value specifies the left [border color](./common-units/#color-values) of the component.|
+|`color‑border‑right`|This value specifies the right [border color](./common-units/#color-values) of the component.|
+|`color‑border‑top`|This value specifies the top [border color](./common-units/#color-values) of the component.|
+|`color‑border‑vertical`|This value specifies the vertical [border color](./common-units/#color-values) of the component. It uses the same value for the top and bottom borders.|
+|`color‑decoration`|This value sets the [color](./common-units/#color-values) of the component's text decoration.|
+|`color‑text`|The text [color](./common-units/#color-values) the component diplays|
+|`font‑family`|The [font family](./common-units/#size-values) to display component text|
+|`font‑size`|The [size](./common-units/#size-values) of the font to display component text|
+|`font‑weight`|The [weight](./common-units/#font-weight-values) of the font displaying component text|
+|`line‑decoration`|This value sets the [line type](./common-units/#text-decoration-values) for the component's text decoration.|
+|`line‑height`|The [height](./common-units/#size-values) of the line that displays component text|
+|`offset‑decoration`|This value sets the [distance](./common-units/#size-values) of the component's text decoration from its text.|
+|`padding`|This variable specifies the [size](./common-units/#size-values) of the padding area. It uses the same value for the left, top, right, and bottom paddings.|
+|`padding‑bottom`|This variable specifies the [size](./common-units/#size-values) of the bottom padding area.|
+|`padding‑horizontal`|This variable specifies the [size](./common-units/#size-values) of the horizontal padding area. It uses the same value for the left and right paddings.|
+|`padding‑left`|This variable specifies the [size](./common-units/#size-values) of the left padding area.|
+|`padding‑right`|This variable specifies the [size](./common-units/#size-values) of the right padding area.|
+|`padding‑top`|This variable specifies the [size](./common-units/#size-values) of the top padding area.|
+|`padding‑vertical`|This variable specifies the [size](./common-units/#size-values) of the vertical padding area. It uses the same value for the top and bottom paddings.|
+|`radius`|The [rounding](./common-units/#border-rounding) of the component's border|
+|`shadow`|The [shadow](./common-units/#color-values) displayed with the component|
+|`style‑border`|The [style](./common-units/#border-style-values) of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
+|`style‑border‑bottom`|This value specifies the [style](./common-units/#border-style-values) of the component's bottom border.|
+|`style‑border‑horizontal`|This value specifies the [style](./common-units/#border-style-values) of the component's horizontal border. It uses the same value for the left and right borders.|
+|`style‑border‑left`|This value specifies the [style](./common-units/#border-style-values) of the component's left border.|
+|`style‑border‑right`|This value specifies the [style](./common-units/#border-style-values) of the component's right border.|
+|`style‑border‑top`|This value specifies the [style](./common-units/#border-style-values) of the component's top border.|
+|`style‑border‑vertical`|This value specifies the [style](./common-units/#border-style-values) of the component's vertical border. It uses the same value for the top and bottom borders.|
+|`style‑decoration`|This value sets the [style](./common-units/#text-decoration-values) for the component's text decoration.|
+|`thickness‑border`|The [thickness](./common-units/#size-values) of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
+|`thickness‑border‑bottom`|This value specifies the [thickness](./common-units/#size-values) of the component's bottom border.|
+|`thickness‑border‑horizontal`|This value specifies the [thickness](./common-units/#size-values) of the component's horizontal border. It uses the same value for the left and right borders.|
+|`thickness‑border‑left`|This value specifies the [thickness](./common-units/#size-values) of the component's left border.|
+|`thickness‑border‑right`|This value specifies the [thickness](./common-units/#size-values) of the component's right border.|
+|`thickness‑border‑top`|This value specifies the [thickness](./common-units/#size-values) of the component's top border.|
+|`thickness‑border‑vertical`|This value specifies the [thickness](./common-units/#size-values) of the component's vertical border. It uses the same value for the left and right borders.|
+|`thickness‑decoration`|This value sets the [thickness](./common-units/#sizw-values) for the component's text decoration line.|
+
+## App-bound Traits
+
+Theme variables in this category are applied to the entire application, not just to particular components.
+
+### Colors
+
+XMLUI defines these variables representing base colors:
+- `color-surface`: The color for the surface (background) areas
+- `color-primary`: The primary color of the app (buttons, badges, checkboxes, etc.)
+- `color-secondary`: The secondary color of the app (buttons, badges, checkboxes, etc.)
+- `color-warn`: The color to use for warnings
+- `color-danger`: The color for signing dangerous situations (for example, the color of a Delete button)
+- `color-success`: The color for signing success
+
+These are base colors; when you specify them, XMLUI automatically creates several shade variants (using 50, 100, 200, 300, 400, 500, 600, 700, 800, 900, and 950 as prefixes) from the lightest to the darkest.
+
+For example, when you set the the `color-primary` variable to `#008000`, XMLUI creates these shades:
+
+<Playground
+  previewOnly
+  name="Custom primary color shades"
+  components={[swatch, palette]}
+  defaultTheme="custom"
+  themes={[
+    {
+      name: "Custom Theme",
+      id: "custom",
+        themeVars: {
+          "color-primary": "#008000",
+        },
+      },
+    ]}
+  app={`
+      <Palette name="primary" />
+  `}
+/>
+
+When selecting the primary color, choose one representing the middle shade (500). Otherwise, you may end up with an unuseful set of shades. For example, setting `surface-color` to `#001000` will create too many dark shades.
+<Playground
+  previewOnly
+  name="Unuseful primary color shades"
+  components={[swatch, palette]}
+  defaultTheme="custom"
+  themes={[
+    {
+      name: "Custom Theme",
+      id: "custom",
+        themeVars: {
+          "color-primary": "#001000",
+        },
+      },
+    ]}
+  app={`
+      <Palette name="primary" />
+  `}
+/>
+
+### Default Colors
+
+XMLUI declares these default color shade sets:
+
+#### Surface
+
+<Playground
+  previewOnly
+  name="Surface Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="surface" />`}
+/>
+
+#### Primary
+
+<Playground
+  previewOnly
+  name="Primary Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="primary" />`}
+/>
+
+#### Secondary
+
+<Playground
+  previewOnly
+  name="Secondary Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="secondary" />`}
+/>
+
+#### Warn
+
+<Playground
+  previewOnly
+  name="Warn Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="warn" />`}
+/>
+
+#### Danger
+
+<Playground
+  previewOnly
+  name="Danger Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="danger" />`}
+/>
+
+#### Success
+
+<Playground
+  previewOnly
+  name="Success Colors"
+  components={[swatch, palette]}
+  app={`<Palette name="success" />`}
+/>
+
+#### Default Text Colors
+
+- `color-text-primary`: The text color used by components that build on the primary color
+- `color-text-secondary`: The text color used by components that build on the secondary color
+- `color-text-attention`: Accented text color
+- `color-text-subtitle`: Text color of text with the "subtitle" variant
+- `color-text--disabled`: Text color representing the disabled state of a component
+
+<Playground
+  previewOnly
+  name="Default Text Colors"
+  components={[swatch]}
+  app={`
+  <VStack padding="1rem" gap="0.5rem">
+    <HStack gap="0.5rem">
+      <Text width="180px" variant="strong">color-text-primary:</Text>
+      <Text color="$color-text-primary">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="180px" variant="strong">color-text-secondary:</Text>
+      <Text color="$color-text-secondary">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="180px" variant="strong">color-text-attention:</Text>
+      <Text color="$color-text-attention">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="180px" variant="strong">color-text-subtitle:</Text>
+      <Text color="$color-text-subtitle">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="180px" variant="strong">color-text--disabled:</Text>
+      <Text color="$color-text--disabled">This is an example text</Text>
+    </HStack>
+  </VStack>
+  `}
+/>
+
+#### Default Background Colors
+
+- `color-bg`: The default background color for all components
+- `color-bg-primary`: The background color used by components that build on the secondary color
+- `color-bg-secondary`: The background color used by components that build on the secondary color
+- `color-bg-attention`: The background color used by components that build on the attention color
+- `color-bg--disabled`: The background color representing the disabled state of a component
+- `color-bg--selected`: The background color representing the selected state of a component
+- `color-bg-overlay`: The background color of overlaid components
+- `color-bg-dropdown-item--hover`: The background color of hovered items in dropdown containers
+- `color-bg-dropdown-item--active`: The background color of active items in dropdown containers
+
+<Playground
+  previewOnly
+  name="Default Background Colors"
+  components={[swatch]}
+  app={`
+  <FlowLayout padding="1rem" gap="0.5rem">
+      <Swatch color="$color-bg" width="25%" />
+      <Swatch color="$color-bg-primary" width="25%" />
+      <Swatch color="$color-bg-secondary" width="25%" />
+      <Swatch color="$color-bg-attention" width="25%" />
+      <Swatch color="$color-bg--disabled" width="25%" />
+      <Swatch color="$color-bg--selected" width="25%" />
+      <Swatch color="$color-bg-overlay" width="25%" />
+      <Swatch color="$color-bg-dropdown-item--hover" width="50%" />
+      <Swatch color="$color-bg-dropdown-item--active" width="50%" />
+  </FlowLayout>
+  `}
+/>
+
+#### Validation Colors
+
+These colors represent validation states:
+- `color-info`: Color of components with informational messages
+- `color-valid`: Color signing valid state
+- `color-warning`: Color of warning
+- `color-error`: Color signing some error
+
+<Playground
+  previewOnly
+  name="Validation Colors"
+  components={[swatch]}
+  app={`
+  <FlowLayout padding="1rem" gap="0.5rem">
+    <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
+    <Swatch color="$color-valid" width="25%" textColor="$color-surface-50" />
+    <Swatch color="$color-warning" width="25%" textColor="$color-surface-50" />
+    <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
+  </FlowLayout>
+  `}
+/>
+
+### Fonts
+
+#### Font Family
+
+These theme variables set the default font styles:
+- `font-family`: The default font family used in the app
+- `font-family-sans-serif`: The default sans-serif font family used in the app
+- `font-family-monospace`: The default monospace font family used in the app
+
+<Playground
+  previewOnly
+  name="Font Family"
+  app={`
+  <VStack padding="1rem" gap="0.5rem">
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">Default font family:</Text>
+      <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">Sans serif font family:</Text>
+      <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">Monospace font family:</Text>
+      <Text fontFamily="$font-family-monospace">This is an example text</Text>
+    </HStack>
+  </VStack>
+  `}
+/>
+
+#### Line Height
+
+These theme variables define a set of line heights:
+
+<Playground
+  previewOnly
+  name="Line Height"
+  app={`
+  <VStack padding="1rem" gap="0.5rem">
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-none:</Text>
+      <Text lineHeight="$line-height-none" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-tight:</Text>
+      <Text lineHeight="$line-height-tight" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-snug:</Text>
+      <Text lineHeight="$line-height-snug" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-normal:</Text>
+      <Text lineHeight="$line-height-normal" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-relaxed:</Text>
+      <Text lineHeight="$line-height-relaxed" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="180px" variant="strong">line-height-loose:</Text>
+      <Text lineHeight="$line-height-loose" backgroundColor="$color-surface-300">This is an example text</Text>
+    </HStack>
+  </VStack>
+  `}
+/>
+
+#### Font Size
+
+The `font-size` theme variables allow you to set your themes' normal font size (`font-size-normal`). You can use this set of theme variables to define font sizes relative to `font-size`:
+
+<Playground
+  previewOnly
+  name="Font Size"
+  app={`
+  <VStack padding="1rem" gap="0.5rem">
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-tiny:</Text>
+      <Text fontSize="$font-size-tiny">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-smaller:</Text>
+      <Text fontSize="$font-size-smaller">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-small:</Text>
+      <Text fontSize="$font-size-small">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-normal:</Text>
+      <Text fontSize="$font-size-normal">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-medium:</Text>
+      <Text fontSize="$font-size-medium">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-large:</Text>
+      <Text fontSize="$font-size-large">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem" verticalAlignment="center">
+      <Text width="160px" variant="strong">font-size-gigantic:</Text>
+      <Text fontSize="$font-size-gigantic">This is an example text</Text>
+    </HStack>
+  </VStack>
+  `}
+/>
+
+#### Font Weight
+
+The `font-weight` theme variables allow you to set your themes' normal font weight (`font-weight-normal`). You can use this set of theme variables to define font sizes relative to `font-weight`:
+
+<Playground
+  previewOnly
+  name="Font Weight"
+  app={`
+  <VStack padding="1rem" gap="0.5rem">
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">font-weight-light:</Text>
+      <Text fontWeight="$font-weight-light">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">font-weight-normal:</Text>
+      <Text fontWeight="$font-weight-normal">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">font-weight-medium:</Text>
+      <Text fontWeight="$font-weight-medium">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">font-weight-bold:</Text>
+      <Text fontWeight="$font-weight-bold">This is an example text</Text>
+    </HStack>
+
+    <HStack gap="0.5rem">
+      <Text width="200px" variant="strong">font-weight-extra-bold:</Text>
+      <Text fontWeight="$font-weight-extra-bold">This is an example text</Text>
+    </HStack>
+  </VStack>
+  `}
+/>
+
+### Shadows
+
+XMLUI defines a few stock shadow resources:
+
+```ueml /shadow="$shadow-xxl"/
+<Card shadow="$shadow-xxl">
+  <HStack verticalAlignment="center" gap="0.5rem">
+    <Icon name="info" />
+    <Text value="Information" variant="strong" />
+  </HStack>
+</Card>
+```
+
+<Playground
+  previewOnly
+  name="Shadows"
+  height={180}
+  app={shadowSizes}
+/>
+
+### Spacing
+
+XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This scale uses a unit defined with `space-base`, which you can set in your theme. When referring to a particular spacing, you can use values like `space-0`, `space-1`, ..., `space-12`, ..., and `space-96`, as the following example shows:
+
+<Playground
+  previewOnly
+  name="Spacings"
+  app={spacingSizes}
+/>
+
+## Miscellaneous
+
+### Screen Size
+
+- `max-content-width`: The theme variable defines the maximum width of the content. A large screen with broad content makes reading text hard because of the long lines. This variable allows for maximizing the content's width and adding margins around it.
+- `media-max-width-phone`: The maximum width of the screen (in pixels) considered as a mobile device (phone) screen. Broader screens may represent a tablet or a desktop.
+- `media-max-width-tablet`: The maximum width of the screen (in pixels) considered a tablet screen. Smaller screens represent a phone, broader a desktop.
+
+### Dropwdowns
+
+XMLUI has several components with dropdowns. The following theme variables help style them:
+- `color-border-dropdown-item`: The border color of the items within the dropdown.
+- `color-bg-dropdown-item--hover`: The hovered color of the dropdown items' background.
+- `color-bg-dropdown-item--active`: The active (selected) color of the dropdown items' background.
+
+### Outline
+
+Most components sign their focused state with an outline around them. These theme variables help style them:
+- `color-outline--focus`: The color of the outline
+- `thickness-outline--focus`: The thickness of the outline
+- `style-outline--focus`: The [style](./common-units/#border-style-values) of the outline
+- `offset-outline--focus`: The offset value of the outline
+
+## Visual States
+
+XMLUI defines these visual states to use with styling component appearance:
+
+|Name|Description|
+|-|-|
+|`‑‑active`|The component is active. For example, the left mouse button is pressed while the pointer is over the component.|
+|`‑‑disabled`|The component is disabled; it does not accept user actions|
+|`‑‑focus`|The component has the keyboard focus and processes keypress-related events|
+|`‑‑hover`|Indicates the state when the mouse (pointer) hovers above the component's client area|
+
+Components may define their custom visual states besides the ones displayed in this table.

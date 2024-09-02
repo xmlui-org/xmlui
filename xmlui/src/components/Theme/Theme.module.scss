@@ -1,0 +1,19 @@
+@use "@components-core/theming/themes" as t;
+
+.from, .to{
+  display: none;
+}
+
+.baseRootComponent {
+  width: 100%;
+  position: relative;
+  height: inherit;
+  font-family: t.$font-family;
+  background-color: t.$color-bg;
+  font-size: t.$font-size;
+  font-weight: t.$font-weight;
+  color: t.$color-text-primary;
+  overflow: auto;
+  direction: t.$direction;
+  font-feature-settings: t.$font-feature-settings;
+}

@@ -1,0 +1,29 @@
+# App Configuration
+
+## The `globals` Section
+
+_TBD_
+
+### Configuring Notifications
+
+With the' notifications' key in the' globals' section, you can configure how notifications (information, success, warning, or error messages) are displayed on the screen.
+
+####  `duration`
+
+Declares the time in milliseconds the notification toasts are displayed on the screen. By default, it is 5000ms (5 seconds). Changing this value (as the following example indicates) to 10,000 will keep the notification displayed for 10 seconds:
+
+```ts copy {5-7}
+const App: StandaloneAppDescription = {
+  name: "Tutorial",
+  version: "0.0.1",
+  globals: {
+    notifications: {
+      duration: 10_000,
+    },
+  },
+  resources: {
+    logo: "resources/xmlui-logo.svg",
+    favicon: "resources/favicon.ico",
+  },
+};
+```

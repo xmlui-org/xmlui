@@ -1,0 +1,32 @@
+# App Structure
+
+An application is more than just an XUML markup describing the UI. When deployed, admins can configure the app to access specific backend systems (through URLs or URIs) and use customer-specific images and brand elements (e.g., logos). An application may have multiple themes (skins), and users can choose their preferred one.
+
+This article describes the structural details of apps.
+
+## App Elements
+
+Each app is composed of these ingredients:
+
+- **Markup**. The XUML markup of the application, including the app definition and the app-specific components. This markup defines the appearance and the logic of the UI.
+- **Resources**. Apps may use configurable resources like logos, icons, and others. Though those can be explicitly wired into the markup, they can also be set as configurable resources. When the app is deployed, the administrator can change those resources, for example, set up a new logo to display.
+- **Configuration settings**. The app may have settings to be configured, including URLs to access a particular backend, some switches to determine how specific elements are displayed, titles, names, etc. The UI components may refer to these settings. The admin can change the particular settings in a deployed app.
+- **Themes**. An app may use multiple themes. App developers can ship apps with multiple themes. Admins can change the themes shipped with the app or create new ones.
+- **Interceptors**. Developers may deliver app prototypes that emulate backend operations without connecting an actual backend. Interceptors are simple scripts that define the behavior of emulated backend APIs. Of course, apps for a production environment should not use any interceptors.
+
+### The Development View
+
+While creating an app, developers use folders and files to place application elements. The build process combines them into a distributable app.
+
+The UI engine has a utility, [`create-xmlui-app`](../tools/create-xmlui-app), which creates the boilerplate development view. This tool sets up the following structure within the app's root folder:
+
+| File/Folder | Description |
+|-|-|
+| `Main.xmlui` | This file is the application definition markup. This markup can use application components placed in the `components` folder. The markup does not need to import or include the used components; the build mechanism is smart enough to find and leverage them. |
+| `components` | This folder contains the markup of application-specific components. Each component is in a separate `.xmlui` file (having the same name as the component, by convention). The build mechanism knows how to find components when compiling the app. |
+| `themes` | This folder contains the theme definitions in `.ts` files. Each file declares a particular theme. The build process compiles them into JSON files. | 
+| `config.ts` | This file controls the app's building process. The file encapsulates the definition of app properties, resources, and configuration settings. |
+| `api.ts` | The build process expects the interceptor definitions in this file. |
+
+> **Note**: The build tool allows you to put the static resources anywhere within the app's root folder, even distributing them among multiple (hierarchical) folders. We suggest you use a `resources` folder whenever applicable to store your static resource files.
+

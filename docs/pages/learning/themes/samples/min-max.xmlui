@@ -1,0 +1,5 @@
+<VStack gap=".2rem" >
+  <VStack width="50%" height="36px" backgroundColor="red" /> 
+  <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" /> 
+  <VStack width="75%" minWidth="200px" maxWidth="300px" height="36px" backgroundColor="blue" /> 
+</VStack>

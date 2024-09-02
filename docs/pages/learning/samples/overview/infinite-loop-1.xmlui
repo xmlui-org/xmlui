@@ -1,0 +1,15 @@
+<Component name="InfiniteLoop">
+  <var name=isRunning value=false />
+  <var name=count value={0} />
+  <HStack gap=1rem>
+    <Button label="Infinite loop: {count}" width=12rem >
+      <event name=click value="
+        isRunning = true;
+        while (isRunning) count++;
+      "/>
+    </Button>
+    <Button label="Stop">
+      <event name=click value="isRunning = false"/>
+    </Button>
+  </HStack>  
+</Component>

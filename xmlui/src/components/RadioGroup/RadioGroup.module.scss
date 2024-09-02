@@ -1,0 +1,136 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$gap-RadioGroupOption: createThemeVar("gap-RadioGroupOption");
+$color-bg-RadioGroupOption-default: createThemeVar("Input:color-bg-RadioGroupOption-default");
+$thickness-border-RadioGroupOption: createThemeVar("thickness-border-RadioGroupOption");
+$color-border-RadioGroupOption-default: createThemeVar("Input:color-border-RadioGroupOption-default");
+$color-border-RadioGroupOption-default--hover: createThemeVar("Input:color-border-RadioGroupOption-default--hover");
+$color-border-RadioGroupOption-default--active: createThemeVar("Input:color-border-RadioGroupOption-default--active");
+$color-border-RadioGroupOption--disabled: createThemeVar("Input:color-border-RadioGroupOption--disabled");
+$color-text-RadioGroupOption--disabled: createThemeVar("Input:color-text-RadioGroupOption--disabled");
+$color-border-RadioGroupOption-error: createThemeVar("Input:color-border-RadioGroupOption-error");
+$color-border-RadioGroupOption-warning: createThemeVar("Input:color-border-RadioGroupOption-warning");
+$color-border-RadioGroupOption-success: createThemeVar("Input:color-border-RadioGroupOption-success");
+$color-bg-checked-RadioGroupOption-default: createThemeVar("color-bg-checked-RadioGroupOption-default");
+$color-bg-checked-RadioGroupOption--disabled: createThemeVar("color-bg-checked-RadioGroupOption--disabled");
+$color-bg-checked-RadioGroupOption-error: createThemeVar("color-bg-checked-RadioGroupOption-error");
+$color-bg-checked-RadioGroupOption-warning: createThemeVar("color-bg-checked-RadioGroupOption-warning");
+$color-bg-checked-RadioGroupOption-success: createThemeVar("color-bg-checked-RadioGroupOption-success");
+$font-size-RadioGroupOption: createThemeVar("Input:font-size-RadioGroupOption");
+$font-weight-RadioGroupOption: createThemeVar("Input:font-weight-RadioGroupOption");
+$color-text-RadioGroupOption-default: createThemeVar("Input:color-text-RadioGroupOption-default");
+$color-text-RadioGroupOption-error: createThemeVar("Input:color-text-RadioGroupOption-error");
+$color-text-RadioGroupOption-warning: createThemeVar("Input:color-text-RadioGroupOption-warning");
+$color-text-RadioGroupOption-success: createThemeVar("Input:color-text-RadioGroupOption-success");
+
+.radioGroupContainer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-2;
+}
+
+.radioOptionContainer {
+  display: flex;
+  align-items: center;
+  gap: $gap-RadioGroupOption;
+}
+
+.radioOption {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 100%;
+  background-color: $color-bg-RadioGroupOption-default;
+  border-width: $thickness-border-RadioGroupOption;
+  border-style: solid;
+  border-color: $color-border-RadioGroupOption-default;
+  padding: 0;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-border-RadioGroupOption-default--hover;
+  }
+  &:focus-visible{
+    outline-width: createThemeVar('Input:thickness-outline-RadioGroupOption--focus');
+    outline-color: createThemeVar('Input:color-outline-RadioGroupOption--focus');
+    outline-style: createThemeVar('Input:style-outline-RadioGroupOption--focus');
+    outline-offset: createThemeVar('Input:offset-outline-RadioGroupOption--focus');
+  }
+  &:disabled {
+    cursor: not-allowed;
+    border-color: $color-border-RadioGroupOption--disabled;
+  }
+  &:disabled+label {
+    cursor: not-allowed;
+    color: $color-text-RadioGroupOption--disabled;
+  }
+  &.error {
+    border-color: $color-border-RadioGroupOption-error;
+  }
+  &.warning {
+    border-color: $color-border-RadioGroupOption-warning;
+  }
+  &.valid {
+    border-color: $color-border-RadioGroupOption-success;
+  }
+}
+
+.indicator {
+  display: grid;
+  place-content: center;
+  width: 100%;
+  height: 100%;
+
+  &::after {
+    content: "";
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    box-shadow: inset 1em 1em $color-bg-checked-RadioGroupOption-default;
+  }
+
+  &.disabled::after {
+    box-shadow: inset 1em 1em $color-bg-checked-RadioGroupOption--disabled;
+  }
+
+  &.error::after {
+    box-shadow: inset 1em 1em $color-bg-checked-RadioGroupOption-error;
+  }
+  &.warning::after {
+    box-shadow: inset 1em 1em $color-bg-checked-RadioGroupOption-warning;
+  }
+  &.valid::after {
+    box-shadow: inset 1em 1em $color-bg-checked-RadioGroupOption-success;
+  }
+}
+
+.label {
+  color: $color-text-RadioGroupOption-default;
+  font-size: $font-size-RadioGroupOption;
+  font-weight: $font-weight-RadioGroupOption;
+  user-select: none;
+  cursor: pointer;
+
+  &.error {
+    color: $color-text-RadioGroupOption-error;
+  }
+  &.warning {
+    color: $color-text-RadioGroupOption-warning;
+  }
+  &.valid {
+    color: $color-text-RadioGroupOption-success;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

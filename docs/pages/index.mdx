@@ -1,0 +1,144 @@
+# Introduction to XMLUI
+
+XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to REST APIs on the backend.
+
+## Simple.
+
+In contrast to other UI frameworks, XMLUI offers simple concepts to create apps quickly without coping with the cumbersome peculiarities of web development.
+
+Here is a sample that demonstrates the conciseness of defining an app with XMLUI:
+
+```ueml copy
+<Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+```
+
+The function of this app is self-explaining; you can try it by clicking the button below:
+
+<Playground
+    previewOnly={true}
+    name="Button with increment action"
+    height={60}
+    horizontal={true}
+    app={`
+      <Button
+        label="Click to increment: {count}"
+        var.count="{0}" onClick="count++" />
+  `}
+/>
+
+Without diving into the details, these are the fundamental concepts XMLUI uses when running an application:
+
+- Its markup language (XUML, XMLUI Markup Language) is like XHTML.
+- `<Button>` is a component.
+- `label` is a property of `Button`.
+- `var.count` initializes a `count` variable to zero.
+- `onClick` is an event handler. Each click increments the value of `count`.
+
+XMLUI uses the reactive paradigm: whenever the state of a particular component changes―in this case, the value of `count`―the engine refreshes that component in the UI.
+
+## API-Aware.
+
+XMLUI integrates with REST APIs out of the box. The following sample app demonstrates the simplicity of retrieving and displaying data: 
+
+```ueml copy
+<List datasource="https://api.spacexdata.com/v3/history">
+  <Card title="{$item.title}" subTitle="{$item.details}"/>
+</List>
+```
+
+The working app below uses these XMLUI features:
+- `<List>` is a component working with data (an array of items). It virtualizes items and renders only those visible in the UI.
+- List items result from a GET request from the `https://api.spacexdata.com/v3/history` API endpoint.
+- `<Card>` is a simple component displaying a `title` and a `subtitle`. These titles are bound to the particular properties of the data item.
+
+<Playground
+    previewOnly
+    name="Getting data from Spacex API"
+    app={`
+    <List datasource="https://api.spacexdata.com/v3/history">
+      <Card title="{$item.title}" subTitle="{$item.details}"/>
+    </List>
+    `}
+    height={300}
+/>
+
+## Composable.
+
+It is easy to create your reusable custom components with XMLUI:
+
+```ueml
+<Component name="IncButton">
+  <Button 
+    label="{($props.label ?? 'Click me to increment') + ': ' + count}" 
+    var.count="{0}" 
+    onClick="count++" />
+</Component>
+```
+
+`IncButton` is a reusable component that allows specifying its label. `$props.label` represents the label value the consumer of `IncButton` assigns to a particular instance. If it is empty (not defined), the component uses the "Click me to increment" default value.
+
+When you create an app, you can leverage your reusable components:
+
+```ueml
+<VStack padding="1rem" gap="1rem">
+  <IncButton />
+  <IncButton label="Click me too" />
+  <IncButton label="And me" />
+</VStack>
+```
+
+<Playground
+    previewOnly
+    name="Reusable components"
+    components={[`
+      <Component name="IncButton">
+        <Button label="{($props.label ?? 'Click me to increment') + ': ' + count}" var.count="{0}" onClick="count++" />
+      </Component>
+    `]}
+    app={`
+    <VStack padding="1rem" gap="1rem">
+      <IncButton />
+      <IncButton label="Click me too" />
+      <IncButton label="And me" />
+    </VStack>
+    `}
+    height={200}
+/>
+
+## Themeable.
+
+You can change the visual appearance of an app by creating a new theme (from an existing one):
+
+```ueml copy {2,5}
+<VStack padding="1rem" gap="1rem">
+  <Theme color-primary="orangered" radius="12px">
+    <IncButton />
+    <IncButton label="Click me too" />
+  </Theme>
+  <IncButton label="And me" />
+</VStack>
+```
+
+Here, the `<Theme>` tag wraps the first two `IncButton` components to change some of their theme properties, while the third button remains intact:
+
+<Playground
+    previewOnly
+    name="Themed components"
+    components={[`
+      <Component name="IncButton">
+        <Button label="{($props.label ?? 'Click me to increment') + ': ' + count}" var.count="{0}" onClick="count++" />
+      </Component>
+    `]}
+    app={`
+      <VStack padding="1rem" gap="1rem">
+        <Theme color-primary="orangered" radius="12px">
+          <IncButton />
+          <IncButton label="Click me too" />
+        </Theme>
+        <IncButton label="And me" />
+      </VStack>
+    `}
+    height={200}
+/>
+
+Get started with XMLUI today and create your first app!

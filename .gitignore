@@ -1,0 +1,7 @@
+node_modules
+.vs
+.idea
+__tmp
+__setup
+__deploy
+.DS_Store

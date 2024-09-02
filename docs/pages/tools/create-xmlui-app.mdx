@@ -1,0 +1,103 @@
+# The `create-xmlui-app` Tool
+
+XMLUI has an accompanying tool, the `create-xmlui-app` tool, to accelerate the first step of creating an XMLUI-based app. This tool is a command-line utility that generates a simple development environment for your app. You can use this environment to construct the app and build the files for web deployment.
+
+## Creating an XMLUI App
+
+The tool is a standard Node.js package. To run it, you must have Node.js installed on your machine. Visit the [download page](https://nodejs.org/en/download) of Node.js to get and install it if this is the first time you have done it.
+
+> **Note**: Install the LTS version of the product.
+
+
+### Select the App Root Folder
+
+The XMLUI app you create will be in a folder encapsulating all files constituting the app. When the tool runs, it creates the app folder for you. Before running the tool, select a working folder with the `cd` command, which will hold the app folder:
+
+```text
+cd <working-folder>
+```
+
+### Get the Tool
+
+You do not need to install the `create-ui-engine` tool; just use it with the help of the `npx` (Node Package eXecute) utility:
+
+```text copy
+npx create-xmlui-app@latest
+```
+
+This command line downloads the tool from the npm package registry, installs it to a temporary location, and starts it.
+
+### Creating the App's Boilerplate Code
+
+The `create-xmlui-app` tool asks for a few options before creating the code:
+- **Application name**. Type in your app's name. As a Node package naming convention, the app names may contain lowercase letters, decimal digits, underscores, and dashes.
+- **Git repository**. The tool can create a local Git repository for you (if you select the Yes option). By default, no repository is created.
+
+After specifying these options, the utility creates a new folder within `<working folder>`, sets up the boilerplate code package and installs all dependencies.
+
+## Boilerplate Code Structure
+
+The utility creates a Node package with all files required to develop, run, and build it. The structure of the package is simple:
+
+<br/>
+<Image alt="Boilerplate" src="/resources/images/get-started/boilerplate-structure.png" width={416} />
+
+The `index.html` file wraps your entire app served with a web server. The `package.json` and `package-lock.json` are the standard Node package descriptor files.
+
+Your primary focus is the `src` folder holding the application source code. Here, the `Main.xmlui` file contains the application's root component definition and may refer to other app components (besides the built-in XMLUI components). The app-specific components are in the `src/components` folder. An app may have one or more custom themes, and they are in the `src/themes` folder.
+
+The `config.ts` file describes a few configuration values, such as the application's name to display, its logo, the default theme, URLs to access backends, etc. When you build the app, this file is turned into a configuration file you can change according to your production environment.
+
+The `api.ts` file contains emulated API definitions that help you during application development.
+
+The `public` folder contains the static resources (such as images, logos, fonts, etc) your app uses.
+
+## Developing Your App
+
+The boilerplate code contains a small application you can run with the `npm start` command. This command utilizes a dev web server within the package to run your app. This server runs in HMR (Hot Module Reloading) mode, which is very convenient: as you modify the app files, the server automatically refreshes your app according to the changes.
+
+The command displays the local URL to access the app in your browser. Some tools (such as the terminal within Visual Studio Code, Sublime, and other code editors) allow you to click this URL. Otherwise, copy the URL and paste it into your browser's address bar.
+
+```text {6}
+$ npm start
+
+> firstapp@0.1.0 start
+> ui-engine start
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: use --host to expose
+```
+
+> **Note**: If you have multiple monitors or put your code editor and the running app side-by-side, you have a live preview. This feature accelerates the app development, as you do not need to stop and restart your app.
+
+The `npm start` command runs in watch mode to detect your changes. You can exit the command with `Ctrl+C`.
+
+### Creating a Build
+
+Use the `npm run build` command to create a distribution folder. This command builds the app and creates a `dist` folder within your app folder. You can copy the content of this folder into your web server static files folder to serve the app.
+
+To test the build locally, run the `npm run preview` command. Similarly to `npm start`, it spins up a local web server and displays its URL you can use in the browser:
+
+```text {6}
+$ npm run preview
+
+> firstapp@0.1.0 preview
+> ui-engine preview
+
+  ➜  Local:   http://localhost:4173/
+  ➜  Network: use --host to expose
+```
+
+> **Note**: This preview does not use HMR, so changing your app's code won't refresh the app in your browser, as it uses the files from the `dist` folder. If you have not built your app, the preview will display `Cannot /GET` as an indication of a 404 (Not Found) response status.
+
+### Creating a Production Build
+
+Executing the `npm run build-prod` creates an optimized build with a flat distribution folder. Instead of grouping the app files into folders, every build file is directly within `dist`.
+
+> **Note**: You can use the `npm run preview` command to test the result of the production build.
+
+### Creating a CI Build
+
+Use the `npm run release-ci` command to build a zipped distribution file ready for continuous integration. This command builds the same `dist` folder as `npm run build-prod` and adds a `ui.zip` file to the app folder.
+
+> **Note**: You can use the `npm run preview` command to test the result of the CI build. However, it will use the `dist` folder, not the `ui.zip` file.

@@ -1,0 +1,26 @@
+# H2
+
+The `H2` component is a shorthand version of the `Heading` element with its `level` property set to "h2".
+
+See also: [H1](./H1), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
+
+```ueml copy
+<H2 value="This is a H2 text" />
+```
+
+<Playground
+  name="H2 example"
+  previewOnly
+  height={100}
+  app={`
+  <Stack>
+    <H2 value="This is a H2 text" />
+  </Stack>
+  `}
+/>
+
+## Styling
+
+The `H2` component inherits its visual style from the `Heading` component.
+Using the `H2` component specifier, you can override the inherited theme variable values.
+For example, the `color-text-H2` theme variable sets the text color of `H2` while keeping the color of all other headings.

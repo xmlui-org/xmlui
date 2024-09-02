@@ -1,0 +1,26 @@
+@use "@components-core/theming/themes" as t;
+
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: createThemeVar("gap-Form");
+}
+
+.buttonRow{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: createThemeVar("gap-buttonRow-Form");
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

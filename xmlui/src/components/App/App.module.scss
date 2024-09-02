@@ -1,0 +1,194 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$width-navPanel-App: createThemeVar("width-navPanel-App");
+$shadow-header-App: createThemeVar("shadow-header-App");
+$shadow-pages-App: createThemeVar("shadow-pages-App");
+$max-content-width-App: createThemeVar("max-content-width-App");
+$color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
+
+.wrapper {
+  --footer-height: 0px;
+  --header-height: 0px;
+  width: 100%;
+  height: 100%;
+  position: relative;     //leave it here, otherwise there could be double scrollbars because of the absolute positionings (typically radix's visuallyHidden)
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+
+  &.vertical {
+    flex-direction: row;
+    overflow: initial;
+
+    .contentWrapper{
+      overflow: auto;
+      position: relative;
+    }
+    .navPanelWrapper {
+      width: $width-navPanel-App;
+      flex-shrink: 0;
+    }
+
+    .PagesWrapper{
+      min-height: initial;
+      flex: 1;
+    }
+
+    .footerWrapper{
+      position: static;
+    }
+    &.sticky{
+      .footerWrapper{
+        position: sticky;
+        bottom: 0;
+      }
+    }
+  }
+  
+  &.horizontal{
+    overflow: auto;
+    .PagesWrapper{
+      min-height: initial;
+    }
+    .footerWrapper{
+      position: static;
+    }
+    &.sticky{
+      min-height: 100%;
+      .footerWrapper{
+        position: sticky;
+        bottom: 0;
+      }
+    }
+  }
+  
+  &.verticalFullHeader{
+    min-height: 100%;
+    height: 100%;
+    overflow: auto;
+    //padding-bottom: var(--footer-height);
+    .navPanelWrapper{
+      width: $width-navPanel-App;
+      position: sticky;
+      height: calc(100vh - var(--footer-height) - var(--header-height));
+      top: var(--header-height);
+    }
+    
+    .PagesWrapper{
+      overflow: initial;
+      min-height: calc(100vh - var(--header-height) - var(--footer-height));
+      height: 100%;
+    }
+
+    .PagesWrapperInner{
+      height: 100%;
+    }
+
+    .footerWrapper{
+      position: sticky;
+      left: 0;
+      right: 0;
+      bottom: 0;
+    }
+  }
+
+  &:not(.scrollWholePage){
+    overflow: hidden;
+    .content{
+      min-height: 0;
+      height: 100%;
+    }
+    .contentWrapper{
+      overflow: initial;
+    }
+    .PagesWrapper{
+      overflow: auto;
+      min-height: 0;
+      height: 100%;
+      scrollbar-gutter: stable both-edges;
+    }
+    .PagesWrapperInner{
+      min-height: 0;
+      height: 100%;
+    }
+  }
+}
+
+.headerWrapper {
+  z-index: 1;
+  //position: relative;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow-x: clip;
+  top: 0;
+  box-shadow: $shadow-header-App;
+  background-color: $color-bg-AppHeader;
+  &.sticky{
+    position: sticky;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: row;
+  isolation: isolate;
+}
+
+.contentWrapper{
+  position: relative;
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-pages-App;
+}
+
+.navPanelWrapper {
+  display: flex;
+  position: sticky;
+  top: 0;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.PagesWrapper {
+  flex: 1;
+  //display: flex;
+  //flex-direction: column;
+  //flex: 1;
+  //min-height: 0;
+  //width: 100%;
+  isolation: isolate;
+  //height: 100%;
+  //overflow: auto;
+}
+
+.PagesWrapperInner{
+  max-width: $max-content-width-App;
+  width: 100%;
+  margin: 0 auto;
+  //flex: 1;
+  min-height: 100%;
+  //padding: 1rem;
+}
+
+.footerWrapper {
+  flex-shrink: 0;
+  //position: sticky;
+  //bottom:  calc(-1 * var(--footer-height));
+  //margin-bottom: calc(-1 * var(--footer-height));
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

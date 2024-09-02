@@ -1,0 +1,36 @@
+name: Publish xmlui npm package
+
+on:
+  workflow_dispatch:
+
+jobs:
+#  build:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-node@v3
+#        with:
+#          node-version: 16
+#      - run: npm ci
+#        working-directory: client/packages/dummy-pkg
+#      - run: npm test
+#        working-directory: client/packages/dummy-pkg
+
+  publish-gpr:
+#    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          registry-url: https://npm.pkg.github.com/
+      - run: npm ci
+        working-directory: client
+      - run: npm publish
+        working-directory: xmlui
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}

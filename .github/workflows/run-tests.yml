@@ -1,0 +1,39 @@
+name: unit tests
+
+concurrency:  # Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time.
+  group: integration-testing
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: [ main ]
+env:
+  NODE_VERSION: '18.x'
+  
+jobs:
+  client-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout the repo
+        uses: actions/checkout@v3
+
+      - name: cache node modules
+        uses: actions/cache@v3
+        with:
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          
+      - name: npm install
+        run: npm ci
+
+      - name: build xmlui
+        run: npm run build
+        working-directory: xmlui
+
+      - name: run unit tests
+        run: npm run test
+        working-directory: xmlui

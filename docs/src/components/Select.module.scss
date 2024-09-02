@@ -1,0 +1,126 @@
+.SelectTrigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 0 15px;
+  font-size: 1rem;
+  line-height: 1;
+  height: 35px;
+  gap: 5px;
+  background-color: transparent;
+  --tw-text-opacity: 1;
+  color: rgba(17,24,39,var(--tw-text-opacity));
+}
+
+:is(html[class~=dark] .SelectTrigger) {
+  --tw-text-opacity: 1;
+  color: rgba(249,250,251,var(--tw-text-opacity));
+}
+.SelectTrigger:hover {
+  background-color: rgba(243,244,246,var(--tw-bg-opacity));
+}
+
+:is(html[class~=dark] .SelectTrigger:hover)  {
+  --tw-text-opacity: 1;
+  color: rgba(249,250,251,var(--tw-text-opacity));
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/.05);
+}
+
+.SelectTrigger:focus {
+  box-shadow: none;
+}
+
+.SelectIcon {
+  color: rgba(17,24,39,var(--tw-text-opacity));
+}
+
+:is(html[class~=dark] .SelectIcon) {
+  --tw-text-opacity: 1;
+  color: rgba(249,250,251,var(--tw-text-opacity));
+}
+
+.SelectContent {
+  overflow: hidden;
+  background-color: hsl(var(--nextra-primary-hue), var(--nextra-primary-saturation), 100%, 1);;
+  border-radius: 6px;
+  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+}
+
+:is(html[class~=dark] .SelectContent) {
+  background-color: rgba(17,17,17,var(--tw-bg-opacity));
+}
+
+.SelectViewport {
+  padding: 5px;
+}
+
+:is(html[class~=dark] .SelectViewport) {
+  --tw-bg-opacity: 1;
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)77%/.1);
+}
+
+.SelectItem {
+  font-size: 1rem;
+  line-height: 1;
+  --tw-text-opacity: 1;
+  color: rgba(107,114,128,var(--tw-text-opacity));
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  padding: 0.375rem 0.5rem;
+  position: relative;
+  user-select: none;
+  cursor: pointer;
+}
+
+:is(html[class~=dark] .SelectItem) {
+  --tw-text-opacity: 1;
+  color: rgba(163,163,163,var(--tw-text-opacity));
+}
+
+.SelectItem[data-highlighted] {
+  outline: none;
+  background-color: rgba(243,244,246,var(--tw-bg-opacity));
+  color: rgba(51,65,85,var(--tw-text-opacity));
+}
+
+:is(html[class~=dark] .SelectItem[data-highlighted]) {
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/.05);
+}
+
+.SelectItem[data-state=checked] {
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/var(--tw-bg-opacity));
+  --tw-text-opacity: 1;
+  color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)32%/var(--tw-text-opacity));
+}
+
+:is(html[class~=dark] .SelectItem[data-state=checked]) {
+  --tw-text-opacity: 1;
+  color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/var(--tw-text-opacity));
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)66%/.1);
+}
+
+.SelectLabel {
+  width: 100%;
+  text-align: center;
+  padding: 1rem .5rem .2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 25px;
+  color: rgba(107,114,128,var(--tw-text-opacity));
+}
+
+:is(html[class~=dark] .SelectLabel) {
+  --tw-text-opacity: 1;
+  color: rgba(163,163,163,var(--tw-text-opacity));
+}
+
+.SelectItemIndicator {
+  position: absolute;
+  left: 0;
+  width: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

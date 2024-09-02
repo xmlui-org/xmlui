@@ -1,0 +1,12 @@
+{
+  "name": "xmlui-root",
+  "version": "1.0.0",
+  "description": "Root folder of XMLUI",
+  "workspaces": [
+    "./xmlui",
+    "./tests",
+    "./docs",
+    "./tools/vscode",
+    "./tools/create-app"
+  ]
+}

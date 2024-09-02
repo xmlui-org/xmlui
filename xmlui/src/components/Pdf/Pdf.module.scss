@@ -1,0 +1,15 @@
+@use "@components-core/theming/themes" as t;
+
+.wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-height: 100%;
+  overflow: auto;
+  width: 100%;
+}
+
+.page{
+  box-shadow: t.$shadow-xxl;
+  margin: 3rem
+}

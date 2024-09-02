@@ -1,0 +1,543 @@
+%-PROP-START autoFocus
+
+If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
+
+```ueml copy
+<NumberBox autoFocus="true" />
+```
+
+<Playground
+  previewOnly
+  name="Example: autoFocus"
+  height={60}
+  app={`<NumberBox autoFocus="true" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START enabled
+
+Controls whether the input field is enabled (`true`) or disabled (`false`).
+
+```ueml copy
+<NumberBox enabled="false" />
+```
+
+<Playground
+  previewOnly
+  name="Example: enabled"
+  height={60}
+  app={`<NumberBox enabled="false" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START endIcon
+
+This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
+
+```ueml copy
+<NumberBox endIcon="email" />
+```
+
+<Playground
+  previewOnly
+  name="Example: endIcon"
+  height={60}
+  app={`<NumberBox endIcon="email" />`}
+/>
+
+It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START endText
+
+This string prop enables the display of a custom string on the right side (left-to-right display) of the input field.
+
+```ueml copy
+<NumberBox endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: endText"
+  height={60}
+  app={`<NumberBox endText=".com" />`}
+/>
+
+It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START hasSpinBox
+
+This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
+The default is `true`.
+
+```ueml copy
+<Stack gap="0.5rem">
+  <NumberBox hasSpinBox="true" initialValue="3" />
+  <NumberBox hasSpinBox="false" initialValue=34"/>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: hasSpinBox"
+  height={100}
+  app={`<Stack gap="0.5rem">
+  <NumberBox hasSpinBox="true" initialValue="3" />
+  <NumberBox hasSpinBox="false" initialValue="34" />
+</Stack>`}
+/>
+
+%-PROP-END
+
+%-PROP-START initialValue
+
+The initial value displayed in the input field.
+
+```ueml copy
+<NumberBox initialValue="123" />
+```
+
+<Playground
+  previewOnly
+  name="Example: initialValue"
+  height={60}
+  app={`<NumberBox initialValue="123" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START integersOnly
+
+This boolean prop toggles whether the input field accepts integers only (`true`) or not (`false`).
+
+```ueml copy
+<Stack gap="0.5rem">
+  <NumberBox integersOnly="true" initialValue="42" />
+  <NumberBox integersOnly="false" initialValue="{Math.PI}" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: integersOnly"
+  height={100}
+  app={`
+    <Stack gap="0.5rem">
+      <NumberBox integersOnly="true" initialValue="42" />
+      <NumberBox integersOnly="false" initialValue="{Math.PI}" />
+    </Stack>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START maxValue
+
+The maximum value the input field allows.
+Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`,
+otherwise it can only be an integer.
+
+Try to enter a bigger value into the input field below than the maximum allowed.
+
+```ueml copy
+<NumberBox maxValue="100" />
+```
+
+<Playground
+  previewOnly
+  name="Example: maxValue"
+  height={60}
+  app={`<NumberBox maxValue="100" initialValue="99" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START minValue
+
+The minimum value the input field allows.
+Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`,
+otherwise it can only be an integer.
+
+Try to enter a bigger value into the input field below than the minimum allowed.
+
+```ueml copy
+<NumberBox minValue="-100" />
+```
+
+<Playground
+  previewOnly
+  name="Example: minValue"
+  height={60}
+  app={`<NumberBox minValue="-100" initialValue="-99" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START placeholder
+
+A placeholder text that is visible in the input field when its empty.
+
+```ueml copy
+<NumberBox placeholder="This is a placeholder" />
+```
+
+<Playground
+  previewOnly
+  name="Example: placeholder"
+  height={60}
+  app={`<NumberBox placeholder="This is a placeholder" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START step
+
+This prop governs how big the step when clicking on the spinner of the field.
+The default stepping value is **1**.
+
+Note that only integers are allowed to be entered.
+
+```ueml copy
+<NumberBox initialValue="10" step="10" />
+```
+
+<Playground
+  previewOnly
+  name="Example: step"
+  height={60}
+  app={`<NumberBox initialValue="10" step="10" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START readOnly
+
+If true, the component's value cannot be modified with user interactions.
+
+```ueml copy
+<NumberBox initialValue="123" readOnly="true" />
+```
+
+<Playground
+  previewOnly
+  name="Example: readOnly"
+  height={60}
+  app={`<NumberBox initialValue="123" readOnly="true" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START startIcon
+
+This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
+
+```ueml copy
+<NumberBox startIcon="hyperlink" />
+```
+
+<Playground
+  previewOnly
+  name="Example: startIcon"
+  height={60}
+  app={`<NumberBox startIcon="hyperlink" />`}
+/>
+
+It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
+
+```ueml copy
+<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START startText
+
+This string prop enables the display of a custom string on the left side (left-to-right display) of the input field.
+
+```ueml copy
+<NumberBox startText="www." />
+```
+
+<Playground
+  previewOnly
+  name="Example: startText"
+  height={60}
+  app={`<NumberBox startText="www." />`}
+/>
+
+It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
+
+```ueml copy
+<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+```
+
+<Playground
+  previewOnly
+  name="Example: all adornments"
+  height={60}
+  app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+/>
+
+%-PROP-END
+
+%-PROP-START validationStatus
+
+This prop is used to visually indicate status changes reacting to form field validation.
+
+| Value     | Description                                           |
+| :-------- | :---------------------------------------------------- |
+| `valid`   | Visual indicator for an input that is accepted        |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error`   | Visual indicator for an input that produced an error  |
+
+```ueml copy
+<VStack gap="0.5rem">
+  <NumberBox />
+  <NumberBox validationStatus="valid" />
+  <NumberBox validationStatus="warning" />
+  <NumberBox validationStatus="error" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: validationStatus"
+  height={200}
+  app={`<VStack gap="0.5rem">
+  <NumberBox />
+  <NumberBox validationStatus="valid" />
+  <NumberBox validationStatus="warning" />
+  <NumberBox validationStatus="error" />
+</VStack>`}
+/>
+
+%-PROP-END
+
+%-PROP-START zeroOrPositive
+
+This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
+By default, this property is set to `false`.
+
+```ueml copy
+<NumberBox initialValue="123" zeroOrPositive="true" />
+```
+
+<Playground
+  previewOnly
+  name="Example: zeroOrPositive"
+  height={60}
+  app={`<NumberBox initialValue="123" zeroOrPositive="true" />`}
+/>
+
+%-PROP-END
+
+%-API-START value
+
+You can query this read-only API property to get the input component's current value.
+
+See an example in the `setValue` API method.
+
+%-API-END
+
+%-API-START setValue
+
+You can use this method to set the component's current value programmatically.
+
+```ueml copy {3, 9, 12}
+<VStack gap="0.5rem">
+  <NumberBox
+    id="numberbox"
+    readOnly="true"
+  />
+  <HStack gap="0.5rem">
+    <Button 
+      label="Set to 100" 
+      onClick="numberbox.setValue(100)" />
+    <Button 
+      label="Set to 0" 
+      onClick="numberbox.setValue(0)" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: value and setValue"
+  height={120}
+  app={`<VStack gap="0.5rem">
+  <NumberBox 
+    id="numberbox"
+    readOnly="true"
+  />
+  <HStack gap="0.5rem">
+    <Button 
+      label="Set to 100" 
+      onClick="numberbox.setValue(100)" />
+    <Button 
+      label="Set to 0" 
+      onClick="numberbox.setValue(0)" />
+  </HStack>
+</VStack>`}
+/>
+
+%-API-END
+
+%-EVENT-START didChange
+
+This event is triggered after the user has changed the field value.
+
+Write in the input field and see how the `Text` underneath it is updated in parallel.
+
+```ueml copy {2}
+<VStack gap="0.5rem" var.field="0">
+  <NumberBox initialValue="{field}" onDidChange="(val) => field = val" />
+  <Text value="{field}" />
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: didChange"
+  height={80}
+  app={`<VStack gap="0.5rem" var.field="0">
+    <NumberBox initialValue="{field}" onDidChange="(val) => field = val" />
+    <Text value="{field}" />
+</VStack>`}
+/>
+
+%-EVENT-END
+
+%-EVENT-START gotFocus
+
+This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
+
+```ueml copy {4-5}
+<VStack gap="0.5rem" var.focused="{false}">
+  <NumberBox
+    onGotFocus="focused = true"
+    onLostFocus="focused = false" />
+  <Text>The NumberBox is {focused ? '' : 'not'} focused</Text>
+</VStack>
+```
+
+Click into the `NumberBox` (and then click the text below):
+
+<Playground
+  previewOnly
+  name="Example: gotFocus/lostFocus"
+  height={100}
+  app={`
+    <VStack gap="0.5rem" var.focused="{false}">
+      <NumberBox
+        onGotFocus="focused = true"
+        onLostFocus="focused = false" />
+      <Text>The NumberBox is {focused ? '' : 'not'} focused</Text>
+    </VStack>
+  `}
+/>
+
+%-EVENT-END
+
+%-EVENT-START lostFocus
+
+This event is triggered when the `NumberBox` loses focus.
+
+(See the example above)
+
+%-EVENT-END
+
+%-STYLE-START
+
+The `NumberBox` component uses these theme variables to customize its appearance:
+
+- `radius-NumberBox`
+- `color-text-NumberBox`
+- `color-bg-NumberBox--disabled`
+- `thickness-border-NumberBox`
+- `style-border-NumberBox`
+- `color-border-NumberBox--disabled`
+- `color-bg-NumberBox--disabled`
+- `color-text-NumberBox--disabled`
+- `color-border-NumberBox-default`
+- `color-border-NumberBox-error`
+- `color-border-NumberBox-warning`
+- `color-border-NumberBox-success`
+- `color-placeholder-NumberBox`
+
+```json
+"radius-NumberBox": "30px",
+"color-adornment-NumberBox": "red",
+"thickness-border-NumberBox": "4px"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={60}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "radius-NumberBox": "30px",
+        "color-adornment-NumberBox": "red",
+        "thickness-border-NumberBox": "4px",
+      },
+    },
+  ]}
+  app={`<NumberBox startIcon="hyperlink" />`}
+/>
+
+To style all input controls not just this component, use `Input` instead of the `NumberBox` segment:
+
+```
+color-border-Input: "#0033FF"
+```
+
+`Input` affects the following controls:
+
+- [`Checkbox`](./Checkbox.mdx)
+- [`RadioGroupOption`](./RadioGroupOption.mdx)
+- [`Select`](./Select.mdx)
+- [`Switch`](./Switch.mdx)
+- [`TextArea`](./TextArea.mdx)
+- [`TextBox`](./TextBox.mdx)
+
+See [custom themes](../learning/themes/overview.mdx) for styling details.
+
+%-STYLE-END

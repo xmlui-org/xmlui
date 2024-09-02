@@ -1,0 +1,192 @@
+# How-To: Events
+
+As XMLUI runs events asynchronously, you cannot be sure when the event handler has completed. There are several situations when you should know whether an event handler is still in progress or you must do something after it has been completed.
+
+In this article, you will learn how to manage a few typical situations related to event handlers.
+
+## Test if an event is in progress
+
+In the following example, a button's click event handler runs for 3 seconds. Nonetheless, you can click the button several times before the 3 seconds expires:
+
+```ueml copy
+<VStack padding="1rem" gap="1rem" var.logClick="">
+  <Button label="I'm running for 3 seconds, click me!" 
+    onClick="
+      logClick += '+';
+      delay(3000);
+    " />
+  <Text>Clicks: {logClick}</Text>  
+</VStack>
+```
+
+Click the button several times quickly:
+
+<Playground
+    previewOnly={true}
+    name="Simultaneously running event handlers"
+    height={120}
+    horizontal={true}
+    app={`
+      <VStack padding="1rem" gap="1rem" var.logClick="">
+        <Button label="I'm running for 3 seconds, click me!" 
+          onClick="
+            logClick += '+';
+            delay(3000);
+          " />
+        <Text>Clicks: {logClick}</Text>  
+      </VStack>
+  `}
+/>
+
+You can see that each click immediately logs a "+" sign. It means that multiple event handlers run simultaneously.
+
+XMLUI has built-in support to check if a particular event handler is in progress. Each component supports an API property named `<eventName>InProgress` set to true while the event handler runs.
+
+The following sample demonstrates how you can use it. Here, the button is enabled only if the click event handler is not running:
+
+```ueml copy {4} /clickInProgress/
+<VStack padding="1rem" gap="1rem" var.logClick="">
+  <Button 
+    id="myButton" 
+    enabled="{!myButton.clickInProgress}" 
+    label="I'm running for 3 seconds, click me!" 
+    onClick="
+      logClick += '+';
+      delay(3000);
+    " />
+  <Text>Clicks: {logClick}</Text>  
+</VStack>
+```
+
+When you click the button, it remains disabled while the event handler runs, so you cannot start simultaneous click events.
+
+<Playground
+  previewOnly={true}
+  name="Howto: Test if an event handler is in progress"
+  height={120}
+  horizontal={true}
+  app={`
+    <VStack padding="1rem" gap="1rem" var.logClick="">
+      <Button 
+        id="myButton" 
+        enabled="{!myButton.clickInProgress}" 
+        label="I'm running for 3 seconds, click me!" 
+        onClick="
+          logClick += '+';
+          delay(3000);
+        " />
+      <Text>Clicks: {logClick}</Text>  
+    </VStack>
+`}
+/>
+
+## Tracking event progress
+
+Though the `<event>InProgress` property (see [here](#test-if-an-event-is-in-progress)) helps check if an event handler is currently running, it does not allow reporting event progress.
+
+For this purpose, you must use a variable tracking the progress as the following sample demonstrates:
+
+```ueml copy /phase/
+<VStack padding="1rem" gap="1rem" var.phase="n/a">
+  <Button 
+    id="myButton" 
+    enabled="{!myButton.clickInProgress}" 
+    label="I'm running a long operation, click me!" 
+    onClick="
+      phase = 'Initializing';
+      delay(1000);
+      phase = 'Working';
+      delay(1000);
+      phase = 'Cleaning up';
+      delay(1000);
+      phase = 'Completed';
+    " />
+  <Text>Current progress: {phase}</Text>
+</VStack>
+```
+
+Click the button and check how it reports progress:
+
+<Playground
+  previewOnly={true}
+  name="Howto: reporting progress"
+  height={120}
+  horizontal={true}
+  app={`
+    <VStack padding="1rem" gap="1rem" var.phase="n/a">
+      <Button 
+        id="myButton" 
+        enabled="{!myButton.clickInProgress}" 
+        label="I'm running a long operation, click me!" 
+        onClick="
+          phase = 'Initializing';
+          delay(1000);
+          phase = 'Working';
+          delay(1000);
+          phase = 'Cleaning up';
+          delay(1000);
+          phase = 'Completed';
+        " />
+      <Text>Current phase: {phase}</Text>  
+    </VStack>
+`}
+/>
+
+## Catching progress changes
+
+You can combine the report progress mechanism with a `ChangeListener` component to catch progress change events:
+
+```ueml copy
+<VStack padding="1rem" gap="1rem" var.phase="n/a" var.logEntries="">
+  <ChangeListener 
+    listenTo="{phase}" 
+    onDidChange="() => logEntries += myButton.clickInProgress ? ' ' + phase : ''" />
+  <Button 
+    id="myButton" 
+    enabled="{!myButton.clickInProgress}" 
+    label="I'm running a long operation, click me!" 
+    onClick="
+      phase = 'Initializing';
+      delay(1000);
+      phase = 'Working';
+      delay(1000);
+      phase = 'Cleaning up';
+      delay(1000);
+      phase = 'Completed';
+    " />
+  <Text>Current phase: {phase}</Text>  
+  <Text>Log: {logEntries}</Text>  
+</VStack>
+```
+
+The code collects progress phase changes in the `logEntries` variable and displays them:
+
+<Playground
+  previewOnly={true}
+  name="Howto: reporting progress"
+  height={160}
+  horizontal={true}
+  app={`
+    <VStack padding="1rem" gap="1rem" var.phase="n/a" var.logEntries="">
+      <ChangeListener 
+        listenTo="{phase}" 
+        onDidChange="() => logEntries += myButton.clickInProgress ? ' ' + phase : ''" />
+      <Button 
+        id="myButton" 
+        enabled="{!myButton.clickInProgress}" 
+        label="I'm running a long operation, click me!" 
+        onClick="
+          phase = 'Initializing';
+          delay(1000);
+          phase = 'Working';
+          delay(1000);
+          phase = 'Cleaning up';
+          delay(1000);
+          phase = 'Completed';
+        " />
+      <Text>Current phase: {phase}</Text>  
+      <Text>Log: {logEntries}</Text>  
+    </VStack>
+`}
+/>
+

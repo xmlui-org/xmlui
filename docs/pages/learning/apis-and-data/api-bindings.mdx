@@ -1,0 +1,217 @@
+# Datasources
+
+A unique feature of XMLUI is the ability to natively bind properties to results from a web API (REST or REST-like) endpoint. For example, the following app retrieves data from the SpaceX public API:
+
+```ueml copy {3}
+<List>
+  <prop name=items>
+    <Datasource url="https://api.spacexdata.com/v3/history"/>
+  </prop>
+  <prop name=itemTemplate>
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </prop>
+</List>
+```
+
+`List` is a templated component working with an array of data specified in its `items` property. The highlighted markup line specifies a `Datasource` component that retrieves data from the endpoint specified in its `url` property and utilizes it to set `items`.
+
+The `Datasource` takes care of every tiny detail a data fetching operation requires, including sending the request, waiting for the response, refreshing the UI after extracting the data from the response, etc.
+
+Here is the app using the markup above:
+
+<Playground
+    previewOnly
+    name="Getting data from Spacex API"
+    app={`
+    <List>
+      <prop name="data">
+        <Datasource url="https://api.spacexdata.com/v3/history"/>
+      </prop>
+      <prop name="itemTemplate">
+        <Card title="{$item.title}" subTitle="{$item.details}"/>
+      </prop>
+    </List>
+    `}
+    height={300}
+/>
+
+In this article, you will learn what powerful features `Datasource` provides for you to use.
+
+## Datasources Everywhere
+
+There are two ways you can use the `Datasource` component:
+- **Component properties**. When you attach a `Datasource` to a component property, the property value evaluation will trigger the API endpoint to run and retrieve data. When the data has been retrieved, the property value is set to the data received. It is up to the host component how it behaves (what it displays) in response to the property value change.
+- **Event handlers**. When you use a `Datasource` in an event handler, triggering the event will ignite, sending the request to the corresponding API endpoint. These requests generally make some modifications on the server side.
+
+`Datasource` can handle file downloads and uploads, too.
+
+### `Datasource` with Component Properties
+
+The introduction of this article already demonstrated a simple SpaceX data query where you bound an `Datasource` component with the `items` property of `List`.
+
+XMLUI does not have any restriction on which properties or event handlers you can use `Datasource`.
+
+Though it has no value, you can use the `Datasource` above to set the `value` property of a `Text` component:
+
+```ueml copy {3}
+<Text>
+  <prop name="value">
+    <Datasource url="https://api.spacexdata.com/v3/history"/>
+  </prop>
+</Text>
+```
+
+<Playground
+    previewOnly
+    name="Getting data from Spacex API #2"
+    app={`
+    <Text>
+      <prop name="value">
+        <Datasource url="https://api.spacexdata.com/v3/history"/>
+      </prop>
+    </Text>
+    `}
+    height={100}
+/>
+
+### `Datasource` with Event Handlers
+
+When you attach a `Datasource` to an event handler, triggering the event will send a request to the corresponding API endpoint.
+
+For example, in the following markup snippet, the `MyForm` component has a button with its `click` event utilizing `Datasource` to send a `DELETE` request to the `https://myApi.com/items/{selectedId}` endpoint replacing the `{selectedId}` binding expression with the value of `selectedId`:
+
+```ueml copy
+<MyForm var.selectedId={-1}>
+  <!-- 
+    Omitted: the component has a UI segment that allows the user 
+    to select an item and set selectedId accordingly. 
+  -->
+  <Button label="Delete">
+    <event name="click">
+      <Datasource method="delete" url="https://myApi.com/items/{selectedId}"/>
+    </event>
+  <Button>
+</MyForm>
+```
+
+## How `Datasource` Works
+
+The primary value of `Datasource` is that it provides the entire infrastructure for executing requests, obtaining the response, processing the data, and handling potential errors. In your markup, you declare the endpoint to reach, and XMLUI manages the entire mechanism.
+
+### Sending a Request
+
+When you attach an `Datasource` to an event handler, the corresponding request is sent to the API endpoint when the event is triggered.
+
+In the case of property-bound `Datasource` instances, the request is sent when the engine detects any of the properties of the corresponding `Datasource,` which influence the requested change due to some user or system events. Such events can be that the component leveraging the `Datasource` is about to display its UI for the first time or re-renders its UI due to some change.
+
+> **Note**: No new request is sent if non-request-influencing properties change.
+
+There are several `Datasource` properties to set up the attributes of the request to be sent.
+
+#### `url`
+
+With this property, you can declare the URL to send the request to. The value of `url` can be an absolute URL (such as `https://mycompany.com/api/books`) or a relative (such as `/api/books`) to the default target set in the `<base>` HTML tag within `<head>`.
+
+#### `method`
+
+This property defines the request method (`get`, `post`, `put`, `delete`, etc.). By default (if you omit this property), it is `get`.
+
+#### `queryParams`
+
+You can set the query parameters to append to the URL. This property contains key and value pairs. Assume you set `queryParams` like in this example:
+
+```ueml
+<Datasource
+  url="https://mycompany.com/api/books"
+  queryParams="{ {genre: 'Fiction', filter: 'Asimov'} }"
+/>
+```
+
+When the request is sent, the URL will be the following:
+
+```text
+https://mycompany.com/api/books?genre=Fiction&filter=Asimov
+```
+
+#### `body`
+
+This property sets the object that should be sent with the `application/json` value in the `Content-Type` header. The engine serializes the property value to JSON and adds the `Content-Type` header to the request with the `application/json; charset=UTF-8` value.
+
+> **Note**: The object must be JSON-serializable; it should not contain circular references.
+
+#### `rawBody`
+
+This property sets the raw value that should be sent with the request. It does not set the `Content-Type` header; you should add the appropriate header values with the `headers` property.
+
+If you define both `body` and `rawBody` property, `rawBody` prevails.
+
+#### `headers`
+
+You can set the request headers with this property containing key and value pairs. The key is the header name; the value specifies the corresponding header value. Assume you set the property to these values:
+
+```ueml
+<Datasource
+  url="https://mycompany.com/api/books"
+  headers="{ {
+    'Cache-Control': 'max-age=0', 
+    'If-Modified-Since': 'Tue, 16 Jan 2024 02:36:04 GMT'
+  } }"
+/>
+```
+This setting will add these request headers:
+
+```text
+Cache-Control: max-age=0 
+If-Modified-Since: Tue, 16 Jan 2024 02:36:04 GMT
+```
+
+### Executing the Request
+
+When it is time to execute a request, the engine assembles it according to the above properties. Before sending the request to the endpoint, the engine raises the `beforeRequest` event. You can declare an event handler processing it; such an event is helpful if you want the UI to reflect that the request is being sent (even if the result has not yet arrived).
+
+> **Note**: The engine waits to complete the `beforeRequest` handler. If the handler raises an error, the engine does not send the prepared request to the API endpoint.
+
+### Processing the Response
+
+When the response arrives from the endpoint, and its status indicates success, the engine processes it in a few steps:
+
+1. **Paging information extraction**. The `Datasource` component can be used in scenarios when data is retrieved in pages (windows). To extract paging information from the response, you can define two properties, `prevPageParamSelector` and `nextPageParamSelector`. The `Datasource` component stores these values and uses them for subsequent paged queries.
+2. **Result extraction**. The complete response may wrap the data of interest with other information we want to ignore. The `resultSelector` property allows the specification of a selector to extract the primary information from the response.
+3. **Result transformation**. The result may need to be in the right format to display in the UI. The `transformResult` property lets you define a function that converts the data into a UI-suitable format.
+4. **Success handler invocation**. The engine fires the `onSuccess` event, passing the result to notify the UI about the successful request execution.
+
+_resultSelector_
+
+_prevPageParamSelector_
+
+_nextPageParamSelector_
+
+_transformResult_
+
+## File Uploads and Downloads
+
+_TBD_
+
+## The Optimistic UI Design Pattern
+
+Showing up-to-date data to users is tricky in distributed systems.
+When data is updated on the backend (e.g. a new item is added to a list), the client generally fetches this new data and then updates the UI accordingly.
+Slow network and backend issues may delay or outright cancel this update.
+Slow updates can be mitigated, however, by utilizing a design pattern called "Optimistic UI" that results in snappier UIs.
+This design pattern is utilizied by XMLUI during data operations.
+
+The idea is the following: when the user modifies data (create, delete or update existing) show the result immediately after the submit or confirmation button is pressed.
+Meanwhile the request to modify the data is sent to the backend but the client does not wait for the backend to respond with a success.
+If any issue comes up (request timeout, backend error, etc.), the UI will roll back to the previous state before the update has happened.
+
+## Backend Data Caching
+
+In the same vein as the [Optimistic UI](#the-optimistic-ui-design-pattern) the idea behind backend data caching is to speed up the display of the most recent version of the data on the UI.
+XMLUI uses a caching strategy that involves storing data fetched from an API in memory on the client side,
+so that subsequent requests for the same data can be served faster by retrieving the data from the cache instead of making a new network request.
+
+XMLUI identifies certain parts of the cache with certain URL routes acting as keys (e.g. an endpoint with the route `/api/tasks` is a reference to the tasks data in the cache).
+These keys can be referenced in code to invalidate certain parts of the cache.
+
+By default, data manipulation requests trigger a whole cache invalidation to ensure the latest data is displayed.
+Thus, knowing the relationships between different parts of the data is useful in optimizing cache invalidation. 

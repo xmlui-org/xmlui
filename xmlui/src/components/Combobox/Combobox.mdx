@@ -1,0 +1,315 @@
+%-DESC-START
+
+## Using Combobox
+
+You can use a `Combobox` to select a text from a dropdown list (click the component to display the list) or type an arbitrary text. As you type the text, it works as a filter for the items on the list.
+
+Define the list of available options with the nested `Option` component, as this example shows:
+
+```ueml copy 
+<Combobox id="myCombo">
+  <Option label="Jane Arrington" value="ja" />
+  <Option label="John Sniper" value="js" />
+  <Option label="Emily Gold" value="eg" />
+  <Option label="Art Heather" value="ah" />
+</Combobox>
+```
+
+<Playground
+  previewOnly
+  name="Example: using Combobox"
+  height={200}
+  app={`
+    <Combobox id="myCombo">
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+      <Option label="Art Heather" value="ah" />
+    </Combobox>
+  `}
+/>
+
+Combobox supports data binding. The following example shows how you can programmatically define options:
+
+```ueml copy
+<Combobox id="myCombo">
+  <Items items="{[1, 2, 3, 4, 5]}">
+    <Option label="Option {$item}" value="{$item}" />
+  </Items>
+</Combobox>
+```
+
+<Playground
+  previewOnly
+  name="Example: Combobox with data"
+  height={220}
+  app={`
+    <Combobox id="myCombo">
+      <Items items="{[1, 2, 3, 4, 5]}">
+        <Option label="Option {$item}" value="{$item}" />
+      </Items>
+    </Combobox>
+  `}
+/>
+
+%-DESC-END
+
+%-PROP-START emptyListTemplate
+
+```ueml copy {6-8}
+<Combobox id="myCombo">
+  <Option label="Jane Arrington" value="ja" />
+  <Option label="John Sniper" value="js" />
+  <Option label="Emily Gold" value="eg" />
+  <Option label="Art Heather" value="ah" />
+  <prop name="emptyListTemplate">
+    <Text variant="title" value="No names match with your filter..." />
+  </prop>
+</Combobox>
+```
+
+Type a "w" to display an empty list:
+
+<Playground
+  previewOnly
+  name="Example: emptyListTemplate"
+  height={200}
+  app={`
+    <Combobox id="myCombo">
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+      <Option label="Art Heather" value="ah" />
+      <prop name="emptyListTemplate">
+        <Text variant="title" value="No names match with your filter..." />
+      </prop>
+    </Combobox>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START optionTemplate
+
+```ueml copy {6-8}
+<Combobox id="myCombo">
+  <Option label="Jane Arrington" value="ja" />
+  <Option label="John Sniper" value="js" />
+  <Option label="Emily Gold" value="eg" />
+  <Option label="Art Heather" value="ah" />
+  <prop name="optionTemplate">
+    <Text variant="strong" color="purple" value="{$item.label}" />
+  </prop>
+</Combobox>
+```
+
+Click the `Combobox` to display its options:
+
+<Playground
+  previewOnly
+  name="Example: optionTemplate"
+  height={200}
+  app={`
+    <Combobox id="myCombo">
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+      <Option label="Art Heather" value="ah" />
+      <prop name="optionTemplate">
+        <Text variant="strong" color="purple" value="{$item.label}" />
+      </prop>
+    </Combobox>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START initialValue
+
+```ueml copy /initialValue="eg"/
+<Combobox id="myCombo" initialValue="eg">
+  <Option label="Jane Arrington" value="ja" />
+  <Option label="John Sniper" value="js" />
+  <Option label="Emily Gold" value="eg" />
+  <Option label="Art Heather" value="ah" />
+</Combobox>
+```
+
+The following list will show the item with "eg" as its initial value:
+
+<Playground
+  previewOnly
+  name="Example: initialValue"
+  height={200}
+  app={`
+    <Combobox id="myCombo" initialValue="eg">
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+      <Option label="Art Heather" value="ah" />
+    </Combobox>
+  `}
+/>
+
+%-PROP-END
+
+%-EVENT-START didChange
+
+```ueml copy /onDidChange="(val) => field = val"/
+<VStack gap="0.5rem" var.field="">
+  <Combobox initialValue="{field}" onDidChange="(val) => field = val">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Combobox>
+  <Text value="{field}" />
+</VStack>
+```
+
+Select an option and see how the text underneath is updated in parallel.
+
+<Playground
+  previewOnly
+  name="Example: initialValue"
+  height={200}
+  app={`
+    <VStack gap="0.5rem" var.field="">
+      <Combobox initialValue="{field}" onDidChange="(val) => field = val">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Combobox>
+      <Text value="{field}" />
+    </VStack>
+  `}
+/>
+
+%-EVENT-END
+
+%-EVENT-START gotFocus
+
+```ueml copy {5-6}
+<VStack padding="$space-1" gap="$space-0_5">
+  <var name="isFocused" value="{false}" />
+  <Text value="Input control is focused: {isFocused}" />
+  <Combobox
+    onGotFocus="isFocused = true"
+    onLostFocus="isFocused = false"
+  >
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Combobox>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: gotFocus/lostFocus"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <var name="isFocused" value="{false}" />
+    <Text value="Input control is focused: {isFocused}" />
+    <Combobox
+      onGotFocus="isFocused = true"
+      onLostFocus="isFocused = false"
+    >
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Combobox>
+  </VStack>
+  `}
+/>
+
+%-EVENT-END
+
+%-API-START focus
+
+```ueml copy /onClick="inputControl.focus()"/
+<VStack padding="$space-1" gap="$space-0_5">
+  <Button label="Focus Input" onClick="inputControl.focus()" />
+  <Combobox id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Combobox>
+</VStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: focus()"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <Button label="Focus Input" onClick="inputControl.focus()" />
+    <Combobox id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Combobox>
+  </VStack>
+  `}
+/>
+
+%-API-END
+
+%-STYLE-START
+
+The `Combobox` component uses these theme variables:
+
+- `min-height-Combobox`
+
+These variables have 4 variants depending on the [validationStatus](#validationstatus) denoted by `|status|`.
+If the status segment is omitted, the style will be applied to all statuses.
+
+- `radius-Combobox-|status|`
+- `font-size-Combobox-|status|`
+- `color-placeholder-Combobox-|status|`
+- `thickness-border-Combobox-|status|`
+
+- `thickness-outline-Combobox-|status|--focus`
+- `color-outline-Combobox-|status|--focus`
+- `style-outline-Combobox-|status|--focus`
+- `offset-outline-Combobox-|status|--focus`
+
+```json copy
+"radius-Combobox-default": "10px",
+"color-placeholder-Combobox-error": "crimson"
+```
+
+In addition to the validation statuses,
+the variables below are associated with styles for `hover` and `disabled` interaction states denoted by `|interact|` in their signature:
+
+- `color-border-Combobox-|status|--|interact|`
+- `color-bg-Combobox-|status|--|interact|`
+- `shadow-Combobox-|status|--|interact|`
+- `color-text-Combobox-|status|--|interact|`
+
+```json copy
+"color-bg-Combobox-default--disabled": "gray",
+"color-text-Combobox-error--active": "lightcoral"
+```
+
+Theme variables to set the dropdown menu styles:
+
+- `color-bg-menu-Combobox`
+- `shadow-menu-Combobox`
+- `radius-menu-Combobox`
+- `color-text-indicator-Combobox`
+
+Theme variables to set the selection styles in a dropdown menu:
+
+- `color-text-value-Combobox`
+- `color-bg-value-Combobox`
+
+Theme variables to set the styles of an unselected item:
+
+- `color-bg-item-Combobox--hover`
+- `color-bg-item-Combobox--active`
+- `color-text-item-Combobox--disabled`
+
+
+%-STYLE-END

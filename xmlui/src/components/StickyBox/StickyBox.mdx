@@ -1,0 +1,38 @@
+%-PROP-START to
+
+```ueml copy
+<VStack padding="$space-4" gap="$space-4">
+  <StickyBox to="top">
+    This part of the UI sticks to the top
+  </StickyBox>
+  <Stack backgroundColor="red" height="80px" width="100%" />
+  <Stack backgroundColor="green" height="80px" width="100%" />
+  <Stack backgroundColor="blue" height="80px" width="100%" />
+</VStack>
+```
+
+<Playground
+  name="Example: to"
+  previewOnly
+  height={100}
+  app={`
+  <VStack padding="$space-4" gap="$space-4">
+    <StickyBox to="top">
+      This part of the UI sticks to the top
+    </StickyBox>
+    <Stack backgroundColor="red" height="80px" width="100%" />
+    <Stack backgroundColor="green" height="80px" width="100%" />
+    <Stack backgroundColor="blue" height="80px" width="100%" />
+  </VStack>
+  `}
+/>
+
+%-PROP-END
+
+%-STYLE-START
+
+The component uses the following theme variables:
+
+- `color-bg-StickyBox`
+
+%-STYLE-END

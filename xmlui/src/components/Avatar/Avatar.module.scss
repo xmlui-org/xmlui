@@ -1,0 +1,81 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-bg-Avatar: createThemeVar("color-bg-Avatar");
+$color-border-Avatar: createThemeVar("color-border-Avatar");
+$thickness-border-Avatar: createThemeVar("thickness-border-Avatar");
+$style-border-Avatar: createThemeVar("style-border-Avatar");
+$border-Avatar: createThemeVar("border-Avatar");
+$radius-Avatar: createThemeVar("radius-Avatar");
+$shadow-Avatar: createThemeVar("shadow-Avatar");
+$color-text-Avatar: createThemeVar("color-text-Avatar");
+$font-weight-Avatar: createThemeVar("font-weight-Avatar");
+
+.container {
+  border-radius: $radius-Avatar;
+  border: $border-Avatar;
+  border-width: $thickness-border-Avatar;
+  border-style: $style-border-Avatar;
+  aspect-ratio: 1 / 1;
+  background-color: $color-bg-Avatar;
+  color: $color-text-Avatar;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+  background-position: 50%;
+  background-size: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: $font-weight-Avatar;
+  white-space: nowrap;
+  user-select: none;
+  font-size: 12px;
+  box-shadow: $shadow-Avatar;
+
+  &.xs {
+    width: t.$space-8;
+    height: t.$space-8;
+    max-width: t.$space-8;
+    max-height: t.$space-8;
+    font-size: t.$space-3;
+  }
+
+  &.sm {
+    width: t.$space-12;
+    height: t.$space-12;
+    max-width: t.$space-12;
+    max-height: t.$space-12;
+    font-size: t.$space-4;
+  }
+
+  &.md {
+    width: t.$space-16;
+    height: t.$space-16;
+    max-width: t.$space-16;
+    max-height: t.$space-16;
+    font-size: t.$space-5;
+  }
+
+  &.lg {
+    width: t.$space-24;
+    height: t.$space-24;
+    max-width: t.$space-24;
+    max-height: t.$space-24;
+    font-size: t.$space-8;
+  }
+
+  &.clickable {
+    cursor: pointer;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

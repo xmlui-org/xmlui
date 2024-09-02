@@ -1,0 +1,32 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+.infoWrapper{
+  width: 100%;
+  margin: 0 auto;
+}
+
+.loadingWrapper{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding-top: t.$space-2;
+  padding-bottom: t.$space-2;
+}
+
+.noRows {
+  width: 100%;
+  text-align: center;
+  margin-top: t.$space-4;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

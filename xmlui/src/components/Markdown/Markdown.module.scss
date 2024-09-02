@@ -1,0 +1,83 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- HorizontalRule
+
+$color-border-HorizontalRule: createThemeVar("color-border-HorizontalRule");
+$thickness-border-HorizontalRule: createThemeVar("thickness-border-HorizontalRule");
+$style-border-HorizontalRule: createThemeVar("style-border-HorizontalRule");
+
+.horizontalRule {
+  border: $thickness-border-HorizontalRule $style-border-HorizontalRule $color-border-HorizontalRule;
+}
+
+$color-bg-Blockquote: createThemeVar("color-bg-Blockquote");
+$accent-Blockquote: createThemeVar("accent-Blockquote");
+$radius-Blockquote: createThemeVar("radius-Blockquote");
+$shadow-Blockquote: createThemeVar("shadow-Blockquote");
+$padding-Blockquote: createThemeVar("padding-Blockquote");
+$margin-Blockquote: createThemeVar("margin-Blockquote");
+
+// --- Blockquote
+
+.blockquote {
+  position: relative;
+  border-radius: $radius-Blockquote;
+  background-color: $color-bg-Blockquote;
+  box-shadow: $shadow-Blockquote;
+  padding: $padding-Blockquote;
+  margin-top: $margin-Blockquote;
+  margin-bottom: $margin-Blockquote;
+
+  &::before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    content: "";
+    height: 100%;
+    width: 2px;
+    background-color: $accent-Blockquote;
+  }
+}
+
+// --- UnorderedList
+
+$padding-left-UnorderedList: createThemeVar("padding-left-UnorderedList");
+
+// the basic <ul> and <ol> styles are the same in tabler.io too 
+.unorderedList {
+  list-style-type: revert; 
+  list-style-position: outside; 
+  padding-left: $padding-left-UnorderedList;
+}
+
+// --- OrderedList
+
+$padding-left-OrderedList: createThemeVar("padding-left-OrderedList");
+
+// the basic <ul> and <ol> styles are the same in tabler.io too 
+.orderedList {
+  list-style-type: revert; 
+  list-style-position: outside; 
+  padding-left: $padding-left-OrderedList;
+}
+
+// --- ListItem
+
+$padding-left-ListItem: createThemeVar("padding-left-ListItem");
+
+.listItem {
+  padding-left: $padding-left-ListItem;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

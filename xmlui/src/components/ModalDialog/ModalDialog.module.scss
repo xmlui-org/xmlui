@@ -1,0 +1,136 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$component: "ModalDialog";
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// --- Theme vars for paddings
+$themeVars: t.appendPaddingVars($themeVars, $component) !global;
+$themeVars: t.appendPaddingVars($themeVars, "overlay-#{$component}") !global;
+$padding-ModalDialog: createThemeVar("padding-#{$component}");
+$color-bg-ModalDialog: createThemeVar("Dialog:color-bg-#{$component}");
+$color-bg-overlay-ModalDialog: createThemeVar("Dialog:color-bg-overlay-#{$component}");
+$radius-ModalDialog: createThemeVar("Dialog:radius-#{$component}");
+$font-family-ModalDialog: createThemeVar("Dialog:font-family-#{$component}");
+$color-text-ModalDialog: createThemeVar("Dialog:color-text-#{$component}");
+$min-width-ModalDialog: createThemeVar("Dialog:min-width-#{$component}");
+$max-width-ModalDialog: createThemeVar("Dialog:max-width-#{$component}");
+$margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$component}");
+
+
+
+.overlay{
+  position: fixed;
+  display: grid;
+  place-items: center;
+  overflow-y: auto;
+  inset: 0;
+  padding: t.$space-4;
+
+  &.fullScreen{
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    .content{
+      width: 100%;
+      height: 100%;
+      max-width: 100%;
+      max-height: 100%;
+      padding: 0;
+      border-radius: 0;
+    }
+  }
+}
+
+.overlayBg{
+  background-color: $color-bg-overlay-ModalDialog;
+  position: fixed;
+  inset: 0;
+  animation: overlayShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.content{
+  background-color: $color-bg-ModalDialog;
+  border-radius: $radius-ModalDialog;
+  font-family: $font-family-ModalDialog;
+  color: $color-text-ModalDialog;
+  padding: $padding-ModalDialog;
+  box-shadow: t.$shadow-spread;
+  transform: translate(0);
+  width: 90vw;
+  max-width: $max-width-ModalDialog;
+  min-width: $min-width-ModalDialog;
+  isolation: isolate;
+  position: relative;
+  animation: contentShow 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+}
+
+.content:focus {
+  outline: none;
+}
+
+.dialogTitle {
+  flex: 1;
+  margin-bottom: $margin-bottom-title-ModalDialog;
+  font-size: t.$font-size-large;
+}
+
+.innerContent{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+}
+
+@keyframes overlayShow {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes contentShow {
+  from {
+    opacity: 0;
+    transform: translateY(2%) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.closeButton{
+  position: absolute;
+  right: 0.5rem;
+  top: 0.4rem;
+}
+
+@media (max-width: 70em) {
+  .dialog, .content {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 50em) {
+  .dialog, .content {
+    width: 100%;
+    max-width: calc(100% - #{t.$space-6});
+    min-width: 0 !important;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

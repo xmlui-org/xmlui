@@ -1,0 +1,172 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Select";
+
+// --- CSS properties of a particular Select variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+  font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus-visible {
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+  }
+
+  .placeholder {
+    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+  }
+}
+
+.selectContainer {
+  display: flex;
+  padding: t.$space-2;
+  width: 100%;
+  border-style: solid;
+  border-width: 1px;
+  outline: #00B248;
+  transition: background-color ease-in 0.1s;
+  overflow: hidden;
+  position: relative;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+
+  &.warning {
+    @include variant("warning");
+  }
+
+  &.valid {
+    @include variant("success");
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    background-color: createThemeVar("Input:color-bg-Select--disabled");
+    color: createThemeVar("Input:color-text-Select--disabled");
+    border-color: createThemeVar("Input:color-border-Select--disabled");
+
+    .inputRoot {
+      .indicator, .input {
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .inputRoot {
+    position: relative;
+    width: 100%;
+  }
+
+  .indicator {
+    font-size: inherit;
+    color: createThemeVar("Input:color-text-indicator-Select");
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    cursor: pointer;
+    border: 0;
+    margin: 0;
+    pointer-events: none;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.input {
+  font-size: inherit;
+  color: inherit;
+  text-align: left;
+  border: 0;
+  outline: none;
+  background-color: transparent;
+  width: 100%;
+  padding: 0;
+  cursor: pointer;
+}
+
+.selectMenu {
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+  transition: height 0.2s ease;
+  height: fit-content;
+  box-shadow: createThemeVar("Input:shadow-menu-Select");
+  max-height: 200px;
+  background-color: createThemeVar("Input:color-bg-menu-Select");
+  border-radius: createThemeVar("Input:radius-menu-Select");
+
+  &:focus,
+  &:focus-visible {
+    outline: none;
+  }
+
+  .item {
+    display: flex;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    padding-inline: 1em;
+    font-size: createThemeVar("Input:font-size-Select");
+    align-items: center;
+    user-select: none;
+
+    .empty {
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+    }
+
+    &.selectable {
+      user-select: initial;
+      cursor: pointer;
+
+      &.itemActive, &[data-highlighted], &:hover:not(.itemDisabled) {
+        background-color: createThemeVar("Input:color-bg-item-Select--hover");
+      }
+
+      &.itemSelected {
+        background-color: createThemeVar("Input:color-bg-item-Select--active");
+      }
+
+      &.itemDisabled {
+        cursor: not-allowed;
+        color: createThemeVar("Input:color-text-item-Select--disabled");
+        font-style: italic;
+      }
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}

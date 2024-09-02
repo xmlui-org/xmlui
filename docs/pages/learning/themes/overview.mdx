@@ -1,0 +1,245 @@
+# Themes and Styles Overview
+
+When you work with apps, you cannot avoid setting up the appearance of components and modifying their default appearance, dimensions, or layout traits. Some style modifications are just for a particular component, but others may affect multiple components or sections of the app and should be kept consistent within the entire app.
+
+XMLUI has several ways to change the visual traits of components and apps. In this article, you will learn the available methods.
+
+## Layout Properties
+
+Each visual component has properties that you can use to set a particular visual trait of that component. XMLUI names them _layout properties_; you can learn their usage in the [Layout Properties article](./layout-props) article. The [Layout Properties reference](/components/appearance/layout-props) gives you a summary of the available properties and their values.
+
+In the following example, all properties of the `HStack` and `CHStack` components are _layout properties_:
+
+```ueml copy
+<HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%">
+  <CHStack border="1px dotted blue" color="black" width="80" height="40">Black</CHStack>
+  <CHStack backgroundColor="red" color="white" width="80" height="40">Red</CHStack>
+  <CHStack backgroundColor="blue" color="white" width="80" height="40">Blue</CHStack>
+  <CHStack backgroundColor="purple" color="white" width="80" height="40">Purple</CHStack>
+  <CHStack backgroundColor="green" color="white" width="80" height="40">Green</CHStack>
+</HStack>
+```
+
+Some of them set dimensions; others set colors or other style elements.
+
+<Playground
+  previewOnly={true}
+  name="Example: Styling with layout properties"
+  height={100}
+  horizontal={true}
+  app={`
+    <HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%">
+      <CHStack border="1px dotted blue" color="black" width="80" height="40">Black</CHStack>
+      <CHStack backgroundColor="red" color="white" width="80" height="40">Red</CHStack>
+      <CHStack backgroundColor="blue" color="white" width="80" height="40">Blue</CHStack>
+      <CHStack backgroundColor="purple" color="white" width="80" height="40">Purple</CHStack>
+      <CHStack backgroundColor="green" color="white" width="80" height="40">Green</CHStack>
+    </HStack>
+  `}
+/>
+
+Layout properties are easy to use; adding simple property values can quickly change the visuals of a particular component. However, this ease comes at a high price: the more individual layout properties there are, the more tedious the application maintenance is if you need to change the appearance of the app.
+
+For example, changing the dimensions of boxes in the code snippet above affects many values (all `width` and `height` properties).
+
+## Reusable Components
+
+Reusable components may help such maintenance nightmares. You can extract the common style traits of individual components into a reusable component.
+
+To remove the pain of setting all `width` and `height` occurrences in the previous example (when using layout properties), define a reusable component, `MyBox` with the wired dimension values; however, allow them to receive properties to set the border and color values:
+
+```ueml copy
+<Component name="MyBox">
+  <CHStack
+    border="{$props.border}"
+    backgroundColor="{$props.bgColor}"
+    color="{$props.color}"
+    width="80" height="40">
+    <ChildrenSlot />
+  </CHStack>
+</Component>
+```
+
+Now, with `MyBox`, the previous UI declaration is more straightforward:
+
+```ueml copy
+<HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%" color="white">
+  <MyBox border="1px dotted blue" color="black">Black</MyBox>
+  <MyBox bgColor="red">Red</MyBox>
+  <MyBox bgColor="blue">Blue</MyBox>
+  <MyBox bgColor="purple">Purple</MyBox>
+  <MyBox bgColor="green">Green</MyBox>
+</HStack>
+```
+
+Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Altering the `width` and `height` properties within `MyBox` has its effect on all boxes:
+
+```ueml copy {6}
+<Component name="MyBox">
+  <CHStack 
+    border="{$props.border}"
+    backgroundColor="{$props.bgColor}"
+    color="{$props.color ?? 'white'}"
+    width="60" height="60">
+    <ChildrenSlot />
+  </CHStack>
+</Component>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Styling with reusable components"
+  height={100}
+  horizontal={true}
+  components={[
+    `
+    <Component name="MyBox">
+      <CHStack 
+        border="{$props.border}"
+        backgroundColor="{$props.bgColor}"
+        color="{$props.color ?? 'white'}"
+        width="60" height="60">
+        <ChildrenSlot />
+      </CHStack>
+    </Component>
+    `,
+  ]}
+  app={`
+    <HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%">
+      <MyBox border="1px dotted blue" color="black">Black</MyBox>
+      <MyBox bgColor="red">Red</MyBox>
+      <MyBox bgColor="blue">Blue</MyBox>
+      <MyBox bgColor="purple">Purple</MyBox>
+      <MyBox bgColor="green">Green</MyBox>
+    </HStack>
+  `}
+/>
+
+## Using Theme Variables
+
+XMLUI uses themes. A theme is a set of theme variables with their actual values; these influence the appearance of an app. A single app can be shipped with multiple themes; if configured, users can select their current theme from the available ones.
+
+You can extract the values of layout properties into theme variables. For example, the hard-wired dimensions of `MyBox` can be put into theme variables:
+
+```ueml copy {6-7}
+<Component name="MyBox">
+  <CHStack 
+    border="{$props.border}"
+    backgroundColor="{$props.bgColor}"
+    color="{$props.color}"
+    width="$width-MyBox" 
+    height="$height-MyBox">
+    <ChildrenSlot />
+  </CHStack>
+</Component>
+```
+> **Note**: A `$` prefix in a layout property value indicates that the value will be obtained from a theme variable.
+
+When you build and deploy the app, you can opt to expose the themes to app admins so that they can modify them. Changing the dimensions of `MyBox` is straightforward by setting the appropriate theme variables:
+
+```json
+{
+  // ... Other theme props omitted
+  "themeVars": {
+    // ...
+    "width-MyBox": "100px",
+    "height-MyBox": "30px"
+    // ...
+  }
+}
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Reusable components with theme variables"
+  height={100}
+  horizontal={true}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "width-MyBox": "100px",
+        "height-MyBox": "30px",
+      },
+    },
+  ]}
+  components={[
+    `
+    <Component name="MyBox">
+      <CHStack 
+        border="{$props.border}"
+        backgroundColor="{$props.bgColor}"
+        color="{$props.color ?? 'white'}"
+        width="$width-MyBox" height="$height-MyBox">
+        <ChildrenSlot />
+      </CHStack>
+    </Component>
+    `,
+  ]}
+  app={`
+    <HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%" color="white">
+      <MyBox border="1px dotted blue" color="black">Black</MyBox>
+      <MyBox bgColor="red">Red</MyBox>
+      <MyBox bgColor="blue">Blue</MyBox>
+      <MyBox bgColor="purple">Purple</MyBox>
+      <MyBox bgColor="green">Green</MyBox>
+    </HStack>
+  `}
+/>
+
+## Style Scopes
+
+Applications may use hybrid themes. For example, while the app uses a light theme, its header utilizes the settings of a dark theme.
+
+XMLUI has a `Theme` component to define scopes with a particular theme setting. With `Theme`, the nested components use a particular theme or theme variables. With this tag, you can set different theme variables for the `MyBox` component instances, as the following example demonstrates:
+
+```ueml copy {2,6,7,10}
+<HStack padding="1rem" gap="0.5rem" height="100%">
+  <Theme width-MyBox="100px" height-MyBox="30px">
+    <MyBox border="1px dotted blue" color="black">Black</MyBox>
+    <MyBox bgColor="red">Red</MyBox>
+    <MyBox bgColor="blue">Blue</MyBox>
+  </Theme>
+  <Theme width-MyBox="60px" height-MyBox="60px">
+    <MyBox bgColor="purple">Purple</MyBox>
+    <MyBox bgColor="green">Green</MyBox>
+  </Theme>
+</HStack>
+```
+
+The first three boxes have different dimensions than the last two due to the different style scope:
+
+<Playground
+    previewOnly={true}
+    name="Example: Using style scopes"
+    height={100}
+    horizontal={true}
+    components={[
+        `
+    <Component name="MyBox">
+      <CHStack 
+        border="{$props.border}"
+        backgroundColor="{$props.bgColor}"
+        color="{$props.color ?? 'white'}"
+        width="$width-MyBox" height="$height-MyBox">
+        <ChildrenSlot />
+      </CHStack>
+    </Component>
+    `,
+    ]}
+    app={`
+    <HStack padding="1rem" gap="0.5rem" backgroundColor="cyan" height="100%">
+      <Theme width-MyBox="100px" height-MyBox="30px">
+        <MyBox border="1px dotted blue" color="black">Black</MyBox>
+        <MyBox bgColor="red">Red</MyBox>
+        <MyBox bgColor="blue">Blue</MyBox>
+      </Theme>
+      <Theme width-MyBox="60px" height-MyBox="60px">
+        <MyBox bgColor="purple">Purple</MyBox>
+        <MyBox bgColor="green">Green</MyBox>
+      </Theme>
+    </HStack>
+  `}
+/>

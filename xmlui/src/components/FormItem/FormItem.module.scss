@@ -1,0 +1,87 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+// TODO: Add HelperText styles here, as HelperText React component is used only in FormItem
+
+.container {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  align-items: start;
+  gap: 0.5em;
+
+  &.top {
+    flex-direction: column;
+    align-items: start;
+    justify-content: center;
+  }
+
+  &.right {
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: start;
+    gap: 0.5em;
+  }
+
+  &.bottom {
+    flex-direction: column-reverse;
+    align-items: start;
+    justify-content: center;
+  }
+
+  &.left {
+    flex-direction: row;
+    align-items: center;
+    justify-content: start;
+    gap: 0.5em;
+  }
+
+  &.shrinkToLabel {
+    width: fit-content;
+  }
+  
+  .inputLabel {
+    display: flex;
+    color: createThemeVar("color-text-FormItemLabel");
+    font-size: createThemeVar("font-size-FormItemLabel");
+    font-weight: createThemeVar("font-weight-FormItemLabel");
+    font-style: createThemeVar("font-style-FormItemLabel");
+    text-transform: createThemeVar("text-transform-FormItemLabel");
+    user-select: none;
+    cursor: pointer;
+    word-break: normal;
+
+    &.disabled {
+      cursor: not-allowed;
+      color: t.$color-text--disabled;
+    }
+
+    &.labelBreak {
+      word-break: break-word;
+    }
+
+    &.required {
+      color: createThemeVar("color-text-FormItemLabel-required");
+      font-size: createThemeVar("font-size-FormItemLabel-required");
+      font-weight: createThemeVar("font-weight-FormItemLabel-required");
+      font-style: createThemeVar("font-style-FormItemLabel-required");
+      text-transform: createThemeVar("text-transform-FormItemLabel-required");
+    }
+
+    .requiredMark {
+      margin-left: 0.2em;
+      color: createThemeVar("color-text-FormItemLabel-requiredMark")
+    }
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

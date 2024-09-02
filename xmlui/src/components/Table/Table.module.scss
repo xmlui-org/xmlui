@@ -1,0 +1,345 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$color-text-pagination-Table: createThemeVar("color-text-pagination-Table");
+$color-bg-Table: createThemeVar("color-bg-Table");
+$color-text-Table: createThemeVar("color-text-Table");
+$color-bg-row-Table: createThemeVar("color-bg-row-Table");
+$color-bg-row-Table--hover: createThemeVar("color-bg-row-Table--hover");
+$color-bg-selected-Table: createThemeVar("color-bg-selected-Table");
+$color-bg-selected-Table--hover: createThemeVar("color-bg-selected-Table--hover");
+$color-bg-heading-Table: createThemeVar("color-bg-heading-Table");
+$color-bg-heading-Table--hover: createThemeVar("color-bg-heading-Table--hover");
+$color-bg-heading-Table--active: createThemeVar("color-bg-heading-Table--active");
+$padding-horizontal-heading-Table: createThemeVar("padding-horizontal-heading-Table");
+$padding-vertical-heading-Table: createThemeVar("padding-vertical-heading-Table");
+$padding-heading-Table: createThemeVar("padding-heading-Table");
+$padding-horizontal-cell-Table: createThemeVar("padding-horizontal-cell-Table");
+$padding-horizontal-cell-first-Table: createThemeVar("padding-horizontal-cell-first-Table");
+$padding-horizontal-cell-last-Table: createThemeVar("padding-horizontal-cell-last-Table");
+$padding-vertical-cell-Table: createThemeVar("padding-vertical-cell-Table");
+$padding-cell-Table: createThemeVar("padding-cell-Table");
+$color-border-cell-Table: createThemeVar("color-border-cell-Table");
+$thickness-border-cell-Table: createThemeVar("thickness-border-cell-Table");
+$style-border-cell-Table: createThemeVar("style-border-cell-Table");
+$border-cell-Table: createThemeVar("border-cell-Table");
+$color-bg-pagination-Table: createThemeVar("color-bg-pagination-Table");
+$color-text-heading-Table: createThemeVar("color-text-heading-Table");
+$font-weight-row-Table: createThemeVar("font-weight-row-Table");
+$font-size-row-Table: createThemeVar("font-size-row-Table");
+$font-weight-heading-Table: createThemeVar("font-weight-heading-Table");
+$font-size-heading-Table: createThemeVar("font-size-heading-Table");
+$transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
+
+.wrapper {
+  width: 100%;
+  outline: none;
+  overflow: auto;
+  isolation: isolate;
+
+  &.noScroll {
+    overflow-y: initial;
+  }
+}
+
+
+.headerWrapper, .tableBody{
+  display: inline-block;
+  min-width: 100%;
+  background-color: $color-bg-Table;
+}
+
+.clickableHeader {
+  width: 100%;
+  height: fit-content;
+  color: $color-text-heading-Table;
+  background-color: transparent;
+  border: none;
+  transition: color 0.2s, background-color 0.2s;
+  cursor: pointer;
+  padding: $padding-heading-Table;
+
+  .headerContent {
+    padding: 0;
+  }
+
+  &:not([disabled]) {
+    &:hover {
+      background-color: $color-bg-heading-Table--hover;
+    }
+
+    &:active {
+      background-color: $color-bg-heading-Table--active;
+    }
+
+    &:focus-visible {
+      outline-width: createThemeVar('thickness-outline-heading-Table--focus');
+      outline-color: createThemeVar('color-outline-heading-Table--focus');
+      outline-style: createThemeVar('style-outline-heading-Table--focus');
+      outline-offset: createThemeVar('offset-outline-heading-Table--focus');
+
+    }
+  }
+}
+
+.headerContent {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  align-items: center;
+  text-transform: $transform-text-heading-Table;
+  font-size: $font-size-heading-Table;
+  color: $color-text-heading-Table;
+  font-weight: $font-weight-heading-Table;
+  padding: $padding-heading-Table;
+}
+
+.headerRow {
+  height: 100%;
+  background-color: $color-bg-heading-Table;
+}
+
+.columnCell, .cell{
+  display: flex;
+  align-items: center;
+}
+
+.table {
+  display: block;
+  color: $color-text-Table;
+
+  .row, .headerRow {
+    display: flex;
+    flex-direction: row;
+    border-bottom: $border-cell-Table;
+    user-select: none;
+    //background-color: inherit;
+
+    .checkBoxWrapper {
+      font-size: 1rem;
+      visibility: hidden;
+    }
+
+    &:hover,
+    &.selected,
+    &:focus-within,
+    &.allSelected {
+      .checkBoxWrapper {
+        visibility: visible;
+      }
+    }
+
+    .columnCell:first-child {
+      .headerContent {
+        padding-left: $padding-horizontal-cell-first-Table;
+      }
+
+      > button {
+        padding-left: $padding-horizontal-cell-first-Table;
+
+        .headerContent {
+          padding-left: 0;
+        }
+      }
+    }
+
+    .columnCell:last-child {
+      .headerContent {
+        padding-right: $padding-horizontal-cell-last-Table;
+      }
+
+      > button {
+        padding-right: $padding-horizontal-cell-last-Table;
+
+        .headerContent {
+          padding-right: 0;
+        }
+      }
+    }
+
+    .cell:first-child {
+      padding-left: $padding-horizontal-cell-first-Table;
+      border-left: 0;
+    }
+
+    .cell:last-child {
+      padding-right: $padding-horizontal-cell-last-Table;
+      border-right: 0;
+    }
+  }
+
+  .row {
+    font-size: $font-size-row-Table;
+    font-weight: $font-weight-row-Table;
+    background-color: $color-bg-row-Table;
+
+    &.selected {
+      background-color: $color-bg-selected-Table;
+
+      .cell {
+        background-color: $color-bg-selected-Table;
+      }
+    }
+
+    &:hover {
+      background-color: $color-bg-row-Table--hover;
+
+      .cell {
+        background-color: $color-bg-row-Table--hover;
+      }
+    }
+
+    &.selected.focused {
+      background-color: $color-bg-selected-Table;
+
+      .cell {
+        background-color: $color-bg-selected-Table;
+      }
+    }
+
+    &.selected:hover {
+      background-color: $color-bg-selected-Table--hover;
+
+      .cell {
+        background-color: $color-bg-selected-Table--hover;
+      }
+    }
+
+    &.disabled {
+      pointer-events: none;
+      opacity: 0.6;
+    }
+  }
+}
+
+.cell {
+  padding: $padding-cell-Table;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerWrapper {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.columnCell {
+  background-color: $color-bg-heading-Table;
+  text-align: start;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 0;
+}
+
+.noRows {
+  width: 100%;
+  text-align: center;
+  margin-top: t.$space-16;
+}
+
+.pagination {
+  position: sticky;
+  left: 0;
+  padding-top: t.$space-4;
+  padding-bottom: t.$space-4;
+  padding-inline: t.$space-4;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-end;
+  gap: t.$space-8;
+  width: 100%;
+  margin: 0 auto;
+  background-color: $color-bg-pagination-Table;
+}
+
+.paginationLabel {
+  color: $color-text-pagination-Table;
+}
+
+.paginationSelect {
+  color: inherit;
+  background-color: transparent;
+  margin-left: t.$space-4;
+}
+
+.paginationButtons {
+  display: flex;
+  flex-direction: row;
+}
+
+.searchIconWrapper {
+  width: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  padding-top: t.$space-2;
+  padding-bottom: t.$space-2;
+}
+
+.checkBoxWrapper {
+  opacity: 0.5;
+
+  &:hover {
+    opacity: 1;
+  }
+}
+
+.resizer {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  width: 6px;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+  right: 0;
+  overflow: visible;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  &:before{
+    content: '';
+    width: 1px;
+    height: 100%;
+    background: $color-border-cell-Table;
+  }
+}
+
+.resizer.isResizing {
+  opacity: 1;
+  &:before{
+    box-shadow: t.$shadow;
+  }
+}
+
+@media (hover: hover) {
+  .resizer {
+    opacity: 0;
+  }
+
+  *:hover > .resizer {
+    opacity: 1;
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+
+

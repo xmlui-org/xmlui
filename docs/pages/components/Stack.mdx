@@ -1,0 +1,248 @@
+# Stack
+
+`Stack` is a layout container displaying children in a horizontal or vertical stack.
+
+The Stack component is the primary and most versatile building block for laying out content. It 
+can display its children horizontally or vertically, and it is possible to align its children 
+easily along the horizontal and vertical axes.
+
+See also: [HStack](
+./HStack
+), [VStack](
+./VStack
+), [CHStack](
+./CHStack
+), [CVStack](
+./CVStack
+).
+
+> **Note**: You can learn about the semantics and usage of layout container, including `Stack`, 
+[here](/learning/layout-components).
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `gap`
+
+Optional [size value](./appearance/common-units#size-values) indicating the gap between child elements.
+
+In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font-size of the element (See size values).
+
+```ueml copy {3, 11, 19}
+<Stack orientation="vertical">
+  <Stack orientation="horizontal" backgroundColor="cyan"
+         gap="80px">
+    <Stack height="40px" width="40px" backgroundColor="red" />
+    <Stack height="40px" width="40px" backgroundColor="green" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+    <Stack height="40px" width="40px" backgroundColor="yellow" />
+  </Stack>
+
+  <Stack orientation="horizontal" backgroundColor="cyan"
+         gap="12ch">
+    <Stack height="40px" width="40px" backgroundColor="red" />
+    <Stack height="40px" width="40px" backgroundColor="green" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+    <Stack height="40px" width="40px" backgroundColor="yellow" />
+  </Stack>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: gap"
+  height={100}
+  app={`
+    <Stack orientation="vertical">
+      <Stack orientation="horizontal" backgroundColor="cyan"
+         gap="80px">
+        <Stack height="40px" width="40px" backgroundColor="red" />
+        <Stack height="40px" width="40px" backgroundColor="green" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+        <Stack height="40px" width="40px" backgroundColor="yellow" />
+      </Stack>
+    
+      <Stack orientation="horizontal" backgroundColor="cyan"
+             gap="12ch">
+        <Stack height="40px" width="40px" backgroundColor="red" />
+        <Stack height="40px" width="40px" backgroundColor="green" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+        <Stack height="40px" width="40px" backgroundColor="yellow" />
+      </Stack>
+    </Stack>
+  `}
+/>
+
+### `horizontalAlignment`
+
+Manages the horizontal content [alignment](./appearance/common-units/#alignment-values) for each child element in the Stack.
+
+> **Note**: The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
+
+```ueml copy {2}
+<Stack width="100%" backgroundColor="cyan"
+  horizontalAlignment="center">
+  <Stack width="36px" height="36px" backgroundColor="red" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: horizontalAlignment"
+  app={`
+    <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
+      <Stack width="36px" height="36px" backgroundColor="red" />
+    </Stack>
+`}
+  height={60}
+/>
+
+### `hoverContainer`
+
+Reserved for future use.
+
+### `orientation`
+
+An optional property that governs the Stack's [orientation](
+./appearance/common-units/#orientation
+)
+ (whether the Stack lays out its children in a row or a column).
+
+`orientation` is an oft-used prop, there are shorthand versions of the Stack component: [
+HStack](
+./HStack
+) (`Stack` with horizontal orientation), [VStack](
+./VStack
+) (`Stack` with 
+vertical orientation).
+
+### `reverse`
+
+Optional boolean prop to reverse the order of child elements.
+Default is **false**, which indicates a left-to-right layout.
+
+```ueml copy {7}
+<Stack gap="10px" backgroundColor="cyan">
+  <Stack gap="10px" orientation="horizontal">
+    <Stack height="40px" width="40px" backgroundColor="red" />
+    <Stack height="40px" width="40px" backgroundColor="green" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+  </Stack>
+  <Stack reverse="true" gap="10px" orientation="horizontal">
+    <Stack height="40px" width="40px" backgroundColor="red" />
+    <Stack height="40px" width="40px" backgroundColor="green" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+  </Stack>
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: reverse"
+  height={100}
+  app={`
+    <Stack gap="10px" backgroundColor="cyan">
+      <Stack gap="10px" orientation="horizontal">
+        <Stack height="40px" width="40px" backgroundColor="red" />
+        <Stack height="40px" width="40px" backgroundColor="green" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+      </Stack>
+      <Stack reverse="true" gap="10px" orientation="horizontal">
+        <Stack height="40px" width="40px" backgroundColor="red" />
+        <Stack height="40px" width="40px" backgroundColor="green" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+      </Stack>
+    </Stack>`}
+/>
+
+### `verticalAlignment`
+
+Manages the vertical content [alignment](./appearance/common-units/#alignment-values) for each child element in the Stack.
+
+```ueml copy {2}
+<Stack height="100px" backgroundColor="cyan"
+  verticalAlignment="end">
+  <Stack width="36px" height="36px" backgroundColor="red" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: verticalAlignment"
+  app={`
+    <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
+      <Stack width="36px" height="36px" backgroundColor="red" />
+    </Stack>
+  `}
+  height={120}
+/>
+
+### `visibleOnHover`
+
+Reserved for future use.
+
+### `wrapContent`
+
+Optional boolean which wraps the content if set to true and the available space is not big enough. Works in all orientations.
+
+```ueml copy
+<Stack wrapContent="true" width="140px" gap="10px" orientation="horizontal" backgroundColor="cyan">
+  <Stack height="40px" width="40px" backgroundColor="blue" />
+  <Stack height="40px" width="40px" backgroundColor="blue" />
+  <Stack height="40px" width="40px" backgroundColor="blue" />
+  <Stack height="40px" width="40px" backgroundColor="blue" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: wrap"
+  app={`
+    <Stack wrapContent="true" width="140px" gap="10px" orientation="horizontal" backgroundColor="cyan">
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+    </Stack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+### `click`
+
+Describes the logic that fires when the component is clicked.
+
+```ueml copy {4}
+<Stack gap="10px" orientation="horizontal" var.shown="{false}">
+  <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
+  <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  name="Example: click"
+  height={80}
+  app={`
+    <Stack gap="10px" orientation="horizontal" var.shown="{false}">
+      <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
+      <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+    </Stack>
+  `}
+/>
+
+### `mounted`
+
+Reserved for future use.
+
+## Styling
+
+This component does not have any styles.

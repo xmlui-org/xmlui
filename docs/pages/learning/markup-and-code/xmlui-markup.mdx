@@ -1,0 +1,649 @@
+# XMLUI Markup
+
+The XMLUI markup is almost identical to the HTML markup; however, there are a few differences. This section explains the markup fundamentals and addresses the differences from HTML.
+
+## Comments
+
+XMLUI comments use the same syntax as HTML comments:
+
+```ueml
+<!-- This is an XMLUI comment, it could be an HTML comment, too -->
+```
+
+XMLUI allows you to use comments within tags:
+
+```ueml
+<Stack <!-- This is a comment --> gap="1rem" />
+```
+
+> **Note**: XHTML does not allow comments within an element. However, XMLUI does; you can place comments before and after attributes or before an element's closing `>` or `\>` tag. This feature is helpful for the temporary removal of a particular attribute (wrapped within a comment) during development.
+
+## Tags
+
+Just like HTML, XMLUI uses tags in multiple ways:
+
+```ueml
+<!-- Simple tag without nested children -->
+<Button label="Click Me!" />
+
+<!-- With separate opening and closing tags -->
+<Button label="Click Me!"></Button>
+
+<!-- With child items -->
+<VStack>
+  <Text>Welcome</Text>
+  <Button label="Click Me!" />
+</VStack>
+```
+
+XMLUI tag names start with a letter and may be continued with letters, digits, and these characters: dash (`-`), underscore (`_`), dollar sign (`$`), and dot (`.`).
+
+Though syntactically they are the same, the engine makes a distinction between two kinds of tags:
+- **Component tags**. These tags use an identifier starting with an uppercase letter. These tags are transformed into the component hierarchy to represent the application structure.
+- **Helper tags**. These tags start with a lowercase letter. The engine transforms them into property, event, or variable value.
+
+In the following code, the two nested `<Button>` component tags are children of `<VStack>`, while `<var>` is a helper tag that represents a variable belonging to `<VStack>`:
+
+```ueml
+<VStack>
+  <var name="count" value="0" />
+  <Button label="Click Me!" />
+  <Button label="Click Me Too!" />
+</VStack>
+```
+
+The order of component tags reflects how those are displayed on the screen; changing them may change the rendered app. However, the order of helper tags embedded into other tags is invariant; they can have any order and add the same effect to their wrapping component. So, the following code will render the same `<Stack>` as the one above,  with a variable and two nested buttons:
+
+```ueml
+<VStack>
+  <Button label="Click Me!" />
+  <Button label="Click Me Too!" />
+  <var name="count" value="0" />
+</VStack>
+```
+
+## Tag Namespaces
+
+You can specify tags with namespaces. This notation is reserved for a future extension when you want to avoid (or resolve) name collision among same-named components from different component packages.
+For example, a 3rd-party package may declare its custom `Button` component. To make it unambiguous which button component to use, you can utilize a namespace declaration:
+
+```ueml
+<myPackage:Button label="Click me!" />
+```
+
+> **Note**: We still need to design how to define namespaces for a particular component library. Currently, the availability of tag namespaces is a syntax feature without precisely defined semantics.
+
+## Attributes
+
+XMLUI attributes have the same role as HTML attributes; they define a particular trait of the component or helper tag they are assigned to. 
+
+Attribute names start with a letter and may be continued with letters, digits, and these characters: dash (`-`), underscore (`_`), dollar sign (`$`), and dot (`.`). By convention, attributes should always begin with a lowercase letter.
+
+XMLUI attribute values may use three types of wrapper characters: single quotes (`'`), double quotes (`"`), or backtick (`` ` ``). The starting and closing delimiter should be the same, so, for example, you cannot start an attribute value with a backtick and close it with a double quote.
+
+> **Note**: The wrapper quotes or backticks are not part of the attribute value but are delimiters.
+
+In the following code snippet, all attribute values are accepted:
+
+```ueml
+<Button label='Click Me!' color="#a0a0a0" width=`50%` padding=".2rem" />
+```
+
+### Multi-Line Attribute Values
+
+Unlike in HTML, in XMLUI, you can break an attribute's value into multiple lines (assuming you use delimiter quotes) without losing the whitespace values. The engine preserves all whitespaces between the delimiters, including spaces, tabs, and line breaks; those characters are part of the attribute value.
+
+In the following code snippet, the `value` attribute of `<event>` contains three line breaks (one before "isRunning", one before "while", and a third one after "count++;"):
+
+```ueml copy
+<Button label="Infinite loop: {count}">
+  <event name="click" value="
+    isRunning = true;
+    while (isRunning) count++;
+  "/>
+</Button>
+```
+
+### Key-Only Attributes
+
+You can use attributes without a value. XMLUI considers them as attributes with the value of "true". These key-only attributes help represent the turned-on state of particular component properties.
+
+For example, you could use this markup to sign an active menu item:
+
+```ueml
+<MenuItem label="Open" active="true" />
+```
+
+With key-only attributes, you can make this markup more concise:
+
+```ueml
+<MenuItem label="Open" active />
+```
+### Quoteless Attributes
+
+You can omit quotes when defining an attribute value, provided the value does not contain whitespaces and its characters are letters, numbers, and one of these characters: dot (`.`), dash (`-`), underscore (`_`), and dollar sign (`$`).
+
+The following `Text` component's `value` is an expression that matches the "quoteless" criterium:
+
+```ueml
+<Text value="re-fetch" />
+```
+
+Thus, you can omit the double quotes when defining it:
+
+```ueml
+<Text value=re-fetch />
+```
+
+## Entity References
+
+In XMLUI text and attribute values, you do not need to use entity references (such as `&amp;`, `&gt;`, and others. However, you may use them, and the XMLUI parser will understand them:
+
+- `&amp;`: `&` (ampersand)
+- `&gt;`: `>` (greater than)
+- `&lt;`: `<` (less than)
+- `&apos;`: `'` (apostrophe)
+- `&quot;`: `"` (double quote)
+- `&nbsp;`: non-breaking space
+
+So, each of these text pairs represents the same text:
+
+```ueml
+<Stack>You're so beautiful</Stack>
+<Stack>You&apos;re so beautiful</Stack>
+
+<Stack>"Hello", she said</Stack>
+<Stack>&quot;Hello&quot;, she said</Stack>
+
+<Stack>"2 < 3"</Stack>
+<Stack>2 &lt; 3</Stack>
+
+<Stack>Go to --> Step #3</Stack>
+<Stack>Go to --&gt; Step #3</Stack>
+
+<Stack>Mac & Jack</Stack>
+<Stack>Mac &amp; Jack</Stack>
+
+<Stack>Keep&nbsp;going</Stack>
+<Stack>Keep{"\xa0"}going</Stack>
+```
+
+This markup will output the following:
+
+<Playground
+    previewOnly={true}
+    name="Using entity references in text"
+    height={260}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Stack>You're so beautiful</Stack>
+      <Stack>You&apos;re so beautiful</Stack>
+      <Stack>"Hello", she said</Stack>
+      <Stack>&quot;Hello&quot;, she said</Stack>
+      <Stack>"2 < 3"</Stack>
+      <Stack>2 &lt; 3</Stack>
+      <Stack>Go to --> Step #3</Stack>
+      <Stack>Go to --&gt; Step #3</Stack>
+      <Stack>Mac & Jack</Stack>
+      <Stack>Mac &amp; Jack</Stack>
+      <Stack>Keep&nbsp;going</Stack>
+      <Stack>Keep{"\\xa0"}going</Stack>
+    </VStack>
+`}
+/>
+
+
+
+## Nesting Child Items
+
+In the markup, you can nest child items into any component. These children can be components, helper tags (such as `<var>` and `<event>`), or text:
+
+```ueml copy
+<VStack>
+  This is a text segment before a Button component.
+  <Button label="I'm a non-functional Button"/>
+  This is a text segment after a Button and before an Icon 
+  <Icon name="user" />
+</VStack>
+```
+
+<Playground
+    previewOnly={true}
+    name="Child items"
+    height={120}
+    horizontal={true}
+    app={`
+    <VStack>
+      This is a text segment before a Button component.
+      <Button label="I'm a non-functional Button"/>
+      This is a text segment after a Button and before an Icon 
+      <Icon name="user"/>
+    </VStack>
+  `}
+/>
+
+### Tag Text Values
+
+Unlike attribute values, tag text values do not preserve whitespaces; they use the same whitespace collapsing that HTML applies. The engine removes extra spaces, tabs, and line breaks:
+
+```ueml copy
+<Text>
+  Though      this is a multiline text     declaration (with several line breaks), 
+  the engine        collapses whitespaces.
+ 
+</Text>
+```
+
+The engine will display the following text after collapsing whitespaces:
+
+<Playground
+    previewOnly={true}
+    name="Whitespace collapsing"
+    height={40}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Text>
+        Though      this is a multiline text     declaration (with several line breaks), 
+        the engine        collapses whitespaces.
+      </Text>
+    </VStack>
+  `}
+/>
+
+There are several characters you have to handle with care. The left angle (`<`) is a delimiter character used as the start character of an opening XMLUI tag. If you want to display it, wrap the text into quotes:
+
+```ueml copy
+<Text>
+  "I'm a text containing a left angle: <"
+</Text>
+```
+
+You can use double quotes (`"`), single quotes (`'`), or backticks (`` ` ``) as wrappers; the starting and ending characters should be the same.
+
+<Playground
+    previewOnly={true}
+    name="Wrapped text value"
+    height={40}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Text>
+        "I'm a text containing a left angle: <"
+      </Text>
+    </VStack>
+  `}
+/>
+
+<Playground
+    previewOnly={true}
+    name="Whitespace collapsing"
+    height={40}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Text>
+        I'm a text containing an apostrophe.
+      </Text>
+    </VStack>
+  `}
+/>
+
+### `CDATA` section
+
+There are a few cases when whitespace collapsing leads to unwanted results. For example, the `Markdown` component uses spaces and linebreaks as a part of the syntax, so we need to preserve them.
+
+The `CDATA` section (using the same syntax as in XML) solves this problem. Every character between the opening `<![CDATA[` and closing `]]>` tag is preserved.
+
+Here is an example:
+
+```ueml
+<MarkDown>
+  <![CDATA[
+# Who's that then?
+
+Well, she turned me into a newt. Burn her! We want a shrubbery!! Well, I got better. 
+Listen. __Strange women lying in ponds distributing swords is no basis for a system of 
+government.__ *Supreme executive power derives from a mandate from the masses, not from 
+some farcical aquatic ceremony.* The swallow may fly south with the sun, and the house 
+martin or the plover may seek warmer climes in winter, yet these are not strangers to our 
+land.
+
+## Well, Mercia's a temperate zone!
+
+You don't frighten us, English pig-dogs! Go and boil your bottoms, sons of a silly person! 
+I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English 
+K-n-n-n-n-n-n-n-niggits! A newt?
+  ]]>
+</Markdown>
+```
+
+<Playground
+    previewOnly={true}
+    name="CDATA section"
+    height={240}
+    horizontal={true}
+    app={`
+<Markdown>
+  <![CDATA[
+# Who's that then?
+    
+Well, she turned me into a newt. Burn her! We want a shrubbery!! Well, I got better. 
+Listen. __Strange women lying in ponds distributing swords is no basis for a system of 
+government.__ *Supreme executive power derives from a mandate from the masses, not from 
+some farcical aquatic ceremony.* The swallow may fly south with the sun, and the house 
+martin or the plover may seek warmer climes in winter, yet these are not strangers to our 
+land.
+    
+## Well, Mercia's a temperate zone!
+    
+You don't frighten us, English pig-dogs! Go and boil your bottoms, sons of a silly person! 
+I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English 
+K-n-n-n-n-n-n-n-niggits! A newt?
+  ]]>
+</Markdown>
+`}
+/>
+
+
+### Child Hierarchy
+
+You can nest children recursively to establish an arbitrarily deep hierarchy:
+
+```ueml
+<HStack padding="8">
+  <VStack width="25%">
+    This is Button #1!
+    <Button label="Button #1" />
+  </VStack>
+  <VStack width="25%">
+    This is Button #2!
+    <Button label="Button #2" />
+  </VStack>
+  <VStack width="25%">
+    Three Boxes
+    <HStack>
+      <Stack backgroundColor="red" width="36" height="36" />
+      <Stack backgroundColor="green" width="36" height="36" />
+      <Stack backgroundColor="blue" width="36" height="36" />
+    </HStack>
+  </VStack>
+</HStack>
+```
+
+<Playground
+    previewOnly={true}
+    name="Child Hierarchy"
+    height={100}
+    horizontal={true}
+    app={`
+    <HStack padding="8">
+      <VStack width="25%">
+        This is Button #1!
+        <Button label="Button #1" />
+      </VStack>
+      <VStack width="25%">
+        This is Button #2!
+        <Button label="Button #2" />
+      </VStack>
+      <VStack width="25%">
+        Three Boxes
+        <HStack>
+          <Stack backgroundColor="red" width="36" height="36" />
+          <Stack backgroundColor="green" width="36" height="36" />
+          <Stack backgroundColor="blue" width="36" height="36" />
+        </HStack>
+      </VStack>
+    </HStack>
+  `}
+/>
+
+## Declaring Apps
+
+When you describe an app, you use the XMLUI markup to declare an app or a reusable component. Whether you define an app or a component, your definition must have a single root tag, like in this example:
+
+```ueml copy
+<App>
+  <!-- You can nest child components into this slot -->
+</App>
+```
+
+> **Note**: Recall that component names start with uppercase letters.
+
+The engine raises an error if the app or component markup contains multiple root tags:
+
+```ueml copy
+<!-- This markup is not valid -->
+<Button label="Click me!" />
+<Text>Clicked!</Text>
+```
+
+Suppose you do not have a better solution. In that case, you can ultimately enclose multiple tags into a `<Fragment>` tag, which serves the purpose of enclosing multiple tags without any additional visuals.
+
+```ueml copy
+<!-- Now, this markup is valid -->
+<Fragment>
+  <Button label="Click me!" />
+  <Text>Clicked!</Text>
+</Fragment>
+```
+
+### Element Properties
+
+The component tags represent elements that compose an app. These elements may have properties. XMLUI allows you to utilize several syntax variations to assign property values.
+
+**#1: Add the property value as an attribute to the component tag.**
+
+The following code snippet shows how you can set the `label` property of a button:
+
+```ueml
+<Button label="Click me!" />
+```
+
+**#2: Add the property value with a nested `<prop>` tag.**
+
+The following code snippet uses this technique. Observe that here, you defined the property's `name` and `value`:
+
+```ueml
+<Button>
+  <prop name="label" value="Click me!"/>
+</Button>
+```
+
+**#3: Add the property value with a nested `<prop>` tag and a text value.**
+
+```ueml
+<Button>
+  <prop name="label">Click me!</prop>
+</Button>
+```
+
+Using these methods, you can add single-value properties to tags. However, in several cases, you should add compound property values, such as in this example:
+
+```ueml copy {3,7}
+<List>
+  <!-- A few properties omitted -->
+  <prop name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </prop>
+</List>
+```
+
+Here, the value of the `itemTemplate` property is a component, the template of a list item. In this case, you can use only the `<prop>` syntax, nesting the compound property value.
+
+### Event Handler Declarations
+
+The component elements may declare event handlers. The XMLUI markup supports several syntax variants to describe event handlers.
+
+**#1. Add the event handler as an attribute to the component tag with the `on` prefix.**
+
+The following code snippet shows how you can set the handler for a button's `click` event. Observe that this syntax uses the `onClick` attribute name for the event handler:
+
+```ueml
+<Button label="Click me!" onClick="console.log('Clicked!')"/>
+```
+
+> **Note**: When representing an event handler with an attribute, use the `on` prefix following the event name with an **uppercase** start letter.
+
+**#2. Add the event handler as an attribute to the component tag with the `event.` prefix.**
+
+The following code snippet shows how you can set the handler for a button's `click` event. Observe that this syntax uses the `event.click` attribute name for the event handler:
+
+```ueml
+<Button label="Click me!" event.click="console.log('Clicked!')"/>
+```
+
+**#3. Add the event handler value with a nested `<event>` tag.**
+
+With this syntax, you should use the event name (no `on` prefix):
+
+```ueml
+<Button label="Click me!">
+  <event name="click" value="console.log('Clicked!')"/>
+</Button>
+```
+
+**#4. Add the event handler value with a nested `<event>` tag and a text value.**
+
+```ueml
+<Button label="Click me!">
+  <event name="click">"console.log('Clicked!')"</event>
+</Button>
+```
+
+Using these methods, you can add single-value event handlers to tags. However, in several cases, an event handler is composed of multiple values, like in this example:
+
+```ueml
+<Button label="Save me!">
+  <event name="click">
+    <ApiBinding method="post" url="http/mySite.com/customer/1234" body={customerRecord} />
+  </event>
+</Button>
+```
+
+Here, the value of the click property is a POST request to a particular URL and body, as described in an `<ApiBinding>` component.
+
+### Variable declarations
+
+Similarly to properties and event handlers, you can declare variables with initial values with several syntax variations using a nested `<var>` element.  The following code snippet assigns the `Hello!` string to the `greeting` variable in a couple of ways:
+
+
+```ueml
+<!-- #1. (with attribute value) -->
+<Button label="Click me!">
+  <var name="greeting" value="Hello!" />
+  <!-- Properties and events omitted -->
+</Button>
+
+<!-- #2. (with text) -->
+<Button label="Click me!">
+  <var name="greeting">Hello!</var>
+  <!-- Properties and events omitted -->
+</Button>
+
+<!-- #3. (with binding expression) -->
+<Button label="Click me!">
+  <var name="greeting">"{'Hel' + 'lo!'}"</var>
+  <!-- Properties and events omitted -->
+</Button>
+```
+
+To shorten variable declarations, you can use the `var.` prefix before an attribute to declare a variable. So, you can declare the `greeting` variable like this, too:
+
+```ueml
+<Button label="Click me!" var.greeting="{'Hel' + 'lo!'}" />
+```
+
+When you use an attribute or a text to define the initial value of a variable, the engine uses a string value. However, the engine uses the variables in code where the type of a particular value is significant.
+If you want to be sure a variable value is initialized with the appropriate type, use binding expressions:
+
+```ueml
+<!-- count is a string, "0" -->
+<Button label="Click me!">
+  <var name="count" value="0" />
+  <!-- Properties and events omitted -->
+</Button>
+
+<!-- count is a number, 0 -->
+<Button label="Click me!">
+  <var name="count" value="{0}" />
+  <!-- Properties and events omitted -->
+</Button>
+
+<!-- isOpen is a string, "true" -->
+<Button label="Click me!">
+  <var name="isOpen" value="true" />
+  <!-- Properties and events omitted -->
+</Button>
+
+<!-- isOpen is a boolean, true -->
+<Button label="Click me!" var.isOpen="{true}" />
+```
+
+You should use a binding expression to define a compound value, for example, a 2D coordinate value:
+
+```ueml
+<Fragment>
+  <var name="origin" value="{{x: 100, y: 40}}" />
+</Fragment>
+```
+
+> **Note**:  In the `{{x: 100, y: 40}}` binding expression, the outer curly braces are the delimiters; the `{x: 100, y: 40}` object literal defines a hash object with `x` and `y` properties.
+
+### Script declarations
+
+XMLUI provides a particular tag, `<script>`, to declare component-scoped scripts. This tag cannot have any attribute; its content keeps whitespaces.
+
+The engine considers the content within `<script>` as text. This text is terminated with the `</script>` closing element.
+
+Here is an example:
+
+```ueml copy
+<Button id="myButton" label="Click me: {count}" >
+  <script>
+    var count = 0;
+    function myButton_onClick() {
+      count++;
+    };
+  </script>
+</Button>  
+```
+
+In the following example, `<Stack>` is not a child component but a string value in the alert message:
+
+```ueml copy
+<Button label="Click me!" >
+  <script>
+    function myButton_onClick() {
+      window.alert('<Stack>Clicked!</Stack>');
+    };
+  </script>
+</Button>  
+```
+
+
+## Reusable Components
+
+You must use the `<Component>` tag to declare a reusable component. The `name` attribute is mandatory; it assigns a unique identifier to the component. You should use this ID when you declare an instance of the component. The nested tags define the component's visual representation and, optionally, the variables assigned to the component.
+
+> **Note**: The `name` attribute of the component should start with an uppercase letter.
+
+The following declaration defines a component named `IncButton`:
+
+```ueml copy
+<Component name="IncButton">
+  <var name="count" value="{0}" />
+  <Button label="Click to increment: {count}">
+    <event name="click" value="count++" />
+  </Button>
+</Component>
+```
+
+With shortened event and variable declarations, you can make the markup more concise:
+
+```ueml copy
+<Component name="IncButton">
+  <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+</Component>
+```
