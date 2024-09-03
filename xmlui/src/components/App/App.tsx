@@ -8,17 +8,16 @@ import styles from "./App.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { AppLayoutType } from "./AppLayoutContext";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { AppLayoutContext } from "./AppLayoutContext";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
 import { createComponentRenderer } from "@components-core/renderers";
 import { useAppContext } from "@components-core/AppContext";
-import { AppLayoutContext } from "./AppLayoutContext";
 import { Sheet, SheetContent } from "@components/App/Sheet";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AppHeader } from "@components/AppHeader/AppHeader";
-import { groupChildrenByType } from "@components-core/utils/misc";
 import { useResizeObserver } from "@components-core/utils/hooks";
 
 type Props = {
@@ -92,21 +91,22 @@ function App({
         setHeaderRoot(element);
       }
     },
-    [safeLayout]
+    [safeLayout],
   );
 
   useResizeObserver(
     footerRef,
     useCallback((entries) => {
       setFooterHeight(entries?.[0]?.contentRect?.height);
-    }, [])
+    }, []),
   );
 
   useResizeObserver(
     headerRef,
     useCallback((entries) => {
+      console.log(entries?.[0]?.contentRect?.height);
       setHeaderHeight(entries?.[0]?.contentRect?.height);
-    }, [])
+    }, []),
   );
 
   const styleWithHelpers = useMemo(() => {
@@ -402,10 +402,10 @@ export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
   }
 }
 
-/** 
+/**
  * The \`App\` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,
  * \`App\` allows you to display your preferred layout.
- * 
+ *
  * > **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
  */
 export interface AppComponentDef extends ComponentDef<"App"> {
@@ -413,11 +413,11 @@ export interface AppComponentDef extends ComponentDef<"App"> {
     /** @descriptionRef */
     layout?: AppLayoutType;
     /** @internal */
-    defaultRoute?: string;  // TODO: remove
+    defaultRoute?: string; // TODO: remove
     /** @descriptionRef */
     loggedInUser?: any;
     /** @internal */
-    logoTemplate?: ComponentDef;  // NOTE: does not seem to work (not needed because of AppHeader?)
+    logoTemplate?: ComponentDef; // NOTE: does not seem to work (not needed because of AppHeader?)
     /**
      * @descriptionRef
      * @defaultValue true
@@ -461,7 +461,19 @@ const metadata: ComponentDescriptor<AppComponentDef> = {
 export const appRenderer = createComponentRenderer<AppComponentDef>(
   "App",
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    const { AppHeader, Footer, ...rest } = groupChildrenByType(node);
+    const AppHeaders = [];
+    const Footers = [];
+    const restChildren = [];
+    node.children.forEach((child) => {
+      if (child.type === "AppHeader") {
+        AppHeaders.push(child);
+      } else if (child.type === "Footer") {
+        Footers.push(child);
+      } else {
+        restChildren.push(child);
+      }
+    });
+
     const layoutType = extractValue(node.props.layout) || "condensed-sticky";
 
     return (
@@ -472,12 +484,12 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
         loggedInUser={extractValue(node.props.loggedInUser)}
         logoContent={renderChild(node.props.logoTemplate)}
         onReady={lookupEventHandler("ready")}
-        header={renderChild(AppHeader)}
-        footer={renderChild(Footer)}
+        header={renderChild(AppHeaders)}
+        footer={renderChild(Footers)}
       >
-        {renderChild(Object.values(rest).flatMap((a) => a))}
+        {renderChild(restChildren)}
       </App>
     );
   },
-  metadata
+  metadata,
 );
