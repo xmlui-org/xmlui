@@ -34,7 +34,7 @@ export const CompoundComponent = React.forwardRef(
       layoutContext,
       uid,
     }: CompoundComponentProps<T>,
-    forwardedRef: React.ForwardedRef<any>
+    forwardedRef: React.ForwardedRef<any>,
   ) => {
     // --- Resolve all event handlers to async functions
     const resolvedEventsInner = useMemo(() => {
@@ -113,14 +113,16 @@ export const CompoundComponent = React.forwardRef(
       }
     });
 
+    const hasEventHandler = useEvent((eventName) => !!lookupEventHandler(eventName));
+
     const vars = useMemo(() => {
       return {
         $props: resolvedProps,
-        $events: resolvedEvents,  //TODO remove, deprecated, use emitEvent
         emitEvent,
+        hasEventHandler,
         ...containerNode.vars,
       };
-    }, [containerNode.vars, emitEvent, resolvedEvents, resolvedProps]);
+    }, [containerNode.vars, emitEvent, hasEventHandler, resolvedProps]);
     const stableVars = useShallowCompareMemoize(vars);
 
     // --- Inject implicit variable into the container of the compound component
@@ -142,5 +144,5 @@ export const CompoundComponent = React.forwardRef(
       } as any);
     }
     return React.isValidElement(ret) ? ret : <>{ret}</>;
-  }
+  },
 );

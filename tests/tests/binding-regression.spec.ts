@@ -192,7 +192,7 @@ test("Compound components works", async ({ page }) => {
             label: "{$props.label}",
           },
           events: {
-            click: "$events.click()",
+            click: "emitEvent('click')",
           },
         },
       },
@@ -213,7 +213,7 @@ test("Compound components works", async ({ page }) => {
                 label: "{$props.label1}",
               },
               events: {
-                click: "$events.click1()",
+                click: "emitEvent('click1')",
               },
             },
             {
@@ -225,7 +225,7 @@ test("Compound components works", async ({ page }) => {
                 label: "{$props.label2}",
               },
               events: {
-                click: "$events.click2()",
+                click: "emitEvent('click2')",
               },
             },
             {
@@ -237,7 +237,7 @@ test("Compound components works", async ({ page }) => {
                 label: "{$props.label3}",
               },
               events: {
-                click: "$events.click3()",
+                click: "emitEvent('click3')",
               },
             },
           ],

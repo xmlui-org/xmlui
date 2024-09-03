@@ -76,7 +76,7 @@ test("$this works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
         <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
-            <Button onClick="$events.click()">Increment counter: {counter}</Button>
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
     entryPoint: `
@@ -92,7 +92,7 @@ test("call api with id works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
         <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
-            <Button onClick="$events.click()">Increment counter: {counter}</Button>
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
     entryPoint: `

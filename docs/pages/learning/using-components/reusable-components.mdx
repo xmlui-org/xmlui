@@ -140,9 +140,11 @@ Create a new reusable component, `<IncButton>`, which increments its value for e
 <Component name="IncButton">
   <Button 
     label="Click to increment: {count}" var.count="{0}" 
-    onClick="count++; $events.incremented(count)" />
+    onClick="count++; emitEvent('incremented', count)" />
 </Component>
 ```
+
+The `emitEvent` function emits the `"incremented"` event attached to the reusable component's instance and triggers the particular event handler. The first argument of `emitEvent` is the event name, and the subsequent ones are the arguments of the specific event.
 
 The following app uses the new event to append the number of clicks to a text. The handler of the `incremented` event (`onIncremented`) declares an arrow function where `v` represents the event value, namely, the count of clicks:
 
@@ -162,7 +164,7 @@ Try using `<IncButton>` with the `incremented` event:
       <Component name="IncButton">
         <Button 
           label="Click to increment: {count}" var.count="{0}" 
-          onClick="count++; $events.incremented(count)" />
+          onClick="count++; emitEvent('incremented', count)" />
       </Component>
     `]}
     app={`

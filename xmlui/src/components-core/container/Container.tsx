@@ -1209,8 +1209,8 @@ function useVars(
     const ret: any = {};
 
     Object.entries(vars).forEach(([key, value]) => {
-      if (key === "$events" || key === "$props") {
-        // --- We already resolved props and events in a compound component
+      if (key === "$props") {
+        // --- We already resolved props in a compound component
         ret[key] = value;
       } else {
         if (!isParsedValue(value) && typeof value !== "string") {
