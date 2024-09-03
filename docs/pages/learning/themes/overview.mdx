@@ -55,7 +55,7 @@ To remove the pain of setting all `width` and `height` occurrences in the previo
     backgroundColor="{$props.bgColor}"
     color="{$props.color}"
     width="80" height="40">
-    <ChildrenSlot />
+    <Slot />
   </CHStack>
 </Component>
 ```
@@ -81,7 +81,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
     backgroundColor="{$props.bgColor}"
     color="{$props.color ?? 'white'}"
     width="60" height="60">
-    <ChildrenSlot />
+    <Slot />
   </CHStack>
 </Component>
 ```
@@ -99,7 +99,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
         width="60" height="60">
-        <ChildrenSlot />
+        <Slot />
       </CHStack>
     </Component>
     `,
@@ -129,7 +129,7 @@ You can extract the values of layout properties into theme variables. For exampl
     color="{$props.color}"
     width="$width-MyBox" 
     height="$height-MyBox">
-    <ChildrenSlot />
+    <Slot />
   </CHStack>
 </Component>
 ```
@@ -173,7 +173,7 @@ When you build and deploy the app, you can opt to expose the themes to app admin
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
         width="$width-MyBox" height="$height-MyBox">
-        <ChildrenSlot />
+        <Slot />
       </CHStack>
     </Component>
     `,
@@ -224,7 +224,7 @@ The first three boxes have different dimensions than the last two due to the dif
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
         width="$width-MyBox" height="$height-MyBox">
-        <ChildrenSlot />
+        <Slot />
       </CHStack>
     </Component>
     `,

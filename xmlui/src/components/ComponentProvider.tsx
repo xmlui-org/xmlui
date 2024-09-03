@@ -82,7 +82,7 @@ import {
   radioGroupOptionRenderer,
   radioGroupRenderer,
 } from "@components/RadioGroup/RadioGroup";
-import { childrenSlotHolder } from "@components-core/ChildrenSlot";
+import { SlotHolder } from "@components-core/Slot";
 import { fileInputRenderer } from "@components/FileInput/FileInput";
 import { chartRenderer } from "@components/Chart/Chart";
 import { spinnerComponentRenderer } from "@components/Spinner/Spinner";
@@ -164,7 +164,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(chStackComponentRenderer);
     }
 
-    this.registerComponentRenderer(childrenSlotHolder);
+    this.registerComponentRenderer(SlotHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerComponentRenderer(spaceFillerComponentRenderer);
     }

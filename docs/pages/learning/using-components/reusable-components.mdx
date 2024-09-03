@@ -228,15 +228,15 @@ Try using this simple app:
     height={60}
 />
 
-## `<ChildrenSlot>`
+## `<Slot>`
 
-You can use the `ChildrenSlot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected. Here, `ChildrenSlot` is nested into `VStack` to mark the location to inject `MyStack` children:
+You can use the `Slot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected. Here, `Slot` is nested into `VStack` to mark the location to inject `MyStack` children:
 
 ```ueml copy {4}
 <Component name="MyStack">
   <H2>This is my special Stack</H2>
   <VStack padding="1rem" gap="0.2rem" backgroundColor="cyan">
-   <ChildrenSlot/>
+   <Slot/>
   </VStack>
 </Component>
 ```
@@ -247,15 +247,15 @@ This sample injects children into `MyStack`:
 <MyStack>
  These are the children injected into the
  <H3>MyStack</H3>
- component's ChildrenSlot placeholder
+ component's Slot placeholder
 </MyStack>
 ```
 
-`MyStack` puts the children into the location designated by `ChildrenSlot`:
+`MyStack` puts the children into the location designated by `Slot`:
 
 <Playground
     previewOnly={true}
-    name="Example: Using ChildrenSlot"
+    name="Example: Using Slot"
     horizontal={true}
     height={200}
     components={[
@@ -263,7 +263,7 @@ This sample injects children into `MyStack`:
     <Component name="MyStack">
       <H2>This is my special Stack</H2>
       <VStack padding="1rem" gap="0.2rem" backgroundColor="cyan">
-       <ChildrenSlot/>
+       <Slot/>
       </VStack>
     </Component>
   `,
@@ -272,7 +272,7 @@ This sample injects children into `MyStack`:
     <MyStack>
      These are the children injected into the
      <H3>MyStack</H3>
-     component's ChildrenSlot placeholder
+     component's Slot placeholder
     </MyStack>
   `}
 />

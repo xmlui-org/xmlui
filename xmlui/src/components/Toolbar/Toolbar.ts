@@ -26,7 +26,7 @@ export const toolbarRenderer: CompoundComponentRendererInfo = {
       },
       children: [
         {
-          type: "ChildrenSlot",
+          type: "Slot",
         },
       ],
     },

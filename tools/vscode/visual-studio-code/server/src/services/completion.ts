@@ -85,7 +85,7 @@ const componentNames: CompletionItem[] = [
   { label: "ChangeListener" },
   { label: "Chart" },
   { label: "Checkbox" },
-  { label: "ChildrenSlot" },
+  { label: "Slot" },
   { label: "CHStack" },
   { label: "Combobox" },
   { label: "ContentSeparator" },

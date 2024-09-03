@@ -39,7 +39,7 @@ export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
       },
       children: [
         {
-          type: "ChildrenSlot",
+          type: "Slot",
         },
       ],
     },
