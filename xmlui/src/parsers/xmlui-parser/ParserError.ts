@@ -1,6 +1,9 @@
 // The common root class of all parser error objects
 export class ParserError extends Error {
-  constructor(message: string, public code?: string) {
+  constructor(
+    message: string,
+    public code?: string,
+  ) {
     super(`${code ? `${code}: ` : ""}${message}`);
 
     // --- Set the prototype explicitly.
@@ -55,7 +58,8 @@ export type ErrorCodes =
   | "T020"
   | "T021"
   | "T022"
-  | "T023";
+  | "T023"
+  | "T024";
 
 // Error message type description
 type ErrorText = Record<ErrorCodes, string>;
@@ -101,4 +105,5 @@ export const errorMessages: ErrorText = {
   T021: "Invalid reusable component attribute '{0}'",
   T022: "The 'script' tag must not have any attribute",
   T023: "A 'script' tag cannot nest other child nodes, only text",
+  T024: "Cannot put a reusable component definitions into a slot",
 };
