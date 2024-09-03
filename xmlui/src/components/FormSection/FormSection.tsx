@@ -115,7 +115,7 @@ export const formSectionRenderer: CompoundComponentRendererInfo = {
           },
           children: [
             {
-              type: "ChildrenSlot",
+              type: "Slot",
             },
           ],
         },

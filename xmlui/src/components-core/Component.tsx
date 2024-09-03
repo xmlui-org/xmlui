@@ -184,14 +184,14 @@ const Component = forwardRef(function Component(
     [renderChild, dynamicChildren],
   );
 
-  // --- Memoizes the node object with the resolved children. If the children contain a `ChildrenSlot`,
+  // --- Memoizes the node object with the resolved children. If the children contain a `Slot`,
   // --- the resolved children (DynamicChildComponentDef) are used instead of the original children.
   const memoedNode = useMemo(() => {
     const children: Array<ComponentDef> = [];
     let didResolve = false;
     if (Array.isArray(safeNode.children)) {
       safeNode.children.forEach((child) => {
-        if (child.type === "ChildrenSlot") {
+        if (child.type === "Slot") {
           didResolve = true;
           if (dynamicChildren) {
             children.push(...dynamicChildren);
@@ -203,7 +203,7 @@ const Component = forwardRef(function Component(
     }
 
     // --- Because of performance reasons, we only return the changed `safeNode` if we resolve the
-    // --- rendered children to a `ChildrenSlot`; otherwise, we return the original reference.
+    // --- rendered children to a `Slot`; otherwise, we return the original reference.
     if (didResolve) {
       return {
         ...safeNode,

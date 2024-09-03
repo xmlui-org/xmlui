@@ -57,7 +57,7 @@ test("ChildSlot rendered in compound components", async ({ page }) => {
       <Component name="Custom">
         <VStack>
           <Text>${EXPECTED_TEXT_COMPONENT}</Text>
-          <ChildrenSlot/>
+          <Slot/>
         </VStack>
       </Component>
     `,

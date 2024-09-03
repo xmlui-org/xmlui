@@ -250,11 +250,11 @@ You can even create a custom component with a header, a footer, and even some co
   <AppHeader>
     MyApp
   </AppHeader>
-  <ChildrenSlot />
+  <Slot />
 </Component>
 ```
 
-> **Note**: The `ChildrenSlot` component is a special placeholder within a reusable component's definition. It marks where the components nested into the reusable ones will be injected.
+> **Note**: The `Slot` component is a special placeholder within a reusable component's definition. It marks where the components nested into the reusable ones will be injected.
 
 The following example utilizes `MyAppContribution`:
 
@@ -284,7 +284,7 @@ Observe that XMLUI puts every piece in its place:
         <AppHeader>
             MyApp
         </AppHeader>
-        <ChildrenSlot />
+        <Slot />
       </Component>
     `,
   ]}

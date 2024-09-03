@@ -4,13 +4,13 @@ import type { FragmentComponentDef } from "@components-core/Fragment";
 
 import { createPropHolderComponent } from "@components-core/renderers";
 
-interface ChildrenSlot extends ComponentDef<"ChildrenSlot"> {}
+interface Slot extends ComponentDef<"Slot"> {}
 
 export const metadata: ComponentDescriptor<FragmentComponentDef> = {
-  displayName: "ChildrenSlot",
+  displayName: "Slot",
   description:
     "Placeholder in a reusable component. " +
     "Signs the slot where the component's injected children should be rendered.",
 };
 
-export const childrenSlotHolder = createPropHolderComponent<ChildrenSlot>("ChildrenSlot", metadata);
+export const SlotHolder = createPropHolderComponent<Slot>("Slot", metadata);

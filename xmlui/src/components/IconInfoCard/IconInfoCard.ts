@@ -60,7 +60,7 @@ export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
               type: "VStack",
               children: [
                 {
-                  type: "ChildrenSlot",
+                  type: "Slot",
                 },
               ],
             },
