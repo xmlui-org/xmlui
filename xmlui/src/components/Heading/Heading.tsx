@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, ReactNode, useEffect, useRef, useState} from "react";
 import styles from "./Heading.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -9,18 +9,19 @@ import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { getMaxLinesStyle } from "@components-core/utils/css-utils";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
+import {useTableOfContents} from "@components-core/TableOfContentsContext";
 
 // =====================================================================================================================
 // React Heading, H1,..., H6 component implementation
 
 const VALUE_DESC = "The text to display in the component - can be empty";
 const LINE_CLAMP_DESC = "Limits the number of lines the component can use";
-const PRESERVE_DESC = "Allow preserving linebreak information?"
+const PRESERVE_DESC = "Allow preserving linebreak information?";
 const NO_ELLIPSIS_DESC = "Indicates if ellipsis should be hidden from the end of the text";
 const LEVEL_DESC = (level: number) => `Represents a heading level ${level} text`;
 
 const HeadingLevelKeys = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;
-type HeadingLevel = typeof HeadingLevelKeys[number];
+type HeadingLevel = (typeof HeadingLevelKeys)[number];
 
 export type HeadingProps = {
   uid?: string;
@@ -43,13 +44,37 @@ export const Heading = ({
   layout,
   title,
   maxLines = 0,
-  preserveLinebreaks,  
+  preserveLinebreaks,
   ellipses = true,
   className,
 }: HeadingProps) => {
   const Element = level?.toLowerCase() as HeadingLevel;
+  const elementRef = useRef<HTMLHeadingElement>(null);
+  const [anchorId, setAnchorId] = useState<string | null>(null);
+  const anchorRef = useRef<HTMLAnchorElement>(null);
+
+  const { registerHeading } = useTableOfContents();
+
+  useEffect(() => {
+    if (elementRef?.current) {
+      setAnchorId(elementRef.current.textContent.trim().replace(/\s+/g, "-").toLowerCase());
+    }
+  }, [elementRef]);
+
+  useEffect(() => {
+    if (elementRef?.current && anchorId) {
+      return registerHeading({
+        id: anchorId,
+        level: parseInt(level.replace("h", "")),
+        text: elementRef.current.textContent.trim(),
+        anchor: anchorRef.current,
+      });
+    }
+  }, [elementRef, level, anchorId, anchorRef]);
+
   return (
     <Element
+      ref={elementRef}
       id={uid}
       title={title}
       style={{ ...sx, ...layout, ...getMaxLinesStyle(maxLines) }}
@@ -59,6 +84,7 @@ export const Heading = ({
         [styles.noEllipsis]: !ellipses,
       })}
     >
+      {anchorId && <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />}
       {children}
     </Element>
   );
@@ -67,39 +93,39 @@ export const Heading = ({
 // =====================================================================================================================
 // XMLUI Heading, H1,..., H6 component definition
 
-/** 
+/**
  * The \`Heading\` component displays titles and section headers.
- * 
+ *
  * > **Note**: \`Heading\` follows the basic rules of the HTML heading elements (\`<h1>\`, ..., \`<h6>\`).
- * 
+ *
  * For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
  */
 export interface HeadingComponentDef extends ComponentDef<"Heading"> {
   props: {
-    /** 
-     * This property determines the text displayed in the heading. 
+    /**
+     * This property determines the text displayed in the heading.
      * \`Heading\` also accepts nested text instead of specifying the `value`.
      * If both \`value\` and a nested text are used, the \`value\` will be displayed.
      * @descriptionRef
      */
     value: string;
-    /** 
+    /**
      * This property sets the visual significance (level) of the heading.
      * @descriptionRef
      */
     level: HeadingLevel;
-    /** 
+    /**
      * This property determines the maximum number of lines the component can wrap to.
      * If there is not enough space for all of the text,
      * the component wraps the text up to as many lines as specified.
      * @descriptionRef */
     maxLines?: number;
-    /** 
+    /**
      * This property indicates whether linebreaks should be preserved when displaying text.
      * @descriptionRef
      */
     preserveLinebreaks?: boolean;
-    /** 
+    /**
      * This property indicates whether ellipses should be displayed (\`true\`)
      * when the heading text is cropped or not (\`false\`).
      * The default value is \`true\`.
@@ -309,7 +335,7 @@ export const headingComponentRenderer = createComponentRenderer<HeadingComponent
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: node.props.level, renderChild });
   },
-  headingMetadata
+  headingMetadata,
 );
 
 export const h1ComponentRenderer = createComponentRenderer<H1ComponentDef>(
@@ -317,7 +343,7 @@ export const h1ComponentRenderer = createComponentRenderer<H1ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h1", renderChild } as any);
   },
-  h1Metadata
+  h1Metadata,
 );
 
 export const h2ComponentRenderer = createComponentRenderer<H2ComponentDef>(
@@ -325,7 +351,7 @@ export const h2ComponentRenderer = createComponentRenderer<H2ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h2", renderChild } as any);
   },
-  h2Metadata
+  h2Metadata,
 );
 
 export const h3ComponentRenderer = createComponentRenderer<H3ComponentDef>(
@@ -333,7 +359,7 @@ export const h3ComponentRenderer = createComponentRenderer<H3ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h3", renderChild } as any);
   },
-  h3Metadata
+  h3Metadata,
 );
 
 export const h4ComponentRenderer = createComponentRenderer<H4ComponentDef>(
@@ -341,7 +367,7 @@ export const h4ComponentRenderer = createComponentRenderer<H4ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h4", renderChild } as any);
   },
-  h4Metadata
+  h4Metadata,
 );
 
 export const h5ComponentRenderer = createComponentRenderer<H5ComponentDef>(
@@ -349,7 +375,7 @@ export const h5ComponentRenderer = createComponentRenderer<H5ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h5", renderChild } as any);
   },
-  h5Metadata
+  h5Metadata,
 );
 
 export const h6ComponentRenderer = createComponentRenderer<H6ComponentDef>(
@@ -357,5 +383,5 @@ export const h6ComponentRenderer = createComponentRenderer<H6ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h6", renderChild } as any);
   },
-  h6Metadata
+  h6Metadata,
 );
