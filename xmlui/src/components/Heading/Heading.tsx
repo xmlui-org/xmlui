@@ -57,7 +57,7 @@ export const Heading = ({
 
   useEffect(() => {
     if (elementRef?.current) {
-      setAnchorId(elementRef.current.textContent.trim().replace(/\s+/g, "-").toLowerCase());
+      setAnchorId(elementRef.current.textContent.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").toLowerCase());
     }
   }, [elementRef]);
 

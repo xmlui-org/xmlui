@@ -5,6 +5,7 @@ import { useEffect, useRef } from "react";
 import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
+import scrollIntoView from "scroll-into-view-if-needed";
 
 export const TableOfContents = () => {
   const tocRef = useRef<HTMLDivElement>(null);
@@ -13,6 +14,21 @@ export const TableOfContents = () => {
   useEffect(() => {
     setObserveIntersection(true);
   }, [setObserveIntersection]);
+
+  useEffect(() => {
+    if (activeAnchorId && tocRef?.current) {
+      const activeAnchor = tocRef.current.querySelector(`#${activeAnchorId}`);
+      if (activeAnchor) {
+        scrollIntoView(activeAnchor, {
+          block: "center",
+          inline: "center",
+          behavior: "smooth",
+          scrollMode: "always",
+          boundary: tocRef.current,
+        });
+      }
+    }
+  }, [activeAnchorId, headings]);
 
   return (
     <div className={styles.nav} ref={tocRef}>
@@ -28,7 +44,7 @@ export const TableOfContents = () => {
               [styles.active]: value.id === activeAnchorId,
             })}
           >
-            <RrdNavLink to={`#${key}`} onClick={() => setActiveAnchorId(value.id)}>
+            <RrdNavLink to={`#${key}`} onClick={() => setActiveAnchorId(value.id)} id={key}>
               {value.text}
             </RrdNavLink>
           </li>

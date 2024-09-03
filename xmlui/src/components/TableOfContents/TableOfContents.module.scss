@@ -2,15 +2,16 @@
 
 .nav {
   background-color: transparent;
-  width: 220px;
   min-width: 220px;
   padding: 16px;
   align-self: flex-start;
-  position: sticky;
   max-height: calc(100vh - 70px);
-  overflow: auto;
+  overflow: scroll;
   z-index: 99;
   top: 0;
+  position: sticky;
+  scrollbar-color: lab(48.438% 0 0 / .4) transparent;
+  scrollbar-width: thin;
 
   ul {
     li {
