@@ -137,6 +137,7 @@ import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
 import { tableHeaderRenderer } from "./TableHeader/TableHeader";
 import { toolbarRenderer } from "./Toolbar/Toolbar";
 import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
+import {tableOfContentsRenderer} from "@components/TableOfContents/TableOfContents";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -328,6 +329,8 @@ export class ComponentRegistry {
       this.registerComponentRenderer(mapComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
+      this.registerComponentRenderer(tableOfContentsRenderer);
+
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
