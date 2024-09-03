@@ -1,11 +1,9 @@
 import { useCallback, useInsertionEffect, useRef } from "react";
-import { ThrottleSettings } from "lodash-es";
-import { throttle , get } from "lodash-es";
+import type { ThrottleSettings } from "lodash-es";
+import { get, throttle } from "lodash-es";
 import { formatDistanceToNow } from "date-fns";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-
-import { NotAComponentDefError } from "@components-core/EngineError";
 
 /**
  * Slice a single array into two based on a discriminator function.
@@ -18,7 +16,7 @@ export function partition<T>(array: Array<T>, discriminator: (v: T) => boolean) 
     ([pass, fail], elem) => {
       return discriminator(elem) ? [[...pass, elem], fail] : [pass, [...fail, elem]];
     },
-    [[] as T[], [] as T[]]
+    [[] as T[], [] as T[]],
   );
 }
 
@@ -41,7 +39,7 @@ export function randomUUID() {
 
   // @ts-ignore
   return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, (c) =>
-    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16),
   );
 }
 
@@ -247,12 +245,12 @@ export const MIME_TYPES: Map<string, string> = new Map([
 
   ["application/octet-stream", "exe"], // bin dll
   /*
-            application/octet-stream              "deb",
-            application/octet-stream              "dmg",
-            application/octet-stream              "eot",
-            application/octet-stream              "iso", // img
-            application/octet-stream              "msi", // msp msm
-            */
+                application/octet-stream              "deb",
+                application/octet-stream              "dmg",
+                application/octet-stream              "eot",
+                application/octet-stream              "iso", // img
+                application/octet-stream              "msi", // msp msm
+                */
 
   ["audio/midi", "mid"], // midi kar
   ["audio/mpeg", "mp3"],
@@ -275,7 +273,7 @@ export function delay(timeInMs: number, callback?: any): Promise<void> {
     setTimeout(async () => {
       await callback?.();
       resolve?.();
-    }, timeInMs)
+    }, timeInMs),
   );
 }
 
@@ -286,7 +284,7 @@ export function normalizePath(url?: string): string | undefined {
   if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")) {
     return url;
   }
-  if(typeof window === 'undefined'){
+  if (typeof window === "undefined") {
     return url;
   }
   // @ts-ignore
@@ -295,7 +293,7 @@ export function normalizePath(url?: string): string | undefined {
 }
 
 export function isComponentDefChildren(
-  children?: ComponentDef | ComponentDef[] | string
+  children?: ComponentDef | ComponentDef[] | string,
 ): children is ComponentDef | ComponentDef[] {
   return typeof children !== "string";
 }
@@ -449,27 +447,6 @@ export const pickFromObject = (object: Record<any, any> | undefined, paths: stri
 
 export const isPrimitive = (val: any) => Object(val) !== val;
 
-export function groupChildrenByType(node: ComponentDef) {
-  if (!isComponentDefChildren(node.children)) {
-    throw new NotAComponentDefError();
-  }
-  const ret: Record<ComponentDef["type"], Array<ComponentDef>> = {};
-
-  node.children?.forEach((child) => {
-    if (!ret[child.type]) {
-      ret[child.type] = [];
-    }
-    ret[child.type].push(child);
-  });
-
-  return ret;
-}
-
-export function getChildrenByType<T extends ComponentDef>(node: ComponentDef, type: T["type"]): Array<T> {
-  const grouped = groupChildrenByType(node);
-  return (grouped[type] || []) as Array<T>;
-}
-
 export function formatFileSizeInBytes(size?: number) {
   if (!size) return "-";
   return humanFileSize(size);
@@ -498,7 +475,7 @@ export function pluralize(number: number, singular: string, plural: string) {
 export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
   func: F,
   wait?: number,
-  options?: ThrottleSettings
+  options?: ThrottleSettings,
 ) {
   const throttled = throttle(
     (resolve, reject, args: Parameters<F>) => {
@@ -507,7 +484,7 @@ export function asyncThrottle<F extends (...args: any[]) => Promise<any>>(
         .catch(reject);
     },
     wait,
-    options
+    options,
   );
   return (...args: Parameters<F>): ReturnType<F> =>
     new Promise((resolve, reject) => {

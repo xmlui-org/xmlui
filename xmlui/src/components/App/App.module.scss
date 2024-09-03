@@ -61,6 +61,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
       position: static;
     }
     &.sticky{
+      scroll-padding-top: var(--header-height);
       min-height: 100%;
       .footerWrapper{
         position: sticky;
@@ -73,6 +74,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
     min-height: 100%;
     height: 100%;
     overflow: auto;
+    scroll-padding-top: var(--header-height);
     //padding-bottom: var(--footer-height);
     .navPanelWrapper{
       width: $width-navPanel-App;
@@ -110,6 +112,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
     }
     .PagesWrapper{
       overflow: auto;
+      scroll-padding-top: var(--header-height);
       min-height: 0;
       height: 100%;
       scrollbar-gutter: stable both-edges;
