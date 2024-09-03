@@ -39,6 +39,13 @@ export interface ComponentDef<T extends string = string> extends Scriptable {
    */
   children?: ComponentDef[];
 
+
+  /**
+   * Components may have slots that can be filled with other components. This property holds the 
+   * contents of the slots
+   */
+  slots?: Record<string, ComponentDef[]>;
+
   /**
    * This property is evaluated to a Boolean value during run time. When this value is `true`, the
    * component with its children chain is rendered; otherwise, the entire component hierarchy is omitted
