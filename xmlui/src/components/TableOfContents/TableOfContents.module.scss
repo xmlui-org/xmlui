@@ -37,5 +37,6 @@
 }
 
 .active {
-  color: red;
+  color: t.$color-text-secondary;
+  font-weight: t.$font-weight-bold;
 }
