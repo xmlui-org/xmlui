@@ -1,6 +1,6 @@
 # App Structure
 
-An application is more than just an XUML markup describing the UI. When deployed, admins can configure the app to access specific backend systems (through URLs or URIs) and use customer-specific images and brand elements (e.g., logos). An application may have multiple themes (skins), and users can choose their preferred one.
+An application is more than just a markup describing the UI. When deployed, admins can configure the app to access specific backend systems (through URLs or URIs) and use customer-specific images and brand elements (e.g., logos). An application may have multiple themes (skins), and users can choose their preferred one.
 
 This article describes the structural details of apps.
 
@@ -8,7 +8,7 @@ This article describes the structural details of apps.
 
 Each app is composed of these ingredients:
 
-- **Markup**. The XUML markup of the application, including the app definition and the app-specific components. This markup defines the appearance and the logic of the UI.
+- **Markup**. The XMLUI markup of the application, including the app definition and the app-specific components. This markup defines the appearance and the logic of the UI.
 - **Resources**. Apps may use configurable resources like logos, icons, and others. Though those can be explicitly wired into the markup, they can also be set as configurable resources. When the app is deployed, the administrator can change those resources, for example, set up a new logo to display.
 - **Configuration settings**. The app may have settings to be configured, including URLs to access a particular backend, some switches to determine how specific elements are displayed, titles, names, etc. The UI components may refer to these settings. The admin can change the particular settings in a deployed app.
 - **Themes**. An app may use multiple themes. App developers can ship apps with multiple themes. Admins can change the themes shipped with the app or create new ones.

@@ -184,7 +184,7 @@ The `ChangeListener` is one of the functional components. It detects value chang
   <ChangeListener
     listenTo="{list.length}"
     throttleWaitInMs="3000"
-    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0) /* Summarize values in 'list' */" />
   <Text>{toDisplay}</Text>
 </VStack>
 ```
@@ -202,7 +202,7 @@ The `ChangeListener` is one of the functional components. It detects value chang
       <ChangeListener
         listenTo="{list.length}"
         throttleWaitInMs="3000"
-        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
+        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0) /* Summarize values in 'list' */" />
       <Text>{toDisplay}</Text>
     </VStack>
   `}
