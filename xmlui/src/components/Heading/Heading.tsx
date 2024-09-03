@@ -53,16 +53,16 @@ export const Heading = ({
   const [anchorId, setAnchorId] = useState<string | null>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
 
-  const { registerHeading } = useTableOfContents();
+  const { registerHeading, observeIntersection } = useTableOfContents();
 
   useEffect(() => {
-    if (elementRef?.current) {
+    if (observeIntersection && elementRef?.current) {
       setAnchorId(elementRef.current.textContent.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").toLowerCase());
     }
-  }, [elementRef]);
+  }, [elementRef, observeIntersection]);
 
   useEffect(() => {
-    if (elementRef?.current && anchorId) {
+    if (observeIntersection && elementRef?.current && anchorId) {
       return registerHeading({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
@@ -70,7 +70,7 @@ export const Heading = ({
         anchor: anchorRef.current,
       });
     }
-  }, [elementRef, level, anchorId, anchorRef]);
+  }, [elementRef, level, anchorId, anchorRef, observeIntersection]);
 
   return (
     <Element
@@ -84,7 +84,7 @@ export const Heading = ({
         [styles.noEllipsis]: !ellipses,
       })}
     >
-      {anchorId && <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />}
+      {(anchorId && observeIntersection) && <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />}
       {children}
     </Element>
   );
