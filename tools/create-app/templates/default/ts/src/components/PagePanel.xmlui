@@ -1,5 +1,5 @@
 <Component name="PagePanel">
   <VStack padding="1em">
-    <ChildrenSlot />
+    <Slot />
   </VStack>
 </Component>

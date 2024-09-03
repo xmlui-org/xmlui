@@ -35,11 +35,11 @@ export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
         label: "{$props.label}",
       },
       events: {
-        click: "e => $events.click(e)",
+        click: "e => emitEvent('click', e)",
       },
       children: [
         {
-          type: "ChildrenSlot",
+          type: "Slot",
         },
       ],
     },

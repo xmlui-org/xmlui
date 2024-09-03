@@ -124,8 +124,8 @@ It can be quickly done by a custom component event in `TaskRow`:
         <prop name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
         </prop>
-        <MenuItem label="Edit" onClick="{() => $events.editClicked()}" />
-        <MenuItem label="Delete" onClick="{() => $events.deleteClicked()}" />
+        <MenuItem label="Edit" onClick="{() => emitEvent('editClicked')}" />
+        <MenuItem label="Delete" onClick="{() => emitEvent('deleteClicked')}" />
     </DropdownMenu>
     </HStack>
   </Card>
@@ -291,7 +291,7 @@ The `TaskRow` component should pass the details of data being edited in its edit
         <prop name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
         </prop>
-        <MenuItem label="Edit" onClick="{() => $events.editClicked($props.item)}" />
+        <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props.item)}" />
         <MenuItem label="Delete" />
     </DropdownMenu>
     </HStack>
@@ -405,7 +405,7 @@ We invoke the API endpoint for the delete operation directly from the context me
         <prop name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
         </prop>
-        <MenuItem label="Edit" onClick="{() => $events.editClicked($props)}" />
+        <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props)}" />
         <MenuItem label="Delete">
           <event name="click">
             <ApiAction

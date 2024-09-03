@@ -52,7 +52,7 @@ export const pageHeaderRenderer: CompoundComponentRendererInfo = {
           type: "SpaceFiller",
         },
         {
-          type: "ChildrenSlot",
+          type: "Slot",
         },
       ],
     },

@@ -57,7 +57,7 @@ test("ChildSlot rendered in compound components", async ({ page }) => {
       <Component name="Custom">
         <VStack>
           <Text>${EXPECTED_TEXT_COMPONENT}</Text>
-          <ChildrenSlot/>
+          <Slot/>
         </VStack>
       </Component>
     `,
@@ -76,7 +76,7 @@ test("$this works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
         <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
-            <Button onClick="$events.click()">Increment counter: {counter}</Button>
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
     entryPoint: `
@@ -92,7 +92,7 @@ test("call api with id works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
         <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
-            <Button onClick="$events.click()">Increment counter: {counter}</Button>
+            <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
     entryPoint: `

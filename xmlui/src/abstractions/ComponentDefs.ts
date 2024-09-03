@@ -39,6 +39,13 @@ export interface ComponentDef<T extends string = string> extends Scriptable {
    */
   children?: ComponentDef[];
 
+
+  /**
+   * Components may have slots that can be filled with other components. This property holds the 
+   * contents of the slots
+   */
+  slots?: Record<string, ComponentDef[]>;
+
   /**
    * This property is evaluated to a Boolean value during run time. When this value is `true`, the
    * component with its children chain is rendered; otherwise, the entire component hierarchy is omitted
@@ -134,7 +141,7 @@ export type ComponentLike = ComponentDef | CompoundComponentDef;
 
 /**
  * Some components render their nested child components dynamically using the current context of
- * their parents. For example, reusable components (`CompoundComponentDef`) have a `ChildrenSlot`
+ * their parents. For example, reusable components (`CompoundComponentDef`) have a `Slot`
  * placeholder that marks the location where the children should be rendered. Other component types
  * (e.g., `ApiBoundComponent` and `ContainerComponent`) use this dynamic rendering, too.
  *
