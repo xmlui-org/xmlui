@@ -44,8 +44,7 @@ import {
   useIsInIFrame,
   useIsWindowFocused,
 } from "./utils/hooks";
-import { InspectorContext, InspectorProvider } from "@components-core/InspectorContext";
-import {TableOfContentsProvider} from "@components-core/TableOfContentsContext";
+import { InspectorProvider } from "@components-core/InspectorContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -398,16 +397,14 @@ const RootComponent = ({
         >
           <InspectorProvider sources={sources}>
             <ConfirmationModalContextProvider>
-              <TableOfContentsProvider>
-                <RootContentComponent
-                  rootContainer={node as ContainerComponentDef}
-                  routerBaseName={baseName}
-                  globalProps={globalProps}
-                  standalone={standalone}
-                  decorateComponentsWithTestId={decorateComponentsWithTestId}
-                  debugEnabled={debugEnabled}
-                />
-              </TableOfContentsProvider>
+              <RootContentComponent
+                rootContainer={node as ContainerComponentDef}
+                routerBaseName={baseName}
+                globalProps={globalProps}
+                standalone={standalone}
+                decorateComponentsWithTestId={decorateComponentsWithTestId}
+                debugEnabled={debugEnabled}
+              />
             </ConfirmationModalContextProvider>
           </InspectorProvider>
         </ThemeProvider>

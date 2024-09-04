@@ -1,4 +1,4 @@
-import {CSSProperties, ReactNode, useEffect, useRef, useState} from "react";
+import {CSSProperties, ReactNode, useContext, useEffect, useRef, useState} from "react";
 import styles from "./Heading.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -9,7 +9,7 @@ import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { getMaxLinesStyle } from "@components-core/utils/css-utils";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
-import {useTableOfContents} from "@components-core/TableOfContentsContext";
+import {TableOfContentsContext} from "@components-core/TableOfContentsContext";
 
 // =====================================================================================================================
 // React Heading, H1,..., H6 component implementation
@@ -53,7 +53,9 @@ export const Heading = ({
   const [anchorId, setAnchorId] = useState<string | null>(null);
   const anchorRef = useRef<HTMLAnchorElement>(null);
 
-  const { registerHeading, observeIntersection } = useTableOfContents();
+  const tableOfContentsContext = useContext(TableOfContentsContext);
+  const registerHeading = tableOfContentsContext?.registerHeading;
+  const observeIntersection = tableOfContentsContext?.observeIntersection;
 
   useEffect(() => {
     if (observeIntersection && elementRef?.current) {

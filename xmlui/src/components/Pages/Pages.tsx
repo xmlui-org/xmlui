@@ -9,6 +9,7 @@ import { RouteContext, useRouteContext, useRouteContextValue } from "@components
 import { EMPTY_ARRAY } from "@components-core/constants";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
+import {TableOfContentsProvider} from "@components-core/TableOfContentsContext";
 
 //we need this component to make sure all the child routes are wrapped in a container.
 //  this way they can access the routeParams
@@ -92,11 +93,13 @@ export const pageRenderer = createComponentRenderer<PageComponentDef>(
   ({ node, extractValue, renderChild }) => {
     return (
       <Page url={extractValue(node.props.url)}>
-        <RouteWrapper childRoute={node.children} renderChild={renderChild} />
+        <TableOfContentsProvider>
+          <RouteWrapper childRoute={node.children} renderChild={renderChild} />
+        </TableOfContentsProvider>
       </Page>
     );
   },
-  PageMetadata,
+  PageMetadata
 );
 
 type PagesProps = {
@@ -155,5 +158,5 @@ export const pagesRenderer = createComponentRenderer<PagesComponentDef>(
   ({ node, extractValue, renderChild }) => {
     return <Pages defaultRoute={extractValue(node.props.defaultRoute)}>{renderChild(node.children)}</Pages>;
   },
-  PagesMetadata,
+  PagesMetadata
 );
