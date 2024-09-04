@@ -44,7 +44,8 @@ import {
   useIsInIFrame,
   useIsWindowFocused,
 } from "./utils/hooks";
-import {InspectorContext, InspectorProvider} from "@components-core/InspectorContext";
+import { InspectorContext, InspectorProvider } from "@components-core/InspectorContext";
+import {TableOfContentsProvider} from "@components-core/TableOfContentsContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -375,7 +376,7 @@ const RootComponent = ({
   defaultTone,
   resources,
   resourceMap,
-  sources
+  sources,
 }: RootComponentProps) => {
   if (previewMode) {
     //to prevent leaking the meta items to the parent document, if it lives in an iframe (e.g. docs)
@@ -396,16 +397,18 @@ const RootComponent = ({
           resources={resources}
         >
           <InspectorProvider sources={sources}>
-          <ConfirmationModalContextProvider>
-            <RootContentComponent
-              rootContainer={node as ContainerComponentDef}
-              routerBaseName={baseName}
-              globalProps={globalProps}
-              standalone={standalone}
-              decorateComponentsWithTestId={decorateComponentsWithTestId}
-              debugEnabled={debugEnabled}
-            />
-          </ConfirmationModalContextProvider>
+            <ConfirmationModalContextProvider>
+              <TableOfContentsProvider>
+                <RootContentComponent
+                  rootContainer={node as ContainerComponentDef}
+                  routerBaseName={baseName}
+                  globalProps={globalProps}
+                  standalone={standalone}
+                  decorateComponentsWithTestId={decorateComponentsWithTestId}
+                  debugEnabled={debugEnabled}
+                />
+              </TableOfContentsProvider>
+            </ConfirmationModalContextProvider>
           </InspectorProvider>
         </ThemeProvider>
       </IconProvider>
@@ -415,18 +418,18 @@ const RootComponent = ({
   const Router = previewMode
     ? MemoryRouter
     : servedFromSingleFile || globalProps?.useHashBasedRouting
-    ? HashRouter
-    : BrowserRouter;
+      ? HashRouter
+      : BrowserRouter;
 
   return (
     <React.StrictMode>
       <ErrorBoundary node={node} location={"root-outer"}>
         <QueryClientProvider client={queryClient}>
-            {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
-            {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-                <Router basename={baseName}>{dynamicChildren}</Router>
-            )}
-            {/*<ReactQueryDevtools initialIsOpen={true} />*/}
+          {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+          {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
+            <Router basename={baseName}>{dynamicChildren}</Router>
+          )}
+          {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>
@@ -448,7 +451,7 @@ function AppRoot({
   previewMode,
   servedFromSingleFile,
   resourceMap,
-  sources
+  sources,
 }: RootComponentProps) {
   const rootNode = useMemo(() => {
     const themedRoot =
