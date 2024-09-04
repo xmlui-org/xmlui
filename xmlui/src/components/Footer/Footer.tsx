@@ -23,8 +23,10 @@ function Footer({
 }) {
   const appLayoutContext = useAppLayoutContext();
   const content = (
-    <div className={classnames(styles.wrapper, className)} style={style}>
-      {children}
+    <div className={styles.outerWrapper}>
+      <div className={classnames(styles.wrapper, className)} style={style}>
+        {children}
+      </div>
     </div>
   );
 
@@ -51,7 +53,10 @@ const metadata: ComponentDescriptor<FooterComponentDef> = {
   defaultThemeVars: {
     "color-bg-Footer": "$color-bg-AppHeader",
     "vertical-alignment-Footer": "center",
-    ...paddingSubject("Footer", { horizontal: "$space-4", vertical: "$space-1" }),
+    "font-size-Footer": "$font-size-small",
+    "color-text-Footer": "$color-text-secondary",
+    "max-content-width-Footer": "$max-content-width",
+    ...paddingSubject("Footer", { horizontal: "$space-4", vertical: "$space-2" }),
     light: {
       // --- No light-specific theme vars
     },

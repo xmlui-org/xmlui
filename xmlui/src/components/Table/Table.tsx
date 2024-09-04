@@ -101,7 +101,7 @@ function defaultIsRowDisabled(_: any) {
 
 const SELECT_COLUMN_WIDTH = 42;
 
-const DEFAULT_PAGE_SIZES = [10, 50, 100];
+const DEFAULT_PAGE_SIZES = [20];
 
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.
@@ -698,7 +698,7 @@ export const Table = forwardRef(({
                 Showing {rows[0].original.order} to {rows[rows.length - 1].original.order} of {data.length} entries
               </span>
             </div>
-            <div>
+            {pageSizes.length > 1 && (<div>
               <span className={styles.paginationLabel}>Rows per page</span>
               <select
                 className={styles.paginationSelect}
@@ -713,7 +713,7 @@ export const Table = forwardRef(({
                   </option>
                 ))}
               </select>
-            </div>
+            </div>)}
             <div className={styles.paginationButtons}>
               <Button
                 onClick={() => table.setPageIndex(0)}
@@ -860,6 +860,7 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     "color-bg-selected-Table--hover": "$color-bg-row-Table--hover",
     "color-bg-pagination-Table": "$color-bg-Table",
     "color-outline-heading-Table--focus": "$color-outline--focus",
+    "color-text-pagination-Table": "$color-secondary",
 
     light: {
       "color-bg-row-Table--hover": "$color-primary-50",

@@ -505,7 +505,7 @@ const metadata: ComponentDescriptor<FormItemComponentDef> = {
   defaultThemeVars: {
     "color-text-FormItemLabel": "$color-text-primary",
     "font-size-FormItemLabel": "$font-size-small",
-    "font-weight-FormItemLabel": "$font-weight-bold",
+    "font-weight-FormItemLabel": "$font-weight-medium",
     "font-style-FormItemLabel": "normal",
     "text-transform-FormItemLabel": "none",
     "color-text-FormItemLabel-requiredMark": "$color-danger-400",

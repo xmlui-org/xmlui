@@ -15,6 +15,7 @@ import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
 import * as Dialog from "@radix-ui/react-dialog";
+import {MemoizedItem} from "@components/container-helpers";
 
 // =====================================================================================================================
 // React component definition
@@ -24,7 +25,7 @@ type ModalProps = {
   style?: CSSProperties;
   onClose?: (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
   onOpen?: (...args: any[]) => void;
-  children?: (() => ReactNode) | ReactNode;
+  children?: ((modalContext: any) => ReactNode) | ReactNode;
   portalTo?: HTMLElement;
   fullScreen?: boolean;
   title?: string;
@@ -53,6 +54,7 @@ export const ModalDialog = React.forwardRef(
     const containerRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
+    const [modalContext, setModalContext] = useState(null);
 
     useEffect(() => {
       if (isOpen) {
@@ -60,7 +62,8 @@ export const ModalDialog = React.forwardRef(
       }
     }, [isOpen]);
 
-    const doOpen = useEvent(() => {
+    const doOpen = useEvent((modalContext?: any) => {
+      setModalContext(modalContext);
       onOpen?.();
       setIsOpen(true);
     });
@@ -130,7 +133,7 @@ export const ModalDialog = React.forwardRef(
                 </Dialog.Title>
               )}
               <div className={styles.innerContent}>
-                {isOpen && (typeof children === "function" ? children?.() : children)}
+                {isOpen && (typeof children === "function" ? children?.(modalContext) : children)}
               </div>
               {closeButtonVisible && (
                 <Dialog.Close asChild={true}>
@@ -259,7 +262,7 @@ const metadata: ComponentDescriptor<ModalDialogComponentDef> = {
     "margin-bottom-title-ModalDialog": "0",
     dark: {
       "color-bg-ModalDialog": "$color-bg-primary",
-    },
+    }
   },
 };
 
@@ -281,11 +284,9 @@ export const modalViewComponentRenderer = createComponentRenderer<ModalDialogCom
         registerComponentApi={registerComponentApi}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
       >
-        {() =>
-          renderChild(node.children, {
-            type: "Stack",
-          })
-        }
+        {(modalContext) => {
+          return <MemoizedItem node={node.children} renderChild={renderChild} layoutContext={{type: "Stack"}} context={modalContext}/>
+        }}
       </ModalDialog>
     );
   },

@@ -112,7 +112,7 @@ const cardMetadata: ComponentDescriptor<CardComponentDef> = {
     "thickness-border-Card": "1px",
     "style-border-Card": "solid",
     "border-Card": "$thickness-border-Card $style-border-Card $color-border-Card",
-    "radius-Cars": "$radius",
+    "radius-Card": "$radius",
     "shadow-Card": "none",
     light: {
       "color-bg-Card": "white",

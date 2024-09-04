@@ -12,10 +12,28 @@ import {
 export const XmlUiThemeDefinition: ThemeDefinition = {
   id: "xmlui",
   resources: {
-    "font.inter": "https://rsms.me/inter/inter.css",
+    // "font.inter": "https://rsms.me/inter/inter.css",
   },
   themeVars: {
-    "shadow-header-App": "none"
+    "shadow-header-App": "none",
+    "font-size": "15px",
+    "shadow-Input": "$shadow-sm",
+    "color-bg-Footer": "transparent",
+  },
+  tones: {
+    light: {
+      themeVars: {
+        "color-bg-ModalDialog": "white",
+        "color-border-Input": "$color-surface-200",
+        "color-bg-checked-RadioGroupOption": "$color-primary-400",
+      }
+    },
+    dark: {
+      themeVars: {
+        "color-border-Input": "$color-surface-800",
+        "color-error": "$color-danger-400",
+      }
+    }
   }
 };
 

@@ -1,8 +1,7 @@
-import React, { isValidElement, useMemo } from "react";
+import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { DynamicChildComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, DynamicChildComponentDef } from "@abstractions/ComponentDefs";
 import type { ContainerComponentDef } from "@components-core/container/ContainerComponentDef";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { RendererContext } from "@abstractions/RendererDefs";
@@ -19,11 +18,10 @@ type CompoundComponentProps<T extends ComponentDef> = {
 } & RendererContext<T>;
 
 // Acts as a bridge between a compound component definition and its renderer.
-export const CompoundComponent = React.forwardRef(
+export const CompoundComponent = forwardRef(
   <T extends ComponentDef>(
     {
       node,
-      lookupAction,
       lookupSyncCallback,
       lookupEventHandler,
       compound,
@@ -36,22 +34,6 @@ export const CompoundComponent = React.forwardRef(
     }: CompoundComponentProps<T>,
     forwardedRef: React.ForwardedRef<any>,
   ) => {
-    // --- Resolve all event handlers to async functions
-    const resolvedEventsInner = useMemo(() => {
-      const resolvedEvents: any = {};
-      Object.entries(node.events || {}).forEach(([key, value]) => {
-        resolvedEvents[key] = lookupAction(value as any, {
-          signError: false,
-          eventName: key,
-        });
-      });
-      return resolvedEvents;
-    }, [lookupAction, node.events]);
-    const resolvedEvents = useShallowCompareMemoize(resolvedEventsInner);
-    // useEffect(()=>{
-    //   console.log("CC resolvedEvent modified", resolvedEvents);
-    // }, [resolvedEvents])
-
     // --- Extract property values (resolve binding expressions)
     const resolvedPropsInner = useMemo(() => {
       const resolvedProps: any = {};
@@ -75,7 +57,7 @@ export const CompoundComponent = React.forwardRef(
     const dynamicChildren = useMemo(() => {
       if (Array.isArray(node.children)) {
         return node.children.map((child) => {
-          let ret: DynamicChildComponentDef = {
+          const ret: DynamicChildComponentDef = {
             ...child,
             renderChild,
             childToRender: child,
@@ -146,3 +128,4 @@ export const CompoundComponent = React.forwardRef(
     return React.isValidElement(ret) ? ret : <>{ret}</>;
   },
 );
+CompoundComponent.displayName = "CompoundComponent";
