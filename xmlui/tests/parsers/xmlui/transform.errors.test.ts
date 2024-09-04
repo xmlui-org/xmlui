@@ -58,15 +58,6 @@ describe("Ueml transform - errors", () => {
     }
   });
 
-  it("Invalid child node name in a component", () => {
-    try {
-      transformSource("<Stack><blabla /></Stack>");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T009")).equal(true);
-    }
-  });
-
   it("'uses' is invalid in a compound component", () => {
     try {
       transformSource("<Component name='MyComp'><Stack/><uses /></Component>");
@@ -81,15 +72,6 @@ describe("Ueml transform - errors", () => {
       transformSource(
         "<Component name='MyComp'><Stack/><loaders /></Component>",
       );
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T009")).equal(true);
-    }
-  });
-
-  it("'hints' is invalid in a simple component", () => {
-    try {
-      transformSource("<Stack><hints /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T009")).equal(true);

@@ -1,0 +1,43 @@
+@use "@components-core/theming/themes" as t;
+
+.nav {
+  background-color: transparent;
+  min-width: 220px;
+  padding: 16px;
+  align-self: flex-start;
+  max-height: calc(100vh - 70px);
+  overflow: scroll;
+  z-index: 99;
+  top: 0;
+  position: sticky;
+  scrollbar-color: lab(48.438% 0 0 / .4) transparent;
+  scrollbar-width: thin;
+
+  ul {
+    li {
+      margin-bottom: t.$space-2;
+      list-style-type: none;
+      font-size: t.$font-size-small;
+    }
+  }
+}
+
+.head_1 {
+  margin-left: 0px;
+}
+
+.head_2 {
+  margin-left: 10px;
+}
+
+.head_3 {
+  margin-left: 20px;
+}
+.head_4 {
+  margin-left: 30px;
+}
+
+.active {
+  color: t.$color-text-secondary;
+  font-weight: t.$font-weight-bold;
+}

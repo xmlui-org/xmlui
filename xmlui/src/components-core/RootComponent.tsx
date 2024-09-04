@@ -44,8 +44,7 @@ import {
   useIsInIFrame,
   useIsWindowFocused,
 } from "./utils/hooks";
-import { InspectorContext, InspectorProvider } from "@components-core/InspectorContext";
-import { l } from "msw/lib/core/GraphQLHandler-b42ca96f";
+import { InspectorProvider } from "@components-core/InspectorContext";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
