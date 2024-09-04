@@ -1,12 +1,13 @@
 {
   "name": "xmlui",
-  "scopeName": "source.ueml",
+  "scopeName": "source.xmlui",
   "patterns": [{ "include": "#root" }],
   "repository": {
     "root": {
       "patterns": [
         { "include": "#comments" },
         { "include": "#helperTag" },
+        { "include": "#slotTag" },
         { "include": "#componentTag" },
         { "include": "#escapeCharacter" },
         { "include": "#textWithBindingExpr" },
@@ -87,11 +88,7 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [
-            { "include": "#comments" },
-            { "include": "#componentTag" },
-            { "include": "source.js" }
-          ],
+          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(event)(?=\\s*>)"
         }
       ],
@@ -124,11 +121,7 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [
-            { "include": "#comments" },
-            { "include": "#componentTag" },
-            { "include": "source.js" }
-          ],
+          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(field)(?=\\s*>)"
         }
       ],
@@ -161,15 +154,20 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [
-            { "include": "#comments" },
-            { "include": "#componentTag" },
-            { "include": "source.js" }
-          ],
+          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(item)(?=\\s*>)"
         }
       ],
       "end": ">"
+    },
+    "slotTag": {
+      "match": "(</?)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([a-z][-\\w\\.$]*)(\\s*/?>)",
+      "captures": {
+        "1": { "name": "punctuation.definition.tag.xmlui" },
+        "2": { "name": "keyword.operator.namespace.xmlui" },
+        "3": { "name": "support.variable.xmlui" },
+        "4": { "name": "punctuation.definition.tag.xmlui" }
+      }
     },
     "bindingExpr": {
       "contentName": "meta.embedded.block.javascript",
@@ -198,7 +196,7 @@
         {
           "captures": {
             "1": { "name": "entity.other.attribute-name.localname.xmlui" },
-            "2": { "name":  "keyword.operator.xmlui"}
+            "2": { "name": "keyword.operator.xmlui" }
           },
           "match": "(?:^|\\s+)(value)(\\s*=)"
         },
@@ -224,11 +222,7 @@
       "patterns": [{ "include": "source.js" }]
     },
     "textWithBindingExpr": {
-      "patterns": [
-        { "include": "#escapeCharacter" },
-        { "include": "#entity" },
-        { "include": "#bindingExpr" }
-      ]
+      "patterns": [{ "include": "#escapeCharacter" }, { "include": "#entity" }, { "include": "#bindingExpr" }]
     },
     "propOrVarTag": {
       "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:var)|(?:prop))",
@@ -254,11 +248,7 @@
       "endCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" }
       },
-      "patterns": [
-        { "include": "#comments" },
-        { "include": "#eventHandler" },
-        { "include": "#attribute" }
-      ]
+      "patterns": [{ "include": "#comments" }, { "include": "#eventHandler" }, { "include": "#attribute" }]
     },
     "quotedStringJsInside": {
       "begin": "\"|'|`",

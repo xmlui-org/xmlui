@@ -16,10 +16,10 @@ const withNextra = require("nextra")({
         const myLanguageGrammar = JSON.parse(fs.readFileSync("./syntax/grammar.tmLanguage.json"));
 
         const uemlLanguage = {
-          id: "ueml",
-          scopeName: "source.ueml",
+          id: "xmlui",
+          scopeName: "source.xmlui",
           grammar: myLanguageGrammar,
-          aliases: ["ueml"],
+          aliases: ["ueml", "xmlui"],
         };
 
         const highlighter = await shiki.getHighlighter({
@@ -43,6 +43,7 @@ const withNextra = require("nextra")({
           "#000011": "var(--syntax-token-cdata)",
           "#000012": "var(--syntax-token-delimiter-curly)",
           "#000013": "var(--syntax-token-text)",
+          "#000014": "var(--syntax-token-slot)",
         });
 
         return highlighter;
