@@ -3,6 +3,7 @@ import { Playground } from "./src/components/Playground";
 import { StandalonePlayground } from "./src/components/StandalonePlayground";
 import { DocsImage } from "./src/components/DocsImage";
 import { useRouter } from "next/router";
+import { useConfig } from 'nextra-theme-docs'
 
 export default {
   useNextSeoProps() {
@@ -25,6 +26,19 @@ export default {
   sidebar: {
     autoCollapse: true,
     defaultMenuCollapseLevel: 1,
+  },
+  head: () => {
+    const { frontMatter } = useConfig()
+    return (
+        <>
+          <meta property="og:title" content={frontMatter.title} />
+          <meta
+              property="og:description"
+              content={frontMatter.description}
+          />
+          <link rel="icon" href="/resources/favicon.ico" type="image/svg+xml"/>
+        </>
+    )
   },
   footer: {
     component: null,
