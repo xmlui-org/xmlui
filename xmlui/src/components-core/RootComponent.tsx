@@ -12,7 +12,7 @@ import type { MemoedVars } from "./abstractions/ComponentRenderer";
 import type { ActionRendererDef } from "@abstractions/ActionDefs";
 import type { ContainerComponentDef } from "./container/ContainerComponentDef";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
 import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
 import type { IAppStateContext } from "@components/App/AppStateContext";
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
@@ -230,6 +230,7 @@ function RootContentComponent({
     setMaxWidthLargeDesktopLower(createLowerDimension(mwLargeDesktop));
   }, [activeThemeId, root]);
 
+  // --- Set viewport size information
   const isViewportPhone = useMediaQuery(`(max-width: ${maxWidthPhoneLower})`);
   const isViewportLandscapePhone = useMediaQuery(
     `(min-width: ${maxWidthPhone}) and (max-width: ${maxWidthLandscapePhoneLower})`,
@@ -239,7 +240,25 @@ function RootContentComponent({
   const isViewportLargeDesktop = useMediaQuery(
     `(min-width: ${maxWidthDesktop}) and (max-width: ${maxWidthLargeDesktopLower})`,
   );
+  let vpSize: MediaBreakpointType = "xs";
+  let vpSizeIndex = 0;
   const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
+  if (isViewportXlDesktop) {
+    vpSize = "xxl";
+    vpSizeIndex = 5;
+  } else if (isViewportLargeDesktop) {
+    vpSize = "xl";
+    vpSizeIndex = 4;
+  } else if (isViewportDesktop) {
+    vpSize = "lg";
+    vpSizeIndex = 3;
+  } else if (isViewportTablet) {
+    vpSize = "md";
+    vpSizeIndex = 2;
+  } else if (isViewportLandscapePhone) {
+    vpSize = "sm";
+    vpSizeIndex = 1;
+  }
 
   const isInIFrame = useIsInIFrame();
   const isWindowFocused = useIsWindowFocused();
@@ -295,6 +314,8 @@ function RootContentComponent({
       xlDesktop: isViewportXlDesktop,
       smallScreen: isViewportPhone || isViewportLandscapePhone || isViewportTablet,
       largeScreen: !(isViewportPhone || isViewportLandscapePhone || isViewportTablet),
+      size: vpSize,
+      sizeIndex: vpSizeIndex,
     };
   }, [
     isViewportPhone,
