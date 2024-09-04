@@ -38,7 +38,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
         threshold: [0, 1],
       });
 
-      Object.values(headings).forEach((elem) => observer.current.observe(elem.anchor!));
+      Object.values(headings).forEach((elem) => observer?.current?.observe?.(elem.anchor!));
       return () => observer.current?.disconnect();
     }
   }, [headings, observeIntersection]);

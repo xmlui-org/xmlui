@@ -194,19 +194,52 @@ function RootContentComponent({
     }
   });
 
-  // we use the initial value from the scss variable
+  // --- We use the state variables to store the current media query values
   const [maxWidthPhone, setMaxWidthPhone] = useState("0");
+  const [maxWidthPhoneLower, setMaxWidthPhoneLower] = useState("0");
+  const [maxWidthLandscapePhone, setMaxWidthLandscapePhone] = useState("0");
+  const [maxWidthLandscapePhoneLower, setMaxWidthLandscapePhoneLower] = useState("0");
   const [maxWidthTablet, setMaxWidthTablet] = useState("0");
+  const [maxWidthTabletLower, setMaxWidthTabletLower] = useState("0");
+  const [maxWidthDesktop, setMaxWidthDesktop] = useState("0");
+  const [maxWidthDesktopLower, setMaxWidthDesktopLower] = useState("0");
+  const [maxWidthLargeDesktop, setMaxWidthLargeDesktop] = useState("0");
+  const [maxWidthLargeDesktopLower, setMaxWidthLargeDesktopLower] = useState("0");
+
+  const createLowerDimension = (dimension: string) => {
+    const match = dimension.match(/^(\d+)px$/);
+    return match ? `${parseInt(match[1]) - 0.02}px` : "0";
+  }
 
   // we sync with the theme variable value (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
-    setMaxWidthPhone(getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone")));
-    setMaxWidthTablet(getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-tablet")));
+    const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone"));
+    setMaxWidthPhone(mwPhone);
+    setMaxWidthPhoneLower(createLowerDimension(mwPhone));
+    const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-landscape-phone"));
+    setMaxWidthLandscapePhone(mwLandscapePhone);
+    setMaxWidthLandscapePhoneLower(createLowerDimension(mwLandscapePhone));
+    const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-tablet"));
+    setMaxWidthTablet(mwTablet);
+    setMaxWidthTabletLower(createLowerDimension(mwTablet));
+    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-desktop"));
+    setMaxWidthDesktop(mwDesktop);
+    setMaxWidthDesktopLower(createLowerDimension(mwDesktop));
+    const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-large-desktop"));
+    setMaxWidthLargeDesktop(mwLargeDesktop);
+    setMaxWidthLargeDesktopLower(createLowerDimension(mwLargeDesktop));
   }, [activeThemeId, root]);
 
-  const isViewportPhone = useMediaQuery(`(max-width: ${maxWidthPhone})`);
-  const isViewportTablet = useMediaQuery(`(min-width: ${maxWidthPhone}) and (max-width: ${maxWidthTablet})`);
-  const isViewportDesktop = useMediaQuery(`(min-width: ${maxWidthTablet})`);
+  const isViewportPhone = useMediaQuery(`(max-width: ${maxWidthPhoneLower})`);
+  const isViewportLandscapePhone = useMediaQuery(
+    `(min-width: ${maxWidthPhone}) and (max-width: ${maxWidthLandscapePhoneLower})`,
+  );
+  const isViewportTablet = useMediaQuery(`(min-width: ${maxWidthLandscapePhone}) and (max-width: ${maxWidthTabletLower})`);
+  const isViewportDesktop = useMediaQuery(`(min-width: ${maxWidthTablet}) and (max-width: ${maxWidthDesktopLower})`);
+  const isViewportLargeDesktop = useMediaQuery(
+    `(min-width: ${maxWidthDesktop}) and (max-width: ${maxWidthLargeDesktopLower})`,
+  );
+  const isViewportXlDesktop = useMediaQuery(`(min-width: ${maxWidthLargeDesktop})`);
 
   const isInIFrame = useIsInIFrame();
   const isWindowFocused = useIsWindowFocused();
@@ -255,12 +288,22 @@ function RootContentComponent({
   const mediaSize = useMemo(() => {
     return {
       phone: isViewportPhone,
+      landscapePhone: isViewportLandscapePhone,
       tablet: isViewportTablet,
       desktop: isViewportDesktop,
-      smallScreen: isViewportPhone || isViewportTablet,
-      largeScreen: isViewportDesktop,
+      largeDesktop: isViewportLargeDesktop,
+      xlDesktop: isViewportXlDesktop,
+      smallScreen: isViewportPhone || isViewportLandscapePhone || isViewportTablet,
+      largeScreen: !(isViewportPhone || isViewportLandscapePhone || isViewportTablet),
     };
-  }, [isViewportDesktop, isViewportPhone, isViewportTablet]);
+  }, [
+    isViewportPhone,
+    isViewportLandscapePhone,
+    isViewportTablet,
+    isViewportDesktop,
+    isViewportLargeDesktop,
+    isViewportXlDesktop,
+  ]);
 
   const globals = useMemo(() => {
     return globalProps ? { ...globalProps } : EMPTY_OBJECT;

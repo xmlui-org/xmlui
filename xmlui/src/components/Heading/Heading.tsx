@@ -59,16 +59,16 @@ export const Heading = ({
 
   useEffect(() => {
     if (observeIntersection && elementRef?.current) {
-      setAnchorId(elementRef.current.textContent.trim().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").toLowerCase());
+      setAnchorId(elementRef?.current?.textContent?.trim()?.replace(/[^\w\s-]/g, "")?.replace(/\s+/g, "-")?.toLowerCase()!);
     }
   }, [elementRef, observeIntersection]);
 
   useEffect(() => {
     if (observeIntersection && elementRef?.current && anchorId) {
-      return registerHeading({
+      return registerHeading!({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
-        text: elementRef.current.textContent.trim(),
+        text: elementRef.current.textContent!.trim(),
         anchor: anchorRef.current,
       });
     }
