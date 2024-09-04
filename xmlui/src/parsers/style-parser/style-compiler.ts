@@ -7,6 +7,7 @@ import type { LayoutContext, NonCssLayoutProps } from "@abstractions/RendererDef
 
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { StyleParser, toCssVar } from "./StyleParser";
+import { MediaBreakpointType } from "@abstractions/AppContextDefs";
 
 // Property parsing issues
 type PropertyIssues = Record<string, string | undefined>;
@@ -26,7 +27,7 @@ const defaultCompResult = {
 export function compileLayout(
   layoutProps: LayoutProps = EMPTY_OBJECT,
   themeVars?: Record<string, string>,
-  layoutContext?: LayoutContext
+  layoutContext?: LayoutContext,
 ): StyleCompilationResult {
   const result: StyleCompilationResult = {
     cssProps: {},
@@ -126,10 +127,7 @@ export function compileLayout(
   if (paddingRight.value) css.paddingRight = paddingRight.value;
   const paddingTop = mergeSizes(compileSize("topPadding,paddingTop", layoutProps), verticalPadding);
   if (paddingTop.value) css.paddingTop = paddingTop.value;
-  const paddingBottom = mergeSizes(
-    compileSize("bottomPadding,paddingBottom", layoutProps),
-    verticalPadding
-  );
+  const paddingBottom = mergeSizes(compileSize("bottomPadding,paddingBottom", layoutProps), verticalPadding);
   if (paddingBottom.value) css.paddingBottom = paddingBottom.value;
 
   // --- Compile margin
@@ -232,32 +230,64 @@ export function compileLayout(
     parseFn: (parser: StyleParser) => T | null,
     convertFn: (node: T) => string | undefined
   ): string | undefined {
-    const parts = propName.split(",");
-    propName = parts[0];
-    const source = layoutProps?.[parts.length > 1 ? parts[1] : parts[0]]?.toString();
-    if (!source) return undefined;
-    const parser = new StyleParser(source);
-    try {
-      const node = parseFn(parser);
-      if (!node) return source;
-      if (!parser.testCompleted()) {
+    const defValue = compileSingleProperty();
+    if (layoutContext?.mediaSize?.sizeIndex !== undefined) {
+      const sizeIndex = layoutContext.mediaSize?.sizeIndex;
+      const xsValue = compileSingleProperty("xs");
+      const smValue = compileSingleProperty("sm");
+      const mdValue = compileSingleProperty("md");
+      const lgValue = compileSingleProperty("lg");
+      const xlValue = compileSingleProperty("xl");
+      const xxlValue = compileSingleProperty("xxl");
+      let mergedValue: string;
+      switch (sizeIndex) {
+        case 0: // xs
+          mergedValue = xsValue ?? smValue ?? mdValue;
+          break;
+        case 1: // sm
+          mergedValue = smValue ?? mdValue;
+          break;
+        case 2: // md
+          mergedValue = mdValue;
+          break;
+        case 3: // lg
+          mergedValue = lgValue;
+          break;
+        case 4: // xl
+          mergedValue = xlValue ?? lgValue;
+          break;
+        case 5: // xxl
+          mergedValue = xxlValue ?? xlValue ?? lgValue;
+          break;
+      }
+      return mergedValue ?? defValue;
+    }
+    return defValue;
+
+    function compileSingleProperty(sizeSpec?: MediaBreakpointType): string | undefined {
+      const parts = propName.split(",");
+      propName = parts[0];
+      const source =
+        layoutProps?.[(parts.length > 1 ? parts[1] : parts[0]) + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
+      if (!source) return undefined;
+      const parser = new StyleParser(source);
+      try {
+        const node = parseFn(parser);
+        if (!node) return source;
+        if (!parser.testCompleted()) {
+          result.issues ??= {};
+          result.issues[propName] = `Unexpected tail after the ${propName}`;
+          return source;
+        }
+        if (node.themeId) {
+          return toCssVar(node.themeId);
+        }
+        return convertFn(node);
+      } catch (err: any) {
         result.issues ??= {};
-        result.issues[propName] = `Unexpected tail after the ${propName}`;
+        result.issues[propName] = err?.toString();
         return source;
       }
-      //TODO illesg
-      // if (hasOnlyUnresolvedVars(node.themeId)) {
-      //   return undefined;
-      // }
-      if (node.themeId) {
-        return toCssVar(node.themeId);
-      }
-      return convertFn(node);
-    } catch (err: any) {
-      result.issues ??= {};
-      result.issues[propName] = err?.toString();
-      //TODO illesg
-      return source;
     }
   }
 
@@ -267,7 +297,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseAlignment(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -277,7 +307,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseTextAlign(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -287,7 +317,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseUserSelect(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -297,7 +327,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseTextTransform(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -306,7 +336,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseOrientation(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -316,7 +346,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseLineHeight(),
-      (n) => `${n.value}${n.unit}`
+      (n) => `${n.value}${n.unit}`,
     );
   }
 
@@ -326,7 +356,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseOpacity(),
-      (n) => `${n.value}${n.unit}`
+      (n) => `${n.value}${n.unit}`,
     );
   }
 
@@ -346,7 +376,7 @@ export function compileLayout(
 
         return sizeNode;
       },
-      (n) => n.extSize ?? `${n.value}${n.unit}`
+      (n) => n.extSize ?? `${n.value}${n.unit}`,
     );
 
     return {
@@ -362,7 +392,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseMargin(),
-      (n) => n.extSize ?? `${n.value}${n.unit}`
+      (n) => n.extSize ?? `${n.value}${n.unit}`,
     );
   }
 
@@ -372,7 +402,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseZIndex(),
-      (n) => n.value.toString()
+      (n) => n.value.toString(),
     );
   }
 
@@ -381,7 +411,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseScrolling(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -390,7 +420,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseDirection(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -399,7 +429,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseCursor(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -408,7 +438,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseFontWeight(),
-      (n) => n.value?.toString()
+      (n) => n.value?.toString(),
     );
   }
 
@@ -417,7 +447,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseFontFamily(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
@@ -431,21 +461,21 @@ export function compileLayout(
           ? typeof n.value === "number"
             ? `#${n.value.toString(16).padStart(8, "0")}`
             : n.value
-          : undefined
+          : undefined,
     );
   }
 
   function compileBackground(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
-        propName,
-        layoutProps,
-        (p) => p.parseColor(),
-        (n) =>
-            n.value !== undefined
-                ? typeof n.value === "number"
-                    ? `#${n.value.toString(16).padStart(8, "0")}`
-                    : n.value
-                : undefined
+      propName,
+      layoutProps,
+      (p) => p.parseColor(),
+      (n) =>
+        n.value !== undefined
+          ? typeof n.value === "number"
+            ? `#${n.value.toString(16).padStart(8, "0")}`
+            : n.value
+          : undefined,
     );
   }
 
@@ -465,7 +495,7 @@ export function compileLayout(
           return false;
         }
         const themeVarDefaultValues = themeId.defaultValue.filter(
-          (value) => typeof value !== "string"
+          (value) => typeof value !== "string",
         ) as ThemeIdDescriptor[];
         if (!hasOnlyUnresolvedVars(...themeVarDefaultValues)) {
           return false;
@@ -503,7 +533,7 @@ export function compileLayout(
               : ""
           }`
         ).trim();
-      }
+      },
     );
   }
 
@@ -532,7 +562,7 @@ export function compileLayout(
           `${(n.line || n.style) && n.color ? " " : ""}` +
           `${n.color ?? ""}`
         ).trim();
-      }
+      },
     );
   }
 
@@ -553,7 +583,7 @@ export function compileLayout(
         let part2 = `${theme2}${value2}`;
         part += part2 ? " / " + part2 : "";
         return part.trim();
-      }
+      },
     );
   }
 
@@ -581,7 +611,7 @@ export function compileLayout(
           }
         }
         return css;
-      }
+      },
     );
   }
 
@@ -591,7 +621,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "italic" : "normal")
+      (n) => (n.value ? "italic" : "normal"),
     );
   }
 
@@ -601,7 +631,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "wrap" : "nowrap")
+      (n) => (n.value ? "wrap" : "nowrap"),
     );
   }
 
@@ -611,7 +641,7 @@ export function compileLayout(
       propName,
       layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "1" : "0")
+      (n) => (n.value ? "1" : "0"),
     );
   }
 
