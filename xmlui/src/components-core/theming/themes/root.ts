@@ -170,8 +170,11 @@ export const RootThemeDefinition: ThemeDefinition = {
     "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
-    "media-max-width-phone": "420px",
-    "media-max-width-tablet": "800px",
+    "media-max-width-phone": "576px",
+    "media-max-width-landscape-phone": "768px",
+    "media-max-width-tablet": "992px",
+    "media-max-width-desktop": "1200px",
+    "media-max-width-large-desktop": "1400px",
 
     // --- The app's default radius value
     radius: "4px",

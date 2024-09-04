@@ -135,8 +135,11 @@ export type AppContextObject = {
   readonly environment: { isWindowFocused: boolean };
   readonly mediaSize: {
     phone: boolean;
+    landscapePhone: boolean;
     tablet: boolean;
     desktop: boolean;
+    largeDesktop: boolean;
+    xlDesktop: boolean;
     smallScreen: boolean;
     largeScreen: boolean;
   };

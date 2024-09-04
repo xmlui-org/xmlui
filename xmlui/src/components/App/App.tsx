@@ -104,7 +104,6 @@ function App({
   useResizeObserver(
     headerRef,
     useCallback((entries) => {
-      console.log(entries?.[0]?.contentRect?.height);
       setHeaderHeight(entries?.[0]?.contentRect?.height);
     }, []),
   );
