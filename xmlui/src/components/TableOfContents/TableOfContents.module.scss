@@ -31,6 +31,7 @@ $themeVars: ();
   padding-bottom: createThemeVar("padding-vertical-TableOfContents");
   ul {
     li {
+      color: createThemeVar("color-TableOfContentsItem");
       font-size: createThemeVar("font-size-TableOfContentsItem");
       font-weight: createThemeVar("font-weight-TableOfContentsItem");
       font-family: createThemeVar("font-family-TableOfContentsItem");
