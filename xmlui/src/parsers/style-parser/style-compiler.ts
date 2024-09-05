@@ -121,13 +121,13 @@ export function compileLayout(
   if (padding.value) css.padding = padding.value;
   const horizontalPadding = compileSize("horizontalPadding", layoutProps);
   const verticalPadding = compileSize("verticalPadding", layoutProps);
-  const paddingLeft = mergeSizes(compileSize("leftPadding,paddingLeft", layoutProps), horizontalPadding);
+  const paddingLeft = mergeSizes(compileSize("paddingLeft", layoutProps), horizontalPadding);
   if (paddingLeft.value) css.paddingLeft = paddingLeft.value;
-  const paddingRight = mergeSizes(compileSize("rightPadding,paddingRight", layoutProps), horizontalPadding);
+  const paddingRight = mergeSizes(compileSize("paddingRight", layoutProps), horizontalPadding);
   if (paddingRight.value) css.paddingRight = paddingRight.value;
-  const paddingTop = mergeSizes(compileSize("topPadding,paddingTop", layoutProps), verticalPadding);
+  const paddingTop = mergeSizes(compileSize("paddingTop", layoutProps), verticalPadding);
   if (paddingTop.value) css.paddingTop = paddingTop.value;
-  const paddingBottom = mergeSizes(compileSize("bottomPadding,paddingBottom", layoutProps), verticalPadding);
+  const paddingBottom = mergeSizes(compileSize("paddingBottom", layoutProps), verticalPadding);
   if (paddingBottom.value) css.paddingBottom = paddingBottom.value;
 
   // --- Compile margin
@@ -135,13 +135,13 @@ export function compileLayout(
   if (margin) css.margin = margin;
   const horizontalMargin = compileMargin("horizontalMargin", layoutProps);
   const verticalMargin = compileMargin("verticalMargin", layoutProps);
-  const marginLeft = compileMargin("leftMargin,marginLeft", layoutProps) ?? horizontalMargin;
+  const marginLeft = compileMargin("marginLeft", layoutProps) ?? horizontalMargin;
   if (marginLeft) css.marginLeft = marginLeft;
-  const marginRight = compileMargin("rightMargin,marginRight", layoutProps) ?? horizontalMargin;
+  const marginRight = compileMargin("marginRight", layoutProps) ?? horizontalMargin;
   if (marginRight) css.marginRight = marginRight;
-  const marginTop = compileMargin("topMargin,marginTop", layoutProps) ?? verticalMargin;
+  const marginTop = compileMargin("marginTop", layoutProps) ?? verticalMargin;
   if (marginTop) css.marginTop = marginTop;
-  const marginBottom = compileMargin("bottomMargin,marginBottom", layoutProps) ?? verticalMargin;
+  const marginBottom = compileMargin("marginBottom", layoutProps) ?? verticalMargin;
   if (marginBottom) css.marginBottom = marginBottom;
 
   // --- Compile other
@@ -265,10 +265,8 @@ export function compileLayout(
     return defValue;
 
     function compileSingleProperty(sizeSpec?: MediaBreakpointType): string | undefined {
-      const parts = propName.split(",");
-      propName = parts[0];
       const source =
-        layoutProps?.[(parts.length > 1 ? parts[1] : parts[0]) + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
+        layoutProps?.[propName + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
       if (!source) return undefined;
       const parser = new StyleParser(source);
       try {
