@@ -3,7 +3,6 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { ToastOptions, Renderable, ValueOrFunction, DefaultToastOptions, Toast } from "react-hot-toast";
 
 import type { ActionFunction } from "./ActionDefs";
-
 /**
  * This interface defines the properties and services of an app context that the application components can use when
  * implementing their behavior.
@@ -133,17 +132,23 @@ export type AppContextObject = {
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
   readonly environment: { isWindowFocused: boolean };
-  readonly mediaSize: {
-    phone: boolean;
-    landscapePhone: boolean;
-    tablet: boolean;
-    desktop: boolean;
-    largeDesktop: boolean;
-    xlDesktop: boolean;
-    smallScreen: boolean;
-    largeScreen: boolean;
-  };
+  readonly mediaSize: MediaSize;
 };
+
+export type MediaBreakpointType = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+
+export type MediaSize = {
+  phone: boolean;
+  landscapePhone: boolean;
+  tablet: boolean;
+  desktop: boolean;
+  largeDesktop: boolean;
+  xlDesktop: boolean;
+  smallScreen: boolean;
+  largeScreen: boolean;
+  size: MediaBreakpointType;
+  sizeIndex: number;
+}
 
 export type LoggedInUserDto = {
   id: number;
