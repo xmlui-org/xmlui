@@ -139,7 +139,7 @@ import { toolbarRenderer } from "./Toolbar/Toolbar";
 import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
 import {tableOfContentsRenderer} from "@components/TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
-import { accordionGroupComponentRenderer } from "./AccordionGroup/AccordionGroup";
+import { alertComponentRenderer } from "./Alert/Alert";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -347,7 +347,7 @@ export class ComponentRegistry {
 
     // --- New Bootstrap-inspired components
     this.registerComponentRenderer(accordionComponentRenderer);
-    this.registerComponentRenderer(accordionGroupComponentRenderer);
+    this.registerComponentRenderer(alertComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

@@ -116,9 +116,9 @@ const metadata: ComponentDescriptor<AccordionComponentDef> = {
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "padding-horizontal-Accordion": "",
-    "padding-vertical-Accordion": "",
-    "align-header-Accordion": "",
+    "padding-horizontal-header-Accordion": "",
+    "padding-vertical-header-Accordion": "",
+    "align-vertical-header-Accordion": "",
     "font-size-header-Accordion": "",
     "font-weight-header-Accordion": "",
     "font-style-header-Accordion": "",
