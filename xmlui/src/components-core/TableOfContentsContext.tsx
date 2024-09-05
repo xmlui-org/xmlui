@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 
 type HeadingItem = {
   id: string;
@@ -43,27 +43,34 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
     }
   }, [headings, observeIntersection]);
 
+  const registerHeading = useCallback((headingItem: HeadingItem) => {
+    setHeadings((prevHeadings) => {
+      return {
+        ...prevHeadings,
+        [headingItem.id]: headingItem,
+      };
+    });
+  }, []);
+
+  const setActiveAnchorId = useCallback(
+    (id: string) => {
+      if (headings[id]) {
+        setActiveId(id);
+      }
+    },
+    [headings],
+  );
+
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {
-      registerHeading: (headingItem: HeadingItem) => {
-        setHeadings((prevHeadings) => {
-          return {
-            ...prevHeadings,
-            [headingItem.id]: headingItem,
-          };
-        });
-      },
+      registerHeading,
       headings,
       observeIntersection,
       setObserveIntersection,
       activeAnchorId: activeId,
-      setActiveAnchorId: (id: string) => {
-        if (headings[id]) {
-          setActiveId(id);
-        }
-      },
+      setActiveAnchorId,
     };
-  }, [activeId, headings, observeIntersection]);
+  }, [registerHeading, headings, observeIntersection, activeId, setActiveAnchorId]);
 
   return <TableOfContentsContext.Provider value={contextValue}>{children}</TableOfContentsContext.Provider>;
 }

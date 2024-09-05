@@ -1,4 +1,4 @@
-import {CSSProperties, ReactNode, useContext, useEffect, useRef, useState} from "react";
+import { CSSProperties, ReactNode, useContext, useEffect, useRef, useState } from "react";
 import styles from "./Heading.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -9,7 +9,7 @@ import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { getMaxLinesStyle } from "@components-core/utils/css-utils";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
-import {TableOfContentsContext} from "@components-core/TableOfContentsContext";
+import { TableOfContentsContext } from "@components-core/TableOfContentsContext";
 
 // =====================================================================================================================
 // React Heading, H1,..., H6 component implementation
@@ -58,21 +58,26 @@ export const Heading = ({
   const observeIntersection = tableOfContentsContext?.observeIntersection;
 
   useEffect(() => {
-    if (observeIntersection && elementRef?.current) {
-      setAnchorId(elementRef?.current?.textContent?.trim()?.replace(/[^\w\s-]/g, "")?.replace(/\s+/g, "-")?.toLowerCase()!);
+    if (observeIntersection && elementRef.current) {
+      const newAnchorId = elementRef.current.textContent
+        ?.trim()
+        ?.replace(/[^\w\s-]/g, "")
+        ?.replace(/\s+/g, "-")
+        ?.toLowerCase();
+      setAnchorId(newAnchorId || null);
     }
-  }, [elementRef, observeIntersection]);
+  }, [observeIntersection]);
 
   useEffect(() => {
-    if (observeIntersection && elementRef?.current && anchorId) {
-      return registerHeading!({
+    if (observeIntersection && elementRef.current && anchorId) {
+      return registerHeading?.({
         id: anchorId,
         level: parseInt(level.replace("h", "")),
         text: elementRef.current.textContent!.trim(),
         anchor: anchorRef.current,
       });
     }
-  }, [elementRef, level, anchorId, anchorRef, observeIntersection]);
+  }, [anchorId, observeIntersection, registerHeading, level]);
 
   return (
     <Element
@@ -86,7 +91,7 @@ export const Heading = ({
         [styles.noEllipsis]: !ellipses,
       })}
     >
-      {(anchorId && observeIntersection) && <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />}
+      {anchorId && observeIntersection && <span ref={anchorRef} id={anchorId} style={{ width: 0, height: 0 }} />}
       {children}
     </Element>
   );
