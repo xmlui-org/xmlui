@@ -29,7 +29,7 @@ const withNextra = require("nextra")({
         });
         await highlighter.loadLanguage(uemlLanguage);
 
-        await highlighter.setColorReplacements({
+        highlighter.setColorReplacements({
           "#000001": "var(--syntax-token-component)",
           "#000002": "var(--syntax-token-delimiter-angle)",
           "#000003": "var(--syntax-token-attribute-name)",
