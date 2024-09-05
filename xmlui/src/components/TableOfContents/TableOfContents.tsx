@@ -6,6 +6,8 @@ import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
+import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { parseScssVar } from "@components-core/theming/themeVars";
 
 export const TableOfContents = () => {
   const tocRef = useRef<HTMLDivElement>(null);
@@ -58,11 +60,42 @@ export const TableOfContents = () => {
  * (Document it)
  */
 export interface TableOfContentsComponentDef extends ComponentDef<"TableOfContents"> {
-  props: {
-    scrollMarginTop?: number;
-  };
+  props: {};
 }
 
-export const tableOfContentsRenderer = createComponentRenderer<TableOfContentsComponentDef>("TableOfContents", ({}) => {
-  return <TableOfContents />;
-});
+const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
+  displayName: "TableOfContents",
+  description: "Table of contents",
+  props: {
+    //...
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    "font-size-TableOfContentsItem": "$font-size-smaller",
+    "font-weight-TableOfContentsItem": "$font-weight-normal",
+    "font-family-TableOfContentsItem": "$font-family",
+    "font-weight-TableOfContentsItem-active": "$font-weight-bold",
+    "color-TableOfContentsItem": "$color-text",
+    "color-TableOfContentsItem-active": "$color-text-secondary",
+    "color-bg-TableOfContents": "transparent",
+    "padding-horizontal-TableOfContents": "$space-4",
+    "padding-vertical-TableOfContents": "$space-4",
+    "margin-top-TableOfContents": "0",
+    "margin-bottom-TableOfContents": "0",
+    "border-radius-TableOfContents": "0",
+    "border-width-TableOfContents": "0",
+    "border-color-TableOfContents": "transparent",
+    "border-style-TableOfContents": "solid",
+    "transform-TableOfContentsItem": "none",
+    "align-vertical-TableOfContentsItem": "baseline",
+    "letter-spacing-TableOfContentsItem": "0",
+  },
+};
+
+export const tableOfContentsRenderer = createComponentRenderer<TableOfContentsComponentDef>(
+  "TableOfContents",
+  ({}) => {
+    return <TableOfContents />;
+  },
+  metadata,
+);
