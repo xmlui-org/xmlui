@@ -1,7 +1,7 @@
 {
   "name": "vscode-xmlui-languageservice-server",
   "description": "The language server",
-  "version": "0.0.8",
+  "version": "0.0.14",
   "author": "Tamas Kapitany",
   "license": "MIT",
   "engines": {
