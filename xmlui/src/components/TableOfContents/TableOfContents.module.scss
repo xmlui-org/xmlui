@@ -1,7 +1,13 @@
 @use "@components-core/theming/themes" as t;
 
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
 .nav {
-  background-color: transparent;
+  background-color: createThemeVar("color-bg-TableOfContents");
   min-width: 220px;
   padding: 16px;
   align-self: flex-start;
@@ -12,32 +18,51 @@
   position: sticky;
   scrollbar-color: lab(48.438% 0 0 / .4) transparent;
   scrollbar-width: thin;
-
+  border-radius: createThemeVar("border-radius-TableOfContents");
+  border-color: createThemeVar("color-border-TableOfContents");
+  border-width: createThemeVar("thickness-border-TableOfContents");
+  border-style: createThemeVar("style-border-TableOfContents");
+  // --- Do not collapse these padding properties; they are intentionally expanded
+  margin-top: createThemeVar("margin-top-TableOfContents");
+  margin-bottom: createThemeVar("margin-bottom-TableOfContents");
+  padding-left: createThemeVar("padding-horizontal-TableOfContents");
+  padding-right: createThemeVar("padding-horizontal-TableOfContents");
+  padding-top: createThemeVar("padding-vertical-TableOfContents");
+  padding-bottom: createThemeVar("padding-vertical-TableOfContents");
   ul {
     li {
+      font-size: createThemeVar("font-size-TableOfContentsItem");
+      font-weight: createThemeVar("font-weight-TableOfContentsItem");
+      font-family: createThemeVar("font-family-TableOfContentsItem");
+      text-transform: createThemeVar("transform-TableOfContentsItem");
+      vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
+      letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
       margin-bottom: t.$space-2;
       list-style-type: none;
-      font-size: t.$font-size-small;
+
+      &.head_1 {
+        margin-left: 0px;
+      }
+
+      &.head_2 {
+        margin-left: 10px;
+      }
+
+      &.head_3 {
+        margin-left: 20px;
+      }
+      &.head_4 {
+        margin-left: 30px;
+      }
+
+      &.active {
+        color: createThemeVar("color-TableOfContentsItem-active");
+        font-weight: createThemeVar("font-weight-TableOfContentsItem-active");
+      }
     }
   }
 }
 
-.head_1 {
-  margin-left: 0px;
-}
-
-.head_2 {
-  margin-left: 10px;
-}
-
-.head_3 {
-  margin-left: 20px;
-}
-.head_4 {
-  margin-left: 30px;
-}
-
-.active {
-  color: t.$color-text-secondary;
-  font-weight: t.$font-weight-bold;
+:export {
+  themeVars: t.json-stringify($themeVars);
 }
