@@ -78,7 +78,7 @@ The type of a component determines how the engine renders it. Some components, l
 
 You can explicitly specify several dimensions of a particular component with the `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` layout properties.
 
-The dimension properties use [size values](/components/appearance/common-units/#size-values), which contain a value and a unit that together determine the actual size. Here are a few examples of size values:
+The dimension properties use [size values](../../styles-and-themes/common-units.mdx#size-values), which contain a value and a unit that together determine the actual size. Here are a few examples of size values:
 
 ```text
 12px
@@ -148,12 +148,14 @@ Resize the screen to see how the sizes of colored boxes change.
 
 ## Overflow
 
-A component may not fit into the viewport its parent provides. XMLUI provides a few properties to define how a particular component should behave in overflow situations. Individual components, such as `Text,` `Heading,` and others, may provide other techniques to handle the overflow.
+A component may not fit into the area its parent provides. This is called overflow.
+XMLUI provides a few properties to define how a particular component should behave in situations like these.
+Individual components, such as [`Text`](../../components/Text.mdx), [`Heading`](../../components/Heading.mdx), and others, provide further techniques to handle overflow.
 
 |Property|Description|
 |-|-|
-|`horizontalOverflow`| This property defines the [overflow](/components/appearance/common-units/#overflow-values) strategy when a component horizontally overflows the UI its parent provides. |
-|`verticalOverflow`| This property defines the [overflow](/components/appearance/common-units/#overflow-values) strategy when a component vertically overflows the UI its parent provides. |
+|`horizontalOverflow`| This property defines the [overflow](../../styles-and-themes/common-units.mdx#overflow-values) strategy when a component horizontally overflows the UI its parent provides. |
+|`verticalOverflow`| This property defines the [overflow](../../styles-and-themes/common-units.mdx#overflow-values) strategy when a component vertically overflows the UI its parent provides. |
 
 ### Horizontal Overflow
 
@@ -179,7 +181,8 @@ The following example demonstrates how the horizontal overflow property works:
 </HStack>
 ```
 
-Observe the second text's width, set to 1000px, to ensure it won't be trimmed and closed with ellipses. Due to the `horizontalOverflow="scroll"` setting, you can see a horizontal scrollbar at the bottom of the light green box:
+Observe the second text's width, which is set to 1000px, to ensure it won't be trimmed and closed with ellipses.
+Due to the `horizontalOverflow="scroll"` setting, you can see a horizontal scrollbar at the bottom of the light green box:
 
 <Playground
     previewOnly
@@ -229,7 +232,7 @@ The following example demonstrates how the vertical overflow property works:
   </VStack>
 </VStack>
 ```
-Each of the three text fragments is enclosed in a box with a fixed size (200 x 40 pixels). Observe the effect of the different `verticalOverflow` values. The last box uses no `verticalOverflow`, which has the same effect as `verticalOverflow='"visible"`.
+Each of the three text fragments is enclosed in a box with a fixed size (200 x 40 pixels). Observe the effect of different `verticalOverflow` values. The last box uses no `verticalOverflow`, which has the same effect as `verticalOverflow="visible"`.
 
 <Playground
     previewOnly
@@ -258,12 +261,14 @@ Each of the three text fragments is enclosed in a box with a fixed size (200 x 4
 
 ## The Box Model
 
-Most components use a rectangular UI estate their parent container provides for them. Several layout properties define how the component should use that rectangular area. These properties follow the so-called *box model*.
+Most components use a rectangular space (or box) their parent container provides.
+Several layout properties define how the component should use this rectangular space.
+These properties follow the so-called *box model* which comes from the CSS model of the same name.
 
-This model works with these virtual boxes:
-- **Component box**. The viewport the parent provides for the component (this box depends on the rendering logic of the parent).
-- **Margin box**. Within the component box, the component may define a margin that surrounds the other boxes of the component. The margin box displays the background (background color) the parent component provides.
-- **Border box**. Within the margin box, the component may have a border with a particular drawing width. Depending on the border pattern (for example, in the case of a dashed or dotted border), the component background may be visible under the border.
+This model works with the following boxes nested in each other (see an example for each underneath the list):
+- **Component box**: The area the parent provides for the component (the size of this box depends on the rendering logic of the parent).
+- **Margin box**: Within the component box, the component may define a margin that surrounds the other boxes of the component. The margin box displays the background (background color) the parent component provides.
+- **Border box**: Within the margin box, the component may have a border with a particular width. Depending on the border pattern (for example, in the case of a dashed or dotted), the component background may be visible under the border.
 - **Padding box**: The component may define a padding surrounding its content. The background of the padding box is set to the component background.
 - **Content box**: This is the rectangular area where the component will render its child components.
 
@@ -279,15 +284,13 @@ The engine defines several layout properties to set up the box model of a partic
     <VStack width="100%" height="100%" backgroundColor="green" />
   </VStack>  
 </VStack>
-
 ```
 
-This markup displays the following screen:
-
 <Playground
-    previewOnly
-    name="Box Model"
-    app={`
+  previewOnly
+  height={250}
+  name="Box Model"
+  app={`
     <VStack height="100%" backgroundColor="cyan">
       <VStack height="85%" 
         backgroundColor="red"
@@ -297,13 +300,17 @@ This markup displays the following screen:
         <VStack width="100%" height="100%" backgroundColor="green" />
       </VStack>  
     </VStack>
-`}
-    height={250}
+  `}
 />
 
-The point of interest in the code snippet is the red rectangle; the markup harnesses it with a couple of box-related properties.
+The point of interest in the code snippet is the red rectangle; the markup contains styling to showcase all parts of the box model:
 
-The component displaying it is the second `<VStack>`. The cyan background belongs to the parent (outermost) `<VStack>`, as the red one has a margin (`20`). The component has a dashed border (`border="8 dashed blue"`). As its padding is set to `60`, the innermost `<VStack>` is surrounded by a green background.
+The outermost `VStack` has a cyan background and encompasses the whole app area because its height is set to `100%` and being a block level element,
+it fills in the available horizontal space as well.
+The child with the red background has a margin of `20px` and is smaller than its parent (its height is also 85% of its parent).
+This child also has a dashed border (`border="8 dashed blue"`),
+and has a padding of `60px` that squishes its own child to occupy less space inside of it (the one with the green background).
+Finally, the `VStack` with the green background fills in the available content area defined by its parent with the red background.
 
 ### Margin
 
@@ -311,13 +318,13 @@ You can use these properties to define component margins:
 
 | Property | Description |
 |-|-|
-| `margin` | Sets the [size](/components/appearance/common-units/#size-values) of the margin area; uses the same value for the left, top, right, and bottom margins. |
-| `horizontalMargin` | Sets the [size](/components/appearance/common-units/#size-values) of the horizontal margins (left and right) to the specified value. |
-| `verticalMargin` | Sets the [size](/components/appearance/common-units/#size-values) of the vertical margins (top and bottom) to the specified value. |
-| `marginLeft` | Sets the [size](/components/appearance/common-units/#size-values) of the left margin to the specified value. |
-| `marginTop` | Sets the [size](/components/appearance/common-units/#size-values) of the top margin to the specified value. |
-| `marginRight` | Sets the [size](/components/appearance/common-units/#size-values) of the right margin to the specified value. |
-| `marginBottom` | Sets the [size](/components/appearance/common-units/#size-values) of the bottom margin to the specified value. |
+| `margin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the margin area; uses the same value for the left, top, right, and bottom margins. |
+| `horizontalMargin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the horizontal margins (left and right) to the specified value. |
+| `verticalMargin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the vertical margins (top and bottom) to the specified value. |
+| `marginLeft` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the left margin to the specified value. |
+| `marginTop` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the top margin to the specified value. |
+| `marginRight` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the right margin to the specified value. |
+| `marginBottom` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the bottom margin to the specified value. |
 
 When you decorate a component with multiple properties setting the same margin, the most specific one prevails. For example, `marginLeft` overrides `horizontalMargin` and `margin`.
 
@@ -327,11 +334,11 @@ You can use these properties to define component borders:
 
 | Property | Description |
 |-|-|
-| `border` | Sets the value of the [border](/components/appearance/common-units/#border-values) area; uses the same value for the left, top, right, and bottom borders. |
-| `borderLeft` | Sets the value of the left [border](/components/appearance/common-units/#border-values) to the specified one. |
-| `borderTop` | Sets the value of the top [border](/components/appearance/common-units/#border-values) to the specified one. |
-| `borderRight` | Sets the value of the right [border](/components/appearance/common-units/#border-values) to the specified one. |
-| `borderBottom` | Sets the value of the bottom [border](/components/appearance/common-units/#border-values) to the specified one. |
+| `border` | Sets the value of the [border](../../styles-and-themes/common-units.mdx#border-values) area; uses the same value for the left, top, right, and bottom borders. |
+| `borderLeft` | Sets the value of the left [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
+| `borderTop` | Sets the value of the top [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
+| `borderRight` | Sets the value of the right [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
+| `borderBottom` | Sets the value of the bottom [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
 
 When you decorate a component with multiple properties setting the same border segment, the most specific one prevails. For example, `borderLeft` overrides `border`.
 
@@ -339,13 +346,13 @@ You can also define the rounding of the border through a set of properties:
 
 | Property | Description |
 |-|-|
-| `radius` | This property rounds the corners of a component's outer border edge according to the specified [value](/components/appearance/common-units/#border-rounding). |
-| `radiusTopLeft` | This property rounds the top-left corner of a component's outer border edge according to the specified [value](/components/appearance/common-units/#border-rounding). |
-| `radiusTopRight` | This property rounds the top-right corner of a component's outer border edge according to the specified [value](/components/appearance/common-units/#border-rounding). |
-| `radiusBottomLeft` | This property rounds the bottom-left corner of a component's outer border edge according to the specified [value](/components/appearance/common-units/#border-rounding). |
-| `radiusBottomRight` | This property rounds the bottom-right corner of a component's outer border edge according to the specified [value](/components/appearance/common-units/#border-rounding). |
+| `radius` | This property rounds the corners of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
+| `radiusTopLeft` | This property rounds the top-left corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
+| `radiusTopRight` | This property rounds the top-right corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
+| `radiusBottomLeft` | This property rounds the bottom-left corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
+| `radiusBottomRight` | This property rounds the bottom-right corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
 
-If you set `radius` and any other properties, the others overwrite  `radius` for the particular corner.
+If you set `radius` and any other properties, the others overwrite `radius` for the particular corner.
 
 ### Padding
 
@@ -353,13 +360,13 @@ You can use these properties to define component paddings:
 
 | Property | Description |
 |-|-|
-| `padding` | Sets the [size](/components/appearance/common-units/#size-values) of the padding area; uses the same value for the left, top, right, and bottom paddings. |
-| `horizontalPadding` | Sets the [size](/components/appearance/common-units/#size-values) of the horizontal padding (left and right) to the specified value. |
-| `verticalPadding` | Sets the [size](/components/appearance/common-units/#size-values) of the vertical paddings (top and bottom) to the specified value. |
-| `paddingLeft` | Sets the [size](/components/appearance/common-units/#size-values) of the left padding to the specified value. |
-| `paddingTop` | Sets the [size](/components/appearance/common-units/#size-values) of the top padding to the specified value. |
-| `paddingRight` | Sets the [size](/components/appearance/common-units/#size-values) of the right padding to the specified value. |
-| `paddingBottom` | Sets the [size](/components/appearance/common-units/#size-values) of the bottom padding to the specified value. |
+| `padding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the padding area; uses the same value for the left, top, right, and bottom paddings. |
+| `horizontalPadding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the horizontal padding (left and right) to the specified value. |
+| `verticalPadding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the vertical paddings (top and bottom) to the specified value. |
+| `paddingLeft` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the left padding to the specified value. |
+| `paddingTop` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the top padding to the specified value. |
+| `paddingRight` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the right padding to the specified value. |
+| `paddingBottom` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the bottom padding to the specified value. |
 
 When you decorate a component with multiple properties setting the same padding, the most specific one prevails. For example, `paddingLeft` overrides `horizontalPadding` and `padding`.
 
@@ -373,8 +380,8 @@ The engine supports these layout properties to set component colors:
 
 |Property|Descrition|
 |-|-|
-|`backgrounbdColor`| Sets the background [color](/components/appearance/common-units/#color-values) of a component. |
-|`color`| Sets the foreground [color](/components/appearance/common-units/#color-values) of a component's text and text decorations. |
+|`backgrounbdColor`| Sets the background [color](../../styles-and-themes/common-units.mdx#color-values) of a component. |
+|`color`| Sets the foreground [color](../../styles-and-themes/common-units.mdx#color-values) of a component's text and text decorations. |
 |`opacity`| This property sets the opacity of an element. Opacity is the degree to which the content behind an element is hidden. The value is a number in the range 0.0 to 1.0, inclusive, or a percentage from 0% to 100%. |
 
 > **Note**: Besides these colors, [borders](#border) and [shadows](#shadow) also can declare their display colors.
@@ -386,9 +393,7 @@ The engine supports these layout properties to set component colors:
 <Playground
   previewOnly
   name="Setting text colors"
-  app={`
-    <H3 backgroundColor="green" color="white">The Power of Green Economy</H3>
-  `}
+  app={`<H3 backgroundColor="green" color="white">The Power of Green Economy</H3>`}
   height={50}
 />
 
@@ -399,9 +404,7 @@ The engine supports these layout properties to set component colors:
 <Playground
     previewOnly
     name="Setting text colors with 50% opacity"
-    app={`
-    <H3 backgroundColor="green" color="white" opacity="50%">The Power of Green Economy</H3>
-  `}
+    app={`<H3 backgroundColor="green" color="white" opacity="50%">The Power of Green Economy</H3>`}
     height={50}
 />
 
@@ -411,17 +414,17 @@ Several properties allow you to set the appearance of text elements displayed in
 
 |Property|Descrition|
 |-|-|
-|`fontFamily`|This property specifies a prioritized list of one or more [font family](/components/appearance/common-units/#font-family-values) names and/or generic family names for the selected component.|
-|`fontSize`|This property sets the size of the font. Changing the font [size](/components/appearance/common-units/#size-values) also updates the sizes of the font size-relative length units, such as em, ex, and so forth.|
-|`fontWeight`|Sets the [weight (or boldness)](/components/appearance/common-units/#font-weight-values) of the font. The weights available depend on the `fontFamily` that is currently set.|
-|`italic`| This [Boolean](/components/appearance/common-units/#boolean-values) property determines if the text should be displayed in italic style. |
-|`letterSpacing`|This property sets the horizontal [spacing](/components/appearance/common-units/#size-values) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.|
-|`textDecoration`|This property sets the appearance of [decorative lines](/components/appearance/common-units/#text-decoration-values) on text.|
-|`textTransform`|This property specifies how to [capitalize](/components/appearance/common-units/#text-transform-values) an element's text.|
-|`userSelect`|This property controls whether the [user can select](/components/appearance/common-units/#user-select-values) text.|
+|`fontFamily`|This property specifies a prioritized list of one or more [font family](../../styles-and-themes/common-units.mdx#font-family-values) names and/or generic family names for the selected component.|
+|`fontSize`|This property sets the size of the font. Changing the font [size](../../styles-and-themes/common-units.mdx#size-values) also updates the sizes of the font size-relative length units, such as em, ex, and so forth.|
+|`fontWeight`|Sets the [weight (or boldness)](../../styles-and-themes/common-units.mdx#font-weight-values) of the font. The weights available depend on the `fontFamily` that is currently set.|
+|`italic`| This [Boolean](../../styles-and-themes/common-units.mdx#boolean-values) property determines if the text should be displayed in italic style. |
+|`letterSpacing`|This property sets the horizontal [spacing](../../styles-and-themes/common-units.mdx#size-values) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.|
+|`textDecoration`|This property sets the appearance of [decorative lines](../../styles-and-themes/common-units.mdx#text-decoration-values) on text.|
+|`textTransform`|This property specifies how to [capitalize](../../styles-and-themes/common-units.mdx#text-transform-values) an element's text.|
+|`userSelect`|This property controls whether the [user can select](../../styles-and-themes/common-units.mdx#user-select-values) text.|
 |`lineHeight`|This property sets the height of a line as a number relative to the normal height. For example, 0.5 means half-height; 2 is twice the normal height. It's commonly used to set the distance between lines of text.|
-|`textAlign`|This property sets the horizontal [alignment](/components/appearance/common-units/#text-alignment-values) of the inline-rendered content (e.g., text) inside its block-rendered parent.|
-|`textAlignLast`|This property sets how the last line of a block or a line, right before a forced line break, is [aligned](/components/appearance/common-units/#text-alignment-values).|
+|`textAlign`|This property sets the horizontal [alignment](../../styles-and-themes/common-units.mdx#text-alignment-values) of the inline-rendered content (e.g., text) inside its block-rendered parent.|
+|`textAlignLast`|This property sets how the last line of a block or a line, right before a forced line break, is [aligned](../../styles-and-themes/common-units.mdx#text-alignment-values).|
 
 ```ueml copy
 <VStack>
@@ -458,7 +461,7 @@ Several properties allow you to set the appearance of text elements displayed in
 
 ### Shadow
 
-You can add [shadow effects](/components/appearance/common-units/#shadow-values) around a component's frame and set up one or more shadow effects.
+You can add [shadow effects](../../styles-and-themes/common-units.mdx#shadow-values) around a component's frame and set up one or more shadow effects.
 
 ```ueml copy {2}
 <Stack margin="24" width="200" padding="20" border="2px solid #202020"
@@ -489,8 +492,8 @@ Components that lay out their children according to their strategy (such as `Sta
 
 |Property|Description|
 |-|-|
-|horizontalAlignment| Specifies the horizontal [alignment](/components/appearance/common-units/#alignment-values) of child component within its parent. |
-|verticalAlignment| Specifies the vertical [alignment](/components/appearance/common-units/#alignment-values) of child component within its parent. |
+|horizontalAlignment| Specifies the horizontal [alignment](../../styles-and-themes/common-units.mdx#alignment-values) of child component within its parent. |
+|verticalAlignment| Specifies the vertical [alignment](../../styles-and-themes/common-units.mdx#alignment-values) of child component within its parent. |
 
 ### Direction
 
@@ -528,15 +531,15 @@ This property sets the direction of text, table columns, and horizontal overflow
 
 ### Gap
 
-Layout components use this property to define the [size](/components/appearance/common-units/#size-values) of space separating child components.
+Layout components use this property to define the [size](../../styles-and-themes/common-units.mdx#size-values) of space separating child components.
 
 ### Cursor
 
-This layout property sets the mouse [cursor](/components/appearance/common-units/#cursor-values), if any, to show when the mouse pointer is over a particular component.
+This layout property sets the mouse [cursor](../../styles-and-themes/common-units.mdx#cursor-values), if any, to show when the mouse pointer is over a particular component.
 
 ### Orientation
 
-This property specifies a particular component's [orientation](/components/appearance/common-units/#orientation) when displaying its child components.
+This property specifies a particular component's [orientation](../../styles-and-themes/common-units.mdx#orientation) when displaying its child components.
 
 ### Z-Index
 

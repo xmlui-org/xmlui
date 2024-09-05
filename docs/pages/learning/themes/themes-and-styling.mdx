@@ -6,19 +6,19 @@ import inputs from "./samples/inputs.xmlui";
 
 # Themes and Styling
 
-XMLUI has a solid styling system containing two layers to declare the visual traits of components:
+XMLUI has a solid styling system divided into two layers:
 
-- **Themes**. You can apply themes that set up the overall appearance of the application. When you deploy an application, you can deploy it with multiple themes, allowing users to select their preferred theme. XMLUI ships with a few themes out of the box; you can quickly create your own. Examples are the default XMLUI light and dark themes, the theme built on your company's brand design, etc.
-- **Layout properties**. You can assign layout properties to individual or reusable components to customize the appearance of a particular component. For example, the background color of a component, the padding size of a button, the rounding of a border, the font size of a particular component, and many more are all layout properties.
+- **Themes**. You can use themes to apply an overall appearance for the application. When you deploy an application, you can deploy it with multiple themes, allowing users to select their preferred theme. XMLUI ships with a few themes out of the box; but you can quickly create your own. Examples are the default XMLUI light and dark themes, the theme built on your company's brand design, etc.
+- **Layout properties**. You can assign layout properties to individual or reusable components to customize the appearance of a particular component. For example, the background color of a container, the padding size of a button, the rounding of a border, the font size of a heading, and many more are all layout properties.
 
 You can use two fundamental strategies (or combine them) when dealing with visual appearance:
 
-1. You can set layout property values _directly_ (to a literal property value) one-by-one. This way of working with layout properties may cause a lot of extra work if you use too many of them in your app, and later, you must modify them.
-2. You can use _theme variables_ to set layout property values. Theme variables, as their name suggests, are defined in a theme. When you update their value centrally in a theme definition, all components using the particular theme variable will change their appearance accordingly.
+1. You can set layout property values _directly_ (to a literal property value) one-by-one. This way of working with layout properties may cause a lot of extra work if you use too many of them in your app.
+2. You can use _theme variables_ to set layout property values. Theme variables, as their name suggests, are defined in a theme. When you update their value in the theme definition, all components using the particular theme variable will change their appearance accordingly.
 
 Though the first method is faster while prototyping an app, you should use theme variables to avoid style maintenance hell.
 
-You can read more details about layout properties and their usage in the [Component Appearance](./component-appearance) article. Here, you will learn to use, create, and modify themes.
+You can read more details about layout properties and their usage in the [Component Appearance](./component-appearance) article. Here, you will learn how to use, create, and modify themes.
 
 Themes encapsulate not only the styles (colors, spacing, etc.) of components but also other resources, such as icons and fonts. This section will focus on the previous appearance category; however, you can learn more about using your custom fonts and icons in the [Resources](./resources) article.
 
@@ -26,7 +26,7 @@ Themes encapsulate not only the styles (colors, spacing, etc.) of components but
 
 When you build an application, it will use the XMLUI light theme by default:
 
-<Playground previewOnly={true} name="Example: using the default theme" height={280} horizontal={true} app={mySimpleAppLight} />
+<Playground previewOnly name="Example: using the default theme" height={280} horizontal={true} app={mySimpleAppLight} />
 
 Your app has a configuration file (config.json) where you can change several settings, including the app's default theme:
 
@@ -41,7 +41,7 @@ Your app has a configuration file (config.json) where you can change several set
 
 Setting the `defaultTheme` configuration value to `solid` will change your app to use a different theme.
 
-<Playground previewOnly={true} name="Example: using the 'solid' theme" height={280} horizontal={true} app={mySimpleApp} defaultTheme="solid" />
+<Playground previewOnly name="Example: using the 'solid' theme" height={280} horizontal app={mySimpleApp} defaultTheme="solid" />
 
 You can change the theme's tone by setting the `defaultTone` configuration value. This sample sets the tone to dark:
 
@@ -57,7 +57,7 @@ You can change the theme's tone by setting the `defaultTone` configuration value
 
 Now, the theme looks like this:
 
-<Playground previewOnly={true} name="Dark tone" height={280} horizontal={true} app={mySimpleApp} defaultTone="dark" />
+<Playground previewOnly name="Dark tone" height={280} horizontal app={mySimpleApp} defaultTone="dark" />
 
 > **Note**: You can combine the `defaultTheme` and `defaultTone` settings.
 
@@ -80,27 +80,27 @@ Like your app's configuration file, themes are in separate files (generally with
 }
 ```
 
-The designer modified a few brand attributes within the design, such as the color of the background and the button, and she created rounded buttons. To use her theme design, add the `our-brand.json` file (with its relative path under the app folder) to the `theme` configuration property:
+The designer modified a few brand attributes within the design, such as the color of the background and the button and she created rounded buttons. To use her theme design, add the `our-brand.json` file (with its relative path under the app folder) to the `theme` configuration property:
 
 <Playground
-    previewOnly={true}
-    name="Custom theme"
-    height={280}
-    horizontal={true}
-    app={mySimpleApp}
-    defaultTheme="our-brand"
-    themes={[
-        {
-            name: "Our Brand Theme",
-            id: "our-brand",
-            themeVars: {
-                "color-bg": "blanchedalmond",
-                "color-primary": "purple",
-                "color-text-primary": "#202020",
-                "radius-Button": "16px",
-            },
-        },
-    ]}
+  previewOnly
+  name="Custom theme"
+  height={280}
+  horizontal
+  app={mySimpleApp}
+  defaultTheme="our-brand"
+  themes={[
+    {
+      name: "Our Brand Theme",
+      id: "our-brand",
+      themeVars: {
+        "color-bg": "blanchedalmond",
+        "color-primary": "purple",
+        "color-text-primary": "#202020",
+        "radius-Button": "16px",
+      },
+    },
+  ]}
 />
 
 You can add multiple theme files to an app. Suppose the designer has created multiple brand themes (`our-brand`, and `our-brand2`) you can list them in the `themes` property:
@@ -117,25 +117,25 @@ You can add multiple theme files to an app. Suppose the designer has created mul
 ```
 
 <Playground
-    previewOnly={true}
-    name="Second theme"
-    height={280}
-    horizontal={true}
-    app={mySimpleApp}
-    defaultTheme="our-brand2"
-    themes={[
-        {
-            name: "Our Brand Theme",
-            id: "our-brand2",
-            tone: "dark",
-            themeVars: {
-                "color-bg": "saddlebrown",
-                "color-primary": "magenta",
-                "color-text-primary": "#e0e0e0",
-                "radius-Button": "16px",
-            },
-        },
-    ]}
+  previewOnly
+  name="Second theme"
+  height={280}
+  horizontal
+  app={mySimpleApp}
+  defaultTheme="our-brand2"
+  themes={[
+    {
+      name: "Our Brand Theme",
+      id: "our-brand2",
+      tone: "dark",
+      themeVars: {
+        "color-bg": "saddlebrown",
+        "color-primary": "magenta",
+        "color-text-primary": "#e0e0e0",
+        "radius-Button": "16px",
+      },
+    },
+  ]}
 />
 
 ### Creating a new Theme
@@ -215,9 +215,9 @@ These are the theme variables in the previous theme definition:
 
 ## Theme Variable Semantics
 
-The XMLUI theming engine aspires to allow the creation of new themes and the customizing of existing ones with the least effort. To support this striving, theme variables have a unique naming convention that the engine leverages when rendering visual components.
+The theming engine in XMLUI is built to allow the creation of new themes and the customizing of existing ones with the least amount of effort. To support this, theme variables have a unique naming convention that the engine leverages when rendering visual components.
 
-Each theme name should follow naming convention to leverage the intelligent features of the theming engine:
+Each theme variable name follows a naming convention to leverage the arsenal of features the theming engine provides:
 
 ```text
 <propertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
@@ -225,32 +225,33 @@ Each theme name should follow naming convention to leverage the intelligent feat
 
 In this convention, the `<ComponentId>` part is optional.
 
-- Those theme variables that do not use the `<ComponentId>` segment are _app-bound_ variables, for they define visuals that can be applied to the entire application, including multiple types of components.
-- The variables with a `<ComponentId>` segment are _component-bound_ variables, which influence only the component's appearance defined by the corresponding ID.
+- Those theme variables that do not use the `<ComponentId>` segment are _app-bound_ variables, so they define visuals that can be applied to the entire application, including multiple types of components.
+- Variables with a `<ComponentId>` segment are _component-bound_ variables, which influence only the component's appearance defined by the corresponding ID.
 
-> **Note**: You can define theme variables that do not follow this convention; we call them _unbound_ variables. You can still use them; however, the theming engine simply replaces their occurrences with their values without the intelligence it adds for app-bound and component-bound variables.
+> **Note**: You can define theme variables that do not follow this convention; we call them _unbound_ variables. You can still use them; however, the theming engine simply replaces their occurrences with their values without utilizing intelligent feaures provided for app-bound and component-bound variables.
 
 ### Properties, Traits, and States
 
-Each theme variable is about to define the value of a property influencing the visual appearance of a particular part of the UI. The `<propertyName>` segment defines such a visual property. Here are a few examples:
+Each theme variable is used to define the value of a property influencing the visual appearance of a particular part of the UI. The `<propertyName>` segment defines such a visual property. Here are a few examples:
 
 - `color-text`: text color (or forecolor)
 - `color-bg`: background color
 - `text-size`: the size of the text
 - `line-height`: the height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
+
 The `<propertyName>` segment should use lowercase letters and dashes.
 
-For the complete list of available `<propertyName>` values, see the [Theme Variables](/components/appearance/theme-variables/#property-names) article in the Component Reference.
+For the complete list of available `<propertyName>` values, see the [Theme Variables](/components/appearance/theme-variables/#property-names) article under "Component Reference".
 
-The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyName>`).
+The `<trait1>` and `<trait2>` segments describe one or two traits regarding a particular property.
 
-For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
+For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among others) these theme variables to modify button colors:
 
 - `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
 - `color-border-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
 
-See the [Theme Variables](/components/appearance/theme-variables/#app-bound-traits) article in the Component Reference for the complete list of app-bound traits. You can check the traits of a particular component on its reference page.
+See the [Theme Variables](/components/appearance/theme-variables/#app-bound-traits) article under "Component Reference" for the complete list of app-bound traits. You can check the traits of a particular component on its reference page.
 
 The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
 
@@ -260,20 +261,20 @@ The `<state1>`, ..., `<stateN>` values define visual states that may modify the 
 
 When defining a theme variable, you can define multiple state values (in any order). Let's see a few examples:
 
-- `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
+- `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button and with the `primary` theme color while the mouse hovers over it.
 - `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
 For the complete list of available `<state>` values, see the [Theme Variables](/components/appearance/theme-variables/#visual-states) article in the Component Reference.
 
 ### Theme Variable Chaining
 
-You earlier learned that theme variables following the naming conventions above are either app- or component-bound. When the name contains a `<ComponentId>` section, it is bound to the component with that ID. The component ID is always the name of the component (with the exact case) as you use them in the markup, For example, `Button` for the `<Button>` component, `AppHeader` for the `<AppHeader>` component, and so on.
+Earlier, you have learned that theme variables following the naming conventions above are either app- or component-bound. When the name contains a `<ComponentId>` section, it is bound to the component with that ID. The component ID is always the name of the component (with the exact case) as you use them in the markup. For example, `Button` for the `<Button>` component, `AppHeader` for the `<AppHeader>` component, and so on.
 
-> **Note**: The individual XMLUI components are built to leverage as many app-bound theme properties as possible instead of using unnecessary component-bound components. Their design ensures that you can change their visual appearance by modifying only a few theme variables and also allows you to fine-tune the component style.
+> **Note**: The individual XMLUI components are built to leverage as many app-bound theme properties as possible. Their design ensures that you can change their visual appearance by modifying only a few theme variables and also allows you to fine-tune component styles.
 
 The theming engine uses several techniques to achieve this behavior. One of them is _theme variable chaining_.
 
-This approach means that theme variables compose a chain, and most fall back to the previous variable on that chain. For example, here is a chain that sets the border color of a solid button using the primary color when the mouse hovers over it:
+This approach means that theme variables compose a chain and most fall back to a previous variable on that chain that is more generic. For example, here is a chain that sets the border color of a solid button using the primary color when the mouse hovers over it:
 
 ```text
 color-primary
@@ -287,18 +288,18 @@ color-primary
 
 Theme variable chaining has two significant behaviors:
 
-- **Traversal from the chain's last (bottom) element toward the first (top).** When the engine looks for a particular theme variable, it searches it from the bottom toward the top, until it finds the particular variable.
+- **Traversal from the chain's last (bottom) element toward the first (top).** When the engine looks for a particular theme variable, it searches it from the bottom toward the top, until it finds the particular variable to use.
 - **Tail pruning**. When you set the value of a theme variable somewhere in the chain, the other variables toward the bottom of the chain get cleared (they lose their values).
 
-> **Note**: Components may add logic to generate undefined lower-level theme variable values from upper-level values. For example, the `Button` component automatically creates fallback colors when the `color-Button` theme variable is set.
+> **Note**: Components may add logic to generate undefined lower-level theme variable values from upper-level values. For example, the `Button` component automaticaly creates fallback colors when the `color-Button` theme variable is set.
 
 ### Changing App-Bound Variables
 
 Let's examine these behaviors with examples! Here, you see a gallery of assorted buttons, a badge, and a few text components using the default theme (light):
 
-<Playground previewOnly={true} name="Gallery with the default theme" height={440} horizontal={true} app={gallery} />
+<Playground previewOnly name="Gallery with the default theme" height={440} horizontal app={gallery} />
 
-Let's update the value of `color-primary`! This theme variable is at the top of the theme variable chain.
+Let's update the value of `color-primary`. This theme variable is at the top of the theme variable chain.
 
 ```json
 {
@@ -309,29 +310,29 @@ Let's update the value of `color-primary`! This theme variable is at the top of 
 Due to the theme variable chaining, all components using the primary color (`Button` instances with their theme color property set to `primary` and `Badge` leverage the primary color) immediately change their appearance:
 
 <Playground
-    previewOnly={true}
-    name="Changing 'color-primary'"
-    height={440}
-    horizontal={true}
-    app={gallery}
-    defaultTheme="sample"
-    themes={[
-        {
-            name: "Sample",
-            id: "sample",
-            tone: "light",
-            themeVars: {
-                "color-primary": "orangered",
-            },
-        },
-    ]}
+  previewOnly
+  name="Changing 'color-primary'"
+  height={440}
+  horizontal
+  app={gallery}
+  defaultTheme="sample"
+  themes={[
+    {
+      name: "Sample",
+      id: "sample",
+      tone: "light",
+      themeVars: {
+        "color-primary": "orangered",
+      },
+    },
+  ]}
 />
 
 Try moving the mouse over the buttons labeled as primary and click them! You can see that the change in the `color-primary` theme variable affects other button colors, like the one used to indicate the hovered and pressed states. The theming engine ensures that the changes in `color-primary` update the related visual properties automatically. Besides the hover color, the border color changes, too.
 
 ### Changing Component-Bound Variables
 
-Changing `color-primary` updated the primary color of all components, including the `Badge`. Suppose you want to keep the `Badge` component intact, for you intend to change only button colors. In that case, you should use the more specific `color-Button` theme variable, which (as it is a component-bound theme variable), affects only `Button`:
+Changing `color-primary` updated the primary color of all components, including the `Badge`. Suppose you want to keep the `Badge` component intact, because you intend to change only button colors. In that case, you should use the more specific `color-Button` theme variable, which (as it is a component-bound theme variable), affects only the `Button` component:
 
 ```json
 {
@@ -453,7 +454,7 @@ Try the hover effect now! You can see now it affects only the top-left button (u
 
 ### Component Theme Classes
 
-Components can form a theming hierarchy. For example, many components represent some inputs, as the following example shows:
+Components can form a theming hierarchy. For example, many components represent some input fields, as the following example shows:
 
 ```ueml {3,4}
 <Form id="driveForm" subject="{{car: 'Toyota Celica', year: '1999'}}" padding=1em>
@@ -500,7 +501,7 @@ The new theme works as you expect:
     ]}
 />
 
-Many components function as inputs. When you change some of their generic visual traits, such as the rounding, you will likely change the same trait of multiple component types. For example, you changed the rounding of two components in the previous sample.
+Many components function as inputs. When you change some of their more generic visual attributes, such as the rounding of borders, you will likely change the same attribute of multiple component types. For example, you changed the border rounding of two components in the previous sample.
 
 What if you intend to change the rounding of ten input component types? Following the pattern above, you would end up with a theme with ten different `radius-<component-name>` theme variables.
 
@@ -540,9 +541,9 @@ This theme changes the rounding and the background color of **all** input compon
 
 The key to this behavior is the `Input` component name within the `radius-Input` and `color-bg-Input` variable names.
 
-There is no `Input` component. `Input` is just an abstract *theme class name* used from theming. The `TextBox`, `NumberBox`, and other input components (behind the scenes, in their implementation) declare their theming inherits from the abstract `Input` theming. This declaration adds new theme variables to the theme variable chain of input components.
+There is no `Input` component. `Input` is just an abstract *theme class name* used from theming. The `TextBox`, `NumberBox`, and other input components inherit visual attributes from this abstraction. This abstraction adds new theme variables to the theme variable chain of input components.
 
-For example, the rounding-related theme variable chain is this for `TextBox`:
+For example, the border rounding-related theme variable chain is the following for the `TextBox`:
 
 ```text
 radius
@@ -554,9 +555,9 @@ radius
 
 ## Theme Inheritance
 
-You can create new themes deriving from existing themes. This pattern helps you create theme variations quickly and also maintain them.
+You can descend new themes from existing themes. This pattern helps in the creation and maintainability of different theme variations.
 
-Supposing you need to construct new theme variants (multiple color options) for your product leveraging the brand design, you can create a new theme for the primary brand elements, such as fonts, sizes, spacing, and other typography traits. You can derive a few others for the color options using this theme as a base. In the derived themes, you define only the colors that distinguish the inherited theme from its base.
+Suppose you need to construct new theme variants (e.g. multiple color options) for your product leveraging your brand design. You can create a new theme for the primary brand elements, such as fonts, sizes, spacing, and other typography styles. Then, you can derive a few others to have different color options using the newly created theme as a base. In the derived themes, you define only the colors that distinguish the inherited theme from the base.
 
 ### Theme Inheritance Example
 
@@ -576,13 +577,13 @@ Let's create a new theme that applies typography elements according to your comp
 }
 ```
 
-Check how this theme modification changes the font (now it uses a serif font), lightens the heading text's weight, and increases spacing (see the Button).
+Note how this theme modification changes the font (now it uses a serif font), lightens the heading text's weight, and increases spacing (see the Button).
 
 <Playground
-    previewOnly={true}
+    previewOnly
     name="Base theme according the company brand design"
     height={280}
-    horizontal={true}
+    horizontal
     app={myThemedApp}
     defaultTheme="brand-base"
     themes={[
@@ -777,7 +778,7 @@ However, when you try the modified theme, the hover effect changes the border to
     ]}
 />
 
-*It is not a bug!* When you override the `color-border-Button-primary-solid` theme variable in the derived theme to reflect the dark nature of the theme, the theming engine applies tail pruning and undefines all theme variables behind `color-border-Button-primary-solid` in the theme variable chain. The hovered border color is (`color-border-Button-primary-solid
+*This is not a bug!* When you override the `color-border-Button-primary-solid` theme variable in the derived theme to reflect the dark nature of the theme, the theming engine applies tail pruning and undefines all theme variables behind `color-border-Button-primary-solid` in the theme variable chain. The hovered border color is (`color-border-Button-primary-solid
 --hovered`) among the undefined ones; thus, the hovered color does not reflect the purple color declared in the base theme.
 
 You can easily handle tail pruning; add the pruned theme variable definition with a new value that matches the dark theme. In this case, use medium-purple instead of purple:
@@ -901,6 +902,6 @@ Now, you can define the theme matrix cell-by-cell using multiple inheritance:
 ]
 ```
 
-Though you have nine themes, if, for some reason, you need to modify the themes, it is usually enough to change two of the base themes: one for the general appearance traits and another for colors.
+Though you have nine themes, if, for some reason, you need to modify any of them, it is usually enough to change two of the base themes: one for the general appearance traits and another for colors.
 
 Due to the multiple inheritance, you can be sure that changes in the base themes flow down to derived themes; you do not have to cope with maintaining nine separate themes.
