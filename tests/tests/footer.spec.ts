@@ -26,7 +26,7 @@ test(`theme: padding`, async ({ page }) => {
     },
   });
 
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("padding", expectedPadding);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding", expectedPadding);
 });
 
 test("theme: padding-horizontal", async ({ page }) => {
@@ -37,8 +37,8 @@ test("theme: padding-horizontal", async ({ page }) => {
       "padding-horizontal-Footer": expectedPadding,
     },
   });
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("padding-left", expectedPadding);
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("padding-right", expectedPadding);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-left", expectedPadding);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-right", expectedPadding);
 });
 
 test("theme: padding-vertical", async ({ page }) => {
@@ -49,8 +49,8 @@ test("theme: padding-vertical", async ({ page }) => {
       "padding-vertical-Footer": expectedPadding,
     },
   });
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("padding-top", expectedPadding);
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("padding-bottom", expectedPadding);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-top", expectedPadding);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("padding-bottom", expectedPadding);
 });
 
 test(`theme: bg-color`, async ({ page }) => {
@@ -74,7 +74,7 @@ test(`theme: font-size`, async ({ page }) => {
     },
   });
 
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("font-size", expectedFontSizePx);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("font-size", expectedFontSizePx);
 });
 
 test(`theme: vertical-alignment`, async ({ page }) => {
@@ -86,5 +86,5 @@ test(`theme: vertical-alignment`, async ({ page }) => {
     },
   });
 
-  await expect(page.getByTestId(FOOTER_ID)).toHaveCSS("align-items", expectedAlignment);
+  await expect(page.getByTestId(FOOTER_ID).locator('> div')).toHaveCSS("align-items", expectedAlignment);
 });
