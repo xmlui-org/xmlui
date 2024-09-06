@@ -580,7 +580,7 @@ export const Table = forwardRef(({
                               <span style={{ display: "inline-flex", minWidth: 12 }}>
                                 {header.column.columnDef.enableSorting &&
                                   <ColumnOrderingIndicator
-                                    alwaysShowOrderingIndicators={alwaysShowOrderingIndicators}
+                                    alwaysShow={alwaysShowOrderingIndicators}
                                     direction={
                                       header.column.columnDef.meta?.accessorKey === _sortBy
                                         ? _sortingDirection
