@@ -1,0 +1,75 @@
+# OffCanvas
+
+(**NOT IMPLEMENTED YET**) The `OffCanvas` component is a hidden panel that slides into view from the side of the screen. It helps
+display additional content or navigation without disrupting the main interface.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `autoCloseInMilliseconds`
+
+This property sets a timeout. When the timeout expires, the component gets hidden.
+
+### `enableBackdrop`
+
+This property indicates if the backdrop is enabled when the component is displayed. By default, this value
+is `true`. When the backdrop is not enabled, clicking outside `OffCanvas` will not close it.
+
+### `enableBodyScroll`
+
+This property indicates if the body scroll is enabled when the component is displayed. By default, this value
+is `false`.
+
+### `noCloseOnBackdropClick`
+
+When this property is set to 
+`true`
+, the 
+`OffCanvas`
+ does not close when the user clicks on its backdrop.
+
+### `placement`
+
+This property indicates the position where the 
+`OffCanvas`
+ should be docked to. The possible values are:
+
+| Value    | Description            |
+| :------- | :--------------------- |
+| `start`  | Start of the viewport  |
+| `end`    | End of the viewport    |
+| `top`    | Top of the viewport    |
+| `bottom` | Bottom of the viewport |
+
+## API
+
+### `close`
+
+This method closes the component. It triggers the `didClose` event with the argument set to `false`.
+
+### `open`
+
+This method opens the component. It triggers the `didOpen` event.
+
+## Events
+
+### `didClose`
+
+This event is triggered when the component has been closed. The event handler has a single boolean argument
+set to 
+`true`
+, indicating that the user closed the component.
+
+### `didOpen`
+
+This event is triggered when the component has been displayed. The event handler has a single boolean argument
+set to 
+`true`
+, indicating that the user closed the component.
+
+## Styling
+
+This component does not have any styles.

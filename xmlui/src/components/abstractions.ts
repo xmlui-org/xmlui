@@ -52,3 +52,16 @@ export type CommonLinkProps = {
 };
 
 export type LinkAria = "aria-disabled" | "aria-label";
+
+/**
+ * Represents the theme color a particular component can have.
+ */
+export type ComponentThemeColor =
+  | "primary"
+  | "secondary"
+  | "success"
+  | "danger"
+  | "warning"
+  | "info"
+  | "light"
+  | "dark";

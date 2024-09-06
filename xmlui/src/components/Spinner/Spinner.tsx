@@ -5,6 +5,8 @@ import { createComponentRenderer } from "@components-core/renderers";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import { desc } from "@components-core/descriptorHelper";
+import { ComponentThemeColor } from "@components/abstractions";
 
 // =====================================================================================================================
 // React Spinner component implementation
@@ -78,13 +80,22 @@ export interface SpinnerComponentDef extends ComponentDef<"Spinner"> {
      * @descriptionRef
      */
     fullScreen?: boolean;
+
+    /**
+     * (**NOT IMPLEMENTED YET**) The theme color of the component.
+     * @descriptionRef
+     */
+    themeColor?: ComponentThemeColor;
   };
 }
 
 const metadata: ComponentDescriptor<SpinnerComponentDef> = {
   displayName: "Spinner",
   description: "Component representing progress",
-  props: {},
+  props: {
+    delay: desc("The delay in milliseconds before the spinner is displayed"),
+    fullScreen: desc("If set to `true`, the component will be rendered in a full screen container"),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "size-Spinner": "$space-10",
