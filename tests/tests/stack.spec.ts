@@ -72,24 +72,30 @@ test("(vertical) children with unspecified dimensions, orientation is implicit",
 // "(horizontal) block children with unspecified dimensions" -> width is content size, height is content size, block children are treated as inline elements
 test("(horizontal) block children with unspecified dimensions", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
-    <Text testId="item_0" backgroundColor="cyan">Heading 3</Text>
-    <Text testId="item_1" backgroundColor="yellow">Heading 2</Text>
-    <Text testId="item_2" backgroundColor="lightgreen">Heading 4</Text>
-  </Stack>
+  <Fragment>
+    <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+      <Text testId="item_0" backgroundColor="cyan">Heading 1</Text>
+      <Text testId="item_1" backgroundColor="yellow">Heading 2</Text>
+      <Text testId="item_2" backgroundColor="lightgreen">Heading 3</Text>
+    </Stack>
+    <Stack testId="stack2" orientation="horizontal" backgroundColor="lightgray">
+      <Text testId="item_3" backgroundColor="coral">Heading 1Heading 2Heading 3</Text>
+    </Stack>
+  </Fragment>
   `;
   await initApp(page, { entryPoint: code });
 
   const { width: stackWidth, height: stackHeight } = await getFullRectangle(page.getByTestId("stack"));
-  const { width: itemWidth0 } = await getFullRectangle(page.getByTestId("item_0"));
-  await getFullRectangle(page.getByTestId("item_0"));
-  const { width: itemWidth1, height: tallestItemHeight } = await getFullRectangle(page.getByTestId("item_1"));
-  const { width: itemWidth2, right: itemRight2 } = await getFullRectangle(page.getByTestId("item_2"));
+  const { width: itemWidth0, height: itemHeight0 } = await getFullRectangle(page.getByTestId("item_0"));
+  const { width: itemWidth1, height: itemHeight1 } = await getFullRectangle(page.getByTestId("item_1"));
+  const { width: itemWidth2, height: itemHeight2 } = await getFullRectangle(page.getByTestId("item_2"));
+  const { width: itemWidth3 } = await getFullRectangle(page.getByTestId("item_3"));
 
   const itemWidthSum = itemWidth0 + itemWidth1 + itemWidth2;
+  const tallestItemHeight = Math.max(itemHeight0, itemHeight1, itemHeight2);
 
   expect(itemWidthSum).toBeLessThan(stackWidth);
-  expect(itemWidthSum).toEqualWithTolerance(itemRight2);
+  expect(itemWidthSum).toEqualWithTolerance(itemWidth3);
   expect(stackHeight).toEqual(tallestItemHeight);
 });
 

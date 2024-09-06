@@ -3,7 +3,7 @@
   "description": "VSCode part of a language server",
   "author": "Tamas Kapitany",
   "license": "MIT",
-  "version": "0.0.8",
+  "version": "0.0.14",
   "repository": {
     "type": "git",
     "url": "https://github.com/xmlui-com/xmlui.git"

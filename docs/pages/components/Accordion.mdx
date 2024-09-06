@@ -1,0 +1,87 @@
+# Accordion
+
+(**NOT IMPLEMENTED YET**) The `Accordion` component is a collapsible container that toggles the display of content sections. It helps
+organize information by expanding or collapsing it based on user interaction.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `collapsedIcon`
+
+This property is the name of the icon that is displayed when the accordion is collapsed.
+
+### `expandedIcon`
+
+This property is the name of the icon that is displayed when the accordion is expanded.
+
+### `header`
+
+Declares the text used in the component's header.
+
+### `headerTemplate`
+
+This property describes the template to use as the component's header.
+
+### `hideIcon`
+
+This property indicates that the trigger icon is not displayed (`true`). By default, its value
+is `false`.
+
+### `initiallyExpanded`
+
+This property indicates if the accordion is expanded (`true`) or collapsed (`false`). By default,
+this value is `false`.
+
+### `positionInGroup`
+
+This property indicates the position of the accordion in a group of accordions. The possible values are:
+
+| Value    | Description                                                              |
+| :------- | :----------------------------------------------------------------------- |
+| `single` | The accordion stands alone (not in a group)                              |
+| `first`  | This accordion is the first in a group                                   |
+| `middle` | This accordion is between the first and last items in an accordion group |
+| `last`   | This accordion is the last in a group                                    |
+
+By default, this value is `single`.
+
+### `triggerPosition`
+
+This property indicates the position where the trigger icon should be displayed. The `start` value
+signs the trigger is before the header text (template), and `end` indicates that it follows the header.
+
+## API
+
+### `collapse`
+
+This method collapses the accordion.
+
+### `expand`
+
+This method expands the accordion.
+
+### `expanded`
+
+This property indicates if the accordion is expanded (`true`) or collapsed (`false`).
+
+### `focus`
+
+This method sets the focus on the accordion.
+
+### `toggle`
+
+This method toggles the accordion's state between expanded and collapsed.
+
+## Events
+
+### `displayDidChange`
+
+This event is triggered when the state of the accordion changes from collapsed to expanded or vice versa.
+The event has a single Boolean argument, which is `true`, if the new state of the accordion is expanded.
+
+## Styling
+
+This component does not have any styles.

@@ -1,7 +1,7 @@
-import { CharacterCodes } from "../xmlui-parser/CharacterCodes";
-import { createScanner } from "../xmlui-parser/scanner";
-import { SyntaxKind, getSyntaxKindStrRepr } from "../xmlui-parser/syntax-kind";
-import { Node } from "../xmlui-parser/syntax-node";
+import { CharacterCodes } from "./CharacterCodes";
+import { createScanner } from "./scanner";
+import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
+import { Node } from "./syntax-node";
 import { tagNameNodesMatch } from "./utils";
 
 export enum ErrCodes {

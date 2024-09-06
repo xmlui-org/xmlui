@@ -20,6 +20,7 @@
   --syntax-token-cdata: #079CF1;
   --syntax-token-delimiter-curly: #000000;
   --syntax-token-text: #4e5fb3;
+  --syntax-token-slot: #6f31ac;
 }
 
 :is(html[class~=dark]) {
@@ -36,6 +37,7 @@
   --syntax-token-cdata: #5CC1F9;
   --syntax-token-delimiter-curly: #FFFFFF;
   --syntax-token-text: #f5f5ff;
+  --syntax-token-slot: #efc79d;
 
   --color-background-secondary: #121b28;
   --color-background-primary: #1e2734;

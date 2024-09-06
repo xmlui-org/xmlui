@@ -110,7 +110,17 @@ There are several `Datasource` properties to set up the attributes of the reques
 
 #### `url`
 
-With this property, you can declare the URL to send the request to. The value of `url` can be an absolute URL (such as `https://mycompany.com/api/books`) or a relative (such as `/api/books`) to the default target set in the `<base>` HTML tag within `<head>`.
+With this property, you can declare the URL to send the request to.
+The value of the `url` can be an absolute URL (such as `https://mycompany.com/api/books`)
+or a relative (such as `/api/books`) to the default base URL set in the `<base>` HTML tag within `<head>` like so:
+
+```html
+<head>
+  <base href="https://www.example.com/" />
+</head>
+```
+
+Where the relative path appended to the base will result in the following: `https://www.example.com/api/books`.
 
 #### `method`
 
@@ -175,7 +185,7 @@ When it is time to execute a request, the engine assembles it according to the a
 
 When the response arrives from the endpoint, and its status indicates success, the engine processes it in a few steps:
 
-1. **Paging information extraction**. The `Datasource` component can be used in scenarios when data is retrieved in pages (windows). To extract paging information from the response, you can define two properties, `prevPageParamSelector` and `nextPageParamSelector`. The `Datasource` component stores these values and uses them for subsequent paged queries.
+1. **Paging information extraction**. The `Datasource` component can be used in scenarios when data is retrieved in pages (or windows). To extract paging information from the response, you can define two properties, `prevPageParamSelector` and `nextPageParamSelector`. The `Datasource` component stores these values and uses them for subsequent paged queries.
 2. **Result extraction**. The complete response may wrap the data of interest with other information we want to ignore. The `resultSelector` property allows the specification of a selector to extract the primary information from the response.
 3. **Result transformation**. The result may need to be in the right format to display in the UI. The `transformResult` property lets you define a function that converts the data into a UI-suitable format.
 4. **Success handler invocation**. The engine fires the `onSuccess` event, passing the result to notify the UI about the successful request execution.
@@ -206,12 +216,24 @@ If any issue comes up (request timeout, backend error, etc.), the UI will roll b
 
 ## Backend Data Caching
 
-In the same vein as the [Optimistic UI](#the-optimistic-ui-design-pattern) the idea behind backend data caching is to speed up the display of the most recent version of the data on the UI.
+Likewise to the notion of [Optimistic UI](#the-optimistic-ui-design-pattern) the motivation behind backend data caching is to speed up the display of the most recent version of the data on the UI.
 XMLUI uses a caching strategy that involves storing data fetched from an API in memory on the client side,
 so that subsequent requests for the same data can be served faster by retrieving the data from the cache instead of making a new network request.
 
-XMLUI identifies certain parts of the cache with certain URL routes acting as keys (e.g. an endpoint with the route `/api/tasks` is a reference to the tasks data in the cache).
+By default, data manipulation requests in XLMUI trigger a whole cache invalidation to ensure the latest data is displayed.
+Thus, knowing the relationships between different parts of the data is useful in optimizing cache invalidation methods. 
+
+To this end, XMLUI identifies parts of the cache with URL routes acting as keys
+(e.g. an endpoint with the route `/api/tasks` is a reference to the data containing the "tasks" data structure in the cache).
 These keys can be referenced in code to invalidate certain parts of the cache.
 
-By default, data manipulation requests trigger a whole cache invalidation to ensure the latest data is displayed.
-Thus, knowing the relationships between different parts of the data is useful in optimizing cache invalidation. 
+For instance, deleting a task from a list of tasks should only trigger the refetching of a fresh list of tasks but leave other cached data alone.
+The following code snippet shows how to do this:
+
+```ueml {4}
+<ApiAction
+  url="/tasks/task1"
+  method="delete"
+  invalidates="/tasks"
+/>
+```

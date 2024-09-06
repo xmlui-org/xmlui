@@ -1,0 +1,63 @@
+# Alert
+
+(**NOT IMPLEMENTED YET**) The `Alert` component is a panel used to display important notifications or feedback to users. It helps 
+convey different statuses or levels of urgency, such as success, warning, error, and others.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `autoDismissInMilliseconds`
+
+This property sets the alert's timeout. When the timeout expires, this component is hidden (independently 
+from the value of `dismissable`).
+
+### `dismissable`
+
+This property's `true` value indicates if this alert is dismissable by the user. When the user closes the 
+alert, it gets hidden.
+
+### `icon`
+
+This property sets the icon to be displayed in the alert. If this property is not defined, the icon 
+is selected according to the `statusColor` value; otherwise, the specified icon is used.
+
+### `showIcon`
+
+This property indicates if the alert should display an icon that represents the alert's status.
+
+### `statusColor`
+
+The value of this optional property sets the string to provide a color scheme for the Alert.
+
+| Value       | Description                                        |
+| :---------- | :------------------------------------------------- |
+| `primary`   | Primary theme color **(default)**, no default icon |
+| `secondary` | Secondary theme color, no default icon             |
+| `success`   | Success theme color, "success" icon                |
+| `warning`   | Warning theme color, "warning" icon                |
+| `danger`    | Danger theme color, "danger" icon                  |
+| `info`      | Info theme color, "info" icon                      |
+| `light`     | Light theme color, no default icon                 |
+| `dark`      | Dark theme color, no default icon                  |
+
+## API
+
+### `dismiss`
+
+This method dismisses the alert. It triggers the `didDismiss` event with the argument set to `false`.
+
+## Events
+
+### `didDismiss`
+
+This event is triggered when the alert is dismissed. The event handler has a single boolean argument 
+set to 
+`true`
+, indicating that the user dismisses the alert.
+
+## Styling
+
+This component does not have any styles.

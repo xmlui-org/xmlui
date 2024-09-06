@@ -9,6 +9,7 @@ import { RouteContext, useRouteContext, useRouteContextValue } from "@components
 import { EMPTY_ARRAY } from "@components-core/constants";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
+import {TableOfContentsProvider} from "@components-core/TableOfContentsContext";
 
 //we need this component to make sure all the child routes are wrapped in a container.
 //  this way they can access the routeParams
@@ -44,7 +45,7 @@ export function RouteWrapper({
 /**
  * The \`Page\` component defines what content is displayed
  * when the user navigates to a particular URL that is associated with the Page.
- * 
+ *
  * Examples for the \`Page\` component can be found in the [\`Pages\`](./Pages.mdx) component documentation.
  * @descriptionRef none
  */
@@ -92,7 +93,9 @@ export const pageRenderer = createComponentRenderer<PageComponentDef>(
   ({ node, extractValue, renderChild }) => {
     return (
       <Page url={extractValue(node.props.url)}>
-        <RouteWrapper childRoute={node.children} renderChild={renderChild} />
+        <TableOfContentsProvider>
+          <RouteWrapper childRoute={node.children} renderChild={renderChild} />
+        </TableOfContentsProvider>
       </Page>
     );
   },
@@ -128,7 +131,7 @@ export function Pages({ defaultRoute, children }: PagesProps) {
 /**
  * The \`Pages\` component is used as a container for [\`Page\`](./Page.mdx) components within an [\`App\`](./App.mdx).
  * See the [\`Page\` docs](./Page.mdx) for a short description.
- * 
+ *
  * Examples for both components can be found here.
  * @descriptionRef
  */

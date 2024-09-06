@@ -7,6 +7,7 @@ import type { LayoutContext, NonCssLayoutProps } from "@abstractions/RendererDef
 
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { StyleParser, toCssVar } from "./StyleParser";
+import { MediaBreakpointType } from "@abstractions/AppContextDefs";
 
 // Property parsing issues
 type PropertyIssues = Record<string, string | undefined>;
@@ -26,7 +27,7 @@ const defaultCompResult = {
 export function compileLayout(
   layoutProps: LayoutProps = EMPTY_OBJECT,
   themeVars?: Record<string, string>,
-  layoutContext?: LayoutContext
+  layoutContext?: LayoutContext,
 ): StyleCompilationResult {
   const result: StyleCompilationResult = {
     cssProps: {},
@@ -35,15 +36,15 @@ export function compileLayout(
   const css: CSSProperties = result.cssProps!;
 
   // --- Compile alignment
-  const horizontalAlignment = compileAlignment("horizontalAlignment", layoutProps?.horizontalAlignment?.toString());
+  const horizontalAlignment = compileAlignment("horizontalAlignment", layoutProps);
   if (horizontalAlignment) {
     result.nonCssProps.horizontalAlignment = horizontalAlignment;
   }
-  const verticalAlignment = compileAlignment("verticalAlignment", layoutProps?.verticalAlignment?.toString());
+  const verticalAlignment = compileAlignment("verticalAlignment", layoutProps);
   if (verticalAlignment) {
     result.nonCssProps.verticalAlignment = verticalAlignment;
   }
-  const orientation = compileOrientation("orientation", layoutProps?.orientation?.toString());
+  const orientation = compileOrientation("orientation", layoutProps);
   if (orientation) {
     result.nonCssProps.orientation = orientation;
   }
@@ -54,155 +55,150 @@ export function compileLayout(
     css.flexShrink = 0;
   }
 
-  const widthResult = compileSize("width", layoutProps.width?.toString());
+  const widthResult = compileSize("width", layoutProps);
   if (widthResult.value) css.width = widthResult.value;
   if (isHorizontalAndStartSize(widthResult, layoutContext)) {
     // --- In a horizontal container, we use "flex" when width is in start-size
     css.flex = widthResult.ratio;
     css.flexShrink = 1; //if it's star sizing, we allow shrinking
   }
-  const minWidthResult = compileSize("minWidth", layoutProps.minWidth?.toString());
+  const minWidthResult = compileSize("minWidth", layoutProps);
   if (minWidthResult.value) css.minWidth = minWidthResult.value;
-  const maxWidthResult = compileSize("maxWidth", layoutProps.maxWidth?.toString());
+  const maxWidthResult = compileSize("maxWidth", layoutProps);
   if (maxWidthResult.value) css.maxWidth = maxWidthResult.value;
-  const heightResult = compileSize("height", layoutProps.height?.toString());
+  const heightResult = compileSize("height", layoutProps);
   if (heightResult.value) css.height = heightResult.value;
   if (isVerticalAndStarSize(heightResult, layoutContext)) {
     // --- In a vertical container, we use "flex" when height is in star-size
     css.flex = heightResult.ratio;
     css.flexShrink = 1;
   }
-  const minHeightResult = compileSize("minHeight", layoutProps.minHeight?.toString());
+  const minHeightResult = compileSize("minHeight", layoutProps);
   if (minHeightResult.value) css.minHeight = minHeightResult.value;
-  const maxHeightResult = compileSize("maxHeight", layoutProps.maxHeight?.toString());
+  const maxHeightResult = compileSize("maxHeight", layoutProps);
   if (maxHeightResult.value) css.maxHeight = maxHeightResult.value;
 
   // --- Compile positions
-  const top = compileSize("top", layoutProps.top?.toString());
+  const top = compileSize("top", layoutProps);
   if (top.value) css.top = top.value;
-  const right = compileSize("right", layoutProps.right?.toString());
+  const right = compileSize("right", layoutProps);
   if (right.value) css.right = right.value;
-  const bottom = compileSize("bottom", layoutProps.bottom?.toString());
+  const bottom = compileSize("bottom", layoutProps);
   if (bottom.value) css.bottom = bottom.value;
-  const left = compileSize("left", layoutProps.left?.toString());
+  const left = compileSize("left", layoutProps);
   if (left.value) css.left = left.value;
 
   // --- Compile gap
-  const gap = compileSize("gap", layoutProps.gap?.toString());
+  const gap = compileSize("gap", layoutProps);
   if (gap.value) css.gap = gap.value;
 
   // --- Compile border
-  const border = compileBorder("border", layoutProps.border?.toString());
+  const border = compileBorder("border", layoutProps);
   if (border) css.border = border;
-  const borderTop = compileBorder("borderTop", layoutProps.borderTop?.toString());
+  const borderTop = compileBorder("borderTop", layoutProps);
   if (borderTop) css.borderTop = borderTop;
-  const borderRight = compileBorder("borderRight", layoutProps.borderRight?.toString());
+  const borderRight = compileBorder("borderRight", layoutProps);
   if (borderRight) css.borderRight = borderRight;
-  const borderBottom = compileBorder("borderBottom", layoutProps.borderBottom?.toString());
+  const borderBottom = compileBorder("borderBottom", layoutProps);
   if (borderBottom) css.borderBottom = borderBottom;
-  const borderLeft = compileBorder("borderLeft", layoutProps.borderLeft?.toString());
+  const borderLeft = compileBorder("borderLeft", layoutProps);
   if (borderLeft) css.borderLeft = borderLeft;
 
   // --- Compile radius
-  const radius = compileRadius("radius", layoutProps.radius?.toString());
+  const radius = compileRadius("radius", layoutProps);
   if (radius) css.borderRadius = radius;
-  const radiusTopLeft = compileRadius("radiusTopLeft", layoutProps.radiusTopLeft?.toString());
+  const radiusTopLeft = compileRadius("radiusTopLeft", layoutProps);
   if (radiusTopLeft) css.borderTopLeftRadius = radiusTopLeft;
-  const radiusTopRight = compileRadius("radiusTopRight", layoutProps.radiusTopRight?.toString());
+  const radiusTopRight = compileRadius("radiusTopRight", layoutProps);
   if (radiusTopRight) css.borderTopRightRadius = radiusTopRight;
-  const radiusBottomLeft = compileRadius("radiusBottomLeft", layoutProps.radiusBottomLeft?.toString());
+  const radiusBottomLeft = compileRadius("radiusBottomLeft", layoutProps);
   if (radiusBottomLeft) css.borderBottomLeftRadius = radiusBottomLeft;
-  const radiusBottomRight = compileRadius("radiusBottomRight", layoutProps.radiusBottomRight?.toString());
+  const radiusBottomRight = compileRadius("radiusBottomRight", layoutProps);
   if (radiusBottomRight) css.borderBottomRightRadius = radiusBottomRight;
 
   // --- Compile padding
-  const padding = compileSize("padding", layoutProps.padding?.toString());
+  const padding = compileSize("padding", layoutProps);
   if (padding.value) css.padding = padding.value;
-  const horizontalPadding = compileSize("horizontalPadding", layoutProps.horizontalPadding?.toString());
-  const verticalPadding = compileSize("verticalPadding", layoutProps.verticalPadding?.toString());
-  const paddingLeft = mergeSizes(compileSize("leftPadding", layoutProps.paddingLeft?.toString()), horizontalPadding);
+  const horizontalPadding = compileSize("horizontalPadding", layoutProps);
+  const verticalPadding = compileSize("verticalPadding", layoutProps);
+  const paddingLeft = mergeSizes(compileSize("paddingLeft", layoutProps), horizontalPadding);
   if (paddingLeft.value) css.paddingLeft = paddingLeft.value;
-  const paddingRight = mergeSizes(compileSize("rightPadding", layoutProps.paddingRight?.toString()), horizontalPadding);
+  const paddingRight = mergeSizes(compileSize("paddingRight", layoutProps), horizontalPadding);
   if (paddingRight.value) css.paddingRight = paddingRight.value;
-  const paddingTop = mergeSizes(compileSize("topPadding", layoutProps.paddingTop?.toString()), verticalPadding);
+  const paddingTop = mergeSizes(compileSize("paddingTop", layoutProps), verticalPadding);
   if (paddingTop.value) css.paddingTop = paddingTop.value;
-  const paddingBottom = mergeSizes(
-    compileSize("bottomPadding", layoutProps.paddingBottom?.toString()),
-    verticalPadding
-  );
+  const paddingBottom = mergeSizes(compileSize("paddingBottom", layoutProps), verticalPadding);
   if (paddingBottom.value) css.paddingBottom = paddingBottom.value;
 
   // --- Compile margin
-  const margin = compileMargin("margin", layoutProps.margin?.toString());
+  const margin = compileMargin("margin", layoutProps);
   if (margin) css.margin = margin;
-  const horizontalMargin = compileMargin("horizontalMargin", layoutProps.horizontalMargin?.toString());
-  const verticalMargin = compileMargin("verticalMargin", layoutProps.verticalMargin?.toString());
-  const marginLeft = compileMargin("leftMargin", layoutProps.marginLeft?.toString()) ?? horizontalMargin;
+  const horizontalMargin = compileMargin("horizontalMargin", layoutProps);
+  const verticalMargin = compileMargin("verticalMargin", layoutProps);
+  const marginLeft = compileMargin("marginLeft", layoutProps) ?? horizontalMargin;
   if (marginLeft) css.marginLeft = marginLeft;
-  const marginRight = compileMargin("rightMargin", layoutProps.marginRight?.toString()) ?? horizontalMargin;
+  const marginRight = compileMargin("marginRight", layoutProps) ?? horizontalMargin;
   if (marginRight) css.marginRight = marginRight;
-  const marginTop = compileMargin("topMargin", layoutProps.marginTop?.toString()) ?? verticalMargin;
+  const marginTop = compileMargin("marginTop", layoutProps) ?? verticalMargin;
   if (marginTop) css.marginTop = marginTop;
-  const marginBottom = compileMargin("bottomMargin", layoutProps.marginBottom?.toString()) ?? verticalMargin;
+  const marginBottom = compileMargin("marginBottom", layoutProps) ?? verticalMargin;
   if (marginBottom) css.marginBottom = marginBottom;
 
   // --- Compile other
-  const backgroundColor = compileColor("backgroundColor", layoutProps.backgroundColor?.toString());
+  const backgroundColor = compileColor("backgroundColor", layoutProps);
   if (backgroundColor) css.backgroundColor = backgroundColor;
   //TODO illesg
-  const background = compileBackground("background", layoutProps.background?.toString());
+  const background = compileBackground("background", layoutProps);
   if (background) css.background = background;
-  const boxShadow = compileShadow("shadow", layoutProps.shadow?.toString());
+  const boxShadow = compileShadow("shadow", layoutProps);
   if (boxShadow) css.boxShadow = boxShadow;
-  const direction = compileDirection("direction", layoutProps.direction?.toString()) as any;
+  const direction = compileDirection("direction", layoutProps) as any;
   if (direction) css.direction = direction;
-  const overflowX = compileScrolling("horizontalOverflow", layoutProps.horizontalOverflow?.toString()) as any;
+  const overflowX = compileScrolling("horizontalOverflow", layoutProps) as any;
   if (overflowX) css.overflowX = overflowX;
-  const overflowY = compileScrolling("verticalOverflow", layoutProps.verticalOverflow?.toString()) as any;
+  const overflowY = compileScrolling("verticalOverflow", layoutProps) as any;
   if (overflowY) css.overflowY = overflowY;
-  const zIndex = compileZIndex("zIndex", layoutProps.zIndex?.toString()) as any;
+  const zIndex = compileZIndex("zIndex", layoutProps) as any;
   if (zIndex) css.zIndex = zIndex;
-  const opacity = compileOpacity("zIndex", layoutProps?.opacity?.toString()) as any;
+  const opacity = compileOpacity("opacity", layoutProps) as any;
   if (opacity) css.opacity = opacity;
 
   // --- Compile typography
-  const color = compileColor("color", layoutProps.color?.toString());
+  const color = compileColor("color", layoutProps);
   if (color) css.color = color;
-  const fontFamily = compileFontFamily("fontFamily", layoutProps.fontFamily?.toString());
+  const fontFamily = compileFontFamily("fontFamily", layoutProps);
   if (fontFamily) css.fontFamily = fontFamily;
-  const fontSize = compileSize("fontSize", layoutProps.fontSize?.toString());
+  const fontSize = compileSize("fontSize", layoutProps);
   if (fontSize.value) css.fontSize = fontSize.value;
-  const fontWeight = compileFontWeight("fontWeight", layoutProps.fontWeight?.toString());
+  const fontWeight = compileFontWeight("fontWeight", layoutProps);
   if (fontWeight) css.fontWeight = fontWeight;
-  const fontStyle = compileItalic("italic", layoutProps.italic?.toString());
+  const fontStyle = compileItalic("italic", layoutProps);
   if (fontStyle) css.fontStyle = fontStyle;
-  const textDecoration = compileTextDecoration("textDecoration", layoutProps.textDecoration?.toString());
+  const textDecoration = compileTextDecoration("textDecoration", layoutProps);
   if (textDecoration) css.textDecoration = textDecoration;
-  const userSelect = compileUserSelect("userSelect", layoutProps?.userSelect?.toString());
+  const userSelect = compileUserSelect("userSelect", layoutProps);
   if (userSelect) css.userSelect = userSelect as any;
-  const letterSpacing = compileSize("letterSpacing", layoutProps?.letterSpacing?.toString());
+  const letterSpacing = compileSize("letterSpacing", layoutProps);
   if (letterSpacing.value) css.letterSpacing = letterSpacing.value;
-  const textTransform = compileTextTransform("textTransform", layoutProps?.textTransform?.toString());
+  const textTransform = compileTextTransform("textTransform", layoutProps);
   if (textTransform) css.textTransform = textTransform as any;
-  const lineHeight = compileLineHeight("lineHeight", layoutProps?.lineHeight?.toString());
+  const lineHeight = compileLineHeight("lineHeight", layoutProps);
   if (lineHeight) css.lineHeight = lineHeight;
-  const textAlign = compileTextAlign("textAlign", layoutProps?.textAlign?.toString());
+  const textAlign = compileTextAlign("textAlign", layoutProps);
   if (textAlign) css.textAlign = textAlign as any;
-  const textAlignLast = compileTextAlign("textAlignLast", layoutProps?.textAlignLast?.toString());
+  const textAlignLast = compileTextAlign("textAlignLast", layoutProps);
   if (textAlignLast) css.textAlignLast = textAlignLast as any;
-
-  //TODO illesg
   const textWrap = layoutProps?.textWrap?.toString();
   if (textWrap) css.textWrap = textWrap as any;
 
   // --- Compile content rendering
-  const wrapContent = compileWrapContent("wrapContent", layoutProps?.wrapContent?.toString());
+  const wrapContent = compileWrapContent("wrapContent", layoutProps);
   if (wrapContent) css.flexWrap = wrapContent as any;
-  const canShrink = compileCanShrink("canShrink", layoutProps?.canShrink?.toString());
+  const canShrink = compileCanShrink("canShrink", layoutProps);
   if (canShrink) css.flexShrink = canShrink as any;
 
   // --- Other
-  const cursor = compileCursor("cursor", layoutProps?.cursor?.toString());
+  const cursor = compileCursor("cursor", layoutProps);
   if (cursor) css.cursor = cursor;
 
   // --- Done
@@ -230,112 +226,145 @@ export function compileLayout(
 
   function compile<T extends StyleNode>(
     propName: string,
-    source: string | undefined,
+    layoutProps: LayoutProps | undefined,
     parseFn: (parser: StyleParser) => T | null,
     convertFn: (node: T) => string | undefined
   ): string | undefined {
-    if (!source) return undefined;
-    const parser = new StyleParser(source);
-    try {
-      const node = parseFn(parser);
-      if (!node) return source;
-      if (!parser.testCompleted()) {
+    const defValue = compileSingleProperty();
+    if (layoutContext?.mediaSize?.sizeIndex !== undefined) {
+      const sizeIndex = layoutContext.mediaSize?.sizeIndex;
+      const xsValue = compileSingleProperty("xs");
+      const smValue = compileSingleProperty("sm");
+      const mdValue = compileSingleProperty("md");
+      const lgValue = compileSingleProperty("lg");
+      const xlValue = compileSingleProperty("xl");
+      const xxlValue = compileSingleProperty("xxl");
+      let mergedValue: string;
+      switch (sizeIndex) {
+        case 0: // xs
+          mergedValue = xsValue ?? smValue ?? mdValue;
+          break;
+        case 1: // sm
+          mergedValue = smValue ?? mdValue;
+          break;
+        case 2: // md
+          mergedValue = mdValue;
+          break;
+        case 3: // lg
+          mergedValue = lgValue;
+          break;
+        case 4: // xl
+          mergedValue = xlValue ?? lgValue;
+          break;
+        case 5: // xxl
+          mergedValue = xxlValue ?? xlValue ?? lgValue;
+          break;
+      }
+      return mergedValue ?? defValue;
+    }
+    return defValue;
+
+    function compileSingleProperty(sizeSpec?: MediaBreakpointType): string | undefined {
+      const source =
+        layoutProps?.[propName + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
+      if (!source) return undefined;
+      const parser = new StyleParser(source);
+      try {
+        const node = parseFn(parser);
+        if (!node) return source;
+        if (!parser.testCompleted()) {
+          result.issues ??= {};
+          result.issues[propName] = `Unexpected tail after the ${propName}`;
+          return source;
+        }
+        if (node.themeId) {
+          return toCssVar(node.themeId);
+        }
+        return convertFn(node);
+      } catch (err: any) {
         result.issues ??= {};
-        result.issues[propName] = `Unexpected tail after the ${propName}`;
+        result.issues[propName] = err?.toString();
         return source;
       }
-      //TODO illesg
-      // if (hasOnlyUnresolvedVars(node.themeId)) {
-      //   return undefined;
-      // }
-      if (node.themeId) {
-        return toCssVar(node.themeId);
-      }
-      return convertFn(node);
-    } catch (err: any) {
-      result.issues ??= {};
-      result.issues[propName] = err?.toString();
-      //TODO illesg
-      return source;
     }
   }
 
   // --- Compiles an alignment definition into a CSS size property
-  function compileAlignment(propName: string, source?: string): string | undefined {
+  function compileAlignment(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseAlignment(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
   // --- Compiles an alignment definition into a CSS size property
-  function compileTextAlign(propName: string, source?: string): string | undefined {
+  function compileTextAlign(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseTextAlign(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
   // --- Compiles a user select definition into a CSS size property
-  function compileUserSelect(propName: string, source?: string): string | undefined {
+  function compileUserSelect(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseUserSelect(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
   // --- Compiles a text transform definition into a CSS size property
-  function compileTextTransform(propName: string, source?: string): string | undefined {
+  function compileTextTransform(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseTextTransform(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
-  function compileOrientation(propName: string, source?: string): string | undefined {
+  function compileOrientation(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseOrientation(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
   // --- Compiles a size definition into a CSS size property
-  function compileLineHeight(propName: string, source?: string): string | undefined {
+  function compileLineHeight(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseLineHeight(),
-      (n) => `${n.value}${n.unit}`
+      (n) => `${n.value}${n.unit}`,
     );
   }
 
   // --- Compiles a size definition into a CSS size property
-  function compileOpacity(propName: string, source?: string): string | undefined {
+  function compileOpacity(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseOpacity(),
-      (n) => `${n.value}${n.unit}`
+      (n) => `${n.value}${n.unit}`,
     );
   }
 
   // --- Compiles a size definition into a CSS size property
-  function compileSize(propName: string, source?: string): SizeResult {
+  function compileSize(propName: string, layoutProps: LayoutProps): SizeResult {
     let isStarSize = false;
     let ratio: number | undefined;
     let value = compile(
       propName,
-      source,
+      layoutProps,
       (p) => {
         const sizeNode = p.parseSize();
         isStarSize = sizeNode?.unit === "*";
@@ -345,7 +374,7 @@ export function compileLayout(
 
         return sizeNode;
       },
-      (n) => n.extSize ?? `${n.value}${n.unit}`
+      (n) => n.extSize ?? `${n.value}${n.unit}`,
     );
 
     return {
@@ -356,95 +385,95 @@ export function compileLayout(
   }
 
   // --- Compiles a size definition into a CSS size property
-  function compileMargin(propName: string, source?: string): string | undefined {
+  function compileMargin(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseMargin(),
-      (n) => n.extSize ?? `${n.value}${n.unit}`
+      (n) => n.extSize ?? `${n.value}${n.unit}`,
     );
   }
 
   // --- Compiles a zIndex definition into a CSS zIndex property
-  function compileZIndex(propName: string, source?: string): string | undefined {
+  function compileZIndex(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseZIndex(),
-      (n) => n.value.toString()
+      (n) => n.value.toString(),
     );
   }
 
-  function compileScrolling(propName: string, source?: string): string | undefined {
+  function compileScrolling(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseScrolling(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
-  function compileDirection(propName: string, source?: string): string | undefined {
+  function compileDirection(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseDirection(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
-  function compileCursor(propName: string, source?: string): string | undefined {
+  function compileCursor(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseCursor(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
-  function compileFontWeight(propName: string, source?: string): string | undefined {
+  function compileFontWeight(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseFontWeight(),
-      (n) => n.value?.toString()
+      (n) => n.value?.toString(),
     );
   }
 
-  function compileFontFamily(propName: string, source?: string): string | undefined {
+  function compileFontFamily(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseFontFamily(),
-      (n) => n.value
+      (n) => n.value,
     );
   }
 
-  function compileColor(propName: string, source?: string): string | undefined {
+  function compileColor(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseColor(),
       (n) =>
         n.value !== undefined
           ? typeof n.value === "number"
             ? `#${n.value.toString(16).padStart(8, "0")}`
             : n.value
-          : undefined
+          : undefined,
     );
   }
 
-  function compileBackground(propName: string, source?: string): string | undefined {
+  function compileBackground(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
-        propName,
-        source,
-        (p) => p.parseColor(),
-        (n) =>
-            n.value !== undefined
-                ? typeof n.value === "number"
-                    ? `#${n.value.toString(16).padStart(8, "0")}`
-                    : n.value
-                : undefined
+      propName,
+      layoutProps,
+      (p) => p.parseColor(),
+      (n) =>
+        n.value !== undefined
+          ? typeof n.value === "number"
+            ? `#${n.value.toString(16).padStart(8, "0")}`
+            : n.value
+          : undefined,
     );
   }
 
@@ -464,7 +493,7 @@ export function compileLayout(
           return false;
         }
         const themeVarDefaultValues = themeId.defaultValue.filter(
-          (value) => typeof value !== "string"
+          (value) => typeof value !== "string",
         ) as ThemeIdDescriptor[];
         if (!hasOnlyUnresolvedVars(...themeVarDefaultValues)) {
           return false;
@@ -474,10 +503,10 @@ export function compileLayout(
     return true;
   }
 
-  function compileBorder(propName: string, source?: string): string | undefined {
+  function compileBorder(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseBorder(),
       (n) => {
         if (hasOnlyUnresolvedVars(n.themeId1, n.themeId2, n.themeId3)) {
@@ -502,14 +531,14 @@ export function compileLayout(
               : ""
           }`
         ).trim();
-      }
+      },
     );
   }
 
-  function compileTextDecoration(propName: string, source?: string): string | undefined {
+  function compileTextDecoration(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseTextDecoration(),
       (n) => {
         if (n.none) {
@@ -531,14 +560,14 @@ export function compileLayout(
           `${(n.line || n.style) && n.color ? " " : ""}` +
           `${n.color ?? ""}`
         ).trim();
-      }
+      },
     );
   }
 
-  function compileRadius(propName: string, source?: string): string | undefined {
+  function compileRadius(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseRadius(),
       (n) => {
         if (hasOnlyUnresolvedVars(n.themeId1, n.themeId2)) {
@@ -552,14 +581,14 @@ export function compileLayout(
         let part2 = `${theme2}${value2}`;
         part += part2 ? " / " + part2 : "";
         return part.trim();
-      }
+      },
     );
   }
 
-  function compileShadow(propName: string, source?: string): string | undefined {
+  function compileShadow(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseShadow(),
       (n) => {
         let css = "";
@@ -580,48 +609,38 @@ export function compileLayout(
           }
         }
         return css;
-      }
+      },
     );
   }
 
   // --- Compiles a Boolean definition into a CSS font-style size property
-  function compileItalic(propName: string, source?: string): string | undefined {
+  function compileItalic(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "italic" : "normal")
+      (n) => (n.value ? "italic" : "normal"),
     );
   }
 
   // --- Compiles a Boolean definition into a CSS flex-wrap property
-  function compileWrapContent(propName: string, source?: string): string | undefined {
+  function compileWrapContent(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "wrap" : "nowrap")
+      (n) => (n.value ? "wrap" : "nowrap"),
     );
   }
 
   // --- Compiles a Boolean definition into a CSS flex-shrink property
-  function compileCanShrink(propName: string, source?: string): string | undefined {
+  function compileCanShrink(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
-      source,
+      layoutProps,
       (p) => p.parseBoolean(),
-      (n) => (n.value ? "1" : "0")
+      (n) => (n.value ? "1" : "0"),
     );
-  }
-
-  function compileBoolean(propName: string, defValue?: boolean, source?: string): boolean | undefined {
-    const compiledValue = compile(
-      propName,
-      source,
-      (p) => (source ? p.parseBoolean() : null),
-      (n) => (n.value ? "true" : "false")
-    );
-    return compiledValue === undefined ? defValue : compiledValue?.toString() === "true";
   }
 
   function isHorizontalAndStartSize(size: SizeResult, layoutContext?: LayoutContext): boolean {

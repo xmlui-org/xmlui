@@ -139,7 +139,7 @@ const MemoizedContainer = memo(
       memoedVarsRef,
       isImplicit,
     }: ContainerProps,
-    ref
+    ref,
   ) {
     const { apiBoundContainer } = node;
     const dispatch = isImplicit ? parentDispatch : containerDispatch;
@@ -326,7 +326,7 @@ const MemoizedContainer = memo(
                 }
               }
               evalContext.localContext = getComponentStateClone();
-            }
+            },
           );
 
           if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
@@ -347,7 +347,7 @@ const MemoizedContainer = memo(
           }
           throw e;
         }
-      }
+      },
     );
 
     const runCodeSync = useEvent((arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
@@ -388,7 +388,7 @@ const MemoizedContainer = memo(
           fnsRef.current[uid][fnCacheKey] = handler;
         }
         return fnsRef.current[uid][fnCacheKey];
-      }
+      },
     );
 
     const getOrCreateSyncCallbackFn = useEvent((arrowExpression: ArrowExpression, uid: symbol) => {
@@ -443,7 +443,7 @@ const MemoizedContainer = memo(
         }
         return getOrCreateEventHandlerFn(safeAction, uid, options);
       },
-      [componentState, getOrCreateEventHandlerFn]
+      [componentState, getOrCreateEventHandlerFn],
     );
 
     const isApiRegisteredInnerRef = useRef(false);
@@ -515,8 +515,10 @@ const MemoizedContainer = memo(
                 resolvedProps[key] = extractParam(componentState, child.props[key], appContext, true);
               }
             });
-            // console.log("compile layout for child", { child, lc });
-            const { cssProps, nonCssProps } = compileLayout(resolvedProps, themeVars, lc);
+            const { cssProps, nonCssProps } = compileLayout(resolvedProps, themeVars, {
+              ...lc,
+              mediaSize: appContext.mediaSize,
+            });
             renderedChild = renderChild({
               node: child,
               state: componentState,
@@ -573,7 +575,7 @@ const MemoizedContainer = memo(
         memoedVarsRef,
         cleanup,
         ref,
-      ]
+      ],
     );
 
     // --- Log the component state if you need it for debugging
@@ -607,7 +609,7 @@ const MemoizedContainer = memo(
         {stableRenderChild(node.children, layoutContextRef?.current, dynamicChildren)}
       </Fragment>
     );
-  })
+  }),
 );
 
 const useRoutingParams = () => {
@@ -678,14 +680,14 @@ const MemoizedErrorProneContainer = memo(
       isImplicit,
       parentDispatch,
     }: ErrorProneContainerProps,
-    ref
+    ref,
   ) {
     const [version, setVersion] = useState(0);
     const routingParams = useRoutingParams();
     const memoedVars = useRef<MemoedVars>(new Map());
 
     const stateFromOutside = useShallowCompareMemoize(
-      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState])
+      useMemo(() => extractScopedState(parentState, node.uses), [node.uses, parentState]),
     );
 
     const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
@@ -713,7 +715,7 @@ const MemoizedErrorProneContainer = memo(
           ret[componentApiKey] = { ...ret[componentApiKey], ...value };
         }
         return ret;
-      }, [componentState, componentApis])
+      }, [componentState, componentApis]),
     );
 
     const localVarsStateContext = useCombinedState(stateFromOutside, componentStateWithApis, node.contextVars);
@@ -753,7 +755,7 @@ const MemoizedErrorProneContainer = memo(
       varDefinitions,
       functionDeps,
       localVarsStateContext,
-      useRef<MemoedVars>(new Map())
+      useRef<MemoedVars>(new Map()),
     );
     const localVarsStateContextWithPreResolvedLocalVars = useShallowCompareMemoize({
       ...preResolvedLocalVars,
@@ -764,7 +766,7 @@ const MemoizedErrorProneContainer = memo(
       varDefinitions,
       functionDeps,
       localVarsStateContextWithPreResolvedLocalVars,
-      memoedVars
+      memoedVars,
     );
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
     const combinedState = useCombinedState(stateFromOutside, node.contextVars, mergedWithVars, routingParams);
@@ -782,7 +784,7 @@ const MemoizedErrorProneContainer = memo(
               draft[uid][key] = value;
             }
           });
-        })
+        }),
       );
     }, []);
 
@@ -798,7 +800,7 @@ const MemoizedErrorProneContainer = memo(
           }
         }
       },
-      [resolvedLocalVars, node.uses, parentStateFieldPartChanged]
+      [resolvedLocalVars, node.uses, parentStateFieldPartChanged],
     );
 
     return (
@@ -822,7 +824,7 @@ const MemoizedErrorProneContainer = memo(
         />
       </ErrorBoundary>
     );
-  })
+  }),
 );
 
 // --- A component definition with optional container properties
@@ -904,7 +906,7 @@ const ComponentContainer = memo(
       dynamicChildren,
       parentDispatch,
     }: ComponentContainerProps,
-    ref
+    ref,
   ) {
     const enhancedNode = useMemo(() => getWrappedWithContainer(node), [node]);
     return (
@@ -923,7 +925,7 @@ const ComponentContainer = memo(
         />
       </ErrorBoundary>
     );
-  })
+  }),
 );
 
 // Represents the context in which the React component belonging to a particular component definition
@@ -1071,7 +1073,7 @@ const Node = memo(
       childIndex,
       ...rest
     }: RenderChildContext & { resolvedKey: string },
-    ref
+    ref,
   ) {
     //pref, this way
     const stableLayoutContext = useRef(layoutContext);
@@ -1128,7 +1130,7 @@ const Node = memo(
     }
 
     return renderedChild;
-  })
+  }),
 );
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
 // `appContext` when resolving the state values.
@@ -1200,7 +1202,7 @@ function useVars(
   vars: ContainerState = EMPTY_OBJECT,
   fnDeps: Record<string, Array<string>> = EMPTY_OBJECT,
   componentState: ContainerState,
-  memoedVars: MutableRefObject<MemoedVars>
+  memoedVars: MutableRefObject<MemoedVars>,
 ): ContainerState {
   const appContext = useAppContext();
   const referenceTrackedApi = useReferenceTrackedApi(componentState);
@@ -1261,10 +1263,10 @@ function useVars(
                 },
                 (
                   [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
-                  [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps]
+                  [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps],
                 ) => {
                   return shallowCompare(newDeps, lastDeps) && shallowCompare(newAppContextDeps, lastAppContextDeps);
-                }
+                },
               ),
             });
           }
@@ -1471,7 +1473,7 @@ export function renderLoaders({
       if (uidInfo[loader.uid]) {
         // --- We have a duplicated ID (another loader)
         throw new Error(
-          `Another ${uidInfo[loader.uid]} definition in this container already uses the uid '${loader.uid}'`
+          `Another ${uidInfo[loader.uid]} definition in this container already uses the uid '${loader.uid}'`,
         );
       }
       uidInfo[loader.uid] = "loader";

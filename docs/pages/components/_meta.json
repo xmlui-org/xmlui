@@ -1,4 +1,6 @@
 {
+  "Accordion": "Accordion",
+  "Alert": "Alert",
   "ApiAction": "ApiAction",
   "App": "App",
   "AppHeader": "AppHeader",
@@ -50,6 +52,7 @@
   "NavPanel": "NavPanel",
   "NoResult": "NoResult",
   "NumberBox": "NumberBox",
+  "OffCanvas": "OffCanvas",
   "Option": "Option",
   "Page": "Page",
   "PageMetaTitle": "PageMetaTitle",

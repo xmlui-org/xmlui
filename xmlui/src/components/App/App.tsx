@@ -107,7 +107,6 @@ function App({
   useResizeObserver(
     headerRef,
     useCallback((entries) => {
-      console.log(entries?.[0]?.contentRect?.height);
       setHeaderHeight(entries?.[0]?.contentRect?.height);
     }, []),
   );
@@ -464,10 +463,10 @@ const metadata: ComponentDescriptor<AppComponentDef> = {
 export const appRenderer = createComponentRenderer<AppComponentDef>(
   "App",
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    const AppHeaders = [];
-    const Footers = [];
-    const restChildren = [];
-    node.children.forEach((child) => {
+    const AppHeaders: any[] = [];
+    const Footers: any[] = [];
+    const restChildren: any[] = [];
+    node.children?.forEach((child) => {
       if (child.type === "AppHeader") {
         AppHeaders.push(child);
       } else if (child.type === "Footer") {

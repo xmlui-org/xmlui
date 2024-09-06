@@ -17,7 +17,7 @@ However, they differ in the URLs they send to the backend server.
 
 When you navigate a URL (e.g., refresh the current page), the browser sends the entire URL to the web server. XMLUI apps are single-page web apps, and your web server should be configured accordingly.
 
-For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path and search segments, such as `myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
+For example, if your app is hosted at the `myComp.com/accountapp` URL (this URL serves the default `index.html` file from the server), it should be configured to retrieve the same `index.html` file even if the browser-sent URL contains path or query segments, such as `myComp.com/accountapp/leads/12` or `myComp.com/accountapp/list?zip=98005`
 
 If your web server is not configured this way, you'll receive 404 errors for the latest two (and similar) requests when refreshing the current page.
 

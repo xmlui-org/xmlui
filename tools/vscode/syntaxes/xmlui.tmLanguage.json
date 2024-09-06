@@ -7,6 +7,7 @@
       "patterns": [
         { "include": "#comments" },
         { "include": "#helperTag" },
+        { "include": "#slotTag" },
         { "include": "#componentTag" },
         { "include": "#escapeCharacter" },
         { "include": "#textWithBindingExpr" },
@@ -158,6 +159,15 @@
         }
       ],
       "end": ">"
+    },
+    "slotTag": {
+      "match": "(</?)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([a-z][-\\w\\.$]*)(\\s*/?>)",
+      "captures": {
+        "1": { "name": "punctuation.definition.tag.xmlui" },
+        "2": { "name": "keyword.operator.namespace.xmlui" },
+        "3": { "name": "support.variable.xmlui" },
+        "4": { "name": "punctuation.definition.tag.xmlui" }
+      }
     },
     "bindingExpr": {
       "contentName": "meta.embedded.block.javascript",
