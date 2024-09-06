@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 
 export const TableOfContents = () => {
@@ -35,9 +35,9 @@ export const TableOfContents = () => {
   return (
     <div className={styles.nav} ref={tocRef}>
       <ul>
-        {Object.entries(headings).map(([key, value]) => (
+        {headings.map((value) => (
           <li
-            key={key}
+            key={value.id}
             className={classnames({
               [styles.head_1]: value.level === 1,
               [styles.head_2]: value.level === 2,
@@ -46,7 +46,7 @@ export const TableOfContents = () => {
               [styles.active]: value.id === activeAnchorId,
             })}
           >
-            <RrdNavLink to={`#${key}`} onClick={() => setActiveAnchorId(value.id)} id={key}>
+            <RrdNavLink to={`#${value.id}`} onClick={() => setActiveAnchorId(value.id)} id={value.id}>
               {value.text}
             </RrdNavLink>
           </li>

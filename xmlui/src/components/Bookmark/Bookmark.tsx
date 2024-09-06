@@ -1,6 +1,6 @@
 import { createComponentRenderer } from "@components-core/renderers";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ReactNode} from "react";
+import type {ReactNode} from "react";
 import { useContext, useEffect, useRef } from "react";
 import { TableOfContentsContext } from "@components-core/TableOfContentsContext";
 
