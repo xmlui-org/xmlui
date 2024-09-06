@@ -74,12 +74,18 @@ const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
     "font-size-TableOfContentsItem": "$font-size-smaller",
     "font-weight-TableOfContentsItem": "$font-weight-normal",
     "font-family-TableOfContentsItem": "$font-family",
-    "font-weight-TableOfContentsItem-active": "$font-weight-bold",
-    "color-TableOfContentsItem": "$color-text",
-    "color-TableOfContentsItem-active": "$color-text-secondary",
+    "border-radius-TableOfContentsItem": "0",
+    "border-width-TableOfContentsItem": "$space-0_5",
+    "border-style-TableOfContentsItem": "solid",
+    "border-radius-TableOfContentsItem--active": "0",
+    "border-width-TableOfContentsItem--active": "$space-0_5",
+    "border-style-TableOfContentsItem--active": "solid",
+    "font-weight-TableOfContentsItem--active": "$font-weight-bold",
     "color-bg-TableOfContents": "transparent",
     "padding-horizontal-TableOfContents": "$space-4",
     "padding-vertical-TableOfContents": "$space-4",
+    "padding-horizontal-TableOfContentsItem": "$space-2",
+    "padding-vertical-TableOfContentsItem": "$space-2",
     "margin-top-TableOfContents": "0",
     "margin-bottom-TableOfContents": "0",
     "border-radius-TableOfContents": "0",
@@ -89,6 +95,19 @@ const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
     "transform-TableOfContentsItem": "none",
     "align-vertical-TableOfContentsItem": "baseline",
     "letter-spacing-TableOfContentsItem": "0",
+    light: {
+      "color-TableOfContentsItem": "$color-text-primary",
+      "border-color-TableOfContentsItem": "$color-border",
+      "border-color-TableOfContentsItem--active": "$color-primary-500",
+      "color-TableOfContentsItem--active": "$color-primary-500",
+    },
+    dark: {
+      "color-TableOfContentsItem": "$color-text-primary",
+      "border-color-TableOfContentsItem": "$color-border",
+      "border-color-TableOfContentsItem--active": "$color-primary-500",
+      "color-TableOfContentsItem--active": "$color-text-secondary",
+
+    }
   },
 };
 
