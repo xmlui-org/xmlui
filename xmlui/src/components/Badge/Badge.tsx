@@ -7,6 +7,7 @@ import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import { ComponentThemeColor } from "@components/abstractions";
 
 // ====================================================================================================================
 // React Badge component implementation
@@ -51,13 +52,40 @@ export interface BadgeComponentDef extends ComponentDef<"Badge"> {
   props: {
     /** @descriptionRef */
     value: string | number;
-    /** 
+    /**
      * @descriptionRef
      * @defaultValue \`badge\`
      */
     variant?: BadgeVariant;
     /** @descriptionRef */
     colorMap?: Record<string, string> | Record<string, BadgeColors>;
+    /**
+     * (**NOT IMPLEMENTED YET**) The theme color of the component.
+     * @descriptionRef
+     */
+    themeColor?: ComponentThemeColor;
+    /**
+     * (**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not 
+     * defined or empty, no indicator is displayed unless the \`forceIndicator\` property is set.
+     */
+    indicatorText?: string;
+
+    /**
+     * (**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if 
+     * the \`indicatorText\` property is not defined or empty.
+     */
+    forceIndicator?: boolean;
+
+    /**
+     * (**NOT IMPLEMENTED YET**) The theme color of the indicator.
+     */
+    indicatorThemeColor?: ComponentThemeColor;
+
+    /**
+     * (**NOT IMPLEMENTED YET**) The position of the indicator.
+     */
+    indicatorPosition?: "start" | "end" | "top-start" | "top-end" | "bottom-start" | "bottom-end";
+
   };
 }
 
@@ -70,7 +98,7 @@ const metadata: ComponentDescriptor<BadgeComponentDef> = {
     colorMap: desc(
       "A key-value collection, where the value is either a color for the background" +
         "or for both the background and the label as well. If provided and accessed, it takes " +
-        "precedence of both default values and theme overrides."
+        "precedence of both default values and theme overrides.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -91,7 +119,7 @@ const metadata: ComponentDescriptor<BadgeComponentDef> = {
     dark: {
       "color-bg-Badge": "$color-primary-500",
       "color-text-Badge": "$color-surface-50",
-    }
+    },
   },
 };
 
@@ -100,9 +128,9 @@ export const badgeComponentRenderer = createComponentRenderer<BadgeComponentDef>
   ({ node, extractValue }) => {
     const value = extractValue(node.props.value);
     const colorMap: Record<string, string> | Record<string, BadgeColors> | undefined = extractValue(
-      node.props?.colorMap
+      node.props?.colorMap,
     );
     return <Badge variant={extractValue(node.props.variant)} value={value} color={colorMap?.[value]} />;
   },
-  metadata
+  metadata,
 );
