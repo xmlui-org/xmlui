@@ -38,27 +38,29 @@ $themeVars: ();
       text-transform: createThemeVar("transform-TableOfContentsItem");
       vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
       letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
-      margin-bottom: t.$space-2;
+      padding: createThemeVar("padding-vertical-TableOfContentsItem") createThemeVar("padding-horizontal-TableOfContentsItem");
       list-style-type: none;
+      border-left: createThemeVar("border-width-TableOfContentsItem") createThemeVar("border-style-TableOfContentsItem") createThemeVar("border-color-TableOfContentsItem");
 
       &.head_1 {
-        margin-left: 0px;
+        padding-left: 0px;
       }
 
       &.head_2 {
-        margin-left: 10px;
+        padding-left: 10px;
       }
 
       &.head_3 {
-        margin-left: 20px;
+        padding-left: 20px;
       }
       &.head_4 {
-        margin-left: 30px;
+        padding-left: 30px;
       }
 
       &.active {
-        color: createThemeVar("color-TableOfContentsItem-active");
-        font-weight: createThemeVar("font-weight-TableOfContentsItem-active");
+        color: createThemeVar("color-TableOfContentsItem--active");
+        font-weight: createThemeVar("font-weight-TableOfContentsItem--active");
+        border-left: 2px solid createThemeVar("border-color-TableOfContentsItem--active");
       }
     }
   }
