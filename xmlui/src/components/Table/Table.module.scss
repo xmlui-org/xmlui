@@ -49,7 +49,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 }
 
 
-.headerWrapper, .tableBody{
+.headerWrapper, .tableBody {
   display: inline-block;
   min-width: 100%;
   background-color: $color-bg-Table;
@@ -57,13 +57,13 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
 .clickableHeader {
   width: 100%;
-  height: fit-content;
+  height: 100%;
   color: $color-text-heading-Table;
   background-color: transparent;
   border: none;
   transition: color 0.2s, background-color 0.2s;
   cursor: pointer;
-  padding: $padding-heading-Table;
+  padding-inline: $padding-heading-Table;
 
   .headerContent {
     padding: 0;

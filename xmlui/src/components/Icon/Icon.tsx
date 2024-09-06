@@ -1,4 +1,4 @@
-import {CSSProperties, forwardRef} from "react";
+import {type CSSProperties, forwardRef} from "react";
 import type React from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
