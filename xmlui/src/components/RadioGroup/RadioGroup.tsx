@@ -172,7 +172,6 @@ const radioGroupOptionMetadata: ComponentDescriptor<RadioGroupOptionDef> = {
   defaultThemeVars: {
     "gap-RadioGroupOption": "$space-1_5",
     "thickness-border-RadioGroupOption": "2px",
-    "color-bg-checked-RadioGroupOption-default": "$color-border-RadioGroupOption-default--active",
     "color-bg-checked-RadioGroupOption--disabled": "$color-border-RadioGroupOption--disabled",
     "color-bg-checked-RadioGroupOption-error": "$color-border-RadioGroupOption-error",
     "color-bg-checked-RadioGroupOption-warning": "$color-border-RadioGroupOption-warning",
@@ -183,11 +182,13 @@ const radioGroupOptionMetadata: ComponentDescriptor<RadioGroupOptionDef> = {
     "color-text-RadioGroupOption-warning": "$color-border-RadioGroupOption-warning",
     "color-text-RadioGroupOption-success": "$color-border-RadioGroupOption-success",
     light: {
+      "color-bg-checked-RadioGroupOption-default": "$color-primary-500",
       "color-border-RadioGroupOption-default": "$color-surface-500",
       "color-border-RadioGroupOption-default--hover": "$color-surface-700",
       "color-border-RadioGroupOption-default--active": "$color-primary-500",
     },
     dark: {
+      "color-bg-checked-RadioGroupOption-default": "$color-primary-500",
       "color-border-RadioGroupOption-default": "$color-surface-500",
       "color-border-RadioGroupOption-default--hover": "$color-surface-300",
       "color-border-RadioGroupOption-default--active": "$color-primary-400",

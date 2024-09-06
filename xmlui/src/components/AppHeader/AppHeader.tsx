@@ -64,8 +64,6 @@ export const AppHeader = ({
   hasRegisteredNavPanel,
   logoTitle
 }: Props) => {
-  const { loggedInUser } = useAppContext();
-
   return (
     <div className={classnames(styles.header, className)} style={style}>
       <div
@@ -85,10 +83,10 @@ export const AppHeader = ({
           <div className={styles.logoContainer}>{logoContent ? <>{logoContent}</> : <Logo title={logoTitle} />}</div>
         )}
         <div className={styles.childrenWrapper}>{children}</div>
-        <div className={styles.rightItems}>
+        {profileMenu && <div className={styles.rightItems}>
           {/*{profileMenu === undefined ? <ProfileMenu loggedInUser={loggedInUser} /> : profileMenu}*/}
           {profileMenu}
-        </div>
+        </div>}
       </div>
     </div>
   );

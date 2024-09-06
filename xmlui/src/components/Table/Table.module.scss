@@ -108,6 +108,8 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 .columnCell, .cell{
   display: flex;
   align-items: center;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .table {
@@ -262,6 +264,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
 
 .paginationLabel {
   color: $color-text-pagination-Table;
+  font-size: t.$font-size-small;
 }
 
 .paginationSelect {

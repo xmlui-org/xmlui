@@ -72,6 +72,7 @@ const NavPanel = forwardRef(function NavPanel(
   const appLayoutContext = useAppLayoutContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
   const showLogo = appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
+  const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
 
   const registered = useRef(false);
   useIsomorphicLayoutEffect(() => {
@@ -97,6 +98,7 @@ const NavPanel = forwardRef(function NavPanel(
               ref={ref}
               className={classnames(styles.wrapper, className, {
                 [styles.horizontal]: horizontal,
+                [styles.condensed]: isCondensed,
               })}
             >
               <ScrollContext.Provider value={scrollContainerRef}>
@@ -125,6 +127,7 @@ const NavPanel = forwardRef(function NavPanel(
       ref={ref}
       className={classnames(styles.wrapper, className, {
         [styles.horizontal]: horizontal,
+        [styles.condensed]: isCondensed,
       })}
     >
       <ScrollContext.Provider value={scrollContainerRef}>
