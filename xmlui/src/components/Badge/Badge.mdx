@@ -6,12 +6,7 @@ The text that the component displays.
 <Badge value="Example badge" />
 ```
 
-<Playground
-  previewOnly
-  height={40}
-  name="Example: value"
-  app={`<Badge value="Example badge" />`}
-/>
+<Playground previewOnly height={40} name="Example: value" app={`<Badge value="Example badge" />`} />
 
 %-PROP-END
 
@@ -95,6 +90,21 @@ Provide the component with a list or key-value pairs in two ways:
   </Stack>
   `}
 />
+
+%-PROP-END
+
+%-PROP-START indicatorPosition
+
+The value of this optional property sets the string to provide a color scheme for the Alert.
+
+| Value          | Description                                                          |
+| :------------- | :------------------------------------------------------------------- |
+| `start`        | The indicator is displayed within the badge before its text          |
+| `end`          | The indicator is displayed within the badge after its text           |
+| `top-start`    | The indicator is displayed over the badge in the top-start corner    |
+| `top-end`      | The indicator is displayed over the badge in the top-end corner      |
+| `bottom-start` | The indicator is displayed over the badge in the bottom-start corner |
+| `bottom-end`   | The indicator is displayed over the badge in the bottom-end corner   |
 
 %-PROP-END
 

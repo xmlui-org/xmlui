@@ -19,6 +19,7 @@ import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AppHeader } from "@components/AppHeader/AppHeader";
 import { useResizeObserver } from "@components-core/utils/hooks";
+import { useTheme } from "@components-core/theming/ThemeContext";
 
 type Props = {
   children: ReactNode;
@@ -35,7 +36,7 @@ type Props = {
 function App({
   children,
   style,
-  layout = "horizontal",
+  layout,
   loggedInUser,
   logoContent,
   scrollWholePage = true,
@@ -43,7 +44,9 @@ function App({
   header,
   footer,
 }: Props) {
-  const safeLayout = layout?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+  const { getThemeVar } = useTheme();
+  const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const safeLayout = layoutWithDefaultValue?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
   const { setLoggedInUser, mediaSize } = useAppContext();
   const [registeredHeaders, setRegisteredHeaders] = useState<Record<string, boolean>>({});
   const [registeredNavPanels, setRegisteredNavPanels] = useState<Record<string, boolean>>({});
@@ -303,7 +306,7 @@ function App({
           ref={scrollPageContainerRef}
         >
           <header
-            className={classnames(styles.headerWrapper, {
+            className={classnames("app-layout-condensed", styles.headerWrapper, {
               [styles.sticky]: safeLayout === "condensed-sticky",
             })}
             ref={headerRefCallback}
@@ -473,7 +476,7 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
       }
     });
 
-    const layoutType = extractValue(node.props.layout) || "condensed-sticky";
+    const layoutType = extractValue(node.props.layout);
 
     return (
       <App

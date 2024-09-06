@@ -102,7 +102,7 @@
     "@types/react-window": "1.8.8",
     "@types/yargs": "17.0.31",
     "@typescript-eslint/eslint-plugin": "6.7.4",
-    "@typescript-eslint/parser": "^8.1.0",
+    "@typescript-eslint/parser": "6.19.0",
     "babel-loader": "8.2.5",
     "clean-package": "2.2.0",
     "eslint": "^8.57.0",

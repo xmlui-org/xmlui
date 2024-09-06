@@ -10,7 +10,7 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 // See reference implementation here: https://getbootstrap.com/docs/5.3/components/alerts/
 
 /**
- * The \`Alert\` component is a panel used to display important notifications or feedback to users. It helps 
+ * (**NOT IMPLEMENTED YET**) The \`Alert\` component is a panel used to display important notifications or feedback to users. It helps 
  * convey different statuses or levels of urgency, such as success, warning, error, and others.
  */
 export interface AlertComponentDef extends ComponentDef<"Alert"> {

@@ -28,18 +28,23 @@ $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
   box-shadow: $shadow-NavPanel;
   @include t.borderVars($themeVars, $component);
 
-  background-color: $color-bg-NavPanel;
   overflow: auto;
   position: relative;
   display: flex;
   flex-direction: column;
 
+  &:not(.condensed){
+    background-color: $color-bg-NavPanel;
+  }
+
   &.horizontal{
     border-right: 0;
     box-shadow: none;
-    background-color: $color-bg-NavPanel;
     height: $height-NavPanel;
-    border-bottom: $border-bottom-NavPanel;
+
+    &:not(.condensed){
+      border-bottom: $border-bottom-NavPanel;
+    }
 
     .wrapperInner{
       height: 100%;

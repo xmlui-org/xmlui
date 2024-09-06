@@ -1,5 +1,5 @@
 import { expect, test } from "./fixtures";
-import { initApp } from "./component-test-helpers";
+import {initApp, initThemedApp} from "./component-test-helpers";
 
 test("parent has items", async ({ page }) => {
   const containerId = "container";
@@ -34,13 +34,17 @@ test("parent style affects children", async ({ page }) => {
   ];
   const expectedFontSize = "14px";
 
-  await initApp(page, {
+  await initThemedApp(page, {
     entryPoint: `
     <Stack testId="${containerId}" fontSize="${expectedFontSize}">
       <Fragment>
         ${childComponents.join("\n")}
       </Fragment>
     </Stack>`,
+  }, {
+    themeVars: {
+        "font-size": "16px",
+    }
   });
 
   for (const child of await page.locator(`[data-testid="${containerId}"] > *`).all()) {

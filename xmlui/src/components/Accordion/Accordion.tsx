@@ -11,7 +11,7 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 // Make the header focusable, handle ARIA attributes, and manage the state of the accordion.
 
 /**
- * The \`Accordion\` component is a collapsible container that toggles the display of content sections. It helps
+ * (**NOT IMPLEMENTED YET**) The \`Accordion\` component is a collapsible container that toggles the display of content sections. It helps
  * organize information by expanding or collapsing it based on user interaction.
  */
 export interface AccordionComponentDef extends ComponentDef<"Accordion"> {

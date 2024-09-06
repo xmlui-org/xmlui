@@ -67,6 +67,7 @@
     "src/components/Datasource/Datasource.tsx",
     "src/components/ApiAction/ApiAction.tsx",
     "src/components/Accordion/Accordion.tsx",
-    "src/components/Alert/Alert.tsx"
+    "src/components/Alert/Alert.tsx",
+    "src/components/OffCanvas/OffCanvas.tsx"
   ]
 }
