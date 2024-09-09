@@ -86,6 +86,8 @@ type TableProps = {
   rowDisabledPredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
+  sortIconUp?: string;
+  sortIconDown?: string;
   sortingDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
   style?: CSSProperties;
@@ -141,6 +143,8 @@ export const Table = forwardRef(({
   rowDisabledPredicate = defaultIsRowDisabled,
   sortBy,
   sortingDirection = "ascending",
+  sortIconUp,
+  sortIconDown,
   sortingDidChange,
   willSort,
   style,
@@ -581,6 +585,8 @@ export const Table = forwardRef(({
                                 {header.column.columnDef.enableSorting &&
                                   <ColumnOrderingIndicator
                                     alwaysShow={alwaysShowOrderingIndicators}
+                                    sortIconUp={sortIconUp}
+                                    sortIconDown={sortIconDown}
                                     direction={
                                       header.column.columnDef.meta?.accessorKey === _sortBy
                                         ? _sortingDirection
@@ -774,21 +780,26 @@ function ClickableHeader({ hasSorting, updateSorting, children }: ClickableHeade
 type ColumnOrderingIndicatorProps = {
   direction?: SortingDirection;
   alwaysShow?: boolean;
+  sortIconUp?: string;
+  sortIconDown?: string;
 }
 
-function ColumnOrderingIndicator({ direction, alwaysShow = true }: ColumnOrderingIndicatorProps) {
+function ColumnOrderingIndicator({ direction, alwaysShow = true, sortIconUp, sortIconDown }: ColumnOrderingIndicatorProps) {
+  const sortIconUpName = sortIconUp || "sortup:Table";
+  const sortIconDownName = sortIconDown || "sortdown:Table";
+
   if (!alwaysShow) {
     if (direction === "ascending") {
-      return <Icon name="sortup:Table" fallback="chevronup" size={"sm"} />
+      return <Icon name={sortIconUpName} fallback="chevronup" size={"sm"} />
     } else if (direction === "descending") {
-      return <Icon name="sortdown:Table" fallback="chevrondown" size={"sm"} />
+      return <Icon name={sortIconDownName} fallback="chevrondown" size={"sm"} />
     }
     return null;
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Icon name="sortup:Table" fallback="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
-      <Icon name="sortdown:Table" fallback="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
+      <Icon name={sortIconUpName} fallback="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
+      <Icon name={sortIconDownName} fallback="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
     </div>
   )
 }
@@ -849,9 +860,9 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
      */
     alwaysShowOrderingIndicators?: boolean;
     /** @descriptionRef */
-    orderIconUp?: string;
+    sortIconUp?: string;
     /** @descriptionRef */
-    orderIconDown?: string;
+    sortIconDown?: string;
   };
   events: {
     /** @descriptionRef */
@@ -955,6 +966,8 @@ export const tableComponentRenderer = createComponentRenderer<TableComponentDef>
         rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
         sortBy={extractValue(node.props?.sortBy)}
         sortingDirection={extractValue(node.props?.sortDirection)}
+        sortIconUp={extractValue.asOptionalString(node.props?.sortIconUp)}
+        sortIconDown={extractValue.asOptionalString(node.props?.sortIconDown)}
         sortingDidChange={lookupEventHandler("sortingDidChange")}
         willSort={lookupEventHandler("willSort")}
         style={layoutCss}
