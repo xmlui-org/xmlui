@@ -779,16 +779,16 @@ type ColumnOrderingIndicatorProps = {
 function ColumnOrderingIndicator({ direction, alwaysShow = true }: ColumnOrderingIndicatorProps) {
   if (!alwaysShow) {
     if (direction === "ascending") {
-      return <Icon name="chevronup" size={"sm"} />
+      return <Icon name="sortup:Table" fallback="chevronup" size={"sm"} />
     } else if (direction === "descending") {
-      return <Icon name="chevrondown" size={"sm"} />
+      return <Icon name="sortdown:Table" fallback="chevrondown" size={"sm"} />
     }
     return null;
   }
   return (
     <div style={{ display: "flex", flexDirection: "column" }}>
-      <Icon name="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
-      <Icon name="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
+      <Icon name="sortup:Table" fallback="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
+      <Icon name="sortdown:Table" fallback="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
     </div>
   )
 }
@@ -848,6 +848,10 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
      * @descriptionRef
      */
     alwaysShowOrderingIndicators?: boolean;
+    /** @descriptionRef */
+    orderIconUp?: string;
+    /** @descriptionRef */
+    orderIconDown?: string;
   };
   events: {
     /** @descriptionRef */

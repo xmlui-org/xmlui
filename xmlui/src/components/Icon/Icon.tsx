@@ -16,22 +16,15 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   title?: string;
   size?: string;
   isInline?: boolean;
-  fallback?: string | React.ReactNode;
+  fallback?: string;
   layout?: CSSProperties;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const Icon = forwardRef(function Icon({ name, fallback, layout, className, ...restProps }: IconBaseProps, ref) {
-  const lowerCaseIconName = name?.toLowerCase();
-  const iconRegistry = useIconRegistry();
-  const customIconUrl = useCustomIconUrl(name);
-  const computedSize = typeof restProps?.size === "string" ? mapSizeToIconPack(restProps.size) : restProps?.size;
-  let iconRenderer = iconRegistry.lookupIconRenderer(lowerCaseIconName || "");
-  if (!iconRenderer && typeof fallback === "string") {
-    iconRenderer = iconRegistry.lookupIconRenderer(fallback);
-  }
-  const renderIcon = iconRenderer?.renderer;
+  const iconRenderer = useFindIconRenderer(name, fallback);
 
+  const computedSize = typeof restProps?.size === "string" ? mapSizeToIconPack(restProps.size) : restProps?.size;
   const width = computedSize || restProps.width;
   const height = computedSize || restProps.height;
   const computedProps = {
@@ -49,12 +42,12 @@ export const Icon = forwardRef(function Icon({ name, fallback, layout, className
   };
 
   // ---
+  const customIconUrl = useCustomIconUrl(name);
   if (customIconUrl) {
-    return (
-        <CustomIcon {...computedProps} url={customIconUrl} name={name} />
-    );
+    return <CustomIcon {...computedProps} url={customIconUrl} name={name} />;
   }
-  return renderIcon ? renderIcon(computedProps) : null;
+
+  return iconRenderer?.renderer?.(computedProps) || null;
 });
 
 function CustomIcon(props: IconBaseProps & { size?: string; url: string }) {
@@ -95,14 +88,51 @@ function mapSizeToIconPack(size: string) {
   );
 }
 
+function useFindIconRenderer(name: string, fallback: string) {
+  const iconRegistry = useIconRegistry();
+  let renderChain: string[] = [];
+
+  // --- Fill chain
+  if (fallback && typeof fallback === "string") {
+    renderChain.push(fallback);
+  }
+
+  const separator = ":";
+  let parts: string[] = [];
+  if (typeof name === "string") {
+    parts = name.split(separator);
+  }
+  if (parts.length >= 1) {
+    renderChain.push(parts[0]);
+  }
+  if (parts.length === 2) {
+    renderChain.push(`${parts[0].toLowerCase()}${separator}${parts[1]}`);
+  }
+  renderChain = renderChain.toReversed();
+
+  // --- Loop chain
+  if (renderChain.length === 0) return null;
+
+  for (const renderer of renderChain) {
+    const iconRenderer = iconRegistry.lookupIconRenderer(renderer);
+    if (iconRenderer) {
+      return iconRenderer;
+    }
+  }
+  // No icon found whatsoever, return a default null
+  return null;
+}
+
 export default Icon;
 
-const IconSizeKeys = ["xs", "sm", "md", "lg"] as const;
-type IconSize = (typeof IconSizeKeys)[number];
-const isIconSize = (str: any): str is IconSize => IconSizeKeys.indexOf(str) !== -1;
+//const IconSizeKeys = ["xs", "sm", "md", "lg"] as const;
+//type IconSize = (typeof IconSizeKeys)[number];
+//const isIconSize = (str: any): str is IconSize => IconSizeKeys.indexOf(str) !== -1;
 
 // ============================================================================
 // XMLUI Icon definition
+
+// iconName:Component (theme resource) -> iconName:Component (built-in) -> iconName (theme resource) -> iconName (built-in) -> fallback (no icon or default)
 
 /** 
  * This component is the representation of an icon.
@@ -130,7 +160,7 @@ export interface IconComponentDef extends ComponentDef<"Icon"> {
      * Works the same way as the [\`name\`](#name) property.
      * @descriptionRef
      */
-    fallback?: string | ComponentDef;
+    fallback?: string;
   };
 }
 
@@ -154,17 +184,13 @@ export const IconMd: ComponentDescriptor<IconComponentDef> = {
 
 export const iconComponentRenderer = createComponentRenderer<IconComponentDef>(
   "Icon",
-  ({ node, extractValue, renderChild, layoutCss }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <Icon
         name={extractValue.asOptionalString(node.props.name)}
         size={extractValue(node.props.size)}
         layout={layoutCss}
-        fallback={
-          node.props.fallback ?? typeof node.props.fallback === "string"
-            ? extractValue(node.props.fallback)
-            : renderChild(node.props.fallback)
-        }
+        fallback={extractValue.asOptionalString(node.props.fallback)}
       />
     );
   },

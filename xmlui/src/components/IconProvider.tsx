@@ -28,12 +28,9 @@ import {
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
   BsArrowDownShort,
-  BsArrowLeftShort,
   BsArrowRightShort,
   BsArrowUpShort,
   BsChatDots,
-  BsChevronDown,
-  BsChevronRight,
   BsHash,
   BsReply,
   BsSquare,
@@ -49,7 +46,7 @@ import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
 import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { TfiReload } from "react-icons/tfi";
 import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
-import { IconBaseProps } from "@components/Icon/Icon";
+import type { IconBaseProps } from "@components/Icon/Icon";
 import { ApiIcon } from "@components/Icon/ApiIcon";
 import { AttachmentIcon } from "@components/Icon/Attach";
 import { BindingIcon } from "@components/Icon/Binding";
@@ -243,6 +240,9 @@ registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {.
 registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
 registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
 registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
+
+registerIconRenderer("sortup:Table", (props: IconBaseProps) => <SunIcon {...props} />);
+registerIconRenderer("sortdown:Table", (props: IconBaseProps) => <MoonIcon {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {
