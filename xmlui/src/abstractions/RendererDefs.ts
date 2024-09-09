@@ -144,7 +144,8 @@ export type RegisterComponentApiFn = (apiFn: Record<string, (...args: any[]) => 
 export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
   children?: ComponentDef | ComponentDef[] | DynamicChildComponentDef | DynamicChildComponentDef[] | string,
   layoutContext?: LayoutContext<L>,
-  childrenToRender?: DynamicChildComponentDef[]
+  childrenToRender?: DynamicChildComponentDef[],
+  dynamicSlotsToRender?: Record<string, DynamicChildComponentDef[]>
 ) => ReactNode | ReactNode[];
 
 /**
@@ -242,6 +243,7 @@ export interface ComponentRendererContextBase<T extends ComponentDef = Component
 
   // --- Information about children rendered dynamically
   dynamicChildren?: Array<DynamicChildComponentDef>;
+  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
 
   // --- The optional index of the child being rendered
   childIndex?: number;

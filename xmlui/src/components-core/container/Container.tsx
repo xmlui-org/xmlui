@@ -115,6 +115,7 @@ type ContainerProps = {
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   dynamicChildren?: Array<DynamicChildComponentDef>;
+  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
   memoedVarsRef: MutableRefObject<MemoedVars>;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
@@ -136,6 +137,7 @@ const MemoizedContainer = memo(
       parentRegisterComponentApi,
       layoutContextRef,
       dynamicChildren,
+      dynamicSlots,
       memoedVarsRef,
       isImplicit,
     }: ContainerProps,
@@ -485,7 +487,7 @@ const MemoizedContainer = memo(
     });
 
     const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, rc) => {
+      (childNode, lc, rc, dSlots) => {
         // let node: any = childNode;
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
@@ -533,6 +535,7 @@ const MemoizedContainer = memo(
               layoutNonCss: nonCssProps,
               layoutContext: lc,
               dynamicChildren: rc,
+              dynamicSlots: dSlots,
               memoedVarsRef,
               cleanup,
               childIndex,
@@ -606,7 +609,7 @@ const MemoizedContainer = memo(
           lookupAction,
           cleanup,
         })}
-        {stableRenderChild(node.children, layoutContextRef?.current, dynamicChildren)}
+        {stableRenderChild(node.children, layoutContextRef?.current, dynamicChildren, dynamicSlots)}
       </Fragment>
     );
   }),
@@ -661,6 +664,7 @@ type ErrorProneContainerProps = {
   resolvedKey?: string;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   dynamicChildren?: Array<DynamicChildComponentDef>;
+  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
 };
@@ -677,6 +681,7 @@ const MemoizedErrorProneContainer = memo(
       parentRegisterComponentApi,
       layoutContextRef,
       dynamicChildren: dynamicChildren,
+      dynamicSlots,
       isImplicit,
       parentDispatch,
     }: ErrorProneContainerProps,
@@ -818,6 +823,7 @@ const MemoizedErrorProneContainer = memo(
           parentRegisterComponentApi={parentRegisterComponentApi}
           layoutContextRef={layoutContextRef}
           dynamicChildren={dynamicChildren}
+          dynamicSlots={dynamicSlots}
           memoedVarsRef={memoedVars}
           isImplicit={isImplicit}
           ref={ref}
@@ -891,6 +897,7 @@ type ComponentContainerProps = {
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   dynamicChildren?: Array<DynamicChildComponentDef>;
+  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
   parentDispatch: ContainerDispatcher;
 };
 
@@ -904,6 +911,7 @@ const ComponentContainer = memo(
       parentRegisterComponentApi,
       layoutContextRef,
       dynamicChildren,
+      dynamicSlots,
       parentDispatch,
     }: ComponentContainerProps,
     ref,
@@ -918,6 +926,7 @@ const ComponentContainer = memo(
           parentState={parentState}
           layoutContextRef={layoutContextRef}
           dynamicChildren={dynamicChildren}
+          dynamicSlots={dynamicSlots}
           isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
@@ -950,6 +959,7 @@ function renderChild({
   stateFieldPartChanged,
   layoutContext,
   dynamicChildren,
+  dynamicSlots,
   memoedVarsRef,
   cleanup,
   childIndex,
@@ -994,6 +1004,7 @@ function renderChild({
       layoutNonCss={layoutNonCss}
       layoutContext={layoutContext}
       dynamicChildren={dynamicChildren}
+      dynamicSlots={dynamicSlots}
       childIndex={childIndex}
     />
   );
@@ -1067,6 +1078,7 @@ const Node = memo(
       stateFieldPartChanged,
       layoutContext,
       dynamicChildren,
+      dynamicSlots,
       memoedVarsRef,
       resolvedKey,
       cleanup,
@@ -1100,6 +1112,7 @@ const Node = memo(
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           dynamicChildren={dynamicChildren}
+          dynamicSlots={dynamicSlots}
           parentStateFieldPartChanged={stateFieldPartChanged}
           parentRegisterComponentApi={registerComponentApi}
           ref={ref}
@@ -1121,6 +1134,7 @@ const Node = memo(
           layoutCss={stableLayoutCss}
           layoutNonCss={stableLayoutNonCss}
           dynamicChildren={dynamicChildren}
+          dynamicSlots={dynamicSlots}
           layoutContextRef={stableLayoutContext}
           childIndex={childIndex}
           ref={ref}
