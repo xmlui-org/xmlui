@@ -6,7 +6,7 @@ import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 
 export const TableOfContents = () => {
@@ -35,9 +35,9 @@ export const TableOfContents = () => {
   return (
     <div className={styles.nav} ref={tocRef}>
       <ul>
-        {Object.entries(headings).map(([key, value]) => (
+        {headings.map((value) => (
           <li
-            key={key}
+            key={value.id}
             className={classnames({
               [styles.head_1]: value.level === 1,
               [styles.head_2]: value.level === 2,
@@ -46,7 +46,7 @@ export const TableOfContents = () => {
               [styles.active]: value.id === activeAnchorId,
             })}
           >
-            <RrdNavLink to={`#${key}`} onClick={() => setActiveAnchorId(value.id)} id={key}>
+            <RrdNavLink to={`#${value.id}`} onClick={() => setActiveAnchorId(value.id)} id={value.id}>
               {value.text}
             </RrdNavLink>
           </li>
@@ -74,12 +74,18 @@ const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
     "font-size-TableOfContentsItem": "$font-size-smaller",
     "font-weight-TableOfContentsItem": "$font-weight-normal",
     "font-family-TableOfContentsItem": "$font-family",
-    "font-weight-TableOfContentsItem-active": "$font-weight-bold",
-    "color-TableOfContentsItem": "$color-text",
-    "color-TableOfContentsItem-active": "$color-text-secondary",
+    "border-radius-TableOfContentsItem": "0",
+    "border-width-TableOfContentsItem": "$space-0_5",
+    "border-style-TableOfContentsItem": "solid",
+    "border-radius-TableOfContentsItem--active": "0",
+    "border-width-TableOfContentsItem--active": "$space-0_5",
+    "border-style-TableOfContentsItem--active": "solid",
+    "font-weight-TableOfContentsItem--active": "$font-weight-bold",
     "color-bg-TableOfContents": "transparent",
     "padding-horizontal-TableOfContents": "$space-4",
     "padding-vertical-TableOfContents": "$space-4",
+    "padding-horizontal-TableOfContentsItem": "$space-2",
+    "padding-vertical-TableOfContentsItem": "$space-2",
     "margin-top-TableOfContents": "0",
     "margin-bottom-TableOfContents": "0",
     "border-radius-TableOfContents": "0",
@@ -89,6 +95,19 @@ const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
     "transform-TableOfContentsItem": "none",
     "align-vertical-TableOfContentsItem": "baseline",
     "letter-spacing-TableOfContentsItem": "0",
+    light: {
+      "color-TableOfContentsItem": "$color-text-primary",
+      "border-color-TableOfContentsItem": "$color-border",
+      "border-color-TableOfContentsItem--active": "$color-primary-500",
+      "color-TableOfContentsItem--active": "$color-primary-500",
+    },
+    dark: {
+      "color-TableOfContentsItem": "$color-text-primary",
+      "border-color-TableOfContentsItem": "$color-border",
+      "border-color-TableOfContentsItem--active": "$color-primary-500",
+      "color-TableOfContentsItem--active": "$color-text-secondary",
+
+    }
   },
 };
 

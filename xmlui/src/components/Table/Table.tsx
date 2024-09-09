@@ -29,7 +29,7 @@ import { EMPTY_ARRAY } from "@components-core/constants";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
-import { OurColumnMetadata, TableContext } from "../TableColumnDef/TableContext";
+import { type OurColumnMetadata, TableContext } from "../TableColumnDef/TableContext";
 import produce from "immer";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
@@ -81,6 +81,7 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
+  alwaysShowOrderingIndicators?: boolean;
   pageSizes?: number[];
   rowDisabledPredicate?: (item: any) => boolean;
   sortBy?: string;
@@ -126,6 +127,7 @@ const getCommonPinningStyles = (column: Column<RowWithOrder>): CSSProperties => 
   };
 };
 
+// eslint-disable-next-line react/display-name
 export const Table = forwardRef(({
   data = EMPTY_ARRAY,
   columns = EMPTY_ARRAY,
@@ -134,6 +136,7 @@ export const Table = forwardRef(({
   headerHeight,
   rowsSelectable = false,
   enableMultiRowSelection = true,
+  alwaysShowOrderingIndicators = true,
   pageSizes = DEFAULT_PAGE_SIZES,
   rowDisabledPredicate = defaultIsRowDisabled,
   sortBy,
@@ -556,23 +559,6 @@ export const Table = forwardRef(({
                   >
                     {headerGroup.headers.map((header, headerIndex) => {
                       const style = header.column.columnDef.meta?.style || {};
-                      const headerContent = (
-                        <div className={styles.headerContent} style={style}>
-                          {flexRender(header.column.columnDef.header, header.getContext()) as ReactNode}
-                          <span style={{ display: "inline-flex", minWidth: 12 }}>
-                            {header.column.columnDef.enableSorting &&
-                            header.column.columnDef.meta?.accessorKey === _sortBy ? (
-                              <>
-                                {_sortingDirection === "ascending" ? (
-                                  <Icon name="arrowup" size={"sm"} />
-                                ) : (
-                                  <Icon name="arrowdown" size={"sm"} />
-                                )}
-                              </>
-                            ) : undefined}
-                          </span>
-                        </div>
-                      );
                       const size = header.getSize();
                       return (
                         <th
@@ -585,13 +571,26 @@ export const Table = forwardRef(({
                             ...getCommonPinningStyles(header.column),
                           }}
                         >
-                          {header.isPlaceholder ? null : header.column.columnDef.enableSorting ? (
-                            <button className={styles.clickableHeader} onClick={() => _updateSorting(header)}>
-                              {headerContent}
-                            </button>
-                          ) : (
-                            <>{headerContent}</>
-                          )}
+                          <ClickableHeader
+                            hasSorting={header.column.columnDef.enableSorting}
+                            updateSorting={() => _updateSorting(header)}
+                          >
+                            <div className={styles.headerContent} style={style}>
+                              {flexRender(header.column.columnDef.header, header.getContext()) as ReactNode}
+                              <span style={{ display: "inline-flex", minWidth: 12 }}>
+                                {header.column.columnDef.enableSorting &&
+                                  <ColumnOrderingIndicator
+                                    alwaysShow={alwaysShowOrderingIndicators}
+                                    direction={
+                                      header.column.columnDef.meta?.accessorKey === _sortBy
+                                        ? _sortingDirection
+                                        : undefined
+                                    }
+                                  />
+                                }
+                              </span>
+                            </div>
+                          </ClickableHeader>
                           {header.column.getCanResize() && (
                             <div
                               {...{
@@ -756,6 +755,46 @@ export const Table = forwardRef(({
   );
 });
 
+type ClickableHeaderProps = {
+  hasSorting?: boolean;
+  updateSorting?: () => void;
+  children?: ReactNode;
+}
+
+function ClickableHeader({ hasSorting, updateSorting, children }: ClickableHeaderProps) {
+  return hasSorting ? (
+    <button className={styles.clickableHeader} onClick={updateSorting}>
+      {children}
+    </button>
+  ) : (
+    <>{children}</>
+  )
+}
+
+type ColumnOrderingIndicatorProps = {
+  direction?: SortingDirection;
+  alwaysShow?: boolean;
+}
+
+function ColumnOrderingIndicator({ direction, alwaysShow = true }: ColumnOrderingIndicatorProps) {
+  if (!alwaysShow) {
+    if (direction === "ascending") {
+      return <Icon name="chevronup" size={"sm"} />
+    } else if (direction === "descending") {
+      return <Icon name="chevrondown" size={"sm"} />
+    }
+    return null;
+  }
+  return (
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <Icon name="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
+      <Icon name="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
+    </div>
+  )
+}
+
+// arrowup:Table (theme resource) -> arrowup:Table (built-in) -> arrowup (theme resource) -> arrowup (built-in) -> fallback (no icon?)
+
 // =====================================================================================================================
 // XMLUI Table component definition
 
@@ -803,6 +842,12 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
     autoFocus?: boolean;
     /** @descriptionRef */
     hideHeader?: boolean;
+    /**
+     * This property controls whether to show ordering indicators in column headers (\`true\`) or not (\`false\`).
+     * The default value is \`false\`.
+     * @descriptionRef
+     */
+    alwaysShowOrderingIndicators?: boolean;
   };
   events: {
     /** @descriptionRef */
@@ -831,6 +876,7 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     sortDirection: desc("The sorting direction (ascending/descending)"),
     autoFocus: desc("Should the table have the focus automatically?"),
     hideHeader: desc("Should the header be hidden?"),
+    alwaysShowOrderingIndicators: desc("Show ordering indicators in column headers or not"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -865,8 +911,8 @@ const tableMetadata: ComponentDescriptor<TableComponentDef> = {
     light: {
       "color-bg-row-Table--hover": "$color-primary-50",
       "color-bg-selected-Table": "$color-primary-100",
-      "color-bg-heading-Table--hover": "$color-surface-100",
-      "color-bg-heading-Table--active": "$color-surface-200",
+      "color-bg-heading-Table--hover": "$color-surface-200",
+      "color-bg-heading-Table--active": "$color-surface-300",
       "color-bg-heading-Table": "$color-surface-100",
       "color-text-heading-Table": "$color-surface-500",
     },
@@ -912,6 +958,7 @@ export const tableComponentRenderer = createComponentRenderer<TableComponentDef>
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
         enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
+        alwaysShowOrderingIndicators={extractValue.asOptionalBoolean(node.props.alwaysShowOrderingIndicators)}
       >
         {renderChild(node.children)}
       </Table>

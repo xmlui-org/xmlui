@@ -1,4 +1,5 @@
-import { CSSProperties, ReactNode, useContext, useEffect, useRef, useState } from "react";
+import type {CSSProperties, ReactNode} from "react";
+import { useContext, useEffect, useRef, useState} from "react";
 import styles from "./Heading.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { createComponentRenderer } from "@components-core/renderers";
