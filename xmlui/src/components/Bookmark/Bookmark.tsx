@@ -53,7 +53,7 @@ export const bookmarkComponentRenderer = createComponentRenderer<BookmarkCompone
     return (
       <Bookmark
           uid={extractValue(node.uid)}
-          level={extractValue(node.props.level)}
+          level={extractValue.asOptionalNumber(node.props.level) }
       >
         {renderChild(node.children, layoutContext)}
       </Bookmark>
