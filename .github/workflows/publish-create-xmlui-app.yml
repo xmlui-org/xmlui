@@ -27,10 +27,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-          registry-url: https://npm.pkg.github.com/
+          registry-url: https://registry.npmjs.org/
       - run: npm ci
-        working-directory: client
       - run: npm publish
         working-directory: tools/create-app
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.PUBLISH_NPM_TOKEN}}
