@@ -6,6 +6,15 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+$padding-vertical-TableOfContentsItem: createThemeVar("padding-vertical-TableOfContentsItem");
+$padding-horizontal-TableOfContentsItem: createThemeVar("padding-horizontal-TableOfContentsItem");
+$padding-horizontal-TableOfContentsItem-level-1: createThemeVar("padding-horizontal-TableOfContentsItem-level-1");
+$padding-horizontal-TableOfContentsItem-level-2: createThemeVar("padding-horizontal-TableOfContentsItem-level-2");
+$padding-horizontal-TableOfContentsItem-level-3: createThemeVar("padding-horizontal-TableOfContentsItem-level-3");
+$padding-horizontal-TableOfContentsItem-level-4: createThemeVar("padding-horizontal-TableOfContentsItem-level-4");
+$padding-horizontal-TableOfContentsItem-level-5: createThemeVar("padding-horizontal-TableOfContentsItem-level-5");
+$padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizontal-TableOfContentsItem-level-6");
+
 .nav {
   background-color: createThemeVar("color-bg-TableOfContents");
   min-width: 220px;
@@ -29,6 +38,7 @@ $themeVars: ();
   padding-right: createThemeVar("padding-horizontal-TableOfContents");
   padding-top: createThemeVar("padding-vertical-TableOfContents");
   padding-bottom: createThemeVar("padding-vertical-TableOfContents");
+
   ul {
     li {
       color: createThemeVar("color-TableOfContentsItem");
@@ -38,23 +48,31 @@ $themeVars: ();
       text-transform: createThemeVar("transform-TableOfContentsItem");
       vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
       letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
-      padding: createThemeVar("padding-vertical-TableOfContentsItem") createThemeVar("padding-horizontal-TableOfContentsItem");
       list-style-type: none;
       border-left: createThemeVar("border-width-TableOfContentsItem") createThemeVar("border-style-TableOfContentsItem") createThemeVar("border-color-TableOfContentsItem");
 
       &.head_1 {
-        padding-left: t.$space-4;
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-1, $padding-horizontal-TableOfContentsItem);
       }
 
       &.head_2 {
-        padding-left: t.$space-5;
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-2, $padding-horizontal-TableOfContentsItem);
       }
 
       &.head_3 {
-        padding-left: t.$space-6;
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-3, $padding-horizontal-TableOfContentsItem);
       }
+
       &.head_4 {
-        padding-left: t.$space-7;
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-4, $padding-horizontal-TableOfContentsItem);
+      }
+
+      &.head_5 {
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-5, $padding-horizontal-TableOfContentsItem);
+      }
+
+      &.head_6 {
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-6, $padding-horizontal-TableOfContentsItem);
       }
 
       &.active {
