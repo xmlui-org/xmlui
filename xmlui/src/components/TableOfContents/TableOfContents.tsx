@@ -1,19 +1,21 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TableOfContents.module.scss";
-import {CSSProperties, useEffect, useRef} from "react";
+import { CSSProperties, useEffect, useRef } from "react";
 import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import {desc} from "@components-core/descriptorHelper";
 
 type TableOfContentsProp = {
   layout?: CSSProperties;
-}
+  smoothScrolling?: boolean;
+};
 
-export const TableOfContents = ({layout}: TableOfContentsProp) => {
+export const TableOfContents = ({ layout, smoothScrolling }: TableOfContentsProp) => {
   const tocRef = useRef<HTMLDivElement>(null);
   const { headings, setObserveIntersection, activeAnchorId, setActiveAnchorId } = useTableOfContents();
 
@@ -40,9 +42,12 @@ export const TableOfContents = ({layout}: TableOfContentsProp) => {
     <div className={styles.nav} ref={tocRef} style={layout}>
       <ul className={styles.list}>
         {headings.map((value) => (
-          <li key={value.id} className={classnames(styles.listItem, {
-            [styles.active]: value.id === activeAnchorId,
-          })}>
+          <li
+            key={value.id}
+            className={classnames(styles.listItem, {
+              [styles.active]: value.id === activeAnchorId,
+            })}
+          >
             <RrdNavLink
               className={classnames(styles.link, {
                 [styles.head_1]: value.level === 1,
@@ -53,7 +58,18 @@ export const TableOfContents = ({layout}: TableOfContentsProp) => {
                 [styles.head_6]: value.level === 6,
               })}
               to={`#${value.id}`}
-              onClick={() => setActiveAnchorId(value.id)}
+              onClick={() => {
+                if (smoothScrolling) {
+                  scrollIntoView(value.anchor, {
+                    block: "start",
+                    inline: "start",
+                    behavior: "smooth",
+                    scrollMode: "if-needed",
+                  });
+                }
+
+                setActiveAnchorId(value.id);
+              }}
               id={value.id}
             >
               {value.text}
@@ -69,14 +85,20 @@ export const TableOfContents = ({layout}: TableOfContentsProp) => {
  * (Document it)
  */
 export interface TableOfContentsComponentDef extends ComponentDef<"TableOfContents"> {
-  props: {};
+  props: {
+    /**
+     * It is used to set smooth scrolling when clicking on the table of contents items.
+     * @descriptionRef
+     */
+    smoothScrolling?: boolean;
+  };
 }
 
 export const TableOfContentsMd: ComponentDescriptor<TableOfContentsComponentDef> = {
   displayName: "TableOfContents",
   description: "Table of contents",
   props: {
-    //...
+    smoothScrolling: desc("It is used to set smooth scrolling when clicking on the table of contents items."),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -129,8 +151,8 @@ export const TableOfContentsMd: ComponentDescriptor<TableOfContentsComponentDef>
 
 export const tableOfContentsRenderer = createComponentRenderer<TableOfContentsComponentDef>(
   "TableOfContents",
-  ({layoutCss}) => {
-    return <TableOfContents layout={layoutCss}/>;
+  ({ layoutCss, node, extractValue }) => {
+    return <TableOfContents layout={layoutCss} smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}/>;
   },
   TableOfContentsMd,
 );
