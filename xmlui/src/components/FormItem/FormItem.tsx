@@ -29,6 +29,7 @@ import { DatePicker } from "@components/DatePicker/DatePicker";
 import { getByPath } from "@components/Form/Form";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { desc } from "@components-core/descriptorHelper";
 
 type FormControlType =
   | "text"
@@ -500,7 +501,43 @@ export interface FormItemComponentDef extends ComponentDef<"FormItem"> {
   };
 }
 
-const metadata: ComponentDescriptor<FormItemComponentDef> = {
+export const FormItemMd: ComponentDescriptor<FormItemComponentDef> = {
+  displayName: "FormItem",
+  description: "A single input element within a form",
+  props: {
+    bindTo: desc("The property path to bind the form item to"),
+    autoFocus: desc("Indicates if the form item should automatically receive focus"),
+    label: desc("The label for the form item"),
+    labelPosition: desc("The position of the label relative to the form item"),
+    labelWidth: desc("The width of the label"),
+    labelBreak: desc("Indicates if the label can be split into multiple lines"),
+    enabled: desc("Indicates if the form item is enabled"),
+    type: desc("The type of form item"),
+    customValidationsDebounce: desc("The debounce time for custom validations"),
+    validationMode: desc("The validation mode"),
+    initialValue: desc("The initial value of the form item"),
+    syncToValidation: desc("Indicates if the form item should sync to validation properties"),
+    required: desc("Indicates if the form item is required"),
+    requiredInvalidMessage: desc("The message to display when the form item is required"),
+    minLength: desc("The minimum length of the form item value"),
+    maxLength: desc("The maximum length of the form item value"),
+    maxTextLength: desc("The maximum length of the text in the input field"),
+    lengthInvalidMessage: desc("The message to display when the form item length is invalid"),
+    lengthInvalidSeverity: desc("The severity of the invalid length message"),
+    minValue: desc("The minimum value of the form item"),
+    maxValue: desc("The maximum value of the form item"),
+    rangeInvalidMessage: desc("The message to display when the form item value is out of range"),
+    rangeInvalidSeverity: desc("The severity of the out of range message"),
+    pattern: desc("The pattern to match the form item value"),
+    patternInvalidMessage: desc("The message to display when the form item value does not match the pattern"),
+    patternInvalidSeverity: desc("The severity of the pattern mismatch message"),
+    regex: desc("The regex to match the form item value"),
+    regexInvalidMessage: desc("The message to display when the form item value does not match the regex"),
+    regexInvalidSeverity: desc("The severity of the regex mismatch message"),
+  },
+  events: {
+    validate: desc("The event fired when the form item is validated"),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     "color-text-FormItemLabel": "$color-text-primary",
@@ -606,5 +643,5 @@ export const formItemComponentRenderer = createComponentRenderer<FormItemCompone
       </FormItem>
     );
   },
-  metadata
+  FormItemMd
 );

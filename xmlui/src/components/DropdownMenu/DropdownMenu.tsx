@@ -164,7 +164,7 @@ export interface DropdownMenuComponentDef extends ComponentDef<"DropdownMenu"> {
   };
 }
 
-const metadata: ComponentDescriptor<DropdownMenuComponentDef> = {
+export const DropdownMenuMd: ComponentDescriptor<DropdownMenuComponentDef> = {
   displayName: "DropdownMenu",
   description:
     "It represents a dropdown menu with multiple menu items. Clicking it displays the available menu items.",
@@ -214,7 +214,7 @@ export const dropdownMenuComponentRenderer =
         </DropdownMenu>
       );
     },
-    metadata
+    DropdownMenuMd
   );
 
 // ====================================================================================================================
@@ -303,7 +303,7 @@ export interface MenuItemComponentDef extends ComponentDef<"MenuItem"> {
   };
 }
 
-const menuItemMetadata: ComponentDescriptor<MenuItemComponentDef> = {
+export const MenuItemMd: ComponentDescriptor<MenuItemComponentDef> = {
   displayName: "MenuItem",
   description:
     "Represents a menu item within a DropDownMenu, clicking of which triggers an action",
@@ -371,7 +371,7 @@ export const menuItemRenderer = createComponentRenderer<MenuItemComponentDef>(
       </MenuItem>
     );
   },
-  menuItemMetadata
+  MenuItemMd
 );
 
 // ====================================================================================================================

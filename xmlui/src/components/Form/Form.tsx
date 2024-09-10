@@ -21,7 +21,7 @@ import { ModalDialog } from "@components/ModalDialog/ModalDialog";
 import { Text } from "@components/Text/Text";
 import { Stack } from "@components/Stack/Stack";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { LookupEventHandlerFn, RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";
 
@@ -421,18 +421,18 @@ export interface FormComponentDef extends ComponentDef<"Form"> {
   };
 }
 
-const metadata: ComponentDescriptor<FormComponentDef> = {
+export const FormMd: ComponentDescriptor<FormComponentDef> = {
   displayName: "Form",
-  description: "Manages editing, validating and saving compound data in the UI",
+  description: "A form component that allows users to input data and submit it to the app",
   props: {
-    buttonRowTemplate: {
-      description: "The template encapsulating form buttons",
-      valueType: "ComponentDef",
-    },
-    subject: desc("The data structure managed by the form"),
-    swapCancelAndSave: desc("Swap the Cancel and Save buttons?"),
+    buttonRowTemplate: nestedComp("The template encapsulating form buttons"),
+    itemLabelPosition: desc("The position of the item label"),
+    itemLabelWidth: desc("The width of the item label"),
+    itemLabelBreak: desc("The label can be split into multiple lines if it would overflow the available label width"),
+    subject: desc("The initial value of the form's data structure"),
     cancelLabel: desc("The label of the Cancel button"),
     saveLabel: desc("The label of the Save button"),
+    swapCancelAndSave: desc("Swap the Cancel and Save buttons"),
   },
   events: {
     submit: desc("Triggers when the form data is about to save"),
@@ -538,5 +538,5 @@ export const formComponentRenderer = createComponentRenderer<FormComponentDef>(
       />
     );
   },
-  metadata
+  FormMd
 );

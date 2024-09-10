@@ -276,25 +276,33 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
      * @descriptionRef
      */
     placeholder?: string;
-    /** @internal */
-    value?: string | string[];
     /**
      * The initial value displayed in the input field.
      * @descriptionRef
      */
     initialValue?: string | string[];
-    /** @internal */
+    /**
+     * You can specify the identifier of a component acting as its label. When you click the label,
+     * the component behaves as you clicked it.
+     * @descriptionRef
+     */
     labelId?: string;
-    /** @internal */
-    maxLength?: number;
-    /** @internal */
+    /**
+     * If this boolean prop is set to \`true\`, the \`DatePicker\` will be focused when it appears on the UI.
+     * The default is \`false\`.
+     * @descriptionRef
+     */
     autoFocus?: boolean;
-    /** @internal */
+    /**
+     * Set this property to \`true\` to indicate it must have a value before submitting the containing form.
+     * @descriptionRef
+     */
     required?: boolean;
-    /** @internal */
+    /**
+     * This boolean determines whether the input field can be modified or not.
+     * @descriptionRef
+     */
     readOnly?: boolean;
-    /** @internal */
-    allowCopy?: boolean;
     /**
      * Controls whether the input field is enabled (\`true\`) or disabled (\`false\`).
      * @descriptionRef
@@ -310,7 +318,10 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
      * @descriptionRef
      */
     mode?: "single" | "range";
-    /** @descriptionRef */
+    /** 
+     * Define custom date formats using this property.
+     * @descriptionRef 
+     */
     dateFormat?: string;
     /**
      * Either show the number of weeks (\`true\`) or not (\`false\`).
@@ -343,9 +354,15 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
     disabledDates?: string[];
   };
   events: {
-    /** @descriptionRef */
+    /** 
+     * This event is triggered after the user has changed the field value.
+     * @descriptionRef 
+     */
     didChange?: string;
-    /** @descriptionRef */
+    /** 
+     * This event is triggered when the `DatePicker` receives focus.
+     * @descriptionRef
+     */
     gotFocus?: string;
     /**
      * This event is triggered when the \`DatePicker\` loses focus.
@@ -369,7 +386,7 @@ export interface DatePickerComponentDef extends ComponentDef<"DatePicker"> {
   };
 }
 
-const metadata: ComponentDescriptor<DatePickerComponentDef> = {
+export const DatePickerMd: ComponentDescriptor<DatePickerComponentDef> = {
   displayName: "DatePicker",
   description: "A datepicker component",
   props: {
@@ -426,5 +443,5 @@ export const datePickerComponentRenderer = createComponentRenderer<DatePickerCom
       />
     );
   },
-  metadata,
+  DatePickerMd,
 );

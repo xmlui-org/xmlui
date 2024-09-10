@@ -41,7 +41,7 @@ export interface LogoComponentDef extends ComponentDef<"Logo"> {
   }
 }
 
-const metadata: ComponentDescriptor<LogoComponentDef> = {
+export const LogoMd: ComponentDescriptor<LogoComponentDef> = {
   displayName: "Logo",
   description: "Displays the application logo",
 };
@@ -51,5 +51,5 @@ export const logoComponentRenderer = createComponentRenderer<LogoComponentDef>(
   ({ node, layoutCss, extractValue }) => {
     return <Logo style={layoutCss} title={extractValue(node.props.title)} />;
   },
-  metadata
+  LogoMd
 );

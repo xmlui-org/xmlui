@@ -4,6 +4,7 @@ import { isPlainObject } from "lodash-es";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { nestedComp } from "@components-core/descriptorHelper";
 
 // =====================================================================================================================
 // React Items component implementation
@@ -68,14 +69,14 @@ export interface ItemsComponentDef extends ComponentDef<"Items"> {
   }
 }
 
-const metadata: ComponentDescriptor<ItemsComponentDef> = {
+export const ItemsMd: ComponentDescriptor<ItemsComponentDef> = {
   displayName: "Items",
   description: "A component displaying a list of items",
   props: {
-    itemTemplate: {
-      description: "The component template to display a single item",
-      valueType: "ComponentDef",
-    },
+    items: nestedComp("The list of items to display"),
+    data: nestedComp("The list of items to display"),
+    reverse: nestedComp("Reverse the order of items"),
+    itemTemplate: nestedComp("The component template to display a single item"),
   },
   opaque: true,
 };
@@ -103,5 +104,5 @@ export const itemsComponentRenderer = createComponentRenderer<ItemsComponentDef>
       />
     );
   },
-  metadata
+  ItemsMd
 );

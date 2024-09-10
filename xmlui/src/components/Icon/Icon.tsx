@@ -134,7 +134,7 @@ export interface IconComponentDef extends ComponentDef<"Icon"> {
   };
 }
 
-const metadata: ComponentDescriptor<IconComponentDef> = {
+export const IconMd: ComponentDescriptor<IconComponentDef> = {
   displayName: "Icon",
   description: "Represent a button component that can be used to trigger a use action",
   props: {
@@ -168,5 +168,5 @@ export const iconComponentRenderer = createComponentRenderer<IconComponentDef>(
       />
     );
   },
-  metadata
+  IconMd
 );

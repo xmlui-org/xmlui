@@ -1,5 +1,5 @@
 import { useCombobox } from "downshift";
-import React, { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
@@ -14,7 +14,7 @@ import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
 import { filterOptions } from "@components/component-utils";
@@ -98,8 +98,6 @@ export const Combobox = ({
     getToggleButtonProps,
     closeMenu,
   } = useCombobox({
-    // labelId: id,
-    // toggleButtonId: id,
     items,
     itemToString(item) {
       return item ? item.label : "";
@@ -276,8 +274,6 @@ export interface ComboboxComponentDef extends ComponentDef<"Combobox"> {
      * @descriptionRef
      */
     placeholder?: string;
-    /** @internal */
-    value?: string | string[];
     /**
      * The initial value displayed in the input field.
      * @descriptionRef
@@ -286,6 +282,7 @@ export interface ComboboxComponentDef extends ComponentDef<"Combobox"> {
     /**
      * You can specify the identifier of a component acting as its label. When you click the label,
      * the component behaves as you clicked it.
+     * @descriptionRef
      */
     labelId?: string;
     /**
@@ -301,6 +298,7 @@ export interface ComboboxComponentDef extends ComponentDef<"Combobox"> {
     autoFocus?: boolean;
     /**
      * Set this property to \`true\` to indicate it must have a value before submitting the containing form.
+     * @descriptionRef
      */
     required?: boolean;
     /**
@@ -320,6 +318,7 @@ export interface ComboboxComponentDef extends ComponentDef<"Combobox"> {
     validationStatus?: ValidationStatus;
     /**
      * You can define a template for the option items of the `Combobox`.
+     * @descriptionRef
      */
     optionTemplate?: ComponentDef;
     /**
@@ -384,12 +383,11 @@ const defaultOptionRenderer = {
   },
 };
 
-const metadata: ComponentDescriptor<ComboboxComponentDef> = {
+export const ComboboxMd: ComponentDescriptor<ComboboxComponentDef> = {
   displayName: "Combobox",
   description: "A combobox component",
   props: {
     placeholder: desc("Placeholder text to sign the input is empty"),
-    value: desc("The current value to display"),
     initialValue: desc("The initial value to display"),
     labelId: desc("ID of the label attached to this input"),
     maxLength: desc("The maximum length of the input text"),
@@ -399,8 +397,8 @@ const metadata: ComponentDescriptor<ComboboxComponentDef> = {
     enabled: desc("Is the component enabled?"),
     validationStatus: desc("The validation status of the component"),
     // --- Adornment props
-    optionTemplate: desc("Template to render each option"),
-    emptyListTemplate: desc("Template to render when the list is empty"),
+    optionTemplate: nestedComp("Template to render each option"),
+    emptyListTemplate: nestedComp("Template to render when the list is empty"),
   },
   events: {
     didChange: desc("Triggered when the input value changes"),
@@ -458,5 +456,5 @@ export const comboboxComponentRenderer = createComponentRenderer<ComboboxCompone
       </Combobox>
     );
   },
-  metadata,
+  ComboboxMd,
 );

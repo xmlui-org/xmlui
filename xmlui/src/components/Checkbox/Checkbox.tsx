@@ -23,42 +23,70 @@ export interface CheckboxComponentDef extends ComponentDef<"Checkbox"> {
   props: {
     initialValue?: boolean;
     /**
-     * You can specify the identifier of a component acting as its label. When you click the label, 
-     * the component behaves as you clicked it.
+     * This property sets whether the checkbox should be displayed in the checked (\`true\`) or unchecked 
+     * (\`false\`) state when it is displayed initially.
+     * @descriptionRef 
      */
     labelId?: string;
     /**
      * Set this property to \`true\` to automatically get the focus when the component is displayed.
+     * @descriptionRef 
      */
     autoFocus?: boolean;
     /**
      * Set this property to \`true\` to indicate it must have a value before submitting the containing form.
+     * @descriptionRef 
      */
     required?: boolean;
     /**
      * Set this property to \`true\` to disallow changing the component value.
+     * @descriptionRef 
      */
     readOnly?: boolean;
-    /** @descriptionRef */
+    /** 
+     * This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
+     * it is `true` by default.
+     * @descriptionRef 
+     */
     enabled?: string | boolean;
     /**
      * With this property, you can set the checkbox's validation status to "none", "error", "warning", 
      * or "valid". 
+     * @descriptionRef 
      */
     validationStatus?: ValidationStatus;
-    /** @descriptionRef */
+    /** 
+     * This property sets the label of the component.
+     * @descriptionRef 
+     */
     label?: string;
-    /** @descriptionRef */
+    /** 
+     * Places the label at the \`top\`, \`right\`, \`bottom\`, or \`left\` of the \`Checkbox\`.
+     * @descriptionRef 
+     */
     labelPosition?: string;
-    /** @descriptionRef */
+    /** 
+     * Setting this prop signals that the component is in an _intedeterminate state_.
+     * @descriptionRef 
+     */
     indeterminate?: boolean;
   };
   events: {
-    /** @descriptionRef */
+    /** 
+     * This event is triggered when the \`Checkbox\` is toggled due to user interaction. A read-only 
+     * checkbox never fires this event, and it won't fire if the checkbox's value is set programmatically.
+     * @descriptionRef 
+     */
     didChange?: string;
-    /** @descriptionRef */
+    /** 
+     * This event is triggered when the \`Checkbox\` receives focus.
+     * @descriptionRef 
+     */
     gotFocus?: string;
-    /** @descriptionRef */
+    /** 
+     * This event is triggered when the \`Checkbox\` loses focus.
+     * @descriptionRef 
+     */
     lostFocus?: string;
   };
   api: {
@@ -69,7 +97,7 @@ export interface CheckboxComponentDef extends ComponentDef<"Checkbox"> {
   }
 }
 
-const metadata: ComponentDescriptor<CheckboxComponentDef> = {
+export const CheckboxMd: ComponentDescriptor<CheckboxComponentDef> = {
   displayName: "Checkbox",
   description: "Display a checkbox that represents a true or false value",
   props: inputComponentPropertyDescriptors,
@@ -120,5 +148,5 @@ export const checkboxComponentRenderer = createComponentRenderer<CheckboxCompone
       />
     );
   },
-  metadata
+  CheckboxMd
 );

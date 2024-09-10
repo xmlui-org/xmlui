@@ -46,7 +46,7 @@ function Footer({
  */
 export interface FooterComponentDef extends ComponentDef<"Footer"> {}
 
-const metadata: ComponentDescriptor<FooterComponentDef> = {
+export const FooterMd: ComponentDescriptor<FooterComponentDef> = {
   displayName: "Footer",
   description: "Display an application footer",
   themeVars: parseScssVar(styles.themeVars),
@@ -79,5 +79,5 @@ export const footerRenderer = createComponentRenderer<FooterComponentDef>(
       </Footer>
     );
   },
-  metadata
+  FooterMd
 );

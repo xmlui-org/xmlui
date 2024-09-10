@@ -66,6 +66,9 @@ export type ComponentThemeColor =
   | "light"
   | "dark";
 
+// --- Available view sizes
+export const viewportSizeNames = ["xs", "sm", "md", "lg", "xl", "xxl"];
+
 // --- Available button sizes
 const sizeValues = ["xs", "sm", "md", "lg"] as const;
 export const sizeNames: string[] = [...sizeValues];

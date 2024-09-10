@@ -55,9 +55,12 @@ export interface EmojiSelectorComponentDef extends ComponentDef<"EmojiSelector">
   };
 }
 
-const metadata: ComponentDescriptor<EmojiSelectorComponentDef> = {
+export const EmojiSelectorMd: ComponentDescriptor<EmojiSelectorComponentDef> = {
   displayName: "EmojiSelector",
   description: "A panel to select an emoji from the available ones",
+  props: {
+    autoFocus: desc("Auto focus on the component when the user navigates to the component"),
+  },
   events: {
     select: desc("Sign that an emoji has been selected"),
   },
@@ -77,5 +80,5 @@ export const emojiSelectorRenderer = createComponentRenderer<EmojiSelectorCompon
       />
     );
   },
-  metadata
+  EmojiSelectorMd
 );

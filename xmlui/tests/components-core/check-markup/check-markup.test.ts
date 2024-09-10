@@ -5,6 +5,7 @@ import { createTestMetadataHandler } from "../test-metadata-handler";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { metadataHash } from "./metadata-hash";
+import { viewportSizeNames } from "@components/abstractions";
 
 const metadataHandler = createTestMetadataHandler(metadataHash);
 
@@ -64,7 +65,7 @@ describe("Markup checks", () => {
       const error = errors[0];
       expect(error.name).equal("Button");
       expect(error.code).equal("M002");
-      expect(error.message).toContain('Button');
+      expect(error.message).toContain("Button");
       expect(error.message).toContain(`'${id}'`);
     });
   });
@@ -202,12 +203,30 @@ describe("Markup checks", () => {
         <Button ${key}="something" />
       `;
       const def = transformSource(source) as ComponentDef;
-  
+
       // --- Act
       const errors = checkXmlUiMarkup(def, [], metadataHandler);
-  
+
       // --- Assert
       expect(errors.length).equal(0);
+    });
+  });
+
+  viewportSizeNames.forEach((bp) => {
+    layoutOptionKeys.forEach((key) => {
+      it(`Layout property '${key}-${bp}' works`, () => {
+        // --- Arrange
+        const source = `
+        <Button ${key}-${bp}="something" />
+      `;
+        const def = transformSource(source) as ComponentDef;
+
+        // --- Act
+        const errors = checkXmlUiMarkup(def, [], metadataHandler);
+
+        // --- Assert
+        expect(errors.length).equal(0);
+      });
     });
   });
 
@@ -399,7 +418,6 @@ describe("Markup checks", () => {
     // --- Assert
     expect(errors.length).equal(0);
   });
-
 });
 
 function transformSource(source: string): ComponentDef | CompoundComponentDef | null {

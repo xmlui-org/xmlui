@@ -192,7 +192,11 @@ export const FileInput = ({
 // ============================================================================
 // XMLUI FileInput component definition
 
-/** @internal */
+/**
+ * The \`FileInput\` is a user interface component that allows users to select files from their device's
+ * file system for upload (or processing its content otherwise).
+ * @descriptionRef
+ */
 export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
   props: {
     /** @descriptionRef */
@@ -219,7 +223,10 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
      * @descriptionRef
      */
     validationStatus?: ValidationStatus;
-    /** @descriptionRef */
+    /**
+     * This property is an optional string to set a label for the button part.
+     * @descriptionRef
+     */
     buttonLabel?: string;
     /**
      * This property accepts an icon name.
@@ -306,11 +313,19 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
   };
 }
 
-const metadata: ComponentDescriptor<FileInputComponentDef> = {
+export const FileInputMd: ComponentDescriptor<FileInputComponentDef> = {
   displayName: "FileInputBox",
   description: "Represents an input component for textual data entry",
   props: {
-    ...inputComponentPropertyDescriptors,
+    placeholder: desc("Placeholder text to sign the input is empty"),
+    value: desc("The current value to display"),
+    initialValue: desc("The initial value to display"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    allowCopy: desc("Allow copying the component value to the clipboard?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
     variant: desc("The button variant (solid, outlined, ghost) to use"),
     buttonLabel: desc("The label of the button that opens the file dialog"),
     buttonIcon: desc("The ID of the icon to display in the button"),
@@ -353,7 +368,7 @@ export const fileInputRenderer = createComponentRenderer<FileInputComponentDef>(
       />
     );
   },
-  metadata,
+  FileInputMd,
 );
 
 function isFile(value: any): value is File {
