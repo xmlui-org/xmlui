@@ -38,7 +38,7 @@ export interface PdfComponentDef extends ComponentDef<"Pdf"> {
   };
 }
 
-const metadata: ComponentDescriptor<PdfComponentDef> = {
+export const PdfMd: ComponentDescriptor<PdfComponentDef> = {
   displayName: "PDF Preview",
   description: "Displays a PDF document preview",
   props: {
@@ -51,5 +51,5 @@ export const pdfComponentRenderer = createComponentRenderer<PdfComponentDef>(
   ({ node, extractValue }) => {
     return <LazyPdf src={extractValue(node.props.src)} />;
   },
-  metadata
+  PdfMd
 );

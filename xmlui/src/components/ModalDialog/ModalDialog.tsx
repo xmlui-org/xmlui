@@ -230,21 +230,17 @@ export interface ModalDialogComponentDef extends ComponentDef<"ModalDialog"> {
   }
 }
 
-const metadata: ComponentDescriptor<ModalDialogComponentDef> = {
+export const ModalDialogMd: ComponentDescriptor<ModalDialogComponentDef> = {
   displayName: "ModalDialog",
   description: "A container for a modal dialog",
   props: {
-    fullScreen: {
-      description: "Indicates the modal fills the entire screen",
-      valueType: "boolean",
-    },
-    title: {
-      description: "The title of the modal",
-      valueType: "string",
-    },
+    fullScreen: desc("Indicates the modal fills the entire screen", "boolean"),
+    title: desc("The title of the modal"),
     closeButtonVisible: desc("Indicates if the close button is visible"),
+    isInitiallyOpen: desc("Indicates if the modal is initially open", "boolean"),
   },
   events: {
+    open: desc("The modal is opened"),
     close: desc("The modal is closed"),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -287,5 +283,5 @@ export const modalViewComponentRenderer = createComponentRenderer<ModalDialogCom
       </ModalDialog>
     );
   },
-  metadata
+  ModalDialogMd
 );

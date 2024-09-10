@@ -118,7 +118,7 @@ export interface SelectionStoreComponentDef extends ComponentDef<"SelectionStore
   };
 }
 
-const metadata: ComponentDescriptor<SelectionStoreComponentDef> = {
+export const SelectionStoreMd: ComponentDescriptor<SelectionStoreComponentDef> = {
   displayName: "SelectionStore",
   description: "A component providing services to store the selection state of items in a list",
   props: {
@@ -142,7 +142,7 @@ export const selectionStoreComponentRenderer = createComponentRenderer<Selection
       </SelectionStore>
     );
   },
-  metadata
+  SelectionStoreMd
 );
 
 // This React hook takes care of retrieving the current selection context

@@ -35,7 +35,7 @@ export interface ProgressBarComponentDef extends ComponentDef<"ProgressBar"> {
   };
 }
 
-const metadata: ComponentDescriptor<ProgressBarComponentDef> = {
+export const ProgressBarMd: ComponentDescriptor<ProgressBarComponentDef> = {
   displayName: "ProgressBar",
   description: "Display a progress value",
   props: {
@@ -62,5 +62,5 @@ export const progressBarComponentRenderer = createComponentRenderer<ProgressBarC
   ({ node, extractValue, layoutCss }) => {
     return <ProgressBar value={Math.max(0, Math.min(1, extractValue(node.props.value)))} style={layoutCss} />;
   },
-  metadata
+  ProgressBarMd
 );

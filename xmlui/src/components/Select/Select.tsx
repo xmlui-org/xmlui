@@ -314,7 +314,7 @@ const defaultOptionRenderer = {
   },
 };
 
-const metadata: ComponentDescriptor<SelectComponentDef> = {
+export const SelectMd: ComponentDescriptor<SelectComponentDef> = {
   displayName: "Select",
   description: "A dropdown list of options",
   props: {
@@ -372,5 +372,5 @@ export const selectComponentRenderer = createComponentRenderer<SelectComponentDe
       </Select>
     );
   },
-  metadata
+  SelectMd
 );

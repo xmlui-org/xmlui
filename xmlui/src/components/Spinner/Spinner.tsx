@@ -89,12 +89,13 @@ export interface SpinnerComponentDef extends ComponentDef<"Spinner"> {
   };
 }
 
-const metadata: ComponentDescriptor<SpinnerComponentDef> = {
+export const SpinnerMd: ComponentDescriptor<SpinnerComponentDef> = {
   displayName: "Spinner",
   description: "Component representing progress",
   props: {
     delay: desc("The delay in milliseconds before the spinner is displayed"),
     fullScreen: desc("If set to `true`, the component will be rendered in a full screen container"),
+    themeColor: desc("The theme color of the component"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -127,5 +128,5 @@ export const spinnerComponentRenderer =
         />
       );
     },
-    metadata
+    SpinnerMd
   );

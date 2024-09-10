@@ -201,7 +201,7 @@ export interface TextComponentDef extends ComponentDef<"Text"> {
   };
 }
 
-const metadata: ComponentDescriptor<TextComponentDef> = {
+export const TextMd: ComponentDescriptor<TextComponentDef> = {
   displayName: "Text",
   description: "Display a text with several variants (styles)",
   props: {
@@ -312,5 +312,5 @@ export const textComponentRenderer = createComponentRenderer<TextComponentDef>(
       </Text>
     );
   },
-  metadata
+  TextMd
 );

@@ -221,7 +221,7 @@ interface PieChartDef extends ComponentDef<"PieChart"> {
   };
 }
 
-const metadata: ComponentDescriptor<PieChartDef> = {
+export const PieChartMd: ComponentDescriptor<PieChartDef> = {
   displayName: "PieChart",
   description: "A pie chart component",
   props: {
@@ -260,5 +260,5 @@ export const pieChartComponentRenderer = createComponentRenderer<PieChartDef>(
       />
     );
   },
-  metadata
+  PieChartMd
 );

@@ -65,14 +65,14 @@ export const RadioGroup = ({
       updateState({ value });
       onDidChange(value);
     },
-    [onDidChange, updateState]
+    [onDidChange, updateState],
   );
 
   const onInputChange = useCallback(
     (value: string) => {
       updateValue(value);
     },
-    [updateValue]
+    [updateValue],
   );
 
   // --- Manage obtaining and losing the focus
@@ -207,7 +207,7 @@ export const radioGroupOptionRenderer = createComponentRenderer<RadioGroupOption
       />
     );
   },
-  radioGroupOptionMetadata
+  radioGroupOptionMetadata,
 );
 
 // =====================================================================================================================
@@ -277,11 +277,24 @@ export interface RadioGroupComponentDef extends ComponentDef<"RadioGroup"> {
   };
 }
 
-const radioGroupMetadata: ComponentDescriptor<RadioGroupComponentDef> = {
+export const RadioGroupMd: ComponentDescriptor<RadioGroupComponentDef> = {
   displayName: "RadioGroup",
   description: "A group of radio buttons (mutually exclusive selection)",
-  props: { ...inputComponentPropertyDescriptors },
-  events: inputComponentEventDescriptors,
+  props: {
+    initialValue: desc("The initial value to display"),
+    labelId: desc("ID of the label attached to this input"),
+    maxLength: desc("The maximum length of the input text"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
+  },
+  events: {
+    didChange: desc("Triggered when the input value changes"),
+    gotFocus: desc("Triggered when the input gains focus"),
+    lostFocus: desc("triggered when the input has lost focus"),
+  },
 };
 
 export const radioGroupRenderer = createComponentRenderer<RadioGroupComponentDef>(
@@ -304,5 +317,5 @@ export const radioGroupRenderer = createComponentRenderer<RadioGroupComponentDef
       </RadioGroup>
     );
   },
-  radioGroupMetadata
+  RadioGroupMd,
 );

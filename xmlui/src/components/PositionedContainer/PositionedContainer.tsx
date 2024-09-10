@@ -40,7 +40,7 @@ interface PositionedContainerComponentDef extends ComponentDef<"PositionedContai
   };
 }
 
-const metadata: ComponentDescriptor<PositionedContainerComponentDef> = {
+export const PositionedContainerMd: ComponentDescriptor<PositionedContainerComponentDef> = {
   displayName: "PositionedContainer",
   description: "",
   props: {
@@ -64,7 +64,7 @@ export const positionedContainerComponentRenderer = createComponentRenderer<Posi
       </PositionedContainer>
     );
   },
-  metadata
+  PositionedContainerMd
 );
 
 export default PositionedContainer;

@@ -1,6 +1,6 @@
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
-import { StackMd } from "@components/Stack/Stack";
+import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
 import { TextboxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
@@ -31,6 +31,41 @@ import { ItemsMd } from "@components/Items/Items";
 import { LinkMd } from "@components/Link/Link";
 import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
+import Markdown from "react-markdown";
+import { MarkdownMd } from "@components/Markdown/Markdown";
+import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
+import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
+import { NavGroupMd } from "@components/NavGroup/NavGroup";
+import { NavLinkMd } from "@components/NavLink/NavLink";
+import { NavPanelMd } from "@components/NavPanel/NavPanel";
+import { NoResultMd } from "@components/NoResult/NoResult";
+import { NumberBoxMd } from "@components/NumberBox/NumberBox";
+import { OffCanvasMd } from "@components/OffCanvas/OffCanvas";
+import { OptionMd } from "@components/Option/Option";
+import { PageMetaTitleMd } from "@components/PageMetaTitle/PageMetaTitle";
+import { PagesMd } from "@components/Pages/Pages";
+import { PdfMd } from "@components/Pdf/LazyPdf";
+import { PieChartMd } from "@components/PieChart/PieChart";
+import { PositionedContainerMd } from "@components/PositionedContainer/PositionedContainer";
+import { ProgressBarMd } from "@components/ProgressBar/ProgressBar";
+import { QueueMd } from "@components/Queue/Queue";
+import { RadioGroupMd } from "@components/RadioGroup/RadioGroup";
+import { RealTimeAdapterMd } from "@components/RealTimeAdapter/RealTimeAdapter";
+import { RedirectMd } from "@components/Redirect/Redirect";
+import { SelectMd } from "@components/Select/Select";
+import { SelectionStoreMd } from "@components/SelectionStore/SelectionStore";
+import { SpaceFillerMd } from "@components/SpaceFiller/SpaceFiller";
+import { SpinnerMd } from "@components/Spinner/Spinner";
+import { HSplitterMd, SplitterMd, VSplitterMd } from "@components/Splitter/Splitter";
+import { StickyBoxMd } from "@components/StickyBox/StickyBox";
+import { SwitchMd } from "@components/Switch/Switch";
+import { TableMd } from "@components/Table/Table";
+import { TableColumnDefMd } from "@components/TableColumnDef/TableColumnDef";
+import { TableHeaderMd } from "@components/TableHeader/TableHeader";
+import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
+import { TabsMd } from "@components/Tabs/Tabs";
+import { TextMd } from "@components/Text/Text";
+import { TextAreaMd } from "@components/TextArea/TextArea";
 
 export const metadataHash: Record<string, ComponentDescriptor<any>> = {
   App: AppMd,
@@ -68,8 +103,49 @@ export const metadataHash: Record<string, ComponentDescriptor<any>> = {
   Link: LinkMd,
   List: ListMd,
   Logo: LogoMd,
+  Markdown: MarkdownMd,
   MenuItem: MenuItemMd,
+  ModalDialog: ModalDialogMd,
+  MultiCombobox: ComboboxMd,
+  MultiSelect: MultiSelectMd,
+  NavGroup: NavGroupMd,
+  NavLink: NavLinkMd,
+  NavPanel: NavPanelMd,
+  NoResult: NoResultMd,
+  NumberBox: NumberBoxMd,
+  OffCanvas: OffCanvasMd,
+  Option: OptionMd,
+  PageMetaTitle: PageMetaTitleMd,
+  Pages: PagesMd,
+  Pdf: PdfMd,
+  PieChart: PieChartMd,
+  PositionedContainer: PositionedContainerMd,
+  ProgressBar: ProgressBarMd,
+  Queue: QueueMd,
+  RadioGroup: RadioGroupMd,
+  RealTimeAdapter: RealTimeAdapterMd,
+  Redirect: RedirectMd,
+  Select: SelectMd,
+  SelectionStore: SelectionStoreMd,
+  SpaceFiller: SpaceFillerMd,
+  Spinner: SpinnerMd,
+  Splitter: SplitterMd,
+  HSplitter: HSplitterMd,
+  VSplitter: VSplitterMd,
   Stack: StackMd,
+  CHStack: CHStackMd,
+  CVStack: CVStackMd,
+  HStack: HStackMd,
+  VStack: VStackMd,
+  StickyBox: StickyBoxMd,
+  Table: TableMd,
+  TableColumnDef: TableColumnDefMd,
+  TableHeader: TableHeaderMd,
+  TableOfContents: TableOfContentsMd,
+  Tabs: TabsMd,
+  Text: TextMd,
+  TextArea: TextAreaMd,
   TextBox: TextboxMd,
   Theme: ThemeMd,
+  Switch: SwitchMd,
 };

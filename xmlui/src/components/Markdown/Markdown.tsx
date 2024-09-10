@@ -132,7 +132,7 @@ const Markdown = memo(function Markdown({ children }: MarkdownProps) {
  */
 export interface MarkdownComponentDef extends ComponentDef<"Markdown"> {}
 
-const metadata: ComponentDescriptor<MarkdownComponentDef> = {
+export const MarkdownMd: ComponentDescriptor<MarkdownComponentDef> = {
   displayName: "Markdown",
   description: "This component lets you use markdown syntax to create rich text content.",
   themeVars: parseScssVar(styles.themeVars),
@@ -160,7 +160,7 @@ export const markdownComponentRenderer = createComponentRenderer<MarkdownCompone
   ({ node, renderChild }) => {
     return <Markdown>{renderChild(node.children)}</Markdown>;
   },
-  metadata
+  MarkdownMd
 );
 
 // --------------------------------------------------------------------------------------------------------------------

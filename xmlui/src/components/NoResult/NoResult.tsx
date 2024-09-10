@@ -44,7 +44,7 @@ export interface NoResultComponentDef extends ComponentDef<"NoResult"> {
   };
 }
 
-const metadata: ComponentDescriptor<NoResultComponentDef> = {
+export const NoResultMd: ComponentDescriptor<NoResultComponentDef> = {
   displayName: "NoResult",
   description: "Component representing a date fetch result with an empty result set",
   props: {
@@ -78,5 +78,5 @@ export const noResultComponentRenderer = createComponentRenderer<NoResultCompone
       />
     );
   },
-  metadata
+  NoResultMd
 );

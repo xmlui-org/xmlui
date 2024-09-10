@@ -28,7 +28,7 @@ export interface PageMetaTitleComponentDef extends ComponentDef<"PageMetaTitle">
   };
 }
 
-const metadata: ComponentDescriptor<PageMetaTitleComponentDef> = {
+export const PageMetaTitleMd: ComponentDescriptor<PageMetaTitleComponentDef> = {
   displayName: "PageMetaTitle",
   description: "This component defines the title to add to the current page's metadata",
   props: {
@@ -41,5 +41,5 @@ export const pageMetaTitleComponentRenderer = createComponentRenderer<PageMetaTi
   ({ node, extractValue }) => {
     return <PageMetaTitle title={extractValue(node.props.value)} />;
   },
-  metadata
+  PageMetaTitleMd
 );

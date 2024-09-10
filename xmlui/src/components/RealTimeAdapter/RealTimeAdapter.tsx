@@ -165,7 +165,7 @@ export interface RealTimeAdapterComponentDef extends ComponentDef<"RealTimeAdapt
   };
 }
 
-const metadata: ComponentDescriptor<RealTimeAdapterComponentDef> = {
+export const RealTimeAdapterMd: ComponentDescriptor<RealTimeAdapterComponentDef> = {
   displayName: "RealTimeAdapter",
   description: "A non-visual component listening to real time change events through long-polling",
   props: {
@@ -181,5 +181,5 @@ export const realTimeAdapterComponentRenderer = createComponentRenderer<RealTime
   ({ node, lookupEventHandler, extractValue }) => {
     return <RealTimeAdapter url={extractValue(node.props.url)} onEvent={lookupEventHandler("eventArrived")} />;
   },
-  metadata
+  RealTimeAdapterMd
 );

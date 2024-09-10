@@ -857,7 +857,7 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
   };
 }
 
-const tableMetadata: ComponentDescriptor<TableComponentDef> = {
+export const TableMd: ComponentDescriptor<TableComponentDef> = {
   displayName: "Table",
   description: "A virtualized table component with columns and cells",
   props: {
@@ -964,5 +964,5 @@ export const tableComponentRenderer = createComponentRenderer<TableComponentDef>
       </Table>
     );
   },
-  tableMetadata
+  TableMd
 );

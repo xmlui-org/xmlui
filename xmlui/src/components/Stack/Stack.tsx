@@ -55,7 +55,7 @@ export interface StackComponentDef extends ComponentDef<"Stack"> {
      *  (whether the Stack lays out its children in a row or a column).
      *
      * \`orientation\` is an oft-used prop, there are shorthand versions of the Stack component: [
-     * HStack](./HStack) (\`Stack\` with horizontal orientation), [VStack](./VStack) (\`Stack\` with 
+     * HStack](./HStack) (\`Stack\` with horizontal orientation), [VStack](./VStack) (\`Stack\` with
      * vertical orientation).
      */
     orientation?: string;
@@ -97,14 +97,29 @@ export const StackMd: ComponentDescriptor<StackComponentDef> = {
   displayName: "Stack",
   description: "A layout container of horizontally or vertically stacked content",
   props: {
+    gap: desc("The gap between child elements"),
+    horizontalAlignment: desc("The horizontal alignment of the child elements"),
     orientation: desc("The layout orientation of the component - works similarly to a CSS flexbox"),
     reverse: desc("Should reverse the order of child elements?"),
+    verticalAlignment: desc("The vertical alignment of the child elements"),
+    wrapContent: desc("Should the content wrap when it overflows?"),
+    hoverContainer: desc("Reserved for future use"),
+    visibleOnHover: desc("Reserved for future use"),
   },
   events: {
     click: desc("The stack is clicked"),
   },
   themeVars: parseScssVar(styles.themeVars),
 };
+export const VStackMd: ComponentDescriptor<VStackComponentDef> = { ...StackMd };
+delete VStackMd.props.orientation;
+export const HStackMd: ComponentDescriptor<HStackComponentDef> = { ...StackMd };
+delete HStackMd.props.orientation;
+export const CVStackMd: ComponentDescriptor<CVStackComponentDef> = { ...StackMd };
+delete CVStackMd.props.orientation;
+export const CHStackMd: ComponentDescriptor<CHStackComponentDef> = { ...StackMd };
+delete CHStackMd.props.orientation;
+
 
 type RenderStackPars = {
   node: StackComponentDef | VStackComponentDef | HStackComponentDef | CVStackComponentDef | CHStackComponentDef;
@@ -158,7 +173,7 @@ export const stackComponentRenderer = createComponentRenderer<StackComponentDef>
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
     return renderStack({ node, layoutNonCss, extractValue, layoutCss, lookupEventHandler, renderChild });
   },
-  StackMd
+  StackMd,
 );
 
 export const vStackComponentRenderer = createComponentRenderer<VStackComponentDef>(
@@ -174,7 +189,7 @@ export const vStackComponentRenderer = createComponentRenderer<VStackComponentDe
       orientation: "vertical",
     });
   },
-  StackMd
+  StackMd,
 );
 
 export const hStackComponentRenderer = createComponentRenderer<HStackComponentDef>(
@@ -190,7 +205,7 @@ export const hStackComponentRenderer = createComponentRenderer<HStackComponentDe
       orientation: "horizontal",
     });
   },
-  StackMd
+  StackMd,
 );
 
 export const cvStackComponentRenderer = createComponentRenderer<CVStackComponentDef>(
@@ -208,7 +223,7 @@ export const cvStackComponentRenderer = createComponentRenderer<CVStackComponent
       verticalAlignment: "center",
     });
   },
-  StackMd
+  StackMd,
 );
 
 export const chStackComponentRenderer = createComponentRenderer<CHStackComponentDef>(
@@ -226,7 +241,7 @@ export const chStackComponentRenderer = createComponentRenderer<CHStackComponent
       verticalAlignment: "center",
     });
   },
-  StackMd
+  StackMd,
 );
 
 // =====================================================================================================================
@@ -248,48 +263,46 @@ type Props = {
 // =====================================================================================================================
 // Stack React component
 
-export const Stack = forwardRef(
-  function Stack(
-    {
-      uid,
-      children,
-      orientation = DEFAULT_ORIENTATION,
-      horizontalAlignment,
-      verticalAlignment,
-      layout,
-      reverse,
-      hoverContainer,
-      visibleOnHover,
-      onClick,
-      onMount,
-      ...rest
-    }: Props,
-    ref: Ref<any>
-  ) {
-    useOnMount(onMount);
-    const { horizontal, vertical } = useContentAlignment(orientation, horizontalAlignment, verticalAlignment);
-    return (
-      <div
-        {...rest}
-        onClick={onClick}
-        ref={ref}
-        style={layout}
-        className={classnames(
-          styles.base,
-          {
-            [styles.vertical]: orientation === "vertical",
-            [styles.horizontal]: orientation === "horizontal",
-            [styles.reverse]: reverse,
-            [styles.hoverContainer]: hoverContainer,
-            "display-on-hover": visibleOnHover,
-            [styles.handlesClick]: !!onClick,
-          },
-          horizontal ?? "",
-          vertical ?? ""
-        )}
-      >
-        {children}
-      </div>
-    );
-  }
-);
+export const Stack = forwardRef(function Stack(
+  {
+    uid,
+    children,
+    orientation = DEFAULT_ORIENTATION,
+    horizontalAlignment,
+    verticalAlignment,
+    layout,
+    reverse,
+    hoverContainer,
+    visibleOnHover,
+    onClick,
+    onMount,
+    ...rest
+  }: Props,
+  ref: Ref<any>,
+) {
+  useOnMount(onMount);
+  const { horizontal, vertical } = useContentAlignment(orientation, horizontalAlignment, verticalAlignment);
+  return (
+    <div
+      {...rest}
+      onClick={onClick}
+      ref={ref}
+      style={layout}
+      className={classnames(
+        styles.base,
+        {
+          [styles.vertical]: orientation === "vertical",
+          [styles.horizontal]: orientation === "horizontal",
+          [styles.reverse]: reverse,
+          [styles.hoverContainer]: hoverContainer,
+          "display-on-hover": visibleOnHover,
+          [styles.handlesClick]: !!onClick,
+        },
+        horizontal ?? "",
+        vertical ?? "",
+      )}
+    >
+      {children}
+    </div>
+  );
+});

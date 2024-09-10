@@ -85,7 +85,7 @@ export interface TabsComponentDef extends ComponentDef<"Tabs"> {
   };
 }
 
-const metadata: ComponentDescriptor<TabsComponentDef> = {
+export const TabsMd: ComponentDescriptor<TabsComponentDef> = {
   displayName: "Tabs",
   description: "Tabs component",
   props: {
@@ -140,5 +140,5 @@ export const tabsComponentRenderer = createComponentRenderer<TabsComponentDef>(
       />
     );
   },
-  metadata
+  TabsMd
 );
