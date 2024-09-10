@@ -1,7 +1,7 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TableOfContents.module.scss";
-import { useEffect, useRef } from "react";
+import {CSSProperties, useEffect, useRef} from "react";
 import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
@@ -9,7 +9,11 @@ import scrollIntoView from "scroll-into-view-if-needed";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 
-export const TableOfContents = () => {
+type TableOfContentsProp = {
+  layout?: CSSProperties;
+}
+
+export const TableOfContents = ({layout}: TableOfContentsProp) => {
   const tocRef = useRef<HTMLDivElement>(null);
   const { headings, setObserveIntersection, activeAnchorId, setActiveAnchorId } = useTableOfContents();
 
@@ -33,20 +37,25 @@ export const TableOfContents = () => {
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={styles.nav} ref={tocRef}>
-      <ul>
+    <div className={styles.nav} ref={tocRef} style={layout}>
+      <ul className={styles.list}>
         {headings.map((value) => (
-          <li
-            key={value.id}
-            className={classnames({
-              [styles.head_1]: value.level === 1,
-              [styles.head_2]: value.level === 2,
-              [styles.head_3]: value.level === 3,
-              [styles.head_4]: value.level === 4,
-              [styles.active]: value.id === activeAnchorId,
-            })}
-          >
-            <RrdNavLink to={`#${value.id}`} onClick={() => setActiveAnchorId(value.id)} id={value.id}>
+          <li key={value.id} className={classnames(styles.listItem, {
+            [styles.active]: value.id === activeAnchorId,
+          })}>
+            <RrdNavLink
+              className={classnames(styles.link, {
+                [styles.head_1]: value.level === 1,
+                [styles.head_2]: value.level === 2,
+                [styles.head_3]: value.level === 3,
+                [styles.head_4]: value.level === 4,
+                [styles.head_5]: value.level === 5,
+                [styles.head_6]: value.level === 6,
+              })}
+              to={`#${value.id}`}
+              onClick={() => setActiveAnchorId(value.id)}
+              id={value.id}
+            >
               {value.text}
             </RrdNavLink>
           </li>
@@ -71,6 +80,8 @@ export const TableOfContentsMd: ComponentDescriptor<TableOfContentsComponentDef>
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    "width-TableOfContents": "auto",
+    "height-TableOfContents": "auto",
     "font-size-TableOfContentsItem": "$font-size-smaller",
     "font-weight-TableOfContentsItem": "$font-weight-normal",
     "font-family-TableOfContentsItem": "$font-family",
@@ -112,15 +123,14 @@ export const TableOfContentsMd: ComponentDescriptor<TableOfContentsComponentDef>
       "border-color-TableOfContentsItem": "$color-border",
       "border-color-TableOfContentsItem--active": "$color-primary-500",
       "color-TableOfContentsItem--active": "$color-text-secondary",
-
-    }
+    },
   },
 };
 
 export const tableOfContentsRenderer = createComponentRenderer<TableOfContentsComponentDef>(
   "TableOfContents",
-  ({}) => {
-    return <TableOfContents />;
+  ({layoutCss}) => {
+    return <TableOfContents layout={layoutCss}/>;
   },
   TableOfContentsMd,
 );
