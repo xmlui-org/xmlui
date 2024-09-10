@@ -16,6 +16,7 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
+import { collectedComponentMetadata } from "@components/collectedComponentMetadata"
 
 export type {
   ThemeDefinition,
@@ -43,4 +44,5 @@ export {
   useColors,
   toCssVar,
   parseXmlUiMarkup,
+  collectedComponentMetadata
 };

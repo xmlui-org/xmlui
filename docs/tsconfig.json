@@ -51,7 +51,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src"
-, "pages/_app.jsx"  ],
+, "pages/_app.jsx", "scripts/create-component-docs.js"  ],
   "exclude": [
     "node_modules"
   ]

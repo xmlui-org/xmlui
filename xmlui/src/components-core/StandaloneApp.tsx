@@ -4,7 +4,6 @@ import ReactDOM from "react-dom/client";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
-import type { AppComponentDef } from "@components/App/App";
 import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
@@ -239,7 +238,7 @@ function getStandalone(
   const servedFromSingleFile =
     typeof document !== "undefined" && document.querySelector('script[type="text/xmlui"]') !== null;
   if (servedFromSingleFile) {
-    let entryPoint: AppComponentDef | null = null;
+    let entryPoint: ComponentDef | null = null;
     const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
     const components: Array<CompoundComponentDef> = [];
     for (let i = 0; i < componentNodes.length; i++) {
@@ -249,7 +248,7 @@ function getStandalone(
         continue;
       }
       if ("type" in componentDef && componentDef.type === "App") {
-        entryPoint = componentDef as AppComponentDef;
+        entryPoint = componentDef as ComponentDef;
       } else {
         components.push(componentDef as CompoundComponentDef);
       }
@@ -300,7 +299,7 @@ function useStandalone(
       //TODO read text/xmlui-config json
       const servedFromSingleFile = document.querySelector('script[type="text/xmlui"]') !== null;
       if (servedFromSingleFile) {
-        let entryPoint: AppComponentDef | null = null;
+        let entryPoint: ComponentDef | null = null;
         const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
         const components: Array<CompoundComponentDef> = [];
         for (let i = 0; i < componentNodes.length; i++) {
@@ -310,7 +309,7 @@ function useStandalone(
             continue;
           }
           if ("type" in componentDef && componentDef.type === "App") {
-            entryPoint = componentDef as AppComponentDef;
+            entryPoint = componentDef as ComponentDef;
           } else {
             components.push(componentDef as CompoundComponentDef);
           }
