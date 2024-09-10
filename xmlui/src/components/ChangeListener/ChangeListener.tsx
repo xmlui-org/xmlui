@@ -47,9 +47,16 @@ function ChangeListener({ listenTo, onChange, throttleWaitInMs = 0 }: Props) {
  */
 export interface ChangeListenerComponentDef extends ComponentDef<"ChangeListener"> {
   props: {
-    /** @descriptionRef */
+    /**
+     * This property declares the value of the changes the component listens to. 
+     * @descriptionRef 
+     */
     listenTo: string;
-    /** @descriptionRef */
+    /** 
+     * This variable sets a throttling time (in milliseconds) to apply when executing the \`didChange\` 
+     * event handler. All changes within that throttling time will only fire the \`didChange\` event once.
+     * @descriptionRef 
+     */
     throttleWaitInMs?: string;
   };
   events: {
@@ -58,7 +65,7 @@ export interface ChangeListenerComponentDef extends ComponentDef<"ChangeListener
   };
 }
 
-const metadata: ComponentDescriptor<ChangeListenerComponentDef> = {
+export const ChangeListenerMd: ComponentDescriptor<ChangeListenerComponentDef> = {
   displayName: "ChangeListener",
   description: "Non-visual component listening to value changes",
   props: {
@@ -81,5 +88,5 @@ export const changeListenerComponentRenderer = createComponentRenderer<ChangeLis
       />
     );
   },
-  metadata
+  ChangeListenerMd
 );

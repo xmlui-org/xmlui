@@ -245,10 +245,7 @@ const metadata: ComponentDescriptor<ModalDialogComponentDef> = {
     closeButtonVisible: desc("Indicates if the close button is visible"),
   },
   events: {
-    close: {
-      description: "The modal is closed",
-      valueType: "ActionSet",
-    },
+    close: desc("The modal is closed"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

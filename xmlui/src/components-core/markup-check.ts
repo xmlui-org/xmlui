@@ -4,6 +4,7 @@ import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "@parsers/scripting/Parser";
 import { IsValidFunction } from "@abstractions/ComponentDescriptorDefs";
 import { layoutOptionKeys } from "./descriptorHelper";
+import { viewportSizeNames } from "@components/abstractions";
 
 // --- This interface reperesent an object that can handle component metadata.
 // --- As the metadata format may change in the futue, this interface is used to
@@ -41,7 +42,7 @@ export function checkXmlUiMarkup(
   rootDef: ComponentDef | null,
   components: CompoundComponentDef[],
   metadataHandler: MetadataHandler,
-  devMode?: boolean
+  devMode?: boolean,
 ): MarkupCheckResult[] {
   const errorsCollected: MarkupCheckResult[] = [];
 
@@ -94,7 +95,7 @@ export function checkXmlUiMarkup(
     def: ComponentDef,
     parent: ComponentDef | null | undefined,
     before: boolean,
-    continuation: VisitResult
+    continuation: VisitResult,
   ): void {
     // --- This is the visitor function to check a ComponentDef markup
     if (!before) {
@@ -141,7 +142,20 @@ export function checkXmlUiMarkup(
         }
       } else {
         // --- The property has no descriptor.
-        if (!metadataHandler.acceptArbitraryProps(def.type) && !layoutOptionKeys.includes(propName)) {
+        const propParts = propName.split("-");
+
+        // --- Check for a layout property
+        const validProp =
+          // --- Layout property
+          (propParts.length === 1 && layoutOptionKeys.includes(propName)) ||
+          // --- Layout property with viewport size
+          (propParts.length === 2 &&
+            layoutOptionKeys.includes(propParts[0]) &&
+            viewportSizeNames.includes(propParts[1])) ||
+          // --- Arbitrary property is allowed
+          metadataHandler.acceptArbitraryProps(def.type);
+
+        if (!validProp) {
           // --- The component does not accept arbitrary properties and
           // --- the property is not a layout option
           reportError("M005", def.type, def.type, propName);
@@ -200,9 +214,9 @@ export function checkXmlUiMarkup(
       def: ComponentDef,
       parent: ComponentDef | null | undefined,
       before: boolean,
-      continuation: VisitResult
+      continuation: VisitResult,
     ) => void,
-    continuation: VisitResult
+    continuation: VisitResult,
   ): void {
     // --- Visit the component (before)
     visitor(def, parent, true, continuation);
@@ -211,7 +225,7 @@ export function checkXmlUiMarkup(
       return;
     }
 
-    // --- Visit the properties with "ComponentDef" or "ComponentDef[]" value
+    // --- Visit the properties with "ComponentDef" value
     const propDescriptors = metadataHandler.getComponentProps(def.type) ?? {};
     const currentProps = def.props ?? {};
     for (const propName in Object.keys(currentProps)) {
@@ -228,21 +242,6 @@ export function checkXmlUiMarkup(
         if (continuation.abort || continuation.cancel) {
           // --- Stop the visit
           return;
-        }
-      } else if (propDescriptor.type === "ComponentDef[]" && Array.isArray(propValue)) {
-        // --- This property holds an array of nested components, visit them
-        for (const propItem of propValue as ComponentDef[]) {
-          if (propItem.type) {
-            visitComponent(propItem, def, visitor, continuation);
-            if (continuation.abort) {
-              // --- Stop visiting this component
-              return;
-            }
-            if (continuation.cancel) {
-              // --- Skip the remaining items
-              break;
-            }
-          }
         }
       }
     }

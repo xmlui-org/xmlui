@@ -156,7 +156,7 @@ export type H5ComponentDef = Omit<HeadingComponentDef, "type"> & { type: "H5" };
 /** @specialized */
 export type H6ComponentDef = Omit<HeadingComponentDef, "type"> & { type: "H6" };
 
-const headingMetadata: ComponentDescriptor<HeadingComponentDef> = {
+export const HeadingMd: ComponentDescriptor<HeadingComponentDef> = {
   displayName: "Heading",
   description: "Represents a heading text",
   props: {
@@ -181,7 +181,7 @@ const headingMetadata: ComponentDescriptor<HeadingComponentDef> = {
   },
 };
 
-const h1Metadata: ComponentDescriptor<H1ComponentDef> = {
+export const H1Md: ComponentDescriptor<H1ComponentDef> = {
   displayName: "H1",
   description: LEVEL_DESC(1),
   props: {
@@ -204,7 +204,7 @@ const h1Metadata: ComponentDescriptor<H1ComponentDef> = {
   },
 };
 
-const h2Metadata: ComponentDescriptor<H2ComponentDef> = {
+export const H2Md: ComponentDescriptor<H2ComponentDef> = {
   displayName: "H2",
   description: LEVEL_DESC(2),
   props: {
@@ -226,7 +226,7 @@ const h2Metadata: ComponentDescriptor<H2ComponentDef> = {
   },
 };
 
-const h3Metadata: ComponentDescriptor<H3ComponentDef> = {
+export const H3Md: ComponentDescriptor<H3ComponentDef> = {
   displayName: "H3",
   description: LEVEL_DESC(3),
   props: {
@@ -248,7 +248,7 @@ const h3Metadata: ComponentDescriptor<H3ComponentDef> = {
   },
 };
 
-const h4Metadata: ComponentDescriptor<H4ComponentDef> = {
+export const H4Md: ComponentDescriptor<H4ComponentDef> = {
   displayName: "H4",
   description: LEVEL_DESC(4),
   props: {
@@ -270,7 +270,7 @@ const h4Metadata: ComponentDescriptor<H4ComponentDef> = {
   },
 };
 
-const h5Metadata: ComponentDescriptor<H5ComponentDef> = {
+export const H5Md: ComponentDescriptor<H5ComponentDef> = {
   displayName: "H5",
   description: LEVEL_DESC(5),
   props: {
@@ -292,7 +292,7 @@ const h5Metadata: ComponentDescriptor<H5ComponentDef> = {
   },
 };
 
-const h6Metadata: ComponentDescriptor<H6ComponentDef> = {
+export const H6Md: ComponentDescriptor<H6ComponentDef> = {
   displayName: "H6",
   description: LEVEL_DESC(6),
   props: {
@@ -343,7 +343,7 @@ export const headingComponentRenderer = createComponentRenderer<HeadingComponent
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: node.props.level, renderChild });
   },
-  headingMetadata,
+  HeadingMd,
 );
 
 export const h1ComponentRenderer = createComponentRenderer<H1ComponentDef>(
@@ -351,7 +351,7 @@ export const h1ComponentRenderer = createComponentRenderer<H1ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h1", renderChild } as any);
   },
-  h1Metadata,
+  H1Md,
 );
 
 export const h2ComponentRenderer = createComponentRenderer<H2ComponentDef>(
@@ -359,7 +359,7 @@ export const h2ComponentRenderer = createComponentRenderer<H2ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h2", renderChild } as any);
   },
-  h2Metadata,
+  H2Md,
 );
 
 export const h3ComponentRenderer = createComponentRenderer<H3ComponentDef>(
@@ -367,7 +367,7 @@ export const h3ComponentRenderer = createComponentRenderer<H3ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h3", renderChild } as any);
   },
-  h3Metadata,
+  H3Md,
 );
 
 export const h4ComponentRenderer = createComponentRenderer<H4ComponentDef>(
@@ -375,7 +375,7 @@ export const h4ComponentRenderer = createComponentRenderer<H4ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h4", renderChild } as any);
   },
-  h4Metadata,
+  H4Md,
 );
 
 export const h5ComponentRenderer = createComponentRenderer<H5ComponentDef>(
@@ -383,7 +383,7 @@ export const h5ComponentRenderer = createComponentRenderer<H5ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h5", renderChild } as any);
   },
-  h5Metadata,
+  H5Md,
 );
 
 export const h6ComponentRenderer = createComponentRenderer<H6ComponentDef>(
@@ -391,5 +391,5 @@ export const h6ComponentRenderer = createComponentRenderer<H6ComponentDef>(
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
     return renderHeading({ node, extractValue, layoutCss, layoutNonCss, level: "h6", renderChild } as any);
   },
-  h6Metadata,
+  H6Md,
 );

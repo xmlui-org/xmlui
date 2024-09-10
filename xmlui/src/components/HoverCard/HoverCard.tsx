@@ -4,7 +4,7 @@ import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { desc } from "@components-core/descriptorHelper";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 
 type Props = {
   triggerTemplate: React.ReactNode;
@@ -32,11 +32,11 @@ interface HoverCardComponentDef extends ComponentDef<"HoverCard"> {
   events: {};
 }
 
-const metadata: ComponentDescriptor<HoverCardComponentDef> = {
+export const HoverCardMd: ComponentDescriptor<HoverCardComponentDef> = {
   displayName: "HoverCard",
   description: "This component displays some content when its parent component is hovered.",
   props: {
-    triggerTemplate: desc("The component that opens the hover card when hovered.")
+    triggerTemplate: nestedComp("The component that opens the hover card when hovered.")
   }
 };
 
@@ -49,5 +49,5 @@ export const hoverCardComponentRenderer = createComponentRenderer(
       </HoverCardComponent>
     );
   },
-  metadata
+  HoverCardMd
 );

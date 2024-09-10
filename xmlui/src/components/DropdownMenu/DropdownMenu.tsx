@@ -6,8 +6,9 @@ import styles from "./DropdownMenu.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/abstractions";
+
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import type { ButtonThemeColor, ButtonVariant, IconPosition } from "@components/Button/Button";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Button } from "@components/Button/Button";
@@ -163,7 +164,7 @@ export interface DropdownMenuComponentDef extends ComponentDef<"DropdownMenu"> {
   };
 }
 
-const metadata: ComponentDescriptor<DropdownMenuComponentDef> = {
+export const DropdownMenuMd: ComponentDescriptor<DropdownMenuComponentDef> = {
   displayName: "DropdownMenu",
   description:
     "It represents a dropdown menu with multiple menu items. Clicking it displays the available menu items.",
@@ -213,7 +214,7 @@ export const dropdownMenuComponentRenderer =
         </DropdownMenu>
       );
     },
-    metadata
+    DropdownMenuMd
   );
 
 // ====================================================================================================================
@@ -302,7 +303,7 @@ export interface MenuItemComponentDef extends ComponentDef<"MenuItem"> {
   };
 }
 
-const menuItemMetadata: ComponentDescriptor<MenuItemComponentDef> = {
+export const MenuItemMd: ComponentDescriptor<MenuItemComponentDef> = {
   displayName: "MenuItem",
   description:
     "Represents a menu item within a DropDownMenu, clicking of which triggers an action",
@@ -370,7 +371,7 @@ export const menuItemRenderer = createComponentRenderer<MenuItemComponentDef>(
       </MenuItem>
     );
   },
-  menuItemMetadata
+  MenuItemMd
 );
 
 // ====================================================================================================================

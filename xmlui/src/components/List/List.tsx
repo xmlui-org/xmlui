@@ -13,7 +13,7 @@ import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { ScrollContext } from "@components-core/ScrollContext";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { desc } from "@components-core/descriptorHelper";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Card } from "@components/Card/Card";
 import { Text } from "@components/Text/Text";
@@ -650,7 +650,7 @@ export interface ListComponentDef extends ComponentDef<"List"> {
   }
 }
 
-export const metadata: ComponentDescriptor<ListComponentDef> = {
+export const ListMd: ComponentDescriptor<ListComponentDef> = {
   displayName: "List",
   description: "A virtualized list component",
   props: {
@@ -661,22 +661,10 @@ export const metadata: ComponentDescriptor<ListComponentDef> = {
     sectionBy: desc("the name of the data field to create sections within the list"),
     orderBy: desc("The name of the data field the items are ordered by"),
     availableSections: desc("List of available sections"),
-    sectionTemplate: {
-      description: "Component template for a section header",
-      valueType: "ComponentDef",
-    },
-    sectionFooterTemplate: {
-      description: "Component template for a section footer",
-      valueType: "ComponentDef",
-    },
-    itemTemplate: {
-      description: "Component template for a list item",
-      valueType: "ComponentDef",
-    },
-    emptyListTemplate: {
-      description: "Component template representing an empty list item",
-      valueType: "ComponentDef",
-    },
+    sectionTemplate: nestedComp("Component template for a section header"),
+    sectionFooterTemplate: nestedComp("Component template for a section footer"),
+    itemTemplate: nestedComp("Component template for a list item"),
+    emptyListTemplate: nestedComp("Component template for an empty list"),
     pageInfo: desc("Information about a particular page"),
     idKey: desc("The field of data items to use as the identifier of the item."),
     selectedIndex: desc("The index of the list item selected by default"),
@@ -772,5 +760,5 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer<ListCo
       />
     );
   },
-  metadata
+  ListMd
 );

@@ -5,8 +5,7 @@ import styles from "./FileInput.module.scss";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import type { ButtonSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/Button/Button";
-import { Button, buttonStylingProps } from "@components/Button/Button";
+import { Button } from "@components/Button/Button";
 import type { ValidationStatus } from "@components/Input/input-abstractions";
 import {
   inputComponentEventDescriptors,
@@ -21,6 +20,7 @@ import { TextBox } from "@components/TextBox/TextBox";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/abstractions";
 
 // ============================================================================
 // React FileInput component implementation
@@ -33,7 +33,7 @@ type Props = {
   buttonLabel?: string;
   variant?: ButtonVariant;
   buttonThemeColor?: ButtonThemeColor;
-  buttonSize?: ButtonSize;
+  buttonSize?: ComponentSize;
   buttonIcon?: React.ReactNode;
   buttonIconPosition?: IconPosition;
   // Input props
@@ -111,7 +111,7 @@ export const FileInput = ({
       updateState({ value: acceptedFiles });
       onDidChange(acceptedFiles);
     },
-    [updateState, onDidChange]
+    [updateState, onDidChange],
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -192,7 +192,11 @@ export const FileInput = ({
 // ============================================================================
 // XMLUI FileInput component definition
 
-/** @internal */
+/**
+ * The \`FileInput\` is a user interface component that allows users to select files from their device's
+ * file system for upload (or processing its content otherwise).
+ * @descriptionRef
+ */
 export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
   props: {
     /** @descriptionRef */
@@ -219,7 +223,10 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
      * @descriptionRef
      */
     validationStatus?: ValidationStatus;
-    /** @descriptionRef */
+    /**
+     * This property is an optional string to set a label for the button part.
+     * @descriptionRef
+     */
     buttonLabel?: string;
     /**
      * This property accepts an icon name.
@@ -255,7 +262,7 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
     /** This optional string property sets the size of the browse button (via paddings).
      * @descriptionRef
      */
-    buttonSize?: ButtonSize;
+    buttonSize?: ComponentSize;
     /**
      * The value of this optional property sets the string to provide a color scheme for the button.
      * @descriptionRef
@@ -285,7 +292,7 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
     lostFocus?: string;
   };
   api: {
-    /** 
+    /**
      * By setting an ID for the component, you can refer to the value of the field if set.
      * If no value is set, the value will be undefined.
      * @descriptionRef
@@ -306,12 +313,20 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
   };
 }
 
-const metadata: ComponentDescriptor<FileInputComponentDef> = {
+export const FileInputMd: ComponentDescriptor<FileInputComponentDef> = {
   displayName: "FileInputBox",
   description: "Represents an input component for textual data entry",
   props: {
-    ...inputComponentPropertyDescriptors,
-    ...buttonStylingProps,
+    placeholder: desc("Placeholder text to sign the input is empty"),
+    value: desc("The current value to display"),
+    initialValue: desc("The initial value to display"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    allowCopy: desc("Allow copying the component value to the clipboard?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
+    variant: desc("The button variant (solid, outlined, ghost) to use"),
     buttonLabel: desc("The label of the button that opens the file dialog"),
     buttonIcon: desc("The ID of the icon to display in the button"),
     buttonIconPosition: desc("The position of the icon within the button (left, right)"),
@@ -353,7 +368,7 @@ export const fileInputRenderer = createComponentRenderer<FileInputComponentDef>(
       />
     );
   },
-  metadata
+  FileInputMd,
 );
 
 function isFile(value: any): value is File {

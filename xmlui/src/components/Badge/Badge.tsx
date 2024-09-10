@@ -40,7 +40,9 @@ type BadgeColors = {
   background: string;
 };
 
-type BadgeVariant = "badge" | "pill";
+const badgeVariantValues = ["badge", "pill"] as const;
+const badgeVariantNames: string[] = [...badgeVariantValues];
+type BadgeVariant = typeof badgeVariantValues[number];
 
 // ====================================================================================================================
 // XMLUI Badge definition
@@ -50,14 +52,23 @@ type BadgeVariant = "badge" | "pill";
  */
 export interface BadgeComponentDef extends ComponentDef<"Badge"> {
   props: {
-    /** @descriptionRef */
+    /** 
+     * The text that the component displays.
+     * @descriptionRef 
+     */
     value: string | number;
     /**
+     * Modifies the shape of the component. Comes in the regular \`badge\` variant or the \`pill\` variant 
+     * with fully rounded corners.
      * @descriptionRef
      * @defaultValue \`badge\`
      */
     variant?: BadgeVariant;
-    /** @descriptionRef */
+    /**
+     * The \`Badge\` component supports the mapping of a list of colors using the \`value\` prop as the 
+     * key. Provide the component with a list or key-value pairs in two ways:
+     * @descriptionRef 
+     */
     colorMap?: Record<string, string> | Record<string, BadgeColors>;
     /**
      * (**NOT IMPLEMENTED YET**) The theme color of the component.
@@ -85,11 +96,10 @@ export interface BadgeComponentDef extends ComponentDef<"Badge"> {
      * (**NOT IMPLEMENTED YET**) The position of the indicator.
      */
     indicatorPosition?: "start" | "end" | "top-start" | "top-end" | "bottom-start" | "bottom-end";
-
   };
 }
 
-const metadata: ComponentDescriptor<BadgeComponentDef> = {
+export const BadgeMd: ComponentDescriptor<BadgeComponentDef> = {
   displayName: "Badge",
   description: "A label that accepts a color map the defines its background (and optionally, its label) color",
   props: {
@@ -132,5 +142,5 @@ export const badgeComponentRenderer = createComponentRenderer<BadgeComponentDef>
     );
     return <Badge variant={extractValue(node.props.variant)} value={value} color={colorMap?.[value]} />;
   },
-  metadata,
+  BadgeMd,
 );

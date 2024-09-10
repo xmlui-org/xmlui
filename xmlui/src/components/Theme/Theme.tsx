@@ -231,9 +231,10 @@ export interface ThemeComponentDef extends ComponentDef<"Theme"> {
   };
 }
 
-const metadata: ComponentDescriptor<ThemeComponentDef> = {
+export const ThemeMd: ComponentDescriptor<ThemeComponentDef> = {
   displayName: "Theme",
   description: "This component allows defining a particular theming context for its nested components",
+  allowArbitraryProps: true,
   props: {
     themeId: desc("The id of the theme to use"),
     tone: desc("The tone to use in the theming context"),
@@ -259,5 +260,5 @@ export const themeComponentRenderer = createComponentRenderer<ThemeComponentDef>
       />
     );
   },
-  metadata
+  ThemeMd
 );

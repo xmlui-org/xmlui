@@ -88,7 +88,7 @@ export interface LinkComponentDef extends ComponentDef<"Link"> {
   };
 }
 
-const metadata: ComponentDescriptor<LinkComponentDef> = {
+export const LinkMd: ComponentDescriptor<LinkComponentDef> = {
   displayName: "Link",
   description: "Represents a local link the user can use to navigate within the application",
   props: {
@@ -146,5 +146,5 @@ export const localLinkComponentRenderer = createComponentRenderer<LinkComponentD
       </LocalLink>
     );
   },
-  metadata
+  LinkMd
 );

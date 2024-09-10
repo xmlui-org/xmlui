@@ -179,7 +179,7 @@ export interface FlowLayoutComponentDef extends ComponentDef<"FlowLayout"> {
   };
 }
 
-const metadata: ComponentDescriptor<FlowLayoutComponentDef> = {
+export const FlowLayoutMd: ComponentDescriptor<FlowLayoutComponentDef> = {
   displayName: "FlowLayout",
   description: "",
   props: {
@@ -221,5 +221,5 @@ export const flowLayoutComponentRenderer = createComponentRenderer<FlowLayoutCom
       </FlowLayout>
     );
   },
-  metadata
+  FlowLayoutMd
 );

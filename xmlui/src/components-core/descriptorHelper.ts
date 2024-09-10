@@ -1,9 +1,23 @@
-import { ComponentPropertyDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { ComponentPropertyDescriptor, PropertyValueType } from "@abstractions/ComponentDescriptorDefs";
 
 // Creates a simple property descriptor
-export function desc(description: string): ComponentPropertyDescriptor {
+export function desc(
+  description: string,
+  valueType?: PropertyValueType,
+  defaultValue?: any,
+): ComponentPropertyDescriptor {
   return {
     description,
+    valueType,
+    defaultValue,
+  };
+}
+
+// Creates a simple property descriptor for a nested component
+export function nestedComp(description: string): ComponentPropertyDescriptor {
+  return {
+    description,
+    valueType: "ComponentDef",
   };
 }
 
@@ -72,4 +86,3 @@ export const layoutOptionKeys = [
   "bottom",
   "left",
 ];
-

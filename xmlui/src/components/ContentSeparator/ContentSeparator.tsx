@@ -6,6 +6,7 @@ import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import classnames from "@components-core/utils/classnames";
+import { orientationOptionNames } from "@components/abstractions";
 
 // =====================================================================================================================
 // React ContentSeparator component implementation
@@ -35,28 +36,34 @@ export const ContentSeparator = ({ orientation = "horizontal", size, style }: Co
 // =====================================================================================================================
 // XMLUI ContentSeparator component definition
 
-/** 
+/**
  * A \`ContentSeparator\` is a component that divides or separates content visually within a layout.
  * It serves as a visual cue to distinguish between different sections or groups of content,
  * helping to improve readability and organization.
  */
 export interface ContentSeparatorComponentDef extends ComponentDef<"ContentSeparator"> {
   props: {
-    /** @descriptionRef */
+    /**
+     * This property defines the component's height (if the \`orientation\` is horizontal) or the width
+     * (if the \`orientation\` is vertical).
+     * @descriptionRef
+     */
     size?: number | string;
-    /** 
-     * @descriptionRef 
+    /**
+     * Sets the main axis of the component.
+     * @descriptionRef
      * @defaultValue \`horizontal\`
      */
-    orientation?: string;   // NOTE: This prop is necessary so that the documentation generator script picks it up
+    orientation?: string; // NOTE: This prop is necessary so that the documentation generator script picks it up
   };
 }
 
-const metadata: ComponentDescriptor<ContentSeparatorComponentDef> = {
+export const ContentSeparatorMd: ComponentDescriptor<ContentSeparatorComponentDef> = {
   displayName: "ContentSeparator",
   description: "A component that indicates a separation between adjacent components",
   props: {
     size: desc("Width or height of the separator, depending on it orientation"),
+    orientation: { description: "Sets the main axis of the component", availableValues: orientationOptionNames },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -82,5 +89,5 @@ export const contentSeparatorComponentRenderer = createComponentRenderer<Content
       />
     );
   },
-  metadata
+  ContentSeparatorMd,
 );

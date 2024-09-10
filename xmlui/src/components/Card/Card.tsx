@@ -77,11 +77,20 @@ export interface CardComponentDef extends ComponentDef<"Card"> {
     title?: string;
     /** @descriptionRef */
     subTitle?: string;
-    /** @descriptionRef */
+    /** 
+     * The `linkTo` wraps the title in a `Link` component that is clickable to navigate.
+     * @descriptionRef 
+     */
     linkTo?: string;
-    /** @descriptionRef */
+    /** 
+     * This property specifies the URL of the image to display in the avatar.
+     * @descriptionRef 
+     */
     avatarUrl?: string;
-    /** @descriptionRef */
+    /**
+     * Show the avatar (`true`) or not (`false`). If no [`avatarUrl`](#avatarurl) is specified then the Avatar will show the first letters of the [`title`](#title). 
+     * @descriptionRef 
+     */
     showAvatar?: boolean;
   };
   events: {
@@ -90,12 +99,12 @@ export interface CardComponentDef extends ComponentDef<"Card"> {
   };
 }
 
-const cardMetadata: ComponentDescriptor<CardComponentDef> = {
+export const CardMd: ComponentDescriptor<CardComponentDef> = {
   displayName: "Card",
   description: "A component displaying its children in a card",
   props: {
     avatarUrl: desc("The URL of the avatar to display"),
-    showAvatar: desc("Indicates whether the avatar should be displayed"),
+    showAvatar: desc("Indicates whether the avatar should be displayed", "boolean"),
     title: desc("A prestyled title"),
     subTitle: desc("A prestyled subtitle"),
     linkTo: desc("Optional link for the title"),
@@ -144,7 +153,7 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
       </Card>
     );
   },
-  cardMetadata,
+  CardMd,
 );
 
 // =====================================================================================================================
@@ -154,7 +163,7 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
 export type MarginlessCardComponentDef = Omit<CardComponentDef, "type"> & { type: "MarginlessCard" };
 
 const marginlessCardMetadata = {
-  ...cardMetadata,
+  ...CardMd,
   displayName: "MarginlessCard",
 };
 

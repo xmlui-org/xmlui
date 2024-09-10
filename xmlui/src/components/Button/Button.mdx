@@ -10,8 +10,6 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START contentPosition
 
-This optional value determines how the label and icon (or nested children) should be placed inside the Button component. Note that "start" and "end" positioning will be flipped if the layout is in a right-to-left writing system.
-
 | Value    | Description                                                  |
 | :------- | :----------------------------------------------------------- |
 | `center` | Place the content in the middle **(default)**                |
@@ -49,8 +47,6 @@ This optional value determines how the label and icon (or nested children) shoul
 
 %-PROP-START icon
 
-This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon (by its name). If no label is specified and an icon is set, the button displays only the icon.
-
 ```ueml
 <HStack gap="1rem" >
   <Button icon="drive" label="Let there be drive" />
@@ -74,8 +70,6 @@ This string value denotes an icon name. The framework will render an icon if XML
 %-PROP-END
 
 %-PROP-START iconPosition
-
-This optional string determines the location of the icon in the Button.
 
 | Value   | Description                                                                       |
 | :------ | :-------------------------------------------------------------------------------- |
@@ -128,8 +122,6 @@ This optional string determines the location of the icon in the Button.
 
 %-PROP-START label
 
-This property is an optional string to set a label for the button. If no label is specified and an icon is set, the button will modify its styling to look like a small icon button. When the button has nested children, it will display them and ignore the value of the `label` prop.
-
 ```ueml copy
 <VStack gap="1rem" >
   <Button label="I am the button label" />
@@ -162,8 +154,6 @@ This property is an optional string to set a label for the button. If no label i
 
 %-PROP-START type
 
-This optional string describes how the button behaves in an HTML context. You rarely need to set this property explicitly.
-
 | Value    | Description                                                                                                        |
 | :------- | :----------------------------------------------------------------------------------------------------------------- |
 | `button` | Regular behavior that only executes logic if explicitly determined. **(default)**                                  |
@@ -173,8 +163,6 @@ This optional string describes how the button behaves in an HTML context. You ra
 %-PROP-END
 
 %-PROP-START variant
-
-The value of this optional property determines the fundamental style of the button.
 
 | Value      | Description                                                                                                     |
 | ---------- | --------------------------------------------------------------------------------------------------------------- |
@@ -209,8 +197,6 @@ The value of this optional property determines the fundamental style of the butt
 
 %-PROP-START themeColor
 
-The value of this optional property sets the string to provide a color scheme for the Button.
-
 | Value       | Description                       |
 | :---------- | :-------------------------------- |
 | `primary`   | Primary theme color **(default)** |
@@ -241,8 +227,6 @@ The value of this optional property sets the string to provide a color scheme fo
 
 %-PROP-START enabled
 
-The value of this property indicates if the button accepts actions (`true`) or does not react to them (`false`). The default value is `true`.
-
 ```ueml copy
 <HStack gap="1rem" >
   <Button label="I am enabled (by default)" />
@@ -272,8 +256,6 @@ The value of this property indicates if the button accepts actions (`true`) or d
 %-META:COMMENT Note: Section can have metadata - skip that
 %-META:COMMENT example:
 %-META:IMPORT data from "./data.json"
-
-This optional string property sets the component's size (via paddings).
 
 | Value | Description              |
 | :---- | :----------------------- |
@@ -325,8 +307,6 @@ This optional string property sets the component's size (via paddings).
 
 %-EVENT-START click
 
-This event is triggered when the button is clicked.
-
 ```ueml copy
 <Button label="Click me!" onClick="window.alert('Button clicked')" />
 ```
@@ -343,8 +323,6 @@ This event is triggered when the button is clicked.
 %-EVENT-END
 
 %-EVENT-START gotFocus
-
-This event is triggered when the button has received the focus.
 
 ```ueml copy
 <VStack gap="1rem" var.text="No event" >
@@ -376,8 +354,6 @@ This event is triggered when the button has received the focus.
 %-EVENT-END
 
 %-EVENT-START lostFocus
-
-This event is triggered when the button has lost the focus.
 
 (See the example above)
 

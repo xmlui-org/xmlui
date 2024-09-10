@@ -144,12 +144,13 @@ export interface FileUploadDropZoneComponentDef extends ComponentDef<"FileUpload
   };
 }
 
-const metadata: ComponentDescriptor<FileUploadDropZoneComponentDef> = {
+export const FileUploadDropZoneMd: ComponentDescriptor<FileUploadDropZoneComponentDef> = {
   displayName: "FileUploadDropZone",
   description: "A screen area to drop files to upload",
   props: {
     text: desc("Text to display"),
     allowPaste: desc("Allow paste files?"),
+    enabled: desc("Is the drop zone enabled?"),
   },
   events: {
     upload: desc("Triggered when a file is about to upload"),
@@ -186,5 +187,5 @@ export const fileUploadDropZoneComponentRenderer = createComponentRenderer<FileU
       </FileUploadDropZone>
     );
   },
-  metadata
+  FileUploadDropZoneMd
 );

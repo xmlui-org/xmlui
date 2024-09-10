@@ -83,16 +83,18 @@ export interface ImageComponentDef extends ComponentDef<"Image"> {
   };
 }
 
-const metadata: ComponentDescriptor<ImageComponentDef> = {
+export const ImageMd: ComponentDescriptor<ImageComponentDef> = {
   displayName: "Image",
   description: "Display an image (.jpg, .png, etc.)",
   props: {
     src: desc("Specifies the path to the image"),
     alt: desc("Specifies an alternate text for the image, if the image for some reason cannot be displayed"),
     fit: desc("Sets how the image fits in its container (cover, contain)"),
+    lazyLoad: desc("Determines if the image should be loaded lazily"),
+    aspectRatio: desc("Sets a preferred aspect ratio for the image"),
   },
   events: {
-    click: desc("Triggers when the avatar is clicked"),
+    click: desc("Triggers when the image is clicked"),
   },
   themeVars: parseScssVar(styles.themeVars),
 };
@@ -111,5 +113,5 @@ export const imageComponentRenderer = createComponentRenderer<ImageComponentDef>
       />
     );
   },
-  metadata,
+  ImageMd,
 );

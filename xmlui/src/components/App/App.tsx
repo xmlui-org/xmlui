@@ -1,4 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { AppLayoutType } from "./AppLayoutContext";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
@@ -6,20 +10,18 @@ import classnames from "@components-core/utils/classnames";
 
 import styles from "./App.module.scss";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { AppLayoutType } from "./AppLayoutContext";
-import { AppLayoutContext } from "./AppLayoutContext";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-
+import { AppLayoutContext, appLayouts } from "./AppLayoutContext";
 import { createComponentRenderer } from "@components-core/renderers";
 import { useAppContext } from "@components-core/AppContext";
 import { Sheet, SheetContent } from "@components/App/Sheet";
 import { ScrollContext } from "@components-core/ScrollContext";
-import { desc } from "@components-core/descriptorHelper";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AppHeader } from "@components/AppHeader/AppHeader";
 import { useResizeObserver } from "@components-core/utils/hooks";
 import { useTheme } from "@components-core/theming/ThemeContext";
+import { boolean } from "yargs";
+import { JSX } from "react/jsx-runtime";
 
 type Props = {
   children: ReactNode;
@@ -29,7 +31,7 @@ type Props = {
   style: CSSProperties;
   layout?: AppLayoutType;
   loggedInUser?: any;
-  scrollWholePage?: boolean;
+  scrollWholePage: boolean;
   onReady?: () => void;
 };
 
@@ -39,7 +41,7 @@ function App({
   layout,
   loggedInUser,
   logoContent,
-  scrollWholePage = true,
+  scrollWholePage,
   onReady = noop,
   header,
   footer,
@@ -62,9 +64,9 @@ function App({
     onReady();
   }, [onReady]);
 
-  //we don't hide the nav panel if there's no header,
-  // because in that case we don't have a show drawer button
-  // the exception is the condensed layout, because we render a header in that case (otherwise we couldn't show the navPanel)
+  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer 
+  // --- button. The exception is the condensed layout because we render a header in that case (otherwise, 
+  // --- we couldn't show the NavPanel)
   const navPanelVisible =
     mediaSize.largeScreen || (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
 
@@ -227,7 +229,7 @@ function App({
     },
   ];
 
-  let content;
+  let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
   switch (safeLayout) {
     case "vertical":
       content = (
@@ -432,18 +434,18 @@ export interface AppComponentDef extends ComponentDef<"App"> {
   };
 }
 
-const metadata: ComponentDescriptor<AppComponentDef> = {
+export const AppMd: ComponentDescriptor<AppComponentDef> = {
   displayName: "App",
-  description: "Display an app",
+  description: "The App component provides a UI frame for XMLUI apps.",
   props: {
-    layout: desc("The layout type of the app"),
-    defaultRoute: desc("The app's default route"),
-    loggedInUser: desc("Optional information about the logged-in user"),
-    logoTemplate: {
-      description: "Optional template of the app logo",
-      valueType: "ComponentDef",
+    layout: {
+      description: "The layout of the app",
+      availableValues: appLayouts,
     },
-    scrollWholePage: desc("Whether the whole page should scroll or just the content area"),
+    defaultRoute: desc("The app's default route", "string"),
+    loggedInUser: desc("Optional information about the logged-in user"),
+    logoTemplate: nestedComp("Optional template of the app logo"),
+    scrollWholePage: desc("Whether the whole page should scroll or just the content area", "boolean", true),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -480,7 +482,7 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
 
     return (
       <App
-        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage)}
+        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
@@ -493,5 +495,5 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
       </App>
     );
   },
-  metadata,
+  AppMd,
 );
