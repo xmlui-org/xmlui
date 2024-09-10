@@ -94,7 +94,7 @@ export const pageRenderer = createComponentRenderer<PageComponentDef>(
     return (
       <Page url={extractValue(node.props.url)}>
         <TableOfContentsProvider>
-          <RouteWrapper childRoute={node.children} renderChild={renderChild} />
+          <RouteWrapper childRoute={node.children} renderChild={renderChild} key={extractValue(node.props.url)}/>
         </TableOfContentsProvider>
       </Page>
     );

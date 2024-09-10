@@ -67,6 +67,22 @@ export const CompoundComponent = forwardRef(
       }
     }, [node.children, renderChild]);
 
+    const dynamicSlots = useMemo(()=>{
+      if (node.slots) {
+        const ret = {};
+        Object.entries(node.slots).forEach(([key, value]) => {
+          ret[key] = value.map((val)=>{
+            return {
+              ...val,
+              renderChild,
+              childToRender: val,
+            }
+          });
+        });
+        return ret;
+      }
+    }, [node.slots, renderChild]);
+
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerComponentDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
@@ -119,7 +135,7 @@ export const CompoundComponent = forwardRef(
 
     //we remove the wrapChild prop from layout context, because that wrapping already happened for the compound component instance
     const safeLayoutContext = layoutContext ? { ...layoutContext, wrapChild: undefined } : layoutContext;
-    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, dynamicChildren);
+    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, dynamicChildren, dynamicSlots);
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),

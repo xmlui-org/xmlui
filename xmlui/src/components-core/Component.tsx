@@ -84,6 +84,7 @@ const Component = forwardRef(function Component(
     layoutNonCss,
     layoutContextRef,
     dynamicChildren,
+    dynamicSlots,
     memoedVarsRef,
     onUnmount,
     childIndex,
@@ -178,10 +179,10 @@ const Component = forwardRef(function Component(
 
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
-    (children, lc, rc) => {
-      return renderChild(children, lc, rc || dynamicChildren);
+    (children, lc, rc, dSlots) => {
+      return renderChild(children, lc, rc || dynamicChildren, dSlots || dynamicSlots);
     },
-    [renderChild, dynamicChildren],
+    [renderChild, dynamicChildren, dynamicSlots],
   );
 
   // --- Memoizes the node object with the resolved children. If the children contain a `Slot`,
@@ -193,8 +194,11 @@ const Component = forwardRef(function Component(
       safeNode.children.forEach((child) => {
         if (child.type === "Slot") {
           didResolve = true;
-          if (dynamicChildren) {
+          if (dynamicChildren && child.props?.name === undefined) {
             children.push(...dynamicChildren);
+          }
+          if(child.props?.name){
+            children.push(...(dynamicSlots?.[child.props?.name] || child.children || []));
           }
         } else {
           children.push(child);
@@ -211,7 +215,7 @@ const Component = forwardRef(function Component(
       };
     }
     return safeNode;
-  }, [safeNode, dynamicChildren]);
+  }, [safeNode, dynamicChildren, dynamicSlots]);
 
   const apiBoundProps = useMemo(() => getApiBoundItems(safeNode.props, "Datasource"), [safeNode.props]);
   const apiBoundEvents = useMemo(

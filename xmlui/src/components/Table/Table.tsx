@@ -102,7 +102,7 @@ function defaultIsRowDisabled(_: any) {
 
 const SELECT_COLUMN_WIDTH = 42;
 
-const DEFAULT_PAGE_SIZES = [20];
+const DEFAULT_PAGE_SIZES = [10];
 
 //These are the important styles to make sticky column pinning work!
 //Apply styles like this using your CSS strategy of choice with this kind of logic to head cells, data cells, footer cells, etc.

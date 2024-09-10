@@ -82,7 +82,7 @@ const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
     "border-style-TableOfContentsItem--active": "solid",
     "font-weight-TableOfContentsItem--active": "$font-weight-bold",
     "color-bg-TableOfContents": "transparent",
-    "padding-horizontal-TableOfContents": "$space-4",
+    "padding-horizontal-TableOfContents": "$space-8",
     "padding-vertical-TableOfContents": "$space-4",
     "padding-horizontal-TableOfContentsItem": "$space-2",
     "padding-vertical-TableOfContentsItem": "$space-2",

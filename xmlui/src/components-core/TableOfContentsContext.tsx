@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import scrollIntoView from "scroll-into-view-if-needed";
 
 type HeadingItem = {
   id: string;
@@ -23,6 +24,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
   const [observeIntersection, setObserveIntersection] = useState<boolean>(false);
   const [activeId, setActiveId] = useState<string | null>(null);
   const observer = useRef<IntersectionObserver | null>(null);
+  const initialHeading = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (observeIntersection) {
@@ -79,6 +81,25 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
       return -1;
     })
   }, [headings]);
+
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash) {
+      if (initialHeading?.current) {
+        return;
+      } else {
+        initialHeading.current = sortedHeadings.find((value) => `#${value.id}` === hash)?.anchor;
+        if (initialHeading.current) {
+          scrollIntoView(initialHeading.current, {
+            block: "start",
+            inline: "start",
+            behavior: "instant",
+            scrollMode: "always",
+          });
+        }
+      }
+    }
+  }, [sortedHeadings]);
 
   const contextValue: ITableOfContentsContext = useMemo(() => {
     return {
