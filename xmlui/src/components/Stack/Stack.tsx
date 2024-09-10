@@ -93,7 +93,7 @@ export type CVStackComponentDef = StackComponentDefContent & ComponentDef<"CVSta
 /** @specialized */
 export type CHStackComponentDef = StackComponentDefContent & ComponentDef<"CHStack">;
 
-const metadata: ComponentDescriptor<StackComponentDef> = {
+export const StackMd: ComponentDescriptor<StackComponentDef> = {
   displayName: "Stack",
   description: "A layout container of horizontally or vertically stacked content",
   props: {
@@ -158,7 +158,7 @@ export const stackComponentRenderer = createComponentRenderer<StackComponentDef>
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
     return renderStack({ node, layoutNonCss, extractValue, layoutCss, lookupEventHandler, renderChild });
   },
-  metadata
+  StackMd
 );
 
 export const vStackComponentRenderer = createComponentRenderer<VStackComponentDef>(
@@ -174,7 +174,7 @@ export const vStackComponentRenderer = createComponentRenderer<VStackComponentDe
       orientation: "vertical",
     });
   },
-  metadata
+  StackMd
 );
 
 export const hStackComponentRenderer = createComponentRenderer<HStackComponentDef>(
@@ -190,7 +190,7 @@ export const hStackComponentRenderer = createComponentRenderer<HStackComponentDe
       orientation: "horizontal",
     });
   },
-  metadata
+  StackMd
 );
 
 export const cvStackComponentRenderer = createComponentRenderer<CVStackComponentDef>(
@@ -208,7 +208,7 @@ export const cvStackComponentRenderer = createComponentRenderer<CVStackComponent
       verticalAlignment: "center",
     });
   },
-  metadata
+  StackMd
 );
 
 export const chStackComponentRenderer = createComponentRenderer<CHStackComponentDef>(
@@ -226,7 +226,7 @@ export const chStackComponentRenderer = createComponentRenderer<CHStackComponent
       verticalAlignment: "center",
     });
   },
-  metadata
+  StackMd
 );
 
 // =====================================================================================================================

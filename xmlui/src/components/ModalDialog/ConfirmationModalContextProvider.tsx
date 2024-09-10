@@ -1,7 +1,8 @@
 import React, { type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Button, type ButtonVariant, type ButtonThemeColor } from "@components/Button/Button";
+import { Button } from "@components/Button/Button";
 import { Stack } from "@components/Stack/Stack";
 import { Dialog } from "./Dialog";
+import { ButtonVariant, ButtonThemeColor } from "@components/abstractions";
 
 const ConfirmationModalContext = React.createContext({
   confirm: async (title: string, message?: string, actionLabel?: string) => false,

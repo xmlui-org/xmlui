@@ -1,13 +1,17 @@
 import { createContext, useContext } from "react";
 
-export type AppLayoutType =
-  | "horizontal"
-  | "vertical"
-  | "vertical-sticky"
-  | "vertical-full-header"
-  | "horizontal-sticky"
-  | "condensed"
-  | "condensed-sticky";
+const appLayoutNames = [
+  "vertical",
+  "vertical-sticky",
+  "vertical-full-header",
+  "condensed",
+  "condensed-sticky",
+  "horizontal",
+  "horizontal-sticky",
+] as const;
+
+export const appLayouts: string[] = [...appLayoutNames];
+export type AppLayoutType = typeof appLayoutNames[number];
 
 interface IAppLayoutContext {
   layout: AppLayoutType;

@@ -5,16 +5,17 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./Avatar.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import { sizeNames } from "@components/abstractions";
 
 // =====================================================================================================================
 // React Avatar component implementation
 
 type Props = {
-  size?: AvatarSize;
+  size?: string;
   url?: string;
   name?: string;
   style?: CSSProperties;
@@ -22,7 +23,7 @@ type Props = {
 
 export const Avatar = forwardRef(function Avatar(
   { size = "sm", url, name, style, onClick, ...rest }: Props,
-  ref: Ref<any>
+  ref: Ref<any>,
 ) {
   let abbrev = null;
   if (!url && !!name) {
@@ -55,35 +56,43 @@ export const Avatar = forwardRef(function Avatar(
 // =====================================================================================================================
 // XMLUI Avatar component definition
 
-/** 
+/**
  * The \`Avatar\` component represents a user, group (or other entity's) avatar with a small image or initials.
  */
 export interface AvatarComponentDef extends ComponentDef<"Avatar"> {
   props: {
-    /** 
+    /**
+     * This property defines the display size of the avatar. The default size is `sm`.
      * @descriptionRef
      * @defaultValue \`sm\`
      */
-    size?: AvatarSize;
-    /** @descriptionRef */
+    size?: string;
+    /** 
+     * This property sets the name value the avatar uses to display initials.
+     * @descriptionRef 
+     */
     name?: string;
-    /** @descriptionRef */
+    /** 
+     * This property specifies the URL of the image to display in the avatar.
+     * @descriptionRef 
+     */
     url?: string;
   };
   events: {
-    /** @descriptionRef */
+    /**
+     * This event is triggered when the avatar is clicked.
+     * @descriptionRef 
+     */
     click?: string;
   };
 }
 
-const AvatarSizeKeys = ["xs", "sm", "md", "lg"] as const;
-type AvatarSize = (typeof AvatarSizeKeys)[number];
-
-const metadata: ComponentDescriptor<AvatarComponentDef> = {
+export const AvatarMd: ComponentDescriptor<AvatarComponentDef> = {
   displayName: "Avatar",
-  description: "Display an avatar associated with an entity",
+  description:
+    "The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials.",
   props: {
-    size: desc("Size of the avatar (xs, sm, md, or lg)"),
+    size: { description: "Size of the avatar (xs, sm, md, or lg)", availableValues: sizeNames },
     name: desc("Name to extract the first letters of words as avatar text"),
     url: desc("Url of the avatar image"),
   },
@@ -123,8 +132,9 @@ export const avatarComponentRenderer = createComponentRenderer<AvatarComponentDe
         url={extractResourceUrl(node.props.url)}
         name={extractValue(node.props.name)}
         style={layoutCss}
+        onClick={lookupEventHandler('click')}
       />
     );
   },
-  metadata
+  AvatarMd,
 );

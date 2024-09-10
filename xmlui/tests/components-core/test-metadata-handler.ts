@@ -36,7 +36,8 @@ export function createTestMetadataHandler(desc: Record<string, ComponentDescript
       return mappedEvents;
     },
     acceptArbitraryProps: (type: string) => {
-      return type === "Theme";
+      const compDesc = desc[type];
+      return compDesc?.allowArbitraryProps ?? false;
     },
     getComponentValidator: (type: string) => {
       if (type === "Button") {

@@ -5,8 +5,7 @@ import styles from "./FileInput.module.scss";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import type { ButtonSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/Button/Button";
-import { Button, buttonStylingProps } from "@components/Button/Button";
+import { Button } from "@components/Button/Button";
 import type { ValidationStatus } from "@components/Input/input-abstractions";
 import {
   inputComponentEventDescriptors,
@@ -21,6 +20,7 @@ import { TextBox } from "@components/TextBox/TextBox";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/abstractions";
 
 // ============================================================================
 // React FileInput component implementation
@@ -33,7 +33,7 @@ type Props = {
   buttonLabel?: string;
   variant?: ButtonVariant;
   buttonThemeColor?: ButtonThemeColor;
-  buttonSize?: ButtonSize;
+  buttonSize?: ComponentSize;
   buttonIcon?: React.ReactNode;
   buttonIconPosition?: IconPosition;
   // Input props
@@ -111,7 +111,7 @@ export const FileInput = ({
       updateState({ value: acceptedFiles });
       onDidChange(acceptedFiles);
     },
-    [updateState, onDidChange]
+    [updateState, onDidChange],
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -255,7 +255,7 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
     /** This optional string property sets the size of the browse button (via paddings).
      * @descriptionRef
      */
-    buttonSize?: ButtonSize;
+    buttonSize?: ComponentSize;
     /**
      * The value of this optional property sets the string to provide a color scheme for the button.
      * @descriptionRef
@@ -285,7 +285,7 @@ export interface FileInputComponentDef extends ComponentDef<"FileInput"> {
     lostFocus?: string;
   };
   api: {
-    /** 
+    /**
      * By setting an ID for the component, you can refer to the value of the field if set.
      * If no value is set, the value will be undefined.
      * @descriptionRef
@@ -311,7 +311,7 @@ const metadata: ComponentDescriptor<FileInputComponentDef> = {
   description: "Represents an input component for textual data entry",
   props: {
     ...inputComponentPropertyDescriptors,
-    ...buttonStylingProps,
+    variant: desc("The button variant (solid, outlined, ghost) to use"),
     buttonLabel: desc("The label of the button that opens the file dialog"),
     buttonIcon: desc("The ID of the icon to display in the button"),
     buttonIconPosition: desc("The position of the icon within the button (left, right)"),
@@ -353,7 +353,7 @@ export const fileInputRenderer = createComponentRenderer<FileInputComponentDef>(
       />
     );
   },
-  metadata
+  metadata,
 );
 
 function isFile(value: any): value is File {

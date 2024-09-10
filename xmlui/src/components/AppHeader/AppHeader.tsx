@@ -1,17 +1,16 @@
 import type { ReactNode } from "react";
-import { useId, useRef} from "react";
+import { useId, useRef } from "react";
 import { createPortal } from "react-dom";
 import classnames from "@components-core/utils/classnames";
 
 import styles from "./AppHeader.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
 import { Icon } from "@components/Icon/Icon";
 import { createComponentRenderer } from "@components-core/renderers";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { useAppContext } from "@components-core/AppContext";
 import { Logo } from "@components/Logo/Logo";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { Button } from "@components/Button/Button";
@@ -19,6 +18,7 @@ import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext"
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 
 type Props = {
   children?: ReactNode;
@@ -62,7 +62,7 @@ export const AppHeader = ({
   toggleDrawer,
   showLogo,
   hasRegisteredNavPanel,
-  logoTitle
+  logoTitle,
 }: Props) => {
   return (
     <div className={classnames(styles.header, className)} style={style}>
@@ -83,10 +83,12 @@ export const AppHeader = ({
           <div className={styles.logoContainer}>{logoContent ? <>{logoContent}</> : <Logo title={logoTitle} />}</div>
         )}
         <div className={styles.childrenWrapper}>{children}</div>
-        {profileMenu && <div className={styles.rightItems}>
-          {/*{profileMenu === undefined ? <ProfileMenu loggedInUser={loggedInUser} /> : profileMenu}*/}
-          {profileMenu}
-        </div>}
+        {profileMenu && (
+          <div className={styles.rightItems}>
+            {/*{profileMenu === undefined ? <ProfileMenu loggedInUser={loggedInUser} /> : profileMenu}*/}
+            {profileMenu}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -129,7 +131,6 @@ function AppContextAwareAppHeader({
     headerRoot,
     layout,
     setNavPanelRoot,
-    hasRegisteredHeader,
     hasRegisteredNavPanel,
   } = appLayoutContext || {};
   const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
@@ -151,7 +152,7 @@ function AppContextAwareAppHeader({
         {layout && layout.startsWith("condensed") && <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />}
         {children}
       </AppHeader>,
-      headerRoot
+      headerRoot,
     );
   }
 
@@ -176,7 +177,7 @@ function AppContextAwareAppHeader({
 
 /**
  * \`AppHeader\` is a placeholder within \`App\` to define a custom application header.
- * 
+ *
  * > **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
  */
 export interface AppHeaderComponentDef extends ComponentDef<"AppHeader"> {
@@ -188,18 +189,13 @@ export interface AppHeaderComponentDef extends ComponentDef<"AppHeader"> {
 }
 
 // @ts-ignore
-const metadata: ComponentDescriptor<AppHeaderComponentDef> = {
+export const AppHeaderMd: ComponentDescriptor<AppHeaderComponentDef> = {
   displayName: "AppHeader",
-  description: "Display an application header",
+  description: "A placeholder within App to define a custom application header",
   props: {
-    logoTemplate: {
-      description: "Template for the application logo",
-      valueType: "ComponentDef",
-    },
-    profileMenuTemplate: {
-      description: "Template for the profile menu",
-      valueType: "ComponentDef",
-    },
+    profileMenuTemplate: nestedComp("Template for the profile menu"),
+    logoTemplate: nestedComp("Template for the application logo"),
+    logoTitle: desc("Title for the application logo"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -264,5 +260,5 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
       </AppContextAwareAppHeader>
     );
   },
-  metadata
+  AppHeaderMd,
 );

@@ -6,8 +6,9 @@ import styles from "./DropdownMenu.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/abstractions";
+
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import type { ButtonThemeColor, ButtonVariant, IconPosition } from "@components/Button/Button";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Button } from "@components/Button/Button";

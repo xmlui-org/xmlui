@@ -1,5 +1,8 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+
+import { desc } from "@components-core/descriptorHelper";
 import { createComponentRenderer } from "@components-core/renderers";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
 import { useAppStateContextPart } from "@components/App/AppStateContext";
@@ -38,21 +41,21 @@ function AppState({
 }
 
 /**
- * AppState is a functional component (without a visible user interface) that helps store and 
+ * AppState is a functional component (without a visible user interface) that helps store and
  * manage the app's state.
  */
 export interface AppStateComponentDef extends ComponentDef<"AppState"> {
   props: {
     /**
-     * This property is the identifier of the bucket to which the \`AppState\` instance is bound. 
-     * Multiple \`AppState\` instances with the same bucket will share the same state object: any of 
+     * This property is the identifier of the bucket to which the \`AppState\` instance is bound.
+     * Multiple \`AppState\` instances with the same bucket will share the same state object: any of
      * them updating the state will cause the other instances to view the new, updated state.
      */
     bucket?: string;
     /**
-     * This property contains the initial state value. Though you can use multiple \`AppState\` 
-     * component instances for the same bucket with their \`initialValue\` set, it may result in faulty 
-     * app logic. When xmlui instantiates an \`AppInstance\` with an explicit initial value, that value 
+     * This property contains the initial state value. Though you can use multiple \`AppState\`
+     * component instances for the same bucket with their \`initialValue\` set, it may result in faulty
+     * app logic. When xmlui instantiates an \`AppInstance\` with an explicit initial value, that value
      * is immediately set. Multiple initial values may result in undesired initialization.
      */
     initialValue?: string;
@@ -63,8 +66,17 @@ export interface AppStateComponentDef extends ComponentDef<"AppState"> {
      */
     value: Record<string, any>;
     update: (patch: Record<string, any>) => void;
-  }
+  };
 }
+
+export const AppStateMd: ComponentDescriptor<AppStateComponentDef> = {
+  displayName: "AppState",
+  description: "A functional component that helps store and manage the app's state.",
+  props: {
+    bucket: desc("The identifier of the bucket to which the AppState instance is bound."),
+    initialValue: desc("The initial state value."),
+  },
+};
 
 export const appStateComponentRenderer = createComponentRenderer<AppStateComponentDef>(
   "AppState",
@@ -78,5 +90,5 @@ export const appStateComponentRenderer = createComponentRenderer<AppStateCompone
       />
     );
   },
-  {}
+  AppStateMd,
 );

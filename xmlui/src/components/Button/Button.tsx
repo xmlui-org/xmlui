@@ -1,12 +1,27 @@
 import React, { type CSSProperties, useEffect, useImperativeHandle, useRef } from "react";
+
 import styles from "./Button.module.scss";
+
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import {
+  alignmentOptionNames,
+  type AlignmentOptions,
+  sizeNames,
+  ButtonThemeColor,
+  buttonThemeNames,
+  type ButtonType,
+  type ComponentSize,
+  ButtonVariant,
+  OrientationOptions,
+  ButtonAria,
+  IconPosition,
+} from "@components/abstractions";
+
 import classnames from "@components-core/utils/classnames";
 import { Icon } from "@components/Icon/Icon";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import type { PropertyComponentDescriptorHash } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
 
 // ====================================================================================================================
@@ -17,7 +32,7 @@ type Props = {
   type?: ButtonType;
   variant?: ButtonVariant;
   themeColor?: ButtonThemeColor;
-  size?: ButtonSize;
+  size?: ComponentSize;
   disabled?: boolean;
   children?: React.ReactNode | React.ReactNode[];
   icon?: React.ReactNode;
@@ -59,7 +74,7 @@ export const Button = React.forwardRef(function Button(
     title,
     ...rest
   }: Props,
-  ref: React.ForwardedRef<HTMLButtonElement>
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
   const innerRef = useRef<HTMLButtonElement>(null);
   useImperativeHandle(ref, () => innerRef.current!);
@@ -117,78 +132,109 @@ export const Button = React.forwardRef(function Button(
 // ====================================================================================================================
 // XMLUI Button definition
 
-export type ButtonSize = "xs" | "sm" | "md" | "lg";
-export type AlignmentOptions = "start" | "center" | "end";
-export type ButtonThemeColor = "attention" | "primary" | "secondary";
-export type ButtonType = "button" | "submit" | "reset";
-export type ButtonVariant = "solid" | "outlined" | "ghost";
-export type OrientationOptions = "horizontal" | "vertical";
-export type ButtonAria = "aria-controls" | "aria-expanded" | "aria-disabled" | "aria-label";
-export type IconPosition = "left" | "right" | "start" | "end";
-
 /**
  * \`Button\` is an interactive element that triggers an action when clicked.
  */
 export interface ButtonComponentDef extends ComponentDef<"Button"> {
   props: {
-    /** @descriptionRef */
+    /**
+     * This property is an optional string to set a label for the button. If no label is specified and
+     * an icon is set, the button will modify its styling to look like a small icon button. When the
+     * button has nested children, it will display them and ignore the value of the \`label\` prop.
+     * @descriptionRef
+     */
     label?: string;
-    /** @descriptionRef */
+    /**
+     * This optional string describes how the button appears in an HTML context. You rarely need to
+     * set this property explicitly.
+     * @descriptionRef
+     */
     type?: ButtonType;
-    /** @descriptionRef */
+    /**
+     * The value of this property indicates if the button accepts actions (\`true\`) or does not react
+     * to them (\`falseq`). The default value is \`true\`.
+     * @descriptionRef
+     */
     enabled?: boolean;
-    /** @descriptionRef */
+    /**
+     * This string value denotes an icon name. The framework will render an icon if XMLUI recognizes
+     * the icon (by its name). If no label is specified and an icon is set, the button displays only
+     * the icon.
+     * @descriptionRef
+     */
     icon?: string;
-    /** @defaultValue left */
+    /**
+     * This optional string determines the location of the icon in the Button.
+     * @defaultValue left
+     */
     iconPosition?: IconPosition;
-    /** @descriptionRef */
-    contentPosition?: "start" | "end" | "center";
+    /**
+     * This optional value determines how the label and icon (or nested children) should be placed
+     * inside the Button component.
+     * @descriptionRef
+     */
+    contentPosition?: AlignmentOptions;
     /** @internal */
     autoFocus?: string;
     /** @internal */
     title?: string;
-    /** @descriptionRef */
+    /**
+     * The value of this optional property determines the fundamental style of the button.
+     * @descriptionRef
+     */
     variant?: ButtonVariant;
-    /** @descriptionRef */
+    /**
+     * The value of this optional property sets the string to provide a color scheme for the Button.
+     *  @descriptionRef
+     */
     themeColor?: ButtonThemeColor;
-    /** @descriptionRef */
-    size?: ButtonSize;
+    /**
+     * This optional string property sets the component's size (via paddings).
+     * @descriptionRef
+     */
+    size?: ComponentSize;
   };
   readonly events: {
-    /** @descriptionRef */
+    /**
+     * This event is triggered when the button is clicked.
+     * @descriptionRef
+     */
     click: string;
-    /** @descriptionRef */
+    /**
+     * This event is triggered when the button has received the focus.
+     * @descriptionRef
+     */
     gotFocus?: string;
-    /** @descriptionRef */
+    /**
+     * This event is triggered when the button has lost the focus.
+     * @descriptionRef
+     */
     lostFocus?: string;
   };
 }
 
-export const buttonStylingProps: PropertyComponentDescriptorHash<ButtonComponentDef> = {
-  variant: desc("The button variant (solid, outlined, ghost) to use"),
-  themeColor: desc("The button color scheme (primary, secondary, attention)"),
-  size: desc("The size of the button (small, medium, large)"),
-};
-
-// JSDoc-szerű leírás - szét kell választani a runtime cuccokat a statikus type-ok melletti kommentekből
-// A lényeg, hogy egy eszközzel kiszedjük a releváns metaadatokat
-const metadata: ComponentDescriptor<ButtonComponentDef> = {
+export const ButtonMd: ComponentDescriptor<ButtonComponentDef> = {
   displayName: "Button",
-  // ref: description.mdx <- later
-  description: "Represent a button component, clicking of which triggers an action",
+  description: "A button that triggers an action when clicked",
   props: {
-    ...buttonStylingProps,
+    variant: desc("The button variant (solid, outlined, ghost) to use"),
+    themeColor: {
+      description: "The button color scheme (primary, secondary, attention)",
+      availableValues: buttonThemeNames,
+    },
+    size: { description: "The size of the button (small, medium, large)", availableValues: sizeNames },
     label: desc(
       "Specifies the optional text to display in the button. If omitted, children can be used to set " +
-        "the button's content."
+        "the button's content.",
     ),
-    // ref: filename.mdx
-    type: desc("The behavior type of the button"),
-    // ref: filename.mdx
+    type: desc("The type of the button"),
     enabled: desc("Indicates if the button is enabled"),
     icon: desc("Optional icon ID to display the particular icon in the button"),
     iconPosition: desc("Position of the icon displayed in the button"),
-    contentPosition: desc("Determines how the label and icon should be placed inside the Button component"),
+    contentPosition: {
+      description: "Determines how the label and icon should be placed inside the Button component",
+      availableValues: alignmentOptionNames,
+    },
   },
   events: {
     click: desc("Triggers when the button is clicked"),
@@ -310,5 +356,5 @@ export const buttonComponentRenderer = createComponentRenderer<ButtonComponentDe
       </Button>
     );
   },
-  metadata
+  ButtonMd,
 );

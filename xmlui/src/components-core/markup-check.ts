@@ -229,22 +229,7 @@ export function checkXmlUiMarkup(
           // --- Stop the visit
           return;
         }
-      } else if (propDescriptor.type === "ComponentDef[]" && Array.isArray(propValue)) {
-        // --- This property holds an array of nested components, visit them
-        for (const propItem of propValue as ComponentDef[]) {
-          if (propItem.type) {
-            visitComponent(propItem, def, visitor, continuation);
-            if (continuation.abort) {
-              // --- Stop visiting this component
-              return;
-            }
-            if (continuation.cancel) {
-              // --- Skip the remaining items
-              break;
-            }
-          }
-        }
-      }
+      } 
     }
 
     // --- Visit events with nested components

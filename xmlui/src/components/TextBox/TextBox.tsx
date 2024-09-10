@@ -283,7 +283,7 @@ export interface TextBoxComponentDef extends ComponentDef<"TextBox"> {
   };
 }
 
-const metadata: ComponentDescriptor<TextBoxComponentDef> = {
+export const TextboxMd: ComponentDescriptor<TextBoxComponentDef> = {
   displayName: "TextBox",
   description: "Represents an input component for textual data entry",
   props: inputComponentPropertyDescriptors,
@@ -364,7 +364,7 @@ export const textBoxComponentRenderer = createComponentRenderer<TextBoxComponent
   ({ node, state, updateState, lookupEventHandler, extractValue, layoutCss, registerComponentApi }) => {
     return renderTextBox(layoutCss, state, updateState, extractValue, node, lookupEventHandler, registerComponentApi);
   },
-  metadata
+  TextboxMd
 );
 
 type PasswordInputComponentDef = InputComponentDef<"PasswordInput"> & Adornments;
@@ -383,5 +383,5 @@ export const passwordInputComponentRenderer = createComponentRenderer<PasswordIn
       "password"
     );
   },
-  metadata
+  TextboxMd
 );

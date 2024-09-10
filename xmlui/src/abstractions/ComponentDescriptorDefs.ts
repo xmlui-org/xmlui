@@ -27,6 +27,9 @@ export type ComponentDescriptor<T extends ComponentDef> = {
 
   // Theme variable defaults for a particular tone-specific theme
   toneSpecificThemeVars?: Record<string, Record<string, string>>;
+
+  // Indicates that the component allows arbitrary props (not just the named ones)
+  allowArbitraryProps?: boolean;
 };
 
 // A generic validation function that retrieves either a hint (the validation argument has
@@ -36,19 +39,19 @@ export type IsValidFunction<T> = (propKey: string, propValue: T) => string | str
 // Describes the metadata of a particular component property
 export type ComponentPropertyDescriptor = {
   // The display name of the property to display in the inspector view
-  displayName?: string;
+  readonly displayName?: string;
 
   // The category the property belongs to
-  category?: string;
+  readonly category?: string;
 
   // The markdown description to explain the property in the inspector view
-  description?: string;
+  readonly description?: string;
 
   // The value type of the property
-  valueType?: PropertyValueType;
+  readonly valueType?: PropertyValueType;
 
   // What are the available values of this property?
-  availableValues?: any[];
+  readonly availableValues?: any[];
 
   // The default property value (if there is any)
   defaultValue?: any;
@@ -71,40 +74,7 @@ export type PropertyValueType =
   | "boolean"
   | "string"
   | "number"
-  | "numberOrString"
-  | "OrientationOptions"
-  | "AlignmentOptions"
-  | "UserSelectOptions"
-  | "DirectionOptions"
-  | "ScrollingOptions"
-  | "CssFontFamily"
-  | "CssFontWeight"
-  | "CssSize"
-  | "CssOpacity"
-  | "CssBorder"
-  | "CssRadius"
-  | "CssColor"
-  | "CssShadow"
-  | "CssTextDecoration"
-  | "ActionSet"
-  | "CssColorType"
-  | "ComponentDef"
-  | "ComponentDef[]"
-  | "ComponentDefMap"
-  | "IconPosition"
-  | "CssUnit"
-  | "TextTransformOptions"
-  | "TextWrapOptions"
-  | "Option[] | string[]"
-  | "FieldValidator[]"
-  | "SearchBoxDef"
-  | TypographyHintValueType
-  | ButtonHintValueType
-  | "any";
-
-export type TypographyHintValueType = "HeadingLevel" | "TextVariant";
-
-export type ButtonHintValueType = "ButtonType" | "ButtonVariant" | "ButtonThemeColor" | "ButtonSize";
+  | "ComponentDef";
 
 // The properties constituting a component's layout
 export type LayoutProps = {
