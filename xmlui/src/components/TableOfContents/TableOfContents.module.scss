@@ -17,10 +17,13 @@ $padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizon
 
 .nav {
   background-color: createThemeVar("color-bg-TableOfContents");
-  min-width: 220px;
+  min-width: 240px;
+  width: createThemeVar("width-TableOfContents");
   align-self: flex-start;
+  height: createThemeVar("height-TableOfContents");
   max-height: calc(100vh - 70px);
-  overflow: scroll;
+  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 99;
   top: 0;
   position: sticky;
@@ -35,46 +38,60 @@ $padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizon
   margin-bottom: createThemeVar("margin-bottom-TableOfContents");
   padding: createThemeVar("padding-vertical-TableOfContents") createThemeVar("padding-horizontal-TableOfContents");
 
-  ul {
-    li {
-      color: createThemeVar("color-TableOfContentsItem");
-      font-size: createThemeVar("font-size-TableOfContentsItem");
-      font-weight: createThemeVar("font-weight-TableOfContentsItem");
-      font-family: createThemeVar("font-family-TableOfContentsItem");
-      text-transform: createThemeVar("transform-TableOfContentsItem");
-      vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
-      letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
+  .list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    .listItem {
       list-style-type: none;
       border-left: createThemeVar("border-width-TableOfContentsItem") createThemeVar("border-style-TableOfContentsItem") createThemeVar("border-color-TableOfContentsItem");
 
-      &.head_1 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-1, $padding-horizontal-TableOfContentsItem);
-      }
+      .link {
+        color: createThemeVar("color-TableOfContentsItem");
+        font-size: createThemeVar("font-size-TableOfContentsItem");
+        font-weight: createThemeVar("font-weight-TableOfContentsItem");
+        font-family: createThemeVar("font-family-TableOfContentsItem");
+        text-transform: createThemeVar("transform-TableOfContentsItem");
+        vertical-align: createThemeVar("align-vertical-TableOfContentsItem");
+        letter-spacing: createThemeVar("letter-spacing-TableOfContentsItem");
+        overflow-wrap: break-word;
+        display: block;
 
-      &.head_2 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-2, $padding-horizontal-TableOfContentsItem);
-      }
+        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem);
 
-      &.head_3 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-3, $padding-horizontal-TableOfContentsItem);
-      }
+        &.head_1 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-1, $padding-horizontal-TableOfContentsItem);
+        }
 
-      &.head_4 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-4, $padding-horizontal-TableOfContentsItem);
-      }
+        &.head_2 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-2, $padding-horizontal-TableOfContentsItem);
+        }
 
-      &.head_5 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-5, $padding-horizontal-TableOfContentsItem);
-      }
+        &.head_3 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-3, $padding-horizontal-TableOfContentsItem);
+        }
 
-      &.head_6 {
-        padding: t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-6, $padding-horizontal-TableOfContentsItem);
+        &.head_4 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-4, $padding-horizontal-TableOfContentsItem);
+        }
+
+        &.head_5 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem)  t.useVar($padding-horizontal-TableOfContentsItem-level-5, $padding-horizontal-TableOfContentsItem);
+        }
+
+        &.head_6 {
+          padding: t.useVar($padding-vertical-TableOfContentsItem) t.$space-2  t.useVar($padding-vertical-TableOfContentsItem) t.useVar($padding-horizontal-TableOfContentsItem-level-6, $padding-horizontal-TableOfContentsItem);
+        }
       }
 
       &.active {
-        color: createThemeVar("color-TableOfContentsItem--active");
-        font-weight: createThemeVar("font-weight-TableOfContentsItem--active");
         border-left: 2px solid createThemeVar("border-color-TableOfContentsItem--active");
+
+        .link {
+          color: createThemeVar("color-TableOfContentsItem--active");
+          font-weight: createThemeVar("font-weight-TableOfContentsItem--active");
+        }
       }
     }
   }
