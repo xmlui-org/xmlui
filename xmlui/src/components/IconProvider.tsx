@@ -97,6 +97,9 @@ import { XlsIcon } from "@components/Icon/XlsIcon";
 import { ErrorIcon } from "@components/Icon/ErrorIcon";
 import { TrendingUpIcon } from "./Icon/TrendingUpIcon";
 import { TrendingDownIcon } from "./Icon/TrendingDownIcon";
+import { SortAscendingIcon } from "./Icon/SortAscendingIcon";
+import { SortDescendingIcon } from "./Icon/SortDescendingIcon";
+import { NoSortIcon } from "./Icon/NoSortIcon";
 
 type IconRenderer<T extends IconBaseProps> = (props: T) => React.ReactElement<T>;
 
@@ -234,15 +237,15 @@ registerIconRenderer("paint", (props: IconBaseProps) => <HiOutlinePaintBrush {..
 registerIconRenderer("palette", (props: IconBaseProps) => <MdOutlinePalette {...props} />);
 registerIconRenderer("trending-up", (props: IconBaseProps) => <TrendingUpIcon {...props} />);
 registerIconRenderer("trending-down", (props: IconBaseProps) => <TrendingDownIcon {...props} />);
+registerIconRenderer("sortasc", (props: IconBaseProps) => <SortAscendingIcon {...props} />);
+registerIconRenderer("sortdesc", (props: IconBaseProps) => <SortDescendingIcon {...props} />);
+registerIconRenderer("nosort", (props: IconBaseProps) => <NoSortIcon {...props} />);
 
 // --- IDE extras (temporary)
 registerIconRenderer("arrowdown", (props: IconBaseProps) => <BsArrowDownShort {...props} />);
 registerIconRenderer("square", (props: IconBaseProps) => <BsSquare {...props} />);
 registerIconRenderer("squarehalf", (props: IconBaseProps) => <BsSquareHalf {...props} />);
 registerIconRenderer("squarefill", (props: IconBaseProps) => <BsSquareFill {...props} />);
-
-registerIconRenderer("sortup:Table", (props: IconBaseProps) => <SunIcon {...props} />);
-registerIconRenderer("sortdown:Table", (props: IconBaseProps) => <MoonIcon {...props} />);
 
 export function IconProvider({ children }: { children: ReactNode }) {
   const getRegisteredIconNames = useCallback(() => {

@@ -88,38 +88,27 @@ function mapSizeToIconPack(size: string) {
   );
 }
 
-function useFindIconRenderer(name: string, fallback: string) {
+function useFindIconRenderer(name?: string, fallback?: string) {
   const iconRegistry = useIconRegistry();
-  let renderChain: string[] = [];
 
-  // --- Fill chain
-  if (fallback && typeof fallback === "string") {
-    renderChain.push(fallback);
-  }
-
-  const separator = ":";
-  let parts: string[] = [];
-  if (typeof name === "string") {
-    parts = name.split(separator);
-  }
-  if (parts.length >= 1) {
-    renderChain.push(parts[0]);
-  }
-  if (parts.length === 2) {
-    renderChain.push(`${parts[0].toLowerCase()}${separator}${parts[1]}`);
-  }
-  renderChain = renderChain.toReversed();
-
-  // --- Loop chain
-  if (renderChain.length === 0) return null;
-
-  for (const renderer of renderChain) {
-    const iconRenderer = iconRegistry.lookupIconRenderer(renderer);
-    if (iconRenderer) {
-      return iconRenderer;
+  if (name && typeof name === "string") {
+    const separator = ":";
+    const parts: string[] = name.split(separator);
+    // Component specific icon
+    if (parts.length > 1) {
+      const iconRenderer = iconRegistry.lookupIconRenderer(`${parts[0].toLowerCase()}${separator}${parts[1]}`);
+      if (iconRenderer) return iconRenderer;
+    }
+    // General icon
+    if (parts.length === 1) {
+      const iconRenderer = iconRegistry.lookupIconRenderer(parts[0]);
+      if (iconRenderer) return iconRenderer;
     }
   }
-  // No icon found whatsoever, return a default null
+  if (fallback && typeof fallback === "string") {
+    const iconRenderer = iconRegistry.lookupIconRenderer(fallback.toLowerCase());
+    if (iconRenderer) return iconRenderer;
+  }
   return null;
 }
 
