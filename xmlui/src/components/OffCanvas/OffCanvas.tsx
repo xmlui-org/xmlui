@@ -76,7 +76,7 @@ export interface OffCanvasComponentDef extends ComponentDef<"OffCanvas"> {
   };
 }
 
-const metadata: ComponentDescriptor<OffCanvasComponentDef> = {
+export const OffCanvasMd: ComponentDescriptor<OffCanvasComponentDef> = {
   displayName: "OffCanvas",
   description: "A hidden panel that slides into view from the side of the screen.",
   props: {
@@ -102,5 +102,5 @@ export const offCanvasComponentRenderer = createComponentRenderer<OffCanvasCompo
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {
     return <div style={{ backgroundColor: "red", color: "white" }}>OffCanvas component is not implemented yet</div>;
   },
-  metadata,
+  OffCanvasMd,
 );

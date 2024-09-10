@@ -53,7 +53,7 @@ export interface StickyBoxComponentDef extends ComponentDef<"StickyBox"> {
   };
 }
 
-const metadata: ComponentDescriptor<StickyBoxComponentDef> = {
+export const StickyBoxMd: ComponentDescriptor<StickyBoxComponentDef> = {
   displayName: "StickyBox",
   description: "Provides a container that sticks to the top or bottom of the screen.",
   props: {
@@ -74,5 +74,5 @@ export const stickyBoxComponentRenderer = createComponentRenderer<StickyBoxCompo
       </StickyBox>
     );
   },
-  metadata
+  StickyBoxMd
 );

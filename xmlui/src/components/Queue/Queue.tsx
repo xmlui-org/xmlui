@@ -392,7 +392,7 @@ export interface QueueComponentDef extends ComponentDef<"Queue"> {
   };
 }
 
-const metadata: ComponentDescriptor<QueueComponentDef> = {
+export const QueueMd: ComponentDescriptor<QueueComponentDef> = {
   displayName: "Queue",
   description: "A queue managing tasks to process in a FIFO order",
   props: {
@@ -442,5 +442,5 @@ export const queueComponentRenderer = createComponentRenderer<QueueComponentDef>
       />
     );
   },
-  metadata
+  QueueMd
 );

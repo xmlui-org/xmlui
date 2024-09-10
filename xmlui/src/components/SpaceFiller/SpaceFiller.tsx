@@ -22,7 +22,7 @@ export const SpaceFiller = () => {
  */
 export interface SpaceFillerComponentDef extends ComponentDef<"SpaceFiller"> {}
 
-const metadata: ComponentDescriptor<AvatarComponentDef> = {
+export const SpaceFillerMd: ComponentDescriptor<AvatarComponentDef> = {
   displayName: "SpaceFiller",
   description: "Fills the space between two components in a Stack or FlowLayout container.",
   themeVars: parseScssVar(styles.themeVars),
@@ -31,5 +31,5 @@ const metadata: ComponentDescriptor<AvatarComponentDef> = {
 export const spaceFillerComponentRenderer = createComponentRenderer<SpaceFillerComponentDef>(
   "SpaceFiller",
   () => <SpaceFiller />,
-  metadata
+  SpaceFillerMd
 );

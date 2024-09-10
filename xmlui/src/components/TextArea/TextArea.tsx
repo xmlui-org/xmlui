@@ -20,6 +20,7 @@ import { isNil } from "lodash-es";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { useEvent } from "@components-core/utils/misc";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { desc } from "@components-core/descriptorHelper";
 
 // =====================================================================================================================
 // Helper types
@@ -362,11 +363,27 @@ export interface TextAreaComponentDef extends ComponentDef<"TextArea"> {
 /**
  * This object defines the hints for TextArea
  */
-const metadata: ComponentDescriptor<TextAreaComponentDef> = {
-  displayName: "Text Area",
+export const TextAreaMd: ComponentDescriptor<TextAreaComponentDef> = {
+  displayName: "TextArea",
   description: "Provide a multiple-line text editing area for plain text content",
   themeVars: parseScssVar(styles.themeVars),
   props: {
+    enterSubmits: desc("If set to `true`, pressing the Enter key submits the form."),
+    escResets: desc("If set to `true`, pressing the ESC key resets the form."),
+    maxRows: desc("The maximum number of rows the TextArea can have."),
+    minRows: desc("The minimum number of rows the TextArea can have."),
+    rows: desc("The number of rows the TextArea should have."),
+    autoSize: desc("If set to `true`, the TextArea automatically resizes based on the number of lines inside it."),
+    placeholder: desc("The placeholder text that appears in the input field when it is empty."),
+    initialValue: desc("The initial value of the TextArea."),
+    labelId: desc("The ID of the label component."),
+    maxLength: desc("The maximum number of characters that can be entered into the TextArea."),
+    autoFocus: desc("If set to `true`, the TextArea is focused when it appears on the UI."),
+    required: desc("If set to `true`, the TextArea must have a value before submitting the containing form."),
+    readOnly: desc("If set to `true`, the TextArea is read-only."),
+    allowCopy: desc("If set to `true`, the TextArea contents can be copied to the clipboard."),
+    enabled: desc("If set to `true`, the TextArea can be written into."),
+    validationStatus: desc("The validation status of the TextArea."),
     resize: {
       isValid: (p) =>
         isResizeOption(p)
@@ -410,5 +427,5 @@ export const textAreaComponentRenderer = createComponentRenderer<TextAreaCompone
       />
     );
   },
-  metadata
+  TextAreaMd
 );

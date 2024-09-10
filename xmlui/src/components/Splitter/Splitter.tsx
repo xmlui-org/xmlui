@@ -84,7 +84,7 @@ export const Splitter = ({
 }: SplitProps) => {
   const panels = useMemo(
     () => (swapped ? React.Children.toArray(children).reverse() : React.Children.toArray(children)),
-    [children, swapped]
+    [children, swapped],
   );
   const [size, setSize] = useState(0);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
@@ -120,16 +120,16 @@ export const Splitter = ({
             ? Math.min(
                 Math.max(
                   event.clientX - splitter.getBoundingClientRect().left,
-                  parseSize(minPrimarySize, containerSize)
+                  parseSize(minPrimarySize, containerSize),
                 ),
-                parseSize(maxPrimarySize, containerSize)
+                parseSize(maxPrimarySize, containerSize),
               )
             : Math.min(
                 Math.max(
                   event.clientY - splitter.getBoundingClientRect().top,
-                  parseSize(minPrimarySize, containerSize)
+                  parseSize(minPrimarySize, containerSize),
                 ),
-                parseSize(maxPrimarySize, containerSize)
+                parseSize(maxPrimarySize, containerSize),
               );
         setSize(newSize);
         if (resize) {
@@ -254,7 +254,7 @@ export const Splitter = ({
 
 type Orientation = "horizontal" | "vertical";
 
-const metadata: ComponentDescriptor<SplitterComponentDef> = {
+export const SplitterMd: ComponentDescriptor<SplitterComponentDef> = {
   displayName: "Splitter",
   description: "A component displaying its children in a card",
   props: {
@@ -278,7 +278,12 @@ const metadata: ComponentDescriptor<SplitterComponentDef> = {
   },
 };
 
-interface SplitterComponentDefContent <T extends string> extends ComponentDef<T> {
+export const HSplitterMd: ComponentDescriptor<HSplitterComponentDef> = { ...SplitterMd };
+delete HSplitterMd.props.orientation;
+export const VSplitterMd: ComponentDescriptor<HSplitterComponentDef> = { ...SplitterMd };
+delete VSplitterMd.props.orientation;
+
+interface SplitterComponentDefContent<T extends string> extends ComponentDef<T> {
   props: {
     orientation?: Orientation;
     swapped?: boolean;
@@ -298,9 +303,9 @@ interface SplitterComponentDefContent <T extends string> extends ComponentDef<T>
  * The \`Splitter\` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
  * These sections are identified by their name: primary and secondary.
  * The sections are divided by a draggable and styleable divider.
- * 
+ *
  * Most properties of the component focus on the primary section (e.g. sizing).
- * 
+ *
  * See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
  */
 export interface SplitterComponentDef extends ComponentDef<"Splitter"> {
@@ -323,7 +328,7 @@ export interface SplitterComponentDef extends ComponentDef<"Splitter"> {
      * @descriptionRef
      */
     splitterTemplate?: ComponentDef;
-    /** 
+    /**
      * This optional number property sets the initial size of the primary section.
      * The unit of the size value is in pixels or percentages.
      * @descriptionRef
@@ -349,7 +354,7 @@ export interface SplitterComponentDef extends ComponentDef<"Splitter"> {
     floating?: boolean;
   };
   events: {
-    /** 
+    /**
      * This event fires when the component is resized.
      * @descriptionRef
      */
@@ -415,7 +420,7 @@ export const splitterComponentRenderer = createComponentRenderer<SplitterCompone
       lookupEventHandler,
     });
   },
-  metadata
+  SplitterMd,
 );
 
 export const vSplitterComponentRenderer = createComponentRenderer<VSplitterComponentDef>(
@@ -431,7 +436,7 @@ export const vSplitterComponentRenderer = createComponentRenderer<VSplitterCompo
       lookupEventHandler,
     });
   },
-  metadata
+  SplitterMd,
 );
 
 export const hSplitterComponentRenderer = createComponentRenderer<HSplitterComponentDef>(
@@ -447,5 +452,5 @@ export const hSplitterComponentRenderer = createComponentRenderer<HSplitterCompo
       lookupEventHandler,
     });
   },
-  metadata
+  SplitterMd,
 );

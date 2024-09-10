@@ -116,7 +116,7 @@ export const NumberBox = ({
       updateState({ value: newValue });
       onDidChange(newValue);
     },
-    [onDidChange, updateState]
+    [onDidChange, updateState],
   );
 
   // --- Keypress
@@ -129,7 +129,7 @@ export const NumberBox = ({
       const repr = value;
       updateValue(value, repr);
     },
-    [integersOnly, updateValue, min, max, zeroOrPositive, value]
+    [integersOnly, updateValue, min, max, zeroOrPositive, value],
   );
 
   // --- Stepper logic
@@ -179,7 +179,7 @@ export const NumberBox = ({
           if (currentValue[expPos + 1] !== "-") {
             setNewValue(
               currentValue.substring(0, expPos + 1) + "-" + currentValue.substring(expPos + 1),
-              currentPos + 1
+              currentPos + 1,
             );
           }
         }
@@ -279,7 +279,7 @@ export const NumberBox = ({
         handleDecStep();
       }
     },
-    [handleIncStep, handleDecStep]
+    [handleIncStep, handleDecStep],
   );
 
   // --- Manage obtaining and losing focus & blur
@@ -578,11 +578,24 @@ export interface NumberBoxComponentDef extends ComponentDef<"NumberBox"> {
   };
 }
 
-const metadata: ComponentDescriptor<NumberBoxComponentDef> = {
+export const NumberBoxMd: ComponentDescriptor<NumberBoxComponentDef> = {
   displayName: "NumberBox",
   description: "Represents an input component for numeric data entry",
   props: {
-    ...inputComponentPropertyDescriptors,
+    placeholder: desc("Placeholder text to sign the input is empty"),
+    initialValue: desc("The initial value to display"),
+    labelId: desc("ID of the label attached to this input"),
+    maxLength: desc("The maximum length of the input text"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    allowCopy: desc("Allow copying the component value to the clipboard?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
+    startText: desc("Text rendered at the start of the input"),
+    startIcon: desc("Icon rendered at the start of the input"),
+    endText: desc("Text rendered at the end of the input"),
+    endIcon: desc("Icon rendered at the end of the input"),
     hasSpinBox: desc("Indicates if the component displays a spin box"),
     step: desc("Number of increment and decrement steps used with the spin box"),
     integersOnly: desc("Indicates if the component accepts only integer numbers"),
@@ -626,5 +639,5 @@ export const numberBoxComponentRenderer = createComponentRenderer<NumberBoxCompo
       />
     );
   },
-  metadata
+  NumberBoxMd,
 );

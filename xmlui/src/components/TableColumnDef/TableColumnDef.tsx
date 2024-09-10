@@ -4,6 +4,8 @@ import { OurColumnMetadata, useTableContext } from "@components/TableColumnDef/T
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo } from "react";
 import { MemoizedItem } from "@components/container-helpers";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
+import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { desc } from "@components-core/descriptorHelper";
 
 type TableColumnProps = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];
@@ -18,7 +20,7 @@ function TableColumnDef({ nodeChildren, renderChild, index, ...columnMetadata }:
     (row: any) => {
       return <MemoizedItem node={nodeChildren!} item={row} renderChild={renderChild} />;
     },
-    [nodeChildren, renderChild]
+    [nodeChildren, renderChild],
   );
 
   const safeCellRenderer = useMemo(() => {
@@ -46,11 +48,11 @@ function TableColumnDef({ nodeChildren, renderChild, index, ...columnMetadata }:
 // XMLUI TableColumnDef component definition
 
 /**
- * The \`TableColumnDef\` component can be used within a \`Table\` to define a particular table column's 
+ * The \`TableColumnDef\` component can be used within a \`Table\` to define a particular table column's
  * visual properties and data bindings.
  */
 export interface TableColumnDefComponentDef extends ComponentDef<"TableColumnDef"> {
-  props:{
+  props: {
     /** @descriptionRef */
     bindTo?: string;
     /** @descriptionRef */
@@ -72,13 +74,28 @@ export interface TableColumnDefComponentDef extends ComponentDef<"TableColumnDef
     /** @descriptionRef */
     pinTo?: string;
     /**
-     * This property indicates whether the user can resize the column. If set to \`true\`, the column can 
-     * be resized by dragging the column border. If set to \`false\`, the column cannot be resized. 
+     * This property indicates whether the user can resize the column. If set to \`true\`, the column can
+     * be resized by dragging the column border. If set to \`false\`, the column cannot be resized.
      * Double-clicking the column border resets to the original size.
      */
     canResize?: boolean;
   };
 }
+
+export const TableColumnDefMd: ComponentDescriptor<TableColumnDefComponentDef> = {
+  displayName: "TableColumnDef",
+  description: "Table column definition",
+  props: {
+    bindTo: desc("The key to bind the column to"),
+    header: desc("The header of the column"),
+    width: desc("The width of the column"),
+    minWidth: desc("The minimum width of the column"),
+    maxWidth: desc("The maximum width of the column"),
+    canSort: desc("Indicates whether the column can be sorted"),
+    pinTo: desc("Indicates whether the column is pinned"),
+    canResize: desc("Indicates whether the column can be resized"),
+  },
+};
 
 export const tableColumnDefComponentRenderer = createComponentRenderer<TableColumnDefComponentDef>(
   "TableColumnDef",
@@ -100,5 +117,6 @@ export const tableColumnDefComponentRenderer = createComponentRenderer<TableColu
         index={childIndex || 0}
       />
     );
-  }
+  },
+  TableColumnDefMd,
 );

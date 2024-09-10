@@ -13,6 +13,7 @@ import { createPortal } from "react-dom";
 import { getAppLayoutOrientation } from "@components/App/App";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { nestedComp } from "@components-core/descriptorHelper";
 
 interface INavPanelContext {
   inDrawer: boolean;
@@ -150,20 +151,21 @@ const NavPanel = forwardRef(function NavPanel(
  */
 export interface NavPanelComponentDef extends ComponentDef<"NavPanel"> {
   props: {
-    /** @descriptionRef */
+    /** 
+     * This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
+     * @descriptionRef 
+     */
     logoTemplate?: string;
   };
 }
 
-const metadata: ComponentDescriptor<NavPanelComponentDef> = {
+export const NavPanelMd: ComponentDescriptor<NavPanelComponentDef> = {
   displayName: "NavPanel",
   description: "Display an avatar associated with an entity",
   props: {
-    logoTemplate: {
-      description:
-        "Optional logo template for the navigation panel. " + "It may be different than the one used for the app",
-      valueType: "ComponentDef",
-    },
+    logoTemplate: nestedComp(
+      "Optional logo template for the navigation panel. It may be different than the one used for the app",
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -195,5 +197,5 @@ export const navPanelRenderer = createComponentRenderer<NavPanelComponentDef>(
       </NavPanel>
     );
   },
-  metadata,
+  NavPanelMd,
 );

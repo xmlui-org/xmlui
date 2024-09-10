@@ -219,7 +219,7 @@ export interface NavGroupComponentDef extends ComponentDef<"NavGroup"> {
   };
 }
 
-const metadata: ComponentDescriptor<NavGroupComponentDef> = {
+export const NavGroupMd: ComponentDescriptor<NavGroupComponentDef> = {
   displayName: "NavGroup",
   description: "Groups related navigation components",
   props: {
@@ -249,5 +249,5 @@ export const navGroupComponentRenderer = createComponentRenderer<NavGroupCompone
       />
     );
   },
-  metadata
+  NavGroupMd
 );

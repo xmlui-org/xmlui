@@ -145,7 +145,7 @@ export interface PagesComponentDef extends ComponentDef<"Pages"> {
   };
 }
 
-const PagesMetadata: ComponentDescriptor<PagesComponentDef> = {
+export const PagesMd: ComponentDescriptor<PagesComponentDef> = {
   displayName: "Pages",
   description: "A node grouping routes with their contents",
   props: {
@@ -158,5 +158,5 @@ export const pagesRenderer = createComponentRenderer<PagesComponentDef>(
   ({ node, extractValue, renderChild }) => {
     return <Pages defaultRoute={extractValue(node.props.defaultRoute)}>{renderChild(node.children)}</Pages>;
   },
-  PagesMetadata
+  PagesMd
 );

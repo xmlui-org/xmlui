@@ -483,11 +483,22 @@ const defaultOptionRenderer = {
   },
 };
 
-const metadata: ComponentDescriptor<MultiComboboxComponentDef> = {
+export const MultiComboboxMd: ComponentDescriptor<MultiComboboxComponentDef> = {
   displayName: "MultiCombobox",
   description: "A multi combobox component",
   props: {
-    ...inputComponentPropertyDescriptors,
+    placeholder: desc("Placeholder text to sign the input is empty"),
+    initialValue: desc("The initial value to display"),
+    labelId: desc("ID of the label attached to this input"),
+    autoFocus: desc("Should the component be automatically focused?"),
+    required: desc("Is the component value required (use for indication)?"),
+    readOnly: desc("Is the component read-only?"),
+    enabled: desc("Is the component enabled?"),
+    validationStatus: desc("The validation status of the component"),
+    startText: desc("Text rendered at the start of the input"),
+    startIcon: desc("Icon rendered at the start of the input"),
+    endText: desc("Text rendered at the end of the input"),
+    endIcon: desc("Icon rendered at the end of the input"),
     options: desc("List of options to display"),
     optionTemplate: desc("Template to render each option"),
     emptyListTemplate: desc("Template to render when the list is empty"),
@@ -548,5 +559,5 @@ export const multiComboboxComponentRenderer = createComponentRenderer<MultiCombo
       </MultiCombobox>
     );
   },
-  metadata,
+  MultiComboboxMd,
 );

@@ -79,7 +79,7 @@ export interface SwitchComponentDef extends ComponentDef<"Switch"> {
   };
 }
 
-const metadata: ComponentDescriptor<SwitchComponentDef> = {
+export const SwitchMd: ComponentDescriptor<SwitchComponentDef> = {
   displayName: "Switch",
   description: "Display a switch that represents a true or false value",
   props: {
@@ -136,5 +136,5 @@ export const switchComponentRenderer = createComponentRenderer<SwitchComponentDe
       />
     );
   },
-  metadata
+  SwitchMd
 );

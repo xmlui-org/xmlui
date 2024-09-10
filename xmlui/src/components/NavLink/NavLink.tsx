@@ -4,7 +4,7 @@ import { forwardRef, useContext, useMemo } from "react";
 import styles from "./NavLink.module.scss";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import classnames from "@components-core/utils/classnames";
-import type { CommonLinkProps, LinkAria, LinkTarget } from "@components/abstractions";
+import type { LinkAria, LinkTarget } from "@components/abstractions";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { Icon } from "@components/Icon/Icon";
@@ -181,7 +181,7 @@ export interface NavLinkComponentDef extends ComponentDef<"NavLink"> {
   };
 }
 
-const metadata: ComponentDescriptor<NavLinkComponentDef> = {
+export const NavLinkMd: ComponentDescriptor<NavLinkComponentDef> = {
   displayName: "NavLink",
   description: "Represents a navigation link",
   props: {
@@ -253,5 +253,5 @@ export const navLinkComponentRenderer = createComponentRenderer<NavLinkComponent
       </NavLink>
     );
   },
-  metadata
+  NavLinkMd
 );

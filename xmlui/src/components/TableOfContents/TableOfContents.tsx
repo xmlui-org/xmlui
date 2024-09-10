@@ -63,7 +63,7 @@ export interface TableOfContentsComponentDef extends ComponentDef<"TableOfConten
   props: {};
 }
 
-const metadata: ComponentDescriptor<TableOfContentsComponentDef> = {
+export const TableOfContentsMd: ComponentDescriptor<TableOfContentsComponentDef> = {
   displayName: "TableOfContents",
   description: "Table of contents",
   props: {
@@ -116,5 +116,5 @@ export const tableOfContentsRenderer = createComponentRenderer<TableOfContentsCo
   ({}) => {
     return <TableOfContents />;
   },
-  metadata,
+  TableOfContentsMd,
 );
