@@ -18,7 +18,6 @@ $padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizon
 .nav {
   background-color: createThemeVar("color-bg-TableOfContents");
   min-width: 220px;
-  padding: 16px;
   align-self: flex-start;
   max-height: calc(100vh - 70px);
   overflow: scroll;
@@ -34,10 +33,7 @@ $padding-horizontal-TableOfContentsItem-level-6: createThemeVar("padding-horizon
   // --- Do not collapse these padding properties; they are intentionally expanded
   margin-top: createThemeVar("margin-top-TableOfContents");
   margin-bottom: createThemeVar("margin-bottom-TableOfContents");
-  padding-left: createThemeVar("padding-horizontal-TableOfContents");
-  padding-right: createThemeVar("padding-horizontal-TableOfContents");
-  padding-top: createThemeVar("padding-vertical-TableOfContents");
-  padding-bottom: createThemeVar("padding-vertical-TableOfContents");
+  padding: createThemeVar("padding-vertical-TableOfContents") createThemeVar("padding-horizontal-TableOfContents");
 
   ul {
     li {
