@@ -81,11 +81,13 @@ type TableProps = {
   headerHeight?: string | number;
   rowsSelectable?: boolean;
   enableMultiRowSelection?: boolean;
-  alwaysShowOrderingIndicators?: boolean;
   pageSizes?: number[];
   rowDisabledPredicate?: (item: any) => boolean;
   sortBy?: string;
   sortingDirection?: SortingDirection;
+  iconSortAsc?: string;
+  iconSortDesc?: string;
+  iconNoSort?: string;
   sortingDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
   style?: CSSProperties;
@@ -136,11 +138,13 @@ export const Table = forwardRef(({
   headerHeight,
   rowsSelectable = false,
   enableMultiRowSelection = true,
-  alwaysShowOrderingIndicators = true,
   pageSizes = DEFAULT_PAGE_SIZES,
   rowDisabledPredicate = defaultIsRowDisabled,
   sortBy,
   sortingDirection = "ascending",
+  iconSortAsc,
+  iconSortDesc,
+  iconNoSort,
   sortingDidChange,
   willSort,
   style,
@@ -577,10 +581,12 @@ export const Table = forwardRef(({
                           >
                             <div className={styles.headerContent} style={style}>
                               {flexRender(header.column.columnDef.header, header.getContext()) as ReactNode}
-                              <span style={{ display: "inline-flex", minWidth: 12 }}>
+                              <span style={{ display: "inline-flex", maxWidth: 16 }}>
                                 {header.column.columnDef.enableSorting &&
                                   <ColumnOrderingIndicator
-                                    alwaysShow={alwaysShowOrderingIndicators}
+                                    iconSortAsc={iconSortAsc}
+                                    iconSortDesc={iconSortDesc}
+                                    iconNoSort={iconNoSort}
                                     direction={
                                       header.column.columnDef.meta?.accessorKey === _sortBy
                                         ? _sortingDirection
@@ -773,27 +779,24 @@ function ClickableHeader({ hasSorting, updateSorting, children }: ClickableHeade
 
 type ColumnOrderingIndicatorProps = {
   direction?: SortingDirection;
-  alwaysShow?: boolean;
+  iconSortAsc?: string;
+  iconSortDesc?: string;
+  iconNoSort?: string;
 }
 
-function ColumnOrderingIndicator({ direction, alwaysShow = true }: ColumnOrderingIndicatorProps) {
-  if (!alwaysShow) {
-    if (direction === "ascending") {
-      return <Icon name="chevronup" size={"sm"} />
-    } else if (direction === "descending") {
-      return <Icon name="chevrondown" size={"sm"} />
-    }
-    return null;
+function ColumnOrderingIndicator({
+  direction,
+  iconSortAsc = "sortasc:Table",
+  iconSortDesc = "sortdesc:Table",
+  iconNoSort = "nosort:Table",
+}: ColumnOrderingIndicatorProps) {
+  if (direction === "ascending") {
+    return <Icon name={iconSortAsc} fallback="sortasc" size="12" /> //sortasc
+  } else if (direction === "descending") {
+    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" /> //sortdesc
   }
-  return (
-    <div style={{ display: "flex", flexDirection: "column" }}>
-      <Icon name="chevronup" size={"sm"} opacity={direction === "ascending" ? "100%" : "40%"} />
-      <Icon name="chevrondown" size={"sm"} opacity={direction === "descending" ? "100%" : "40%"} />
-    </div>
-  )
+  return <Icon name={iconNoSort} fallback="nosort" size="12" />; //nosort
 }
-
-// arrowup:Table (theme resource) -> arrowup:Table (built-in) -> arrowup (theme resource) -> arrowup (built-in) -> fallback (no icon?)
 
 // =====================================================================================================================
 // XMLUI Table component definition
@@ -842,12 +845,12 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
     autoFocus?: boolean;
     /** @descriptionRef */
     hideHeader?: boolean;
-    /**
-     * This property controls whether to show ordering indicators in column headers (\`true\`) or not (\`false\`).
-     * The default value is \`false\`.
-     * @descriptionRef
-     */
-    alwaysShowOrderingIndicators?: boolean;
+    /** @descriptionRef */
+    iconSortAsc?: string;
+    /** @descriptionRef */
+    iconSortDesc?: string;
+    /** @descriptionRef */
+    iconNoSort?: string;
   };
   events: {
     /** @descriptionRef */
@@ -876,7 +879,6 @@ export const TableMd: ComponentDescriptor<TableComponentDef> = {
     sortDirection: desc("The sorting direction (ascending/descending)"),
     autoFocus: desc("Should the table have the focus automatically?"),
     hideHeader: desc("Should the header be hidden?"),
-    alwaysShowOrderingIndicators: desc("Show ordering indicators in column headers or not"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -951,6 +953,9 @@ export const tableComponentRenderer = createComponentRenderer<TableComponentDef>
         rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
         sortBy={extractValue(node.props?.sortBy)}
         sortingDirection={extractValue(node.props?.sortDirection)}
+        iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+        iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+        iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
         sortingDidChange={lookupEventHandler("sortingDidChange")}
         willSort={lookupEventHandler("willSort")}
         style={layoutCss}
@@ -958,7 +963,6 @@ export const tableComponentRenderer = createComponentRenderer<TableComponentDef>
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
         enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
-        alwaysShowOrderingIndicators={extractValue.asOptionalBoolean(node.props.alwaysShowOrderingIndicators)}
       >
         {renderChild(node.children)}
       </Table>
