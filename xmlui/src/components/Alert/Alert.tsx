@@ -20,6 +20,7 @@ export interface AlertComponentDef extends ComponentDef<"Alert"> {
      * @defaultValue "success"
      */
     statusColor?: "primary" | "secondary" | "success" | "danger" | "warning" | "info" | "light" | "dark";
+    // status?: "success" | "danger" | "warning" | "info"
     /**
      * This property's \`true\` value indicates if this alert is dismissable by the user. When the user closes the 
      * alert, it gets hidden.
@@ -40,6 +41,9 @@ export interface AlertComponentDef extends ComponentDef<"Alert"> {
     /**
      * This property sets the icon to be displayed in the alert. If this property is not defined, the icon 
      * is selected according to the \`statusColor\` value; otherwise, the specified icon is used.
+     * 
+     * By default, the \`status\` property determines the icon shown and the colorscheme the component uses.
+     * This default icon can be overwritten by this property.
      * @descriptionRef
      */
     icon?: string;

@@ -63,7 +63,7 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
   border: none;
   transition: color 0.2s, background-color 0.2s;
   cursor: pointer;
-  padding-inline: $padding-heading-Table;
+  padding: $padding-heading-Table;
 
   .headerContent {
     padding: 0;

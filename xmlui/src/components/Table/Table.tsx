@@ -791,11 +791,11 @@ function ColumnOrderingIndicator({
   iconNoSort = "nosort:Table",
 }: ColumnOrderingIndicatorProps) {
   if (direction === "ascending") {
-    return <Icon name={iconSortAsc} fallback="sortasc" size="12" />
+    return <Icon name={iconSortAsc} fallback="sortasc" size="12" /> //sortasc
   } else if (direction === "descending") {
-    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" />
+    return <Icon name={iconSortDesc} fallback="sortdesc" size="12" /> //sortdesc
   }
-  return <Icon name={iconNoSort} fallback="nosort" size="12" />;
+  return <Icon name={iconNoSort} fallback="nosort" size="12" />; //nosort
 }
 
 // =====================================================================================================================
@@ -845,12 +845,6 @@ export interface TableComponentDef extends ComponentDef<"Table"> {
     autoFocus?: boolean;
     /** @descriptionRef */
     hideHeader?: boolean;
-    /**
-     * This property controls whether to show ordering indicators in column headers (\`true\`) or not (\`false\`).
-     * The default value is \`false\`.
-     * @descriptionRef
-     */
-    alwaysShowOrderingIndicators?: boolean;
     /** @descriptionRef */
     iconSortAsc?: string;
     /** @descriptionRef */
@@ -885,7 +879,6 @@ export const TableMd: ComponentDescriptor<TableComponentDef> = {
     sortDirection: desc("The sorting direction (ascending/descending)"),
     autoFocus: desc("Should the table have the focus automatically?"),
     hideHeader: desc("Should the header be hidden?"),
-    alwaysShowOrderingIndicators: desc("Show ordering indicators in column headers or not"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
