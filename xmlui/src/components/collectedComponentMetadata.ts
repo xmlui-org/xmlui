@@ -66,8 +66,9 @@ import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
 import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
+import { ComponentMetadata } from "@abstractions/ComponentDefs";
 
-export const collectedComponentMetadata: Record<string, ComponentDescriptor<any>> = {
+export const collectedComponentMetadata: Record<string, ComponentMetadata | ComponentDescriptor<any>> = {
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,

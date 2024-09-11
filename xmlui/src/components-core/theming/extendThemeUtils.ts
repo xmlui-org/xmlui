@@ -1,9 +1,8 @@
 import { cloneDeep } from "lodash-es";
 
 import type { ThemeDefinition, ThemeDefinitionDetails, ThemeTone } from "@components-core/theming/abstractions";
-import type { DefaultThemeVars } from "@components/ViewComponentRegistryContext";
-
 import { RootThemeDefinition } from "@components-core/theming/themes/root";
+import { DefaultThemeVars } from "@abstractions/ThemingDefs";
 
 function collectExtends(cTheme: ThemeDefinition | undefined, allThemes: Array<ThemeDefinition>) {
   if (!cTheme) {
@@ -28,7 +27,7 @@ function collectExtends(cTheme: ThemeDefinition | undefined, allThemes: Array<Th
 export function collectThemeChainByExtends(
   customTheme: ThemeDefinition,
   allThemes: Array<ThemeDefinition>,
-  componentDefaultThemeVars: DefaultThemeVars
+  componentDefaultThemeVars: DefaultThemeVars,
 ) {
   const rootThemeVars: Record<string, string> = cloneDeep(RootThemeDefinition.themeVars) || {};
   const rootTones: Record<string | ThemeTone, ThemeDefinitionDetails> = cloneDeep(RootThemeDefinition.tones) || {};

@@ -1,5 +1,5 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { DefaultThemeVars } from "@components/ViewComponentRegistryContext";
+import { DefaultThemeVars } from "./ThemingDefs";
 
 // Describes the metadata of a particular component
 export type ComponentDescriptor<T extends ComponentDef> = {
@@ -70,11 +70,7 @@ export type EventDescriptorHash<T extends ComponentDef> = Partial<
   Record<keyof NonNullable<T["events"]>, ComponentPropertyDescriptor>
 >;
 
-export type PropertyValueType =
-  | "boolean"
-  | "string"
-  | "number"
-  | "ComponentDef";
+export type PropertyValueType = "boolean" | "string" | "number" | "ComponentDef";
 
 // The properties constituting a component's layout
 export type LayoutProps = {
@@ -162,3 +158,6 @@ export type LayoutProps = {
   // --- Other
   cursor?: string;
 };
+
+// =====================================================================================================================
+// New component metadata types

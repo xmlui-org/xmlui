@@ -1,4 +1,4 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentDefNew, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { ComponentRendererFn, ComponentRendererDef } from "@abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
@@ -21,6 +21,26 @@ export function createComponentRenderer<T extends ComponentDef>(
     metadata: hints,
   };
 }
+
+/**
+ * This helper function creates a component renderer definition from its arguments.
+ * @param type The unique identifier of the component definition
+ * @param renderer The function that renders the component definition into a React node
+ * @param metadata Optional hints to help fix the rendering errors coming from invalid component property definitions
+ * @returns The view renderer definition composed of the arguments
+ */
+export function createComponentRendererNew<TMd extends ComponentMetadata>(
+  type: string,
+  metadata: TMd,
+  renderer: ComponentRendererFn<ComponentDefNew<TMd>>
+): ComponentRendererDef {
+  return {
+    type,
+    renderer,
+    metadata,
+  };
+}
+
 
 /**
  * Create a non-visual component used for encapsulating property values

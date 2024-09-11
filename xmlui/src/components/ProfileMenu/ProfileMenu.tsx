@@ -1,5 +1,5 @@
 import styles from "./ProfileMenu.module.scss";
-import { Avatar } from "@components/Avatar/Avatar";
+import { Avatar } from "@components/Avatar/AvatarNative";
 import { useThemes } from "@components-core/theming/ThemeContext";
 import { DropdownMenu, MenuItem, MenuSeparator } from "@components/DropdownMenu/DropdownMenu";
 

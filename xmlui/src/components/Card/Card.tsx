@@ -7,7 +7,7 @@ import { forwardRef } from "react";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
-import { Avatar } from "@components/Avatar/Avatar";
+import { Avatar } from "@components/Avatar/AvatarNative";
 import { LocalLink } from "@components/Link/Link";
 import type { HeadingProps } from "@components/Heading/Heading";
 import { Heading } from "@components/Heading/Heading";
