@@ -33,7 +33,7 @@ import { stickyBoxComponentRenderer } from "@components/StickyBox/StickyBox";
 import { badgeComponentRenderer } from "@components/Badge/Badge";
 import { avatarComponentRenderer } from "@components/Avatar/Avatar";
 import { contentSeparatorComponentRenderer } from "@components/ContentSeparator/ContentSeparator";
-import { cardComponentRenderer, marginlessCardComponentRenderer } from "@components/Card/Card";
+import { cardComponentRenderer } from "@components/Card/Card";
 import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
 import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "@components/NoResult/NoResult";
@@ -341,7 +341,6 @@ export class ComponentRegistry {
     this.registerCompoundComponentRenderer(pageHeaderRenderer);
     this.registerCompoundComponentRenderer(trendLabelRenderer);
     this.registerCompoundComponentRenderer(iconInfoCardRenderer);
-    this.registerComponentRenderer(marginlessCardComponentRenderer);
     this.registerCompoundComponentRenderer(tableHeaderRenderer);
     this.registerCompoundComponentRenderer(toolbarRenderer);
     this.registerCompoundComponentRenderer(toolbarButtonRenderer);

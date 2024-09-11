@@ -6,11 +6,13 @@
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
-    "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui && npm run build:xmlui-standalone",
+    "build:xmlui-metadata": "vite build --mode metadata",
+    "build": "rimraf dist && tsc && npm run build:bin && npm run build:xmlui-metadata && npm run build:xmlui && npm run build:xmlui-standalone",
     "test": "vitest run",
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
-    "get-metadata": "node scripts/get-meta.js"
+    "get-metadata": "node scripts/get-meta.js",
+    "prepare-docs-data": "npm run build:xmlui-metadata && node scripts/buildDocs.mjs"
   },
   "dependencies": {
     "@azure/msal-browser": "2.30.0",

@@ -13,7 +13,7 @@ import type {
 import { flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } from "@tanstack/react-table";
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { Spinner } from "@components/Spinner/Spinner";
 import classnames from "@components-core/utils/classnames";
 import useRowSelection from "./useRowSelection";

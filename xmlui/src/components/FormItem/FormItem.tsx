@@ -17,7 +17,7 @@ import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { HelperText } from "@components/FormItem/HelperText";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { parseSeverity, useValidation, useValidationDisplay } from "./Validations";
-import { Combobox } from "@components/Combobox/Combobox";
+import { Combobox } from "@components/Combobox/ComboboxNative";
 import { MultiCombobox } from "@components/MultiCombobox/MultiCombobox";
 import { fieldChanged, fieldFocused, fieldInitialized, fieldLostFocus } from "@components/Form/formActions";
 import { TextArea } from "@components/TextArea/TextArea";

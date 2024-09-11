@@ -2,9 +2,12 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./Badge.module.scss";
 
 const badgeVariantValues = ["badge", "pill"] as const;
-type BadgeVariant = (typeof badgeVariantValues)[number];
-
+export type BadgeVariant = (typeof badgeVariantValues)[number];
 export const badgeVariantNames: string[] = [...badgeVariantValues];
+export type BadgeColors = {
+  label: string;
+  background: string;
+};
 
 type Props = {
   value: string;
@@ -28,9 +31,3 @@ export const Badge = ({ value, color, variant = "badge" }: Props) => {
     </div>
   );
 };
-
-type BadgeColors = {
-  label: string;
-  background: string;
-};
-
