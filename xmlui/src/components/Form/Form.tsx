@@ -123,11 +123,11 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.SUBMITTING: {
-      state.isSubmitting = true;
+      state.submitInProgress = true;
       break;
     }
     case FormActionKind.SUBMITTED: {
-      state.isSubmitting = false;
+      state.submitInProgress = false;
       state.generalValidationResults = [];
       state.interactionFlags = {};
       Object.keys(state.validationResults).forEach((key) => {
@@ -165,7 +165,7 @@ interface FormState {
   validationResults: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
-  isSubmitting?: boolean;
+  submitInProgress?: boolean;
 }
 
 const initialState: FormState = {
@@ -173,7 +173,7 @@ const initialState: FormState = {
   validationResults: {},
   generalValidationResults: [],
   interactionFlags: {},
-  isSubmitting: false,
+  submitInProgress: false,
 };
 
 type Props = {
@@ -320,11 +320,11 @@ const Form = forwardRef(function (
   );
   const submitButton = useMemo(
     () => (
-      <Button key="submit" type={"submit"} disabled={formState.isSubmitting}>
+      <Button key="submit" type={"submit"} disabled={formState.submitInProgress}>
         {saveLabel}
       </Button>
     ),
-    [formState.isSubmitting, saveLabel],
+    [formState.submitInProgress, saveLabel],
   );
 
   useEffect(() => {
