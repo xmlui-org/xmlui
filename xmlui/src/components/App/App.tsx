@@ -1,8 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { AppLayoutType } from "./AppLayoutContext";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
@@ -10,18 +6,20 @@ import classnames from "@components-core/utils/classnames";
 
 import styles from "./App.module.scss";
 
-import { AppLayoutContext, appLayouts } from "./AppLayoutContext";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import {AppLayoutType, useAppLayoutContext} from "./AppLayoutContext";
+import { AppLayoutContext } from "./AppLayoutContext";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+
 import { createComponentRenderer } from "@components-core/renderers";
 import { useAppContext } from "@components-core/AppContext";
 import { Sheet, SheetContent } from "@components/App/Sheet";
 import { ScrollContext } from "@components-core/ScrollContext";
-import { desc, nestedComp } from "@components-core/descriptorHelper";
+import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { AppHeader } from "@components/AppHeader/AppHeader";
+import {AppContextAwareAppHeader, AppHeader} from "@components/AppHeader/AppHeader";
 import { useResizeObserver } from "@components-core/utils/hooks";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { boolean } from "yargs";
-import { JSX } from "react/jsx-runtime";
 
 type Props = {
   children: ReactNode;
@@ -31,44 +29,25 @@ type Props = {
   style: CSSProperties;
   layout?: AppLayoutType;
   loggedInUser?: any;
-  scrollWholePage: boolean;
+  scrollWholePage?: boolean;
   onReady?: () => void;
 };
 
 function App({
   children,
   style,
-  layout,
-  loggedInUser,
   logoContent,
-  scrollWholePage,
+  scrollWholePage = true,
   onReady = noop,
   header,
   footer,
 }: Props) {
-  const { getThemeVar } = useTheme();
-  const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const safeLayout = layoutWithDefaultValue?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
-  const { setLoggedInUser, mediaSize } = useAppContext();
-  const [registeredHeaders, setRegisteredHeaders] = useState<Record<string, boolean>>({});
-  const [registeredNavPanels, setRegisteredNavPanels] = useState<Record<string, boolean>>({});
-  const hasRegisteredHeader = Object.keys(registeredHeaders).length > 0 || header !== undefined;
-  const hasRegisteredFooter = Object.keys(registeredHeaders).length > 0 || footer !== undefined;
-  const hasRegisteredNavPanel = Object.keys(registeredNavPanels).length > 0;
-
-  useEffect(() => {
-    setLoggedInUser(loggedInUser);
-  }, [loggedInUser, setLoggedInUser]);
+  const { mediaSize } = useAppContext();
 
   useEffect(() => {
     onReady();
   }, [onReady]);
 
-  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer 
-  // --- button. The exception is the condensed layout because we render a header in that case (otherwise, 
-  // --- we couldn't show the NavPanel)
-  const navPanelVisible =
-    mediaSize.largeScreen || (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
 
   const scrollPageContainerRef = useRef(null);
   const noScrollPageContainerRef = useRef(null);
@@ -77,26 +56,23 @@ function App({
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  const [navPanelRoot, setNavPanelRoot] = useState<HTMLElement | null>(null);
-  const [drawerRoot, setDrawerRoot] = useState<HTMLDivElement | null>(null);
-  const [headerRoot, setHeaderRoot] = useState<HTMLDivElement | null>(null);
-  const [footerRoot, setFooterRoot] = useState<HTMLDivElement | null>(null);
+  const {setFooterRoot, layout, setHeaderRoot, navPanelVisible, setDrawerVisible, setNavPanelRoot, hasRegisteredNavPanel, hasRegisteredHeader, toggleDrawer, drawerVisible, setDrawerRoot} = useAppLayoutContext();
 
   const footerRef = useRef<HTMLDivElement | null>();
   const footerRefCallback = useCallback((element: HTMLDivElement | null) => {
     footerRef.current = element;
     setFooterRoot(element);
-  }, []);
+  }, [setFooterRoot]);
 
   const headerRef = useRef<HTMLDivElement | null>();
   const headerRefCallback = useCallback(
     (element: HTMLDivElement | null) => {
       headerRef.current = element;
-      if (safeLayout !== "horizontal" && safeLayout !== "horizontal-sticky") {
+      if (layout !== "horizontal" && layout !== "horizontal-sticky") {
         setHeaderRoot(element);
       }
     },
-    [safeLayout],
+    [layout],
   );
 
   useResizeObserver(
@@ -121,91 +97,8 @@ function App({
     };
   }, [footerHeight, headerHeight, scrollWholePage, style]);
 
-  const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
 
-  const toggleDrawer = useCallback(() => {
-    setDrawerVisible((prev) => !prev);
-  }, []);
-
-  const layoutContextValue = useMemo(() => {
-    return {
-      registerHeader: (id: string) => {
-        setRegisteredHeaders((prev) => {
-          if (prev[id]) {
-            return prev;
-          }
-          return {
-            ...prev,
-            [id]: true,
-          };
-        });
-      },
-      unregisterHeader: (id: string) => {
-        setRegisteredHeaders((prev) => {
-          if (!prev[id]) {
-            return prev;
-          }
-          const ret = { ...prev };
-          delete ret[id];
-          return ret;
-        });
-      },
-      registerNavPanel: (id: string) => {
-        setRegisteredNavPanels((prev) => {
-          if (prev[id]) {
-            return prev;
-          }
-          return {
-            ...prev,
-            [id]: true,
-          };
-        });
-      },
-      unregisterNavPanel: (id: string) => {
-        setRegisteredNavPanels((prev) => {
-          if (!prev[id]) {
-            return prev;
-          }
-          const ret = { ...prev };
-          delete ret[id];
-          return ret;
-        });
-      },
-      navPanelRoot,
-      drawerRoot,
-      headerRoot,
-      footerRoot,
-      navPanelVisible,
-      drawerVisible,
-      hasRegisteredHeader,
-      hasRegisteredNavPanel,
-      hasRegisteredFooter,
-      layout: safeLayout,
-      setNavPanelRoot: (el: HTMLElement | null) => {
-        setNavPanelRoot(el);
-      },
-      showDrawer: () => {
-        setDrawerVisible(true);
-      },
-      hideDrawer: () => {
-        setDrawerVisible(false);
-      },
-      toggleDrawer: toggleDrawer,
-    };
-  }, [
-    navPanelRoot,
-    drawerRoot,
-    headerRoot,
-    footerRoot,
-    navPanelVisible,
-    drawerVisible,
-    hasRegisteredHeader,
-    hasRegisteredNavPanel,
-    hasRegisteredFooter,
-    safeLayout,
-    toggleDrawer,
-  ]);
 
   useEffect(() => {
     if (navPanelVisible) {
@@ -215,7 +108,7 @@ function App({
 
   useEffect(() => {
     setDrawerVisible(false);
-  }, [location, safeLayout]);
+  }, [location, layout]);
 
   const wrapperBaseClasses = [
     styles.wrapper,
@@ -229,8 +122,8 @@ function App({
     },
   ];
 
-  let content: string | number | boolean | Iterable<ReactNode> | JSX.Element;
-  switch (safeLayout) {
+  let content;
+  switch (layout) {
     case "vertical":
       content = (
         <div className={classnames(wrapperBaseClasses, styles.vertical)} style={styleWithHelpers}>
@@ -302,14 +195,14 @@ function App({
       content = (
         <div
           className={classnames(wrapperBaseClasses, styles.horizontal, {
-            [styles.sticky]: safeLayout === "condensed-sticky",
+            [styles.sticky]: layout === "condensed-sticky",
           })}
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
         >
           <header
             className={classnames("app-layout-condensed", styles.headerWrapper, {
-              [styles.sticky]: safeLayout === "condensed-sticky",
+              [styles.sticky]: layout === "condensed-sticky",
             })}
             ref={headerRefCallback}
           >
@@ -382,16 +275,16 @@ function App({
       );
       break;
     default:
-      throw new Error("layout type not supported: " + safeLayout);
+      throw new Error("layout type not supported: " + layout);
   }
 
   return (
-    <AppLayoutContext.Provider value={layoutContextValue}>
+      <>
       <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
         <SheetContent side={"left"} ref={setDrawerRoot} />
       </Sheet>
       {content}
-    </AppLayoutContext.Provider>
+      </>
   );
 }
 
@@ -434,18 +327,18 @@ export interface AppComponentDef extends ComponentDef<"App"> {
   };
 }
 
-export const AppMd: ComponentDescriptor<AppComponentDef> = {
+const metadata: ComponentDescriptor<AppComponentDef> = {
   displayName: "App",
-  description: "The App component provides a UI frame for XMLUI apps.",
+  description: "Display an app",
   props: {
-    layout: {
-      description: "The layout of the app",
-      availableValues: appLayouts,
-    },
-    defaultRoute: desc("The app's default route", "string"),
+    layout: desc("The layout type of the app"),
+    defaultRoute: desc("The app's default route"),
     loggedInUser: desc("Optional information about the logged-in user"),
-    logoTemplate: nestedComp("Optional template of the app logo"),
-    scrollWholePage: desc("Whether the whole page should scroll or just the content area", "boolean", true),
+    logoTemplate: {
+      description: "Optional template of the app logo",
+      valueType: "ComponentDef",
+    },
+    scrollWholePage: desc("Whether the whole page should scroll or just the content area"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -461,6 +354,145 @@ export const AppMd: ComponentDescriptor<AppComponentDef> = {
     },
   },
 };
+
+function AppLayoutRoot({
+                         children,
+                         style,
+                         layout,
+                         loggedInUser,
+                         logoContent,
+                         scrollWholePage = true,
+                         onReady = noop,
+                         headers,
+    footers,
+    renderChild
+                       }: Props){
+  const { getThemeVar } = useTheme();
+  const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
+  const safeLayout = layoutWithDefaultValue?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+
+  //we don't hide the nav panel if there's no header,
+  // because in that case we don't have a show drawer button
+  // the exception is the condensed layout, because we render a header in that case (otherwise we couldn't show the navPanel)
+  const { setLoggedInUser, mediaSize } = useAppContext();
+
+  useEffect(() => {
+    setLoggedInUser(loggedInUser);
+  }, [loggedInUser, setLoggedInUser]);
+
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [navPanelRoot, setNavPanelRoot] = useState<HTMLElement | null>(null);
+  const [drawerRoot, setDrawerRoot] = useState<HTMLDivElement | null>(null);
+  const [headerRoot, setHeaderRoot] = useState<HTMLDivElement | null>(null);
+  const [footerRoot, setFooterRoot] = useState<HTMLDivElement | null>(null);
+
+  const [registeredHeaders, setRegisteredHeaders] = useState<Record<string, boolean>>({});
+  const [registeredNavPanels, setRegisteredNavPanels] = useState<Record<string, boolean>>({});
+  const hasRegisteredHeader = Object.keys(registeredHeaders).length > 0 || headers !== undefined;
+  const hasRegisteredFooter = Object.keys(registeredHeaders).length > 0 || footers !== undefined;
+  const hasRegisteredNavPanel = Object.keys(registeredNavPanels).length > 0;
+
+  const navPanelVisible =
+      mediaSize.largeScreen || (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
+
+  const toggleDrawer = useCallback(() => {
+    setDrawerVisible((prev) => !prev);
+  }, []);
+
+  const layoutContextValue = useMemo(() => {
+    return {
+      registerHeader: (id: string) => {
+        setRegisteredHeaders((prev) => {
+          if (prev[id]) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [id]: true,
+          };
+        });
+      },
+      unregisterHeader: (id: string) => {
+        setRegisteredHeaders((prev) => {
+          if (!prev[id]) {
+            return prev;
+          }
+          const ret = { ...prev };
+          delete ret[id];
+          return ret;
+        });
+      },
+      registerNavPanel: (id: string) => {
+        setRegisteredNavPanels((prev) => {
+          if (prev[id]) {
+            return prev;
+          }
+          return {
+            ...prev,
+            [id]: true,
+          };
+        });
+      },
+      unregisterNavPanel: (id: string) => {
+        setRegisteredNavPanels((prev) => {
+          if (!prev[id]) {
+            return prev;
+          }
+          const ret = { ...prev };
+          delete ret[id];
+          return ret;
+        });
+      },
+      navPanelRoot,
+      setDrawerRoot,
+      drawerRoot,
+      headerRoot,
+      setHeaderRoot,
+      footerRoot,
+      setFooterRoot,
+      navPanelVisible,
+      drawerVisible,
+      hasRegisteredHeader,
+      hasRegisteredNavPanel,
+      hasRegisteredFooter,
+      layout: safeLayout,
+      setNavPanelRoot: (el: HTMLElement | null) => {
+        setNavPanelRoot(el);
+      },
+      showDrawer: () => {
+        setDrawerVisible(true);
+      },
+      hideDrawer: () => {
+        setDrawerVisible(false);
+      },
+      setDrawerVisible,
+      toggleDrawer: toggleDrawer,
+    };
+  }, [
+    navPanelRoot,
+    drawerRoot,
+    headerRoot,
+    footerRoot,
+    navPanelVisible,
+    drawerVisible,
+    hasRegisteredHeader,
+    hasRegisteredNavPanel,
+    hasRegisteredFooter,
+    safeLayout,
+    toggleDrawer,
+  ]);
+
+  return <AppLayoutContext.Provider value={layoutContextValue}>
+    <AppContextAwareAppHeader>MIERT EMPTY</AppContextAwareAppHeader>
+    <App scrollWholePage={scrollWholePage}
+         style={style}
+         // header={renderChild(headers)}
+         footer={renderChild(footers)}
+         logoContent={logoContent}
+         onReady={onReady}
+    >{children}</App>
+  </AppLayoutContext.Provider>;
+}
 
 export const appRenderer = createComponentRenderer<AppComponentDef>(
   "App",
@@ -481,19 +513,20 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
     const layoutType = extractValue(node.props.layout);
 
     return (
-      <App
-        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+      <AppLayoutRoot
+        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage)}
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
         logoContent={renderChild(node.props.logoTemplate)}
         onReady={lookupEventHandler("ready")}
-        header={renderChild(AppHeaders)}
-        footer={renderChild(Footers)}
+        headers={AppHeaders}
+        footers={Footers}
+        renderChild={renderChild}
       >
         {renderChild(restChildren)}
-      </App>
+      </AppLayoutRoot>
     );
   },
-  AppMd,
+  metadata,
 );

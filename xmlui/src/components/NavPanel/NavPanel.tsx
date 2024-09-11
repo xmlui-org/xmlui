@@ -75,6 +75,8 @@ const NavPanel = forwardRef(function NavPanel(
   const showLogo = appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
 
+  console.log(appLayoutContext);
+
   const registered = useRef(false);
   useIsomorphicLayoutEffect(() => {
     if (!appLayoutContext || registered.current) {
@@ -88,8 +90,8 @@ const NavPanel = forwardRef(function NavPanel(
     };
   }, [appLayoutContext, id]);
 
-  if (appLayoutContext) {
-    const { navPanelRoot, navPanelVisible, drawerVisible, drawerRoot } = appLayoutContext;
+  const { navPanelRoot, navPanelVisible, drawerVisible, drawerRoot } = appLayoutContext || {};
+  if (navPanelRoot) {
     return (
       <>
         {navPanelRoot &&

@@ -43,7 +43,7 @@ import { iconComponentRenderer } from "@components/Icon/Icon";
 import { itemsComponentRenderer } from "@components/Items/Items";
 import { selectionStoreComponentRenderer } from "@components/SelectionStore/SelectionStore";
 import { imageComponentRenderer } from "@components/Image/Image";
-import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
+// import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import { pageMetaTitleComponentRenderer } from "@components/PageMetaTitle/PageMetaTitle";
 import { progressBarComponentRenderer } from "@components/ProgressBar/ProgressBar";
 import {
@@ -290,9 +290,9 @@ export class ComponentRegistry {
       this.registerComponentRenderer(imageComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_Pdf !== "false") {
-      this.registerComponentRenderer(pdfComponentRenderer);
-    }
+    // if (process.env.VITE_USED_COMPONENTS_Pdf !== "false") {
+      // this.registerComponentRenderer(pdfComponentRenderer);
+    // }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
       //TODO, if it proves to be a working solution, make these components skippable, too

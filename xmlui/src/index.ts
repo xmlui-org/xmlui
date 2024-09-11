@@ -12,11 +12,11 @@ import { Button } from "@components/Button/Button";
 import { Splitter } from "@components/Splitter/Splitter";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
-import { ThemeDefinition } from "@components-core/theming/abstractions";
+import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
-import { collectedComponentMetadata } from "@components/collectedComponentMetadata"
+import type { RendererContext } from "@abstractions/RendererDefs";
 
 export type {
   ThemeDefinition,
@@ -28,6 +28,7 @@ export type {
   ApiInterceptorDefinition,
   //TODO review from here (added for playground)
   TreeNode, //TODO REMOVE
+  RendererContext,
 };
 export {
   StandaloneApp,
@@ -44,5 +45,4 @@ export {
   useColors,
   toCssVar,
   parseXmlUiMarkup,
-  collectedComponentMetadata
 };

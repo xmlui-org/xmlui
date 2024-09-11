@@ -162,12 +162,12 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The sans-serif font set
     "font-family-sans-serif":
-      "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
+      "Inter, -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
 
     // --- The monospace font set
     "font-family-monospace":
       "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
-    "font-feature-settings": "'cv03', 'cv04', 'cv11'",
+    // "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
     "media-max-width-phone": "576px",

@@ -6,7 +6,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./AppHeader.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
 import { Icon } from "@components/Icon/Icon";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -18,7 +18,6 @@ import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext"
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
-import { desc, nestedComp } from "@components-core/descriptorHelper";
 
 type Props = {
   children?: ReactNode;
@@ -94,7 +93,7 @@ export const AppHeader = ({
   );
 };
 
-function AppContextAwareAppHeader({
+export function AppContextAwareAppHeader({
   children,
   logoContent,
   profileMenu,
@@ -110,20 +109,20 @@ function AppContextAwareAppHeader({
   logoTitle?: string;
 }) {
   const appLayoutContext = useAppLayoutContext();
-  const id = useId();
+  // const id = useId();
 
-  const registered = useRef(false);
-  useIsomorphicLayoutEffect(() => {
-    if (!appLayoutContext || registered.current) {
-      return;
-    }
-    appLayoutContext.registerHeader(id);
-    registered.current = true;
-    return () => {
-      registered.current = false;
-      appLayoutContext.unregisterHeader(id);
-    };
-  }, [appLayoutContext, id]);
+  // const registered = useRef(false);
+  // useIsomorphicLayoutEffect(() => {
+  //   if (!appLayoutContext || registered.current) {
+  //     return;
+  //   }
+  //   appLayoutContext.registerHeader(id);
+  //   registered.current = true;
+  //   return () => {
+  //     registered.current = false;
+  //     appLayoutContext.unregisterHeader(id);
+  //   };
+  // }, [appLayoutContext, id]);
 
   const {
     navPanelVisible,
@@ -133,6 +132,8 @@ function AppContextAwareAppHeader({
     setNavPanelRoot,
     hasRegisteredNavPanel,
   } = appLayoutContext || {};
+
+  console.log('APP LAYOUT CONTEXT', appLayoutContext);
   const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
   const canRestrictContentWidth = layout !== "vertical-full-header";
   if (headerRoot) {
@@ -156,6 +157,7 @@ function AppContextAwareAppHeader({
     );
   }
 
+
   return (
     <AppHeader
       hasRegisteredNavPanel={hasRegisteredNavPanel}
@@ -169,7 +171,7 @@ function AppContextAwareAppHeader({
       className={className}
       logoTitle={logoTitle}
     >
-      {layout && layout.startsWith("condensed") && <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />}
+      {/*{layout?.startsWith("condensed") && <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />}*/}
       {children}
     </AppHeader>
   );
@@ -189,13 +191,18 @@ export interface AppHeaderComponentDef extends ComponentDef<"AppHeader"> {
 }
 
 // @ts-ignore
-export const AppHeaderMd: ComponentDescriptor<AppHeaderComponentDef> = {
+const metadata: ComponentDescriptor<AppHeaderComponentDef> = {
   displayName: "AppHeader",
-  description: "A placeholder within App to define a custom application header",
+  description: "Display an application header",
   props: {
-    profileMenuTemplate: nestedComp("Template for the profile menu"),
-    logoTemplate: nestedComp("Template for the application logo"),
-    logoTitle: desc("Title for the application logo"),
+    logoTemplate: {
+      description: "Template for the application logo",
+      valueType: "ComponentDef",
+    },
+    profileMenuTemplate: {
+      description: "Template for the profile menu",
+      valueType: "ComponentDef",
+    },
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -260,5 +267,5 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
       </AppContextAwareAppHeader>
     );
   },
-  AppHeaderMd,
+  metadata,
 );

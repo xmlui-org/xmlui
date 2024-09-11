@@ -41,7 +41,7 @@
     "@vitejs/plugin-react": "4.3.0",
     "adm-zip": "0.5.10",
     "apexcharts": "3.44.0",
-    "axios": "1.6.1",
+    "axios": "1.7.7",
     "color": "4.2.3",
     "date-fns": "2.30.0",
     "dexie": "3.2.4",

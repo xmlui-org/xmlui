@@ -24,6 +24,7 @@ interface IAppLayoutContext {
   drawerRoot: HTMLElement | null;
   headerRoot: HTMLElement | null;
   footerRoot: HTMLElement | null;
+  setFooterRoot: (element: HTMLElement | null) => void;
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
   setNavPanelRoot: (element: HTMLElement | null) => void;
@@ -33,7 +34,7 @@ interface IAppLayoutContext {
   unregisterNavPanel: (id: string) => void;
 }
 
-export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);
+export const AppLayoutContext = createContext<IAppLayoutContext | null>({csecs: 'mecss'});
 
 export function useAppLayoutContext() {
   return useContext(AppLayoutContext);
