@@ -36,9 +36,6 @@ type ComponentContextVarMetadata = ComponentFieldMetadata;
 type ComponentApiMetadata = ComponentFieldMetadata;
 
 type PM = ComponentPropertyMetadata;
-type PE = ComponentEventMetadata;
-type PC = ComponentContextVarMetadata;
-type PA = ComponentApiMetadata;
 
 // =====================================================================================================================
 // Experiment with types

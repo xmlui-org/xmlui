@@ -56,37 +56,6 @@ export const Avatar = forwardRef(function Avatar(
 });
 
 // =====================================================================================================================
-// XMLUI Avatar component definition
-
-type ComponentFieldMetadata = {
-  // The markdown description to explain the property in the inspector view
-  readonly description: string;
-};
-
-type ComponentPropertyMetadata = ComponentFieldMetadata & {
-  // The markdown description to explain the property in the inspector view
-  readonly description: string;
-
-  // The value type of the property
-  readonly valueType?: PropertyValueType;
-
-  // What are the available values of this property?
-  readonly availableValues?: any[];
-
-  // The default property value (if there is any)
-  defaultValue?: any;
-
-  // The function that tests if the current property value is valid
-  isValid?: IsValidFunction<any>;
-};
-
-type ComponentEventMetadata = ComponentFieldMetadata;
-
-type ComponentContextVarMetadata = ComponentFieldMetadata;
-
-type ComponentApiMetadata = ComponentFieldMetadata;
-
-// =====================================================================================================================
 // Experiment with types
 
 type AvatarComponentDef = ComponentDefNew<"Avatar", typeof AvatarMetadataNew>;
