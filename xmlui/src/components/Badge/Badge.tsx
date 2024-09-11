@@ -1,5 +1,3 @@
-import classnames from "@components-core/utils/classnames";
-
 import styles from "./Badge.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
@@ -8,44 +6,9 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { ComponentThemeColor } from "@components/abstractions";
+import { Badge, BadgeColors, BadgeVariant } from "./BadgeNative";
 
-// ====================================================================================================================
-// React Badge component implementation
-
-type Props = {
-  value: string;
-  variant?: BadgeVariant;
-  color?: string | BadgeColors;
-};
-
-const Badge = ({ value, color, variant = "badge" }: Props) => {
-  return (
-    <div
-      className={classnames({ [styles.badge]: variant === "badge", [styles.pill]: variant === "pill" })}
-      style={
-        color
-          ? typeof color === "string"
-            ? { backgroundColor: color }
-            : { backgroundColor: color.background, color: color.label }
-          : undefined
-      }
-    >
-      {value}
-    </div>
-  );
-};
-
-type BadgeColors = {
-  label: string;
-  background: string;
-};
-
-const badgeVariantValues = ["badge", "pill"] as const;
-const badgeVariantNames: string[] = [...badgeVariantValues];
-type BadgeVariant = typeof badgeVariantValues[number];
-
-// ====================================================================================================================
-// XMLUI Badge definition
+const COMP = "Badge";
 
 /**
  * The \`Badge\` is a text label that accepts a color map to define its background color and, optionally, its label color.
@@ -99,7 +62,7 @@ export interface BadgeComponentDef extends ComponentDef<"Badge"> {
   };
 }
 
-export const BadgeMd: ComponentDescriptor<BadgeComponentDef> = {
+export const BadgeMd = {
   displayName: "Badge",
   description: "A label that accepts a color map the defines its background (and optionally, its label) color",
   props: {
