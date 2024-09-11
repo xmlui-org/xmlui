@@ -8,6 +8,7 @@ export enum FormActionKind {
     FIELD_INITIALIZED = "FormActionKind:FIELD_INITIALIZED",
     TRIED_TO_SUBMIT = "FormActionKind:TRIED_TO_SUBMIT",
     BACKEND_VALIDATION_ARRIVED = "FormActionKind:BACKEND_VALIDATION_ARRIVED",
+    SUBMITTING = "FormActionKind:SUBMITTING",
     SUBMITTED = "FormActionKind:SUBMITTED",
 }
 
@@ -78,6 +79,13 @@ export function triedToSubmit() {
         payload: {},
     };
 }
+export function formSubmitting() {
+    return {
+        type: FormActionKind.SUBMITTING,
+        payload: {},
+    };
+}
+
 export function formSubmitted() {
     return {
         type: FormActionKind.SUBMITTED,
