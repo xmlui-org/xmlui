@@ -1,6 +1,4 @@
 import type { ReactNode } from "react";
-import { useId, useRef } from "react";
-import { createPortal } from "react-dom";
 import classnames from "@components-core/utils/classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -17,8 +15,8 @@ import { Button } from "@components/Button/Button";
 import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
-import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
+import { RenderChildFn } from "@abstractions/RendererDefs";
 
 type Props = {
   children?: ReactNode;
@@ -101,6 +99,7 @@ export function AppContextAwareAppHeader({
   style,
   className,
   logoTitle,
+  renderChild,
 }: {
   children?: ReactNode;
   profileMenu?: ReactNode;
@@ -108,49 +107,15 @@ export function AppContextAwareAppHeader({
   logoContent?: ReactNode;
   className?: string;
   logoTitle?: string;
+  renderChild: RenderChildFn;
 }) {
   const appLayoutContext = useAppLayoutContext();
-  const id = useId();
 
-  const registered = useRef(false);
-  useIsomorphicLayoutEffect(() => {
-    if (!appLayoutContext || registered.current) {
-      return;
-    }
-    appLayoutContext.registerHeader(id);
-    registered.current = true;
-    return () => {
-      registered.current = false;
-      appLayoutContext.unregisterHeader(id);
-    };
-  }, [appLayoutContext, id]);
-
-  const { navPanelVisible, toggleDrawer, headerRoot, layout, setNavPanelRoot, hasRegisteredNavPanel } =
-    appLayoutContext || {};
+  const { navPanelVisible, toggleDrawer, layout, hasRegisteredNavPanel, navPanelDef } = appLayoutContext || {};
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
   const canRestrictContentWidth = layout !== "vertical-full-header";
-  if (headerRoot) {
-    return createPortal(
-      <AppHeader
-        hasRegisteredNavPanel={hasRegisteredNavPanel}
-        navPanelVisible={navPanelVisible}
-        toggleDrawer={toggleDrawer}
-        canRestrictContentWidth={canRestrictContentWidth}
-        showLogo={showLogo}
-        logoContent={logoContent}
-        profileMenu={profileMenu}
-        style={style}
-        className={className}
-        logoTitle={logoTitle}
-      >
-        {layout && layout.startsWith("condensed") && <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />}
-        {children}
-      </AppHeader>,
-      headerRoot,
-    );
-  }
 
   return (
     <AppHeader
@@ -165,7 +130,7 @@ export function AppContextAwareAppHeader({
       className={className}
       logoTitle={logoTitle}
     >
-      {/*{layout?.startsWith("condensed") && <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />}*/}
+      {layout?.startsWith("condensed") && navPanelVisible && <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>}
       {children}
     </AppHeader>
   );
@@ -245,6 +210,7 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
         }
         style={layoutCss}
         className={layoutContext?.themeClassName}
+        renderChild={renderChild}
       >
         {renderChild(node.children, {
           // Since the AppHeader is a flex container, it's children should behave the same as in a stack
