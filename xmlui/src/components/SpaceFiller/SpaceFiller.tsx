@@ -3,7 +3,6 @@ import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./SpaceFiller.module.scss";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import type { AvatarComponentDef } from "@components/Avatar/Avatar";
 
 // =====================================================================================================================
 // React SpaceFiller component implementation
@@ -22,7 +21,7 @@ export const SpaceFiller = () => {
  */
 export interface SpaceFillerComponentDef extends ComponentDef<"SpaceFiller"> {}
 
-export const SpaceFillerMd: ComponentDescriptor<AvatarComponentDef> = {
+export const SpaceFillerMd: ComponentDescriptor<SpaceFillerComponentDef> = {
   displayName: "SpaceFiller",
   description: "Fills the space between two components in a Stack or FlowLayout container.",
   themeVars: parseScssVar(styles.themeVars),

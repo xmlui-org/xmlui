@@ -68,7 +68,7 @@ import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
 
-export const metadataHash: Record<string, ComponentMetadata | ComponentDescriptor<any>> = {
+export const collectedComponentMetadata: Record<string, ComponentMetadata | ComponentDescriptor<any>> = {
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,

@@ -1,11 +1,9 @@
 import React, { useContext } from "react";
-import type { ThemeTone } from "@components-core/theming/abstractions";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { ComponentRegistry } from "@components/ComponentProvider";
 import type { ComponentRendererFn } from "@abstractions/RendererDefs";
 
 
-export type DefaultThemeVars = Record<string | ThemeTone, string | Record<string, string>>;
 // A single registry entry
 export type ComponentRegistryEntry = {
   // The function that renders a component definition into a React component

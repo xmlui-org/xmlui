@@ -1,5 +1,6 @@
 import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
+import { DefaultThemeVars } from "./ThemingDefs";
 
 /**
  * XMLUI turns its markup into component definitions, simple data structures describing a component.
@@ -39,9 +40,8 @@ export interface ComponentDef<T extends string = string> extends Scriptable {
    */
   children?: ComponentDef[];
 
-
   /**
-   * Components may have slots that can be filled with other components. This property holds the 
+   * Components may have slots that can be filled with other components. This property holds the
    * contents of the slots
    */
   slots?: Record<string, ComponentDef[]>;
@@ -179,3 +179,193 @@ interface Scriptable {
    */
   scriptError?: any;
 }
+
+// =====================================================================================================================
+// New component definition types
+export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetadata>
+  extends Scriptable {
+
+  // The type discriminator field of the component; it defines the unique ID of the component type.
+  type: string;
+
+  // Unique identifier of a component-like object
+  uid?: string;
+
+  // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
+  testId?: string;
+
+  // Component properties
+  props?: Record<keyof TMd["props"], string>;
+
+  // Component events
+  events?: Record<keyof TMd["events"], string>;
+
+  /**
+   * Though components manage their state internally, the app logic may require user state management.
+   * Components may have user *variables*, which the UI logic uses to manage the application state.
+   * This property holds the variables (name and value pairs) associated with this component definition.
+   */
+  vars?: Record<string, any>;
+
+  /**
+   * Each component may have child components to constitute a hierarchy of components. This property
+   * holds the definition of these nested children.
+   */
+  children?: ComponentDefNew[];
+
+  /**
+   * Components may have slots that can be filled with other components. This property holds the
+   * contents of the slots
+   */
+  slots?: Record<string, ComponentDefNew[]>;
+
+  /**
+   * This property is evaluated to a Boolean value during run time. When this value is `true`, the
+   * component with its children chain is rendered; otherwise, the entire component hierarchy is omitted
+   * from the rendered tree.
+   */
+  when?: string | boolean;
+
+  /**
+   * Some components work with data obtained asynchronously. Fetching this data requires some state
+   * management handling the complexity (including error handling) of data access. A *loader* is
+   * responsible for managing this logic. This property holds the loaders associated with this component
+   * definition.
+   */
+  loaders?: ComponentDefNew[];
+
+  /**
+   * Components may have functions that are used to perform some logic. This property holds the functions
+   * (name and function body) associated with this component definition.
+   */
+  functions?: Record<string, any>;
+
+  /**
+   * Components may have an API that other components can use to interact with them. This property holds
+   * the API methods associated with this component definition.
+   */
+  api?: Record<keyof TMd["apis"], any>;
+
+  /**
+   * Components may provide context variables that can be used to in expressions and event handlers
+   * within the component.
+   * REVIEW: This property can be removed after migration to the new componend definition type.
+   */
+  contextVars?: Record<keyof TMd["contextVars"], string>;
+
+  /**
+   * Components managing state through variables or loaders are wrapped with containers responsible
+   * for this job. Just as components, containers form a hierarchy. While working with this hierarchy,
+   * parent components may flow state values (key and value pairs) to their child containers. This
+   * property holds the name of state values to flow down to the direct child containers.
+   */
+  uses?: string[];
+
+  /**
+   * Arbitrary debug information that can be attached to a component definition.
+   * Current usage:
+   * - `debug: { source: { start: number, end: number } }` Ther start and end positions of of the source
+   *   belonging to the particular component definition.
+   */
+  debug?: Record<string, any>;
+}
+
+export type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
+
+// A generic validation function that retrieves either a hint (the validation argument has
+// issues) or undefined (the argument is valid).
+export type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+
+export type ComponentPropertyMetadata = {
+  // The markdown description to explain the property in the inspector view
+  readonly description: string;
+
+  // The value type of the property
+  readonly valueType?: PropertyValueType;
+
+  // What are the available values of this property?
+  readonly availableValues?: any[];
+
+  // The default property value (if there is any)
+  defaultValue?: any;
+
+  // The function that tests if the current property value is valid
+  isValid?: IsValidFunction<any>;
+};
+
+export type ComponentMetadata<
+  TProps extends Record<string, ComponentPropertyMetadata> = {},
+  TEvents extends Record<string, ComponentPropertyMetadata> = {},
+  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
+  TApis extends Record<string, ComponentPropertyMetadata> = {},
+> = {
+  description?: string;
+  shortDescription?: string;
+  props: TProps;
+  events: TEvents;
+  contextVars?: TContextVars;
+  apis?: TApis;
+
+  // Indicates that a particular component does not render any visual element on its own (Default: false)
+  nonVisual?: boolean;
+
+  opaque?: boolean;
+
+  // List of theme variables available for the component
+  themeVars?: Array<string>;
+
+  // Theme variable default values for the "solid" theme
+  defaultThemeVars?: DefaultThemeVars;
+
+  // Theme variable defaults for a particular tone-specific theme
+  toneSpecificThemeVars?: Record<string, Record<string, string>>;
+
+  // Indicates that the component allows arbitrary props (not just the named ones)
+  allowArbitraryProps?: boolean;
+};
+
+export function createMetadata<
+  TProps extends Record<string, ComponentPropertyMetadata>,
+  TEvents extends Record<string, ComponentPropertyMetadata> = {},
+  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
+  TApis extends Record<string, ComponentPropertyMetadata> = {},
+>({
+  description,
+  shortDescription,
+  props,
+  events,
+  contextVars,
+  apis,
+  nonVisual,
+  opaque,
+  themeVars,
+  defaultThemeVars,
+  toneSpecificThemeVars,
+  allowArbitraryProps,
+}: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
+  return {
+    description,
+    shortDescription,
+    props,
+    events,
+    contextVars,
+    apis,
+    nonVisual,
+    opaque,
+    themeVars,
+    defaultThemeVars,
+    toneSpecificThemeVars,
+    allowArbitraryProps,
+  };
+}
+
+export function d(
+  description: string,
+  availableValues?: string[],
+  valueType?: PropertyValueType,
+  defaultValue?: any,
+  isValid?: IsValidFunction<any>,
+): ComponentPropertyMetadata {
+  return { description, availableValues, valueType, defaultValue, isValid };
+}
+
