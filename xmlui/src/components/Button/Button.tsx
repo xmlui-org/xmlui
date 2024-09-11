@@ -3,23 +3,25 @@ import React, { type CSSProperties, useEffect, useImperativeHandle, useRef } fro
 import styles from "./Button.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import {
-  alignmentOptionNames,
-  type AlignmentOptions,
-  sizeNames,
+import type {
   ButtonThemeColor,
-  buttonThemeNames,
-  type ButtonType,
-  type ComponentSize,
   ButtonVariant,
   OrientationOptions,
   ButtonAria,
   IconPosition,
 } from "@components/abstractions";
+import {
+  alignmentOptionNames,
+  type AlignmentOptions,
+  sizeNames,
+  buttonThemeNames,
+  type ButtonType,
+  type ComponentSize,
+} from "@components/abstractions";
 
 import classnames from "@components-core/utils/classnames";
 import { Icon } from "@components/Icon/Icon";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
@@ -333,7 +335,7 @@ export const ButtonMd: ComponentDescriptor<ButtonComponentDef> = {
 
 export const buttonComponentRenderer = createComponentRenderer<ButtonComponentDef>(
   "Button",
-  ({ node, extractValue, renderChild, lookupEventHandler, lookupAction, layoutCss }) => {
+  ({ node, extractValue, renderChild, lookupAction, layoutCss }) => {
     const iconName = extractValue.asString(node.props.icon);
     const label = extractValue.asDisplayText(node.props.label);
     return (

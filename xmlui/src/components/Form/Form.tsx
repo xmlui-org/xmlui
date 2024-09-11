@@ -1,6 +1,5 @@
 import type { CSSProperties, Dispatch, FormEvent, ForwardedRef, ReactNode } from "react";
-import { useEffect } from "react";
-import { forwardRef, useMemo, useReducer, useState } from "react";
+import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import styles from "./Form.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -16,14 +15,20 @@ import { ValidationSummary } from "@components/ValidationSummary/ValidationSumma
 import { useEvent } from "@components-core/utils/misc";
 import { groupInvalidValidationResultsBySeverity } from "@components/FormItem/Validations";
 import type { FormAction } from "@components/Form/formActions";
-import { backendValidationArrived, FormActionKind, formSubmitted, triedToSubmit } from "@components/Form/formActions";
+import {
+  backendValidationArrived,
+  FormActionKind,
+  formSubmitted,
+  formSubmitting,
+  triedToSubmit,
+} from "@components/Form/formActions";
 import { ModalDialog } from "@components/ModalDialog/ModalDialog";
 import { Text } from "@components/Text/Text";
 import { Stack } from "@components/Stack/Stack";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { LookupEventHandlerFn, RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";
+import type { LookupEventHandlerFn, RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";
 
 const setByPath = (obj: any, path: string, val: any) => {
   const keys = path.split(".");
@@ -117,12 +122,17 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       });
       break;
     }
+    case FormActionKind.SUBMITTING: {
+      state.isSubmitting = true;
+      break;
+    }
     case FormActionKind.SUBMITTED: {
+      state.isSubmitting = false;
       state.generalValidationResults = [];
       state.interactionFlags = {};
       Object.keys(state.validationResults).forEach((key) => {
         state.validationResults[key].validations = state.validationResults[key].validations?.filter(
-          (validation) => !validation.fromBackend
+          (validation) => !validation.fromBackend,
         );
         state.validationResults[key].isValid =
           state.validationResults[key].validations.find((val) => !val.isValid) === undefined;
@@ -133,7 +143,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
         state.validationResults[key].validations = state.validationResults[key].validations?.filter(
-          (validation) => !validation.fromBackend
+          (validation) => !validation.fromBackend,
         );
       });
       Object.entries(action.payload.fieldValidationResults).forEach(([field, singleValidationResults]) => {
@@ -155,6 +165,7 @@ interface FormState {
   validationResults: Record<string, ValidationResult>;
   generalValidationResults: Array<SingleValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
+  isSubmitting?: boolean;
 }
 
 const initialState: FormState = {
@@ -162,6 +173,7 @@ const initialState: FormState = {
   validationResults: {},
   generalValidationResults: [],
   interactionFlags: {},
+  isSubmitting: false,
 };
 
 type Props = {
@@ -207,7 +219,7 @@ const Form = forwardRef(function (
     itemLabelWidth,
     itemLabelPosition = "top",
   }: Props,
-  ref: ForwardedRef<HTMLFormElement>
+  ref: ForwardedRef<HTMLFormElement>,
 ) {
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
 
@@ -248,6 +260,7 @@ const Form = forwardRef(function (
       setConfirmSubmitModalVisible(true);
       return;
     }
+    dispatch(formSubmitting());
     try {
       await onSubmit?.(formState.subject, {
         passAsDefaultBody: true,
@@ -289,7 +302,7 @@ const Form = forwardRef(function (
         backendValidationArrived({
           generalValidationResults,
           fieldValidationResults,
-        })
+        }),
       );
     }
   });
@@ -305,10 +318,13 @@ const Form = forwardRef(function (
       {cancelLabel}
     </Button>
   );
-  const submitButton = (
-    <Button key="submit" type={"submit"}>
-      {saveLabel}
-    </Button>
+  const submitButton = useMemo(
+    () => (
+      <Button key="submit" type={"submit"} disabled={formState.isSubmitting}>
+        {saveLabel}
+      </Button>
+    ),
+    [formState.isSubmitting, saveLabel],
   );
 
   useEffect(() => {
@@ -538,5 +554,5 @@ export const formComponentRenderer = createComponentRenderer<FormComponentDef>(
       />
     );
   },
-  FormMd
+  FormMd,
 );
