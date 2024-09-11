@@ -3,10 +3,12 @@ import type { HighlighterCore } from "@shikijs/core/types";
 import styles from "./XmluiCodeHighlighter.module.scss";
 import {useTheme} from "@components-core/theming/ThemeContext";
 import classnames from "classnames";
+import { createComponentRenderer } from "@components-core/renderers";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 let highlighter: HighlighterCore | null = null;
 
-function XmluiCodeHighlighter({ value }: { value: string }) {
+export function XmluiCodeHighlighter({ value }: { value: string }) {
   const {activeThemeTone} = useTheme();
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
@@ -51,16 +53,23 @@ function XmluiCodeHighlighter({ value }: { value: string }) {
   }, [initialized, value]);
 
   return (
-      <div
-          className={classnames(styles.wrapper, {
-            [styles.dark]: activeThemeTone === "dark",
-            [styles.light]: activeThemeTone === "light"
-          })}
-          dangerouslySetInnerHTML={{
-            __html: html,
-          }}
-      />
+    <div
+      className={classnames(styles.wrapper, {
+        [styles.dark]: activeThemeTone === "dark",
+        [styles.light]: activeThemeTone === "light",
+      })}
+      dangerouslySetInnerHTML={{
+        __html: html,
+      }}
+    />
   );
 }
 
-export default XmluiCodeHighlighter;
+export interface XmluiCodeHightlighterComponentDef extends ComponentDef<"XmluiCodehighlighter"> {}
+
+export const codeComponentRenderer = createComponentRenderer<XmluiCodeHightlighterComponentDef>(
+  "XmluiCodehighlighter",
+  ({ node, renderChild }) => {
+    return <XmluiCodeHighlighter value={renderChild(node.children) as string} />;
+  },
+);

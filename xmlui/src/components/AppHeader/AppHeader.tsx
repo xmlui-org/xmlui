@@ -6,7 +6,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./AppHeader.module.scss";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
 import { Icon } from "@components/Icon/Icon";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -18,6 +18,7 @@ import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext"
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
+import { desc, nestedComp } from "@components-core/descriptorHelper";
 
 type Props = {
   children?: ReactNode;
@@ -109,31 +110,25 @@ export function AppContextAwareAppHeader({
   logoTitle?: string;
 }) {
   const appLayoutContext = useAppLayoutContext();
-  // const id = useId();
+  const id = useId();
 
-  // const registered = useRef(false);
-  // useIsomorphicLayoutEffect(() => {
-  //   if (!appLayoutContext || registered.current) {
-  //     return;
-  //   }
-  //   appLayoutContext.registerHeader(id);
-  //   registered.current = true;
-  //   return () => {
-  //     registered.current = false;
-  //     appLayoutContext.unregisterHeader(id);
-  //   };
-  // }, [appLayoutContext, id]);
+  const registered = useRef(false);
+  useIsomorphicLayoutEffect(() => {
+    if (!appLayoutContext || registered.current) {
+      return;
+    }
+    appLayoutContext.registerHeader(id);
+    registered.current = true;
+    return () => {
+      registered.current = false;
+      appLayoutContext.unregisterHeader(id);
+    };
+  }, [appLayoutContext, id]);
 
-  const {
-    navPanelVisible,
-    toggleDrawer,
-    headerRoot,
-    layout,
-    setNavPanelRoot,
-    hasRegisteredNavPanel,
-  } = appLayoutContext || {};
+  const { navPanelVisible, toggleDrawer, headerRoot, layout, setNavPanelRoot, hasRegisteredNavPanel } =
+    appLayoutContext || {};
 
-  console.log('APP LAYOUT CONTEXT', appLayoutContext);
+  // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
   const canRestrictContentWidth = layout !== "vertical-full-header";
   if (headerRoot) {
@@ -156,7 +151,6 @@ export function AppContextAwareAppHeader({
       headerRoot,
     );
   }
-
 
   return (
     <AppHeader
@@ -190,19 +184,13 @@ export interface AppHeaderComponentDef extends ComponentDef<"AppHeader"> {
   };
 }
 
-// @ts-ignore
-const metadata: ComponentDescriptor<AppHeaderComponentDef> = {
+export const AppHeaderMd: ComponentDescriptor<AppHeaderComponentDef> = {
   displayName: "AppHeader",
-  description: "Display an application header",
+  description: "A placeholder within App to define a custom application header",
   props: {
-    logoTemplate: {
-      description: "Template for the application logo",
-      valueType: "ComponentDef",
-    },
-    profileMenuTemplate: {
-      description: "Template for the profile menu",
-      valueType: "ComponentDef",
-    },
+    profileMenuTemplate: nestedComp("Template for the profile menu"),
+    logoTemplate: nestedComp("Template for the application logo"),
+    logoTitle: desc("Title for the application logo"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -267,5 +255,5 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
       </AppContextAwareAppHeader>
     );
   },
-  metadata,
+  AppHeaderMd,
 );

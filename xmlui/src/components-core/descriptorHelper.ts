@@ -1,4 +1,4 @@
-import { ComponentPropertyDescriptor, PropertyValueType } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentPropertyDescriptor, PropertyValueType } from "@abstractions/ComponentDescriptorDefs";
 
 // Creates a simple property descriptor
 export function desc(

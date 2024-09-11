@@ -102,6 +102,8 @@ export const pageRenderer = createComponentRenderer<PageComponentDef>(
 
 type PagesProps = {
   defaultRoute?: string;
+  node?: ComponentDef;
+  renderChild: RenderChildFn;
   children?: ReactNode;
 };
 
