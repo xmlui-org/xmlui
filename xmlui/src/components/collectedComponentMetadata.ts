@@ -79,7 +79,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Card: CardMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
-  // Combobox: ComboboxMd,
+  Combobox: ComboboxMd,
   // ContentSeparator: ContentSeparatorMd,
   // DatePicker: DatePickerMd,
   // DropdownMenu: DropdownMenuMd,
