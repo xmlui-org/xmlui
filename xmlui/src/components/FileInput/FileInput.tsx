@@ -5,7 +5,7 @@ import styles from "./FileInput.module.scss";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import type { ValidationStatus } from "@components/Input/input-abstractions";
 import { inputComponentEventDescriptors } from "@components/Input/input-abstractions";
 import { noop } from "@components-core/constants";

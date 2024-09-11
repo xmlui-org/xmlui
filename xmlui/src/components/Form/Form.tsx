@@ -9,7 +9,7 @@ import type { ContainerAction } from "@components-core/abstractions/containers";
 import produce from "immer";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import type { GenericBackendError } from "@components-core/EngineError";
 import { ValidationSummary } from "@components/ValidationSummary/ValidationSummary";

@@ -11,7 +11,7 @@ import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { desc } from "@components-core/descriptorHelper";
 import { Icon } from "@components/Icon/Icon";

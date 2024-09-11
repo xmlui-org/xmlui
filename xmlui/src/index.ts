@@ -8,7 +8,7 @@ import type { TreeNode } from "@components-core/abstractions/treeAbstractions";
 import { Icon } from "@components/Icon/Icon";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import { Stack } from "@components/Stack/Stack";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { Splitter } from "@components/Splitter/Splitter";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
