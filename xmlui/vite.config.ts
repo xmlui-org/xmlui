@@ -16,6 +16,7 @@ export default ({ mode }) => {
       lib = {
         entry: [path.resolve("src", "index-standalone.ts")],
         name: "xmlui-standalone",
+        formats: ["umd"],
         fileName: (format) => `xmlui-standalone.${format}.js`,
       };
       break;
@@ -31,8 +32,8 @@ export default ({ mode }) => {
     default: {
       lib = {
         entry: [path.resolve("src", "index.ts")],
-        name: "xmlui",
-        fileName: (format) => `xmlui.${format}.js`,
+          name: "xmlui",
+          fileName: "xmlui",
       };
     }
   }
@@ -50,26 +51,36 @@ export default ({ mode }) => {
       mode === "standalone" || mode === "metadata"
         ? {
             "process.env": {
-              NODE_ENV: env.NODE_ENV,
+                'NODE_ENV': env.NODE_ENV
+            }
+        } : undefined,
+        esbuild: {
+            target: "es2020",
+        },
+        optimizeDeps: {
+            esbuildOptions: {
+                target: "es2020",
             },
-          }
-        : undefined,
-    esbuild: {
-      target: "es2020",
-    },
-    optimizeDeps: {
-      esbuildOptions: {
-        target: "es2020",
-      },
-    },
-    build: {
-      emptyOutDir: false,
-      outDir: "dist",
-      lib: lib,
-      rollupOptions: {
-        external: mode === "standalone" ? [] : [...Object.keys(packageJson.dependencies)],
-      },
-    },
-    plugins: mode === "metadata" ? [dts({ rollupTypes: true })] : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
-  });
+        },
+        build: {
+            emptyOutDir: false,
+            outDir: "dist",
+            lib: lib,
+            rollupOptions: {
+                treeshake: mode === "metadata" ? "smallest" : undefined,
+                external: mode === 'standalone' ? [] : [
+                    ...Object.keys(packageJson.dependencies),
+                    "react/jsx-runtime",
+                ],
+                output: {
+                    globals: {
+                        react: "React",
+                        "react-dom": "ReactDOM",
+                        'react/jsx-runtime': 'react/jsx-runtime',
+                    },
+                },
+            },
+        },
+      plugins: mode === "metadata" ? [dts({ rollupTypes: true })] : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
+    })
 };

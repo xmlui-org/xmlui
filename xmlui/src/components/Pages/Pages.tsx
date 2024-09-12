@@ -1,15 +1,13 @@
 import type { ReactNode } from "react";
-import { Fragment, useEffect, useId, useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
-import { RouteContext, useRouteContext, useRouteContextValue } from "@components-core/RouteContext";
 import { EMPTY_ARRAY } from "@components-core/constants";
-import type { LayoutContext } from "@abstractions/RendererDefs";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import {TableOfContentsProvider} from "@components-core/TableOfContentsContext";
+import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
+import { TableOfContentsProvider } from "@components-core/TableOfContentsContext";
 
 //we need this component to make sure all the child routes are wrapped in a container.
 //  this way they can access the routeParams
@@ -36,7 +34,11 @@ export function RouteWrapper({
     };
   }, [childRoute]);
 
-  return <Fragment key={JSON.stringify(params)}>{renderChild(wrappedWithContainer, layoutContext)}</Fragment>;
+  return (
+    <Fragment key={JSON.stringify(params)}>
+      {renderChild(wrappedWithContainer, layoutContext)}
+    </Fragment>
+  );
 }
 
 // =====================================================================================================================
@@ -64,64 +66,56 @@ const PageMetadata: ComponentDescriptor<PageComponentDef> = {
   },
 };
 
-type PageProps = {
-  children: ReactNode;
-  url: string;
-};
-
-export function Page({ children, url }: PageProps) {
-  const id = useId();
-  const { register, unRegister } = useRouteContext();
-  useEffect(() => {
-    register({
-      id,
-      url,
-      children,
-    });
-  }, [children, id, register, url]);
-  useEffect(() => {
-    return () => {
-      unRegister(id);
-    };
-  }, [id, unRegister]);
-
-  return null;
-}
-
 export const pageRenderer = createComponentRenderer<PageComponentDef>(
   "Page",
   ({ node, extractValue, renderChild }) => {
     return (
-      <Page url={extractValue(node.props.url)}>
-        <TableOfContentsProvider>
-          <RouteWrapper childRoute={node.children} renderChild={renderChild} key={extractValue(node.props.url)}/>
-        </TableOfContentsProvider>
-      </Page>
+      <TableOfContentsProvider>
+        <RouteWrapper
+          childRoute={node.children}
+          renderChild={renderChild}
+          key={extractValue(node.props.url)}
+        />
+      </TableOfContentsProvider>
     );
   },
-  PageMetadata
+  PageMetadata,
 );
 
 type PagesProps = {
   defaultRoute?: string;
+  node?: ComponentDef;
+  renderChild: RenderChildFn;
+  extractValue: ValueExtractor;
   children?: ReactNode;
 };
 
-export function Pages({ defaultRoute, children }: PagesProps) {
-  const { routes, routeContextValue } = useRouteContextValue();
-
+export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
+  const routes: Array<PageComponentDef> = [];
+  const restChildren: Array<ComponentDef> = [];
+  node.children.map((child) => {
+    if (child.type === "Page") {
+      routes.push(child as PageComponentDef);
+    } else {
+      restChildren.push(child);
+    }
+  });
   return (
-    <RouteContext.Provider value={routeContextValue}>
-      {children}
-      {routes.length > 0 && (
-        <Routes>
-          {routes.map((value) => {
-            return <Route path={value.url} key={value.id} element={value.children} />;
-          })}
-          {defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
-        </Routes>
-      )}
-    </RouteContext.Provider>
+    <>
+      <Routes>
+        {routes.map((child, i) => {
+          return (
+            <Route
+              path={extractValue(child.props.url)}
+              key={i}
+              element={renderChild(child)}
+            />
+          );
+        })}
+        {!!defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
+      </Routes>
+      {renderChild(restChildren)}
+    </>
   );
 }
 
@@ -156,7 +150,14 @@ export const PagesMd: ComponentDescriptor<PagesComponentDef> = {
 export const pagesRenderer = createComponentRenderer<PagesComponentDef>(
   "Pages",
   ({ node, extractValue, renderChild }) => {
-    return <Pages defaultRoute={extractValue(node.props.defaultRoute)}>{renderChild(node.children)}</Pages>;
+    return (
+      <Pages
+        defaultRoute={extractValue(node.props.defaultRoute)}
+        node={node}
+        renderChild={renderChild}
+        extractValue={extractValue}
+      />
+    );
   },
-  PagesMd
+  PagesMd,
 );

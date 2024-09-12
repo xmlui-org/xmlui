@@ -1,16 +1,14 @@
 import type { CSSProperties, ReactNode } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { AppLayoutType } from "./AppLayoutContext";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
+import { AppLayoutContext, appLayouts } from "./AppLayoutContext";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
 import classnames from "@components-core/utils/classnames";
 
 import styles from "./App.module.scss";
-
-import { AppLayoutContext, appLayouts } from "./AppLayoutContext";
 import { createComponentRenderer } from "@components-core/renderers";
 import { useAppContext } from "@components-core/AppContext";
 import { Sheet, SheetContent } from "@components/App/Sheet";
@@ -20,19 +18,21 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { AppHeader } from "@components/AppHeader/AppHeader";
 import { useResizeObserver } from "@components-core/utils/hooks";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { boolean } from "yargs";
-import { JSX } from "react/jsx-runtime";
+import type { JSX } from "react/jsx-runtime";
 
 type Props = {
   children: ReactNode;
   logoContent?: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
+  navPanel?: ReactNode;
+  navPanelInDrawer?: ReactNode;
   style: CSSProperties;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
   onReady?: () => void;
+  navPanelDef?: ComponentDef;
 };
 
 function App({
@@ -44,17 +44,17 @@ function App({
   scrollWholePage,
   onReady = noop,
   header,
+  navPanel,
+  navPanelInDrawer,
   footer,
+  navPanelDef,
 }: Props) {
   const { getThemeVar } = useTheme();
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
   const { setLoggedInUser, mediaSize } = useAppContext();
-  const [registeredHeaders, setRegisteredHeaders] = useState<Record<string, boolean>>({});
-  const [registeredNavPanels, setRegisteredNavPanels] = useState<Record<string, boolean>>({});
-  const hasRegisteredHeader = Object.keys(registeredHeaders).length > 0 || header !== undefined;
-  const hasRegisteredFooter = Object.keys(registeredHeaders).length > 0 || footer !== undefined;
-  const hasRegisteredNavPanel = Object.keys(registeredNavPanels).length > 0;
+  const hasRegisteredHeader = header !== undefined;
+  const hasRegisteredNavPanel = navPanelDef !== undefined;
 
   useEffect(() => {
     setLoggedInUser(loggedInUser);
@@ -64,8 +64,8 @@ function App({
     onReady();
   }, [onReady]);
 
-  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer 
-  // --- button. The exception is the condensed layout because we render a header in that case (otherwise, 
+  // --- We don't hide the nav panel if there's no header; in that case, we don't have a show drawer
+  // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
   // --- we couldn't show the NavPanel)
   const navPanelVisible =
     mediaSize.largeScreen || (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
@@ -77,27 +77,15 @@ function App({
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
 
-  const [navPanelRoot, setNavPanelRoot] = useState<HTMLElement | null>(null);
-  const [drawerRoot, setDrawerRoot] = useState<HTMLDivElement | null>(null);
-  const [headerRoot, setHeaderRoot] = useState<HTMLDivElement | null>(null);
-  const [footerRoot, setFooterRoot] = useState<HTMLDivElement | null>(null);
-
   const footerRef = useRef<HTMLDivElement | null>();
   const footerRefCallback = useCallback((element: HTMLDivElement | null) => {
     footerRef.current = element;
-    setFooterRoot(element);
   }, []);
 
   const headerRef = useRef<HTMLDivElement | null>();
-  const headerRefCallback = useCallback(
-    (element: HTMLDivElement | null) => {
-      headerRef.current = element;
-      if (safeLayout !== "horizontal" && safeLayout !== "horizontal-sticky") {
-        setHeaderRoot(element);
-      }
-    },
-    [safeLayout],
-  );
+  const headerRefCallback = useCallback((element: HTMLDivElement | null) => {
+    headerRef.current = element;
+  }, []);
 
   useResizeObserver(
     footerRef,
@@ -128,83 +116,30 @@ function App({
     setDrawerVisible((prev) => !prev);
   }, []);
 
-  const layoutContextValue = useMemo(() => {
+  const layoutContextValue = useMemo<IAppLayoutContext>(() => {
     return {
-      registerHeader: (id: string) => {
-        setRegisteredHeaders((prev) => {
-          if (prev[id]) {
-            return prev;
-          }
-          return {
-            ...prev,
-            [id]: true,
-          };
-        });
-      },
-      unregisterHeader: (id: string) => {
-        setRegisteredHeaders((prev) => {
-          if (!prev[id]) {
-            return prev;
-          }
-          const ret = { ...prev };
-          delete ret[id];
-          return ret;
-        });
-      },
-      registerNavPanel: (id: string) => {
-        setRegisteredNavPanels((prev) => {
-          if (prev[id]) {
-            return prev;
-          }
-          return {
-            ...prev,
-            [id]: true,
-          };
-        });
-      },
-      unregisterNavPanel: (id: string) => {
-        setRegisteredNavPanels((prev) => {
-          if (!prev[id]) {
-            return prev;
-          }
-          const ret = { ...prev };
-          delete ret[id];
-          return ret;
-        });
-      },
-      navPanelRoot,
-      drawerRoot,
-      headerRoot,
-      footerRoot,
+      hasRegisteredNavPanel,
+      hasRegisteredHeader,
       navPanelVisible,
       drawerVisible,
-      hasRegisteredHeader,
-      hasRegisteredNavPanel,
-      hasRegisteredFooter,
       layout: safeLayout,
-      setNavPanelRoot: (el: HTMLElement | null) => {
-        setNavPanelRoot(el);
-      },
       showDrawer: () => {
         setDrawerVisible(true);
       },
       hideDrawer: () => {
         setDrawerVisible(false);
       },
-      toggleDrawer: toggleDrawer,
+      toggleDrawer,
+      navPanelDef,
     };
   }, [
-    navPanelRoot,
-    drawerRoot,
-    headerRoot,
-    footerRoot,
+    hasRegisteredNavPanel,
+    hasRegisteredHeader,
     navPanelVisible,
     drawerVisible,
-    hasRegisteredHeader,
-    hasRegisteredNavPanel,
-    hasRegisteredFooter,
     safeLayout,
     toggleDrawer,
+    navPanelDef,
   ]);
 
   useEffect(() => {
@@ -234,7 +169,7 @@ function App({
     case "vertical":
       content = (
         <div className={classnames(wrapperBaseClasses, styles.vertical)} style={styleWithHelpers}>
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)} ref={setNavPanelRoot} />}
+          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
           <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
             <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
               {header}
@@ -254,7 +189,7 @@ function App({
     case "vertical-sticky":
       content = (
         <div className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)} style={styleWithHelpers}>
-          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)} ref={setNavPanelRoot} />}
+          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
           <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
             <header ref={headerRefCallback} className={classnames(styles.headerWrapper, styles.sticky)}>
               {header}
@@ -282,7 +217,7 @@ function App({
             {header}
           </header>
           <div className={styles.content}>
-            {navPanelVisible && <aside className={styles.navPanelWrapper} ref={setNavPanelRoot} />}
+            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
             <main className={styles.contentWrapper}>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
@@ -320,7 +255,7 @@ function App({
                 navPanelVisible={navPanelVisible}
                 toggleDrawer={toggleDrawer}
               >
-                <div ref={setNavPanelRoot} style={{ minWidth: 0 }} />
+                <div style={{ minWidth: 0 }}>{navPanel}</div>
               </AppHeader>
             )}
             {header}
@@ -344,8 +279,8 @@ function App({
           ref={scrollPageContainerRef}
         >
           <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
-            <div ref={setHeaderRoot}>{header}</div>
-            {navPanelVisible && <div className={styles.navPanelWrapper} ref={setNavPanelRoot} />}
+            <div>{header}</div>
+            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
@@ -367,8 +302,8 @@ function App({
           ref={scrollPageContainerRef}
         >
           <header className={classnames(styles.headerWrapper, styles.sticky)} ref={headerRefCallback}>
-            <div ref={setHeaderRoot}>{header}</div>
-            {navPanelVisible && <div className={styles.navPanelWrapper} ref={setNavPanelRoot} />}
+            <div>{header}</div>
+            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
           <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
             <ScrollContext.Provider value={scrollContainerRef}>
@@ -388,7 +323,7 @@ function App({
   return (
     <AppLayoutContext.Provider value={layoutContextValue}>
       <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
-        <SheetContent side={"left"} ref={setDrawerRoot} />
+        <SheetContent side={"left"}>{navPanelInDrawer}</SheetContent>
       </Sheet>
       {content}
     </AppLayoutContext.Provider>
@@ -465,14 +400,17 @@ export const AppMd: ComponentDescriptor<AppComponentDef> = {
 export const appRenderer = createComponentRenderer<AppComponentDef>(
   "App",
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    const AppHeaders: any[] = [];
-    const Footers: any[] = [];
+    let AppHeader: ComponentDef;
+    let Footer: ComponentDef;
+    let NavPanel: ComponentDef;
     const restChildren: any[] = [];
     node.children?.forEach((child) => {
       if (child.type === "AppHeader") {
-        AppHeaders.push(child);
+        AppHeader = child;
       } else if (child.type === "Footer") {
-        Footers.push(child);
+        Footer = child;
+      } else if (child.type === "NavPanel") {
+        NavPanel = child;
       } else {
         restChildren.push(child);
       }
@@ -488,8 +426,11 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
         loggedInUser={extractValue(node.props.loggedInUser)}
         logoContent={renderChild(node.props.logoTemplate)}
         onReady={lookupEventHandler("ready")}
-        header={renderChild(AppHeaders)}
-        footer={renderChild(Footers)}
+        header={renderChild(AppHeader)}
+        footer={renderChild(Footer)}
+        navPanel={renderChild(NavPanel)}
+        navPanelInDrawer={renderChild(NavPanel, { inDrawer: true })}
+        navPanelDef={NavPanel}
       >
         {renderChild(restChildren)}
       </App>

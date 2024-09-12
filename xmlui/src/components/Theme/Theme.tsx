@@ -106,7 +106,7 @@ export function Theme({
       toClass,
       css,
     };
-  }, [getThemeVar, isRoot, themeCssVars, themeTone]);
+  }, [isRoot, themeCssVars, themeTone]);
 
   // useInsertionEffect(() => {
   //   //PERF OPT IDEA: don't inject the css content that we already have

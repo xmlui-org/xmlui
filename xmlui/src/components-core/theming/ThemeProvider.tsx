@@ -151,7 +151,7 @@ export function useCompiledTheme(
           ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]
             ?.themeVars,
         }),
-      } || {},
+      },
     ];
   }, [activeTone, themeDefChain]);
 

@@ -1,4 +1,4 @@
-import React, { forwardRef, type ReactNode, useId, useRef } from "react";
+import React, { forwardRef, type ReactNode, useRef } from "react";
 import styles from "./NavPanel.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -9,9 +9,7 @@ import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs"
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject } from "@components-core/theming/themes/base-utils";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { createPortal } from "react-dom";
 import { getAppLayoutOrientation } from "@components/App/App";
-import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { nestedComp } from "@components-core/descriptorHelper";
 
@@ -67,7 +65,6 @@ const NavPanel = forwardRef(function NavPanel(
   },
   forwardedRef,
 ) {
-  const id = useId();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const ref = forwardedRef ? composeRefs(scrollContainerRef, forwardedRef) : scrollContainerRef;
   const appLayoutContext = useAppLayoutContext();
@@ -75,53 +72,7 @@ const NavPanel = forwardRef(function NavPanel(
   const showLogo = appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
 
-  const registered = useRef(false);
-  useIsomorphicLayoutEffect(() => {
-    if (!appLayoutContext || registered.current) {
-      return;
-    }
-    appLayoutContext.registerNavPanel(id);
-    registered.current = true;
-    return () => {
-      registered.current = false;
-      appLayoutContext.unregisterNavPanel(id);
-    };
-  }, [appLayoutContext, id]);
-
-  if (appLayoutContext) {
-    const { navPanelRoot, navPanelVisible, drawerVisible, drawerRoot } = appLayoutContext;
-    return (
-      <>
-        {navPanelRoot &&
-          navPanelVisible &&
-          createPortal(
-            <div
-              ref={ref}
-              className={classnames(styles.wrapper, className, {
-                [styles.horizontal]: horizontal,
-                [styles.condensed]: isCondensed,
-              })}
-            >
-              <ScrollContext.Provider value={scrollContainerRef}>
-                {showLogo && <div className={classnames(styles.logoWrapper)}>{logoContent || <Logo />}</div>}
-                <div className={styles.wrapperInner} style={style}>
-                  {children}
-                </div>
-              </ScrollContext.Provider>
-            </div>,
-            navPanelRoot,
-          )}
-        {drawerRoot &&
-          drawerVisible &&
-          createPortal(
-            <DrawerNavPanel className={className} style={style} logoContent={logoContent}>
-              {children}
-            </DrawerNavPanel>,
-            drawerRoot,
-          )}
-      </>
-    );
-  }
+  console.log(appLayoutContext);
 
   return (
     <div
@@ -151,9 +102,9 @@ const NavPanel = forwardRef(function NavPanel(
  */
 export interface NavPanelComponentDef extends ComponentDef<"NavPanel"> {
   props: {
-    /** 
+    /**
      * This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
-     * @descriptionRef 
+     * @descriptionRef
      */
     logoTemplate?: string;
   };
@@ -187,7 +138,15 @@ export const NavPanelMd: ComponentDescriptor<NavPanelComponentDef> = {
 export const navPanelRenderer = createComponentRenderer<NavPanelComponentDef>(
   "NavPanel",
   ({ node, renderChild, layoutCss, layoutContext }) => {
-    return (
+    return layoutContext?.inDrawer ? (
+      <DrawerNavPanel
+        style={layoutCss}
+        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
+        className={layoutContext?.themeClassName}
+      >
+        {renderChild(node.children)}
+      </DrawerNavPanel>
+    ) : (
       <NavPanel
         style={layoutCss}
         logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
