@@ -282,6 +282,10 @@ export class ComponentRegistry {
       this.registerComponentRenderer(codeComponentRenderer);
     }
 
+    if(process.env.VITE_USER_COMPONENTS_Markdown !== "false"){
+      this.registerComponentRenderer(markdownComponentRenderer);
+    }
+
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
       //TODO, if it proves to be a working solution, make these components skippable, too
       this.registerComponentRenderer(pageMetaTitleComponentRenderer);
@@ -304,7 +308,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(fileInputRenderer);
       this.registerComponentRenderer(datePickerComponentRenderer);
       this.registerComponentRenderer(spinnerComponentRenderer);
-      this.registerComponentRenderer(markdownComponentRenderer);
       this.registerComponentRenderer(selectComponentRenderer);
       this.registerComponentRenderer(dropdownMenuComponentRenderer);
       this.registerComponentRenderer(themeChangerButtonComponentRenderer);
