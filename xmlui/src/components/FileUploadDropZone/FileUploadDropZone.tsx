@@ -12,7 +12,8 @@ import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs"
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
 
-const {useDropzone} = dropzone;
+// https://github.com/react-dropzone/react-dropzone/issues/1259
+const { useDropzone } = dropzone;
 
 // =====================================================================================================================
 // React FileUploadDropZone component implementation
@@ -45,7 +46,7 @@ function FileUploadDropZone({
       }
       onUpload?.(acceptedFiles);
     },
-    [onUpload]
+    [onUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive, open, inputRef } = useDropzone({
@@ -91,7 +92,7 @@ function FileUploadDropZone({
         }
       }
     },
-    [allowPaste, inputRef]
+    [allowPaste, inputRef],
   );
 
   useEffect(() => {
@@ -118,13 +119,13 @@ function FileUploadDropZone({
 // XMLUI AppHeader component definition
 
 /**
- * The \`FileUploadDropZone\` component allows users to upload files to a web application by dragging 
+ * The \`FileUploadDropZone\` component allows users to upload files to a web application by dragging
  * and dropping files from their local file system onto a designated area within the UI.
  */
 export interface FileUploadDropZoneComponentDef extends ComponentDef<"FileUploadDropZone"> {
   props: {
     /**
-     * With this property, you can change the default text ("Drop files here") to display when 
+     * With this property, you can change the default text ("Drop files here") to display when
      * files are dragged over the drop zone.
      */
     text?: string;
@@ -137,8 +138,8 @@ export interface FileUploadDropZoneComponentDef extends ComponentDef<"FileUpload
   };
   events: {
     /**
-     * This component accepts files for upload but does not perform the actual operation. It fires the 
-     * \`upload\` event and passes the list files to upload in the method's argument. You can use the 
+     * This component accepts files for upload but does not perform the actual operation. It fires the
+     * \`upload\` event and passes the list files to upload in the method's argument. You can use the
      * passed file information to implement the upload (according to the protocol your backend supports).
      *
      * Each item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).
@@ -186,9 +187,9 @@ export const fileUploadDropZoneComponentRenderer = createComponentRenderer<FileU
         text={extractValue(node.props.text)}
         disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
       >
-        {renderChild(node.children, { type: "Stack"})}
+        {renderChild(node.children, { type: "Stack" })}
       </FileUploadDropZone>
     );
   },
-  FileUploadDropZoneMd
+  FileUploadDropZoneMd,
 );

@@ -1,353 +1,130 @@
-import {CSSProperties, forwardRef, ReactNode} from "react";
-import { useEffect, useState } from "react";
-import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
-
 import styles from "./DropdownMenu.module.scss";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/abstractions";
+import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { iconPositionNames, type IconPosition } from "@components/abstractions";
 
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Button } from "@components/Button/Button";
-import { useTheme } from "@components-core/theming/ThemeContext";
 import { desc } from "@components-core/descriptorHelper";
 import { Icon } from "@components/Icon/Icon";
-import { noop } from "@components-core/constants";
-import classnames from "@components-core/utils/classnames";
+import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
+import {
+  dClick,
+  dComponent,
+  dEnabled,
+  dLabel,
+  dTriggerTemplate,
+} from "@components/metadata-helpers";
 
-// ====================================================================================================================
-// React DropdownMenu component implementation
+const DDMCOMP = "DropdownMenu";
 
-type DropdownMenuProps = {
-  triggerTemplate?: ReactNode;
-  children?: ReactNode;
-  label?: string;
-  registerComponentApi?: RegisterComponentApiFn;
-  layout?: CSSProperties;
-  alignment?: "start" | "center" | "end";
-  onWillOpen?: () => Promise<boolean | undefined>;
-  disabled?: boolean;
-  triggerButtonVariant?: string;
-  triggerButtonThemeColor?: string;
-  triggerButtonIcon?: string;
-  triggerButtonIconPosition?: IconPosition;
-};
-
-export const DropdownMenu = forwardRef(function DropdownMenu({
-  triggerTemplate,
-  children,
-  label,
-  registerComponentApi,
-  layout,
-  onWillOpen,
-  alignment = "start",
-  disabled = false,
-  triggerButtonVariant = "ghost",
-  triggerButtonThemeColor = "primary",
-  triggerButtonIcon = "chevrondown",
-  triggerButtonIconPosition = "end",
-}: DropdownMenuProps, ref) {
-  const { root } = useTheme();
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    registerComponentApi?.({
-      close: () => setOpen(false),
-    });
-  }, [registerComponentApi]);
-
-  return (
-    <ReactDropdownMenu.Root
-      open={open}
-      onOpenChange={async (isOpen) => {
-        if (isOpen) {
-          const willOpenResult = await onWillOpen?.();
-          if (willOpenResult === false) {
-            return;
-          }
-        }
-        setOpen(isOpen);
-      }}
-    >
-      <ReactDropdownMenu.Trigger asChild disabled={disabled} ref={ref as any}>
-        {triggerTemplate ? (
-          triggerTemplate
-        ) : (
-          <Button
-            icon={<Icon name={triggerButtonIcon} />}
-            iconPosition={triggerButtonIconPosition}
-            type="button"
-            variant={triggerButtonVariant as ButtonVariant}
-            themeColor={triggerButtonThemeColor as ButtonThemeColor}
-            disabled={disabled}          
-          >
-            {label}
-          </Button>
-        )}
-      </ReactDropdownMenu.Trigger>
-      <ReactDropdownMenu.Portal container={root}>
-        <ReactDropdownMenu.Content
-          align={alignment}
-          style={layout}
-          className={styles.DropdownMenuContent}
-        >
-          {children}
-        </ReactDropdownMenu.Content>
-      </ReactDropdownMenu.Portal>
-    </ReactDropdownMenu.Root>
-  );
+export const DropdownMenuMd = createMetadata({
+  description:
+    `This component represents a dropdown menu with a trigger. When the user clicks the trigger, ` +
+    `the dropdown menu displays its items.`,
+  props: {
+    label: dLabel(),
+    triggerTemplate: dTriggerTemplate(DDMCOMP),
+    alignment: d(
+      `This property allows you to determine the alignment of the displayed menu items.`,
+    ),
+    enabled: dEnabled(),
+    triggerButtonVariant: d(
+      `This property defines the theme variant of the \`Button\` as the dropdown menu's trigger. ` +
+        `It has no effect when a custom trigger is defined with \`triggerTemplate\`.`,
+    ),
+    triggerButtonThemeColor: d(
+      `This property defines the theme color of the \`Button\` as the dropdown menu's trigger. ` +
+        `It has no effect when a custom trigger is defined with \`triggerTemplate\`.`,
+    ),
+    triggerButtonIcon: d(`This property defines the icon to display on the trigger button.`),
+    triggerButtonIconPosition: d(
+      `This property defines the position of the icon on the trigger button.`,
+      iconPositionNames,
+    ),
+  },
+  events: {
+    willOpen: d(`This event fires when the \`${DDMCOMP}\` component is opened.`),
+  },
+  apis: {
+    close: d(`This method command closes the dropdown.`),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`color-bg-${DDMCOMP}`]: "$color-bg-primary",
+    [`min-width-${DDMCOMP}`]: "160px",
+    [`shadow-${DDMCOMP}`]: "$shadow-xl",
+    [`style-border-${DDMCOMP}-content`]: "solid",
+  },
 });
 
-// ====================================================================================================================
-// XMLUI DropdownMenu definition
+export const dropdownMenuComponentRenderer = createComponentRendererNew(
+  DDMCOMP,
+  DropdownMenuMd,
+  ({ node, extractValue, renderChild, registerComponentApi, layoutCss, lookupEventHandler }) => {
+    return (
+      <DropdownMenu
+        triggerTemplate={renderChild(node.props?.triggerTemplate)}
+        label={extractValue(node.props?.label)}
+        registerComponentApi={registerComponentApi}
+        onWillOpen={lookupEventHandler("willOpen")}
+        layout={layoutCss}
+        alignment={extractValue(node.props?.alignment)}
+        disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
+        triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
+        triggerButtonVariant={extractValue(node.props.triggerButtonVariant)}
+        triggerButtonIcon={extractValue(node.props.triggerButtonIcon)}
+        triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
+      >
+        {renderChild(node.children)}
+      </DropdownMenu>
+    );
+  },
+);
 
-/**
- * This component represents a dropdown menu with a trigger.
- * When the user clicks the trigger, the dropdown menu displays its items.
- */
-export interface DropdownMenuComponentDef extends ComponentDef<"DropdownMenu"> {
+const MICOMP = "MenuItem";
+
+export const MenuItemMd = createMetadata({
+  description: `This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.`,
   props: {
-    /**
-     * This property allows you to define a custom trigger instead of the default one provided by \`DropdownMenu\`.
-     * @descriptionRef
-     */
-    triggerTemplate?: ComponentDef;
-    /**
-     * This property defines the label to display in the dropdown menu.
-     * If you define a custom trigger template, this property has no effect.
-     */
-    label?: string;
-    /** @descriptionRef */
-    alignment?: "start" | "end";
-    /**
-     * This property enables (\`true\`) or disables (\`false\`) the component.
-     * @descriptionRef
-     */
-    enabled?: string;
-    /**
-     * This property defines the theme variant of the \`Button\` as the dropdown menu's trigger. It has no 
-     * effect when a custom trigger is defined with \`triggerTemplate\`.
-     */
-    triggerButtonVariant?: string;
-    /**
-     * This property defines the theme color of the \`Button\` as the dropdown menu's trigger. It has no 
-     * effect when a custom trigger is defined with \`triggerTemplate\`.
-     */
-    triggerButtonThemeColor?: string;
-    /**
-     * This property defines the icon to display on the trigger button.
-     */
-    triggerButtonIcon?: string;
-    /**
-     * This property defines the position of the icon on the trigger button.
-     */
-    triggerButtonIconPosition?: IconPosition;
-  };
+    iconPosition: d(
+      `This property allows you to determine the position of the icon displayed in the menu item.`,
+      iconPositionNames,
+    ),
+    icon: d(`This property names an optional icon to display with the menu item.`),
+    label: dLabel(),
+    to: d(
+      `This property defines the URL of the menu item. If this property is defined (and the \`click\` ` +
+        `event does not have an event handler), clicking the menu item navigates to this link.`,
+    ),
+    active: d(`This property indicates if the specified menu item is active.`),
+  },
   events: {
-    /**
-     * This event fires when the \`DropdownMenu\` component is opened.
-     * @descriptionRef
-     */
-    willOpen?: string;
-  };
-  api: {
-    /**
-     * The \`close\` command closes the dropdown.
-     *
-     * Open the dropdown menu and click on any of the menu items to close the menu.
-     * @descriptionRef
-     */
-    close: () => void;
-  };
-}
-
-export const DropdownMenuMd: ComponentDescriptor<DropdownMenuComponentDef> = {
-  displayName: "DropdownMenu",
-  description:
-    "It represents a dropdown menu with multiple menu items. Clicking it displays the available menu items.",
-  props: {
-    label: desc("The label to display on the button"),
-    triggerTemplate: desc("The trigger template to use"),
-    alignment: desc("The alignment of the drop-down menu"),
-    enabled: desc("Enables or disables the component"),
-    triggerButtonVariant: desc("The variant of the trigger button"),
-    triggerButtonThemeColor: desc("The theme color of the trigger button"),
+    click: dClick(MICOMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-bg-DropdownMenu": "$color-bg-primary",
-    "min-width-DropdownMenu": "160px",
-    "shadow-DropdownMenu": "$shadow-xl",
-    "style-border-DropdownMenu-content": "solid",
+    [`color-bg-${MICOMP}`]: "$color-bg-dropdown-item",
+    [`color-${MICOMP}`]: "$color-text-primary",
+    [`font-family-${MICOMP}`]: "$font-family",
+    [`font-size-${MICOMP}`]: "$font-size-small",
+    [`padding-vertical-${MICOMP}`]: "$space-2",
+    [`padding-horizontal-${MICOMP}`]: "$space-3",
+    [`color-bg-${MICOMP}--hover`]: "$color-bg-dropdown-item--hover",
+    [`color-${MICOMP}--hover`]: "inherit",
+    [`gap-${MICOMP}`]: "$space-2",
+    [`color-${MICOMP}--active`]: "$color-primary",
+    [`color-bg-${MICOMP}--active`]: "$color-bg-dropdown-item--active",
+    light: {},
+    dark: {},
   },
-};
+});
 
-export const dropdownMenuComponentRenderer =
-  createComponentRenderer<DropdownMenuComponentDef>(
-    "DropdownMenu",
-    ({
-      node,
-      extractValue,
-      renderChild,
-      registerComponentApi,
-      layoutCss,
-      lookupEventHandler,
-    }) => {
-      return (
-        <DropdownMenu
-          triggerTemplate={renderChild(node.props?.triggerTemplate)}
-          label={extractValue(node.props?.label)}
-          registerComponentApi={registerComponentApi}
-          onWillOpen={lookupEventHandler("willOpen")}
-          layout={layoutCss}
-          alignment={extractValue(node.props?.alignment)}
-          disabled={!extractValue.asOptionalBoolean(node.props.enabled, true)}
-          triggerButtonThemeColor={extractValue(node.props.triggerButtonThemeColor)}
-          triggerButtonVariant={extractValue(node.props.triggerButtonVariant)}
-          triggerButtonIcon={extractValue(node.props.triggerButtonIcon)}
-          triggerButtonIconPosition={extractValue(node.props.triggerButtonIconPosition)}
-        >
-          {renderChild(node.children)}
-        </DropdownMenu>
-      );
-    },
-    DropdownMenuMd
-  );
-
-// ====================================================================================================================
-// React MenuItem component implementation
-
-type MenuItemProps = {
-  icon?: ReactNode;
-  iconPosition?: IconPosition;
-  onClick?: (event: any) => void;
-  children?: ReactNode;
-  label?: string;
-  style?: CSSProperties;
-  to?: string;
-  active?: boolean;
-};
-
-export function MenuItem({
-  children,
-  onClick = noop,
-  label,
-  style,
-  icon,
-  iconPosition = "start",
-  active = false,
-}: MenuItemProps) {
-  const iconToLeft = iconPosition === "left" || iconPosition === "start";
-
-  return (
-    <ReactDropdownMenu.Item
-      style={style}
-      className={classnames(styles.DropdownMenuItem, {
-        [styles.active]: active,
-      })}
-      onClick={(event) => {
-        event.stopPropagation();
-        onClick(event);
-      }}
-    >
-      {iconToLeft && icon}
-      <div className={styles.wrapper}>{label ?? children}</div>
-      {!iconToLeft && icon}
-    </ReactDropdownMenu.Item>
-  );
-}
-
-// ====================================================================================================================
-// XMLUI MenuItem definition
-
-/**
- * This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the 
- * [\`DropdownMenu\` component](./DropdownMenu) for using this component in menus.
- * 
- * @componentFolder DropdownMenu
- * @descriptionRef
- */
-export interface MenuItemComponentDef extends ComponentDef<"MenuItem"> {
-  props: {
-    /**
-     * @descriptionRef
-     */
-    iconPosition?: IconPosition;
-    /**
-     * This property names an optional icon to display with the menu item.
-     * @descriptionRef
-     */
-    icon?: string;
-    /**
-     * This property defines the item's label.
-     * @descriptionRef
-     */
-    label?: string;
-    /**
-     * This property defines the URL of the menu item. If this property is defined (and the \`click\` event 
-     * does not have an event handler), clicking the menu item navigates to this link.
-     * @descriptionRef
-     */
-    to?: string;
-    /**
-     *This property indicates if the specified menu item is active.
-     * @descriptionRef
-     */
-    active?: boolean;
-  };
-  events: {
-    click: string;
-  };
-}
-
-export const MenuItemMd: ComponentDescriptor<MenuItemComponentDef> = {
-  displayName: "MenuItem",
-  description:
-    "Represents a menu item within a DropDownMenu, clicking of which triggers an action",
-  props: {
-    iconPosition: desc("Position of the icon displayed"),
-    icon: desc("Optional icon ID to display the particular icon"),
-    label: desc("The label to display on the button"),
-    to: desc("The target URL"),
-  },
-  events: {
-    click: desc("Triggers when the menu item is clicked"),
-  },
-  themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {
-    "color-bg-MenuItem": "$color-bg-dropdown-item",
-    "color-MenuItem": "$color-text-primary",
-    "font-family-MenuItem": "$font-family",
-    "font-size-MenuItem": "$font-size-small",
-    "padding-vertical-MenuItem": "$space-2",
-    "padding-horizontal-MenuItem": "$space-3",
-    "color-bg-MenuItem--hover": "$color-bg-dropdown-item--hover",
-    "color-MenuItem--hover": "inherit",
-    "gap-MenuItem": "$space-2",
-    "color-MenuItem--active": "$color-primary",
-    "color-bg-MenuItem--active": "$color-bg-dropdown-item--active",
-    light: {
-
-    },
-    dark: {
-
-    }
-  },
-};
-
-export const menuItemRenderer = createComponentRenderer<MenuItemComponentDef>(
-  "MenuItem",
-  ({
-    node,
-    renderChild,
-    lookupEventHandler,
-    lookupAction,
-    extractValue,
-    layoutCss,
-  }) => {
+export const menuItemRenderer = createComponentRendererNew(
+  MICOMP,
+  MenuItemMd,
+  ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, layoutCss }) => {
     const clickEventHandler = lookupEventHandler("click");
 
     let clickHandler;
@@ -371,40 +148,9 @@ export const menuItemRenderer = createComponentRenderer<MenuItemComponentDef>(
       </MenuItem>
     );
   },
-  MenuItemMd
 );
 
-// ====================================================================================================================
-// React SubMenuItem component implementation
-
-type SubMenuItemProps = {
-  label?: string;
-  children?: ReactNode;
-  triggerTemplate?: ReactNode;
-};
-
-function SubMenuItem({ children, label, triggerTemplate }: SubMenuItemProps) {
-  const { root } = useTheme();
-
-  return (
-    <ReactDropdownMenu.Sub>
-      <ReactDropdownMenu.SubTrigger
-        className={styles.DropdownMenuSubTrigger}
-        asChild
-      >
-        {triggerTemplate ? triggerTemplate : <div>{label}</div>}
-      </ReactDropdownMenu.SubTrigger>
-      <ReactDropdownMenu.Portal container={root}>
-        <ReactDropdownMenu.SubContent className={styles.DropdownMenuSubContent}>
-          {children}
-        </ReactDropdownMenu.SubContent>
-      </ReactDropdownMenu.Portal>
-    </ReactDropdownMenu.Sub>
-  );
-}
-
-// ====================================================================================================================
-// XMLUI SubMenuItem definition
+const SMCOMP = "SubMenuItem";
 
 interface SubMenuItemDef extends ComponentDef<"SubMenuItem"> {
   props: {
@@ -413,17 +159,17 @@ interface SubMenuItemDef extends ComponentDef<"SubMenuItem"> {
   };
 }
 
-const subMenuItemMetadata: ComponentDescriptor<SubMenuItemDef> = {
-  displayName: "SubMenuItem",
-  description: "Represents a nested menu item within another menu or menu item",
+export const SubMenuItemMd = createMetadata({
+  description: "This component represents a nested menu item within another menu or menu item.",
   props: {
-    label: desc("The label to display as the name of the submenu"),
-    triggerTemplate: desc("The trigger template to use for this submenu"),
+    label: dLabel(),
+    triggerTemplate: dTriggerTemplate(SMCOMP),
   },
-};
+});
 
-export const subMenuItemRenderer = createComponentRenderer<SubMenuItemDef>(
-  "SubMenuItem",
+export const subMenuItemRenderer = createComponentRendererNew(
+  SMCOMP,
+  SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
     return (
       <SubMenuItem
@@ -434,17 +180,7 @@ export const subMenuItemRenderer = createComponentRenderer<SubMenuItemDef>(
       </SubMenuItem>
     );
   },
-  subMenuItemMetadata
 );
-
-// ====================================================================================================================
-// React MenuSeparator component implementation
-
-export function MenuSeparator() {
-  return (
-    <ReactDropdownMenu.Separator className={styles.DropdownMenuSeparator} />
-  );
-}
 
 // ====================================================================================================================
 // XMLUI MenuSeparator definition
@@ -472,5 +208,5 @@ export const menuSeparatorRenderer = createComponentRenderer<MenuSeparatorDef>(
   () => {
     return <MenuSeparator />;
   },
-  menuSeparatorMetadata
+  menuSeparatorMetadata,
 );

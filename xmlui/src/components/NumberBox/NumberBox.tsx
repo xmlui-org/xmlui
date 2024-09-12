@@ -11,7 +11,7 @@ import styles from "./NumberBox.module.scss";
 import { noop } from "@components-core/constants";
 import { Icon } from "@components/Icon/Icon";
 import { Adornment } from "@components/Input/InputAdornment";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";

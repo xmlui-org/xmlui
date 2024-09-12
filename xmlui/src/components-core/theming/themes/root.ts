@@ -28,6 +28,9 @@ const {
   $colorDanger700,
 
   $colorSuccess600,
+
+  $colorInfo600,
+  $colorInfo800,
 } = palette;
 
 // --- This theme contains the application-bound base theme variables and their default values.
@@ -35,28 +38,28 @@ const {
 export const RootThemeDefinition: ThemeDefinition = {
   id: "root",
   resources: {
-    "font.inter": "https://rsms.me/inter/inter.css"
+    "font.inter": "https://rsms.me/inter/inter.css",
   },
   themeVars: {
     // --- The unit of measurement for all sizes/spaces
     "space-base": "0.25rem",
 
     // --- Default surface color shades (form white to black)
-    "color-surface-50": "hsl(204,30.3%,98%)",
-    "color-surface-100": "hsl(204,30.3%,95%)",
-    "color-surface-200": "hst(204,30.3%,83%)",
-    "color-surface-300": "hsl(204,30.3%,75%)",
-    "color-surface-400": "hsl(204,30.3%,63%)",
-    "color-surface-500": "hsl(204,30.3%,52%)",
-    "color-surface-600": "hs1(204,30.3%,40%)",
-    "color-surface-700": "hsl(204,30.3%,32%)",
-    "color-surface-800": "hs1(204,30.3%,27%);",
-    "color-surface-900": "hsl(204,30.3%,16%)",
-    "color-surface-950": "hsl(204,30.3%,13%)",
-    "color-surface": "$color-surface-500", // #24656
+    "color-surface-50": "hsl(204, 30.3%, 96.5%)",
+    "color-surface-100": "hsl(204, 30.3%, 93%)",
+    "color-surface-200": "hsl(204, 30.3%, 85%)",
+    "color-surface-300": "hsl(204, 30.3%, 75%)",
+    "color-surface-400": "hsl(204, 30.3%, 65%)",
+    "color-surface-500": "hsl(204, 30.3%, 52%)", // #6894AD
+    "color-surface-600": "hsl(204, 30.3%, 45%)",
+    "color-surface-700": "hsl(204, 30.3%, 35%)",
+    "color-surface-800": "hsl(204, 30.3%, 27%)",
+    "color-surface-900": "hsl(204, 30.3%, 16%)",
+    "color-surface-950": "hsl(204, 30.3%, 13%)",
+    "color-surface": "$color-surface-500",
 
     // --- Primary color shades (bluish)
-    "color-primary-50": "#f6f8fb",
+    "color-primary-50": "hsl(212,71.9%,94.5%)",
     "color-primary-100": "hsl(212,71.9%,89.1%)",
     "color-primary-200": "hsl(212,71.9%,78.1%)",
     "color-primary-300": "hsl(212,71.9%,67.2%)",
@@ -84,47 +87,59 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-secondary": "$color-secondary-500",
 
     // --- Warning color shades (orange shades)
-    "color-warn-50": "#fffaec",
-    "color-warn-100": "#fff4d3",
-    "color-warn-200": "#ffe5a5",
-    "color-warn-300": "#ffd16d",
-    "color-warn-400": "#ffb232",
-    "color-warn-500": "#ff980a",
-    "color-warn-600": "#f57b00",
-    "color-warn-700": "#cc5d02",
-    "color-warn-800": "#a1480b",
-    "color-warn-900": "#823d0c",
-    "color-warn-950": "#461d04",
+    "color-warn-50": "hsl(45, 100%, 97%)",
+    "color-warn-100": "hsl(45, 100%, 91%)",
+    "color-warn-200": "hsl(45, 100%, 80%)",
+    "color-warn-300": "hsl(45, 100%, 70%)",
+    "color-warn-400": "hsl(45, 100%, 60%)",
+    "color-warn-500": "hsl(35, 100%, 50%)", // #ff980a
+    "color-warn-600": "hsl(35, 100%, 45%)",
+    "color-warn-700": "hsl(35, 100%, 40%)",
+    "color-warn-800": "hsl(35, 100%, 35%)",
+    "color-warn-900": "hsl(35, 100%, 30%)",
+    "color-warn-950": "hsl(35, 100%, 15%)",
     "color-warn": "$color-warn-500",
 
     // --- Danger color shades (reddish)
-    "color-danger-50": "#fff1f2",
-    "color-danger-100": "#ffdfe1",
-    "color-danger-200": "#ffc5c9",
-    "color-danger-300": "#ff9ca3",
-    "color-danger-400": "#ff636e",
-    "color-danger-500": "#ff3240",
-    "color-danger-600": "#ea101f",
-    "color-danger-700": "#c90c19",
-    "color-danger-800": "#a60e18",
-    "color-danger-900": "#89131b",
-    "color-danger-950": "#4b0409",
+    "color-danger-50": "hsl(356, 100%, 95%)",
+    "color-danger-100": "hsl(356, 100%, 91%)",
+    "color-danger-200": "hsl(356, 100%, 80%)",
+    "color-danger-300": "hsl(356, 100%, 70%)",
+    "color-danger-400": "hsl(356, 100%, 60%)",
+    "color-danger-500": "hsl(356, 100%, 50%)", // #ff3240
+    "color-danger-600": "hsl(356, 100%, 45%)",
+    "color-danger-700": "hsl(356, 100%, 40%)",
+    "color-danger-800": "hsl(356, 100%, 35%)",
+    "color-danger-900": "hsl(356, 100%, 30%)",
+    "color-danger-950": "hsl(356, 100%, 15%)",
     "color-danger": "$color-danger-600",
     "color-attention": "$color-danger-500",
 
     // --- Success color shades (greenish)
-    "color-success-50": "hsl(129.5,58.4%,96.4%)",
-    "color-success-100": "hsl(129.5,58.4%,92.9%)",
-    "color-success-200": "hsl(129.5,58.4%,85.7%)",
-    "color-success-300": "hsl(129.5,58.4%,78.6%)",
-    "color-success-400": "hsl(129.5,58.4%,71.5%)",
-    "color-success-500": "#2fb344",
-    "color-success-600": "hsl(129.5,58.4%,51.5%)",
-    "color-success-700": "hsl(129.5,58.4%,38.6%)",
-    "color-success-800": "hsl(129.5,58.4%,25.7%)",
-    "color-success-900": "hsl(129.5,58.4%,12.9%)",
-    "color-success-950": "hsl(129.5,58.4%,6.4%)",
+    "color-success-50": "hsl(129.5, 58.4%, 96.4%)",
+    "color-success-100": "hsl(129.5, 58.4%, 92.9%)",
+    "color-success-200": "hsl(129.5, 58.4%, 85.7%)",
+    "color-success-300": "hsl(129.5, 58.4%, 78.6%)",
+    "color-success-400": "hsl(129.5, 58.4%, 71.5%)",
+    "color-success-500": "hsl(129.5, 58.4%, 51.5%)", // #2fb344
+    "color-success-600": "hsl(129.5, 58.4%, 45%)",
+    "color-success-700": "hsl(129.5, 58.4%, 38.6%)",
+    "color-success-800": "hsl(129.5, 58.4%, 25.7%)",
+    "color-success-900": "hsl(129.5, 58.4%, 12.9%)",
+    "color-success-950": "hsl(129.5, 58.4%, 6.4%)",
     "color-success": "$color-success-500",
+
+    "color-info-50": "hsl(183, 97%, 95%)",
+    "color-info-100": "hsl(183, 97%, 90%)",
+    "color-info-200": "hsl(183, 97%, 80%)",
+    "color-info-300": "hsl(183, 97%, 70%)",
+    "color-info-400": "hsl(183, 97%, 60%)",
+    "color-info-500": "hsl(183, 97%, 50%)", // #02C4CE
+    "color-info-600": "hsl(183, 97%, 45%)",
+    "color-info-700": "hsl(183, 97%, 35%)",
+    "color-info-800": "hsl(183, 97%, 25%)",
+    "color-info-900": "hsl(183, 97%, 15%)",
+    "color-info-950": "hsl(183, 97%, 10%)",
 
     // --- Font weights
     "font-weight-light": "300",
@@ -147,7 +162,7 @@ export const RootThemeDefinition: ThemeDefinition = {
     "color-bg--selected": "$color-primary-50",
 
     // --- Various default colors
-    "color-info": "$color-surface-700",
+    "color-info": "$color-info-500",
     "color-valid": "$color-success-600",
     "color-warning": "$color-warn-700",
     "color-error": "$color-danger-600",
@@ -165,9 +180,8 @@ export const RootThemeDefinition: ThemeDefinition = {
       "Inter, -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
 
     // --- The monospace font set
-    "font-family-monospace":
-      "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
-    // "font-feature-settings": "'cv03', 'cv04', 'cv11'",
+    "font-family-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
+    "font-feature-settings": "'cv03', 'cv04', 'cv11'",
 
     // --- Some media breakpoints (review them)
     "media-max-width-phone": "576px",
@@ -206,11 +220,10 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- Various predefined shadow values
     shadow: "0 1px 3px 0 rgba(0, 0, 0, .1), 0 1px 2px 0 rgba(0, 0, 0, .06)",
-    "shadow-md":
-      "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
-    "shadow-xl": "0 16px 24px 2px rgba(0, 0, 0, 0.07), 0 6px 30px 5px rgba(0, 0, 0, 0.06), 0 8px 10px -5px rgba(0, 0, 0, 0.1)",
-    "shadow-xxl":
-      "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
+    "shadow-md": "0 4px 6px -1px rgba(0, 0, 0, .1), 0 2px 4px -1px rgba(0, 0, 0, .06)",
+    "shadow-xl":
+      "0 16px 24px 2px rgba(0, 0, 0, 0.07), 0 6px 30px 5px rgba(0, 0, 0, 0.06), 0 8px 10px -5px rgba(0, 0, 0, 0.1)",
+    "shadow-xxl": "0 8px 17px 0 rgba(0, 0, 0, .2), 0 6px 20px 0 rgba(0, 0, 0, .19)",
     "shadow-spread": "0px 0px 30px rgba(0, 0, 0, 0.1)",
     "shadow-spread-2": "-6px -4px 40px 10px rgba(0, 0, 0, 0.1)",
     "shadow-spread-2-xl": "-6px -4px 40px 18px rgba(0, 0, 0, 0.1)",
@@ -253,7 +266,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-bg-tree-row--selected--before": $colorPrimary50,
 
         // --- Various default colors
-        "color-info": $colorSurface950,
+        "color-info": "$color-info-800",
         "color-valid": $colorSuccess600,
         "color-warning": $colorWarn700,
         "color-error": $colorDanger700,
@@ -297,7 +310,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-bg-tree-row--selected--before": $colorPrimary950,
 
         // --- Various default colors
-        "color-info": $colorSurface50,
+        "color-info": $colorInfo600,
         "color-valid": $colorSuccess600,
         "color-warning": $colorWarn700,
         "color-error": $colorDanger700,

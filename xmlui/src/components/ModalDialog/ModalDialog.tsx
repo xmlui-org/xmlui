@@ -8,7 +8,7 @@ import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs"
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { useEvent } from "@components-core/utils/misc";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { desc } from "@components-core/descriptorHelper";

@@ -5,12 +5,9 @@ import styles from "./FileInput.module.scss";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import type { ValidationStatus } from "@components/Input/input-abstractions";
-import {
-  inputComponentEventDescriptors,
-  inputComponentPropertyDescriptors,
-} from "@components/Input/input-abstractions";
+import { inputComponentEventDescriptors } from "@components/Input/input-abstractions";
 import { noop } from "@components-core/constants";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
@@ -20,9 +17,10 @@ import { TextBox } from "@components/TextBox/TextBox";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/abstractions";
+import type { ButtonThemeColor, ButtonVariant, ComponentSize, IconPosition } from "@components/abstractions";
 
-const {useDropzone} = dropzone;
+// https://github.com/react-dropzone/react-dropzone/issues/1259
+const { useDropzone } = dropzone;
 
 // ============================================================================
 // React FileInput component implementation

@@ -301,8 +301,8 @@ export type ComponentMetadata<
 > = {
   description?: string;
   shortDescription?: string;
-  props: TProps;
-  events: TEvents;
+  props?: TProps;
+  events?: TEvents;
   contextVars?: TContextVars;
   apis?: TApis;
 
@@ -326,7 +326,7 @@ export type ComponentMetadata<
 
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
-  TEvents extends Record<string, ComponentPropertyMetadata> = {},
+  TEvents extends Record<string, ComponentPropertyMetadata>,
   TContextVars extends Record<string, ComponentPropertyMetadata> = {},
   TApis extends Record<string, ComponentPropertyMetadata> = {},
 >({

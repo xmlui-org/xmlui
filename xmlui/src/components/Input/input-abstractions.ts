@@ -105,7 +105,9 @@ export interface Adornments {
 }
 
 // The state of a validated UI element
-export type ValidationStatus = "none" | "error" | "warning" | "valid" | undefined;
+const validationStatusValues = ["none", "error", "warning", "valid"] as const;
+export const validationStatusNames: string[] = [...validationStatusValues];
+export type ValidationStatus = typeof validationStatusValues[number];
 
 // The validation result of a particular component
 export type ValidationResult = {

@@ -1,7 +1,7 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { DropdownMenu, MenuItem } from "@components/DropdownMenu/DropdownMenu";
-import { Button } from "@components/Button/Button";
-import { ContentSeparator } from "@components/ContentSeparator/ContentSeparator";
+import { DropdownMenu, MenuItem } from "@components/DropdownMenu/DropdownMenuNative";
+import { Button } from "@components/Button/ButtonNative";
+import { ContentSeparator } from "@components/ContentSeparator/ContentSeparatorNative";
 import { ModalDialog } from "@components/ModalDialog/ModalDialog";
 import { RadioGroup, RadioGroupOption } from "@components/RadioGroup/RadioGroup";
 import { useState } from "react";

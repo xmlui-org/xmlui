@@ -6,7 +6,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import { ModalDialog } from "@components/ModalDialog/ModalDialog";
 import classnames from "classnames";
 import { XmluiCodeHighlighter } from "@components-core/XmluiCodeHighlighter";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import Icon from "@components/Icon/Icon";
 import styles from "./InspectorButton.module.scss";
 

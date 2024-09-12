@@ -11,7 +11,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { Logo } from "@components/Logo/Logo";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { Button } from "@components/Button/Button";
+import { Button } from "@components/Button/ButtonNative";
 import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";

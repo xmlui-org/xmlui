@@ -5,7 +5,7 @@ export const blueThemeColors = {
   "color-surface-200": "hsl(204, 30.3%, 85%)",
   "color-surface-300": "hsl(204, 30.3%, 75%)",
   "color-surface-400": "hsl(204, 30.3%, 65%)",
-  "color-surface-500": "hsl(204, 30.3%, 52%)",   // #6894AD
+  "color-surface-500": "hsl(204, 30.3%, 52%)", // #6894AD
   "color-surface-600": "hsl(204, 30.3%, 45%)",
   "color-surface-700": "hsl(204, 30.3%, 35%)",
   "color-surface-800": "hsl(204, 30.3%, 27%)",
@@ -13,7 +13,7 @@ export const blueThemeColors = {
   "color-surface-950": "hsl(204, 30.3%, 13%)",
   "color-surface": "$color-surface-500",
 
-  // --- Primary color shades (bluish)
+  // --- Primary color shades
   "color-primary-50": "hsl(212,71.9%,94.5%)",
   "color-primary-100": "hsl(212,71.9%,89.1%)",
   "color-primary-200": "hsl(212,71.9%,78.1%)",
@@ -27,7 +27,7 @@ export const blueThemeColors = {
   "color-primary-950": "hsl(212,71.9%,4.5%)",
   "color-primary": "$color-primary-500",
 
-  // --- Secondary color shades (steel-bluish)
+  // --- Secondary color shades
   "color-secondary-50": "hsl(211.7,21.2%,96.9%)",
   "color-secondary-100": "hsl(211.7,21.2%,93.7%)",
   "color-secondary-200": "hsl(211.7,21.2%,87.4%)",
@@ -41,7 +41,7 @@ export const blueThemeColors = {
   "color-secondary-950": "hsl(211.7,21.2%,6.9%)",
   "color-secondary": "$color-secondary-500",
 
-  // --- Warning color shades (orange shades)
+  // --- Warning color shades
   "color-warn-50": "hsl(45, 100%, 97%)",
   "color-warn-100": "hsl(45, 100%, 91%)",
   "color-warn-200": "hsl(45, 100%, 80%)",
@@ -55,7 +55,7 @@ export const blueThemeColors = {
   "color-warn-950": "hsl(35, 100%, 15%)",
   "color-warn": "$color-warn-500",
 
-  // --- Danger color shades (reddish)
+  // --- Danger color shades
   "color-danger-50": "hsl(356, 100%, 95%)",
   "color-danger-100": "hsl(356, 100%, 91%)",
   "color-danger-200": "hsl(356, 100%, 80%)",
@@ -70,7 +70,7 @@ export const blueThemeColors = {
   "color-danger": "$color-danger-600",
   "color-attention": "$color-danger-500",
 
-  // --- Success color shades (greenish)
+  // --- Success color shades
   "color-success-50": "hsl(129.5, 58.4%, 96.4%)",
   "color-success-100": "hsl(129.5, 58.4%, 92.9%)",
   "color-success-200": "hsl(129.5, 58.4%, 85.7%)",
@@ -83,6 +83,19 @@ export const blueThemeColors = {
   "color-success-900": "hsl(129.5, 58.4%, 12.9%)",
   "color-success-950": "hsl(129.5, 58.4%, 6.4%)",
   "color-success": "$color-success-500",
+
+  // --- Info color shades
+  "color-info-50": "hsl(183, 97%, 95%)",
+  "color-info-100": "hsl(183, 97%, 90%)",
+  "color-info-200": "hsl(183, 97%, 80%)",
+  "color-info-300": "hsl(183, 97%, 70%)",
+  "color-info-400": "hsl(183, 97%, 60%)",
+  "color-info-500": "hsl(183, 97%, 50%)", // #02C4CE
+  "color-info-600": "hsl(183, 97%, 45%)",
+  "color-info-700": "hsl(183, 97%, 35%)",
+  "color-info-800": "hsl(183, 97%, 25%)",
+  "color-info-900": "hsl(183, 97%, 15%)",
+  "color-info-950": "hsl(183, 97%, 10%)",
 };
 
 export const greenThemeColors = {
@@ -92,7 +105,7 @@ export const greenThemeColors = {
   "color-surface-200": "hsl(144, 20%, 85%)",
   "color-surface-300": "hsl(144, 20%, 75%)",
   "color-surface-400": "hsl(144, 20%, 65%)",
-  "color-surface-500": "hsl(144, 20%, 61%)",   // #83AA90
+  "color-surface-500": "hsl(144, 20%, 61%)", // #83AA90
   "color-surface-600": "hsl(144, 20%, 45%)",
   "color-surface-700": "hsl(144, 20%, 35%)",
   "color-surface-800": "hsl(144, 20%, 27%)",
@@ -106,7 +119,7 @@ export const greenThemeColors = {
   "color-primary-200": "hsl(158, 85%, 78.1%)",
   "color-primary-300": "hsl(158, 85%, 67.2%)",
   "color-primary-400": "hsl(158, 85%, 56.3%)",
-  "color-primary-500": "hsl(158, 85%, 33%)",   // #0D9B60
+  "color-primary-500": "hsl(158, 85%, 33%)", // #0D9B60
   "color-primary-600": "hsl(158, 85%, 29.7%)",
   "color-primary-700": "hsl(158, 85%, 27.2%)",
   "color-primary-800": "hsl(158, 85%, 18.1%)",
@@ -120,7 +133,7 @@ export const greenThemeColors = {
   "color-secondary-200": "hsl(198, 100%, 78.1%)",
   "color-secondary-300": "hsl(198, 100%, 67.2%)",
   "color-secondary-400": "hsl(198, 100%, 56.3%)",
-  "color-secondary-500": "hsl(198, 100%, 29%)",   // #006792
+  "color-secondary-500": "hsl(198, 100%, 29%)", // #006792
   "color-secondary-600": "hsl(198, 100%, 25%)",
   "color-secondary-700": "hsl(198, 100%, 20%)",
   "color-secondary-800": "hsl(198, 100%, 15%)",
@@ -170,6 +183,20 @@ export const greenThemeColors = {
   "color-success-900": "hsl(158, 85%, 9.1%)",
   "color-success-950": "hsl(158, 85%, 4.5%)",
   "color-success": "$color-success-500",
+
+  // --- Info color shades
+  "color-info-50": "hsl(202, 95%, 95%)",
+  "color-info-100": "hsl(202, 95%, 90%)",
+  "color-info-200": "hsl(202, 95%, 80%)",
+  "color-info-300": "hsl(202, 95%, 70%)",
+  "color-info-400": "hsl(202, 95%, 60%)",
+  "color-info-500": "hsl(202, 95%, 50%)", // #0587CD
+  "color-info-600": "hsl(202, 95%, 45%)",
+  "color-info-700": "hsl(202, 95%, 35%)",
+  "color-info-800": "hsl(202, 95%, 25%)",
+  "color-info-900": "hsl(202, 95%, 15%)",
+  "color-info-950": "hsl(202, 95%, 10%)",
+  "color-info": "$color-info-500",
 };
 
 export const grayThemeColors = {
@@ -257,6 +284,19 @@ export const grayThemeColors = {
   "color-success-900": "hsl(168, 100%, 20%)",
   "color-success-950": "hsl(168, 100%, 15%)",
   "color-success": "$color-success-500",
+
+  "color-info-50": "hsl(204, 98%, 95%)",
+  "color-info-100": "hsl(204, 98%, 90%)",
+  "color-info-200": "hsl(204, 98%, 80%)",
+  "color-info-300": "hsl(204, 98%, 70%)",
+  "color-info-400": "hsl(204, 98%, 60%)",
+  "color-info-500": "hsl(204, 98%, 50%)", // #028ED9
+  "color-info-600": "hsl(204, 98%, 45%)",
+  "color-info-700": "hsl(204, 98%, 35%)",
+  "color-info-800": "hsl(204, 98%, 25%)",
+  "color-info-900": "hsl(204, 98%, 15%)",
+  "color-info-950": "hsl(204, 98%, 10%)",
+  "color-info": "$color-info-500",
 };
 
 export const orangeThemeColors = {
@@ -344,6 +384,19 @@ export const orangeThemeColors = {
   "color-success-900": "hsl(134, 38%, 25%)",
   "color-success-950": "hsl(134, 38%, 20%)",
   "color-success": "$color-success-500",
+
+  "color-info-50": "hsl(197, 100%, 95%)",
+  "color-info-100": "hsl(197, 100%, 90%)",
+  "color-info-200": "hsl(197, 100%, 80%)",
+  "color-info-300": "hsl(197, 100%, 70%)",
+  "color-info-400": "hsl(197, 100%, 60%)",
+  "color-info-500": "hsl(197, 100%, 50%)", // #009BCF
+  "color-info-600": "hsl(197, 100%, 45%)",
+  "color-info-700": "hsl(197, 100%, 35%)",
+  "color-info-800": "hsl(197, 100%, 25%)",
+  "color-info-900": "hsl(197, 100%, 15%)",
+  "color-info-950": "hsl(197, 100%, 10%)",
+  "color-info": "$color-info-500",
 };
 
 export const purpleThemeColors = {
@@ -430,6 +483,19 @@ export const purpleThemeColors = {
   "color-success-900": "hsl(178, 100%, 24%)",
   "color-success-950": "hsl(178, 100%, 20%)",
   "color-success": "$color-success-500",
+
+  "color-info-50": "hsl(183, 66%, 92%)",
+  "color-info-100": "hsl(183, 66%, 84%)",
+  "color-info-200": "hsl(183, 66%, 76%)",
+  "color-info-300": "hsl(183, 66%, 68%)",
+  "color-info-400": "hsl(183, 66%, 60%)",
+  "color-info-500": "hsl(183, 66%, 50%)", // #25C2C7
+  "color-info-600": "hsl(183, 66%, 45%)",
+  "color-info-700": "hsl(183, 66%, 35%)",
+  "color-info-800": "hsl(183, 66%, 25%)",
+  "color-info-900": "hsl(183, 66%, 15%)",
+  "color-info-950": "hsl(183, 66%, 10%)",
+  "color-info": "$color-info-500",
 };
 
 export const cyanThemeColors = {
@@ -517,6 +583,19 @@ export const cyanThemeColors = {
   "color-success-900": "hsl(168, 80%, 16%)",
   "color-success-950": "hsl(168, 80%, 13%)",
   "color-success": "$color-success-500",
+
+  "color-info-50": "hsl(204, 100%, 92%)",
+  "color-info-100": "hsl(204, 100%, 84%)",
+  "color-info-200": "hsl(204, 100%, 76%)",
+  "color-info-300": "hsl(204, 100%, 68%)",
+  "color-info-400": "hsl(204, 100%, 60%)",
+  "color-info-500": "hsl(204, 100%, 50%)", // #23B2FF
+  "color-info-600": "hsl(204, 100%, 45%)",
+  "color-info-700": "hsl(204, 100%, 35%)",
+  "color-info-800": "hsl(204, 100%, 25%)",
+  "color-info-900": "hsl(204, 100%, 15%)",
+  "color-info-950": "hsl(204, 100%, 10%)",
+  "color-info": "$color-info-500",
 };
 
 export const redThemeColors = {
@@ -604,4 +683,17 @@ export const redThemeColors = {
   "color-success-900": "hsl(156, 80%, 15%)",
   "color-success-950": "hsl(156, 80%, 10%)",
   "color-success": "$color-success-500",
+
+  "color-info-50": "hsl(197, 98%, 92%)",
+  "color-info-100": "hsl(197, 98%, 84%)",
+  "color-info-200": "hsl(197, 98%, 76%)",
+  "color-info-300": "hsl(197, 98%, 68%)",
+  "color-info-400": "hsl(197, 98%, 60%)",
+  "color-info-500": "hsl(197, 98%, 50%)", // #02A7E9
+  "color-info-600": "hsl(197, 98%, 45%)",
+  "color-info-700": "hsl(197, 98%, 35%)",
+  "color-info-800": "hsl(197, 98%, 25%)",
+  "color-info-900": "hsl(197, 98%, 15%)",
+  "color-info-950": "hsl(197, 98%, 10%)",
+  "color-info": "$color-info-500",
 };

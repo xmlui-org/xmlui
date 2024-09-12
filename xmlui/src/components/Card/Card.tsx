@@ -1,139 +1,52 @@
 import styles from "./Card.module.scss";
-import classnames from "@components-core/utils/classnames";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import type { CSSProperties, ReactNode } from "react";
-import { forwardRef } from "react";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { desc } from "@components-core/descriptorHelper";
-import { Avatar } from "@components/Avatar/AvatarNative";
-import { LocalLink } from "@components/Link/Link";
-import type { HeadingProps } from "@components/Heading/Heading";
-import { Heading } from "@components/Heading/Heading";
-import { Stack } from "@components/Stack/Stack";
-import { Text } from "@components/Text/Text";
+import { Card } from "./CardNative";
+import { dClick } from "@components/metadata-helpers";
 
-// =====================================================================================================================
-// React Card component implementation
+const COMP = "Card";
 
-type Props = {
-  style?: CSSProperties;
-  children?: ReactNode;
-  title?: string;
-  subTitle?: string;
-  linkTo?: string;
-  avatarUrl?: string;
-  showAvatar?: boolean;
-  onClick?: any;
-};
-
-export const Card = forwardRef(function Card(
-  { children, style, title, subTitle, linkTo, avatarUrl, showAvatar = !!avatarUrl || false, onClick }: Props,
-  ref,
-) {
-  const titleProps: Partial<HeadingProps> = {
-    level: "h2",
-    layout: { marginTop: 0, marginBottom: "4px" },
-  };
-  return (
-    <div
-      ref={ref as any}
-      className={classnames(styles.wrapper, {
-        [styles.isClickable]: !!onClick,
-      })}
-      style={style}
-      onClick={onClick}
-    >
-      {[title, subTitle, avatarUrl, showAvatar].some(Boolean) && (
-        <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "1rem" }}>
-          {showAvatar && <Avatar url={avatarUrl} name={title} />}
-          <Stack orientation="vertical">
-            {linkTo ? (
-              <LocalLink to={linkTo + ""}>
-                <Heading {...titleProps}>{title}</Heading>
-              </LocalLink>
-            ) : (
-              <Heading {...titleProps}>{title}</Heading>
-            )}
-            <Text variant="small">{subTitle}</Text>
-          </Stack>
-        </Stack>
-      )}
-      {children}
-    </div>
-  );
-});
-
-// =====================================================================================================================
-// XMLUI Card component definition
-
-/**
- * The \`Card\` component is a container for cohesive elements, often rendered visually as a card.
- */
-export interface CardComponentDef extends ComponentDef<"Card"> {
+export const CardMd = createMetadata({
+  description: `The \`${COMP}\` component is a container for cohesive elements, often rendered visually as a card.`,
   props: {
-    /** @descriptionRef */
-    title?: string;
-    /** @descriptionRef */
-    subTitle?: string;
-    /** 
-     * The `linkTo` wraps the title in a `Link` component that is clickable to navigate.
-     * @descriptionRef 
-     */
-    linkTo?: string;
-    /** 
-     * This property specifies the URL of the image to display in the avatar.
-     * @descriptionRef 
-     */
-    avatarUrl?: string;
-    /**
-     * Show the avatar (`true`) or not (`false`). If no [`avatarUrl`](#avatarurl) is specified then the Avatar will show the first letters of the [`title`](#title). 
-     * @descriptionRef 
-     */
-    showAvatar?: boolean;
-  };
-  events: {
-    /** @descriptionRef */
-    click: string;
-  };
-}
-
-export const CardMd: ComponentDescriptor<CardComponentDef> = {
-  displayName: "Card",
-  description: "A component displaying its children in a card",
-  props: {
-    avatarUrl: desc("The URL of the avatar to display"),
-    showAvatar: desc("Indicates whether the avatar should be displayed", "boolean"),
-    title: desc("A prestyled title"),
-    subTitle: desc("A prestyled subtitle"),
-    linkTo: desc("Optional link for the title"),
+    avatarUrl: d(
+      `Show the avatar (\`true\`) or not (\`false\`). If not specified, the ${COMP} will show the ` +
+        `first letters of the [\`title\`](#title).`,
+    ),
+    showAvatar: d(`Indicates whether the ${COMP} should be displayed`, null, "boolean"),
+    title: d(`This prop sets the prestyled title.`),
+    subTitle: d(`This prop sets the prestyled subtitle.`),
+    linkTo: d(
+      `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
+    ),
   },
   events: {
-    click: desc("The card is clicked"),
+    click: dClick(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "padding-horizontal-Card": "$space-4",
-    "padding-vertical-Card": "$space-4",
-    "padding-Card": "$padding-vertical-Card $padding-horizontal-Card",
-    "color-border-Card": "$color-border",
-    "thickness-border-Card": "1px",
-    "style-border-Card": "solid",
-    "border-Card": "$thickness-border-Card $style-border-Card $color-border-Card",
-    "radius-Card": "$radius",
-    "shadow-Card": "none",
+    [`padding-horizontal-${COMP}`]: "$space-4",
+    [`padding-vertical-${COMP}`]: "$space-4",
+    [`padding-${COMP}`]: `$padding-vertical-${COMP} $padding-horizontal-${COMP}`,
+    [`color-border-${COMP}`]: "$color-border",
+    [`thickness-border-${COMP}`]: "1px",
+    [`style-border-${COMP}`]: "solid",
+    [`border-${COMP}`]: `$thickness-border-${COMP} $style-border-${COMP} $color-border-${COMP}`,
+    [`radius-${COMP}`]: "$radius",
+    [`shadow-${COMP}`]: "none",
     light: {
-      "color-bg-Card": "white",
+      [`color-bg-${COMP}`]: "white",
     },
     dark: {
-      "color-bg-Card": "$color-surface-900",
+      [`color-bg-${COMP}`]: "$color-surface-900",
     },
   },
-};
+});
 
-export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
+export const cardComponentRenderer = createComponentRendererNew(
   "Card",
+  CardMd,
   ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <Card
@@ -145,48 +58,10 @@ export const cardComponentRenderer = createComponentRenderer<CardComponentDef>(
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
       >
         {renderChild(node.children, {
-          // Since the card is a flex container, it's children should behave the same as in a stack
-          // (e.g. starsizing works in this case)
           type: "Stack",
           orientation: "vertical",
         })}
       </Card>
     );
   },
-  CardMd,
-);
-
-// =====================================================================================================================
-// XMLUI MarginlessCard component definition
-
-/** @specialized */
-export type MarginlessCardComponentDef = Omit<CardComponentDef, "type"> & { type: "MarginlessCard" };
-
-const marginlessCardMetadata = {
-  ...CardMd,
-  displayName: "MarginlessCard",
-};
-
-export const marginlessCardComponentRenderer = createComponentRenderer<MarginlessCardComponentDef>(
-  "MarginlessCard",
-  ({ node, extractValue, renderChild, layoutCss }) => {
-    return (
-      <Card
-        style={{ ...layoutCss, padding: 0 }}
-        title={extractValue.asOptionalString(node.props.title)}
-        linkTo={extractValue.asOptionalString(node.props.linkTo)}
-        subTitle={extractValue.asOptionalString(node.props.subTitle)}
-        avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
-        showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
-      >
-        {renderChild(node.children, {
-          // Since the card is a flex container, it's children should behave the same as in a stack
-          // (e.g. starsizing works in this case)
-          type: "Stack",
-          orientation: "vertical",
-        })}
-      </Card>
-    );
-  },
-  marginlessCardMetadata,
 );
