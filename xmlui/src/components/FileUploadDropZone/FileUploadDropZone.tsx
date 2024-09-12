@@ -1,5 +1,6 @@
-import { CSSProperties, ReactNode, useCallback, useEffect } from "react";
-import { useDropzone } from "react-dropzone";
+import type { CSSProperties, ReactNode} from "react";
+import { useCallback, useEffect } from "react";
+import * as dropzone from "react-dropzone";
 import { Icon } from "@components/Icon/Icon";
 import styles from "./FileUploadDropZone.module.scss";
 import { useEvent } from "@components-core/utils/misc";
@@ -7,9 +8,11 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { asyncNoop } from "@components-core/constants";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
+
+const {useDropzone} = dropzone;
 
 // =====================================================================================================================
 // React FileUploadDropZone component implementation

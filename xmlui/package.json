@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "sideEffects": false,
   "scripts": {
     "build:bin": "tsc -p tsconfig.bin.json",
@@ -138,12 +138,12 @@
         "xmlui": "dist/scripts/bin/bootstrap.js"
       },
       "main": "./dist/xmlui.umd.js",
-      "module": "./dist/xmlui.es.js",
+      "module": "./dist/xmlui.mjs",
       "types": "./dist/xmlui.es.d.ts",
       "source": "./src/index.ts",
       "exports": {
         ".": {
-          "import": "./dist/xmlui.es.js",
+          "import": "./dist/xmlui.mjs",
           "require": "./dist/xmlui.umd.js"
         },
         "./*.css": {

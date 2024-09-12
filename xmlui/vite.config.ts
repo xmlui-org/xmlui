@@ -39,14 +39,21 @@ export default ({mode}) => {
             lib: mode === 'standalone'? {
                 entry: [path.resolve("src", "index-standalone.ts")],
                 name: "xmlui-standalone",
+                formats: ["umd"],
                 fileName: (format) => `xmlui-standalone.${format}.js`,
             } : {
                 entry: [path.resolve("src", "index.ts")],
                 name: "xmlui",
-                fileName: (format) => `xmlui.${format}.js`,
+                fileName: "xmlui",
             },
             rollupOptions: {
                 external: mode === 'standalone' ? [] : [...Object.keys(packageJson.dependencies)],
+                output: {
+                    globals: {
+                        react: "React",
+                        "react-dom": "ReactDOM",
+                    },
+                },
             },
         },
         plugins: [react(), svgr(), ViteYaml(), libInjectCss(), dts({rollupTypes: true})],

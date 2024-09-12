@@ -13,14 +13,16 @@ import {
 } from "@components/Input/input-abstractions";
 import { noop } from "@components-core/constants";
 import type { DropzoneRootProps } from "react-dropzone";
-import { useDropzone } from "react-dropzone";
+import * as dropzone from "react-dropzone";
 import { useEvent } from "@components-core/utils/misc";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
 import { TextBox } from "@components/TextBox/TextBox";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc } from "@components-core/descriptorHelper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ComponentSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/abstractions";
+import type { ComponentSize, ButtonThemeColor, ButtonVariant, IconPosition } from "@components/abstractions";
+
+const {useDropzone} = dropzone;
 
 // ============================================================================
 // React FileInput component implementation
