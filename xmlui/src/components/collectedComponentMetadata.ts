@@ -15,7 +15,7 @@ import { CheckboxMd } from "@components/Checkbox/Checkbox";
 import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import { DropdownMenuMd, MenuItemMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -67,8 +67,12 @@ import { TabsMd } from "@components/Tabs/Tabs";
 import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
+import { AccordionMd } from "./Accordion/Accordion";
+import { AlertMd } from "./Alert/Alert";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
+  Accordion: AccordionMd,
+  Alert: AlertMd,
   // App: AppMd,
   // AppHeader: AppHeaderMd,
   // AppState: AppStateMd,
@@ -80,10 +84,12 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   Combobox: ComboboxMd,
-  // ContentSeparator: ContentSeparatorMd,
-  // DatePicker: DatePickerMd,
-  // DropdownMenu: DropdownMenuMd,
-  // EmojiSelector: EmojiSelectorMd,
+  ContentSeparator: ContentSeparatorMd,
+  DatePicker: DatePickerMd,
+  DropdownMenu: DropdownMenuMd,
+  MenuItem: MenuItemMd,
+  SubMenuItem: SubMenuItemMd,
+  EmojiSelector: EmojiSelectorMd,
   // FileInput: FileInputMd,
   // FileUploadDropZone: FileUploadDropZoneMd,
   // FlowLayout: FlowLayoutMd,

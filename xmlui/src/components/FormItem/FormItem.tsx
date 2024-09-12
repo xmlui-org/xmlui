@@ -25,7 +25,7 @@ import { useEvent } from "@components-core/utils/misc";
 import { MultiSelect } from "@components/MultiSelect/MultiSelect";
 import type { LabelPosition } from "./ItemWithLabel";
 import { ItemWithLabel } from "./ItemWithLabel";
-import { DatePicker } from "@components/DatePicker/DatePicker";
+import { DatePicker } from "@components/DatePicker/DatePickerNative";
 import { getByPath } from "@components/Form/Form";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
