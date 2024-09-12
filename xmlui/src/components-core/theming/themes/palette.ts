@@ -52,4 +52,7 @@ export const palette = {
 
   $colorSuccess600: "$color-success-600",
   $colorSuccess950: "$color-success-950",
+  
+  $colorInfo600: "$color-info-600",
+  $colorInfo800: "$color-info-700",
 };

@@ -21,7 +21,6 @@ $color-bg-trigger-Tabs--hover: createThemeVar("color-bg-trigger-Tabs--hover");
   width: 100%;
   background-color: $color-bg-Tabs;
   overflow: auto;
-
   &[data-orientation='horizontal'] {
     flex-direction: row;
   }
