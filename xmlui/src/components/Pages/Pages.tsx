@@ -34,7 +34,11 @@ export function RouteWrapper({
     };
   }, [childRoute]);
 
-  return <Fragment key={JSON.stringify(params)}>{renderChild(wrappedWithContainer, layoutContext)}</Fragment>;
+  return (
+    <Fragment key={JSON.stringify(params)}>
+      {renderChild(wrappedWithContainer, layoutContext)}
+    </Fragment>
+  );
 }
 
 // =====================================================================================================================
@@ -67,7 +71,11 @@ export const pageRenderer = createComponentRenderer<PageComponentDef>(
   ({ node, extractValue, renderChild }) => {
     return (
       <TableOfContentsProvider>
-        <RouteWrapper childRoute={node.children} renderChild={renderChild} key={extractValue(node.props.url)} />
+        <RouteWrapper
+          childRoute={node.children}
+          renderChild={renderChild}
+          key={extractValue(node.props.url)}
+        />
       </TableOfContentsProvider>
     );
   },
@@ -83,17 +91,31 @@ type PagesProps = {
 };
 
 export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
+  const routes: Array<PageComponentDef> = [];
+  const restChildren: Array<ComponentDef> = [];
+  node.children.map((child) => {
+    if (child.type === "Page") {
+      routes.push(child as PageComponentDef);
+    } else {
+      restChildren.push(child);
+    }
+  });
   return (
-    <Routes>
-      {node.children
-        .filter((child) => child.type === "Page")
-        .map((child, i) => {
+    <>
+      <Routes>
+        {routes.map((child, i) => {
           return (
-            <Route path={extractValue((child as PageComponentDef).props.url)} key={i} element={renderChild(child)} />
+            <Route
+              path={extractValue(child.props.url)}
+              key={i}
+              element={renderChild(child)}
+            />
           );
         })}
-      {!!defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
-    </Routes>
+        {!!defaultRoute && <Route path="*" element={<Navigate to={defaultRoute} replace />} />}
+      </Routes>
+      {renderChild(restChildren)}
+    </>
   );
 }
 
