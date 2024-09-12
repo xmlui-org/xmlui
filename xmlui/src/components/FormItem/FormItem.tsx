@@ -9,7 +9,7 @@ import type { FormItemValidations, ValidateEventHandler, ValidationMode } from "
 import { useFormContextPart } from "@components/Form/FormContext";
 import { TextBox } from "@components/TextBox/TextBox";
 import { Toggle } from "@components/Toggle/Toggle";
-import { FileInput } from "@components/FileInput/FileInput";
+import { FileInput } from "@components/FileInput/FileInputNative";
 import { NumberBox } from "@components/NumberBox/NumberBox";
 import { Select } from "@components/Select/Select";
 import { RadioGroup } from "@components/RadioGroup/RadioGroup";
