@@ -67,11 +67,16 @@ export default ({ mode }) => {
             outDir: "dist",
             lib: lib,
             rollupOptions: {
-                external: mode === 'standalone' ? [] : [...Object.keys(packageJson.dependencies)],
+                treeshake: mode === "metadata" ? "smallest" : undefined,
+                external: mode === 'standalone' ? [] : [
+                    ...Object.keys(packageJson.dependencies),
+                    "react/jsx-runtime",
+                ],
                 output: {
                     globals: {
                         react: "React",
                         "react-dom": "ReactDOM",
+                        'react/jsx-runtime': 'react/jsx-runtime',
                     },
                 },
             },

@@ -141,8 +141,7 @@
       },
       "main": "./dist/xmlui.umd.js",
       "module": "./dist/xmlui.mjs",
-      "types": "./dist/xmlui.es.d.ts",
-      "source": "./src/index.ts",
+      "types": "./dist/xmlui.d.ts",
       "exports": {
         ".": {
           "import": "./dist/xmlui.mjs",
