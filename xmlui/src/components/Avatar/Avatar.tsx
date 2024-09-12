@@ -24,7 +24,7 @@ export const AvatarMd = createMetadata({
     [`radius-${COMP}`]: "4px",
     [`thickness-border-${COMP}`]: "0px",
     [`style-border-${COMP}`]: "solid",
-    [`border-${COMP}`]: `$thickness-border-${COMP} $style-border-Avatar $color-border-${COMP}`,
+    [`border-${COMP}`]: `$thickness-border-${COMP} $style-border-${COMP} $color-border-${COMP}`,
     [`shadow-${COMP}`]: "inset 0 0 0 1px rgba(4,32,69,0.1)",
     [`color-text-${COMP}`]: "$color-text-secondary",
     [`font-weight-${COMP}`]: "$font-weight-bold",

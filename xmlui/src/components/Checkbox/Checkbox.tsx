@@ -51,12 +51,12 @@ export const CheckboxMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`color-border-checked-${COMP}-error`]: "$color-border-${COMP}-error",
-    [`color-bg-checked-${COMP}-error`]: "$color-border-${COMP}-error",
-    [`color-border-checked-${COMP}-warning`]: "$color-border-${COMP}-warning",
-    [`color-bg-checked-${COMP}-warning`]: "$color-border-${COMP}-warning",
-    [`color-border-checked-${COMP}-success`]: "$color-border-${COMP}-success",
-    [`color-bg-checked-${COMP}-success`]: "$color-border-${COMP}-success",
+    [`color-border-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
+    [`color-bg-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
+    [`color-border-checked-${COMP}-warning`]: `$color-border-${COMP}-warning`,
+    [`color-bg-checked-${COMP}-warning`]: `$color-border-${COMP}-warning`,
+    [`color-border-checked-${COMP}-success`]: `$color-border-${COMP}-success`,
+    [`color-bg-checked-${COMP}-success`]: `$color-border-${COMP}-success`,
     light: {
       [`color-bg-indicator-${COMP}`]: "$color-bg-primary",
       [`color-border-checked-${COMP}`]: "$color-primary-500",

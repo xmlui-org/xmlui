@@ -7,6 +7,7 @@ import {
   buttonThemeNames,
   buttonTypeNames,
   iconPositionNames,
+  buttonVariantNames,
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/Icon";
@@ -21,11 +22,8 @@ export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
   props: {
     autoFocus: d("Indicates if the button should receive focus when the page loads"),
-    variant: d("The button variant (solid, outlined, ghost) to use"),
-    themeColor: {
-      description: "The button color scheme (primary, secondary, attention)",
-      availableValues: buttonThemeNames,
-    },
+    variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantNames),
+    themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeNames),
     size: d("The size of the button (small, medium, large)", sizeNames),
     label: d(
       `This property is an optional string to set a label for the ${COMP}. If no label is ` +
