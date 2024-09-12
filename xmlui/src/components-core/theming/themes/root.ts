@@ -177,7 +177,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
     // --- The sans-serif font set
     "font-family-sans-serif":
-      "Inter, -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
+      "'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif",
 
     // --- The monospace font set
     "font-family-monospace": "Menlo,Monaco,Consolas,Liberation Mono,Courier New,monospace",
