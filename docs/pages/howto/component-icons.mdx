@@ -1,0 +1,211 @@
+import data from  "../../component-samples/Table/list-component-data.js";
+import arrowIcon from "../../public/resources/files/howto/component-icons/up-arrow.svg";
+
+# Using Table-specific Icons
+
+Changing the graphical element displayed by an `Icon` component is as easy as entering a different name in the `name` property:
+
+```ueml copy
+<Icon name="email" />
+```
+
+Some components have icons already built into them like the ones in the `Table` component indicating sorting by a specific column.
+
+> **Note:** The following examples all use the same dataset that the `Table` component [reference documentation](../components/Table.mdx) uses.
+
+<Playground
+  previewOnly
+  name="Example: Sorting icons in Table column headers"
+  height={360}
+  app={`
+    <Table data='{${JSON.stringify(data)}}'>
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <TableColumnDef bindTo="unit" canSort="true"/>
+    </Table>
+  `}
+/>
+
+The `Table` uses three icons to indicate the sorting order for the three possible icon options:
+- ascending: `sortasc`
+- descending: `sortdesc`
+- not sorted by the column: `nosort`
+
+If you want to use your own icons instead of the ones already provided,
+you would add an entry with the icon name to the configuration file like so:
+
+```js
+{
+  name: "My Project",
+  resources: {
+    "icon.arrowup": "resources/arrow-up.svg",
+  },
+}
+```
+
+However, this would change all icons using the name `arrowup`.
+
+## Component-specific Custom Icons
+
+In situations where you would want to change only the icon(s) of a particular component, like the `Table`,
+you can use icon names scoped specifically to that component.
+
+Component-scoped icon names follow the same signature:
+
+```
+<icon-name>:<component-name>
+```
+
+Icons in the `Table` component using this signature are the following icons:
+- `sortasc:Table`
+- `sortdesc:Table`
+- `nosort:Table`
+
+Use the same method for overwriting these icons as you would do with other icons:
+
+```js /icon.sortasc:Table/
+{
+  name: "My Project",
+  resources: {
+    "icon.sortasc:Table": "resources/arrow-up.svg",
+  },
+}
+```
+
+This ensures that only the `sortasc` icon found in the `Table` component is affected by the change.
+
+<Playground
+  previewOnly
+  name="Example: Component-specific icon customization"
+  height={360}
+  resources={{ "icon.sortasc:Table": arrowIcon }}
+  app={`
+    <Table data='{${JSON.stringify(data)}}'>
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <TableColumnDef bindTo="unit" canSort="true"/>
+    </Table>
+  `}
+/>
+
+## Instance-specific Custom Icons
+
+Another scenario regarding icon change is where only one instance of the `Table` component on a particular page needs to have different sorting icons.
+The `Table` component also supports this case by providing the following properties:
+- `iconSortAsc`: overwrites the "sortasc:Table" icon
+- `iconSortDesc`: overwrites the "sortdesc:Table" icon
+- `iconNoSort`: "overwrites the "nosort:Table" icon
+
+In the next example, the first `Table` component to the left retains the default sort by ascending order icon,
+while the second `Table` to the right uses the `chevronup` icon instead.
+
+```ueml copy /iconSortAsc="chevronup"/
+<HStack>
+  <VStack width="50%">
+    Default icon:
+    <Table data='{[...]}' sortBy="name">
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+    </Table>
+  </VStack>
+  <VStack width="50%">
+    Instance-specific icon:
+    <Table data='{[...]}' iconSortAsc="chevronup" sortBy="name">
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+    </Table>
+  </VStack>
+</HStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: Instance-specific icon customization"
+  height={360}
+  app={`
+    <HStack>
+      <VStack width="50%">
+        Default icon:
+        <Table data='{${JSON.stringify(data)}}' sortBy="name">
+          <TableColumnDef bindTo="name" canSort="true"/>
+          <TableColumnDef bindTo="quantity" canSort="true"/>
+        </Table>
+      </VStack>
+      <VStack width="50%">
+        Instance-specific icon:
+        <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
+          <TableColumnDef bindTo="name" canSort="true"/>
+          <TableColumnDef bindTo="quantity" canSort="true"/>
+        </Table>
+      </VStack>
+    </HStack>
+  `}
+/>
+
+## Fallbacks
+
+Scoped icons always fall back to a more generic alternative if a particular name is not found.
+XMLUI uses the same concept here as it does regarding [theme variable chaining](../learning/themes/themes-and-styling.mdx#theme-variable-chaining).
+From the most specific to the most generic the chain looks like the following for the Table's `sortasc` icon:
+
+1. XMLUI looks for the `sortasc:Table` icon name in the resources of the application config
+2. If (1) is not found, XMLUI checks the same resources entry in the config file for an icon name `sortasc`
+3. If (2) is not found, XMLUI browses the icon registry for an icon name `sortasc`
+4. If none of the above is found, XMLUI renders an empty icon
+
+This also means that if more than one icon is set, the icon that is more specific will overwrite a more generic icon.
+In the following example, we will override the `icon.sortasc:Table` resource with a custom one and also set the `iconSortAsc` property.
+Note, how the icon resource only appears in the left `Table` and not on the right one which has the property set:
+
+```js copy filename="config.ts"
+{
+  name: "My Project",
+  resources: {
+    "icon.sortasc:Table": "resources/arrow-up.svg",
+  },
+}
+```
+
+```ueml copy /iconSortAsc="chevronup"/ filename="Main.xmlui"
+<HStack>
+  <VStack width="50%">
+    Component-specific icon:
+    <Table data='{[...]}' sortBy="name">
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+    </Table>
+  </VStack>
+  <VStack width="50%">
+    Instance-specific icon:
+    <Table data='{[...]}' iconSortAsc="chevronup" sortBy="name">
+      <TableColumnDef bindTo="name" canSort="true"/>
+      <TableColumnDef bindTo="quantity" canSort="true"/>
+    </Table>
+  </VStack>
+</HStack>
+```
+
+<Playground
+  previewOnly
+  name="Example: Instance- and Component-specific icon customizations"
+  height={360}
+  resources={{ "icon.sortasc:Table": arrowIcon }}
+  app={`
+    <HStack>
+      <VStack width="50%">
+        Component-specific icon:
+        <Table data='{${JSON.stringify(data)}}' sortBy="name">
+          <TableColumnDef bindTo="name" canSort="true"/>
+          <TableColumnDef bindTo="quantity" canSort="true"/>
+        </Table>
+      </VStack>
+      <VStack width="50%">
+        Instance-specific icon:
+        <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
+          <TableColumnDef bindTo="name" canSort="true"/>
+          <TableColumnDef bindTo="quantity" canSort="true"/>
+        </Table>
+      </VStack>
+    </HStack>
+  `}
+/>
