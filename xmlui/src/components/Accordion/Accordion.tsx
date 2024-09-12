@@ -1,151 +1,111 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 
 import styles from "./Accordion.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { desc } from "@components-core/descriptorHelper";
+import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import { Accordion, positionInGroupNames } from "./AccordionNative";
+import {
+  dCollapse,
+  dComponent,
+  dDidChange,
+  dExpand,
+  dExpanded,
+  dFocus,
+} from "@components/metadata-helpers";
+import { triggerPositionNames } from "@components/abstractions";
+
+const COMP = "Accordion";
 
 // See reference implementation here: https://getbootstrap.com/docs/5.3/components/accordion/
 // Make the header focusable, handle ARIA attributes, and manage the state of the accordion.
 
-/**
- * (**NOT IMPLEMENTED YET**) The \`Accordion\` component is a collapsible container that toggles the display of content sections. It helps
- * organize information by expanding or collapsing it based on user interaction.
- */
-export interface AccordionComponentDef extends ComponentDef<"Accordion"> {
+export const AccordionMd = createMetadata({
+  description:
+    `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component is a collapsible container that toggles ` +
+    `the display of content sections. It helps organize information by expanding or collapsing it ` +
+    `based on user interaction.`,
   props: {
-    /**
-     * Declares the text used in the component's header.
-     * @descriptionRef
-     */
-    header?: string;
-    /**
-     * This property describes the template to use as the component's header.
-     * @descriptionRef
-     */
-    headerTemplate?: ComponentDef;
-    /**
-     * This property indicates if the accordion is expanded (\`true\`) or collapsed (\`false\`). By default,
-     * this value is \`false\`.
-     * @descriptionRef
-     */
-    initiallyExpanded?: boolean;
-    /**
-     * This property indicates the position where the trigger icon should be displayed. The \`start\` value
-     * signs the trigger is before the header text (template), and \`end\` indicates that it follows the header.
-     * @descriptionRef
-     */
-    triggerPosition?: "start" | "end";
-    /**
-     * This property is the name of the icon that is displayed when the accordion is collapsed.
-     * @descriptionRef
-     */
-    collapsedIcon?: string;
-    /**
-     * This property is the name of the icon that is displayed when the accordion is expanded.
-     * @descriptionRef
-     */
-    expandedIcon?: string;
-    /**
-     * This property indicates that the trigger icon is not displayed (\`true\`). By default, its value
-     * is \`false\`.
-     * @descriptionRef
-     */
-    hideIcon?: boolean;
-    /**
-     * This property indicates the position of the accordion in a group of accordions. The possible values are:
-     * @descriptionRef
-     * @defaultValue "single"
-     */
-    positionInGroup?: "single" | "first" | "middle" | "last";
-  };
-  events: {
-    /**
-     * This event is triggered when the state of the accordion changes from collapsed to expanded or vice versa.
-     * The event has a single Boolean argument, which is \`true\`, if the new state of the accordion is expanded.
-     * @descriptionRef
-     */
-    displayDidChange?: (expanded: boolean) => void;
-  };
-  api: {
-    /**
-     * This property indicates if the accordion is expanded (\`true\`) or collapsed (\`false\`).
-     * @descriptionRef
-     */
-    expanded: boolean;
-    /**
-     * This method expands the accordion.
-     * @descriptionRef
-     */
-    expand: () => void;
-    /**
-     * This method collapses the accordion.
-     * @descriptionRef
-     */
-    collapse: () => void;
-    /**
-     * This method toggles the accordion's state between expanded and collapsed.
-     * @descriptionRef
-     */
-    toggle: () => void;
-    /**
-     * This method sets the focus on the accordion.
-     * @descriptionRef
-     */
-    focus: () => void;
-  };
-}
-
-const metadata: ComponentDescriptor<AccordionComponentDef> = {
-  displayName: "Accordion",
-  description: "A collapsible container that toggles the display of content sections.",
-  props: {
-    header: desc("Text used in the component's header"),
-    headerTemplate: desc("Template to use as the component's header"),
-    initiallyExpanded: desc("Indicates if the accordion is expanded or collapsed"),
-    triggerPosition: desc("Position where the trigger icon should be displayed"),
-    collapsedIcon: desc("Name of the icon displayed when the accordion is collapsed"),
-    expandedIcon: desc("Name of the icon displayed when the accordion is expanded"),
-    hideIcon: desc("Indicates that the trigger icon is not displayed"),
-    positionInGroup: desc("Position of the accordion in a group of accordions"),
+    header: d("This property declares the text used in the component's header."),
+    headerTemplate: dComponent(
+      "This property describes the template to use as the component's header.",
+    ),
+    initiallyExpanded: d(
+      `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
+      null,
+      "boolean",
+      false,
+    ),
+    triggerPosition: d(
+      `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
+        `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
+        `follows the header.`,
+      triggerPositionNames,
+      null,
+      "end",
+    ),
+    collapsedIcon: d(
+      `This property is the name of the icon that is displayed when the accordion is collapsed.`,
+    ),
+    expandedIcon: d(
+      `This property is the name of the icon that is displayed when the accordion is expanded.`,
+    ),
+    hideIcon: d(
+      `This property indicates that the trigger icon is not displayed (\`true\`).`,
+      null,
+      "boolean",
+      false,
+    ),
+    rotateExpanded: d(
+      `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
+    ),
+    positionInGroup: d(
+      `This property indicates the position of the accordion in a group of accordions.`,
+      positionInGroupNames,
+    ),
   },
   events: {
-    displayDidChange: desc("Triggered when the state of the accordion changes"),
+    displayDidChange: dDidChange(COMP),
+  },
+  apis: {
+    expanded: dExpanded(COMP),
+    expand: dExpand(COMP),
+    collapse: dCollapse(COMP),
+    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
+    focus: dFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "padding-horizontal-header-Accordion": "",
-    "padding-vertical-header-Accordion": "",
-    "align-vertical-header-Accordion": "",
-    "font-size-header-Accordion": "",
-    "font-weight-header-Accordion": "",
-    "font-style-header-Accordion": "",
-    "border-radius-Accordion": "",
-    "thickness-border-Accordion": "",
-    "style-border-Accordion": "",
-    "width-icon-Accordion": "",
-    "height-icon-Accordion": "",
+    [`padding-horizontal-header-${COMP}`]: "",
+    [`padding-vertical-header-${COMP}`]: "",
+    [`align-vertical-header-${COMP}`]: "",
+    [`font-size-header-${COMP}`]: "",
+    [`font-weight-header-${COMP}`]: "",
+    [`font-style-header-${COMP}`]: "",
+    [`border-radius-${COMP}`]: "",
+    [`thickness-border-${COMP}`]: "",
+    [`style-border-${COMP}`]: "",
+    [`width-icon-${COMP}`]: "",
+    [`height-icon-${COMP}`]: "",
     light: {
-      "color-bg-header-Accordion": "",
-      "color-header-Accordion": "",
-      "color-border-Accordion": "",
-      "color-icon-Accordion": "",
+      [`color-bg-header-${COMP}`]: "",
+      [`color-header-${COMP}`]: "",
+      [`color-border-${COMP}`]: "",
+      [`color-icon-${COMP}`]: "",
     },
     dark: {
-      "color-bg-header-Accordion": "",
-      "color-header-Accordion": "",
-      "color-border-Accordion": "",
-      "color-icon-Accordion": "",
+      [`color-bg-header-${COMP}`]: "",
+      [`color-header-${COMP}`]: "",
+      [`color-border-${COMP}`]: "",
+      [`color-icon-${COMP}`]: "",
     },
   },
-};
+});
 
-export const accordionComponentRenderer = createComponentRenderer<AccordionComponentDef>(
-  "Accordion",
+export const accordionComponentRenderer = createComponentRendererNew(
+  COMP,
+  AccordionMd,
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {
-    return <div style={{ backgroundColor: "red", color: "white" }}>Accordion component is not implemented yet</div>;
+    return <Accordion />;
   },
-  metadata,
 );

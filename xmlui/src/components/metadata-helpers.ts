@@ -169,3 +169,52 @@ export function dEndIcon(): ComponentPropertyMetadata {
       `left-to-right direction is set) of the input.`,
   };
 }
+
+export function dExpanded(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This property indicates if the ${comp} is expanded (\`true\`) or collapsed (\`false\`).`,
+  };
+}
+
+export function dExpand(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This method expands the ${comp}.`,
+  };
+}
+
+export function dCollapse(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This method collapses the ${comp}.`,
+  };
+}
+
+export function dFocus(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This method sets the focus on the ${comp}.`,
+  };
+}
+
+export function dDidOpen(comp: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This event is triggered when the ${comp} has been displayed. The event handler has a single ` +
+      `boolean argument set to \`true\`, indicating that the user opened the component.`,
+  };
+}
+
+export function dDidClose(comp: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This event is triggered when the ${comp} has been closed. The event handler has a single ` +
+      `boolean argument set to \`true\`, indicating that the user closed the component.`,
+  };
+}
+
+export function dTriggerTemplate(comp: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This property allows you to define a custom trigger instead of the default one provided by ` +
+      `\`${comp}\`.`,
+    valueType: "ComponentDef",
+  };
+}
