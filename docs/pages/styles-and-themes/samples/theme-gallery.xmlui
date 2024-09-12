@@ -25,9 +25,10 @@
        <Badge value="Long Pill" variant="pill"/>
     </HStack>
     <HStack gap="$space-4">
-       <Text value="Warning" color="$color-warn-500"/>
-       <Text value="Danger" color="$color-danger-500"/>
-       <Text value="Success" color="$color-success-500"/>
+       <Text value="Warning" color="$color-warn"/>
+       <Text value="Danger" color="$color-danger"/>
+       <Text value="Success" color="$color-success"/>
+       <Text value="Info" color="$color-info"/>
     </HStack>
     <HStack gap="$space-4">
       <Checkbox initialValue="false" label="Set or clear me!"/>
