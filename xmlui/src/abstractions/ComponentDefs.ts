@@ -1,6 +1,6 @@
 import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
-import { DefaultThemeVars } from "./ThemingDefs";
+import type { DefaultThemeVars } from "./ThemingDefs";
 
 /**
  * This interface represents the core properties of a component definition (independent
@@ -216,10 +216,10 @@ export type ComponentPropertyMetadata = {
 };
 
 export type ComponentMetadata<
-  TProps extends Record<string, ComponentPropertyMetadata> = {},
-  TEvents extends Record<string, ComponentPropertyMetadata> = {},
-  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
-  TApis extends Record<string, ComponentPropertyMetadata> = {},
+  TProps extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TEvents extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // The current status of the component. By default, it is "stable".
   status?: "stable" | "experimental" | "deprecated" | "in review";
@@ -263,8 +263,8 @@ export type ComponentMetadata<
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
   TEvents extends Record<string, ComponentPropertyMetadata>,
-  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
-  TApis extends Record<string, ComponentPropertyMetadata> = {},
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 >({
   description,
   shortDescription,
