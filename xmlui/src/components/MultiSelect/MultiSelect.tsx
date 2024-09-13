@@ -23,7 +23,7 @@ import { createPortal } from "react-dom";
 import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
 import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
-import Icon from "@components/Icon/Icon";
+import Icon from "@components/Icon/IconNative";
 import { isEqual } from "lodash-es";
 import { Adornment } from "@components/Input/InputAdornment";
 

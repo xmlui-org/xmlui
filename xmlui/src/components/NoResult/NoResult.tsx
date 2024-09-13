@@ -1,4 +1,4 @@
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import styles from "./NoResult.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";

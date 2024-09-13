@@ -9,7 +9,7 @@ import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/
 
 import { Button } from "@components/Button/ButtonNative";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import classnames from "@components-core/utils/classnames";
 import { noop } from "@components-core/constants";
 

@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./ModalDialog.module.scss";
 import classnames from "@components-core/utils/classnames";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";

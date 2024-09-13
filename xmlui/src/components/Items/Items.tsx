@@ -1,63 +1,16 @@
-import { type ReactNode, useMemo } from "react";
 import { MemoizedItem } from "../container-helpers";
-import { isPlainObject } from "lodash-es";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { nestedComp } from "@components-core/descriptorHelper";
+import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
+import { Items } from "./ItemsNative";
+import { dComponent } from "@components/metadata-helpers";
 
-// =====================================================================================================================
-// React Items component implementation
+const COMP = "Items";
 
-function Items({
-  items,
-  renderItem,
-  reverse = false,
-}: {
-  reverse?: boolean;
-  items: any[];
-  renderItem: (contextVars: any, key: number) => ReactNode;
-}) {
-  const itemsToRender = useMemo(() => {
-    if (!items) {
-      return [];
-    }
-    let normalizedItems = items;
-    if (isPlainObject(items)) {
-      normalizedItems = Object.values(items);
-    }
-    return reverse ? [...normalizedItems].reverse() : normalizedItems;
-  }, [items, reverse]);
-
-  if (!itemsToRender) {
-    return null;
-  }
-  return <>{itemsToRender.map((item, index) => renderItem({
-      $item: item,
-      $itemIndex: index,
-      $isFirst: index === 0,
-      $isLast: index === itemsToRender.length - 1
-  }, index))}</>;
-}
-
-// =====================================================================================================================
-// XMLUI Items component definition
-
-/** 
- * The \`Items\` component maps sequential data items into component instances,
- * representing each data item as a particular component.
- * 
- * > **Note**: \`Items\` is not a container! It does not wrap its items into a container; it merely renders the its children.
- */
 export interface ItemsComponentDef extends ComponentDef<"Items"> {
   props: {
-    /** This property contains the list of data items this component renders. */
-    items: any[];
-    /** @internal */
-    data: any[];
     /** @internal */
     itemTemplate: ComponentDef;
-    /** 
+    /**
      * This property reverses the order in which data is mapped to template components.
      * @descriptionRef
      */
@@ -65,27 +18,28 @@ export interface ItemsComponentDef extends ComponentDef<"Items"> {
   };
   contextVars: {
     /** This property represents the value of an item in the data list. */
-    "$item": any;
-  }
+    $item: any;
+  };
 }
 
-export const ItemsMd: ComponentDescriptor<ItemsComponentDef> = {
-  displayName: "Items",
-  description: "A component displaying a list of items",
+export const ItemsMd = createMetadata({
+  description:
+    `The \`${COMP}\` component maps sequential data items into component instances, representing ` +
+    `each data item as a particular component.`,
   props: {
-    items: nestedComp("The list of items to display"),
-    data: nestedComp("The list of items to display"),
-    reverse: nestedComp("Reverse the order of items"),
-    itemTemplate: nestedComp("The component template to display a single item"),
+    items: dComponent(`This property contains the list of data items this component renders.`),
+    data: d(`This property contains the list of data items (obtained from a data source) this component renders.`),
+    reverse: d(`This property reverses the order in which data is mapped to template components.`),
+    itemTemplate: dComponent("The component template to display a single item"),
   },
   opaque: true,
-};
+});
 
-export const itemsComponentRenderer = createComponentRenderer<ItemsComponentDef>(
-  "Items",
+export const itemsComponentRenderer = createComponentRendererNew(
+  COMP,
+  ItemsMd,
   (rendererContext) => {
     const { node, renderChild, extractValue, layoutContext } = rendererContext;
-
     return (
       <Items
         items={extractValue(node.props.items) || extractValue(node.props.data)}
@@ -95,7 +49,7 @@ export const itemsComponentRenderer = createComponentRenderer<ItemsComponentDef>
             <MemoizedItem
               key={key}
               contextVars={contextVars}
-              node={node.children || node.props.itemTemplate}
+              node={node.children || node.props.itemTemplate as any}
               renderChild={renderChild}
               layoutContext={layoutContext}
             />
@@ -104,5 +58,4 @@ export const itemsComponentRenderer = createComponentRenderer<ItemsComponentDef>
       />
     );
   },
-  ItemsMd
 );

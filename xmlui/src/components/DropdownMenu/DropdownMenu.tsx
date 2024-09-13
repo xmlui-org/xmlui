@@ -6,8 +6,7 @@ import { iconPositionNames, type IconPosition } from "@components/abstractions";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { desc } from "@components-core/descriptorHelper";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
 import {
   dClick,

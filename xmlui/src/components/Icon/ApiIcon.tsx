@@ -1,1 +1,4 @@
-import Icon from "./svg/api.svg?react";import type {IconBaseProps} from "./Icon";export const ApiIcon = (props: IconBaseProps) => <Icon {...props}/>
+import Icon from "./svg/api.svg?react";
+import type {IconBaseProps} from "./IconNative";
+
+export const ApiIcon = (props: IconBaseProps) => <Icon {...props}/>

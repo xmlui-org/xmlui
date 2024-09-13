@@ -7,7 +7,7 @@ import { ModalDialog } from "@components/ModalDialog/ModalDialog";
 import classnames from "classnames";
 import { XmluiCodeHighlighter } from "@components-core/XmluiCodeHighlighter";
 import { Button } from "@components/Button/ButtonNative";
-import Icon from "@components/Icon/Icon";
+import Icon from "@components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
 
 interface IInspectorContext {

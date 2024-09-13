@@ -25,7 +25,7 @@ import { Adornment } from "@components/Input/InputAdornment";
 import { filterOptions } from "../component-utils";
 import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
-import Icon from "@components/Icon/Icon";
+import Icon from "@components/Icon/IconNative";
 import { isEqual } from "lodash-es";
 
 // =====================================================================================================================

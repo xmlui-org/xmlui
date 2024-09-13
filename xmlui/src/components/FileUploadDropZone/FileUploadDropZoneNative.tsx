@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect } from "react";
 import * as dropzone from "react-dropzone";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import styles from "./FileUploadDropZone.module.scss";
 import { useEvent } from "@components-core/utils/misc";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";

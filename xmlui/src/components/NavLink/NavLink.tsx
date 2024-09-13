@@ -7,7 +7,7 @@ import classnames from "@components-core/utils/classnames";
 import type { LinkAria, LinkTarget } from "@components/abstractions";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import type { To } from "react-router";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { desc } from "@components-core/descriptorHelper";

@@ -1,5 +1,5 @@
 import { NavLink } from "@components/NavLink/NavLink";
-import { Image } from "@components/Image/Image";
+import { Image } from "@components/Image/ImageNative";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { useLogoUrl } from "@components/AppHeader/AppHeader";

@@ -6,7 +6,7 @@ import styles from "./AppHeader.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { createComponentRenderer } from "@components-core/renderers";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { Logo } from "@components/Logo/Logo";
