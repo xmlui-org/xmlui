@@ -2,7 +2,7 @@ import { memo, ReactNode } from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import ReactMarkdown from "react-markdown";
-import { Heading } from "@components/Heading/Heading";
+import { Heading } from "@components/Heading/HeadingNative";
 import { Text } from "../Text/Text";
 import styles from "./Markdown.module.scss";
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";

@@ -4,8 +4,8 @@ import type { CSSProperties, ReactNode } from "react";
 import { forwardRef } from "react";
 import { Avatar } from "@components/Avatar/AvatarNative";
 import { LocalLink } from "@components/Link/Link";
-import type { HeadingProps } from "@components/Heading/Heading";
-import { Heading } from "@components/Heading/Heading";
+import type { HeadingProps } from "@components/Heading/HeadingNative";
+import { Heading } from "@components/Heading/HeadingNative";
 import { Stack } from "@components/Stack/Stack";
 import { Text } from "@components/Text/Text";
 

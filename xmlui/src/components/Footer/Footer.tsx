@@ -1,36 +1,11 @@
-import type { ReactNode } from "react";
-import type React from "react";
 import styles from "./Footer.module.scss";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { createMetadata, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
-import classnames from "@components-core/utils/classnames";
+import { Footer } from "./FooterNative";
 
-// =====================================================================================================================
-// React Footer component implementation
-
-function Footer({
-  children,
-  style,
-  className,
-}: {
-  children: ReactNode;
-  style: React.CSSProperties;
-  className?: string;
-}) {
-  return (
-    <div className={styles.outerWrapper}>
-      <div className={classnames(styles.wrapper, className)} style={style}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-// =====================================================================================================================
-// XMLUI Footer component definition
+const COMP = "Footer";
 
 /**
  * The \`Footer\` is a component that acts as the footer within `App`.
@@ -38,16 +13,15 @@ function Footer({
  */
 export interface FooterComponentDef extends ComponentDef<"Footer"> {}
 
-export const FooterMd: ComponentDescriptor<FooterComponentDef> = {
-  displayName: "Footer",
-  description: "Display an application footer",
+export const FooterMd = createMetadata({
+  description: `The \`${COMP}\` is a component that acts as the footer within \`App\`.`,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-bg-Footer": "$color-bg-AppHeader",
-    "vertical-alignment-Footer": "center",
-    "font-size-Footer": "$font-size-small",
-    "color-text-Footer": "$color-text-secondary",
-    "max-content-width-Footer": "$max-content-width",
+    [`color-bg-${COMP}`]: "$color-bg-AppHeader",
+    [`vertical-alignment-${COMP}`]: "center",
+    [`font-size-${COMP}`]: "$font-size-small",
+    [`color-text-${COMP}`]: "$color-text-secondary",
+    [`max-content-width-${COMP}`]: "$max-content-width",
     ...paddingSubject("Footer", { horizontal: "$space-4", vertical: "$space-2" }),
     light: {
       // --- No light-specific theme vars
@@ -56,10 +30,11 @@ export const FooterMd: ComponentDescriptor<FooterComponentDef> = {
       // --- No dark-specific theme vars
     },
   },
-};
+});
 
-export const footerRenderer = createComponentRenderer<FooterComponentDef>(
-  "Footer",
+export const footerRenderer = createComponentRendererNew(
+  COMP,
+  FooterMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
     return (
       <Footer style={layoutCss} className={layoutContext?.themeClassName}>
@@ -71,5 +46,4 @@ export const footerRenderer = createComponentRenderer<FooterComponentDef>(
       </Footer>
     );
   },
-  FooterMd,
 );

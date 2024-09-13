@@ -1,7 +1,10 @@
+%-DESC-START
+
+You can learn more about this component in the [Using Forms](../learning/using-components/forms.mdx) article.
+
+%-DESC-END
 
 %-PROP-START autoFocus
-
-This property indicates that the `FormItem` should automatically receive focus when the form is focused.
 
 ```ueml copy /autoFocus="true"/
 <Form padding="0.5rem" 
@@ -28,8 +31,6 @@ This property indicates that the `FormItem` should automatically receive focus w
 %-PROP-END
 
 %-PROP-START bindTo
-
-This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `subject` data to get the input's initial value. When the field is saved, its value will be stored in the `subject` property with this name.
 
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `subject`.
 
@@ -59,9 +60,6 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 
 %-PROP-START enabled
 
-This boolean property is used to set the `FormItem` active (`true`) or inactive (`false`).
-The default value is `true`.
-
 ```ueml copy {2-3}
 <Form padding="0.5rem">
   <FormItem label="Firstname" enabled="true" />
@@ -81,8 +79,6 @@ The default value is `true`.
 %-PROP-END
 
 %-PROP-START initialValue
-
-This property is used to provide an initial value for the input field in the `FormItem` if the value that it is [bound to](#bindto) is undefined.
 
 ```ueml copy {3} /initialValue/
 <Form
@@ -110,8 +106,6 @@ This property is used to provide an initial value for the input field in the `Fo
 
 %-PROP-START label
 
-This string property sets a text label for the input field.
-
 ```ueml copy /label="Firstname"/
 <Form>
   <FormItem label="Firstname" />
@@ -129,7 +123,6 @@ This string property sets a text label for the input field.
 
 %-PROP-START labelPosition
 
-This optional property indicates where the label should be positioned next to the input field.
 Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
 
@@ -156,8 +149,6 @@ Different input components have different layout methods
 %-PROP-END
 
 %-PROP-START lengthInvalidMessage
-
-This optional string property is used to customize the message that is displayed on a failed length check: [minLength](#minlength) or [maxLength](#maxlength).
 
 In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses the customized one.
 
@@ -189,7 +180,6 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 %-PROP-START lengthInvalidSeverity
 
-This property sets the severity level of length validations.
 Possible values are the following: `error`, `warning`, `valid`.
 The default severity level is `error`.
 
@@ -223,8 +213,6 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 %-PROP-START maxLength
 
-Checks whether the input has a maximum length of a specified value.
-
 Note that it is not possible for the user to enter a string larger than the value of the `maxLength`,
 but setting such a value programmatically still results in a validation check.
 
@@ -256,8 +244,6 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 
 %-PROP-START minLength
 
-Checks whether the input has a minimum length of a specified value.
-
 In the demo below, enter an input shorter than 4 characters or just submit the form as is.
 
 ```ueml copy /minLength="4"/
@@ -285,8 +271,6 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 %-PROP-END
 
 %-PROP-START maxValue
-
-Checks whether the input has the maximum specified value.
 
 Note that it is not possible for the user to enter a number larger than the value of the `maxValue`,
 but setting such a value programmatically still results in a validation check.
@@ -319,8 +303,6 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 
 %-PROP-START minValue
 
-Checks whether the input has the minimum specified value.
-
 Note that it is not possible for the user to enter a number smaller than the value of the `minValue`,
 but setting such a value programmatically still results in a validation check.
 
@@ -351,8 +333,6 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 %-PROP-END
 
 %-PROP-START pattern
-
-Checks whether the input fits a predefined regular expression.
 
 | Value   | Description                                                                                                                                                |
 | :------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -390,8 +370,6 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 
 %-PROP-START patternInvalidMessage
 
-This optional string property is used to customize the message that is displayed on a failed pattern test.
-
 In the demo below, enter anything that does not look like an email and click outside to see the regular and custom message.
 
 ```ueml copy /patternInvalidMessage="This does not look like an email"/
@@ -422,7 +400,6 @@ In the demo below, enter anything that does not look like an email and click out
 
 %-PROP-START patternInvalidSeverity
 
-This property sets the severity level of the pattern validation.
 Possible values are the following: `error`, `warning`, `valid`.
 The default severity is `error`.
 
@@ -456,8 +433,6 @@ In the demo below, enter a string of characters that does not look like an email
 
 %-PROP-START rangeInvalidMessage
 
-This optional string property is used to customize the message that is displayed when a value is out of range.
-
 In the demo below, enter any value that is out of range in the input fields and click outside to see the regular and custom message.
 Just submitting the form as is also produces the same error.
 
@@ -489,7 +464,6 @@ Just submitting the form as is also produces the same error.
 
 %-PROP-START rangeInvalidSeverity
 
-This property sets the severity level of the value range validation.
 Possible values are the following: `error`, `warning`, `valid`.
 The default severity is `error`.
 
@@ -524,8 +498,6 @@ Just submitting the form as is also produces the same error.
 
 %-PROP-START regex
 
-Checks whether the input fits the provided regular expression.
-
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
 ```ueml copy /regex="^[a-z]+$"/
@@ -553,8 +525,6 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 %-PROP-END
 
 %-PROP-START regexInvalidMessage
-
-This optional string property is used to customize the message that is displayed on a failed regular expression test.
 
 In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
 
@@ -586,7 +556,6 @@ In the demo below, enter a password that is not a lowercase string and click out
 
 %-PROP-START regexInvalidSeverity
 
-This property sets the severity level of regular expression validation.
 Possible values are the following: `error`, `warning`, `valid`.
 The default severity is `error`.
 
@@ -621,8 +590,6 @@ Just submitting the form as is also produces the same error.
 
 %-PROP-START required
 
-This optional boolean prop indicates whether the input field is required (`true`) or not (`false`) to fill out in order to submit the form.
-
 ```ueml copy /required="true"/
 <Form
   subject="{{ name: undefined }}"
@@ -647,8 +614,6 @@ This optional boolean prop indicates whether the input field is required (`true`
 %-PROP-END
 
 %-PROP-START requiredInvalidMessage
-
-This optional string property is used to customize the message that is displayed if the field is not filled in.
 
 In the demo below, leave the field empty and click outside to see the regular and custom message.
 
@@ -680,9 +645,6 @@ In the demo below, leave the field empty and click outside to see the regular an
 
 %-PROP-START type
 
-The `type` property is used to determine the specific input control the FormItem will wrap around.
-Note that the control names start with a lowercase letter and map to input components found in XMLUI.
-
 | Identifier      | Renders to this component                  |
 | :-------------- | :----------------------------------------- |
 | `checkbox`      | Checkbox                                   |
@@ -707,8 +669,6 @@ Note that the control names start with a lowercase letter and map to input compo
 
 %-PROP-START validationMode
 
-This property sets what kind of validation mode or strategy to employ for a particular input field.
-
 | Value         | Description                                                                                                                                         |
 | :------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `errorLate`   | **(default)** Display the error when the field loses focus. If an error is already displayed, continue for every keystroke until input is accepted. |
@@ -719,7 +679,6 @@ This property sets what kind of validation mode or strategy to employ for a part
 
 %-PROP-START customValidationsDebounce
 
-This optional number prop determines the time interval between two runs of a custom validation.
 The default value is `0`.
 
 Note how changing the input in the demo below will result in a slight delay of input checks noted by the appearance of a new "I" character.
@@ -760,9 +719,15 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 %-PROP-END
 
-%-EVENT-START validate
+%-PROP-START syncToValidation
 
-This event is used to define a custom validation function.
+- `maxLength` --> Set the `maxTextLength` property value of `Text` or `TextArea` if that value is not defined.
+- `minValue` --> Set the `min` property value of `NumberBox`.
+- `maxValue` --> Set the `max` property value of `NumberBox`.
+
+%-PROP-END
+
+%-EVENT-START validate
 
 In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
 
