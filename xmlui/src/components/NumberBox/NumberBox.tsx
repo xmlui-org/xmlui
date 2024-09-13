@@ -9,7 +9,7 @@ import React, { type CSSProperties, useCallback, useEffect, useRef } from "react
 import classnames from "@components-core/utils/classnames";
 import styles from "./NumberBox.module.scss";
 import { noop } from "@components-core/constants";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { Adornment } from "@components/Input/InputAdornment";
 import { Button } from "@components/Button/ButtonNative";
 import { parseScssVar } from "@components-core/theming/themeVars";

@@ -1,4 +1,4 @@
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { Text } from "../Text/Text";
 import styles from "./InputAdornment.module.scss";
 import classnames from "@components-core/utils/classnames";

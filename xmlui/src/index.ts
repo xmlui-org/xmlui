@@ -5,7 +5,7 @@ import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstrac
 import RootComponent from "@components-core/RootComponent";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { TreeNode } from "@components-core/abstractions/treeAbstractions";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import { Stack } from "@components/Stack/Stack";
 import { Button } from "@components/Button/ButtonNative";

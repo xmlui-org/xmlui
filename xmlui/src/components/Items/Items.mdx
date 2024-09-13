@@ -1,5 +1,7 @@
 %-DESC-START
 
+> **Note**: `Items` is not a container! It does not wrap its items into a container; it merely renders the its children.
+
 The `Items` component does not use virtualization; it maps each data item into a component.
 Thus, passing many items to a component instance will use many resources and slow down your app.
 If you plan to work with many items (more than a few dozen), use the [`List`](./List) and [`Table`](./Table) components instead.

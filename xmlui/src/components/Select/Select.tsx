@@ -8,7 +8,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/Render
 import { createComponentRenderer } from "@components-core/renderers";
 import { useEvent } from "@components-core/utils/misc";
 import styles from "@components/Select/Select.module.scss";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 
 import { MemoizedItem } from "@components/container-helpers";
 import classnames from "@components-core/utils/classnames";

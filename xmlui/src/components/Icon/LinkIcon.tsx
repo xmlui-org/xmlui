@@ -1,5 +1,5 @@
 import React from "react";
 import {IoMdLink} from "react-icons/io";
-import type {IconBaseProps} from "./Icon";
+import type {IconBaseProps} from "./IconNative";
 
 export const LinkIcon = (props: IconBaseProps) => <IoMdLink {...props}/>

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { Stack } from "@components/Stack/Stack";
-import {Icon} from "@components/Icon/Icon";
+import {Icon} from "@components/Icon/IconNative";
 import { Text } from "@components/Text/Text";
 import classnames from "@components-core/utils/classnames";
 import styles from "./ValidationSummary.module.scss";

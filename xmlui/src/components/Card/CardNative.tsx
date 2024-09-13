@@ -3,7 +3,7 @@ import classnames from "@components-core/utils/classnames";
 import type { CSSProperties, ReactNode } from "react";
 import { forwardRef } from "react";
 import { Avatar } from "@components/Avatar/AvatarNative";
-import { LocalLink } from "@components/Link/Link";
+import { LocalLink } from "@components/Link/LinkNative";
 import type { HeadingProps } from "@components/Heading/HeadingNative";
 import { Heading } from "@components/Heading/HeadingNative";
 import { Stack } from "@components/Stack/Stack";

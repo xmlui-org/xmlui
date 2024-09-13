@@ -1,5 +1,9 @@
 %-PROP-START alt
 
+This is useful in two cases:
+1. Accessibility: screen readers read the prop value to users so they know what the image is about.
+2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).
+
 ```ueml copy
 <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
 ```
@@ -38,6 +42,13 @@
   </HStack>
   `}
 />
+
+%-PROP-END
+
+%-PROP-START lazyLoad
+
+Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).
+The default value is eager (\`false\`).
 
 %-PROP-END
 

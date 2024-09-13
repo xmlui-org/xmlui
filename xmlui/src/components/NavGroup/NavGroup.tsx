@@ -22,7 +22,7 @@ import {
     DropdownMenuSubTrigger
 } from "@radix-ui/react-dropdown-menu";
 import styles from "./NavGroup.module.scss";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { NavLink } from "@components/NavLink/NavLink";
 import navLinkStyles from "@components/NavLink/NavLink.module.scss";

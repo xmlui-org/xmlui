@@ -18,7 +18,7 @@ import { Spinner } from "@components/Spinner/Spinner";
 import classnames from "@components-core/utils/classnames";
 import useRowSelection from "./useRowSelection";
 import { Toggle } from "@components/Toggle/Toggle";
-import { Icon } from "@components/Icon/Icon";
+import { Icon } from "@components/Icon/IconNative";
 import { observeElementOffset, useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { orderBy } from "lodash-es";
 import type { ComponentDef } from "@abstractions/ComponentDefs";

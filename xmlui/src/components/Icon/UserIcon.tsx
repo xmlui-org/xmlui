@@ -1,5 +1,5 @@
 import React from "react";
 import { FiUser } from "react-icons/fi";
-import type {IconBaseProps} from "./Icon";
+import type {IconBaseProps} from "./IconNative";
 
 export const UserIcon = (props: IconBaseProps) => <FiUser {...props}/>
