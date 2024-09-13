@@ -1,8 +1,10 @@
+%-DESC-START
+
+You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
+
+%-DESC-END
+
 %-CONTEXT_VAR-START $subject
-
-This property represents the value of the current iteration item.
-
-This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances.
 
 The following sample demonstrates enabling a field according to another's current value.
 
@@ -31,7 +33,7 @@ The following sample demonstrates enabling a field according to another's curren
 
 %-PROP-START buttonRowTemplate
 
-This property allows defining a custom component to display the buttons at the bottom of the form. The following example demonstrates using it:
+The following example demonstrates using it:
 
 ```ueml copy {9-18}
 <Form id="searchForm" padding="0.5rem"
@@ -86,8 +88,6 @@ This example mimics a one-second search and turns off the submit button during t
 %-PROP-END
 
 %-EVENT-START submit
-
-The form infrastructure fires this event when the form is submitted. The event argument is the current `subject` value to save.
 
 ```ueml copy {3}
 <Form padding="0.5rem"
