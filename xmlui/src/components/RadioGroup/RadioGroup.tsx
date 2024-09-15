@@ -1,203 +1,62 @@
-import React, { createContext, CSSProperties, useCallback, useContext, useEffect, useId, useMemo } from "react";
-import classnames from "@components-core/utils/classnames";
 import styles from "./RadioGroup.module.scss";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { noop } from "@components-core/constants";
-import {
-  inputComponentEventDescriptors,
-  inputComponentPropertyDescriptors,
-  ValidationStatus,
-} from "@components/Input/input-abstractions";
-import * as InnerRadioGroup from "@radix-ui/react-radio-group";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { useEvent } from "@components-core/utils/misc";
+import { RadioGroup, RadioGroupOption } from "./RadioGroupNative";
+import {
+  dAutoFocus,
+  dDidChange,
+  dEnabled,
+  dGotFocus,
+  dInitialValue,
+  dLabelId,
+  dLostFocus,
+  dMaxLength,
+  dReadonly,
+  dRequired,
+  dValidationStatus,
+} from "@components/metadata-helpers";
 
-// =====================================================================================================================
-// React RadioGroup component implementation
+const RGOption = "RadioGroupOption";
 
-const RadioGroupValidationStatusContext = createContext<{ value?: string; status: ValidationStatus }>({
-  status: "none",
-});
-
-type RadioGroupProps = {
-  id?: string;
-  initialValue?: string;
-  value?: string;
-  enabled?: boolean;
-  layout?: CSSProperties;
-  validationStatus?: ValidationStatus;
-  updateState?: UpdateStateFn;
-  onDidChange?: (newValue: string) => void;
-  onFocus?: () => void;
-  onBlur?: () => void;
-  children?: React.ReactNode;
-  registerComponentApi?: RegisterComponentApiFn;
-};
-
-export const RadioGroup = ({
-  id,
-  value = "",
-  initialValue = "",
-  enabled = true,
-  validationStatus = "none",
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  children,
-  registerComponentApi,
-}: RadioGroupProps) => {
-  const [focused, setFocused] = React.useState(false);
-
-  // --- Initialize the related field with the input's initial value
-  useEffect(() => {
-    updateState({ value: initialValue });
-  }, [initialValue, updateState]);
-
-  // --- Handle the value change events for this input
-
-  const updateValue = useCallback(
-    (value: string) => {
-      updateState({ value });
-      onDidChange(value);
-    },
-    [onDidChange, updateState],
-  );
-
-  const onInputChange = useCallback(
-    (value: string) => {
-      updateValue(value);
-    },
-    [updateValue],
-  );
-
-  // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    setFocused(true);
-    onFocus?.();
-  }, [onFocus]);
-
-  const handleOnBlur = useCallback(() => {
-    setFocused(false);
-    onBlur?.();
-  }, [onBlur]);
-
-  const setValue = useEvent((val: string) => {
-    updateValue(val);
-  });
-
-  useEffect(() => {
-    registerComponentApi?.({
-      //focus,
-      setValue,
-    });
-  }, [/* focus, */ registerComponentApi, setValue]);
-
-  const contextValue = useMemo(() => {
-    return { value, status: validationStatus };
-  }, [value, validationStatus]);
-
-  return (
-    <RadioGroupValidationStatusContext.Provider value={contextValue}>
-      <InnerRadioGroup.Root
-        id={id}
-        onBlur={handleOnBlur}
-        onFocus={handleOnFocus}
-        onValueChange={onInputChange}
-        value={value}
-        disabled={!enabled}
-        className={classnames(styles.radioGroupContainer, {
-          [styles.focused]: focused,
-          [styles.disabled]: !enabled,
-        })}
-      >
-        {children}
-      </InnerRadioGroup.Root>
-    </RadioGroupValidationStatusContext.Provider>
-  );
-};
-
-type RadioGroupOptionProps = {
-  value: string;
-  label?: string;
-  enabled?: boolean;
-};
-
-export const RadioGroupOption = ({ value, label, enabled = true }: RadioGroupOptionProps) => {
-  const id = useId();
-  const validationContext = useContext(RadioGroupValidationStatusContext);
-
-  const statusStyles = {
-    [styles.disabled]: !enabled,
-    [styles.error]: value === validationContext.value && validationContext.status === "error",
-    [styles.warning]: value === validationContext.value && validationContext.status === "warning",
-    [styles.valid]: value === validationContext.value && validationContext.status === "valid",
-  };
-  return (
-    <div key={id} className={styles.radioOptionContainer}>
-      <InnerRadioGroup.Item
-        className={classnames(styles.radioOption, statusStyles)}
-        value={value}
-        disabled={!enabled}
-        id={id}
-      >
-        <InnerRadioGroup.Indicator className={classnames(styles.indicator, statusStyles)} />
-      </InnerRadioGroup.Item>
-      <label htmlFor={id} className={classnames(styles.label, statusStyles)}>
-        {label ?? value}
-      </label>
-    </div>
-  );
-};
-
-type RadioGroupOptionDef = ComponentDef<"RadioGroupOption"> & {
-  props: {
-    enabled?: boolean;
-  };
-};
-
-const radioGroupOptionMetadata: ComponentDescriptor<RadioGroupOptionDef> = {
-  displayName: "RadioGroupOption",
+export const RadioGroupOptionMd = createMetadata({
   description: "A single radio button within a radio button group",
   props: {
-    enabled: desc("Is the particular option enabled?"),
-    value: desc("The value of the option"),
-    label: desc("The option's label"),
+    enabled: dEnabled(),
+    value: d("The value of the option"),
+    label: d("The option's label"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "gap-RadioGroupOption": "$space-1_5",
-    "thickness-border-RadioGroupOption": "2px",
-    "color-bg-checked-RadioGroupOption--disabled": "$color-border-RadioGroupOption--disabled",
-    "color-bg-checked-RadioGroupOption-error": "$color-border-RadioGroupOption-error",
-    "color-bg-checked-RadioGroupOption-warning": "$color-border-RadioGroupOption-warning",
-    "color-bg-checked-RadioGroupOption-success": "$color-border-RadioGroupOption-success",
-    "font-size-RadioGroupOption": "$font-size-small",
-    "font-weight-RadioGroupOption": "$font-weight-bold",
-    "color-text-RadioGroupOption-error": "$color-border-RadioGroupOption-error",
-    "color-text-RadioGroupOption-warning": "$color-border-RadioGroupOption-warning",
-    "color-text-RadioGroupOption-success": "$color-border-RadioGroupOption-success",
+    [`gap-${RGOption}`]: "$space-1_5",
+    [`thickness-border-${RGOption}`]: "2px",
+    [`color-bg-checked-${RGOption}--disabled]`]: `$color-border-${RGOption}--disabled`,
+    [`color-bg-checked-${RGOption}-error`]: `$color-border-${RGOption}-error`,
+    [`color-bg-checked-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
+    [`color-bg-checked-${RGOption}-success`]: `$color-border-${RGOption}-success`,
+    [`font-size-${RGOption}`]: "$font-size-small",
+    [`font-weight-${RGOption}`]: "$font-weight-bold",
+    [`color-text-${RGOption}-error`]: `$color-border-${RGOption}-error`,
+    [`color-text-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
+    [`color-text-${RGOption}-success`]: `$color-border-${RGOption}-success`,
     light: {
-      "color-bg-checked-RadioGroupOption-default": "$color-primary-500",
-      "color-border-RadioGroupOption-default": "$color-surface-500",
-      "color-border-RadioGroupOption-default--hover": "$color-surface-700",
-      "color-border-RadioGroupOption-default--active": "$color-primary-500",
+      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
+      [`color-border-${RGOption}-default`]: "$color-surface-500",
+      [`color-border-${RGOption}-default--hover`]: "$color-surface-700",
+      [`color-border-${RGOption}-default--active`]: "$color-primary-500",
     },
     dark: {
-      "color-bg-checked-RadioGroupOption-default": "$color-primary-500",
-      "color-border-RadioGroupOption-default": "$color-surface-500",
-      "color-border-RadioGroupOption-default--hover": "$color-surface-300",
-      "color-border-RadioGroupOption-default--active": "$color-primary-400",
+      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
+      [`color-border-${RGOption}-default`]: "$color-surface-500",
+      [`color-border-${RGOption}-default--hover`]: "$color-surface-300",
+      [`color-border-${RGOption}-default--active`]: "$color-primary-400",
     },
   },
-};
+});
 
-export const radioGroupOptionRenderer = createComponentRenderer<RadioGroupOptionDef>(
-  "RadioGroupOption",
+export const radioGroupOptionRenderer = createComponentRendererNew(
+  RGOption,
+  RadioGroupOptionMd,
   ({ node, extractValue }) => {
     return (
       <RadioGroupOption
@@ -207,99 +66,45 @@ export const radioGroupOptionRenderer = createComponentRenderer<RadioGroupOption
       />
     );
   },
-  radioGroupOptionMetadata,
 );
 
-// =====================================================================================================================
-// XMLUI RadioGroup component definition
+const COMP = "RadioGroup";
 
-/**
- * The \`RadioGroup\` input component is a group of radio buttons ([\`RadioGroupOption\`](./RadioGroupOption.mdx)
- * components) that allow users to select only one option from the group at a time.
- *
- * \`RadioGroup\` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide
- * for details.
- */
-export interface RadioGroupComponentDef extends ComponentDef<"RadioGroup"> {
+export const RadioGroupMd = createMetadata({
+  description:
+    `The \`${COMP}\` input component is a group of radio buttons ` +
+    `([\`RadioGroupOption\`](./RadioGroupOption.mdx) components) that allow users to select ` +
+    `only one option from the group at a time.`,
   props: {
-    /** @descriptionRef */
-    initialValue?: string | string[];
-    /**
-     * You can specify the identifier of a component acting as its label. When you click the label,
-     * the component behaves as you clicked it.
-     */
-    labelId?: string;
-    /**
-     * This property sets the maximum number of characters you can type into the component's text.
-     */
-    maxLength?: number;
-    /**
-     * Set this property to \`true\` to automatically get the focus when the component is displayed.
-     */
-    autoFocus?: boolean;
-    /**
-     * Set this property to \`true\` to indicate it must have a value before submitting the containing form.
-     */
-    required?: boolean;
-    /**
-     * Set this property to \`true\` to disallow changing the component value.
-     */
-    readOnly?: boolean;
-    /** @descriptionRef */
-    enabled?: string | boolean;
-    /**
-     * With this property, you can set the checkbox's validation status to "none", "error", "warning",
-     * or "valid".
-     */
-    validationStatus?: ValidationStatus;
-  };
-  events: {
-    /** @descriptionRef */
-    didChange?: string;
-    /**
-     * This event is triggered when the `RadioGroup` receives focus.
-     */
-    gotFocus?: string;
-    /**
-     * This event is triggered when the `RadioGroup` loses focus.
-     */
-    lostFocus?: string;
-  };
-  api: {
-    /**
-     * You can query this read-only API property to get the input component's current value.
-     *
-     * See an example in the `setValue` API method.
-     */
-    value: string;
-    /** @descriptionRef */
-    setValue: (value: string) => void;
-  };
-}
-
-export const RadioGroupMd: ComponentDescriptor<RadioGroupComponentDef> = {
-  displayName: "RadioGroup",
-  description: "A group of radio buttons (mutually exclusive selection)",
-  props: {
-    initialValue: desc("The initial value to display"),
-    labelId: desc("ID of the label attached to this input"),
-    maxLength: desc("The maximum length of the input text"),
-    autoFocus: desc("Should the component be automatically focused?"),
-    required: desc("Is the component value required (use for indication)?"),
-    readOnly: desc("Is the component read-only?"),
-    enabled: desc("Is the component enabled?"),
-    validationStatus: desc("The validation status of the component"),
+    initialValue: dInitialValue(),
+    labelId: dLabelId(),
+    maxLength: dMaxLength(),
+    autoFocus: dAutoFocus(),
+    required: dRequired(),
+    readOnly: dReadonly(),
+    enabled: dEnabled(),
+    validationStatus: dValidationStatus(),
   },
   events: {
-    didChange: desc("Triggered when the input value changes"),
-    gotFocus: desc("Triggered when the input gains focus"),
-    lostFocus: desc("triggered when the input has lost focus"),
+    gotFocus: dGotFocus(COMP),
+    lostFocus: dLostFocus(COMP),
+    didChange: dDidChange(COMP),
   },
-};
+});
 
-export const radioGroupRenderer = createComponentRenderer<RadioGroupComponentDef>(
-  "RadioGroup",
-  ({ node, extractValue, layoutCss, state, updateState, lookupEventHandler, renderChild, registerComponentApi }) => {
+export const radioGroupRenderer = createComponentRendererNew(
+  COMP,
+  RadioGroupMd,
+  ({
+    node,
+    extractValue,
+    layoutCss,
+    state,
+    updateState,
+    lookupEventHandler,
+    renderChild,
+    registerComponentApi,
+  }) => {
     return (
       <RadioGroup
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
@@ -317,5 +122,4 @@ export const radioGroupRenderer = createComponentRenderer<RadioGroupComponentDef
       </RadioGroup>
     );
   },
-  RadioGroupMd,
 );

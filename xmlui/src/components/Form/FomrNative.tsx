@@ -20,7 +20,7 @@ import {
   formSubmitting,
   triedToSubmit,
 } from "@components/Form/formActions";
-import { ModalDialog } from "@components/ModalDialog/ModalDialog";
+import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
 import { Text } from "@components/Text/Text";
 import { Stack } from "@components/Stack/Stack";
 import type { RenderChildFn } from "@abstractions/RendererDefs";

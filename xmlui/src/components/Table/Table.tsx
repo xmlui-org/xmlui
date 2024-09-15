@@ -14,7 +14,7 @@ import { flexRender, getCoreRowModel, getPaginationRowModel, useReactTable } fro
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
 import { Button } from "@components/Button/ButtonNative";
-import { Spinner } from "@components/Spinner/Spinner";
+import { Spinner } from "@components/Spinner/SopinnerNative";
 import classnames from "@components-core/utils/classnames";
 import useRowSelection from "./useRowSelection";
 import { Toggle } from "@components/Toggle/Toggle";

@@ -3,7 +3,7 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { ModalDialog } from "@components/ModalDialog/ModalDialog";
+import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
 import classnames from "classnames";
 import { XmluiCodeHighlighter } from "@components-core/XmluiCodeHighlighter";
 import { Button } from "@components/Button/ButtonNative";

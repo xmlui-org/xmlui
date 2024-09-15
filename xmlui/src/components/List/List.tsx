@@ -17,7 +17,7 @@ import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Card } from "@components/Card/CardNative";
 import { Text } from "@components/Text/Text";
-import { Spinner } from "@components/Spinner/Spinner";
+import { Spinner } from "@components/Spinner/SopinnerNative";
 import { usePrevious, useResizeObserver } from "@components-core/utils/hooks";
 
 // =====================================================================================================================

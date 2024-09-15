@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Children, useId } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./FormItem.module.scss";
-import { Spinner } from "@components/Spinner/Spinner";
+import { Spinner } from "@components/Spinner/SopinnerNative";
 import { Slot } from "@radix-ui/react-slot";
 
 export type LabelPosition = "top" | "right" | "left" | "bottom";
