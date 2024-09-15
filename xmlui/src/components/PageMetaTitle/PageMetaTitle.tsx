@@ -1,45 +1,22 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { Helmet } from "react-helmet-async";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
+import { PageMetaTitle } from "./PageMetaTilteNative";
 
-// =====================================================================================================================
-// React PageMetaTitle component implementation
+const COMP = "PageMetaTitle";
 
-const PageMetaTitle = ({ title }: { title: string }) => {
-  return <Helmet title={title} />;
-};
-
-// =====================================================================================================================
-// XMLUI PageMetaTitle component definition
-
-/**
- * A \`PageMetaTitle\` component allows setting up (or changing) the app title to display with the 
- * current browser tab.
- * @descriptionRef none
- */
-export interface PageMetaTitleComponentDef extends ComponentDef<"PageMetaTitle"> {
+export const PageMetaTitleMd = createMetadata({
+  description:
+    `A PageMetaTitle component allows setting up (or changing) the app title to display with the ` +
+    `current browser tab.`,
   props: {
-    /**
-     * This property sets the page's title to display in the browser tab.
-     */
-    value: string;
-  };
-}
-
-export const PageMetaTitleMd: ComponentDescriptor<PageMetaTitleComponentDef> = {
-  displayName: "PageMetaTitle",
-  description: "This component defines the title to add to the current page's metadata",
-  props: {
-    value: desc("Page title"),
+    value: d(`This property sets the page's title to display in the browser tab.`),
   },
-};
+});
 
-export const pageMetaTitleComponentRenderer = createComponentRenderer<PageMetaTitleComponentDef>(
-  "PageMetaTitle",
+export const pageMetaTitleComponentRenderer = createComponentRendererNew(
+  COMP,
+  PageMetaTitleMd,
   ({ node, extractValue }) => {
     return <PageMetaTitle title={extractValue(node.props.value)} />;
   },
-  PageMetaTitleMd
 );

@@ -1,8 +1,8 @@
 import { KeyboardEventHandler, useEffect, useMemo, useState } from "react";
-import { useSelectionContext } from "../SelectionStore/SelectionStore";
 import { useEvent } from "@components-core/utils/misc";
 import { union, uniq } from "lodash-es";
 import { EMPTY_ARRAY } from "@components-core/constants";
+import { useSelectionContext } from "@components/SelectionStore/SelectionStoreNative";
 
 /**
  * An interval of selected items

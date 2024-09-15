@@ -64,8 +64,6 @@
 
 %-PROP-START disabled
 
-If this property is set to `true`, the option is disabled and cannot be selected in its parent component.
-
 ```ueml copy /disabled="true"/
 <VStack padding="$space-4" gap="$space-4">
   <Text value="Selected ID: {mySelect.value}"/>
@@ -96,8 +94,6 @@ If this property is set to `true`, the option is disabled and cannot be selected
 %-PROP-END
 
 %-PROP-START label
-
-This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
 
 > **Note**: If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 
@@ -133,8 +129,6 @@ This property defines the text to display for the option. If `label` is not defi
 %-PROP-END
 
 %-PROP-START value
-
-This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
 
 > **Note**: If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 
