@@ -125,6 +125,7 @@ import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
+import {tabComponentRenderer} from "@components/Tabs/Tab";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -257,6 +258,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
+      this.registerComponentRenderer(tabComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerComponentRenderer(fileUploadDropZoneComponentRenderer);
