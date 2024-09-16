@@ -20,7 +20,7 @@ import RootComponent from "@components-core/RootComponent";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
+import { componentFromXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   componentFileExtension,
@@ -113,7 +113,7 @@ async function parseComponentResp(response: Response) {
     const code = await response.text();
     const fileId = response.url;
     return {
-      component: parseXmlUiMarkup(code, fileId),
+      component: componentFromXmlUiMarkup(code, fileId),
       src: code,
       file: fileId,
     };
@@ -262,7 +262,7 @@ function getStandalone(
     const components: Array<CompoundComponentDef> = [];
     for (let i = 0; i < componentNodes.length; i++) {
       const value = componentNodes[i];
-      const componentDef = parseXmlUiMarkup(value.textContent!);
+      const componentDef = componentFromXmlUiMarkup(value.textContent!);
       if (!componentDef) {
         continue;
       }
@@ -327,7 +327,7 @@ function useStandalone(
         const components: Array<CompoundComponentDef> = [];
         for (let i = 0; i < componentNodes.length; i++) {
           const value = componentNodes[i];
-          const componentDef = parseXmlUiMarkup(value.textContent!);
+          const componentDef = componentFromXmlUiMarkup(value.textContent!);
           if (!componentDef) {
             continue;
           }

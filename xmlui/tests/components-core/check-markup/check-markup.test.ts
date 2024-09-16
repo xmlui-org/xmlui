@@ -440,5 +440,5 @@ describe("Markup checks", () => {
 });
 
 function transformSource(source: string): ComponentDef | CompoundComponentDef | null {
-  return parseXmlUiMarkup(source);
+  return parseXmlUiMarkup(source).component;
 }
