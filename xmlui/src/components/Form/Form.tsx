@@ -3,7 +3,7 @@ import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDef
 import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
-import { FormWithContextVar } from "./FomrNative";
+import { FormWithContextVar } from "./FormNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Form";

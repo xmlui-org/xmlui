@@ -1,7 +1,7 @@
 import { Header } from "@/src/components/Header";
 import { Preview } from "@/src/components/Preview";
 import { Editor } from "@/src/components/Editor";
-import { Splitter } from "@components/Splitter/Splitter";
+import { Splitter } from "@components/Splitter/SplitterNative";
 import styles from "@/src/components/PlaygroundContent.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import classnames from "classnames";

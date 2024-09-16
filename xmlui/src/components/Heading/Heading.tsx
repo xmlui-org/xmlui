@@ -52,30 +52,6 @@ export const HeadingMd = createMetadata({
   },
 });
 
-function createHeadingMd(level: number) {
-  return createMetadata({
-    description: LEVEL_DESC(level),
-    props: {
-      value: VALUE_DESC,
-      maxLines: MAX_LINES_DESC,
-    },
-    themeVars: parseScssVar(styles.themeVars),
-    defaultThemeVars: {
-      // letter-spacing
-      [`font-size-H${level}`]: "$font-size-large",
-      [`line-height-H${level}`]: "$line-height-loose",
-      [`margin-top-H${level}`]: "$space-3",
-      [`margin-bottom-H${level}`]: "$space-6",
-      light: {
-        // --- No light-specific theme vars
-      },
-      dark: {
-        // --- No dark-specific theme vars
-      },
-    },
-  });
-}
-
 const H1 = "H1";
 export const H1Md = createMetadata({
   description: LEVEL_DESC(1),

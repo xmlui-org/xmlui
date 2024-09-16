@@ -7,8 +7,8 @@ import { RadioGroup, RadioGroupOption } from "@components/RadioGroup/RadioGroupN
 import { useState } from "react";
 import { useThemes } from "@components-core/theming/ThemeContext";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Stack } from "@components/Stack/Stack";
-import { Text } from "@components/Text/Text";
+import { Stack } from "@components/Stack/StackNative";
+import { Text } from "@components/Text/TextNative";
 import { Icon } from "@components/Icon/IconNative";
 
 /**

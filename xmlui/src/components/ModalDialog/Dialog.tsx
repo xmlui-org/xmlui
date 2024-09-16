@@ -1,5 +1,5 @@
 import React from "react";
-import { Text } from "../Text/Text";
+import { Text } from "../Text/TextNative";
 import styles from "./Dialog.module.scss";
 import { ModalDialog } from "./ModalDialogNative";
 

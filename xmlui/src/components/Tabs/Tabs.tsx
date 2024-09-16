@@ -1,125 +1,47 @@
-import { type CSSProperties, type ReactNode, useState } from "react";
-import * as RTabs from "@radix-ui/react-tabs";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "./Tabs.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
-import { TabContext, useTabContextValue } from "@components/Tabs/TabContext";
+import { dComponent } from "@components/metadata-helpers";
+import { Tabs } from "./TabsNative";
+import { createComponentRendererNew } from "@components-core/renderers";
 
-type TabsProps = {
-  activeTab?: number;
-  orientation?: "horizontal" | "vertical";
-  tabRenderer?: (item: { label: string; isActive: boolean }) => ReactNode;
-  style?: CSSProperties;
-  children?: ReactNode;
-};
+const COMP = "Tabs";
 
-const Tabs = ({
-  activeTab = 0,
-  orientation = "vertical",
-  tabRenderer,
-  style,
-  children,
-}: TabsProps) => {
-  const { tabItems, tabContextValue } = useTabContextValue();
-  const _activeTab =
-    activeTab <= 0 ? 0 : activeTab > tabItems.length - 1 ? tabItems.length - 1 : activeTab;
-  const [currentTab, setCurrentTab] = useState(`${_activeTab}`);
-
-  return (
-    <TabContext.Provider value={tabContextValue}>
-      {children}
-      <RTabs.Root
-        className={styles.tabs}
-        value={`${currentTab}`}
-        onValueChange={setCurrentTab}
-        orientation={orientation}
-        style={style}
-      >
-        <RTabs.List className={styles.tabsList}>
-          {tabItems.map((tab, index) =>
-            tabRenderer ? (
-              <RTabs.Trigger key={index} value={`${index}`}>
-                {tabRenderer({ label: tab.label, isActive: `${index}` === currentTab })}
-              </RTabs.Trigger>
-            ) : (
-              <RTabs.Trigger className={styles.tabTrigger} key={index} value={`${index}`}>
-                {tab.label}
-              </RTabs.Trigger>
-            ),
-          )}
-          <div className={styles.filler} data-orientation={orientation} />
-        </RTabs.List>
-        {tabItems.map((tab, index) => (
-          <RTabs.Content key={index} value={`${index}`} className={styles.tabsContent}>
-            {tab.content}
-          </RTabs.Content>
-        ))}
-      </RTabs.Root>
-    </TabContext.Provider>
-  );
-};
-
-/**
- * The \`Tabs\` component provides a tabbed layout where each tab has a clickable label and content.
- * The label is displayed on the button associated with the content.
- * @descriptionRef
- */
-export interface TabsComponentDef extends ComponentDef<"Tabs"> {
+export const TabsMd = createMetadata({
+  description: `The \`${COMP}\` component provides a tabbed layout where each tab has a clickable label and content.`,
   props: {
-    /**
-     * Indicates which tab index is active. The indexing starts from 0. The default value is 0 (aka the first tab from left to right).
-     * @descriptionRef
-     */
-    activeTab?: number;
-    /**
-     * Indicates the orientation of the tabs.
-     * Horizontal orientation has the tab buttons layed out on the left side of the content panel.
-     * Vertical orientation places the buttons at the top.
-     * The default value is vertical.
-     * @descriptionRef
-     */
-    orientation?: "horizontal" | "vertical";
-    /**
-     * Defines how a tab button should look like.
-     * @descriptionRef
-     */
-    tabTemplate?: ComponentDef;
-
-    children?: ReactNode;
-  };
-}
-
-export const TabsMd: ComponentDescriptor<TabsComponentDef> = {
-  displayName: "Tabs",
-  description: "Tabs component",
-  props: {
-    activeTab: desc("The active tab index"),
-    orientation: desc("The orientation of the tabs"),
-    tabTemplate: desc("The template for the tab"),
+    activeTab: d(
+      `This property indicates the index of the active tab. The indexing starts from 0, ` +
+        `representing the starting (leftmost) tab.`,
+    ),
+    orientation: d(
+      `This property indicates the orientation of the component. In horizontal orientation, ` +
+        `the tab sections are laid out on the left side of the content panel, while in vertical ` +
+        `orientation, the buttons are at the top.`,
+    ),
+    tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "color-bg-Tabs": "$color-bg-primary",
-    "style-border-Tabs": "solid",
-    "color-border-Tabs": "$color-border",
-    "color-border-active-Tabs": "$color-primary",
-    "thickness-border-Tabs": "2px",
-    "color-bg-trigger-Tabs": "$color-bg-primary",
+    [`color-bg-${COMP}`]: "$color-bg-primary",
+    [`style-border-${COMP}`]: "solid",
+    [`color-border-${COMP}`]: "$color-border",
+    [`color-border-active-${COMP}`]: "$color-primary",
+    [`thickness-border-${COMP}`]: "2px",
+    [`color-bg-trigger-${COMP}`]: "$color-bg-primary",
     light: {
-      "color-bg-trigger-Tabs--hover": "$color-primary-50",
+      [`color-bg-trigger-${COMP}--hover`]: "$color-primary-50",
     },
     dark: {
-      "color-bg-trigger-Tabs--hover": "$color-primary-800",
+      [`color-bg-trigger-${COMP}--hover`]: "$color-primary-800",
     },
   },
-};
+});
 
-export const tabsComponentRenderer = createComponentRenderer<TabsComponentDef>(
-  "Tabs",
+export const tabsComponentRenderer = createComponentRendererNew(
+  COMP,
+  TabsMd,
   ({ extractValue, node, renderChild, layoutCss }) => {
     return (
       <Tabs
@@ -128,7 +50,7 @@ export const tabsComponentRenderer = createComponentRenderer<TabsComponentDef>(
           !!node?.props?.tabTemplate
             ? (item) => (
                 <MemoizedItem
-                  node={node.props.tabTemplate!}
+                  node={node.props.tabTemplate! as any}
                   item={item}
                   renderChild={renderChild}
                 />
@@ -142,5 +64,4 @@ export const tabsComponentRenderer = createComponentRenderer<TabsComponentDef>(
       </Tabs>
     );
   },
-  TabsMd,
 );

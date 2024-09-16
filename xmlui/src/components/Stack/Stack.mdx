@@ -1,6 +1,14 @@
-%-PROP-START gap
+%-DESC-START
 
-Optional [size value](./appearance/common-units#size-values) indicating the gap between child elements.
+The Stack component is the primary and most versatile building block for laying out content. It can display its children horizontally or vertically, and it is possible to align its children easily along the horizontal and vertical axes.
+
+See also: [HStack](./HStack), [VStack](./VStack), [CHStack](./CHStack), [CVStack](./CVStack).
+
+> **Note**: You can learn about the semantics and usage of layout container, including `Stack`, [here](/learning/layout-components).
+
+%-DESC-END
+
+%-PROP-START gap
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font-size of the element (See size values).
 
@@ -53,8 +61,6 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 
 %-PROP-START horizontalAlignment
 
-Manages the horizontal content [alignment](./appearance/common-units/#alignment-values) for each child element in the Stack.
-
 > **Note**: The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
 
 ```ueml copy {2}
@@ -79,7 +85,6 @@ Manages the horizontal content [alignment](./appearance/common-units/#alignment-
 
 %-PROP-START reverse
 
-Optional boolean prop to reverse the order of child elements.
 Default is **false**, which indicates a left-to-right layout.
 
 ```ueml copy {7}
@@ -119,8 +124,6 @@ Default is **false**, which indicates a left-to-right layout.
 %-PROP-END
 
 %-PROP-START verticalAlignment
-
-Manages the vertical content [alignment](./appearance/common-units/#alignment-values) for each child element in the Stack.
 
 ```ueml copy {2}
 <Stack height="100px" backgroundColor="cyan"

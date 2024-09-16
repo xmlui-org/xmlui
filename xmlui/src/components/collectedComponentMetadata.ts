@@ -70,6 +70,7 @@ import { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
 import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
+import { TabItemMd } from "./Tabs/TabItem";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -138,23 +139,24 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   SelectionStore: SelectionStoreMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
-  // Splitter: SplitterMd,
-  // HSplitter: HSplitterMd,
-  // VSplitter: VSplitterMd,
-  // Stack: StackMd,
-  // CHStack: CHStackMd,
-  // CVStack: CVStackMd,
-  // HStack: HStackMd,
-  // VStack: VStackMd,
-  // StickyBox: StickyBoxMd,
-  // Table: TableMd,
-  // TableColumnDef: TableColumnDefMd,
-  // TableHeader: TableHeaderMd,
-  // TableOfContents: TableOfContentsMd,
-  // Tabs: TabsMd,
+  Splitter: SplitterMd,
+  HSplitter: HSplitterMd,
+  VSplitter: VSplitterMd,
+  Stack: StackMd,
+  CHStack: CHStackMd,
+  CVStack: CVStackMd,
+  HStack: HStackMd,
+  VStack: VStackMd,
+  StickyBox: StickyBoxMd,
+  Switch: SwitchMd,
+  Table: TableMd,
+  TableColumnDef: TableColumnDefMd,
+  TableHeader: TableHeaderMd,
+  TableOfContents: TableOfContentsMd,
+  TabItem: TabItemMd,
+  Tabs: TabsMd,
   // Text: TextMd,
   // TextArea: TextAreaMd,
   // TextBox: TextboxMd,
   // Theme: ThemeMd,
-  Switch: SwitchMd,
 };
