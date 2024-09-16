@@ -3,7 +3,7 @@ import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject } from "@components-core/theming/themes/base-utils";
-import { DrawerNavPanel, NavPanel } from "./NavPanelNative";
+import { NavPanel } from "./NavPanelNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "NavPanel";
