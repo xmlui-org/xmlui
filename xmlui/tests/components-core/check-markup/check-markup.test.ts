@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
 import { createTestMetadataHandler } from "../test-metadata-handler";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
@@ -13,7 +13,7 @@ describe("Markup checks", () => {
   it("Registered component works", () => {
     // --- Arrange
     const source = "<Button />";
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -25,7 +25,7 @@ describe("Markup checks", () => {
   it("Unregistered component fails", () => {
     // --- Arrange
     const source = "<Dummy />";
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -41,7 +41,7 @@ describe("Markup checks", () => {
   it("Valid component ID works", () => {
     // --- Arrange
     const source = `<Button id="myId" />`;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -55,7 +55,7 @@ describe("Markup checks", () => {
     it(`Invalid component ID fails: ${id}`, () => {
       // --- Arrange
       const source = `<Button id="${id}" />`;
-      const def = transformSource(source) as ComponentDef;
+      const def = transformSource(source) as ComponentDefNew;
 
       // --- Act
       const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -77,7 +77,7 @@ describe("Markup checks", () => {
         <Button id="myId" />
       </Stack>
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -102,7 +102,7 @@ describe("Markup checks", () => {
         <Button id="myId" />
       </Component>
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
     const compoundDef = transformSource(compoundCompSource) as CompoundComponentDef;
 
     // --- Act
@@ -117,7 +117,7 @@ describe("Markup checks", () => {
     const source = `
       <Button dummy="something" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -135,7 +135,7 @@ describe("Markup checks", () => {
     const source = `
       <Button label="something" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -149,7 +149,7 @@ describe("Markup checks", () => {
     const source = `
       <Theme my-theme-var="something" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -163,7 +163,7 @@ describe("Markup checks", () => {
     const source = `
       <Button label="{some" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -182,7 +182,7 @@ describe("Markup checks", () => {
     const source = `
       <Button label="{/123}" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -202,7 +202,7 @@ describe("Markup checks", () => {
       const source = `
         <Button ${key}="something" />
       `;
-      const def = transformSource(source) as ComponentDef;
+      const def = transformSource(source) as ComponentDefNew;
 
       // --- Act
       const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -219,7 +219,7 @@ describe("Markup checks", () => {
         const source = `
         <Button ${key}-${bp}="something" />
       `;
-        const def = transformSource(source) as ComponentDef;
+        const def = transformSource(source) as ComponentDefNew;
 
         // --- Act
         const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -320,7 +320,7 @@ describe("Markup checks", () => {
     const source = `
       <Button onDummy="something" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -338,7 +338,7 @@ describe("Markup checks", () => {
     const source = `
       <Button onClick="something" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -352,7 +352,7 @@ describe("Markup checks", () => {
     const source = `
       <Button onClick="some?" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -374,7 +374,7 @@ describe("Markup checks", () => {
         </event>
       </Button>
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -392,7 +392,7 @@ describe("Markup checks", () => {
     const source = `
       <Button label="q - should not start with q" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler, true);
@@ -410,7 +410,7 @@ describe("Markup checks", () => {
     const source = `
       <Button label="q - should not start with q" />
     `;
-    const def = transformSource(source) as ComponentDef;
+    const def = transformSource(source) as ComponentDefNew;
 
     // --- Act
     const errors = checkXmlUiMarkup(def, [], metadataHandler);
@@ -420,6 +420,6 @@ describe("Markup checks", () => {
   });
 });
 
-function transformSource(source: string): ComponentDef | CompoundComponentDef | null {
+function transformSource(source: string): ComponentDefNew | CompoundComponentDef | null {
   return parseXmlUiMarkup(source);
 }

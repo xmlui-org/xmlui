@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - regression", () => {
@@ -16,7 +16,7 @@ describe("Ueml transform - regression", () => {
       </TableColumnDef>
       <TableColumnDef accessor="key" header="Header"/>
     </Table>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Table");
   });
   
@@ -33,7 +33,7 @@ describe("Ueml transform - regression", () => {
       </TableColumnDef>
       <TableColumnDef accessor="key" header="Header"/>
     </Table>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Table");
   });
 
@@ -50,7 +50,7 @@ describe("Ueml transform - regression", () => {
       </TableColumnDef>
       <TableColumnDef accessor="key" header="Header"/>
     </Table>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Table");
   });
 
@@ -67,7 +67,7 @@ describe("Ueml transform - regression", () => {
       </TableColumnDef>
       <TableColumnDef accessor="key" header="Header"/>
     </Table>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Table");
   });
 
@@ -79,9 +79,9 @@ const a = 1;
 const b = 2;
 </event>
     </Text>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Text");
-    expect(cd.events!.click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.events as any).click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
   });
 
   it("Api keeps whitespaces", () => {
@@ -92,9 +92,9 @@ const a = 1;
 const b = 2;
 </api>
     </Text>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Text");
-    expect(cd.api!.myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n")
   });
 
   it("Var removes whitespaces", () => {
@@ -105,7 +105,7 @@ const a = 1;
 const b = 2;
 </var>
     </Text>
-    `) as ComponentDef;
+    `) as ComponentDefNew;
     expect(cd.type).equal("Text");
     expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ")
   });

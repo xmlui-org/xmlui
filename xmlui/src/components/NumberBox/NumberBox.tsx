@@ -9,6 +9,7 @@ import {
   dEnabled,
   dEndIcon,
   dEndText,
+  dFocus,
   dGotFocus,
   dInitialValue,
   dLabelId,
@@ -17,6 +18,7 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
+  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -67,6 +69,13 @@ export const NumberBoxMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
+  },
+  apis: {
+    focus: dFocus(COMP),
+    value: d(
+      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+    ),
+    setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
 });

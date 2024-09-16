@@ -9,7 +9,7 @@ import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
 import { useEvent } from "@components-core/utils/misc";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { TextBox } from "@components/TextBox/TextBox";
+import { TextBox } from "@components/TextBox/TextBoxNative";
 import type {
   ButtonThemeColor,
   ButtonVariant,

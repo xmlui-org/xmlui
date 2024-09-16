@@ -1,20 +1,13 @@
 import styles from "./DropdownMenu.module.scss";
 
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { iconPositionNames, type IconPosition } from "@components/abstractions";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { iconPositionNames } from "@components/abstractions";
 
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Icon } from "@components/Icon/IconNative";
 import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
-import {
-  dClick,
-  dComponent,
-  dEnabled,
-  dLabel,
-  dTriggerTemplate,
-} from "@components/metadata-helpers";
+import { dClick, dEnabled, dLabel, dTriggerTemplate } from "@components/metadata-helpers";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -151,13 +144,6 @@ export const menuItemRenderer = createComponentRendererNew(
 
 const SMCOMP = "SubMenuItem";
 
-interface SubMenuItemDef extends ComponentDef<"SubMenuItem"> {
-  props: {
-    label?: string;
-    triggerTemplate?: ComponentDef;
-  };
-}
-
 export const SubMenuItemMd = createMetadata({
   description: "This component represents a nested menu item within another menu or menu item.",
   props: {
@@ -181,31 +167,21 @@ export const subMenuItemRenderer = createComponentRendererNew(
   },
 );
 
-// ====================================================================================================================
-// XMLUI MenuSeparator definition
+const MSEP = "MenuSeparator";
 
-export interface MenuSeparatorDef extends ComponentDef<"MenuSeparator"> {
-  props: {};
-}
-
-const menuSeparatorMetadata: ComponentDescriptor<MenuSeparatorDef> = {
-  displayName: "MenuSeparator",
-  description: "Displays a separator line between menu items",
+export const MenuSeparatorMd = createMetadata({
+  description: "This component displays a separator line between menu items.",
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "margin-top-MenuSeparator": "$space-1",
-    "margin-bottom-MenuSeparator": "$space-1",
-    "width-MenuSeparator": "100%",
-    "height-MenuSeparator": "1px",
-    "color-MenuSeparator": "$color-border-dropdown-item",
-    "margin-horizontal-MenuSeparator": "12px",
+    [`margin-top-${MSEP}`]: "$space-1",
+    [`margin-bottom-${MSEP}`]: "$space-1",
+    [`width-${MSEP}`]: "100%",
+    [`height-${MSEP}`]: "1px",
+    [`color-${MSEP}`]: "$color-border-dropdown-item",
+    [`margin-horizontal-${MSEP}`]: "12px",
   },
-};
+});
 
-export const menuSeparatorRenderer = createComponentRenderer<MenuSeparatorDef>(
-  "MenuSeparator",
-  () => {
-    return <MenuSeparator />;
-  },
-  menuSeparatorMetadata,
-);
+export const menuSeparatorRenderer = createComponentRendererNew(MSEP, MenuSeparatorMd, () => {
+  return <MenuSeparator />;
+});

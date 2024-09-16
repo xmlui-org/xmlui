@@ -1,4 +1,4 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 
 import styles from "./Alert.module.scss";
 

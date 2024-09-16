@@ -1,18 +1,11 @@
 import styles from "./Form.module.scss";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { FormWithContextVar } from "./FormNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Form";
-export interface FormComponentDef extends ComponentDef<"Form"> {
-  contextVars: {
-    /** @descriptionRef */
-    $subject?: string;
-  };
-}
 
 export const FormMd = createMetadata({
   description:
