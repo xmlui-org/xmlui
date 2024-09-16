@@ -12,6 +12,7 @@ import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { getAppLayoutOrientation } from "@components/App/App";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { nestedComp } from "@components-core/descriptorHelper";
+import type { RenderChildFn } from "@abstractions/RendererDefs";
 
 interface INavPanelContext {
   inDrawer: boolean;
@@ -57,11 +58,15 @@ const NavPanel = forwardRef(function NavPanel(
     style,
     logoContent,
     className,
+    inDrawer,
+    renderChild,
   }: {
     children: ReactNode;
     className?: string;
     style?: React.CSSProperties;
     logoContent?: ReactNode;
+    inDrawer?: boolean;
+    renderChild: RenderChildFn;
   },
   forwardedRef,
 ) {
@@ -69,10 +74,20 @@ const NavPanel = forwardRef(function NavPanel(
   const ref = forwardedRef ? composeRefs(scrollContainerRef, forwardedRef) : scrollContainerRef;
   const appLayoutContext = useAppLayoutContext();
   const horizontal = getAppLayoutOrientation(appLayoutContext?.layout) === "horizontal";
-  const showLogo = appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
+  const showLogo =
+    appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
+  const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
-  console.log(appLayoutContext);
+  // console.log(appLayoutContext);
+
+  if (inDrawer) {
+    return (
+      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className}>
+        {children}
+      </DrawerNavPanel>
+    );
+  }
 
   return (
     <div
@@ -83,7 +98,9 @@ const NavPanel = forwardRef(function NavPanel(
       })}
     >
       <ScrollContext.Provider value={scrollContainerRef}>
-        {showLogo && <div className={classnames(styles.logoWrapper)}>{logoContent || <Logo />}</div>}
+        {showLogo && (
+          <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
+        )}
         <div className={styles.wrapperInner} style={style}>
           {children}
         </div>
@@ -122,7 +139,7 @@ export const NavPanelMd: ComponentDescriptor<NavPanelComponentDef> = {
   defaultThemeVars: {
     "color-bg-NavPanel": "transparent",
     ...borderSubject("NavPanel", {}),
-    "padding-horizontal-NavPanel": "$space-4",
+    "padding-horizontal-NavPanel": "0",
     "padding-vertical-logo-NavPanel": "$space-4",
     "padding-horizontal-logo-NavPanel": "$space-4",
     "margin-bottom-logo-NavPanel": "$space-4",
@@ -138,19 +155,13 @@ export const NavPanelMd: ComponentDescriptor<NavPanelComponentDef> = {
 export const navPanelRenderer = createComponentRenderer<NavPanelComponentDef>(
   "NavPanel",
   ({ node, renderChild, layoutCss, layoutContext }) => {
-    return layoutContext?.inDrawer ? (
-      <DrawerNavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
-        className={layoutContext?.themeClassName}
-      >
-        {renderChild(node.children)}
-      </DrawerNavPanel>
-    ) : (
+    return (
       <NavPanel
         style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
+        logoContent={renderChild(node.props.logoTemplate)}
         className={layoutContext?.themeClassName}
+        inDrawer={layoutContext?.inDrawer}
+        renderChild={renderChild}
       >
         {renderChild(node.children)}
       </NavPanel>

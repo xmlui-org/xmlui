@@ -17,6 +17,9 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { RenderChildFn } from "@abstractions/RendererDefs";
+import { NavLink } from "@components/NavLink/NavLink";
+import {useAppContext} from "@components-core/AppContext";
+import {MemoizedItem} from "@components/container-helpers";
 
 type Props = {
   children?: ReactNode;
@@ -25,11 +28,12 @@ type Props = {
   logoContent?: ReactNode;
   canRestrictContentWidth?: boolean;
   className?: string;
-  logoTitle?: string;
+  title?: string;
   navPanelVisible?: boolean;
   showLogo?: boolean;
   toggleDrawer?: () => void;
   hasRegisteredNavPanel?: boolean;
+  titleContent?: ReactNode;
 };
 
 export function useLogoUrl(inDrawer?: boolean) {
@@ -60,8 +64,17 @@ export const AppHeader = ({
   toggleDrawer,
   showLogo,
   hasRegisteredNavPanel,
-  logoTitle,
+  title,
+  titleContent,
 }: Props) => {
+  const {mediaSize} = useAppContext();
+  const safeLogoTitle = mediaSize.sizeIndex < 2 ? null : (!titleContent && title) ? (
+    <NavLink to={"/"} displayActive={false} style={{paddingLeft: 0}}>
+      {title}
+    </NavLink>
+  ) : (
+    titleContent
+  );
   return (
     <div className={classnames(styles.header, className)} style={style}>
       <div
@@ -77,13 +90,27 @@ export const AppHeader = ({
             style={{ color: "inherit", flexShrink: 0 }}
           />
         )}
-        {(showLogo || !navPanelVisible) && (
-          <div className={styles.logoContainer}>{logoContent ? <>{logoContent}</> : <Logo title={logoTitle} />}</div>
-        )}
+        {(showLogo || !navPanelVisible) &&
+          (logoContent ? (
+            <>
+              <div className={styles.customLogoContainer}>
+                {logoContent}
+              </div>
+              {safeLogoTitle}
+            </>
+          ) : (
+            <>
+              <div className={styles.logoContainer}>
+                <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
+                  <Logo />
+                </NavLink>
+              </div>
+              {safeLogoTitle}
+            </>
+          ))}
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && (
           <div className={styles.rightItems}>
-            {/*{profileMenu === undefined ? <ProfileMenu loggedInUser={loggedInUser} /> : profileMenu}*/}
             {profileMenu}
           </div>
         )}
@@ -98,7 +125,8 @@ export function AppContextAwareAppHeader({
   profileMenu,
   style,
   className,
-  logoTitle,
+  title,
+  titleContent,
   renderChild,
 }: {
   children?: ReactNode;
@@ -106,12 +134,20 @@ export function AppContextAwareAppHeader({
   style?: React.CSSProperties;
   logoContent?: ReactNode;
   className?: string;
-  logoTitle?: string;
+  title?: string;
+  titleContent?: ReactNode;
   renderChild: RenderChildFn;
 }) {
   const appLayoutContext = useAppLayoutContext();
 
-  const { navPanelVisible, toggleDrawer, layout, hasRegisteredNavPanel, navPanelDef } = appLayoutContext || {};
+  const {
+    navPanelVisible,
+    toggleDrawer,
+    layout,
+    hasRegisteredNavPanel,
+    navPanelDef,
+    logoContentDef,
+  } = appLayoutContext || {};
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
   const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
@@ -124,13 +160,16 @@ export function AppContextAwareAppHeader({
       toggleDrawer={toggleDrawer}
       canRestrictContentWidth={canRestrictContentWidth}
       showLogo={showLogo}
-      logoContent={logoContent}
+      logoContent={logoContent || renderChild(logoContentDef)}
       profileMenu={profileMenu}
       style={style}
       className={className}
-      logoTitle={logoTitle}
+      title={title}
+      titleContent={titleContent}
     >
-      {layout?.startsWith("condensed") && navPanelVisible && <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>}
+      {layout?.startsWith("condensed") && navPanelVisible && (
+        <div style={{ minWidth: 0 }}>{renderChild(navPanelDef)}</div>
+      )}
       {children}
     </AppHeader>
   );
@@ -145,7 +184,8 @@ export interface AppHeaderComponentDef extends ComponentDef<"AppHeader"> {
   props: {
     profileMenuTemplate?: ComponentDef;
     logoTemplate?: ComponentDef;
-    logoTitle?: string;
+    titleTemplate?: ComponentDef;
+    title?: string;
   };
 }
 
@@ -155,7 +195,7 @@ export const AppHeaderMd: ComponentDescriptor<AppHeaderComponentDef> = {
   props: {
     profileMenuTemplate: nestedComp("Template for the profile menu"),
     logoTemplate: nestedComp("Template for the application logo"),
-    logoTitle: desc("Title for the application logo"),
+    title: desc("Title for the application logo"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -189,25 +229,17 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
   "AppHeader",
   ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
     // --- Convert the plain (text) logo template into component definition
-    let logoTemplate = node.props.logoTemplate;
-    if (typeof (logoTemplate as any) === "string") {
-      logoTemplate = {
-        type: "TextNode",
-        props: {
-          value: logoTemplate,
-        },
-      };
-    }
+    const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
+    const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
     return (
       <AppContextAwareAppHeader
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
-        logoTitle={extractValue(node.props.logoTitle) || layoutContext?.logoTitle}
-        logoContent={
-          renderChild(logoTemplate, {
-            type: "Stack",
-            orientation: "horizontal",
-          }) || layoutContext?.logoContent
-        }
+        title={extractValue(node.props.title)}
+        titleContent={titleTemplate && <MemoizedItem node={titleTemplate} renderChild={renderChild} contextVars={{'$title': extractValue(node.props.title)}}/>}
+        logoContent={renderChild(logoTemplate, {
+          type: "Stack",
+          orientation: "horizontal",
+        })}
         style={layoutCss}
         className={layoutContext?.themeClassName}
         renderChild={renderChild}
@@ -215,8 +247,6 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
         {renderChild(node.children, {
           // Since the AppHeader is a flex container, it's children should behave the same as in a stack
           type: "Stack",
-          width: "100%",
-          height: "100%",
         })}
       </AppContextAwareAppHeader>
     );

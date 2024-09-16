@@ -15,24 +15,25 @@ import { Sheet, SheetContent } from "@components/App/Sheet";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { AppHeader } from "@components/AppHeader/AppHeader";
+import {AppContextAwareAppHeader, AppHeader} from "@components/AppHeader/AppHeader";
 import { useResizeObserver } from "@components-core/utils/hooks";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import type { JSX } from "react/jsx-runtime";
+import {RenderChildFn} from "@abstractions/RendererDefs";
 
 type Props = {
   children: ReactNode;
-  logoContent?: ReactNode;
   header?: ReactNode;
   footer?: ReactNode;
   navPanel?: ReactNode;
-  navPanelInDrawer?: ReactNode;
   style: CSSProperties;
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
   onReady?: () => void;
   navPanelDef?: ComponentDef;
+  logoContentDef?: ComponentDef;
+  renderChild: RenderChildFn;
 };
 
 function App({
@@ -40,18 +41,20 @@ function App({
   style,
   layout,
   loggedInUser,
-  logoContent,
   scrollWholePage,
   onReady = noop,
   header,
   navPanel,
-  navPanelInDrawer,
   footer,
   navPanelDef,
+  logoContentDef,
+  renderChild
 }: Props) {
   const { getThemeVar } = useTheme();
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
-  const safeLayout = layoutWithDefaultValue?.trim().replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+  const safeLayout = layoutWithDefaultValue
+    ?.trim()
+    .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
   const { setLoggedInUser, mediaSize } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
@@ -68,7 +71,8 @@ function App({
   // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
   // --- we couldn't show the NavPanel)
   const navPanelVisible =
-    mediaSize.largeScreen || (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
+    mediaSize.largeScreen ||
+    (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
 
   const scrollPageContainerRef = useRef(null);
   const noScrollPageContainerRef = useRef(null);
@@ -131,6 +135,7 @@ function App({
       },
       toggleDrawer,
       navPanelDef,
+      logoContentDef,
     };
   }, [
     hasRegisteredNavPanel,
@@ -140,6 +145,7 @@ function App({
     safeLayout,
     toggleDrawer,
     navPanelDef,
+    logoContentDef,
   ]);
 
   useEffect(() => {
@@ -188,10 +194,16 @@ function App({
       break;
     case "vertical-sticky":
       content = (
-        <div className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)} style={styleWithHelpers}>
+        <div
+          className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
+          style={styleWithHelpers}
+        >
           {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
           <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
-            <header ref={headerRefCallback} className={classnames(styles.headerWrapper, styles.sticky)}>
+            <header
+              ref={headerRefCallback}
+              className={classnames(styles.headerWrapper, styles.sticky)}
+            >
               {header}
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
@@ -213,7 +225,10 @@ function App({
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
         >
-          <header className={classnames(styles.headerWrapper, styles.sticky)} ref={headerRefCallback}>
+          <header
+            className={classnames(styles.headerWrapper, styles.sticky)}
+            ref={headerRefCallback}
+          >
             {header}
           </header>
           <div className={styles.content}>
@@ -249,14 +264,7 @@ function App({
             ref={headerRefCallback}
           >
             {!hasRegisteredHeader && hasRegisteredNavPanel && (
-              <AppHeader
-                canRestrictContentWidth={true}
-                logoContent={logoContent}
-                navPanelVisible={navPanelVisible}
-                toggleDrawer={toggleDrawer}
-              >
-                <div style={{ minWidth: 0 }}>{navPanel}</div>
-              </AppHeader>
+              <AppContextAwareAppHeader renderChild={renderChild}/>
             )}
             {header}
           </header>
@@ -301,7 +309,10 @@ function App({
           style={styleWithHelpers}
           ref={scrollPageContainerRef}
         >
-          <header className={classnames(styles.headerWrapper, styles.sticky)} ref={headerRefCallback}>
+          <header
+            className={classnames(styles.headerWrapper, styles.sticky)}
+            ref={headerRefCallback}
+          >
             <div>{header}</div>
             {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
           </header>
@@ -323,7 +334,7 @@ function App({
   return (
     <AppLayoutContext.Provider value={layoutContextValue}>
       <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
-        <SheetContent side={"left"}>{navPanelInDrawer}</SheetContent>
+        <SheetContent side={"left"}>{renderChild(navPanelDef, { inDrawer: true })}</SheetContent>
       </Sheet>
       {content}
     </AppLayoutContext.Provider>
@@ -380,7 +391,11 @@ export const AppMd: ComponentDescriptor<AppComponentDef> = {
     defaultRoute: desc("The app's default route", "string"),
     loggedInUser: desc("Optional information about the logged-in user"),
     logoTemplate: nestedComp("Optional template of the app logo"),
-    scrollWholePage: desc("Whether the whole page should scroll or just the content area", "boolean", true),
+    scrollWholePage: desc(
+      "Whether the whole page should scroll or just the content area",
+      "boolean",
+      true,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -424,13 +439,13 @@ export const appRenderer = createComponentRenderer<AppComponentDef>(
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
-        logoContent={renderChild(node.props.logoTemplate)}
         onReady={lookupEventHandler("ready")}
         header={renderChild(AppHeader)}
         footer={renderChild(Footer)}
         navPanel={renderChild(NavPanel)}
-        navPanelInDrawer={renderChild(NavPanel, { inDrawer: true })}
         navPanelDef={NavPanel}
+        logoContentDef={node.props.logoTemplate}
+        renderChild={renderChild}
       >
         {renderChild(restChildren)}
       </App>

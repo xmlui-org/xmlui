@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import {ComponentDef} from "@abstractions/ComponentDefs";
+import type {ComponentDef} from "@abstractions/ComponentDefs";
 
 const appLayoutNames = [
   "vertical",
@@ -24,6 +24,7 @@ export interface IAppLayoutContext {
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
   navPanelDef?: ComponentDef
+  logoContentDef?: ComponentDef
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

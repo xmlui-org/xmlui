@@ -9,15 +9,13 @@ import type { CSSProperties } from "react";
 // =====================================================================================================================
 // React Logo component implementation
 
-export const Logo = ({ inDrawer, style, title }: { inDrawer?: boolean; style?: CSSProperties, title?: string }) => {
+export const Logo = ({ inDrawer, style }: { inDrawer?: boolean; style?: CSSProperties }) => {
   const logoUrl = useLogoUrl(inDrawer);
   if (!logoUrl) {
     return null;
   }
   return (
-    <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%", fontWeight: '500', ...style }}>
-      <Image src={logoUrl} alt={"Logo"} /> {title}
-    </NavLink>
+      <Image src={logoUrl} alt={"Logo"} layout={style}/>
   );
 };
 
@@ -49,7 +47,7 @@ export const LogoMd: ComponentDescriptor<LogoComponentDef> = {
 export const logoComponentRenderer = createComponentRenderer<LogoComponentDef>(
   "Logo",
   ({ node, layoutCss, extractValue }) => {
-    return <Logo style={layoutCss} title={extractValue(node.props.title)} />;
+    return <Logo style={layoutCss} />;
   },
   LogoMd
 );

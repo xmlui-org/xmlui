@@ -20,7 +20,7 @@ $size-ContentSeparator: createThemeVar("size-ContentSeparator");
 
   &.vertical {
     width: $size-ContentSeparator;
-    height: 100%;
+    min-height: 100%;
   }
 }
 

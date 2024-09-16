@@ -52,7 +52,7 @@ export const LocalLink = ({ to, children, icon, active, onClick, target, disable
           <Icon name={icon} />
         </div>
       )}
-      <span className={classnames(styles.inner, styles.actions)}>{children}</span>
+      {children}
     </Node>
   );
 };
