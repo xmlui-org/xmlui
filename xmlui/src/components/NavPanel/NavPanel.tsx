@@ -37,22 +37,16 @@ export const navPanelRenderer = createComponentRendererNew(
   COMP,
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
-    return layoutContext?.inDrawer ? (
-      <DrawerNavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
-        className={layoutContext?.themeClassName}
-      >
-        {renderChild(node.children)}
-      </DrawerNavPanel>
-    ) : (
-      <NavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
-        className={layoutContext?.themeClassName}
-      >
-        {renderChild(node.children)}
-      </NavPanel>
+    return (
+        <NavPanel
+            style={layoutCss}
+            logoContent={renderChild(node.props.logoTemplate)}
+            className={layoutContext?.themeClassName}
+            inDrawer={layoutContext?.inDrawer}
+            renderChild={renderChild}
+        >
+          {renderChild(node.children)}
+        </NavPanel>
     );
   },
 );
