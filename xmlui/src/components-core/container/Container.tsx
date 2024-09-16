@@ -76,6 +76,7 @@ import {
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { LoaderComponent } from "@components-core/LoaderComponent";
 import { AppContextObject } from "@abstractions/AppContextDefs";
+import {SlotItem} from "@components/slot-helpers";
 
 /**
  * This function signature is used whenever the engine wants to sign that an object's field (property),
@@ -120,6 +121,10 @@ type ContainerProps = {
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
 };
+
+function isDynamicChild(child: ComponentDef<string>): child is DynamicChildComponentDef {
+  return "childToRender" in child;
+}
 
 // React component to display a view container and implement its behavior
 const MemoizedContainer = memo(
@@ -507,9 +512,16 @@ const MemoizedContainer = memo(
             return undefined;
           }
           let renderedChild: any;
-          if ("childToRender" in child) {
+          if (isDynamicChild(child)) {
             //inside a compoundComponent, render it with the parent state context, but the actual CC layoutContext
-            renderedChild = (child as any).renderChild(child.childToRender, lc);
+            if(child.contextVars){
+              renderedChild = <SlotItem node={child.childToRender}
+                                        renderChild={child.renderChild}
+                                        slotProps={child.contextVars.$slotProps}
+                                        layoutContext={lc}/>
+            } else {
+              renderedChild = child.renderChild(child.childToRender, lc);
+            }
           } else {
             const resolvedProps: Record<string, any> = {};
             layoutOptionKeys.forEach((key) => {
@@ -865,6 +877,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
   delete wrappedNode.uses;
   delete wrappedNode.props?.uses;
   delete wrappedNode.api;
+  delete wrappedNode.contextVars;
 
   // --- Do the wrapping
   return {
@@ -881,6 +894,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
     api: node.api,
     containerUid: "containerUid" in node && node.containerUid,
     apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
+    contextVars: node.contextVars,
     props: {
       debug: node.props?.debug,
       // debug: true,

@@ -18,8 +18,8 @@ import { borderSubject, paddingSubject } from "@components-core/theming/themes/b
 import { desc, nestedComp } from "@components-core/descriptorHelper";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { NavLink } from "@components/NavLink/NavLinkNative";
-import {useAppContext} from "@components-core/AppContext";
-import {MemoizedItem} from "@components/container-helpers";
+import { useAppContext } from "@components-core/AppContext";
+import { SlotItem } from "@components/slot-helpers";
 
 type Props = {
   children?: ReactNode;
@@ -67,14 +67,15 @@ export const AppHeader = ({
   title,
   titleContent,
 }: Props) => {
-  const {mediaSize} = useAppContext();
-  const safeLogoTitle = mediaSize.sizeIndex < 2 ? null : (!titleContent && title) ? (
-    <NavLink to={"/"} displayActive={false} style={{paddingLeft: 0}}>
-      {title}
-    </NavLink>
-  ) : (
-    titleContent
-  );
+  const { mediaSize } = useAppContext();
+  const safeLogoTitle =
+    mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
+      <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
+        {title}
+      </NavLink>
+    ) : (
+      titleContent
+    );
   return (
     <div className={classnames(styles.header, className)} style={style}>
       <div
@@ -93,9 +94,7 @@ export const AppHeader = ({
         {(showLogo || !navPanelVisible) &&
           (logoContent ? (
             <>
-              <div className={styles.customLogoContainer}>
-                {logoContent}
-              </div>
+              <div className={styles.customLogoContainer}>{logoContent}</div>
               {safeLogoTitle}
             </>
           ) : (
@@ -109,11 +108,7 @@ export const AppHeader = ({
             </>
           ))}
         <div className={styles.childrenWrapper}>{children}</div>
-        {profileMenu && (
-          <div className={styles.rightItems}>
-            {profileMenu}
-          </div>
-        )}
+        {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>
     </div>
   );
@@ -235,7 +230,15 @@ export const appHeaderComponentRenderer = createComponentRenderer<AppHeaderCompo
       <AppContextAwareAppHeader
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
         title={extractValue(node.props.title)}
-        titleContent={titleTemplate && <MemoizedItem node={titleTemplate} renderChild={renderChild} contextVars={{'$title': extractValue(node.props.title)}}/>}
+        titleContent={
+          titleTemplate && (
+            <SlotItem
+              node={titleTemplate}
+              renderChild={renderChild}
+              slotProps={{ title: extractValue(node.props.title) }}
+            />
+          )
+        }
         logoContent={renderChild(logoTemplate, {
           type: "Stack",
           orientation: "horizontal",
