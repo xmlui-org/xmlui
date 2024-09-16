@@ -126,6 +126,7 @@ import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
+import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -261,6 +262,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
+      this.registerComponentRenderer(accordionItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerComponentRenderer(fileUploadDropZoneComponentRenderer);

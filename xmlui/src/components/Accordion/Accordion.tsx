@@ -14,6 +14,7 @@ import {
   dFocus,
 } from "@components/metadata-helpers";
 import { triggerPositionNames } from "@components/abstractions";
+import { MemoizedItem } from "@components/container-helpers";
 
 const COMP = "Accordion";
 
@@ -105,7 +106,11 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRendererNew(
   COMP,
   AccordionMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss }) => {
-    return <Accordion />;
+  ({ node, extractValue, lookupEventHandler, layoutCss, renderChild }) => {
+    return (
+      <Accordion>
+        {renderChild(node.children)}
+      </Accordion>
+    );
   },
 );

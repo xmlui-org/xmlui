@@ -26,6 +26,18 @@ export type Option = {
   renderer?: (item: any) => ReactNode;
 };
 
+export type Accordion = {
+  /**
+   * The header of the accordion.
+   */
+  header: string;
+
+  /**
+   * The content of the accordion.
+   */
+  content: ReactNode;
+};
+
 export type Tab = {
   /**
    * The label of the tab.

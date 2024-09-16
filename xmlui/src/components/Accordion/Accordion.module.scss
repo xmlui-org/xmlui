@@ -7,10 +7,106 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-// TODO: Define styles here
+$height: t.$space-12;
+
+.root {
+  padding: t.$space-4;
+  border-radius: 6px;
+  width: 100%;
+  background-color: var(--mauve-6);
+  box-shadow: 0 2px 10px var(--black-a4);
+}
+
+.item {
+  overflow: hidden;
+  margin-top: 1px;
+
+  &:first-child {
+    margin-top: 0;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  &:focus-within {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 0 0 2px var(--mauve-12);
+  }
+}
+
+.header {
+  display: flex;
+}
+
+.trigger {
+  font-family: inherit;
+  background-color: transparent;
+  height: $height;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--violet-11);
+  box-shadow: 0 1px 0 var(--mauve-6);
+
+  &:hover {
+    background-color: var(--mauve-2);
+  }
+}
+
+.content {
+  overflow: hidden;
+  font-size: 15px;
+  color: var(--mauve-11);
+  background-color: var(--mauve-2);
+
+  &[data-state='open'] {
+   /* animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
+    height: auto;
+  }
+
+  &[data-state='closed'] {
+    /*animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
+    height: 0;
+  }
+}
+
+.AccordionChevron {
+  color: var(--violet-10);
+  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+.AccordionTrigger[data-state='open'] > .AccordionChevron {
+  transform: rotate(180deg);
+}
+
+/*@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}*/
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-    themeVars: t.json-stringify($themeVars);
-  }
-  
+  themeVars: t.json-stringify($themeVars);
+}
