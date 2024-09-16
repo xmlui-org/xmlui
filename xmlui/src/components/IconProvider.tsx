@@ -46,7 +46,7 @@ import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
 import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { TfiReload } from "react-icons/tfi";
 import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
-import type { IconBaseProps } from "@components/Icon/Icon";
+import type { IconBaseProps } from "@components/Icon/IconNative";
 import { ApiIcon } from "@components/Icon/ApiIcon";
 import { AttachmentIcon } from "@components/Icon/Attach";
 import { BindingIcon } from "@components/Icon/Binding";

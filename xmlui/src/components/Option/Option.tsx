@@ -1,61 +1,34 @@
-import { useEffect, useId } from "react";
-
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { Option } from "@components/abstractions";
-import { createComponentRenderer } from "@components-core/renderers";
-import { useSelectContext } from "@components/Select/SelectContext";
+import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { OptionComponent } from "./OptionNative";
 
-function OptionComponent(props: Option) {
-  const id = useId();
-  const { register, unRegister } = useSelectContext();
-  useEffect(() => {
-    register({
-      ...props,
-      id,
-    });
-  }, [id, props, register]);
-  useEffect(() => {
-    return () => {
-      unRegister(id);
-    };
-  }, [id, unRegister]);
-  return null;
-}
+const COMP = "Option";
 
-// =====================================================================================================================
-// XMLUI Option component definition
-
-/**
- * \`Option\` is a non-visual component describing a selection option. Other components (such as \`Select\`,
- * \`Combobox\`, and others) may use nested \`Option\` instances from which the user can select.
- */
-export interface OptionComponentDef extends ComponentDef<"Option"> {
-  props: {
-    /** @descriptionRef */
-    label: string;
-    /** @descriptionRef */
-    value: string;
-    /** @descriptionRef */
-    disabled?: string;
-  };
-}
-
-export const OptionMd: ComponentDescriptor<OptionComponentDef> = {
-  displayName: "Option",
+export const OptionMd = createMetadata({
   description:
-    "Option is a non-visual component describing a selection option. Other components (such as Select, Combobox, and others) may use nested Option instances from which the user can select.",
+    `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
+    `(such as \`Select\`, \`Combobox\`, and others) may use nested \`Option\` instances ` +
+    `from which the user can select.`,
   props: {
-    label: desc("The label of the option."),
-    value: desc("The value of the option."),
-    disabled: desc("Indicates if the option is disabled."),
+    label: d(
+      `This property defines the text to display for the option. If \`label\` is not defined, ` +
+        `\`Option\` will use the \`value\` as the label.`,
+    ),
+    value: d(
+      `This property defines the value of the option. If \`value\` is not defined, ` +
+        `\`Option\` will use the \`label\` as the value.`,
+    ),
+    disabled: d(
+      `If this property is set to \`true\`, the option is disabled and cannot be selected ` +
+        `in its parent component.`,
+    ),
   },
-};
+});
 
-export const optionComponentRenderer = createComponentRenderer<OptionComponentDef>(
-  "Option",
+export const optionComponentRenderer = createComponentRendererNew(
+  COMP,
+  OptionMd,
   (rendererContext) => {
     const { node, renderChild, extractValue } = rendererContext;
     let label = extractValue(node.props.label);
@@ -83,5 +56,4 @@ export const optionComponentRenderer = createComponentRenderer<OptionComponentDe
       />
     );
   },
-  OptionMd,
 );

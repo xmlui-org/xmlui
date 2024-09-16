@@ -1,56 +1,22 @@
-import React, { CSSProperties, ReactNode } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
 import styles from "./PositionedContainer.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import { PositionedContainer } from "./PositionedContainerNative";
 
-function PositionedContainer({
-  children,
-  top,
-  right,
-  bottom,
-  left,
-  visibleOnHover = false,
-}: {
-  children: ReactNode;
-  top: CSSProperties["top"];
-  right: CSSProperties["right"];
-  bottom: CSSProperties["bottom"];
-  left: CSSProperties["left"];
-  visibleOnHover: boolean;
-}) {
-  return (
-    <div
-      style={{ top, right, bottom, left }}
-      className={classnames(styles.wrapper, {
-        [styles.visibleOnHover]: visibleOnHover,
-      })}
-    >
-      {children}
-    </div>
-  );
-}
+const COMP = "PositionedContainer";
 
-interface PositionedContainerComponentDef extends ComponentDef<"PositionedContainer"> {
+export const PositionedContainerMd = createMetadata({
+  description: "No description",
   props: {
-    visibleOnHover?: string;
-  };
-}
-
-export const PositionedContainerMd: ComponentDescriptor<PositionedContainerComponentDef> = {
-  displayName: "PositionedContainer",
-  description: "",
-  props: {
-    visibleOnHover: desc(""),
+    visibleOnHover: d("No description"),
   },
   themeVars: parseScssVar(styles.themeVars),
-};
+});
 
-export const positionedContainerComponentRenderer = createComponentRenderer<PositionedContainerComponentDef>(
-  "PositionedContainer",
+export const positionedContainerComponentRenderer = createComponentRendererNew(
+  COMP,
+  PositionedContainerMd,
   ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <PositionedContainer
@@ -64,7 +30,4 @@ export const positionedContainerComponentRenderer = createComponentRenderer<Posi
       </PositionedContainer>
     );
   },
-  PositionedContainerMd
 );
-
-export default PositionedContainer;

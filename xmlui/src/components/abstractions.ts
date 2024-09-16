@@ -26,6 +26,19 @@ export type Option = {
   renderer?: (item: any) => ReactNode;
 };
 
+export type Tab = {
+  /**
+   * The label of the tab.
+   */
+  label: string;
+
+  /**
+   * The content of the tab.
+   */
+
+  content: ReactNode;
+};
+
 export type LinkTarget = "_self" | "_blank" | "_parent" | "_top";
 
 /**

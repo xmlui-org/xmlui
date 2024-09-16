@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import styles from "./Header.module.scss";
 import classnames from "classnames";
 import { useTheme } from "nextra-theme-docs";
-import { Text } from "@components/Text/Text";
+import { Text } from "@components/Text/TextNative";
 import { CodeSelector } from "@/src/components/CodeSelector";
 import { Tooltip } from "@/src/components/Tooltip";
 import { MdSwapHoriz, MdSwapVert } from "react-icons/md";

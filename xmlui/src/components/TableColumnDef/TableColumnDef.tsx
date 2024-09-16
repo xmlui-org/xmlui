@@ -1,104 +1,43 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { OurColumnMetadata, useTableContext } from "@components/TableColumnDef/TableContext";
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo } from "react";
-import { MemoizedItem } from "@components/container-helpers";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
+import { TableColumnDef } from "./TableColumnDefNative";
 
-type TableColumnProps = OurColumnMetadata & {
-  nodeChildren?: ComponentDef[];
-  renderChild: RenderChildFn;
-};
+const COMP = "TableColumnDef";
 
-function TableColumnDef({ nodeChildren, renderChild, index, ...columnMetadata }: TableColumnProps) {
-  const id = useId();
-  const { registerColumn, unRegisterColumn } = useTableContext();
-
-  const cellRenderer = useCallback(
-    (row: any) => {
-      return <MemoizedItem node={nodeChildren!} item={row} renderChild={renderChild} />;
-    },
-    [nodeChildren, renderChild],
-  );
-
-  const safeCellRenderer = useMemo(() => {
-    return nodeChildren ? cellRenderer : undefined;
-  }, [cellRenderer, nodeChildren]);
-
-  useLayoutEffect(() => {
-    registerColumn({
-      ...columnMetadata,
-      cellRenderer: safeCellRenderer,
-      id,
-      index,
-    });
-  }, [index, columnMetadata, id, registerColumn, safeCellRenderer]);
-
-  useEffect(() => {
-    return () => {
-      unRegisterColumn(id);
-    };
-  }, [id, unRegisterColumn]);
-  return null;
-}
-
-// =====================================================================================================================
-// XMLUI TableColumnDef component definition
-
-/**
- * The \`TableColumnDef\` component can be used within a \`Table\` to define a particular table column's
- * visual properties and data bindings.
- */
-export interface TableColumnDefComponentDef extends ComponentDef<"TableColumnDef"> {
+export const TableColumnDefMd = createMetadata({
+  description:
+    `The \`${COMP}\` component can be used within a \`Table\` to define a particular table ` +
+    `column's visual properties and data bindings.`,
   props: {
-    /** @descriptionRef */
-    bindTo?: string;
-    /** @descriptionRef */
-    header: string;
-    /** @descriptionRef */
-    width?: string;
-    /**
-     * Indicates the minimum width a particular column can have. (See an example in the [\`width\` property]
-     * (#width) section below.)
-     */
-    minWidth?: number;
-    /**
-     * Indicates the maximum width a particular column can have.  (See an example in the [\`width\` property]
-     * (#width) section below.)
-     */
-    maxWidth?: number;
-    /** @descriptionRef */
-    canSort?: boolean;
-    /** @descriptionRef */
-    pinTo?: string;
-    /**
-     * This property indicates whether the user can resize the column. If set to \`true\`, the column can
-     * be resized by dragging the column border. If set to \`false\`, the column cannot be resized.
-     * Double-clicking the column border resets to the original size.
-     */
-    canResize?: boolean;
-  };
-}
-
-export const TableColumnDefMd: ComponentDescriptor<TableColumnDefComponentDef> = {
-  displayName: "TableColumnDef",
-  description: "Table column definition",
-  props: {
-    bindTo: desc("The key to bind the column to"),
-    header: desc("The header of the column"),
-    width: desc("The width of the column"),
-    minWidth: desc("The minimum width of the column"),
-    maxWidth: desc("The maximum width of the column"),
-    canSort: desc("Indicates whether the column can be sorted"),
-    pinTo: desc("Indicates whether the column is pinned"),
-    canResize: desc("Indicates whether the column can be resized"),
+    bindTo: d(`Indicates what part of the data to lay out in the column.`),
+    header: d(`Adds a label for a particular column.`),
+    width: d(
+      `This property defines the width of the column. You can use a numeric value, a pixel ` +
+        `value (such as \`100px\`), or a star size value (such as \`*\`, \`2*\`, etc.). ` +
+        `You will get an error if you use any other unit (or value).`,
+    ),
+    minWidth: d(`Indicates the minimum width a particular column can have.`),
+    maxWidth: d(`Indicates the maximum width a particular column can have.`),
+    canSort: d(
+      `This property sets whether the user can sort by a column by clicking on its header ` +
+        `(\`true\`) or not (\`false\`).`,
+    ),
+    pinTo: d(
+      `This property allows the column to be pinned to the \`left\` or right \`edge\` ` +
+        `of the table.`,
+    ),
+    canResize: d(
+      `This property indicates whether the user can resize the column. If set to ` +
+        `\`true\`, the column can be resized by dragging the column border. If set to ` +
+        `\`false\`, the column cannot be resized. Double-clicking the column border ` +
+        `resets to the original size.`,
+    ),
   },
-};
+});
 
-export const tableColumnDefComponentRenderer = createComponentRenderer<TableColumnDefComponentDef>(
-  "TableColumnDef",
+export const tableColumnDefComponentRenderer = createComponentRendererNew(
+  COMP,
+  TableColumnDefMd,
   (rendererContext) => {
     const { node, renderChild, extractValue, childIndex, layoutCss } = rendererContext;
     return (
@@ -118,5 +57,4 @@ export const tableColumnDefComponentRenderer = createComponentRenderer<TableColu
       />
     );
   },
-  TableColumnDefMd,
 );

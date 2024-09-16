@@ -12,8 +12,6 @@ Throught this documentation page the data used is the same that is found in the 
 
 %-PROP-START bindTo
 
-Indicates what part of the data to lay out in the column.
-
 ```ueml copy {3}
 <Table data='{[...]}'>
   <TableColumnDef bindTo="name"/>
@@ -32,9 +30,6 @@ Indicates what part of the data to lay out in the column.
 %-PROP-END
 
 %-PROP-START canSort
-
-This property sets whether the user can sort by a column by clicking on its header (`true`) or not (`false`).
-The default value is `false`.
 
 Click on either the `Name` or the `Quantity` column headers to order the data by that attribute.
 
@@ -61,8 +56,6 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 
 %-PROP-START header
 
-Adds a label for a particular column
-
 ```ueml copy {3-4}
 <Table data='{[...]}'>
   <TableColumnDef header="Food Name" bindTo="name" />
@@ -86,7 +79,7 @@ Adds a label for a particular column
 
 %-PROP-START pinTo
 
-This property allows the column to be pinned to the `left` or right `edge` of the table, as the following example demonstrates:
+This property allows the column to be pinned to the `left` or right `edge` of the table.
 
 ```ueml copy {2,6} /pinTo="left"/ /pinTo="right"/
 <Table data='{[...]}'>
@@ -145,8 +138,6 @@ Access the data's attributes via the `$item` in a binding expression.
 %-PROP-END
 
 %-PROP-START width
-
-This property defines the width of the column. You can use a numeric value, a pixel value (such as `100px`), or a star size value (such as `*,` `2*`, etc.). You will get an error if you use any other unit (or value).
 
 The following example sets the second column to an absolute size (size pixels), while the first and third columns have star sizes:
 

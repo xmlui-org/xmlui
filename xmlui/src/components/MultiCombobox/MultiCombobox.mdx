@@ -412,6 +412,8 @@ See the example in [gotFocus event section](#gotfocus).
 
 %-API-START focus
 
+Access attributes of the item using the dot notation. For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`change\`](#change) event.
+
 ```ueml copy /onClick="inputControl.focus()"/
 <VStack padding="$space-1" gap="$space-0_5">
   <Button label="Focus Input" onClick="inputControl.focus()" />
@@ -516,7 +518,7 @@ Theme variables to set the styles of an unselected item:
       themeVars: {
         "thickness-border-MultiCombobox": "8px",
         "radius-MultiCombobox": "30px",
-        "color-placeholder-MultiCombobox-default": "blue"
+        "color-placeholder-MultiCombobox-default": "blue",
       },
     },
   ]}

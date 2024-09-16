@@ -1,6 +1,6 @@
 import React, { type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@components/Button/ButtonNative";
-import { Stack } from "@components/Stack/Stack";
+import { Stack } from "@components/Stack/StackNative";
 import { Dialog } from "./Dialog";
 import { ButtonVariant, ButtonThemeColor } from "@components/abstractions";
 

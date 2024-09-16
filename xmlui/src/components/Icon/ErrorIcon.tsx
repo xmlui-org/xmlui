@@ -1,5 +1,5 @@
 import React from "react";
 import {BiErrorCircle} from "react-icons/bi";
-import type {IconBaseProps} from "./Icon";
+import type {IconBaseProps} from "./IconNative";
 
 export const ErrorIcon = (props: IconBaseProps) => <BiErrorCircle {...props}/>

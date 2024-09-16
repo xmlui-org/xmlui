@@ -1,62 +1,26 @@
-import { Icon } from "@components/Icon/Icon";
 import styles from "./NoResult.module.scss";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { CSSProperties } from "react";
+import { NoResult } from "./NoResultNative";
+import { dLabel } from "@components/metadata-helpers";
+import { createComponentRendererNew } from "@components-core/renderers";
 
-// =====================================================================================================================
-// React NoResult component implementation
+const COMP = "NoResult";
 
-type Props = {
-  label: string;
-  icon?: string;
-  hideIcon?: boolean;
-  style?: CSSProperties;
-};
-
-const NoResult = ({ label, icon, hideIcon = false, style }: Props) => {
-  return (
-    <div className={styles.wrapper} style={style}>
-      {!hideIcon && <Icon name={icon ?? "noResult"} className={styles.icon} />}
-      {label}
-    </div>
-  );
-};
-
-// =====================================================================================================================
-// XMLUI NoResult component definition
-
-/**
- * \`NoResult\` is a component that displays a visual indication that some data query (search) resulted 
- * in no (zero) items.
- */
-export interface NoResultComponentDef extends ComponentDef<"NoResult"> {
+export const NoResultMd = createMetadata({
+  description:
+    `\`${COMP}\` is a component that displays a visual indication that some data query (search) ` +
+    `resulted in no (zero) items.`,
   props: {
-    /** @descriptionRef */
-    label?: string;
-    /** @descriptionRef */
-    icon?: string;
-    /** @descriptionRef */
-    hideIcon?: boolean;
-  };
-}
-
-export const NoResultMd: ComponentDescriptor<NoResultComponentDef> = {
-  displayName: "NoResult",
-  description: "Component representing a date fetch result with an empty result set",
-  props: {
-    label: desc("Optional label to display"),
-    icon: desc("Optional icon ID to display"),
-    hideIcon: desc("Indicates if the icon should be hidden"),
+    label: dLabel(),
+    icon: d(`This property defines the icon to display with the component.`),
+    hideIcon: d(`This boolean property indicates if the icon should be hidden.`),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "padding-vertical-NoResult": "$space-2",
-    "gap-icon-NoResult": "$space-2",
-    "size-icon-NoResult": "$space-8",
+    [`padding-vertical-${COMP}`]: "$space-2",
+    [`gap-icon-${COMP}`]: "$space-2",
+    [`size-icon-${COMP}`]: "$space-8",
     light: {
       // --- No light-specific theme vars
     },
@@ -64,10 +28,11 @@ export const NoResultMd: ComponentDescriptor<NoResultComponentDef> = {
       // --- No dark-specific theme vars
     },
   },
-};
+});
 
-export const noResultComponentRenderer = createComponentRenderer<NoResultComponentDef>(
-  "NoResult",
+export const noResultComponentRenderer = createComponentRendererNew(
+  COMP,
+  NoResultMd,
   ({ node, extractValue, layoutCss }) => {
     return (
       <NoResult
@@ -78,5 +43,4 @@ export const noResultComponentRenderer = createComponentRenderer<NoResultCompone
       />
     );
   },
-  NoResultMd
 );

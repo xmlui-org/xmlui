@@ -1,5 +1,5 @@
-import { Icon } from "@components/Icon/Icon";
-import { Text } from "../Text/Text";
+import { Icon } from "@components/Icon/IconNative";
+import { Text } from "../Text/TextNative";
 import styles from "./InputAdornment.module.scss";
 import classnames from "@components-core/utils/classnames";
 

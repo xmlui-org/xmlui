@@ -1,5 +1,5 @@
 import React from "react";
 import {FiSearch} from "react-icons/fi";
-import type {IconBaseProps} from "./Icon";
+import type {IconBaseProps} from "./IconNative";
 
 export const SearchIcon = (props: IconBaseProps) => <FiSearch {...props}/>
