@@ -1,5 +1,5 @@
 import { useId, useMemo, useState } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 import styles from "./Theme.module.scss";
 import { useCompiledTheme } from "@components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "@components-core/theming/ThemeContext";
@@ -35,7 +35,7 @@ type Props = {
   isRoot?: boolean;
   layoutContext?: LayoutContext;
   renderChild: RenderChildFn;
-  node: ComponentDef;
+  node: ComponentDefNew;
   tone?: ThemeTone;
   toastDuration?: number;
   themeVars?: Record<string, string>;

@@ -1,17 +1,11 @@
 import styles from "./Footer.module.scss";
-import { createMetadata, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRendererNew } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
 import { Footer } from "./FooterNative";
 
 const COMP = "Footer";
-
-/**
- * The \`Footer\` is a component that acts as the footer within `App`.
- * > **Note**: Learn more about using this component [here](../learning/app-component).
- */
-export interface FooterComponentDef extends ComponentDef<"Footer"> {}
 
 export const FooterMd = createMetadata({
   description: `The \`${COMP}\` is a component that acts as the footer within \`App\`.`,
@@ -39,7 +33,6 @@ export const footerRenderer = createComponentRendererNew(
     return (
       <Footer style={layoutCss} className={layoutContext?.themeClassName}>
         {renderChild(node.children, {
-          // Since the Footer is a flex container, it's children should behave the same as in a stack
           type: "Stack",
           orientation: "horizontal",
         })}

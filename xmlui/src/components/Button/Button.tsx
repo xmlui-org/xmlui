@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   alignmentOptionNames,
   sizeNames,

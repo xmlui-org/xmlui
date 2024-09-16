@@ -14,7 +14,7 @@ import { CheckboxMd } from "@components/Checkbox/Checkbox";
 import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -69,13 +69,15 @@ import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
 import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
 import { TabItemMd } from "./Tabs/TabItem";
+import { FragmentMd } from "@components-core/Fragment";
+import { SlotMd } from "@components-core/Slot";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
   Alert: AlertMd,
   // App: AppMd,
   // AppHeader: AppHeaderMd,
-  // AppState: AppStateMd,
+  AppState: AppStateMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
   Bookmark: BookmarkMd,
@@ -87,6 +89,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ContentSeparator: ContentSeparatorMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
+  Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   EmojiSelector: EmojiSelectorMd,
@@ -111,6 +114,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   // List: ListMd,
   // Logo: LogoMd,
   Markdown: MarkdownMd,
+  MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
   MultiCombobox: ComboboxMd,
   MultiSelect: MultiSelectMd,
@@ -135,6 +139,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Redirect: RedirectMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
+  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,

@@ -13,7 +13,7 @@ import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRen
 export function createComponentRenderer<T extends ComponentDef>(
   type: T["type"],
   renderer: ComponentRendererFn<T>,
-  hints?: ComponentDescriptor<T>
+  hints?: ComponentDescriptor<T>,
 ): ComponentRendererDef {
   return {
     type,
@@ -32,7 +32,7 @@ export function createComponentRenderer<T extends ComponentDef>(
 export function createComponentRendererNew<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
-  renderer: ComponentRendererFn<ComponentDefNew<TMd>>
+  renderer: ComponentRendererFn<ComponentDefNew<TMd>>,
 ): ComponentRendererDef {
   return {
     type,
@@ -41,19 +41,39 @@ export function createComponentRendererNew<TMd extends ComponentMetadata>(
   };
 }
 
+/**
+ * Create a non-visual component used for encapsulating property values
+ * @param type Component type
+ * @param metadata Component metadata
+ */
+export function createPropHolderComponent<T extends ComponentDef>(
+  type: T["type"],
+  metadata?: ComponentDescriptor<T>,
+) {
+  return createComponentRenderer(
+    type,
+    () => {
+      throw new Error("Prop holder component, shouldn't render");
+    },
+    metadata,
+  );
+}
 
 /**
  * Create a non-visual component used for encapsulating property values
  * @param type Component type
  * @param metadata Component metadata
  */
-export function createPropHolderComponent<T extends ComponentDef>(type: T["type"], metadata?: ComponentDescriptor<T>) {
+export function createPropHolderComponentNew<TMd extends ComponentMetadata>(
+  type: string,
+  metadata?: TMd,
+) {
   return createComponentRenderer(
     type,
     () => {
       throw new Error("Prop holder component, shouldn't render");
     },
-    metadata
+    metadata,
   );
 }
 
@@ -69,7 +89,7 @@ export function createPropHolderComponent<T extends ComponentDef>(type: T["type"
 export function createLoaderRenderer<T extends ComponentDef>(
   type: T["type"],
   renderer: LoaderRenderer<T>,
-  hints?: ComponentDescriptor<T>
+  hints?: ComponentDescriptor<T>,
 ): LoaderRendererDef {
   return {
     type,

@@ -1,26 +1,12 @@
 import styles from "./FlowLayout.module.scss";
 import { createComponentRendererNew } from "@components-core/renderers";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
-import { shadow } from "pdfjs-dist";
 
 const COMP = "FlowLayout";
-
-export interface FlowLayoutComponentDef extends ComponentDef<"FlowLayout"> {
-  props: {
-    /** @descriptionRef */
-    gap?: string | number;
-    /** @descriptionRef */
-    columnGap?: string | number;
-    /** @descriptionRef */
-    rowGap?: string | number;
-    /** @descriptionRef */
-    shadow?: string;
-  };
-}
 
 export const FlowLayoutMd = createMetadata({
   description:
