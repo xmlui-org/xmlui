@@ -31,7 +31,7 @@ import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 import type { LabelPosition } from "./ItemWithLabel";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
-import { getByPath } from "@components/Form/FomrNative";
+import { getByPath } from "@components/Form/FormNative";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
 import { ComponentDefNew } from "@abstractions/ComponentDefs";
 import { FormItemMd } from "./FormItem";

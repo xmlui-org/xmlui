@@ -6,8 +6,8 @@ import { Avatar } from "@components/Avatar/AvatarNative";
 import { LocalLink } from "@components/Link/LinkNative";
 import type { HeadingProps } from "@components/Heading/HeadingNative";
 import { Heading } from "@components/Heading/HeadingNative";
-import { Stack } from "@components/Stack/Stack";
-import { Text } from "@components/Text/Text";
+import { Stack } from "@components/Stack/StackNative";
+import { Text } from "@components/Text/TextNative";
 
 type Props = {
   style?: CSSProperties;

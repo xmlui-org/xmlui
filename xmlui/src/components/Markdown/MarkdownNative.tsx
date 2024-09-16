@@ -4,7 +4,7 @@ import styles from "./Markdown.module.scss";
 
 import ReactMarkdown from "react-markdown";
 import { Heading } from "@components/Heading/HeadingNative";
-import { Text } from "../Text/Text";
+import { Text } from "../Text/TextNative";
 import { LocalLink } from "@components/Link/LinkNative";
 import { Image } from "@components/Image/ImageNative";
 

@@ -21,8 +21,8 @@ import {
   triedToSubmit,
 } from "@components/Form/formActions";
 import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
-import { Text } from "@components/Text/Text";
-import { Stack } from "@components/Stack/Stack";
+import { Text } from "@components/Text/TextNative";
+import { Stack } from "@components/Stack/StackNative";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import type {
   LookupEventHandlerFn,

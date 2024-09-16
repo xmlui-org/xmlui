@@ -155,7 +155,6 @@ By default, the value of this property is `true`.
 
 %-PROP-START headerHeight
 
-This optional property is used to specify the height of the table header.
 It accepts common [size values](./appearance/common-units.mdx#size-values).
 
 ```ueml copy /headerHeight="60px"/
@@ -181,7 +180,7 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 
 %-PROP-START hideHeader
 
-Toggle the header visibility using this property. Set it to `true` to hide the header.
+Set the header visibility using this property. Set it to `true` to hide the header.
 The default value is `false`.
 
 ```ueml copy /hideHeader="true"/
@@ -205,9 +204,18 @@ The default value is `false`.
 
 %-PROP-END
 
-%-PROP-START isPaginated
+%-PROP-START items
 
-This property adds pagination controls to the `Table`.
+You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `data source` property to a URL to fetch the data from), `data` represents the information obtained from the API.
+
+By convention, when you use direct data (set manually or assembled by code), you pass it in the `items` property.
+
+When both `items` and `data` are used, `items` has priority.
+
+
+%-PROP-END
+
+%-PROP-START isPaginated
 
 ```ueml copy /isPaginated="true"/
 <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
@@ -250,8 +258,6 @@ This property is useful when data is loaded conditionally or receiving it takes 
 
 %-PROP-START noDataTemplate
 
-A property to customize what to display if the table does not contain any data.
-
 ```ueml copy {2-4}
 <Table>
   <prop name="noDataTemplate">
@@ -277,7 +283,6 @@ A property to customize what to display if the table does not contain any data.
 
 %-PROP-START pageSizes
 
-Describes how big a page should be for pagination.
 Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
@@ -304,9 +309,6 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 %-PROP-END
 
 %-PROP-START rowDisabledPredicate
-
-This property defines a predicate function with a return value that determines if the row should be disabled.
-The function retrieves the item to display and should return a Boolean-like value.
 
 The following example disables all table rows where the item's quantity exceeds 6:
 
@@ -339,7 +341,6 @@ The following example disables all table rows where the item's quantity exceeds 
 
 %-PROP-START rowsSelectable
 
-Indicates whether the rows are selectable (`true`) or not (`false`).
 The default value is `false`.
 
 > **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
@@ -372,8 +373,6 @@ The default value is `false`.
 
 %-PROP-START sortBy
 
-This property is used to determine which data attributes to sort by.
-
 ```ueml copy /sortBy="quantity"/
 <Table data='{[...]}' sortBy="quantity">
   ...
@@ -396,9 +395,6 @@ This property is used to determine which data attributes to sort by.
 %-PROP-END
 
 %-PROP-START sortDirection
-
-The `sortDirection` determines the sort order to be `ascending` or `descending`.
-This property only works if the [`sortBy`](#sortby) property is also set.
 
 ```ueml copy /sortDirection="descending"/
 <Table data='{[...]}' sortBy="quantity" sortDirection="descending">
@@ -503,10 +499,6 @@ and sorting is not done according to the column.
 
 %-EVENT-START sortingDidChange
 
-This event is fired when the table data sorting has changed.
-It has two arguments: the column's name and the sort direction.
-When the column name is empty, the table displays the data list as it received it.
-
 Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
 
 ```ueml copy {4}
@@ -543,10 +535,6 @@ Click on any of the column headers to trigger a new sorting:
 %-EVENT-END
 
 %-EVENT-START willSort
-
-This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction.
-
-When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
 
 The following example uses the `willSort` event to refuse sorting by name:
 
