@@ -1,7 +1,6 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextboxMd } from "@components/TextBox/TextBox";
+import { TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -31,7 +30,6 @@ import { ItemsMd } from "@components/Items/Items";
 import { LinkMd } from "@components/Link/Link";
 import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
-import Markdown from "react-markdown";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
 import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
@@ -155,8 +153,9 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,
-  // Text: TextMd,
-  // TextArea: TextAreaMd,
-  // TextBox: TextboxMd,
-  // Theme: ThemeMd,
+  Text: TextMd,
+  TextArea: TextAreaMd,
+  TextBox: TextBoxMd,
+  PasswordInput: TextBoxMd,
+  Theme: ThemeMd,
 };

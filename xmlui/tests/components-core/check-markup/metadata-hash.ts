@@ -1,7 +1,7 @@
 import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextboxMd } from "@components/TextBox/TextBox";
+import { TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -146,7 +146,7 @@ export const metadataHash: Record<string, ComponentMetadata | ComponentDescripto
   Tabs: TabsMd,
   Text: TextMd,
   TextArea: TextAreaMd,
-  TextBox: TextboxMd,
+  TextBox: TextBoxMd,
   Theme: ThemeMd,
   Switch: SwitchMd,
 };

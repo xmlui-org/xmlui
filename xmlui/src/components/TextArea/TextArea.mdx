@@ -1,3 +1,11 @@
+%-DESC-START
+
+The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
+
+To add new lines to the input field press `Shift` + `Enter`.
+
+%-DESC-END
+
 %-PROP-START autoFocus
 
 ```ueml copy
@@ -49,9 +57,6 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 
 %-PROP-START enterSubmits
 
-This optional boolean property toggles whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
-The default value is is `true`.
-
 Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
 
@@ -98,8 +103,6 @@ The initial value displayed in the input field.
 
 %-PROP-START maxRows
 
-This optional number property maximizes the number of lines the `TextArea` can grow to.
-
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
 ```ueml copy
@@ -130,8 +133,6 @@ quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa
 %-PROP-END
 
 %-PROP-START minRows
-
-This optional number property indicates the minimum number of lines the `TextArea` has and specifies its size accordingly.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -180,8 +181,6 @@ This optional number property indicates the minimum number of lines the `TextAre
 
 %-PROP-START resize
 
-This optional property specifies in which dimensions can the `TextArea` be resized by the user.
-
 | Value        | Description                   |
 | :----------- | :---------------------------- |
 |  undefined   | No resizing                   |
@@ -215,8 +214,6 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 %-PROP-END
 
 %-PROP-START rows
-
-Specifies the number of lines or rows (and thus, its size) the component has.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 

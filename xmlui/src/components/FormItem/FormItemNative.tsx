@@ -7,7 +7,7 @@ import type {
   ValidationMode,
 } from "@components/Form/FormContext";
 import { useFormContextPart } from "@components/Form/FormContext";
-import { TextBox } from "@components/TextBox/TextBox";
+import { TextBox } from "@components/TextBox/TextBoxNative";
 import { Toggle } from "@components/Toggle/Toggle";
 import { FileInput } from "@components/FileInput/FileInputNative";
 import { NumberBox } from "@components/NumberBox/NumberBoxNative";
@@ -25,7 +25,7 @@ import {
   fieldInitialized,
   fieldLostFocus,
 } from "@components/Form/formActions";
-import { TextArea } from "@components/TextArea/TextArea";
+import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
 import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 import type { LabelPosition } from "./ItemWithLabel";
