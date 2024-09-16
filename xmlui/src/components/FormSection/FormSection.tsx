@@ -1,16 +1,12 @@
-import type {
-  ComponentDef,
-  CompoundComponentDef,
+import {
+  createMetadata,
+  type ComponentDef,
+  type CompoundComponentDef,
 } from "@abstractions/ComponentDefs";
 import { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * The \`FormSection\` is a component that groups cohesive elements together within a `Form`.
- * This grouping is indicated visually:
- * the child components of the \`FormSection\` are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.
- *
- * See the \`FlowLayout\` reference documentation for details on sizing children.
- */
+const COMP = "FormSection";
+
 export interface FormSectionComponentDef extends ComponentDef<"FormSection"> {
   props: {
     /**
@@ -78,6 +74,12 @@ export interface FormSectionComponentDef extends ComponentDef<"FormSection"> {
     mounted: string;
   };
 }
+
+export const FormSectionMd = createMetadata({
+  description: `The \`${COMP}\` is a component that groups cohesive elements together within ` + 
+  `a \`Form\`. This grouping is indicated visually: the child components of the \`${COMP}\` ` + 
+  `are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.`,
+});
 
 export const formSectionRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {

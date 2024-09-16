@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform", () => {
@@ -31,12 +31,12 @@ describe("Ueml transform", () => {
   });
 
   it("Empty component #1", () => {
-    const cd = transformSource("<Stack />") as ComponentDef;
+    const cd = transformSource("<Stack />") as ComponentDefNew;
     expect(cd.type).equal("Stack");
   });
 
   it("Empty component #2", () => {
-    const cd = transformSource("<!-- This is a stack --><Stack />") as ComponentDef;
+    const cd = transformSource("<!-- This is a stack --><Stack />") as ComponentDefNew;
     expect(cd.type).equal("Stack");
   });
 
@@ -60,14 +60,14 @@ describe("Ueml transform", () => {
 
   it("Compound component needs a component child #1", () => {
     const cd = transformSource("<Component name='MyComp'><!-- comment--></Component>") as CompoundComponentDef;
-    expect((cd.component as ComponentDef).type).equal("TextNode");
-    expect((cd.component as ComponentDef).props!.value).equal("");
+    expect((cd.component as ComponentDefNew).type).equal("TextNode");
+    expect(((cd.component as ComponentDefNew).props as any).value).equal("");
   });
 
   it("Compound component needs a component child #2", () => {
     const cd = transformSource("<Component name='MyComp'></Component>") as CompoundComponentDef;
-    expect((cd.component as ComponentDef).type).equal("TextNode");
-    expect((cd.component as ComponentDef).props!.value).equal("");
+    expect((cd.component as ComponentDefNew).type).equal("TextNode");
+    expect(((cd.component as ComponentDefNew).props as any).value).equal("");
   });
 
   it("Compound component cannot nest another one", () => {

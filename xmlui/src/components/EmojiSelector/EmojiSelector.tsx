@@ -1,30 +1,10 @@
 import { createComponentRendererNew } from "@components-core/renderers";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { EmojiSelector } from "./EmojiSelectorNative";
 import { dAutoFocus } from "@components/metadata-helpers";
 
 const COMP = "EmojiSelector";
-/** 
- * The `EmojiSelector` component provides users with a graphical interface to browse,
- * search and select emojis to insert into text fields, messages, or other forms of communication.
- */
-export interface EmojiSelectorComponentDef extends ComponentDef<"EmojiSelector"> {
-  props: {
-    /** 
-     * This prop is used to auto focus on the component when the user navigates to the page.
-     * @descriptionRef
-     */
-    autoFocus: string;
-  };
-  readonly events: {
-    /** 
-     * This event is fired when the user selects an emoticon from this component.
-     * @descriptionRef
-     */
-    select: string;
-  };
-}
 
 export const EmojiSelectorMd = createMetadata({
   description: 

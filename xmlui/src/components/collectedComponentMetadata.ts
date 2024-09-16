@@ -1,7 +1,6 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextboxMd } from "@components/TextBox/TextBox";
+import { TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -15,7 +14,7 @@ import { CheckboxMd } from "@components/Checkbox/Checkbox";
 import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -31,7 +30,6 @@ import { ItemsMd } from "@components/Items/Items";
 import { LinkMd } from "@components/Link/Link";
 import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
-import Markdown from "react-markdown";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
 import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
@@ -71,13 +69,15 @@ import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
 import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
 import { TabItemMd } from "./Tabs/TabItem";
+import { FragmentMd } from "@components-core/Fragment";
+import { SlotMd } from "@components-core/Slot";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
   Alert: AlertMd,
   // App: AppMd,
   // AppHeader: AppHeaderMd,
-  // AppState: AppStateMd,
+  AppState: AppStateMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
   Bookmark: BookmarkMd,
@@ -89,6 +89,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ContentSeparator: ContentSeparatorMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
+  Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   EmojiSelector: EmojiSelectorMd,
@@ -113,6 +114,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   // List: ListMd,
   // Logo: LogoMd,
   Markdown: MarkdownMd,
+  MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
   MultiCombobox: ComboboxMd,
   MultiSelect: MultiSelectMd,
@@ -137,6 +139,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Redirect: RedirectMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
+  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
@@ -155,8 +158,9 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,
-  // Text: TextMd,
-  // TextArea: TextAreaMd,
-  // TextBox: TextboxMd,
-  // Theme: ThemeMd,
+  Text: TextMd,
+  TextArea: TextAreaMd,
+  TextBox: TextBoxMd,
+  PasswordInput: TextBoxMd,
+  Theme: ThemeMd,
 };
