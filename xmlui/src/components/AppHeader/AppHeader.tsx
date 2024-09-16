@@ -16,8 +16,8 @@ import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext"
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { desc, nestedComp } from "@components-core/descriptorHelper";
-import { RenderChildFn } from "@abstractions/RendererDefs";
-import { NavLink } from "@components/NavLink/NavLink";
+import type { RenderChildFn } from "@abstractions/RendererDefs";
+import { NavLink } from "@components/NavLink/NavLinkNative";
 import {useAppContext} from "@components-core/AppContext";
 import {MemoizedItem} from "@components/container-helpers";
 
