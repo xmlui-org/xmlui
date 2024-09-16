@@ -3,6 +3,10 @@ import { parse, join, basename, extname, sep, posix } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
 
+// temp
+const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
+const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
+
 // Note: string concatenation is the fastest using `+=` in Node.js
 
 const IMPORTS = "imports";
@@ -70,7 +74,11 @@ export function processMdx(component, componentNames, outFolder) {
       fileData = readFileContents(join(sourceFolder, component.descriptionRef));
     } catch (error) {
       if (error instanceof ErrorWithSeverity) {
-        logger.log(error.severity, error.message);
+        logger.error(error.severity, error.message);
+      } else if (error instanceof Error) {
+        logger.error(error.message);
+      } else {
+        logger.error(error);
       }
     }
   }
@@ -88,7 +96,6 @@ export function processMdx(component, componentNames, outFolder) {
     logger.info(`Processing ${component.displayName}...`);
 
     logger.info("Processing imports section");
-    console.log(fileData)
     const { buffer, copyFilePaths } = addImportsSection(fileData, component);
     if (buffer) {
       result += `${buffer}\n`;
@@ -128,7 +135,6 @@ export function processMdx(component, componentNames, outFolder) {
 // --- File & String Processing
 
 function addImportsSection(data, component) {
-  console.log(data)
   // This array is used in the transformer function
   const copyFilePaths = [];
   const buffer = getSection(
@@ -322,6 +328,7 @@ function combineDescriptionAndDescriptionRef(
     descriptionBuffer = component[SECTION_DESCRIPTION];
   }
 
+  //console.log(component[SECTION_DESCRIPTION_REF])
   if (
     component.hasOwnProperty(SECTION_DESCRIPTION_REF) &&
     component[SECTION_DESCRIPTION_REF]
@@ -349,7 +356,6 @@ function getSection(
   transformer = (contents) => contents
 ) {
   const separator = "?";
-  console.log(sectionRef, sectionId)
   const descRefParts = sectionRef.split(separator);
   const sectionName = descRefParts.length > 1 ? descRefParts[1] : "";
 

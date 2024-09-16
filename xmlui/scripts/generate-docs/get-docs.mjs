@@ -14,16 +14,35 @@ for (const [key, value] of Object.entries(collectedComponentMetadata)) {
   logger.info("Working with", `[${key}]`);
   const displayName = key;
   const componentFolder = key;
-  const descriptionRef = join(inputComponentsFolder, componentFolder, `${displayName}.mdx`);
+  const descriptionRef = join(componentFolder, `${displayName}.mdx`);
 
-  //logger.info(value.props);
-
-  processDocfiles([{
+  const metadata = {
+    ...value,
     displayName,
     description: value.description,
     descriptionRef,
     componentFolder,
-  }], outFolder);
+  }
+
+  const entries = addDescriptionRef(metadata, ["props", "events", "api", "contextVars"]);
+  processDocfiles([{ ...metadata, ...entries }], outFolder);
+}
+
+function addDescriptionRef(component, entries = []) {
+  const result = {};
+  
+  if (component) {
+    entries.forEach((entry) => {
+      if (component[entry]) {
+        result[entry] = Object.fromEntries(Object.entries(component[entry]).map(([k, v]) => {
+          v.descriptionRef = `${component.componentFolder}/${component.displayName}.mdx?${k}`;
+          return [k, v];
+        }))
+      }
+    });
+  }
+
+  return result;
 }
 
 //import { readFile } from 'fs/promises';

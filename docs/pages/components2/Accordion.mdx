@@ -8,7 +8,54 @@ This component does not have any context variables.
 
 ## Properties
 
-This component does not have any properties.
+### `collapsedIcon`
+
+This property is the name of the icon that is displayed when the accordion is collapsed.
+
+### `expandedIcon`
+
+This property is the name of the icon that is displayed when the accordion is expanded.
+
+### `header`
+
+This property declares the text used in the component's header.
+
+### `headerTemplate`
+
+This property describes the template to use as the component's header.
+
+### `hideIcon`
+
+This property indicates that the trigger icon is not displayed (`true`).
+
+### `initiallyExpanded`
+
+This property indicates if the Accordion is expanded (`true`) or collapsed (`false`).
+
+### `positionInGroup`
+
+This property indicates the position of the accordion in a group of accordions.
+
+The possible values are:
+
+| Value    | Description                                                              |
+| :------- | :----------------------------------------------------------------------- |
+| `single` | The accordion stands alone (not in a group)                              |
+| `first`  | This accordion is the first in a group                                   |
+| `middle` | This accordion is between the first and last items in an accordion group |
+| `last`   | This accordion is the last in a group                                    |
+
+By default, this value is `single`.
+
+### `rotateExpanded`
+
+This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).
+
+If this property has a value, only the collapsed icon is used. When the accordion is expanded, the collapsed icon is rotated with this angle.
+
+### `triggerPosition`
+
+This property indicates the position where the trigger icon should be displayed. The `start` value signs the trigger is before the header text (template), and `end` indicates that it follows the header.
 
 ## API
 
@@ -16,7 +63,9 @@ This component does not provide any API.
 
 ## Events
 
-This component does not have any events.
+### `displayDidChange`
+
+This event is triggered when value of Accordion has changed.
 
 ## Styling
 
