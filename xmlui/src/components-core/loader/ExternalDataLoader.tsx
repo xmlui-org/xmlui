@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDefNew, createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { removeNullProperties } from "@components-core/utils/misc";
@@ -79,19 +79,19 @@ function ExternalDataLoader({
   );
 }
 
-/**
- * Represents a loader that calls an API through an HTTP/HTTPS GET request
- */
-interface ExternalDataLoaderDef extends ComponentDef<"ExternalDataLoader"> {
+export const ExternalDataLoaderMd = createMetadata({
+  description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
-    url: string;
-    method: "GET" | "POST";
-    headers: Record<string, string>;
-    data: any;
-  };
-}
+    url: d("URL segment to use in the GET request"),
+    method: d("The HTTP method to use"),
+    headers: d("Headers to send with the request"),
+    data: d("The body of the request to be sent as JSON"),
+  },
+});
 
-export const externalDataLoaderRenderer = createLoaderRenderer<ExternalDataLoaderDef>(
+type ExternalDataLoaderDef = ComponentDefNew<typeof ExternalDataLoaderMd>;
+
+export const externalDataLoaderRenderer = createLoaderRenderer(
   "ExternalDataLoader",
   ({ loader, state, loaderInProgressChanged, loaderError, loaderLoaded }) => {
     return (
@@ -103,5 +103,6 @@ export const externalDataLoaderRenderer = createLoaderRenderer<ExternalDataLoade
         loaderError={loaderError}
       />
     );
-  }
+  },
+  ExternalDataLoaderMd,
 );

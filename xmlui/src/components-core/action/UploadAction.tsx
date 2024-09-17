@@ -1,13 +1,13 @@
 import type { ActionExecutionContext } from "@abstractions/ActionDefs";
-import type {ApiActionOptions, UploadOperationDef} from "@components-core/RestApiProxy";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ApiActionOptions, UploadOperationDef } from "@components-core/RestApiProxy";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 
 import { createAction } from "./actions";
 import RestApiProxy from "@components-core/RestApiProxy";
 import { extractParam } from "@components-core/utils/extractParam";
 import { invalidateQueries } from "@components-core/utils/actionUtils";
 
-export interface UploadActionComponent extends ComponentDef<"UploadAction"> {
+export interface UploadActionComponent extends ComponentDefNew {
   props: {
     invalidates?: string | string[];
   } & UploadOperationDef;
@@ -17,17 +17,33 @@ export interface UploadActionComponent extends ComponentDef<"UploadAction"> {
   };
 }
 
-export type UploadActionParams  = {
+export type UploadActionParams = {
   invalidates?: string | string[];
   params: any;
   chunkSizeInBytes?: number;
   onError?: string;
-  onProgress?: (...args: any)=>void;
+  onProgress?: (...args: any) => void;
 } & UploadOperationDef;
 
 async function uploadFile(
   { appContext, state, lookupAction, uid }: ActionExecutionContext,
-  { params, invalidates, onError, queryParams, asForm, file, headers, url, method, formParams, rawBody, body, chunkSizeInBytes, onProgress }: UploadActionParams, { resolveBindingExpressions }: ApiActionOptions = {}
+  {
+    params,
+    invalidates,
+    onError,
+    queryParams,
+    asForm,
+    file,
+    headers,
+    url,
+    method,
+    formParams,
+    rawBody,
+    body,
+    chunkSizeInBytes,
+    onProgress,
+  }: UploadActionParams,
+  { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
   const stateContext = { ...params, ...state };
   const api = new RestApiProxy(appContext);
@@ -41,7 +57,7 @@ async function uploadFile(
     method,
     url,
     queryParams,
-    headers
+    headers,
   };
 
   let result = null;
@@ -74,7 +90,7 @@ async function uploadFile(
             };
             _onProgress?.(overallProgressEvent);
           },
-          resolveBindingExpressions
+          resolveBindingExpressions,
         });
       }
     } else {
@@ -82,7 +98,7 @@ async function uploadFile(
         operation,
         params: stateContext,
         onUploadProgress: _onProgress,
-        resolveBindingExpressions
+        resolveBindingExpressions,
       });
     }
   } catch (e) {
