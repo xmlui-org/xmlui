@@ -23,6 +23,7 @@ export class Logger {
   static levels = {
     ...Logger.severity,
     all: "all",
+    none: "none",
   };
 
   isValidLevel(level) {
@@ -43,12 +44,15 @@ export class Logger {
     }
 
     this.info = this._noop;
-    this.warn = this._noop;
+    this.warning = this._noop;
     this.error = this._noop;
 
+    if (validLevels.find((level) => level === Logger.levels.none)) {
+      return;
+    }
     if (validLevels.find((level) => level === Logger.levels.all)) {
       this.info = this._logInfo;
-      this.warn = this._logWarning;
+      this.warning = this._logWarning;
       this.error = this._logError;
       return;
     }
@@ -59,7 +63,7 @@ export class Logger {
 
   log(severity = Logger.severity.info, ...args) {
     if (!this.isValidSeverity(severity)) {
-      this.warn(
+      this.warning(
         `Invalid log severity: ${severity}. Defaulting to message severity: ${this.defaultSeverity}.`
       );
       severity = this.defaultSeverity;
@@ -67,14 +71,14 @@ export class Logger {
     if (severity === Logger.severity.info) {
       this.info(...args);
     } else if (severity === Logger.severity.warning) {
-      this.warn(...args);
+      this.warning(...args);
     } else if (severity === Logger.severity.error) {
       this.error(...args);
     }
   }
 
   info(...args) {}
-  warn(...args) {}
+  warning(...args) {}
   error(...args) {}
 
   _logInfo(...args) {
@@ -82,7 +86,7 @@ export class Logger {
   }
 
   _logWarning(...args) {
-    console.warn("[WARN]", ...args);
+    console.log("[WARN]", ...args);
   }
 
   _logError(...args) {

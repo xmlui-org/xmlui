@@ -1,11 +1,13 @@
 import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSync, lstatSync } from "fs";
-import { parse, join, basename, extname, sep, posix } from "path";
+import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
 
 // temp
 const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
 const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
+const examplesFolder = join(projectRootFolder, "docs", "component-samples");
+const outFolder = join(projectRootFolder, "docs", "pages", "components2");
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 
@@ -45,13 +47,13 @@ const sectionNames = {
   contextVars: "Context Variables",
 };
 
-export function processDocfiles(metadata, outFolder) {
+export function processDocfiles(metadata) {
   // Check for docs already in the output folder
   const docFiles = readdirSync(outFolder).filter((file) => extname(file) === ".mdx");
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, outFolder);
+    componentNames = processMdx(component, componentNames);
   });
 
   // Write the _meta.json file
@@ -63,7 +65,7 @@ export function processDocfiles(metadata, outFolder) {
   }
 }
 
-export function processMdx(component, componentNames, outFolder) {
+export function processMdx(component, componentNames) {
   let result = "";
   let fileData = "";
 
@@ -74,7 +76,7 @@ export function processMdx(component, componentNames, outFolder) {
       fileData = readFileContents(join(sourceFolder, component.descriptionRef));
     } catch (error) {
       if (error instanceof ErrorWithSeverity) {
-        logger.error(error.severity, error.message);
+        logger.log(error.severity, error.message);
       } else if (error instanceof Error) {
         logger.error(error.message);
       } else {
@@ -143,6 +145,7 @@ function addImportsSection(data, component) {
     IMPORTS,
     importPathTransformer
   );
+  //console.log(copyFilePaths)
   return { buffer, copyFilePaths };
 
   // ---
@@ -190,9 +193,8 @@ function addImportsSection(data, component) {
         continue;
       }
       const importFile = parse(importPaths[i]);
-      const transformedPath = path
-        .join(examplesFolder, component.displayName, importFile.base)
-        .replaceAll(posix.sep, sep);
+      const transformedPath = join(examplesFolder, component.displayName, importFile.base).replaceAll(posix.sep, sep);
+      
       // NOTE: need to use POSIX separators here regardless of platform
       transformedStatements += `${
         importStatements[i]
@@ -206,7 +208,7 @@ function addImportsSection(data, component) {
           importFile.dir,
           importFile.base
         ),
-        newPath: join(outFolder, transformedPath),
+        newPath: relative(outFolder, transformedPath),
       });
     }
 

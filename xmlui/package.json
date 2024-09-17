@@ -12,8 +12,8 @@
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
     "get-metadata": "node scripts/get-meta.js",
-    "asd": "node scripts/buildDocs.mjs",
     "prepare-docs-data": "npm run build:xmlui-metadata",
+    "build-docs": "node scripts/buildDocs.mjs",
     "generate-docs": "node scripts/generate-docs/get-docs.mjs"
   },
   "dependencies": {

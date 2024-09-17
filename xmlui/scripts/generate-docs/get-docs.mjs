@@ -1,14 +1,9 @@
 import { collectedComponentMetadata } from '../../dist/xmlui-metadata.mjs';
 import { join } from "path";
-import { readFile } from "fs/promises";
-import { logger } from "./logger.mjs";
+import { logger, Logger } from "./logger.mjs";
 import { processDocfiles } from './process-mdx.mjs';
 
-// get these variables from config
-const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
-const inputComponentsFolder = join(projectRootFolder, "xmlui", "src", "components");
-const outFolderRoot = join(projectRootFolder, "docs");
-const outFolder = join(outFolderRoot, "pages", "components2");
+logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
 for (const [key, value] of Object.entries(collectedComponentMetadata)) {
   logger.info("Working with", `[${key}]`);
@@ -25,7 +20,7 @@ for (const [key, value] of Object.entries(collectedComponentMetadata)) {
   }
 
   const entries = addDescriptionRef(metadata, ["props", "events", "api", "contextVars"]);
-  processDocfiles([{ ...metadata, ...entries }], outFolder);
+  processDocfiles([{ ...metadata, ...entries }]);
 }
 
 function addDescriptionRef(component, entries = []) {
@@ -44,6 +39,12 @@ function addDescriptionRef(component, entries = []) {
 
   return result;
 }
+
+// get these variables from config
+/* const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
+const inputComponentsFolder = join(projectRootFolder, "xmlui", "src", "components");
+const outFolderRoot = join(projectRootFolder, "docs");
+const outFolder = join(outFolderRoot, "pages", "components2"); */
 
 //import { readFile } from 'fs/promises';
 //await readFile();

@@ -1,11 +1,11 @@
 import type { CSSProperties } from "react";
 import styles from "./Heading.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
-import { Heading, HeadingLevel } from "./HeadingNative";
+import { Heading, type HeadingLevel } from "./HeadingNative";
 
 const COMP = "Heading";
 
@@ -55,6 +55,7 @@ export const HeadingMd = createMetadata({
 const H1 = "H1";
 export const H1Md = createMetadata({
   description: LEVEL_DESC(1),
+  parent: "Heading",
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,

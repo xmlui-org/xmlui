@@ -258,6 +258,9 @@ export type ComponentMetadata<
 
   // Indicates that the component allows arbitrary props (not just the named ones)
   allowArbitraryProps?: boolean;
+
+  // If the component is specalized, this property holds the name of the parent component
+  parent?: string;
 };
 
 export function createMetadata<
