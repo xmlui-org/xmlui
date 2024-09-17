@@ -55,7 +55,11 @@ export const AccordionComponent = ({
                 ): null}
               </RAccordion.Trigger>
             </RAccordion.Header>
-            <RAccordion.Content className={styles.content}>{item.content}</RAccordion.Content>
+            <RAccordion.Content className={styles.contentWrapper}>
+              <div className={styles.content}>
+                {item.content}
+              </div>
+            </RAccordion.Content>
           </RAccordion.Item>
         ))}
       </RAccordion.Root>

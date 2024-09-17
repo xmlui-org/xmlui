@@ -10,7 +10,6 @@ $themeVars: ();
 $height: t.$space-12;
 
 .root {
-  padding: t.$space-4;
   border-radius: 6px;
   width: 100%;
   background-color: var(--mauve-6);
@@ -46,36 +45,36 @@ $height: t.$space-12;
 .trigger {
   font-family: inherit;
   background-color: transparent;
-  height: $height;
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 15px;
   line-height: 1;
   color: var(--violet-11);
   box-shadow: 0 1px 0 var(--mauve-6);
+  padding: t.$space-2;
 
   &:hover {
     background-color: var(--mauve-2);
   }
 }
 
-.content {
+.contentWrapper {
   overflow: hidden;
-  font-size: 15px;
   color: var(--mauve-11);
   background-color: var(--mauve-2);
 
   &[data-state='open'] {
-    /* animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
-    height: auto;
+     animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
   }
 
   &[data-state='closed'] {
-    /*animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
-    height: 0;
+    animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
   }
+}
+
+.content {
+  padding: t.$space-2;
 }
 
 .chevron {
@@ -87,7 +86,7 @@ $height: t.$space-12;
   transform: rotate(180deg);
 }*/
 
-/*@keyframes slideDown {
+@keyframes slideDown {
   from {
     height: 0;
   }
@@ -103,7 +102,7 @@ $height: t.$space-12;
   to {
     height: 0;
   }
-}*/
+}
 
 
 // --- We export the theme variables to add them to the component renderer

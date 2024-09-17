@@ -18,13 +18,6 @@ import { triggerPositionNames } from "@components/abstractions";
 
 const COMP = "Accordion";
 
-const defaultOptionRenderer = {
-  type: "Text",
-  props: {
-    value: "{$item.header}",
-  },
-};
-
 // See reference implementation here: https://getbootstrap.com/docs/5.3/components/accordion/
 // Make the header focusable, handle ARIA attributes, and manage the state of the accordion.
 
@@ -105,13 +98,17 @@ export const accordionComponentRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue }) => {
     return (
       <AccordionComponent
-        headerRenderer={(item) => (
-          <MemoizedItem
-            node={node.props.headerTemplate || (defaultOptionRenderer as any)}
-            item={item}
-            renderChild={renderChild}
-          />
-        )}
+        headerRenderer={
+          node.props.headerTemplate
+            ? (item) => (
+                <MemoizedItem
+                  node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
+                  item={item}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+        }
         triggerPosition={node.props.triggerPosition}
         collapsedIcon={node.props.collapsedIcon}
         expandedIcon={node.props.expandedIcon}
