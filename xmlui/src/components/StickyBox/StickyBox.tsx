@@ -1,6 +1,6 @@
 import styles from "./StickyBox.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { StickyBox } from "./StickyBoxNative";
 
@@ -22,7 +22,7 @@ export const StickyBoxMd = createMetadata({
   },
 });
 
-export const stickyBoxComponentRenderer = createComponentRendererNew(
+export const stickyBoxComponentRenderer = createComponentRenderer(
   COMP,
   StickyBoxMd,
   ({ node, renderChild, extractValue, layoutCss }) => {

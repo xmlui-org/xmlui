@@ -1,5 +1,5 @@
 import { createMetadata, d, } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Chart } from "./ChartNative";
 
 
@@ -18,7 +18,7 @@ export const ChartMd = createMetadata({
   }
 });
 
-export const chartRenderer = createComponentRendererNew(
+export const chartRenderer = createComponentRenderer(
   COMP,
   ChartMd,
   ({ node, extractValue, lookupAction, layoutCss, registerComponentApi }) => {

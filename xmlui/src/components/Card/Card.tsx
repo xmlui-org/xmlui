@@ -1,6 +1,6 @@
 import styles from "./Card.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Card } from "./CardNative";
 import { dClick } from "@components/metadata-helpers";
@@ -44,7 +44,7 @@ export const CardMd = createMetadata({
   },
 });
 
-export const cardComponentRenderer = createComponentRendererNew(
+export const cardComponentRenderer = createComponentRenderer(
   "Card",
   CardMd,
   ({ node, extractValue, renderChild, layoutCss }) => {

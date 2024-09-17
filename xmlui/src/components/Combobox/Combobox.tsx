@@ -1,7 +1,7 @@
 import styles from "@components/Combobox/Combobox.module.scss";
 
 import { ComponentDefNew, createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Combobox } from "./ComboboxNative";
@@ -79,7 +79,7 @@ export const ComboboxMd = createMetadata({
   },
 });
 
-export const comboboxComponentRenderer = createComponentRendererNew(
+export const comboboxComponentRenderer = createComponentRenderer(
   "Combobox",
   ComboboxMd,
   ({

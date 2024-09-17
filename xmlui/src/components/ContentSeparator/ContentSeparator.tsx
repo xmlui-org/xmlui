@@ -1,6 +1,6 @@
 import styles from "./ContentSeparator.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { orientationOptionNames } from "@components/abstractions";
 import { ContentSeparator } from "./ContentSeparatorNative";
@@ -32,7 +32,7 @@ export const ContentSeparatorMd = createMetadata({
   },
 });
 
-export const contentSeparatorComponentRenderer = createComponentRendererNew(
+export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
   ({ node, layoutCss, layoutNonCss, extractValue }) => {

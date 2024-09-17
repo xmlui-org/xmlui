@@ -6,7 +6,7 @@ import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
 import { RadioGroup, RadioGroupOption } from "@components/RadioGroup/RadioGroupNative";
 import { useState } from "react";
 import { useThemes } from "@components-core/theming/ThemeContext";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Stack } from "@components/Stack/StackNative";
 import { Text } from "@components/Text/TextNative";
 import { Icon } from "@components/Icon/IconNative";
@@ -19,7 +19,7 @@ export const ThemeChangerButtonMd = createMetadata({
 /**
  * Define the renderer for the Button component
  */
-export const themeChangerButtonComponentRenderer = createComponentRendererNew(
+export const themeChangerButtonComponentRenderer = createComponentRenderer(
   COMP,
   ThemeChangerButtonMd,
   ({ renderChild }) => {

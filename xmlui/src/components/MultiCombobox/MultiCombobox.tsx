@@ -1,7 +1,7 @@
 import styles from "./MultiCombobox.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { MultiCombobox } from "./MultiComboboxNative";
@@ -92,7 +92,7 @@ export const MultiComboboxMd = createMetadata({
   },
 });
 
-export const multiComboboxComponentRenderer = createComponentRendererNew(
+export const multiComboboxComponentRenderer = createComponentRenderer(
   COMP,
   MultiComboboxMd,
   ({ node, state, updateState, extractValue, renderChild, layoutCss, lookupEventHandler }) => {

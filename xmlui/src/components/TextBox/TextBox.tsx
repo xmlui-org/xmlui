@@ -1,5 +1,5 @@
 import type { ValueExtractor } from "@abstractions/RendererDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TextBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
@@ -149,7 +149,7 @@ function renderTextBox(
   );
 }
 
-export const textBoxComponentRenderer = createComponentRendererNew(
+export const textBoxComponentRenderer = createComponentRenderer(
   COMP,
   TextBoxMd,
   ({
@@ -173,7 +173,7 @@ export const textBoxComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const passwordInputComponentRenderer = createComponentRendererNew(
+export const passwordInputComponentRenderer = createComponentRenderer(
   "PasswordInput",
   TextBoxMd,
   ({

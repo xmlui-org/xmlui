@@ -2,7 +2,7 @@ import styles from "./AppHeader.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
@@ -50,7 +50,7 @@ export const AppHeaderMd = createMetadata({
   },
 });
 
-export const appHeaderComponentRenderer = createComponentRendererNew(
+export const appHeaderComponentRenderer = createComponentRenderer(
   COMP,
   AppHeaderMd,
   ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {

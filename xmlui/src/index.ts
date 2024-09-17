@@ -32,7 +32,7 @@ export type {
 };
 export {
   StandaloneApp,
-  createComponentRenderer,
+  createComponentRenderer as createComponentRendererNew,
   startApp,
   useTheme, //TODO REMOVE
   RootComponent, //TODO remove, playground uses it

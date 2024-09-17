@@ -2,7 +2,7 @@ import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs"
 import { appLayouts } from "./AppLayoutContext";
 
 import styles from "./App.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { dComponent } from "@components/metadata-helpers";
 import { App } from "./AppNative";
@@ -49,7 +49,7 @@ export const AppMd = createMetadata({
   },
 });
 
-export const appRenderer = createComponentRendererNew(
+export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {

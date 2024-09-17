@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { TableColumnDef } from "./TableColumnDefNative";
 
 const COMP = "TableColumnDef";
@@ -35,7 +35,7 @@ export const TableColumnDefMd = createMetadata({
   },
 });
 
-export const tableColumnDefComponentRenderer = createComponentRendererNew(
+export const tableColumnDefComponentRenderer = createComponentRenderer(
   COMP,
   TableColumnDefMd,
   (rendererContext) => {

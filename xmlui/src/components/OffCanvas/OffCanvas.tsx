@@ -2,7 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 
 import styles from "./OffCanvas.module.scss";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { OffCanvas } from "./OffCanvasNative";
 import { placementNames } from "@components/abstractions";
@@ -66,7 +66,7 @@ export const OffCanvasMd = createMetadata({
   },
 });
 
-export const offCanvasComponentRenderer = createComponentRendererNew(
+export const offCanvasComponentRenderer = createComponentRenderer(
   COMP,
   OffCanvasMd,
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {

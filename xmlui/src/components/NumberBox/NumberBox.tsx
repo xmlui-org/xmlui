@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./NumberBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
@@ -80,7 +80,7 @@ export const NumberBoxMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const numberBoxComponentRenderer = createComponentRendererNew(
+export const numberBoxComponentRenderer = createComponentRenderer(
   COMP,
   NumberBoxMd,
   ({

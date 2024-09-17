@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./DatePicker.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
@@ -56,7 +56,7 @@ export const DatePickerMd = createMetadata({
   },
 });
 
-export const datePickerComponentRenderer = createComponentRendererNew(
+export const datePickerComponentRenderer = createComponentRenderer(
   COMP,
   DatePickerMd,
   ({

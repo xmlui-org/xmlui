@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 
 const COMP = "Fragment";
 export const FragmentMd = createMetadata({
@@ -8,7 +8,7 @@ export const FragmentMd = createMetadata({
   opaque: true,
 });
 
-export const fragmentComponentRenderer = createComponentRendererNew(
+export const fragmentComponentRenderer = createComponentRenderer(
   COMP,
   FragmentMd,
   ({ node, extractValue, renderChild, layoutContext }) => {

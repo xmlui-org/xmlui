@@ -1,6 +1,6 @@
 import styles from "./Form.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { FormWithContextVar } from "./FormNative";
 import { dComponent } from "@components/metadata-helpers";
@@ -87,7 +87,7 @@ export const FormMd = createMetadata({
   },
 });
 
-export const formComponentRenderer = createComponentRendererNew(
+export const formComponentRenderer = createComponentRenderer(
   COMP,
   FormMd,
   ({ node, renderChild, extractValue, layoutCss, lookupEventHandler, registerComponentApi }) => {

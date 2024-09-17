@@ -2,7 +2,7 @@ import type React from "react";
 import styles from "./Stack.module.scss";
 import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -143,7 +143,7 @@ function renderStack({
   );
 }
 
-export const stackComponentRenderer = createComponentRendererNew(
+export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -158,7 +158,7 @@ export const stackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const vStackComponentRenderer = createComponentRendererNew(
+export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -174,7 +174,7 @@ export const vStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const hStackComponentRenderer = createComponentRendererNew(
+export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -190,7 +190,7 @@ export const hStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const cvStackComponentRenderer = createComponentRendererNew(
+export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -208,7 +208,7 @@ export const cvStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const chStackComponentRenderer = createComponentRendererNew(
+export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {

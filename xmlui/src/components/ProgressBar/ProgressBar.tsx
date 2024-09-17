@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./ProgressBar.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { ProgressBar } from "./ProgressBarNative";
@@ -27,7 +27,7 @@ export const ProgressBarMd = createMetadata({
   },
 });
 
-export const progressBarComponentRenderer = createComponentRendererNew(
+export const progressBarComponentRenderer = createComponentRenderer(
   COMP,
   ProgressBarMd,
   ({ node, extractValue, layoutCss }) => {

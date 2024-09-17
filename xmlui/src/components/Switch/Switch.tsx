@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Toggle } from "@components/Toggle/Toggle";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "@components/Toggle/Toggle.module.scss";
@@ -76,7 +76,7 @@ export const SwitchMd = createMetadata({
   },
 });
 
-export const switchComponentRenderer = createComponentRendererNew(
+export const switchComponentRenderer = createComponentRenderer(
   "Switch",
   SwitchMd,
   ({

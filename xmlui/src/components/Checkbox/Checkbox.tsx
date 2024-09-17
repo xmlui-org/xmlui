@@ -1,6 +1,6 @@
 import styles from "@components/Toggle/Toggle.module.scss";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Toggle } from "@components/Toggle/Toggle";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { createMetadata } from "@abstractions/ComponentDefs";
@@ -72,7 +72,7 @@ export const CheckboxMd = createMetadata({
   },
 });
 
-export const checkboxComponentRenderer = createComponentRendererNew(
+export const checkboxComponentRenderer = createComponentRenderer(
   COMP,
   CheckboxMd,
   ({

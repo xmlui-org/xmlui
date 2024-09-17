@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { TableOfContentsProvider } from "@components-core/TableOfContentsContext";
 import { Pages, RouteWrapper } from "./PagesNative";
 
@@ -14,7 +14,7 @@ export const PageMd = createMetadata({
   },
 });
 
-export const pageRenderer = createComponentRendererNew(
+export const pageRenderer = createComponentRenderer(
   PAGE,
   PageMd,
   ({ node, extractValue, renderChild }) => {
@@ -41,7 +41,7 @@ export const PagesMd = createMetadata({
   },
 });
 
-export const pagesRenderer = createComponentRendererNew(
+export const pagesRenderer = createComponentRenderer(
   COMP,
   PagesMd,
   ({ node, extractValue, renderChild }) => {

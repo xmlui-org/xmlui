@@ -1,5 +1,5 @@
 import styles from "./RadioGroup.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { RadioGroup, RadioGroupOption } from "./RadioGroupNative";
@@ -54,7 +54,7 @@ export const RadioGroupOptionMd = createMetadata({
   },
 });
 
-export const radioGroupOptionRenderer = createComponentRendererNew(
+export const radioGroupOptionRenderer = createComponentRenderer(
   RGOption,
   RadioGroupOptionMd,
   ({ node, extractValue }) => {
@@ -92,7 +92,7 @@ export const RadioGroupMd = createMetadata({
   },
 });
 
-export const radioGroupRenderer = createComponentRendererNew(
+export const radioGroupRenderer = createComponentRenderer(
   COMP,
   RadioGroupMd,
   ({

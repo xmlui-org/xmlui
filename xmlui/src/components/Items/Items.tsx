@@ -1,6 +1,6 @@
 import { MemoizedItem } from "../container-helpers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Items } from "./ItemsNative";
 import { dComponent } from "@components/metadata-helpers";
 
@@ -21,7 +21,7 @@ export const ItemsMd = createMetadata({
   opaque: true,
 });
 
-export const itemsComponentRenderer = createComponentRendererNew(
+export const itemsComponentRenderer = createComponentRenderer(
   COMP,
   ItemsMd,
   (rendererContext) => {

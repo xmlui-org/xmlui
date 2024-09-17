@@ -3,7 +3,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { NoResult } from "./NoResultNative";
 import { dLabel } from "@components/metadata-helpers";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 
 const COMP = "NoResult";
 
@@ -30,7 +30,7 @@ export const NoResultMd = createMetadata({
   },
 });
 
-export const noResultComponentRenderer = createComponentRendererNew(
+export const noResultComponentRenderer = createComponentRenderer(
   COMP,
   NoResultMd,
   ({ node, extractValue, layoutCss }) => {

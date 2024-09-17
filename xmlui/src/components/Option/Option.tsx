@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { OptionComponent } from "./OptionNative";
 
@@ -26,7 +26,7 @@ export const OptionMd = createMetadata({
   },
 });
 
-export const optionComponentRenderer = createComponentRendererNew(
+export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
   (rendererContext) => {

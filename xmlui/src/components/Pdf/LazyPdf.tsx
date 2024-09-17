@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { LazyPdf } from "./LayPdfNative";
 
 const COMP = "Pdf";
@@ -11,7 +11,7 @@ export const PdfMd = createMetadata({
   },
 });
 
-export const pdfComponentRenderer = createComponentRendererNew(
+export const pdfComponentRenderer = createComponentRenderer(
   COMP,
   PdfMd,
   ({ node, extractValue }) => {

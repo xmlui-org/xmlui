@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "./FormItem.module.scss";
 import type { FormItemValidations } from "@components/Form/FormContext";
@@ -115,7 +115,7 @@ export const FormItemMd = createMetadata({
   },
 });
 
-export const formItemComponentRenderer = createComponentRendererNew(
+export const formItemComponentRenderer = createComponentRenderer(
   COMP,
   FormItemMd,
   ({

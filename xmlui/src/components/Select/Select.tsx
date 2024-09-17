@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "@components/Select/Select.module.scss";
 
 import { MemoizedItem } from "@components/container-helpers";
@@ -82,7 +82,7 @@ export const SelectMd = createMetadata({
   },
 });
 
-export const selectComponentRenderer = createComponentRendererNew(
+export const selectComponentRenderer = createComponentRenderer(
   COMP,
   SelectMd,
   ({

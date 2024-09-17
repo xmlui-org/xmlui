@@ -1,7 +1,7 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import style from "@components/PieChart/PieChart.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import type { CSSProperties } from "react";
 import React, { Suspense } from "react";
 import worldData from "./world_countries.json";
@@ -73,7 +73,7 @@ const MapMd = createMetadata({
   },
 });
 
-export const mapComponentRenderer = createComponentRendererNew(
+export const mapComponentRenderer = createComponentRenderer(
   "Map",
   MapMd,
   ({ extractValue, node, layoutCss }) => {

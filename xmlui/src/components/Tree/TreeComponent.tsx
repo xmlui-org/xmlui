@@ -1,6 +1,6 @@
 import { MemoizedItem } from "@components/container-helpers";
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { TreeComponent } from "./TreeNative";
 import { dComponent } from "@components/metadata-helpers";
 
@@ -23,7 +23,7 @@ export const TreeMd = createMetadata({
 /**
  * This function defines the renderer for the Tree component.
  */
-export const treeComponentRenderer = createComponentRendererNew(
+export const treeComponentRenderer = createComponentRenderer(
   COMP,
   TreeMd,
   ({ node, extractValue, renderChild }) => {

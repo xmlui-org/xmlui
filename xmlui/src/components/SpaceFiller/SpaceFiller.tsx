@@ -1,5 +1,5 @@
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./SpaceFiller.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { SpaceFiller } from "./SpaceFillerNative";
@@ -13,6 +13,6 @@ export const SpaceFillerMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const spaceFillerComponentRenderer = createComponentRendererNew(COMP, SpaceFillerMd, () => (
+export const spaceFillerComponentRenderer = createComponentRenderer(COMP, SpaceFillerMd, () => (
   <SpaceFiller />
 ));

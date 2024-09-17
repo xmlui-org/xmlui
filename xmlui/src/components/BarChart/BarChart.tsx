@@ -2,7 +2,7 @@ import style from "@components/PieChart/PieChart.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { BarChart } from "./BarChartNative";
 
 const COMP = "BarChart";
@@ -45,7 +45,7 @@ export const BarChartMd = createMetadata({
   },
 });
 
-export const barChartComponentRenderer = createComponentRendererNew(
+export const barChartComponentRenderer = createComponentRenderer(
   COMP,
   BarChartMd,
   ({ extractValue, node, layoutCss }) => {

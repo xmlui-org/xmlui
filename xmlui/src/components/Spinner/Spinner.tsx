@@ -1,5 +1,5 @@
 import styles from "./Spinner.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { ComponentThemeColor } from "@components/abstractions";
@@ -29,7 +29,7 @@ export const SpinnerMd = createMetadata({
   },
 });
 
-export const spinnerComponentRenderer = createComponentRendererNew(
+export const spinnerComponentRenderer = createComponentRenderer(
   COMP,
   SpinnerMd,
   ({ node, layoutCss, extractValue }) => {

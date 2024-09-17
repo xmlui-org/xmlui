@@ -1,5 +1,5 @@
 import styles from "./FlowLayout.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
@@ -30,7 +30,7 @@ export const FlowLayoutMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const flowLayoutComponentRenderer = createComponentRendererNew(
+export const flowLayoutComponentRenderer = createComponentRenderer(
   COMP,
   FlowLayoutMd,
   ({ node, renderChild, layoutCss, extractValue }) => {

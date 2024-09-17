@@ -1,6 +1,6 @@
 import styles from "./Text.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Text, VariantProps, VariantPropsKeys } from "./TextNative";
 
@@ -109,7 +109,7 @@ export const TextMd = createMetadata({
   },
 });
 
-export const textComponentRenderer = createComponentRendererNew(
+export const textComponentRenderer = createComponentRenderer(
   COMP,
   TextMd,
   ({ node, extractValue, layoutCss, renderChild }) => {

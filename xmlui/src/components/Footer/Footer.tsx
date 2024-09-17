@@ -1,6 +1,6 @@
 import styles from "./Footer.module.scss";
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
 import { Footer } from "./FooterNative";
@@ -26,7 +26,7 @@ export const FooterMd = createMetadata({
   },
 });
 
-export const footerRenderer = createComponentRendererNew(
+export const footerRenderer = createComponentRenderer(
   COMP,
   FooterMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
