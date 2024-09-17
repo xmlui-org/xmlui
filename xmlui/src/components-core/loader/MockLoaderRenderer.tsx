@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { asyncWait } from "@components-core/utils/misc";
@@ -22,7 +22,13 @@ type MockLoaderProps = {
   state: ContainerState;
 };
 
-function ApiLoader({ loader, loaderInProgressChanged, loaderError, loaderLoaded, state }: MockLoaderProps) {
+function ApiLoader({
+  loader,
+  loaderInProgressChanged,
+  loaderError,
+  loaderLoaded,
+  state,
+}: MockLoaderProps) {
   const appContext = useAppContext();
   const waitTime: number = extractParam(state, loader.props.waitTime, appContext);
   const responseObj: Record<string, any>[] = extractParam(state, loader.props.data, appContext);
@@ -44,17 +50,17 @@ function ApiLoader({ loader, loaderInProgressChanged, loaderError, loaderLoaded,
   );
 }
 
-/**
- * Represents a loader that calls an API through an HTTP/HTTPS GET request
- */
-interface MockLoaderDef extends ComponentDef<"MockLoader"> {
+export const MockLoaderMd = createMetadata({
+  description: "A loader that simulates a delay and returns a predefined response",
   props: {
-    waitTime?: number;
-    data: Record<string, any>;
-  };
-}
+    waitTime: d("The time to wait before returning the response"),
+    data: d("The data to return"),
+  },
+});
 
-export const mockLoaderRenderer = createLoaderRenderer<MockLoaderDef>(
+type MockLoaderDef = ComponentDefNew<typeof MockLoaderMd>;
+
+export const mockLoaderRenderer = createLoaderRenderer(
   "MockLoader",
   ({ loader, state, loaderInProgressChanged, loaderLoaded, loaderError }) => {
     return (
@@ -66,5 +72,6 @@ export const mockLoaderRenderer = createLoaderRenderer<MockLoaderDef>(
         loaderError={loaderError}
       />
     );
-  }
+  },
+  MockLoaderMd,
 );

@@ -1,6 +1,6 @@
 import type { Component, CSSProperties, ReactNode } from "react";
 import type { AppContextObject } from "./AppContextDefs";
-import type { ComponentDef, CompoundComponentDef, DynamicChildComponentDef } from "./ComponentDefs";
+import type { ComponentDef, ComponentMetadata, CompoundComponentDef, DynamicChildComponentDef } from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { ComponentDescriptor } from "./ComponentDescriptorDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
@@ -192,7 +192,7 @@ export type ComponentRendererFn<T extends ComponentDef> = (context: RendererCont
  */
 export type CompoundComponentRendererInfo = {
   compoundComponentDef: CompoundComponentDef;
-  hints?: ComponentDescriptor<any>;
+  hints?: ComponentMetadata;
 };
 
 /**

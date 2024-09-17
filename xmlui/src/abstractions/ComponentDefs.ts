@@ -137,7 +137,7 @@ export interface CompoundComponentDef extends Scriptable {
 /**
  * Sometimes, components and compound components can both be used
  */
-export type ComponentLike = ComponentDef | CompoundComponentDef;
+export type ComponentLike = ComponentDef | ComponentDefNew| CompoundComponentDef;
 
 /**
  * Some components render their nested child components dynamically using the current context of

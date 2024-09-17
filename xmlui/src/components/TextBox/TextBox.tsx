@@ -1,26 +1,10 @@
-import type {
-  Adornments,
-  InputComponentDef,
-  ValidationStatus,
-} from "@components/Input/input-abstractions";
-import {
-  inputComponentEventDescriptors,
-  inputComponentPropertyDescriptors,
-} from "@components/Input/input-abstractions";
-import type { RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";
-import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
-import type { CSSProperties } from "react";
-import React, { useCallback, useEffect, useRef } from "react";
-import classnames from "@components-core/utils/classnames";
+import type { ValueExtractor } from "@abstractions/RendererDefs";
+import { createComponentRendererNew } from "@components-core/renderers";
 import styles from "./TextBox.module.scss";
-import { noop } from "@components-core/constants";
-import { Adornment } from "@components/Input/InputAdornment";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { useEvent } from "@components-core/utils/misc";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import type { LookupActionOptions } from "@abstractions/ActionDefs";
-import { ComponentDefNew, createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dDidChange,

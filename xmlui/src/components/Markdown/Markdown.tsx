@@ -1,4 +1,4 @@
-import { createMetadata, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRendererNew } from "@components-core/renderers";
 import styles from "./Markdown.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";

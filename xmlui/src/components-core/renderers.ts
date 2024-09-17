@@ -86,10 +86,10 @@ export function createPropHolderComponentNew<TMd extends ComponentMetadata>(
  * @param renderer The function that renders the loader
  * @param hints Optional hints to help fix the rendering errors coming from invalid component property definitions
  */
-export function createLoaderRenderer<T extends ComponentDef>(
-  type: T["type"],
-  renderer: LoaderRenderer<T>,
-  hints?: ComponentDescriptor<T>,
+export function createLoaderRenderer<TMd extends ComponentMetadata>(
+  type: string,
+  renderer: LoaderRenderer<TMd>,
+  hints?: TMd,
 ): LoaderRendererDef {
   return {
     type,

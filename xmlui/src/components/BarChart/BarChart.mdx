@@ -1,8 +1,5 @@
 %-PROP-START data
 
-This property is used to provide the component with data to display.
-The data itself needs to be an array of objects.
-
 ```ueml copy
 <BarChart
   data="{[
@@ -64,8 +61,6 @@ The data itself needs to be an array of objects.
 %-PROP-END
 
 %-PROP-START keys
-
-The `keys` prop specifies what the label texts are for each bar.
 
 ```ueml copy {2}
 <BarChart
@@ -131,10 +126,6 @@ The `keys` prop specifies what the label texts are for each bar.
 
 %-PROP-START groupMode
 
-Determines how the bars are layed out.
-The `grouped` variant lays out the bars next to each other on the primary axis.
-The `stacked` variant stacks the bars on top of each other.
-
 ```ueml copy {2}
 <BarChart
   groupMode="stacked"
@@ -199,7 +190,7 @@ The `stacked` variant stacks the bars on top of each other.
 
 %-PROP-START layout
 
-Determines the orientation of the bar chart.
+This property determines the orientation of the bar chart.
 The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right.
 The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
 
@@ -266,8 +257,6 @@ The `horizontal` variant specifies the vertical axis as the primary and has the 
 %-PROP-END
 
 %-PROP-START indexBy
-
-Determines which attribute groups the bars together.
 
 ```ueml copy {2}
 <BarChart
