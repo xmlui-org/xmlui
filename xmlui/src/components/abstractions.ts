@@ -33,6 +33,26 @@ export type Accordion = {
   header: string;
 
   /**
+   * The icon to show when the accordion is collapsed.
+   */
+  collapsedIcon?: string;
+
+  /**
+   * The icon to show when the accordion is expanded.
+   */
+  expandedIcon?: string;
+
+  /**
+   * Indicates if the icon should be hidden.
+   */
+  hideIcon?: boolean;
+
+  /**
+   * The position where the trigger icon should be displayed.
+   */
+  triggerPosition?: "start" | "end";
+
+  /**
    * The content of the accordion.
    */
   content: ReactNode;

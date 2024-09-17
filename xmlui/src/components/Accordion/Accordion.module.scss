@@ -68,7 +68,7 @@ $height: t.$space-12;
   background-color: var(--mauve-2);
 
   &[data-state='open'] {
-   /* animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
+    /* animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);*/
     height: auto;
   }
 
@@ -78,14 +78,14 @@ $height: t.$space-12;
   }
 }
 
-.AccordionChevron {
+.chevron {
   color: var(--violet-10);
   transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
 }
 
-.AccordionTrigger[data-state='open'] > .AccordionChevron {
+/*.trigger[data-state='open'] > .chevron {
   transform: rotate(180deg);
-}
+}*/
 
 /*@keyframes slideDown {
   from {
