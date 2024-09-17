@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { EmojiSelector } from "./EmojiSelectorNative";
@@ -18,7 +18,7 @@ export const EmojiSelectorMd = createMetadata({
   },
 });
 
-export const emojiSelectorRenderer = createComponentRendererNew(
+export const emojiSelectorRenderer = createComponentRenderer(
   COMP,
   EmojiSelectorMd,
   ({ node, lookupEventHandler, extractValue }) => {

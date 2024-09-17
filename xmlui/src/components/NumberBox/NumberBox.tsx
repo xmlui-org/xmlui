@@ -1,7 +1,7 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./NumberBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { NumberBox } from "./NumberBoxNative";
 import {
   dAutoFocus,
@@ -80,7 +80,7 @@ export const NumberBoxMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const numberBoxComponentRenderer = createComponentRendererNew(
+export const numberBoxComponentRenderer = createComponentRenderer(
   COMP,
   NumberBoxMd,
   ({

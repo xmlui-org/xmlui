@@ -2,7 +2,7 @@ import styles from "./Avatar.module.scss";
 import { Avatar } from "./AvatarNative";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { sizeNames } from "@components/abstractions";
 
@@ -39,7 +39,7 @@ export const AvatarMd = createMetadata({
   },
 });
 
-export const avatarComponentRenderer = createComponentRendererNew(
+export const avatarComponentRenderer = createComponentRenderer(
   COMP,
   AvatarMd,
   ({ node, extractValue, lookupEventHandler, layoutCss, extractResourceUrl }) => {

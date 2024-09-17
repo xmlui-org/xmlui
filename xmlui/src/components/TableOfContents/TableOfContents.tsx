@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TableOfContents.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { TableOfContents } from "./TableOfContentsNative";
@@ -66,7 +66,7 @@ export const TableOfContentsMd = createMetadata({
   },
 });
 
-export const tableOfContentsRenderer = createComponentRendererNew(
+export const tableOfContentsRenderer = createComponentRenderer(
   COMP,
   TableOfContentsMd,
   ({ layoutCss, node, extractValue }) => {

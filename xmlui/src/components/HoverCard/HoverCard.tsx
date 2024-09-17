@@ -1,5 +1,5 @@
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { HoverCardComponent } from "./HovercardNative";
 import { dComponent } from "@components/metadata-helpers";
 
@@ -12,7 +12,7 @@ export const HoverCardMd = createMetadata({
   },
 });
 
-export const hoverCardComponentRenderer = createComponentRendererNew(
+export const hoverCardComponentRenderer = createComponentRenderer(
   COMP,
   HoverCardMd,
   ({ node, extractValue, renderChild }) => {

@@ -1,7 +1,9 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { MetadataHandler, PropDescriptorHash } from "@components-core/markup-check";
 
-export function createTestMetadataHandler(desc: Record<string, ComponentDescriptor<any>>): MetadataHandler {
+export function createTestMetadataHandler(
+  desc: Record<string, ComponentMetadata>,
+): MetadataHandler {
   return {
     componentRegistered: (type: string) => {
       return !!desc[type];

@@ -1,8 +1,6 @@
-import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { ThemeTone } from "@components-core/theming/abstractions";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
 import { Theme } from "./ThemeNative";
 
 const COMP = "Theme";
@@ -25,7 +23,7 @@ export const ThemeMd = createMetadata({
   opaque: true,
 });
 
-export const themeComponentRenderer = createComponentRendererNew(
+export const themeComponentRenderer = createComponentRenderer(
   COMP,
   ThemeMd,
   ({ node, extractValue, renderChild, layoutContext, appContext }) => {

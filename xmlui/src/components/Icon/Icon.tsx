@@ -1,23 +1,10 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import Icon from "./IconNative";
 
 const COMP = "Icon";
-
-/**
- * This component is the representation of an icon.
- */
-export interface IconComponentDef extends ComponentDef<"Icon"> {
-  props: {
-    /**
-     * This optional property provides a way to handle situations when the provided [icon name](#name) is not found in the registry.
-     * @descriptionRef
-     */
-    fallback?: string;
-  };
-}
 
 export const IconMd = createMetadata({
   description: `This component is the representation of an icon.`,
@@ -41,7 +28,7 @@ export const IconMd = createMetadata({
   },
 });
 
-export const iconComponentRenderer = createComponentRendererNew(
+export const iconComponentRenderer = createComponentRenderer(
   COMP,
   IconMd,
   ({ node, extractValue, layoutCss }) => {

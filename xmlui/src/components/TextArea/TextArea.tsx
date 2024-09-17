@@ -1,7 +1,7 @@
 import styles from "./TextArea.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { resizeOptionKeys, ResizeOptions, TextArea } from "./TextAreaNative";
 import {
   dAutoFocus,
@@ -75,7 +75,7 @@ export const TextAreaMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const textAreaComponentRenderer = createComponentRendererNew(
+export const textAreaComponentRenderer = createComponentRenderer(
   COMP,
   TextAreaMd,
   ({

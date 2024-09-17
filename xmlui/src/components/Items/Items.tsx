@@ -1,26 +1,10 @@
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Items } from "./ItemsNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Items";
-
-export interface ItemsComponentDef extends ComponentDef<"Items"> {
-  props: {
-    /** @internal */
-    itemTemplate: ComponentDef;
-    /**
-     * This property reverses the order in which data is mapped to template components.
-     * @descriptionRef
-     */
-    reverse?: boolean;
-  };
-  contextVars: {
-    /** This property represents the value of an item in the data list. */
-    $item: any;
-  };
-}
 
 export const ItemsMd = createMetadata({
   description:
@@ -28,14 +12,16 @@ export const ItemsMd = createMetadata({
     `each data item as a particular component.`,
   props: {
     items: dComponent(`This property contains the list of data items this component renders.`),
-    data: d(`This property contains the list of data items (obtained from a data source) this component renders.`),
+    data: d(
+      `This property contains the list of data items (obtained from a data source) this component renders.`,
+    ),
     reverse: d(`This property reverses the order in which data is mapped to template components.`),
     itemTemplate: dComponent("The component template to display a single item"),
   },
   opaque: true,
 });
 
-export const itemsComponentRenderer = createComponentRendererNew(
+export const itemsComponentRenderer = createComponentRenderer(
   COMP,
   ItemsMd,
   (rendererContext) => {
@@ -49,7 +35,7 @@ export const itemsComponentRenderer = createComponentRendererNew(
             <MemoizedItem
               key={key}
               contextVars={contextVars}
-              node={node.children || node.props.itemTemplate as any}
+              node={node.children || (node.props.itemTemplate as any)}
               renderChild={renderChild}
               layoutContext={layoutContext}
             />

@@ -67,26 +67,41 @@ import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
-import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
 import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "@components-core/Fragment";
 import { SlotMd } from "@components-core/Slot";
+import { TreeMd } from "./Tree/TreeComponent";
+import { ApiActionMd } from "./ApiAction/ApiAction";
+import { BarChartMd } from "./BarChart/BarChart";
+import { ChartMd } from "./Chart/Chart";
+import { DataSourceMd } from "./Datasource/Datasource";
+import { FormSectionMd } from "./FormSection/FormSection";
+import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
+import { PageHeaderMd } from "./PageHeader/PageHeader";
+import { ThemeChangerButtonMd } from "./ThemeChanger/ThemeChanger";
+import { ToolbarMd } from "./Toolbar/Toolbar";
+import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
+import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
   Alert: AlertMd,
-  // App: AppMd,
-  // AppHeader: AppHeaderMd,
+  ApiAction: ApiActionMd,
+  App: AppMd,
+  AppHeader: AppHeaderMd,
   AppState: AppStateMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
+  BarChart: BarChartMd,
   Bookmark: BookmarkMd,
   Button: ButtonMd,
   Card: CardMd,
   ChangeListener: ChangeListenerMd,
+  Chart: ChartMd,
   Checkbox: CheckboxMd,
   Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
+  DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
   Fragment: FragmentMd,
@@ -99,6 +114,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Footer: FooterMd,
   Form: FormMd,
   FormItem: FormItemMd,
+  FormSection: FormSectionMd,
   Heading: HeadingMd,
   H1: H1Md,
   H2: H2Md,
@@ -108,11 +124,12 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   H6: H6Md,
   HoverCard: HoverCardMd,
   Icon: IconMd,
+  IconInfoCard: IconInfoCardMd,
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,
-  // List: ListMd,
-  // Logo: LogoMd,
+  List: ListMd,
+  Logo: LogoMd,
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
@@ -127,6 +144,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
+  PageHeader: PageHeaderMd,
   Pages: PagesMd,
   Pdf: PdfMd,
   PieChart: PieChartMd,
@@ -162,5 +180,10 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
   PasswordInput: TextBoxMd,
+  Toolbar: ToolbarMd,
+  ToolbarButton: ToolbarButtonMd,
+  TrendLabel: TrendLabelMd,
   Theme: ThemeMd,
+  ThemeChangerButton: ThemeChangerButtonMd,
+  Tree: TreeMd,
 };

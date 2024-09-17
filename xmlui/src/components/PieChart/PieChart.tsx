@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import styles from "./PieChart.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -34,7 +34,7 @@ export const PieChartMd = createMetadata({
   },
 });
 
-export const pieChartComponentRenderer = createComponentRendererNew(
+export const pieChartComponentRenderer = createComponentRenderer(
   COMP,
   PieChartMd,
   ({ extractValue, node, layoutCss }) => {

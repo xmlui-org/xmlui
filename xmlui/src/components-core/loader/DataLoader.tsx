@@ -8,10 +8,8 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import type { ApiOperationDef } from "@components-core/RestApiProxy";
 import type { LoaderDirections } from "@components-core/loader/PageableLoader";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { createLoaderRenderer } from "@components-core/renderers";
 import RestApiProxy from "@components-core/RestApiProxy";
@@ -20,7 +18,6 @@ import { DataLoaderQueryKeyGenerator } from "@components-core/utils/DataLoaderQu
 import { PageableLoader } from "@components-core/loader/PageableLoader";
 import { Loader } from "@components-core/loader/Loader";
 import { useAppContext } from "@components-core/AppContext";
-import { desc } from "@components-core/descriptorHelper";
 import { useShallowCompareMemoize } from "@components-core/utils/hooks";
 
 type LoaderProps = {
@@ -73,7 +70,7 @@ function DataLoader({
   const doLoad = async (abortSignal?: AbortSignal, pageParams?: any) => {
     const response = await api.execute({
       abortSignal,
-      operation: loader.props,
+      operation: loader.props as any,
       params: {
         ...state,
         $pageParams: pageParams,
@@ -237,44 +234,32 @@ function DataLoader({
   );
 }
 
-interface DataLoaderDef extends ComponentDef<"DataLoader"> {
-  props: ApiOperationDef & {
-    pollIntervalInSeconds?: number;
-    inProgressNotificationMessage?: string;
-    completedNotificationMessage?: string;
-    errorNotificationMessage?: string;
-    resultSelector?: string;
-    prevPageParamSelector?: string;
-    nextPageParamSelector?: string;
-    debounceTimeInMs?: string;
-  };
-  events: {
-    loaded?: string;
-    error?: string;
-  };
-}
-
-const metadata: ComponentDescriptor<DataLoaderDef> = {
-  displayName: "DataLoader",
+export const DataLoaderMd = createMetadata({
   description: "This component manages data fetching from a web API",
   props: {
-    method: desc("The HTTP method to use"),
-    url: desc("The URL to fetch data from"),
-    rawBody: desc("The raw body of the request"),
-    body: desc("The body of the request to be sent as JSON"),
-    queryParams: desc("Query parameters to send with the request"),
-    headers: desc("Headers to send with the request"),
-    pollIntervalInSeconds: desc("The interval in seconds to poll the API for refreshing data"),
-    resultSelector: desc("An expression to extract the result from the response"),
-    prevPageParamSelector: desc("An expression to extract the previous page parameter from the response"),
-    nextPageParamSelector: desc("An expression to extract the next page parameter from the response"),
+    method: d("The HTTP method to use"),
+    url: d("The URL to fetch data from"),
+    rawBody: d("The raw body of the request"),
+    body: d("The body of the request to be sent as JSON"),
+    queryParams: d("Query parameters to send with the request"),
+    headers: d("Headers to send with the request"),
+    pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
+    resultSelector: d("An expression to extract the result from the response"),
+    prevPageParamSelector: d("An expression to extract the previous page parameter from the response"),
+    nextPageParamSelector: d("An expression to extract the next page parameter from the response"),
+    inProgressNotificationMessage: d("The message to show when the loader is in progress"),
+    completedNotificationMessage: d("The message to show when the loader completes"),
+    errorNotificationMessage: d("The message to show when an error occurs"),
   },
   events: {
-    loaded: desc("Event to trigger when the data is loaded"),
+    loaded: d("Event to trigger when the data is loaded"),
+    error: d("This event fires when an error occurs while fetching data"),
   },
-};
+});
 
-export const dataLoaderRenderer = createLoaderRenderer<DataLoaderDef>(
+type DataLoaderDef = ComponentDefNew<typeof DataLoaderMd>;
+
+export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",
   ({ loader, state, loaderLoaded, loaderInProgressChanged, loaderError, registerComponentApi, lookupAction }) => {
     return (
@@ -290,5 +275,5 @@ export const dataLoaderRenderer = createLoaderRenderer<DataLoaderDef>(
       />
     );
   },
-  metadata
+  DataLoaderMd
 );

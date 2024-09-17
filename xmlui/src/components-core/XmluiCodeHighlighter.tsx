@@ -1,15 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HighlighterCore } from "@shikijs/core/types";
 import styles from "./XmluiCodeHighlighter.module.scss";
-import {useTheme} from "@components-core/theming/ThemeContext";
+import { useTheme } from "@components-core/theming/ThemeContext";
 import classnames from "classnames";
 import { createComponentRenderer } from "@components-core/renderers";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 let highlighter: HighlighterCore | null = null;
 
 export function XmluiCodeHighlighter({ value }: { value: string }) {
-  const {activeThemeTone} = useTheme();
+  const { activeThemeTone } = useTheme();
   const [initialized, setInitialized] = useState(false);
   useEffect(() => {
     async function load() {
@@ -29,7 +28,7 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
   }, []);
 
   const html = useMemo(() => {
-    return (!initialized || !highlighter)
+    return !initialized || !highlighter
       ? ""
       : highlighter.codeToHtml(value, {
           lang: "xmlui",
@@ -65,10 +64,9 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
   );
 }
 
-export interface XmluiCodeHightlighterComponentDef extends ComponentDef<"XmluiCodehighlighter"> {}
-
-export const codeComponentRenderer = createComponentRenderer<XmluiCodeHightlighterComponentDef>(
+export const codeComponentRenderer = createComponentRenderer(
   "XmluiCodehighlighter",
+  {},
   ({ node, renderChild }) => {
     return <XmluiCodeHighlighter value={renderChild(node.children) as string} />;
   },

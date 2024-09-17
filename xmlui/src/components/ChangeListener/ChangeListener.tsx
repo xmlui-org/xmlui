@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { ChangeListener } from "./ChangeListenerNative";
 import { dDidChange } from "@components/metadata-helpers";
 
@@ -21,7 +21,7 @@ export const ChangeListenerMd = createMetadata({
   },
 });
 
-export const changeListenerComponentRenderer = createComponentRendererNew(
+export const changeListenerComponentRenderer = createComponentRenderer(
   COMP,
   ChangeListenerMd,
   ({ node, lookupEventHandler, extractValue }) => {

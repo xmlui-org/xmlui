@@ -2,7 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 
 import styles from "./Alert.module.scss";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Alert } from "./AlertNative";
 import { statusColorNames } from "@components/abstractions";
@@ -43,7 +43,7 @@ export const AlertMd = createMetadata({
   },
 });
 
-export const alertComponentRenderer = createComponentRendererNew(
+export const alertComponentRenderer = createComponentRenderer(
   COMP,
   AlertMd,
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {

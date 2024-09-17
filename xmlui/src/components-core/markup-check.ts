@@ -2,9 +2,10 @@ import type { ComponentDef, CompoundComponentDef } from "@abstractions/Component
 
 import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "@parsers/scripting/Parser";
-import { IsValidFunction } from "@abstractions/ComponentDescriptorDefs";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { viewportSizeNames } from "@components/abstractions";
+
+type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 
 // --- This interface reperesent an object that can handle component metadata.
 // --- As the metadata format may change in the futue, this interface is used to

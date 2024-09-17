@@ -1,26 +1,6 @@
 import type { ComponentDef, ComponentDefNew, ComponentMetadata } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { ComponentRendererFn, ComponentRendererDef } from "@abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
-
-/**
- * This helper function creates a component renderer definition from its arguments.
- * @param type The unique identifier of the component definition
- * @param renderer The function that renders the component definition into a React node
- * @param hints Optional hints to help fix the rendering errors coming from invalid component property definitions
- * @returns The view renderer definition composed of the arguments
- */
-export function createComponentRenderer<T extends ComponentDef>(
-  type: T["type"],
-  renderer: ComponentRendererFn<T>,
-  hints?: ComponentDescriptor<T>,
-): ComponentRendererDef {
-  return {
-    type,
-    renderer,
-    metadata: hints,
-  };
-}
 
 /**
  * This helper function creates a component renderer definition from its arguments.
@@ -29,7 +9,7 @@ export function createComponentRenderer<T extends ComponentDef>(
  * @param metadata Optional hints to help fix the rendering errors coming from invalid component property definitions
  * @returns The view renderer definition composed of the arguments
  */
-export function createComponentRendererNew<TMd extends ComponentMetadata>(
+export function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
   renderer: ComponentRendererFn<ComponentDefNew<TMd>>,
@@ -48,15 +28,11 @@ export function createComponentRendererNew<TMd extends ComponentMetadata>(
  */
 export function createPropHolderComponent<T extends ComponentDef>(
   type: T["type"],
-  metadata?: ComponentDescriptor<T>,
+  metadata?: ComponentMetadata,
 ) {
-  return createComponentRenderer(
-    type,
-    () => {
-      throw new Error("Prop holder component, shouldn't render");
-    },
-    metadata,
-  );
+  return createComponentRenderer(type, metadata, () => {
+    throw new Error("Prop holder component, shouldn't render");
+  });
 }
 
 /**
@@ -68,13 +44,9 @@ export function createPropHolderComponentNew<TMd extends ComponentMetadata>(
   type: string,
   metadata?: TMd,
 ) {
-  return createComponentRenderer(
-    type,
-    () => {
-      throw new Error("Prop holder component, shouldn't render");
-    },
-    metadata,
-  );
+  return createComponentRenderer(type, metadata, () => {
+    throw new Error("Prop holder component, shouldn't render");
+  });
 }
 
 /**
@@ -86,10 +58,10 @@ export function createPropHolderComponentNew<TMd extends ComponentMetadata>(
  * @param renderer The function that renders the loader
  * @param hints Optional hints to help fix the rendering errors coming from invalid component property definitions
  */
-export function createLoaderRenderer<T extends ComponentDef>(
-  type: T["type"],
-  renderer: LoaderRenderer<T>,
-  hints?: ComponentDescriptor<T>,
+export function createLoaderRenderer<TMd extends ComponentMetadata>(
+  type: string,
+  renderer: LoaderRenderer<TMd>,
+  hints?: TMd,
 ): LoaderRendererDef {
   return {
     type,

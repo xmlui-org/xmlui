@@ -11,7 +11,7 @@ import {
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/IconNative";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Button } from "./ButtonNative";
 import { dClick, dGotFocus, dLostFocus } from "@components/metadata-helpers";
@@ -153,7 +153,7 @@ export const ButtonMd = createMetadata({
   },
 });
 
-export const buttonComponentRenderer = createComponentRendererNew(
+export const buttonComponentRenderer = createComponentRenderer(
   "Button",
   ButtonMd,
   ({ node, extractValue, renderChild, lookupEventHandler, layoutCss }) => {

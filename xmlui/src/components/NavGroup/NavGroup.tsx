@@ -1,5 +1,5 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./NavGroup.module.scss";
 import { Icon } from "@components/Icon/IconNative";
 import navLinkStyles from "@components/NavLink/NavLink.module.scss";
@@ -25,7 +25,7 @@ export const NavGroupMd = createMetadata({
   },
 });
 
-export const navGroupComponentRenderer = createComponentRendererNew(
+export const navGroupComponentRenderer = createComponentRenderer(
   COMP,
   NavGroupMd,
   ({ node, extractValue, renderChild }) => {

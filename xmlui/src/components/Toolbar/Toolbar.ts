@@ -1,18 +1,15 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * (Document it)
- */
-export interface ToolbarComponentDef
-  extends ComponentDef<"Toolbar"> {
+export const ToolbarMd = createMetadata({
+  description: "This component is a container for a toolbar.",
   props: {
-    /**
-     * @descriptionRef
-     */
-    alignment?: string;
-  };
-}
+    alignment: d("The alignment of the toolbar."),
+  },
+  defaultThemeVars: {
+    "gap-Toolbar": "$space-2",
+  },
+});
 
 export const toolbarRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {
@@ -31,9 +28,5 @@ export const toolbarRenderer: CompoundComponentRendererInfo = {
       ],
     },
   },
-  hints: {
-    defaultThemeVars: {
-        "gap-Toolbar": "$space-2",
-    }
-  }
+  hints: ToolbarMd,
 };

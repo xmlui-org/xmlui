@@ -1,7 +1,7 @@
 import styles from "./Badge.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Badge, BadgeColors } from "./BadgeNative";
 
@@ -54,7 +54,7 @@ export const BadgeMd = createMetadata({
   },
 });
 
-export const badgeComponentRenderer = createComponentRendererNew(
+export const badgeComponentRenderer = createComponentRenderer(
   COMP,
   BadgeMd,
   ({ node, extractValue }) => {

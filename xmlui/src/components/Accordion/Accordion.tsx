@@ -2,7 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 
 import styles from "./Accordion.module.scss";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Accordion, positionInGroupNames } from "./AccordionNative";
 import {
@@ -103,7 +103,7 @@ export const AccordionMd = createMetadata({
   },
 });
 
-export const accordionComponentRenderer = createComponentRendererNew(
+export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
   ({ node, extractValue, lookupEventHandler, layoutCss, renderChild }) => {

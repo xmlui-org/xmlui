@@ -6,7 +6,7 @@ import { NavLink as RrdNavLink } from "@remix-run/react";
 import classnames from "@components-core/utils/classnames";
 import type { LinkAria, LinkTarget } from "@components/abstractions";
 import type { To } from "react-router";
-import { getAppLayoutOrientation } from "@components/App/App";
+import { getAppLayoutOrientation } from "@components/App/AppNative";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { NavPanelContext } from "@components/NavPanel/NavPanelNative";
 import { createUrlWithQueryParams } from "@components/component-utils";
