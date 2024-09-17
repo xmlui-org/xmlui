@@ -1,26 +1,3 @@
-import type { ComponentPropertyDescriptor, PropertyValueType } from "@abstractions/ComponentDescriptorDefs";
-
-// Creates a simple property descriptor
-export function desc(
-  description: string,
-  valueType?: PropertyValueType,
-  defaultValue?: any,
-): ComponentPropertyDescriptor {
-  return {
-    description,
-    valueType,
-    defaultValue,
-  };
-}
-
-// Creates a simple property descriptor for a nested component
-export function nestedComp(description: string): ComponentPropertyDescriptor {
-  return {
-    description,
-    valueType: "ComponentDef",
-  };
-}
-
 // We need these keys for extracting layout parameters
 export const layoutOptionKeys = [
   "horizontalAlignment",

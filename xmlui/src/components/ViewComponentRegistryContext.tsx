@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { ComponentRegistry } from "@components/ComponentProvider";
 import type { ComponentRendererFn } from "@abstractions/RendererDefs";
+import { ComponentMetadata } from "@abstractions/ComponentDefs";
 
 
 // A single registry entry
@@ -10,7 +10,7 @@ export type ComponentRegistryEntry = {
   renderer: ComponentRendererFn<any>;
 
   // Component descriptor (hints and other metadata)
-  descriptor?: ComponentDescriptor<any>;
+  descriptor?: ComponentMetadata;
   isCompoundComponent?: boolean;
 };
 
