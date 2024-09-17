@@ -8,14 +8,14 @@ import type {
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
 import type { CodeDeclaration } from "@abstractions/scripting/ScriptingSourceTree";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "@abstractions/RendererDefs";
 
 /**
  * This interface defines the renderer context for the XMLUI core framework components. Its implementations
  * are used only within the component core.
  */
-export interface InnerRendererContext<T extends ComponentDef = ComponentDef> extends ComponentRendererContextBase<T> {
+export interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata> extends ComponentRendererContextBase<T> {
   /**
    * The dispatcher function to change the state of the component
    */

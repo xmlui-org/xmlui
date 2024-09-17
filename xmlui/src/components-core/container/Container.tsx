@@ -24,7 +24,7 @@ import type {
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 import type { InnerRendererContext, ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import type {
   ComponentApi,
@@ -85,7 +85,7 @@ type StateFieldPartChangedFn = (path: string[], value: any, target: string, acti
 
 // This function renders the entire component tree starting from the root component. As it works recursively,
 // all child components will be rendered, including the wrapping containers
-export function renderRoot(node: ComponentDef, memoedVarsRef: MutableRefObject<MemoedVars>) {
+export function renderRoot(node: ComponentDefNew, memoedVarsRef: MutableRefObject<MemoedVars>) {
   return renderChild({
     node,
     state: EMPTY_OBJECT,
@@ -463,7 +463,7 @@ const MemoizedContainer = memo(
       const api: Record<string, any> = {};
       const self = Symbol("$self");
       Object.entries(node.api).forEach(([key, value]) => {
-        api[key] = lookupAction(value, self);
+        api[key] = lookupAction(value as string, self);
       });
       if (!isImplicit) {
         registerComponentApi(self, api); //we register the api as $self for the compound components,
@@ -582,7 +582,7 @@ const MemoizedContainer = memo(
     );
 
     // --- Log the component state if you need it for debugging
-    if (node.props?.debug) {
+    if ((node.props as any)?.debug) {
       console.log(`Container: ${resolvedKey}`, {
         componentState,
         node,
@@ -834,7 +834,7 @@ const MemoizedErrorProneContainer = memo(
 );
 
 // --- A component definition with optional container properties
-type ComponentDefWithContainerUid = ComponentDef & {
+type ComponentDefWithContainerUid = ComponentDefNew & {
   // --- The unique identifier of the container that wraps this component
   containerUid?: symbol;
 
@@ -863,7 +863,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
   delete wrappedNode.scriptCollected;
   delete wrappedNode.scriptError;
   delete wrappedNode.uses;
-  delete wrappedNode.props?.uses;
+  delete (wrappedNode.props as any)?.uses;
   delete wrappedNode.api;
 
   // --- Do the wrapping
@@ -882,7 +882,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
     containerUid: "containerUid" in node && node.containerUid,
     apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
     props: {
-      debug: node.props?.debug,
+      debug: (node.props as any)?.debug,
       // debug: true,
     },
     children: [wrappedNode],
@@ -974,14 +974,14 @@ function renderChild({
   }
 
   // --- We do not parse text nodes specified with CDATA
+  const nodeValue = (node.props as any)?.value
   if (node.type === "TextNodeCData") {
-    return node.props?.value ?? "";
+    return nodeValue ?? "";
   }
 
   if (node.type === "TextNode") {
     // --- Special conversion: "&nbsp;" is converted to a non-breaking space
-    let nodeValue = extractParam(state, node.props?.value, appContext, true);
-    return nodeValue;
+    return extractParam(state, nodeValue, appContext, true);
   }
 
   const key = extractParam(state, node.uid, appContext, true);
@@ -1010,10 +1010,10 @@ function renderChild({
   );
 }
 
-function transformNodeWithChildDatasource(node: ComponentDef<any>) {
+function transformNodeWithChildDatasource(node: ComponentDefNew) {
   let didResolve = false;
   let loaders = node.loaders;
-  let children: Array<ComponentDef> | undefined = undefined;
+  let children: Array<ComponentDefNew> | undefined = undefined;
   node.children?.forEach((child) => {
     if (child.type === "Datasource") {
       didResolve = true;
@@ -1044,7 +1044,7 @@ function transformNodeWithChildDatasource(node: ComponentDef<any>) {
   return node;
 }
 
-function transformNodeWithDatasourceProp(node: ComponentDef) {
+function transformNodeWithDatasourceProp(node: ComponentDefNew) {
   if (node.props && "datasource" in node.props && typeof node.props.datasource === "string") {
     return {
       ...node,
@@ -1097,7 +1097,6 @@ const Node = memo(
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an Datasource child, we transform it to a loader on the node
       transformed = transformNodeWithDatasourceProp(transformed);
-      // console.log(transformNodeWithDatasourceProp(transformed));
 
       return transformed;
     }, [node]);
@@ -1107,7 +1106,7 @@ const Node = memo(
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
-          node={nodeWithTransformedLoaders}
+          node={nodeWithTransformedLoaders as ContainerComponentDef}
           parentState={state}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
@@ -1462,7 +1461,7 @@ export const containerReducer = produce((state: ContainerState, action: Containe
 
 interface LoaderRenderContext {
   uidInfo: Record<string, string>;
-  loaders?: ComponentDef[];
+  loaders?: ComponentDefNew[];
   componentState: ContainerState;
   dispatch: ContainerDispatcher;
   appContext: AppContextObject;
@@ -1481,7 +1480,7 @@ export function renderLoaders({
   lookupAction,
   cleanup,
 }: LoaderRenderContext) {
-  return loaders.map((loader: ComponentDef) => {
+  return loaders.map((loader: ComponentDefNew) => {
     // --- Check for the uniqueness of UIDs
     if (loader?.uid) {
       if (uidInfo[loader.uid]) {
@@ -1522,7 +1521,7 @@ export function renderLoaders({
     lookupAction,
     cleanup,
   }: {
-    loader: ComponentDef;
+    loader: ComponentDefNew;
     componentState: ContainerState;
     dispatch: ContainerDispatcher;
     appContext: AppContextObject;

@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import { ComponentDefNew, createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { removeNullProperties } from "@components-core/utils/misc";

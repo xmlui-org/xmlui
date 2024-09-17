@@ -1,4 +1,4 @@
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, CompoundComponentDef } from "@abstractions/ComponentDefs";
 
 import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "@parsers/scripting/Parser";
@@ -27,7 +27,7 @@ export type PropDescriptor = {
 
 export type PropDescriptorHash = Record<string, PropDescriptor>;
 
-export type ComponentValidator = (instance: ComponentDef, devMode?: boolean) => string | string[] | null;
+export type ComponentValidator = (instance: ComponentDefNew, devMode?: boolean) => string | string[] | null;
 
 type VisitResult = { cancel?: boolean; abort?: boolean };
 
@@ -40,7 +40,7 @@ type VisitResult = { cancel?: boolean; abort?: boolean };
  * @returns List of errors and warnings
  */
 export function checkXmlUiMarkup(
-  rootDef: ComponentDef | null,
+  rootDef: ComponentDefNew | null,
   components: CompoundComponentDef[],
   metadataHandler: MetadataHandler,
   devMode?: boolean,
@@ -84,7 +84,7 @@ export function checkXmlUiMarkup(
       // --- Reset component ID scope
       componentIdsCollected.clear();
       // --- Visit the compount component's definition
-      visitComponent(component.component as ComponentDef, null, componentDefVisitor, continuation);
+      visitComponent(component.component as ComponentDefNew, null, componentDefVisitor, continuation);
     }
   }
 
@@ -93,8 +93,8 @@ export function checkXmlUiMarkup(
 
   // --- This visitor checks the rules for a particular component
   function componentDefVisitor(
-    def: ComponentDef,
-    parent: ComponentDef | null | undefined,
+    def: ComponentDefNew,
+    parent: ComponentDefNew | null | undefined,
     before: boolean,
     continuation: VisitResult,
   ): void {
@@ -209,11 +209,11 @@ export function checkXmlUiMarkup(
 
   // --- This function visits a component, its nested components and children
   function visitComponent(
-    def: ComponentDef,
-    parent: ComponentDef | null | undefined,
+    def: ComponentDefNew,
+    parent: ComponentDefNew | null | undefined,
     visitor: (
-      def: ComponentDef,
-      parent: ComponentDef | null | undefined,
+      def: ComponentDefNew,
+      parent: ComponentDefNew | null | undefined,
       before: boolean,
       continuation: VisitResult,
     ) => void,

@@ -137,7 +137,7 @@ export interface CompoundComponentDef extends Scriptable {
 /**
  * Sometimes, components and compound components can both be used
  */
-export type ComponentLike = ComponentDef | ComponentDefNew| CompoundComponentDef;
+export type ComponentLike = ComponentDef | ComponentDefNew | CompoundComponentDef;
 
 /**
  * Some components render their nested child components dynamically using the current context of
@@ -182,9 +182,7 @@ interface Scriptable {
 
 // =====================================================================================================================
 // New component definition types
-export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetadata>
-  extends Scriptable {
-
+export interface ComponentDefCore<TMd extends ComponentMetadata = ComponentMetadata> {
   // The type discriminator field of the component; it defines the unique ID of the component type.
   type: string;
 
@@ -193,12 +191,6 @@ export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetada
 
   // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
   testId?: string;
-
-  // Component properties
-  props?: Record<keyof TMd["props"], string>;
-
-  // Component events
-  events?: Record<keyof TMd["events"], string>;
 
   /**
    * Though components manage their state internally, the app logic may require user state management.
@@ -241,19 +233,6 @@ export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetada
   functions?: Record<string, any>;
 
   /**
-   * Components may have an API that other components can use to interact with them. This property holds
-   * the API methods associated with this component definition.
-   */
-  api?: Record<keyof TMd["apis"], any>;
-
-  /**
-   * Components may provide context variables that can be used to in expressions and event handlers
-   * within the component.
-   * REVIEW: This property can be removed after migration to the new componend definition type.
-   */
-  contextVars?: Record<keyof TMd["contextVars"], string>;
-
-  /**
    * Components managing state through variables or loaders are wrapped with containers responsible
    * for this job. Just as components, containers form a hierarchy. While working with this hierarchy,
    * parent components may flow state values (key and value pairs) to their child containers. This
@@ -270,11 +249,37 @@ export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetada
   debug?: Record<string, any>;
 }
 
+export interface ComponentDefNew<TMd extends ComponentMetadata = ComponentMetadata>
+  extends ComponentDefCore<TMd>,
+    Scriptable {
+  // Component properties
+  props?: Record<keyof TMd["props"], string>;
+
+  // Component events
+  events?: Record<keyof TMd["events"], string>;
+
+  /**
+   * Components may have an API that other components can use to interact with them. This property holds
+   * the API methods associated with this component definition.
+   */
+  api?: Record<keyof TMd["apis"], any>;
+
+  /**
+   * Components may provide context variables that can be used to in expressions and event handlers
+   * within the component.
+   * REVIEW: This property can be removed after migration to the new componend definition type.
+   */
+  contextVars?: Record<keyof TMd["contextVars"], string>;
+}
+
 export type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
 
 // A generic validation function that retrieves either a hint (the validation argument has
 // issues) or undefined (the argument is valid).
-export type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+export type IsValidFunction<T> = (
+  propKey: string,
+  propValue: T,
+) => string | string[] | undefined | null;
 
 export type ComponentPropertyMetadata = {
   // The markdown description to explain the property in the inspector view
@@ -342,7 +347,12 @@ export function createMetadata<
   defaultThemeVars,
   toneSpecificThemeVars,
   allowArbitraryProps,
-}: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<TProps, TEvents, TContextVars, TApis> {
+}: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
+  TProps,
+  TEvents,
+  TContextVars,
+  TApis
+> {
   return {
     description,
     shortDescription,
@@ -368,4 +378,3 @@ export function d(
 ): ComponentPropertyMetadata {
   return { description, availableValues, valueType, defaultValue, isValid };
 }
-

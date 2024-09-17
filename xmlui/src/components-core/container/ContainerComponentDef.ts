@@ -1,8 +1,9 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 
 // Represents a container component. A container provides optional actions, loaders to implement its behavior and stores
 // state the child components can access.
-export interface ContainerComponentDef extends ComponentDef<"Container"> {
+export interface ContainerComponentDef extends ComponentDefNew {
+  type: "Container";
   containerUid?: symbol;
   contextVars?: Record<string, any>;
   apiBoundContainer?: boolean;
@@ -31,7 +32,7 @@ export type RegisterComponentApiFnInner = (componentUid: symbol, api: ComponentA
 export type ComponentCleanupFn = (uid: symbol) => void;
 
 // Tests if the particular component definition needs to be wrapped with an inline container
-export function isContainerLike(node: ComponentDef) {
+export function isContainerLike(node: ComponentDefNew) {
   if (node.type === "Container") {
     return true;
   }
