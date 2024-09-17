@@ -145,7 +145,6 @@ function addImportsSection(data, component) {
     IMPORTS,
     importPathTransformer
   );
-  //console.log(copyFilePaths)
   return { buffer, copyFilePaths };
 
   // ---
@@ -184,21 +183,16 @@ function addImportsSection(data, component) {
     for (let i = 0; i < importPaths.length; i++) {
       // NOTE: this is pretty restrictive, but works for now
       if (!importPaths[i].startsWith("./doc-resources")) {
-        logger.error(
-          "Invalid import path: ",
-          importPaths[i],
-          " in ",
-          component.displayName
-        );
+        logger.error("Invalid import path:", importPaths[i], " in ", component.displayName);
         continue;
       }
       const importFile = parse(importPaths[i]);
       const transformedPath = join(examplesFolder, component.displayName, importFile.base).replaceAll(posix.sep, sep);
-      
+
       // NOTE: need to use POSIX separators here regardless of platform
       transformedStatements += `${
         importStatements[i]
-      } "${transformedPath.replaceAll(sep, posix.sep)}";\n`;
+      } "${relative(outFolder, transformedPath).replaceAll(sep, posix.sep)}";\n`;
 
       // 3. Add the original and new import paths to an array to copy them later
       copyFilePaths.push({
@@ -330,7 +324,6 @@ function combineDescriptionAndDescriptionRef(
     descriptionBuffer = component[SECTION_DESCRIPTION];
   }
 
-  //console.log(component[SECTION_DESCRIPTION_REF])
   if (
     component.hasOwnProperty(SECTION_DESCRIPTION_REF) &&
     component[SECTION_DESCRIPTION_REF]
