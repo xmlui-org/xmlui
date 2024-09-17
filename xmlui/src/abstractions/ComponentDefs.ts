@@ -183,11 +183,11 @@ interface Scriptable {
   scriptError?: any;
 }
 
-export type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
+type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
 
 // A generic validation function that retrieves either a hint (the validation argument has
 // issues) or undefined (the argument is valid).
-export type IsValidFunction<T> = (
+type IsValidFunction<T> = (
   propKey: string,
   propValue: T,
 ) => string | string[] | undefined | null;
