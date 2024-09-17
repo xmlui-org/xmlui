@@ -3,7 +3,7 @@ import React from "react";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import styles from "./Splitter.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type {
@@ -73,9 +73,9 @@ export const SplitterMd = {
 export const HSplitterMd = { ...splitterMd };
 export const VSplitterMd = { ...splitterMd };
 
-type SplitterComponentDef = ComponentDefNew<typeof SplitterMd>;
-type VSplitterComponentDef = ComponentDefNew<typeof VSplitterMd>;
-type HSplitterComponentDef = ComponentDefNew<typeof HSplitterMd>;
+type SplitterComponentDef = ComponentDef<typeof SplitterMd>;
+type VSplitterComponentDef = ComponentDef<typeof VSplitterMd>;
+type HSplitterComponentDef = ComponentDef<typeof HSplitterMd>;
 
 type RenderSplitterPars = {
   node: SplitterComponentDef | VSplitterComponentDef | HSplitterComponentDef;

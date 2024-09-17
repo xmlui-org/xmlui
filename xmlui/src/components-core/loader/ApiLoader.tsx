@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { removeNullProperties } from "@components-core/utils/misc";
@@ -78,7 +78,7 @@ const ApiLoaderMd = createMetadata({
   },
 });
 
-type ApiLoaderDef = ComponentDefNew<typeof ApiLoaderMd>;
+type ApiLoaderDef = ComponentDef<typeof ApiLoaderMd>;
 
 export const apiLoaderRenderer = createLoaderRenderer(
   "ApiLoader",

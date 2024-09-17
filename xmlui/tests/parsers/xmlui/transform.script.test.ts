@@ -1,12 +1,12 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDefNew, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { Expression, ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - script", () => {
 
   it("Script works with empty text #2", () => {
-    const cd = transformSource(`<Stack><script>   </script></Stack>`) as ComponentDefNew;
+    const cd = transformSource(`<Stack><script>   </script></Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children).equal(undefined);
     expect(cd.script).equal("   ");
@@ -17,7 +17,7 @@ describe("Ueml transform - script", () => {
       <Stack>
         <script>Hi!</script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("Hi!");
   });
@@ -27,7 +27,7 @@ describe("Ueml transform - script", () => {
       <Stack>
         <script>   Hi!   </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("   Hi!   ");
   });
@@ -39,7 +39,7 @@ describe("Ueml transform - script", () => {
 Hello!</script>
         
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("Hi!\nHello!");
   });
@@ -52,7 +52,7 @@ Hi!
 Hello!</script>
         
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("\nHi!\nHello!");
   });
@@ -66,7 +66,7 @@ Hello!
 </script>
         
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("\nHi!\nHello!\n");
   });
@@ -77,7 +77,7 @@ Hello!
         <script>Hi!</script>
         <script>Hello!</script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("Hi!\nHello!");
   });
@@ -88,7 +88,7 @@ Hello!
         <script>  Hi!  </script>
         <script>Hello!  </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.script).equal("  Hi!  \nHello!  ");
   });
@@ -115,7 +115,7 @@ Hello!
           var a = 3
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -132,7 +132,7 @@ Hello!
           var a = 1 < 2;
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -149,7 +149,7 @@ Hello!
           var a = () => Math.floor(c/d);
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -166,7 +166,7 @@ Hello!
           var a = 3, b = () => Math.floor(c/d);
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -185,7 +185,7 @@ Hello!
           var a = 3, a = () => Math.floor(c/d);
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const err = cd.scriptError;
@@ -202,7 +202,7 @@ Hello!
           function a(b, c, d) { return Math.floor(c/d) }
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -219,7 +219,7 @@ Hello!
           function a() { let x = 3; return x * 2 }
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -237,7 +237,7 @@ Hello!
           function b(c,d,e) { return c + d + e }\`;
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -257,7 +257,7 @@ Hello!
           function a() { return Math.floor(c/d); }\`;
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const err = cd.scriptError as Record<string, ModuleErrors[]>;
@@ -274,7 +274,7 @@ Hello!
           function myButton_onClick(eventArgs){ console.log(allTasks.length) }
         </script>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
 
     // --- Assert
     const collected = cd.scriptCollected!;
@@ -291,9 +291,9 @@ Hello!
         <Stack>{other}</Stack>
       </prop>
     </Items>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.children).equal(undefined);
-    const template = (cd.props as any).itemTemplate as ComponentDefNew;
+    const template = (cd.props as any).itemTemplate as ComponentDef;
     expect(template.type).equal("Fragment");
     expect(template.script).equal("something");
     expect(template.children!.length).equal(1);
@@ -306,9 +306,9 @@ Hello!
       <script>somescript</script>
       <Stack>{uppercaseItem}</Stack>
     </Items>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.children!.length).equal(1);
-    const child = cd.children![0] as ComponentDefNew;
+    const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Fragment");
     expect(child.script).equal("somescript");
     expect(child.children!.length).equal(1);

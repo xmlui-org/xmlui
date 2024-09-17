@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef } from "react";
 import styles from "./FileInput.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { Button } from "@components/Button/ButtonNative";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { noop } from "@components-core/constants";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";

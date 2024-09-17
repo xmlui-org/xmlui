@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { AppContextObject } from "./AppContextDefs";
 import type {
-  ComponentDefNew,
+  ComponentDef,
   ComponentMetadata,
   CompoundComponentDef,
   DynamicChildComponentDef,
@@ -146,10 +146,10 @@ export type LookupEventHandlerFn<TMd extends ComponentMetadata = ComponentMetada
 export type RegisterComponentApiFn = (apiFn: Record<string, (...args: any[]) => void>) => void;
 
 // Function signature to render a particular child component (or set of child components)
-export type RenderChildFn<L extends ComponentDefNew = ComponentDefNew> = (
+export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
   children?:
-    | ComponentDefNew
-    | ComponentDefNew[]
+    | ComponentDef
+    | ComponentDef[]
     | DynamicChildComponentDef
     | DynamicChildComponentDef[]
     | string,
@@ -162,7 +162,7 @@ export type RenderChildFn<L extends ComponentDefNew = ComponentDefNew> = (
  * Each component is rendered in a particular layout context (for example, within a stack). This
  * type provides information about that context and the operations that render children in it.
  */
-export type LayoutContext<T extends ComponentDefNew = ComponentDefNew> = {
+export type LayoutContext<T extends ComponentDef = ComponentDef> = {
   /**
    * The type of the layout context
    */
@@ -199,7 +199,7 @@ export type NonCssLayoutProps = {
 /**
  * This function renders a component definition into a React component
  */
-export type ComponentRendererFn<T extends ComponentDefNew> = (
+export type ComponentRendererFn<T extends ComponentDef> = (
   context: RendererContext<T>,
 ) => ReactNode;
 
@@ -237,7 +237,7 @@ export type ComponentRendererDef = {
 // --- defines the common properties of that context.
 export interface ComponentRendererContextBase<TMd extends ComponentMetadata = ComponentMetadata> {
   // --- The definition of the component to render
-  node: ComponentDefNew<TMd>;
+  node: ComponentDef<TMd>;
 
   // --- The state of the container in which the component is rendered
   state: ContainerState;

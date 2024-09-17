@@ -4,7 +4,7 @@ import styles from "./TextBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import type { LookupActionOptions } from "@abstractions/ActionDefs";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dDidChange,
@@ -109,7 +109,7 @@ export const TextBoxMd = createMetadata({
   },
 });
 
-type TextBoxComponentDef = ComponentDefNew<typeof TextBoxMd>;
+type TextBoxComponentDef = ComponentDef<typeof TextBoxMd>;
 
 function renderTextBox(
   layoutCss: React.CSSProperties,

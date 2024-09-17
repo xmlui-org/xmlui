@@ -29,10 +29,10 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import classnames from "@components-core/utils/classnames";
 import { mergeProps } from "@components-core/utils/mergeProps";
 import { useTheme } from "@components-core/theming/ThemeContext";
-import { ComponentDefNew } from "@abstractions/ComponentDefs";
+import { ComponentDef } from "@abstractions/ComponentDefs";
 import { NavGroupMd } from "./NavGroup";
 
-type NavGroupComponentDef = ComponentDefNew<typeof NavGroupMd>;
+type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;
 
 type Props = {
   style?: CSSProperties;

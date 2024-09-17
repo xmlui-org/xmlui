@@ -1,7 +1,7 @@
 import type { CSSProperties, Dispatch, FormEvent, ForwardedRef, ReactNode } from "react";
 import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import styles from "./Form.module.scss";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ContainerAction } from "@components-core/abstractions/containers";
 import produce from "immer";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
@@ -405,7 +405,7 @@ const Form = forwardRef(function (
 });
 Form.displayName = "Form";
 
-type FormComponentDef = ComponentDefNew<typeof FormMd>;
+type FormComponentDef = ComponentDef<typeof FormMd>;
 
 export function FormWithContextVar({
   node,

@@ -44,7 +44,7 @@ export function createTestMetadataHandler(
     getComponentValidator: (type: string) => {
       if (type === "Button") {
         return (instance, devMode) => {
-          if (devMode && instance.props?.label?.startsWith("q")) {
+          if (devMode && (instance.props as any)?.label?.startsWith("q")) {
             return "Label should not start with 'q'";
           }
           return null;

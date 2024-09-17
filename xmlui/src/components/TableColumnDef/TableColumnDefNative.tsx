@@ -1,11 +1,11 @@
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { OurColumnMetadata, useTableContext } from "@components/TableColumnDef/TableContext";
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo } from "react";
 import { MemoizedItem } from "@components/container-helpers";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 
 type Props = OurColumnMetadata & {
-  nodeChildren?: ComponentDefNew[];
+  nodeChildren?: ComponentDef[];
   renderChild: RenderChildFn;
 };
 

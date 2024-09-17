@@ -1,11 +1,11 @@
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ActionExecutionContext } from "@abstractions/ActionDefs";
 import type { ApiActionOptions, DownloadOperationDef } from "@components-core/RestApiProxy";
 
 import { createAction } from "./actions";
 import RestApiProxy from "@components-core/RestApiProxy";
 
-export interface DownloadActionComponent extends ComponentDefNew {
+export interface DownloadActionComponent extends ComponentDef {
   props: DownloadOperationDef;
 }
 

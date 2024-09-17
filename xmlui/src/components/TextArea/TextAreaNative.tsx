@@ -9,7 +9,7 @@ import React, {
   } from "react";
   import styles from "./TextArea.module.scss";
   import classnames from "@components-core/utils/classnames";
-  import type { ValidationStatus } from "@components/Input/input-abstractions";
+  import type { ValidationStatus } from "@components/abstractions";
   import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
   import { noop } from "@components-core/constants";
   import TextAreaResizable from "./TextAreaResizable";

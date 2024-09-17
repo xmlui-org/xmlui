@@ -24,7 +24,7 @@ import type {
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { InnerRendererContext, ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
 import type {
   ComponentApi,
@@ -85,7 +85,7 @@ type StateFieldPartChangedFn = (path: string[], value: any, target: string, acti
 
 // This function renders the entire component tree starting from the root component. As it works recursively,
 // all child components will be rendered, including the wrapping containers
-export function renderRoot(node: ComponentDefNew, memoedVarsRef: MutableRefObject<MemoedVars>) {
+export function renderRoot(node: ComponentDef, memoedVarsRef: MutableRefObject<MemoedVars>) {
   return renderChild({
     node,
     state: EMPTY_OBJECT,
@@ -834,7 +834,7 @@ const MemoizedErrorProneContainer = memo(
 );
 
 // --- A component definition with optional container properties
-type ComponentDefWithContainerUid = ComponentDefNew & {
+type ComponentDefWithContainerUid = ComponentDef & {
   // --- The unique identifier of the container that wraps this component
   containerUid?: symbol;
 
@@ -1010,10 +1010,10 @@ function renderChild({
   );
 }
 
-function transformNodeWithChildDatasource(node: ComponentDefNew) {
+function transformNodeWithChildDatasource(node: ComponentDef) {
   let didResolve = false;
   let loaders = node.loaders;
-  let children: Array<ComponentDefNew> | undefined = undefined;
+  let children: Array<ComponentDef> | undefined = undefined;
   node.children?.forEach((child) => {
     if (child.type === "Datasource") {
       didResolve = true;
@@ -1044,7 +1044,7 @@ function transformNodeWithChildDatasource(node: ComponentDefNew) {
   return node;
 }
 
-function transformNodeWithDatasourceProp(node: ComponentDefNew) {
+function transformNodeWithDatasourceProp(node: ComponentDef) {
   if (node.props && "datasource" in node.props && typeof node.props.datasource === "string") {
     return {
       ...node,
@@ -1461,7 +1461,7 @@ export const containerReducer = produce((state: ContainerState, action: Containe
 
 interface LoaderRenderContext {
   uidInfo: Record<string, string>;
-  loaders?: ComponentDefNew[];
+  loaders?: ComponentDef[];
   componentState: ContainerState;
   dispatch: ContainerDispatcher;
   appContext: AppContextObject;
@@ -1480,7 +1480,7 @@ export function renderLoaders({
   lookupAction,
   cleanup,
 }: LoaderRenderContext) {
-  return loaders.map((loader: ComponentDefNew) => {
+  return loaders.map((loader: ComponentDef) => {
     // --- Check for the uniqueness of UIDs
     if (loader?.uid) {
       if (uidInfo[loader.uid]) {
@@ -1521,7 +1521,7 @@ export function renderLoaders({
     lookupAction,
     cleanup,
   }: {
-    loader: ComponentDefNew;
+    loader: ComponentDef;
     componentState: ContainerState;
     dispatch: ContainerDispatcher;
     appContext: AppContextObject;

@@ -6,7 +6,7 @@ import { format, parse, isValid, parseISO } from "date-fns";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { noop } from "@components-core/constants";
 import classnames from "@components-core/utils/classnames";

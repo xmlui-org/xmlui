@@ -5,14 +5,14 @@ import type {
 } from "@components-core/abstractions/ComponentRenderer";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type { ContainerState, RegisterComponentApiFnInner } from "@components-core/container/ContainerComponentDef";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { LookupAsyncFn, LookupAsyncFnInner } from "@abstractions/ActionDefs";
 
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import { ContainerActionKind } from "./abstractions/containers";
 
 interface LoaderRendererContext {
-  node: ComponentDefNew;
+  node: ComponentDef;
   state: ContainerState;
   dispatch: ContainerDispatcher;
   registerComponentApi: RegisterComponentApiFnInner;

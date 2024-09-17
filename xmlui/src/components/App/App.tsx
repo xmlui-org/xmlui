@@ -1,4 +1,4 @@
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import { appLayouts } from "./AppLayoutContext";
 
 import styles from "./App.module.scss";
@@ -53,9 +53,9 @@ export const appRenderer = createComponentRenderer(
   COMP,
   AppMd,
   ({ node, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
-    let AppHeader: ComponentDefNew;
-    let Footer: ComponentDefNew;
-    let NavPanel: ComponentDefNew;
+    let AppHeader: ComponentDef;
+    let Footer: ComponentDef;
+    let NavPanel: ComponentDef;
     const restChildren: any[] = [];
     node.children?.forEach((child) => {
       if (child.type === "AppHeader") {

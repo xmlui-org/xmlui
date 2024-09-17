@@ -1,4 +1,4 @@
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type { CSSProperties } from "react";
 import React, { useCallback, useEffect, useRef } from "react";

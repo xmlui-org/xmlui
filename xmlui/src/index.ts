@@ -20,7 +20,7 @@ import type { RendererContext } from "@abstractions/RendererDefs";
 
 export type {
   ThemeDefinition,
-  ComponentDef,
+  ComponentDef as ComponentDefNew,
   CompoundComponentDef,
   ComponentLike,
   StandaloneAppDescription,

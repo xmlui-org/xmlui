@@ -3,7 +3,7 @@ import type { ThrottleSettings } from "lodash-es";
 import { get, throttle } from "lodash-es";
 import { formatDistanceToNow } from "date-fns";
 
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 /**
  * Slice a single array into two based on a discriminator function.
@@ -293,8 +293,8 @@ export function normalizePath(url?: string): string | undefined {
 }
 
 export function isComponentDefChildren(
-  children?: ComponentDefNew | ComponentDefNew[] | string,
-): children is ComponentDefNew | ComponentDefNew[] {
+  children?: ComponentDef | ComponentDef[] | string,
+): children is ComponentDef | ComponentDef[] {
   return typeof children !== "string";
 }
 

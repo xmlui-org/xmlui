@@ -1,7 +1,7 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentDefNew, ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type {
   LookupEventHandlerFn,
   RegisterComponentApiFn,
@@ -197,7 +197,7 @@ const Component = forwardRef(function Component(
   // --- Memoizes the node object with the resolved children. If the children contain a `Slot`,
   // --- the resolved children (DynamicChildComponentDef) are used instead of the original children.
   const memoedNode = useMemo(() => {
-    const children: Array<ComponentDefNew> = [];
+    const children: Array<ComponentDef> = [];
     let didResolve = false;
     if (Array.isArray(safeNode.children)) {
       safeNode.children.forEach((child) => {

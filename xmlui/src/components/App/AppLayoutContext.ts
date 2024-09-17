@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import {ComponentDefNew} from "@abstractions/ComponentDefs";
+import {ComponentDef} from "@abstractions/ComponentDefs";
 
 const appLayoutNames = [
   "vertical",
@@ -23,7 +23,7 @@ export interface IAppLayoutContext {
   toggleDrawer: () => void;
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
-  navPanelDef?: ComponentDefNew
+  navPanelDef?: ComponentDef
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

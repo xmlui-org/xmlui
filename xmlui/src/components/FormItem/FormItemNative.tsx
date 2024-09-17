@@ -33,7 +33,7 @@ import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
 import { getByPath } from "@components/Form/FormNative";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
-import { ComponentDefNew } from "@abstractions/ComponentDefs";
+import { ComponentDef } from "@abstractions/ComponentDefs";
 import { FormItemMd } from "./FormItem";
 
 type FormControlType =
@@ -377,7 +377,7 @@ export const FormItem = memo(function FormItem({
   );
 });
 
-type FormItemComponentDef = ComponentDefNew<typeof FormItemMd>;
+type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
 export function CustomFormItem({
   renderChild,

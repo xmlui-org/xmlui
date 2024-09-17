@@ -10,7 +10,7 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 import { extractParam } from "@components-core/utils/extractParam";
 import { useAppContext } from "@components-core/AppContext";
@@ -20,7 +20,7 @@ export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
 type LoaderProps = {
   state: ContainerState;
-  loader: ComponentDefNew;
+  loader: ComponentDef;
   loaderFn: (abortSignal: AbortSignal | undefined, pageParam: string) => Promise<any>;
   queryId?: readonly any[];
   direction?: LoaderDirections;

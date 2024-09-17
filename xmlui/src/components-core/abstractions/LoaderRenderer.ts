@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { ContainerDispatcher } from "./ComponentRenderer";
 import type { ContainerState } from "../container/ContainerComponentDef";
 import type { LookupAsyncFn } from "@abstractions/ActionDefs";
-import type { ComponentDefNew, ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 // This function renders a loader definition into a React component
@@ -29,7 +29,7 @@ export type LoaderErrorFn = (error: any) => void;
 // The context in which a particular component is rendered
 type RendererContext<TMd extends ComponentMetadata> = {
   // The definition of the loader
-  loader: ComponentDefNew<TMd>;
+  loader: ComponentDef<TMd>;
 
   // Loader state
   state: ContainerState;

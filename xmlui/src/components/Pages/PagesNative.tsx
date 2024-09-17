@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useMemo } from "react";
 import { Navigate, Route, Routes } from "@remix-run/react";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { useParams } from "@remix-run/react";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
@@ -13,7 +13,7 @@ export function RouteWrapper({
   renderChild,
   layoutContext,
 }: {
-  childRoute?: ComponentDefNew | Array<ComponentDefNew>;
+  childRoute?: ComponentDef | Array<ComponentDef>;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
 }) {
@@ -38,11 +38,11 @@ export function RouteWrapper({
   );
 }
 
-type PageComponentDef = ComponentDefNew<typeof PageMd>
+type PageComponentDef = ComponentDef<typeof PageMd>
 
 type PagesProps = {
   defaultRoute?: string;
-  node?: ComponentDefNew;
+  node?: ComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   children?: ReactNode;
@@ -50,7 +50,7 @@ type PagesProps = {
 
 export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
   const routes: Array<PageComponentDef> = [];
-  const restChildren: Array<ComponentDefNew> = [];
+  const restChildren: Array<ComponentDef> = [];
   node.children.map((child) => {
     if (child.type === "Page") {
       routes.push(child as PageComponentDef);

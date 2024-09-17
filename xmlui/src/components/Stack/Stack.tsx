@@ -1,6 +1,6 @@
 import type React from "react";
 import styles from "./Stack.module.scss";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { isComponentDefChildren } from "@components-core/utils/misc";
@@ -51,7 +51,7 @@ export const StackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type StackComponentDef = ComponentDefNew<typeof StackMd>;
+type StackComponentDef = ComponentDef<typeof StackMd>;
 
 export const VStackMd = {
   ...StackMd,
@@ -62,7 +62,7 @@ export const VStackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type VStackComponentDef = ComponentDefNew<typeof VStackMd>;
+type VStackComponentDef = ComponentDef<typeof VStackMd>;
 
 export const HStackMd = {
   ...StackMd,
@@ -73,7 +73,7 @@ export const HStackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type HStackComponentDef = ComponentDefNew<typeof HStackMd>;
+type HStackComponentDef = ComponentDef<typeof HStackMd>;
 
 export const CVStackMd = {
   ...StackMd,
@@ -81,7 +81,7 @@ export const CVStackMd = {
     `This component represents a stack that renders its contents vertically ` +
     `and aligns that in the center along both axes.`,
 };
-type CVStackComponentDef = ComponentDefNew<typeof CVStackMd>;
+type CVStackComponentDef = ComponentDef<typeof CVStackMd>;
 
 export const CHStackMd = {
   ...StackMd,
@@ -89,7 +89,7 @@ export const CHStackMd = {
     `This component represents a stack that renders its contents horizontally ` +
     `and aligns that in the center along both axes.`,
 };
-type CHStackComponentDef = ComponentDefNew<typeof CHStackMd>;
+type CHStackComponentDef = ComponentDef<typeof CHStackMd>;
 
 type RenderStackPars = {
   node:

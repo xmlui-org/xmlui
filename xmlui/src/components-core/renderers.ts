@@ -1,4 +1,4 @@
-import type { ComponentDef, ComponentDefNew, ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { ComponentRendererFn, ComponentRendererDef } from "@abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
 
@@ -12,7 +12,7 @@ import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRen
 export function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
-  renderer: ComponentRendererFn<ComponentDefNew<TMd>>,
+  renderer: ComponentRendererFn<ComponentDef<TMd>>,
 ): ComponentRendererDef {
   return {
     type,

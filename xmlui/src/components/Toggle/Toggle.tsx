@@ -3,7 +3,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import type { LabelPosition } from "@components/FormItem/ItemWithLabel";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 import { useEvent } from "@components-core/utils/misc";
