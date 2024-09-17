@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { AppContextObject } from "./AppContextDefs";
 import type {
-  ComponentDef,
+  ComponentDefNew,
   ComponentMetadata,
   CompoundComponentDef,
   DynamicChildComponentDef,
@@ -13,7 +13,8 @@ import type { AsyncFunction } from "./FunctionDefs";
 /**
  * This interface defines the renderer context for the exposed components of the XMLUI framework.
  */
-export interface RendererContext<T extends ComponentDef> extends ComponentRendererContextBase<T> {
+export interface RendererContext<TMd extends ComponentMetadata>
+  extends ComponentRendererContextBase<TMd> {
   /**
    * The unique identifier of the component instance
    */
@@ -38,7 +39,7 @@ export interface RendererContext<T extends ComponentDef> extends ComponentRender
   /**
    * This function gets an async executable function that handles an event.
    */
-  lookupEventHandler: LookupEventHandlerFn<T>;
+  lookupEventHandler: LookupEventHandlerFn<TMd>;
 
   /**
    * A component can register its APIs with this function
@@ -134,8 +135,8 @@ export type ValueExtractor = {
  * This function retrieves an async function for a particular component's specified event to be
  * invoked as an event handler (`undefined` if the particular event handler is not defined).
  */
-export type LookupEventHandlerFn<T extends ComponentDef = ComponentDef> = (
-  eventName: keyof NonNullable<T["events"]>,
+export type LookupEventHandlerFn<TMd extends ComponentMetadata = ComponentMetadata> = (
+  eventName: keyof NonNullable<TMd["events"]>,
   actionOptions?: LookupActionOptions,
 ) => AsyncFunction | undefined;
 
@@ -145,10 +146,10 @@ export type LookupEventHandlerFn<T extends ComponentDef = ComponentDef> = (
 export type RegisterComponentApiFn = (apiFn: Record<string, (...args: any[]) => void>) => void;
 
 // Function signature to render a particular child component (or set of child components)
-export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
+export type RenderChildFn<L extends ComponentDefNew = ComponentDefNew> = (
   children?:
-    | ComponentDef
-    | ComponentDef[]
+    | ComponentDefNew
+    | ComponentDefNew[]
     | DynamicChildComponentDef
     | DynamicChildComponentDef[]
     | string,
@@ -161,7 +162,7 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
  * Each component is rendered in a particular layout context (for example, within a stack). This
  * type provides information about that context and the operations that render children in it.
  */
-export type LayoutContext<T extends ComponentDef = ComponentDef> = {
+export type LayoutContext<T extends ComponentDefNew = ComponentDefNew> = {
   /**
    * The type of the layout context
    */
@@ -198,7 +199,7 @@ export type NonCssLayoutProps = {
 /**
  * This function renders a component definition into a React component
  */
-export type ComponentRendererFn<T extends ComponentDef> = (
+export type ComponentRendererFn<T extends ComponentDefNew> = (
   context: RendererContext<T>,
 ) => ReactNode;
 
@@ -234,9 +235,9 @@ export type ComponentRendererDef = {
 // --- Rendering components (turning component definitions into their React node representation) is a
 // --- complicated process that requires information describing the actual context. This interface
 // --- defines the common properties of that context.
-export interface ComponentRendererContextBase<T extends ComponentDef = ComponentDef> {
+export interface ComponentRendererContextBase<TMd extends ComponentMetadata = ComponentMetadata> {
   // --- The definition of the component to render
-  node: T;
+  node: ComponentDefNew<TMd>;
 
   // --- The state of the container in which the component is rendered
   state: ContainerState;

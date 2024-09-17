@@ -84,7 +84,7 @@ type RenderSplitterPars = {
   layoutCss: React.CSSProperties;
   renderChild: RenderChildFn;
   orientation?: OrientationOptions;
-  lookupEventHandler: LookupEventHandlerFn;
+  lookupEventHandler: LookupEventHandlerFn<typeof SplitterMd>;
 };
 
 const DEFAULT_ORIENTATION = "vertical";
@@ -95,7 +95,7 @@ function renderSplitter({
   layoutNonCss,
   layoutCss,
   renderChild,
-  lookupEventHandler,
+  lookupEventHandler ,
   orientation = (layoutNonCss.orientation as OrientationOptions) ?? DEFAULT_ORIENTATION,
 }: RenderSplitterPars) {
   if (!isComponentDefChildren(node.children)) {
@@ -128,7 +128,7 @@ export const splitterComponentRenderer = createComponentRenderer(
       layoutCss,
       layoutNonCss,
       renderChild,
-      lookupEventHandler,
+      lookupEventHandler: lookupEventHandler as any,
     });
   },
 );
@@ -144,7 +144,7 @@ export const vSplitterComponentRenderer = createComponentRenderer(
       layoutNonCss,
       renderChild,
       orientation: "vertical",
-      lookupEventHandler,
+      lookupEventHandler: lookupEventHandler as any,
     });
   },
 );
@@ -160,7 +160,7 @@ export const hSplitterComponentRenderer = createComponentRenderer(
       layoutNonCss,
       renderChild,
       orientation: "horizontal",
-      lookupEventHandler,
+      lookupEventHandler: lookupEventHandler as any,
     });
   },
 );

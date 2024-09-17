@@ -419,7 +419,7 @@ export function FormWithContextVar({
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
   layoutCss: CSSProperties;
-  lookupEventHandler: LookupEventHandlerFn;
+  lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
   registerComponentApi: RegisterComponentApiFn;
 }) {
   const [formState, dispatch] = useReducer(formReducer, initialState);

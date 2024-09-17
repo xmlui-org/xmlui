@@ -166,7 +166,7 @@ export const textBoxComponentRenderer = createComponentRenderer(
       state,
       updateState,
       extractValue,
-      node,
+      node as TextBoxComponentDef,
       lookupEventHandler,
       registerComponentApi,
     );
@@ -190,7 +190,7 @@ export const passwordInputComponentRenderer = createComponentRenderer(
       state,
       updateState,
       extractValue,
-      node,
+      node as TextBoxComponentDef,
       lookupEventHandler,
       registerComponentApi,
       "password",
