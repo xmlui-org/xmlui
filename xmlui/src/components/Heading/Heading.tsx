@@ -55,7 +55,7 @@ export const HeadingMd = createMetadata({
 const H1 = "H1";
 export const H1Md = createMetadata({
   description: LEVEL_DESC(1),
-  parent: "Heading",
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
@@ -79,6 +79,7 @@ export const H1Md = createMetadata({
 const H2 = "H2";
 export const H2Md = createMetadata({
   description: LEVEL_DESC(2),
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
@@ -102,6 +103,7 @@ export const H2Md = createMetadata({
 const H3 = "H3";
 export const H3Md = createMetadata({
   description: LEVEL_DESC(3),
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
@@ -125,6 +127,7 @@ export const H3Md = createMetadata({
 const H4 = "H4";
 export const H4Md = createMetadata({
   description: LEVEL_DESC(4),
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
@@ -148,6 +151,7 @@ export const H4Md = createMetadata({
 const H5 = "H5";
 export const H5Md = createMetadata({
   description: LEVEL_DESC(5),
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,
@@ -171,6 +175,7 @@ export const H5Md = createMetadata({
 const H6 = "H6";
 export const H6Md = createMetadata({
   description: LEVEL_DESC(6),
+  specializedFrom: COMP,
   props: {
     value: VALUE_DESC,
     maxLines: MAX_LINES_DESC,

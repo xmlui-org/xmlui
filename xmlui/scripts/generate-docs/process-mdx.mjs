@@ -53,7 +53,7 @@ export function processDocfiles(metadata) {
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames);
+    componentNames = processMdx(component, componentNames, metadata);
   });
 
   // Write the _meta.json file
@@ -65,7 +65,7 @@ export function processDocfiles(metadata) {
   }
 }
 
-export function processMdx(component, componentNames) {
+export function processMdx(component, componentNames, metadata) {
   let result = "";
   let fileData = "";
 

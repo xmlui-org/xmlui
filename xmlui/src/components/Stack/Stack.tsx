@@ -1,6 +1,6 @@
 import type React from "react";
 import styles from "./Stack.module.scss";
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { isComponentDefChildren } from "@components-core/utils/misc";
@@ -55,6 +55,7 @@ type StackComponentDef = ComponentDef<typeof StackMd>;
 
 export const VStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description: `This component represents a stack rendering its contents vertically.`,
   props: {
     ...stackMd.props,
@@ -66,6 +67,7 @@ type VStackComponentDef = ComponentDef<typeof VStackMd>;
 
 export const HStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description: `This component represents a stack rendering its contents horizontally.`,
   props: {
     ...stackMd.props,
@@ -77,6 +79,7 @@ type HStackComponentDef = ComponentDef<typeof HStackMd>;
 
 export const CVStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description:
     `This component represents a stack that renders its contents vertically ` +
     `and aligns that in the center along both axes.`,
@@ -85,6 +88,7 @@ type CVStackComponentDef = ComponentDef<typeof CVStackMd>;
 
 export const CHStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description:
     `This component represents a stack that renders its contents horizontally ` +
     `and aligns that in the center along both axes.`,

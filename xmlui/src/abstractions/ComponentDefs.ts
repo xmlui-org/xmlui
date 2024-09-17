@@ -260,7 +260,10 @@ export type ComponentMetadata<
   allowArbitraryProps?: boolean;
 
   // If the component is specalized, this property holds the name of the parent component
-  parent?: string;
+  specializedFrom?: string;
+
+  // Contains the folder name if it does not match the component name
+  folder?: string;
 };
 
 export function createMetadata<
@@ -271,6 +274,7 @@ export function createMetadata<
 >({
   description,
   shortDescription,
+  specializedFrom,
   props,
   events,
   contextVars,
@@ -281,6 +285,7 @@ export function createMetadata<
   defaultThemeVars,
   toneSpecificThemeVars,
   allowArbitraryProps,
+  folder,
 }: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
   TProps,
   TEvents,
@@ -290,6 +295,7 @@ export function createMetadata<
   return {
     description,
     shortDescription,
+    specializedFrom,
     props,
     events,
     contextVars,
@@ -300,6 +306,7 @@ export function createMetadata<
     defaultThemeVars,
     toneSpecificThemeVars,
     allowArbitraryProps,
+    folder,
   };
 }
 

@@ -5,23 +5,28 @@ import { processDocfiles } from './process-mdx.mjs';
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
-for (const [key, value] of Object.entries(collectedComponentMetadata)) {
-  logger.info("Working with", `[${key}]`);
-  const displayName = key;
-  const componentFolder = key;
+logger.info("Extending component metadata with default values");
+const metadata = Object.entries(collectedComponentMetadata).map(([compName, compData]) => {
+  const displayName = compName;
+  const componentFolder = compData.specializedFrom || compData.folder || compName;
   const descriptionRef = join(componentFolder, `${displayName}.mdx`);
 
   const metadata = {
-    ...value,
+    ...compData,
     displayName,
-    description: value.description,
+    description: compData.description,
     descriptionRef,
     componentFolder,
   }
 
   const entries = addDescriptionRef(metadata, ["props", "events", "api", "contextVars"]);
-  processDocfiles([{ ...metadata, ...entries }]);
-}
+  return { ...metadata, ...entries };
+});
+
+logger.info("Processing MDX files");
+processDocfiles(metadata);
+
+// ------------------------ HELPERS --------------------------
 
 function addDescriptionRef(component, entries = []) {
   const result = {};
