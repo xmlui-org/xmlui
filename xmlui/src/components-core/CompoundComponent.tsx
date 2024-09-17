@@ -1,7 +1,7 @@
 import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentDef, DynamicChildComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, DynamicChildComponentDef } from "@abstractions/ComponentDefs";
 import type { ContainerComponentDef } from "@components-core/container/ContainerComponentDef";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { RendererContext } from "@abstractions/RendererDefs";
@@ -9,9 +9,9 @@ import type { RendererContext } from "@abstractions/RendererDefs";
 import { useEvent } from "@components-core/utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 
-type CompoundComponentProps<T extends ComponentDef> = {
+type CompoundComponentProps<T extends ComponentDefNew> = {
   // Definition of the `component` part of the compound component
-  compound: ComponentDef;
+  compound: ComponentDefNew;
   // The API of the compound component
   api?: Record<string, string>;
   scriptCollected?: CollectedDeclarations;
@@ -19,7 +19,7 @@ type CompoundComponentProps<T extends ComponentDef> = {
 
 // Acts as a bridge between a compound component definition and its renderer.
 export const CompoundComponent = forwardRef(
-  <T extends ComponentDef>(
+  <T extends ComponentDefNew>(
     {
       node,
       lookupSyncCallback,
@@ -97,7 +97,7 @@ export const CompoundComponent = forwardRef(
         scriptError: scriptError,
         containerUid: uid,
         props: {
-          debug: compound.props?.debug,
+          debug: (compound.props as any)?.debug,
         },
         children: [rest],
       };

@@ -1,6 +1,6 @@
 import React from "react";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 
 import styles from "./InvalidComponent.module.scss";
 import { EMPTY_ARRAY } from "@components-core/constants";
@@ -17,7 +17,7 @@ type Props = {
   /**
    * The definition of the component validated
    */
-  node: ComponentDef;
+  node: ComponentDefNew;
 
   /**
    * Component children to render with the error message

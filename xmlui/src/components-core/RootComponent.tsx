@@ -7,7 +7,7 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { enableMapSet } from "immer";
 
-import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
 import type { MemoedVars } from "./abstractions/ComponentRenderer";
 import type { ActionRendererDef } from "@abstractions/ActionDefs";
 import type { ContainerComponentDef } from "./container/ContainerComponentDef";
@@ -516,11 +516,11 @@ function AppRoot({
 }: RootComponentProps) {
   const rootNode = useMemo(() => {
     const themedRoot =
-      (node as ComponentDef).type === "Theme"
+      (node as ComponentDefNew).type === "Theme"
         ? {
             ...node,
             props: {
-              ...(node as ComponentDef).props,
+              ...(node as ComponentDefNew).props,
               root: true,
             },
           }

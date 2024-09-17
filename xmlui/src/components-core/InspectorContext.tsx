@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";
@@ -12,7 +12,7 @@ import styles from "./InspectorButton.module.scss";
 
 interface IInspectorContext {
   sources?: Record<string, string>;
-  attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
+  attach: (node: ComponentDefNew, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
 }
@@ -76,7 +76,7 @@ export function InspectorProvider({
   );
 }
 
-function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
+function InspectModal(props: { onClose: () => void; node: ComponentDefNew }) {
   const { sources } = useContext(InspectorContext)!;
   const value = useMemo(() => {
     const compSrc = props.node.debug?.source;
@@ -118,7 +118,7 @@ function InspectModal(props: { onClose: () => void; node: ComponentDef }) {
   );
 }
 
-function InspectButton({ inspectId, node }: { inspectId: string; node: ComponentDef }) {
+function InspectButton({ inspectId, node }: { inspectId: string; node: ComponentDefNew }) {
   const { root } = useTheme();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [popperElement, setPopperElement] = useState<HTMLButtonElement | null>(null);
@@ -206,9 +206,9 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
   );
 }
 
-export function useInspector(node: ComponentDef, uid: symbol) {
+export function useInspector(node: ComponentDefNew, uid: symbol) {
   const context = useContext(InspectorContext);
-  const shouldInspect = node.props?.inspect;
+  const shouldInspect = (node.props as any)?.inspect;
   const inspectId = useId();
   const refreshInspection = useCallback(() => {
     context?.refresh(inspectId);

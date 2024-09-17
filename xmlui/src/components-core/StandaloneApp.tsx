@@ -3,7 +3,7 @@ import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
 import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
-import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
 import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
@@ -133,7 +133,7 @@ function matchesFolder(path: string, folderName: string) {
 
 function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription {
   let config: StandaloneAppDescription | undefined;
-  let entryPoint: ComponentDef | undefined;
+  let entryPoint: ComponentDefNew | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
   let themes: Array<ThemeDefinition> = [];
   let apiInterceptor;
@@ -238,7 +238,7 @@ function getStandalone(
   const servedFromSingleFile =
     typeof document !== "undefined" && document.querySelector('script[type="text/xmlui"]') !== null;
   if (servedFromSingleFile) {
-    let entryPoint: ComponentDef | null = null;
+    let entryPoint: ComponentDefNew | null = null;
     const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
     const components: Array<CompoundComponentDef> = [];
     for (let i = 0; i < componentNodes.length; i++) {
@@ -248,7 +248,7 @@ function getStandalone(
         continue;
       }
       if ("type" in componentDef && componentDef.type === "App") {
-        entryPoint = componentDef as ComponentDef;
+        entryPoint = componentDef as ComponentDefNew;
       } else {
         components.push(componentDef as CompoundComponentDef);
       }
@@ -299,7 +299,7 @@ function useStandalone(
       //TODO read text/xmlui-config json
       const servedFromSingleFile = document.querySelector('script[type="text/xmlui"]') !== null;
       if (servedFromSingleFile) {
-        let entryPoint: ComponentDef | null = null;
+        let entryPoint: ComponentDefNew | null = null;
         const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
         const components: Array<CompoundComponentDef> = [];
         for (let i = 0; i < componentNodes.length; i++) {
@@ -309,7 +309,7 @@ function useStandalone(
             continue;
           }
           if ("type" in componentDef && componentDef.type === "App") {
-            entryPoint = componentDef as ComponentDef;
+            entryPoint = componentDef as ComponentDefNew;
           } else {
             components.push(componentDef as CompoundComponentDef);
           }

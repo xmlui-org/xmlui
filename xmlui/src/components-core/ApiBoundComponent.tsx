@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDefNew } from "@abstractions/ComponentDefs";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { MutableRefObject } from "react";
 import type { UploadActionComponent } from "@components-core/action/UploadAction";
@@ -11,7 +11,7 @@ import type { RenderChildFn } from "@abstractions/RendererDefs";
 
 type ApiBoundComponentProps = {
   uid: symbol;
-  node: ComponentDef;
+  node: ComponentDefNew;
   apiBoundProps: Array<string>;
   apiBoundEvents: Array<string>;
   renderChild: RenderChildFn;
@@ -33,9 +33,9 @@ export function ApiBoundComponent({
       return `${node.uid}_data_${key}`;
     }
 
-    const loaders: Array<ComponentDef> = [...(node.loaders || [])];
-    const events = { ...(node.events || {}) };
-    const props = { ...(node.props || {}) };
+    const loaders: Array<ComponentDefNew> = [...(node.loaders || [])];
+    const events = { ...(node.events || {}) } as any;
+    const props = { ...(node.props || {}) } as any;
     const vars = { ...(node.vars || {}) };
     const api = { ...(node.api || {}) };
 
