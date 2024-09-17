@@ -463,7 +463,7 @@ const MemoizedContainer = memo(
       const api: Record<string, any> = {};
       const self = Symbol("$self");
       Object.entries(node.api).forEach(([key, value]) => {
-        api[key] = lookupAction(value, self);
+        api[key] = lookupAction(value as string, self);
       });
       if (!isImplicit) {
         registerComponentApi(self, api); //we register the api as $self for the compound components,
@@ -582,7 +582,7 @@ const MemoizedContainer = memo(
     );
 
     // --- Log the component state if you need it for debugging
-    if (node.props?.debug) {
+    if ((node.props as any)?.debug) {
       console.log(`Container: ${resolvedKey}`, {
         componentState,
         node,
@@ -863,7 +863,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
   delete wrappedNode.scriptCollected;
   delete wrappedNode.scriptError;
   delete wrappedNode.uses;
-  delete wrappedNode.props?.uses;
+  delete (wrappedNode.props as any)?.uses;
   delete wrappedNode.api;
 
   // --- Do the wrapping
@@ -882,7 +882,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
     containerUid: "containerUid" in node && node.containerUid,
     apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
     props: {
-      debug: node.props?.debug,
+      debug: (node.props as any)?.debug,
       // debug: true,
     },
     children: [wrappedNode],
@@ -974,14 +974,14 @@ function renderChild({
   }
 
   // --- We do not parse text nodes specified with CDATA
+  const nodeValue = (node.props as any)?.value
   if (node.type === "TextNodeCData") {
-    return node.props?.value ?? "";
+    return nodeValue ?? "";
   }
 
   if (node.type === "TextNode") {
     // --- Special conversion: "&nbsp;" is converted to a non-breaking space
-    let nodeValue = extractParam(state, node.props?.value, appContext, true);
-    return nodeValue;
+    return extractParam(state, nodeValue, appContext, true);
   }
 
   const key = extractParam(state, node.uid, appContext, true);
@@ -1010,7 +1010,7 @@ function renderChild({
   );
 }
 
-function transformNodeWithChildDatasource(node: ComponentDef<any>) {
+function transformNodeWithChildDatasource(node: ComponentDef) {
   let didResolve = false;
   let loaders = node.loaders;
   let children: Array<ComponentDef> | undefined = undefined;
@@ -1097,7 +1097,6 @@ const Node = memo(
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an Datasource child, we transform it to a loader on the node
       transformed = transformNodeWithDatasourceProp(transformed);
-      // console.log(transformNodeWithDatasourceProp(transformed));
 
       return transformed;
     }, [node]);
@@ -1107,7 +1106,7 @@ const Node = memo(
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
-          node={nodeWithTransformedLoaders}
+          node={nodeWithTransformedLoaders as ContainerComponentDef}
           parentState={state}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}

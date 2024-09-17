@@ -1,6 +1,6 @@
 import styles from "@components/Combobox/Combobox.module.scss";
 
-import { ComponentDefNew, createMetadata } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -113,7 +113,7 @@ export const comboboxComponentRenderer = createComponentRenderer(
         optionRenderer={(item) => {
           return (
             <MemoizedItem
-              node={(node.props.optionTemplate || defaultOptionRenderer) as ComponentDefNew}
+              node={(node.props.optionTemplate || defaultOptionRenderer) as ComponentDef}
               item={item}
               renderChild={renderChild}
             />

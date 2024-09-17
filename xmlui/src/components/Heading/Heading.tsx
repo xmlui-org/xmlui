@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 import styles from "./Heading.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
@@ -190,7 +190,7 @@ export const H6Md = createMetadata({
   },
 });
 
-type HeadingComponentDef = ComponentDefNew<typeof HeadingMd>;
+type HeadingComponentDef = ComponentDef<typeof HeadingMd>;
 
 type RenderHeadingPars = {
   node: HeadingComponentDef;

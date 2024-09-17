@@ -177,3 +177,14 @@ export type Placement = (typeof placementValues)[number];
 const triggerPositionValues = ["start", "end"] as const;
 export const triggerPositionNames: string[] = [...triggerPositionValues];
 export type TriggerPosition = (typeof triggerPositionValues)[number];
+
+// --- The state of a validated UI element
+const validationStatusValues = ["none", "error", "warning", "valid"] as const;
+export const validationStatusNames: string[] = [...validationStatusValues];
+export type ValidationStatus = (typeof validationStatusValues)[number];
+
+// --- The validation result of a particular component
+export type ValidationResult = {
+  status: ValidationStatus;
+  message?: string;
+};

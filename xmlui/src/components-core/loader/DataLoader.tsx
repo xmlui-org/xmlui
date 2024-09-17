@@ -9,7 +9,7 @@ import type {
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
 import type { LoaderDirections } from "@components-core/loader/PageableLoader";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { createLoaderRenderer } from "@components-core/renderers";
 import RestApiProxy from "@components-core/RestApiProxy";
@@ -257,7 +257,7 @@ export const DataLoaderMd = createMetadata({
   },
 });
 
-type DataLoaderDef = ComponentDefNew<typeof DataLoaderMd>;
+type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
 export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",

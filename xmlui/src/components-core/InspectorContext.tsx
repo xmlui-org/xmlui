@@ -208,7 +208,7 @@ function InspectButton({ inspectId, node }: { inspectId: string; node: Component
 
 export function useInspector(node: ComponentDef, uid: symbol) {
   const context = useContext(InspectorContext);
-  const shouldInspect = node.props?.inspect;
+  const shouldInspect = (node.props as any)?.inspect;
   const inspectId = useId();
   const refreshInspection = useCallback(() => {
     context?.refresh(inspectId);

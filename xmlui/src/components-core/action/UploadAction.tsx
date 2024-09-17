@@ -1,13 +1,13 @@
 import type { ActionExecutionContext } from "@abstractions/ActionDefs";
 import type { ApiActionOptions, UploadOperationDef } from "@components-core/RestApiProxy";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 import { createAction } from "./actions";
 import RestApiProxy from "@components-core/RestApiProxy";
 import { extractParam } from "@components-core/utils/extractParam";
 import { invalidateQueries } from "@components-core/utils/actionUtils";
 
-export interface UploadActionComponent extends ComponentDefNew {
+export interface UploadActionComponent extends ComponentDef {
   props: {
     invalidates?: string | string[];
   } & UploadOperationDef;

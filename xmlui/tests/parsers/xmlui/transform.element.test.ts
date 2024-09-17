@@ -1,66 +1,66 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDefNew, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - child elements", () => {
   it("Comments ignored, whitespace collapsed", () => {
     const cd = transformSource(
       "<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal(" text here");
   });
 
   it("Comments ignored ws between words collapsed", () => {
-    const cd = transformSource("<H1>hi  <!-- comment -->  there</H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>hi  <!-- comment -->  there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("hi there");
   });
 
   it("Comments ignored between words", () => {
-    const cd = transformSource("<H1>hi<!-- comment -->there</H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>hi<!-- comment -->there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("hithere");
   });
 
   it("string literal as child #1", () => {
-    const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("hi ");
   });
 
   it("string literal as child #2", () => {
-    const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("hi ");
   });
 
   it("string literal as child #3", () => {
-    const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDefNew;
+    const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal(' "123 ""abc" ');
   });
 
   it("CData as child", () => {
-    const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDefNew;
+    const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect((cd.children![0].props! as any).value).equal("hi");
   });
 
   it("string literal then text as child", () => {
-    const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
     expect((cd.children![0].props! as any).value).equal("'hi ' there");
   });
 
   it("string literal then CData as child", () => {
-    const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect((cd.children![0].props! as any).value).equal("hi there");
   });
 
   it("string literal #2 then CData as child", () => {
-    const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDefNew;
+    const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect((cd.children![0].props! as any).value).equal("hithere");
   });
@@ -68,7 +68,7 @@ describe("Xmlui transform - child elements", () => {
   it("string literal, text, CData as child", () => {
     const cd = transformSource(
       "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
     expect((cd.children![0].props! as any).value).equal("hi thereallpeople");
   });
@@ -80,7 +80,7 @@ describe("Xmlui transform - child elements", () => {
         <Button>hi</Button>
         bello
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.children![0].props! as any).value).equal(" hello ");
     expect(cd.children![1].type).equal("Button");
@@ -95,7 +95,7 @@ describe("Xmlui transform - child elements", () => {
         This is a text segment after a Button and before an Icon 
         <Icon name='user' />
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.children![0].props! as any).value).equal(
       " This is a text segment before a Button component. ",
@@ -146,13 +146,13 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("dotted var works #1", () => {
-    const cd = transformSource("<Stack var.myVar='123'></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack var.myVar='123'></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
 
   it("var with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><var name='myVar' value='123'/></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><var name='myVar' value='123'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
@@ -163,14 +163,14 @@ describe("Xmlui transform - child elements", () => {
         <var name='myVar' value='123'/>
         <var name='other' value='234'/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
     expect(cd.vars!.other).equal("234");
   });
 
   it("var with name and text works #1", () => {
-    const cd = transformSource("<Stack><var name='myVar'>123</var></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><var name='myVar'>123</var></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
   });
@@ -181,14 +181,14 @@ describe("Xmlui transform - child elements", () => {
         <var name='myVar'>123</var>
         <var name="other">234</var>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal("123");
     expect(cd.vars!.other).equal("234");
   });
 
   it("vars with name results null", () => {
-    const cd = transformSource("<Stack><var name='myVar'/></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><var name='myVar'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).equal(null);
   });
@@ -196,7 +196,7 @@ describe("Xmlui transform - child elements", () => {
   it("var becomes array #1", () => {
     const cd = transformSource(
       "<Stack><var name='myVar' value='123'/><var name='myVar' value='234'/></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.vars!.myVar).deep.equal(["123", "234"]);
   });
@@ -239,13 +239,13 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("implicit props with attr works #1", () => {
-    const cd = transformSource("<Stack myProp='123'/>") as ComponentDefNew;
+    const cd = transformSource("<Stack myProp='123'/>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
   });
 
   it("implicit props with attr works #2", () => {
-    const cd = transformSource("<Stack myProp='123' other='234'/>") as ComponentDefNew;
+    const cd = transformSource("<Stack myProp='123' other='234'/>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
     expect((cd.props! as any).other).equal("234");
@@ -254,7 +254,7 @@ describe("Xmlui transform - child elements", () => {
   it("prop with name/value attr works #1", () => {
     const cd = transformSource(
       "<Stack><prop name='myProp' value='123'/></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
   });
@@ -265,14 +265,14 @@ describe("Xmlui transform - child elements", () => {
         <prop name='myProp' value='123'/>
         <prop name='other' value='234'/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
     expect((cd.props! as any).other).equal("234");
   });
 
   it("prop with name and text works #1", () => {
-    const cd = transformSource("<Stack><prop name='myProp'>123</prop></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><prop name='myProp'>123</prop></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     const prop = (cd.props! as any).myProp;
     expect(prop.type).equal("TextNode");
@@ -285,18 +285,18 @@ describe("Xmlui transform - child elements", () => {
         <prop name="myProp">123</prop>
         <prop name="other">234</prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    let prop = (cd.props! as any).myProp as ComponentDefNew;
+    let prop = (cd.props! as any).myProp as ComponentDef;
     expect(prop.type).equal("TextNode");
     expect((prop.props as any).value).equal("123");
-    prop = (cd.props! as any).other as ComponentDefNew;
+    prop = (cd.props! as any).other as ComponentDef;
     expect(prop.type).equal("TextNode");
     expect((prop.props as any).value).equal("234");
   });
 
   it("prop with name results null", () => {
-    const cd = transformSource("<Stack><prop name='myProp' /></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><prop name='myProp' /></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal(null);
   });
@@ -304,7 +304,7 @@ describe("Xmlui transform - child elements", () => {
   it("prop becomes array #1", () => {
     const cd = transformSource(
       "<Stack><prop name='myProp' value='123'/><prop name='myProp' value='234'/></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).deep.equal(["123", "234"]);
   });
@@ -315,7 +315,7 @@ describe("Xmlui transform - child elements", () => {
       <prop name='myProp'>
         <Button />
       </prop>
-    </Stack>`) as ComponentDefNew;
+    </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).toMatchObject({ type: "Button" });
   });
@@ -327,7 +327,7 @@ describe("Xmlui transform - child elements", () => {
         <Button />
         <Text />
       </prop>
-    </Stack>`) as ComponentDefNew;
+    </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).toMatchObject([{ type: "Button" }, { type: "Text" }]);
   });
@@ -352,7 +352,7 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("implicit events with attr works #1", () => {
-    const cd = transformSource("<Stack onClick='doIt' />") as ComponentDefNew;
+    const cd = transformSource("<Stack onClick='doIt' />") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).click).equal("doIt");
   });
@@ -387,7 +387,7 @@ describe("Xmlui transform - child elements", () => {
   it("event with name/value attr works #1", () => {
     const cd = transformSource(
       "<Stack><event name='myEvent' value='doIt'/></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).myEvent).equal("doIt");
   });
@@ -398,7 +398,7 @@ describe("Xmlui transform - child elements", () => {
         <event name="myEvent" value='doIt'/>
         <event name="other" value='move'/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).myEvent).equal("doIt");
     expect((cd.events! as any).other).equal("move");
@@ -407,7 +407,7 @@ describe("Xmlui transform - child elements", () => {
   it("event with name and text works #1", () => {
     const cd = transformSource(
       "<Stack><event name='myEvent'>doIt</event></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).myEvent).equal("doIt");
   });
@@ -418,14 +418,14 @@ describe("Xmlui transform - child elements", () => {
         <event name="myEvent">doIt</event>
         <event name="other">move</event>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).myEvent).equal("doIt");
     expect((cd.events! as any).other).equal("move");
   });
 
   it("events with name results null", () => {
-    const cd = transformSource("<Stack><event name='myEvent'/></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><event name='myEvent'/></Stack>") as ComponentDef;
     expect((cd.events! as any).myEvent).equal(null);
     expect(cd.type).equal("Stack");
   });
@@ -459,7 +459,7 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("api with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><api name='set' value='do'/></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><api name='set' value='do'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
   });
@@ -470,20 +470,20 @@ describe("Xmlui transform - child elements", () => {
         <api name="set" value='do'/>
         <api name="other" value='get'/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
     expect((cd.api! as any).other).equal("get");
   });
 
   it("api dotted attr works #1", () => {
-    const cd = transformSource("<Stack api.myApi='getCount()'></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack api.myApi='getCount()'></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).myApi).equal("getCount()");
   });
 
   it("api with name and text works #1", () => {
-    const cd = transformSource("<Stack><api name='set'>do</api></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><api name='set'>do</api></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
   });
@@ -494,14 +494,14 @@ describe("Xmlui transform - child elements", () => {
         <api name='set'>do</api>
         <api name='other'>get</api>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
     expect((cd.api! as any).other).equal("get");
   });
 
   it("api with name results null", () => {
-    const cd = transformSource("<Stack><api name='set'/></Stack>") as ComponentDefNew;
+    const cd = transformSource("<Stack><api name='set'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal(null);
   });
@@ -509,7 +509,7 @@ describe("Xmlui transform - child elements", () => {
   it("api becomes array #1", () => {
     const cd = transformSource(
       "<Stack><api name='myApi' value='123'/><api name='myApi' value='234'/></Stack>",
-    ) as ComponentDefNew;
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
   });
@@ -538,7 +538,7 @@ describe("Xmlui transform - child elements", () => {
       <Stack>
         <uses value="something, other"/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.uses).deep.equal(["something", "other"]);
   });
@@ -553,7 +553,7 @@ describe("Xmlui transform - child elements", () => {
             bello
           </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.type).equal("TextNode");
     expect((cd.props! as any).myProp.props.value).equal(" hello bello ");
@@ -569,7 +569,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({ p1: "1", p2: "2" });
   });
@@ -590,7 +590,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal([
       { p1: "1", p2: "2" },
@@ -612,7 +612,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({ p1: "1", p2: "2" });
     expect((cd.props! as any).myProp.y).deep.equal({ p1: "3", p2: "4" });
@@ -635,7 +635,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal([{ p1: "1", p2: "2" }, null, { p1: "3", p2: "4" }]);
   });
@@ -645,7 +645,7 @@ describe("Xmlui transform - child elements", () => {
       <Stack>
         <prop name="myProp" />
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal(null);
   });
@@ -664,7 +664,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
@@ -693,7 +693,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
@@ -709,10 +709,10 @@ describe("Xmlui transform - child elements", () => {
   it("direct child #1", () => {
     const cd = transformSource(`
       <Stack>Heading</Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children!.length).equal(1);
-    const textNode = cd.children![0] as ComponentDefNew;
+    const textNode = cd.children![0] as ComponentDef;
     expect(textNode.type).equal("TextNode");
     expect((textNode.props! as any).value).equal("Heading");
   });
@@ -720,10 +720,10 @@ describe("Xmlui transform - child elements", () => {
   it("direct child #2", () => {
     const cd = transformSource(`
       <Stack><Heading text="hello"/></Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children!.length).equal(1);
-    const child = cd.children![0] as ComponentDefNew;
+    const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
     expect((child.props! as any).text).equal("hello");
   });
@@ -734,10 +734,10 @@ describe("Xmlui transform - child elements", () => {
         <!--comment-->
         <Heading text="hello"/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children!.length).equal(1);
-    const child = cd.children![0] as ComponentDefNew;
+    const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
     expect((child.props! as any).text).equal("hello");
   });
@@ -749,13 +749,13 @@ describe("Xmlui transform - child elements", () => {
         <Heading text="hello"/>
         <XButton text="bello"/>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children!.length).equal(2);
-    let child = cd.children![0] as ComponentDefNew;
+    let child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
     expect((child.props! as any).text).equal("hello");
-    child = cd.children![1] as ComponentDefNew;
+    child = cd.children![1] as ComponentDef;
     expect(child.type).equal("XButton");
     expect((child.props! as any).text).equal("bello");
   });
@@ -763,12 +763,12 @@ describe("Xmlui transform - child elements", () => {
   it("direct child #5", () => {
     const cd = transformSource(`
       <Stack><Heading>Hello</Heading></Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect(cd.children!.length).equal(1);
-    const child = cd.children![0] as ComponentDefNew;
+    const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
-    const textNode = child.children![0] as ComponentDefNew;
+    const textNode = child.children![0] as ComponentDef;
     expect(textNode.type).equal("TextNode");
     expect((textNode.props! as any).value).equal("Hello");
   });
@@ -795,7 +795,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
@@ -833,7 +833,7 @@ describe("Xmlui transform - child elements", () => {
           </field>
         </prop>
       </Stack>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
@@ -849,7 +849,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component #1", () => {
     const cd = transformSource(`
       <Component name='MyComp'><Stack /><var name="myVar" value="123" /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -873,7 +873,7 @@ describe("Xmlui transform - child elements", () => {
         <Text />
         <var name="myVar" value="123" />
       </Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -899,7 +899,7 @@ describe("Xmlui transform - child elements", () => {
         <Stack />
         <Text value="hello" />
       </Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -925,7 +925,7 @@ describe("Xmlui transform - child elements", () => {
         <Text value="hello"/>
         <api name="hello" value="console.log('hello')"/>
       </Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "AttachFileContainer",
       component: {
@@ -943,7 +943,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with dotted api #1", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()"><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       api: {
@@ -958,7 +958,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with dotted api #2", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()" api.other="other()"><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       api: {
@@ -974,7 +974,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with dotted api #3", () => {
     const cd = transformSource(`
       <Component name='MyComp' api.getIt="getIt()"><api name="other" value="other()"/><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -990,7 +990,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with dotted vars #1", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123"><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -1005,7 +1005,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with dotted vars #2", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123" var.other="{false}"><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -1021,7 +1021,7 @@ describe("Xmlui transform - child elements", () => {
   it("Compound component with vars #3", () => {
     const cd = transformSource(`
       <Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>
-    `) as ComponentDefNew;
+    `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
       component: {
@@ -1061,7 +1061,7 @@ describe("Xmlui transform - child elements", () => {
       </Component>
     `;
     const cd = transformSource(source) as CompoundComponentDef;
-    const comp = cd.component as ComponentDefNew;
+    const comp = cd.component as ComponentDef;
     expect(comp.children[0].debug).toMatchObject({
       source: {
         start: source.indexOf("<Stack>") + "<Stack>".length,
@@ -1095,7 +1095,7 @@ describe("Xmlui transform - child elements", () => {
       },
     });
 
-    const fragmentComp = cd.component as ComponentDefNew;
+    const fragmentComp = cd.component as ComponentDef;
     expect(fragmentComp.debug).toMatchObject({
       source: {
         start: source.indexOf('<var name="other"'),
@@ -1104,7 +1104,7 @@ describe("Xmlui transform - child elements", () => {
       },
     });
 
-    const stackComp = fragmentComp.children[0] as ComponentDefNew;
+    const stackComp = fragmentComp.children[0] as ComponentDef;
     const beforeStack = '<var name="other" value="{false}" />';
     expect(stackComp.debug).toMatchObject({
       source: {
@@ -1117,7 +1117,7 @@ describe("Xmlui transform - child elements", () => {
 
   it("Debug info #1", () => {
     const source = `<Stack><Button/></Stack>`;
-    const cd = transformSource(source) as ComponentDefNew;
+    const cd = transformSource(source) as ComponentDef;
     expect(cd.debug).toMatchObject({
       source: {
         start: 0,
@@ -1126,7 +1126,7 @@ describe("Xmlui transform - child elements", () => {
       },
     });
 
-    const btnComp = cd.children[0] as ComponentDefNew;
+    const btnComp = cd.children[0] as ComponentDef;
     expect(btnComp.debug).toMatchObject({
       source: {
         start: source.indexOf("<Stack>") + "<Stack>".length,
@@ -1139,7 +1139,7 @@ describe("Xmlui transform - child elements", () => {
   it("Debug info #2", () => {
     const source = `<Stack><Button/></Stack>`;
     const FILE_ID = 123;
-    const cd = transformSource(source, FILE_ID) as ComponentDefNew;
+    const cd = transformSource(source, FILE_ID) as ComponentDef;
     expect(cd.debug).toMatchObject({
       source: {
         start: 0,
@@ -1148,7 +1148,7 @@ describe("Xmlui transform - child elements", () => {
       },
     });
 
-    const btnComp = cd.children[0] as ComponentDefNew;
+    const btnComp = cd.children[0] as ComponentDef;
     expect(btnComp.debug).toMatchObject({
       source: {
         start: source.indexOf("<Stack>") + "<Stack>".length,
@@ -1165,7 +1165,7 @@ describe("Xmlui transform - child elements", () => {
           <toolbar></toolbar>
         </MyTemplate>`;
 
-      const cd = transformSource(source) as ComponentDefNew;
+      const cd = transformSource(source) as ComponentDef;
       expect(cd.slots).toBeUndefined();
     });
 
@@ -1175,7 +1175,7 @@ describe("Xmlui transform - child elements", () => {
           <toolbar><Button/></toolbar>
         </MyTemplate>`;
 
-      const cd = transformSource(source) as ComponentDefNew;
+      const cd = transformSource(source) as ComponentDef;
       expect(cd.slots).toMatchObject({
         toolbar: [{ type: "Button" }],
       });
@@ -1188,7 +1188,7 @@ describe("Xmlui transform - child elements", () => {
           <toolbar>abc</toolbar>
         </MyTemplate>`;
 
-      const cd = transformSource(source) as ComponentDefNew;
+      const cd = transformSource(source) as ComponentDef;
       expect(cd.slots).toMatchObject({
         toolbar: [{ type: "TextNode", props: { value: "abc" } }],
       });
@@ -1202,7 +1202,7 @@ describe("Xmlui transform - child elements", () => {
           <body>abc</body>
         </MyTemplate>`;
 
-      const cd = transformSource(source) as ComponentDefNew;
+      const cd = transformSource(source) as ComponentDef;
       expect(cd).toMatchObject({
         children: [
           {
@@ -1224,7 +1224,7 @@ describe("Xmlui transform - child elements", () => {
           </toolbar>
         </MyTemplate>`;
 
-      const cd = transformSource(source) as ComponentDefNew;
+      const cd = transformSource(source) as ComponentDef;
       expect(cd.slots).toBeUndefined();
     });
 
@@ -1237,7 +1237,7 @@ describe("Xmlui transform - child elements", () => {
         </MyTemplate>`;
 
       try {
-        const cd = transformSource(source) as ComponentDefNew;
+        const cd = transformSource(source) as ComponentDef;
         assert.fail("Exception expected");
       } catch (err) {
         expect(err.toString().includes("T024")).equal(true);
