@@ -1,25 +1,17 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * (Document it)
- */
-export interface ToolbarButtonComponentDef
-  extends ComponentDef<"ToolbarButton"> {
+export const ToolbarButtonMd = createMetadata({
+  description: "This component is a button that is used in a toolbar.",
   props: {
-    /**
-     * @descriptionRef
-     */
-    label?: string;
-    /**
-     * @descriptionRef
-     */
-    icon?: string;
-  };
-  events: {
-    click: (event: any) => void;
-  }
-}
+    label: d("The label to display on the button."),
+    icon: d("The icon to display on the button."),
+  },
+  defaultThemeVars: {
+    "padding-horizontal-ToolbarButton": "$space-1",
+    "padding-vertical-ToolbarButton": "$space-1",
+  },
+});
 
 export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {
@@ -44,10 +36,5 @@ export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
       ],
     },
   },
-  hints: {
-    defaultThemeVars: {
-        "padding-horizontal-ToolbarButton": "$space-1",
-        "padding-vertical-ToolbarButton": "$space-1",
-    }
-  }
+  hints: ToolbarButtonMd,
 };

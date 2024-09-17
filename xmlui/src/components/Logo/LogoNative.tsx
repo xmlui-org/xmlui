@@ -1,6 +1,6 @@
 import { NavLink } from "@components/NavLink/NavLinkNative";
 import { Image } from "@components/Image/ImageNative";
-import { useLogoUrl } from "@components/AppHeader/AppHeader";
+import { useLogoUrl } from "@components/AppHeader/AppHeaderNative";
 import type { CSSProperties } from "react";
 
 export const Logo = ({

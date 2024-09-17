@@ -4,7 +4,7 @@ import classnames from "@components-core/utils/classnames";
 import { Logo } from "@components/Logo/LogoNative";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { getAppLayoutOrientation } from "@components/App/App";
+import { getAppLayoutOrientation } from "@components/App/AppNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 interface INavPanelContext {
