@@ -44,6 +44,7 @@ export const FormMd = createMetadata({
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`subject\` value to save.`,
     ),
+    cancel: d(`The form infrastructure fires this event when the form is canceled.`),
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
   contextVars: {
@@ -96,7 +97,7 @@ export const formComponentRenderer = createComponentRenderer(
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler}
+        lookupEventHandler={lookupEventHandler as any}
         layoutCss={layoutCss}
         registerComponentApi={registerComponentApi}
       />

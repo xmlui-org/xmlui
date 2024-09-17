@@ -25,7 +25,7 @@ import { Text } from "@components/Text/TextNative";
 import { Spinner } from "@components/Spinner/SopinnerNative";
 import { usePrevious, useResizeObserver } from "@components-core/utils/hooks";
 import { MemoizedItem } from "@components/container-helpers";
-import { ComponentDefNew } from "@abstractions/ComponentDefs";
+import { ComponentDef } from "@abstractions/ComponentDefs";
 import { RenderChildFn } from "@abstractions/RendererDefs";
 
 interface IExpandableListContext {
@@ -544,7 +544,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
 });
 
 // --- Helper function for List item rendering
-export function MemoizedSection({ node, renderChild, item }: { node: ComponentDefNew; item: any; renderChild: RenderChildFn }) {
+export function MemoizedSection({ node, renderChild, item }: { node: ComponentDef; item: any; renderChild: RenderChildFn }) {
     const { isExpanded, toggleExpanded } = useContext(ListContext);
     const id = item.id;
     const expanded = isExpanded(id);

@@ -9,7 +9,7 @@ import classnames from "@components-core/utils/classnames";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { usePopper } from "react-popper";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
 import { Adornment } from "@components/Input/InputAdornment";
 import { filterOptions } from "../component-utils";

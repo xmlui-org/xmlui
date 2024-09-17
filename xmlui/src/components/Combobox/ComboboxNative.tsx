@@ -6,7 +6,7 @@ import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import styles from "@components/Combobox/Combobox.module.scss";
 import classnames from "@components-core/utils/classnames";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
 import { useTheme } from "@components-core/theming/ThemeContext";

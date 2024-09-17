@@ -1,5 +1,5 @@
 import { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
-import { validationStatusNames } from "./Input/input-abstractions";
+import { validationStatusNames } from "./abstractions";
 
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {

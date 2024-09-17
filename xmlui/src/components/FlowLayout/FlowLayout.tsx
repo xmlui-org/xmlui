@@ -49,12 +49,12 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
               return renderedChild;
             }
             // Handle SpaceFiller as a * width item
-            const width = node.type === "SpaceFiller" ? "*" : extractValue(node.props?.width);
+            const width = node.type === "SpaceFiller" ? "*" : extractValue((node.props as any)?.width);
             return (
               <FlowItemWrapper
                 width={width}
-                minWidth={extractValue(node.props?.minWidth)}
-                maxWidth={extractValue(node.props?.maxWidth)}
+                minWidth={extractValue((node.props as any)?.minWidth)}
+                maxWidth={extractValue((node.props as any)?.maxWidth)}
               >
                 {renderedChild}
               </FlowItemWrapper>

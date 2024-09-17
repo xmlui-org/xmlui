@@ -1,8 +1,12 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { LookupEventHandlerFn, RegisterComponentApiFn, RendererContext } from "@abstractions/RendererDefs";
+import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
+import type {
+  LookupEventHandlerFn,
+  RegisterComponentApiFn,
+  RendererContext,
+} from "@abstractions/RendererDefs";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
@@ -30,8 +34,12 @@ type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
   onUnmount: (uid: symbol) => void;
 };
 
-function useEventHandler(eventName: string, lookupEvent: LookupEventHandlerFn, shouldSkip: boolean) {
-  const onEvent = shouldSkip ? undefined : lookupEvent(eventName);
+function useEventHandler<TMd extends ComponentMetadata>(
+  eventName: string,
+  lookupEvent: LookupEventHandlerFn<TMd>,
+  shouldSkip: boolean,
+) {
+  const onEvent = shouldSkip ? undefined : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
   const eventHandler: EventHandler<any> = useCallback(
     (event) => {
       if (onEvent) {
@@ -175,7 +183,8 @@ const Component = forwardRef(function Component(
   );
 
   // --- Obtain the component renderer and descriptor from the component registry
-  const { renderer, descriptor, isCompoundComponent } = componentRegistry.lookupComponentRenderer(safeNode.type) || {};
+  const { renderer, descriptor, isCompoundComponent } =
+    componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
@@ -192,13 +201,14 @@ const Component = forwardRef(function Component(
     let didResolve = false;
     if (Array.isArray(safeNode.children)) {
       safeNode.children.forEach((child) => {
+        const childName = (child.props as any)?.name;
         if (child.type === "Slot") {
           didResolve = true;
-          if (dynamicChildren && child.props?.name === undefined) {
+          if (dynamicChildren && childName === undefined) {
             children.push(...dynamicChildren);
           }
-          if(child.props?.name){
-            children.push(...(dynamicSlots?.[child.props?.name] || child.children || []));
+          if (childName) {
+            children.push(...(dynamicSlots?.[childName] || child.children || []));
           }
         } else {
           children.push(child);
@@ -217,13 +227,19 @@ const Component = forwardRef(function Component(
     return safeNode;
   }, [safeNode, dynamicChildren, dynamicSlots]);
 
-  const apiBoundProps = useMemo(() => getApiBoundItems(safeNode.props, "Datasource"), [safeNode.props]);
+  const apiBoundProps = useMemo(
+    () => getApiBoundItems(safeNode.props, "Datasource"),
+    [safeNode.props],
+  );
   const apiBoundEvents = useMemo(
     () => getApiBoundItems(safeNode.events, "ApiAction", "DownloadAction", "UploadAction"),
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
-  const mouseEventHandlers = useMouseEventHandlers(memoedLookupEventHandler, descriptor?.nonVisual || isApiBound);
+  const mouseEventHandlers = useMouseEventHandlers(
+    memoedLookupEventHandler,
+    descriptor?.nonVisual || isApiBound,
+  );
 
   // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
   // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
@@ -267,7 +283,9 @@ const Component = forwardRef(function Component(
     };
 
     if (!renderer) {
-      console.error(`Component '${safeNode.type}' is not available. Did you forget to register it?`);
+      console.error(
+        `Component '${safeNode.type}' is not available. Did you forget to register it?`,
+      );
       return <UnknownComponent message={`${safeNode.type}`} />;
     }
 
@@ -302,7 +320,10 @@ const Component = forwardRef(function Component(
           {cloneElement(
             renderedNode as ReactElement,
             {
-              ...mergeProps({ ...(renderedNode as ReactElement).props, ...mouseEventHandlers }, rest),
+              ...mergeProps(
+                { ...(renderedNode as ReactElement).props, ...mouseEventHandlers },
+                rest,
+              ),
             } as any,
           )}
         </ComponentDecorator>

@@ -97,7 +97,7 @@ export const CompoundComponent = forwardRef(
         scriptError: scriptError,
         containerUid: uid,
         props: {
-          debug: compound.props?.debug,
+          debug: (compound.props as any)?.debug,
         },
         children: [rest],
       };

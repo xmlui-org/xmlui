@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { asyncWait } from "@components-core/utils/misc";
@@ -58,7 +58,7 @@ export const MockLoaderMd = createMetadata({
   },
 });
 
-type MockLoaderDef = ComponentDefNew<typeof MockLoaderMd>;
+type MockLoaderDef = ComponentDef<typeof MockLoaderMd>;
 
 export const mockLoaderRenderer = createLoaderRenderer(
   "MockLoader",

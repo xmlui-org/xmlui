@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import type { ApiActionOptions, ApiOperationDef } from "@components-core/RestApiProxy";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
-import type { ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import type { ActionExecutionContext, LookupAsyncFnInner } from "@abstractions/ActionDefs";
 
@@ -233,7 +233,7 @@ type ApiAction = {
   uid?: string;
 } & ApiOperationDef;
 
-export interface ApiActionComponent extends ComponentDefNew {
+export interface ApiActionComponent extends ComponentDef {
   props: {
     payloadType?: string;
     invalidates?: string | string[];

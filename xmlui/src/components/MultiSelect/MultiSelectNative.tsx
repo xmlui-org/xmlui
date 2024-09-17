@@ -6,7 +6,7 @@ import { EMPTY_ARRAY, noop } from "@components-core/constants";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import styles from "./MultiSelect.module.scss";
 import classnames from "@components-core/utils/classnames";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";

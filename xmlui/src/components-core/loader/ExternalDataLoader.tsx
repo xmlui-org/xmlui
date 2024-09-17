@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import { ComponentDefNew, createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { removeNullProperties } from "@components-core/utils/misc";
@@ -89,7 +89,7 @@ export const ExternalDataLoaderMd = createMetadata({
   },
 });
 
-type ExternalDataLoaderDef = ComponentDefNew<typeof ExternalDataLoaderMd>;
+type ExternalDataLoaderDef = ComponentDef<typeof ExternalDataLoaderMd>;
 
 export const externalDataLoaderRenderer = createLoaderRenderer(
   "ExternalDataLoader",
