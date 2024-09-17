@@ -109,7 +109,7 @@ export const accordionComponentRenderer = createComponentRenderer(
               )
             : undefined
         }
-        triggerPosition={node.props.triggerPosition}
+        triggerPosition={extractValue.asOptionalString(node.props?.triggerPosition)}
         collapsedIcon={node.props.collapsedIcon}
         expandedIcon={node.props.expandedIcon}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}

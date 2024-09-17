@@ -7,8 +7,6 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$height: t.$space-12;
-
 .root {
   border-radius: 6px;
   width: 100%;
@@ -56,6 +54,10 @@ $height: t.$space-12;
 
   &:hover {
     background-color: var(--mauve-2);
+  }
+
+  &.triggerStart {
+    flex-direction: row-reverse;
   }
 }
 
