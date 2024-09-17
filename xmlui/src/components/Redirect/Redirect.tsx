@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Navigate } from "@remix-run/react";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { To } from "react-router";
@@ -16,7 +16,7 @@ export const RedirectMd = createMetadata({
   },
 });
 
-export const redirectRenderer = createComponentRendererNew(
+export const redirectRenderer = createComponentRenderer(
   COMP,
   RedirectMd,
   ({ node, extractValue }) => {

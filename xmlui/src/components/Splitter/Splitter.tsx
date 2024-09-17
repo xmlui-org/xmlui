@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import React from "react";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
@@ -118,7 +118,7 @@ function renderSplitter({
   );
 }
 
-export const splitterComponentRenderer = createComponentRendererNew(
+export const splitterComponentRenderer = createComponentRenderer(
   COMP,
   SplitterMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -133,7 +133,7 @@ export const splitterComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const vSplitterComponentRenderer = createComponentRendererNew(
+export const vSplitterComponentRenderer = createComponentRenderer(
   "VSplitter",
   VSplitterMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -149,7 +149,7 @@ export const vSplitterComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const hSplitterComponentRenderer = createComponentRendererNew(
+export const hSplitterComponentRenderer = createComponentRenderer(
   "HSplitter",
   HSplitterMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {

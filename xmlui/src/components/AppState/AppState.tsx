@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { AppState } from "./AppStateNative";
 
 const COMP = "AppState";
@@ -25,7 +25,7 @@ export const AppStateMd = createMetadata({
   nonVisual: true,
 });
 
-export const appStateComponentRenderer = createComponentRendererNew(
+export const appStateComponentRenderer = createComponentRenderer(
   COMP,
   AppStateMd,
   ({ node, extractValue, updateState, registerComponentApi }) => {

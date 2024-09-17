@@ -1,4 +1,3 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
 import { TextBoxMd } from "@components/TextBox/TextBox";
@@ -68,7 +67,7 @@ import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
 
-export const metadataHash: Record<string, ComponentMetadata | ComponentDescriptor<any>> = {
+export const metadataHash: Record<string, ComponentMetadata> = {
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,

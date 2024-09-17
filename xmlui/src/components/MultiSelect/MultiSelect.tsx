@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./MultiSelect.module.scss";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -91,7 +91,7 @@ export const MultiSelectMd = createMetadata({
   },
 });
 
-export const multiSelectComponentRenderer = createComponentRendererNew(
+export const multiSelectComponentRenderer = createComponentRenderer(
   COMP,
   MultiSelectMd,
   ({ node, state, updateState, extractValue, renderChild, lookupEventHandler }) => {

@@ -1,6 +1,6 @@
 import { Icon } from "@components/Icon/IconNative";
 import styles from "./FileInput.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
@@ -89,7 +89,7 @@ export const FileInputMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const fileInputRenderer = createComponentRendererNew(
+export const fileInputRenderer = createComponentRenderer(
   COMP,
   FileInputMd,
   ({ node, state, updateState, extractValue, lookupEventHandler, registerComponentApi }) => {

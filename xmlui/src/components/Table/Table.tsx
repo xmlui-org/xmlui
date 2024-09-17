@@ -1,7 +1,7 @@
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Table } from "./TableNative";
 import { dAutoFocus, dComponent } from "@components/metadata-helpers";
@@ -120,7 +120,7 @@ export const TableMd = createMetadata({
   },
 });
 
-export const tableComponentRenderer = createComponentRendererNew(
+export const tableComponentRenderer = createComponentRenderer(
   COMP,
   TableMd,
   ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss }) => {

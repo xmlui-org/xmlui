@@ -1,5 +1,5 @@
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./Markdown.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
@@ -28,7 +28,7 @@ export const MarkdownMd = createMetadata({
   },
 });
 
-export const markdownComponentRenderer = createComponentRendererNew(
+export const markdownComponentRenderer = createComponentRenderer(
   COMP,
   MarkdownMd,
   ({ node, renderChild }) => {

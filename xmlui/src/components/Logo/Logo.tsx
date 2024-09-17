@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata } from "@abstractions/ComponentDefs";
 import { Logo } from "./LogoNative";
 
@@ -10,7 +10,7 @@ export const LogoMd = createMetadata({
     `this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).`,
 });
 
-export const logoComponentRenderer = createComponentRendererNew(
+export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
   ({ node, layoutCss, extractValue }) => {

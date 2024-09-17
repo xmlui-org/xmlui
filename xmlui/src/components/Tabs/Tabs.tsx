@@ -4,7 +4,7 @@ import styles from "./Tabs.module.scss";
 import { MemoizedItem } from "@components/container-helpers";
 import { dComponent } from "@components/metadata-helpers";
 import { Tabs } from "./TabsNative";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 
 const COMP = "Tabs";
 
@@ -39,7 +39,7 @@ export const TabsMd = createMetadata({
   },
 });
 
-export const tabsComponentRenderer = createComponentRendererNew(
+export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
   ({ extractValue, node, renderChild, layoutCss }) => {

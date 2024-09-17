@@ -1,6 +1,6 @@
 import styles from "./Link.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { LocalLink } from "./LinkNative";
 import { dEnabled, dLabel } from "@components/metadata-helpers";
@@ -54,7 +54,7 @@ export const LinkMd = createMetadata({
 /**
  * This function define the renderer for the Limk component.
  */
-export const localLinkComponentRenderer = createComponentRendererNew(
+export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
   ({ node, extractValue, lookupEventHandler, renderChild, layoutCss }) => {

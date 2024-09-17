@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./Image.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Image } from "./ImageNative";
@@ -30,7 +30,7 @@ export const ImageMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const imageComponentRenderer = createComponentRendererNew(
+export const imageComponentRenderer = createComponentRenderer(
   COMP,
   ImageMd,
   ({ node, extractValue, layoutCss, extractResourceUrl }) => {

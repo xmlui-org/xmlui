@@ -1,6 +1,6 @@
 import styles from "./NavPanel.module.scss";
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject } from "@components-core/theming/themes/base-utils";
 import { DrawerNavPanel, NavPanel } from "./NavPanelNative";
@@ -33,7 +33,7 @@ export const NavPanelMd = createMetadata({
   },
 });
 
-export const navPanelRenderer = createComponentRendererNew(
+export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {

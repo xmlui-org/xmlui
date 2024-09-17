@@ -2,7 +2,6 @@ import { isEmpty } from "lodash-es";
 
 import type { CSSProperties } from "react";
 import type { StyleNode, ThemeIdDescriptor } from "./source-tree";
-import type { LayoutProps } from "@abstractions/ComponentDescriptorDefs";
 import type { LayoutContext, NonCssLayoutProps } from "@abstractions/RendererDefs";
 
 import { EMPTY_OBJECT } from "@components-core/constants";
@@ -228,7 +227,7 @@ export function compileLayout(
     propName: string,
     layoutProps: LayoutProps | undefined,
     parseFn: (parser: StyleParser) => T | null,
-    convertFn: (node: T) => string | undefined
+    convertFn: (node: T) => string | undefined,
   ): string | undefined {
     const defValue = compileSingleProperty();
     if (layoutContext?.mediaSize?.sizeIndex !== undefined) {
@@ -265,8 +264,7 @@ export function compileLayout(
     return defValue;
 
     function compileSingleProperty(sizeSpec?: MediaBreakpointType): string | undefined {
-      const source =
-        layoutProps?.[propName + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
+      const source = layoutProps?.[propName + (sizeSpec ? `-${sizeSpec}` : "")]?.toString();
       if (!source) return undefined;
       const parser = new StyleParser(source);
       try {
@@ -488,7 +486,8 @@ export function compileLayout(
         return false;
       }
       if (themeId.defaultValue) {
-        const hasStringDefaultValue = themeId.defaultValue.find((value) => typeof value === "string") !== undefined;
+        const hasStringDefaultValue =
+          themeId.defaultValue.find((value) => typeof value === "string") !== undefined;
         if (hasStringDefaultValue) {
           return false;
         }
@@ -685,4 +684,91 @@ type SizeResult = {
   ratio?: number;
   value?: string;
   isStarSize: boolean;
+};
+
+// The properties constituting a component's layout
+export type LayoutProps = {
+  // --- Context-dependent/non-CSS props
+  horizontalAlignment?: string;
+  verticalAlignment?: string;
+  orientation?: string;
+
+  // --- Dimensions
+  width?: number | string;
+  minWidth?: number | string;
+  maxWidth?: number | string;
+  height?: number | string;
+  minHeight?: number | string;
+  maxHeight?: number | string;
+  gap?: string;
+
+  // --- Positions
+  top?: number | string;
+  right?: number | string;
+  bottom?: number | string;
+  left?: number | string;
+
+  // --- Border
+  border?: string;
+  borderTop?: string;
+  borderRight?: string;
+  borderBottom?: string;
+  borderLeft?: string;
+
+  // --- Border radius
+  radius?: number | string;
+  radiusTopLeft?: number | string;
+  radiusTopRight?: number | string;
+  radiusBottomLeft?: number | string;
+  radiusBottomRight?: number | string;
+
+  // --- Padding
+  padding?: number | string;
+  horizontalPadding?: number | string;
+  verticalPadding?: number | string;
+  paddingTop?: number | string;
+  paddingRight?: number | string;
+  paddingBottom?: number | string;
+  paddingLeft?: number | string;
+
+  // --- Margin
+  margin?: number | string;
+  horizontalMargin?: number | string;
+  verticalMargin?: number | string;
+  marginTop?: number | string;
+  marginRight?: number | string;
+  marginBottom?: number | string;
+  marginLeft?: number | string;
+
+  // --- Other
+  backgroundColor?: string;
+  background?: string;
+  shadow?: string;
+  direction?: string;
+  horizontalOverflow?: string;
+  verticalOverflow?: string;
+  zIndex?: number | string;
+  opacity?: string | number;
+
+  // --- Typography
+  color?: string;
+  fontFamily?: string;
+  fontSize?: number | string;
+  fontWeight?: number | string;
+  italic?: boolean | string;
+  textDecoration?: string;
+  userSelect?: string;
+  letterSpacing?: string;
+  textTransform?: string;
+  lineHeight?: string;
+  textAlign?: string;
+  textWrap?: string;
+  textAlignLast?: string;
+
+  // --- Content rendering
+  wrapContent?: boolean | string;
+  canShrink?: boolean | string;
+
+  // --- Other
+  cursor?: string;
 };

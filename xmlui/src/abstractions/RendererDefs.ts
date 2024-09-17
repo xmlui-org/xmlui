@@ -1,8 +1,12 @@
-import type { Component, CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { AppContextObject } from "./AppContextDefs";
-import type { ComponentDef, ComponentMetadata, CompoundComponentDef, DynamicChildComponentDef } from "./ComponentDefs";
+import type {
+  ComponentDef,
+  ComponentMetadata,
+  CompoundComponentDef,
+  DynamicChildComponentDef,
+} from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
-import type { ComponentDescriptor } from "./ComponentDescriptorDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
 import type { AsyncFunction } from "./FunctionDefs";
 
@@ -132,7 +136,7 @@ export type ValueExtractor = {
  */
 export type LookupEventHandlerFn<T extends ComponentDef = ComponentDef> = (
   eventName: keyof NonNullable<T["events"]>,
-  actionOptions?: LookupActionOptions
+  actionOptions?: LookupActionOptions,
 ) => AsyncFunction | undefined;
 
 /**
@@ -142,10 +146,15 @@ export type RegisterComponentApiFn = (apiFn: Record<string, (...args: any[]) => 
 
 // Function signature to render a particular child component (or set of child components)
 export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
-  children?: ComponentDef | ComponentDef[] | DynamicChildComponentDef | DynamicChildComponentDef[] | string,
+  children?:
+    | ComponentDef
+    | ComponentDef[]
+    | DynamicChildComponentDef
+    | DynamicChildComponentDef[]
+    | string,
   layoutContext?: LayoutContext<L>,
   childrenToRender?: DynamicChildComponentDef[],
-  dynamicSlotsToRender?: Record<string, DynamicChildComponentDef[]>
+  dynamicSlotsToRender?: Record<string, DynamicChildComponentDef[]>,
 ) => ReactNode | ReactNode[];
 
 /**
@@ -168,7 +177,11 @@ export type LayoutContext<T extends ComponentDef = ComponentDef> = {
    * @param metadata The metadata of the child component
    * @returns The wrapped React node
    */
-  wrapChild?: (context: RendererContext<T>, renderedChild: ReactNode, metadata?: ComponentDescriptor<T>) => ReactNode;
+  wrapChild?: (
+    context: RendererContext<T>,
+    renderedChild: ReactNode,
+    metadata?: ComponentMetadata,
+  ) => ReactNode;
 
   /**
    * Arbitrary props extending the layout context
@@ -185,7 +198,9 @@ export type NonCssLayoutProps = {
 /**
  * This function renders a component definition into a React component
  */
-export type ComponentRendererFn<T extends ComponentDef> = (context: RendererContext<T>) => ReactNode;
+export type ComponentRendererFn<T extends ComponentDef> = (
+  context: RendererContext<T>,
+) => ReactNode;
 
 /**
  * This function renders a component definition into a React component
@@ -213,7 +228,7 @@ export type ComponentRendererDef = {
   /**
    * The metadata to use when rendering the component
    */
-  metadata?: ComponentDescriptor<any>;
+  metadata?: ComponentMetadata;
 };
 
 // --- Rendering components (turning component definitions into their React node representation) is a

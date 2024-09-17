@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { RealTimeAdapter } from "./RealTimeAdapterNative";
 
 const COMP = "RealTimeAdapter";
@@ -14,7 +14,7 @@ export const RealTimeAdapterMd = createMetadata({
   },
 });
 
-export const realTimeAdapterComponentRenderer = createComponentRendererNew(
+export const realTimeAdapterComponentRenderer = createComponentRenderer(
   COMP,
   RealTimeAdapterMd,
   ({ node, lookupEventHandler, extractValue }) => {

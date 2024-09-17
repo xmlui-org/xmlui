@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import styles from "./Heading.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -216,7 +216,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
   );
 }
 
-export const headingComponentRenderer = createComponentRendererNew(
+export const headingComponentRenderer = createComponentRenderer(
   COMP,
   HeadingMd,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -231,7 +231,7 @@ export const headingComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h1ComponentRenderer = createComponentRendererNew(
+export const h1ComponentRenderer = createComponentRenderer(
   H1,
   H1Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -246,7 +246,7 @@ export const h1ComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h2ComponentRenderer = createComponentRendererNew(
+export const h2ComponentRenderer = createComponentRenderer(
   H2,
   H2Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -261,7 +261,7 @@ export const h2ComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h3ComponentRenderer = createComponentRendererNew(
+export const h3ComponentRenderer = createComponentRenderer(
   H3,
   H3Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -276,7 +276,7 @@ export const h3ComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h4ComponentRenderer = createComponentRendererNew(
+export const h4ComponentRenderer = createComponentRenderer(
   H4,
   H4Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -291,7 +291,7 @@ export const h4ComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h5ComponentRenderer = createComponentRendererNew(
+export const h5ComponentRenderer = createComponentRenderer(
   H5,
   H5Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {
@@ -306,7 +306,7 @@ export const h5ComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const h6ComponentRenderer = createComponentRendererNew(
+export const h6ComponentRenderer = createComponentRenderer(
   H6,
   H6Md,
   ({ node, extractValue, layoutCss, layoutNonCss, renderChild }) => {

@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import type { ContainerDispatcher } from "./ComponentRenderer";
 import type { ContainerState } from "../container/ContainerComponentDef";
 import type { LookupAsyncFn } from "@abstractions/ActionDefs";
@@ -20,7 +19,7 @@ export interface LoaderRendererDef {
   renderer: LoaderRenderer<any>;
 
   // Loader descriptor
-  hints?: ComponentDescriptor<any>;
+  hints?: ComponentMetadata;
 }
 
 export type LoaderInProgressChangedFn = (isInProgress: boolean) => void;

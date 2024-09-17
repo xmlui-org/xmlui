@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./Icon.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import Icon from "./IconNative";
@@ -28,7 +28,7 @@ export const IconMd = createMetadata({
   },
 });
 
-export const iconComponentRenderer = createComponentRendererNew(
+export const iconComponentRenderer = createComponentRenderer(
   COMP,
   IconMd,
   ({ node, extractValue, layoutCss }) => {

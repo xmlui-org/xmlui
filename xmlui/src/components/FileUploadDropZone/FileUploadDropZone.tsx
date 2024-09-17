@@ -1,6 +1,6 @@
 import styles from "./FileUploadDropZone.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { FileUploadDropZone } from "./FileUploadDropZoneNative";
 
@@ -49,7 +49,7 @@ export const FileUploadDropZoneMd = createMetadata({
   },
 });
 
-export const fileUploadDropZoneComponentRenderer = createComponentRendererNew(
+export const fileUploadDropZoneComponentRenderer = createComponentRenderer(
   COMP,
   FileUploadDropZoneMd,
   ({ node, extractValue, renderChild, lookupEventHandler, registerComponentApi, layoutCss }) => {

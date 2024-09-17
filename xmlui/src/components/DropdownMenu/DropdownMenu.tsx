@@ -3,7 +3,7 @@ import styles from "./DropdownMenu.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { iconPositionNames } from "@components/abstractions";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Icon } from "@components/Icon/IconNative";
 import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
@@ -51,7 +51,7 @@ export const DropdownMenuMd = createMetadata({
   },
 });
 
-export const dropdownMenuComponentRenderer = createComponentRendererNew(
+export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, layoutCss, lookupEventHandler }) => {
@@ -113,7 +113,7 @@ export const MenuItemMd = createMetadata({
   },
 });
 
-export const menuItemRenderer = createComponentRendererNew(
+export const menuItemRenderer = createComponentRenderer(
   MICOMP,
   MenuItemMd,
   ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, layoutCss }) => {
@@ -152,7 +152,7 @@ export const SubMenuItemMd = createMetadata({
   },
 });
 
-export const subMenuItemRenderer = createComponentRendererNew(
+export const subMenuItemRenderer = createComponentRenderer(
   SMCOMP,
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
@@ -182,6 +182,6 @@ export const MenuSeparatorMd = createMetadata({
   },
 });
 
-export const menuSeparatorRenderer = createComponentRendererNew(MSEP, MenuSeparatorMd, () => {
+export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
   return <MenuSeparator />;
 });
