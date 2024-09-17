@@ -9,7 +9,7 @@ import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs"
 import { Icon } from "@components/Icon/IconNative";
 import { createComponentRenderer } from "@components-core/renderers";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { Logo } from "@components/Logo/Logo";
+import { Logo } from "@components/Logo/LogoNative";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { Button } from "@components/Button/ButtonNative";
 import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext";

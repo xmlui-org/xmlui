@@ -67,10 +67,10 @@ import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
-import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
 import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "@components-core/Fragment";
 import { SlotMd } from "@components-core/Slot";
+import { TreeMd } from "./Tree/TreeComponent";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -111,8 +111,8 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,
-  // List: ListMd,
-  // Logo: LogoMd,
+  List: ListMd,
+  Logo: LogoMd,
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
@@ -163,4 +163,5 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TextBox: TextBoxMd,
   PasswordInput: TextBoxMd,
   Theme: ThemeMd,
+  Tree: TreeMd,
 };

@@ -1,4 +1,4 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRendererNew } from "@components-core/renderers";
 import styles from "./Image.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -6,24 +6,6 @@ import { Image } from "./ImageNative";
 import { dClick } from "@components/metadata-helpers";
 
 const COMP = "Image";
-
-/**
- * The \`Image\` component represents or depicts an object, scene, idea, or other concept with a picture.
- */
-export interface ImageComponentDef extends ComponentDef<"Image"> {
-  props: {
-    /**
-     * This property sets a preferred aspect ratio for the image,
-     * which will be used in the calculation of auto sizes and some other layout functions.
-     * @descriptionRef
-     */
-    aspectRatio?: string;
-  };
-  events: {
-    /** @descriptionRef */
-    click?: string;
-  };
-}
 
 export const ImageMd = createMetadata({
   description:

@@ -1,6 +1,6 @@
 import styles from "./Spinner.module.scss";
 import { createComponentRendererNew } from "@components-core/renderers";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { ComponentThemeColor } from "@components/abstractions";
 import { Spinner } from "./SopinnerNative";
