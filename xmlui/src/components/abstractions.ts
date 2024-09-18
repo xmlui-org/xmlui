@@ -27,6 +27,38 @@ export type Option = {
   renderer?: (item: any) => ReactNode;
 };
 
+export type Accordion = {
+  /**
+   * The header of the accordion.
+   */
+  header: string;
+
+  /**
+   * The icon to show when the accordion is collapsed.
+   */
+  collapsedIcon?: string;
+
+  /**
+   * The icon to show when the accordion is expanded.
+   */
+  expandedIcon?: string;
+
+  /**
+   * Indicates if the icon should be hidden.
+   */
+  hideIcon?: boolean;
+
+  /**
+   * The position where the trigger icon should be displayed.
+   */
+  triggerPosition?: "start" | "end";
+
+  /**
+   * The content of the accordion.
+   */
+  content: ReactNode;
+};
+
 export type Tab = {
   /**
    * The label of the tab.
