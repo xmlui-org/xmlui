@@ -23,9 +23,9 @@ All samples use table columns with the following definition unless noted otherwi
 
 ```ueml copy
 <Table data='{[...]}'>
-  <TableColumnDef bindTo="name"/>
-  <TableColumnDef bindTo="quantity"/>
-  <TableColumnDef bindTo="unit"/>
+  <Column bindTo="name"/>
+  <Column bindTo="quantity"/>
+  <Column bindTo="unit"/>
 </Table>
 ```
 
@@ -58,9 +58,9 @@ If this boolean prop is set to true, the `Table` will be focused when appearing 
   height={300}
   app={`
     <Table data='{${JSON.stringify(data)}}' autoFocus="true">
-      <TableColumnDef bindTo="name"/>
-      <TableColumnDef bindTo="quantity"/>
-      <TableColumnDef bindTo="unit"/>
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+      <Column bindTo="unit"/>
     </Table>
   `}
 />
@@ -82,9 +82,9 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}'>
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -115,9 +115,9 @@ By default, the value of this property is `true`.
   app={`
   <SelectionStore id="tableData">
     <Table data='{${JSON.stringify(data)}}' rowsSelectable="true" enableMultiRowSelection="false">
-      <TableColumnDef bindTo="name"/>
-      <TableColumnDef bindTo="quantity"/>
-      <TableColumnDef bindTo="unit"/>
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+      <Column bindTo="unit"/>
     </Table>
   </SelectionStore>`
   }
@@ -140,9 +140,9 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
   height={320}
   app={`
   <Table data='{${JSON.stringify(data)}}' headerHeight="60px">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -164,9 +164,9 @@ The default value is `false`.
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' hideHeader="true">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -188,9 +188,9 @@ and sorting is not done according to the column.
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconNoSort="close">
-    <TableColumnDef bindTo="name" canSort="true" />
-    <TableColumnDef bindTo="quantity" canSort="true" />
-    <TableColumnDef bindTo="unit" canSort="true" />
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
   </Table>`
   }
 />
@@ -212,9 +212,9 @@ sorting is done according to the column, and the column is sorted in ascending o
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconSortAsc="chevronup">
-    <TableColumnDef bindTo="name" canSort="true" />
-    <TableColumnDef bindTo="quantity" canSort="true" />
-    <TableColumnDef bindTo="unit" canSort="true" />
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
   </Table>`
   }
 />
@@ -238,9 +238,9 @@ Select a column header and set it to descending ordering.
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconSortDesc="chevrondown">
-    <TableColumnDef bindTo="name" canSort="true" />
-    <TableColumnDef bindTo="quantity" canSort="true" />
-    <TableColumnDef bindTo="unit" canSort="true" />
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
   </Table>`
   }
 />
@@ -261,9 +261,9 @@ This property adds pagination controls to the `Table`.
   height={240}
   app={`
   <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -341,9 +341,9 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -358,9 +358,9 @@ The following example disables all table rows where the item's quantity exceeds 
 ```ueml copy {2}
 <Table data='{[...]}' rowDisabledPredicate="true">
   rowDisabledPredicate="{(item) => item.quantity > 6}">
-  <TableColumnDef bindTo="name"/>
-  <TableColumnDef bindTo="quantity"/>
-  <TableColumnDef bindTo="unit"/>
+  <Column bindTo="name"/>
+  <Column bindTo="quantity"/>
+  <Column bindTo="unit"/>
 </Table>
 ```
 
@@ -373,9 +373,9 @@ The following example disables all table rows where the item's quantity exceeds 
   app={`
     <Table data='{${JSON.stringify(data)}}' 
       rowDisabledPredicate="{(item) => item.quantity > 6}">
-      <TableColumnDef bindTo="name"/>
-      <TableColumnDef bindTo="quantity"/>
-      <TableColumnDef bindTo="unit"/>
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+      <Column bindTo="unit"/>
     </Table>
   `}
 />
@@ -403,9 +403,9 @@ The default value is `false`.
   app={`
   <SelectionStore id="tableData">
     <Table data='{${JSON.stringify(data)}}' rowsSelectable="true">
-      <TableColumnDef bindTo="name"/>
-      <TableColumnDef bindTo="quantity"/>
-      <TableColumnDef bindTo="unit"/>
+      <Column bindTo="name"/>
+      <Column bindTo="quantity"/>
+      <Column bindTo="unit"/>
     </Table>
   </SelectionStore>`
   }
@@ -427,9 +427,9 @@ This property is used to determine which data attributes to sort by.
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' sortBy="quantity">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -451,9 +451,9 @@ This property only works if the [`sortBy`](#sortby) property is also set.
   height={300}
   app={`
   <Table data='{${JSON.stringify(data)}}' sortBy="quantity" sortDirection="descending">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />
@@ -477,9 +477,9 @@ Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColum
   <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="0.5rem" />
   <Table data='{[...]}'
     onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-    <TableColumnDef bindTo="name" canSort="true"/>
-    <TableColumnDef bindTo="quantity" canSort="true"/>
-    <TableColumnDef bindTo="unit" canSort="true"/>
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
   </Table>
 </Stack>
 ```
@@ -495,9 +495,9 @@ Click on any of the column headers to trigger a new sorting:
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
       <Table data='{${JSON.stringify(data)}}' 
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-        <TableColumnDef bindTo="name" canSort="true"/>
-        <TableColumnDef bindTo="quantity" canSort="true"/>
-        <TableColumnDef bindTo="unit" canSort="true"/>
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
       </Table>
     </Stack>
   `}
@@ -517,9 +517,9 @@ The following example uses the `willSort` event to refuse sorting by name:
   <Table data='{[...]}'
     onWillSort="(by, dir) => by !== 'name'"
     onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-    <TableColumnDef bindTo="name" canSort="true"/>
-    <TableColumnDef bindTo="quantity" canSort="true"/>
-    <TableColumnDef bindTo="unit" canSort="true"/>
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
   </Table>
 </Stack>
 ```
@@ -538,9 +538,9 @@ clicking that column header still does not sort because `willSort` prevents it:
       <Table data='{${JSON.stringify(data)}}' 
         onWillSort="(by, dir) => by !== 'name'"
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
-        <TableColumnDef bindTo="name" canSort="true"/>
-        <TableColumnDef bindTo="quantity" canSort="true"/>
-        <TableColumnDef bindTo="unit" canSort="true"/>
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
       </Table>
     </Stack>
   `}
@@ -624,9 +624,9 @@ Heading theme variables:
   ]}
   app={`
   <Table data='{${JSON.stringify(data)}}'>
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
   </Table>`
   }
 />

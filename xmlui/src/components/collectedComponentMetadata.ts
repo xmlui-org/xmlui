@@ -58,7 +58,7 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "@components/Splitter/Split
 import { StickyBoxMd } from "@components/StickyBox/StickyBox";
 import { SwitchMd } from "@components/Switch/Switch";
 import { TableMd } from "@components/Table/Table";
-import { TableColumnDefMd } from "@components/TableColumnDef/TableColumnDef";
+import { ColumnMd } from "@components/Column/Column";
 import { TableHeaderMd } from "@components/TableHeader/TableHeader";
 import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
@@ -99,6 +99,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Chart: ChartMd,
   Checkbox: CheckboxMd,
+  Column: ColumnMd,
   Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
@@ -171,7 +172,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   StickyBox: StickyBoxMd,
   Switch: SwitchMd,
   Table: TableMd,
-  TableColumnDef: TableColumnDefMd,
   TableHeader: TableHeaderMd,
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,

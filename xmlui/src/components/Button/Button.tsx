@@ -3,11 +3,11 @@ import styles from "./Button.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   alignmentOptionNames,
-  sizeNames,
   buttonThemeNames,
   buttonTypeNames,
   iconPositionNames,
   buttonVariantNames,
+  sizeMd,
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/IconNative";
@@ -20,11 +20,12 @@ const COMP = "Button";
 
 export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
+  status: "stable",
   props: {
     autoFocus: d("Indicates if the button should receive focus when the page loads"),
     variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantNames),
     themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeNames),
-    size: d("The size of the button (small, medium, large)", sizeNames),
+    size: d("The size of the button (small, medium, large)", sizeMd),
     label: d(
       `This property is an optional string to set a label for the ${COMP}. If no label is ` +
         `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
