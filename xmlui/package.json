@@ -12,7 +12,8 @@
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
     "get-metadata": "node scripts/get-meta.js",
-    "prepare-docs-data": "npm run build:xmlui-metadata && node scripts/buildDocs.mjs"
+    "prepare-docs-data": "npm run build:xmlui-metadata",
+    "generate-docs": "node scripts/generate-docs/get-docs.mjs"
   },
   "dependencies": {
     "@azure/msal-browser": "2.30.0",

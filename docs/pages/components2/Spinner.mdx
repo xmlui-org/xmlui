@@ -1,0 +1,139 @@
+# Spinner
+
+The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
+
+While it is visible, the action is yet to be completed; on completion, the UI logic may opt to remove the component.
+
+## Using the `Spinner`
+
+```ueml copy
+<HStack padding="$space-1">
+  <Spinner />
+</HStack>
+```
+
+<Playground
+  name="Example: using Spinner"
+  previewOnly
+  height={72}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner />
+  </HStack>
+  `}
+/>
+
+> **Note**: `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `delay`
+
+The delay in milliseconds before the spinner is displayed.
+
+Use the buttons to toggle between the two `Spinners`.
+
+```ueml copy {8-9}
+<VStack padding="$space-1" gap="$space-1">
+  <var name="noDelay" value="{true}" />
+  <var name="yesDelay" value="{false}" />
+  <HStack gap="$space-0_5">
+    <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
+    <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
+  </HStack>
+  <Spinner when="{noDelay}" delay="0" />
+  <Spinner when="{yesDelay}" delay="1000" />
+</VStack>
+```
+
+<Playground
+  name="Example: delay"
+  previewOnly
+  height={140}
+  app={`
+  <VStack padding="$space-1" gap="$space-1">
+    <var name="noDelay" value="{true}" />
+    <var name="yesDelay" value="{false}" />
+    <HStack gap="$space-0_5">
+      <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
+      <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
+    </HStack>
+    <Spinner when="{noDelay}" delay="0" />
+    <Spinner when="{yesDelay}" delay="1000" />
+  </VStack>
+  `}
+/>
+
+### `fullScreen`
+
+If set to `true`, the component will be rendered in a full screen container.
+
+```ueml copy
+<HStack padding="$space-1">
+  <Spinner fullScreen="true" />
+</HStack>
+```
+
+<Playground
+  name="Example: fullScreen"
+  previewOnly
+  height={200}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner fullScreen="true" />
+  </HStack>
+  `}
+/>
+
+### `themeColor`
+
+(**NOT IMPLEMENTED YET**) The theme color of the component.
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `Spinner` has the following theme variables:
+
+- `color-border-Spinner`
+- `size-Spinner`
+- `thickness-Spinner`
+
+```json copy
+"size-Spinner": "3rem",
+"thickness-Spinner": "12px",
+"color-border-Spinner": "red"
+```
+
+<Playground
+  name="Example: styling"
+  previewOnly
+  height={80}
+  app={`
+  <HStack padding="$space-1">
+    <Spinner />
+  </HStack>
+  `}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "size-Spinner": "3rem",
+        "thickness-Spinner": "8px",
+        "color-border-Spinner": "red",
+      }
+    }  
+  ]}
+/>

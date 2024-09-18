@@ -79,6 +79,7 @@ const MICOMP = "MenuItem";
 
 export const MenuItemMd = createMetadata({
   description: `This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.`,
+  docFolder: DDMCOMP,
   props: {
     iconPosition: d(
       `This property allows you to determine the position of the icon displayed in the menu item.`,
@@ -146,6 +147,7 @@ const SMCOMP = "SubMenuItem";
 
 export const SubMenuItemMd = createMetadata({
   description: "This component represents a nested menu item within another menu or menu item.",
+  docFolder: DDMCOMP,
   props: {
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(SMCOMP),
@@ -171,6 +173,7 @@ const MSEP = "MenuSeparator";
 
 export const MenuSeparatorMd = createMetadata({
   description: "This component displays a separator line between menu items.",
+  docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`margin-top-${MSEP}`]: "$space-1",

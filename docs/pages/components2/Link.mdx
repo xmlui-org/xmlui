@@ -1,0 +1,196 @@
+# Link
+
+A `Link` component represents a navigation target within the app or a reference to an external web URL.
+
+## Using Link
+
+### `Link` Appearance
+
+You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
+
+```ueml copy {6-14}
+<Link to="https://ncrm.azurewebsites.net/" target="_blank">
+  <HStack gap="0.5rem" verticalAlignment="center">
+    <Stack width="16px" height="16px" backgroundColor="purple" />
+    XMLUI introduction
+  </HStack>
+</Link>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: custom Link content"
+  height={40}
+  app={`
+    <Link to="https://ncrm.azurewebsites.net/" target="_blank">
+      <HStack gap="0.5rem" verticalAlignment="center">
+        <Stack width="16px" height="16px" backgroundColor="purple" />
+        XMLUI introduction
+      </HStack>
+    </Link>
+  `}
+/>
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `active`
+
+This Boolean property indicates if the particular navigation is an active link (`false`, by default). An active link has a particular visual appearance.
+
+```ueml copy
+<VStack>
+  <Link>I'm an inactive link (by default)</Link>
+  <Link active="true">I'm an active link</Link>
+  <Link active="false">I'm an inactive link (explicit setting)</Link>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: active"
+  height={80}
+  app={`
+    <VStack>
+      <Link>I'm an inactive link (by default)</Link>
+      <Link active="true">I'm an active link</Link>
+      <Link active="false">I'm an inactive link (explicit setting)</Link>
+    </VStack>
+  `}
+/>
+
+### `enabled`
+
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
+
+This Boolean property indicates if the link is enabled (default: true).
+
+<Playground
+  previewOnly={true}
+  name="Example: active"
+  height={80}
+  app={`
+    <VStack>
+      <Link>I'm an enabled link (by default)</Link>
+      <Link enabled="false">I'm a disabled link</Link>
+      <Link enabled="true">I'm an enabled link (explicit setting)</Link>
+    </VStack>
+  `}
+/>
+
+### `icon`
+
+This property allows you to add an icon (specify the icon's name) to the link.
+
+```ueml copy
+<VStack>
+  <Link icon="home" label="Home" />
+  <Link icon="drive">Drives</Link>
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: icon"
+  height={80}
+  app={`
+    <VStack>
+      <Link icon="home" label="Home" />
+      <Link icon="drive">Drives</Link>
+    </VStack>
+  `}
+/>
+
+> **Note**: If you want to specify paddings and gaps or put the icon to the right of the link text, use your custom link template (nest it into `Link`).
+
+### `label`
+
+This property sets the label of the component.
+
+### `target`
+
+This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
+
+| Value     | Description                                                   |
+| --------- | ------------------------------------------------------------- |
+| `_blank`  | Opens the link in a new window or tab                         |
+| `_self`   | Opens the link in the same frame as it was clicked (default)  |
+| `_parent` | Opens the link in the parent frame                            |
+| `_top`    | Opens the link in the full body of the current browser window |
+
+The following sample opens its link in a new tab:
+
+<Playground
+  previewOnly={true}
+  name="Example: target"
+  height={40}
+  app={`
+    <Link to="https://ncrm.azurewebsites.net/" target="_blank">
+      Open XMLUI overview in a new tab
+    </Link>
+  `}
+/>
+
+### `to`
+
+This property defines the URL of the link.
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `Link` component uses these theme variables to customize its appearance:
+
+- `color-decoration`
+- `color-text`
+- `font-weight`
+- `line-decoration`
+- `offset-decoration`
+- `style-decoration`
+- `thickness-decoration`
+
+The following sample theme sets a few visual properties of `Link`:
+
+```json
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-text-Link--hover": "orangered",
+    "color-decoration-Link": "purple",
+    "thickness-decoration-Link": "4px",
+    "style-decoration-Link": "dotted"
+  }
+}
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: styling"
+  height={40}
+  defaultTheme="custom"
+  themes={[
+    {
+      id: "custom",
+      name: "Custom Theme",
+      themeVars: {
+        "color-text-Link--hover": "orangered",
+        "color-decoration-Link": "purple",
+        "thickness-decoration-Link": "4px",
+        "style-decoration-Link": "dotted",  
+      },
+    },
+  ]}
+  app={`
+    <Link>I have a fancy style when you hover me!</Link>
+  `}
+/>
