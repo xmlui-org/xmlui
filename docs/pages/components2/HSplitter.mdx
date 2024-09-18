@@ -1,47 +1,30 @@
 # HSplitter
 
-The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
+`HSplitter` is a specialized, shorthand version for the regular [Splitter](./Splitter) component with a vertical orientation.
+See also: [VSplitter](./VSplitter.mdx).
 
-## Context Variables
+```ueml copy
+<HSplitter height="100%">
+  <Stack backgroundColor="lightblue" height="100%" />
+  <Stack backgroundColor="darksalmon" height="100%" />
+</HSplitter>
+```
 
-This component does not have any context variables.
+## Examples
 
-## Properties
+<Playground
+  name="Example: HSplitter"
+  previewOnly
+  height={150}
+  app={`
+  <HSplitter height="100%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </HSplitter>
+  `}
+/>
 
-### `floating`
+> **Note**: You cannot change the orientation of `HSplitter` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
 
-Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
-### `initialPrimarySize`
-
-This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
-
-### `maxPrimarySize`
-
-This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
-
-### `minPrimarySize`
-
-This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
-
-### `splitterTemplate`
-
-The divider can be customized using XMLUI components via this property.
-
-### `swapped`
-
-This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
-
-## API
-
-This component does not provide any API.
-
-## Events
-
-### `resize`
-
-This event fires when the component is resized.
-
-## Styling
-
-This component does not have any styles.
+The parent component documentation can be found [here](./Splitter.mdx).

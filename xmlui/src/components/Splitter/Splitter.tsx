@@ -70,8 +70,8 @@ export const SplitterMd = {
   },
 };
 
-export const HSplitterMd = { ...splitterMd };
-export const VSplitterMd = { ...splitterMd };
+export const HSplitterMd = { ...splitterMd, specializedFrom: COMP };
+export const VSplitterMd = { ...splitterMd, specializedFrom: COMP };
 
 type SplitterComponentDef = ComponentDef<typeof SplitterMd>;
 type VSplitterComponentDef = ComponentDef<typeof VSplitterMd>;

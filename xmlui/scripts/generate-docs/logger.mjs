@@ -105,3 +105,13 @@ export class ErrorWithSeverity extends Error {
     this.severity = severity;
   }
 }
+
+export function handleError(error) {
+  if (error instanceof ErrorWithSeverity) {
+    logger.log(error.severity, error.message);
+  } else if (error instanceof Error) {
+    logger.error(error.message);
+  } else {
+    logger.error(error);
+  }
+}
