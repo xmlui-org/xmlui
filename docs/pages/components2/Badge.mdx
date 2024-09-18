@@ -1,0 +1,161 @@
+# Badge
+
+The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `colorMap`
+
+The `Badge` component supports the mapping of a list of colors using the `value` prop as the key. Provide the component with a list or key-value pairs in two ways:
+
+1. Only change the background color
+
+```ueml copy {2}
+<Stack>
+  <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+  <Badge value="important" colorMap="{simpleColorMap}" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={40}
+  name="Example: only background color"
+  app={`<Stack var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
+    <Badge value="important" colorMap="{simpleColorMap}" />
+</Stack>
+`}
+/>
+
+2. Change the background and label color
+
+```ueml copy {4-7}
+<Stack>
+  <var name="simpleColorMap"
+    value="{
+      {
+        important: { label: 'red', background: 'pink' },
+        unimportant: { label: 'black', background: 'gray' }
+      }
+    }"
+  />
+  <Badge value="important" colorMap="{simpleColorMap}" />
+  <Badge value="unimportant" colorMap="{simpleColorMap}" />
+  <Badge value="other" colorMap="{simpleColorMap}" />
+</Stack>
+```
+
+<Playground
+  previewOnly
+  height={120}
+  name="Example: background and label color"
+  app={`
+  <Stack gap="0.5rem">
+    <var name="simpleColorMap" 
+    value="{ { important: { label: 'red', background: 'pink' }, unimportant: { label: 'black', background: 'gray' } } }" />
+    <Badge value="important" colorMap="{simpleColorMap}" />
+    <Badge value="unimportant" colorMap="{simpleColorMap}" />
+    <Badge value="other" colorMap="{simpleColorMap}" />
+  </Stack>
+  `}
+/>
+
+### `forceIndicator`
+
+(**NOT IMPLEMENTED YET**) This property forces the display of the indicator, even if the `indicatorText` property is not defined or empty.
+
+### `indicatorPosition`
+
+(**NOT IMPLEMENTED YET**) The position of the indicator.
+
+The value of this optional property sets the string to provide a color scheme for the Alert.
+
+| Value          | Description                                                          |
+| :------------- | :------------------------------------------------------------------- |
+| `start`        | The indicator is displayed within the badge before its text          |
+| `end`          | The indicator is displayed within the badge after its text           |
+| `top-start`    | The indicator is displayed over the badge in the top-start corner    |
+| `top-end`      | The indicator is displayed over the badge in the top-end corner      |
+| `bottom-start` | The indicator is displayed over the badge in the bottom-start corner |
+| `bottom-end`   | The indicator is displayed over the badge in the bottom-end corner   |
+
+### `indicatorText`
+
+(**NOT IMPLEMENTED YET**) This property defines the text to display in the indicator. If it is not defined or empty, no indicator is displayed unless the `forceIndicator` property is set.
+
+### `indicatorThemeColor`
+
+(**NOT IMPLEMENTED YET**) The theme color of the indicator.
+
+### `themeColor`
+
+(**NOT IMPLEMENTED YET**) The theme color of the component.
+
+### `value`
+
+The text that the component displays
+
+```ueml copy
+<Badge value="Example badge" />
+```
+
+<Playground previewOnly height={40} name="Example: value" app={`<Badge value="Example badge" />`} />
+
+### `variant`
+
+Modifies the shape of the component. Comes in the regular `badge` variant or the `pill` variant with fully rounded corners.
+
+```ueml copy
+<Badge value="Example badge" variant="badge" />
+<Badge value="Example pill" variant="pill" />
+```
+
+<Playground
+  previewOnly
+  height={90}
+  name="Example: variant"
+  app={`
+  <Stack gap="1rem">
+    <Badge value="Example badge" variant="badge" />
+    <Badge value="Example pill" variant="pill" />
+  </Stack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `Badge` component uses these theme variables to customize its appearance:
+
+- `color-bg-Badge`
+- `color-text-Badge`
+
+There are also variant specific styling options:
+
+### `badge`
+
+- `radius-Badge`
+- `font-size-Badge`
+- `font-weight-Badge`
+- `padding-Badge`
+- `padding-horizontal-Badge`
+- `padding-vertical-Badge`
+
+### `pill`
+
+- `font-size-Badge-pill`
+- `font-weight-Badge-pill`
+- `padding-Badge-pill`
+- `padding-horizontal-Badge-pill`
+- `padding-vertical-Badge-pill`

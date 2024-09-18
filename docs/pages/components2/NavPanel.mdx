@@ -1,0 +1,84 @@
+# NavPanel
+
+`NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `logoTemplate`
+
+This property defines the logo template to display in the navigation panel with the `vertical` and `vertical-sticky` layout.
+
+```ueml copy {3-8}
+<App layout="vertical">
+  <NavPanel>
+    <prop name="logoTemplate">
+       <H3>
+         <Icon name="drive" />
+         DriveDiag (Nav)
+       </H3>
+    </prop>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Page 1" to="/page1"/>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      <Text value="Home" />
+    </Page>
+    <Page url="/page1">
+      <Text value="Page 1" />
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: logoTemplate"
+  horizontal={true}
+  height={200}
+  app={`
+    <App layout="vertical">
+      <NavPanel>
+        <prop name="logoTemplate">
+           <H3>
+             <Icon name="drive" />
+             DriveDiag (Nav)
+           </H3>
+        </prop>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavLink label="Page 1" to="/page1"/>
+      </NavPanel>
+      <Pages defaultRoute="/">
+        <Page url="/">
+          <Text value="Home" />
+        </Page>
+        <Page url="/page1">
+          <Text value="Page 1" />
+        </Page>
+      </Pages>
+    </App>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+The `NavPanel` component uses these theme variables to customize its appearance:
+
+- `color-bg`
+- `shadow`
+- `padding-horizontal`
+- `padding-horizontal-logo-NavPanel`
+- `padding-vertical-logo-NavPanel`
+- `margin-bottom-logo-NavPanel`

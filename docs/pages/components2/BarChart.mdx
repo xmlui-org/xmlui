@@ -1,0 +1,343 @@
+# BarChart
+
+The `BarChart` component represents a bar chart.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `data`
+
+This property is used to provide the component with data to display. The data itself needs to be an array of objects.
+
+```ueml copy
+<BarChart
+  data="{[
+    {
+      "stage": "Prospecting",
+      "value": 231
+    },
+    {
+      "stage": "Qualification",
+      "value": 56
+    },
+    {
+      "stage": "Proposal",
+      "value": 73
+    },
+    {
+      "stage": "Negotiation",
+      "value": 20
+    },
+    {
+      "stage": "Closed Won",
+      "value": 5
+    }
+  ]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: data"
+  app={`
+    <BarChart
+      data="{[
+        {
+          "stage": "Prospecting",
+          "value": 231
+        },
+        {
+          "stage": "Qualification",
+          "value": 56
+        },
+        {
+          "stage": "Proposal",
+          "value": 73
+        },
+        {
+          "stage": "Negotiation",
+          "value": 20
+        },
+        {
+          "stage": "Closed Won",
+          "value": 5
+        }
+      ]}"
+    />
+  `}
+/>
+
+### `groupMode`
+
+This property determines how the bars are layed out. The `grouped` variant lays out the bars next to each other on the primary axis. The `stacked` variant stacks the bars on top of each other.
+
+```ueml copy {2}
+<BarChart
+  groupMode="stacked"
+  data="{[
+    {
+      "stage": "Prospecting",
+      "value": 231
+    },
+    {
+      "stage": "Qualification",
+      "value": 56
+    },
+    {
+      "stage": "Proposal",
+      "value": 73
+    },
+    {
+      "stage": "Negotiation",
+      "value": 20
+    },
+    {
+      "stage": "Closed Won",
+      "value": 5
+    }
+  ]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: groupMode"
+  app={`
+    <BarChart
+      groupMode="stacked"
+      data="{[
+        {
+          "stage": "Prospecting",
+          "value": 231
+        },
+        {
+          "stage": "Qualification",
+          "value": 56
+        },
+        {
+          "stage": "Proposal",
+          "value": 73
+        },
+        {
+          "stage": "Negotiation",
+          "value": 20
+        },
+        {
+          "stage": "Closed Won",
+          "value": 5
+        }
+      ]}"
+    />
+  `}
+/>
+
+### `indexBy`
+
+Determines which attribute groups the bars together.
+
+```ueml copy {2}
+<BarChart
+  indexBy="stage"
+  data="{[
+    {
+      "stage": "Prospecting",
+      "value": 231
+    },
+    {
+      "stage": "Qualification",
+      "value": 56
+    },
+    {
+      "stage": "Proposal",
+      "value": 73
+    },
+    {
+      "stage": "Negotiation",
+      "value": 20
+    },
+    {
+      "stage": "Closed Won",
+      "value": 5
+    }
+  ]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: indexBy"
+  app={`
+    <BarChart
+      indexBy="stage"
+      data="{[
+        {
+          "stage": "Prospecting",
+          "value": 231
+        },
+        {
+          "stage": "Qualification",
+          "value": 56
+        },
+        {
+          "stage": "Proposal",
+          "value": 73
+        },
+        {
+          "stage": "Negotiation",
+          "value": 20
+        },
+        {
+          "stage": "Closed Won",
+          "value": 5
+        }
+      ]}"
+    />
+  `}
+/>
+
+### `keys`
+
+This property specifies what the label texts are for each bar.
+
+```ueml copy {2}
+<BarChart
+  keys="{['Pros', 'Qual', 'Prop', 'Neg', 'Won']}"
+  data="{[
+    {
+      "stage": "Prospecting",
+      "value": 231
+    },
+    {
+      "stage": "Qualification",
+      "value": 56
+    },
+    {
+      "stage": "Proposal",
+      "value": 73
+    },
+    {
+      "stage": "Negotiation",
+      "value": 20
+    },
+    {
+      "stage": "Closed Won",
+      "value": 5
+    }
+  ]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: keys"
+  app={`
+    <BarChart
+      keys="{['Prospecting', 'Qualification', 'Proposal', 'Negotiation', 'Closed Won']}"
+      data="{[
+        {
+          "stage": "Prospecting",
+          "value": 231
+        },
+        {
+          "stage": "Qualification",
+          "value": 56
+        },
+        {
+          "stage": "Proposal",
+          "value": 73
+        },
+        {
+          "stage": "Negotiation",
+          "value": 20
+        },
+        {
+          "stage": "Closed Won",
+          "value": 5
+        }
+      ]}"
+    />
+  `}
+/>
+
+### `layout`
+
+This property determines the orientation of the bar chart. The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right. The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
+
+This property determines the orientation of the bar chart.
+The `vertical` variant specifies the horizontal axis as the primary and lays out the bars from left to right.
+The `horizontal` variant specifies the vertical axis as the primary and has the bars spread from top to bottom.
+
+```ueml copy {2}
+<BarChart
+  layout="horizontal"
+  data="{[
+    {
+      "stage": "Prospecting",
+      "value": 231
+    },
+    {
+      "stage": "Qualification",
+      "value": 56
+    },
+    {
+      "stage": "Proposal",
+      "value": 73
+    },
+    {
+      "stage": "Negotiation",
+      "value": 20
+    },
+    {
+      "stage": "Closed Won",
+      "value": 5
+    }
+  ]}"
+/>
+```
+
+<Playground
+  previewOnly
+  name="Example: layout"
+  app={`
+    <BarChart
+      layout="horizontal"
+      data="{[
+        {
+          "stage": "Prospecting",
+          "value": 231
+        },
+        {
+          "stage": "Qualification",
+          "value": 56
+        },
+        {
+          "stage": "Proposal",
+          "value": 73
+        },
+        {
+          "stage": "Negotiation",
+          "value": 20
+        },
+        {
+          "stage": "Closed Won",
+          "value": 5
+        }
+      ]}"
+    />
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+This component does not have any styles.
