@@ -408,5 +408,5 @@ export function CustomFormItem({
     };
   }, [bindTo, dispatch, node.children, node.vars, validationResult, value]);
 
-  return <>{renderChild(decoratedMetadata)}</>;
+  return <>{renderChild(decoratedMetadata as any)}</>;
 }
