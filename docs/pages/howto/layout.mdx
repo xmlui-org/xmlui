@@ -135,9 +135,9 @@ Click the Clear data (and the Reload data) buttons to check the issue:
         <Button onClick="tableData = savedData">Reload data</Button>
       </HStack>
       <Table data='{tableData}' backgroundColor="lightgreen">
-        <TableColumnDef bindTo="name"/>
-        <TableColumnDef bindTo="quantity"/>
-        <TableColumnDef bindTo="unit"/>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
         <prop name="noDataTemplate">
           <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
             Nothing here!
@@ -164,9 +164,9 @@ When you look at the markup, you can see that the outermost `VStack` has an expl
     <Button onClick="tableData = savedData">Reload data</Button>
   </HStack>
   <Table data='{tableData}' backgroundColor="lightgreen">
-    <TableColumnDef bindTo="name"/>
-    <TableColumnDef bindTo="quantity"/>
-    <TableColumnDef bindTo="unit"/>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
     <prop name="noDataTemplate">
       <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
         Nothing here!
@@ -206,9 +206,9 @@ Check this out; now the `noDataTemplate` is rendered as expected:
         <Button onClick="tableData = savedData">Reload data</Button>
       </HStack>
       <Table data='{tableData}' height="*" backgroundColor="lightgreen">
-        <TableColumnDef bindTo="name"/>
-        <TableColumnDef bindTo="quantity"/>
-        <TableColumnDef bindTo="unit"/>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
         <prop name="noDataTemplate">
           <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
             Nothing here!

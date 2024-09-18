@@ -29,7 +29,7 @@ import { orderBy } from "lodash-es";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import { ScrollContext } from "@components-core/ScrollContext";
-import { type OurColumnMetadata, TableContext } from "../TableColumnDef/TableContext";
+import { type OurColumnMetadata, TableContext } from "../Column/TableContext";
 import produce from "immer";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";

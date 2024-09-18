@@ -19,9 +19,9 @@ Some components have icons already built into them like the ones in the `Table` 
   height={360}
   app={`
     <Table data='{${JSON.stringify(data)}}'>
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
-      <TableColumnDef bindTo="unit" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
+      <Column bindTo="unit" canSort="true"/>
     </Table>
   `}
 />
@@ -81,9 +81,9 @@ This ensures that only the `sortasc` icon found in the `Table` component is affe
   resources={{ "icon.sortasc:Table": arrowIcon }}
   app={`
     <Table data='{${JSON.stringify(data)}}'>
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
-      <TableColumnDef bindTo="unit" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
+      <Column bindTo="unit" canSort="true"/>
     </Table>
   `}
 />
@@ -104,15 +104,15 @@ while the second `Table` to the right uses the `chevronup` icon instead.
   <VStack width="50%">
     Default icon:
     <Table data='{[...]}' sortBy="name">
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
     </Table>
   </VStack>
   <VStack width="50%">
     Instance-specific icon:
     <Table data='{[...]}' iconSortAsc="chevronup" sortBy="name">
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
     </Table>
   </VStack>
 </HStack>
@@ -127,15 +127,15 @@ while the second `Table` to the right uses the `chevronup` icon instead.
       <VStack width="50%">
         Default icon:
         <Table data='{${JSON.stringify(data)}}' sortBy="name">
-          <TableColumnDef bindTo="name" canSort="true"/>
-          <TableColumnDef bindTo="quantity" canSort="true"/>
+          <Column bindTo="name" canSort="true"/>
+          <Column bindTo="quantity" canSort="true"/>
         </Table>
       </VStack>
       <VStack width="50%">
         Instance-specific icon:
         <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
-          <TableColumnDef bindTo="name" canSort="true"/>
-          <TableColumnDef bindTo="quantity" canSort="true"/>
+          <Column bindTo="name" canSort="true"/>
+          <Column bindTo="quantity" canSort="true"/>
         </Table>
       </VStack>
     </HStack>
@@ -171,15 +171,15 @@ Note, how the icon resource only appears in the left `Table` and not on the righ
   <VStack width="50%">
     Component-specific icon:
     <Table data='{[...]}' sortBy="name">
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
     </Table>
   </VStack>
   <VStack width="50%">
     Instance-specific icon:
     <Table data='{[...]}' iconSortAsc="chevronup" sortBy="name">
-      <TableColumnDef bindTo="name" canSort="true"/>
-      <TableColumnDef bindTo="quantity" canSort="true"/>
+      <Column bindTo="name" canSort="true"/>
+      <Column bindTo="quantity" canSort="true"/>
     </Table>
   </VStack>
 </HStack>
@@ -195,15 +195,15 @@ Note, how the icon resource only appears in the left `Table` and not on the righ
       <VStack width="50%">
         Component-specific icon:
         <Table data='{${JSON.stringify(data)}}' sortBy="name">
-          <TableColumnDef bindTo="name" canSort="true"/>
-          <TableColumnDef bindTo="quantity" canSort="true"/>
+          <Column bindTo="name" canSort="true"/>
+          <Column bindTo="quantity" canSort="true"/>
         </Table>
       </VStack>
       <VStack width="50%">
         Instance-specific icon:
         <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
-          <TableColumnDef bindTo="name" canSort="true"/>
-          <TableColumnDef bindTo="quantity" canSort="true"/>
+          <Column bindTo="name" canSort="true"/>
+          <Column bindTo="quantity" canSort="true"/>
         </Table>
       </VStack>
     </HStack>

@@ -28,11 +28,11 @@ Whenever the user changes the selection state of a particular row, the `Selectio
       rowsSelectable="{true}" 
       datasource="https://api.spacexdata.com/v3/rockets" 
       height="300px">
-      <TableColumnDef header="Image" size="80px">
+      <Column header="Image" size="80px">
         <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
-      </TableColumnDef>
-      <TableColumnDef canSort="true" bindTo="country"/>
-      <TableColumnDef canSort="true" bindTo="company"/>
+      </Column>
+      <Column canSort="true" bindTo="country"/>
+      <Column canSort="true" bindTo="company"/>
     </Table>
   </SelectionStore>
 </VStack>
@@ -58,11 +58,11 @@ The UI refreshes the number of selected items as you check or uncheck the rows i
         rowsSelectable="{true}" 
         datasource="https://api.spacexdata.com/v3/rockets" 
         height="300px">
-        <TableColumnDef header="Image" size="80px">
+        <Column header="Image" size="80px">
           <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </TableColumnDef>
-        <TableColumnDef canSort="true" bindTo="country"/>
-        <TableColumnDef canSort="true" bindTo="company"/>
+        </Column>
+        <Column canSort="true" bindTo="country"/>
+        <Column canSort="true" bindTo="company"/>
       </Table>
     </SelectionStore>
   </VStack>

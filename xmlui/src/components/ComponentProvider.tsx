@@ -92,7 +92,7 @@ import { themeComponentRenderer } from "@components/Theme/Theme";
 import { merge } from "lodash-es";
 import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
-import { tableColumnDefComponentRenderer } from "@components/TableColumnDef/TableColumnDef";
+import { columnComponentRenderer } from "@components/Column/Column";
 import { optionComponentRenderer } from "@components/Option/Option";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/ApiAction";
@@ -213,7 +213,7 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerComponentRenderer(tableComponentRenderer);
-      this.registerComponentRenderer(tableColumnDefComponentRenderer);
+      this.registerComponentRenderer(columnComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerComponentRenderer(dynamicHeightListComponentRenderer);
