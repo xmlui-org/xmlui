@@ -101,7 +101,7 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
-  ({ node, renderChild, extractValue }) => {
+  ({ node, renderChild, extractValue, lookupEventHandler }) => {
     return (
       <AccordionComponent
         headerRenderer={
@@ -120,6 +120,7 @@ export const accordionComponentRenderer = createComponentRenderer(
         expandedIcon={node.props.expandedIcon}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
         rotateExpanded={node.props.rotateExpanded}
+        onDisplayDidChange={lookupEventHandler("displayDidChange")}
       >
         {renderChild(node.children)}
       </AccordionComponent>

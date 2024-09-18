@@ -3,8 +3,10 @@ import { AccordionContext, useAccordionContextValue } from "@components/Accordio
 import styles from "./Accordion.module.scss";
 import Icon from "@components/Icon/IconNative";
 import type { Accordion } from "@components/abstractions";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import classnames from "classnames";
+import { noop } from "@components-core/constants";
+import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 type Props = {
   children?: React.ReactNode;
@@ -14,6 +16,8 @@ type Props = {
   expandedIcon?: string;
   hideIcon?: boolean;
   rotateExpanded?: string;
+  registerComponentApi?: RegisterComponentApiFn;
+  onDisplayDidChange?: (value: string) => void;
 };
 
 function defaultRenderer(item: Accordion) {
@@ -30,23 +34,42 @@ export const AccordionComponent = ({
   expandedIcon = "chevronup",
   collapsedIcon = "chevrondown",
   triggerPosition = "end",
+  registerComponentApi,
+  onDisplayDidChange = noop,
 }: Props) => {
   const { accordionContextValue, accordionItems } = useAccordionContextValue();
   const [value, setValue] = useState<string | null>(null);
+
+  useEffect(() => {
+    registerComponentApi?.({});
+  }, [registerComponentApi]);
+
+  const onValueChange = useCallback(
+    (changedValue: string) => {
+      onDisplayDidChange?.(changedValue);
+    },
+    [onDisplayDidChange],
+  );
 
   return (
     <AccordionContext.Provider value={accordionContextValue}>
       {children}
       <RAccordion.Root
+        value={value}
         type="single"
         className={styles.root}
-        onValueChange={(changedValue) => {
-          setValue(changedValue);
-        }}
+        onValueChange={onValueChange}
         collapsible
       >
         {accordionItems.map((item) => (
-          <RAccordion.Item key={item.id} value={item.id} className={styles.item}>
+          <RAccordion.Item
+            key={item.id}
+            value={item.id}
+            className={styles.item}
+            onClick={() => {
+              setValue(item.id);
+            }}
+          >
             <RAccordion.Header className={styles.header}>
               <RAccordion.Trigger
                 className={classnames(styles.trigger, {
