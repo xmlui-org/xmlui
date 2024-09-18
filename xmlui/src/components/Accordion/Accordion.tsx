@@ -6,12 +6,8 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AccordionComponent } from "./AccordionNative";
 import {
-  dCollapse,
   dComponent,
   dDidChange,
-  dExpand,
-  dExpanded,
-  dFocus,
 } from "@components/metadata-helpers";
 import { MemoizedItem } from "@components/container-helpers";
 import { triggerPositionNames } from "@components/abstractions";
@@ -27,9 +23,6 @@ export const AccordionMd = createMetadata({
     `the display of content sections. It helps organize information by expanding or collapsing it ` +
     `based on user interaction.`,
   props: {
-    headerTemplate: dComponent(
-      "This property describes the template to use as the component's header.",
-    ),
     triggerPosition: d(
       `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
         `value signs the trigger is before the header text (template), and \`end\` indicates that it ` +
@@ -56,13 +49,6 @@ export const AccordionMd = createMetadata({
   },
   events: {
     displayDidChange: dDidChange(COMP),
-  },
-  apis: {
-    expanded: dExpanded(COMP),
-    expand: dExpand(COMP),
-    collapse: dCollapse(COMP),
-    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
-    focus: dFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -101,26 +87,16 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
-  ({ node, renderChild, extractValue, lookupEventHandler }) => {
+  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi }) => {
     return (
       <AccordionComponent
-        headerRenderer={
-          node.props.headerTemplate
-            ? (item) => (
-                <MemoizedItem
-                  node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
-                  item={item}
-                  renderChild={renderChild}
-                />
-              )
-            : undefined
-        }
         triggerPosition={extractValue.asOptionalString(node.props?.triggerPosition)}
         collapsedIcon={node.props.collapsedIcon}
         expandedIcon={node.props.expandedIcon}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
         rotateExpanded={node.props.rotateExpanded}
         onDisplayDidChange={lookupEventHandler("displayDidChange")}
+        registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}
       </AccordionComponent>
