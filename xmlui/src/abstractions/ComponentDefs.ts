@@ -1,6 +1,6 @@
 import type { RenderChildFn } from "./RendererDefs";
 import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
-import { DefaultThemeVars } from "./ThemingDefs";
+import type { DefaultThemeVars } from "./ThemingDefs";
 
 /**
  * This interface represents the core properties of a component definition (independent
@@ -216,10 +216,10 @@ export type ComponentPropertyMetadata = {
 };
 
 export type ComponentMetadata<
-  TProps extends Record<string, ComponentPropertyMetadata> = {},
-  TEvents extends Record<string, ComponentPropertyMetadata> = {},
-  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
-  TApis extends Record<string, ComponentPropertyMetadata> = {},
+  TProps extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TEvents extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // The current status of the component. By default, it is "stable".
   status?: "stable" | "experimental" | "deprecated" | "in review";
@@ -258,16 +258,23 @@ export type ComponentMetadata<
 
   // Indicates that the component allows arbitrary props (not just the named ones)
   allowArbitraryProps?: boolean;
+
+  // If the component is specalized, this property holds the name of the parent component
+  specializedFrom?: string;
+
+  // Contains the folder name if it does not match the component name
+  docFolder?: string;
 };
 
 export function createMetadata<
   TProps extends Record<string, ComponentPropertyMetadata>,
   TEvents extends Record<string, ComponentPropertyMetadata>,
-  TContextVars extends Record<string, ComponentPropertyMetadata> = {},
-  TApis extends Record<string, ComponentPropertyMetadata> = {},
+  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 >({
   description,
   shortDescription,
+  specializedFrom,
   props,
   events,
   contextVars,
@@ -278,6 +285,7 @@ export function createMetadata<
   defaultThemeVars,
   toneSpecificThemeVars,
   allowArbitraryProps,
+  docFolder,
 }: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
   TProps,
   TEvents,
@@ -287,6 +295,7 @@ export function createMetadata<
   return {
     description,
     shortDescription,
+    specializedFrom,
     props,
     events,
     contextVars,
@@ -297,6 +306,7 @@ export function createMetadata<
     defaultThemeVars,
     toneSpecificThemeVars,
     allowArbitraryProps,
+    docFolder,
   };
 }
 

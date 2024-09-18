@@ -1,0 +1,63 @@
+# EmojiSelector
+
+The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `autoFocus`
+
+This property sets the label of the component.
+
+```ueml copy
+<HStack padding="0.5rem">
+  <EmojiSelector autoFocus="true" />
+</HStack>
+```
+
+<Playground
+  name="Example: autoFocus"
+  previewOnly
+  height={380}
+  app={`
+  <HStack padding="0.5rem">
+    <EmojiSelector autoFocus="true" />
+  </HStack>
+  `}
+/>
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+### `select`
+
+This event is fired when the user selects an emoticon from this component.
+
+```ueml copy /onSelect="(emoji) => { selected = emoji }"/
+<HStack var.selected="" gap="1rem">
+  <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+  <Text value="Selected emoji: {selected}" />
+</HStack>
+```
+
+<Playground
+  name="Example: select"
+  previewOnly
+  height={380}
+  app={`
+  <HStack var.selected="" gap="0.5rem">
+    <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+    <Text value="Selected emoji: {selected}" />
+  </HStack>
+  `}
+/>
+
+## Styling
+
+This component does not have any styles.
