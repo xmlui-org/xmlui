@@ -8,7 +8,7 @@ logger.setLevels(Logger.levels.warning, Logger.levels.error);
 logger.info("Extending component metadata with default values");
 const metadata = Object.entries(collectedComponentMetadata).map(([compName, compData]) => {
   const displayName = compName;
-  const componentFolder = compData.specializedFrom || compData.folder || compName;
+  const componentFolder = compData.specializedFrom || compData.docFolder || compName;
   const descriptionRef = join(componentFolder, `${displayName}.mdx`);
 
   const metadata = {

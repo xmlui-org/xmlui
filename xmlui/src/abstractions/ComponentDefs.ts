@@ -263,7 +263,7 @@ export type ComponentMetadata<
   specializedFrom?: string;
 
   // Contains the folder name if it does not match the component name
-  folder?: string;
+  docFolder?: string;
 };
 
 export function createMetadata<
@@ -285,7 +285,7 @@ export function createMetadata<
   defaultThemeVars,
   toneSpecificThemeVars,
   allowArbitraryProps,
-  folder,
+  docFolder,
 }: ComponentMetadata<TProps, TEvents, TContextVars, TApis>): ComponentMetadata<
   TProps,
   TEvents,
@@ -306,7 +306,7 @@ export function createMetadata<
     defaultThemeVars,
     toneSpecificThemeVars,
     allowArbitraryProps,
-    folder,
+    docFolder,
   };
 }
 
