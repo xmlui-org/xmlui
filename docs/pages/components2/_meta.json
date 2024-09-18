@@ -16,6 +16,7 @@
   "ChangeListener": "ChangeListener",
   "Chart": "Chart",
   "Checkbox": "Checkbox",
+  "Column": "Column",
   "Combobox": "Combobox",
   "ContentSeparator": "ContentSeparator",
   "DataSource": "DataSource",
