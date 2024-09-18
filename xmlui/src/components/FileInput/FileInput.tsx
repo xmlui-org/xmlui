@@ -7,7 +7,7 @@ import {
   buttonThemeNames,
   buttonVariantNames,
   iconPositionNames,
-  sizeNames,
+  sizeMd,
 } from "@components/abstractions";
 import { FileInput, isFileArray } from "./FileInputNative";
 import {
@@ -30,6 +30,7 @@ export const FileInputMd = createMetadata({
   description:
     `The \`${COMP}\` is a user interface component that allows users to select files from their ` +
     `device's file system for upload (or processing its content otherwise).`,
+  status: "experimental",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
@@ -63,7 +64,7 @@ export const FileInputMd = createMetadata({
       "boolean",
       false,
     ),
-    buttonSize: d("The size of the button (small, medium, large)", sizeNames),
+    buttonSize: d("The size of the button (small, medium, large)", sizeMd),
     buttonThemeColor: d(
       "The button color scheme (primary, secondary, attention)",
       buttonThemeNames,

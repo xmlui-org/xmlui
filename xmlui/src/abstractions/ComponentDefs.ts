@@ -3,7 +3,7 @@ import type { CollectedDeclarations } from "./scripting/ScriptingSourceTree";
 import { DefaultThemeVars } from "./ThemingDefs";
 
 /**
- * This interface represents the core properties of a component definition (independent 
+ * This interface represents the core properties of a component definition (independent
  * of component metadata).
  */
 export interface ComponentDefCore {
@@ -187,10 +187,16 @@ type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef
 
 // A generic validation function that retrieves either a hint (the validation argument has
 // issues) or undefined (the argument is valid).
-type IsValidFunction<T> = (
-  propKey: string,
-  propValue: T,
-) => string | string[] | undefined | null;
+type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
+
+// You can describe the available values of a property using this type.
+export type PropertyValueDescription =
+  | string
+  | number
+  | {
+      value: string | number;
+      description: string;
+    };
 
 export type ComponentPropertyMetadata = {
   // The markdown description to explain the property in the inspector view
@@ -200,7 +206,7 @@ export type ComponentPropertyMetadata = {
   readonly valueType?: PropertyValueType;
 
   // What are the available values of this property?
-  readonly availableValues?: any[];
+  readonly availableValues?: PropertyValueDescription[];
 
   // The default property value (if there is any)
   defaultValue?: any;
@@ -215,11 +221,25 @@ export type ComponentMetadata<
   TContextVars extends Record<string, ComponentPropertyMetadata> = {},
   TApis extends Record<string, ComponentPropertyMetadata> = {},
 > = {
+  // The current status of the component. By default, it is "stable".
+  status?: "stable" | "experimental" | "deprecated" | "in review";
+
+  // Component description in markdown; it goes into the generated documentation
   description?: string;
+
+  // Optional short description of the component to display in visual tools
   shortDescription?: string;
+
+  // Description of component properties
   props?: TProps;
+
+  // Description of component events
   events?: TEvents;
+
+  // Description of component context variables
   contextVars?: TContextVars;
+
+  // Description of component APIs
   apis?: TApis;
 
   // Indicates that a particular component does not render any visual element on its own (Default: false)
@@ -282,7 +302,7 @@ export function createMetadata<
 
 export function d(
   description: string,
-  availableValues?: string[],
+  availableValues?: PropertyValueDescription[],
   valueType?: PropertyValueType,
   defaultValue?: any,
   isValid?: IsValidFunction<any>,

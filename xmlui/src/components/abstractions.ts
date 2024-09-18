@@ -1,3 +1,4 @@
+import { PropertyValueDescription } from "@abstractions/ComponentDefs";
 import type { ReactNode } from "react";
 
 /**
@@ -81,10 +82,27 @@ export type ComponentThemeColor =
 
 // --- Available view sizes
 export const viewportSizeNames = ["xs", "sm", "md", "lg", "xl", "xxl"];
+export const viewportSizeMd: PropertyValueDescription[] = [
+  {
+    value: "xs",
+    description: "Extra small devices (e.g., a small smartphone with low screen resolution)",
+  },
+  { value: "sm", description: "Small devices (e.g., a smartphone in landscape view)" },
+  { value: "md", description: "Medium devices (e.g., a tablet)" },
+  { value: "lg", description: "Large devices (e.g., a laptop)" },
+  { value: "xl", description: 'Extra large devices (e.g., a standard 20" monitor)' },
+  { value: "xxl", description: 'Extra extra large devices (e.g., a large 29" monitor)' },
+];
 
 // --- Available button sizes
 const sizeValues = ["xs", "sm", "md", "lg"] as const;
 export const sizeNames: string[] = [...sizeValues];
+export const sizeMd: PropertyValueDescription[] = [
+  { value: "xs", description: "Extra small button" },
+  { value: "sm", description: "Small button (default)" },
+  { value: "md", description: "Medium button" },
+  { value: "lg", description: "Large button" },
+];
 export type ComponentSize = (typeof sizeValues)[number];
 
 // --- Available button themes
