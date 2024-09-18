@@ -80,10 +80,10 @@ export interface ComponentDef<TMd extends ComponentMetadata = ComponentMetadata>
   extends ComponentDefCore,
     Scriptable {
   // Component properties
-  props?: Record<keyof TMd["props"], string>;
+  props?: Record<keyof TMd["props"], any>;
 
   // Component events
-  events?: Record<keyof TMd["events"], string>;
+  events?: Record<keyof TMd["events"], any>;
 
   /**
    * Components may have an API that other components can use to interact with them. This property holds
