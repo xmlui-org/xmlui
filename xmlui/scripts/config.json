@@ -27,7 +27,7 @@
     "src/components/RealTimeAdapter/RealTimeAdapter.tsx",
     "src/components/Redirect/Redirect.tsx",
     "src/components/Table/Table.tsx",
-    "src/components/TableColumnDef/TableColumnDef.tsx",
+    "src/components/Column/Column.tsx",
     "src/components/Tabs/Tabs.tsx",
     "src/components/Text/Text.tsx",
     "src/components/TextBox/TextBox.tsx",

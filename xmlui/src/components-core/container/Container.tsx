@@ -1015,7 +1015,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
   let loaders = node.loaders;
   let children: Array<ComponentDef> | undefined = undefined;
   node.children?.forEach((child) => {
-    if (child.type === "Datasource") {
+    if (child?.type === "Datasource") {
       didResolve = true;
       if (!loaders) {
         loaders = [];

@@ -1,5 +1,5 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { OurColumnMetadata, useTableContext } from "@components/TableColumnDef/TableContext";
+import { OurColumnMetadata, useTableContext } from "./TableContext";
 import { useCallback, useEffect, useId, useLayoutEffect, useMemo } from "react";
 import { MemoizedItem } from "@components/container-helpers";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
@@ -9,7 +9,7 @@ type Props = OurColumnMetadata & {
   renderChild: RenderChildFn;
 };
 
-export function TableColumnDef({ nodeChildren, renderChild, index, ...columnMetadata }: Props) {
+export function Column({ nodeChildren, renderChild, index, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
 

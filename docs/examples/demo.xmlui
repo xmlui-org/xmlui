@@ -841,11 +841,11 @@ console.log(foo(5));
                     <prop name="items">
                         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
                     </prop>
-                    <TableColumnDef header="Image" size="140px">
+                    <Column header="Image" size="140px">
                         <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-                    </TableColumnDef>
-                    <TableColumnDef canSort="true" bindTo="country"/>
-                    <TableColumnDef canSort="true" bindTo="company"/>
+                    </Column>
+                    <Column canSort="true" bindTo="country"/>
+                    <Column canSort="true" bindTo="company"/>
                 </Table>
             </SelectionStore>
         </ComponentSection>
