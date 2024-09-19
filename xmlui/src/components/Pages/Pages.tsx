@@ -6,9 +6,10 @@ import { Pages, RouteWrapper } from "./PagesNative";
 const PAGE = "Page";
 
 export const PageMd = createMetadata({
+  docFolder: PAGE,
   description:
     `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +
-    `to a particular URL that is associated with the page.`,
+    `to a particular URL that is associated with the page.`,  
   props: {
     url: d(`The URL of the route associated with the content.`),
   },

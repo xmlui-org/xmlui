@@ -8,12 +8,9 @@ import verticalFullHeader from  "../../component-samples/App/vertical-full-heade
 
 # App
 
-The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,
-`App` allows you to display your preferred layout.
+The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 
-> **Note**: You can learn more details about using this component [here](
-../learning/using-components/app-component
-).
+> **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
 
 ## Context Variables
 
@@ -114,6 +111,8 @@ For a detailed list on the different kinds of layouts available see [this short 
 ### `loggedInUser`
 
 Stores information about the currently logged in user.
+
+Stores information about the currently logged in user.
 Currently, there is no restriction on what the user data must look like.
 
 ```ueml copy /loggedInUser="{{ name: 'Joe', token: '1234' }}"/
@@ -150,7 +149,13 @@ Currently, there is no restriction on what the user data must look like.
   `}
 />
 
+### `logoTemplate`
+
+Optional template of the app logo
+
 ### `scrollWholePage`
+
+This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
 
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
@@ -204,6 +209,8 @@ This component does not provide any API.
 ## Events
 
 ### `ready`
+
+This event fires when the `App` component finishes rendering on the page.
 
 This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.

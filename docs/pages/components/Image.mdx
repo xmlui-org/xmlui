@@ -11,6 +11,7 @@ This component does not have any context variables.
 ### `alt`
 
 This property specifies an alternate text for the image.
+
 This is useful in two cases:
 1. Accessibility: screen readers read the prop value to users so they know what the image is about.
 2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).
@@ -28,9 +29,7 @@ This is useful in two cases:
 
 ### `aspectRatio`
 
-Corresponds to the `aspect-ratio` CSS style property.
-This property sets a preferred aspect ratio for the image,
-which will be used in the calculation of auto sizes and some other layout functions.
+This property sets a preferred aspect ratio for the image, which will be used in the calculation of auto sizes and some other layout functions.
 
 ```ueml copy
 <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="1420 / 934" />
@@ -73,10 +72,10 @@ This property sets how the image content should be resized to fit its container.
 
 ### `lazyLoad`
 
-Corresponds to the `loading` attribute of the `img` element.
-This attribute specifies if the image should be loaded lazily (`true`) or eager (`false`).
+Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it). The default value is eager (`false`).
+
 Lazy loading instructs the browser to load the image only when it is imminently needed (e.g. user scrolls to it).
-The default value is eager (`false`).
+The default value is eager (\`false\`).
 
 ### `src`
 
@@ -89,6 +88,8 @@ This component does not provide any API.
 ## Events
 
 ### `click`
+
+This event is triggered when the Image is clicked.
 
 This event is triggered when the image is clicked.
 

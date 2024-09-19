@@ -1,22 +1,10 @@
 # Heading
 
-The `Heading` component displays titles and section headers.
+Represents a heading text
 
 > **Note**: `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
 
-For the shorthand versions see their reference page: [H1](
-./H1
-), [H2](
-./H2
-), [H3](
-./H3
-), [H4](
-./H4
-), [H5](
-./H5
-), [H6](
-./H6
-).
+For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
 <Playground
   previewOnly
@@ -48,9 +36,7 @@ This component does not have any context variables.
 
 ### `ellipses`
 
-This property indicates whether ellipses should be displayed (`true`)
-when the heading text is cropped or not (`false`).
-The default value is `true`.
+This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
 
 ```ueml copy {4}
 <VStack width="200" gap="0.5rem">
@@ -107,9 +93,7 @@ For a visual example, see the component description.
 
 ### `maxLines`
 
-This property determines the maximum number of lines the component can wrap to.
-If there is not enough space for all of the text,
-the component wraps the text up to as many lines as specified.
+This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
 
 ```ueml copy
 <H2 
@@ -182,11 +166,7 @@ You can observe the effect of using `preserveLinebreaks`:
 
 ### `value`
 
-This property determines the text displayed in the heading.
-`Heading` also accepts nested text instead of specifying the 
-`value`
-.
-If both `value` and a nested text are used, the `value` will be displayed.
+This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.
 
 ```ueml copy
 <VStack>

@@ -2,10 +2,7 @@
 
 `TextArea` is a component that provides a multiline text input area.
 
-The `TextArea` is an input control component and is often used in forms.
-See the [Using Forms](
-../learning/forms.mdx
-) guide for details.
+The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
 
 To add new lines to the input field press `Shift` + `Enter`.
 
@@ -15,14 +12,9 @@ This component does not have any context variables.
 
 ## Properties
 
-### `allowCopy`
-
-This boolean property indicates if the component's contents can be copied to the clipboard.
-Default: `true`.
-
 ### `autoFocus`
 
-If this boolean prop is set to `true`, the `TextArea` input will be focused when appearing on the UI.
+This property sets the label of the component.
 
 ```ueml copy
 <TextArea autoFocus="true" />
@@ -37,8 +29,7 @@ If this boolean prop is set to `true`, the `TextArea` input will be focused when
 
 ### `autoSize`
 
-If set to `true`, this boolean property enables the `TextArea`
-to resize automatically based on the number of lines inside it.
+If set to `true`, this boolean property enables the `TextArea` to resize automatically based on the number of lines inside it.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
@@ -57,8 +48,7 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 
 ### `enabled`
 
-This property indicates whether the input can be written into (`true`) or not (`false`).
-The default value is `true`.
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy
 <TextArea enabled="false" />
@@ -73,8 +63,7 @@ The default value is `true`.
 
 ### `enterSubmits`
 
-This optional boolean property toggles whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit.
-The default value is is `true`.
+This optional boolean property indicates whether pressing the `Enter` key on the keyboard prompts the parent `Form` component to submit. The default value is is `true`.
 
 Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
@@ -104,9 +93,10 @@ See [Using Forms](../learning/forms.mdx) for details.
 ### `escResets`
 
 This boolean property indicates whether the TextArea contents should be reset when pressing the ESC key.
-The default is `true`.
 
 ### `initialValue`
+
+This property sets the component's initial value.
 
 The initial value displayed in the input field.
 
@@ -123,12 +113,11 @@ The initial value displayed in the input field.
 
 ### `labelId`
 
-You can specify the identifier of a component acting as its label. When you click the label,
-the component behaves as you clicked it.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `maxLength`
 
-This property sets the maximum number of characters you can type into the component's text.
+This property sets the maximum length of the input it accepts.
 
 ### `maxRows`
 
@@ -195,7 +184,7 @@ A placeholder text that is visible in the input field when its empty.
 
 ### `readOnly`
 
-This boolean determines whether the input field can be written.
+Set this property to `true` to disallow changing the component value.
 
 ```ueml copy /readOnly="{true}"/
 <TextArea initialValue="Example text" readOnly="{true}" />
@@ -265,7 +254,7 @@ Specifies the number of lines or rows (and thus, its size) the component has.
 
 ### `validationStatus`
 
-With this property, you can set the checkbox's validation status to "none", "error", "warning", or "valid".
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
@@ -300,103 +289,13 @@ This prop is used to visually indicate status changes reacting to form field val
 
 ## API
 
-### `focus`
-
-This API command triggers a focus event on the input field.
-
-```ueml copy {2-3}
-<VStack gap="$space-0_5">
-  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-  <TextArea id="inputComponent" />
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus"
-  height={120}
-  app={`
-  <VStack gap="$space-0_5">
-    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-    <TextArea id="inputComponent" />
-  </VStack>
-  `}
-/>
-
-### `setValue`
-
-This API method programmatically sets the value of the field.
-The same rules apply as for the [`initialValue`](#initialvalue) property.
-
-```ueml copy {10}
-<VStack margin="$space-1" gap="$space-0_5" var.changes="">
-  <TextArea 
-    id="inputField" 
-    readOnly="true" 
-    onDidChange="changes++"
-  />
-  <HStack gap="$space-1">
-    <Button 
-      label="Check" 
-      onClick="inputField.setValue('example ')"
-    />
-    <Text value="Number of changes: {changes}" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: setValue"
-  app={`
-  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
-    <TextArea 
-      id="inputField" 
-      readOnly="true" 
-      onDidChange="changes++"
-    />
-    <HStack gap="$space-1">
-      <Button 
-        label="Check" 
-        onClick="inputField.setValue('example ')"
-      />
-      <Text value="Number of changes: {changes}" />
-    </HStack>
-  </VStack>
-  `}
-/>
-
-### `value`
-
-By setting an ID for the component, you can refer to the value of the field if set.
-If no value is set, the value will be undefined.
-
-In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
-
-```ueml copy {2-3}
-<HStack gap="$space-0_5">
-  <Text value="TextArea content length: {inputComponent.value.length}" />
-  <TextArea id="inputComponent" />
-</HStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value"
-  height={60}
-  app={`
-  <HStack gap="$space-0_5">
-    <Text value="TextArea content length: {inputComponent.value.length}" />
-    <TextArea id="inputComponent" />
-  </HStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event is triggered after the user has changed the field value.
+This event is triggered when value of TextArea has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
@@ -421,9 +320,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ### `gotFocus`
 
-This event is triggered when the 
-`TextArea`
- receives focus.
+This event is triggered when the TextArea has received the focus.
 
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
@@ -453,11 +350,7 @@ Note how clicking elsewhere resets the text to the original.
 
 ### `lostFocus`
 
-This event is triggered when the 
-`TextArea`
- loses focus.
-
-See the example in the [gotFocus event section](#gotfocus).
+This event is triggered when the TextArea has lost the focus.
 
 ## Styling
 

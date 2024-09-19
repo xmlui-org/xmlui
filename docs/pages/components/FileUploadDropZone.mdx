@@ -1,7 +1,6 @@
 # FileUploadDropZone
 
-The `FileUploadDropZone` component allows users to upload files to a web application by dragging 
-and dropping files from their local file system onto a designated area within the UI.
+The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI.
 
 ## Using `FileUploadDropZone`
 
@@ -42,6 +41,8 @@ This component does not have any context variables.
 
 This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
 
+This property indicates if the drop zone accepts files pasted from the clipboard (`true`) or only dragged files (`false`).
+
 The following example sets this property to `false` and, thus, it turns off pasting files:
 
 ```ueml copy
@@ -75,8 +76,7 @@ If set to `false`, the drop zone will be disabled and users will not be able to 
 
 ### `text`
 
-With this property, you can change the default text ("Drop files here") to display when 
-files are dragged over the drop zone.
+With this property, you can change the default text ("Drop files here") to display when files are dragged over the drop zone.
 
 ## API
 
@@ -86,9 +86,7 @@ This component does not provide any API.
 
 ### `upload`
 
-This component accepts files for upload but does not perform the actual operation. It fires the 
-`upload` event and passes the list files to upload in the method's argument. You can use the 
-passed file information to implement the upload (according to the protocol your backend supports).
+This component accepts files for upload but does not perform the actual operation. It fires the `upload` event and passes the list files to upload in the method's argument. You can use the passed file information to implement the upload (according to the protocol your backend supports).
 
 Each item passed in the event argument is an instance of [File](https://developer.mozilla.org/en-US/docs/Web/API/File).
 
