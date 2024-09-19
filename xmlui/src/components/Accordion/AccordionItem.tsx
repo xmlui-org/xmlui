@@ -1,6 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { AccordionItemComponent } from "@components/Accordion/AccordionItemNative";
-import { createComponentRendererNew } from "../../index";
 import {
   dCollapse,
   dComponent,
@@ -10,6 +9,7 @@ import {
   dFocus,
 } from "@components/metadata-helpers";
 import { MemoizedItem } from "@components/container-helpers";
+import {createComponentRenderer} from "@components-core/renderers";
 
 const COMP = "AccordionItem";
 
@@ -41,7 +41,7 @@ export const AccordionItemMd = createMetadata({
   },
 });
 
-export const accordionItemComponentRenderer = createComponentRendererNew(
+export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
