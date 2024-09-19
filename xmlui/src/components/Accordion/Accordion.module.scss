@@ -34,14 +34,13 @@ $radius: createThemeVar("radius-#{$componentName}");
   }
 
   &:last-child {
-    /*    border-bottom-left-radius: $radius;
-        border-bottom-right-radius: $radius;*/
+    border-bottom-left-radius: $radius;
+    border-bottom-right-radius: $radius;
   }
 
   &:focus-within {
     position: relative;
     z-index: 1;
-    //box-shadow: 0 0 0 2px var(--mauve-12);
   }
 }
 
