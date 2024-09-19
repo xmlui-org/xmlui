@@ -13,6 +13,7 @@ const COMP = "OffCanvas";
 // See reference implementation here: https://getbootstrap.com/docs/5.3/components/alerts/
 
 export const OffCanvasMd = createMetadata({
+  status: "in review",
   description:
     `(**NOT IMPLEMENTED YET**) The \`OffCanvas\` component is a hidden panel that slides into view ` +
     `from the side of the screen. It helps display additional content or navigation without disrupting ` +

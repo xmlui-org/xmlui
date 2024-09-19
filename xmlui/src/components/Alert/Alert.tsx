@@ -12,6 +12,7 @@ const COMP = "Alert";
 // See reference implementation here: https://getbootstrap.com/docs/5.3/components/alerts/
 
 export const AlertMd = createMetadata({
+  status: "in review",
   description:
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component is a panel used to display important ` +
     `notifications or feedback to users. It helps convey different statuses or levels of urgency, ` +

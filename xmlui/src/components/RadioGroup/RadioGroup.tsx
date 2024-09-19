@@ -84,6 +84,10 @@ export const RadioGroupMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    orientation: d(
+      `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
+        `options within the radio group.`,
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
