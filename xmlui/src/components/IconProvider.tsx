@@ -140,7 +140,9 @@ registerIconRenderer("refresh", (props: IconBaseProps) => <FiRefreshCcw {...prop
 registerIconRenderer("chevrondown", (props: IconBaseProps) => <FiChevronDown {...props} />);
 registerIconRenderer("chevronup", (props: IconBaseProps) => <FiChevronUp {...props} />);
 registerIconRenderer("dotmenu", (props: IconBaseProps) => <DotMenuIcon {...props} />);
-registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => <DotMenuHorizontalIcon {...props} />);
+registerIconRenderer("dotmenuhorizontal", (props: IconBaseProps) => (
+  <DotMenuHorizontalIcon {...props} />
+));
 registerIconRenderer("noresult", (props: IconBaseProps) => <FiSlash {...props} />);
 registerIconRenderer("crm", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
 registerIconRenderer("chat", (props: IconBaseProps) => <IoChatboxOutline {...props} />);
@@ -154,7 +156,9 @@ registerIconRenderer("help", (props: IconBaseProps) => <FiHelpCircle {...props} 
 registerIconRenderer("compactlist", (props: IconBaseProps) => <CompactListIcon {...props} />);
 registerIconRenderer("copy", (props: IconBaseProps) => <ContentCopyIcon {...props} />);
 registerIconRenderer("move", (props: IconBaseProps) => <FiClipboard {...props} />);
-registerIconRenderer("rename", (props: IconBaseProps) => <MdOutlineDriveFileRenameOutline {...props} />);
+registerIconRenderer("rename", (props: IconBaseProps) => (
+  <MdOutlineDriveFileRenameOutline {...props} />
+));
 registerIconRenderer("hyperlink", (props: IconBaseProps) => <HyperLinkIcon {...props} />);
 registerIconRenderer("globe", (props: IconBaseProps) => <GlobeIcon {...props} />);
 registerIconRenderer("link", (props: IconBaseProps) => <LinkIcon {...props} />);
@@ -196,9 +200,10 @@ registerIconRenderer("code", (props: IconBaseProps) => <CodeFileIcon {...props} 
 registerIconRenderer("codesandbox", (props: IconBaseProps) => <CodeSandboxIcon {...props} />);
 registerIconRenderer("box", (props: IconBaseProps) => <BoxIcon {...props} />);
 registerIconRenderer(["xls", "xlsx"], (props: IconBaseProps) => <XlsIcon {...props} />);
-registerIconRenderer(["jpg", "jpeg", "png", "webp", "svg", "gif", "tif", "ppt", "pptx"], (props: IconBaseProps) => (
-  <ImageFileIcon {...props} />
-));
+registerIconRenderer(
+  ["jpg", "jpeg", "png", "webp", "svg", "gif", "tif", "ppt", "pptx"],
+  (props: IconBaseProps) => <ImageFileIcon {...props} />,
+);
 registerIconRenderer("unknownfile", (props: IconBaseProps) => <UnknownFileIcon {...props} />);
 registerIconRenderer("photo", (props: IconBaseProps) => <PhotoIcon {...props} />);
 registerIconRenderer("previous", (props: IconBaseProps) => <GrPrevious {...props} />);
@@ -211,7 +216,9 @@ registerIconRenderer("emoji", (props: IconBaseProps) => <GrEmoji {...props} />);
 registerIconRenderer("message", (props: IconBaseProps) => <RiMessage2Line {...props} />);
 registerIconRenderer("upload", (props: IconBaseProps) => <FiUpload {...props} />);
 registerIconRenderer("split-vertical", (props: IconBaseProps) => <VscSplitVertical {...props} />);
-registerIconRenderer("split-horizontal", (props: IconBaseProps) => <VscSplitHorizontal {...props} />);
+registerIconRenderer("split-horizontal", (props: IconBaseProps) => (
+  <VscSplitHorizontal {...props} />
+));
 registerIconRenderer("swap", (props: IconBaseProps) => <IoSwapVertical {...props} />);
 registerIconRenderer("download", (props: IconBaseProps) => <FiDownload {...props} />);
 registerIconRenderer("note", (props: IconBaseProps) => <RiStickyNoteLine {...props} />);
@@ -257,7 +264,9 @@ export function IconProvider({ children }: { children: ReactNode }) {
     return pool.get(name);
   }, []);
 
-  const [customSvgs, setCustomSvgs] = useState<Record<string, { name: string; attributes: Record<string, any> }>>({});
+  const [customSvgs, setCustomSvgs] = useState<
+    Record<string, { name: string; attributes: Record<string, any> }>
+  >({});
   const attachedResources = useRef<Record<string, boolean>>({});
   const spriteRootRef = useRef<SVGSVGElement>(null);
 

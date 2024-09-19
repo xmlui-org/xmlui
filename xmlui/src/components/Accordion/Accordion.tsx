@@ -4,7 +4,7 @@ import styles from "./Accordion.module.scss";
 
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Accordion, positionInGroupNames } from "./AccordionNative";
+import { AccordionComponent } from "./AccordionNative";
 import {
   dCollapse,
   dComponent,
@@ -13,6 +13,7 @@ import {
   dExpanded,
   dFocus,
 } from "@components/metadata-helpers";
+import { MemoizedItem } from "@components/container-helpers";
 import { triggerPositionNames } from "@components/abstractions";
 
 const COMP = "Accordion";
@@ -27,15 +28,8 @@ export const AccordionMd = createMetadata({
     `the display of content sections. It helps organize information by expanding or collapsing it ` +
     `based on user interaction.`,
   props: {
-    header: d("This property declares the text used in the component's header."),
     headerTemplate: dComponent(
       "This property describes the template to use as the component's header.",
-    ),
-    initiallyExpanded: d(
-      `This property indicates if the ${COMP} is expanded (\`true\`) or collapsed (\`false\`).`,
-      null,
-      "boolean",
-      false,
     ),
     triggerPosition: d(
       `This property indicates the position where the trigger icon should be displayed. The \`start\` ` +
@@ -60,10 +54,6 @@ export const AccordionMd = createMetadata({
     rotateExpanded: d(
       `This optional property defines the rotation angle of the expanded icon (relative to the collapsed icon).`,
     ),
-    positionInGroup: d(
-      `This property indicates the position of the accordion in a group of accordions.`,
-      positionInGroupNames,
-    ),
   },
   events: {
     displayDidChange: dDidChange(COMP),
@@ -77,28 +67,34 @@ export const AccordionMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    [`padding-horizontal-header-${COMP}`]: "",
-    [`padding-vertical-header-${COMP}`]: "",
-    [`align-vertical-header-${COMP}`]: "",
-    [`font-size-header-${COMP}`]: "",
-    [`font-weight-header-${COMP}`]: "",
-    [`font-style-header-${COMP}`]: "",
-    [`border-radius-${COMP}`]: "",
-    [`thickness-border-${COMP}`]: "",
-    [`style-border-${COMP}`]: "",
+    [`padding-horizontal-header-${COMP}`]: "$space-3",
+    [`padding-vertical-header-${COMP}`]: "$space-3",
+    [`align-vertical-header-${COMP}`]: "center",
+    [`font-size-header-${COMP}`]: "$font-size-normal",
+    [`font-weight-header-${COMP}`]: "$font-weight-normal",
+    [`font-family-header-${COMP}`]: "$font-family",
+    [`radius-${COMP}`]: "$radius",
+    [`thickness-border-${COMP}`]: "0",
+    [`style-border-${COMP}`]: "solid",
     [`width-icon-${COMP}`]: "",
     [`height-icon-${COMP}`]: "",
     light: {
-      [`color-bg-header-${COMP}`]: "",
-      [`color-header-${COMP}`]: "",
-      [`color-border-${COMP}`]: "",
-      [`color-icon-${COMP}`]: "",
+      [`color-bg-header-${COMP}`]: "$color-primary-500",
+      [`color-bg-header-${COMP}-hover`]: "$color-primary-400",
+      [`color-header-${COMP}`]: "$color-surface-50",
+      [`color-content-${COMP}`]: "$color-text-primary",
+      [`color-bg-content-${COMP}`]: "transparent",
+      [`color-border-${COMP}`]: "transparent",
+      [`color-icon-${COMP}`]: "$color-surface-50",
     },
     dark: {
-      [`color-bg-header-${COMP}`]: "",
-      [`color-header-${COMP}`]: "",
-      [`color-border-${COMP}`]: "",
-      [`color-icon-${COMP}`]: "",
+      [`color-bg-header-${COMP}`]: "$color-primary-500",
+      [`color-bg-header-${COMP}-hover`]: "$color-primary-600",
+      [`color-header-${COMP}`]: "$color-surface-50",
+      [`color-content-${COMP}`]: "$color-text-primary",
+      [`color-bg-content-${COMP}`]: "transparent",
+      [`color-border-${COMP}`]: "transparent",
+      [`color-icon-${COMP}`]: "$color-surface-50",
     },
   },
 });
@@ -106,7 +102,28 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss }) => {
-    return <Accordion />;
+  ({ node, renderChild, extractValue }) => {
+    return (
+      <AccordionComponent
+        headerRenderer={
+          node.props.headerTemplate
+            ? (item) => (
+                <MemoizedItem
+                  node={node.props.headerTemplate ?? ({ type: "Fragment" } as any)}
+                  item={item}
+                  renderChild={renderChild}
+                />
+              )
+            : undefined
+        }
+        triggerPosition={extractValue.asOptionalString(node.props?.triggerPosition)}
+        collapsedIcon={node.props.collapsedIcon}
+        expandedIcon={node.props.expandedIcon}
+        hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
+        rotateExpanded={node.props.rotateExpanded}
+      >
+        {renderChild(node.children)}
+      </AccordionComponent>
+    );
   },
 );

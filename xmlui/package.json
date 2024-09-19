@@ -12,7 +12,8 @@
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
     "get-metadata": "node scripts/get-meta.js",
-    "prepare-docs-data": "npm run build:xmlui-metadata && node scripts/buildDocs.mjs"
+    "prepare-docs-data": "npm run build:xmlui-metadata",
+    "generate-docs": "node scripts/generate-docs/get-docs.mjs"
   },
   "dependencies": {
     "@azure/msal-browser": "2.30.0",
@@ -28,6 +29,7 @@
     "@nivo/geo": "0.87.0",
     "@nivo/pie": "0.87.0",
     "@popperjs/core": "2.11.6",
+    "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-dialog": "1.0.5",
     "@radix-ui/react-dropdown-menu": "2.0.6",
     "@radix-ui/react-hover-card": "1.0.7",

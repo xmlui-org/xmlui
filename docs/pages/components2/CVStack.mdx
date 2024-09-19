@@ -1,0 +1,31 @@
+# CVStack
+
+`CVStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation centered on its contents.
+
+See also: [HStack](./HStack.mdx), [VStack](./VStack.mdx), [CHStack](./CHStack.mdx).
+
+```ueml copy
+<CVStack padding="1rem" width="33%" backgroundColor="cyan">
+  <Stack height="32px" width="32px" backgroundColor="red" />
+  <Stack height="32px" width="32px" backgroundColor="blue" />
+  <Stack height="32px" width="32px" backgroundColor="green" />
+</CVStack>
+```
+
+<Playground
+  name="Example: CVStack"
+  previewOnly={true}
+  height={140}
+  app={`
+    <CVStack padding="1rem" width="33%" backgroundColor="cyan">
+      <Stack height="32px" width="32px" backgroundColor="red" />
+      <Stack height="32px" width="32px" backgroundColor="blue" />
+      <Stack height="32px" width="32px" backgroundColor="green" />
+    </CVStack>
+  `}
+/>
+
+> **Note**: You cannot change the orientation of `CVStack` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+
+
+The parent component documentation can be found [here](./Stack.mdx).

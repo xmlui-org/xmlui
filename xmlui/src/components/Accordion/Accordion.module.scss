@@ -7,10 +7,122 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-// TODO: Define styles here
+$componentName: "Accordion";
+$radius: createThemeVar("radius-#{$componentName}");
+
+.root {
+  overflow: hidden;
+  width: 100%;
+  //box-shadow: 0 2px 10px var(--black-a4);
+  border-radius: $radius;
+  border-color: createThemeVar("color-border-#{$componentName}");
+  border-width: createThemeVar("thickness-border-#{$componentName}");
+  border-style: createThemeVar("style-border-#{$componentName}");
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.item {
+  overflow: hidden;
+  margin-top: 1px;
+  box-sizing: border-box;
+
+  &:first-child {
+    margin-top: 0;
+    border-top-left-radius: $radius;
+    border-top-right-radius: $radius;
+  }
+
+  &:last-child {
+    /*    border-bottom-left-radius: $radius;
+        border-bottom-right-radius: $radius;*/
+  }
+
+  &:focus-within {
+    position: relative;
+    z-index: 1;
+    //box-shadow: 0 0 0 2px var(--mauve-12);
+  }
+}
+
+.header {
+  display: flex;
+  margin: 0;
+}
+
+.trigger {
+  font-family: inherit;
+  flex: 1;
+  display: inline-flex;
+  align-items: createThemeVar("align-vertical-header-#{$componentName}");
+  justify-content: space-between;
+  line-height: 1;
+  box-sizing: border-box;
+  font-size: createThemeVar("font-size-header-#{$componentName}");
+  font-weight: createThemeVar("font-weight-header-#{$componentName}");
+  font-style: createThemeVar("font-style-header-#{$componentName}");
+  padding: createThemeVar("padding-vertical-header-#{$componentName}") createThemeVar("padding-horizontal-header-#{$componentName}");
+  background-color: createThemeVar("color-bg-header-#{$componentName}");
+  color: createThemeVar("color-header-#{$componentName}");
+
+  &:hover {
+    background-color: createThemeVar("color-bg-header-#{$componentName}-hover");
+  }
+
+  &.triggerStart {
+    flex-direction: row-reverse;
+  }
+}
+
+.contentWrapper {
+  overflow: hidden;
+  color: createThemeVar("color-content-#{$componentName}");
+  background-color: createThemeVar("color-bg-content-#{$componentName}");
+
+  &[data-state='open'] {
+    animation: slideDown 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  }
+
+  &[data-state='closed'] {
+    animation: slideUp 300ms cubic-bezier(0.87, 0, 0.13, 1);
+  }
+}
+
+.content {
+  padding: t.$space-2;
+}
+
+.chevron {
+  width: createThemeVar("width-icon-#{$componentName}");
+  height: createThemeVar("height-icon-#{$componentName}");
+  color: createThemeVar("color-icon-#{$componentName}");
+  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
+}
+
+/*.trigger[data-state='open'] > .chevron {
+  transform: rotate(180deg);
+}*/
+
+@keyframes slideDown {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-    themeVars: t.json-stringify($themeVars);
-  }
-  
+  themeVars: t.json-stringify($themeVars);
+}

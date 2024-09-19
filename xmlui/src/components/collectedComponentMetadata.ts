@@ -64,7 +64,7 @@ import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
 import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
-import { ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
 import { TabItemMd } from "./Tabs/TabItem";
