@@ -1,5 +1,6 @@
 import * as RAccordion from "@radix-ui/react-accordion";
-import { AccordionContext, AccordionItem } from "@components/Accordion/AccordionContext";
+import type { AccordionItem } from "@components/Accordion/AccordionContext";
+import { AccordionContext } from "@components/Accordion/AccordionContext";
 import styles from "./Accordion.module.scss";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { EMPTY_ARRAY, noop } from "@components-core/constants";
@@ -26,20 +27,26 @@ export const AccordionComponent = ({
   expandedIcon = "chevronup",
   collapsedIcon = "chevrondown",
   triggerPosition = "end",
-  registerComponentApi,
   onDisplayDidChange = noop,
 }: Props) => {
   const [accordionItems, setAccordionItems] = useState(EMPTY_ARRAY);
+  const [expandedItems, setExpandedItems] = useState<string[]>([]);
 
-  useEffect(() => {
-    registerComponentApi?.({});
-  }, [registerComponentApi]);
+  const collapseItem = useCallback(
+    (id: string) => {
+      setExpandedItems((prev) => prev.filter((item) => item !== id));
+    },
+    [setExpandedItems],
+  );
 
-  /*  useEffect(() => {
-                    onDisplayDidChange?.(activeItems);
-                  }, [activeItems]);*/
+  const expandItem = useCallback(
+    (id: string) => {
+      setExpandedItems((prev) => [...prev, id]);
+    },
+    [setExpandedItems],
+  );
 
-  const registerOrUpdate = useCallback(
+  const register = useCallback(
     (column: AccordionItem) => {
       setAccordionItems(
         produce((draft) => {
@@ -68,19 +75,30 @@ export const AccordionComponent = ({
 
   const contextValue = useMemo(
     () => ({
-      registerOrUpdate,
+      expandItem,
+      collapseItem,
       unRegister,
+      register,
       hideIcon,
       expandedIcon,
       collapsedIcon,
       triggerPosition,
     }),
-    [registerOrUpdate, unRegister, hideIcon, expandedIcon, collapsedIcon, triggerPosition],
+    [
+      expandItem,
+      collapseItem,
+      register,
+      unRegister,
+      hideIcon,
+      expandedIcon,
+      collapsedIcon,
+      triggerPosition,
+    ],
   );
 
-  const expandedItems = useMemo(() => {
-    return accordionItems.filter((item) => item.expanded).map((item) => item.id);
-  }, [accordionItems]);
+  useEffect(() => {
+    onDisplayDidChange?.(expandedItems);
+  }, [expandedItems, onDisplayDidChange]);
 
   return (
     <AccordionContext.Provider value={contextValue}>

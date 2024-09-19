@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { useAccordionContext } from "@components/Accordion/AccordionContext";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import styles from "@components/Accordion/Accordion.module.scss";
@@ -38,8 +38,33 @@ export function AccordionItemComponent({
 }: Props) {
   const [expanded, setExpanded] = useState(false);
   const id = useId();
-  const { registerOrUpdate, unRegister, hideIcon, expandedIcon, collapsedIcon, triggerPosition } =
-    useAccordionContext();
+  const itemRef = useRef<HTMLButtonElement>(null);
+  const {
+    expandItem,
+    collapseItem,
+    register,
+    unRegister,
+    hideIcon,
+    expandedIcon,
+    collapsedIcon,
+    triggerPosition,
+  } = useAccordionContext();
+
+  const doExpand = useEvent(() => {
+    setExpanded(true);
+  });
+
+  const doFocus = useCallback(() => {
+    itemRef.current?.focus();
+  }, []);
+
+  const doToggle = useEvent(() => {
+    setExpanded(!expanded);
+  });
+
+  const doCollapse = useEvent(() => {
+    setExpanded(false);
+  });
 
   useEffect(() => {
     registerComponentApi?.({
@@ -47,28 +72,18 @@ export function AccordionItemComponent({
       expand: doExpand,
       collapse: doCollapse,
       toggle: doToggle,
-      focus: () => {},
+      focus: doFocus,
     });
-  }, [registerComponentApi]);
+  }, [doCollapse, doExpand, doFocus, doToggle, registerComponentApi]);
 
-  const doExpand = useEvent(() => {
-    console.log("expand");
-    setExpanded(true);
-  });
-
-  const doToggle = useEvent(() => {
-    console.log("toggle");
-    setExpanded(!expanded);
-  });
-
-  /*  const expanded = useMemo(() => {
-              return accordionItems.find((item) => item.id === id)?.expanded ?? false;
-            }, [accordionItems]);*/
-
-  const doCollapse = useEvent(() => {
-    console.log("collapse");
-    setExpanded(false);
-  });
+  useEffect(() => {
+    if (expanded) {
+      expandItem(id);
+    } else {
+      collapseItem(id);
+    }
+    //onDisplayDidChange?.(expanded);
+  }, [collapseItem, expandItem, expanded, id, onDisplayDidChange]);
 
   const item = useMemo(
     () => (
@@ -76,10 +91,11 @@ export function AccordionItemComponent({
         key={id}
         value={id}
         className={styles.item}
-        onClick={() => setExpanded(!expanded)}
+        onClick={doToggle}
       >
         <RAccordion.Header className={styles.header}>
           <RAccordion.Trigger
+            ref={itemRef}
             className={classnames(styles.trigger, {
               [styles.triggerStart]: triggerPosition === "start",
             })}
@@ -99,18 +115,16 @@ export function AccordionItemComponent({
         </RAccordion.Content>
       </RAccordion.Item>
     ),
-    [id, hideIcon, expandedIcon, collapsedIcon, triggerPosition, expanded],
+    [id, doToggle, triggerPosition, headerRenderer, header, hideIcon, expanded, expandedIcon, collapsedIcon, content],
   );
 
   useEffect(() => {
-    console.log("register or update");
-    registerOrUpdate({
+    register({
       header,
       content: item,
       id,
-      expanded,
     });
-  }, [id, header, registerOrUpdate, item, expanded]);
+  }, [id, header, item, register]);
 
   useEffect(() => {
     return () => {

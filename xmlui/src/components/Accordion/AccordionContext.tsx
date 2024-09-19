@@ -1,9 +1,18 @@
-import { createContext, useContext } from "react";
+import { createContext, type ReactNode, useContext } from "react";
 import type { Accordion } from "@components/abstractions";
 
-export type AccordionItem = Accordion & { id: string };
+export type AccordionItem = Accordion & {
+  id: string;
+  headerRenderer?: (header: string) => ReactNode;
+  expanded?: boolean;
+  doExpand?: () => void;
+  doCollapse?: () => void;
+  doToggle?: () => void;
+};
 export const AccordionContext = createContext({
-  registerOrUpdate: (accordionItem: AccordionItem) => {},
+  expandItem: (id: string) => {},
+  collapseItem: (id: string) => {},
+  register: (accordionItem: AccordionItem) => {},
   unRegister: (id: string) => {},
   hideIcon: false,
   expandedIcon: "chevronup",
