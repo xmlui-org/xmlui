@@ -22,6 +22,7 @@ const COMP = "Accordion";
 // Make the header focusable, handle ARIA attributes, and manage the state of the accordion.
 
 export const AccordionMd = createMetadata({
+  status: "in review",
   description:
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component is a collapsible container that toggles ` +
     `the display of content sections. It helps organize information by expanding or collapsing it ` +
