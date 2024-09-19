@@ -1,12 +1,8 @@
 # RadioGroup
 
-The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](
-./RadioGroupOption.mdx
-)
-components) that allow users to select only one option from the group at a time.
+The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time.
 
-`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide
-for details.
+`RadioGroup` is often used in forms. See the [Using Forms](/learning/using-components/forms.mdx) guide for details.
 
 ## Context Variables
 
@@ -16,9 +12,11 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-Set this property to `true` to automatically get the focus when the component is displayed.
+This property sets the label of the component.
 
 ### `enabled`
+
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
@@ -49,6 +47,8 @@ This property indicates whether the input accepts user actions (`true`) or not (
 
 ### `initialValue`
 
+This property sets the component's initial value.
+
 This property defines the initial value of the selected option within the group.
 
 ```ueml copy /initialValue="first"/
@@ -78,12 +78,11 @@ This property defines the initial value of the selected option within the group.
 
 ### `labelId`
 
-You can specify the identifier of a component acting as its label. When you click the label,
-the component behaves as you clicked it.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `maxLength`
 
-This property sets the maximum number of characters you can type into the component's text.
+This property sets the maximum length of the input it accepts.
 
 ### `readOnly`
 
@@ -95,8 +94,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 ### `validationStatus`
 
-With this property, you can set the checkbox's validation status to "none", "error", "warning",
-or "valid".
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
@@ -147,52 +145,13 @@ This prop is used to visually indicate status changes reacting to form field val
 
 ## API
 
-### `setValue`
-
-You can use this method to set the component's current value programmatically.
-
-```ueml copy {2, 7-8}
-<VStack gap="1rem">
-  <RadioGroup id="radio">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-  </RadioGroup>
-  <HStack gap="0.5rem">
-    <Button label="Set First" onClick="radio.setValue('first')" />
-    <Button label="Set Second" onClick="radio.setValue('second')" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value and setValue"
-  height={110}
-  app={`
-    <VStack gap="1rem">
-      <RadioGroup id="radio">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
-      </RadioGroup>
-      <HStack gap="0.5rem">
-        <Button label="Set First" onClick="radio.setValue('first')" />
-        <Button label="Set Second" onClick="radio.setValue('second')" />
-      </HStack>
-    </VStack>
-  `}
-/>
-
-### `value`
-
-You can query this read-only API property to get the input component's current value.
-
-See an example in the 
-`setValue`
- API method.
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
+
+This event is triggered when value of RadioGroup has changed.
 
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
@@ -225,15 +184,11 @@ Select one of the available options and see how the `Text` underneath it is upda
 
 ### `gotFocus`
 
-This event is triggered when the 
-`RadioGroup`
- receives focus.
+This event is triggered when the RadioGroup has received the focus.
 
 ### `lostFocus`
 
-This event is triggered when the 
-`RadioGroup`
- loses focus.
+This event is triggered when the RadioGroup has lost the focus.
 
 ## Styling
 

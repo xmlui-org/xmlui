@@ -1,10 +1,6 @@
 # MultiCombobox
 
-The `MultiCombobox` component is essentially a [`ComboBox`](
-./ComboBox.mdx
-) that enables the selection of multiple elements
-from a list either by typing in the field or by clicking list elements in the dropdown.
-These elements are then displayed in the field and can be removed as necessary.
+A `Combobox` is a component that combines the features of a dropdown list and an input field.
 
 The component provides two ways to add a list of options to the dropdown:
 
@@ -69,18 +65,13 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 
 ## Context Variables
 
-### `$item`
-
-This context variable acts as a template for an item in the list.
-Access attributes of the item using the dot notation.
-
-For an example, see the [`optionTemplate`](#optiontemplate) property or the [`change`](#change) event.
+This component does not have any context variables.
 
 ## Properties
 
 ### `autoFocus`
 
-Set this property to `true` to automatically focus the component when it is displayed.
+This property sets the label of the component.
 
 ```ueml copy /autoFocus="true"/
 <MultiCombobox autoFocus="true" padding="$space-1">
@@ -105,8 +96,7 @@ Set this property to `true` to automatically focus the component when it is disp
 
 ### `emptyListTemplate`
 
-With this property, you can specify what should appear when the list is empty.
-The template accepts any component definition.
+With this property, you can define the template to display when the search list (after filtering) contains no element.
 
 Click on the second field to see the custom empty list indicator.
 
@@ -151,8 +141,7 @@ Click on the second field to see the custom empty list indicator.
 
 ### `enabled`
 
-Indicates whether the input field is enabled (`true`) or disabled (`false`).
-The default value is `true`.
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy /enabled="false"/
 <MultiCombobox enabled="false" padding="$space-1">
@@ -177,16 +166,15 @@ The default value is `true`.
 
 ### `endIcon`
 
-This property sets the icon the right side of the input field (in a left-to-right display).
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `endText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `initialValue`
 
-Specify a list of values that should be initially selected from the list.
-If the value is not in the list, it will be ignored.
+This property sets the component's initial value.
 
 ```ueml copy /initialValue="['chocolate', 'pistachio']"/
 <MultiCombobox initialValue="['chocolate', 'pistachio']" padding="$space-1">
@@ -209,9 +197,17 @@ If the value is not in the list, it will be ignored.
   `}
 />
 
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
+
+### `maxLength`
+
+This property sets the maximum length of the input it accepts.
+
 ### `optionTemplate`
 
-This property sets the placeholder text displayed in the input field if no value is selected.
+You can define a template for the option items of the `Combobox`.
 
 ```ueml copy
 <MultiCombobox>
@@ -248,7 +244,7 @@ This property sets the placeholder text displayed in the input field if no value
 
 ### `placeholder`
 
-This property sets the placeholder text displayed in the input field if no value is selected.
+A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy /placeholder="Select any number of options"/
 <MultiCombobox placeholder="Select any number of options" padding="$space-1">
@@ -271,10 +267,17 @@ This property sets the placeholder text displayed in the input field if no value
   `}
 />
 
+### `readOnly`
+
+Set this property to `true` to disallow changing the component value.
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
 ### `startIcon`
 
-This property sets the icon the left side of the input field (in a left-to-right display).
-The value must be a valid icon name, otherwise nothing will be rendered.
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy /startIcon="email"/
 <MultiCombobox startIcon="email" padding="$space-1">
@@ -299,7 +302,7 @@ The value must be a valid icon name, otherwise nothing will be rendered.
 
 ### `startText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy /startText="Badges:"/
 <MultiCombobox startText="Badges:" padding="$space-1">
@@ -324,7 +327,7 @@ This property sets a text to appear on the right side of the input field (in a l
 
 ### `validationStatus`
 
-With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 | Value     | Description                                           |
 | :-------- | :---------------------------------------------------- |
@@ -357,42 +360,13 @@ With this property, you can set the input control's validation status to "none",
 
 ## API
 
-### `focus`
-
-This API method focuses the input field.
-
-```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
-  <Button label="Focus Input" onClick="inputControl.focus()" />
-  <MultiCombobox id="inputControl">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
-  </MultiCombobox>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus()"
-  height={200}
-  app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <MultiCombobox id="inputControl">
-      <Option label="Vanilla" value="vanilla" />
-      <Option label="Chocolate" value="chocolate" />
-      <Option label="Pistachio" value="pistachio" />
-    </MultiCombobox>
-  </VStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event fires when the selected item list changes.
+This event is triggered when value of Combobox has changed.
 
 ```ueml copy /onDidChange="(newItems) => newValues = newItems"/
 <VStack padding="$space-1" gap="$space-0_5">
@@ -429,7 +403,7 @@ This event fires when the selected item list changes.
 
 ### `gotFocus`
 
-This event fires when the component is focused.
+This event is triggered when the Combobox has received the focus.
 
 ```ueml copy {5-6}
 <VStack padding="$space-1" gap="$space-0_5">
@@ -468,7 +442,7 @@ This event fires when the component is focused.
 
 ### `lostFocus`
 
-This event fires when the component loses focus.
+This event is triggered when the Combobox has lost the focus.
 
 See the example in [gotFocus event section](#gotfocus).
 
@@ -547,7 +521,7 @@ Theme variables to set the styles of an unselected item:
       themeVars: {
         "thickness-border-MultiCombobox": "8px",
         "radius-MultiCombobox": "30px",
-        "color-placeholder-MultiCombobox-default": "blue"
+        "color-placeholder-MultiCombobox-default": "blue",
       },
     },
   ]}

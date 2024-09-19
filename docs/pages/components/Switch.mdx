@@ -1,20 +1,6 @@
 # Switch
 
-The 
-`Switch`
- component is a user interface element that allows users to toggle between two states: on and off.
-It consists of a small rectangular or circular button that can be moved left or right to change its state.
-It's analogous in function to the [
-`Checkbox`
-](
-./Checkbox.mdx
-).
-
-To bind data to a 
-`Switch`
-, use the XMLUI [Forms infrastructure](
-../learning/using-components/forms
-).
+The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.
 
 ## Context Variables
 
@@ -24,9 +10,11 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-Set this property to `true` to automatically get the focus when the component is displayed.
+This property sets the label of the component.
 
 ### `enabled`
+
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
 it is `true` by default.
@@ -66,12 +54,17 @@ it is `true` by default.
   `}
 />
 
+### `indeterminate`
+
+The `true` value of this property signals that the component is in an _intedeterminate state_.
+
 ### `initialValue`
 
-This property sets whether the switch should be displayed in the checked (`true`) or unchecked 
-(`false`) state when it is displayed initially.
+This property sets the component's initial value.
 
 ### `label`
+
+This property sets the label of the component.
 
 This property sets the label of the component.
 
@@ -96,10 +89,11 @@ This property sets the label of the component.
 
 ### `labelId`
 
-You can specify the identifier of a component acting as its label. When you click the label, 
-the component behaves as you clicked it.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `labelPosition`
+
+Places the label at the `top`, `right`, `bottom`, or `left` of the component.
 
 Places the label at the `top`, `right`, `bottom`, or `left` of the `Switch`.
 
@@ -151,78 +145,23 @@ If true, the value of the component cannot be modified.
   `}
 />
 
-### `required`
-
-Set this property to `true` to indicate it must have a value before submitting the containing form.
-
 ### `validationStatus`
 
-With this property, you can set the checkbox's validation status to "none", "error", "warning", 
-or "valid".
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 ## API
 
-### `setValue`
-
-You can use this method to set the switch's current value programmatically (`true`: checked, `false`: unchecked).
-
-```ueml copy {9,12,14}
-<VStack margin="1rem" gap="0.5rem" var.changes="">
-  <Switch 
-    id="mySwitch" 
-    readOnly="true" 
-    label="This switch can be set only programmatically" 
-    onDidChange="changes += '+'" />
-  <HStack gap="0.5rem">
-    <Button 
-      label="Check" 
-      onClick="mySwitch.setValue(true)" />
-    <Button 
-      label="Uncheck" 
-      onClick="mySwitch.setValue(false)" />
-  </HStack>
-  <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
-  <Text value="Changes: {changes}" />
-</VStack>
-```
-
-<Playground
-    previewOnly
-    name="Example: value and setValue"
-    height={170}
-    app={`
-    <VStack margin="1rem" gap="0.5rem" var.changes="">
-      <Switch 
-        id="mySwitch" 
-        readOnly="true" 
-        label="This switch can be set only programmatically" 
-        onDidChange="changes += '+'" />
-      <HStack gap="0.5rem">
-        <Button 
-          label="Check" 
-          onClick="mySwitch.setValue(true)" />
-        <Button 
-          label="Uncheck" 
-          onClick="mySwitch.setValue(false)" />
-      </HStack>
-      <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
-      <Text value="Changes: {changes}" />
-    </VStack>
-  `}
-/>
-
-### `value`
-
-You can query this read-only API property to query the switch's current value (`true`: checked,
-`false`: unchecked).
-
-See an example in the 
-`setValue`
- API method.
+This component does not provide any API.
 
 ## Events
 
+### `click`
+
+This event is triggered when the Switch is clicked.
+
 ### `didChange`
+
+This event is triggered when value of Switch has changed.
 
 This event is triggered when the `Switch` is toggled due to user interaction.
 A read-only switch never fires this event, and it won't fire if the switch's value is set programmatically.
@@ -249,6 +188,8 @@ A read-only switch never fires this event, and it won't fire if the switch's val
 />
 
 ### `gotFocus`
+
+This event is triggered when the Switch has received the focus.
 
 This event is triggered when the `Switch` receives focus.
 
@@ -283,11 +224,7 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 
 ### `lostFocus`
 
-This event is triggered when the 
-`Switch`
- loses focus.
-
-(See the example above)
+This event is triggered when the Switch has lost the focus.
 
 ## Styling
 

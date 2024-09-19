@@ -64,6 +64,8 @@ This Boolean property indicates if the particular navigation is an active link (
 
 ### `enabled`
 
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
+
 This Boolean property indicates if the link is enabled (default: true).
 
 <Playground
@@ -106,11 +108,11 @@ This property allows you to add an icon (specify the icon's name) to the link.
 
 ### `label`
 
-This property sets the text to display with the `Link` component.
+This property sets the label of the component.
 
 ### `target`
 
-This property specifies where to open the link represented by the `NavLink`. This property accepts the following values (in accordance with the HTML standard):
+This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
 
 | Value     | Description                                                   |
 | --------- | ------------------------------------------------------------- |
@@ -142,26 +144,7 @@ This component does not provide any API.
 
 ## Events
 
-### `click`
-
-This event is fired when the user clicks the link. With an event handler, you can define how to respond to the user's click.
-
-The following sample displays a message when the user navigates to the link:
-
-```ueml
-<Link label="Check my status"
-  onClick="window.alert('You are on the Status page.');" />
-```
-
-<Playground
-  previewOnly={true}
-  name="Example: navigate"
-  height={40}
-  app={`
-    <Link label="Check my status" 
-      onClick="window.alert('You are on the Status page.');" />
-  `}
-/>
+This component does not have any events.
 
 ## Styling
 

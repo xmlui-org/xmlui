@@ -1,18 +1,12 @@
 # Form
 
-An XMLUI 
-`Form`
- is a fundamental component that displays user interfaces that allow users to input
-(or change) data and submit it to the app (a server) for further processing.
+A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.
 
-You can learn more about this component in the [Using Forms](/learning/using-components/forms/)
-article.
+You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
 
 ## Context Variables
 
 ### `$subject`
-
-This property represents the value of the current iteration item.
 
 This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances.
 
@@ -43,7 +37,9 @@ The following sample demonstrates enabling a field according to another's curren
 
 ### `buttonRowTemplate`
 
-This property allows defining a custom component to display the buttons at the bottom of the form. The following example demonstrates using it:
+This property allows defining a custom component to display the buttons at the bottom of the form.
+
+The following example demonstrates using it:
 
 ```ueml copy {9-18}
 <Form id="searchForm" padding="0.5rem"
@@ -101,16 +97,15 @@ This property defines the label of the Cancel button, by default, "Cancel".
 
 ### `itemLabelBreak`
 
-This boolean value indicates if the label can be split into multiple lines if it would overflow
-the available label width.
+This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
 
 ### `itemLabelPosition`
 
-This property sets the position of the item label. The default value is `top`.
+This property sets the position of the item labels within the form. The default value is `top`. Individual `FormItem` instances can override this property.
 
 ### `itemLabelWidth`
 
-This property sets the width of the item label.
+This property sets the width of the item labels within the form. Individual `FormItem` instances can override this property.
 
 ### `saveLabel`
 
@@ -118,19 +113,21 @@ This property defines the label of the Save button, by default, "Save".
 
 ### `subject`
 
-This property sets the initial value of the form's data structure. The form infrastructure
-uses this value to set the initial state of form items within the form.
+This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
 
 ### `swapCancelAndSave`
 
-By default, the Cancel button is to the left of the Save button. Set this property to
-`true` to swap them or `false` to keep their original location.
+By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 
 ## API
 
 This component does not provide any API.
 
 ## Events
+
+### `cancel`
+
+The form infrastructure fires this event when the form is canceled.
 
 ### `reset`
 

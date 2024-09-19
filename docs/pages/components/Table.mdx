@@ -2,8 +2,7 @@ import data from  "../../component-samples/Table/list-component-data.js";
 
 # Table
 
-`Table` is a component that displays cells organized into rows and columns.
-The `Table` component is virtualized so it only renders visible cells.
+`Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells.
 
 In the following sections the examples use data with the structure outlined below:
 
@@ -37,12 +36,9 @@ This component does not have any context variables.
 
 ## Properties
 
-### `alwaysShowOrderingIndicators`
-
-This property controls whether to show ordering indicators in column headers (`true`) or not (`false`).
-The default value is `false`.
-
 ### `autoFocus`
+
+This property sets the label of the component.
 
 If this boolean prop is set to true, the `Table` will be focused when appearing on the UI.
 
@@ -91,6 +87,8 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
 
 ### `enableMultiRowSelection`
 
+This boolean property indicates whether you can select multiple rows in the table. This property only has an effect when the rowsSelectable property is set. Setting it to `false` limits selection to a single row.
+
 This boolean property indicates whether you can select multiple rows in the table.
 This property only has an effect when the `rowsSelectable` property is set.
 Setting it to `false` limits selection to a single row.
@@ -126,6 +124,7 @@ By default, the value of this property is `true`.
 ### `headerHeight`
 
 This optional property is used to specify the height of the table header.
+
 It accepts common [size values](./appearance/common-units.mdx#size-values).
 
 ```ueml copy /headerHeight="60px"/
@@ -149,7 +148,9 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 
 ### `hideHeader`
 
-Toggle the header visibility using this property. Set it to `true` to hide the header.
+Set the header visibility using this property. Set it to `true` to hide the header.
+
+Set the header visibility using this property. Set it to `true` to hide the header.
 The default value is `false`.
 
 ```ueml copy /hideHeader="true"/
@@ -172,6 +173,8 @@ The default value is `false`.
 />
 
 ### `iconNoSort`
+
+Allows the customization of the icon displayed in the Table column header when when sorting is enabled and sorting is not done according to the column.
 
 Allows the customization of the icon displayed in a Table column header when when sorting is enabled 
 and sorting is not done according to the column.
@@ -197,6 +200,8 @@ and sorting is not done according to the column.
 
 ### `iconSortAsc`
 
+Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in ascending order.
+
 Allows the customization of the icon displayed in a Table column header when sorting is enabled, 
 sorting is done according to the column, and the column is sorted in ascending order.
 
@@ -221,6 +226,8 @@ sorting is done according to the column, and the column is sorted in ascending o
 
 ### `iconSortDesc`
 
+Allows the customization of the icon displayed in the Table column header when sorting is enabled, sorting is done according to the column, and the column is sorted in descending order.
+
 Allows the customization of the icon displayed in a Table column header when sorting is enabled, 
 sorting is done according to the column, and the column is sorted in descending order.
 
@@ -230,7 +237,7 @@ sorting is done according to the column, and the column is sorted in descending 
 </Table>
 ```
 
-Select a column header and set it to descending ordering.
+Select a column header and set it to descending ordering. 
 
 <Playground
   previewOnly
@@ -270,18 +277,17 @@ This property adds pagination controls to the `Table`.
 
 ### `items`
 
-You can use `items` as an alias for the `data` property. When you bind the table to a data source 
-(for example, you set the 
-`data source`
- property to a URL to fetch the data from), `data` 
-represents the information obtained from the API.
+You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `datasource` property to a URL to fetch the data from), `data` represents the information obtained from the API.
 
-By convention, when you use direct data (set manually or assembled by code), you pass it in the 
-`items` property.
+You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `data source` property to a URL to fetch the data from), `data` represents the information obtained from the API.
+
+By convention, when you use direct data (set manually or assembled by code), you pass it in the `items` property.
 
 When both `items` and `data` are used, `items` has priority.
 
 ### `loading`
+
+This boolean property indicates if the component is fetching (or processing) data. This property is useful when data is loaded conditionally or receiving it takes some time.
 
 This boolean property indicates if the component is fetching (or processing) data.
 This property is useful when data is loaded conditionally or receiving it takes some time.
@@ -325,6 +331,7 @@ A property to customize what to display if the table does not contain any data.
 ### `pageSizes`
 
 Describes how big a page should be for pagination.
+
 Page sizes are only accepted in an array, even if the array contains one item.
 
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
@@ -350,8 +357,7 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 
 ### `rowDisabledPredicate`
 
-This property defines a predicate function with a return value that determines if the row should be disabled.
-The function retrieves the item to display and should return a Boolean-like value.
+This property defines a predicate function with a return value that determines if the row should be disabled. The function retrieves the item to display and should return a Boolean-like value.
 
 The following example disables all table rows where the item's quantity exceeds 6:
 
@@ -383,6 +389,7 @@ The following example disables all table rows where the item's quantity exceeds 
 ### `rowsSelectable`
 
 Indicates whether the rows are selectable (`true`) or not (`false`).
+
 The default value is `false`.
 
 > **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
@@ -436,8 +443,7 @@ This property is used to determine which data attributes to sort by.
 
 ### `sortDirection`
 
-The `sortDirection` determines the sort order to be `ascending` or `descending`.
-This property only works if the [`sortBy`](#sortby) property is also set.
+This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 
 ```ueml copy /sortDirection="descending"/
 <Table data='{[...]}' sortBy="quantity" sortDirection="descending">
@@ -466,9 +472,7 @@ This component does not provide any API.
 
 ### `sortingDidChange`
 
-This event is fired when the table data sorting has changed.
-It has two arguments: the column's name and the sort direction.
-When the column name is empty, the table displays the data list as it received it.
+This event is fired when the table data sorting has changed. It has two arguments: the column's name and the sort direction. When the column name is empty, the table displays the data list as it received it.
 
 Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
 
@@ -505,9 +509,7 @@ Click on any of the column headers to trigger a new sorting:
 
 ### `willSort`
 
-This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction.
-
-When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
+This event is fired before the table data is sorted. It has two arguments: the column's name and the sort direction. When the method returns a literal `false` value (and not any other falsy one), the method indicates that the sorting should be aborted.
 
 The following example uses the `willSort` event to refuse sorting by name:
 

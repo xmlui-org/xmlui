@@ -1,6 +1,6 @@
 # DatePicker
 
-The `DatePicker` component allows users to select a date from a graphical calendar interface.
+A datepicker component
 
 ## Context Variables
 
@@ -10,12 +10,11 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-If this boolean prop is set to `true`, the `DatePicker` will be focused when it appears on the UI.
-The default is `false`.
+This property sets the label of the component.
 
 ### `dateFormat`
 
-Define custom date formats using this property.
+The format of the date displayed in the input field
 
 Formats handle years (`y`), months (`m` or `M`), days of the month (`d`).
 Providing multiple placeholder letters changes the display of the date.
@@ -46,8 +45,7 @@ The table below shows the available date formats:
 
 ### `disabledDates`
 
-This optional property determines which dates are disabled and unselectable.
-The property accepts a list of dates in string format the same way as the `initialValue` does.
+An array of dates that are disabled
 
 ```ueml copy
 <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
@@ -62,7 +60,7 @@ The property accepts a list of dates in string format the same way as the `initi
 
 ### `enabled`
 
-Controls whether the input field is enabled (`true`) or disabled (`false`).
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy
 <DatePicker enabled="false" />
@@ -77,8 +75,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 ### `fromDate`
 
-This optional property indicates the start of the range of selectable dates.
-The property accepts a date in string format the same way as the `initialValue` does.
+The start date of the range of selectable dates
 
 ```ueml copy
 <DatePicker fromDate="05/24/2024" />
@@ -93,7 +90,7 @@ The property accepts a date in string format the same way as the `initialValue` 
 
 ### `initialValue`
 
-The initial value displayed in the input field.
+This property sets the component's initial value.
 
 ```ueml copy
 <DatePicker initialValue="05/25/2024" />
@@ -106,14 +103,9 @@ The initial value displayed in the input field.
   app={`<DatePicker initialValue="05/25/2024" />`}
 />
 
-### `labelId`
-
-You can specify the identifier of a component acting as its label. When you click the label,
-the component behaves as you clicked it.
-
 ### `mode`
 
-This property determines whether the user can pick only one date (`single`) or a start and end date (`range`).
+The mode of the datepicker (single or range)
 
 ```ueml copy {2-3}
 <VStack>
@@ -150,15 +142,11 @@ A placeholder text that is visible in the input field when its empty.
 
 ### `readOnly`
 
-This boolean determines whether the input field can be modified or not.
-
-### `required`
-
-Set this property to `true` to indicate it must have a value before submitting the containing form.
+Set this property to `true` to disallow changing the component value.
 
 ### `showWeekNumber`
 
-Either show the number of weeks (`true`) or not (`false`).
+Whether to show the week number in the calendar
 
 ```ueml copy
 <DatePicker showWeekNumber="true" />
@@ -173,8 +161,7 @@ Either show the number of weeks (`true`) or not (`false`).
 
 ### `toDate`
 
-This optional property indicates the end of the range of selectable dates.
-The property accepts a date in string format the same way as the `initialValue` does.
+The end date of the range of selectable dates
 
 ```ueml copy
 <DatePicker toDate="05/26/2024" />
@@ -189,7 +176,7 @@ The property accepts a date in string format the same way as the `initialValue` 
 
 ### `validationStatus`
 
-This prop is used to visually indicate status changes reacting to form field validation.
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 | Value     | Description                                           |
 | :-------- | :---------------------------------------------------- |
@@ -221,8 +208,7 @@ This prop is used to visually indicate status changes reacting to form field val
 
 ### `weekStartsOn`
 
-Determines on which day the week starts denoted by integers.
-The week starts on Sunday by default.
+The first day of the week. 0 is Sunday, 1 is Monday, etc.
 
 | Day       | Number |
 | :-------- | :----- |
@@ -247,58 +233,13 @@ The week starts on Sunday by default.
 
 ## API
 
-### `setValue`
-
-You can use this method to set the component's current value programmatically.
-
-```ueml copy {3, 9, 12}
-<VStack gap="0.5rem">
-  <DatePicker
-    id="picker"
-    readOnly="true"
-  />
-  <HStack gap="0.5rem">
-    <Button 
-      label="Add Text" 
-      onClick="picker.setValue('05/25/2024')" />
-    <Button 
-      label="Remove Text" 
-      onClick="picker.setValue('')" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value and setValue"
-  app={`
-  <VStack gap="0.5rem">
-    <DatePicker
-      id="picker"
-      readOnly="true"
-    />
-    <HStack gap="0.5rem">
-      <Button 
-        label="Add Text" 
-        onClick="picker.setValue('05/25/2024')" />
-      <Button 
-        label="Remove Text" 
-        onClick="picker.setValue('')" />
-    </HStack>
-  </VStack>`}
-/>
-
-### `value`
-
-You can query this read-only API property to get the input component's current value.
-
-See an example in the `setValue` API method.
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event is triggered after the user has changed the field value.
+This event is triggered when value of DatePicker has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
@@ -322,9 +263,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ### `gotFocus`
 
-This event is triggered when the 
-`DatePicker`
- receives focus.
+This event is triggered when the DatePicker has received the focus.
 
 Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
@@ -355,9 +294,7 @@ Note how clicking elsewhere resets the text to the original.
 
 ### `lostFocus`
 
-This event is triggered when the `DatePicker` loses focus.
-
-(See the example in the [`gotFocus`](#gotfocus) event section.)
+This event is triggered when the DatePicker has lost the focus.
 
 ## Styling
 

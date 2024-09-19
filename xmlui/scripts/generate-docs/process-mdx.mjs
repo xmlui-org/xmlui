@@ -7,7 +7,7 @@ import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
 const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
 const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
 const examplesFolder = join(projectRootFolder, "docs", "component-samples");
-const outFolder = join(projectRootFolder, "docs", "pages", "components2");
+const outFolder = join(projectRootFolder, "docs", "pages", "components");
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 

@@ -1,10 +1,6 @@
 # MultiSelect
 
-The `MultiSelect` component works the same way as the [`Select`](
-./Select.mdx
-)
-component with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown.
-These elements are then displayed in the field and can be removed as necessary.
+The `MultiSelect` component works the same way as the [`Select`](./Select.mdx) component with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown. These elements are then displayed in the field and can be removed as necessary.
 
 The component provides two ways to add a list of options to the dropdown:
 
@@ -72,16 +68,37 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 ### `$item`
 
 This context variable acts as a template for an item in the list.
-Access attributes of the item using the dot notation.
-
-For an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didChange) event.
 
 ## Properties
+
+### `autoFocus`
+
+This property sets the label of the component.
+
+```ueml copy /autoFocus="true"/
+<MultiSelect autoFocus="true" padding="$space-1">
+  <Option value="opt1" label="first"/>
+  <Option value="opt2" label="second"/>
+  <Option value="opt3" label="third"/>
+</MultiSelect>
+```
+
+<Playground
+  previewOnly
+  name="Example: autoFocus"
+  height={160}
+  app={`
+  <MultiSelect autoFocus="true" padding="$space-1">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </MultiSelect>
+  `}
+/>
 
 ### `emptyListTemplate`
 
 With this property, you can specify what should appear when the list is empty.
-The template accepts any component definition.
 
 Click on the second field to see the custom empty list indicator.
 
@@ -126,8 +143,7 @@ Click on the second field to see the custom empty list indicator.
 
 ### `enabled`
 
-Indicates whether the input field is enabled (`true`) or disabled (`false`).
-The default value is `true`.
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy /enabled="false"/
 <MultiSelect enabled="false" padding="$space-1">
@@ -152,16 +168,15 @@ The default value is `true`.
 
 ### `endIcon`
 
-This property sets the icon the right side of the input field (in a left-to-right display).
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `endText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `initialValue`
 
-Specify a list of values that should be initially selected from the list.
-If the value is not in the list, it will be ignored.
+This property sets the component's initial value.
 
 ```ueml copy /initialValue="['second', 'third']"/
 <MultiSelect initialValue="['second', 'third']" padding="$space-1">
@@ -183,6 +198,10 @@ If the value is not in the list, it will be ignored.
   </MultiSelect>
   `}
 />
+
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `optionTemplate`
 
@@ -221,9 +240,13 @@ This property sets the placeholder text displayed in the input field if no value
   `}
 />
 
+### `options`
+
+This property specifies the list of options to be displayed in the dropdown.
+
 ### `placeholder`
 
-This property sets the placeholder text displayed in the input field if no value is selected.
+A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy /placeholder="Select any number of options"/
 <MultiSelect placeholder="Select any number of options" padding="$space-1">
@@ -246,18 +269,25 @@ This property sets the placeholder text displayed in the input field if no value
   `}
 />
 
+### `readOnly`
+
+Set this property to `true` to disallow changing the component value.
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
 ### `startIcon`
 
-This property sets the icon the left side of the input field (in a left-to-right display).
-The value must be a valid icon name, otherwise nothing will be rendered.
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `startText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `validationStatus`
 
-With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 | Value     | Description                                           |
 | :-------- | :---------------------------------------------------- |
@@ -290,42 +320,13 @@ With this property, you can set the input control's validation status to "none",
 
 ## API
 
-### `focus`
-
-This API method focuses the input field.
-
-```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
-  <Button label="Focus Input" onClick="inputControl.focus()" />
-  <MultiSelect id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </MultiSelect>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus()"
-  height={200}
-  app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <MultiSelect id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </MultiSelect>
-  </VStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event fires when the selected item list changes.
+This event is triggered when value of MultiSelect has changed.
 
 ```ueml copy /onDidChange="(newItems) => newValues = newItems"/
 <VStack padding="$space-1" gap="$space-0_5">
@@ -362,7 +363,7 @@ This event fires when the selected item list changes.
 
 ### `gotFocus`
 
-This event fires when the component is focused.
+This event is triggered when the MultiSelect has received the focus.
 
 ```ueml copy {5-6}
 <VStack padding="$space-1" gap="$space-0_5">
@@ -401,7 +402,7 @@ This event fires when the component is focused.
 
 ### `lostFocus`
 
-This event fires when the component loses focus.
+This event is triggered when the MultiSelect has lost the focus.
 
 See the example in [gotFocus event section](#gotfocus).
 

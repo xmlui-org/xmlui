@@ -1,8 +1,6 @@
 # Select
 
-The `Select` component provides a menu of options to be displayed in a dropdown list with using label-value pairs.
-The dropdown list displays the labels while
-XMLUI stores the selected value for further use when the user selects a particular item.
+A dropdown list of options
 
 ## Using `Select`
 
@@ -36,11 +34,16 @@ If the `label` is not specified `value` is shown.
 ### `$item`
 
 This context variable acts as a template for an item in the list.
+
 Access attributes of the item using the dot notation.
 
-For an example, see the [`optionTemplate`](#optiontemplate) property or the [`didChange`](#didchange) event.
+For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
 
 ## Properties
+
+### `autoFocus`
+
+This property sets the label of the component.
 
 ### `emptyListTemplate`
 
@@ -89,8 +92,7 @@ Click on the second field to see the custom empty list indicator.
 
 ### `enabled`
 
-Indicates whether the input field is enabled (`true`) or disabled (`false`).
-The default value is `true`.
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy
 <Select enabled="false" />
@@ -107,8 +109,7 @@ The default value is `true`.
 
 ### `initialValue`
 
-The initial value displayed in the input field.
-If the value is not in the list, it will be ignored.
+This property sets the component's initial value.
 
 ```ueml copy
 <Select initialValue="opt3">
@@ -131,12 +132,17 @@ If the value is not in the list, it will be ignored.
   `}
 />
 
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
+
+### `maxLength`
+
+This property sets the maximum length of the input it accepts.
+
 ### `optionTemplate`
 
-This property enables the customization of list items.
-To access the attributes of a list item use the 
-`$item`
- keyword.
+This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
 
 ```ueml copy
 <Select>
@@ -173,7 +179,7 @@ To access the attributes of a list item use the
 
 ### `placeholder`
 
-The placeholder is displayed in place of the selected value in the input field.
+A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy
 <Select placeholder="Please select an item">
@@ -196,10 +202,17 @@ The placeholder is displayed in place of the selected value in the input field.
   `}
 />
 
+### `readOnly`
+
+Set this property to `true` to disallow changing the component value.
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
 ### `validationStatus`
 
-With this property, you can set the input control's validation status to "none", "error", "warning", or "valid".
-This results in a visual indication of a status change (reacting to form field validation).
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 | Value     | Description                                           |
 | :-------- | :---------------------------------------------------- |
@@ -230,88 +243,13 @@ This results in a visual indication of a status change (reacting to form field v
 
 ## API
 
-### `focus`
-
-This API method focuses the input field.
-
-```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
-  <Button label="Focus Input" onClick="inputControl.focus()" />
-  <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus()"
-  height={200}
-  app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <Select id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-  </VStack>
-  `}
-/>
-
-### `setValue`
-
-This API method programmatically sets the value of the field.
-The same rules apply as for the [`initialValue`](#initialvalue) property.
-
-```ueml copy 
-<VStack gap="$space-0_5">
-  <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Select>
-  <HStack gap="$space-0_5">
-    <Button 
-      label="Select 2nd Item" 
-      onClick="inputControl.setValue('opt2')" />
-    <Button 
-      label="Remove Selection" 
-      onClick="inputControl.setValue('')" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  height={110}
-  name="Example: value() and setValue()"
-  app={`
-  <VStack gap="$space-0_5">
-    <Select id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-    <HStack gap="$space-0_5">
-      <Button 
-        label="Select 2nd Item" 
-        onClick="inputControl.setValue('opt2')" />
-      <Button 
-        label="Remove Selection" 
-        onClick="inputControl.setValue('')" />
-    </HStack>
-  </VStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event fires when the selected item list changes.
+This event is triggered when value of Select has changed.
 
 ```ueml copy /onDidChange="(newItem) => newValue = newItem"/
 <VStack padding="$space-1" gap="$space-0_5">
@@ -344,7 +282,7 @@ This event fires when the selected item list changes.
 
 ### `gotFocus`
 
-This event fires when the component is focused.
+This event is triggered when the Select has received the focus.
 
 ```ueml copy {5-6}
 <VStack padding="$space-1" gap="$space-0_5">
@@ -383,9 +321,7 @@ This event fires when the component is focused.
 
 ### `lostFocus`
 
-This event fires when the component loses focus.
-
-See the example in the [gotFocus event section](#gotfocus).
+This event is triggered when the Select has lost the focus.
 
 ## Styling
 

@@ -1,6 +1,6 @@
 # Button
 
-`Button` is an interactive element that triggers an action when clicked.
+Button is an interactive element that triggers an action when clicked.
 
 Use the `Button` component to trigger various actions.
 
@@ -10,10 +10,13 @@ This component does not have any context variables.
 
 ## Properties
 
+### `autoFocus`
+
+Indicates if the button should receive focus when the page loads
+
 ### `contentPosition`
 
-This optional value determines how the label and icon (or nested children) should be placed
-inside the Button component.
+This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
 | Value    | Description                                                  |
 | :------- | :----------------------------------------------------------- |
@@ -50,8 +53,7 @@ inside the Button component.
 
 ### `enabled`
 
-The value of this property indicates if the button accepts actions (`true`) or does not react
-to them (`falseq`). The default value is `true`.
+The value of this property indicates if the button accepts actions (`true`) or does not react to them (`falseq`).
 
 ```ueml copy
 <HStack gap="1rem" >
@@ -77,9 +79,7 @@ to them (`falseq`). The default value is `true`.
 
 ### `icon`
 
-This string value denotes an icon name. The framework will render an icon if XMLUI recognizes
-the icon (by its name). If no label is specified and an icon is set, the button displays only
-the icon.
+This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon (by its name). If no label is specified and an icon is set, the Button displays only the icon.
 
 ```ueml
 <HStack gap="1rem" >
@@ -154,9 +154,7 @@ This optional string determines the location of the icon in the Button.
 
 ### `label`
 
-This property is an optional string to set a label for the button. If no label is specified and
-an icon is set, the button will modify its styling to look like a small icon button. When the
-button has nested children, it will display them and ignore the value of the `label` prop.
+This property is an optional string to set a label for the Button. If no label is specified and an icon is set, the Button will modify its styling to look like a small icon button. When the Button has nested children, it will display them and ignore the value of the `label` prop.
 
 ```ueml copy
 <VStack gap="1rem" >
@@ -188,7 +186,7 @@ button has nested children, it will display them and ignore the value of the `la
 
 ### `size`
 
-This optional string property sets the component's size (via paddings).
+The size of the button (small, medium, large)
 
 | Value | Description              |
 | :---- | :----------------------- |
@@ -238,7 +236,7 @@ This optional string property sets the component's size (via paddings).
 
 ### `themeColor`
 
-The value of this optional property sets the string to provide a color scheme for the Button.
+The button color scheme (primary, secondary, attention)
 
 | Value       | Description                       |
 | :---------- | :-------------------------------- |
@@ -268,8 +266,7 @@ The value of this optional property sets the string to provide a color scheme fo
 
 ### `type`
 
-This optional string describes how the button appears in an HTML context. You rarely need to
-set this property explicitly.
+This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
 | Value    | Description                                                                                                        |
 | :------- | :----------------------------------------------------------------------------------------------------------------- |
@@ -279,7 +276,7 @@ set this property explicitly.
 
 ### `variant`
 
-The value of this optional property determines the fundamental style of the button.
+The button variant (solid, outlined, ghost) to use
 
 | Value      | Description                                                                                                     |
 | ---------- | --------------------------------------------------------------------------------------------------------------- |
@@ -318,7 +315,7 @@ This component does not provide any API.
 
 ### `click`
 
-This event is triggered when the button is clicked.
+This event is triggered when the Button is clicked.
 
 ```ueml copy
 <Button label="Click me!" onClick="window.alert('Button clicked')" />
@@ -335,7 +332,7 @@ This event is triggered when the button is clicked.
 
 ### `gotFocus`
 
-This event is triggered when the button has received the focus.
+This event is triggered when the Button has received the focus.
 
 ```ueml copy
 <VStack gap="1rem" var.text="No event" >
@@ -366,7 +363,7 @@ This event is triggered when the button has received the focus.
 
 ### `lostFocus`
 
-This event is triggered when the button has lost the focus.
+This event is triggered when the Button has lost the focus.
 
 (See the example above)
 

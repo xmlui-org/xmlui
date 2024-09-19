@@ -1,7 +1,6 @@
 # DropdownMenu
 
-This component represents a dropdown menu with a trigger.
-When the user clicks the trigger, the dropdown menu displays its items.
+This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items.
 
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
@@ -46,7 +45,9 @@ This component does not have any context variables.
 
 ### `alignment`
 
-This property allows you to determine the alignment of the displayed menu items:
+This property allows you to determine the alignment of the displayed menu items.
+
+Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
 - `end`: Menu items are aligned to the end of the trigger component.
 
@@ -89,7 +90,7 @@ This property allows you to determine the alignment of the displayed menu items:
 
 ### `enabled`
 
-This property enables (`true`) or disables (`false`) the component.
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ```ueml copy {3, 11}
 <HStack padding="1rem" gap="2rem">
@@ -140,8 +141,7 @@ This property enables (`true`) or disables (`false`) the component.
 
 ### `label`
 
-This property defines the label to display in the dropdown menu.
-If you define a custom trigger template, this property has no effect.
+This property sets the label of the component.
 
 ### `triggerButtonIcon`
 
@@ -153,13 +153,11 @@ This property defines the position of the icon on the trigger button.
 
 ### `triggerButtonThemeColor`
 
-This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no 
-effect when a custom trigger is defined with `triggerTemplate`.
+This property defines the theme color of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
 ### `triggerButtonVariant`
 
-This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no 
-effect when a custom trigger is defined with `triggerTemplate`.
+This property defines the theme variant of the `Button` as the dropdown menu's trigger. It has no effect when a custom trigger is defined with `triggerTemplate`.
 
 ### `triggerTemplate`
 
@@ -196,34 +194,7 @@ This property allows you to define a custom trigger instead of the default one p
 
 ## API
 
-### `close`
-
-The `close` command closes the dropdown.
-
-Open the dropdown menu and click on any of the menu items to close the menu.
-
-```ueml copy {3}
-<DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
-  <EmojiSelector
-    onSelect="(reaction) => { emojiDropDown.close(); }"
-    autoFocus="true"
-  />
-</DropdownMenu>
-```
-
-<Playground
-  name="Example: close"
-  previewOnly
-  height={200}
-  app={`
-  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
-    <EmojiSelector
-      onSelect="(reaction) => { emojiDropDown.close(); }"
-      autoFocus="true"
-    />
-  </DropdownMenu>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 

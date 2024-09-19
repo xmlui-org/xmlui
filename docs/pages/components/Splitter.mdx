@@ -1,16 +1,12 @@
 # Splitter
 
 The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections.
-These sections are identified by their name: primary and secondary.
-The sections are divided by a draggable and styleable divider.
+
+These sections are identified by their names: primary and secondary. They have a draggable bar between them.
 
 Most properties of the component focus on the primary section (e.g. sizing).
 
-See also: [`HSplitter`](
-./HSplitter.mdx
-), [`VSplitter`](
-./VSplitter.mdx
-).
+See also: [\`HSplitter\`](./HSplitter.mdx), [\`VSplitter\`](./VSplitter.mdx).
 
 ## Context Variables
 
@@ -20,8 +16,7 @@ This component does not have any context variables.
 
 ### `floating`
 
-Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged.
-The default value is `false`, meaning the resizer is visible all the time.
+Toggles whether the resizer is visible (`false`) or not (`true`) when not hovered or dragged. The default value is `false`, meaning the resizer is visible all the time.
 
 ```ueml copy /floating="true"/
 <Splitter height="100%" floating="true">
@@ -44,8 +39,7 @@ The default value is `false`, meaning the resizer is visible all the time.
 
 ### `initialPrimarySize`
 
-This optional number property sets the initial size of the primary section.
-The unit of the size value is in pixels or percentages.
+This optional number property sets the initial size of the primary section. The unit of the size value is in pixels or percentages.
 
 ```ueml copy /initialPrimarySize="40%"/
 <Splitter height="100%" initialPrimarySize="40%">
@@ -68,8 +62,7 @@ The unit of the size value is in pixels or percentages.
 
 ### `maxPrimarySize`
 
-This property sets the maximum size the primary section can have.
-The unit of the size value is in pixels or percentages.
+This property sets the maximum size the primary section can have. The unit of the size value is in pixels or percentages.
 
 ```ueml copy /maxPrimarySize="80%"/
 <Splitter height="100%" maxPrimarySize="80%">
@@ -92,8 +85,7 @@ The unit of the size value is in pixels or percentages.
 
 ### `minPrimarySize`
 
-This property sets the minimum size the primary section can have.
-The unit of the size value is in pixels or percentages.
+This property sets the minimum size the primary section can have. The unit of the size value is in pixels or percentages.
 
 ```ueml copy /minPrimarySize="40px"/
 <Splitter height="100%" minPrimarySize="40px">
@@ -116,9 +108,7 @@ The unit of the size value is in pixels or percentages.
 
 ### `orientation`
 
-Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`),
-or vertically by placing the sections next to each other (`horizontal`).
-The default value is `vertical`.
+Sets whether the `Splitter` divides the container horizontally and lays out the section on top of each other (`vertical`), or vertically by placing the sections next to each other (`horizontal`).
 
 ```ueml copy /orientation="horizontal"/
 <Splitter height="100%" orientation="horizontal">
@@ -170,8 +160,7 @@ The divider can be customized using XMLUI components via this property.
 
 ### `swapped`
 
-This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`)
-or secondary and primary (`true`) from left to right.
+This optional booelan property indicates whether the `Splitter` sections are layed out as primary and secondary (`false`) or secondary and primary (`true`) from left to right.
 
 ```ueml copy /swapped="true"/
 <Splitter height="100%" swapped="true">

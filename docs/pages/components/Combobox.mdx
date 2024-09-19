@@ -62,13 +62,11 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-If this boolean prop is set to `true`, the `Combobox` will be focused when it appears on the UI.
-The default is `false`.
+This property sets the label of the component.
 
 ### `emptyListTemplate`
 
-With this property, you can define the template to display when the search list (after filtering)
-contains no element.
+With this property, you can define the template to display when the search list (after filtering) contains no element.
 
 ```ueml copy {6-8}
 <Combobox id="myCombo">
@@ -103,19 +101,19 @@ Type a "w" to display an empty list:
 
 ### `enabled`
 
-Controls whether the input field is enabled (`true`) or disabled (`false`).
+This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
 
 ### `endIcon`
 
-This property sets the icon the right side of the input field (in a left-to-right display).
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `endText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ### `initialValue`
 
-The initial value displayed in the input field.
+This property sets the component's initial value.
 
 ```ueml copy /initialValue="eg"/
 <Combobox id="myCombo" initialValue="eg">
@@ -144,18 +142,15 @@ The following list will show the item with "eg" as its initial value:
 
 ### `labelId`
 
-You can specify the identifier of a component acting as its label. When you click the label,
-the component behaves as you clicked it.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `maxLength`
 
-The maximum length of the input that the field accepts.
+This property sets the maximum length of the input it accepts.
 
 ### `optionTemplate`
 
-You can define a template for the option items of the 
-`Combobox`
-.
+You can define a template for the option items of the `Combobox`.
 
 ```ueml copy {6-8}
 <Combobox id="myCombo">
@@ -194,7 +189,7 @@ A placeholder text that is visible in the input field when its empty.
 
 ### `readOnly`
 
-This boolean determines whether the input field can be modified or not.
+Set this property to `true` to disallow changing the component value.
 
 ### `required`
 
@@ -202,55 +197,25 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 ### `startIcon`
 
-This property sets the icon the left side of the input field (in a left-to-right display).
-The value must be a valid icon name, otherwise nothing will be rendered.
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `startText`
 
-This property sets a text to appear on the right side of the input field (in a left-to-right display).
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ### `validationStatus`
 
-This prop is used to visually indicate status changes reacting to form field validation.
+This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
 
 ## API
 
-### `focus`
-
-This API method focuses the input field.
-
-```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
-  <Button label="Focus Input" onClick="inputControl.focus()" />
-  <Combobox id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </Combobox>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus()"
-  height={200}
-  app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <Combobox id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Combobox>
-  </VStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event is triggered after the user has changed the field value.
+This event is triggered when value of Combobox has changed.
 
 ```ueml copy /onDidChange="(val) => field = val"/
 <VStack gap="0.5rem" var.field="">
@@ -283,7 +248,7 @@ Select an option and see how the text underneath is updated in parallel.
 
 ### `gotFocus`
 
-This event fires when the component is focused.
+This event is triggered when the Combobox has received the focus.
 
 ```ueml copy {5-6}
 <VStack padding="$space-1" gap="$space-0_5">
@@ -322,9 +287,7 @@ This event fires when the component is focused.
 
 ### `lostFocus`
 
-This event fires when the component loses focus.
-
-See the example in the [gotFocus event section](#gotfocus).
+This event is triggered when the Combobox has lost the focus.
 
 ## Styling
 
