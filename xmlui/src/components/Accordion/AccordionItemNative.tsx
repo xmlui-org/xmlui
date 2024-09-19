@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useId, useMemo } from "react";
+import { type ReactNode, useCallback, useEffect, useId, useMemo, useState } from "react";
 import { useAccordionContext } from "@components/Accordion/AccordionContext";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import styles from "@components/Accordion/Accordion.module.scss";
@@ -24,12 +24,15 @@ type Props = {
   content: ReactNode;
 
   registerComponentApi?: RegisterComponentApiFn;
+
+  onDisplayDidChange?: (expanded: boolean) => void;
 };
 
 export function AccordionItemComponent({
   header,
   headerRenderer = defaultRenderer,
   content,
+  onDisplayDidChange,
 }: Props) {
   const id = useId();
   const {
@@ -43,16 +46,14 @@ export function AccordionItemComponent({
     setAccordionActive,
   } = useAccordionContext();
 
+  const onChange = useCallback(() => {
+    onDisplayDidChange?.(!activeItems.includes(id));
+    setAccordionActive(id);
+  }, [activeItems]);
+
   const item = useMemo(
     () => (
-      <RAccordion.Item
-        key={id}
-        value={id}
-        className={styles.item}
-        onClick={() => {
-          setAccordionActive(id);
-        }}
-      >
+      <RAccordion.Item key={id} value={id} className={styles.item} onClick={onChange}>
         <RAccordion.Header className={styles.header}>
           <RAccordion.Trigger
             className={classnames(styles.trigger, {
@@ -83,7 +84,7 @@ export function AccordionItemComponent({
       content: item,
       id,
     });
-  }, [id, header, content, register]);
+  }, [id, header, register, item]);
 
   useEffect(() => {
     return () => {

@@ -45,7 +45,7 @@ export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, registerComponentApi } = rendererContext;
+    const { node, renderChild, extractValue, registerComponentApi, lookupEventHandler } = rendererContext;
     return (
       <AccordionItemComponent
         header={extractValue(node.props.header)}
@@ -60,6 +60,7 @@ export const accordionItemComponentRenderer = createComponentRenderer(
               )
             : undefined
         }
+        onDisplayDidChange={lookupEventHandler("displayDidChange")}
         content={renderChild(node.children)}
         registerComponentApi={registerComponentApi}
       />
