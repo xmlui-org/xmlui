@@ -141,6 +141,11 @@ export type ComponentSize = (typeof sizeValues)[number];
 const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames: string[] = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
+export const buttonThemeMd: PropertyValueDescription[] = [
+  { value: "attention", description: "Use the theme color that emphasizes attention" },
+  { value: "primary", description: "Use the primary theme color" },
+  { value: "secondary", description: "Use the primary theme color" },
+];
 
 // --- Available button types
 const buttonTypeValues = ["button", "submit", "reset"] as const;
@@ -151,6 +156,16 @@ export type ButtonType = (typeof buttonTypeValues)[number];
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
 export const buttonVariantNames: string[] = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
+export const buttonVariantMd: PropertyValueDescription[] = [
+  { value: "solid", description: "A button with a border and a filled background" },
+  { value: "outlined", description: "A button with a border and a transparent background" },
+  {
+    value: "ghost",
+    description:
+      "A button with no border and fill. Only the label is visible; the background is " +
+      "colored when hovered or clicked.",
+  },
+];
 
 // --- Available button aria attributes
 const buttonAriaValues = ["aria-controls", "aria-expanded", "aria-disabled", "aria-label"] as const;
@@ -166,6 +181,10 @@ export type AlignmentOptions = (typeof alignmentOptionValues)[number];
 const orientationOptionValues = ["horizontal", "vertical"] as const;
 export const orientationOptionNames: string[] = [...orientationOptionValues];
 export type OrientationOptions = (typeof orientationOptionValues)[number];
+export const orientationOptionMd: PropertyValueDescription[] = [
+  { value: "horizontal", description: "Nested components are arranged horizontally" },
+  { value: "vertical", description: "Nested components are arranged vertically" },
+];
 
 // --- Available icon positions
 const iconPositionValues = ["left", "right", "start", "end"] as const;

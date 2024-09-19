@@ -228,3 +228,13 @@ export function dTriggerTemplate(comp: string): ComponentPropertyMetadata {
     valueType: "ComponentDef",
   };
 }
+
+export function dOrientation(defaultValue: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This property sets the main axis along which the nested components are rendered.`,
+    availableValues: ["horizontal", "vertical"],
+    valueType: "string",
+    defaultValue,
+  };
+}

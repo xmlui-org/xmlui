@@ -1,10 +1,12 @@
+import path from "path";
+import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSync, lstatSync } from "fs";
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
 
 // temp
-const projectRootFolder = "D:/Projects/albacrm/xmlui";  // <- OVERRIDE THIS!
+const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
 const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
 const examplesFolder = join(projectRootFolder, "docs", "component-samples");
 const outFolder = join(projectRootFolder, "docs", "pages", "components");

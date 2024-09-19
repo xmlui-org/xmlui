@@ -1,6 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 
-import styles from "./Range.module.scss";
+import styles from "./Slider.module.scss";
 
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
