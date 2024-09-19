@@ -128,6 +128,8 @@ import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
 import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
+import { sliderComponentRenderer } from "./Slider/Slider";
+import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -350,6 +352,9 @@ export class ComponentRegistry {
     this.registerComponentRenderer(alertComponentRenderer);
     this.registerComponentRenderer(offCanvasComponentRenderer);
     this.registerComponentRenderer(rangeComponentRenderer);
+    this.registerComponentRenderer(sliderComponentRenderer);
+    this.registerComponentRenderer(buttonGroupComponentRenderer);
+
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

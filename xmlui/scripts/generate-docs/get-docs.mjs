@@ -1,6 +1,7 @@
+import path from "path";
+import { fileURLToPath } from 'url';
 import { basename, join } from "path";
 import { readFile, writeFile } from "fs/promises";
-
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger, handleError } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
@@ -8,7 +9,7 @@ import { processDocfiles } from "./process-mdx.mjs";
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
 // get these variables from config
-const projectRootFolder = "D:/Projects/albacrm/xmlui"; // <- OVERRIDE THIS!
+const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
 const docsFolderRoot = join(projectRootFolder, "docs");
 const componentDocsFolder = join(docsFolderRoot, "pages", "components");
 const componentDocsFolderName = basename(componentDocsFolder);

@@ -82,6 +82,7 @@ import { ThemeChangerButtonMd } from "./ThemeChanger/ThemeChanger";
 import { ToolbarMd } from "./Toolbar/Toolbar";
 import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
 import { TrendLabelMd } from "./TrendLabel/TrendLabel";
+import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -95,6 +96,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   BarChart: BarChartMd,
   Bookmark: BookmarkMd,
   Button: ButtonMd,
+  ButtonGroup: ButtonGroupMd,
   Card: CardMd,
   ChangeListener: ChangeListenerMd,
   Chart: ChartMd,
