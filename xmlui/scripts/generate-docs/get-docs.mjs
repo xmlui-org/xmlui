@@ -84,7 +84,7 @@ async function createSummary(
   let table = "";
   table += `## ${sectionName}\n\n`;
   table += "| Value | Description | Status |\n";
-  table += "| :---: | --- | --- |\n";
+  table += "| :---: | --- | :---: |\n";
   table += metadata
     .map(
       (component) =>
