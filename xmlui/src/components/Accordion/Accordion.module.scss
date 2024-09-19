@@ -34,8 +34,8 @@ $radius: createThemeVar("radius-#{$componentName}");
   }
 
   &:last-child {
-    /*    border-bottom-left-radius: $radius;
-        border-bottom-right-radius: $radius;*/
+    border-bottom-left-radius: $radius;
+    border-bottom-right-radius: $radius;
   }
 
   &:focus-within {
@@ -99,9 +99,9 @@ $radius: createThemeVar("radius-#{$componentName}");
   transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
 }
 
-/*.trigger[data-state='open'] > .chevron {
+.trigger[data-state='open'] > .chevron {
   transform: rotate(180deg);
-}*/
+}
 
 @keyframes slideDown {
   from {

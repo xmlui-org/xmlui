@@ -6,10 +6,8 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AccordionComponent } from "./AccordionNative";
 import {
-  dComponent,
   dDidChange,
 } from "@components/metadata-helpers";
-import { MemoizedItem } from "@components/container-helpers";
 import { triggerPositionNames } from "@components/abstractions";
 
 const COMP = "Accordion";
@@ -48,6 +46,7 @@ export const AccordionMd = createMetadata({
     ),
   },
   events: {
+    // index array
     displayDidChange: dDidChange(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),

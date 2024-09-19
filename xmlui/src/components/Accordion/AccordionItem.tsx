@@ -1,7 +1,14 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { AccordionItemComponent } from "@components/Accordion/AccordionItemNative";
 import { createComponentRendererNew } from "../../index";
-import { dCollapse, dComponent, dExpand, dExpanded, dFocus } from "@components/metadata-helpers";
+import {
+  dCollapse,
+  dComponent,
+  dDidChange,
+  dExpand,
+  dExpanded,
+  dFocus,
+} from "@components/metadata-helpers";
 import { MemoizedItem } from "@components/container-helpers";
 
 const COMP = "AccordionItem";
@@ -21,6 +28,9 @@ export const AccordionItemMd = createMetadata({
       "boolean",
       false,
     ),
+  },
+  events: {
+    displayDidChange: dDidChange(COMP),
   },
   apis: {
     expanded: dExpanded(COMP),
