@@ -1,4 +1,4 @@
-import { PropertyValueDescription } from "@abstractions/ComponentDefs";
+import type { PropertyValueDescription } from "@abstractions/ComponentDefs";
 import type { ReactNode } from "react";
 
 /**
@@ -93,7 +93,6 @@ export type ComponentThemeColor =
   | "dark";
 
 // --- Available view sizes
-export const viewportSizeNames = ["xs", "sm", "md", "lg", "xl", "xxl"];
 export const viewportSizeMd: PropertyValueDescription[] = [
   {
     value: "xs",
@@ -104,17 +103,18 @@ export const viewportSizeMd: PropertyValueDescription[] = [
   { value: "lg", description: "Large devices (e.g., a laptop)" },
   { value: "xl", description: 'Extra large devices (e.g., a standard 20" monitor)' },
   { value: "xxl", description: 'Extra extra large devices (e.g., a large 29" monitor)' },
-];
+] as const;
+export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
-const sizeValues = ["xs", "sm", "md", "lg"] as const;
-export const sizeNames: string[] = [...sizeValues];
 export const sizeMd: PropertyValueDescription[] = [
   { value: "xs", description: "Extra small button" },
   { value: "sm", description: "Small button (default)" },
   { value: "md", description: "Medium button" },
   { value: "lg", description: "Large button" },
 ];
+const sizeValues = Object.keys(sizeMd);
+export const sizeNames: string[] = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
 
 // --- Available button themes
@@ -122,30 +122,30 @@ const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames: string[] = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
 export const buttonThemeMd: PropertyValueDescription[] = [
-  { value: "attention", description: "Use the theme color that emphasizes attention" },
-  { value: "primary", description: "Use the primary theme color" },
-  { value: "secondary", description: "Use the primary theme color" },
-];
+  { value: "attention", description: "Attention state theme color" },
+  { value: "primary", description: "Primary theme color (default)" },
+  { value: "secondary", description: "Secondary theme color" },
+] as const;
 
 // --- Available button types
 const buttonTypeValues = ["button", "submit", "reset"] as const;
 export const buttonTypeNames: string[] = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
+export const buttonTypesMd: PropertyValueDescription[] = [
+  { value: "button", description: "Regular behavior that only executes logic if explicitly determined. (default)" },
+  { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
+  { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
+] as const;
 
 // --- Available button variants
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
 export const buttonVariantNames: string[] = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
 export const buttonVariantMd: PropertyValueDescription[] = [
-  { value: "solid", description: "A button with a border and a filled background" },
-  { value: "outlined", description: "A button with a border and a transparent background" },
-  {
-    value: "ghost",
-    description:
-      "A button with no border and fill. Only the label is visible; the background is " +
-      "colored when hovered or clicked.",
-  },
-];
+  { value: "solid", description: "A button with a border and a filled background." },
+  { value: "outlined", description: "The button is displayed with a border and a transparent background." },
+  { value: "ghost", description: "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked." },
+] as const;
 
 // --- Available button aria attributes
 const buttonAriaValues = ["aria-controls", "aria-expanded", "aria-disabled", "aria-label"] as const;
@@ -184,6 +184,16 @@ const statusColorValues = [
 ] as const;
 export const statusColorNames: string[] = [...statusColorValues];
 export type StatusColor = (typeof statusColorValues)[number];
+export const statusColorMd: PropertyValueDescription[] = [
+  { value: "primary", description: "Primary theme color (default), no default icon" },
+  { value: "secondary", description: "Secondary theme color, no default icon" },
+  { value: "success", description: "Success theme color, \"success\" icon" },
+  { value: "danger", description: "Warning theme color, \"warning\" icon" },
+  { value: "warning", description: "Danger theme color, \"danger\" icon" },
+  { value: "info", description: "Info theme color, \"info\" icon" },
+  { value: "light", description: "Light theme color, no default icon" },
+  { value: "dark", description: "Dark theme color, no default icon" },
+];
 
 // --- Available placements
 const placementValues = ["start", "end", "top", "bottom"] as const;

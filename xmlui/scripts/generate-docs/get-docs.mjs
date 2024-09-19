@@ -5,6 +5,7 @@ import { readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger, handleError } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
+import { createTable } from "./utils.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
@@ -79,19 +80,19 @@ async function createSummary(
 
   const beforeComponentsSection = lines.slice(0, startComponentsSection).join("\n");
   const afterComponentsSection = lines
-    .slice(startComponentsSection + 1 + endComponentsSection)
+    .slice(startComponentsSection + 1, startComponentsSection + 1 + endComponentsSection)
     .join("\n");
 
   let table = "";
   table += `## ${sectionName}\n\n`;
-  table += "| Value | Description | Status |\n";
-  table += "| :---: | --- | :---: |\n";
-  table += metadata
-    .map(
-      (component) =>
-        `| [${component.displayName}](./${componentFolder}/${component.displayName}.mdx) | ${component.description} | ${component.status ?? "stable"} |`,
-    )
-    .join("\n");
+  table += createTable({
+    headers: [{ value: "Component", style: "center" }, "Description", { value: "Status", style: "center" }],
+    rows: metadata.map((component) => [
+      `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
+      component.description,
+      component.status ?? "stable",
+    ]),
+  })
 
   return beforeComponentsSection + "\n" + table + "\n\n" + afterComponentsSection;
 }

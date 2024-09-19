@@ -6,8 +6,8 @@ import {
   buttonThemeNames,
   buttonTypeNames,
   iconPositionNames,
-  buttonVariantNames,
   sizeMd,
+  buttonVariantMd,
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/IconNative";
@@ -23,7 +23,7 @@ export const ButtonMd = createMetadata({
   status: "stable",
   props: {
     autoFocus: d("Indicates if the button should receive focus when the page loads"),
-    variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantNames),
+    variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantMd),
     themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeNames),
     size: d("The size of the button (small, medium, large)", sizeMd),
     label: d(

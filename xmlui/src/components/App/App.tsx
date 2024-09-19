@@ -1,4 +1,4 @@
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import { appLayouts } from "./AppLayoutContext";
 
 import styles from "./App.module.scss";
