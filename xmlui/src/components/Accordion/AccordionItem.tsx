@@ -1,6 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { AccordionItemComponent } from "@components/Accordion/AccordionItemNative";
-import { createComponentRendererNew } from "../../index";
 
 const COMP = "AccordionItem";
 
@@ -19,7 +19,7 @@ export const AccordionItemMd = createMetadata({
   },
 });
 
-export const accordionItemComponentRenderer = createComponentRendererNew(
+export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
