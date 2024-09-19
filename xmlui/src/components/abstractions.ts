@@ -37,6 +37,8 @@ export type Accordion = {
    * The content of the accordion.
    */
   content: ReactNode;
+
+  expanded?: boolean;
 };
 
 export type Tab = {

@@ -30,17 +30,16 @@ export const AccordionComponent = ({
   onDisplayDidChange = noop,
 }: Props) => {
   const [accordionItems, setAccordionItems] = useState(EMPTY_ARRAY);
-  const [activeItems, setActiveItems] = useState(EMPTY_ARRAY);
 
   useEffect(() => {
     registerComponentApi?.({});
   }, [registerComponentApi]);
 
-  useEffect(() => {
-    onDisplayDidChange?.(activeItems);
-  }, [activeItems]);
+  /*  useEffect(() => {
+                    onDisplayDidChange?.(activeItems);
+                  }, [activeItems]);*/
 
-  const register = useCallback(
+  const registerOrUpdate = useCallback(
     (column: AccordionItem) => {
       setAccordionItems(
         produce((draft) => {
@@ -67,46 +66,26 @@ export const AccordionComponent = ({
     [setAccordionItems],
   );
 
-  const setAccordionActive = useCallback(
-    (id: string) => {
-      setActiveItems((prev) => {
-        const index = prev.indexOf(id);
-        if (index < 0) {
-          return [...prev, id];
-        }
-        return prev.filter((item) => item !== id);
-      });
-    },
-    [setActiveItems],
-  );
-
   const contextValue = useMemo(
     () => ({
-      register,
+      registerOrUpdate,
       unRegister,
       hideIcon,
       expandedIcon,
       collapsedIcon,
       triggerPosition,
-      activeItems,
-      setAccordionActive,
     }),
-    [
-      register,
-      unRegister,
-      hideIcon,
-      expandedIcon,
-      collapsedIcon,
-      triggerPosition,
-      activeItems,
-      setAccordionActive,
-    ],
+    [registerOrUpdate, unRegister, hideIcon, expandedIcon, collapsedIcon, triggerPosition],
   );
+
+  const expandedItems = useMemo(() => {
+    return accordionItems.filter((item) => item.expanded).map((item) => item.id);
+  }, [accordionItems]);
 
   return (
     <AccordionContext.Provider value={contextValue}>
       {children}
-      <RAccordion.Root value={activeItems} type="multiple" className={styles.root}>
+      <RAccordion.Root value={expandedItems} type="multiple" className={styles.root}>
         {accordionItems.map((item) => item.content)}
       </RAccordion.Root>
     </AccordionContext.Provider>
