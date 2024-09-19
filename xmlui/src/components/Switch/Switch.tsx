@@ -2,7 +2,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { Toggle } from "@components/Toggle/Toggle";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "@components/Toggle/Toggle.module.scss";
-import { createMetadata } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dClick,
@@ -38,6 +38,10 @@ export const SwitchMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    description: d(
+      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
+        `of the ${COMP} besides its label.`,
+    ),
   },
   events: {
     click: dClick(COMP),

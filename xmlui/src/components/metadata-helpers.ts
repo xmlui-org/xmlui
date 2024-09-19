@@ -194,6 +194,16 @@ export function dFocus(comp: string): ComponentPropertyMetadata {
   };
 }
 
+export function dValue(): ComponentPropertyMetadata {
+  return {
+    description:
+      `You can query the component's value. If no value is set, it will ` +
+      `retrieve \`undefined\`.`,
+  };
+}
+
+`You can query the component's value. If no value is set, it will retrieve \`undefined\`.`;
+
 export function dDidOpen(comp: string): ComponentPropertyMetadata {
   return {
     description:

@@ -89,7 +89,7 @@ import {
   subMenuItemRenderer,
 } from "@components/DropdownMenu/DropdownMenu";
 import { themeComponentRenderer } from "@components/Theme/Theme";
-import { merge } from "lodash-es";
+import { merge, range } from "lodash-es";
 import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
 import { columnComponentRenderer } from "@components/Column/Column";
@@ -126,6 +126,7 @@ import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
+import { rangeComponentRenderer } from "./Range/Range";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -344,6 +345,7 @@ export class ComponentRegistry {
     this.registerComponentRenderer(accordionComponentRenderer);
     this.registerComponentRenderer(alertComponentRenderer);
     this.registerComponentRenderer(offCanvasComponentRenderer);
+    this.registerComponentRenderer(rangeComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
