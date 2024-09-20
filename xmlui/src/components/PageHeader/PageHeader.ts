@@ -3,6 +3,7 @@ import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 const COMP = "PageHeader";
 export const PageHeaderMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component is a component that displays a title and an ` +
     `optional pre-title. The pre-title is displayed above the title.`,

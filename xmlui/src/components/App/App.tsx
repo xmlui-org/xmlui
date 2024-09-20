@@ -10,6 +10,7 @@ import { App } from "./AppNative";
 const COMP = "App";
 
 export const AppMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component provides a UI frame for XMLUI apps. According to predefined (and ` +
     `run-time configurable) structure templates, \`${COMP}\` allows you to display your ` +

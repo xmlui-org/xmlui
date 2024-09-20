@@ -35,6 +35,7 @@ const defaultOptionRenderer = {
 };
 
 export const MultiComboboxMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component is essentially a [\`ComboBox\`](./ComboBox.mdx) that enables ` +
     `the selection of multiple elements from a list either by typing in the field or by ` +

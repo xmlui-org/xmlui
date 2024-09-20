@@ -9,6 +9,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 const COMP = "Tabs";
 
 export const TabsMd = createMetadata({
+  status: "experimental",
   description: `The \`${COMP}\` component provides a tabbed layout where each tab has a clickable label and content.`,
   props: {
     activeTab: d(

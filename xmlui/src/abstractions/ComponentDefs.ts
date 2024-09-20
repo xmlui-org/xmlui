@@ -222,7 +222,7 @@ export type ComponentMetadata<
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // The current status of the component. By default, it is "stable".
-  status?: "stable" | "experimental" | "deprecated" | "in review";
+  status?: "stable" | "experimental" | "deprecated" | "in review" | "in progress";
 
   // Component description in markdown; it goes into the generated documentation
   description?: string;

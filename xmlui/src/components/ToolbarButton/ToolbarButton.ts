@@ -2,6 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 export const ToolbarButtonMd = createMetadata({
+  status: "experimental",
   description: "This component is a button that is used in a toolbar.",
   props: {
     label: d("The label to display on the button."),

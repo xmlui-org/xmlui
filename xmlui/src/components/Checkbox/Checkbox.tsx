@@ -25,6 +25,7 @@ import {
 const COMP = "Checkbox";
 
 export const CheckboxMd = createMetadata({
+  status: "in review",
   description:
     `The \`${COMP}\` component allows users to make binary choices, typically between checked or ` +
     `unchecked. It consists of a small box that can be toggled on or off by clicking on it.`,

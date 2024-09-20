@@ -5,6 +5,7 @@ import { RealTimeAdapter } from "./RealTimeAdapterNative";
 const COMP = "RealTimeAdapter";
 
 export const RealTimeAdapterMd = createMetadata({
+  status: "experimental",
   description: `\`${COMP}\` is a non-visual component that listens to real-time events through long-polling.`,
   props: {
     url: d(`This property specifies the URL to use for long-polling.`),
