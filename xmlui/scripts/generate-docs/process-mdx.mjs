@@ -4,6 +4,7 @@ import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSyn
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
+import { createTable } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -324,6 +325,30 @@ function combineDescriptionAndDescriptionRef(
 
   if (component[SECTION_DESCRIPTION]) {
     descriptionBuffer = component[SECTION_DESCRIPTION];
+  }
+
+  if (
+    sectionId === PROPS
+    && component.availableValues
+    && Array.isArray(component.availableValues)
+    && component.availableValues.length > 0
+  ) {
+    let availableValuesBuffer = "";
+    const valuesType = typeof component.availableValues[0];
+    const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
+    
+    if (valuesType === "string" || valuesType === "number") {
+      availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
+    } else if (valuesType === "object") {
+      availableValuesBuffer = createTable({
+        headers: ["Value", "Description"],
+        rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
+      })
+    }
+
+    if (availableValuesBuffer) {
+      descriptionBuffer += `\n\nAvailable values:${valuesTypeIsPrimitive ? " " : "\n\n"}${availableValuesBuffer}`;
+    }
   }
 
   if (

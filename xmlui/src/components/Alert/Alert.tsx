@@ -5,7 +5,7 @@ import styles from "./Alert.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Alert } from "./AlertNative";
-import { statusColorNames } from "@components/abstractions";
+import { statusColorMd } from "@components/abstractions";
 
 const COMP = "Alert";
 
@@ -20,7 +20,7 @@ export const AlertMd = createMetadata({
   props: {
     statusColor: d(
       `The value of this optional property sets the string to provide a color scheme for the ${COMP}.`,
-      statusColorNames,
+      statusColorMd,
     ),
     dismissable: d(
       `This property's \`true\` value indicates if this alert is dismissable by the user. When the ` +
@@ -47,7 +47,7 @@ export const AlertMd = createMetadata({
 export const alertComponentRenderer = createComponentRenderer(
   COMP,
   AlertMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss }) => {
+  ({}) => {
     return <Alert />;
   },
 );

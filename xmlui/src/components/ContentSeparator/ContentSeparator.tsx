@@ -2,7 +2,7 @@ import styles from "./ContentSeparator.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { orientationOptionNames } from "@components/abstractions";
+import { orientationOptionMd } from "@components/abstractions";
 import { ContentSeparator } from "./ContentSeparatorNative";
 
 const COMP = "ContentSeparator";
@@ -17,7 +17,7 @@ export const ContentSeparatorMd = createMetadata({
       `This property defines the component's height (if the \`orientation\` is horizontal) ` +
         `or the width (if the \`orientation\` is vertical).`,
     ),
-    orientation: d("Sets the main axis of the component", orientationOptionNames),
+    orientation: d("Sets the main axis of the component", orientationOptionMd),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

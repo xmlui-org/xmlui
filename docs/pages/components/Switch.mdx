@@ -18,7 +18,7 @@ This property sets the label of the component.
 
 ### `enabled`
 
-This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
 it is `true` by default.
@@ -97,9 +97,9 @@ You can specify the identifier of a component acting as its label. When you clic
 
 ### `labelPosition`
 
-Places the label at the `top`, `right`, `bottom`, or `left` of the component.
+Places the label at the given position of the component.
 
-Places the label at the `top`, `right`, `bottom`, or `left` of the `Switch`.
+Available values: `top`, `right`, `bottom`, `left`
 
 ```ueml copy
 <VStack margin="1rem" gap="0.8rem">
@@ -151,7 +151,16 @@ If true, the value of the component cannot be modified.
 
 ### `validationStatus`
 
-This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
 
 ## API
 

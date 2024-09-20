@@ -118,7 +118,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 
 ### `enabled`
 
-This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 ```ueml copy {2-3}
 <Form padding="0.5rem">
@@ -186,7 +186,9 @@ This boolean value indicates if the label can be split into multiple lines if it
 
 ### `labelPosition`
 
-Places the label at the `top`, `right`, `bottom`, or `left` of the component.
+Places the label at the given position of the component.
+
+Available values: `top`, `right`, `bottom`, `left`
 
 Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).

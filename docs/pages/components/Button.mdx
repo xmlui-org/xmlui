@@ -18,11 +18,14 @@ Indicates if the button should receive focus when the page loads
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
-| Value    | Description                                                  |
-| :------- | :----------------------------------------------------------- |
-| `center` | Place the content in the middle **(default)**                |
-| `start`  | Justify the content to the left (to the right if in **rtl**) |
-| `end`    | Justify the content to the right (to the left if in **ltr**) |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `center` | Place the content in the middle (default) |
+| `start` | Justify the content to the left (to the right if in right-to-left) |
+| `end` | Justify the content to the right (to the left if in right-to-left) |
+
 
 ```ueml copy
 <Stack gap="1rem">
@@ -105,12 +108,15 @@ This string value denotes an icon name. The framework will render an icon if XML
 
 This optional string determines the location of the icon in the Button.
 
-| Value   | Description                                                                       |
-| :------ | :-------------------------------------------------------------------------------- |
-| `left`  | Place the icon on the left of the label **(default)**                             |
-| `right` | Place the icon on the right of the label                                          |
-| `start` | Place the icon at the start of the label (considering the current text direction) |
-| `end`   | Place the icon at the end of the label (considering the current text direction)   |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `left` | The icon will appear on the left side |
+| `right` | The icon will appear on the right side |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
+| `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
+
 
 ```ueml
 <VStack gap="1rem">
@@ -188,12 +194,15 @@ This property is an optional string to set a label for the Button. If no label i
 
 The size of the button (small, medium, large)
 
-| Value | Description              |
-| :---- | :----------------------- |
-| `xs`  | Extra small size         |
-| `sm`  | Small size **(default)** |
-| `md`  | Medium size              |
-| `lg`  | Large size               |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `xs` | Extra small button |
+| `sm` | Small button (default) |
+| `md` | Medium button |
+| `lg` | Large button |
+
 
 ```ueml copy
 <Stack gap="4px">
@@ -238,11 +247,14 @@ The size of the button (small, medium, large)
 
 The button color scheme (primary, secondary, attention)
 
-| Value       | Description                       |
-| :---------- | :-------------------------------- |
-| `primary`   | Primary theme color **(default)** |
-| `secondary` | Secondary theme color             |
-| `attention` | Attention state theme color       |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `attention` | Attention state theme color |
+| `primary` | Primary theme color (default) |
+| `secondary` | Secondary theme color |
+
 
 ```ueml copy
 <Stack orientation="horizontal" gap="10px">
@@ -268,21 +280,27 @@ The button color scheme (primary, secondary, attention)
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
-| Value    | Description                                                                                                        |
-| :------- | :----------------------------------------------------------------------------------------------------------------- |
-| `button` | Regular behavior that only executes logic if explicitly determined. **(default)**                                  |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `button` | Regular behavior that only executes logic if explicitly determined. (default) |
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
-| `reset`  | Resets all the controls to their initial values. Using it is ill advised for UX reasons.                           |
+| `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
+
 
 ### `variant`
 
 The button variant (solid, outlined, ghost) to use
 
-| Value      | Description                                                                                                     |
-| ---------- | --------------------------------------------------------------------------------------------------------------- |
-| `solid`    | A button with a border and a filled background. **(default)**                                                   |
-| `outlined` | The button is displayed with a border and a transparent background.                                             |
-| `ghost`    | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `solid` | A button with a border and a filled background. |
+| `outlined` | The button is displayed with a border and a transparent background. |
+| `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+
 
 ```ueml copy
 <HStack gap="1rem">

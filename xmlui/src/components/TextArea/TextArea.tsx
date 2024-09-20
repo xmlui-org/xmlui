@@ -1,8 +1,8 @@
 import styles from "./TextArea.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { resizeOptionKeys, ResizeOptions, TextArea } from "./TextAreaNative";
+import { createMetadata, d, type PropertyValueDescription } from "@abstractions/ComponentDefs";
+import { type ResizeOptions, TextArea } from "./TextAreaNative";
 import {
   dAutoFocus,
   dDidChange,
@@ -21,6 +21,13 @@ import {
 } from "@components/metadata-helpers";
 
 const COMP = "TextArea";
+
+export const resizeOptionsMd: PropertyValueDescription[] = [
+  { value: "undefined", description: "No resizing" },
+  { value: "horizontal", description: "Can only resize horizontally" },
+  { value: "vertical", description: "Can only resize vertically" },
+  { value: "both", description: "Can resize in both dimensions" },
+] as const;
 
 export const TextAreaMd = createMetadata({
   status: "in review",
@@ -57,8 +64,8 @@ export const TextAreaMd = createMetadata({
     validationStatus: dValidationStatus(),
     resize: d(
       `This optional property specifies in which dimensions can the \`TextArea\` ` +
-        `be resized by the user.`,
-      [...resizeOptionKeys],
+      `be resized by the user.`,
+       resizeOptionsMd,
     ),
   },
   events: {

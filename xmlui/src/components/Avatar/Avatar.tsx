@@ -4,7 +4,7 @@ import { Avatar } from "./AvatarNative";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { sizeNames } from "@components/abstractions";
+import { sizeMd } from "@components/abstractions";
 
 const COMP = "Avatar";
 
@@ -12,7 +12,7 @@ export const AvatarMd = createMetadata({
   description:
     `The \`${COMP}\` component represents a user, group (or other entity's) avatar with a small image or initials.`,
   props: {
-    size: d(`This property defines the display size of the ${COMP}.`, sizeNames, "string", "sm"),
+    size: d(`This property defines the display size of the ${COMP}.`, sizeMd, "string", "sm"),
     name: d(`This property sets the name value the ${COMP} uses to display initials.`),
     url: d(`This property specifies the URL of the image to display in the ${COMP}.`),
   },
