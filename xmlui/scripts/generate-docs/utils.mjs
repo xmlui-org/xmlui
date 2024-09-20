@@ -1,11 +1,16 @@
 export function createTable({
   headers = [],
   rows = [],
+  rowNums = false,
 }) {
   let table = "";
 
   if (headers.length === 0 && rows.length === 0) {
     return table;
+  }
+
+  if (rowNums) {
+    headers.unshift({ value: "Num", style: "center" });
   }
 
   table += "| " + headers.map((h) => {
@@ -21,7 +26,7 @@ export function createTable({
   }).join(" | ") + " |\n";
   
   rows.forEach((row) => {
-    table += "| " + row.join(" | ") + " |\n";
+    table += "| " + (rowNums ? rows.indexOf(row) + 1 + " | " : "") + row.join(" | ") + " |\n";
   });
   
   return table;

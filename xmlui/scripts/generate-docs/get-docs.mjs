@@ -86,6 +86,7 @@ async function createSummary(
   let table = "";
   table += `## ${sectionName}\n\n`;
   table += createTable({
+    rowNums: true,
     headers: [{ value: "Component", style: "center" }, "Description", { value: "Status", style: "center" }],
     rows: metadata.map((component) => [
       `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
