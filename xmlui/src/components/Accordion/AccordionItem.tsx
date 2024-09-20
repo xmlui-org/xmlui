@@ -1,15 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { AccordionItemComponent } from "@components/Accordion/AccordionItemNative";
-import {
-  dCollapse,
-  dComponent,
-  dDidChange,
-  dExpand,
-  dExpanded,
-  dFocus,
-} from "@components/metadata-helpers";
+import { dComponent } from "@components/metadata-helpers";
 import { MemoizedItem } from "@components/container-helpers";
-import {createComponentRenderer} from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 
 const COMP = "AccordionItem";
 
@@ -29,26 +22,18 @@ export const AccordionItemMd = createMetadata({
       false,
     ),
   },
-  events: {
-    displayDidChange: dDidChange(COMP),
-  },
-  apis: {
-    expanded: dExpanded(COMP),
-    expand: dExpand(COMP),
-    collapse: dCollapse(COMP),
-    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
-    focus: dFocus(COMP),
-  },
 });
 
 export const accordionItemComponentRenderer = createComponentRenderer(
   COMP,
   AccordionItemMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, registerComponentApi, lookupEventHandler } = rendererContext;
+    const { node, renderChild, extractValue } = rendererContext;
     return (
       <AccordionItemComponent
+        id={extractValue(node.uid)}
         header={extractValue(node.props.header)}
+        initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
         headerRenderer={
           node.props.headerTemplate
             ? (item) => (
@@ -60,9 +45,7 @@ export const accordionItemComponentRenderer = createComponentRenderer(
               )
             : undefined
         }
-        onDisplayDidChange={lookupEventHandler("displayDidChange")}
         content={renderChild(node.children)}
-        registerComponentApi={registerComponentApi}
       />
     );
   },

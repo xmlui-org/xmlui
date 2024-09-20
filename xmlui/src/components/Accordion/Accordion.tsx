@@ -5,9 +5,7 @@ import styles from "./Accordion.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { AccordionComponent } from "./AccordionNative";
-import {
-  dDidChange,
-} from "@components/metadata-helpers";
+import { dCollapse, dDidChange, dExpand, dExpanded, dFocus } from "@components/metadata-helpers";
 import { triggerPositionNames } from "@components/abstractions";
 
 const COMP = "Accordion";
@@ -47,8 +45,14 @@ export const AccordionMd = createMetadata({
     ),
   },
   events: {
-    // index array
     displayDidChange: dDidChange(COMP),
+  },
+  apis: {
+    expanded: dExpanded(COMP),
+    expand: dExpand(COMP),
+    collapse: dCollapse(COMP),
+    toggle: d(`This method toggles the state of the ${COMP} between expanded and collapsed.`),
+    focus: dFocus(COMP),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -90,11 +94,11 @@ export const accordionComponentRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi }) => {
     return (
       <AccordionComponent
-        triggerPosition={extractValue.asOptionalString(node.props?.triggerPosition)}
-        collapsedIcon={node.props.collapsedIcon}
-        expandedIcon={node.props.expandedIcon}
+        triggerPosition={extractValue(node.props?.triggerPosition)}
+        collapsedIcon={extractValue(node.props.collapsedIcon)}
+        expandedIcon={extractValue(node.props.expandedIcon)}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
-        rotateExpanded={node.props.rotateExpanded}
+        rotateExpanded={extractValue(node.props.rotateExpanded)}
         onDisplayDidChange={lookupEventHandler("displayDidChange")}
         registerComponentApi={registerComponentApi}
       >
