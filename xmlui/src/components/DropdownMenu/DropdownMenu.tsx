@@ -83,7 +83,7 @@ export const MenuItemMd = createMetadata({
   props: {
     iconPosition: d(
       `This property allows you to determine the position of the icon displayed in the menu item.`,
-      iconPositionMd.filter(p => p.value === "start" || p.value === "end"),
+      iconPositionMd.filter(p => (p as any).value === "start" || (p as any).value === "end"),
     ),
     icon: d(`This property names an optional icon to display with the menu item.`),
     label: dLabel(),
