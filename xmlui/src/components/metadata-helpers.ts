@@ -1,5 +1,5 @@
 import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
-import { validationStatusMd } from "./abstractions";
+import { orientationOptionMd, validationStatusMd } from "./abstractions";
 
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {
@@ -231,7 +231,7 @@ export function dOrientation(defaultValue: string): ComponentPropertyMetadata {
   return {
     description:
       `This property sets the main axis along which the nested components are rendered.`,
-    availableValues: ["horizontal", "vertical"],
+    availableValues: orientationOptionMd,
     valueType: "string",
     defaultValue,
   };

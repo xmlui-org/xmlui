@@ -53,7 +53,7 @@ export const ButtonGroupMd = createMetadata({
 export const buttonGroupComponentRenderer = createComponentRenderer(
   COMP,
   ButtonGroupMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss }) => {
+  ({}) => {
     return <ButtonGroup />;
   },
 );
