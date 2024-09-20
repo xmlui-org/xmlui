@@ -1,15 +1,13 @@
 import * as RAccordion from "@radix-ui/react-accordion";
-import type { AccordionItem } from "@components/Accordion/AccordionContext";
 import { AccordionContext } from "@components/Accordion/AccordionContext";
 import styles from "./Accordion.module.scss";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { EMPTY_ARRAY, noop } from "@components-core/constants";
+import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import produce from "immer";
 
 type Props = {
   children?: React.ReactNode;
-  triggerPosition?: string;
+  triggerPosition?: "start" | "end";
   collapsedIcon?: string;
   expandedIcon?: string;
   hideIcon?: boolean;
@@ -18,9 +16,6 @@ type Props = {
   onDisplayDidChange?: (changedValue: string[]) => void;
 };
 
-const positionInGroupValues = ["single", "first", "middle", "last"] as const;
-export const positionInGroupNames: string[] = [...positionInGroupValues];
-
 export const AccordionComponent = ({
   children,
   hideIcon = false,
@@ -28,72 +23,84 @@ export const AccordionComponent = ({
   collapsedIcon = "chevrondown",
   triggerPosition = "end",
   onDisplayDidChange = noop,
+  registerComponentApi,
 }: Props) => {
-  const [accordionItems, setAccordionItems] = useState(EMPTY_ARRAY);
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
+  const [itemElements, setItemElements] = useState<Record<string, HTMLButtonElement>>({});
 
   const collapseItem = useCallback(
     (id: string) => {
-      setExpandedItems((prev) => prev.filter((item) => item !== id));
+      setExpandedItems((prev) => prev.filter((item) => item !== `${id}`));
     },
     [setExpandedItems],
   );
 
   const expandItem = useCallback(
     (id: string) => {
-      setExpandedItems((prev) => [...prev, id]);
+      if (!expandedItems.includes(`${id}`)) {
+        setExpandedItems((prev) => [...prev, `${id}`]);
+      }
     },
-    [setExpandedItems],
+    [setExpandedItems, expandedItems],
+  );
+
+  const toggleItem = useCallback(
+    (id: string) => {
+      if (expandedItems.includes(`${id}`)) {
+        collapseItem(id);
+      } else {
+        expandItem(id);
+      }
+    },
+    [setExpandedItems, expandedItems],
   );
 
   const register = useCallback(
-    (column: AccordionItem) => {
-      setAccordionItems(
-        produce((draft) => {
-          const existing = draft.findIndex((col) => col.id === column.id);
-          if (existing < 0) {
-            draft.push(column);
-          } else {
-            draft[existing] = column;
-          }
-        }),
-      );
+    (id: string, el: HTMLButtonElement) => {
+      setItemElements((prev) => ({ ...prev, [id]: el }));
     },
-    [setAccordionItems],
+    [setItemElements],
   );
 
   const unRegister = useCallback(
     (id: string) => {
-      setAccordionItems(
-        produce((draft) => {
-          return draft.filter((col) => col.id !== id);
-        }),
-      );
+      setItemElements((prev) => {
+        delete prev[id];
+        return prev;
+      });
     },
-    [setAccordionItems],
+    [setItemElements],
   );
+
+  const focusItem = useCallback(
+    (id: string) => {
+      if (itemElements[id]) {
+        itemElements[id].focus();
+      }
+    },
+    [itemElements],
+  );
+
+  useEffect(() => {
+    registerComponentApi?.({
+      expand: expandItem,
+      collapse: collapseItem,
+      toggle: toggleItem,
+      focus: focusItem,
+    });
+  }, [registerComponentApi, expandItem, collapseItem, toggleItem, focusItem]);
 
   const contextValue = useMemo(
     () => ({
-      expandItem,
-      collapseItem,
-      unRegister,
       register,
+      unRegister,
+      expandedItems,
       hideIcon,
       expandedIcon,
       collapsedIcon,
       triggerPosition,
     }),
-    [
-      expandItem,
-      collapseItem,
-      register,
-      unRegister,
-      hideIcon,
-      expandedIcon,
-      collapsedIcon,
-      triggerPosition,
-    ],
+    [register, unRegister, expandedItems, hideIcon, expandedIcon, collapsedIcon, triggerPosition],
   );
 
   useEffect(() => {
@@ -102,9 +109,13 @@ export const AccordionComponent = ({
 
   return (
     <AccordionContext.Provider value={contextValue}>
-      {children}
-      <RAccordion.Root value={expandedItems} type="multiple" className={styles.root}>
-        {accordionItems.map((item) => item.content)}
+      <RAccordion.Root
+        value={expandedItems}
+        type="multiple"
+        className={styles.root}
+        onValueChange={(value) => setExpandedItems(value)}
+      >
+        {children}
       </RAccordion.Root>
     </AccordionContext.Provider>
   );
