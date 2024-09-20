@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useContext } from "react";
 import type { Accordion } from "@components/abstractions";
+import { noop } from "@components-core/constants";
 
 export type AccordionItem = Accordion & {
   id: string;
@@ -7,7 +8,8 @@ export type AccordionItem = Accordion & {
 };
 
 type AccordionContextDefinition = {
-  register: (id: string, el: HTMLButtonElement) => void;
+  expandItem: (id: string) => void;
+  register: (id: string) => void;
   unRegister: (id: string) => void;
   expandedItems: string[];
   hideIcon: boolean;
@@ -18,8 +20,9 @@ type AccordionContextDefinition = {
 
 export const AccordionContext = createContext<AccordionContextDefinition>({
   expandedItems: [],
-  register: () => {},
-  unRegister: () => {},
+  expandItem: noop,
+  register: noop,
+  unRegister: noop,
   hideIcon: null,
   expandedIcon: null,
   collapsedIcon: null,

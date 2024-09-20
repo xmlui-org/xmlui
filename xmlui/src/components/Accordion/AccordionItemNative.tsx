@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useId, useMemo, useRef } from "react";
+import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
 import { useAccordionContext } from "@components/Accordion/AccordionContext";
 import styles from "@components/Accordion/Accordion.module.scss";
 import Icon from "@components/Icon/IconNative";
@@ -22,6 +22,8 @@ type Props = {
    * The content of the accordion.
    */
   content: ReactNode;
+
+  initiallyExpanded?: boolean;
 };
 
 export function AccordionItemComponent({
@@ -29,38 +31,48 @@ export function AccordionItemComponent({
   header,
   headerRenderer = defaultRenderer,
   content,
+  initiallyExpanded,
 }: Props) {
-  const itemId = id ? `${id}` : useId();
-  const itemRef = useRef<any>(null);
+  const generatedId = useId();
+  const itemId = useMemo(() => (id ? `${id}` : generatedId), [id, generatedId]);
+  const triggerId = useMemo(() => `trigger_${itemId}`, [itemId]);
   const {
     expandedItems,
     hideIcon,
     expandedIcon,
     collapsedIcon,
     triggerPosition,
+    expandItem,
     register,
     unRegister,
   } = useAccordionContext();
-
   const expanded = useMemo(() => expandedItems.includes(itemId), [itemId, expandedItems]);
+  const [initialised, setInitialised] = useState(false);
 
   useEffect(() => {
-    if (itemRef?.current) {
-      register(itemId, itemRef.current);
+    if (!initialised) {
+      setInitialised(true);
+      if (initiallyExpanded) {
+        expandItem(itemId);
+      }
     }
-  }, [itemId, itemRef, register]);
+  }, [expandItem, itemId, initiallyExpanded, initialised]);
+
+  useEffect(() => {
+    register(triggerId);
+  }, [register, triggerId]);
 
   useEffect(() => {
     return () => {
-      unRegister(itemId);
+      unRegister(triggerId);
     };
-  }, [itemId, unRegister]);
+  }, [triggerId, unRegister]);
 
   return (
     <RAccordion.Item key={itemId} value={itemId} className={styles.item}>
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
-          ref={itemRef}
+          id={`trigger_${itemId}`}
           className={classnames(styles.trigger, {
             [styles.triggerStart]: triggerPosition === "start",
           })}

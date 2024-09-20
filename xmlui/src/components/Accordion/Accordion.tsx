@@ -45,7 +45,6 @@ export const AccordionMd = createMetadata({
     ),
   },
   events: {
-    // index array
     displayDidChange: dDidChange(COMP),
   },
   apis: {
@@ -96,10 +95,10 @@ export const accordionComponentRenderer = createComponentRenderer(
     return (
       <AccordionComponent
         triggerPosition={extractValue(node.props?.triggerPosition)}
-        collapsedIcon={node.props.collapsedIcon}
-        expandedIcon={node.props.expandedIcon}
+        collapsedIcon={extractValue(node.props.collapsedIcon)}
+        expandedIcon={extractValue(node.props.expandedIcon)}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
-        rotateExpanded={node.props.rotateExpanded}
+        rotateExpanded={extractValue(node.props.rotateExpanded)}
         onDisplayDidChange={lookupEventHandler("displayDidChange")}
         registerComponentApi={registerComponentApi}
       >

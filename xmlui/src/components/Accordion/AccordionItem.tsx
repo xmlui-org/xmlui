@@ -33,6 +33,7 @@ export const accordionItemComponentRenderer = createComponentRenderer(
       <AccordionItemComponent
         id={extractValue(node.uid)}
         header={extractValue(node.props.header)}
+        initiallyExpanded={extractValue.asOptionalBoolean(node.props.initiallyExpanded)}
         headerRenderer={
           node.props.headerTemplate
             ? (item) => (

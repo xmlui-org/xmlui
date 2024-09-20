@@ -26,7 +26,7 @@ export const AccordionComponent = ({
   registerComponentApi,
 }: Props) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
-  const [itemElements, setItemElements] = useState<Record<string, HTMLButtonElement>>({});
+  const [itemElements, setItemElements] = useState<Set<string>>(new Set());
 
   const collapseItem = useCallback(
     (id: string) => {
@@ -56,8 +56,11 @@ export const AccordionComponent = ({
   );
 
   const register = useCallback(
-    (id: string, el: HTMLButtonElement) => {
-      setItemElements((prev) => ({ ...prev, [id]: el }));
+    (id: string) => {
+      setItemElements((prev) => {
+        prev.add(id);
+        return prev;
+      });
     },
     [setItemElements],
   );
@@ -65,7 +68,7 @@ export const AccordionComponent = ({
   const unRegister = useCallback(
     (id: string) => {
       setItemElements((prev) => {
-        delete prev[id];
+        prev.delete(id);
         return prev;
       });
     },
@@ -74,24 +77,45 @@ export const AccordionComponent = ({
 
   const focusItem = useCallback(
     (id: string) => {
-      if (itemElements[id]) {
-        itemElements[id].focus();
+      if (itemElements.has(`trigger_${id}`)) {
+        const trigger = document.getElementById(`trigger_${id}`);
+        if (trigger) {
+          trigger.focus();
+        }
       }
     },
     [itemElements],
   );
 
+  const isExpanded = useCallback(
+    (id: string) => {
+      return expandedItems.includes(`${id}`);
+    },
+    [expandedItems],
+  );
+
   useEffect(() => {
     registerComponentApi?.({
+      expanded: isExpanded,
       expand: expandItem,
       collapse: collapseItem,
       toggle: toggleItem,
       focus: focusItem,
     });
-  }, [registerComponentApi, expandItem, collapseItem, toggleItem, focusItem]);
+  }, [registerComponentApi, expandItem, collapseItem, toggleItem, focusItem, isExpanded]);
 
   const contextValue = useMemo(
     () => ({
+      register,
+      unRegister,
+      expandItem,
+      expandedItems,
+      hideIcon,
+      expandedIcon,
+      collapsedIcon,
+      triggerPosition,
+    }),
+    [
       register,
       unRegister,
       expandedItems,
@@ -99,8 +123,8 @@ export const AccordionComponent = ({
       expandedIcon,
       collapsedIcon,
       triggerPosition,
-    }),
-    [register, unRegister, expandedItems, hideIcon, expandedIcon, collapsedIcon, triggerPosition],
+      expandItem,
+    ],
   );
 
   useEffect(() => {
