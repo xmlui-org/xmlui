@@ -37,6 +37,7 @@ export function AccordionItemComponent({
   const itemId = useMemo(() => (id ? `${id}` : generatedId), [id, generatedId]);
   const triggerId = useMemo(() => `trigger_${itemId}`, [itemId]);
   const {
+    rotateExpanded,
     expandedItems,
     hideIcon,
     expandedIcon,
@@ -78,13 +79,19 @@ export function AccordionItemComponent({
           })}
         >
           {headerRenderer(header)}
-          {!hideIcon ? (
-            expanded ? (
-              <Icon name={expandedIcon} className={styles.chevron} />
-            ) : (
-              <Icon name={collapsedIcon} className={styles.chevron} />
-            )
-          ) : null}
+          {!hideIcon && (
+            <span
+              style={{
+                transform: expanded && !expandedIcon ? `rotate(${rotateExpanded})` : "rotate(0deg)",
+                transition: "transform 300ms cubic-bezier(0.87, 0, 0.13, 1)",
+              }}
+            >
+              <Icon
+                name={!expanded ? collapsedIcon : expandedIcon || collapsedIcon}
+                className={styles.chevron}
+              />
+            </span>
+          )}
         </RAccordion.Trigger>
       </RAccordion.Header>
       <RAccordion.Content className={styles.contentWrapper}>

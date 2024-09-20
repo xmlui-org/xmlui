@@ -19,11 +19,12 @@ type Props = {
 export const AccordionComponent = ({
   children,
   hideIcon = false,
-  expandedIcon = "chevronup",
+  expandedIcon,
   collapsedIcon = "chevrondown",
   triggerPosition = "end",
   onDisplayDidChange = noop,
   registerComponentApi,
+  rotateExpanded = "180deg",
 }: Props) => {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [itemElements, setItemElements] = useState<Set<string>>(new Set());
@@ -114,6 +115,7 @@ export const AccordionComponent = ({
       expandedIcon,
       collapsedIcon,
       triggerPosition,
+      rotateExpanded,
     }),
     [
       register,
@@ -124,6 +126,7 @@ export const AccordionComponent = ({
       collapsedIcon,
       triggerPosition,
       expandItem,
+      rotateExpanded,
     ],
   );
 

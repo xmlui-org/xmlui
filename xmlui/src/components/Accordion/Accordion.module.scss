@@ -95,12 +95,7 @@ $radius: createThemeVar("radius-#{$componentName}");
   width: createThemeVar("width-icon-#{$componentName}");
   height: createThemeVar("height-icon-#{$componentName}");
   color: createThemeVar("color-icon-#{$componentName}");
-  transition: transform 300ms cubic-bezier(0.87, 0, 0.13, 1);
 }
-
-/*.trigger[data-state='open'] > .chevron {
-  transform: rotate(180deg);
-}*/
 
 @keyframes slideDown {
   from {

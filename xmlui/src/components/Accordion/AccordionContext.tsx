@@ -8,6 +8,7 @@ export type AccordionItem = Accordion & {
 };
 
 type AccordionContextDefinition = {
+  rotateExpanded: string;
   expandItem: (id: string) => void;
   register: (id: string) => void;
   unRegister: (id: string) => void;
@@ -19,7 +20,8 @@ type AccordionContextDefinition = {
 };
 
 export const AccordionContext = createContext<AccordionContextDefinition>({
-  expandedItems: [],
+  expandedItems: null,
+  rotateExpanded: null,
   expandItem: noop,
   register: noop,
   unRegister: noop,
