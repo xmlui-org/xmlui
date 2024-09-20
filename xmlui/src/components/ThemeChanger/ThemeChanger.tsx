@@ -13,6 +13,7 @@ import { Icon } from "@components/Icon/IconNative";
 
 const COMP = "ThemeChangerButton";
 export const ThemeChangerButtonMd = createMetadata({
+  status: "experimental",
   docFolder: "ThemeChanger",
   description: `The \`${COMP}\` component is a component that allows the user to change the theme of the app.`,
 });

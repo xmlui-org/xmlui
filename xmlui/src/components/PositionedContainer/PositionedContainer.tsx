@@ -7,7 +7,8 @@ import { PositionedContainer } from "./PositionedContainerNative";
 const COMP = "PositionedContainer";
 
 export const PositionedContainerMd = createMetadata({
-  description: "No description",
+  status: "deprecated",
+  description: "(**OBSOLETE**) This component was created for the ChatEngine app.",
   props: {
     visibleOnHover: d("No description"),
   },

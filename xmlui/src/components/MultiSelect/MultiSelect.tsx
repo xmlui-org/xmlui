@@ -34,6 +34,7 @@ const defaultOptionRenderer = {
 };
 
 export const MultiSelectMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component works the same way as the [\`Select\`](./Select.mdx) ` +
     `component with the addition of the ability to select multiple elements from a list by ` +

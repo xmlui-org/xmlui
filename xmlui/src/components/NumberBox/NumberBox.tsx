@@ -27,6 +27,7 @@ import {
 const COMP = "NumberBox";
 
 export const NumberBoxMd = createMetadata({
+  status: "in review",
   description:
     `A \`${COMP}\` component allows users to input numeric values: either integer or floating ` +
     `point numbers. It also accepts empty values, where the stored value will be of type \`null\`.`,

@@ -23,6 +23,7 @@ import {
 const COMP = "TextArea";
 
 export const TextAreaMd = createMetadata({
+  status: "in review",
   description: `\`${COMP}\` is a component that provides a multiline text input area.`,
   props: {
     enterSubmits: d(

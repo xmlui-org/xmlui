@@ -2,6 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 export const ToolbarMd = createMetadata({
+  status: "experimental",
   description: "This component is a container for a toolbar.",
   props: {
     alignment: d("The alignment of the toolbar."),

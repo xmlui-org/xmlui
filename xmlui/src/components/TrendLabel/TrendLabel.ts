@@ -2,6 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 export const TrendLabelMd = createMetadata({
+  status: "experimental",
   description: "This component displays a trend label.",
   props: {
     change: d("The change percentage."),

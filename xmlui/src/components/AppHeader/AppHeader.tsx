@@ -11,6 +11,7 @@ import { dComponent } from "@components/metadata-helpers";
 const COMP = "AppHeader";
 
 export const AppHeaderMd = createMetadata({
+  status: "experimental",
   description: `\`${COMP}\` is a placeholder within \`App\` to define a custom application header.`,
   props: {
     profileMenuTemplate: dComponent(

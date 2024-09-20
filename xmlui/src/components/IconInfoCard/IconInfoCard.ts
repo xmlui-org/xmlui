@@ -2,6 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
 export const IconInfoCardMd = createMetadata({
+  status: "experimental",
   description: "This component displays an icon and some content in a card.",
   props: {
     height: d("The height of the card."),

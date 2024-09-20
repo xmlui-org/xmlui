@@ -6,15 +6,16 @@ import { Chart } from "./ChartNative";
 const COMP = "Chart";
 
 export const ChartMd = createMetadata({
-  description: "(*** OBSOLETE ***) A chart component",
+  status: "deprecated",
+  description: "(**OBSOLETE**) A chart component",
   props: {
-    type: d("(*** OBSOLETE ***)"),
-    labels: d("(*** OBSOLETE ***)"),
-    series: d("(*** OBSOLETE ***)"),
-    stacked: d("(*** OBSOLETE ***)"),
-    showAxisLabels: d("(*** OBSOLETE ***)"),
-    tooltipEnabled: d("(*** OBSOLETE ***)"),
-    showLegend: d("(*** OBSOLETE ***)"),
+    type: d("(**OBSOLETE**)"),
+    labels: d("(**OBSOLETE**)"),
+    series: d("(**OBSOLETE**)"),
+    stacked: d("(**OBSOLETE**)"),
+    showAxisLabels: d("(**OBSOLETE**)"),
+    tooltipEnabled: d("(**OBSOLETE**)"),
+    showLegend: d("(**OBSOLETE**)"),
   }
 });
 

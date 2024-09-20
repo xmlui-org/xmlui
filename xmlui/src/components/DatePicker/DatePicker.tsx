@@ -18,6 +18,7 @@ import {
 const COMP = "DatePicker";
 
 export const DatePickerMd = createMetadata({
+  status: "experimental",
   description: "A datepicker component",
   props: {
     placeholder: dPlaceholder(),

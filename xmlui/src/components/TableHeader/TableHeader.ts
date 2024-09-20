@@ -4,6 +4,7 @@ import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 const COMP = "TableHeader";
 
 export const TableHeaderMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component can be used within a \`Table\` to define a particular table ` +
     `column's visual properties and data bindings.`,

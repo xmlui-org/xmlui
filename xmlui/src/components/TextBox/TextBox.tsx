@@ -30,6 +30,7 @@ import { TextBox } from "./TextBoxNative";
 const COMP = "TextBox";
 
 export const TextBoxMd = createMetadata({
+  status: "in review",
   description: `The \`${COMP}\` is an input component that allows users to input and edit textual data.`,
   props: {
     placeholder: dPlaceholder(),

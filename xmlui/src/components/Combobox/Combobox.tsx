@@ -35,6 +35,7 @@ const defaultOptionRenderer = {
 };
 
 export const ComboboxMd = createMetadata({
+  status: "experimental",
   description: `A \`${COMP}\` is a component that combines the features of a dropdown list and an input field.`,
   props: {
     placeholder: dPlaceholder(),
