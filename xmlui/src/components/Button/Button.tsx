@@ -2,12 +2,12 @@ import styles from "./Button.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
-  alignmentOptionNames,
-  buttonThemeNames,
-  buttonTypeNames,
-  iconPositionNames,
+  buttonThemeMd,
+  alignmentOptionMd,
   sizeMd,
   buttonVariantMd,
+  buttonTypesMd,
+  iconPositionMd,
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/IconNative";
@@ -24,39 +24,39 @@ export const ButtonMd = createMetadata({
   props: {
     autoFocus: d("Indicates if the button should receive focus when the page loads"),
     variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantMd),
-    themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeNames),
+    themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeMd),
     size: d("The size of the button (small, medium, large)", sizeMd),
     label: d(
       `This property is an optional string to set a label for the ${COMP}. If no label is ` +
-        `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
-        `small icon button. When the ${COMP} has nested children, it will display them and ` +
-        `ignore the value of the \`label\` prop.`,
+      `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
+      `small icon button. When the ${COMP} has nested children, it will display them and ` +
+      `ignore the value of the \`label\` prop.`,
     ),
     type: d(
       `This optional string describes how the ${COMP} appears in an HTML context. You ` +
-        `rarely need to set this property explicitly.`,
-      buttonTypeNames,
+      `rarely need to set this property explicitly.`,
+      buttonTypesMd,
     ),
     enabled: d(
       `The value of this property indicates if the button accepts actions (\`true\`) ` +
-        `or does not react to them (\`falseq\`).`,
-      null,
-      null,
-      true,
+      `or does not react to them (\`falseq\`).`,
+    null,
+    null,
+    true,
     ),
     icon: d(
       `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
-        `recognizes the icon (by its name). If no label is specified and an icon is set, the ${COMP} ` +
-        `displays only the icon.`,
+      `recognizes the icon (by its name). If no label is specified and an icon is set, the ${COMP} ` +
+      `displays only the icon.`,
     ),
     iconPosition: d(
       `This optional string determines the location of the icon in the ${COMP}.`,
-      iconPositionNames,
+      iconPositionMd,
     ),
     contentPosition: d(
       `This optional value determines how the label and icon (or nested children) should be placed` +
-        `inside the ${COMP} component.`,
-      alignmentOptionNames,
+      `inside the ${COMP} component.`,
+      alignmentOptionMd,
     ),
   },
   events: {

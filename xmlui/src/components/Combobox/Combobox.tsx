@@ -1,6 +1,6 @@
 import styles from "@components/Combobox/Combobox.module.scss";
 
-import { ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";

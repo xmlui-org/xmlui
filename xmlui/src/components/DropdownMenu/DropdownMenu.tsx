@@ -1,7 +1,7 @@
 import styles from "./DropdownMenu.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { iconPositionNames } from "@components/abstractions";
+import { iconPositionMd, iconPositionNames } from "@components/abstractions";
 
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -83,7 +83,7 @@ export const MenuItemMd = createMetadata({
   props: {
     iconPosition: d(
       `This property allows you to determine the position of the icon displayed in the menu item.`,
-      iconPositionNames,
+      iconPositionMd.filter(p => p.value === "start" || p.value === "end"),
     ),
     icon: d(`This property names an optional icon to display with the menu item.`),
     label: dLabel(),

@@ -1,231 +1,230 @@
 import React, {
-    type ChangeEventHandler,
-    type CSSProperties,
-    type TextareaHTMLAttributes,
-    useCallback,
-    useEffect,
-    useRef,
-    useState,
-  } from "react";
-  import styles from "./TextArea.module.scss";
-  import classnames from "@components-core/utils/classnames";
-  import type { ValidationStatus } from "@components/abstractions";
-  import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-  import { noop } from "@components-core/constants";
-  import TextAreaResizable from "./TextAreaResizable";
-  import TextareaAutosize from "react-textarea-autosize";
-  import { isNil } from "lodash-es";
-  import { useEvent } from "@components-core/utils/misc";
+  type ChangeEventHandler,
+  type CSSProperties,
+  type TextareaHTMLAttributes,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import styles from "./TextArea.module.scss";
+import classnames from "@components-core/utils/classnames";
+import type { ValidationStatus } from "@components/abstractions";
+import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import { noop } from "@components-core/constants";
+import TextAreaResizable from "./TextAreaResizable";
+import TextareaAutosize from "react-textarea-autosize";
+import { isNil } from "lodash-es";
+import { useEvent } from "@components-core/utils/misc";
   
-  
-  export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
-  export type ResizeOptions = (typeof resizeOptionKeys)[number];
+export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
+export type ResizeOptions = (typeof resizeOptionKeys)[number];
 
-  const resizeMap = {
-    horizontal: styles.resizeHorizontal,
-    vertical: styles.resizeVertical,
-    both: styles.resizeBoth,
+const resizeMap = {
+  horizontal: styles.resizeHorizontal,
+  vertical: styles.resizeVertical,
+  both: styles.resizeBoth,
+};
+
+type Props = {
+  id?: string;
+  value?: string;
+  placeholder?: string;
+  required?: boolean;
+  readOnly?: boolean;
+  allowCopy?: boolean;
+  updateState?: UpdateStateFn;
+  validationStatus?: ValidationStatus;
+  autoFocus?: boolean;
+  initialValue?: string;
+  resize?: ResizeOptions;
+  enterSubmits?: boolean;
+  escResets?: boolean;
+  onDidChange?: (e: any) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  controlled?: boolean;
+  style?: CSSProperties;
+  registerComponentApi?: RegisterComponentApiFn;
+  autoSize?: boolean;
+  maxRows?: number;
+  minRows?: number;
+  maxLength?: number;
+  rows?: number;
+  enabled?: boolean;
+};
+
+export const TextArea = ({
+  id,
+  value = "",
+  placeholder = "",
+  required = false,
+  readOnly = false,
+  allowCopy = true,
+  updateState = noop,
+  validationStatus,
+  autoFocus = false,
+  initialValue = "",
+  resize,
+  onDidChange = noop,
+  onFocus = noop,
+  onBlur = noop,
+  controlled = true,
+  enterSubmits = true,
+  escResets,
+  style,
+  registerComponentApi,
+  autoSize,
+  maxRows,
+  minRows,
+  maxLength,
+  rows = 2,
+  enabled = true,
+}: Props) => {
+  // --- The component is initially unfocused
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [cursorPosition, setCursorPosition] = useState(null);
+  const [focused, setFocused] = React.useState(false);
+
+  const updateValue = useCallback(
+    (value: string) => {
+      updateState({ value: value });
+      onDidChange(value);
+    },
+    [onDidChange, updateState]
+  );
+
+  const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
+    (event) => {
+      updateValue(event.target.value);
+    },
+    [updateValue]
+  );
+
+  useEffect(() => {
+    updateState({ value: initialValue });
+  }, [initialValue, updateState]);
+
+  // --- Execute this function when the user copies the value
+  const handleCopy = (event: React.SyntheticEvent) => {
+    if (allowCopy) {
+      return true;
+    } else {
+      event.preventDefault();
+      return false;
+    }
   };
-  
-  type Props = {
-    id?: string;
-    value?: string;
-    placeholder?: string;
-    required?: boolean;
-    readOnly?: boolean;
-    allowCopy?: boolean;
-    updateState?: UpdateStateFn;
-    validationStatus?: ValidationStatus;
-    autoFocus?: boolean;
-    initialValue?: string;
-    resize?: ResizeOptions;
-    enterSubmits?: boolean;
-    escResets?: boolean;
-    onDidChange?: (e: any) => void;
-    onFocus?: () => void;
-    onBlur?: () => void;
-    controlled?: boolean;
-    style?: CSSProperties;
-    registerComponentApi?: RegisterComponentApiFn;
-    autoSize?: boolean;
-    maxRows?: number;
-    minRows?: number;
-    maxLength?: number;
-    rows?: number;
-    enabled?: boolean;
+
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = () => {
+    setFocused(true);
+    onFocus?.();
   };
-  
-  export const TextArea = ({
-    id,
-    value = "",
-    placeholder = "",
-    required = false,
-    readOnly = false,
-    allowCopy = true,
-    updateState = noop,
-    validationStatus,
-    autoFocus = false,
-    initialValue = "",
-    resize,
-    onDidChange = noop,
-    onFocus = noop,
-    onBlur = noop,
-    controlled = true,
-    enterSubmits = true,
-    escResets,
-    style,
-    registerComponentApi,
-    autoSize,
-    maxRows,
-    minRows,
-    maxLength,
-    rows = 2,
-    enabled = true,
-  }: Props) => {
-    // --- The component is initially unfocused
-    const inputRef = useRef<HTMLTextAreaElement>(null);
-    const [cursorPosition, setCursorPosition] = useState(null);
-    const [focused, setFocused] = React.useState(false);
-  
-    const updateValue = useCallback(
-      (value: string) => {
-        updateState({ value: value });
-        onDidChange(value);
-      },
-      [onDidChange, updateState]
-    );
-  
-    const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
-      (event) => {
-        updateValue(event.target.value);
-      },
-      [updateValue]
-    );
-  
-    useEffect(() => {
-      updateState({ value: initialValue });
-    }, [initialValue, updateState]);
-  
-    // --- Execute this function when the user copies the value
-    const handleCopy = (event: React.SyntheticEvent) => {
-      if (allowCopy) {
-        return true;
-      } else {
-        event.preventDefault();
-        return false;
+  const handleOnBlur = () => {
+    setFocused(false);
+    onBlur?.();
+  };
+
+  const focus = useCallback(() => {
+    setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  }, []);
+
+  const insert = useCallback(
+    (text: any) => {
+      const input = inputRef?.current;
+      if (input && text) {
+        const start = input.selectionStart;
+        const value = input.value;
+        onInputChange({
+          // @ts-ignore
+          target: {
+            value: value.substring(0, start) + text + value.substring(start),
+          },
+        });
+        setCursorPosition(start + text.length);
       }
-    };
-  
-    // --- Manage obtaining and losing the focus
-    const handleOnFocus = () => {
-      setFocused(true);
-      onFocus?.();
-    };
-    const handleOnBlur = () => {
-      setFocused(false);
-      onBlur?.();
-    };
-  
-    const focus = useCallback(() => {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }, []);
-  
-    const insert = useCallback(
-      (text: any) => {
-        const input = inputRef?.current;
-        if (input && text) {
-          const start = input.selectionStart;
-          const value = input.value;
-          onInputChange({
-            // @ts-ignore
-            target: {
-              value: value.substring(0, start) + text + value.substring(start),
-            },
-          });
-          setCursorPosition(start + text.length);
-        }
-      },
-      [inputRef, onInputChange]
-    );
-  
-    const setValue = useEvent((val: string) => {
-      updateValue(val);
+    },
+    [inputRef, onInputChange]
+  );
+
+  const setValue = useEvent((val: string) => {
+    updateValue(val);
+  });
+
+  useEffect(() => {
+    if (cursorPosition) {
+      const input = inputRef?.current;
+      if (input) {
+        input.setSelectionRange(cursorPosition, cursorPosition);
+        setCursorPosition(null);
+      }
+    }
+  }, [value, cursorPosition, inputRef]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      insert,
+      setValue,
     });
-  
-    useEffect(() => {
-      if (cursorPosition) {
-        const input = inputRef?.current;
-        if (input) {
-          input.setSelectionRange(cursorPosition, cursorPosition);
-          setCursorPosition(null);
-        }
+  }, [focus, insert, registerComponentApi, setValue]);
+
+  // --- Handle the Enter key press
+  const handleEnter = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (enterSubmits && e.key.toLowerCase() === "enter" && !e.shiftKey) {
+        // -- Do not generate a new line
+        e.preventDefault();
+        e.currentTarget.form?.requestSubmit();
       }
-    }, [value, cursorPosition, inputRef]);
-  
-    useEffect(() => {
-      registerComponentApi?.({
-        focus,
-        insert,
-        setValue,
-      });
-    }, [focus, insert, registerComponentApi, setValue]);
-  
-    // --- Handle the Enter key press
-    const handleEnter = useCallback(
-      (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-        if (enterSubmits && e.key.toLowerCase() === "enter" && !e.shiftKey) {
-          // -- Do not generate a new line
-          e.preventDefault();
-          e.currentTarget.form?.requestSubmit();
-        }
-        if (escResets && e.key.toLowerCase() === "escape" && !e.shiftKey) {
-          e.preventDefault();
-          e.currentTarget.form?.reset();
-        }
-      },
-      [enterSubmits, escResets]
-    );
-  
-    const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> & React.RefAttributes<HTMLTextAreaElement> = {
-      className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
-        [styles.focused]: focused,
-        [styles.disabled]: !enabled,
-        [styles.error]: validationStatus === "error",
-        [styles.warning]: validationStatus === "warning",
-        [styles.valid]: validationStatus === "valid",
-      }),
-      ref: inputRef,
-      style: style as any,
-      value: controlled ? value || "" : undefined,
-      disabled: !enabled,
-      autoFocus,
-      id: id,
-      name: id,
-      placeholder,
-      required,
-      maxLength,
-      "aria-multiline": true,
-      "aria-readonly": readOnly,
-      readOnly: readOnly,
-      onChange: onInputChange,
-      onCopy: handleCopy,
-      onFocus: handleOnFocus,
-      onBlur: handleOnBlur,
-      onKeyDown: handleEnter,
-      autoComplete: "off",
-    };
-  
-    if (resize === "both" || resize === "horizontal" || resize === "vertical") {
-      return (
-        <TextAreaResizable {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />
-      );
-    }
-    if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
-      return <TextareaAutosize {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />;
-    }
-  
-    return <textarea {...textareaProps} rows={rows} />;
+      if (escResets && e.key.toLowerCase() === "escape" && !e.shiftKey) {
+        e.preventDefault();
+        e.currentTarget.form?.reset();
+      }
+    },
+    [enterSubmits, escResets]
+  );
+
+  const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> & React.RefAttributes<HTMLTextAreaElement> = {
+    className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
+      [styles.focused]: focused,
+      [styles.disabled]: !enabled,
+      [styles.error]: validationStatus === "error",
+      [styles.warning]: validationStatus === "warning",
+      [styles.valid]: validationStatus === "valid",
+    }),
+    ref: inputRef,
+    style: style as any,
+    value: controlled ? value || "" : undefined,
+    disabled: !enabled,
+    autoFocus,
+    id: id,
+    name: id,
+    placeholder,
+    required,
+    maxLength,
+    "aria-multiline": true,
+    "aria-readonly": readOnly,
+    readOnly: readOnly,
+    onChange: onInputChange,
+    onCopy: handleCopy,
+    onFocus: handleOnFocus,
+    onBlur: handleOnBlur,
+    onKeyDown: handleEnter,
+    autoComplete: "off",
   };
+
+  if (resize === "both" || resize === "horizontal" || resize === "vertical") {
+    return (
+      <TextAreaResizable {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />
+    );
+  }
+  if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
+    return <TextareaAutosize {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />;
+  }
+
+  return <textarea {...textareaProps} rows={rows} />;
+};
   

@@ -83,19 +83,23 @@ async function createSummary(
     .slice(startComponentsSection + 1, startComponentsSection + 1 + endComponentsSection)
     .join("\n");
 
+  const sortedMetadata = metadata.sort((a, b) => {
+    return a.displayName.localeCompare(b.displayName);
+  });
+
   let table = "";
   table += `## ${sectionName}\n\n`;
   table += createTable({
     rowNums: true,
     headers: [{ value: "Component", style: "center" }, "Description", { value: "Status", style: "center" }],
-    rows: metadata.map((component) => [
+    rows: sortedMetadata.map((component) => [
       `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
       component.description,
       component.status ?? "stable",
     ]),
   })
 
-  return beforeComponentsSection + "\n" + table + "\n\n" + afterComponentsSection;
+  return beforeComponentsSection + "\n" + table + afterComponentsSection;
 }
 
 function addDescriptionRef(component, entries = []) {

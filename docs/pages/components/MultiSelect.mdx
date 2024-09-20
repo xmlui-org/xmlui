@@ -143,7 +143,7 @@ Click on the second field to see the custom empty list indicator.
 
 ### `enabled`
 
-This boolean property's `true` value indicates whether the checkbox responds to user events that could change the component value.
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
 ```ueml copy /enabled="false"/
 <MultiSelect enabled="false" padding="$space-1">
@@ -287,7 +287,16 @@ This property sets a text to appear at the start (left side when the left-to-rig
 
 ### `validationStatus`
 
-This property allows you to set the checkbox's validation status to "none," "error," "warning," or "valid."
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
 
 | Value     | Description                                           |
 | :-------- | :---------------------------------------------------- |

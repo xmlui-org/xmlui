@@ -342,7 +342,7 @@ function combineDescriptionAndDescriptionRef(
     } else if (valuesType === "object") {
       availableValuesBuffer = createTable({
         headers: ["Value", "Description"],
-        rows: component.availableValues.map((v) => [v.value, v.description]),
+        rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
       })
     }
 

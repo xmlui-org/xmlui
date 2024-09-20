@@ -156,20 +156,31 @@ export type ButtonAria = (typeof buttonAriaValues)[number];
 const alignmentOptionValues = ["start", "center", "end"] as const;
 export const alignmentOptionNames: string[] = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
+export const alignmentOptionMd: PropertyValueDescription[] = [
+  { value: "center", description: "Place the content in the middle (default)" },
+  { value: "start", description: "Justify the content to the left (to the right if in right-to-left)" },
+  { value: "end", description: "Justify the content to the right (to the left if in right-to-left)" },
+] as const;
 
 // --- Available orientation options
 const orientationOptionValues = ["horizontal", "vertical"] as const;
 export const orientationOptionNames: string[] = [...orientationOptionValues];
 export type OrientationOptions = (typeof orientationOptionValues)[number];
 export const orientationOptionMd: PropertyValueDescription[] = [
-  { value: "horizontal", description: "Nested components are arranged horizontally" },
-  { value: "vertical", description: "Nested components are arranged vertically" },
-];
+  { value: "horizontal", description: "The component will fill the available space horizontally" },
+  { value: "vertical", description: "The component will fill the available space vertically" },
+] as const;
 
 // --- Available icon positions
 const iconPositionValues = ["left", "right", "start", "end"] as const;
 export const iconPositionNames: string[] = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
+export const iconPositionMd: PropertyValueDescription[] = [
+  { value: "left", description: "The icon will appear on the left side" },
+  { value: "right", description: "The icon will appear on the right side" },
+  { value: "start", description: "The icon will appear at the start (left side when the left-to-right direction is set)" },
+  { value: "end", description: "The icon will appear at the end (right side when the left-to-right direction is set)" },
+]
 
 // --- Available status colors
 const statusColorValues = [
@@ -193,12 +204,18 @@ export const statusColorMd: PropertyValueDescription[] = [
   { value: "info", description: "Info theme color, \"info\" icon" },
   { value: "light", description: "Light theme color, no default icon" },
   { value: "dark", description: "Dark theme color, no default icon" },
-];
+] as const;
 
 // --- Available placements
 const placementValues = ["start", "end", "top", "bottom"] as const;
 export const placementNames: string[] = [...placementValues];
 export type Placement = (typeof placementValues)[number];
+export const placementMd: PropertyValueDescription[] = [
+  { value: "start", description: "The left side of the window (left-to-right) or the right side of the window (right-to-left)" },
+  { value: "end", description: "The right side of the window (left-to-right) or the left side of the window (right-to-left)" },
+  { value: "top", description: "The top of the window" },
+  { value: "bottom", description: "The bottom of the window" },
+] as const;
 
 // --- Available trigger positions
 const triggerPositionValues = ["start", "end"] as const;
@@ -209,6 +226,12 @@ export type TriggerPosition = (typeof triggerPositionValues)[number];
 const validationStatusValues = ["none", "error", "warning", "valid"] as const;
 export const validationStatusNames: string[] = [...validationStatusValues];
 export type ValidationStatus = (typeof validationStatusValues)[number];
+export const validationStatusMd: PropertyValueDescription[] = [
+  // { value: "none", description: "No indicator (default)" },
+  { value: "valid", description: "Visual indicator for an input that is accepted" },
+  { value: "warning", description: "Visual indicator for an input that produced a warning" },
+  { value: "error", description: "Visual indicator for an input that produced an error" },
+] as const;
 
 // --- The validation result of a particular component
 export type ValidationResult = {

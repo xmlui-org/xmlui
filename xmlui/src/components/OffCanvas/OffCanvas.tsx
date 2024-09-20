@@ -5,7 +5,7 @@ import styles from "./OffCanvas.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { OffCanvas } from "./OffCanvasNative";
-import { placementNames } from "@components/abstractions";
+import { placementMd } from "@components/abstractions";
 import { dDidClose, dDidOpen } from "@components/metadata-helpers";
 
 const COMP = "OffCanvas";
@@ -40,7 +40,7 @@ export const OffCanvasMd = createMetadata({
     ),
     placement: d(
       `This property indicates the position where the ${COMP} should be docked to.`,
-      placementNames,
+      placementMd,
     ),
     autoCloseInMs: d(
       `This property sets a timeout. When the timeout expires, the component gets hidden.`,
@@ -70,7 +70,7 @@ export const OffCanvasMd = createMetadata({
 export const offCanvasComponentRenderer = createComponentRenderer(
   COMP,
   OffCanvasMd,
-  ({ node, extractValue, lookupEventHandler, layoutCss }) => {
+  ({}) => {
     return <OffCanvas />;
   },
 );

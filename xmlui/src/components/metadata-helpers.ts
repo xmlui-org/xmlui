@@ -1,5 +1,5 @@
 import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
-import { validationStatusNames } from "./abstractions";
+import { validationStatusMd } from "./abstractions";
 
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {
@@ -49,7 +49,7 @@ export function dLabel(): ComponentPropertyMetadata {
 
 export function dLabelPosition(def?: any): ComponentPropertyMetadata {
   return {
-    description: `Places the label at the \`top\`, \`right\`, \`bottom\`, or \`left\` of the component.`,
+    description: `Places the label at the given position of the component.`,
     availableValues: ["top", "right", "bottom", "left"],
     defaultValue: def,
   };
@@ -79,8 +79,7 @@ export function dReadonly(): ComponentPropertyMetadata {
 export function dEnabled(): ComponentPropertyMetadata {
   return {
     description:
-      `This boolean property's \`true\` value indicates whether the checkbox responds to user events ` +
-      `that could change the component value.`,
+      `This boolean property value indicates whether the component responds to user events (\`true\`) or not (\`false\`).`,
     valueType: "boolean",
     defaultValue: true,
   };
@@ -89,9 +88,8 @@ export function dEnabled(): ComponentPropertyMetadata {
 export function dValidationStatus(): ComponentPropertyMetadata {
   return {
     description:
-      `This property allows you to set the checkbox's validation status to "none," "error," ` +
-      `"warning," or "valid."`,
-    availableValues: validationStatusNames,
+      `This property allows you to set the validation status of the input component.`,
+    availableValues: validationStatusMd,
   };
 }
 

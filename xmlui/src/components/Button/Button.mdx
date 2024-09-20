@@ -10,12 +10,6 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-START contentPosition
 
-| Value    | Description                                                  |
-| :------- | :----------------------------------------------------------- |
-| `center` | Place the content in the middle **(default)**                |
-| `start`  | Justify the content to the left (to the right if in **rtl**) |
-| `end`    | Justify the content to the right (to the left if in **ltr**) |
-
 ```ueml copy
 <Stack gap="1rem">
   <Button width="200px" icon="drive" label="Button" contentPosition="center" />
@@ -70,13 +64,6 @@ Use the `Button` component to trigger various actions.
 %-PROP-END
 
 %-PROP-START iconPosition
-
-| Value   | Description                                                                       |
-| :------ | :-------------------------------------------------------------------------------- |
-| `left`  | Place the icon on the left of the label **(default)**                             |
-| `right` | Place the icon on the right of the label                                          |
-| `start` | Place the icon at the start of the label (considering the current text direction) |
-| `end`   | Place the icon at the end of the label (considering the current text direction)   |
 
 ```ueml
 <VStack gap="1rem">
@@ -152,23 +139,7 @@ Use the `Button` component to trigger various actions.
 
 %-PROP-END
 
-%-PROP-START type
-
-| Value    | Description                                                                                                        |
-| :------- | :----------------------------------------------------------------------------------------------------------------- |
-| `button` | Regular behavior that only executes logic if explicitly determined. **(default)**                                  |
-| `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
-| `reset`  | Resets all the controls to their initial values. Using it is ill advised for UX reasons.                           |
-
-%-PROP-END
-
 %-PROP-START variant
-
-| Value      | Description                                                                                                     |
-| ---------- | --------------------------------------------------------------------------------------------------------------- |
-| `solid`    | A button with a border and a filled background. **(default)**                                                   |
-| `outlined` | The button is displayed with a border and a transparent background.                                             |
-| `ghost`    | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
 
 ```ueml copy
 <HStack gap="1rem">
@@ -196,12 +167,6 @@ Use the `Button` component to trigger various actions.
 %-PROP-END
 
 %-PROP-START themeColor
-
-| Value       | Description                       |
-| :---------- | :-------------------------------- |
-| `primary`   | Primary theme color **(default)** |
-| `secondary` | Secondary theme color             |
-| `attention` | Attention state theme color       |
 
 ```ueml copy
 <Stack orientation="horizontal" gap="10px">
@@ -252,17 +217,6 @@ Use the `Button` component to trigger various actions.
 %-PROP-END
 
 %-PROP-START size
-
-%-META:COMMENT Note: Section can have metadata - skip that
-%-META:COMMENT example:
-%-META:IMPORT data from "./data.json"
-
-| Value | Description              |
-| :---- | :----------------------- |
-| `xs`  | Extra small size         |
-| `sm`  | Small size **(default)** |
-| `md`  | Medium size              |
-| `lg`  | Large size               |
 
 ```ueml copy
 <Stack gap="4px">

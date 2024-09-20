@@ -1,5 +1,5 @@
 import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-import { appLayouts } from "./AppLayoutContext";
+import { appLayoutMd } from "./AppLayoutContext";
 
 import styles from "./App.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
@@ -18,9 +18,9 @@ export const AppMd = createMetadata({
   props: {
     layout: d(
       `This property sets the layout template of the app. This setting determines the position ` +
-        `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
-        `scroll behavior.`,
-      appLayouts,
+      `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
+      `scroll behavior.`,
+      appLayoutMd,
     ),
     loggedInUser: d(`Stores information about the currently logged in user.`),
     logoTemplate: dComponent("Optional template of the app logo"),
