@@ -325,15 +325,15 @@ function combineDescriptionAndDescriptionRef(
     descriptionBuffer = component[SECTION_DESCRIPTION];
   }
 
-  if (
-    sectionId === PROPS
-    && component.availableValues
-    && Array.isArray(component.availableValues)
-    && component.availableValues.length > 0
-  ) {
-    const buffer = addAvailableValues(component.availableValues);
-    if (buffer) {
-      descriptionBuffer += "\n\n" + buffer;
+  if (sectionId === PROPS) {
+    const defaultValuesBuffer = addDefaultValue(component);
+    if (defaultValuesBuffer) {
+      descriptionBuffer += "\n\n" + defaultValuesBuffer;
+    }
+
+    const availableValuesBuffer = addAvailableValues(component);
+    if (availableValuesBuffer) {
+      descriptionBuffer += "\n\n" + availableValuesBuffer;
     }
   }
 
@@ -480,17 +480,36 @@ function isDirectory(filePath) {
   }
 }
 
-function addAvailableValues(availableValues) {
+function addDefaultValue(component) {
+  const defaultValue = component.defaultValue;
+  if (defaultValue === undefined) {
+    return "";
+  }
+  if (typeof defaultValue === "string") {
+    return `Default value: \`"${defaultValue}"\`.`;
+  }
+  return `Default value: \`${JSON.stringify(defaultValue, null, 2)}\`.`;
+}
+
+function addAvailableValues(component) {
+  if (
+    !(component.availableValues &&
+    Array.isArray(component.availableValues) &&
+    component.availableValues.length > 0)
+  ) {
+    return "";
+  }
+
   let availableValuesBuffer = "";
-  const valuesType = typeof availableValues[0];
+  const valuesType = typeof component.availableValues[0];
   const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
   
   if (valuesType === "string" || valuesType === "number") {
-    availableValuesBuffer = availableValues.map((v) => `\`${v}\``).join(", ");
+    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
       headers: ["Value", "Description"],
-      rows: availableValues.map((v) => [`\`${v.value}\``, v.description]),
+      rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
     })
   }
 
