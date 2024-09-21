@@ -1,3 +1,5 @@
+import { logger } from "./logger.mjs";
+
 export class ErrorWithSeverity extends Error {
   constructor(message, severity = Logger.severity.error) {
     super(message);

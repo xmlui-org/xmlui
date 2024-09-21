@@ -4,7 +4,7 @@ import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSyn
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
-import { createTable, handleError } from "./utils.mjs";
+import { createTable, handleError, ErrorWithSeverity } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
