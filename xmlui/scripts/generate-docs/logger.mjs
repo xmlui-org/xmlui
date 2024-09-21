@@ -97,21 +97,3 @@ export class Logger {
 }
 // --- Usable logger instance
 export const logger = new Logger(Logger.levels.all);
-
-export class ErrorWithSeverity extends Error {
-  constructor(message, severity = Logger.severity.error) {
-    super(message);
-    this.name = "ErrorWithSeverity";
-    this.severity = severity;
-  }
-}
-
-export function handleError(error) {
-  if (error instanceof ErrorWithSeverity) {
-    logger.log(error.severity, error.message);
-  } else if (error instanceof Error) {
-    logger.error(error.message);
-  } else {
-    logger.error(error);
-  }
-}
