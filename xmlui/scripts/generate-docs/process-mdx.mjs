@@ -3,8 +3,8 @@ import { fileURLToPath } from 'url';
 import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSync, lstatSync } from "fs";
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
-import { ErrorWithSeverity, logger, Logger } from "./logger.mjs";
-import { createTable } from "./utils.mjs";
+import { logger, Logger } from "./logger.mjs";
+import { createTable, handleError, ErrorWithSeverity } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -78,13 +78,7 @@ export function processMdx(component, componentNames, metadata) {
       // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
       fileData = readFileContents(join(sourceFolder, component.descriptionRef));
     } catch (error) {
-      if (error instanceof ErrorWithSeverity) {
-        logger.log(error.severity, error.message);
-      } else if (error instanceof Error) {
-        logger.error(error.message);
-      } else {
-        logger.error(error);
-      }
+      handleError(error);
     }
   }
 
@@ -108,6 +102,10 @@ export function processMdx(component, componentNames, metadata) {
     }
 
     result += `# ${component.displayName}\n\n`;
+
+    if (component.nonVisual) {
+      result += "> **Note**: This component does does not show up on the UI; it merely helps implement UI logic.\n\n";
+    }
 
     result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
     result += "\n\n";
@@ -333,21 +331,9 @@ function combineDescriptionAndDescriptionRef(
     && Array.isArray(component.availableValues)
     && component.availableValues.length > 0
   ) {
-    let availableValuesBuffer = "";
-    const valuesType = typeof component.availableValues[0];
-    const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
-    
-    if (valuesType === "string" || valuesType === "number") {
-      availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
-    } else if (valuesType === "object") {
-      availableValuesBuffer = createTable({
-        headers: ["Value", "Description"],
-        rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
-      })
-    }
-
-    if (availableValuesBuffer) {
-      descriptionBuffer += `\n\nAvailable values:${valuesTypeIsPrimitive ? " " : "\n\n"}${availableValuesBuffer}`;
+    const buffer = addAvailableValues(component.availableValues);
+    if (buffer) {
+      descriptionBuffer += "\n\n" + buffer;
     }
   }
 
@@ -492,4 +478,24 @@ function isDirectory(filePath) {
   } catch (error) {
     return false;
   }
+}
+
+function addAvailableValues(availableValues) {
+  let availableValuesBuffer = "";
+  const valuesType = typeof availableValues[0];
+  const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
+  
+  if (valuesType === "string" || valuesType === "number") {
+    availableValuesBuffer = availableValues.map((v) => `\`${v}\``).join(", ");
+  } else if (valuesType === "object") {
+    availableValuesBuffer = createTable({
+      headers: ["Value", "Description"],
+      rows: availableValues.map((v) => [`\`${v.value}\``, v.description]),
+    })
+  }
+
+  if (availableValuesBuffer) {
+    return `Available values:${valuesTypeIsPrimitive ? " " : "\n\n"}${availableValuesBuffer}`;
+  }
+  return "";
 }

@@ -1,3 +1,23 @@
+import { logger } from "./logger.mjs";
+
+export class ErrorWithSeverity extends Error {
+  constructor(message, severity = Logger.severity.error) {
+    super(message);
+    this.name = "ErrorWithSeverity";
+    this.severity = severity;
+  }
+}
+
+export function handleError(error) {
+  if (error instanceof ErrorWithSeverity) {
+    logger.log(error.severity, error.message);
+  } else if (error instanceof Error) {
+    logger.error(error.message);
+  } else {
+    logger.error(error);
+  }
+}
+
 export function createTable({
   headers = [],
   rows = [],

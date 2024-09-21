@@ -3,9 +3,9 @@ import { fileURLToPath } from 'url';
 import { basename, join } from "path";
 import { readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
-import { Logger, logger, handleError } from "./logger.mjs";
+import { Logger, logger } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
-import { createTable } from "./utils.mjs";
+import { handleError, createTable } from "./utils.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
