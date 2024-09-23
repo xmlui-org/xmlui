@@ -1,10 +1,12 @@
 import { ModuleResolver } from "@abstractions/scripting/modules";
-import { createXmlUiParser } from "@parsers/xmlui-parser/parser";
-import { nodeToComponentDef } from "@parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodes } from "@parsers/xmlui-parser/diagnostics";
 import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import type { Error as ParseError } from "@parsers/xmlui-parser/parser";
-import { ParserError } from "@parsers/xmlui-parser/ParserError"
+import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
+import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
+import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
+import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
+import { ParserError } from "../parsers/xmlui-parser/ParserError";
+import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
+import { Node } from "../parsers/xmlui-parser/syntax-node";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;
@@ -12,40 +14,29 @@ interface ErrorWithLineColInfo extends ParseError {
 }
 
 /** Finding any error while parsing / transforming will result
- * in a custom error reporting component being returned with the errors inside it.
- * If that process fails (which is a bug), it will throw.*/
-export function componentFromXmlUiMarkup(
+ * in a custom error reporting component being returned with the errors inside it. */
+export function componentFromXmlUiMarkupWithErrRendered(
   source: string,
   fileId: string | number = 0,
+  fileName: string,
   moduleResolver?: ModuleResolver,
 ) {
-  const { errors, component } = parseXmlUiMarkup(source, fileId, moduleResolver);
+  const { errors, component } = xmlUiMarkupToComponent(source, fileId, moduleResolver);
   if (errors.length === 0) {
     return component;
   }
-  const errReportComponentSource = errReportSourceFromErrors(errors);
-
-  const { errors: errReportErrors, component: errReportComponent } = parseXmlUiMarkup(
-    errReportComponentSource,
-    fileId,
-    moduleResolver,
-  );
-  if (errReportErrors.length === 0) {
-    return errReportComponent;
-  }
-  throw new Error(
-    "Error in the error reporting process. This is definitely a bug. Here are the raw errors encountered while processing the xmlui markup:\n\n" +
-      errors.map(errToStr) +
-      "\n\nAnd here are the errors that caused the reporting to broke:\n\n" +
-      errReportErrors.map(errToStr),
-  );
+  return errReportComponent(errors, fileName, "TODO");
 }
 
-export function parseXmlUiMarkup(
+export function xmlUiMarkupToComponent(
   source: string,
   fileId: string | number = 0,
   moduleResolver?: ModuleResolver,
-): { component: null | ComponentDef | CompoundComponentDef; errors: ErrorWithLineColInfo[] } {
+): {
+  component: null | ComponentDef | CompoundComponentDef;
+  errors: ErrorWithLineColInfo[];
+  erroneousCompoundComponentName?: string;
+} {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
 
@@ -57,11 +48,13 @@ export function parseXmlUiMarkup(
       }
     }
     const errorsWithLines = addPositions(errors, newlinePositions);
-    return { component: null, errors: errorsWithLines };
+    const erroneousCompoundComponentName = getCompoundCompName(node, getText);
+    return { component: null, errors: errorsWithLines, erroneousCompoundComponentName };
   }
   try {
     return { component: nodeToComponentDef(node, getText, fileId, moduleResolver), errors: [] };
   } catch (e) {
+    const erroneousCompoundComponentName = getCompoundCompName(node, getText);
     const singleErr: ErrorWithLineColInfo = {
       message: (e as ParserError).message,
       col: 0,
@@ -73,6 +66,7 @@ export function parseXmlUiMarkup(
     };
     return {
       component: null,
+      erroneousCompoundComponentName,
       errors: [singleErr],
     };
   }
@@ -106,22 +100,67 @@ function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWi
   return errors as ErrorWithLineColInfo[];
 }
 
-function errToStr(e: ErrorWithLineColInfo) {
-  return `Error at line ${e.line}, column ${e.col}:\n    ${e.message}`;
+/** returns a component definition containing the errors.
+ * It is a component and a compound component definition at the same time,
+ * so that it can be used to render the errors for a compound component as well*/
+export function errReportComponent(
+  errors: ErrorWithLineColInfo[],
+  fileName: number | string,
+  compoundCompName: string | undefined,
+) {
+  function makeComponent() {
+    const errList = errors.map((e) => {
+      return {
+        type: "VStack",
+        children: [
+          {
+            type: "Text",
+            props: { value: `Error at file '${fileName}'` },
+          },
+          {
+            type: "Text",
+            props: { value: `line ${e.line}, column ${e.col}:` },
+          },
+          {
+            type: "Text",
+            props: { value: `${e.message}` },
+          },
+        ],
+      };
+    });
+    const comp: ComponentDef = {
+      type: "VStack",
+      children: [
+        { type: "H1", props: { value: "Error while processing xmlui markup." } },
+        { type: "VStack", props: { gap: "2rem" }, children: errList },
+      ],
+    };
+    return comp;
+  }
+  const comp = makeComponent() as any;
+  comp.name = compoundCompName;
+  comp.component = makeComponent();
+  return comp;
 }
+function getCompoundCompName(node: Node, getText: GetText) {
+  const rootTag = node?.children?.[0];
+  const rootTagNameTokens = rootTag?.children?.find(
+    (c) => c.kind === SyntaxKind.TagNameNode,
+  )?.children;
+  const rootTagName = rootTagNameTokens?.[rootTagNameTokens.length - 1];
 
-function errReportSourceFromErrors(errors: ErrorWithLineColInfo[]) {
-  const errStrList = errors
-    .map((e) => {
-      `<Text value="${errToStr(e)}"/>`;
-    })
-    .join();
-  const errReportComponentSource = `
-  <VStack>
-    <H1>Error while processing xmlui markup.</H1>
-    <VStack>
-      ${errStrList}
-    </VStack>
-  </VStack>`;
-  return errReportComponentSource;
+  if (rootTagName === undefined || getText(rootTagName) !== "Component") {
+    return undefined;
+  }
+
+  const attrs = rootTag.children?.find((c) => c.kind === SyntaxKind.AttributeListNode)?.children;
+  const nameAttrTokens = attrs?.find(
+    (c) => c.kind === SyntaxKind.AttributeNode && getText(c?.children[0]) === "name",
+  )?.children;
+  const nameValueToken = nameAttrTokens?.[nameAttrTokens.length - 1];
+  if (nameValueToken !== undefined && nameValueToken.kind === SyntaxKind.StringLiteral) {
+    const strLit = getText(nameValueToken);
+    return strLit.substring(1, strLit.length - 1);
+  }
+  return undefined;
 }

@@ -13,7 +13,7 @@ import { Splitter } from "@components/Splitter/SplitterNative";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { toCssVar } from "./parsers/style-parser/StyleParser";
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import { componentFromXmlUiMarkup } from "@components-core/xmlui-parser";
+import { componentFromXmlUiMarkupWithErrRendered } from "@components-core/xmlui-parser";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
 import type { RendererContext } from "@abstractions/RendererDefs";
@@ -44,5 +44,5 @@ export {
   getColor,
   useColors,
   toCssVar,
-  componentFromXmlUiMarkup
+  componentFromXmlUiMarkupWithErrRendered as componentFromXmlUiMarkup
 };

@@ -20,7 +20,11 @@ import RootComponent from "@components-core/RootComponent";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { componentFromXmlUiMarkup } from "@components-core/xmlui-parser";
+import {
+  componentFromXmlUiMarkupWithErrRendered,
+  errReportComponent,
+  xmlUiMarkupToComponent,
+} from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   componentFileExtension,
@@ -113,7 +117,7 @@ async function parseComponentResp(response: Response) {
     const code = await response.text();
     const fileId = response.url;
     return {
-      component: componentFromXmlUiMarkup(code, fileId),
+      component: componentFromXmlUiMarkupWithErrRendered(code, fileId, "unspecified"),
       src: code,
       file: fileId,
     };
@@ -260,10 +264,18 @@ function getStandalone(
     let entryPoint: ComponentDef | null = null;
     const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
     const components: Array<CompoundComponentDef> = [];
+    const errorsAggregated = [];
+    const erroneousCompNamesAggr = [];
     for (let i = 0; i < componentNodes.length; i++) {
       const value = componentNodes[i];
-      const componentDef = componentFromXmlUiMarkup(value.textContent!);
-      if (!componentDef) {
+      const {
+        component: componentDef,
+        errors,
+        erroneousCompoundComponentName,
+      } = xmlUiMarkupToComponent(value.textContent!, 0);
+      if (errors.length > 0) {
+        errorsAggregated.push(...errors);
+        erroneousCompNamesAggr.push(erroneousCompoundComponentName);
         continue;
       }
       if ("type" in componentDef && componentDef.type === "App") {
@@ -271,6 +283,13 @@ function getStandalone(
       } else {
         components.push(componentDef as CompoundComponentDef);
       }
+    }
+    if (errorsAggregated.length > 0) {
+      entryPoint = errReportComponent(
+        errorsAggregated,
+        "Standalone-html-file",
+        erroneousCompNamesAggr.join(", "),
+      );
     }
     if (entryPoint === null) {
       throw new Error("No App component specified");
@@ -325,10 +344,18 @@ function useStandalone(
         let entryPoint: ComponentDef | null = null;
         const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
         const components: Array<CompoundComponentDef> = [];
+        const errorsAggregated = [];
+        const erroneousCompNamesAggr = [];
         for (let i = 0; i < componentNodes.length; i++) {
           const value = componentNodes[i];
-          const componentDef = componentFromXmlUiMarkup(value.textContent!);
-          if (!componentDef) {
+          const {
+            component: componentDef,
+            errors,
+            erroneousCompoundComponentName,
+          } = xmlUiMarkupToComponent(value.textContent!, 0);
+          if (errors.length > 0) {
+            errorsAggregated.push(...errors);
+            erroneousCompNamesAggr.push(erroneousCompoundComponentName);
             continue;
           }
           if ("type" in componentDef && componentDef.type === "App") {
@@ -336,6 +363,13 @@ function useStandalone(
           } else {
             components.push(componentDef as CompoundComponentDef);
           }
+        }
+        if (errorsAggregated.length > 0) {
+          entryPoint = errReportComponent(
+            errorsAggregated,
+            "Standalone-html-file",
+            erroneousCompNamesAggr.join(", "),
+          );
         }
         if (entryPoint === null) {
           throw new Error("No App component specified");
