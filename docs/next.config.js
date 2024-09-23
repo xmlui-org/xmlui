@@ -43,7 +43,6 @@ const withNextra = require("nextra")({
           "#000011": "var(--syntax-token-cdata)",
           "#000012": "var(--syntax-token-delimiter-curly)",
           "#000013": "var(--syntax-token-text)",
-          "#000014": "var(--syntax-token-slot)",
         });
 
         return highlighter;

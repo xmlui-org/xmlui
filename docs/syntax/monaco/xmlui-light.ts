@@ -6,7 +6,6 @@ const lightTheme: any = {
         {token: "comment.content", foreground: "#4E4E4E"},
         {token: "tag-component", foreground: "#F07100"},
         {token: "tag-event", foreground: "#3572F6"},
-        {token: "tag-slot", foreground: "#F07100"},
         {token: "tag-helper", foreground: "#3572F6"},
         {token: "attribute", foreground: "#C79B00"},
         {token: "operators", foreground: "#7235C7"},
