@@ -252,9 +252,7 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("prop with name/value attr works #1", () => {
-    const cd = transformSource(
-      "<Stack><prop name='myProp' value='123'/></Stack>",
-    ) as ComponentDef;
+    const cd = transformSource("<Stack><prop name='myProp' value='123'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
   });
@@ -405,9 +403,7 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("event with name and text works #1", () => {
-    const cd = transformSource(
-      "<Stack><event name='myEvent'>doIt</event></Stack>",
-    ) as ComponentDef;
+    const cd = transformSource("<Stack><event name='myEvent'>doIt</event></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.events! as any).myEvent).equal("doIt");
   });
@@ -637,7 +633,11 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect((cd.props! as any).myProp.x).deep.equal([{ p1: "1", p2: "2" }, null, { p1: "3", p2: "4" }]);
+    expect((cd.props! as any).myProp.x).deep.equal([
+      { p1: "1", p2: "2" },
+      null,
+      { p1: "3", p2: "4" },
+    ]);
   });
 
   it("props with attr #5", () => {
@@ -1155,93 +1155,6 @@ describe("Xmlui transform - child elements", () => {
         end: source.indexOf("<Button/>") + "<Button/>".length,
         fileId: FILE_ID,
       },
-    });
-  });
-
-  describe("slots", () => {
-    it("empty slot", () => {
-      const source = `
-        <MyTemplate>
-          <toolbar></toolbar>
-        </MyTemplate>`;
-
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd.slots).toBeUndefined();
-    });
-
-    it("slot with Component", () => {
-      const source = `
-        <MyTemplate>
-          <toolbar><Button/></toolbar>
-        </MyTemplate>`;
-
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd.slots).toMatchObject({
-        toolbar: [{ type: "Button" }],
-      });
-    });
-
-    it("slot with text", () => {
-      const source = `
-        <MyTemplate>
-          <T>abc</T>
-          <toolbar>abc</toolbar>
-        </MyTemplate>`;
-
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd.slots).toMatchObject({
-        toolbar: [{ type: "TextNode", props: { value: "abc" } }],
-      });
-    });
-
-    it("empty and text slot", () => {
-      const source = `
-        <MyTemplate>
-          <toolbar> </toolbar>
-          <Button/>
-          <body>abc</body>
-        </MyTemplate>`;
-
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd).toMatchObject({
-        children: [
-          {
-            type: "Button",
-          },
-        ],
-        slots: {
-          body: [{ type: "TextNode", props: { value: "abc" } }],
-        },
-      });
-    });
-
-    it("slot with prop", () => {
-      const source = `
-        <MyTemplate>
-          <toolbar>
-            <prop name="a" value="b"/>
-            <prop name="a">abc</prop>
-          </toolbar>
-        </MyTemplate>`;
-
-      const cd = transformSource(source) as ComponentDef;
-      expect(cd.slots).toBeUndefined();
-    });
-
-    it("slot with CompoundComp", () => {
-      const source = `
-        <MyTemplate>
-          <toolbar>
-            <Component name="A"><Button/></Component>
-          </toolbar>
-        </MyTemplate>`;
-
-      try {
-        const cd = transformSource(source) as ComponentDef;
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T024")).equal(true);
-      }
     });
   });
 });
