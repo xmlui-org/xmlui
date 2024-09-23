@@ -1,6 +1,6 @@
 import { Fragment, ReactNode, useMemo } from "react";
 import { Navigate, Route, Routes } from "@remix-run/react";
-import type { ComponentDef, ComponentDefNew } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { useParams } from "@remix-run/react";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
@@ -38,7 +38,7 @@ export function RouteWrapper({
   );
 }
 
-type PageComponentDef = ComponentDefNew<typeof PageMd>
+type PageComponentDef = ComponentDef<typeof PageMd>
 
 type PagesProps = {
   defaultRoute?: string;

@@ -1,7 +1,7 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type {
   LookupEventHandlerFn,
   RegisterComponentApiFn,
@@ -34,12 +34,12 @@ type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
   onUnmount: (uid: symbol) => void;
 };
 
-function useEventHandler(
+function useEventHandler<TMd extends ComponentMetadata>(
   eventName: string,
-  lookupEvent: LookupEventHandlerFn,
+  lookupEvent: LookupEventHandlerFn<TMd>,
   shouldSkip: boolean,
 ) {
-  const onEvent = shouldSkip ? undefined : lookupEvent(eventName);
+  const onEvent = shouldSkip ? undefined : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
   const eventHandler: EventHandler<any> = useCallback(
     (event) => {
       if (onEvent) {
@@ -201,9 +201,10 @@ const Component = forwardRef(function Component(
     let didResolve = false;
     if (Array.isArray(safeNode.children)) {
       safeNode.children.forEach((child) => {
+        const childName = (child.props as any)?.name;
         if (child.type === "Slot") {
           didResolve = true;
-          if (dynamicChildren && child.props?.name === undefined) {
+          if (dynamicChildren && childName === undefined) {
             children.push(...dynamicChildren);
           }
           if (child.props?.name) {

@@ -1,3 +1,4 @@
+import type { PropertyValueDescription } from "@abstractions/ComponentDefs";
 import type { ReactNode } from "react";
 
 /**
@@ -24,6 +25,18 @@ export type Option = {
    * @param item Item to display
    */
   renderer?: (item: any) => ReactNode;
+};
+
+export type Accordion = {
+  /**
+   * The header of the accordion.
+   */
+  header: string;
+
+  /**
+   * The content of the accordion.
+   */
+  content: ReactNode;
 };
 
 export type Tab = {
@@ -80,10 +93,27 @@ export type ComponentThemeColor =
   | "dark";
 
 // --- Available view sizes
-export const viewportSizeNames = ["xs", "sm", "md", "lg", "xl", "xxl"];
+export const viewportSizeMd: PropertyValueDescription[] = [
+  {
+    value: "xs",
+    description: "Extra small devices (e.g., a small smartphone with low screen resolution)",
+  },
+  { value: "sm", description: "Small devices (e.g., a smartphone in landscape view)" },
+  { value: "md", description: "Medium devices (e.g., a tablet)" },
+  { value: "lg", description: "Large devices (e.g., a laptop)" },
+  { value: "xl", description: 'Extra large devices (e.g., a standard 20" monitor)' },
+  { value: "xxl", description: 'Extra extra large devices (e.g., a large 29" monitor)' },
+] as const;
+export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
-const sizeValues = ["xs", "sm", "md", "lg"] as const;
+export const sizeMd: PropertyValueDescription[] = [
+  { value: "xs", description: "Extra small button" },
+  { value: "sm", description: "Small button (default)" },
+  { value: "md", description: "Medium button" },
+  { value: "lg", description: "Large button" },
+];
+const sizeValues = Object.keys(sizeMd);
 export const sizeNames: string[] = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
 
@@ -91,16 +121,31 @@ export type ComponentSize = (typeof sizeValues)[number];
 const buttonThemeValues = ["attention", "primary", "secondary"] as const;
 export const buttonThemeNames: string[] = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
+export const buttonThemeMd: PropertyValueDescription[] = [
+  { value: "attention", description: "Attention state theme color" },
+  { value: "primary", description: "Primary theme color (default)" },
+  { value: "secondary", description: "Secondary theme color" },
+] as const;
 
 // --- Available button types
 const buttonTypeValues = ["button", "submit", "reset"] as const;
 export const buttonTypeNames: string[] = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
+export const buttonTypesMd: PropertyValueDescription[] = [
+  { value: "button", description: "Regular behavior that only executes logic if explicitly determined. (default)" },
+  { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
+  { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
+] as const;
 
 // --- Available button variants
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
 export const buttonVariantNames: string[] = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
+export const buttonVariantMd: PropertyValueDescription[] = [
+  { value: "solid", description: "A button with a border and a filled background." },
+  { value: "outlined", description: "The button is displayed with a border and a transparent background." },
+  { value: "ghost", description: "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked." },
+] as const;
 
 // --- Available button aria attributes
 const buttonAriaValues = ["aria-controls", "aria-expanded", "aria-disabled", "aria-label"] as const;
@@ -111,16 +156,31 @@ export type ButtonAria = (typeof buttonAriaValues)[number];
 const alignmentOptionValues = ["start", "center", "end"] as const;
 export const alignmentOptionNames: string[] = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
+export const alignmentOptionMd: PropertyValueDescription[] = [
+  { value: "center", description: "Place the content in the middle (default)" },
+  { value: "start", description: "Justify the content to the left (to the right if in right-to-left)" },
+  { value: "end", description: "Justify the content to the right (to the left if in right-to-left)" },
+] as const;
 
 // --- Available orientation options
 const orientationOptionValues = ["horizontal", "vertical"] as const;
 export const orientationOptionNames: string[] = [...orientationOptionValues];
 export type OrientationOptions = (typeof orientationOptionValues)[number];
+export const orientationOptionMd: PropertyValueDescription[] = [
+  { value: "horizontal", description: "The component will fill the available space horizontally" },
+  { value: "vertical", description: "The component will fill the available space vertically" },
+] as const;
 
 // --- Available icon positions
 const iconPositionValues = ["left", "right", "start", "end"] as const;
 export const iconPositionNames: string[] = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
+export const iconPositionMd: PropertyValueDescription[] = [
+  { value: "left", description: "The icon will appear on the left side" },
+  { value: "right", description: "The icon will appear on the right side" },
+  { value: "start", description: "The icon will appear at the start (left side when the left-to-right direction is set)" },
+  { value: "end", description: "The icon will appear at the end (right side when the left-to-right direction is set)" },
+]
 
 // --- Available status colors
 const statusColorValues = [
@@ -135,13 +195,46 @@ const statusColorValues = [
 ] as const;
 export const statusColorNames: string[] = [...statusColorValues];
 export type StatusColor = (typeof statusColorValues)[number];
+export const statusColorMd: PropertyValueDescription[] = [
+  { value: "primary", description: "Primary theme color (default), no default icon" },
+  { value: "secondary", description: "Secondary theme color, no default icon" },
+  { value: "success", description: "Success theme color, \"success\" icon" },
+  { value: "danger", description: "Warning theme color, \"warning\" icon" },
+  { value: "warning", description: "Danger theme color, \"danger\" icon" },
+  { value: "info", description: "Info theme color, \"info\" icon" },
+  { value: "light", description: "Light theme color, no default icon" },
+  { value: "dark", description: "Dark theme color, no default icon" },
+] as const;
 
 // --- Available placements
 const placementValues = ["start", "end", "top", "bottom"] as const;
 export const placementNames: string[] = [...placementValues];
 export type Placement = (typeof placementValues)[number];
+export const placementMd: PropertyValueDescription[] = [
+  { value: "start", description: "The left side of the window (left-to-right) or the right side of the window (right-to-left)" },
+  { value: "end", description: "The right side of the window (left-to-right) or the left side of the window (right-to-left)" },
+  { value: "top", description: "The top of the window" },
+  { value: "bottom", description: "The bottom of the window" },
+] as const;
 
 // --- Available trigger positions
 const triggerPositionValues = ["start", "end"] as const;
 export const triggerPositionNames: string[] = [...triggerPositionValues];
 export type TriggerPosition = (typeof triggerPositionValues)[number];
+
+// --- The state of a validated UI element
+const validationStatusValues = ["none", "error", "warning", "valid"] as const;
+export const validationStatusNames: string[] = [...validationStatusValues];
+export type ValidationStatus = (typeof validationStatusValues)[number];
+export const validationStatusMd: PropertyValueDescription[] = [
+  // { value: "none", description: "No indicator (default)" },
+  { value: "valid", description: "Visual indicator for an input that is accepted" },
+  { value: "warning", description: "Visual indicator for an input that produced a warning" },
+  { value: "error", description: "Visual indicator for an input that produced an error" },
+] as const;
+
+// --- The validation result of a particular component
+export type ValidationResult = {
+  status: ValidationStatus;
+  message?: string;
+};

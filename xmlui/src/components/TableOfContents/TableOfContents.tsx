@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TableOfContents.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { TableOfContents } from "./TableOfContentsNative";
@@ -7,6 +7,7 @@ import { TableOfContents } from "./TableOfContentsNative";
 const COMP = "TableOfContents";
 
 export const TableOfContentsMd = createMetadata({
+  status: "experimental",
   description: 
     `The \`${COMP}\` component collects headings and bookmarks within the current page ` + 
     `and displays them in a tree representing their hierarchy. When you select an item ` + 
@@ -66,7 +67,7 @@ export const TableOfContentsMd = createMetadata({
   },
 });
 
-export const tableOfContentsRenderer = createComponentRendererNew(
+export const tableOfContentsRenderer = createComponentRenderer(
   COMP,
   TableOfContentsMd,
   ({ layoutCss, node, extractValue }) => {

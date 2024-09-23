@@ -1,7 +1,7 @@
 import styles from "@components/Combobox/Combobox.module.scss";
 
-import { ComponentDefNew, createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { type ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Combobox } from "./ComboboxNative";
@@ -35,6 +35,7 @@ const defaultOptionRenderer = {
 };
 
 export const ComboboxMd = createMetadata({
+  status: "experimental",
   description: `A \`${COMP}\` is a component that combines the features of a dropdown list and an input field.`,
   props: {
     placeholder: dPlaceholder(),
@@ -79,7 +80,7 @@ export const ComboboxMd = createMetadata({
   },
 });
 
-export const comboboxComponentRenderer = createComponentRendererNew(
+export const comboboxComponentRenderer = createComponentRenderer(
   "Combobox",
   ComboboxMd,
   ({
@@ -113,7 +114,7 @@ export const comboboxComponentRenderer = createComponentRendererNew(
         optionRenderer={(item) => {
           return (
             <MemoizedItem
-              node={(node.props.optionTemplate || defaultOptionRenderer) as ComponentDefNew}
+              node={(node.props.optionTemplate || defaultOptionRenderer) as ComponentDef}
               item={item}
               renderChild={renderChild}
             />

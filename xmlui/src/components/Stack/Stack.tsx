@@ -1,8 +1,8 @@
 import type React from "react";
 import styles from "./Stack.module.scss";
-import { ComponentDefNew, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -51,10 +51,11 @@ export const StackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type StackComponentDef = ComponentDefNew<typeof StackMd>;
+type StackComponentDef = ComponentDef<typeof StackMd>;
 
 export const VStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description: `This component represents a stack rendering its contents vertically.`,
   props: {
     ...stackMd.props,
@@ -62,10 +63,11 @@ export const VStackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type VStackComponentDef = ComponentDefNew<typeof VStackMd>;
+type VStackComponentDef = ComponentDef<typeof VStackMd>;
 
 export const HStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description: `This component represents a stack rendering its contents horizontally.`,
   props: {
     ...stackMd.props,
@@ -73,23 +75,25 @@ export const HStackMd = {
     verticalAlignment: VERTICAL_ALIGNMENT,
   },
 };
-type HStackComponentDef = ComponentDefNew<typeof HStackMd>;
+type HStackComponentDef = ComponentDef<typeof HStackMd>;
 
 export const CVStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description:
     `This component represents a stack that renders its contents vertically ` +
     `and aligns that in the center along both axes.`,
 };
-type CVStackComponentDef = ComponentDefNew<typeof CVStackMd>;
+type CVStackComponentDef = ComponentDef<typeof CVStackMd>;
 
 export const CHStackMd = {
   ...StackMd,
+  specializedFrom: COMP,
   description:
     `This component represents a stack that renders its contents horizontally ` +
     `and aligns that in the center along both axes.`,
 };
-type CHStackComponentDef = ComponentDefNew<typeof CHStackMd>;
+type CHStackComponentDef = ComponentDef<typeof CHStackMd>;
 
 type RenderStackPars = {
   node:
@@ -143,7 +147,7 @@ function renderStack({
   );
 }
 
-export const stackComponentRenderer = createComponentRendererNew(
+export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -158,7 +162,7 @@ export const stackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const vStackComponentRenderer = createComponentRendererNew(
+export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -174,7 +178,7 @@ export const vStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const hStackComponentRenderer = createComponentRendererNew(
+export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -190,7 +194,7 @@ export const hStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const cvStackComponentRenderer = createComponentRendererNew(
+export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
@@ -208,7 +212,7 @@ export const cvStackComponentRenderer = createComponentRendererNew(
   },
 );
 
-export const chStackComponentRenderer = createComponentRendererNew(
+export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
   ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {

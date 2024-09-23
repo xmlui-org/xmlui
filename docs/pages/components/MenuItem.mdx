@@ -1,9 +1,8 @@
 # MenuItem
 
-This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. See the 
-[`DropdownMenu` component](
-./DropdownMenu
-) for using this component in menus.
+This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.
+
+See the [`DropdownMenu` component](./DropdownMenu) for using this component in menus.
 
 ## Context Variables
 
@@ -67,7 +66,19 @@ This property names an optional icon to display with the menu item.
 
 ### `iconPosition`
 
-This property allows you to determine the position of the icon displayed in the menu item:
+This property allows you to determine the position of the icon displayed in the menu item.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
+| `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
+
+
+This property allows you to determine the position of the icon displayed in the menu item.
+
+Avaliable values are:
 
 - `start`: The icon starts the menu item (default).
 - `end`: The icon is displayed after the menu item.
@@ -98,12 +109,11 @@ This property allows you to determine the position of the icon displayed in the 
 
 ### `label`
 
-This property defines the item's label.
+This property sets the label of the component.
 
 ### `to`
 
-This property defines the URL of the menu item. If this property is defined (and the `click` event 
-does not have an event handler), clicking the menu item navigates to this link.
+This property defines the URL of the menu item. If this property is defined (and the `click` event does not have an event handler), clicking the menu item navigates to this link.
 
 ## API
 
@@ -112,6 +122,8 @@ This component does not provide any API.
 ## Events
 
 ### `click`
+
+This event is triggered when the MenuItem is clicked.
 
 This event is fired when the user clicks the menu item. With an event handler, you can define how to respond to the user's click. If this event does not have an associated event handler but the `to` property has a value, clicking the component navigates the URL set in `to`.
 

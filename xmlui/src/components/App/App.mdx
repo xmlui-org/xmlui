@@ -10,19 +10,13 @@ import verticalFullHeader from "./doc-resources/vertical-full-header.xmlui";
 
 %-IMPORT-END
 
+%-DESC-START
+
+> **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
+
+%-DESC-END
+
 %-PROP-START layout
-
-This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
-
-| Value                  | Description                                                                                                                                                                                                                                                          |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizontal`           | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page.                                                                     |
-| `horizontal‑sticky`    | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom.                                                                                                                                   |
-| `condensed`            | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. **(default)**                                                                                                                                                      |
-| `condensed‑sticky`     | Similar to `horizontal-sticky`. However, the header and the navigation bar are in a single header block.                                                                                                                                                             |
-| `vertical`             | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header.|
-| `vertical‑sticky`      | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header.|
-| `vertical‑full‑header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom.                                                                                                                |
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 

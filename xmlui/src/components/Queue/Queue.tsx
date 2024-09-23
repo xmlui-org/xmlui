@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { Queue } from "./QueueNative";
 
@@ -77,7 +77,7 @@ export const QueueMd = createMetadata({
   },
 });
 
-export const queueComponentRenderer = createComponentRendererNew(
+export const queueComponentRenderer = createComponentRenderer(
   COMP,
   QueueMd,
   ({ node, registerComponentApi, lookupEventHandler, renderChild, extractValue }) => {

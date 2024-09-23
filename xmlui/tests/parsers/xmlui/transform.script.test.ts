@@ -293,7 +293,7 @@ Hello!
     </Items>
     `) as ComponentDef;
     expect(cd.children).equal(undefined);
-    const template = cd.props?.itemTemplate as ComponentDef;
+    const template = (cd.props as any).itemTemplate as ComponentDef;
     expect(template.type).equal("Fragment");
     expect(template.script).equal("something");
     expect(template.children!.length).equal(1);
@@ -315,6 +315,6 @@ Hello!
     expect(child.children![0].type).equal("Stack");
     expect(child.children![0].children!.length).equal(1);
     const textNode = child.children![0].children![0];
-    expect(textNode.props?.value).equal("{uppercaseItem}");  
+    expect((textNode.props as any).value).equal("{uppercaseItem}");  
   });
 });

@@ -9,12 +9,12 @@ describe("Ueml transform - regression", () => {
       <prop name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
       </prop>
-      <TableColumnDef size="140">
+      <Column size="140">
           <prop name="template">
             <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
           </prop>
-      </TableColumnDef>
-      <TableColumnDef accessor="key" header="Header"/>
+      </Column>
+      <Column accessor="key" header="Header"/>
     </Table>
     `) as ComponentDef;
     expect(cd.type).equal("Table");
@@ -26,12 +26,12 @@ describe("Ueml transform - regression", () => {
       <prop name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
       </prop>
-      <TableColumnDef size="140">
+      <Column size="140">
         <prop name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
         </prop>
-      </TableColumnDef>
-      <TableColumnDef accessor="key" header="Header"/>
+      </Column>
+      <Column accessor="key" header="Header"/>
     </Table>
     `) as ComponentDef;
     expect(cd.type).equal("Table");
@@ -43,12 +43,12 @@ describe("Ueml transform - regression", () => {
       <prop name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
       </prop>
-      <TableColumnDef size="140">
+      <Column size="140">
         <prop name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
         </prop>
-      </TableColumnDef>
-      <TableColumnDef accessor="key" header="Header"/>
+      </Column>
+      <Column accessor="key" header="Header"/>
     </Table>
     `) as ComponentDef;
     expect(cd.type).equal("Table");
@@ -60,12 +60,12 @@ describe("Ueml transform - regression", () => {
       <prop name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
       </prop>
-      <TableColumnDef size="140">
+      <Column size="140">
         <prop name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
         </prop>
-      </TableColumnDef>
-      <TableColumnDef accessor="key" header="Header"/>
+      </Column>
+      <Column accessor="key" header="Header"/>
     </Table>
     `) as ComponentDef;
     expect(cd.type).equal("Table");
@@ -81,7 +81,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect(cd.events!.click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.events as any).click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
   });
 
   it("Api keeps whitespaces", () => {
@@ -94,7 +94,7 @@ const b = 2;
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
-    expect(cd.api!.myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n")
+    expect((cd.api as any).myMethod).toBe("\nconst a = 1;\n\nconst b = 2;\n")
   });
 
   it("Var removes whitespaces", () => {

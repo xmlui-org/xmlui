@@ -1,6 +1,6 @@
 import styles from "./ModalDialog.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
 import { MemoizedItem } from "@components/container-helpers";
@@ -59,7 +59,7 @@ export const ModalDialogMd = createMetadata({
   },
 });
 
-export const modalViewComponentRenderer = createComponentRendererNew(
+export const modalViewComponentRenderer = createComponentRenderer(
   COMP,
   ModalDialogMd,
   ({ node, extractValue, layoutCss, renderChild, lookupEventHandler, registerComponentApi }) => {

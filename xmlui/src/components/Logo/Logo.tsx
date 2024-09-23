@@ -1,53 +1,20 @@
-import { NavLink } from "@components/NavLink/NavLinkNative";
-import { Image } from "@components/Image/ImageNative";
 import { createComponentRenderer } from "@components-core/renderers";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { useLogoUrl } from "@components/AppHeader/AppHeader";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import type { CSSProperties } from "react";
+import { createMetadata } from "@abstractions/ComponentDefs";
+import { Logo } from "./LogoNative";
 
-// =====================================================================================================================
-// React Logo component implementation
+const COMP = "Logo";
 
-export const Logo = ({ inDrawer, style }: { inDrawer?: boolean; style?: CSSProperties }) => {
-  const logoUrl = useLogoUrl(inDrawer);
-  if (!logoUrl) {
-    return null;
-  }
-  return (
-      <Image src={logoUrl} alt={"Logo"} layout={style}/>
-  );
-};
+export const LogoMd = createMetadata({
+  status: "in review",
+  description:
+    `The \`${COMP}\` component represents a logo or a brand symbol. Usually, you use ` +
+    `this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).`,
+});
 
-// =====================================================================================================================
-// XMLUI Logo component definition
-
-/**
- * The \`Logo\` component represents a logo or a brand symbol.
- * Usually, you use this component in the [\`AppHeader\`](./AppHeader.mdx#logotemplate).
- * @descriptionRef
- */
-export interface LogoComponentDef extends ComponentDef<"Logo"> {
-  props: {
-    /** 
-     * With this property, you can define a title placed horizontally after the logo itself.
-     * 
-     * Issue: this prop is redundant, why should I use this when there is a templating option or just place a Heading/Text after it?
-     * @internal
-     */
-    title?: string;
-  }
-}
-
-export const LogoMd: ComponentDescriptor<LogoComponentDef> = {
-  displayName: "Logo",
-  description: "Displays the application logo",
-};
-
-export const logoComponentRenderer = createComponentRenderer<LogoComponentDef>(
-  "Logo",
+export const logoComponentRenderer = createComponentRenderer(
+  COMP,
+  LogoMd,
   ({ node, layoutCss, extractValue }) => {
     return <Logo style={layoutCss} />;
   },
-  LogoMd
 );

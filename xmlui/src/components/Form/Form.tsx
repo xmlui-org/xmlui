@@ -1,20 +1,14 @@
 import styles from "./Form.module.scss";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { desc, nestedComp } from "@components-core/descriptorHelper";
 import { FormWithContextVar } from "./FormNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Form";
-export interface FormComponentDef extends ComponentDef<"Form"> {
-  contextVars: {
-    /** @descriptionRef */
-    $subject?: string;
-  };
-}
 
 export const FormMd = createMetadata({
+  status: "in review",
   description:
     `A \`${COMP}\` is a fundamental component that displays user interfaces that allow users to input ` +
     `(or change) data and submit it to the app (a server) for further processing.`,
@@ -51,6 +45,7 @@ export const FormMd = createMetadata({
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
         `is the current \`subject\` value to save.`,
     ),
+    cancel: d(`The form infrastructure fires this event when the form is canceled.`),
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
   contextVars: {
@@ -94,7 +89,7 @@ export const FormMd = createMetadata({
   },
 });
 
-export const formComponentRenderer = createComponentRendererNew(
+export const formComponentRenderer = createComponentRenderer(
   COMP,
   FormMd,
   ({ node, renderChild, extractValue, layoutCss, lookupEventHandler, registerComponentApi }) => {
@@ -103,7 +98,7 @@ export const formComponentRenderer = createComponentRendererNew(
         node={node}
         renderChild={renderChild}
         extractValue={extractValue}
-        lookupEventHandler={lookupEventHandler}
+        lookupEventHandler={lookupEventHandler as any}
         layoutCss={layoutCss}
         registerComponentApi={registerComponentApi}
       />

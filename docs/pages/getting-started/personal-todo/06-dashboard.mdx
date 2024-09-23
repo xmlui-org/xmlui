@@ -172,12 +172,12 @@ Update the `Dashboard.xmlui` file by appending a new `Card` component after the 
       <Card width="50%" height="350px">
         <H4>Recent Tasks</H4>
         <Table datasource="/api/tasks-recent" height="*">
-          <TableColumnDef header="Topic" width="80">
+          <Column header="Topic" width="80">
             <Text>{$item.topicId}</Text>
-          </TableColumnDef>
-          <TableColumnDef header="Title" width="*">
+          </Column>
+          <Column header="Title" width="*">
             <Text maxLines="1">{$item.title}</Text>
-          </TableColumnDef>
+          </Column>
         </Table>
       </Card>
     </FlowLayout>
@@ -222,12 +222,12 @@ Change the `Text` element within the first `TableColumnDef` to the new `TopicBad
       <Card width="50%" height="350px">
         <H4>Recent Tasks</H4>
         <Table datasource="/api/tasks-recent" height="*">
-          <TableColumnDef header="Topic" width="120px">
+          <Column header="Topic" width="120px">
             <TopicBadge topicId="{$item.topicId}" />
-          </TableColumnDef>
-          <TableColumnDef header="Title" width="*">
+          </Column>
+          <Column header="Title" width="*">
             <Text maxLines="1">{$item.title}</Text>
-          </TableColumnDef>
+          </Column>
         </Table>
       </Card>
     </FlowLayout>

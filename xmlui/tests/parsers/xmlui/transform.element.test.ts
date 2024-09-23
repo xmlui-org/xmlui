@@ -4,69 +4,73 @@ import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - child elements", () => {
   it("Comments ignored, whitespace collapsed", () => {
-    const cd = transformSource("<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal(" text here");
+    expect((cd.children![0].props! as any).value).equal(" text here");
   });
 
   it("Comments ignored ws between words collapsed", () => {
     const cd = transformSource("<H1>hi  <!-- comment -->  there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal("hi there");
+    expect((cd.children![0].props! as any).value).equal("hi there");
   });
 
   it("Comments ignored between words", () => {
     const cd = transformSource("<H1>hi<!-- comment -->there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal("hithere");
+    expect((cd.children![0].props! as any).value).equal("hithere");
   });
 
   it("string literal as child #1", () => {
     const cd = transformSource("<H1>'hi   '    </H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal("hi ");
+    expect((cd.children![0].props! as any).value).equal("hi ");
   });
 
   it("string literal as child #2", () => {
     const cd = transformSource("<H1>    'hi   '</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal("hi ");
+    expect((cd.children![0].props! as any).value).equal("hi ");
   });
 
   it("string literal as child #3", () => {
     const cd = transformSource('<Stack> "123 ""abc"   </Stack>') as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal(' "123 ""abc" ');
+    expect((cd.children![0].props! as any).value).equal(' "123 ""abc" ');
   });
 
   it("CData as child", () => {
     const cd = transformSource("<H1><![CDATA[hi]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    expect(cd.children![0].props!.value).equal("hi");
+    expect((cd.children![0].props! as any).value).equal("hi");
   });
 
   it("string literal then text as child", () => {
     const cd = transformSource("<H1>'hi     '     there</H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNode");
-    expect(cd.children![0].props!.value).equal("'hi ' there");
+    expect((cd.children![0].props! as any).value).equal("'hi ' there");
   });
 
   it("string literal then CData as child", () => {
     const cd = transformSource("<H1>'hi     ' <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    expect(cd.children![0].props!.value).equal("hi there");
+    expect((cd.children![0].props! as any).value).equal("hi there");
   });
 
   it("string literal #2 then CData as child", () => {
     const cd = transformSource("<H1>'hi'    <![CDATA[there]]></H1>") as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    expect(cd.children![0].props!.value).equal("hithere");
+    expect((cd.children![0].props! as any).value).equal("hithere");
   });
 
   it("string literal, text, CData as child", () => {
-    const cd = transformSource("<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>") as ComponentDef;
+    const cd = transformSource(
+      "<H1>hi   <![CDATA[there]]> 'all'  <![CDATA[people]]></H1>",
+    ) as ComponentDef;
     expect(cd.children![0].type).equal("TextNodeCData");
-    expect(cd.children![0].props!.value).equal("hi thereallpeople");
+    expect((cd.children![0].props! as any).value).equal("hi thereallpeople");
   });
 
   it("text and element as child #1", () => {
@@ -78,9 +82,9 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.children![0].props!.value).equal(" hello ");
+    expect((cd.children![0].props! as any).value).equal(" hello ");
     expect(cd.children![1].type).equal("Button");
-    expect(cd.children![2].props!.value).equal(" bello ");
+    expect((cd.children![2].props! as any).value).equal(" bello ");
   });
 
   it("text and element as child #2", () => {
@@ -93,9 +97,13 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.children![0].props!.value).equal(" This is a text segment before a Button component. ");
+    expect((cd.children![0].props! as any).value).equal(
+      " This is a text segment before a Button component. ",
+    );
     expect(cd.children![1].type).equal("Button");
-    expect(cd.children![2].props!.value).equal(" This is a text segment after a Button and before an Icon ");
+    expect((cd.children![2].props! as any).value).equal(
+      " This is a text segment after a Button and before an Icon ",
+    );
     expect(cd.children![3].type).equal("Icon");
   });
 
@@ -233,20 +241,22 @@ describe("Xmlui transform - child elements", () => {
   it("implicit props with attr works #1", () => {
     const cd = transformSource("<Stack myProp='123'/>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal("123");
+    expect((cd.props! as any).myProp).equal("123");
   });
 
   it("implicit props with attr works #2", () => {
     const cd = transformSource("<Stack myProp='123' other='234'/>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal("123");
-    expect(cd.props!.other).equal("234");
+    expect((cd.props! as any).myProp).equal("123");
+    expect((cd.props! as any).other).equal("234");
   });
 
   it("prop with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><prop name='myProp' value='123'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><prop name='myProp' value='123'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal("123");
+    expect((cd.props! as any).myProp).equal("123");
   });
 
   it("prop with name/value attr works #2", () => {
@@ -257,16 +267,16 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal("123");
-    expect(cd.props!.other).equal("234");
+    expect((cd.props! as any).myProp).equal("123");
+    expect((cd.props! as any).other).equal("234");
   });
 
   it("prop with name and text works #1", () => {
     const cd = transformSource("<Stack><prop name='myProp'>123</prop></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    const prop = cd.props!.myProp as ComponentDef;
+    const prop = (cd.props! as any).myProp;
     expect(prop.type).equal("TextNode");
-    expect(prop.props!.value).equal("123");
+    expect(prop.props.value).equal("123");
   });
 
   it("prop with name and text works #2", () => {
@@ -277,18 +287,18 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    let prop = cd.props!.myProp as ComponentDef;
+    let prop = (cd.props! as any).myProp as ComponentDef;
     expect(prop.type).equal("TextNode");
-    expect(prop.props!.value).equal("123");
-    prop = cd.props!.other as ComponentDef;
+    expect((prop.props as any).value).equal("123");
+    prop = (cd.props! as any).other as ComponentDef;
     expect(prop.type).equal("TextNode");
-    expect(prop.props!.value).equal("234");
+    expect((prop.props as any).value).equal("234");
   });
 
   it("prop with name results null", () => {
     const cd = transformSource("<Stack><prop name='myProp' /></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal(null);
+    expect((cd.props! as any).myProp).equal(null);
   });
 
   it("prop becomes array #1", () => {
@@ -296,7 +306,7 @@ describe("Xmlui transform - child elements", () => {
       "<Stack><prop name='myProp' value='123'/><prop name='myProp' value='234'/></Stack>",
     ) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).deep.equal(["123", "234"]);
+    expect((cd.props! as any).myProp).deep.equal(["123", "234"]);
   });
 
   it("prop with component #1", () => {
@@ -307,7 +317,7 @@ describe("Xmlui transform - child elements", () => {
       </prop>
     </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).toMatchObject({ type: "Button" });
+    expect((cd.props! as any).myProp).toMatchObject({ type: "Button" });
   });
 
   it("prop with component #2", () => {
@@ -319,7 +329,7 @@ describe("Xmlui transform - child elements", () => {
       </prop>
     </Stack>`) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).toMatchObject([{ type: "Button" }, { type: "Text" }]);
+    expect((cd.props! as any).myProp).toMatchObject([{ type: "Button" }, { type: "Text" }]);
   });
 
   // --- Events
@@ -344,7 +354,7 @@ describe("Xmlui transform - child elements", () => {
   it("implicit events with attr works #1", () => {
     const cd = transformSource("<Stack onClick='doIt' />") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.events!.click).equal("doIt");
+    expect((cd.events! as any).click).equal("doIt");
   });
 
   it("event fails with missing name attribute", () => {
@@ -375,9 +385,11 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("event with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><event name='myEvent' value='doIt'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><event name='myEvent' value='doIt'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.events!.myEvent).equal("doIt");
+    expect((cd.events! as any).myEvent).equal("doIt");
   });
 
   it("event with name/value attr works #2", () => {
@@ -388,14 +400,16 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.events!.myEvent).equal("doIt");
-    expect(cd.events!.other).equal("move");
+    expect((cd.events! as any).myEvent).equal("doIt");
+    expect((cd.events! as any).other).equal("move");
   });
 
   it("event with name and text works #1", () => {
-    const cd = transformSource("<Stack><event name='myEvent'>doIt</event></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><event name='myEvent'>doIt</event></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.events!.myEvent).equal("doIt");
+    expect((cd.events! as any).myEvent).equal("doIt");
   });
 
   it("event with name and text works #2", () => {
@@ -406,14 +420,14 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.events!.myEvent).equal("doIt");
-    expect(cd.events!.other).equal("move");
+    expect((cd.events! as any).myEvent).equal("doIt");
+    expect((cd.events! as any).other).equal("move");
   });
 
   it("events with name results null", () => {
     const cd = transformSource("<Stack><event name='myEvent'/></Stack>") as ComponentDef;
+    expect((cd.events! as any).myEvent).equal(null);
     expect(cd.type).equal("Stack");
-    expect(cd.events!.myEvent).equal(null);
   });
 
   // --- Api
@@ -447,7 +461,7 @@ describe("Xmlui transform - child elements", () => {
   it("api with name/value attr works #1", () => {
     const cd = transformSource("<Stack><api name='set' value='do'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.set).equal("do");
+    expect((cd.api! as any).set).equal("do");
   });
 
   it("api with name/value attr works #2", () => {
@@ -458,20 +472,20 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.set).equal("do");
-    expect(cd.api!.other).equal("get");
+    expect((cd.api! as any).set).equal("do");
+    expect((cd.api! as any).other).equal("get");
   });
 
   it("api dotted attr works #1", () => {
     const cd = transformSource("<Stack api.myApi='getCount()'></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.myApi).equal("getCount()");
+    expect((cd.api! as any).myApi).equal("getCount()");
   });
 
   it("api with name and text works #1", () => {
     const cd = transformSource("<Stack><api name='set'>do</api></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.set).equal("do");
+    expect((cd.api! as any).set).equal("do");
   });
 
   it("api with name and text works #2", () => {
@@ -482,14 +496,14 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.set).equal("do");
-    expect(cd.api!.other).equal("get");
+    expect((cd.api! as any).set).equal("do");
+    expect((cd.api! as any).other).equal("get");
   });
 
   it("api with name results null", () => {
     const cd = transformSource("<Stack><api name='set'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.set).equal(null);
+    expect((cd.api! as any).set).equal(null);
   });
 
   it("api becomes array #1", () => {
@@ -497,7 +511,7 @@ describe("Xmlui transform - child elements", () => {
       "<Stack><api name='myApi' value='123'/><api name='myApi' value='234'/></Stack>",
     ) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.api!.myApi).deep.equal(["123", "234"]);
+    expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
   });
 
   // --- Uses
@@ -541,8 +555,8 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.type).equal("TextNode");
-    expect(cd.props!.myProp.props.value).equal(" hello bello ");
+    expect((cd.props! as any).myProp.type).equal("TextNode");
+    expect((cd.props! as any).myProp.props.value).equal(" hello bello ");
   });
 
   it("props with attr #1", () => {
@@ -557,7 +571,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({ p1: "1", p2: "2" });
+    expect((cd.props! as any).myProp.x).deep.equal({ p1: "1", p2: "2" });
   });
 
   it("props with attr #2", () => {
@@ -578,7 +592,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal([
+    expect((cd.props! as any).myProp.x).deep.equal([
       { p1: "1", p2: "2" },
       { p1: "3", p2: "4" },
     ]);
@@ -600,8 +614,8 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({ p1: "1", p2: "2" });
-    expect(cd.props!.myProp.y).deep.equal({ p1: "3", p2: "4" });
+    expect((cd.props! as any).myProp.x).deep.equal({ p1: "1", p2: "2" });
+    expect((cd.props! as any).myProp.y).deep.equal({ p1: "3", p2: "4" });
   });
 
   it("props with attr #4", () => {
@@ -623,7 +637,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal([{ p1: "1", p2: "2" }, null, { p1: "3", p2: "4" }]);
+    expect((cd.props! as any).myProp.x).deep.equal([{ p1: "1", p2: "2" }, null, { p1: "3", p2: "4" }]);
   });
 
   it("props with attr #5", () => {
@@ -633,7 +647,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp).equal(null);
+    expect((cd.props! as any).myProp).equal(null);
   });
 
   it("props with nested attr #", () => {
@@ -652,7 +666,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({
+    expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
       p2: "2",
       nx: { a1: "a", b1: "b" },
@@ -681,7 +695,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({
+    expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
       p2: "2",
       nx: [
@@ -700,7 +714,7 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.children!.length).equal(1);
     const textNode = cd.children![0] as ComponentDef;
     expect(textNode.type).equal("TextNode");
-    expect(textNode.props!.value).equal("Heading");
+    expect((textNode.props! as any).value).equal("Heading");
   });
 
   it("direct child #2", () => {
@@ -711,7 +725,7 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.children!.length).equal(1);
     const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
-    expect(child.props!.text).equal("hello");
+    expect((child.props! as any).text).equal("hello");
   });
 
   it("direct child #3", () => {
@@ -725,7 +739,7 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.children!.length).equal(1);
     const child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
-    expect(child.props!.text).equal("hello");
+    expect((child.props! as any).text).equal("hello");
   });
 
   it("direct child #4", () => {
@@ -740,10 +754,10 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.children!.length).equal(2);
     let child = cd.children![0] as ComponentDef;
     expect(child.type).equal("Heading");
-    expect(child.props!.text).equal("hello");
+    expect((child.props! as any).text).equal("hello");
     child = cd.children![1] as ComponentDef;
     expect(child.type).equal("XButton");
-    expect(child.props!.text).equal("bello");
+    expect((child.props! as any).text).equal("bello");
   });
 
   it("direct child #5", () => {
@@ -756,7 +770,7 @@ describe("Xmlui transform - child elements", () => {
     expect(child.type).equal("Heading");
     const textNode = child.children![0] as ComponentDef;
     expect(textNode.type).equal("TextNode");
-    expect(textNode.props!.value).equal("Hello");
+    expect((textNode.props! as any).value).equal("Hello");
   });
 
   // --- Comments
@@ -783,7 +797,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({
+    expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
       p2: "2",
       nx: [
@@ -821,7 +835,7 @@ describe("Xmlui transform - child elements", () => {
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect(cd.props!.myProp.x).deep.equal({
+    expect((cd.props! as any).myProp.x).deep.equal({
       p1: "1",
       p2: "2",
       nx: [

@@ -1,20 +1,13 @@
 import styles from "./DropdownMenu.module.scss";
 
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { iconPositionNames, type IconPosition } from "@components/abstractions";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { iconPositionMd, iconPositionNames } from "@components/abstractions";
 
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Icon } from "@components/Icon/IconNative";
 import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
-import {
-  dClick,
-  dComponent,
-  dEnabled,
-  dLabel,
-  dTriggerTemplate,
-} from "@components/metadata-helpers";
+import { dClick, dEnabled, dLabel, dTriggerTemplate } from "@components/metadata-helpers";
 
 const DDMCOMP = "DropdownMenu";
 
@@ -58,7 +51,7 @@ export const DropdownMenuMd = createMetadata({
   },
 });
 
-export const dropdownMenuComponentRenderer = createComponentRendererNew(
+export const dropdownMenuComponentRenderer = createComponentRenderer(
   DDMCOMP,
   DropdownMenuMd,
   ({ node, extractValue, renderChild, registerComponentApi, layoutCss, lookupEventHandler }) => {
@@ -86,10 +79,11 @@ const MICOMP = "MenuItem";
 
 export const MenuItemMd = createMetadata({
   description: `This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action.`,
+  docFolder: DDMCOMP,
   props: {
     iconPosition: d(
       `This property allows you to determine the position of the icon displayed in the menu item.`,
-      iconPositionNames,
+      iconPositionMd.filter(p => (p as any).value === "start" || (p as any).value === "end"),
     ),
     icon: d(`This property names an optional icon to display with the menu item.`),
     label: dLabel(),
@@ -120,7 +114,7 @@ export const MenuItemMd = createMetadata({
   },
 });
 
-export const menuItemRenderer = createComponentRendererNew(
+export const menuItemRenderer = createComponentRenderer(
   MICOMP,
   MenuItemMd,
   ({ node, renderChild, lookupEventHandler, lookupAction, extractValue, layoutCss }) => {
@@ -151,22 +145,16 @@ export const menuItemRenderer = createComponentRendererNew(
 
 const SMCOMP = "SubMenuItem";
 
-interface SubMenuItemDef extends ComponentDef<"SubMenuItem"> {
-  props: {
-    label?: string;
-    triggerTemplate?: ComponentDef;
-  };
-}
-
 export const SubMenuItemMd = createMetadata({
   description: "This component represents a nested menu item within another menu or menu item.",
+  docFolder: DDMCOMP,
   props: {
     label: dLabel(),
     triggerTemplate: dTriggerTemplate(SMCOMP),
   },
 });
 
-export const subMenuItemRenderer = createComponentRendererNew(
+export const subMenuItemRenderer = createComponentRenderer(
   SMCOMP,
   SubMenuItemMd,
   ({ node, renderChild, extractValue }) => {
@@ -181,31 +169,22 @@ export const subMenuItemRenderer = createComponentRendererNew(
   },
 );
 
-// ====================================================================================================================
-// XMLUI MenuSeparator definition
+const MSEP = "MenuSeparator";
 
-export interface MenuSeparatorDef extends ComponentDef<"MenuSeparator"> {
-  props: {};
-}
-
-const menuSeparatorMetadata: ComponentDescriptor<MenuSeparatorDef> = {
-  displayName: "MenuSeparator",
-  description: "Displays a separator line between menu items",
+export const MenuSeparatorMd = createMetadata({
+  description: "This component displays a separator line between menu items.",
+  docFolder: DDMCOMP,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
-    "margin-top-MenuSeparator": "$space-1",
-    "margin-bottom-MenuSeparator": "$space-1",
-    "width-MenuSeparator": "100%",
-    "height-MenuSeparator": "1px",
-    "color-MenuSeparator": "$color-border-dropdown-item",
-    "margin-horizontal-MenuSeparator": "12px",
+    [`margin-top-${MSEP}`]: "$space-1",
+    [`margin-bottom-${MSEP}`]: "$space-1",
+    [`width-${MSEP}`]: "100%",
+    [`height-${MSEP}`]: "1px",
+    [`color-${MSEP}`]: "$color-border-dropdown-item",
+    [`margin-horizontal-${MSEP}`]: "12px",
   },
-};
+});
 
-export const menuSeparatorRenderer = createComponentRenderer<MenuSeparatorDef>(
-  "MenuSeparator",
-  () => {
-    return <MenuSeparator />;
-  },
-  menuSeparatorMetadata,
-);
+export const menuSeparatorRenderer = createComponentRenderer(MSEP, MenuSeparatorMd, () => {
+  return <MenuSeparator />;
+});

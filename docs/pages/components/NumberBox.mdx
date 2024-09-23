@@ -1,13 +1,8 @@
 # NumberBox
 
-A `NumberBox` component allows users to input numeric values: either integer
-or floating point numbers. It also accepts empty values, where the stored value
-will be of type `null`.
+A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`.
 
-The 
-`NumberBox`
- is an input control component and is often used in forms.
-See the [Using Forms](/learning/using-components/forms/) guide for details.
+The `NumberBox` is an input control component and is often used in forms. See the [Using Forms](/learning/using-components/forms/) guide for details.
 
 ## Context Variables
 
@@ -15,12 +10,11 @@ This component does not have any context variables.
 
 ## Properties
 
-### `allowCopy`
-
-This boolean property indicates if the component's contents can be copied to the clipboard.
-Default: `true`.
-
 ### `autoFocus`
+
+This property sets the label of the component.
+
+Default value: `false`.
 
 If this boolean prop is set to true, the `NumberBox` input will be focused when appearing on the UI.
 
@@ -37,6 +31,10 @@ If this boolean prop is set to true, the `NumberBox` input will be focused when 
 
 ### `enabled`
 
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+Default value: `true`.
+
 Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 ```ueml copy
@@ -51,6 +49,8 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 />
 
 ### `endIcon`
+
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of an icon on the right side (left-to-right display) of the input field by providing a valid [icon name]().
 
@@ -79,6 +79,8 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 />
 
 ### `endText`
+
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of a custom string on the right side (left-to-right display) of the input field.
 
@@ -109,7 +111,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ### `hasSpinBox`
 
 This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
-The default is `true`.
 
 ```ueml copy
 <Stack gap="0.5rem">
@@ -130,6 +131,8 @@ The default is `true`.
 
 ### `initialValue`
 
+This property sets the component's initial value.
+
 The initial value displayed in the input field.
 
 ```ueml copy
@@ -145,7 +148,7 @@ The initial value displayed in the input field.
 
 ### `integersOnly`
 
-This boolean prop toggles whether the input field accepts integers only (`true`) or not (`false`).
+This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
 
 ```ueml copy
 <Stack gap="0.5rem">
@@ -168,14 +171,15 @@ This boolean prop toggles whether the input field accepts integers only (`true`)
 
 ### `labelId`
 
-You can specify the identifier of a component acting as its label. When you click the label,
-the component behaves as you clicked it.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `maxLength`
 
-This property sets the maximum number of characters you can type into the component's text.
+This property sets the maximum length of the input it accepts.
 
 ### `maxValue`
+
+The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
 The maximum value the input field allows.
 Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`,
@@ -196,9 +200,7 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 
 ### `minValue`
 
-The minimum value the input field allows.
-Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`,
-otherwise it can only be an integer.
+The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
 Try to enter a bigger value into the input field below than the minimum allowed.
 
@@ -217,6 +219,8 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 
 A placeholder text that is visible in the input field when its empty.
 
+A placeholder text that is visible in the input field when its empty.
+
 ```ueml copy
 <NumberBox placeholder="This is a placeholder" />
 ```
@@ -229,6 +233,8 @@ A placeholder text that is visible in the input field when its empty.
 />
 
 ### `readOnly`
+
+Set this property to `true` to disallow changing the component value.
 
 If true, the component's value cannot be modified with user interactions.
 
@@ -248,6 +254,8 @@ If true, the component's value cannot be modified with user interactions.
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ### `startIcon`
+
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of an icon on the left side (left-to-right display) of the input field by providing a valid [icon name]().
 
@@ -276,6 +284,8 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 />
 
 ### `startText`
+
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 This string prop enables the display of a custom string on the left side (left-to-right display) of the input field.
 
@@ -306,6 +316,7 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ### `step`
 
 This prop governs how big the step when clicking on the spinner of the field.
+
 The default stepping value is **1**.
 
 Note that only integers are allowed to be entered.
@@ -322,6 +333,17 @@ Note that only integers are allowed to be entered.
 />
 
 ### `validationStatus`
+
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
@@ -355,6 +377,8 @@ This prop is used to visually indicate status changes reacting to form field val
 ### `zeroOrPositive`
 
 This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
+
+This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
 By default, this property is set to `false`.
 
 ```ueml copy
@@ -370,60 +394,13 @@ By default, this property is set to `false`.
 
 ## API
 
-### `focus`
-
-Invoke this method to set the focus to the component.
-
-### `setValue`
-
-You can use this method to set the component's current value programmatically.
-
-```ueml copy {3, 9, 12}
-<VStack gap="0.5rem">
-  <NumberBox
-    id="numberbox"
-    readOnly="true"
-  />
-  <HStack gap="0.5rem">
-    <Button 
-      label="Set to 100" 
-      onClick="numberbox.setValue(100)" />
-    <Button 
-      label="Set to 0" 
-      onClick="numberbox.setValue(0)" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value and setValue"
-  height={120}
-  app={`<VStack gap="0.5rem">
-  <NumberBox 
-    id="numberbox"
-    readOnly="true"
-  />
-  <HStack gap="0.5rem">
-    <Button 
-      label="Set to 100" 
-      onClick="numberbox.setValue(100)" />
-    <Button 
-      label="Set to 0" 
-      onClick="numberbox.setValue(0)" />
-  </HStack>
-</VStack>`}
-/>
-
-### `value`
-
-You can query this read-only API property to get the input component's current value.
-
-See an example in the `setValue` API method.
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
+
+This event is triggered when value of NumberBox has changed.
 
 This event is triggered after the user has changed the field value.
 
@@ -447,6 +424,8 @@ Write in the input field and see how the `Text` underneath it is updated in para
 />
 
 ### `gotFocus`
+
+This event is triggered when the NumberBox has received the focus.
 
 This event is triggered when the `NumberBox` receives focus. The following sample demonstrates this event.
 
@@ -476,6 +455,8 @@ Click into the `NumberBox` (and then click the text below):
 />
 
 ### `lostFocus`
+
+This event is triggered when the NumberBox has lost the focus.
 
 This event is triggered when the `NumberBox` loses focus.
 

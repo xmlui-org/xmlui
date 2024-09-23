@@ -1,4 +1,4 @@
-import { ValidationStatus } from "@components/Input/input-abstractions";
+import { ValidationStatus } from "@components/abstractions";
 import classnames from "@components-core/utils/classnames";
 import styles from "./HelperText.module.scss";
 import {CSSProperties} from "react";

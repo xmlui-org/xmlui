@@ -1,13 +1,14 @@
 import styles from "./Badge.module.scss";
 
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Badge, BadgeColors } from "./BadgeNative";
 
 const COMP = "Badge";
 
 export const BadgeMd = createMetadata({
+  status: "in review",
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
     value: d("The text that the component displays"),
@@ -54,7 +55,7 @@ export const BadgeMd = createMetadata({
   },
 });
 
-export const badgeComponentRenderer = createComponentRendererNew(
+export const badgeComponentRenderer = createComponentRenderer(
   COMP,
   BadgeMd,
   ({ node, extractValue }) => {

@@ -1,11 +1,8 @@
 # Checkbox
 
-The `Checkbox` component allows users to make binary choices, typically between checked or unchecked.
-It consists of a small box that can be toggled on or off by clicking on it.
+The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.
 
-To bind data to a `Checkbox`, use the XMLUI [Forms infrastructure](
-../learning/using-components/forms
-).
+To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning/using-components/forms).
 
 ## Context Variables
 
@@ -15,14 +12,19 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-Set this property to `true` to automatically get the focus when the component is displayed.
+This property sets the label of the component.
+
+Default value: `false`.
+
+### `description`
+
+(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description of the Checkbox besides its label.
 
 ### `enabled`
 
-This boolean property indicates whether the checkbox responds to user events (i.e. clicks);
-it is 
-`true`
- by default.
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+Default value: `true`.
 
 ```ueml copy {4-5, 9-10}
 <VStack margin="1rem" gap="0.8rem">
@@ -61,7 +63,7 @@ it is
 
 ### `indeterminate`
 
-Setting this prop signals that the component is in an _intedeterminate state_.
+The `true` value of this property signals that the component is in an _intedeterminate state_.
 
 This prop is commonly used if there are several other checkboxes linked to one checkbox and some items in that group of checkboxes are in a mixed state: at least one item has a different value compared to the rest.
 
@@ -112,7 +114,9 @@ Try this sample by clicking the bottom group of checkboxes.
 
 ### `initialValue`
 
-No description provided.
+This property sets the component's initial value.
+
+Default value: `false`.
 
 ### `label`
 
@@ -139,12 +143,15 @@ This property sets the label of the component.
 
 ### `labelId`
 
-This property sets whether the checkbox should be displayed in the checked (`true`) or unchecked 
-(`false`) state when it is displayed initially.
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
 
 ### `labelPosition`
 
-Places the label at the `top`, `right`, `bottom`, or `left` of the `Checkbox`.
+Places the label at the given position of the component.
+
+Default value: `"right"`.
+
+Available values: `top`, `right`, `bottom`, `left`
 
 ```ueml copy
 <VStack margin="1rem" gap="0.8rem">
@@ -173,78 +180,32 @@ Places the label at the `top`, `right`, `bottom`, or `left` of the `Checkbox`.
 
 Set this property to `true` to disallow changing the component value.
 
-### `required`
-
-Set this property to `true` to indicate it must have a value before submitting the containing form.
-
 ### `validationStatus`
 
-With this property, you can set the checkbox's validation status to "none", "error", "warning", 
-or "valid".
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
 
 ## API
 
-### `setValue`
-
-You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
-
-```ueml copy {9,12,14}
-<VStack margin="1rem" gap="0.5rem" var.changes="">
-  <Checkbox 
-    id="checkbox" 
-    readOnly="true" 
-    label="This checkbox can be set only programmatically" 
-    onDidChange="changes += '+'" />
-  <HStack gap="0.5rem">
-    <Button 
-      label="Check" 
-      onClick="checkbox.setValue(true)" />
-    <Button 
-      label="Uncheck" 
-      onClick="checkbox.setValue(false)" />
-  </HStack>
-  <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
-  <Text value="Changes: {changes}" />
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value and setValue"
-  height={170}
-  app={`
-    <VStack margin="1rem" gap="0.5rem" var.changes="">
-      <Checkbox 
-        id="checkbox" 
-        readOnly="true" 
-        label="This checkbox can be set only programmatically" 
-        onDidChange="changes += '+'" />
-      <HStack gap="0.5rem">
-        <Button 
-          label="Check" 
-          onClick="checkbox.setValue(true)" />
-        <Button 
-          label="Uncheck" 
-          onClick="checkbox.setValue(false)" />
-      </HStack>
-      <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
-      <Text value="Changes: {changes}" />
-    </VStack>
-  `}
-/>
-
-### `value`
-
-You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
-
-See an example in the `setValue` API method.
+This component does not provide any API.
 
 ## Events
 
+### `click`
+
+This event is triggered when the Checkbox is clicked.
+
 ### `didChange`
 
-This event is triggered when the `Checkbox` is toggled due to user interaction. A read-only 
-checkbox never fires this event, and it won't fire if the checkbox's value is set programmatically.
+This event is triggered when value of Checkbox has changed.
 
 ```ueml copy
 <VStack margin="0.75rem" gap="0.5rem" verticalAlignment="center" var.changes="">
@@ -269,7 +230,7 @@ checkbox never fires this event, and it won't fire if the checkbox's value is se
 
 ### `gotFocus`
 
-This event is triggered when the `Checkbox` receives focus.
+This event is triggered when the Checkbox has received the focus.
 
 Click the `Checkbox` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
@@ -302,7 +263,7 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 
 ### `lostFocus`
 
-This event is triggered when the `Checkbox` loses focus.
+This event is triggered when the Checkbox has lost the focus.
 
 (See the example above)
 

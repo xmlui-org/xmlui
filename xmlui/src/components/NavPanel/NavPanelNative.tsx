@@ -1,10 +1,10 @@
 import React, { forwardRef, type ReactNode, useRef } from "react";
 import styles from "./NavPanel.module.scss";
 import classnames from "@components-core/utils/classnames";
-import { Logo } from "@components/Logo/Logo";
+import { Logo } from "@components/Logo/LogoNative";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { getAppLayoutOrientation } from "@components/App/App";
+import { getAppLayoutOrientation } from "@components/App/AppNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { RenderChildFn } from "@abstractions/RendererDefs";
 

@@ -1,7 +1,9 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
+import { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { MetadataHandler, PropDescriptorHash } from "@components-core/markup-check";
 
-export function createTestMetadataHandler(desc: Record<string, ComponentDescriptor<any>>): MetadataHandler {
+export function createTestMetadataHandler(
+  desc: Record<string, ComponentMetadata>,
+): MetadataHandler {
   return {
     componentRegistered: (type: string) => {
       return !!desc[type];
@@ -42,7 +44,7 @@ export function createTestMetadataHandler(desc: Record<string, ComponentDescript
     getComponentValidator: (type: string) => {
       if (type === "Button") {
         return (instance, devMode) => {
-          if (devMode && instance.props?.label?.startsWith("q")) {
+          if (devMode && (instance.props as any)?.label?.startsWith("q")) {
             return "Label should not start with 'q'";
           }
           return null;

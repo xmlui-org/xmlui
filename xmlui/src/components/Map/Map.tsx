@@ -1,16 +1,14 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
-import { desc } from "@components-core/descriptorHelper";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import style from "@components/PieChart/PieChart.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
-import type { CSSProperties} from "react";
+import type { CSSProperties } from "react";
 import React, { Suspense } from "react";
 import worldData from "./world_countries.json";
-import {noop} from "lodash-es";
+import { noop } from "lodash-es";
 
 const ResponsiveChoropleth = React.lazy(() =>
-  import("@nivo/geo").then((module) => ({ default: module.ResponsiveChoropleth }))
+  import("@nivo/geo").then((module) => ({ default: module.ResponsiveChoropleth })),
 );
 
 type MapProps = {
@@ -51,25 +49,18 @@ const Map = ({ data = [], style }: MapProps) => {
           role={""}
           match={"id"}
           value={"value"}
-            // @ts-ignore
-          layers={['graticule', 'features']}
+          // @ts-ignore
+          layers={["graticule", "features"]}
         />
       </Suspense>
     </div>
   );
 };
 
-interface MapDef extends ComponentDef<"Map"> {
+const MapMd = createMetadata({
+  description: "(*** OBSOLETE ***) A simple map component",
   props: {
-    data: object[];
-  };
-}
-
-const metadata: ComponentDescriptor<MapDef> = {
-  displayName: "Map",
-  description: "A pie chart component",
-  props: {
-    data: desc("The data to be displayed in the pie chart"),
+    data: d("The data to be displayed in the map"),
   },
   themeVars: parseScssVar(style.themeVars),
   defaultThemeVars: {
@@ -80,12 +71,12 @@ const metadata: ComponentDescriptor<MapDef> = {
       ///
     },
   },
-};
+});
 
-export const mapComponentRenderer = createComponentRenderer<MapDef>(
+export const mapComponentRenderer = createComponentRenderer(
   "Map",
+  MapMd,
   ({ extractValue, node, layoutCss }) => {
     return <Map data={extractValue(node.props?.data)} style={layoutCss} />;
   },
-  metadata
 );

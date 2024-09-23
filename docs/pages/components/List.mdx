@@ -2,9 +2,7 @@ import data from  "../../component-samples/List/list-component-data.js";
 
 # List
 
-The `List` component is a robust layout container that renders associated data items as a 
-list of components. `List` is virtualized; it renders only items that are visible in the 
-viewport.
+The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport.
 
 In the following examples all use the same list of data which looks like so:
 
@@ -27,10 +25,13 @@ This property represents the value of an item in the data list.
 
 ## Properties
 
+### `availableSections`
+
+This property is an array of section names that the `List` will display.
+
 ### `data`
 
-The component receives data via this property.
-The `data` property is a list of items that the `List` can display.
+The component receives data via this property. The `data` property is a list of items that the `List` can display.
 
 The component receives its data via this property.
 The `data` property is an array of items that the `List` can display.
@@ -50,9 +51,6 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
 />
 
 ### `defaultSections`
-
-This property adds default sections for the `List` and displays the section headers
-even if no items fall into a particular section.
 
 This property adds default sections for the `List` and displays the section headers even if no items fall into a particular section.
 
@@ -96,8 +94,7 @@ Note the `meat` section header before all the others in the list below:
 
 ### `emptyListTemplate`
 
-This property displays the given component as a placeholder
-if the `loader` property is false and the `data` items length is 0 or is not set.
+This property defines the template to display when the list is empty.
 
 ```ueml copy
 <List>
@@ -126,8 +123,7 @@ if the `loader` property is false and the `data` items length is 0 or is not set
 
 ### `idKey`
 
-Denotes which attribute of an item acts as the ID or key of the item.
-Default is `"id"`.
+Denotes which attribute of an item acts as the ID or key of the item. Default is `"id"`.
 
 ```ueml /idKey="key"/
 <List idKey="key" data="{[...]}" />
@@ -142,8 +138,7 @@ Default is `"id"`.
 
 ### `itemTemplate`
 
-This property allows the customization of mapping data items to components.
-You can use the `$item` syntax to access an item and map its individual attributes.
+This property allows the customization of mapping data items to components. You can use the `$item` context variable to access an item and map its individual attributes.
 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
 
@@ -186,6 +181,10 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   `}
 />
 
+### `items`
+
+You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `datasource` property to a URL to fetch the data from), `data` represents the information obtained from the API.
+
 ### `limit`
 
 This property limits the number of items displayed in the `List`.
@@ -203,8 +202,7 @@ This property limits the number of items displayed in the `List`.
 
 ### `loading`
 
-The `loading` property delays the rendering of children until it is set to false,
-or the component receives usable list items via the [`data`](#data) property.
+This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
 ```ueml copy
 <List loading="true" />
@@ -232,6 +230,19 @@ This property enables the ordering of list items by specifying an attribute in t
   app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
 />
 
+### `pageInfo`
+
+This property contains the current page information. Setting this property also enures the `List` uses pagination.
+
+It contains the following boolean attributes:
+
+| Attribute            | Description                          |
+| :------------------- | :------------------------------------|
+| `hasPrevPage`        | Does the list have a previous page   |
+| `hasNextPage`        | Does the list have a next page       |
+| `isFetchingPrevPage` | _TBD_                                |
+| `isFetchingNextPage` | _TBD_                                |
+
 ### `scrollAnchor`
 
 This property pins the scroll position to either the `top` or the `bottom` of the list.
@@ -249,8 +260,7 @@ This property pins the scroll position to either the `top` or the `bottom` of th
 
 ### `sectionBy`
 
-This property set which attribute of the data is used to group or section the list items.
-If the attribute does not appear in the data items, it will be ignored.
+This property set which attribute of the data is used to group or section the list items. If the attribute does not appear in the data items, it will be ignored.
 
 > **Note:** For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
 > or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
@@ -290,11 +300,7 @@ If the attribute does not appear in the data items, it will be ignored.
 
 ### `sectionFooterTemplate`
 
-Enables the customization of how the the footer of each section or group id displayed.
-Combine with [`sectionTemplate`](#sectiontemplate) to customize sections.
-You can use the 
-`$item`
- syntax to access an item section and map its individual attributes.
+Enables the customization of how the the footer of each section or group id displayed. Combine with [`sectionTemplate`](#sectiontemplate) to customize sections. You can use the `$item` context variable to access an item section and map its individual attributes.
 
 The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
 An `$item` here looks like the following:
@@ -338,10 +344,7 @@ An `$item` here looks like the following:
 
 ### `sectionTemplate`
 
-Enables the customization of how the sections or groups are displayed, similarly to the [`itemTemplate`](#itemtemplate).
-You can use the 
-`$item`
- syntax to access an item section and map its individual attributes.
+Enables the customization of how the sections or groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item section and map its individual attributes.
 
 The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
 An `$item` here looks like the following:
@@ -377,13 +380,48 @@ An `$item` here looks like the following:
   `}
 />
 
+### `sectionsInitiallyExpanded`
+
+This Boolean property defines whether the list sections are initially expanded.
+
+### `selectedIndex`
+
+This property scrolls to a specific item indicated by its index.
+
+```ueml /selectedIndex="5"/
+<List selectedIndex="5" data="{[...]}" />
+```
+
+<Playground
+  previewOnly
+  name="Example: selectedIndex"
+  height={400}
+  app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
+/>
+
 ## API
 
 This component does not provide any API.
 
 ## Events
 
-This component does not have any events.
+### `requestFetchNextPage`
+
+Obsolete.
+
+**Note:** Not used in code.
+
+### `requestFetchPrevPage`
+
+Obsolete.
+
+**Note:** Not used in code.
+
+### `resetSelectedIndex`
+
+Obsolete.
+
+**Note:** Not used in code.
 
 ## Styling
 

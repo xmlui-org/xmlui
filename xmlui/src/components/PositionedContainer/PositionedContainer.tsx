@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./PositionedContainer.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { PositionedContainer } from "./PositionedContainerNative";
@@ -7,14 +7,15 @@ import { PositionedContainer } from "./PositionedContainerNative";
 const COMP = "PositionedContainer";
 
 export const PositionedContainerMd = createMetadata({
-  description: "No description",
+  status: "deprecated",
+  description: "(**OBSOLETE**) This component was created for the ChatEngine app.",
   props: {
     visibleOnHover: d("No description"),
   },
   themeVars: parseScssVar(styles.themeVars),
 });
 
-export const positionedContainerComponentRenderer = createComponentRendererNew(
+export const positionedContainerComponentRenderer = createComponentRenderer(
   COMP,
   PositionedContainerMd,
   ({ node, extractValue, renderChild, layoutCss }) => {

@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { SelectionStore } from "./SelectionStoreNative";
 
 const COMP = "SelectionStore";
@@ -17,7 +17,7 @@ export const SelectionStoreMd = createMetadata({
   },
 });
 
-export const selectionStoreComponentRenderer = createComponentRendererNew(
+export const selectionStoreComponentRenderer = createComponentRenderer(
   COMP,
   SelectionStoreMd,
   (rendererContext) => {

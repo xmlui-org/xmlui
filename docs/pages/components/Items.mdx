@@ -1,7 +1,6 @@
 # Items
 
-The `Items` component maps sequential data items into component instances,
-representing each data item as a particular component.
+The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
 
 > **Note**: `Items` is not a container! It does not wrap its items into a container; it merely renders the its children.
 
@@ -79,11 +78,17 @@ You can use also API bindings to display data:
 
 ## Context Variables
 
-### `$item`
-
-This property represents the value of an item in the data list.
+This component does not have any context variables.
 
 ## Properties
+
+### `data`
+
+This property contains the list of data items (obtained from a data source) this component renders.
+
+### `itemTemplate`
+
+The component template to display a single item
 
 ### `items`
 

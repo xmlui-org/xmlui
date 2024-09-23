@@ -1,0 +1,73 @@
+# ButtonGroup
+
+(**NOT IMPLEMENTED YET**) The `ButtonGroup` component is a container that embeds buttons used together for a particular reason. It provides a view that emphasizes this coherency.
+
+## Context Variables
+
+This component does not have any context variables.
+
+## Properties
+
+### `buttonWidth`
+
+When this optional property is set, all buttons within the group will have the specified width. If it is empty, each button's width accommodates its content.
+
+### `gap`
+
+When this optional property is set, adjacent buttons will have the specified gap between them. If this property is not set, the buttons will be merged into one group.
+
+### `orientation`
+
+This property sets the main axis along which the nested components are rendered.
+
+Default value: `"horizontal"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `horizontal` | The component will fill the available space horizontally |
+| `vertical` | The component will fill the available space vertically |
+
+
+### `themeColor`
+
+This optional property specifies the default theme color for the buttons in the group. Individual buttons may override this setting with their `themeColor` property.
+
+Default value: `"primary"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `attention` | Attention state theme color |
+| `primary` | Primary theme color (default) |
+| `secondary` | Secondary theme color |
+
+
+### `variant`
+
+This optional property specifies the default variant for the buttons in the group. Individual buttons may override this setting with their `variant` property.
+
+Default value: `"solid"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `solid` | A button with a border and a filled background. |
+| `outlined` | The button is displayed with a border and a transparent background. |
+| `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+
+
+## API
+
+This component does not provide any API.
+
+## Events
+
+This component does not have any events.
+
+## Styling
+
+This component does not have any styles.

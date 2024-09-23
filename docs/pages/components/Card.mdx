@@ -82,27 +82,15 @@ This component does not have any context variables.
 
 ### `avatarUrl`
 
-This property specifies the URL of the image to display in the avatar.
+Show the avatar (`true`) or not (`false`). If not specified, the Card will show the first letters of the [`title`](#title).
 
 ### `linkTo`
 
-The 
-`linkTo`
- wraps the title in a 
-`Link`
- component that is clickable to navigate.
+This property wraps the title in a `Link` component that is clickable to navigate.
 
 ### `showAvatar`
 
-Show the avatar (
-`true`
-) or not (
-`false`
-). If no [
-`avatarUrl`
-](#avatarurl) is specified then the Avatar will show the first letters of the [
-`title`
-](#title).
+Indicates whether the Card should be displayed
 
 Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
 
@@ -130,6 +118,8 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
 
 This prop sets the prestyled subtitle.
 
+This prop sets the prestyled subtitle.
+
 ```ueml copy /subTitle="Example Subtitle"/
 <Stack padding="1rem">
   <Card maxWidth="300px" subTitle="Example Subtitle" />
@@ -147,6 +137,8 @@ This prop sets the prestyled subtitle.
 />
 
 ### `title`
+
+This prop sets the prestyled title.
 
 This prop sets the prestyled title.
 
@@ -173,6 +165,8 @@ This component does not provide any API.
 ## Events
 
 ### `click`
+
+This event is triggered when the Card is clicked.
 
 This event is triggered when the `Card` is clicked.
 

@@ -1,20 +1,22 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { TableOfContentsProvider } from "@components-core/TableOfContentsContext";
 import { Pages, RouteWrapper } from "./PagesNative";
 
 const PAGE = "Page";
 
 export const PageMd = createMetadata({
+  status: "in review",
+  docFolder: PAGE,
   description:
     `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +
-    `to a particular URL that is associated with the page.`,
+    `to a particular URL that is associated with the page.`,  
   props: {
     url: d(`The URL of the route associated with the content.`),
   },
 });
 
-export const pageRenderer = createComponentRendererNew(
+export const pageRenderer = createComponentRenderer(
   PAGE,
   PageMd,
   ({ node, extractValue, renderChild }) => {
@@ -41,7 +43,7 @@ export const PagesMd = createMetadata({
   },
 });
 
-export const pagesRenderer = createComponentRendererNew(
+export const pagesRenderer = createComponentRenderer(
   COMP,
   PagesMd,
   ({ node, extractValue, renderChild }) => {

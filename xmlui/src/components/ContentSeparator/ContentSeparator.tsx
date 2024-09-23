@@ -1,27 +1,11 @@
 import styles from "./ContentSeparator.module.scss";
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { orientationOptionNames } from "@components/abstractions";
+import { orientationOptionMd } from "@components/abstractions";
 import { ContentSeparator } from "./ContentSeparatorNative";
 
 const COMP = "ContentSeparator";
-export interface ContentSeparatorComponentDef extends ComponentDef<"ContentSeparator"> {
-  props: {
-    /**
-     * This property defines the component's height (if the \`orientation\` is horizontal) or the width
-     * (if the \`orientation\` is vertical).
-     * @descriptionRef
-     */
-    size?: number | string;
-    /**
-     * Sets the main axis of the component.
-     * @descriptionRef
-     * @defaultValue \`horizontal\`
-     */
-    orientation?: string; // NOTE: This prop is necessary so that the documentation generator script picks it up
-  };
-}
 
 export const ContentSeparatorMd = createMetadata({
   description:
@@ -33,7 +17,7 @@ export const ContentSeparatorMd = createMetadata({
       `This property defines the component's height (if the \`orientation\` is horizontal) ` +
         `or the width (if the \`orientation\` is vertical).`,
     ),
-    orientation: d("Sets the main axis of the component", orientationOptionNames),
+    orientation: d("Sets the main axis of the component", orientationOptionMd),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -48,7 +32,7 @@ export const ContentSeparatorMd = createMetadata({
   },
 });
 
-export const contentSeparatorComponentRenderer = createComponentRendererNew(
+export const contentSeparatorComponentRenderer = createComponentRenderer(
   COMP,
   ContentSeparatorMd,
   ({ node, layoutCss, layoutNonCss, extractValue }) => {

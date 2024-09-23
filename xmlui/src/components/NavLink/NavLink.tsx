@@ -1,6 +1,6 @@
 import styles from "./NavLink.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Icon } from "@components/Icon/IconNative";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { NavLink } from "./NavLinkNative";
@@ -71,7 +71,7 @@ export const NavLinkMd = createMetadata({
   },
 });
 
-export const navLinkComponentRenderer = createComponentRendererNew(
+export const navLinkComponentRenderer = createComponentRenderer(
   COMP,
   NavLinkMd,
   ({ node, extractValue, renderChild, layoutCss }) => {

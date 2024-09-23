@@ -34,8 +34,8 @@ export function ApiBoundComponent({
     }
 
     const loaders: Array<ComponentDef> = [...(node.loaders || [])];
-    const events = { ...(node.events || {}) };
-    const props = { ...(node.props || {}) };
+    const events = { ...(node.events || {}) } as any;
+    const props = { ...(node.props || {}) } as any;
     const vars = { ...(node.vars || {}) };
     const api = { ...(node.api || {}) };
 

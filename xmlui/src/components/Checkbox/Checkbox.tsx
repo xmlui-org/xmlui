@@ -1,9 +1,9 @@
 import styles from "@components/Toggle/Toggle.module.scss";
 
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { Toggle } from "@components/Toggle/Toggle";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dClick,
@@ -25,6 +25,7 @@ import {
 const COMP = "Checkbox";
 
 export const CheckboxMd = createMetadata({
+  status: "in review",
   description:
     `The \`${COMP}\` component allows users to make binary choices, typically between checked or ` +
     `unchecked. It consists of a small box that can be toggled on or off by clicking on it.`,
@@ -38,6 +39,10 @@ export const CheckboxMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    description: d(
+      `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` + 
+      `of the ${COMP} besides its label.`,
+    ),
   },
   events: {
     click: dClick(COMP),
@@ -72,7 +77,7 @@ export const CheckboxMd = createMetadata({
   },
 });
 
-export const checkboxComponentRenderer = createComponentRendererNew(
+export const checkboxComponentRenderer = createComponentRenderer(
   COMP,
   CheckboxMd,
   ({

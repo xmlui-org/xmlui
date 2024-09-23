@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { PageMetaTitle } from "./PageMetaTilteNative";
 
 const COMP = "PageMetaTitle";
@@ -13,7 +13,7 @@ export const PageMetaTitleMd = createMetadata({
   },
 });
 
-export const pageMetaTitleComponentRenderer = createComponentRendererNew(
+export const pageMetaTitleComponentRenderer = createComponentRenderer(
   COMP,
   PageMetaTitleMd,
   ({ node, extractValue }) => {

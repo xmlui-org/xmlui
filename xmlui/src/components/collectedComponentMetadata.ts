@@ -1,7 +1,6 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextboxMd } from "@components/TextBox/TextBox";
+import { TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -15,7 +14,7 @@ import { CheckboxMd } from "@components/Checkbox/Checkbox";
 import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -31,7 +30,6 @@ import { ItemsMd } from "@components/Items/Items";
 import { LinkMd } from "@components/Link/Link";
 import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
-import Markdown from "react-markdown";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
 import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
@@ -60,35 +58,56 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "@components/Splitter/Split
 import { StickyBoxMd } from "@components/StickyBox/StickyBox";
 import { SwitchMd } from "@components/Switch/Switch";
 import { TableMd } from "@components/Table/Table";
-import { TableColumnDefMd } from "@components/TableColumnDef/TableColumnDef";
+import { ColumnMd } from "@components/Column/Column";
 import { TableHeaderMd } from "@components/TableHeader/TableHeader";
 import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
 import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
-import { ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentMetadata } from "@abstractions/ComponentDefs";
 import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
-import { RadioGroupOption } from "./RadioGroup/RadioGroupNative";
 import { TabItemMd } from "./Tabs/TabItem";
+import { FragmentMd } from "@components-core/Fragment";
+import { SlotMd } from "@components-core/Slot";
+import { TreeMd } from "./Tree/TreeComponent";
+import { ApiActionMd } from "./ApiAction/ApiAction";
+import { BarChartMd } from "./BarChart/BarChart";
+import { ChartMd } from "./Chart/Chart";
+import { DataSourceMd } from "./Datasource/Datasource";
+import { FormSectionMd } from "./FormSection/FormSection";
+import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
+import { PageHeaderMd } from "./PageHeader/PageHeader";
+import { ThemeChangerButtonMd } from "./ThemeChanger/ThemeChanger";
+import { ToolbarMd } from "./Toolbar/Toolbar";
+import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
+import { TrendLabelMd } from "./TrendLabel/TrendLabel";
+import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
   Alert: AlertMd,
-  // App: AppMd,
-  // AppHeader: AppHeaderMd,
-  // AppState: AppStateMd,
+  ApiAction: ApiActionMd,
+  App: AppMd,
+  AppHeader: AppHeaderMd,
+  AppState: AppStateMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
+  BarChart: BarChartMd,
   Bookmark: BookmarkMd,
   Button: ButtonMd,
+  ButtonGroup: ButtonGroupMd,
   Card: CardMd,
   ChangeListener: ChangeListenerMd,
+  Chart: ChartMd,
   Checkbox: CheckboxMd,
+  Column: ColumnMd,
   Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
+  DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
+  Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
   EmojiSelector: EmojiSelectorMd,
@@ -98,6 +117,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Footer: FooterMd,
   Form: FormMd,
   FormItem: FormItemMd,
+  FormSection: FormSectionMd,
   Heading: HeadingMd,
   H1: H1Md,
   H2: H2Md,
@@ -107,12 +127,14 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   H6: H6Md,
   HoverCard: HoverCardMd,
   Icon: IconMd,
+  IconInfoCard: IconInfoCardMd,
   Image: ImageMd,
   Items: ItemsMd,
   Link: LinkMd,
-  // List: ListMd,
-  // Logo: LogoMd,
+  List: ListMd,
+  Logo: LogoMd,
   Markdown: MarkdownMd,
+  MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
   MultiCombobox: ComboboxMd,
   MultiSelect: MultiSelectMd,
@@ -125,6 +147,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
+  PageHeader: PageHeaderMd,
   Pages: PagesMd,
   Pdf: PdfMd,
   PieChart: PieChartMd,
@@ -137,6 +160,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Redirect: RedirectMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
+  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,
@@ -150,13 +174,18 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   StickyBox: StickyBoxMd,
   Switch: SwitchMd,
   Table: TableMd,
-  TableColumnDef: TableColumnDefMd,
   TableHeader: TableHeaderMd,
   TableOfContents: TableOfContentsMd,
   TabItem: TabItemMd,
   Tabs: TabsMd,
-  // Text: TextMd,
-  // TextArea: TextAreaMd,
-  // TextBox: TextboxMd,
-  // Theme: ThemeMd,
+  Text: TextMd,
+  TextArea: TextAreaMd,
+  TextBox: TextBoxMd,
+  PasswordInput: TextBoxMd,
+  Toolbar: ToolbarMd,
+  ToolbarButton: ToolbarButtonMd,
+  TrendLabel: TrendLabelMd,
+  Theme: ThemeMd,
+  ThemeChangerButton: ThemeChangerButtonMd,
+  Tree: TreeMd,
 };

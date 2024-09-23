@@ -89,10 +89,10 @@ import {
   subMenuItemRenderer,
 } from "@components/DropdownMenu/DropdownMenu";
 import { themeComponentRenderer } from "@components/Theme/Theme";
-import { merge } from "lodash-es";
+import { merge, range } from "lodash-es";
 import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
-import { tableColumnDefComponentRenderer } from "@components/TableColumnDef/TableColumnDef";
+import { columnComponentRenderer } from "@components/Column/Column";
 import { optionComponentRenderer } from "@components/Option/Option";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/ApiAction";
@@ -126,6 +126,10 @@ import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
+import { rangeComponentRenderer } from "./Range/Range";
+import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
+import { sliderComponentRenderer } from "./Slider/Slider";
+import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -213,7 +217,7 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
       this.registerComponentRenderer(tableComponentRenderer);
-      this.registerComponentRenderer(tableColumnDefComponentRenderer);
+      this.registerComponentRenderer(columnComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
       this.registerComponentRenderer(dynamicHeightListComponentRenderer);
@@ -261,6 +265,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
+      this.registerComponentRenderer(accordionItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerComponentRenderer(fileUploadDropZoneComponentRenderer);
@@ -344,6 +351,10 @@ export class ComponentRegistry {
     this.registerComponentRenderer(accordionComponentRenderer);
     this.registerComponentRenderer(alertComponentRenderer);
     this.registerComponentRenderer(offCanvasComponentRenderer);
+    this.registerComponentRenderer(rangeComponentRenderer);
+    this.registerComponentRenderer(sliderComponentRenderer);
+    this.registerComponentRenderer(buttonGroupComponentRenderer);
+
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

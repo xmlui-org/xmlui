@@ -2,11 +2,6 @@
 
 The `TextBox` is an input component that allows users to input and edit textual data.
 
-It can often be found in forms.
-See the guide on [Using Forms](
-../learning/forms.mdx
-) for details.
-
 ## Context Variables
 
 This component does not have any context variables.
@@ -15,12 +10,15 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-If this boolean prop is set to `true`, the `TextBox` will be focused when it appears on the UI.
-The default is `false`.
+This property sets the label of the component.
+
+Default value: `false`.
 
 ### `enabled`
 
-Controls whether the input field is enabled (`true`) or disabled (`false`).
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+Default value: `true`.
 
 ```ueml copy
 <TextBox enabled="false" />
@@ -35,8 +33,7 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 
 ### `endIcon`
 
-This string prop enables the display of an icon
-on the right side of the input field by providing a valid icon name (left-to-right display).
+This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```ueml copy
 <TextBox endIcon="email" />
@@ -64,7 +61,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `endText`
 
-This string prop enables the display of a custom string on the right side of the input field (left-to-right display).
+This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```ueml copy
 <TextBox endText=".com" />
@@ -90,9 +87,13 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
 />
 
+### `hasSpinBox`
+
+This boolean prop shows (`true`) or hides (`false`) the spinner buttons for the input field.
+
 ### `initialValue`
 
-The initial value displayed in the input field.
+This property sets the component's initial value.
 
 ```ueml copy
 <TextBox initialValue="Example text" />
@@ -105,9 +106,17 @@ The initial value displayed in the input field.
   app={`<TextBox initialValue="Example text" />`}
 />
 
+### `integersOnly`
+
+This boolean property signs whether the input field accepts integers only (`true`) or not (`false`).
+
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
+
 ### `maxLength`
 
-The maximum length of the input that the field accepts.
+This property sets the maximum length of the input it accepts.
 
 Try to enter a longer value into the input field below.
 
@@ -121,6 +130,14 @@ Try to enter a longer value into the input field below.
   height={60}
   app={`<TextBox maxLength="16" />`}
 />
+
+### `maxValue`
+
+The maximum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
+
+### `minValue`
+
+The minimum value the input field allows. Can be a float or an integer if [`integersOnly`](#integersonly) is set to `false`, otherwise it can only be an integer.
 
 ### `placeholder`
 
@@ -139,7 +156,7 @@ A placeholder text that is visible in the input field when its empty.
 
 ### `readOnly`
 
-This boolean determines whether the input field can be modified or not.
+Set this property to `true` to disallow changing the component value.
 
 ```ueml copy
 <TextBox initialValue="Example text" readOnly="true" />
@@ -158,8 +175,7 @@ Set this property to `true` to indicate it must have a value before submitting t
 
 ### `startIcon`
 
-This string prop enables the display of an icon
-on the left side of the input field by providing a valid icon name (left-to-right display).
+This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy
 <TextBox startIcon="hyperlink" />
@@ -187,7 +203,7 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 
 ### `startText`
 
-This string prop enables the display of a custom string on the left side of the input field (left-to-right display).
+This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy
 <TextBox startText="www." />
@@ -213,15 +229,22 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
 />
 
+### `step`
+
+This prop governs how big the step when clicking on the spinner of the field.
+
 ### `validationStatus`
 
-This prop is used to visually indicate status changes reacting to form field validation.
+This property allows you to set the validation status of the input component.
 
-| Value     | Description                                           |
-| :-------- | :---------------------------------------------------- |
-| `valid`   | Visual indicator for an input that is accepted        |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
 | `warning` | Visual indicator for an input that produced a warning |
-| `error`   | Visual indicator for an input that produced an error  |
+| `error` | Visual indicator for an input that produced an error |
+
 
 ```ueml copy
 <VStack gap="$space-0_5">
@@ -246,105 +269,19 @@ This prop is used to visually indicate status changes reacting to form field val
   `}
 />
 
+### `zeroOrPositive`
+
+This boolean property determines whether the input value can only be 0 or positive numbers (`true`) or also negative (`false`).
+
 ## API
 
-### `focus`
-
-This API method focuses the input field.
-
-```ueml copy {2-3}
-<VStack gap="$space-0_5">
-  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-  <TextBox id="inputComponent" />
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: focus"
-  height={100}
-  app={`
-  <VStack gap="$space-0_5">
-    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
-    <TextBox id="inputComponent" />
-  </VStack>
-  `}
-/>
-
-### `setValue`
-
-This API method programmatically sets the value of the field.
-The same rules apply as for the [`initialValue`](#initialvalue) property.
-
-```ueml copy {10}
-<VStack margin="$space-1" gap="$space-0_5" var.changes="">
-  <TextBox 
-    id="inputField" 
-    readOnly="true" 
-    onDidChange="changes++"
-  />
-  <HStack gap="$space-1">
-    <Button 
-      label="Check" 
-      onClick="inputField.setValue('example ')"
-    />
-    <Text value="Number of changes: {changes}" />
-  </HStack>
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: setValue"
-  app={`
-  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
-    <TextBox 
-      id="inputField" 
-      readOnly="true" 
-      onDidChange="changes++"
-    />
-    <HStack gap="$space-1">
-      <Button 
-        label="Check" 
-        onClick="inputField.setValue('example ')"
-      />
-      <Text value="Number of changes: {changes}" />
-    </HStack>
-  </VStack>
-  `}
-/>
-
-### `value`
-
-By setting an ID for the component, you can refer to the value of the field if set.
-If no value is set, the value will be undefined.
-
-In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
-
-```ueml copy {2-3}
-<VStack gap="$space-0_5">
-  <Text value="TextBox content length: {inputComponent.value.length}" />
-  <TextBox id="inputComponent" />
-</VStack>
-```
-
-<Playground
-  previewOnly
-  name="Example: value"
-  height={100}
-  app={`
-  <VStack gap="$space-0_5">
-    <Text value="TextBox content length: {inputComponent.value.length}" />
-    <TextBox id="inputComponent" />
-  </VStack>
-  `}
-/>
+This component does not provide any API.
 
 ## Events
 
 ### `didChange`
 
-This event is triggered after the user has changed the field value.
+This event is triggered when value of TextBox has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
@@ -369,7 +306,7 @@ Write in the input field and see how the `Text` underneath it is updated in para
 
 ### `gotFocus`
 
-This event is triggered when the `TextBox` receives focus.
+This event is triggered when the TextBox has received the focus.
 
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
@@ -399,9 +336,7 @@ Note how clicking elsewhere resets the text to its original.
 
 ### `lostFocus`
 
-This event is triggered when the `TextBox` loses focus.
-
-See the example in the [gotFocus event section](#gotfocus).
+This event is triggered when the TextBox has lost the focus.
 
 ## Styling
 

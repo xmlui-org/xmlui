@@ -10,7 +10,7 @@ This component does not have any context variables.
 
 ### `name`
 
-This property sets the name value the avatar uses to display initials.
+This property sets the name value the Avatar uses to display initials.
 
 ```ueml copy
 <Avatar name="John, Doe" />
@@ -25,16 +25,19 @@ This property sets the name value the avatar uses to display initials.
 
 ### `size`
 
-This property defines the display size of the avatar. The default size is 
-`sm`
-.
+This property defines the display size of the Avatar.
 
-| Value | Description              |
-| :---- | :----------------------- |
-| `xs`  | Extra small size         |
-| `sm`  | Small size               |
-| `md`  | Medium size              |
-| `lg`  | Large size               |
+Default value: `"sm"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `xs` | Extra small button |
+| `sm` | Small button (default) |
+| `md` | Medium button |
+| `lg` | Large button |
+
 
 ```ueml copy
 <HStack gap="1rem" >
@@ -63,7 +66,7 @@ This property defines the display size of the avatar. The default size is
 
 ### `url`
 
-This property specifies the URL of the image to display in the avatar.
+This property specifies the URL of the image to display in the Avatar.
 
 <Playground
   previewOnly

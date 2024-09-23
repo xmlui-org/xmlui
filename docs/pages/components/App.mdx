@@ -8,12 +8,9 @@ import verticalFullHeader from  "../../component-samples/App/vertical-full-heade
 
 # App
 
-The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates,
-`App` allows you to display your preferred layout.
+The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 
-> **Note**: You can learn more details about using this component [here](
-../learning/using-components/app-component
-).
+> **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
 
 ## Context Variables
 
@@ -25,15 +22,18 @@ This component does not have any context variables.
 
 This property sets the layout template of the app. This setting determines the position and size of the app parts (such as header, navigation bar, footer, etc.) and the app's scroll behavior.
 
-| Value                  | Description                                                                                                                                                                                                                                                          |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `horizontal`           | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page.                                                                     |
-| `horizontal‑sticky`    | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom.                                                                                                                                   |
-| `condensed`            | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. **(default)**                                                                                                                                                      |
-| `condensed‑sticky`     | Similar to `horizontal-sticky`. However, the header and the navigation bar are in a single header block.                                                                                                                                                             |
-| `vertical`             | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header.|
-| `vertical‑sticky`      | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header.|
-| `vertical‑full‑header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom.                                                                                                                |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `vertical` | This layout puts the navigation bar on the left side and displays its items vertically. The main content is aligned to the right (including the header and the footer), and its content is a single scroll container; every part of it moves as you scroll the page. This layout does not display the logo in the app header. |
+| `vertical-sticky` | Similar to `vertical`, the header and the navigation bar dock to the top of the main content's viewport, while the footer sticks to the bottom. This layout does not display the logo in the app header. |
+| `vertical-full-header` | Similar to `vertical-sticky`. However, the header and the navigation bar dock to the top of the app's window, while the footer sticks to the bottom. |
+| `condensed` | Similar to `horizontal`. However, the header and the navigation bar are in a single header block. (default) |
+| `condensed-sticky` | However, the header and the navigation bar are in a single header block. |
+| `horizontal` | This layout stacks the layout sections in a single column in this order: header, navigation bar, main content, and footer. The application is a single scroll container; every part moves as you scroll the page. |
+| `horizontal-sticky` | Similar to `horizontal`, the header and the navigation bar dock to the top of the viewport, while the footer sticks to the bottom. |
+
 
 Here are a few samples demonstrating the usage of the `layout` property. All samples use this markup, except the value of `App`'s layout and a few marked code snippets:
 
@@ -114,6 +114,8 @@ For a detailed list on the different kinds of layouts available see [this short 
 ### `loggedInUser`
 
 Stores information about the currently logged in user.
+
+Stores information about the currently logged in user.
 Currently, there is no restriction on what the user data must look like.
 
 ```ueml copy /loggedInUser="{{ name: 'Joe', token: '1234' }}"/
@@ -150,7 +152,15 @@ Currently, there is no restriction on what the user data must look like.
   `}
 />
 
+### `logoTemplate`
+
+Optional template of the app logo
+
 ### `scrollWholePage`
+
+This boolean property specifies whether the whole page should scroll (`true`) or just the content area (`false`). The default value is `true`.
+
+Default value: `true`.
 
 This boolean property specifies whether the whole page should scroll (true) or just the content area (false).
 The default value is `true`.
@@ -204,6 +214,8 @@ This component does not provide any API.
 ## Events
 
 ### `ready`
+
+This event fires when the `App` component finishes rendering on the page.
 
 This event fires when the `App` component finishes rendering on the page.
 Use it as `onReady` when inlining it on the component.

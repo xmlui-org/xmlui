@@ -233,7 +233,7 @@ type ApiAction = {
   uid?: string;
 } & ApiOperationDef;
 
-export interface ApiActionComponent extends ComponentDef<"ApiAction"> {
+export interface ApiActionComponent extends ComponentDef {
   props: {
     payloadType?: string;
     invalidates?: string | string[];

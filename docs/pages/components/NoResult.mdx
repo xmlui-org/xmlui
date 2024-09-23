@@ -1,7 +1,6 @@
 # NoResult
 
-`NoResult` is a component that displays a visual indication that some data query (search) resulted 
-in no (zero) items.
+`NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items.
 
 ## Context Variables
 
@@ -11,7 +10,7 @@ This component does not have any context variables.
 
 ### `hideIcon`
 
-This boolean property toggles the visibility of the icon.
+This boolean property indicates if the icon should be hidden.
 
 ```ueml copy
 <HStack height="100%">
@@ -33,7 +32,9 @@ This boolean property toggles the visibility of the icon.
 
 ### `icon`
 
-This property is used to modify the icon. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
+This property defines the icon to display with the component.
+
+This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
 
 ```ueml copy
 <NoResult icon="error" height="100%" />
@@ -47,6 +48,8 @@ This property is used to modify the icon. For a list of of available icons consu
 />
 
 ### `label`
+
+This property sets the label of the component.
 
 Customize the displayed text using this property. Leave empty to omit it.
 

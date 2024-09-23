@@ -1,12 +1,13 @@
 import styles from "./StickyBox.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { StickyBox } from "./StickyBoxNative";
 
 const COMP = "StickyBox";
 
 export const StickyBoxMd = createMetadata({
+  status: "in review",
   description:
     `The \`${COMP}\` is a component that "sticks" or remains fixed at the top or bottom ` +
     `position on the screen as the user scrolls.`,
@@ -22,7 +23,7 @@ export const StickyBoxMd = createMetadata({
   },
 });
 
-export const stickyBoxComponentRenderer = createComponentRendererNew(
+export const stickyBoxComponentRenderer = createComponentRenderer(
   COMP,
   StickyBoxMd,
   ({ node, renderChild, extractValue, layoutCss }) => {

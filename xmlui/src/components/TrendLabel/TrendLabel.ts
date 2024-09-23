@@ -1,17 +1,13 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * (Document it)
- */
-export interface TrendLabelComponentDef extends ComponentDef<"TrendLabel"> {
+export const TrendLabelMd = createMetadata({
+  status: "experimental",
+  description: "This component displays a trend label.",
   props: {
-    /**
-     * @descriptionRef
-     */
-    change?: number;
-  };
-}
+    change: d("The change percentage."),
+  },
+});
 
 export const trendLabelRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {
@@ -88,4 +84,5 @@ export const trendLabelRenderer: CompoundComponentRendererInfo = {
       ],
     },
   },
+  hints: TrendLabelMd,
 };

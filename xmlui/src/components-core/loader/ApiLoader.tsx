@@ -6,7 +6,7 @@ import type {
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";
 import { removeNullProperties } from "@components-core/utils/misc";
@@ -70,20 +70,17 @@ function ApiLoader({
   );
 }
 
-/**
- * Represents a loader that calls an API through an HTTP/HTTPS GET request
- */
-interface ApiLoaderDef extends ComponentDef<"ApiLoader"> {
+const ApiLoaderMd = createMetadata({
+  description: `Represents a loader that calls an API through an HTTP/HTTPS GET request`,
   props: {
-    /**
-     * URL segment to use in the GET request
-     */
-    url: string;
-    raw?: boolean;
-  };
-}
+    url: d("URL segment to use in the GET request"),
+    raw: d("If true, the loader returns the raw text response instead of parsing it as JSON"),
+  },
+});
 
-export const apiLoaderRenderer = createLoaderRenderer<ApiLoaderDef>(
+type ApiLoaderDef = ComponentDef<typeof ApiLoaderMd>;
+
+export const apiLoaderRenderer = createLoaderRenderer(
   "ApiLoader",
   ({ loader, state, dispatch, loaderInProgressChanged, loaderLoaded, loaderError }) => {
     return (
@@ -95,5 +92,6 @@ export const apiLoaderRenderer = createLoaderRenderer<ApiLoaderDef>(
         loaderError={loaderError}
       />
     );
-  }
+  },
+  ApiLoaderMd,
 );

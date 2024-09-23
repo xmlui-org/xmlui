@@ -5,7 +5,7 @@ import type { ApiActionOptions, DownloadOperationDef } from "@components-core/Re
 import { createAction } from "./actions";
 import RestApiProxy from "@components-core/RestApiProxy";
 
-export interface DownloadActionComponent extends ComponentDef<"DownloadAction"> {
+export interface DownloadActionComponent extends ComponentDef {
   props: DownloadOperationDef;
 }
 

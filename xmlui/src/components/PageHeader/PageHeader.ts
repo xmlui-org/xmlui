@@ -1,22 +1,20 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * (Document it)
- */
-export interface PageHeaderComponentDef
-  extends ComponentDef<"PageHeader"> {
+const COMP = "PageHeader";
+export const PageHeaderMd = createMetadata({
+  status: "experimental",
+  description:
+    `The \`${COMP}\` component is a component that displays a title and an ` +
+    `optional pre-title. The pre-title is displayed above the title.`,
   props: {
-    /**
-     * @descriptionRef
-     */
-    preTitle?: string;
-    /**
-     * @descriptionRef
-     */
-    title?: string;
-  };
-}
+    preTitle: d("The pre-title to display above the title."),
+    title: d("The title to display."),
+  },
+  defaultThemeVars: {
+    "gap-PageHeader": "$space-2",
+  },
+});
 
 export const pageHeaderRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {
@@ -57,9 +55,5 @@ export const pageHeaderRenderer: CompoundComponentRendererInfo = {
       ],
     },
   },
-  hints: {
-    defaultThemeVars: {
-        "gap-PageHeader": "$space-2",
-    }
-  }
+  hints: PageHeaderMd,
 };

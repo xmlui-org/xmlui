@@ -1,7 +1,6 @@
-import { ComponentDescriptor } from "@abstractions/ComponentDescriptorDefs";
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextboxMd } from "@components/TextBox/TextBox";
+import { TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -60,7 +59,7 @@ import { HSplitterMd, SplitterMd, VSplitterMd } from "@components/Splitter/Split
 import { StickyBoxMd } from "@components/StickyBox/StickyBox";
 import { SwitchMd } from "@components/Switch/Switch";
 import { TableMd } from "@components/Table/Table";
-import { TableColumnDefMd } from "@components/TableColumnDef/TableColumnDef";
+import { ColumnMd } from "@components/Column/Column";
 import { TableHeaderMd } from "@components/TableHeader/TableHeader";
 import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
@@ -68,7 +67,7 @@ import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
 import { ComponentMetadata } from "@abstractions/ComponentDefs";
 
-export const metadataHash: Record<string, ComponentMetadata | ComponentDescriptor<any>> = {
+export const metadataHash: Record<string, ComponentMetadata> = {
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,
@@ -79,6 +78,7 @@ export const metadataHash: Record<string, ComponentMetadata | ComponentDescripto
   Card: CardMd,
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
+  Column: ColumnMd,
   Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DatePicker: DatePickerMd,
@@ -140,13 +140,12 @@ export const metadataHash: Record<string, ComponentMetadata | ComponentDescripto
   VStack: VStackMd,
   StickyBox: StickyBoxMd,
   Table: TableMd,
-  TableColumnDef: TableColumnDefMd,
   TableHeader: TableHeaderMd,
   TableOfContents: TableOfContentsMd,
   Tabs: TabsMd,
   Text: TextMd,
   TextArea: TextAreaMd,
-  TextBox: TextboxMd,
+  TextBox: TextBoxMd,
   Theme: ThemeMd,
   Switch: SwitchMd,
 };

@@ -1,5 +1,5 @@
-import { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
-import { validationStatusNames } from "./Input/input-abstractions";
+import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
+import { orientationOptionMd, validationStatusMd } from "./abstractions";
 
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {
@@ -49,7 +49,7 @@ export function dLabel(): ComponentPropertyMetadata {
 
 export function dLabelPosition(def?: any): ComponentPropertyMetadata {
   return {
-    description: `Places the label at the \`top\`, \`right\`, \`bottom\`, or \`left\` of the component.`,
+    description: `Places the label at the given position of the component.`,
     availableValues: ["top", "right", "bottom", "left"],
     defaultValue: def,
   };
@@ -79,8 +79,7 @@ export function dReadonly(): ComponentPropertyMetadata {
 export function dEnabled(): ComponentPropertyMetadata {
   return {
     description:
-      `This boolean property's \`true\` value indicates whether the checkbox responds to user events ` +
-      `that could change the component value.`,
+      `This boolean property value indicates whether the component responds to user events (\`true\`) or not (\`false\`).`,
     valueType: "boolean",
     defaultValue: true,
   };
@@ -89,9 +88,8 @@ export function dEnabled(): ComponentPropertyMetadata {
 export function dValidationStatus(): ComponentPropertyMetadata {
   return {
     description:
-      `This property allows you to set the checkbox's validation status to "none," "error," ` +
-      `"warning," or "valid."`,
-    availableValues: validationStatusNames,
+      `This property allows you to set the validation status of the input component.`,
+    availableValues: validationStatusMd,
   };
 }
 
@@ -194,6 +192,16 @@ export function dFocus(comp: string): ComponentPropertyMetadata {
   };
 }
 
+export function dValue(): ComponentPropertyMetadata {
+  return {
+    description:
+      `You can query the component's value. If no value is set, it will ` +
+      `retrieve \`undefined\`.`,
+  };
+}
+
+`You can query the component's value. If no value is set, it will retrieve \`undefined\`.`;
+
 export function dDidOpen(comp: string): ComponentPropertyMetadata {
   return {
     description:
@@ -216,5 +224,15 @@ export function dTriggerTemplate(comp: string): ComponentPropertyMetadata {
       `This property allows you to define a custom trigger instead of the default one provided by ` +
       `\`${comp}\`.`,
     valueType: "ComponentDef",
+  };
+}
+
+export function dOrientation(defaultValue: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This property sets the main axis along which the nested components are rendered.`,
+    availableValues: orientationOptionMd,
+    valueType: "string",
+    defaultValue,
   };
 }

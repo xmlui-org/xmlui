@@ -1,7 +1,7 @@
 import styles from "./MultiCombobox.module.scss";
 
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { MultiCombobox } from "./MultiComboboxNative";
@@ -27,23 +27,6 @@ import {
 
 const COMP = "MultiCombobox";
 
-/**
- * The \`MultiCombobox\` component is essentially a [\`ComboBox\`](./ComboBox.mdx) that enables the selection of multiple elements
- * from a list either by typing in the field or by clicking list elements in the dropdown.
- * These elements are then displayed in the field and can be removed as necessary.
- */
-export interface MultiComboboxComponentDef extends ComponentDef<"MultiCombobox"> {
-  contextVars: {
-    /**
-     * This context variable acts as a template for an item in the list.
-     * Access attributes of the item using the dot notation.
-     *
-     * For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`change\`](#change) event.
-     */
-    $item: any;
-  };
-}
-
 const defaultOptionRenderer = {
   type: "Text",
   props: {
@@ -52,6 +35,7 @@ const defaultOptionRenderer = {
 };
 
 export const MultiComboboxMd = createMetadata({
+  status: "experimental",
   description:
     `The \`${COMP}\` component is essentially a [\`ComboBox\`](./ComboBox.mdx) that enables ` +
     `the selection of multiple elements from a list either by typing in the field or by ` +
@@ -109,7 +93,7 @@ export const MultiComboboxMd = createMetadata({
   },
 });
 
-export const multiComboboxComponentRenderer = createComponentRendererNew(
+export const multiComboboxComponentRenderer = createComponentRenderer(
   COMP,
   MultiComboboxMd,
   ({ node, state, updateState, extractValue, renderChild, layoutCss, lookupEventHandler }) => {

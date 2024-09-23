@@ -1,10 +1,9 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRenderer, createComponentRendererNew } from "@components-core/renderers";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "./FormItem.module.scss";
 import type { FormItemValidations } from "@components/Form/FormContext";
 import { parseSeverity } from "./Validations";
-import { desc } from "@components-core/descriptorHelper";
 import { CustomFormItem, FormItem } from "./FormItemNative";
 import {
   dAutoFocus,
@@ -17,33 +16,8 @@ import {
 
 const COMP = "FormItem";
 
-/**
- * A `FormItem` component represents a single input element within a `Form`. The value within
- * the `FormItem` may be associated with a particular property within the encapsulating `Form` component's
- * data.
- */
-export interface FormItemComponentDef extends ComponentDef<"FormItem"> {
-  contextVars: {
-    /**
-     * The context variable represents the current value of the \`FormItem\`. It can be used in
-     * expressions and code snippets within the \`FormItem\` instance.
-     */
-    $value: any;
-
-    /**
-     * This function can be invoked to set the \`FormItem\` instance's value. The function has a
-     * single argument, the new value to set.
-     */
-    $setValue: (newValue: any) => void;
-
-    /**
-     * This variable represents the result of the latest validation of the \`FormItem\` instance.
-     */
-    $validationResult: any;
-  };
-}
-
 export const FormItemMd = createMetadata({
+  status: "in review",
   description:
     `A \`${COMP}\` component represents a single input element within a \`Form\`. The value within ` +
     `the \`${COMP}\` may be associated with a particular property within the encapsulating \`Form\` ` +
@@ -142,7 +116,7 @@ export const FormItemMd = createMetadata({
   },
 });
 
-export const formItemComponentRenderer = createComponentRendererNew(
+export const formItemComponentRenderer = createComponentRenderer(
   COMP,
   FormItemMd,
   ({

@@ -1,5 +1,5 @@
 import styles from "./RadioGroup.module.scss";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { RadioGroup, RadioGroupOption } from "./RadioGroupNative";
@@ -20,6 +20,7 @@ import {
 const RGOption = "RadioGroupOption";
 
 export const RadioGroupOptionMd = createMetadata({
+  status: "in review",
   description: "A single radio button within a radio button group",
   props: {
     enabled: dEnabled(),
@@ -54,7 +55,7 @@ export const RadioGroupOptionMd = createMetadata({
   },
 });
 
-export const radioGroupOptionRenderer = createComponentRendererNew(
+export const radioGroupOptionRenderer = createComponentRenderer(
   RGOption,
   RadioGroupOptionMd,
   ({ node, extractValue }) => {
@@ -84,6 +85,10 @@ export const RadioGroupMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    orientation: d(
+      `(*** NOT IMPLEMENTED YET ***) This property sets the orientation of the ` +
+        `options within the radio group.`,
+    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -92,7 +97,7 @@ export const RadioGroupMd = createMetadata({
   },
 });
 
-export const radioGroupRenderer = createComponentRendererNew(
+export const radioGroupRenderer = createComponentRenderer(
   COMP,
   RadioGroupMd,
   ({

@@ -1,6 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { ButtonMd } from "@components/Button/Button";
 import { transformSource } from "./xmlui";
+import { StackMd } from "@components/Stack/Stack";
 
 describe("Ueml transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {
@@ -44,29 +46,29 @@ describe("Ueml transform - attributes", () => {
   });
 
   it("key-only attr is true", () => {
-    const cd = transformSource("<Button enabled />") as ComponentDef;
+    const cd = transformSource("<Button enabled />") as ComponentDef<typeof ButtonMd>;
     expect(cd.props.enabled).equal("true");
   });
 
   it("quoteless attr", () => {
-    const cd = transformSource("<Stack orientation=horizontal/>") as ComponentDef;
+    const cd = transformSource("<Stack orientation=horizontal/>") as ComponentDef<typeof StackMd>;
     expect(cd.props.orientation).equal("horizontal");
   });
 
   it("uid works", () => {
-    const cd = transformSource("<Stack id='myStack' />") as ComponentDef;
+    const cd = transformSource("<Stack id='myStack' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
     expect(cd.uid).equal("myStack");
   });
 
   it("testId works", () => {
-    const cd = transformSource("<Stack testId='myStack' />") as ComponentDef;
+    const cd = transformSource("<Stack testId='myStack' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
     expect(cd.testId).equal("myStack");
   });
 
   it("when works", () => {
-    const cd = transformSource("<Stack when='isOpen' />") as ComponentDef;
+    const cd = transformSource("<Stack when='isOpen' />") as ComponentDef<typeof StackMd>;
     expect(cd.type).equal("Stack");
     expect(cd.when).equal("isOpen");
   });

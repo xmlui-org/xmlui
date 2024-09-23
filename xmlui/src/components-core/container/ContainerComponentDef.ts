@@ -2,7 +2,8 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 // Represents a container component. A container provides optional actions, loaders to implement its behavior and stores
 // state the child components can access.
-export interface ContainerComponentDef extends ComponentDef<"Container"> {
+export interface ContainerComponentDef extends ComponentDef {
+  type: "Container";
   containerUid?: symbol;
   contextVars?: Record<string, any>;
   apiBoundContainer?: boolean;

@@ -12,7 +12,7 @@ import classnames from "@components-core/utils/classnames";
 import { usePopper } from "react-popper";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { createPortal } from "react-dom";
-import type { ValidationStatus } from "@components/Input/input-abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import { SelectContext, useSelectContextValue } from "./SelectContext";
 import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";

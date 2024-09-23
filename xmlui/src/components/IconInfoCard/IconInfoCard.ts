@@ -1,25 +1,15 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
 
-/**
- * (Document it)
- */
-export interface IconInfoCardComponentDef extends ComponentDef<"IconInfoCard"> {
+export const IconInfoCardMd = createMetadata({
+  status: "experimental",
+  description: "This component displays an icon and some content in a card.",
   props: {
-    /**
-     * @descriptionRef
-     */
-    height?: string;
-    /**
-     * @descriptionRef
-     */
-    iconBackgroundColor?: string;
-    /**
-     * @descriptionRef
-     */
-    iconName?: string;
-  };
-}
+    height: d("The height of the card."),
+    iconBackgroundColor: d("The background color of the icon."),
+    iconName: d("The name of the icon to display."),
+  },
+});
 
 export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: {
@@ -69,4 +59,5 @@ export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
       ],
     },
   },
+  hints: IconInfoCardMd,
 };

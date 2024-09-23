@@ -1,4 +1,4 @@
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { Bookmark } from "./BookmarkNative";
 
@@ -21,7 +21,7 @@ export const BookmarkMd = createMetadata({
   },
 });
 
-export const bookmarkComponentRenderer = createComponentRendererNew(
+export const bookmarkComponentRenderer = createComponentRenderer(
   COMP,
   BookmarkMd,
   (rendererContext) => {

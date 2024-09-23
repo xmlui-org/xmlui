@@ -7,7 +7,7 @@ import type {
   ValidationMode,
 } from "@components/Form/FormContext";
 import { useFormContextPart } from "@components/Form/FormContext";
-import { TextBox } from "@components/TextBox/TextBox";
+import { TextBox } from "@components/TextBox/TextBoxNative";
 import { Toggle } from "@components/Toggle/Toggle";
 import { FileInput } from "@components/FileInput/FileInputNative";
 import { NumberBox } from "@components/NumberBox/NumberBoxNative";
@@ -25,7 +25,7 @@ import {
   fieldInitialized,
   fieldLostFocus,
 } from "@components/Form/formActions";
-import { TextArea } from "@components/TextArea/TextArea";
+import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
 import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 import type { LabelPosition } from "./ItemWithLabel";
@@ -33,7 +33,7 @@ import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
 import { getByPath } from "@components/Form/FormNative";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
-import { ComponentDefNew } from "@abstractions/ComponentDefs";
+import { ComponentDef } from "@abstractions/ComponentDefs";
 import { FormItemMd } from "./FormItem";
 
 type FormControlType =
@@ -377,7 +377,7 @@ export const FormItem = memo(function FormItem({
   );
 });
 
-type FormItemComponentDef = ComponentDefNew<typeof FormItemMd>;
+type FormItemComponentDef = ComponentDef<typeof FormItemMd>;
 
 export function CustomFormItem({
   renderChild,
@@ -408,5 +408,5 @@ export function CustomFormItem({
     };
   }, [bindTo, dispatch, node.children, node.vars, validationResult, value]);
 
-  return <>{renderChild(decoratedMetadata)}</>;
+  return <>{renderChild(decoratedMetadata as any)}</>;
 }

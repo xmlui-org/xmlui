@@ -20,7 +20,7 @@ import type { RendererContext } from "@abstractions/RendererDefs";
 
 export type {
   ThemeDefinition,
-  ComponentDef,
+  ComponentDef as ComponentDefNew,
   CompoundComponentDef,
   ComponentLike,
   StandaloneAppDescription,
@@ -32,7 +32,7 @@ export type {
 };
 export {
   StandaloneApp,
-  createComponentRenderer,
+  createComponentRenderer as createComponentRendererNew,
   startApp,
   useTheme, //TODO REMOVE
   RootComponent, //TODO remove, playground uses it

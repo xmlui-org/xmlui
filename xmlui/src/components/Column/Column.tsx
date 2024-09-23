@@ -1,10 +1,10 @@
-import { createMetadata, d, type ComponentDef } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
-import { TableColumnDef } from "./TableColumnDefNative";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
+import { Column } from "./ColumnNative";
 
-const COMP = "TableColumnDef";
+const COMP = "Column";
 
-export const TableColumnDefMd = createMetadata({
+export const ColumnMd = createMetadata({
   description:
     `The \`${COMP}\` component can be used within a \`Table\` to define a particular table ` +
     `column's visual properties and data bindings.`,
@@ -35,13 +35,13 @@ export const TableColumnDefMd = createMetadata({
   },
 });
 
-export const tableColumnDefComponentRenderer = createComponentRendererNew(
+export const columnComponentRenderer = createComponentRenderer(
   COMP,
-  TableColumnDefMd,
+  ColumnMd,
   (rendererContext) => {
     const { node, renderChild, extractValue, childIndex, layoutCss } = rendererContext;
     return (
-      <TableColumnDef
+      <Column
         style={layoutCss}
         header={extractValue.asDisplayText(node.props.header)}
         accessorKey={extractValue.asOptionalString(node.props.bindTo)}

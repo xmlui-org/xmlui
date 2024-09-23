@@ -1,6 +1,6 @@
 # Button
 
-`Button` is an interactive element that triggers an action when clicked.
+Button is an interactive element that triggers an action when clicked.
 
 Use the `Button` component to trigger various actions.
 
@@ -10,16 +10,22 @@ This component does not have any context variables.
 
 ## Properties
 
+### `autoFocus`
+
+Indicates if the button should receive focus when the page loads
+
 ### `contentPosition`
 
-This optional value determines how the label and icon (or nested children) should be placed
-inside the Button component.
+This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
-| Value    | Description                                                  |
-| :------- | :----------------------------------------------------------- |
-| `center` | Place the content in the middle **(default)**                |
-| `start`  | Justify the content to the left (to the right if in **rtl**) |
-| `end`    | Justify the content to the right (to the left if in **ltr**) |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `center` | Place the content in the middle (default) |
+| `start` | Justify the content to the left (to the right if in right-to-left) |
+| `end` | Justify the content to the right (to the left if in right-to-left) |
+
 
 ```ueml copy
 <Stack gap="1rem">
@@ -50,8 +56,9 @@ inside the Button component.
 
 ### `enabled`
 
-The value of this property indicates if the button accepts actions (`true`) or does not react
-to them (`falseq`). The default value is `true`.
+The value of this property indicates if the button accepts actions (`true`) or does not react to them (`falseq`).
+
+Default value: `true`.
 
 ```ueml copy
 <HStack gap="1rem" >
@@ -77,9 +84,7 @@ to them (`falseq`). The default value is `true`.
 
 ### `icon`
 
-This string value denotes an icon name. The framework will render an icon if XMLUI recognizes
-the icon (by its name). If no label is specified and an icon is set, the button displays only
-the icon.
+This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon (by its name). If no label is specified and an icon is set, the Button displays only the icon.
 
 ```ueml
 <HStack gap="1rem" >
@@ -105,12 +110,15 @@ the icon.
 
 This optional string determines the location of the icon in the Button.
 
-| Value   | Description                                                                       |
-| :------ | :-------------------------------------------------------------------------------- |
-| `left`  | Place the icon on the left of the label **(default)**                             |
-| `right` | Place the icon on the right of the label                                          |
-| `start` | Place the icon at the start of the label (considering the current text direction) |
-| `end`   | Place the icon at the end of the label (considering the current text direction)   |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `left` | The icon will appear on the left side |
+| `right` | The icon will appear on the right side |
+| `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
+| `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
+
 
 ```ueml
 <VStack gap="1rem">
@@ -154,9 +162,7 @@ This optional string determines the location of the icon in the Button.
 
 ### `label`
 
-This property is an optional string to set a label for the button. If no label is specified and
-an icon is set, the button will modify its styling to look like a small icon button. When the
-button has nested children, it will display them and ignore the value of the `label` prop.
+This property is an optional string to set a label for the Button. If no label is specified and an icon is set, the Button will modify its styling to look like a small icon button. When the Button has nested children, it will display them and ignore the value of the `label` prop.
 
 ```ueml copy
 <VStack gap="1rem" >
@@ -188,14 +194,17 @@ button has nested children, it will display them and ignore the value of the `la
 
 ### `size`
 
-This optional string property sets the component's size (via paddings).
+The size of the button (small, medium, large)
 
-| Value | Description              |
-| :---- | :----------------------- |
-| `xs`  | Extra small size         |
-| `sm`  | Small size **(default)** |
-| `md`  | Medium size              |
-| `lg`  | Large size               |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `xs` | Extra small button |
+| `sm` | Small button (default) |
+| `md` | Medium button |
+| `lg` | Large button |
+
 
 ```ueml copy
 <Stack gap="4px">
@@ -238,13 +247,16 @@ This optional string property sets the component's size (via paddings).
 
 ### `themeColor`
 
-The value of this optional property sets the string to provide a color scheme for the Button.
+The button color scheme (primary, secondary, attention)
 
-| Value       | Description                       |
-| :---------- | :-------------------------------- |
-| `primary`   | Primary theme color **(default)** |
-| `secondary` | Secondary theme color             |
-| `attention` | Attention state theme color       |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `attention` | Attention state theme color |
+| `primary` | Primary theme color (default) |
+| `secondary` | Secondary theme color |
+
 
 ```ueml copy
 <Stack orientation="horizontal" gap="10px">
@@ -268,24 +280,29 @@ The value of this optional property sets the string to provide a color scheme fo
 
 ### `type`
 
-This optional string describes how the button appears in an HTML context. You rarely need to
-set this property explicitly.
+This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
-| Value    | Description                                                                                                        |
-| :------- | :----------------------------------------------------------------------------------------------------------------- |
-| `button` | Regular behavior that only executes logic if explicitly determined. **(default)**                                  |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `button` | Regular behavior that only executes logic if explicitly determined. (default) |
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
-| `reset`  | Resets all the controls to their initial values. Using it is ill advised for UX reasons.                           |
+| `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
+
 
 ### `variant`
 
-The value of this optional property determines the fundamental style of the button.
+The button variant (solid, outlined, ghost) to use
 
-| Value      | Description                                                                                                     |
-| ---------- | --------------------------------------------------------------------------------------------------------------- |
-| `solid`    | A button with a border and a filled background. **(default)**                                                   |
-| `outlined` | The button is displayed with a border and a transparent background.                                             |
-| `ghost`    | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `solid` | A button with a border and a filled background. |
+| `outlined` | The button is displayed with a border and a transparent background. |
+| `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
+
 
 ```ueml copy
 <HStack gap="1rem">
@@ -318,7 +335,7 @@ This component does not provide any API.
 
 ### `click`
 
-This event is triggered when the button is clicked.
+This event is triggered when the Button is clicked.
 
 ```ueml copy
 <Button label="Click me!" onClick="window.alert('Button clicked')" />
@@ -335,7 +352,7 @@ This event is triggered when the button is clicked.
 
 ### `gotFocus`
 
-This event is triggered when the button has received the focus.
+This event is triggered when the Button has received the focus.
 
 ```ueml copy
 <VStack gap="1rem" var.text="No event" >
@@ -366,7 +383,7 @@ This event is triggered when the button has received the focus.
 
 ### `lostFocus`
 
-This event is triggered when the button has lost the focus.
+This event is triggered when the Button has lost the focus.
 
 (See the example above)
 

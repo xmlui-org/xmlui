@@ -1,18 +1,19 @@
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRendererNew } from "@components-core/renderers";
+import { createComponentRenderer } from "@components-core/renderers";
 import { HoverCardComponent } from "./HovercardNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "HoverCard";
 
 export const HoverCardMd = createMetadata({
-  description: "This component displays some content when its parent component is hovered.",
+  status: "deprecated",
+  description: "(**OBSOLETE**) This component displays some content when its parent component is hovered.",
   props: {
     triggerTemplate: dComponent("The component that opens the hover card when hovered."),
   },
 });
 
-export const hoverCardComponentRenderer = createComponentRendererNew(
+export const hoverCardComponentRenderer = createComponentRenderer(
   COMP,
   HoverCardMd,
   ({ node, extractValue, renderChild }) => {
