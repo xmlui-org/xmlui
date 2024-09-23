@@ -215,7 +215,7 @@
       "patterns": [{ "include": "#escapeCharacter" }, { "include": "#entity" }, { "include": "#bindingExpr" }]
     },
     "propOrVarTag": {
-      "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:var)|(?:prop))",
+      "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:var)|(?:property)|(?:prop))",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },

@@ -115,7 +115,7 @@ export const UEMLGrammar: any = {
       ],
       propOrVarTagStart: [
         [
-          /(<\/?)((?:[a-zA-Z_][\w\.\-]*?:)?)((?:prop)|(?:var))/,
+          /(<\/?)((?:[a-zA-Z_][\w\.\-]*?:)?)((?:property)|(?:prop)|(?:var))/,
           ["delimiter.angle", "namespace", { token: "tag-helper", next: "@propOrVarTag" }],
         ],
       ],
