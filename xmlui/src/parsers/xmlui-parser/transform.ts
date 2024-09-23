@@ -133,7 +133,10 @@ export function nodeToComponentDef(
         element = nestedComponents[0];
       }
 
-      let nestedComponent: ComponentDef = transformSingleElement(usesStack, element)! as ComponentDef;
+      let nestedComponent: ComponentDef = transformSingleElement(
+        usesStack,
+        element,
+      )! as ComponentDef;
 
       component = {
         name: compoundName.value,
@@ -216,7 +219,10 @@ export function nodeToComponentDef(
           reportError("T022");
         }
         const scriptText = getText(child);
-        const scriptContent = scriptText.slice(scriptText.indexOf(">") + 1, scriptText.lastIndexOf("</"));
+        const scriptContent = scriptText.slice(
+          scriptText.indexOf(">") + 1,
+          scriptText.lastIndexOf("</"),
+        );
 
         comp.script ??= "";
         if (comp.script.length > 0) {
@@ -260,6 +266,7 @@ export function nodeToComponentDef(
 
       // --- Element with a lowercase start letter, it must be some traits of the host component
       switch (childName) {
+        case "property":
         case "prop":
           collectElementHelper(
             usesStack,
@@ -333,29 +340,6 @@ export function nodeToComponentDef(
           return;
 
         default:
-          if (!isCompound) {
-            const slotComp: ComponentDef = {
-              type: childName,
-              debug: {
-                source: {
-                  start: child.start,
-                  end: child.end,
-                  fileId,
-                },
-              },
-            };
-
-            collectTraits(usesStack, slotComp, child);
-            if (slotComp.children && slotComp.children.length > 0) {
-              const compoundInSlot = slotComp.children.find((comp) => !isComponent(comp));
-              if (compoundInSlot) {
-                reportError("T024");
-              }
-              comp.slots ??= {};
-              comp.slots[childName] = slotComp.children;
-            }
-            return;
-          }
           reportError("T009", childName);
           return;
       }
@@ -513,8 +497,12 @@ export function nodeToComponentDef(
     const elementName = getTagName(element);
     // --- Accept only "name", "value"
     const childNodes = getChildNodes(element);
-    const nestedComponents = childNodes.filter((c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)));
-    const nestedElements = childNodes.filter((c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)));
+    const nestedComponents = childNodes.filter(
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)),
+    );
+    const nestedElements = childNodes.filter(
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)),
+    );
     const attributes = getAttributes(element).map(segmentAttr);
 
     const attrProps = attributes.filter((attr) => propAttrs.indexOf(attr.name) >= 0);
@@ -727,8 +715,8 @@ export function nodeToComponentDef(
   function prepNode(node: Node): Node {
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getTagName(node);
-    const oneOfNonPropHelper = /var|event|api|loaders|uses|field|item/;
-    const shouldUseTextNodeElement = !oneOfNonPropHelper.test(tagName);
+    const hasComponentName = UCRegex.test(tagName);
+    const shouldUseTextNodeElement = hasComponentName || tagName === "prop" || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "api";
     const attrs = getAttributes(node);
 
@@ -779,11 +767,17 @@ export function nodeToComponentDef(
       childNodes[i] = newChild;
     }
 
-    const helperNodes = childNodes.filter((c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)));
-    const otherNodes = childNodes.filter(
-      (c) => c.kind !== SyntaxKind.ElementNode || (c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c))),
+    const helperNodes = childNodes.filter(
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)),
     );
-    const hasComponentChild = otherNodes.some((c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)));
+    const otherNodes = childNodes.filter(
+      (c) =>
+        c.kind !== SyntaxKind.ElementNode ||
+        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c))),
+    );
+    const hasComponentChild = otherNodes.some(
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)),
+    );
 
     if (hasScriptChild && hasComponentChild) {
       const fragment = wrapWithFragment(otherNodes);
@@ -796,12 +790,18 @@ export function nodeToComponentDef(
 
   function collapseWhitespace(childNodes: TransformNode[]) {
     for (let i = 0; i < childNodes.length; ++i) {
-      if (childNodes[i].kind === SyntaxKind.StringLiteral || childNodes[i].kind === SyntaxKind.TextNode) {
+      if (
+        childNodes[i].kind === SyntaxKind.StringLiteral ||
+        childNodes[i].kind === SyntaxKind.TextNode
+      ) {
         //the union is the same as \s , but took \u00a0 (non breaking space) out
         //source https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_expressions/Cheatsheet
         const allSubsequentWsExceptNonBreakingSpace =
           /[\f\n\r\t\v\u0020\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]+/g;
-        childNodes[i].text = getText(childNodes[i]).replace(allSubsequentWsExceptNonBreakingSpace, " ");
+        childNodes[i].text = getText(childNodes[i]).replace(
+          allSubsequentWsExceptNonBreakingSpace,
+          " ",
+        );
       }
     }
   }
@@ -864,7 +864,10 @@ export function nodeToComponentDef(
           //&g
           case CharacterCodes.g:
             //\gt;
-            if (text.charCodeAt(i + 2) === CharacterCodes.t && text.charCodeAt(i + 3) === CharacterCodes.semicolon) {
+            if (
+              text.charCodeAt(i + 2) === CharacterCodes.t &&
+              text.charCodeAt(i + 3) === CharacterCodes.semicolon
+            ) {
               newText = newText + text.substring(startOfSubstr, i) + ">";
               i += 3;
               startOfSubstr = i + 1;
@@ -873,7 +876,10 @@ export function nodeToComponentDef(
           //&l
           case CharacterCodes.l:
             //&lt;
-            if (text.charCodeAt(i + 2) === CharacterCodes.t && text.charCodeAt(i + 3) === CharacterCodes.semicolon) {
+            if (
+              text.charCodeAt(i + 2) === CharacterCodes.t &&
+              text.charCodeAt(i + 3) === CharacterCodes.semicolon
+            ) {
               newText = newText + text.substring(startOfSubstr, i) + "<";
               i += 3;
               startOfSubstr = i + 1;

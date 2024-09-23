@@ -2,6 +2,15 @@ import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - errors", () => {
+  it("Invalid child node name in a component", () => {
+    try {
+      transformSource("<Stack><blabla /></Stack>");
+      assert.fail("Exception expected");
+    } catch (err) {
+      expect(err.toString().includes("T009")).equal(true);
+    }
+  });
+
   it("Missing name in compound component", () => {
     try {
       transformSource("<Component />");
@@ -40,9 +49,7 @@ describe("Ueml transform - errors", () => {
 
   it("Invalid attribute in compound component", () => {
     try {
-      transformSource(
-        "<Component name='MyComp' blabla='123'><Stack/></Component>",
-      );
+      transformSource("<Component name='MyComp' blabla='123'><Stack/></Component>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T021")).equal(true);
@@ -69,9 +76,7 @@ describe("Ueml transform - errors", () => {
 
   it("'loaders' is invalid in a compound component", () => {
     try {
-      transformSource(
-        "<Component name='MyComp'><Stack/><loaders /></Component>",
-      );
+      transformSource("<Component name='MyComp'><Stack/><loaders /></Component>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T009")).equal(true);
@@ -215,9 +220,7 @@ describe("Ueml transform - errors", () => {
 
   it("Cannot mix field and item children #1", () => {
     try {
-      transformSource(
-        "<Stack><prop name='my'><field name='my' /><item value='3'/></prop></Stack>",
-      );
+      transformSource("<Stack><prop name='my'><field name='my' /><item value='3'/></prop></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T017")).equal(true);
@@ -226,9 +229,7 @@ describe("Ueml transform - errors", () => {
 
   it("Cannot mix field and item children #2", () => {
     try {
-      transformSource(
-        "<Stack><prop name='my'><item value='3'/><field name='my' /></prop></Stack>",
-      );
+      transformSource("<Stack><prop name='my'><item value='3'/><field name='my' /></prop></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T017")).equal(true);
@@ -237,9 +238,7 @@ describe("Ueml transform - errors", () => {
 
   it("Item cannot have a 'name' attribute", () => {
     try {
-      transformSource(
-        "<Stack><prop name='my'><item name='my' value='3'/></prop></Stack>",
-      );
+      transformSource("<Stack><prop name='my'><item name='my' value='3'/></prop></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T018")).equal(true);
