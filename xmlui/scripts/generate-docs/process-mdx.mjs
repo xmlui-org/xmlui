@@ -517,15 +517,28 @@ function listThemeVars(component) {
   if (!component.themeVars) {
     return "";
   }
-  const varsWithDefaults = Object.keys(component.themeVars).sort().map((themeVar) => {
+
+  const defaultThemeVars = component.defaultThemeVars
+    ? flattenDefaultThemeVarKeys(component.defaultThemeVars)
+    : [];
+
+  const allThemeVars = Array.from(
+    new Set([...defaultThemeVars, ...Object.keys(component.themeVars)]),
+  );
+
+  const varsWithDefaults = allThemeVars.sort().map((themeVar) => {
     const parts = themeVar.split(":");
     if (parts.length > 1) {
       themeVar = parts[1];
     }
     return [
       themeVar,
-      component.defaultThemeVars?.["light"]?.[themeVar] ?? component.defaultThemeVars?.[themeVar],
-      component.defaultThemeVars?.["dark"]?.[themeVar] ?? component.defaultThemeVars?.[themeVar],
+      component.defaultThemeVars?.["light"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)",
+      component.defaultThemeVars?.["dark"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)",
     ];
   });
 
@@ -535,4 +548,26 @@ function listThemeVars(component) {
         headers: ["Variable", "Default Value (Light)", "Default Value (Dark)"],
         rows: varsWithDefaults,
       });
+
+  function flattenDefaultThemeVarKeys(defaultThemeVars) {
+    const lightDefaults = defaultThemeVars?.["light"] || [];
+    if (lightDefaults.length > 0) {
+      defaultThemeVars["light"] = undefined;
+      delete defaultThemeVars["light"];
+    }
+
+    const darkDefaults = defaultThemeVars?.["dark"] || [];
+    if (darkDefaults.length > 0) {
+      defaultThemeVars["dark"] = undefined;
+      delete defaultThemeVars["dark"];
+    }
+
+    return Array.from(
+      new Set([
+        ...Object.keys(defaultThemeVars).filter((key) => key !== "light" && key !== "dark"),
+        ...Object.keys?.(lightDefaults),
+        ...Object.keys?.(darkDefaults),
+      ]),
+    );
+  }
 }
