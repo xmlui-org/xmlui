@@ -26,6 +26,11 @@ const metadata = Object.entries(collectedComponentMetadata).map(([compName, comp
   const componentFolder = compData.specializedFrom || compData.docFolder || compName;
   const descriptionRef = join(componentFolder, `${displayName}.mdx`);
 
+  /* if (compName === "Select") {
+    console.log(compData.themeVars)
+    console.log(compData.defaultThemeVars)
+  } */
+
   const extendedComponentData = {
     ...compData,
     displayName,
@@ -97,7 +102,7 @@ async function createSummary(
       component.description,
       component.status ?? "stable",
     ]),
-  })
+  });
 
   return beforeComponentsSection + "\n" + table + afterComponentsSection;
 }
