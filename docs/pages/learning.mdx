@@ -69,7 +69,7 @@ If the `customer.name` expression evaluates to "Jane Templeton", the button's la
 </Callout>
 
 ```ueml /onClick/
-<Button label="See order ID" onClick="toast('Current order: {orderId}')" />
+<Button label="See order ID" onClick="toast('Current order: ' + orderId)" />
 ```
 When the user clicks this button, the app will pop up a toast with the ID held by the `orderId` value.
 
@@ -126,14 +126,68 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 </Callout>
 
 ```ueml copy
-<MenuItem label="Delete completed tasks">
+<Button label="Delete completed tasks">
   <event name="click">
     <ApiAction url="/api/tasks/completed" method="delete" />
   </event>
-</MenuItem>
+</Button>
 ```
 
 ## Working with code
+
+<Callout type="info" emoji="💡">
+  You can put event handlers and other functions into **code-behind** files. Markup files (`.xmlui` extension) may have a code-behind file using the markup file name but the `.xmlui.xs` extension.
+
+  XMLUI **automatically binds event handlers** using the component's ID and the event name. While you follow the naming convention, you do not need to add event handlers to the component markup.
+</Callout>
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+  <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```ueml copy filename="Main.xmlui (markup)" /calcButton/
+<Button id="calcButton" 
+  label="Calculate delay" />
+
+
+```
+  </div>
+  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```js copy filename="Main.xmlui.xs (code-behind)" /calcButton_onClick/
+function calcButton_onClick() {
+  const delay = 500 * 2;
+  console.log('Delay calculated: ' + delay);
+}
+```
+  </div>
+</div>
+
+The button's ID is `calcButton`. The framework observes the `calcButton_onClick` function declaration in the code-behind file and binds it to handle the `click` event.
+
+<Callout type="info" emoji="💡">
+  You can name the **event handler function differently** if you find it more expressive. In this case, you must add the function's invocation to the component's event handler.
+</Callout>
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+  <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+<Button 
+  label="Calculate delay" 
+  onClick="handleOnClick()" />
+
+```
+  </div>
+  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
+function handleClick() {
+  const delay = 500 * 2;
+  toast('Delay calculated: '+ delay);
+}
+```
+  </div>
+</div>
+
+The button is the `Main.xmlui` file utilizes the `handleOnClick` function declared in the `Main.xmlui.xs` code-behind file.
 
 <Callout type="info" emoji="💡">
   Using wrapping braces, you can add **inline code expressions** to **property** and **element text values**. You can use the JavaScript syntax for them; the framework evaluates them using JavaScript semantics.
@@ -142,7 +196,6 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 ```ueml copy /{tasks.length}/ /initialValue="{customer.name}"/ /delay="{calculatedDelay * (1 + reservePercentage * 0.01)} minutes"/
 <Text>There are {tasks.length} tasks in the list.</Text>
 <TextBox initialValue="{customer.name}">
-<H1>Expected delay="{calculatedDelay * (1 + reservePercentage * 0.01)} minutes"</H1>
 ```
 
 <Callout type="info" emoji="💡">
@@ -152,80 +205,70 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 
 ```ueml copy /onClick/
 <Button label="Calculate delay" onClick="
-  console.log('Calculating delay...');
-  const delay = calculatedDelay * (1 + reservePercentage * 0.01);
-  console.log('Delay calculated:', delay);
+  const delay = 500 * 2;
+  toast('Delay calculated: ' + delay);
 " />
 ```
 
-<Callout type="info" emoji="💡">
-  You can move inline event handlers and use functions declared in **code-behind** files. Each markup file with a `.xmlui` extension may have a code-behind file with the same name as the markup file but using `.xmlui.xs`.
-</Callout>
 
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui"
-<Button 
-  label="Calculate delay" 
-  onClick="handleOnClick()" />
-
-
-
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs"
-function handleClick() {
-  console.log('Calculating delay...');
-  const delay = calculatedDelay * 
-    (1 + reservePercentage * 0.01);
-  console.log('Delay calculated:', delay);
-}
-```
-  </div>
-</div>
-
-The button is the `Main.xmlui` file utilizes the `handleOnClick` function declared in the `Main.xmlui.xs` code-behind file.
-
-<Callout type="info" emoji="💡">
-  XMLUI **automatically binds event handlers** using the component's ID and the event name. While you follow the naming convention, you do not need to add event handlers to the component markup.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui" /calcButton/
-<Button id="calcButton" 
-  label="Calculate delay" />
-
-
-
-
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs" /calcButton_onClick/
-function calcButton_onClick() {
-  console.log('Calculating delay...');
-  const delay = calculatedDelay * 
-    (1 + reservePercentage * 0.01);
-  console.log('Delay calculated:', delay);
-}
-```
-  </div>
-</div>
-
-The button's ID is `calcButton`. The framework observes the `calcButton_onClick` function declaration in the code-behind file and binds it to handle the `click` event.
 
 _TBD: Reactive variables_
 
 
 ## Component composition
 
-- _Template properties_
-- _Context values_
-- _Reusable components_
+<Callout type="info" emoji="💡">
+  Components may have properties that accept other component definitions (markup) as their value. We call them **template properties**. 
+</Callout>
+
+```ueml copy {2-4} /property name="itemTemplate"/
+<List items="{['apple', 'banana', 'cherry', 'orange']}">
+  <property name="itemTemplate">
+    <Text variant="mono">{$item}</Text>
+  </property>
+</List>
+```
+
+This code snippet renders a list of the fruit items using monospace text to display a particular fruit name.
+
+<Callout type="info" emoji="💡">
+The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
+</Callout>
+
+In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a context value that holds the current iteration value of the list (a particular fruit name).
+
+<Callout type="info" emoji="💡">
+  To avoid code repetition, you can enclose frequently occurring markup snippets in **reusable component definitions**. When you change this component's definition, all occurrences will render the modified markup.
+
+  Reusable components go into a separate `.xmlui` file (with an arbitrary name). The framework observes them and uses them in the markup.
+</Callout>
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+  <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```ueml copy filename="Main.xmlui (markup)" /calcButton/
+<InfoCard icon="email" label="Send email" />
+<InfoCard icon="phone" label="Start call" />
+<InfoCard icon="home" label="Back to home" />
+
+
+
+```
+  </div>
+  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```ueml copy filename="InfoCard.xmlui (reusable component)"
+<Component name="InfoCard">
+  <Card>
+    <Icon name="{$props.icon}" />
+    <Text>{$props.label}</Text>
+  </Card>
+</Component>
+```
+  </div>
+</div>
+
+`Infocard` is a resusable component. In its definition, the `name` property of `<Component>` declares the name that can be used in the markup. The `$props` context value exposes the current property values defined for a particular `<InfoCard>` usage. This context value allows properties to be passed to the reusable component.
+
 
 ## Theming and styling
 
@@ -237,11 +280,17 @@ _TBD: Reactive variables_
 ## Deployment
 
 <Callout type="info" emoji="💡">
+  XMLUI apps have a **simple folder structure**. The app's root folder contains the `index.html` file that loads the framework as a single JavaScript file. The `Main.xmlui` (in the root) is the app's primary markup file. Other folders, like `components`, `resources`, and `themes`, contain simple markup and resource files. 
+</Callout>
+
+<Callout type="info" emoji="💡">
+  You do not need to declare anything about the structure's content. **The framework will observe and process all source files into a working app**.
+</Callout>
+
+<Callout type="info" emoji="💡">
   XMLUI applications have a **simple folder structure**. You can copy this structure into the static files folder of your web server, and they are **ready to be hosted instantly** by a web server.
 </Callout>
 
 <Callout type="info" emoji="💡">
   The framework offers several build methods that **optimize the static file structure for size and startup performance**. 
 </Callout>
-
-
