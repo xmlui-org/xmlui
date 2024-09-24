@@ -42,21 +42,27 @@ XMLUI integrates with REST APIs out of the box. The following sample app demonst
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <Card title="{$item.title}" subTitle="{$item.details}"/>
+  <property name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </property>  
 </List>
 ```
 
 The working app below uses these XMLUI features:
 - `<List>` is a component working with data (an array of items). It virtualizes items and renders only those visible in the UI.
 - List items result from a GET request from the `https://api.spacexdata.com/v3/history` API endpoint.
+- The `itemTemplate` property defines the UI patch for a particular list item.
 - `<Card>` is a simple component displaying a `title` and a `subtitle`. These titles are bound to the particular properties of the data item.
+- `$item` is a context value within the item template. It contains the data for the current list item.
 
 <Playground
     previewOnly
     name="Getting data from Spacex API"
     app={`
     <List datasource="https://api.spacexdata.com/v3/history">
-      <Card title="{$item.title}" subTitle="{$item.details}"/>
+      <property name="itemTemplate">
+        <Card title="{$item.title}" subTitle="{$item.details}"/>
+      </property>  
     </List>
     `}
     height={300}
