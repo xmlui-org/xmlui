@@ -53,8 +53,8 @@ export const SwitchMd = createMetadata({
     value: dValueApi(),
     setValue: dSetValueApi(),
   },
-  /* themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {
+  themeVars: parseScssVar(styles.themeVars),
+  /*defaultThemeVars: {
     [`color-border-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
     [`color-bg-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
     [`color-border-checked-${COMP}-warning`]: `$color-border-${COMP}-warning`,
