@@ -17,6 +17,7 @@ npm run test
 3. Run the `xmlui` document generation (run from within the `xmlui` folder):
 
 ```
+npm run prepapre-docs-data
 npm run generate-docs
 ```
 
