@@ -28,7 +28,7 @@ export const SwitchMd = createMetadata({
     `The \`${COMP}\` component is a user interface element that allows users to toggle between two states: ` +
     `on and off. It consists of a small rectangular or circular button that can be moved left or right to ` +
     `change its state.`,
-  /* props: {
+  props: {
     indeterminate: dIndeterminate(),
     label: dLabel(),
     labelPosition: dLabelPosition("right"),
@@ -42,7 +42,7 @@ export const SwitchMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-  }, */
+  },
   /* events: {
     click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
