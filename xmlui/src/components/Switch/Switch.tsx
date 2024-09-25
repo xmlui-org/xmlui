@@ -54,14 +54,14 @@ export const SwitchMd = createMetadata({
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
-  /*defaultThemeVars: {
+  defaultThemeVars: {
     [`color-border-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
     [`color-bg-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
     [`color-border-checked-${COMP}-warning`]: `$color-border-${COMP}-warning`,
     [`color-bg-checked-${COMP}-warning`]: `$color-border-${COMP}-warning`,
     [`color-border-checked-${COMP}-success`]: `$color-border-${COMP}-success`,
     [`color-bg-checked-${COMP}-success`]: `$color-border-${COMP}-success`,
-    light: {
+    /* light: {
       [`color-bg-${COMP}`]: "$color-surface-400",
       [`color-border-${COMP}`]: "$color-surface-400",
       [`color-bg-indicator-${COMP}`]: "$color-bg-primary",
@@ -76,8 +76,8 @@ export const SwitchMd = createMetadata({
       [`color-border-checked-${COMP}`]: "$color-primary-400",
       [`color-bg-checked-${COMP}`]: "$color-primary-400",
       [`color-bg-${COMP}--disabled`]: "$color-surface-800",
-    },
-  }, */
+    }, */
+  },
 });
 
 export const switchComponentRenderer = createComponentRenderer(
