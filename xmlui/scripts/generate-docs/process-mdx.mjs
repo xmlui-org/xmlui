@@ -526,21 +526,26 @@ function listThemeVars(component) {
     new Set([...defaultThemeVars, ...Object.keys(component.themeVars)]),
   );
 
-  const varsWithDefaults = allThemeVars.sort().map((themeVar) => {
-    const parts = themeVar.split(":");
-    if (parts.length > 1) {
-      themeVar = parts[1];
-    }
-    return [
-      themeVar,
-      component.defaultThemeVars?.["light"]?.[themeVar] ??
+  const varsWithDefaults = allThemeVars
+    .sort()
+    .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
+    .map((themeVar) => {
+      const parts = themeVar.split(":");
+      if (parts.length > 1) {
+        themeVar = parts[1];
+      }
+
+      const defaultLightVar =
+        component.defaultThemeVars?.["light"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)",
-      component.defaultThemeVars?.["dark"]?.[themeVar] ??
+        "(fallback)";
+      const defaultDarkVar =
+        component.defaultThemeVars?.["dark"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)",
-    ];
-  });
+        "(fallback)";
+
+      return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
+    });
 
   return varsWithDefaults.length === 0
     ? ""
@@ -570,4 +575,39 @@ function listThemeVars(component) {
       ]),
     );
   }
+
+  function provideLinkForThemeVar(themeVar) {
+    if (!themeVar) {
+      return "";
+    }
+
+    const themeKeywords = Object.keys(themeKeywordLinks);
+    const matches = themeKeywords.filter((item) => themeVar.includes(item));
+    if (matches.length === 0) {
+      return themeVar;
+    }
+
+    const result = matches.reduce((longest, current) =>
+      current.length > longest.length ? current : longest,
+    );
+
+    const parts = themeVar.split(result);
+    return parts[0] + themeKeywordLinks[result] + parts[1];
+  }
 }
+
+// Use this object/map to replace the occurrences of the keys and have them be replaced by links
+const themeKeywordLinks = {
+  color: "[color](../styles-and-themes/common-units/#color-values)",
+  "color-border": "[color-border](../styles-and-themes/common-units/#color-values)",
+  "color-bg": "[color-bg](../styles-and-themes/common-units/#color-values)",
+  weight: "[weight](../styles-and-themes/common-units/#font-weight-values)",
+  rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
+  "style-border": "[style-border](../styles-and-themes/common-units/#border-style-values)",
+  size: "[size](../styles-and-themes/common-units/#size-values)",
+  "font-size": "[font-size](../styles-and-themes/common-units/#size-values)",
+  height: "[height](../styles-and-themes/common-units/#size-values)",
+  width: "[width](../styles-and-themes/common-units/#size-values)",
+  distance: "[distance](../styles-and-themes/common-units/#size-values)",
+  thickness: "[thickness](../styles-and-themes/common-units/#size-values)",
+};
