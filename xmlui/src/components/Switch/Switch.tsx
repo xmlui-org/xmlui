@@ -43,7 +43,7 @@ export const SwitchMd = createMetadata({
         `of the ${COMP} besides its label.`,
     ),
   },
-  /* events: {
+  events: {
     click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
@@ -52,7 +52,7 @@ export const SwitchMd = createMetadata({
   apis: {
     value: dValueApi(),
     setValue: dSetValueApi(),
-  }, */
+  },
   /* themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-border-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
