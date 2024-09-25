@@ -526,21 +526,26 @@ function listThemeVars(component) {
     new Set([...defaultThemeVars, ...Object.keys(component.themeVars)]),
   );
 
-  const varsWithDefaults = allThemeVars.sort().map((themeVar) => {
-    const parts = themeVar.split(":");
-    if (parts.length > 1) {
-      themeVar = parts[1];
-    }
+  const varsWithDefaults = allThemeVars
+    .sort()
+    .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
+    .map((themeVar) => {
+      const parts = themeVar.split(":");
+      if (parts.length > 1) {
+        themeVar = parts[1];
+      }
 
-    const defaultLightVar = component.defaultThemeVars?.["light"]?.[themeVar] ??
-      component.defaultThemeVars?.[themeVar] ??
-      "(fallback)";
-    const defaultDarkVar = component.defaultThemeVars?.["dark"]?.[themeVar] ??
-      component.defaultThemeVars?.[themeVar] ??
-      "(fallback)";
+      const defaultLightVar =
+        component.defaultThemeVars?.["light"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)";
+      const defaultDarkVar =
+        component.defaultThemeVars?.["dark"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)";
 
-    return [ provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar ];
-  });
+      return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
+    });
 
   return varsWithDefaults.length === 0
     ? ""
@@ -577,13 +582,13 @@ function listThemeVars(component) {
     }
 
     const themeKeywords = Object.keys(themeKeywordLinks);
-    const matches = themeKeywords.filter(item => themeVar.includes(item));
+    const matches = themeKeywords.filter((item) => themeVar.includes(item));
     if (matches.length === 0) {
       return themeVar;
     }
 
-    const result = matches.reduce((longest, current) => 
-      current.length > longest.length ? current : longest
+    const result = matches.reduce((longest, current) =>
+      current.length > longest.length ? current : longest,
     );
 
     const parts = themeVar.split(result);
