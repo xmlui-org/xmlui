@@ -28,7 +28,7 @@ export const SwitchMd = createMetadata({
     `The \`${COMP}\` component is a user interface element that allows users to toggle between two states: ` +
     `on and off. It consists of a small rectangular or circular button that can be moved left or right to ` +
     `change its state.`,
-  props: {
+  /* props: {
     indeterminate: dIndeterminate(),
     label: dLabel(),
     labelPosition: dLabelPosition("right"),
@@ -42,8 +42,8 @@ export const SwitchMd = createMetadata({
       `(*** NOT IMPLEMENTED YET ***) This optional property displays an alternate description ` +
         `of the ${COMP} besides its label.`,
     ),
-  },
-  events: {
+  }, */
+  /* events: {
     click: dClick(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
@@ -52,8 +52,8 @@ export const SwitchMd = createMetadata({
   apis: {
     value: dValueApi(),
     setValue: dSetValueApi(),
-  },
-  themeVars: parseScssVar(styles.themeVars),
+  }, */
+  /* themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-border-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
     [`color-bg-checked-${COMP}-error`]: `$color-border-${COMP}-error`,
@@ -77,7 +77,7 @@ export const SwitchMd = createMetadata({
       [`color-bg-checked-${COMP}`]: "$color-primary-400",
       [`color-bg-${COMP}--disabled`]: "$color-surface-800",
     },
-  },
+  }, */
 });
 
 export const switchComponentRenderer = createComponentRenderer(
