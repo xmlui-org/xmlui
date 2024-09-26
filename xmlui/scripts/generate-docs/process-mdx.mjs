@@ -116,7 +116,7 @@ export function processMdx(component, componentNames, metadata) {
 
     if (component.nonVisual) {
       result +=
-        "<Callout>**Note**: This component does does not show up on the UI;" +
+        "<Callout>**Note**: This component does does not show up on the UI; " +
         "it merely helps implement UI logic.</Callout>\n\n";
     }
 
