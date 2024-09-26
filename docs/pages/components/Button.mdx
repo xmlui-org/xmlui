@@ -14,6 +14,8 @@ This component does not have any context variables.
 
 Indicates if the button should receive focus when the page loads
 
+Default value: `false`.
+
 ### `contentPosition`
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
@@ -56,7 +58,7 @@ Available values:
 
 ### `enabled`
 
-The value of this property indicates if the button accepts actions (`true`) or does not react to them (`falseq`).
+The value of this property indicates if the button accepts actions (`true`) or does not react to them (`false`).
 
 Default value: `true`.
 
@@ -282,6 +284,8 @@ Available values:
 
 This optional string describes how the Button appears in an HTML context. You rarely need to set this property explicitly.
 
+Default value: `"button"`.
+
 Available values:
 
 | Value | Description |
@@ -493,3 +497,195 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
   `}
     height={80}
 />
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button--disabled | $color-bg--disabled | $color-bg--disabled |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention | $color-bg-attention | $color-bg-attention |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention--active | $color-danger-500 | $color-danger-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention--hover | $color-danger-400 | $color-danger-400 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-ghost--active | $color-danger-100 | $color-danger-950 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-ghost--hover | $color-danger-50 | $color-danger-900 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--active | $color-danger-100 | $color-danger-950 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--hover | $color-danger-50 | $color-danger-900 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-solid | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-solid--active | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-attention-solid--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary--active | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary--hover | $color-primary-400 | $color-primary-600 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-ghost--active | $color-primary-100 | $color-primary-950 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-ghost--hover | $color-primary-50 | $color-primary-900 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--active | $color-primary-100 | $color-primary-950 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--hover | $color-primary-50 | $color-primary-900 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-solid | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-solid--active | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-primary-solid--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary | $color-secondary-500 | $color-secondary-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary--active | $color-secondary-500 | $color-secondary-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary--hover | $color-secondary-400 | $color-secondary-400 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-ghost--active | $color-secondary-100 | $color-secondary-950 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-ghost--hover | $color-secondary-100 | $color-secondary-900 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--active | $color-secondary-100 | $color-secondary-500 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--hover | $color-secondary-50 | $color-secondary-600 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--active | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button--disabled | $color-border--disabled | $color-border--disabled |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention | $color-attention | $color-attention |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-solid | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-solid--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-attention-solid--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary | $color-primary-500 | $color-primary-500 |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-outlined | $color-primary-600 | $color-primary-600 |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--hover | $color-primary-500 | $color-primary-500 |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-solid | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-solid--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-primary-solid--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary | $color-secondary-100 | $color-secondary-500 |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--active | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--hover | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button--focus | $color-outline--focus | $color-outline--focus |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-attention-ghost--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-attention-outlined--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-attention-solid--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-primary-ghost--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-primary-outlined--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-primary-solid--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-secondary-ghost--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-secondary-outlined--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Button-secondary-solid--focus | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button | $color-surface-950 | $color-surface-50 |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button--disabled | $color-text--disabled | $color-text--disabled |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-ghost | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-ghost--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-ghost--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-outlined--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-solid | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-solid--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-attention-solid--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-ghost | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-ghost--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-ghost--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-outlined | $color-primary-900 | $color-primary-100 |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--active | $color-primary-900 | $color-primary-100 |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-outlined--hover | $color-primary-950 | $color-primary-50 |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-solid | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-solid--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-primary-solid--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-ghost | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-ghost--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-ghost--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--active | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-secondary-solid--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Button-solid | $color-surface-50 | $color-surface-50 |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button | $font-size-small | $font-size-small |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-attention-ghost | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-attention-solid | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-primary-ghost | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-primary-outlined | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-primary-solid | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-secondary-ghost | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button | $font-weight-medium | $font-weight-medium |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-attention-ghost | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-attention-solid | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-primary-ghost | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-primary-outlined | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-primary-solid | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-secondary-ghost | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [font-weight](../styles-and-themes/common-units/#font-weight-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [height](../styles-and-themes/common-units/#size-values)-Button | fit-content | fit-content |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button--focus | $offset-outline--focus | $offset-outline--focus |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-attention-ghost--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-attention-outlined--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-attention-solid--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-primary-ghost--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-primary-outlined--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-primary-solid--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-ghost--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-outlined--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-solid--focus | (fallback) | (fallback) |
+| [padding-horizontal](../styles-and-themes/common-units/#size-values)-lg-Button | $space-5 | $space-5 |
+| [padding-horizontal](../styles-and-themes/common-units/#size-values)-md-Button | $space-4 | $space-4 |
+| [padding-horizontal](../styles-and-themes/common-units/#size-values)-sm-Button | $space-4 | $space-4 |
+| [padding-horizontal](../styles-and-themes/common-units/#size-values)-xs-Button | $space-1 | $space-1 |
+| [padding-vertical](../styles-and-themes/common-units/#size-values)-lg-Button | $space-4 | $space-4 |
+| [padding-vertical](../styles-and-themes/common-units/#size-values)-md-Button | $space-3 | $space-3 |
+| [padding-vertical](../styles-and-themes/common-units/#size-values)-sm-Button | $space-2 | $space-2 |
+| [padding-vertical](../styles-and-themes/common-units/#size-values)-xs-Button | $space-0_5 | $space-0_5 |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button | $radius | $radius |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-attention-ghost | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-attention-outlined | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-attention-solid | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-primary-ghost | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-primary-outlined | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-primary-solid | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-secondary-ghost | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-secondary-outlined | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Button-secondary-solid | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-attention-solid | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-primary-outlined | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-primary-solid | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button | solid | solid |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-attention-solid | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-primary-outlined | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-primary-solid | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Button-secondary-solid | (fallback) | (fallback) |
+| style-outline-Button--focus | $style-outline--focus | $style-outline--focus |
+| style-outline-Button-attention-ghost--focus | (fallback) | (fallback) |
+| style-outline-Button-attention-outlined--focus | (fallback) | (fallback) |
+| style-outline-Button-attention-solid--focus | (fallback) | (fallback) |
+| style-outline-Button-primary-ghost--focus | (fallback) | (fallback) |
+| style-outline-Button-primary-outlined--focus | (fallback) | (fallback) |
+| style-outline-Button-primary-solid--focus | (fallback) | (fallback) |
+| style-outline-Button-secondary-ghost--focus | (fallback) | (fallback) |
+| style-outline-Button-secondary-outlined--focus | (fallback) | (fallback) |
+| style-outline-Button-secondary-solid--focus | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button | 1px | 1px |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-attention-ghost | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-attention-outlined | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-attention-solid | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-primary-ghost | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-primary-outlined | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-primary-solid | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-secondary-ghost | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-secondary-outlined | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Button-secondary-solid | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button--focus | $thickness-outline--focus | $thickness-outline--focus |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-attention-ghost--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-attention-outlined--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-attention-solid--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-primary-ghost--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-primary-outlined--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-primary-solid--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-ghost--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-outlined--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Button-secondary-solid--focus | (fallback) | (fallback) |
+| [width](../styles-and-themes/common-units/#size-values)-Button | fit-content | fit-content |
+

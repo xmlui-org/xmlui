@@ -22,7 +22,7 @@ export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
   status: "stable",
   props: {
-    autoFocus: d("Indicates if the button should receive focus when the page loads"),
+    autoFocus: d("Indicates if the button should receive focus when the page loads", null, "boolean", false),
     variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantMd),
     themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeMd),
     size: d("The size of the button (small, medium, large)", sizeMd),
@@ -36,10 +36,12 @@ export const ButtonMd = createMetadata({
       `This optional string describes how the ${COMP} appears in an HTML context. You ` +
       `rarely need to set this property explicitly.`,
       buttonTypesMd,
+      "string",
+      "button",
     ),
     enabled: d(
       `The value of this property indicates if the button accepts actions (\`true\`) ` +
-      `or does not react to them (\`falseq\`).`,
+      `or does not react to them (\`false\`).`,
     null,
     null,
     true,

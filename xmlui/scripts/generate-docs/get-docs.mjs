@@ -97,7 +97,7 @@ async function createSummary(
       component.description,
       component.status ?? "stable",
     ]),
-  })
+  });
 
   return beforeComponentsSection + "\n" + table + afterComponentsSection;
 }

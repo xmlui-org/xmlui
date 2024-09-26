@@ -1,6 +1,14 @@
 import path from "path";
-import { fileURLToPath } from 'url';
-import { existsSync, mkdirSync, copyFileSync, constants, readFileSync, accessSync, lstatSync } from "fs";
+import { fileURLToPath } from "url";
+import {
+  existsSync,
+  mkdirSync,
+  copyFileSync,
+  constants,
+  readFileSync,
+  accessSync,
+  lstatSync,
+} from "fs";
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
@@ -104,7 +112,8 @@ export function processMdx(component, componentNames, metadata) {
     result += `# ${component.displayName}\n\n`;
 
     if (component.nonVisual) {
-      result += "> **Note**: This component does does not show up on the UI; it merely helps implement UI logic.\n\n";
+      result +=
+        "> **Note**: This component does does not show up on the UI; it merely helps implement UI logic.\n\n";
     }
 
     result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
@@ -144,7 +153,7 @@ function addImportsSection(data, component) {
     data,
     component[SECTION_DESCRIPTION_REF],
     IMPORTS,
-    importPathTransformer
+    importPathTransformer,
   );
   return { buffer, copyFilePaths };
 
@@ -165,12 +174,17 @@ function addImportsSection(data, component) {
         line
           .trim()
           .split('"')
-          .filter((part) => !!part.trim())
+          .filter((part) => !!part.trim()),
       ),
     ];
     // We assume that removing the ;-s and/or the \n-s will leave an even number of parts: an import statement & an import path
     if (splitNormalized.length % 2 !== 0) {
-      throw new ErrorWithSeverity("Malformed import statement found in: ", component.displayName, "Skipping imports", Logger.severity.warning);
+      throw new ErrorWithSeverity(
+        "Malformed import statement found in: ",
+        component.displayName,
+        "Skipping imports",
+        Logger.severity.warning,
+      );
     }
     const importStatements = [];
     const importPaths = [];
@@ -188,7 +202,11 @@ function addImportsSection(data, component) {
         continue;
       }
       const importFile = parse(importPaths[i]);
-      const transformedPath = join(examplesFolder, component.displayName, importFile.base).replaceAll(posix.sep, sep);
+      const transformedPath = join(
+        examplesFolder,
+        component.displayName,
+        importFile.base,
+      ).replaceAll(posix.sep, sep);
 
       // NOTE: need to use POSIX separators here regardless of platform
       transformedStatements += `${
@@ -197,12 +215,7 @@ function addImportsSection(data, component) {
 
       // 3. Add the original and new import paths to an array to copy them later
       copyFilePaths.push({
-        oldPath: join(
-          sourceFolder,
-          component.displayName,
-          importFile.dir,
-          importFile.base
-        ),
+        oldPath: join(sourceFolder, component.displayName, importFile.dir, importFile.base),
         newPath: relative(outFolder, transformedPath),
       });
     }
@@ -215,21 +228,14 @@ function addContextVarsSection(data, component) {
   logger.info(`Processing ${component.displayName} context variables`);
   let buffer = `## ${sectionNames.contextVars}\n\n`;
 
-  if (
-    !component.contextVars ||
-    Object.keys(component.contextVars ?? {}).length === 0
-  ) {
+  if (!component.contextVars || Object.keys(component.contextVars ?? {}).length === 0) {
     return buffer + "This component does not have any context variables.";
   }
   Object.entries(component.contextVars)
     .sort()
     .forEach(([contextVarName, contextVar]) => {
       buffer += `### \`${contextVarName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(
-        data,
-        contextVar,
-        CONTEXT_VARS
-      );
+      buffer += combineDescriptionAndDescriptionRef(data, contextVar, CONTEXT_VARS);
       buffer += "\n\n";
     });
 
@@ -302,12 +308,13 @@ function addStylesSection(data, component) {
   logger.info(`Processing ${component.displayName} styles`);
 
   let buffer = `## ${sectionNames.styles}\n\n`;
-  const fileBuffer = getSection(
-    data,
-    component[SECTION_DESCRIPTION_REF],
-    STYLES
-  );
-  buffer += fileBuffer || "This component does not have any styles.";
+  const fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], STYLES);
+  const varsTable = listThemeVars(component);
+
+  buffer +=
+    fileBuffer && varsTable
+      ? fileBuffer + "\n\n### Theme Variables\n\n" + varsTable
+      : "This component does not have any styles.";
 
   return buffer;
 }
@@ -316,7 +323,7 @@ function combineDescriptionAndDescriptionRef(
   data,
   component,
   sectionId,
-  emptyDescriptionMessage = "No description provided."
+  emptyDescriptionMessage = "No description provided.",
 ) {
   let descriptionBuffer = "";
   let fileBuffer = "";
@@ -337,15 +344,8 @@ function combineDescriptionAndDescriptionRef(
     }
   }
 
-  if (
-    component.hasOwnProperty(SECTION_DESCRIPTION_REF) &&
-    component[SECTION_DESCRIPTION_REF]
-  ) {
-    fileBuffer = getSection(
-      data,
-      component[SECTION_DESCRIPTION_REF],
-      sectionId
-    );
+  if (component.hasOwnProperty(SECTION_DESCRIPTION_REF) && component[SECTION_DESCRIPTION_REF]) {
+    fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], sectionId);
   }
 
   if (!descriptionBuffer && !fileBuffer) {
@@ -357,12 +357,7 @@ function combineDescriptionAndDescriptionRef(
   return descriptionBuffer || fileBuffer;
 }
 
-function getSection(
-  data,
-  sectionRef,
-  sectionId,
-  transformer = (contents) => contents
-) {
+function getSection(data, sectionRef, sectionId, transformer = (contents) => contents) {
   const separator = "?";
   const descRefParts = sectionRef.split(separator);
   const sectionName = descRefParts.length > 1 ? descRefParts[1] : "";
@@ -371,14 +366,12 @@ function getSection(
     if (!acceptSection(sectionId, sectionName)) {
       throw new ErrorWithSeverity(
         `Invalid section name and ID: ${sectionName} and ${sectionId}`,
-        Logger.severity.warning
+        Logger.severity.warning,
       );
     }
     const sectionHeader = SECTION_DIRECTIVE_MAP[sectionId];
     if (!sectionHeader) {
-      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, 
-        Logger.severity.warning
-      );
+      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, Logger.severity.warning);
     }
 
     const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${
@@ -401,9 +394,7 @@ function acceptSection(sectionId, sectionName) {
 
 function resolveSection(data, startDirective, endDirective) {
   startDirective = startDirective.replaceAll("$", "\\$");
-  const match = data.match(
-    new RegExp(`${startDirective}([\\s\\S]*?${endDirective})`, "i")
-  );
+  const match = data.match(new RegExp(`${startDirective}([\\s\\S]*?${endDirective})`, "i"));
   if (!match || match?.length === 0) {
     return "";
   }
@@ -419,9 +410,7 @@ function resolveSection(data, startDirective, endDirective) {
 
 function trimSection(sectionLines) {
   const firstNonEmptyIdx = sectionLines.findIndex((line) => line.trim() !== "");
-  const lastNonEmptyIdx = sectionLines.findLastIndex(
-    (line) => line.trim() !== ""
-  );
+  const lastNonEmptyIdx = sectionLines.findLastIndex((line) => line.trim() !== "");
   return sectionLines.slice(firstNonEmptyIdx, lastNonEmptyIdx + 1);
 }
 
@@ -457,7 +446,10 @@ function readFileContents(filePath) {
     throw new ErrorWithSeverity(`File ${filePath} does not exist.`, Logger.severity.warning);
   }
   if (isDirectory(filePath)) {
-    throw new ErrorWithSeverity(`File ${filePath} is a directory, cannot be processed.`, Logger.severity.warning);
+    throw new ErrorWithSeverity(
+      `File ${filePath} is a directory, cannot be processed.`,
+      Logger.severity.warning,
+    );
   }
 
   return readFileSync(filePath, "utf8");
@@ -493,9 +485,11 @@ function addDefaultValue(component) {
 
 function addAvailableValues(component) {
   if (
-    !(component.availableValues &&
-    Array.isArray(component.availableValues) &&
-    component.availableValues.length > 0)
+    !(
+      component.availableValues &&
+      Array.isArray(component.availableValues) &&
+      component.availableValues.length > 0
+    )
   ) {
     return "";
   }
@@ -503,14 +497,14 @@ function addAvailableValues(component) {
   let availableValuesBuffer = "";
   const valuesType = typeof component.availableValues[0];
   const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
-  
+
   if (valuesType === "string" || valuesType === "number") {
     availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
       headers: ["Value", "Description"],
       rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
-    })
+    });
   }
 
   if (availableValuesBuffer) {
@@ -518,3 +512,137 @@ function addAvailableValues(component) {
   }
   return "";
 }
+
+function listThemeVars(component) {
+  if (!component.themeVars) {
+    return "";
+  }
+
+  const defaultThemeVars = component.defaultThemeVars
+    ? flattenDefaultThemeVarKeys(component.defaultThemeVars)
+    : [];
+
+  const allThemeVars = Array.from(
+    new Set([...defaultThemeVars, ...Object.keys(component.themeVars)]),
+  );
+
+  const varsWithDefaults = allThemeVars
+    .sort()
+    .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
+    .map((themeVar) => {
+      const parts = themeVar.split(":");
+      if (parts.length > 1) {
+        themeVar = parts[1];
+      }
+
+      const defaultLightVar =
+        component.defaultThemeVars?.["light"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)";
+      const defaultDarkVar =
+        component.defaultThemeVars?.["dark"]?.[themeVar] ??
+        component.defaultThemeVars?.[themeVar] ??
+        "(fallback)";
+
+      return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
+    });
+
+  return varsWithDefaults.length === 0
+    ? ""
+    : createTable({
+        headers: ["Variable", "Default Value (Light)", "Default Value (Dark)"],
+        rows: varsWithDefaults,
+      });
+
+  function flattenDefaultThemeVarKeys(defaultThemeVars) {
+    const lightDefaults = defaultThemeVars?.["light"] || [];
+    if (lightDefaults.length > 0) {
+      defaultThemeVars["light"] = undefined;
+      delete defaultThemeVars["light"];
+    }
+
+    const darkDefaults = defaultThemeVars?.["dark"] || [];
+    if (darkDefaults.length > 0) {
+      defaultThemeVars["dark"] = undefined;
+      delete defaultThemeVars["dark"];
+    }
+
+    return Array.from(
+      new Set([
+        ...Object.keys(defaultThemeVars).filter((key) => key !== "light" && key !== "dark"),
+        ...Object.keys?.(lightDefaults),
+        ...Object.keys?.(darkDefaults),
+      ]),
+    );
+  }
+
+  function provideLinkForThemeVar(themeVar) {
+    if (!themeVar) {
+      return "";
+    }
+
+    const themeKeywords = Object.keys(themeKeywordLinks);
+    const matches = themeKeywords.filter((item) => themeVar.includes(item));
+    if (matches.length === 0) {
+      return themeVar;
+    }
+
+    const result = matches.reduce((longest, current) =>
+      current.length > longest.length ? current : longest,
+    );
+
+    const parts = themeVar.split(result);
+    return parts[0] + themeKeywordLinks[result] + parts[1];
+  }
+}
+
+// Use this object/map to replace the occurrences of the keys and have them be replaced by links
+const themeKeywordLinks = {
+  color: "[color](../styles-and-themes/common-units/#color-values)",
+  "color-border": "[color-border](../styles-and-themes/common-units/#color-values)",
+  "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color-values)",
+  "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color-values)",
+  "color-border-horizontal": "[color-border-horizontal](../styles-and-themes/common-units/#color-values)",
+  "color-border-vertical": "[color-border-vertical](../styles-and-themes/common-units/#color-values)",
+  "color-border-right": "[color-text](../styles-and-themes/common-units/#color-values)",
+  "color-border-left": "[color-text](../styles-and-themes/common-units/#color-values)",
+  "color-bg": "[color-bg](../styles-and-themes/common-units/#color-values)",
+  "color-decoration": "[color-decoration](../styles-and-themes/common-units/#color-values)",
+  "color-text": "[color-text](../styles-and-themes/common-units/#color-values)",
+  "font-weight": "[font-weight](../styles-and-themes/common-units/#font-weight-values)",
+  rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
+  "style-border": "[style-border](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-bottom": "[style-border-bottom](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-top": "[style-border-top](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-horizontal": "[style-border-horizontal](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-vertical": "[style-border-vertical](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-right": "[style-border-right](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-left": "[style-border-left](../styles-and-themes/common-units/#border-style-values)",
+  size: "[size](../styles-and-themes/common-units/#size-values)",
+  "font-size": "[font-size](../styles-and-themes/common-units/#size-values)",
+  height: "[height](../styles-and-themes/common-units/#size-values)",
+  width: "[width](../styles-and-themes/common-units/#size-values)",
+  distance: "[distance](../styles-and-themes/common-units/#size-values)",
+  thickness: "[thickness](../styles-and-themes/common-units/#size-values)",
+  "thickness-border": "[thickness-border](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-bottom": "[thickness-border-bottom](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-top": "[thickness-border-top](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-horizontal": "[thickness-border-horizontal](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-vertical": "[thickness-border-vertical](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-right": "[thickness-border-right](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-left": "[thickness-border-left](../styles-and-themes/common-units/#size-values)",
+  "thickness‑decoration": "[thickness‑decoration](../styles-and-themes/common-units/#size-values)",
+  offset: "[offset](../styles-and-themes/common-units/#size-values)",
+  padding: "[padding](../styles-and-themes/common-units/#size-values)",
+  "padding-top": "[padding-top](../styles-and-themes/common-units/#size-values)",
+  "padding-right": "[padding-right](../styles-and-themes/common-units/#size-values)",
+  "padding-bottom": "[padding-bottom](../styles-and-themes/common-units/#size-values)",
+  "padding-left": "[padding-left](../styles-and-themes/common-units/#size-values)",
+  "padding-horizontal": "[padding-horizontal](../styles-and-themes/common-units/#size-values)",
+  "padding-vertical": "[padding-vertical](../styles-and-themes/common-units/#size-values)",
+  margin: "[margin](../styles-and-themes/common-units/#size-values)",
+  "line-decoration": "[style-decoration](../styles-and-themes/common-units/#text-decoration-values)",
+  "line-height": "[line‑height](../styles-and-themes/common-units/#size-values)",
+  radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
+  shadow: "[shadow](../styles-and-themes/common-units/#color-values)",
+};

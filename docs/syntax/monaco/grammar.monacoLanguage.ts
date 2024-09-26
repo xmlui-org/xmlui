@@ -27,7 +27,6 @@ export const UEMLGrammar: any = {
       root: [
         { include: "@commentStart" },
         { include: "@helperTag" },
-        { include: "@slotTag" },
         { include: "@componentTagStart" },
         { include: "@escapeCharacter" },
         { include: "@textWithBindingExpr" },
@@ -39,12 +38,6 @@ export const UEMLGrammar: any = {
         { include: "@eventTagStart" },
         { include: "@apiTagStart" },
         { include: "@propOrVarTagStart" },
-      ],
-      slotTag: [
-        [
-          /(<\/?)((?:[a-zA-Z_][\w\.\-]*?:)?)([a-z][-\w\.$]*)(\s*\/?>)/,
-          ["delimiter.angle", "namespace", "tag-slot", "delimiter.angle"],
-        ],
       ],
       eventTagStart: [
         [
@@ -122,7 +115,7 @@ export const UEMLGrammar: any = {
       ],
       propOrVarTagStart: [
         [
-          /(<\/?)((?:[a-zA-Z_][\w\.\-]*?:)?)((?:prop)|(?:var))/,
+          /(<\/?)((?:[a-zA-Z_][\w\.\-]*?:)?)((?:property)|(?:prop)|(?:var))/,
           ["delimiter.angle", "namespace", { token: "tag-helper", next: "@propOrVarTag" }],
         ],
       ],

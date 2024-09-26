@@ -255,14 +255,6 @@
     },
     {
       "scope":[
-        "support.variable.xmlui"
-      ],
-      "settings":{
-        "foreground":"#000014"
-      }
-    },
-    {
-      "scope":[
         "meta.paragraph.markdown",
         "string.other.link.description.title.markdown"
       ],

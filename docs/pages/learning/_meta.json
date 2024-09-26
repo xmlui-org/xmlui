@@ -1,6 +1,6 @@
 {
-  "overview": "Overview",
-  "markup-and-code": "Markup & Code",
+  "xmlui-markup": "Markup",
+  "coding-concepts": "Code",
   "using-components": "Using Components",
   "apis-and-data": "APIs & Data",
   "themes": "Themes & Styling",
