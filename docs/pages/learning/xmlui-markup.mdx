@@ -1,0 +1,617 @@
+import { Callout } from 'nextra/components'
+
+# Markup
+
+The XMLUI markup is almost identical to the XML/XHTML markup; however, there are a few differences. This section explains the markup fundamentals and addresses the differences from XML/XHTML.
+
+## Comments
+
+<Callout type="info" emoji="💡">
+XMLUI **comments** use the same syntax as XML/XHTML comments.
+</Callout>
+
+```ueml
+<!-- This is an XMLUI comment, it could be an XML or XHTML comment, too -->
+```
+
+<Callout type="info" emoji="💡">
+XMLUI allows you to use **comments within tags**.
+</Callout>
+
+```ueml
+<Button <!-- This is a comment --> label="Click me!" />
+```
+
+XML and XHTML does not allow comments within an element. However, XMLUI does; you can place comments before and after attributes or before an element's closing `>` or `\>` tag. This feature is helpful for the temporary removal of a particular attribute (wrapped within a comment) during development.
+
+## Tags
+
+<Callout type="info" emoji="💡">
+XML uses tags for components and helper tags.
+- Each **component tag** represents a particular tag in the app's component hierarchy. These tags use an identifier starting with an uppercase letter.
+- Tags starting with a lowercase letter are **helper tags**. Each helper tag has a particular role, and the engine transforms them accordingly.
+</Callout>
+
+```ueml /Button/ /Text/ /VStack/
+<!-- Simple tag without nested children -->
+<Button label="Click Me!" />
+
+<!-- With separate opening and closing tags -->
+<Button label="Click Me!"></Button>
+
+<!-- With child items -->
+<VStack>
+  <Text>Welcome</Text>
+  <Button label="Click Me!" />
+</VStack>
+```
+
+<Callout emoji="📔">
+  XMLUI tag names start with a letter and may be continued with letters, digits, and these characters: dash (`-`), underscore (`_`), dollar sign (`$`), and dot (`.`).
+</Callout>
+
+In the following code, `<property>` is a helper tag. XMLUI uses the `<property>` helper to specify the value of a property, which cannot be represented as a string.
+
+```ueml /property/
+<DropdownMenu>
+  <property name="triggerTemplate">
+    <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
+  </property>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+</DropdownMenu>
+```
+
+The order of component tags reflects their display order. However, the order of helper tags embedded into other tags is invariant; they can have any order and still resulting the same effect. So, the following markup renders the same UI as the previous one:
+
+```ueml
+<DropdownMenu>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+  <property name="triggerTemplate">
+    <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
+  </property>
+</DropdownMenu>
+```
+
+## Tag Namespaces
+
+<Callout type="info" emoji="💡">
+  XMLUI reserves namespaces for future extensions. When you use them, the framework simply ignores them.
+</Callout>
+
+```ueml
+<myPackage:Button label="Click me!" />
+```
+
+This declaration renders a `Button` as if you used it without a namespace.
+
+<Callout type="warning">
+  Using different namespace prefixes in an opening and the related closing tag is considered an error.
+</Callout>
+
+The following markup would not compile:
+
+```ueml
+<some:Text>
+  This is wrong.
+</other:Text>
+```
+
+## Attributes
+
+<Callout type="info" emoji="💡">
+**XMLUI attributes** have the same role as HTML attributes; they define a particular component trait (e.g., *property*, *event handler*, etc.) or a helper tag's attribute. 
+</Callout>
+
+Attribute names start with a letter and may be continued with letters, digits, and these characters: dash (`-`), underscore (`_`), dollar sign (`$`), and dot (`.`). By convention, attributes should always begin with a lowercase letter.
+
+<Callout emoji="📔">
+XMLUI attribute values may use three types of wrapper characters: single quotes (`'`), double quotes (`"`), or backtick (`` ` ``). The starting and closing delimiter should be the same, so, for example, you cannot start an attribute value with a backtick and close it with a double quote.
+</Callout>
+
+In the following code snippet, all attribute values are accepted:
+
+```ueml
+<Button label='Click Me!' color="#a0a0a0" width=`50%` padding=".2rem" />
+```
+
+### Multi-Line Attribute Values
+
+<Callout type="info" emoji="💡">
+  Unlike in XML and XHTML, **XMLUI allows you to break an attribute's value into multiple lines** (assuming you use delimiter quotes). The engine preserves all whitespaces between the delimiters, including spaces, tabs, and line breaks; those characters are part of the attribute value.
+</Callout>
+
+In the following code snippet, the `onClick` attribute of `<Button>` contains three line breaks (one before `isRunning`, one before `while`, and a third one after `count++;`):
+
+```ueml copy
+<Button label="Infinite loop: {count}" onClick="
+  isRunning = true;
+  while (isRunning) count++;
+" />
+```
+
+### Key-Only Attributes
+
+<Callout type="info" emoji="💡">
+  You can use **attributes without a value**. XMLUI considers them as attributes with the value of "true". These key-only attributes help represent the turned-on state of particular component properties.
+</Callout>
+
+For example, you could use this markup to sign an active menu item:
+
+```ueml
+<MenuItem label="Open" active="true" />
+```
+
+With key-only attributes, you can make this markup more concise:
+
+```ueml
+<MenuItem label="Open" active />
+```
+### Quoteless Attributes
+
+<Callout type="info" emoji="💡">
+  You can **omit quotes when defining an attribute value**, provided the value does not contain whitespaces and its characters are letters, numbers, and one of these characters: dot (`.`), dash (`-`), underscore (`_`), and dollar sign (`$`).
+</Callout>
+
+The following `Text` component's `value` is an expression that matches the "quoteless" criterium:
+
+```ueml
+<Text value="re-fetch" />
+```
+
+Thus, you can omit the double quotes when defining it:
+
+```ueml
+<Text value=re-fetch />
+```
+
+## Entity References
+
+<Callout type="info" emoji="💡">
+In XMLUI text and attribute values, you **do not need to use entity references** (such as `&amp;`, `&gt;`, and others. However, **you may use them**, and the XMLUI parser will understand them.
+</Callout>
+
+- `&amp;`: `&` (ampersand)
+- `&gt;`: `>` (greater than)
+- `&lt;`: `<` (less than)
+- `&apos;`: `'` (apostrophe)
+- `&quot;`: `"` (double quote)
+- `&nbsp;`: non-breaking space
+
+So, each of these text pairs represents the same text:
+
+```ueml
+<Stack>You're so beautiful</Stack>
+<Stack>You&apos;re so beautiful</Stack>
+
+<Stack>"Hello", she said</Stack>
+<Stack>&quot;Hello&quot;, she said</Stack>
+
+<Stack>"2 < 3"</Stack>
+<Stack>2 &lt; 3</Stack>
+
+<Stack>Go to --> Step #3</Stack>
+<Stack>Go to --&gt; Step #3</Stack>
+
+<Stack>Mac & Jack</Stack>
+<Stack>Mac &amp; Jack</Stack>
+
+<Stack>Keep&nbsp;going</Stack>
+<Stack>Keep{"\xa0"}going</Stack>
+```
+
+This markup will output the following:
+
+<Playground
+    previewOnly={true}
+    name="Using entity references in text"
+    height={300}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Stack>You're so beautiful</Stack>
+      <Stack>You&apos;re so beautiful</Stack>
+      <Stack>"Hello", she said</Stack>
+      <Stack>&quot;Hello&quot;, she said</Stack>
+      <Stack>"2 < 3"</Stack>
+      <Stack>2 &lt; 3</Stack>
+      <Stack>Go to --> Step #3</Stack>
+      <Stack>Go to --&gt; Step #3</Stack>
+      <Stack>Mac & Jack</Stack>
+      <Stack>Mac &amp; Jack</Stack>
+      <Stack>Keep&nbsp;going</Stack>
+      <Stack>Keep{"\\xa0"}going</Stack>
+    </VStack>
+`}
+/>
+
+
+
+## Nesting Child Items
+
+<Callout type="info" emoji="💡">
+In the markup, you can **nest child items into any component**. Each of these children can be a tag or a text value.
+</Callout>
+
+```ueml copy
+<VStack>
+  This is a text segment before a Button component.
+  <Button label="I'm a non-functional Button"/>
+  This is a text segment after a Button and before an Icon 
+  <Icon name="user" />
+</VStack>
+```
+
+<Playground
+    previewOnly={true}
+    name="Child items"
+    height={120}
+    horizontal={true}
+    app={`
+    <VStack>
+      This is a text segment before a Button component.
+      <Button label="I'm a non-functional Button"/>
+      This is a text segment after a Button and before an Icon 
+      <Icon name="user"/>
+    </VStack>
+  `}
+/>
+
+### Tag Text Values
+
+<Callout type="info" emoji="💡">
+Unlike attribute values, **tag text values do not preserve whitespaces**; they use the same whitespace collapsing that HTML applies. The engine removes extra spaces, tabs, and line breaks:
+</Callout>
+
+```ueml copy
+<Text>
+  Though      this is a multiline text     declaration (with several line breaks), 
+  the engine        collapses whitespaces.
+ 
+</Text>
+```
+
+The engine will display the following text after collapsing whitespaces:
+
+<Playground
+    previewOnly={true}
+    name="Whitespace collapsing"
+    height={40}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Text>
+        Though      this is a multiline text     declaration (with several line breaks), 
+        the engine        collapses whitespaces.
+      </Text>
+    </VStack>
+  `}
+/>
+
+<Callout emoji="📔">
+  There are several characters you have to handle with care. The left angle (`<`) is a delimiter character used as the start character of an opening XMLUI tag. If you want to display it, wrap the text into quotes.
+</Callout>
+
+```ueml copy
+<Text>
+  "I'm a text containing a left angle: <"
+</Text>
+```
+
+You can use double quotes (`"`), single quotes (`'`), or backticks (`` ` ``) as wrappers; the starting and ending characters should be the same.
+
+<Playground
+    previewOnly={true}
+    name="Wrapped text value"
+    height={40}
+    horizontal={true}
+    app={`
+    <VStack padding="8">
+      <Text>
+        "I'm a text containing a left angle: <"
+      </Text>
+    </VStack>
+  `}
+/>
+
+### `CDATA` section
+
+<Callout type="info" emoji="💡">
+  The **`CDATA` section** (using the same syntax as in XML) ensures that text value within an XMLUI tag preserves all characters (prevents whitespace collapsing).
+</Callout>
+
+```ueml
+<MarkDown>
+  <![CDATA[
+# Who's that then?
+
+Well, she turned me into a newt. Burn her! We want a shrubbery!! Well, I got better. 
+Listen. __Strange women lying in ponds distributing swords is no basis for a system of 
+government.__ *Supreme executive power derives from a mandate from the masses, not from 
+some farcical aquatic ceremony.* The swallow may fly south with the sun, and the house 
+martin or the plover may seek warmer climes in winter, yet these are not strangers to our 
+land.
+
+## Well, Mercia's a temperate zone!
+
+You don't frighten us, English pig-dogs! Go and boil your bottoms, sons of a silly person! 
+I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English 
+K-n-n-n-n-n-n-n-niggits! A newt?
+  ]]>
+</Markdown>
+```
+
+This sample uses the `Markdown` components where whitespaces are essential to display the desired text format.
+
+<Playground
+    previewOnly={true}
+    name="CDATA section"
+    height={260}
+    horizontal={true}
+    app={`
+<Markdown>
+  <![CDATA[
+# Who's that then?
+    
+Well, she turned me into a newt. Burn her! We want a shrubbery!! Well, I got better. 
+Listen. __Strange women lying in ponds distributing swords is no basis for a system of 
+government.__ *Supreme executive power derives from a mandate from the masses, not from 
+some farcical aquatic ceremony.* The swallow may fly south with the sun, and the house 
+martin or the plover may seek warmer climes in winter, yet these are not strangers to our 
+land.
+    
+## Well, Mercia's a temperate zone!
+    
+You don't frighten us, English pig-dogs! Go and boil your bottoms, sons of a silly person! 
+I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English 
+K-n-n-n-n-n-n-n-niggits! A newt?
+  ]]>
+</Markdown>
+`}
+/>
+
+
+### Child Hierarchy
+
+<Callout type="info" emoji="💡">
+  You can nest children recursively to establish an arbitrarily deep hierarchy.
+</Callout>
+
+```ueml
+<HStack padding="8">
+  <VStack width="25%">
+    This is Button #1!
+    <Button label="Button #1" />
+  </VStack>
+  <VStack width="25%">
+    This is Button #2!
+    <Button label="Button #2" />
+  </VStack>
+  <VStack width="25%">
+    Three Boxes
+    <HStack>
+      <Stack backgroundColor="red" width="36" height="36" />
+      <Stack backgroundColor="green" width="36" height="36" />
+      <Stack backgroundColor="blue" width="36" height="36" />
+    </HStack>
+  </VStack>
+</HStack>
+```
+
+<Playground
+    previewOnly={true}
+    name="Child Hierarchy"
+    height={100}
+    horizontal={true}
+    app={`
+    <HStack padding="8">
+      <VStack width="25%">
+        This is Button #1!
+        <Button label="Button #1" />
+      </VStack>
+      <VStack width="25%">
+        This is Button #2!
+        <Button label="Button #2" />
+      </VStack>
+      <VStack width="25%">
+        Three Boxes
+        <HStack>
+          <Stack backgroundColor="red" width="36" height="36" />
+          <Stack backgroundColor="green" width="36" height="36" />
+          <Stack backgroundColor="blue" width="36" height="36" />
+        </HStack>
+      </VStack>
+    </HStack>
+  `}
+/>
+
+## Declaring Apps
+
+<Callout type="info" emoji="💡">
+  When you describe an app, you use the XMLUI markup to declare an app or a reusable component. Whether you define an app or a component, your **definition must have a single root tag**.
+</Callout>
+
+```ueml copy
+<App>
+  <!-- You can nest child components into this slot -->
+</App>
+```
+
+<Callout emoji="📔">
+  Recall that component names start with uppercase letters.
+</Callout>
+
+The engine raises an error if the app or component markup contains multiple root tags:
+
+```ueml copy
+<!-- This markup is not valid -->
+<Button label="Click me!" />
+<Text>Clicked!</Text>
+```
+
+<Callout type="info" emoji="💡">
+  If you do not have a better solution, you can enclose multiple tags into a `<Fragment>` tag. This tag does not add any visual or functional overhear to your app.
+</Callout>
+
+```ueml copy
+<!-- Now, this markup is valid -->
+<Fragment>
+  <Button label="Click me!" />
+  <Text>Clicked!</Text>
+</Fragment>
+```
+
+### Properties
+
+<Callout type="info" emoji="💡">
+  XMLUI uses markup attributes to represent **component properties**. Attributes have the same name as the particular property.
+</Callout>
+
+```ueml
+<Button label="Click me!" />
+```
+
+<Callout type="info" emoji="💡">
+  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. Use the tag's **`name` attribute** to identify the property.
+</Callout>
+
+```ueml {2-4} /property/
+<DropdownMenu>
+  <property name="triggerTemplate">
+    <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
+  </property>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+</DropdownMenu>
+```
+
+`triggerTemplate` is a property of the `DropdownMenu` component that defines the UI for the trigger that opens the dropdown menu.
+
+<Callout type="info" emoji="💡">
+  If you prefer explicitly using the `<property>` tag, you can use it to represent string data; specify that with the `value` attribute.
+</Callout>
+
+```ueml /property/ /name/ /value/
+<Button>
+  <property name="label" value="Click me!" />
+</Button>
+```
+
+<Callout type="info" emoji="💡">
+  You can use the `<property>` tag with nested text as an alternative to the `value` attribute.
+</Callout>
+
+
+### Event Handlers
+
+<Callout type="info" emoji="💡">
+  You can use markup attributes to define event handlers for a particular event. Use an attribute with the `on` prefix for a particular event.
+</Callout>
+
+```ueml copy /onClick/
+<Button label="Click me!" onClick="console.log('Clicked!')"/>
+```
+
+### Variable declarations
+
+
+<Callout type="info" emoji="💡">
+  Besides code-behind files, you can use inline variable declarations in the markup. The most concise way is to use an attribute with the `var.` prefix followed by the variable's name.
+</Callout>
+
+```ueml /var./
+<Button label="Click me!" var.greeting="Hello!" />
+```
+
+This markup assigns a variable named `greeting` to the `Button` with the initial value of "Hello!".
+
+<Callout type="info" emoji="💡">
+  You may prefer more explicit variable declarations. You can do it with the `var` tag, too.
+</Callout>
+
+
+```ueml /var./
+<Button label="Click me!">
+  <var name="greeting" value="Hello!">
+</Button>
+```
+
+And similarly to `<property>`, XMLUI accepts nested text for the variable's initial value.
+
+```ueml /var./
+<Button label="Click me!">
+  <var name="greeting">Hello!</var>
+</Button>
+```
+
+<Callout type="info" emoji="💡">
+  The type of a variable's value is significant when working with code. When you initialize variables, their value is a string (as tag attributes are strings). **If you want to be sure a variable value is initialized with the intended type, use binding expressions.**
+</Callout>
+
+```ueml
+<!-- count is a string, "0" -->
+<Button label="Click me!">
+  <var name="count" value="0" />
+</Button>
+
+<!-- count is a number, 0 -->
+<Button label="Click me!">
+  <var name="count" value="{0}" />
+</Button>
+
+<!-- isOpen is a string, "true" -->
+<Button label="Click me!">
+  <var name="isOpen" value="true" />
+</Button>
+
+<!-- isOpen is a boolean, true -->
+<Button label="Click me!" var.isOpen="{true}" />
+```
+
+<Callout emoji="📔">
+  Components are smart enough to convert the string values of properties to the appropriate type they expect.
+</Callout>
+
+<Callout type="info" emoji="💡">
+  You can use a binding expression to define a **compound value**.
+</Callout>
+
+```ueml /{x: 100, y: 40}/
+<Fragment>
+  <var name="origin" value="{{x: 100, y: 40}}" />
+</Fragment>
+```
+
+In the `{{x: 100, y: 40}}` binding expression, the outer curly braces are the delimiters; the `{x: 100, y: 40}` object literal defines a hash object with `x` and `y` properties.
+
+## Reusable Components
+
+<Callout type="info" emoji="💡">
+  You can define reusable components with the `<Component>` tag. These declarations should go into a separate file within the app's `components` folder. Use the `name` attribute to assign a unique name to the component.
+</Callout>
+
+```ueml copy /Component name="IncButton"/ /Component/
+<Component name="IncButton">
+  <var name="count" value="{0}" />
+  <Button label="Click to increment: {count}" onClick="count++" />
+</Component>
+```
+
+<Callout emoji="📔">
+  The `name` attribute of the component should start with an uppercase letter.
+</Callout>
+
+You can add the new component to your app with the `<IncButton>` tag.
+
+```ueml /IncButton/
+<App>
+  <!-- Other components -->
+  <IncButton />
+</App>  
+```
+
+

@@ -9,12 +9,12 @@
 
   --syntax-token-component: #cb5291;
   --syntax-token-delimiter-angle: #66748E;
-  --syntax-token-attribute-name: #2d2d2d;
+  --syntax-token-attribute-name: #3e5f74;
   --syntax-token-equal-sign: #2d2d2d;
   --syntax-token-string: #0074a9;
   --syntax-token-script: #02A1A1;
-  --syntax-token-helper: #005AE1;
-  --syntax-token-comment: #4E4E4E;
+  --syntax-token-helper: #702e70;
+  --syntax-token-comment: #0F7C54;
   --syntax-token-escape: #00B248;
   --syntax-token-constant: #708C00;
   --syntax-token-cdata: #079CF1;
@@ -25,12 +25,12 @@
 :is(html[class~=dark]) {
   --syntax-token-component: #f472b6;
   --syntax-token-delimiter-angle: #97A7C5;
-  --syntax-token-attribute-name: #cbd5e1;
+  --syntax-token-attribute-name: #acc3d3;
   --syntax-token-equal-sign: #cbd5e1;
   --syntax-token-string: #7dd3fc;
   --syntax-token-script: #78DBDB;
-  --syntax-token-helper: #80A6F8;
-  --syntax-token-comment: #CFCFCF;
+  --syntax-token-helper: #c775c7;
+  --syntax-token-comment: #30e89f;
   --syntax-token-escape: #61F69D;
   --syntax-token-constant: #BAF80A;
   --syntax-token-cdata: #5CC1F9;
