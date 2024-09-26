@@ -27,8 +27,10 @@
   padding: 0.5rem 1rem;
 }
 
-.dark {
-  background-color: #141B27;
-  color: #fff;
+:is(html[class~=dark]) {
+  .header {
+    background-color: #141B27;
+    color: #fff;
+  }
 }
 

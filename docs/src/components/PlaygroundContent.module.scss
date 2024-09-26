@@ -11,7 +11,7 @@
   z-index: 1;
 }
 
-.playground:focus-within{
+.playground:focus-within {
   z-index: 2;
 }
 
@@ -30,7 +30,10 @@
   background-color: #F4F7FD;
 }
 
-.dark {
-  background-color: #141B27;
+:is(html[class~=dark]) {
+  .playgroundContent {
+    background-color: #141B27;
+  }
 }
+
 
