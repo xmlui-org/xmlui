@@ -453,7 +453,7 @@ The engine raises an error if the app or component markup contains multiple root
 ```
 
 <Callout type="info" emoji="💡">
-If you do not have a better solution, you can enclose multiple tags into a `<Fragment>` tag. This tag does not add any visual or functional overhear to your app.
+  If you do not have a better solution, you can enclose multiple tags into a `<Fragment>` tag. This tag does not add any visual or functional overhear to your app.
 </Callout>
 
 ```ueml copy
@@ -464,189 +464,154 @@ If you do not have a better solution, you can enclose multiple tags into a `<Fra
 </Fragment>
 ```
 
-### Element Properties
+### Properties
 
-The component tags represent elements that compose an app. These elements may have properties. XMLUI allows you to utilize several syntax variations to assign property values.
-
-**#1: Add the property value as an attribute to the component tag.**
-
-The following code snippet shows how you can set the `label` property of a button:
+<Callout type="info" emoji="💡">
+  XMLUI uses markup attributes to represent **component properties**. Attributes have the same name as the particular property.
+</Callout>
 
 ```ueml
 <Button label="Click me!" />
 ```
 
-**#2: Add the property value with a nested `<prop>` tag.**
+<Callout type="info" emoji="💡">
+  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. Use the tag's **`name` attribute** to identify the property.
+</Callout>
 
-The following code snippet uses this technique. Observe that here, you defined the property's `name` and `value`:
+```ueml {2-4} /property/
+<DropdownMenu>
+  <property name="triggerTemplate">
+    <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
+  </property>
+  <MenuItem>Item 1</MenuItem>
+  <MenuItem>Item 2</MenuItem>
+  <MenuItem>Item 3</MenuItem>
+</DropdownMenu>
+```
 
-```ueml
+`triggerTemplate` is a property of the `DropdownMenu` component that defines the UI for the trigger that opens the dropdown menu.
+
+<Callout type="info" emoji="💡">
+  If you prefer explicitly using the `<property>` tag, you can use it to represent string data; specify that with the `value` attribute.
+</Callout>
+
+```ueml /property/ /name/ /value/
 <Button>
-  <prop name="label" value="Click me!"/>
+  <property name="label" value="Click me!" />
 </Button>
 ```
 
-**#3: Add the property value with a nested `<prop>` tag and a text value.**
+<Callout type="info" emoji="💡">
+  You can use the `<property>` tag with nested text as an alternative to the `value` attribute.
+</Callout>
 
-```ueml
-<Button>
-  <prop name="label">Click me!</prop>
-</Button>
-```
 
-Using these methods, you can add single-value properties to tags. However, in several cases, you should add compound property values, such as in this example:
+### Event Handlers
 
-```ueml copy {3,7}
-<List>
-  <!-- A few properties omitted -->
-  <prop name="itemTemplate">
-    <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </prop>
-</List>
-```
+<Callout type="info" emoji="💡">
+  You can use markup attributes to define event handlers for a particular event. Use an attribute with the `on` prefix for a particular event.
+</Callout>
 
-Here, the value of the `itemTemplate` property is a component, the template of a list item. In this case, you can use only the `<prop>` syntax, nesting the compound property value.
-
-### Event Handler Declarations
-
-The component elements may declare event handlers. The XMLUI markup supports several syntax variants to describe event handlers.
-
-**#1. Add the event handler as an attribute to the component tag with the `on` prefix.**
-
-The following code snippet shows how you can set the handler for a button's `click` event. Observe that this syntax uses the `onClick` attribute name for the event handler:
-
-```ueml
+```ueml copy /onClick/
 <Button label="Click me!" onClick="console.log('Clicked!')"/>
 ```
 
-> **Note**: When representing an event handler with an attribute, use the `on` prefix following the event name with an **uppercase** start letter.
-
-**#2. Add the event handler as an attribute to the component tag with the `event.` prefix.**
-
-The following code snippet shows how you can set the handler for a button's `click` event. Observe that this syntax uses the `event.click` attribute name for the event handler:
-
-```ueml
-<Button label="Click me!" event.click="console.log('Clicked!')"/>
-```
-
-**#3. Add the event handler value with a nested `<event>` tag.**
-
-With this syntax, you should use the event name (no `on` prefix):
-
-```ueml
-<Button label="Click me!">
-  <event name="click" value="console.log('Clicked!')"/>
-</Button>
-```
-
-**#4. Add the event handler value with a nested `<event>` tag and a text value.**
-
-```ueml
-<Button label="Click me!">
-  <event name="click">"console.log('Clicked!')"</event>
-</Button>
-```
-
-Using these methods, you can add single-value event handlers to tags. However, in several cases, an event handler is composed of multiple values, like in this example:
-
-```ueml
-<Button label="Save me!">
-  <event name="click">
-    <ApiBinding method="post" url="http/mySite.com/customer/1234" body={customerRecord} />
-  </event>
-</Button>
-```
-
-Here, the value of the click property is a POST request to a particular URL and body, as described in an `<ApiBinding>` component.
-
 ### Variable declarations
 
-Similarly to properties and event handlers, you can declare variables with initial values with several syntax variations using a nested `<var>` element.  The following code snippet assigns the `Hello!` string to the `greeting` variable in a couple of ways:
+
+<Callout type="info" emoji="💡">
+  Besides code-behind files, you can use inline variable declarations in the markup. The most concise way is to use an attribute with the `var.` prefix followed by the variable's name.
+</Callout>
+
+```ueml /var./
+<Button label="Click me!" var.greeting="Hello!" />
+```
+
+This markup assigns a variable named `greeting` to the `Button` with the initial value of "Hello!".
+
+<Callout type="info" emoji="💡">
+  You may prefer more explicit variable declarations. You can do it with the `var` tag, too.
+</Callout>
 
 
-```ueml
-<!-- #1. (with attribute value) -->
+```ueml /var./
 <Button label="Click me!">
-  <var name="greeting" value="Hello!" />
-  <!-- Properties and events omitted -->
+  <var name="greeting" value="Hello!">
 </Button>
+```
 
-<!-- #2. (with text) -->
+And similarly to `<property>`, XMLUI accepts nested text for the variable's initial value.
+
+```ueml /var./
 <Button label="Click me!">
   <var name="greeting">Hello!</var>
-  <!-- Properties and events omitted -->
-</Button>
-
-<!-- #3. (with binding expression) -->
-<Button label="Click me!">
-  <var name="greeting">"{'Hel' + 'lo!'}"</var>
-  <!-- Properties and events omitted -->
 </Button>
 ```
 
-To shorten variable declarations, you can use the `var.` prefix before an attribute to declare a variable. So, you can declare the `greeting` variable like this, too:
-
-```ueml
-<Button label="Click me!" var.greeting="{'Hel' + 'lo!'}" />
-```
-
-When you use an attribute or a text to define the initial value of a variable, the engine uses a string value. However, the engine uses the variables in code where the type of a particular value is significant.
-If you want to be sure a variable value is initialized with the appropriate type, use binding expressions:
+<Callout type="info" emoji="💡">
+  The type of a variable's value is significant when working with code. When you initialize variables, their value is a string (as tag attributes are strings). **If you want to be sure a variable value is initialized with the intended type, use binding expressions.**
+</Callout>
 
 ```ueml
 <!-- count is a string, "0" -->
 <Button label="Click me!">
   <var name="count" value="0" />
-  <!-- Properties and events omitted -->
 </Button>
 
 <!-- count is a number, 0 -->
 <Button label="Click me!">
   <var name="count" value="{0}" />
-  <!-- Properties and events omitted -->
 </Button>
 
 <!-- isOpen is a string, "true" -->
 <Button label="Click me!">
   <var name="isOpen" value="true" />
-  <!-- Properties and events omitted -->
 </Button>
 
 <!-- isOpen is a boolean, true -->
 <Button label="Click me!" var.isOpen="{true}" />
 ```
 
-You should use a binding expression to define a compound value, for example, a 2D coordinate value:
+<Callout emoji="📔">
+  Components are smart enough to convert the string values of properties to the appropriate type they expect.
+</Callout>
 
-```ueml
+<Callout type="info" emoji="💡">
+  You can use a binding expression to define a **compound value**.
+</Callout>
+
+```ueml /{x: 100, y: 40}/
 <Fragment>
   <var name="origin" value="{{x: 100, y: 40}}" />
 </Fragment>
 ```
 
-> **Note**:  In the `{{x: 100, y: 40}}` binding expression, the outer curly braces are the delimiters; the `{x: 100, y: 40}` object literal defines a hash object with `x` and `y` properties.
+In the `{{x: 100, y: 40}}` binding expression, the outer curly braces are the delimiters; the `{x: 100, y: 40}` object literal defines a hash object with `x` and `y` properties.
 
 ## Reusable Components
 
-You must use the `<Component>` tag to declare a reusable component. The `name` attribute is mandatory; it assigns a unique identifier to the component. You should use this ID when you declare an instance of the component. The nested tags define the component's visual representation and, optionally, the variables assigned to the component.
+<Callout type="info" emoji="💡">
+  You can define reusable components with the `<Component>` tag. These declarations should go into a separate file within the app's `components` folder. Use the `name` attribute to assign a unique name to the component.
+</Callout>
 
-> **Note**: The `name` attribute of the component should start with an uppercase letter.
-
-The following declaration defines a component named `IncButton`:
-
-```ueml copy
+```ueml copy /Component name="IncButton"/ /Component/
 <Component name="IncButton">
   <var name="count" value="{0}" />
-  <Button label="Click to increment: {count}">
-    <event name="click" value="count++" />
-  </Button>
+  <Button label="Click to increment: {count}" onClick="count++" />
 </Component>
 ```
 
-With shortened event and variable declarations, you can make the markup more concise:
+<Callout emoji="📔">
+  The `name` attribute of the component should start with an uppercase letter.
+</Callout>
 
-```ueml copy
-<Component name="IncButton">
-  <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
-</Component>
+You can add the new component to your app with the `<IncButton>` tag.
+
+```ueml /IncButton/
+<App>
+  <!-- Other components -->
+  <IncButton />
+</App>  
 ```
+
+
