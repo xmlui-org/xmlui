@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # Checkbox
 
 The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it.
@@ -151,7 +153,7 @@ Places the label at the given position of the component.
 
 Default value: `"right"`.
 
-Available values: `top`, `right`, `bottom`, `left`
+Available values: `top`, `right` **(default)**, `bottom`, `left`
 
 ```ueml copy
 <VStack margin="1rem" gap="0.8rem">
@@ -297,74 +299,53 @@ The `Checkbox` component uses these theme variables to customize its appearance:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| color-bg-Checkbox--disabled | $color-surface-200 | $color-surface-800 |
-| color-bg-Checkbox-default | (fallback) | (fallback) |
-| color-bg-Checkbox-error | (fallback) | (fallback) |
-| color-bg-Checkbox-success | (fallback) | (fallback) |
-| color-bg-Checkbox-warning | (fallback) | (fallback) |
-| color-bg-Switch | (fallback) | (fallback) |
-| color-bg-Switch--disabled | (fallback) | (fallback) |
-| color-bg-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| color-bg-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| color-bg-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| color-bg-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
-| color-bg-checked-Switch | (fallback) | (fallback) |
-| color-bg-checked-Switch-error | (fallback) | (fallback) |
-| color-bg-checked-Switch-success | (fallback) | (fallback) |
-| color-bg-checked-Switch-warning | (fallback) | (fallback) |
-| color-border-Checkbox--disabled | (fallback) | (fallback) |
-| color-border-Checkbox-default | (fallback) | (fallback) |
-| color-border-Checkbox-default--hover | (fallback) | (fallback) |
-| color-border-Checkbox-error | (fallback) | (fallback) |
-| color-border-Checkbox-success | (fallback) | (fallback) |
-| color-border-Checkbox-warning | (fallback) | (fallback) |
-| color-border-Switch | (fallback) | (fallback) |
-| color-border-Switch--disabled | (fallback) | (fallback) |
-| color-border-Switch-default--hover | (fallback) | (fallback) |
-| color-border-Switch-error | (fallback) | (fallback) |
-| color-border-Switch-success | (fallback) | (fallback) |
-| color-border-Switch-warning | (fallback) | (fallback) |
-| color-border-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| color-border-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| color-border-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| color-border-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
-| color-border-checked-Switch | (fallback) | (fallback) |
-| color-border-checked-Switch-error | (fallback) | (fallback) |
-| color-border-checked-Switch-success | (fallback) | (fallback) |
-| color-border-checked-Switch-warning | (fallback) | (fallback) |
-| color-outline-Checkbox-default--focus | (fallback) | (fallback) |
-| color-outline-Checkbox-error--focus | (fallback) | (fallback) |
-| color-outline-Checkbox-success--focus | (fallback) | (fallback) |
-| color-outline-Checkbox-warning--focus | (fallback) | (fallback) |
-| color-outline-Switch--focus | (fallback) | (fallback) |
-| offset-outline-Checkbox-default--focus | (fallback) | (fallback) |
-| offset-outline-Checkbox-error--focus | (fallback) | (fallback) |
-| offset-outline-Checkbox-success--focus | (fallback) | (fallback) |
-| offset-outline-Checkbox-warning--focus | (fallback) | (fallback) |
-| offset-outline-Switch--focus | (fallback) | (fallback) |
-| radius-Checkbox-default | (fallback) | (fallback) |
-| radius-Checkbox-error | (fallback) | (fallback) |
-| radius-Checkbox-success | (fallback) | (fallback) |
-| radius-Checkbox-warning | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox--disabled | $color-surface-200 | $color-surface-800 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox-default | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox-error | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox-success | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox-warning | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox--disabled | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox-default | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox-default--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox-error | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox-success | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Checkbox-warning | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Checkbox-default--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Checkbox-error--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Checkbox-success--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Checkbox-warning--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Checkbox-default--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Checkbox-error--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Checkbox-success--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Checkbox-warning--focus | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Checkbox-default | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Checkbox-error | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Checkbox-success | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Checkbox-warning | (fallback) | (fallback) |
 | style-outline-Checkbox-default--focus | (fallback) | (fallback) |
 | style-outline-Checkbox-error--focus | (fallback) | (fallback) |
 | style-outline-Checkbox-success--focus | (fallback) | (fallback) |
 | style-outline-Checkbox-warning--focus | (fallback) | (fallback) |
-| style-outline-Switch--focus | (fallback) | (fallback) |
-| thickness-outline-Checkbox-default--focus | (fallback) | (fallback) |
-| thickness-outline-Checkbox-error--focus | (fallback) | (fallback) |
-| thickness-outline-Checkbox-success--focus | (fallback) | (fallback) |
-| thickness-outline-Checkbox-warning--focus | (fallback) | (fallback) |
-| thickness-outline-Switch--focus | (fallback) | (fallback) |
-| color-bg-Checkbox--disabled | $color-surface-200 | $color-surface-800 |
-| color-bg-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| color-bg-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| color-bg-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| color-bg-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
-| color-bg-indicator-Checkbox | $color-bg-primary | $color-bg-primary |
-| color-bg-indicator-Switch | (fallback) | (fallback) |
-| color-border-checked-Checkbox | $color-primary-500 | $color-primary-400 |
-| color-border-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
-| color-border-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
-| color-border-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Checkbox-default--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Checkbox-error--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Checkbox-success--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Checkbox-warning--focus | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Checkbox--disabled | $color-surface-200 | $color-surface-800 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
+| [color-bg](../styles-and-themes/common-units/#color-values)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
+| [color-bg](../styles-and-themes/common-units/#color-values)-indicator-Checkbox | $color-bg-primary | $color-bg-primary |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox | $color-primary-500 | $color-primary-400 |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-error | $color-border-Checkbox-error | $color-border-Checkbox-error |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-success | $color-border-Checkbox-success | $color-border-Checkbox-success |
+| [color-border](../styles-and-themes/common-units/#color-values)-checked-Checkbox-warning | $color-border-Checkbox-warning | $color-border-Checkbox-warning |
 

@@ -58,41 +58,8 @@ The hosted web page loads a single JavaScript file with the XMLUI engine. When l
 
 ## Installing a web server on your machine
 
-You can use your preferred web server on your machine. Nonetheless, if you have no idea which one to use, here are a few suggestions.
-
-### Simple Web Server (any platform)
-
-The Simple Web Server is a free tool with a graphical user interface. Visit this page to download it: https://simplewebserver.org/download.html
+<Callout>
+If you do not have a web server on your machine or are unsure how to configure it, **we suggest you install the Simple Web Server**. It is a free tool with a graphical user interface. Visit this page to download it: https://simplewebserver.org/download.html
 
 After the installation, you can easily set up a new web server by selecting your preferred port number and the host directory. When using it with XMLUI, set the host directory to your XMLUI app's folder.
-
-### Using a python3 web server on MacOS
-
-Newer MacOS versions ship with python3 installed. If your operating system has not been updated for a long time, you may need to install it; you will quickly find appropriate instructions by searching for the "install python3 macosx" web search.
-
-To run an XMLUI app, select the app's root folder and start `http-server` with these commands:
-
-```
-cd <the path to the XMLUI app>
-python3 -m http.server 8080 --bind localhost 
-```
-
-This command line will start the Python-hosted web server on port 8080. You can change the port by specifying a different number. The running web server displays the available host URLs; choose one and open it in the browser.
- 
- ### Using the `http-server` NPM package (any platform)
-
-If you have Node already installed on your machine, adding a web server is a low-hanging fruit. The `http-server` NPM package works on Windows, Mac, and Linux and does not need any configuration; it just works.
-
-To run an XMLUI app, select the app's root folder and start `http-server` with these commands:
-
-```
-cd <the path to the XMLUI app>
-npx http-server 
-```
-
-The `npx` utility checks if your machine has cached the `http-server`. If not, it will be installed after you confirm. Then, the web server starts serving static file contents from the current folder; it will run the XMLUI app. The web server will list a few URLs. Choose your preferred one and open it in the browser to display the running app.
-> **Note**: If you want to use a different port from the default one, use the -p option to specify that port like in this sample:
-> ```
-> npx http-server -p 5173
-> ```
-
+</Callout> 

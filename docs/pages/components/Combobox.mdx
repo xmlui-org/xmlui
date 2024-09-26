@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # Combobox
 
 A `Combobox` is a component that combines the features of a dropdown list and an input field.
@@ -8,7 +10,7 @@ You can use a `Combobox` to select a text from a dropdown list (click the compon
 
 Define the list of available options with the nested `Option` component, as this example shows:
 
-```ueml copy 
+```ueml copy
 <Combobox id="myCombo">
   <Option label="Jane Arrington" value="ja" />
   <Option label="John Sniper" value="js" />
@@ -18,10 +20,10 @@ Define the list of available options with the nested `Option` component, as this
 ```
 
 <Playground
-  previewOnly
-  name="Example: using Combobox"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: using Combobox"
+    height={200}
+    app={`
     <Combobox id="myCombo">
       <Option label="Jane Arrington" value="ja" />
       <Option label="John Sniper" value="js" />
@@ -42,10 +44,10 @@ Combobox supports data binding. The following example shows how you can programm
 ```
 
 <Playground
-  previewOnly
-  name="Example: Combobox with data"
-  height={220}
-  app={`
+    previewOnly
+    name="Example: Combobox with data"
+    height={220}
+    app={`
     <Combobox id="myCombo">
       <Items items="{[1, 2, 3, 4, 5]}">
         <Option label="Option {$item}" value="{$item}" />
@@ -85,10 +87,10 @@ With this property, you can define the template to display when the search list 
 Type a "w" to display an empty list:
 
 <Playground
-  previewOnly
-  name="Example: emptyListTemplate"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: emptyListTemplate"
+    height={200}
+    app={`
     <Combobox id="myCombo">
       <Option label="Jane Arrington" value="ja" />
       <Option label="John Sniper" value="js" />
@@ -131,10 +133,10 @@ This property sets the component's initial value.
 The following list will show the item with "eg" as its initial value:
 
 <Playground
-  previewOnly
-  name="Example: initialValue"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: initialValue"
+    height={200}
+    app={`
     <Combobox id="myCombo" initialValue="eg">
       <Option label="Jane Arrington" value="ja" />
       <Option label="John Sniper" value="js" />
@@ -171,10 +173,10 @@ You can define a template for the option items of the `Combobox`.
 Click the `Combobox` to display its options:
 
 <Playground
-  previewOnly
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: optionTemplate"
+    height={200}
+    app={`
     <Combobox id="myCombo">
       <Option label="Jane Arrington" value="ja" />
       <Option label="John Sniper" value="js" />
@@ -244,10 +246,10 @@ This event is triggered when value of Combobox has changed.
 Select an option and see how the text underneath is updated in parallel.
 
 <Playground
-  previewOnly
-  name="Example: initialValue"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: initialValue"
+    height={200}
+    app={`
     <VStack gap="0.5rem" var.field="">
       <Combobox initialValue="{field}" onDidChange="(val) => field = val">
         <Option value="opt1" label="first"/>
@@ -279,10 +281,10 @@ This event is triggered when the Combobox has received the focus.
 ```
 
 <Playground
-  previewOnly
-  name="Example: gotFocus/lostFocus"
-  height={200}
-  app={`
+    previewOnly
+    name="Example: gotFocus/lostFocus"
+    height={200}
+    app={`
   <VStack padding="$space-1" gap="$space-0_5">
     <var name="isFocused" value="{false}" />
     <Text value="Input control is focused: {isFocused}" />
@@ -361,90 +363,90 @@ Theme variables to set the styles of an unselected item:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| color-bg-Combobox--disabled | (fallback) | (fallback) |
-| color-bg-Combobox-default | (fallback) | (fallback) |
-| color-bg-Combobox-default--hover | (fallback) | (fallback) |
-| color-bg-Combobox-error | (fallback) | (fallback) |
-| color-bg-Combobox-error--hover | (fallback) | (fallback) |
-| color-bg-Combobox-success | (fallback) | (fallback) |
-| color-bg-Combobox-success--hover | (fallback) | (fallback) |
-| color-bg-Combobox-warning | (fallback) | (fallback) |
-| color-bg-Combobox-warning--hover | (fallback) | (fallback) |
-| color-bg-item-Combobox--active | (fallback) | (fallback) |
-| color-bg-item-Combobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| color-bg-menu-Combobox | $color-bg-primary | $color-bg-primary |
-| color-border-Combobox--disabled | (fallback) | (fallback) |
-| color-border-Combobox-default | (fallback) | (fallback) |
-| color-border-Combobox-default--hover | (fallback) | (fallback) |
-| color-border-Combobox-error | (fallback) | (fallback) |
-| color-border-Combobox-error--hover | (fallback) | (fallback) |
-| color-border-Combobox-success | (fallback) | (fallback) |
-| color-border-Combobox-success--hover | (fallback) | (fallback) |
-| color-border-Combobox-warning | (fallback) | (fallback) |
-| color-border-Combobox-warning--hover | (fallback) | (fallback) |
-| color-outline-Combobox-default--focus | (fallback) | (fallback) |
-| color-outline-Combobox-error--focus | (fallback) | (fallback) |
-| color-outline-Combobox-success--focus | (fallback) | (fallback) |
-| color-outline-Combobox-warning--focus | (fallback) | (fallback) |
-| color-placeholder-Combobox | (fallback) | (fallback) |
-| color-placeholder-Combobox-default | (fallback) | (fallback) |
-| color-placeholder-Combobox-error | (fallback) | (fallback) |
-| color-placeholder-Combobox-success | (fallback) | (fallback) |
-| color-placeholder-Combobox-warning | (fallback) | (fallback) |
-| color-text-Combobox--disabled | (fallback) | (fallback) |
-| color-text-Combobox-default | (fallback) | (fallback) |
-| color-text-Combobox-default--hover | (fallback) | (fallback) |
-| color-text-Combobox-error | (fallback) | (fallback) |
-| color-text-Combobox-error--hover | (fallback) | (fallback) |
-| color-text-Combobox-success | (fallback) | (fallback) |
-| color-text-Combobox-success--hover | (fallback) | (fallback) |
-| color-text-Combobox-warning | (fallback) | (fallback) |
-| color-text-Combobox-warning--hover | (fallback) | (fallback) |
-| color-text-indicator-Combobox | (fallback) | (fallback) |
-| color-text-item-Combobox--disabled | $color-surface-200 | $color-surface-800 |
-| font-size-Combobox-default | (fallback) | (fallback) |
-| font-size-Combobox-error | (fallback) | (fallback) |
-| font-size-Combobox-success | (fallback) | (fallback) |
-| font-size-Combobox-warning | (fallback) | (fallback) |
-| min-height-Combobox | (fallback) | (fallback) |
-| offset-outline-Combobox-default--focus | (fallback) | (fallback) |
-| offset-outline-Combobox-error--focus | (fallback) | (fallback) |
-| offset-outline-Combobox-success--focus | (fallback) | (fallback) |
-| offset-outline-Combobox-warning--focus | (fallback) | (fallback) |
-| radius-Combobox-default | (fallback) | (fallback) |
-| radius-Combobox-error | (fallback) | (fallback) |
-| radius-Combobox-success | (fallback) | (fallback) |
-| radius-Combobox-warning | (fallback) | (fallback) |
-| radius-menu-Combobox | $radius | $radius |
-| shadow-Combobox-default | (fallback) | (fallback) |
-| shadow-Combobox-default--hover | (fallback) | (fallback) |
-| shadow-Combobox-error | (fallback) | (fallback) |
-| shadow-Combobox-error--hover | (fallback) | (fallback) |
-| shadow-Combobox-success | (fallback) | (fallback) |
-| shadow-Combobox-success--hover | (fallback) | (fallback) |
-| shadow-Combobox-warning | (fallback) | (fallback) |
-| shadow-Combobox-warning--hover | (fallback) | (fallback) |
-| shadow-menu-Combobox | $shadow-md | $shadow-md |
-| style-border-Combobox-default | (fallback) | (fallback) |
-| style-border-Combobox-error | (fallback) | (fallback) |
-| style-border-Combobox-success | (fallback) | (fallback) |
-| style-border-Combobox-warning | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox--disabled | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-default | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-default--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-error | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-error--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-success | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-success--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-warning | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-Combobox-warning--hover | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-item-Combobox--active | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-item-Combobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color-values)-menu-Combobox | $color-bg-primary | $color-bg-primary |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox--disabled | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-default | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-default--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-error | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-error--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-success | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-success--hover | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-warning | (fallback) | (fallback) |
+| [color-border](../styles-and-themes/common-units/#color-values)-Combobox-warning--hover | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Combobox-default--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Combobox-error--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Combobox-success--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-outline-Combobox-warning--focus | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-placeholder-Combobox | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-placeholder-Combobox-default | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-placeholder-Combobox-error | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-placeholder-Combobox-success | (fallback) | (fallback) |
+| [color](../styles-and-themes/common-units/#color-values)-placeholder-Combobox-warning | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox--disabled | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-default | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-default--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-error | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-error--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-success | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-success--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-warning | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-Combobox-warning--hover | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-indicator-Combobox | (fallback) | (fallback) |
+| [color-text](../styles-and-themes/common-units/#color-values)-item-Combobox--disabled | $color-surface-200 | $color-surface-800 |
+| [font-size](../styles-and-themes/common-units/#size-values)-Combobox-default | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Combobox-error | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Combobox-success | (fallback) | (fallback) |
+| [font-size](../styles-and-themes/common-units/#size-values)-Combobox-warning | (fallback) | (fallback) |
+| min-[height](../styles-and-themes/common-units/#size-values)-Combobox | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Combobox-default--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Combobox-error--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Combobox-success--focus | (fallback) | (fallback) |
+| [offset](../styles-and-themes/common-units/#size-values)-outline-Combobox-warning--focus | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Combobox-default | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Combobox-error | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Combobox-success | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-Combobox-warning | (fallback) | (fallback) |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-Combobox | $radius | $radius |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-default | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-default--hover | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-error | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-error--hover | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-success | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-success--hover | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-warning | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-Combobox-warning--hover | (fallback) | (fallback) |
+| [shadow](../styles-and-themes/common-units/#color-values)-menu-Combobox | $shadow-md | $shadow-md |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Combobox-default | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Combobox-error | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Combobox-success | (fallback) | (fallback) |
+| [style-border](../styles-and-themes/common-units/#border-style-values)-Combobox-warning | (fallback) | (fallback) |
 | style-outline-Combobox-default--focus | (fallback) | (fallback) |
 | style-outline-Combobox-error--focus | (fallback) | (fallback) |
 | style-outline-Combobox-success--focus | (fallback) | (fallback) |
 | style-outline-Combobox-warning--focus | (fallback) | (fallback) |
-| thickness-border-Combobox-default | (fallback) | (fallback) |
-| thickness-border-Combobox-error | (fallback) | (fallback) |
-| thickness-border-Combobox-success | (fallback) | (fallback) |
-| thickness-border-Combobox-warning | (fallback) | (fallback) |
-| thickness-outline-Combobox-default--focus | (fallback) | (fallback) |
-| thickness-outline-Combobox-error--focus | (fallback) | (fallback) |
-| thickness-outline-Combobox-success--focus | (fallback) | (fallback) |
-| thickness-outline-Combobox-warning--focus | (fallback) | (fallback) |
-| color-bg-item-Combobox | $color-bg-dropdown-item | $color-bg-dropdown-item |
-| color-bg-item-Combobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| color-bg-menu-Combobox | $color-bg-primary | $color-bg-primary |
-| color-text-item-Combobox--disabled | $color-surface-200 | $color-surface-800 |
-| radius-menu-Combobox | $radius | $radius |
-| shadow-menu-Combobox | $shadow-md | $shadow-md |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Combobox-default | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Combobox-error | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Combobox-success | (fallback) | (fallback) |
+| [thickness-border](../styles-and-themes/common-units/#size-values)-Combobox-warning | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Combobox-default--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Combobox-error--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Combobox-success--focus | (fallback) | (fallback) |
+| [thickness](../styles-and-themes/common-units/#size-values)-outline-Combobox-warning--focus | (fallback) | (fallback) |
+| [color-bg](../styles-and-themes/common-units/#color-values)-item-Combobox | $color-bg-dropdown-item | $color-bg-dropdown-item |
+| [color-bg](../styles-and-themes/common-units/#color-values)-item-Combobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color-values)-menu-Combobox | $color-bg-primary | $color-bg-primary |
+| [color-text](../styles-and-themes/common-units/#color-values)-item-Combobox--disabled | $color-surface-200 | $color-surface-800 |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-Combobox | $radius | $radius |
+| [shadow](../styles-and-themes/common-units/#color-values)-menu-Combobox | $shadow-md | $shadow-md |
 

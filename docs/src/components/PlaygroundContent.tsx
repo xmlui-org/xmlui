@@ -1,10 +1,11 @@
-import { Header } from "@/src/components/Header";
 import { Preview } from "@/src/components/Preview";
 import { Editor } from "@/src/components/Editor";
 import { Splitter } from "@components/Splitter/SplitterNative";
 import styles from "@/src/components/PlaygroundContent.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import classnames from "classnames";
+import React, {useMemo} from "react";
+import { useTheme } from "nextra-theme-docs";
 
 type PlaygroundContentProps = {
   height?: number | string;
@@ -13,8 +14,17 @@ type PlaygroundContentProps = {
   loading?: boolean;
 };
 
-export const PlaygroundContent = ({ height, initialPrimarySize, standalone, loading }: PlaygroundContentProps) => {
+export const PlaygroundContent = ({
+  height,
+  initialPrimarySize,
+  standalone,
+}: PlaygroundContentProps) => {
   const { options, status } = usePlayground();
+  const { theme, systemTheme } = useTheme();
+
+  const isDark = useMemo(() => {
+    return theme === "dark" || (theme === "system" && systemTheme === "dark")
+  }, [theme, systemTheme]);
 
   return (
     <div
@@ -22,7 +32,6 @@ export const PlaygroundContent = ({ height, initialPrimarySize, standalone, load
         [styles.standalone]: standalone,
       })}
     >
-      {standalone && options.previewMode ? null : <Header />}
       <div className={styles.playgroundContent} style={{ height }}>
         {options.previewMode && status === "loaded" ? (
           <Preview />

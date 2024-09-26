@@ -6,7 +6,6 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "generate-docs": "node scripts/generate-mdx.js",
     "release-ci": "npm run build && xmlui zip-dist"
   },
   "dependencies": {

@@ -1,5 +1,158 @@
+import { Callout } from 'nextra/components'
+
 # APIs and Data
 
 Real apps consume data. XMLUI provides a straightforward way to reach data from the backend and display them in the UI. It also lets you execute actions that change backend data.
 
 This section will teach you how to access backend APIs through XMLUI components.
+
+## Fetching Data
+
+<Callout type="info" emoji="💡">
+  Getting data from the backend is as easy as **specifying the URL** to invoke with a GET operation to fetch the data. **You do not need to initiate the fetch explicitly**; the framework will do it for you and manage the request-response protocol with all its bells and whistles.
+</Callout>
+
+### Using the `datasource` Property
+
+<Callout type="info" emoji="💡">
+  Data-aware components (like `List`) support a `datasource` property to specify a URL for a fetch operation. When the particular component needs to display its content, the framework fetches the data.
+</Callout>
+
+```ueml copy
+<List datasource="https://api.spacexdata.com/v3/history">
+  <property name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </property>  
+</List>
+```
+
+In the above example, the `List` component fetches data from the SpaceX API and displays it using the `Card` component.
+
+The framework decides how it gets the data; **it is just there without any imperative code**. The code binds the properties of the retrieved data through the `$item` context value to the `Card` component.
+
+
+### Leveraging the Datasource Component
+
+Though using the `data source` property is extremely easy, there are situations when you need more control over the fetched data than just automatically getting it. Here are a few of them:
+- You need to extract some part of the response and consider that part as the data you want to display.
+- You need to transform the data from the backend before displaying it.
+- You want to know that the data is being fetched to indicate that the fetch operation is in progress.
+- Initiating the fetch request is more complex than issuing a GET request with the specified URL; for example, you must pass some information in the request header.  
+
+<Callout type="info" emoji="💡">
+  The `Datasource` component provides **more control of the fetch operation** with its methods and state information.
+</Callout>
+
+Let's repeat the `List` example using the `datasource` property earlier:
+
+```ueml copy
+<List datasource="https://api.spacexdata.com/v3/history">
+  <property name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </property>  
+</List>
+```
+
+You can describe the same operation with the `Datasource` component this way:
+
+```ueml copy /Datasource/ /{spaceXData.value}/
+<Datasource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+<List data="{spaceXData.value}">
+  <property name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}"/>
+  </property>  
+</List>
+```
+
+<Callout type="info" emoji="💡">
+  XMLUI internally uses a similar representation for components with the `datasource` property.
+</Callout>
+
+When the framework renders the component (it can be the app's main component) and processes `Datasource`, it initiates the fetch. When the data retrieval has been completed, the `spaceXData.value` expression changes, and this change updates the List's UI; the data appears.
+
+So far, using the `Datasource` component does not add any value over using the `data source` property. Moreover, the markup became more verbose. However, it allows other components more information and control about the data fetch. Let's see a few examples!
+
+**Example #1**: You can use the `inProgress` value of a `Datasource` to check if the fetch operation is going on. This following markup snippet displays progress text below the list while its data is being fetched.
+
+```ueml copy /loading="spaceXData.inProgress"/
+<Datasource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+<List data="{spaceXData.value}" />
+<Text when="{spaceXData.inProgress}">Data fetch is in progress</Text>
+```
+
+**Example #2**:This sample sets up request headers to fetch the data, for the backend API expects the header for its operation:
+
+```ueml /headers="{{ 'x-api-key': '0001' }}"/
+<Datasource 
+  id="groceriesWithHeaders" 
+  url="/api/shopping-list-headers" 
+  headers="{{ 'x-api-key': '0001' }}" />
+<List data="{groceriesWithHeaders.value}" />
+```
+
+**Example #3**: Let's assume an API endpoint retrieves data with this structure:
+
+```json
+{
+  "shoppingList": "<shopping list items>",
+  "meta": {
+    "totalItems": "<#of item in the shopping list>",
+  },
+}
+```
+
+We want to display only `shoppingItems` in the list, so we must extract it from the response:
+
+```ueml /shoppingList/
+<Datasource id="selectedGroceries" url="/api/shopping-list-meta" />
+<List data="{selectedGroceries.value.shoppingList}" />
+```
+
+<Callout>
+  Each of the `Datasource` and `List` (like other data-aware) components expose a `refresh` method that can be invoked to re-query the data. `Datasource` can be configured with a poll interval to periodically re-fetch the data.
+</Callout>
+
+## Persisting Data
+
+In contrast to fetching data, where the framework can be smart about when to initiate the data fetch operation, persisting data requires an explicit user (or system) trigger to invoke a related API endpoint.
+
+<Callout type="info" emoji="💡">
+  XMLUI has an **`ApiAction` component** that manages API endpoint invocations that persist data (or cause other state changes at the backend).
+</Callout>
+
+An `ApiAction` component requires a URL and an operation method (such as POST, PUT, DELETE, etc.) to do its job. It must also be configured with other details to convey the request information between the UI and the backend.
+
+Besides managing the request-response protocol, `ApiAction` provides a few UI services:
+
+- It can ask you for confirmation and cancel the operation on refusing it.
+- You can check if an operation is in progress.
+- It may display toast messages (if you ask so) when the operation is completed.
+- You can define a toast message to show while the operation is in progress.
+- Other components may ask the ApiAction whether it is in progress.
+- You can define event handlers for handling successful/failed operations.
+
+<Callout>
+So far, we used `ApiAction` components within `<event>` tags to execute a particular action. However, this approach is perplexing. In the future, we will only allow event handlers with code.
+
+```ueml /submitForm/
+<ApiAction url="/api/server/settings" id="submitForm" />
+<Form onSubmit="submitForm.execute()">
+  <!-- Nested form items -->
+</Form>
+```
+
+We may implment this pattern too:
+
+```ueml /on="submit"/
+<ApiAction url="/api/server/settings" method="post" id="submitForm" />
+<Form>
+  <ApiAction 
+    url="/api/server/settings" 
+    method="post" 
+    on="submit" />
+  <!-- Nested form items -->
+</Form>
+```
+</Callout>
+
+
