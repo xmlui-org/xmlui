@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # Button
 
 Button is an interactive element that triggers an action when clicked.
@@ -12,7 +14,7 @@ This component does not have any context variables.
 
 ### `autoFocus`
 
-Indicates if the button should receive focus when the page loads
+Indicates if the button should receive focus when the page loads.
 
 Default value: `false`.
 
@@ -20,11 +22,13 @@ Default value: `false`.
 
 This optional value determines how the label and icon (or nested children) should be placedinside the Button component.
 
+Default value: `"center"`.
+
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `center` | Place the content in the middle (default) |
+| `center` | Place the content in the middle **(default)** |
 | `start` | Justify the content to the left (to the right if in right-to-left) |
 | `end` | Justify the content to the right (to the left if in right-to-left) |
 
@@ -58,7 +62,7 @@ Available values:
 
 ### `enabled`
 
-The value of this property indicates if the button accepts actions (`true`) or does not react to them (`false`).
+The value of this property indicates whether the button accepts actions (`true`) or does not react to them (`false`).
 
 Default value: `true`.
 
@@ -86,7 +90,7 @@ Default value: `true`.
 
 ### `icon`
 
-This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon (by its name). If no label is specified and an icon is set, the Button displays only the icon.
+This string value denotes an icon name. The framework will render an icon if XMLUI recognizes the icon by its name. If no label is specified and an icon is set, the Button displays only that icon.
 
 ```ueml
 <HStack gap="1rem" >
@@ -112,11 +116,13 @@ This string value denotes an icon name. The framework will render an icon if XML
 
 This optional string determines the location of the icon in the Button.
 
+Default value: `"left"`.
+
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `left` | The icon will appear on the left side |
+| `left` | The icon will appear on the left side **(default)** |
 | `right` | The icon will appear on the right side |
 | `start` | The icon will appear at the start (left side when the left-to-right direction is set) |
 | `end` | The icon will appear at the end (right side when the left-to-right direction is set) |
@@ -196,14 +202,16 @@ This property is an optional string to set a label for the Button. If no label i
 
 ### `size`
 
-The size of the button (small, medium, large)
+The size of the button.
+
+Default value: `"sm"`.
 
 Available values:
 
 | Value | Description |
 | --- | --- |
 | `xs` | Extra small button |
-| `sm` | Small button (default) |
+| `sm` | Small button **(default)** |
 | `md` | Medium button |
 | `lg` | Large button |
 
@@ -249,14 +257,16 @@ Available values:
 
 ### `themeColor`
 
-The button color scheme (primary, secondary, attention)
+Sets the button color scheme defined in the application theme.
+
+Default value: `"primary"`.
 
 Available values:
 
 | Value | Description |
 | --- | --- |
 | `attention` | Attention state theme color |
-| `primary` | Primary theme color (default) |
+| `primary` | Primary theme color **(default)** |
 | `secondary` | Secondary theme color |
 
 
@@ -290,20 +300,22 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `button` | Regular behavior that only executes logic if explicitly determined. (default) |
+| `button` | Regular behavior that only executes logic if explicitly determined. **(default)** |
 | `submit` | The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component. |
 | `reset` | Resets all the controls to their initial values. Using it is ill advised for UX reasons. |
 
 
 ### `variant`
 
-The button variant (solid, outlined, ghost) to use
+The button variant determines the level of emphasis the button should possess.
+
+Default value: `"solid"`.
 
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `solid` | A button with a border and a filled background. |
+| `solid` | A button with a border and a filled background. **(default)** |
 | `outlined` | The button is displayed with a border and a transparent background. |
 | `ghost` | A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked. |
 

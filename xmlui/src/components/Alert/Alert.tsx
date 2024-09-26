@@ -21,6 +21,8 @@ export const AlertMd = createMetadata({
     statusColor: d(
       `The value of this optional property sets the string to provide a color scheme for the ${COMP}.`,
       statusColorMd,
+      "string",
+      "primary",
     ),
     dismissable: d(
       `This property's \`true\` value indicates if this alert is dismissable by the user. When the ` +
