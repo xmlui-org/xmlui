@@ -1,14 +1,24 @@
 import React, { useEffect, useMemo, useReducer } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
-import { appDescriptionInitialized, optionsInitialized, PlaygroundContext, playgroundReducer, toneChanged } from "@/src/state/store";
+import {
+  appDescriptionInitialized,
+  optionsInitialized,
+  PlaygroundContext,
+  playgroundReducer,
+  toneChanged,
+} from "@/src/state/store";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
-import {useTheme} from "nextra-theme-docs";
+import { useTheme } from "nextra-theme-docs";
+import {Text} from "@components/Text/TextNative";
+import styles from "./Playground.module.scss";
+import {Header} from "@/src/components/Header";
 
 type PlaygroundProps = {
   name: string;
+  description?: string;
   app: string;
   themes?: ThemeDefinition[];
   defaultTheme?: string;
@@ -26,6 +36,7 @@ type PlaygroundProps = {
 
 export const Playground = ({
   name,
+  description,
   app,
   themes = [],
   defaultTheme,
@@ -47,6 +58,7 @@ export const Playground = ({
         appDescriptionInitialized({
           config: {
             name,
+            description,
             logo: null,
             globals: {},
             resources,
@@ -56,7 +68,7 @@ export const Playground = ({
           },
           components,
           app,
-        })
+        }),
       );
       dispatch(
         optionsInitialized({
@@ -69,7 +81,7 @@ export const Playground = ({
           allowStandalone,
           id: 0,
           language: "ueml",
-        })
+        }),
       );
     }
     //TODO illesg, review (dep array?)!!!
@@ -102,10 +114,10 @@ export const Playground = ({
   return (
     <PlaygroundContext.Provider value={playgroundContextValue}>
       <ErrorBoundary>
-        <PlaygroundContent
-          height={height}
-          initialPrimarySize={initialEditorHeight}
-        />
+        <div className={styles.playground}>
+          <Header />
+          <PlaygroundContent height={height} initialPrimarySize={initialEditorHeight} />
+        </div>
       </ErrorBoundary>
     </PlaygroundContext.Provider>
   );
