@@ -22,6 +22,7 @@ type Options = {
 type AppDescription = {
     config: {
         name: string;
+        description?: string;
         globals: any;
         resources: any;
         themes: ThemeDefinition[];

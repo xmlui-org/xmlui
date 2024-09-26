@@ -37,62 +37,67 @@ export const Header = () => {
   }, [appDescription, options.previewMode, options.activeTheme, options.orientation, options.content]);
 
   return (
-    <div
-      className={classnames(styles.header, {
-        [styles.dark]: theme === "dark" || (theme === "system" && systemTheme === "dark"),
-      })}
-    >
-      <div className={styles.box}>
-        <Text fontWeight="bold">{appDescription.config?.name}</Text>
-        {!options.previewMode && <CodeSelector />}
-      </div>
-      <div className={styles.box}>
-        {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
-          <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
-        )}
-        {!options.previewMode && show && (
-          <>
+      <div
+          className={classnames(styles.header, {
+            [styles.dark]: theme === "dark" || (theme === "system" && systemTheme === "dark"),
+          })}
+      >
+        <div className={styles.box}>
+          <div>
+            <Text>{appDescription.config?.name}</Text>
+            {!options.previewMode && <CodeSelector/>}
+          </div>
+          <div>
+            {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
+                <Tooltip trigger={<ThemeSwitcher/>} label="Change theme"/>
+            )}
+            {!options.previewMode && show && (
+                <>
+                  <Tooltip
+                      trigger={
+                        <button className={styles.button} onClick={() => dispatch(swapApp())}>
+                          {options.orientation === "vertical" ? <MdSwapHoriz/> : <MdSwapVert/>}
+                        </button>
+                      }
+                      label="Swap editor and preview"
+                  />
+                  <Tooltip
+                      trigger={
+                        <button className={styles.button} onClick={() => dispatch(changeOrientation())}>
+                          {options.orientation === "vertical" ? (
+                              <PiSquareSplitHorizontalLight/>
+                          ) : (
+                              <PiSquareSplitVerticalLight/>
+                          )}
+                        </button>
+                      }
+                      label="Toggle orientation"
+                  />
+                </>
+            )}
+            {options.allowStandalone && (
+                <Tooltip
+                    trigger={
+                      <button className={styles.button} onClick={() => openStandaloneApp()}>
+                        <RxOpenInNewWindow/>
+                      </button>
+                    }
+                    label="Open in new window"
+                />
+            )}
             <Tooltip
-              trigger={
-                <button className={styles.button} onClick={() => dispatch(swapApp())}>
-                  {options.orientation === "vertical" ? <MdSwapHoriz /> : <MdSwapVert />}
-                </button>
-              }
-              label="Swap editor and preview"
+                trigger={
+                  <button className={styles.button} onClick={() => dispatch(resetApp())}>
+                    <RxReset/>
+                  </button>
+                }
+                label="Reset the app"
             />
-            <Tooltip
-              trigger={
-                <button className={styles.button} onClick={() => dispatch(changeOrientation())}>
-                  {options.orientation === "vertical" ? (
-                    <PiSquareSplitHorizontalLight />
-                  ) : (
-                    <PiSquareSplitVerticalLight />
-                  )}
-                </button>
-              }
-              label="Toggle orientation"
-            />
-          </>
-        )}
-        {options.allowStandalone && (
-          <Tooltip
-            trigger={
-              <button className={styles.button} onClick={() => openStandaloneApp()}>
-                <RxOpenInNewWindow />
-              </button>
-            }
-            label="Open in new window"
-          />
-        )}
-        <Tooltip
-          trigger={
-            <button className={styles.button} onClick={() => dispatch(resetApp())}>
-              <RxReset />
-            </button>
-          }
-          label="Reset the app"
-        />
+          </div>
+        </div>
+        <div className={styles.description}>
+          {appDescription.config?.description}
+        </div>
       </div>
-    </div>
   );
 };
