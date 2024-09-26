@@ -499,11 +499,11 @@ function addAvailableValues(component) {
   const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
 
   if (valuesType === "string" || valuesType === "number") {
-    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
+    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\`${appendDefaultIndicator(v)}`).join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
       headers: ["Value", "Description"],
-      rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
+      rows: component.availableValues.map((v) => [`\`${v.value}\``, `${v.description}${appendDefaultIndicator(v.value)}`]),
     });
   }
 
@@ -511,6 +511,10 @@ function addAvailableValues(component) {
     return `Available values:${valuesTypeIsPrimitive ? " " : "\n\n"}${availableValuesBuffer}`;
   }
   return "";
+
+  function appendDefaultIndicator(value) {
+    return component.defaultValue === value ? " **(default)**" : "";
+  }
 }
 
 function listThemeVars(component) {
