@@ -471,6 +471,7 @@ export const Table = forwardRef(
     const tableContextValue = useMemo(() => {
       return {
         registerColumn: (column: OurColumnMetadata) => {
+          // console.log("registering column", column);
           setStableColumns(
             produce((draft) => {
               const existing = draft.findIndex((col) => col.id === column.id);

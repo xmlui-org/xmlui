@@ -4,7 +4,7 @@ import type {
   ComponentDef,
   ComponentMetadata,
   CompoundComponentDef,
-  DynamicChildComponentDef,
+  DynamicChildComponentDef, ParentRenderContext,
 } from "./ComponentDefs";
 import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
@@ -55,6 +55,12 @@ export interface RendererContext<TMd extends ComponentMetadata>
    * This function retrieves a sync function the component can use as a callback
    */
   lookupSyncCallback: LookupSyncFn;
+
+  // --- These are the CSS property values the underlying React component can merge into its "style" property
+  layoutCss: CSSProperties;
+
+  // --- Other layout property values the component may transform and merge into its "style" property
+  layoutNonCss: NonCssLayoutProps;
 }
 
 /**
@@ -154,8 +160,7 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
     | DynamicChildComponentDef[]
     | string,
   layoutContext?: LayoutContext<L>,
-  childrenToRender?: DynamicChildComponentDef[],
-  dynamicSlotsToRender?: Record<string, DynamicChildComponentDef[]>,
+  parentRenderContext?: ParentRenderContext,
 ) => ReactNode | ReactNode[];
 
 /**
@@ -248,19 +253,6 @@ export interface ComponentRendererContextBase<TMd extends ComponentMetadata = Co
   // --- The component can use this function to render its child components
   renderChild: RenderChildFn;
 
-  // --- These are the CSS property values the underlying React component can merge into its "style" property
-  layoutCss: CSSProperties;
-
-  // --- Other layout property values the component may transform and merge into its "style" property
-  layoutNonCss: NonCssLayoutProps;
-
   // --- Information about the layout context in which the component is rendered
   layoutContext?: LayoutContext;
-
-  // --- Information about children rendered dynamically
-  dynamicChildren?: Array<DynamicChildComponentDef>;
-  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
-
-  // --- The optional index of the child being rendered
-  childIndex?: number;
 }

@@ -1,13 +1,14 @@
 import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentDef, DynamicChildComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { ContainerComponentDef } from "@components-core/container/ContainerComponentDef";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { RendererContext } from "@abstractions/RendererDefs";
 
 import { useEvent } from "@components-core/utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
+import {isArray, isObject} from "lodash-es";
 
 type CompoundComponentProps<T extends ComponentDef> = {
   // Definition of the `component` part of the compound component
@@ -52,36 +53,6 @@ export const CompoundComponent = forwardRef(
     }, [extractValue, lookupSyncCallback, node.props]);
 
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
-
-    // --- Resolve child definition (allow children injected through binding expressions)
-    const dynamicChildren = useMemo(() => {
-      if (Array.isArray(node.children)) {
-        return node.children.map((child) => {
-          const ret: DynamicChildComponentDef = {
-            ...child,
-            renderChild,
-            childToRender: child,
-          };
-          return ret;
-        });
-      }
-    }, [node.children, renderChild]);
-
-    const dynamicSlots = useMemo(()=>{
-      if (node.slots) {
-        const ret = {};
-        Object.entries(node.slots).forEach(([key, value]) => {
-          ret[key] = value.map((val)=>{
-            return {
-              ...val,
-              renderChild,
-              childToRender: val,
-            }
-          });
-        });
-        return ret;
-      }
-    }, [node.slots, renderChild]);
 
     // --- Wrap the `component` part with a container that manages the
     const containerNode: ContainerComponentDef = useMemo(() => {
@@ -133,9 +104,32 @@ export const CompoundComponent = forwardRef(
 
     const nodeWithPropsAndEvents = useShallowCompareMemoize(nodeWithPropsAndEventsInner);
 
+    const hasTemplateProps = useMemo(()=>{
+      return Object.values(node.props).some((value) => {
+        return (isObject(value) && (value as any).type !== undefined || isArray(value) && (value as any)[0].type !== undefined);
+      });
+    }, [node.props]);
+
+    const memoedParentRenderContext = useMemo(() => {
+      if ((!node.children || node.children.length === 0) && !hasTemplateProps) {
+        return undefined;
+      }
+      return {
+        renderChild,
+        props: node.props,     //TODO, put only the resolved template props here
+        children: node.children,
+      };
+    }, [hasTemplateProps, node.children, node.props, renderChild]);
+
     //we remove the wrapChild prop from layout context, because that wrapping already happened for the compound component instance
-    const safeLayoutContext = layoutContext ? { ...layoutContext, wrapChild: undefined } : layoutContext;
-    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, dynamicChildren, dynamicSlots);
+    const safeLayoutContext = layoutContext
+      ? { ...layoutContext, wrapChild: undefined }
+      : layoutContext;
+    const ret = renderChild(
+      nodeWithPropsAndEvents,
+      safeLayoutContext,
+      memoedParentRenderContext,
+    );
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),

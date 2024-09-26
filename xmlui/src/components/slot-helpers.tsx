@@ -18,9 +18,7 @@ export const SlotItem = memo(
     const nodeWithItem = useMemo(() => {
       return {
         type: "Container",
-        contextVars: {
-          $slotProps: shallowMemoedSlotProps,
-        },
+        contextVars: shallowMemoedSlotProps,
         children: Array.isArray(node) ? node : [node],
       } as ContainerComponentDef;
     }, [node, shallowMemoedSlotProps]);

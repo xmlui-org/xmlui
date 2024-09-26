@@ -1,14 +1,14 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentMetadata } from "@abstractions/ComponentDefs";
 import type {
+  LayoutContext,
   LookupEventHandlerFn,
   RegisterComponentApiFn,
+  RenderChildFn,
   RendererContext,
 } from "@abstractions/RendererDefs";
-import type { LayoutContext } from "@abstractions/RendererDefs";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
 
 import UnknownComponent from "./UnknownComponent";
@@ -23,10 +23,13 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
-import { useReferenceTrackedApi } from "./utils/hooks";
+import { useReferenceTrackedApi, useShallowCompareMemoize } from "./utils/hooks";
 import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./abstractions/containers";
 import { useInspector } from "@components-core/InspectorContext";
+import { SlotItem } from "@components/slot-helpers";
+import { layoutOptionKeys } from "@components-core/descriptorHelper";
+import { compileLayout } from "../parsers/style-parser/style-compiler";
 
 // --- The available properties of Component
 type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
@@ -39,7 +42,9 @@ function useEventHandler<TMd extends ComponentMetadata>(
   lookupEvent: LookupEventHandlerFn<TMd>,
   shouldSkip: boolean,
 ) {
-  const onEvent = shouldSkip ? undefined : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
+  const onEvent = shouldSkip
+    ? undefined
+    : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
   const eventHandler: EventHandler<any> = useCallback(
     (event) => {
       if (onEvent) {
@@ -88,14 +93,10 @@ const Component = forwardRef(function Component(
     lookupSyncCallback,
     renderChild,
     registerComponentApi,
-    layoutCss,
-    layoutNonCss,
     layoutContextRef,
-    dynamicChildren,
-    dynamicSlots,
+    parentRenderContext,
     memoedVarsRef,
     onUnmount,
-    childIndex,
     ...rest
   }: ComponentProps,
   ref: React.ForwardedRef<any>,
@@ -121,7 +122,7 @@ const Component = forwardRef(function Component(
   }, [onUnmount, uid]);
 
   const componentRegistry = useComponentRegistry();
-  const { getResourceUrl } = useTheme();
+  const { getResourceUrl, themeVars } = useTheme();
 
   const { inspectId, refreshInspection } = useInspector(safeNode, uid);
   // --- Memoizes component API registration
@@ -188,56 +189,11 @@ const Component = forwardRef(function Component(
 
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
-    (children, lc, rc, dSlots) => {
-      return renderChild(children, lc, rc || dynamicChildren, dSlots || dynamicSlots);
+    (children, lc, pRenderContext) => {
+      return renderChild(children, lc, pRenderContext || parentRenderContext);
     },
-    [renderChild, dynamicChildren, dynamicSlots],
+    [renderChild, parentRenderContext],
   );
-
-  // --- Memoizes the node object with the resolved children. If the children contain a `Slot`,
-  // --- the resolved children (DynamicChildComponentDef) are used instead of the original children.
-  const memoedNode = useMemo(() => {
-    const children: Array<ComponentDef> = [];
-    let didResolve = false;
-    if (Array.isArray(safeNode.children)) {
-      safeNode.children.forEach((child) => {
-        const childName = (child.props as any)?.name;
-        if (child.type === "Slot") {
-          didResolve = true;
-          if (dynamicChildren && childName === undefined) {
-            children.push(...dynamicChildren);
-          }
-          if (child.props?.name) {
-            const $slotProps: Record<string, any> = valueExtractor(child.props);
-            Object.entries($slotProps).forEach(([name, val])=>{
-              if((val as any)?._ARROW_EXPR_){
-                $slotProps[name] = memoedLookupAction(val);
-              }
-            })
-            children.push(
-              ...(dynamicSlots?.[child.props?.name] || child.children || []).map((sl) => ({
-                ...sl,
-                contextVars: {$slotProps},
-                // contextProps: $slotProps,
-              })),
-            );
-          }
-        } else {
-          children.push(child);
-        }
-      });
-    }
-
-    // --- Because of performance reasons, we only return the changed `safeNode` if we resolve the
-    // --- rendered children to a `Slot`; otherwise, we return the original reference.
-    if (didResolve) {
-      return {
-        ...safeNode,
-        children,
-      };
-    }
-    return safeNode;
-  }, [safeNode, dynamicChildren, valueExtractor, dynamicSlots, memoedLookupAction]);
 
   const apiBoundProps = useMemo(
     () => getApiBoundItems(safeNode.props, "Datasource"),
@@ -253,6 +209,22 @@ const Component = forwardRef(function Component(
     descriptor?.nonVisual || isApiBound,
   );
 
+  const { cssProps, nonCssProps } = useMemo(() => {
+    const resolvedLayoutProps: Record<string, any> = {};
+    layoutOptionKeys.forEach((key) => {
+      if (safeNode.props && key in safeNode.props) {
+        resolvedLayoutProps[key] = valueExtractor(safeNode.props[key], true);
+      }
+    });
+    return compileLayout(resolvedLayoutProps, themeVars, {
+      ...layoutContextRef?.current,
+      mediaSize: appContext.mediaSize,
+    });
+  }, [appContext.mediaSize, layoutContextRef, safeNode.props, themeVars, valueExtractor]);
+
+  const stableLayoutCss = useShallowCompareMemoize(cssProps);
+  const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
+
   // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
   // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
   if (isApiBound) {
@@ -260,12 +232,12 @@ const Component = forwardRef(function Component(
       <ApiBoundComponent
         uid={uid}
         renderChild={memoedRenderChild}
-        node={memoedNode}
+        node={safeNode}
         key={safeNode.uid}
         apiBoundEvents={apiBoundEvents}
         apiBoundProps={apiBoundProps}
         layoutContextRef={layoutContextRef}
-        dynamicChildren={dynamicChildren}
+        parentRendererContext={parentRenderContext}
       />
     );
   }
@@ -276,7 +248,7 @@ const Component = forwardRef(function Component(
   try {
     // --- Assemble the renderer context we pass down the rendering chain
     const rendererContext: RendererContext<any> = {
-      node: memoedNode,
+      node: safeNode,
       state: state[uid] || EMPTY_OBJECT,
       updateState: memoedUpdateState,
       appContext,
@@ -287,29 +259,32 @@ const Component = forwardRef(function Component(
       extractResourceUrl,
       renderChild: memoedRenderChild,
       registerComponentApi: memoedRegisterComponentApi,
-      layoutCss,
-      layoutNonCss,
+      layoutCss: stableLayoutCss,
+      layoutNonCss: stableLayoutNonCss,
       layoutContext: layoutContextRef?.current,
-      uid,
-      childIndex,
+      uid
     };
 
-    if (!renderer) {
-      console.error(
-        `Component '${safeNode.type}' is not available. Did you forget to register it?`,
-      );
-      return <UnknownComponent message={`${safeNode.type}`} />;
-    }
+    if (safeNode.type === "Slot") {
+      renderedNode = slotRenderer(rendererContext, parentRenderContext);
+    } else {
+      if (!renderer) {
+        console.error(
+          `Component '${safeNode.type}' is not available. Did you forget to register it?`,
+        );
+        return <UnknownComponent message={`${safeNode.type}`} />;
+      }
 
-    // --- Render the component using the renderer function obtained from the component registry
-    renderedNode = renderer(rendererContext);
+      // --- Render the component using the renderer function obtained from the component registry
+      renderedNode = renderer(rendererContext);
+    }
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.
     if (
       // --- The component has its "id" (internally, "uid") or "testId" property defined
       ((appContext?.decorateComponentsWithTestId &&
-        (memoedNode.uid !== undefined || memoedNode.testId !== undefined)) ||
+        (safeNode.uid !== undefined || safeNode.testId !== undefined)) ||
         // --- The component has its "inspectId" property defined
         (appContext?.debugEnabled && inspectId !== undefined)) &&
       // // --- The app context indicates test mode
@@ -319,7 +294,7 @@ const Component = forwardRef(function Component(
       descriptor?.opaque !== true
     ) {
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
-      const testId = memoedNode.testId || memoedNode.uid;
+      const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
 
       renderedNode = (
@@ -376,6 +351,53 @@ const Component = forwardRef(function Component(
   // --- If the rendering resulted in multiple React nodes, wrap them in a fragment.
   return React.isValidElement(renderedNode) ? renderedNode : <>{renderedNode}</>;
 });
+
+function slotRenderer(
+  { node, extractValue, renderChild, lookupAction, layoutContext }: RendererContext<any>,
+  parentRenderContext,
+) {
+  if (!parentRenderContext) {
+    return undefined;
+  }
+  const templateName = extractValue(node.props.name);
+  if (templateName === undefined) {
+    return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
+  } else {
+    let slotProps;
+    if (!isEmpty(node.props)) {
+      slotProps = {};
+      Object.keys(node.props).forEach((key) => {
+        if (key !== "name") {
+          let extractedValue = extractValue(node.props[key], true);
+          if (extractedValue?._ARROW_EXPR_) {
+            extractedValue = lookupAction(extractedValue);
+          }
+          slotProps["$" + key] = extractedValue;
+        }
+      });
+    }
+
+    if (parentRenderContext.props[templateName]) {
+      return (
+        <SlotItem
+          node={parentRenderContext.props[templateName]}
+          renderChild={parentRenderContext.renderChild}
+          slotProps={slotProps}
+          layoutContext={layoutContext}
+        />
+      );
+    } else {
+      return (
+        <SlotItem
+          node={node.children}
+          renderChild={renderChild}
+          slotProps={slotProps}
+          layoutContext={layoutContext}
+        />
+      );
+    }
+  }
+}
 
 /**
  * This function gets the API-bound component properties. A property is API-bound if its value is a

@@ -7,6 +7,7 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
 import { dComponent } from "@components/metadata-helpers";
+import {SlotItem} from "@components/slot-helpers";
 
 const COMP = "AppHeader";
 
@@ -21,7 +22,11 @@ export const AppHeaderMd = createMetadata({
       `This property defines the template to use for the logo. With this property, you can ` +
         `construct your custom logo instead of using a single image.`,
     ),
-    logoTitle: d("Title for the application logo"),
+    titleTemplate: dComponent(
+        `This property defines the template to use for the title. With this property, you can ` +
+        `construct your custom title instead of using a single image.`,
+    ),
+    title: d("Title for the application logo"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
