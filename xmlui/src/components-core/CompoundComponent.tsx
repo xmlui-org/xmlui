@@ -8,7 +8,7 @@ import type { RendererContext } from "@abstractions/RendererDefs";
 
 import { useEvent } from "@components-core/utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
-import {isArray, isObject} from "lodash-es";
+import { isArray, isObject } from "lodash-es";
 
 type CompoundComponentProps<T extends ComponentDef> = {
   // Definition of the `component` part of the compound component
@@ -104,9 +104,14 @@ export const CompoundComponent = forwardRef(
 
     const nodeWithPropsAndEvents = useShallowCompareMemoize(nodeWithPropsAndEventsInner);
 
-    const hasTemplateProps = useMemo(()=>{
-      return Object.values(node.props).some((value) => {
-        return (isObject(value) && (value as any).type !== undefined || isArray(value) && (value as any)[0].type !== undefined);
+    const hasTemplateProps = useMemo(() => {
+      return Object.entries(node.props).some(([key, value]) => {
+        return (
+          //TODO this is a hack, we should have a better way to detect template props
+          key.endsWith("Template") ||
+          (isObject(value) && (value as any).type !== undefined) ||
+          (isArray(value) && (value as any)[0]?.type !== undefined)
+        );
       });
     }, [node.props]);
 
@@ -116,7 +121,7 @@ export const CompoundComponent = forwardRef(
       }
       return {
         renderChild,
-        props: node.props,     //TODO, put only the resolved template props here
+        props: node.props,
         children: node.children,
       };
     }, [hasTemplateProps, node.children, node.props, renderChild]);
@@ -125,11 +130,7 @@ export const CompoundComponent = forwardRef(
     const safeLayoutContext = layoutContext
       ? { ...layoutContext, wrapChild: undefined }
       : layoutContext;
-    const ret = renderChild(
-      nodeWithPropsAndEvents,
-      safeLayoutContext,
-      memoedParentRenderContext,
-    );
+    const ret = renderChild(nodeWithPropsAndEvents, safeLayoutContext, memoedParentRenderContext);
     if (forwardedRef && ret && isValidElement(ret)) {
       return React.cloneElement(ret, {
         ref: composeRefs(forwardedRef, (ret as any).ref),
