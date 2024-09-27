@@ -10,6 +10,52 @@ However, there are a few occasions where you need to add code. XMLUI strives to 
 
 This article will teach you the fundamental concepts and constructs of working with XMLUI code.
 
+## Component IDs
+
+The nested tags in the XMLUI markup form a natural hierarchy of components. Parent components have children (directly or through their children or children's children, and so on).
+
+When rendering an app, the engine uses this hierarchy as a declarative binding, rendering children within their parent.
+
+However, sometimes, you want to establish cooperation between two (or more) components that are not in a parent-child relationship. They may be siblings (having the same parent component) or can be in totally different branches of the markup.
+
+
+
+## Expressions
+
+<Callout type="info" emoji="💡">
+  Expressions are the primary tools for binding components to work one with the state of another.
+</Callout>
+
+```ueml copy /myText/ /myText.value/
+<VStack>
+  <TextBox id="myText" initialValue="Hello!" />
+  <Text>You typed: {myText.value}</Text>
+</VStack>
+```
+
+Type some text into the textbox to discover how this small example works.
+
+<Playground
+  previewOnly={true}
+  name="Example: Setting property values"
+  height={120}
+  horizontal={true}
+  app={`
+    <VStack padding="$space-4" gap="$space-2">
+      <TextBox id="myText" initialValue="Hello!" />
+      <Text>You typed: {myText.value}</Text>
+    </VStack>
+  `}
+/>
+
+The `{myText.value}` part in the Text component is a nested expression. The wrapping braces sign the engine that the content within will be evaluated as the app runs.
+
+The TextBox component's identifier is `myText`. You can access the TextBox's exposed values (and methods) through this ID. `myText.value` represents the current text content within the box. **So, this expression binds the TextBox's value to the Text's displayed label**.
+
+<Callout type="info" emoji="💡">
+  When the XMLUI engine observes that a dependency of an expression changes, it re-evaluates the expression and re-renders the affected part of the UI (and only that part).
+</Callout>
+
 
 _This article is about to be reviewed._
 

@@ -19,12 +19,14 @@ This simple is self-explaining; you can try it by clicking the button below:
 <Playground
     previewOnly={true}
     name="Button with increment action"
-    height={60}
+    height={88}
     horizontal={true}
     app={`
-      <Button
-        label="Click to increment: {count}"
-        var.count="{0}" onClick="count++" />
+      <VStack padding="$space-4">
+        <Button
+          label="Click to increment: {count}"
+          var.count="{0}" onClick="count++" />
+      </VStack>
   `}
 />
 
@@ -93,7 +95,7 @@ This simple is self-explaining; you can try it by clicking the button below:
 </Callout>
 
 ```ueml
-<VStack padding="1rem" gap="1rem">
+<VStack>
   <IncButton />
   <IncButton label="Click me too" />
   <IncButton label="And me" />
@@ -125,7 +127,7 @@ This simple is self-explaining; you can try it by clicking the button below:
 </Callout>
 
 ```ueml copy {2,5}
-<VStack padding="1rem" gap="1rem">
+<VStack>
   <Theme color-primary="orangered" radius="12px">
     <IncButton />
     <IncButton label="Click me too" />

@@ -1,0 +1,21 @@
+# XMLUI Apps
+
+import { Callout } from 'nextra/components'
+
+# Application Files
+
+<Callout type="info" emoji="💡">
+  XMLUI apps have a simple file structure that can be directly hosted as a set of static files in a web server's folder. 
+</Callout>
+
+This folder contains an `index.html` file that loads one or more JavaScript files (the XMLUI framework and other optional component libraries). It also contains your app's XMLUI source.
+
+When the XMLUI app starts running, the framework compiles the source files and ignites the app.
+
+<Callout type="info" emoji="💡">
+  This behavior allows you to run an XMLUI app by copying (or uploading) its files into a web server folder prepared for serving static files without a build process.
+</Callout>
+
+Your app consists of a few source files, which have the `.xmlui` (XMLUI markup files) or `xmlui.xs` (XMLUI code-behind files) extensions.
+
+An app has a mandatory file named `Main.xmlui`. When the app's `index.html` file is served from the web server, it looks for the `Main.xmlui` file to render the app's UI.
