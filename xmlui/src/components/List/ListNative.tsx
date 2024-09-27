@@ -44,7 +44,7 @@ const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
   useResizeObserver(
     ref,
     useCallback(
-      (entries) => {
+      () => {
         onHeightChanged?.(ref.current);
       },
       [onHeightChanged],
@@ -259,7 +259,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   const rowsContainerRef = useRef<HTMLDivElement | null>(null);
   const [suspendInfiniteLoad, setSuspendInfiniteLoad] = useState(true);
 
-  const [expanded, setExpanded] = useState<Record<any, boolean>>({});
+  const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
     setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
   }, []);

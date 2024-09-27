@@ -7,6 +7,7 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
 import { dComponent } from "@components/metadata-helpers";
+import {SlotItem} from "@components/slot-helpers";
 
 const COMP = "AppHeader";
 
@@ -21,7 +22,11 @@ export const AppHeaderMd = createMetadata({
       `This property defines the template to use for the logo. With this property, you can ` +
         `construct your custom logo instead of using a single image.`,
     ),
-    logoTitle: d("Title for the application logo"),
+    titleTemplate: dComponent(
+        `This property defines the template to use for the title. With this property, you can ` +
+        `construct your custom title instead of using a single image.`,
+    ),
+    title: d("Title for the application logo"),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -56,25 +61,25 @@ export const appHeaderComponentRenderer = createComponentRenderer(
   AppHeaderMd,
   ({ node, renderChild, layoutCss, layoutContext, extractValue }) => {
     // --- Convert the plain (text) logo template into component definition
-    let logoTemplate = node.props.logoTemplate as any;
-    if (typeof (logoTemplate as any) === "string") {
-      logoTemplate = {
-        type: "TextNode",
-        props: {
-          value: logoTemplate,
-        },
-      };
-    }
+    const logoTemplate = node.props.logoTemplate || node.slots?.logoSlot;
+    const titleTemplate = node.props.titleTemplate || node.slots?.titleSlot;
     return (
       <AppContextAwareAppHeader
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
-        logoTitle={extractValue(node.props.logoTitle) || layoutContext?.logoTitle}
-        logoContent={
-          renderChild(logoTemplate, {
-            type: "Stack",
-            orientation: "horizontal",
-          }) || layoutContext?.logoContent
+        title={extractValue(node.props.title)}
+        titleContent={
+          titleTemplate && (
+            <SlotItem
+              node={titleTemplate}
+              renderChild={renderChild}
+              slotProps={{ title: extractValue(node.props.title) }}
+            />
+          )
         }
+        logoContent={renderChild(logoTemplate, {
+          type: "Stack",
+          orientation: "horizontal",
+        })}
         style={layoutCss}
         className={layoutContext?.themeClassName}
         renderChild={renderChild}
@@ -82,8 +87,6 @@ export const appHeaderComponentRenderer = createComponentRenderer(
         {renderChild(node.children, {
           // Since the AppHeader is a flex container, it's children should behave the same as in a stack
           type: "Stack",
-          width: "100%",
-          height: "100%",
         })}
       </AppContextAwareAppHeader>
     );

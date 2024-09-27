@@ -81,7 +81,7 @@ module.exports = {
         // 'jsx-a11y/no-static-element-interactions': 'off',
         // 'react/display-name': 'off',
         // '@typescript-eslint/no-non-null-assertion': 'off',
-        // 'react/prop-types': 'off'
+        'react/prop-types': 'off'
       }
     },
 

@@ -321,3 +321,10 @@ export function d(
 ): ComponentPropertyMetadata {
   return { description, availableValues, valueType, defaultValue, isValid };
 }
+
+
+export interface ParentRenderContext {
+  renderChild: RenderChildFn;
+  children?: ComponentDef[];
+  props?: Record<string, any>
+}

@@ -6,7 +6,7 @@ import type { LayoutContext, NonCssLayoutProps } from "@abstractions/RendererDef
 
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { StyleParser, toCssVar } from "./StyleParser";
-import { MediaBreakpointType } from "@abstractions/AppContextDefs";
+import type { MediaBreakpointType } from "@abstractions/AppContextDefs";
 
 // Property parsing issues
 type PropertyIssues = Record<string, string | undefined>;
