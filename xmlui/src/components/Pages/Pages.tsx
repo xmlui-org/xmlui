@@ -6,7 +6,7 @@ import { Pages, RouteWrapper } from "./PagesNative";
 const PAGE = "Page";
 
 export const PageMd = createMetadata({
-  status: "in review",
+  status: "experimental",
   docFolder: PAGE,
   description:
     `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +

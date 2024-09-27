@@ -8,7 +8,7 @@ import { dComponent } from "@components/metadata-helpers";
 const COMP = "Form";
 
 export const FormMd = createMetadata({
-  status: "in review",
+  status: "experimental",
   description:
     `A \`${COMP}\` is a fundamental component that displays user interfaces that allow users to input ` +
     `(or change) data and submit it to the app (a server) for further processing.`,

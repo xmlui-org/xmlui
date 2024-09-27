@@ -8,7 +8,7 @@ import { BarChart } from "./BarChartNative";
 const COMP = "BarChart";
 
 export const BarChartMd = createMetadata({
-  status: "in review",
+  status: "deprecated",
   description: `The \`BarChart\` component represents a bar chart.`,
   props: {
     data: d(

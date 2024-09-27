@@ -8,7 +8,7 @@ import { Badge, BadgeColors } from "./BadgeNative";
 const COMP = "Badge";
 
 export const BadgeMd = createMetadata({
-  status: "in review",
+  status: "stable",
   description: `The \`${COMP}\` is a text label that accepts a color map to define its background color and, optionally, its label color.`,
   props: {
     value: d("The text that the component displays"),

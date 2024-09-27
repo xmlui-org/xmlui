@@ -7,7 +7,11 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { enableMapSet } from "immer";
 
-import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  ComponentLike,
+} from "@abstractions/ComponentDefs";
 import type { MemoedVars } from "./abstractions/ComponentRenderer";
 import type { ActionRendererDef } from "@abstractions/ActionDefs";
 import type { ContainerComponentDef } from "./container/ContainerComponentDef";
@@ -35,7 +39,10 @@ import { miscellaneousUtils } from "./appContext/misc-utils";
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import { ThemeToneKeys } from "@components-core/theming/abstractions";
 import { ComponentProvider } from "@components/ComponentProvider";
-import { ConfirmationModalContextProvider, useConfirm } from "@components/ModalDialog/ConfirmationModalContextProvider";
+import {
+  ConfirmationModalContextProvider,
+  useConfirm,
+} from "@components/ModalDialog/ConfirmationModalContextProvider";
 import { AppStateContext } from "@components/App/AppStateContext";
 import {
   useDocumentKeydown,
@@ -183,14 +190,27 @@ function RootContentComponent({
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
-  const { activeThemeId, activeThemeTone, setActiveThemeId, setActiveThemeTone, availableThemeIds, root } = useThemes();
+  const {
+    activeThemeId,
+    activeThemeTone,
+    setActiveThemeId,
+    setActiveThemeTone,
+    availableThemeIds,
+    root,
+  } = useThemes();
 
   useDocumentKeydown((event: KeyboardEvent) => {
     if (event.code === "KeyT" && event.altKey && event.ctrlKey && event.shiftKey) {
-      setActiveThemeId(availableThemeIds[(availableThemeIds.indexOf(activeThemeId) + 1) % availableThemeIds.length]);
+      setActiveThemeId(
+        availableThemeIds[
+          (availableThemeIds.indexOf(activeThemeId) + 1) % availableThemeIds.length
+        ],
+      );
     }
     if (event.code === "KeyO" && event.altKey && event.ctrlKey && event.shiftKey) {
-      setActiveThemeTone(ThemeToneKeys[(ThemeToneKeys.indexOf(activeThemeTone) + 1) % ThemeToneKeys.length]);
+      setActiveThemeTone(
+        ThemeToneKeys[(ThemeToneKeys.indexOf(activeThemeTone) + 1) % ThemeToneKeys.length],
+      );
     }
   });
 
@@ -209,23 +229,29 @@ function RootContentComponent({
   const createLowerDimension = (dimension: string) => {
     const match = dimension.match(/^(\d+)px$/);
     return match ? `${parseInt(match[1]) - 0.02}px` : "0";
-  }
+  };
 
   // we sync with the theme variable value (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
     const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone"));
     setMaxWidthPhone(mwPhone);
     setMaxWidthPhoneLower(createLowerDimension(mwPhone));
-    const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-landscape-phone"));
+    const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(
+      getVarKey("media-max-width-landscape-phone"),
+    );
     setMaxWidthLandscapePhone(mwLandscapePhone);
     setMaxWidthLandscapePhoneLower(createLowerDimension(mwLandscapePhone));
     const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-tablet"));
     setMaxWidthTablet(mwTablet);
     setMaxWidthTabletLower(createLowerDimension(mwTablet));
-    const mwDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-desktop"));
+    const mwDesktop = getComputedStyle(root!).getPropertyValue(
+      getVarKey("media-max-width-desktop"),
+    );
     setMaxWidthDesktop(mwDesktop);
     setMaxWidthDesktopLower(createLowerDimension(mwDesktop));
-    const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-large-desktop"));
+    const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
+      getVarKey("media-max-width-large-desktop"),
+    );
     setMaxWidthLargeDesktop(mwLargeDesktop);
     setMaxWidthLargeDesktopLower(createLowerDimension(mwLargeDesktop));
   }, [activeThemeId, root]);
@@ -235,8 +261,12 @@ function RootContentComponent({
   const isViewportLandscapePhone = useMediaQuery(
     `(min-width: ${maxWidthPhone}) and (max-width: ${maxWidthLandscapePhoneLower})`,
   );
-  const isViewportTablet = useMediaQuery(`(min-width: ${maxWidthLandscapePhone}) and (max-width: ${maxWidthTabletLower})`);
-  const isViewportDesktop = useMediaQuery(`(min-width: ${maxWidthTablet}) and (max-width: ${maxWidthDesktopLower})`);
+  const isViewportTablet = useMediaQuery(
+    `(min-width: ${maxWidthLandscapePhone}) and (max-width: ${maxWidthTabletLower})`,
+  );
+  const isViewportDesktop = useMediaQuery(
+    `(min-width: ${maxWidthTablet}) and (max-width: ${maxWidthDesktopLower})`,
+  );
   const isViewportLargeDesktop = useMediaQuery(
     `(min-width: ${maxWidthDesktop}) and (max-width: ${maxWidthLargeDesktopLower})`,
   );
@@ -276,7 +306,9 @@ function RootContentComponent({
 
     if (lastHash.current) {
       setTimeout(() => {
-        document.getElementById(lastHash.current)?.scrollIntoView({ behavior: "instant", block: "start" });
+        document
+          .getElementById(lastHash.current)
+          ?.scrollIntoView({ behavior: "instant", block: "start" });
         lastHash.current = "";
       }, 100);
     }
@@ -324,6 +356,8 @@ function RootContentComponent({
     isViewportDesktop,
     isViewportLargeDesktop,
     isViewportXlDesktop,
+    vpSize,
+    vpSizeIndex,
   ]);
 
   const globals = useMemo(() => {
@@ -369,6 +403,7 @@ function RootContentComponent({
     apiInterceptorContext,
     availableThemeIds,
     confirm,
+    debugEnabled,
     decorateComponentsWithTestId,
     embed,
     environment,

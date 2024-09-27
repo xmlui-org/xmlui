@@ -39,7 +39,7 @@ export const columnComponentRenderer = createComponentRenderer(
   COMP,
   ColumnMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue, childIndex, layoutCss } = rendererContext;
+    const { node, renderChild, extractValue, layoutCss } = rendererContext;
     return (
       <Column
         style={layoutCss}
@@ -53,7 +53,7 @@ export const columnComponentRenderer = createComponentRenderer(
         maxWidth={extractValue(node.props.maxWidth)}
         nodeChildren={node.children}
         renderChild={renderChild}
-        index={childIndex || 0}
+        index={0}
       />
     );
   },

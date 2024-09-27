@@ -78,13 +78,13 @@ export const appRenderer = createComponentRenderer(
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
-        logoContent={renderChild(node.props.logoTemplate)}
         onReady={lookupEventHandler("ready")}
         header={renderChild(AppHeader)}
         footer={renderChild(Footer)}
         navPanel={renderChild(NavPanel)}
-        navPanelInDrawer={renderChild(NavPanel, { inDrawer: true })}
         navPanelDef={NavPanel}
+        logoContentDef={node.props.logoTemplate}
+        renderChild={renderChild}
       >
         {renderChild(restChildren)}
       </App>

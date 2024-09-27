@@ -1,18 +1,20 @@
+import { Callout } from 'nextra/components'
+
 # Introduction to XMLUI
 
-XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to REST APIs on the backend.
+**XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to web APIs on the backend.**
 
 ## Simple.
 
-In contrast to other UI frameworks, XMLUI offers simple concepts to create apps quickly without coping with the cumbersome peculiarities of web development.
-
-Here is a sample that demonstrates the conciseness of defining an app with XMLUI:
+<Callout type="info" emoji="💡">
+  In contrast to other UI frameworks, XMLUI offers **simple concepts** to create apps quickly **without coping with the cumbersome peculiarities of web development**.
+</Callout>
 
 ```ueml copy
 <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
 ```
 
-The function of this app is self-explaining; you can try it by clicking the button below:
+This simple is self-explaining; you can try it by clicking the button below:
 
 <Playground
     previewOnly={true}
@@ -26,19 +28,21 @@ The function of this app is self-explaining; you can try it by clicking the butt
   `}
 />
 
-Without diving into the details, these are the fundamental concepts XMLUI uses when running an application:
-
 - Its markup language (XMLUI Markup Language) is like XHTML.
 - `<Button>` is a component.
 - `label` is a property of `Button`.
 - `var.count` initializes a `count` variable to zero.
 - `onClick` is an event handler. Each click increments the value of `count`.
 
-XMLUI uses the reactive paradigm: whenever the state of a particular component changes―in this case, the value of `count`―the engine refreshes that component in the UI.
+<Callout type="info" emoji="💡">
+  XMLUI uses the **reactive paradigm**: whenever the state of a particular component changes―in this case, the value of `count`―the engine refreshes that component in the UI.
+</Callout>
 
 ## API-Aware.
 
-XMLUI integrates with REST APIs out of the box. The following sample app demonstrates the simplicity of retrieving and displaying data: 
+<Callout type="info" emoji="💡">
+  XMLUI integrates with **web APIs** out of the box.
+</Callout>
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
@@ -48,7 +52,6 @@ XMLUI integrates with REST APIs out of the box. The following sample app demonst
 </List>
 ```
 
-The working app below uses these XMLUI features:
 - `<List>` is a component working with data (an array of items). It virtualizes items and renders only those visible in the UI.
 - List items result from a GET request from the `https://api.spacexdata.com/v3/history` API endpoint.
 - The `itemTemplate` property defines the UI patch for a particular list item.
@@ -70,7 +73,9 @@ The working app below uses these XMLUI features:
 
 ## Composable.
 
-It is easy to create your reusable custom components with XMLUI:
+<Callout type="info" emoji="💡">
+  You can create **reusable app components** to avoid markup repetition and improve maintainability.
+</Callout>
 
 ```ueml
 <Component name="IncButton">
@@ -83,7 +88,9 @@ It is easy to create your reusable custom components with XMLUI:
 
 `IncButton` is a reusable component that allows specifying its label. `$props.label` represents the label value the consumer of `IncButton` assigns to a particular instance. If it is empty (not defined), the component uses the "Click me to increment" default value.
 
-When you create an app, you can leverage your reusable components:
+<Callout type="info" emoji="💡">
+  When you create an app, you can **leverage your reusable components**.
+</Callout>
 
 ```ueml
 <VStack padding="1rem" gap="1rem">
@@ -113,7 +120,9 @@ When you create an app, you can leverage your reusable components:
 
 ## Themeable.
 
-You can change the visual appearance of an app by creating a new theme (from an existing one):
+<Callout type="info" emoji="💡">
+  You can change the visual appearance of an app by creating a new theme (from an existing one).
+</Callout>
 
 ```ueml copy {2,5}
 <VStack padding="1rem" gap="1rem">
@@ -125,7 +134,7 @@ You can change the visual appearance of an app by creating a new theme (from an 
 </VStack>
 ```
 
-Here, the `<Theme>` tag wraps the first two `IncButton` components to change some of their theme properties, while the third button remains intact:
+The `<Theme>` tag wraps the first two `IncButton` components to change some of their theme properties, while the third button remains intact.
 
 <Playground
     previewOnly

@@ -20,7 +20,7 @@ import {
 const RGOption = "RadioGroupOption";
 
 export const RadioGroupOptionMd = createMetadata({
-  status: "in review",
+  status: "stable",
   description: "A single radio button within a radio button group",
   props: {
     enabled: dEnabled(),
