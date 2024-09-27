@@ -59,7 +59,8 @@ export interface IAppLayoutContext {
   toggleDrawer: () => void;
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
-  navPanelDef?: ComponentDef;
+  navPanelDef?: ComponentDef
+  logoContentDef?: ComponentDef
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

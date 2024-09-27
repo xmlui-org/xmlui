@@ -54,8 +54,8 @@ const sectionNames = {
   props: "Properties",
   events: "Events",
   styles: "Styling",
-  api: "API",
-  contextVars: "Context Variables",
+  api: "Exposed Members",
+  contextVars: "Context Values",
 };
 
 export function processDocfiles(metadata) {
@@ -123,16 +123,16 @@ export function processMdx(component, componentNames, metadata) {
     result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
     result += "\n\n";
 
-    result += addContextVarsSection(fileData, component);
-    result += "\n\n";
-
     result += addPropsSection(fileData, component);
     result += "\n\n";
 
-    result += addApiSection(fileData, component);
+    result += addEventsSection(fileData, component);
     result += "\n\n";
 
-    result += addEventsSection(fileData, component);
+    result += addContextVarsSection(fileData, component);
+    result += "\n\n";
+
+    result += addApisSection(fileData, component);
     result += "\n\n";
 
     result += addStylesSection(fileData, component);
@@ -233,7 +233,7 @@ function addContextVarsSection(data, component) {
   let buffer = `## ${sectionNames.contextVars}\n\n`;
 
   if (!component.contextVars || Object.keys(component.contextVars ?? {}).length === 0) {
-    return buffer + "This component does not have any context variables.";
+    return buffer + "This component does not have any context values.";
   }
   Object.entries(component.contextVars)
     .sort()
@@ -268,14 +268,14 @@ function addPropsSection(data, component) {
   return buffer;
 }
 
-function addApiSection(data, component) {
+function addApisSection(data, component) {
   logger.info(`Processing ${component.displayName} APIs`);
   let buffer = `## ${sectionNames.api}\n\n`;
 
-  if (!component.api || Object.keys(component.api ?? {}).length === 0) {
-    return buffer + "This component does not provide any API.";
+  if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
+    return buffer + "This component does not expose any members.";
   }
-  Object.entries(component.api)
+  Object.entries(component.apis)
     .sort()
     .forEach(([apiName, api]) => {
       buffer += `### \`${apiName}\`\n\n`;
@@ -318,7 +318,7 @@ function addStylesSection(data, component) {
   buffer +=
     fileBuffer && varsTable
       ? fileBuffer + "\n\n### Theme Variables\n\n" + varsTable
-      : "This component does not have any styles.";
+      : "This component does not have any theme variables.";
 
   return buffer;
 }

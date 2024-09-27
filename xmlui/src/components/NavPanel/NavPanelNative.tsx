@@ -6,6 +6,7 @@ import { ScrollContext } from "@components-core/ScrollContext";
 import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { getAppLayoutOrientation } from "@components/App/AppNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { RenderChildFn } from "@abstractions/RendererDefs";
 
 interface INavPanelContext {
   inDrawer: boolean;
@@ -17,7 +18,7 @@ const contextValue = {
   inDrawer: true,
 };
 
-export function DrawerNavPanel({
+function DrawerNavPanel({
   logoContent,
   children,
   className,
@@ -51,11 +52,15 @@ export const NavPanel = forwardRef(function NavPanel(
     style,
     logoContent,
     className,
+    inDrawer,
+    renderChild,
   }: {
     children: ReactNode;
     className?: string;
     style?: React.CSSProperties;
     logoContent?: ReactNode;
+    inDrawer?: boolean;
+    renderChild: RenderChildFn;
   },
   forwardedRef,
 ) {
@@ -66,8 +71,17 @@ export const NavPanel = forwardRef(function NavPanel(
   const showLogo =
     appLayoutContext?.layout === "vertical" || appLayoutContext?.layout === "vertical-sticky";
   const isCondensed = appLayoutContext?.layout?.startsWith("condensed");
+  const safeLogoContent = logoContent || renderChild(appLayoutContext?.logoContentDef);
 
-  console.log(appLayoutContext);
+  // console.log(appLayoutContext);
+
+  if (inDrawer) {
+    return (
+      <DrawerNavPanel style={style} logoContent={safeLogoContent} className={className}>
+        {children}
+      </DrawerNavPanel>
+    );
+  }
 
   return (
     <div
@@ -79,7 +93,7 @@ export const NavPanel = forwardRef(function NavPanel(
     >
       <ScrollContext.Provider value={scrollContainerRef}>
         {showLogo && (
-          <div className={classnames(styles.logoWrapper)}>{logoContent || <Logo />}</div>
+          <div className={classnames(styles.logoWrapper)}>{safeLogoContent || <Logo />}</div>
         )}
         <div className={styles.wrapperInner} style={style}>
           {children}

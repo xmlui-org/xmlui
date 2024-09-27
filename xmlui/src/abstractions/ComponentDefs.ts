@@ -222,7 +222,7 @@ export type ComponentMetadata<
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // The current status of the component. By default, it is "stable".
-  status?: "stable" | "experimental" | "deprecated" | "in review" | "in progress";
+  status?: "stable" | "experimental" | "deprecated" | "in progress";
 
   // Component description in markdown; it goes into the generated documentation
   description?: string;
@@ -320,4 +320,11 @@ export function d(
   isValid?: IsValidFunction<any>,
 ): ComponentPropertyMetadata {
   return { description, availableValues, valueType, defaultValue, isValid };
+}
+
+
+export interface ParentRenderContext {
+  renderChild: RenderChildFn;
+  children?: ComponentDef[];
+  props?: Record<string, any>
 }

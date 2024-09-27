@@ -5,37 +5,27 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import { useShallowCompareMemoize } from "@components-core/utils/hooks";
 
-type MemoizedItemProps = {
+type SlotItemProps = {
   node: ComponentDef | Array<ComponentDef>;
-  item?: any;
-  context?: any;
+  slotProps?: any;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
-  itemName?: string;
-  contextVars?: Record<string, any>;
 };
 
-export const MemoizedItem = memo(
-  ({
-    node,
-    item,
-    context,
-    renderChild,
-    layoutContext,
-    contextVars = EMPTY_OBJECT,
-  }: MemoizedItemProps) => {
-    const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
+export const SlotItem = memo(
+  ({ node, renderChild, layoutContext, slotProps = EMPTY_OBJECT }: SlotItemProps) => {
+    const shallowMemoedSlotProps = useShallowCompareMemoize(slotProps);
     const nodeWithItem = useMemo(() => {
+      const templateProps = {};
+      Object.entries(shallowMemoedSlotProps).forEach(([key, value]) => {
+        templateProps["$" + key] = value;
+      });
       return {
         type: "Container",
-        contextVars: {
-          $item: item,
-          $context: context,
-          ...shallowMemoedContextVars,
-        },
+        contextVars: templateProps,
         children: Array.isArray(node) ? node : [node],
       } as ContainerComponentDef;
-    }, [context, item, node, shallowMemoedContextVars]);
+    }, [node, shallowMemoedSlotProps]);
 
     return <>{renderChild(nodeWithItem, layoutContext)}</>;
   },

@@ -27,7 +27,7 @@ $thickness-decoration-Link: createThemeVar("thickness-decoration-Link");
   text-decoration: none;
   width: fit-content;
   max-width: 100%;
-  height: fit-content;
+  max-height: 100%;
   display: inline-flex;
   flex-direction: row;
   align-items: center;
@@ -64,10 +64,6 @@ $thickness-decoration-Link: createThemeVar("thickness-decoration-Link");
 .iconWrapper {
   padding: t.$space-0_5;
   line-height: 0;
-}
-
-.inner {
-  max-width: 100%;
 }
 
 .container:not(.active) {

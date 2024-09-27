@@ -31,16 +31,6 @@ If the `label` is not specified `value` is shown.
   `}
 />
 
-## Context Variables
-
-### `$item`
-
-This context variable acts as a template for an item in the list.
-
-Access attributes of the item using the dot notation.
-
-For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
-
 ## Properties
 
 ### `autoFocus`
@@ -250,10 +240,6 @@ Available values:
 </VStack>`}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didChange`
@@ -331,6 +317,26 @@ This event is triggered when the Select has received the focus.
 ### `lostFocus`
 
 This event is triggered when the Select has lost the focus.
+
+## Context Values
+
+### `$item`
+
+This context variable acts as a template for an item in the list.
+
+Access attributes of the item using the dot notation.
+
+For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
+
+## Exposed Members
+
+### `focus`
+
+This method sets the focus on the Select.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
 ## Styling
 

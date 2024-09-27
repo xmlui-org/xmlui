@@ -1,3 +1,4 @@
+import type { Dispatch, MutableRefObject, ReactNode, SetStateAction } from "react";
 import React, {
   forwardRef,
   Fragment,
@@ -14,8 +15,6 @@ import React, {
 import memoizeOne from "memoize-one";
 import produce from "immer";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-
-import type { Dispatch, MutableRefObject, ReactNode, SetStateAction } from "react";
 import type {
   ArrowExpression,
   ArrowExpressionStatement,
@@ -24,8 +23,16 @@ import type {
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { InnerRendererContext, ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
+import type {
+  ComponentDef,
+  DynamicChildComponentDef,
+  ParentRenderContext,
+} from "@abstractions/ComponentDefs";
+import type {
+  ContainerDispatcher,
+  InnerRendererContext,
+  MemoedVars,
+} from "../abstractions/ComponentRenderer";
 import type {
   ComponentApi,
   ComponentCleanupFn,
@@ -33,14 +40,29 @@ import type {
   ContainerState,
   RegisterComponentApiFnInner,
 } from "./ContainerComponentDef";
+import { isContainerLike } from "./ContainerComponentDef";
 import type { ProxyAction } from "./buildProxy";
-import type { DynamicChildComponentDef } from "@abstractions/ComponentDefs";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import type { LookupActionOptions, LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
-import type { LayoutContext } from "@abstractions/RendererDefs";
+import buildProxy from "./buildProxy";
+import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
+import type {
+  LookupActionOptions,
+  LookupAsyncFnInner,
+  LookupSyncFnInner,
+} from "@abstractions/ActionDefs";
 import type { ContainerAction } from "@components-core/abstractions/containers";
+import { ContainerActionKind } from "@components-core/abstractions/containers";
 
-import { cloneDeep, isArray, isEmpty, isPlainObject, keyBy, merge, pick, setWith, unset } from "lodash-es";
+import {
+  cloneDeep,
+  isArray,
+  isEmpty,
+  isPlainObject,
+  keyBy,
+  merge,
+  pick,
+  setWith,
+  unset,
+} from "lodash-es";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import { extractParam, shouldKeep } from "@components-core/utils/extractParam";
 import {
@@ -55,10 +77,6 @@ import { processStatementQueueAsync } from "@components-core/script-runner/proce
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
 import Component from "@components-core/Component";
 import { EMPTY_ARRAY, EMPTY_OBJECT, noop } from "@components-core/constants";
-import { isContainerLike } from "./ContainerComponentDef";
-import { compileLayout } from "../../parsers/style-parser/style-compiler";
-import { layoutOptionKeys } from "@components-core/descriptorHelper";
-import buildProxy from "./buildProxy";
 import { parseHandlerCode, prepareHandlerStatements } from "@components-core/utils/statementUtils";
 import { useLocation, useNavigate, useParams, useSearchParams } from "@remix-run/react";
 import { useAppContext } from "@components-core/AppContext";
@@ -70,10 +88,9 @@ import { evalBinding } from "@components-core/script-runner/eval-tree-sync";
 import { collectFnVarDeps } from "@components-core/container/collectFnVarDeps";
 import {
   useIsomorphicLayoutEffect,
-  useShallowCompareMemoize,
   useReferenceTrackedApi,
+  useShallowCompareMemoize,
 } from "@components-core/utils/hooks";
-import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { LoaderComponent } from "@components-core/LoaderComponent";
 import { AppContextObject } from "@abstractions/AppContextDefs";
 
@@ -81,7 +98,12 @@ import { AppContextObject } from "@abstractions/AppContextDefs";
  * This function signature is used whenever the engine wants to sign that an object's field (property),
  * which is part of the container state, has changed.
  */
-type StateFieldPartChangedFn = (path: string[], value: any, target: string, action: ProxyAction) => void;
+type StateFieldPartChangedFn = (
+  path: string[],
+  value: any,
+  target: string,
+  action: ProxyAction,
+) => void;
 
 // This function renders the entire component tree starting from the root component. As it works recursively,
 // all child components will be rendered, including the wrapping containers
@@ -96,8 +118,6 @@ export function renderRoot(node: ComponentDef, memoedVarsRef: MutableRefObject<M
     registerComponentApi: noop,
     renderChild: noop,
     stateFieldPartChanged: noop,
-    layoutCss: EMPTY_OBJECT,
-    layoutNonCss: EMPTY_OBJECT,
     cleanup: noop,
     memoedVarsRef,
   });
@@ -119,6 +139,7 @@ type ContainerProps = {
   memoedVarsRef: MutableRefObject<MemoedVars>;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
+  parentRenderContext?: ParentRenderContext;
 };
 
 // React component to display a view container and implement its behavior
@@ -136,8 +157,7 @@ const MemoizedContainer = memo(
       registerComponentApi: containerRegisterComponentApi,
       parentRegisterComponentApi,
       layoutContextRef,
-      dynamicChildren,
-      dynamicSlots,
+      parentRenderContext,
       memoedVarsRef,
       isImplicit,
     }: ContainerProps,
@@ -145,7 +165,9 @@ const MemoizedContainer = memo(
   ) {
     const { apiBoundContainer } = node;
     const dispatch = isImplicit ? parentDispatch : containerDispatch;
-    const registerComponentApi = isImplicit ? parentRegisterComponentApi : containerRegisterComponentApi;
+    const registerComponentApi = isImplicit
+      ? parentRegisterComponentApi
+      : containerRegisterComponentApi;
 
     const { themeVars } = useTheme();
     const appContext = useAppContext();
@@ -255,7 +277,10 @@ const MemoizedContainer = memo(
           let statements;
           if (typeof source === "string") {
             if (!parsedStatementsRef.current[source]) {
-              parsedStatementsRef.current[source] = prepareHandlerStatements(parseHandlerCode(source), evalContext);
+              parsedStatementsRef.current[source] = prepareHandlerStatements(
+                parseHandlerCode(source),
+                evalContext,
+              );
             }
             statements = parsedStatementsRef.current[source];
           } else {
@@ -282,7 +307,12 @@ const MemoizedContainer = memo(
               if (changes.length) {
                 mainThreadBlockingRuns = 0;
                 changes.forEach((change) => {
-                  stateFieldPartChanged(change.pathArray, cloneDeep(change.newValue), change.target, change.action);
+                  stateFieldPartChanged(
+                    change.pathArray,
+                    cloneDeep(change.newValue),
+                    change.target,
+                    change.action,
+                  );
                 });
                 let resolve = null;
                 const stateUpdatedPromise = new Promise((res) => {
@@ -336,7 +366,8 @@ const MemoizedContainer = memo(
           }
 
           if (evalContext.mainThread?.blocks?.length) {
-            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
+            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
+              .returnValue;
           }
         } catch (e) {
           //if we pass down an event handler to a component, we should sign the error once, not in every step of the component chain
@@ -367,7 +398,8 @@ const MemoizedContainer = memo(
         processStatementQueue([arrowStmt], evalContext);
 
         if (evalContext.mainThread?.blocks?.length) {
-          return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1].returnValue;
+          return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
+            .returnValue;
         }
       } catch (e) {
         console.error(e);
@@ -429,7 +461,11 @@ const MemoizedContainer = memo(
     });
 
     const lookupAction: LookupAsyncFnInner = useCallback(
-      (action: string | undefined | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
+      (
+        action: string | undefined | ArrowExpression,
+        uid: symbol,
+        options?: LookupActionOptions,
+      ) => {
         let safeAction = action;
         if (!action && uid.description && options?.eventName) {
           const handlerFnName = `${uid.description}_on${capitalizeFirstLetter(options?.eventName)}`;
@@ -487,60 +523,36 @@ const MemoizedContainer = memo(
     });
 
     const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, rc, dSlots) => {
-        // let node: any = childNode;
+      (childNode, lc, pRenderContext) => {
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
         }
-        // if(rc){
-        //   console.log("hey, ", rc);
-        //   // console.log(childNode);
-        // }
         const children = isArray(childNode) ? childNode : [childNode];
 
         if (!children || !children.length) {
           return null;
         }
         const wrapWithFragment = children.length > 1;
-        const dynamicChildren = children.map((child, childIndex) => {
+        const renderedChildren = children.map((child, childIndex) => {
           if (!child) {
             return undefined;
           }
-          let renderedChild: any;
-          if ("childToRender" in child) {
-            //inside a compoundComponent, render it with the parent state context, but the actual CC layoutContext
-            renderedChild = (child as any).renderChild(child.childToRender, lc);
-          } else {
-            const resolvedProps: Record<string, any> = {};
-            layoutOptionKeys.forEach((key) => {
-              if (child.props && key in child.props) {
-                resolvedProps[key] = extractParam(componentState, child.props[key], appContext, true);
-              }
-            });
-            const { cssProps, nonCssProps } = compileLayout(resolvedProps, themeVars, {
-              ...lc,
-              mediaSize: appContext.mediaSize,
-            });
-            renderedChild = renderChild({
-              node: child,
-              state: componentState,
-              dispatch,
-              appContext,
-              lookupAction,
-              lookupSyncCallback,
-              registerComponentApi,
-              renderChild: stableRenderChild,
-              stateFieldPartChanged,
-              layoutCss: cssProps,
-              layoutNonCss: nonCssProps,
-              layoutContext: lc,
-              dynamicChildren: rc,
-              dynamicSlots: dSlots,
-              memoedVarsRef,
-              cleanup,
-              childIndex,
-            });
-          }
+
+          const renderedChild = renderChild({
+            node: child,
+            state: componentState,
+            dispatch,
+            appContext,
+            lookupAction,
+            lookupSyncCallback,
+            registerComponentApi,
+            renderChild: stableRenderChild,
+            stateFieldPartChanged,
+            layoutContext: lc,
+            parentRenderContext: pRenderContext,
+            memoedVarsRef,
+            cleanup
+          });
           if (renderedChild === undefined) {
             return undefined;
           }
@@ -557,14 +569,14 @@ const MemoizedContainer = memo(
           }
           return rendered;
         });
-        if (dynamicChildren.length === 1) {
-          return ref && dynamicChildren[0] && isValidElement(dynamicChildren[0])
-            ? React.cloneElement(dynamicChildren[0], {
-                ref: composeRefs(ref, (dynamicChildren[0] as any).ref),
+        if (renderedChildren.length === 1) {
+          return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
+            ? React.cloneElement(renderedChildren[0], {
+                ref: composeRefs(ref, (renderedChildren[0] as any).ref),
               } as any)
-            : dynamicChildren[0];
+            : renderedChildren[0];
         }
-        return dynamicChildren;
+        return renderedChildren;
       },
       [
         themeVars,
@@ -596,7 +608,11 @@ const MemoizedContainer = memo(
 
     return (
       <Fragment
-        key={node.uid ? `${resolvedKey}>${extractParam(componentState, node.uid, appContext, true)}` : undefined}
+        key={
+          node.uid
+            ? `${resolvedKey}>${extractParam(componentState, node.uid, appContext, true)}`
+            : undefined
+        }
       >
         {renderLoaders({
           uidInfo,
@@ -604,12 +620,18 @@ const MemoizedContainer = memo(
           componentState,
           //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
           dispatch: apiBoundContainer ? containerDispatch : dispatch,
-          registerComponentApi: apiBoundContainer ? containerRegisterComponentApi : registerComponentApi,
+          registerComponentApi: apiBoundContainer
+            ? containerRegisterComponentApi
+            : registerComponentApi,
           appContext,
           lookupAction,
           cleanup,
         })}
-        {stableRenderChild(node.children, layoutContextRef?.current, dynamicChildren, dynamicSlots)}
+        {stableRenderChild(
+          node.children,
+          layoutContextRef?.current,
+          parentRenderContext,
+        )}
       </Fragment>
     );
   }),
@@ -663,8 +685,7 @@ type ErrorProneContainerProps = {
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   resolvedKey?: string;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
-  dynamicChildren?: Array<DynamicChildComponentDef>;
-  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
+  parentRenderContext?: ParentRenderContext;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
 };
@@ -680,8 +701,7 @@ const MemoizedErrorProneContainer = memo(
       parentStateFieldPartChanged,
       parentRegisterComponentApi,
       layoutContextRef,
-      dynamicChildren: dynamicChildren,
-      dynamicSlots,
+      parentRenderContext,
       isImplicit,
       parentDispatch,
     }: ErrorProneContainerProps,
@@ -723,7 +743,11 @@ const MemoizedErrorProneContainer = memo(
       }, [componentState, componentApis]),
     );
 
-    const localVarsStateContext = useCombinedState(stateFromOutside, componentStateWithApis, node.contextVars);
+    const localVarsStateContext = useCombinedState(
+      stateFromOutside,
+      componentStateWithApis,
+      node.contextVars,
+    );
     const parsedScriptPart = node.scriptCollected;
     if (parsedScriptPart?.moduleErrors && !isEmpty(parsedScriptPart.moduleErrors)) {
       throw new CodeBehindParseError(parsedScriptPart.moduleErrors);
@@ -774,7 +798,12 @@ const MemoizedErrorProneContainer = memo(
       memoedVars,
     );
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
-    const combinedState = useCombinedState(stateFromOutside, node.contextVars, mergedWithVars, routingParams);
+    const combinedState = useCombinedState(
+      stateFromOutside,
+      node.contextVars,
+      mergedWithVars,
+      routingParams,
+    );
 
     const registerComponentApi: RegisterComponentApiFnInner = useCallback((uid, api) => {
       setComponentApis(
@@ -822,8 +851,9 @@ const MemoizedErrorProneContainer = memo(
           registerComponentApi={registerComponentApi}
           parentRegisterComponentApi={parentRegisterComponentApi}
           layoutContextRef={layoutContextRef}
-          dynamicChildren={dynamicChildren}
-          dynamicSlots={dynamicSlots}
+          // dynamicChildren={dynamicChildren}
+          // dynamicSlots={dynamicSlots}
+          parentRenderContext={parentRenderContext}
           memoedVarsRef={memoedVars}
           isImplicit={isImplicit}
           ref={ref}
@@ -865,6 +895,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
   delete wrappedNode.uses;
   delete (wrappedNode.props as any)?.uses;
   delete wrappedNode.api;
+  delete wrappedNode.contextVars;
 
   // --- Do the wrapping
   return {
@@ -881,6 +912,7 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
     api: node.api,
     containerUid: "containerUid" in node && node.containerUid,
     apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
+    contextVars: node.contextVars,
     props: {
       debug: (node.props as any)?.debug,
       // debug: true,
@@ -896,9 +928,8 @@ type ComponentContainerProps = {
   parentStateFieldPartChanged: StateFieldPartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
-  dynamicChildren?: Array<DynamicChildComponentDef>;
-  dynamicSlots?: Record<string, Array<DynamicChildComponentDef>>;
   parentDispatch: ContainerDispatcher;
+  parentRenderContext?: ParentRenderContext;
 };
 
 const ComponentContainer = memo(
@@ -910,8 +941,7 @@ const ComponentContainer = memo(
       parentStateFieldPartChanged,
       parentRegisterComponentApi,
       layoutContextRef,
-      dynamicChildren,
-      dynamicSlots,
+      parentRenderContext,
       parentDispatch,
     }: ComponentContainerProps,
     ref,
@@ -925,8 +955,9 @@ const ComponentContainer = memo(
           node={enhancedNode as any}
           parentState={parentState}
           layoutContextRef={layoutContextRef}
-          dynamicChildren={dynamicChildren}
-          dynamicSlots={dynamicSlots}
+          // dynamicChildren={dynamicChildren}
+          // dynamicSlots={dynamicSlots}
+          parentRenderContext={parentRenderContext}
           isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
@@ -954,15 +985,11 @@ function renderChild({
   lookupSyncCallback,
   registerComponentApi,
   renderChild,
-  layoutCss,
-  layoutNonCss,
   stateFieldPartChanged,
   layoutContext,
-  dynamicChildren,
-  dynamicSlots,
+  parentRenderContext,
   memoedVarsRef,
-  cleanup,
-  childIndex,
+  cleanup
 }: RenderChildContext): ReactNode {
   if (!node) {
     return null;
@@ -974,7 +1001,7 @@ function renderChild({
   }
 
   // --- We do not parse text nodes specified with CDATA
-  const nodeValue = (node.props as any)?.value
+  const nodeValue = (node.props as any)?.value;
   if (node.type === "TextNodeCData") {
     return nodeValue ?? "";
   }
@@ -1000,12 +1027,8 @@ function renderChild({
       lookupSyncCallback={lookupSyncCallback}
       registerComponentApi={registerComponentApi}
       renderChild={renderChild}
-      layoutCss={layoutCss}
-      layoutNonCss={layoutNonCss}
       layoutContext={layoutContext}
-      dynamicChildren={dynamicChildren}
-      dynamicSlots={dynamicSlots}
-      childIndex={childIndex}
+      parentRenderContext={parentRenderContext}
     />
   );
 }
@@ -1073,16 +1096,12 @@ const Node = memo(
       lookupSyncCallback,
       registerComponentApi,
       renderChild,
-      layoutCss,
-      layoutNonCss,
       stateFieldPartChanged,
       layoutContext,
-      dynamicChildren,
-      dynamicSlots,
+      parentRenderContext,
       memoedVarsRef,
       resolvedKey,
       cleanup,
-      childIndex,
       ...rest
     }: RenderChildContext & { resolvedKey: string },
     ref,
@@ -1090,9 +1109,6 @@ const Node = memo(
     //pref, this way
     const stableLayoutContext = useRef(layoutContext);
     stableLayoutContext.current = layoutContext;
-
-    const stableLayoutCss = useShallowCompareMemoize(layoutCss);
-    const stableLayoutNonCss = useShallowCompareMemoize(layoutNonCss);
 
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an Datasource child, we transform it to a loader on the node
@@ -1110,8 +1126,7 @@ const Node = memo(
           parentState={state}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
-          dynamicChildren={dynamicChildren}
-          dynamicSlots={dynamicSlots}
+          parentRenderContext={parentRenderContext}
           parentStateFieldPartChanged={stateFieldPartChanged}
           parentRegisterComponentApi={registerComponentApi}
           ref={ref}
@@ -1130,12 +1145,8 @@ const Node = memo(
           lookupSyncCallback={lookupSyncCallback}
           registerComponentApi={registerComponentApi}
           renderChild={renderChild}
-          layoutCss={stableLayoutCss}
-          layoutNonCss={stableLayoutNonCss}
-          dynamicChildren={dynamicChildren}
-          dynamicSlots={dynamicSlots}
+          parentRenderContext={parentRenderContext}
           layoutContextRef={stableLayoutContext}
-          childIndex={childIndex}
           ref={ref}
           {...rest}
         />
@@ -1147,7 +1158,10 @@ const Node = memo(
 );
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
 // `appContext` when resolving the state values.
-function extractScopedState(parentState: ContainerState, uses?: string[]): ContainerState | undefined {
+function extractScopedState(
+  parentState: ContainerState,
+  uses?: string[],
+): ContainerState | undefined {
   if (!uses) {
     return parentState;
   }
@@ -1243,7 +1257,10 @@ function useVars(
                 let ret = new Set<string>();
                 params.forEach((param) => {
                   if (param.type === "expression") {
-                    ret = new Set([...ret, ...collectVariableDependencies(param.value, referenceTrackedApi)]);
+                    ret = new Set([
+                      ...ret,
+                      ...collectVariableDependencies(param.value, referenceTrackedApi),
+                    ]);
                   }
                 });
                 return Array.from(ret);
@@ -1275,10 +1292,27 @@ function useVars(
                   }
                 },
                 (
-                  [_newExpression, _newState, _newAppContext, _newStrict, newDeps, newAppContextDeps],
-                  [_lastExpression, _lastState, _lastAppContext, _lastStrict, lastDeps, lastAppContextDeps],
+                  [
+                    _newExpression,
+                    _newState,
+                    _newAppContext,
+                    _newStrict,
+                    newDeps,
+                    newAppContextDeps,
+                  ],
+                  [
+                    _lastExpression,
+                    _lastState,
+                    _lastAppContext,
+                    _lastStrict,
+                    lastDeps,
+                    lastAppContextDeps,
+                  ],
                 ) => {
-                  return shallowCompare(newDeps, lastDeps) && shallowCompare(newAppContextDeps, lastAppContextDeps);
+                  return (
+                    shallowCompare(newDeps, lastDeps) &&
+                    shallowCompare(newAppContextDeps, lastAppContextDeps)
+                  );
                 },
               ),
             });
@@ -1307,7 +1341,14 @@ function useVars(
 
           ret[key] = memoedVars.current
             .get(value)!
-            .obtainValue(value, stateContext, appContext, true, stateDepValues, appContextDepValues);
+            .obtainValue(
+              value,
+              stateContext,
+              appContext,
+              true,
+              stateDepValues,
+              appContextDepValues,
+            );
         }
       }
     });

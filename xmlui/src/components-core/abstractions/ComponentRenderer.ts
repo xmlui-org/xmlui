@@ -8,7 +8,7 @@ import type {
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
 import type { CodeDeclaration } from "@abstractions/scripting/ScriptingSourceTree";
-import type { ComponentMetadata } from "@abstractions/ComponentDefs";
+import type {ComponentMetadata, ParentRenderContext} from "@abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "@abstractions/RendererDefs";
 
 /**
@@ -40,6 +40,8 @@ export interface InnerRendererContext<T extends ComponentMetadata = ComponentMet
    * The memoized variables (with their values) used in the component
    */
   memoedVarsRef: MutableRefObject<MemoedVars>;
+
+  parentRenderContext?: ParentRenderContext;
 }
 
 /**
