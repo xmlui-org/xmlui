@@ -3,7 +3,7 @@ import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject } from "@components-core/theming/themes/base-utils";
-import { DrawerNavPanel, NavPanel } from "./NavPanelNative";
+import { NavPanel } from "./NavPanelNative";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "NavPanel";
@@ -37,22 +37,16 @@ export const navPanelRenderer = createComponentRenderer(
   COMP,
   NavPanelMd,
   ({ node, renderChild, layoutCss, layoutContext }) => {
-    return layoutContext?.inDrawer ? (
-      <DrawerNavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
-        className={layoutContext?.themeClassName}
-      >
-        {renderChild(node.children)}
-      </DrawerNavPanel>
-    ) : (
-      <NavPanel
-        style={layoutCss}
-        logoContent={renderChild(node.props.logoTemplate) || layoutContext?.logoContent}
-        className={layoutContext?.themeClassName}
-      >
-        {renderChild(node.children)}
-      </NavPanel>
+    return (
+        <NavPanel
+            style={layoutCss}
+            logoContent={renderChild(node.props.logoTemplate)}
+            className={layoutContext?.themeClassName}
+            inDrawer={layoutContext?.inDrawer}
+            renderChild={renderChild}
+        >
+          {renderChild(node.children)}
+        </NavPanel>
     );
   },
 );

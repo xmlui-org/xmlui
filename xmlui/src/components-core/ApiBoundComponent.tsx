@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type {ComponentDef, ParentRenderContext} from "@abstractions/ComponentDefs";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { MutableRefObject } from "react";
 import type { UploadActionComponent } from "@components-core/action/UploadAction";
@@ -16,7 +16,7 @@ type ApiBoundComponentProps = {
   apiBoundEvents: Array<string>;
   renderChild: RenderChildFn;
   layoutContextRef?: MutableRefObject<LayoutContext | undefined>;
-  dynamicChildren?: Array<DynamicChildComponentDef>;
+  parentRendererContext?: ParentRenderContext;
 };
 
 export function ApiBoundComponent({
@@ -26,7 +26,7 @@ export function ApiBoundComponent({
   apiBoundEvents,
   renderChild,
   layoutContextRef,
-  dynamicChildren,
+  parentRendererContext
 }: ApiBoundComponentProps) {
   const wrappedWithAdapter = useMemo(() => {
     function generateloaderUid(key: string) {
@@ -212,6 +212,6 @@ export function ApiBoundComponent({
   //   console.log("wrapped with adapter changed", wrappedWithAdapter);
   // }, [wrappedWithAdapter]);
 
-  const renderedChild = renderChild(wrappedWithAdapter, layoutContextRef?.current, dynamicChildren);
+  const renderedChild = renderChild(wrappedWithAdapter, layoutContextRef?.current, parentRendererContext);
   return React.isValidElement(renderedChild) ? renderedChild : <>{renderedChild}</>;
 }

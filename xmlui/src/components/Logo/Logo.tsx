@@ -15,6 +15,6 @@ export const logoComponentRenderer = createComponentRenderer(
   COMP,
   LogoMd,
   ({ node, layoutCss, extractValue }) => {
-    return <Logo style={layoutCss} title={extractValue(node.props.title)} />;
+    return <Logo style={layoutCss} />;
   },
 );
