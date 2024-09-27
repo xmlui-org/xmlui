@@ -4,10 +4,6 @@ import { Callout } from "nextra/components";
 
 (**NOT IMPLEMENTED YET**) The `OffCanvas` component is a hidden panel that slides into view from the side of the screen. It helps display additional content or navigation without disrupting the main interface.
 
-## Context Variables
-
-This component does not have any context variables.
-
 ## Properties
 
 ### `autoCloseInMs`
@@ -46,10 +42,6 @@ Available values:
 | `bottom` | The bottom of the window |
 
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didClose`
@@ -60,6 +52,20 @@ This event is triggered when the OffCanvas has been closed. The event handler ha
 
 This event is triggered when the OffCanvas has been displayed. The event handler has a single boolean argument set to `true`, indicating that the user opened the component.
 
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `close`
+
+This method closes the component. It triggers the `didClose` event with the argument set to `false`.
+
+### `open`
+
+This method opens the component. It triggers the `didOpen` event  with the argument set to `false`.
+
 ## Styling
 
-This component does not have any styles.
+This component does not have any theme variables.

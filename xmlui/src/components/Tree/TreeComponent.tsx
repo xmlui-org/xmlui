@@ -7,7 +7,7 @@ import { dComponent } from "@components/metadata-helpers";
 const COMP = "Tree";
 
 export const TreeMd = createMetadata({
-  status: "in review",
+  status: "in progress",
   description: `The \`${COMP}\` component is a virtualized tree component that displays hierarchical data.`,
   props: {
     data: {
