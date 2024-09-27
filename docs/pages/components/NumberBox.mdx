@@ -6,10 +6,6 @@ A `NumberBox` component allows users to input numeric values: either integer or 
 
 The `NumberBox` is an input control component and is often used in forms. See the [Using Forms](/learning/using-components/forms/) guide for details.
 
-## Context Variables
-
-This component does not have any context variables.
-
 ## Properties
 
 ### `autoFocus`
@@ -394,10 +390,6 @@ By default, this property is set to `false`.
   app={`<NumberBox initialValue="123" zeroOrPositive="true" />`}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didChange`
@@ -463,6 +455,24 @@ This event is triggered when the NumberBox has lost the focus.
 This event is triggered when the `NumberBox` loses focus.
 
 (See the example above)
+
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `focus`
+
+This method sets the focus on the NumberBox.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+### `value`
+
+You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 ## Styling
 

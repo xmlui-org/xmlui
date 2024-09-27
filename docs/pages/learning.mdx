@@ -8,7 +8,7 @@ After completing the first experiment with the framework, the articles in this s
 ## Components
 
 <Callout type="info" emoji="💡">
-  **XMLUI apps** are declarative. You define an app with an XMLUI (XML) markup.
+  **XMLUI apps** are declarative. You define an app with an XMLUI (XML) markup. [Learn more!](./learning/xmlui-markup)
 </Callout>
 
 ```ueml
@@ -17,7 +17,7 @@ After completing the first experiment with the framework, the articles in this s
 </App>
 ```
 <Callout type="info" emoji="💡">
-  **Components** are the basic building blocks of XMLUI apps. A component is an XML element (tag) in the markup.
+  **Components** are the basic building blocks of XMLUI apps. A component is an XML element (tag) in the markup. [Learn more!](./learning/xmlui-markup/#tags)
 </Callout>
 
 ```ueml /Avatar/
@@ -37,7 +37,7 @@ After completing the first experiment with the framework, the articles in this s
 `url` and `size` define the location and size of the `Avatar` component instance.
 
 <Callout type="info" emoji="💡">
-  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**.
+  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. [Learn more!](./learning/xmlui-markup/#properties)
 </Callout>
 
 ```ueml {2-4}
@@ -66,7 +66,7 @@ If the `customer.name` expression evaluates to "Jane Templeton", the button's la
 <Callout type="info" emoji="💡">
   Components handle **user and system events**. As a consequence of these events, some components' properties may change. XMLUI evaluates these changes and refreshes the UI accordingly.
 
-  Defining **event handlers** with expressions or short scripts (with statements, loops, and other constructs) can change how components respond to particular events.
+  Defining **event handlers** with expressions or short scripts (with statements, loops, and other constructs) can change how components respond to particular events. [Learn more!](./learning/xmlui-markup/#event-handlers)
 </Callout>
 
 ```ueml /onClick/
