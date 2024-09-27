@@ -1,22 +1,10 @@
+import { Callout } from "nextra/components";
+
 # FormItem
 
 A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data.
 
 You can learn more about this component in the [Using Forms](../learning/using-components/forms.mdx) article.
-
-## Context Variables
-
-### `$setValue`
-
-This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set.
-
-### `$validationResult`
-
-This variable represents the result of the latest validation of the `FormItem` instance.
-
-### `$value`
-
-The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
 
 ## Properties
 
@@ -763,10 +751,6 @@ This property sets what kind of validation mode or strategy to employ for a part
 | `onChanged`   | Display error (if present) for every keystroke.                                                                                                     |
 | `onLostFocus` | Show/hide error (if present) only if the field loses focus.                                                                                         |
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `validate`
@@ -802,6 +786,24 @@ In the demo below, leave the field as is and submit the form or enter an input t
   />
 </Form>`}
 />
+
+## Context Values
+
+### `$setValue`
+
+This function can be invoked to set the `FormItem` instance's value. The function has a single argument, the new value to set.
+
+### `$validationResult`
+
+This variable represents the result of the latest validation of the `FormItem` instance.
+
+### `$value`
+
+The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
+
+## Exposed Members
+
+This component does not expose any members.
 
 ## Styling
 

@@ -6,6 +6,7 @@ import ReactDOM, { Root } from "react-dom/client";
 import { parseFromEditorText } from "../utils/helpers";
 import { CompoundComponentDef, ComponentLike } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
+import styles from "./Preview.module.scss";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -55,15 +56,17 @@ export function Preview() {
     appDescription.components,
   ]);
   return (
-    <div
-      ref={rootRef}
-      style={{
-        width: "100%",
-        height: "100%",
-        overflow: "auto",
-        position: "relative",
-        isolation: "isolate",
-      }}
-    />
+    <div className={styles.preview}>
+      <div
+        ref={rootRef}
+        style={{
+          width: "100%",
+          height: "100%",
+          overflow: "auto",
+          position: "relative",
+          isolation: "isolate",
+        }}
+      />
+    </div>
   );
 }

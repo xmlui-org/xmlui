@@ -30,7 +30,7 @@ export const resizeOptionsMd: PropertyValueDescription[] = [
 ] as const;
 
 export const TextAreaMd = createMetadata({
-  status: "in review",
+  status: "experimental",
   description: `\`${COMP}\` is a component that provides a multiline text input area.`,
   props: {
     enterSubmits: d(

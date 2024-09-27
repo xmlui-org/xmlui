@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # MultiSelect
 
 The `MultiSelect` component works the same way as the [`Select`](./Select.mdx) component with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown. These elements are then displayed in the field and can be removed as necessary.
@@ -62,12 +64,6 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
   </MultiSelect>
   `}
 />
-
-## Context Variables
-
-### `$item`
-
-This context variable acts as a template for an item in the list.
 
 ## Properties
 
@@ -331,10 +327,6 @@ Available values:
   `}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didChange`
@@ -418,6 +410,18 @@ This event is triggered when the MultiSelect has received the focus.
 This event is triggered when the MultiSelect has lost the focus.
 
 See the example in [gotFocus event section](#gotfocus).
+
+## Context Values
+
+### `$item`
+
+This context variable acts as a template for an item in the list.
+
+## Exposed Members
+
+### `focus`
+
+This method sets the focus on the MultiSelect.
 
 ## Styling
 

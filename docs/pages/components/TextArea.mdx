@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # TextArea
 
 `TextArea` is a component that provides a multiline text input area.
@@ -5,10 +7,6 @@
 The `TextArea` is an input control component and is often used in forms. See the [Using Forms](../learning/forms.mdx) guide for details.
 
 To add new lines to the input field press `Shift` + `Enter`.
-
-## Context Variables
-
-This component does not have any context variables.
 
 ## Properties
 
@@ -310,10 +308,6 @@ This prop is used to visually indicate status changes reacting to form field val
   `}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didChange`
@@ -375,6 +369,24 @@ Note how clicking elsewhere resets the text to the original.
 
 This event is triggered when the TextArea has lost the focus.
 
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `focus`
+
+This method sets the focus on the TextArea.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+### `value`
+
+You can query the component's value. If no value is set, it will retrieve `undefined`.
+
 ## Styling
 
-This component does not have any styles.
+This component does not have any theme variables.

@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # ModalDialog
 
 The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.
@@ -130,10 +132,6 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
   `}
 />
 
-## Context Variables
-
-This component does not have any context variables.
-
 ## Properties
 
 ### `closeButtonVisible`
@@ -224,10 +222,6 @@ Provides a prestyled heading to display the intent of the dialog.
   `}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `close`
@@ -311,6 +305,20 @@ Open and close the dialog several times to test that it changes the counter.
   </Stack>
   `}
 />
+
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `close`
+
+This method is used to close the `ModalDialog`. Invoke it using `modalId.close()` where `modalId` refers to a `ModalDialog` component.
+
+### `open`
+
+No description provided.
 
 ## Styling
 

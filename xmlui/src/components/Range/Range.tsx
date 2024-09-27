@@ -14,7 +14,7 @@ const COMP = "Range";
 // Add this component to the form infrastructure.
 
 export const RangeMd = createMetadata({
-  status: "in review",
+  status: "in progress",
   description:
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component allows you to select a numeric range (lower ` +
     `and upper boundary values) between the complete range specified by minimum and maximum values.`,

@@ -7,8 +7,8 @@ import { PieChart } from "./PieChartNative";
 const COMP = "PieChart";
 
 export const PieChartMd = createMetadata({
-  status: "in review",
-  description: "A pie chart component",
+  status: "deprecated",
+  description: "(**OBSOLETE**) A pie chart component",
   props: {
     data: d("The data to be displayed in the pie chart"),
     isInteractive: d("Whether the chart is interactive"),

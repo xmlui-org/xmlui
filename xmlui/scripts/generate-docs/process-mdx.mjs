@@ -54,8 +54,8 @@ const sectionNames = {
   props: "Properties",
   events: "Events",
   styles: "Styling",
-  api: "API",
-  contextVars: "Context Variables",
+  api: "Exposed Members",
+  contextVars: "Context Values",
 };
 
 export function processDocfiles(metadata) {
@@ -103,6 +103,9 @@ export function processMdx(component, componentNames, metadata) {
     logger.info(`Processing ${component.displayName}...`);
 
     logger.info("Processing imports section");
+    // Add the Callout component import to the top of the file
+    result += `import { Callout } from "nextra/components";\n\n`;
+
     const { buffer, copyFilePaths } = addImportsSection(fileData, component);
     if (buffer) {
       result += `${buffer}\n`;
@@ -113,22 +116,23 @@ export function processMdx(component, componentNames, metadata) {
 
     if (component.nonVisual) {
       result +=
-        "> **Note**: This component does does not show up on the UI; it merely helps implement UI logic.\n\n";
+        "<Callout>**Note**: This component does does not show up on the UI; " +
+        "it merely helps implement UI logic.</Callout>\n\n";
     }
 
     result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
     result += "\n\n";
 
-    result += addContextVarsSection(fileData, component);
-    result += "\n\n";
-
     result += addPropsSection(fileData, component);
     result += "\n\n";
 
-    result += addApiSection(fileData, component);
+    result += addEventsSection(fileData, component);
     result += "\n\n";
 
-    result += addEventsSection(fileData, component);
+    result += addContextVarsSection(fileData, component);
+    result += "\n\n";
+
+    result += addApisSection(fileData, component);
     result += "\n\n";
 
     result += addStylesSection(fileData, component);
@@ -229,7 +233,7 @@ function addContextVarsSection(data, component) {
   let buffer = `## ${sectionNames.contextVars}\n\n`;
 
   if (!component.contextVars || Object.keys(component.contextVars ?? {}).length === 0) {
-    return buffer + "This component does not have any context variables.";
+    return buffer + "This component does not have any context values.";
   }
   Object.entries(component.contextVars)
     .sort()
@@ -264,14 +268,14 @@ function addPropsSection(data, component) {
   return buffer;
 }
 
-function addApiSection(data, component) {
+function addApisSection(data, component) {
   logger.info(`Processing ${component.displayName} APIs`);
   let buffer = `## ${sectionNames.api}\n\n`;
 
-  if (!component.api || Object.keys(component.api ?? {}).length === 0) {
-    return buffer + "This component does not provide any API.";
+  if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
+    return buffer + "This component does not expose any members.";
   }
-  Object.entries(component.api)
+  Object.entries(component.apis)
     .sort()
     .forEach(([apiName, api]) => {
       buffer += `### \`${apiName}\`\n\n`;
@@ -314,7 +318,7 @@ function addStylesSection(data, component) {
   buffer +=
     fileBuffer && varsTable
       ? fileBuffer + "\n\n### Theme Variables\n\n" + varsTable
-      : "This component does not have any styles.";
+      : "This component does not have any theme variables.";
 
   return buffer;
 }
@@ -499,11 +503,11 @@ function addAvailableValues(component) {
   const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
 
   if (valuesType === "string" || valuesType === "number") {
-    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\``).join(", ");
+    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\`${appendDefaultIndicator(v)}`).join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
       headers: ["Value", "Description"],
-      rows: component.availableValues.map((v) => [`\`${v.value}\``, v.description]),
+      rows: component.availableValues.map((v) => [`\`${v.value}\``, `${v.description}${appendDefaultIndicator(v.value)}`]),
     });
   }
 
@@ -511,6 +515,10 @@ function addAvailableValues(component) {
     return `Available values:${valuesTypeIsPrimitive ? " " : "\n\n"}${availableValuesBuffer}`;
   }
   return "";
+
+  function appendDefaultIndicator(value) {
+    return component.defaultValue === value ? " **(default)**" : "";
+  }
 }
 
 function listThemeVars(component) {
@@ -602,8 +610,10 @@ const themeKeywordLinks = {
   "color-border": "[color-border](../styles-and-themes/common-units/#color-values)",
   "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color-values)",
   "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color-values)",
-  "color-border-horizontal": "[color-border-horizontal](../styles-and-themes/common-units/#color-values)",
-  "color-border-vertical": "[color-border-vertical](../styles-and-themes/common-units/#color-values)",
+  "color-border-horizontal":
+    "[color-border-horizontal](../styles-and-themes/common-units/#color-values)",
+  "color-border-vertical":
+    "[color-border-vertical](../styles-and-themes/common-units/#color-values)",
   "color-border-right": "[color-text](../styles-and-themes/common-units/#color-values)",
   "color-border-left": "[color-text](../styles-and-themes/common-units/#color-values)",
   "color-bg": "[color-bg](../styles-and-themes/common-units/#color-values)",
@@ -612,12 +622,17 @@ const themeKeywordLinks = {
   "font-weight": "[font-weight](../styles-and-themes/common-units/#font-weight-values)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
   "style-border": "[style-border](../styles-and-themes/common-units/#border-style-values)",
-  "style-border-bottom": "[style-border-bottom](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-bottom":
+    "[style-border-bottom](../styles-and-themes/common-units/#border-style-values)",
   "style-border-top": "[style-border-top](../styles-and-themes/common-units/#border-style-values)",
-  "style-border-horizontal": "[style-border-horizontal](../styles-and-themes/common-units/#border-style-values)",
-  "style-border-vertical": "[style-border-vertical](../styles-and-themes/common-units/#border-style-values)",
-  "style-border-right": "[style-border-right](../styles-and-themes/common-units/#border-style-values)",
-  "style-border-left": "[style-border-left](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-horizontal":
+    "[style-border-horizontal](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-vertical":
+    "[style-border-vertical](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-right":
+    "[style-border-right](../styles-and-themes/common-units/#border-style-values)",
+  "style-border-left":
+    "[style-border-left](../styles-and-themes/common-units/#border-style-values)",
   size: "[size](../styles-and-themes/common-units/#size-values)",
   "font-size": "[font-size](../styles-and-themes/common-units/#size-values)",
   height: "[height](../styles-and-themes/common-units/#size-values)",
@@ -625,12 +640,17 @@ const themeKeywordLinks = {
   distance: "[distance](../styles-and-themes/common-units/#size-values)",
   thickness: "[thickness](../styles-and-themes/common-units/#size-values)",
   "thickness-border": "[thickness-border](../styles-and-themes/common-units/#size-values)",
-  "thickness-border-bottom": "[thickness-border-bottom](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-bottom":
+    "[thickness-border-bottom](../styles-and-themes/common-units/#size-values)",
   "thickness-border-top": "[thickness-border-top](../styles-and-themes/common-units/#size-values)",
-  "thickness-border-horizontal": "[thickness-border-horizontal](../styles-and-themes/common-units/#size-values)",
-  "thickness-border-vertical": "[thickness-border-vertical](../styles-and-themes/common-units/#size-values)",
-  "thickness-border-right": "[thickness-border-right](../styles-and-themes/common-units/#size-values)",
-  "thickness-border-left": "[thickness-border-left](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-horizontal":
+    "[thickness-border-horizontal](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-vertical":
+    "[thickness-border-vertical](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-right":
+    "[thickness-border-right](../styles-and-themes/common-units/#size-values)",
+  "thickness-border-left":
+    "[thickness-border-left](../styles-and-themes/common-units/#size-values)",
   "thickness‑decoration": "[thickness‑decoration](../styles-and-themes/common-units/#size-values)",
   offset: "[offset](../styles-and-themes/common-units/#size-values)",
   padding: "[padding](../styles-and-themes/common-units/#size-values)",
@@ -641,7 +661,8 @@ const themeKeywordLinks = {
   "padding-horizontal": "[padding-horizontal](../styles-and-themes/common-units/#size-values)",
   "padding-vertical": "[padding-vertical](../styles-and-themes/common-units/#size-values)",
   margin: "[margin](../styles-and-themes/common-units/#size-values)",
-  "line-decoration": "[style-decoration](../styles-and-themes/common-units/#text-decoration-values)",
+  "line-decoration":
+    "[style-decoration](../styles-and-themes/common-units/#text-decoration-values)",
   "line-height": "[line‑height](../styles-and-themes/common-units/#size-values)",
   radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
   shadow: "[shadow](../styles-and-themes/common-units/#color-values)",

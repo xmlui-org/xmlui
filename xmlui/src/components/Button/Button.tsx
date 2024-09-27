@@ -22,43 +22,62 @@ export const ButtonMd = createMetadata({
   description: `Button is an interactive element that triggers an action when clicked.`,
   status: "stable",
   props: {
-    autoFocus: d("Indicates if the button should receive focus when the page loads", null, "boolean", false),
-    variant: d("The button variant (solid, outlined, ghost) to use", buttonVariantMd),
-    themeColor: d("The button color scheme (primary, secondary, attention)", buttonThemeMd),
-    size: d("The size of the button (small, medium, large)", sizeMd),
+    autoFocus: d(
+      "Indicates if the button should receive focus when the page loads.",
+      null,
+      "boolean",
+      false,
+    ),
+    variant: d(
+      "The button variant determines the level of emphasis the button should possess.",
+      buttonVariantMd,
+      "string",
+      "solid",
+    ),
+    themeColor: d(
+      "Sets the button color scheme defined in the application theme.",
+      buttonThemeMd,
+      "string",
+      "primary",
+    ),
+    size: d("The size of the button.", sizeMd, "string", "sm"),
     label: d(
       `This property is an optional string to set a label for the ${COMP}. If no label is ` +
-      `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
-      `small icon button. When the ${COMP} has nested children, it will display them and ` +
-      `ignore the value of the \`label\` prop.`,
+        `specified and an icon is set, the ${COMP} will modify its styling to look like a ` +
+        `small icon button. When the ${COMP} has nested children, it will display them and ` +
+        `ignore the value of the \`label\` prop.`,
     ),
     type: d(
       `This optional string describes how the ${COMP} appears in an HTML context. You ` +
-      `rarely need to set this property explicitly.`,
+        `rarely need to set this property explicitly.`,
       buttonTypesMd,
       "string",
       "button",
     ),
     enabled: d(
-      `The value of this property indicates if the button accepts actions (\`true\`) ` +
-      `or does not react to them (\`false\`).`,
-    null,
-    null,
-    true,
+      `The value of this property indicates whether the button accepts actions (\`true\`) ` +
+        `or does not react to them (\`false\`).`,
+      null,
+      null,
+      true,
     ),
     icon: d(
       `This string value denotes an icon name. The framework will render an icon if XMLUI ` +
-      `recognizes the icon (by its name). If no label is specified and an icon is set, the ${COMP} ` +
-      `displays only the icon.`,
+        `recognizes the icon by its name. If no label is specified and an icon is set, the ${COMP} ` +
+        `displays only that icon.`,
     ),
     iconPosition: d(
       `This optional string determines the location of the icon in the ${COMP}.`,
       iconPositionMd,
+      "string",
+      "left",
     ),
     contentPosition: d(
       `This optional value determines how the label and icon (or nested children) should be placed` +
-      `inside the ${COMP} component.`,
+        `inside the ${COMP} component.`,
       alignmentOptionMd,
+      "string",
+      "center",
     ),
   },
   events: {

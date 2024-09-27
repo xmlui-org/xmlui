@@ -109,7 +109,7 @@ export const viewportSizeNames = Object.keys(viewportSizeMd);
 // --- Available button sizes
 export const sizeMd: PropertyValueDescription[] = [
   { value: "xs", description: "Extra small button" },
-  { value: "sm", description: "Small button (default)" },
+  { value: "sm", description: "Small button" },
   { value: "md", description: "Medium button" },
   { value: "lg", description: "Large button" },
 ];
@@ -123,7 +123,7 @@ export const buttonThemeNames: string[] = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
 export const buttonThemeMd: PropertyValueDescription[] = [
   { value: "attention", description: "Attention state theme color" },
-  { value: "primary", description: "Primary theme color (default)" },
+  { value: "primary", description: "Primary theme color" },
   { value: "secondary", description: "Secondary theme color" },
 ] as const;
 
@@ -132,7 +132,7 @@ const buttonTypeValues = ["button", "submit", "reset"] as const;
 export const buttonTypeNames: string[] = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
 export const buttonTypesMd: PropertyValueDescription[] = [
-  { value: "button", description: "Regular behavior that only executes logic if explicitly determined. (default)" },
+  { value: "button", description: "Regular behavior that only executes logic if explicitly determined." },
   { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
   { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
 ] as const;
@@ -157,7 +157,7 @@ const alignmentOptionValues = ["start", "center", "end"] as const;
 export const alignmentOptionNames: string[] = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
 export const alignmentOptionMd: PropertyValueDescription[] = [
-  { value: "center", description: "Place the content in the middle (default)" },
+  { value: "center", description: "Place the content in the middle" },
   { value: "start", description: "Justify the content to the left (to the right if in right-to-left)" },
   { value: "end", description: "Justify the content to the right (to the left if in right-to-left)" },
 ] as const;
@@ -196,7 +196,7 @@ const statusColorValues = [
 export const statusColorNames: string[] = [...statusColorValues];
 export type StatusColor = (typeof statusColorValues)[number];
 export const statusColorMd: PropertyValueDescription[] = [
-  { value: "primary", description: "Primary theme color (default), no default icon" },
+  { value: "primary", description: "Primary theme color, no default icon" },
   { value: "secondary", description: "Secondary theme color, no default icon" },
   { value: "success", description: "Success theme color, \"success\" icon" },
   { value: "danger", description: "Warning theme color, \"warning\" icon" },
@@ -227,7 +227,7 @@ const validationStatusValues = ["none", "error", "warning", "valid"] as const;
 export const validationStatusNames: string[] = [...validationStatusValues];
 export type ValidationStatus = (typeof validationStatusValues)[number];
 export const validationStatusMd: PropertyValueDescription[] = [
-  // { value: "none", description: "No indicator (default)" },
+  // { value: "none", description: "No indicator" },
   { value: "valid", description: "Visual indicator for an input that is accepted" },
   { value: "warning", description: "Visual indicator for an input that produced a warning" },
   { value: "error", description: "Visual indicator for an input that produced an error" },

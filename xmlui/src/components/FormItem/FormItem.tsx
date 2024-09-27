@@ -17,7 +17,7 @@ import {
 const COMP = "FormItem";
 
 export const FormItemMd = createMetadata({
-  status: "in review",
+  status: "experimental",
   description:
     `A \`${COMP}\` component represents a single input element within a \`Form\`. The value within ` +
     `the \`${COMP}\` may be associated with a particular property within the encapsulating \`Form\` ` +

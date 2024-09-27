@@ -1,10 +1,8 @@
+import { Callout } from "nextra/components";
+
 # Switch
 
 The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state.
-
-## Context Variables
-
-This component does not have any context variables.
 
 ## Properties
 
@@ -107,7 +105,7 @@ Places the label at the given position of the component.
 
 Default value: `"right"`.
 
-Available values: `top`, `right`, `bottom`, `left`
+Available values: `top`, `right` **(default)**, `bottom`, `left`
 
 ```ueml copy
 <VStack margin="1rem" gap="0.8rem">
@@ -169,10 +167,6 @@ Available values:
 | `warning` | Visual indicator for an input that produced a warning |
 | `error` | Visual indicator for an input that produced an error |
 
-
-## API
-
-This component does not provide any API.
 
 ## Events
 
@@ -246,6 +240,20 @@ Click the `Switch` in the example demo to change the label text. Note how clicki
 ### `lostFocus`
 
 This event is triggered when the Switch has lost the focus.
+
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+### `value`
+
+You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
 
 ## Styling
 

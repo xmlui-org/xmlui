@@ -1,37 +1,10 @@
+import { Callout } from "nextra/components";
+
 # Form
 
 A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing.
 
 You can learn more about this component in the [Using Forms](/learning/using-components/forms/) article.
-
-## Context Variables
-
-### `$subject`
-
-This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances.
-
-The following sample demonstrates enabling a field according to another's current value.
-
-```ueml copy {4}
-<Form 
-  subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
-  <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
-</Form>
-```
-
-<Playground
-  name="Example: referencing field values"
-  previewOnly={true}
-  height={250}
-  app={`
-    <Form 
-      subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
-      <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
-    </Form>
-  `}
-/>
 
 ## Properties
 
@@ -119,10 +92,6 @@ This property sets the initial value of the form's data structure. The form infr
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `cancel`
@@ -164,6 +133,39 @@ The form infrastructure fires this event when the form is submitted. The event a
     </Form>
   `}
 />
+
+## Context Values
+
+### `$subject`
+
+This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances.
+
+The following sample demonstrates enabling a field according to another's current value.
+
+```ueml copy {4}
+<Form 
+  subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+  <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+  <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+</Form>
+```
+
+<Playground
+  name="Example: referencing field values"
+  previewOnly={true}
+  height={250}
+  app={`
+    <Form 
+      subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+      <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+      <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+    </Form>
+  `}
+/>
+
+## Exposed Members
+
+This component does not expose any members.
 
 ## Styling
 

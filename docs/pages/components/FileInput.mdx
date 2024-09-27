@@ -1,3 +1,5 @@
+import { Callout } from "nextra/components";
+
 # FileInput
 
 The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise).
@@ -7,10 +9,6 @@ There are two ways to add a file to the input field:
 - Dragging files from a file browser to the input field.
 
 The text box of the input field is read only.
-
-## Context Variables
-
-This component does not have any context variables.
 
 ## Properties
 
@@ -104,7 +102,7 @@ Available values:
 | Value | Description |
 | --- | --- |
 | `xs` | Extra small button |
-| `sm` | Small button (default) |
+| `sm` | Small button |
 | `md` | Medium button |
 | `lg` | Large button |
 
@@ -256,10 +254,6 @@ Available values:
 </VStack>`}
 />
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 ### `didChange`
@@ -323,6 +317,28 @@ This event is triggered when the FileInput has lost the focus.
 
 (See the example above)
 
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `focus`
+
+This method sets the focus on the FileInput.
+
+### `open`
+
+This API command triggers the file browsing dialog to open.
+
+### `setValue`
+
+(**NOT IMPLEMENTED YET**) You can use this method to set the component's current value programmatically.
+
+### `value`
+
+By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined.
+
 ## Styling
 
-This component does not have any styles.
+This component does not have any theme variables.

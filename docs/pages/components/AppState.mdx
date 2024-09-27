@@ -1,6 +1,8 @@
+import { Callout } from "nextra/components";
+
 # AppState
 
-> **Note**: This component does does not show up on the UI; it merely helps implement UI logic.
+<Callout>**Note**: This component does does not show up on the UI; it merely helps implement UI logic.</Callout>
 
 AppState is a functional component (without a visible user interface) that helps store and manage the app's state.
 
@@ -169,10 +171,6 @@ If you want to run the sample with explicit state buckets (for example, with the
 <AppState id="state" bucket="settings" />
 ```
 
-## Context Variables
-
-This component does not have any context variables.
-
 ## Properties
 
 ### `bucket`
@@ -183,14 +181,18 @@ This property is the identifier of the bucket to which the `AppState` instance i
 
 This property contains the initial state value. Though you can use multiple `AppState`component instances for the same bucket with their `initialValue` set, it may result in faulty app logic. When xmlui instantiates an `AppState` with an explicit initial value, that value is immediately set. Multiple initial values may result in undesired initialization.
 
-## API
-
-This component does not provide any API.
-
 ## Events
 
 This component does not have any events.
 
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+This component does not expose any members.
+
 ## Styling
 
-This component does not have any styles.
+This component does not have any theme variables.

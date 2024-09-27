@@ -13,7 +13,7 @@ const COMP = "Slider";
 // Add this component to the form infrastructure.
 
 export const SliderMd = createMetadata({
-  status: "in review",
+  status: "in progress",
   description:
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component allows you to select a numeric value ` +
     `between a range specified by minimum and maximum values.`,
