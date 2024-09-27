@@ -117,14 +117,14 @@ async function createSummary(
   const buffer = await readFile(filename, "utf8");
 
   const lines = strBufferToLines(buffer);
-  const startComponentsSection = lines.findIndex((line) => line.includes(`## ${sectionName}`));
-  const endComponentsSection = lines
-    .slice(startComponentsSection + 1)
+  const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
+  const componentSectionEndIdx = lines
+    .slice(componentSectionStartIdx + 1)
     .findIndex((line) => /^#+[\s\S]/.exec(line));
 
-  const beforeComponentsSection = lines.slice(0, startComponentsSection).join("\n");
+  const beforeComponentsSection = lines.slice(0, componentSectionStartIdx).join("\n");
   const afterComponentsSection = lines
-    .slice(startComponentsSection + 1, startComponentsSection + 1 + endComponentsSection)
+    .slice(componentSectionStartIdx + 1, componentSectionStartIdx + 1 + componentSectionEndIdx)
     .join("\n");
 
   const sortedMetadata = metadata.sort((a, b) => {

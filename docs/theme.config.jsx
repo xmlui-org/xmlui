@@ -2,8 +2,9 @@ import { Logo } from "./src/components/Logo";
 import { Playground } from "./src/components/Playground";
 import { StandalonePlayground } from "./src/components/StandalonePlayground";
 import { DocsImage } from "./src/components/DocsImage";
+import { GrayedOutText } from "./src/components/GrayedOutText";
 import { useRouter } from "next/router";
-import { useConfig } from 'nextra-theme-docs'
+import { useConfig } from 'nextra-theme-docs';
 
 export default {
   useNextSeoProps() {
@@ -22,6 +23,7 @@ export default {
     Playground,
     StandalonePlayground,
     Image: DocsImage,
+    GrayText: GrayedOutText,
   },
   sidebar: {
     autoCollapse: true,

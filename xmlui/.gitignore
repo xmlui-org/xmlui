@@ -25,4 +25,4 @@ storybook-static
 *.sln
 *.sw?
 
-scripts/metadata.json
+scripts/generate-docs/metadata.json
