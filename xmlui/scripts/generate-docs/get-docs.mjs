@@ -79,7 +79,7 @@ if (config.cleanFolder) {
 if (config.exportToJson) {
   logger.info("Exporting metadata to JSON");
   try {
-    await writeFile(join(scriptFolder, "metadata.json"), JSON.stringify(metadata, null, 2));
+    await writeFile(join(scriptFolder, "metadata.json"), JSON.stringify(collectedComponentMetadata, null, 2));
   } catch (error) {
     processError(error);
   }
