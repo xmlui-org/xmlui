@@ -1,5 +1,5 @@
 .header {
-  padding: 1rem 1.125rem;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -7,7 +7,7 @@
   gap: .8rem;
   border-top-right-radius: 1rem;
   border-top-left-radius: 1rem;
-  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/.1);
+  background-color: #E0E7F0;
 }
 
 .description {
@@ -29,7 +29,7 @@
 
 :is(html[class~=dark]) {
   .header {
-    background-color: #141B27;
+    background-color: #020B1A;
     color: #fff;
   }
 }
