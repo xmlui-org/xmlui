@@ -5,9 +5,7 @@
   align-items: center;
   justify-content: space-between;
   gap: .8rem;
-  border-top-right-radius: 1rem;
-  border-top-left-radius: 1rem;
-  background-color: #E0E7F0;
+  background-color: #E0EDF9;
 }
 
 .description {
@@ -29,7 +27,7 @@
 
 :is(html[class~=dark]) {
   .header {
-    background-color: #141B27;
+    background-color: #020B1A;
     color: #fff;
   }
 }
