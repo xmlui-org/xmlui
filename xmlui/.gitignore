@@ -25,4 +25,4 @@ storybook-static
 *.sln
 *.sw?
 
-scripts/parsed.json
+scripts/metadata.json
