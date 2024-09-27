@@ -26,13 +26,13 @@
 .playgroundContent {
   width: 100%;
   height: 100%;
-  padding: 0 1.125rem 1.125rem 1.125rem;
-  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/.1);
+  padding: 0 16px 16px 16px;
+  background-color: #E0E7F0;
 }
 
 :is(html[class~=dark]) {
   .playgroundContent {
-    background-color: #141B27;
+    background-color: #020B1A;
   }
 }
 
