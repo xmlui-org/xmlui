@@ -1,4 +1,5 @@
 {
   "excludeComponentStatuses": ["deprecated"],
-  "cleanFolder": true
+  "cleanFolder": true,
+  "exportToJson": true
 }
