@@ -546,11 +546,11 @@ function listThemeVars(component) {
       const defaultLightVar =
         component.defaultThemeVars?.["light"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)";
+        "<GrayText>none</GrayText>";
       const defaultDarkVar =
         component.defaultThemeVars?.["dark"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)";
+        "<GrayText>none</GrayText>";
 
       return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
     });
