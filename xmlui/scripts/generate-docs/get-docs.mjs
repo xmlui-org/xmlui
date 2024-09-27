@@ -25,12 +25,9 @@ const componentSamplesFolder = join(docsFolderRoot, "component-samples");
 
 logger.info("Loading config");
 
-let cleanFolder = false;
-let excludeComponentStatuses = [];
+let config = {};
 try {
-  const config = await loadConfig(join(scriptFolder, "config.json"));
-  cleanFolder = config.cleanFolder;
-  excludeComponentStatuses = config.excludeComponentStatuses;
+  config = await loadConfig(join(scriptFolder, "config.json"));
 } catch (error) {
   processError("Error reading JSON file:", error);
   throw error;
@@ -42,7 +39,7 @@ logger.info("Extending component metadata");
 
 const metadata = Object.entries(collectedComponentMetadata)
   .filter(([_, compData]) => {
-    return !excludeComponentStatuses.includes(compData.status?.toLowerCase());
+    return !config.excludeComponentStatuses.includes(compData.status?.toLowerCase());
   })
   .map(([compName, compData]) => {
     const displayName = compName;
@@ -68,10 +65,21 @@ const metadata = Object.entries(collectedComponentMetadata)
 
 // --- Clean Folder
 
-if (cleanFolder) {
+if (config.cleanFolder) {
   logger.info(`Cleaning ${componentDocsFolderName}`);
   try {
     await removeAllFilesInFolder(componentDocsFolder);
+  } catch (error) {
+    processError(error);
+  }
+}
+
+// --- Export Metadata to JSON (Optional)
+
+if (config.exportToJson) {
+  logger.info("Exporting metadata to JSON");
+  try {
+    await writeFile(join(scriptFolder, "metadata.json"), JSON.stringify(metadata, null, 2));
   } catch (error) {
     processError(error);
   }
@@ -109,14 +117,14 @@ async function createSummary(
   const buffer = await readFile(filename, "utf8");
 
   const lines = strBufferToLines(buffer);
-  const startComponentsSection = lines.findIndex((line) => line.includes(`## ${sectionName}`));
-  const endComponentsSection = lines
-    .slice(startComponentsSection + 1)
+  const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
+  const componentSectionEndIdx = lines
+    .slice(componentSectionStartIdx + 1)
     .findIndex((line) => /^#+[\s\S]/.exec(line));
 
-  const beforeComponentsSection = lines.slice(0, startComponentsSection).join("\n");
+  const beforeComponentsSection = lines.slice(0, componentSectionStartIdx).join("\n");
   const afterComponentsSection = lines
-    .slice(startComponentsSection + 1, startComponentsSection + 1 + endComponentsSection)
+    .slice(componentSectionStartIdx + 1, componentSectionStartIdx + 1 + componentSectionEndIdx)
     .join("\n");
 
   const sortedMetadata = metadata.sort((a, b) => {
