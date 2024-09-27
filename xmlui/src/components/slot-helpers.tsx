@@ -16,9 +16,13 @@ export const SlotItem = memo(
   ({ node, renderChild, layoutContext, slotProps = EMPTY_OBJECT }: SlotItemProps) => {
     const shallowMemoedSlotProps = useShallowCompareMemoize(slotProps);
     const nodeWithItem = useMemo(() => {
+      const templateProps = {};
+      Object.entries(shallowMemoedSlotProps).forEach(([key, value]) => {
+        templateProps["$" + key] = value;
+      });
       return {
         type: "Container",
-        contextVars: shallowMemoedSlotProps,
+        contextVars: templateProps,
         children: Array.isArray(node) ? node : [node],
       } as ContainerComponentDef;
     }, [node, shallowMemoedSlotProps]);

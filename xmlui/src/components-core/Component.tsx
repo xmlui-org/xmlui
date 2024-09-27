@@ -1,7 +1,7 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentMetadata } from "@abstractions/ComponentDefs";
+import type {ComponentMetadata, ParentRenderContext} from "@abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -354,7 +354,7 @@ const Component = forwardRef(function Component(
 
 function slotRenderer(
   { node, extractValue, renderChild, lookupAction, layoutContext }: RendererContext<any>,
-  parentRenderContext,
+  parentRenderContext?: ParentRenderContext,
 ) {
   if (!parentRenderContext) {
     return undefined;
@@ -372,7 +372,7 @@ function slotRenderer(
           if (extractedValue?._ARROW_EXPR_) {
             extractedValue = lookupAction(extractedValue);
           }
-          slotProps["$" + key] = extractedValue;
+          slotProps[key] = extractedValue;
         }
       });
     }
