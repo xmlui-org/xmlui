@@ -1,24 +1,15 @@
-import { resolve } from "path";
-import { existsSync } from "fs";
+import { readFile } from "fs/promises";
+import { ErrorWithSeverity } from "./utils.mjs";
+import { Logger } from "./logger.mjs";
 
-export function handleConfig(config) {
-  const workingFolder = resolve(__dirname);
-  let { sourceFolderPath, outFolderPath, entryPoints } = config;
-
-  const _sourceFolder = resolve(workingFolder, sourceFolderPath);
-  if (!existsSync(_sourceFolder)) {
-    throw new Error(`Source folder ${_sourceFolder} does not exist.`);
+export default async function loadConfig(configPath) {
+  if (!configPath) {
+    throw new ErrorWithSeverity("No config path provided", Logger.severity.error);
   }
-
-  const _outFolder = !outFolderPath ? workingFolder : resolve(workingFolder, outFolderPath);
-  if (!existsSync(_outFolder)) {
-    throw new Error(`Output folder ${_outFolder} does not exist.`);
-  }
-
+  const fileContents = await readFile(configPath, "utf8");
+  const { excludeComponentStatuses, ...data } = JSON.parse(fileContents);
   return {
-    workingFolder,
-    sourceFolder: _sourceFolder,
-    outFolder: _outFolder,
-    entryPoints: [...new Set(entryPoints)] || [],
+    excludeComponentStatuses: excludeComponentStatuses.map((status) => status.toLowerCase()),
+    ...data,
   };
 }

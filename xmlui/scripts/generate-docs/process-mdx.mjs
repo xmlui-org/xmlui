@@ -12,7 +12,7 @@ import {
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
-import { createTable, handleError, ErrorWithSeverity } from "./utils.mjs";
+import { createTable, processError, ErrorWithSeverity } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -86,7 +86,7 @@ export function processMdx(component, componentNames, metadata) {
       // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
       fileData = readFileContents(join(sourceFolder, component.descriptionRef));
     } catch (error) {
-      handleError(error);
+      processError(error);
     }
   }
 
