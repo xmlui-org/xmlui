@@ -27,7 +27,7 @@
   width: 100%;
   height: 100%;
   padding: 0 1.125rem 1.125rem 1.125rem;
-  background-color: #F4F7FD;
+  background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/.1);
 }
 
 :is(html[class~=dark]) {
