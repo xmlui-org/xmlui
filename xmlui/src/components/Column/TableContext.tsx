@@ -17,7 +17,7 @@ export type OurColumnMetadata = {
 };
 
 export const TableContext = createContext({
-  registerColumn: (col: OurColumnMetadata) => {},
+  registerColumn: (col: OurColumnMetadata, id: string) => {},
   unRegisterColumn: (id: string) => {},
 });
 

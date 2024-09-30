@@ -29,8 +29,7 @@ export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) 
     registerColumn({
       ...columnMetadata,
       cellRenderer: safeCellRenderer,
-      id,
-    });
+    }, id);
   }, [columnMetadata, id, registerColumn, safeCellRenderer]);
 
   useLayoutEffect(() => {

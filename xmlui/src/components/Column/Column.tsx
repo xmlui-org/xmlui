@@ -53,6 +53,7 @@ export const columnComponentRenderer = createComponentRenderer(
         maxWidth={extractValue(node.props.maxWidth)}
         nodeChildren={node.children}
         renderChild={renderChild}
+        id={node.uid}
       />
     );
   },

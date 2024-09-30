@@ -6,10 +6,10 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { Table } from "./TableNative";
 import { dAutoFocus, dComponent } from "@components/metadata-helpers";
 import { useMemo, useRef, useState } from "react";
-import type { OurColumnMetadata} from "@components/Column/TableContext";
+import type { OurColumnMetadata } from "@components/Column/TableContext";
 import { TableContext } from "@components/Column/TableContext";
 import produce from "immer";
-import { EMPTY_ARRAY } from "@components-core/constants";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 
 const COMP = "Table";
 
@@ -135,28 +135,36 @@ const TableWithColumns = ({
 }) => {
   const data = extractValue(node.props.items) || extractValue(node.props.data);
 
-  const [stableColumns, setStableColumns] = useState(EMPTY_ARRAY);
-  const stableColumnsRef = useRef(stableColumns);
-  stableColumnsRef.current = stableColumns;
+  const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
+  const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
+  const columnIdsRef = useRef([]);
   const [tableKey, setTableKey] = useState(0);
   const tableContextValue = useMemo(() => {
     return {
-      registerColumn: (column: OurColumnMetadata) => {
-        setStableColumns(
+      registerColumn: (column: OurColumnMetadata, id: string) => {
+        setColumnIds(
           produce((draft) => {
-            const existing = draft.findIndex((col) => col.id === column.id);
+            const existing = draft.findIndex((colId) => colId === id);
             if (existing < 0) {
-              draft.push(column);
-            } else {
-              draft[existing] = column;
+              draft.push(id);
             }
+          }),
+        );
+        setColumnByIds(
+          produce((draft) => {
+            draft[id] = column;
           }),
         );
       },
       unRegisterColumn: (id: string) => {
-        setStableColumns(
+        setColumnIds(
           produce((draft) => {
-            return draft.filter((col) => col.id !== id);
+            return draft.filter((colId) => colId !== id);
+          }),
+        );
+        setColumnByIds(
+          produce((draft) => {
+            delete draft[id];
           }),
         );
       },
@@ -164,36 +172,41 @@ const TableWithColumns = ({
   }, []);
   const columnRefresherContextValue = useMemo(() => {
     return {
-      registerColumn: (column: OurColumnMetadata) => {
-        if (!stableColumnsRef.current.find((col) => col.id === column.id)) {
+      registerColumn: (column: OurColumnMetadata, id: string) => {
+        if (!columnIdsRef.current.find((colId) => colId === id)) {
           setTableKey((prev) => prev + 1);
+          columnIdsRef.current.push(id);
         }
       },
       unRegisterColumn: (id: string) => {
-        if (stableColumnsRef.current.find((col) => col.id === id)) {
+        if (columnIdsRef.current.find((colId) => colId === id)) {
+          columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
           setTableKey((prev) => prev + 1);
         }
       },
     };
   }, []);
 
+  const columns = useMemo(
+    () => columnIds.map((colId) => columnsByIds[colId]),
+    [columnIds, columnsByIds],
+  );
+
   return (
     <>
-      <span style={{ position: "absolute", width: 0, left: 0, display: "none" }}>
-        {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+      {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
             This way the order of the columns is preserved.
         */}
-        <TableContext.Provider value={tableContextValue} key={tableKey}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-        <TableContext.Provider value={columnRefresherContextValue}>
-          {renderChild(node.children)}
-        </TableContext.Provider>
-      </span>
+      <TableContext.Provider value={tableContextValue} key={tableKey}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
+      <TableContext.Provider value={columnRefresherContextValue}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
       <Table
         data={data}
-        columns={stableColumns}
+        columns={columns}
         pageSizes={extractValue(node.props.pageSizes)}
         rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
         noDataRenderer={

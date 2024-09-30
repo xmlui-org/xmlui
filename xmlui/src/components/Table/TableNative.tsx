@@ -251,7 +251,7 @@ export const Table = forwardRef(
         // Even if sorting is internal, we can notify other components through this callback
         sortingDidChange?.(newSortBy, newDirection);
       },
-      [sortingDidChange, _sortBy, _sortingDirection],
+      [_sortBy, willSort, sortingDidChange, _sortingDirection],
     );
 
     // --- Prepare column renderers according to columns defined in the table
@@ -314,7 +314,7 @@ export const Table = forwardRef(
           return { width, starSizedWidth };
         }
       });
-    }, [rowsSelectable, safeColumns]);
+    }, [safeColumns]);
 
     // --- Prepare column renderers according to columns defined in the table supporting optional row selection
     const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
