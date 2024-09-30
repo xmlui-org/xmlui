@@ -1,0 +1,65 @@
+import { Callout } from 'nextra/components'
+import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
+
+# Creating XMLUI Apps
+
+<Callout type="info" emoji="💡">
+  XMLUI apps have a **simple file structure** that can be directly hosted as static files in a web server's folder (without a build process). 
+</Callout>
+
+## Application Files
+
+This folder contains an `index.html` file that loads one or more JavaScript files (the XMLUI framework and other optional component libraries). It also contains your app's XMLUI source.
+
+When the XMLUI app starts running, the framework compiles the source files and ignites the app.
+
+<Callout type="info" emoji="💡">
+  This behavior allows you to run an XMLUI app by copying (or uploading) its files into a web server folder prepared for serving static files without a build process.
+</Callout>
+
+Your app consists of a few source files, which have the `.xmlui` (XMLUI markup files) or `xmlui.xs` (XMLUI code-behind files) extensions.
+
+An app has a mandatory file named `Main.xmlui`. When the app's `index.html` file is served from the web server, it looks for the `Main.xmlui` file to render the app's UI.
+
+## Application Folders
+
+_TBD_
+
+XMLUI samples and applications are available as static files and are immediately ready to be hosted by a web server. Most samples are zipped files with a particular file structure; each file and folder has its specific role. When you download our [starter sample](#) (URL to be set later), the unzipped folder has this structure:
+
+```
+<XMLUI app folder>
+  ├── index.html (The web page that opens in the browser)
+  ├── Main.xmlui (The main XMLUI file with the app)
+  ├── config.json (The app's configuration file)
+  ├── components (The folder with the app's XMLUI components)
+  │   ├── ApiAware.xmlui
+  │   ├── Home.xmlui
+  │   ├── IncButton.xmlui
+  │   ├── PagePanel.xmlui
+  └── resources (Static app resources like images, logos, icons, etc.)
+      ├── favicon.ico
+      ├── xmlui-logo.svg
+      └── xmlui-logo-inverted.svg
+```
+
+The files with the `.xmlui` extension (and, as you will learn later, with the `.xmlui.xs` extension) are XMLUI source files. When you modify any of them and refresh the browser, the engine immediately compiles them and updates the page accordingly.
+
+
+
+
+## Configuration
+
+_TBD_
+
+## Optimization
+
+<Callout type="info" emoji="💡">
+  The framework offers several build methods that **optimize the static file structure for size and startup performance**. 
+</Callout>
+
+With the framework's tools, you can build the XMLUI source code files into static files that provide optimization to make your loaded code smaller and start it faster. These optimizations include (among others) these:
+- Pre-compiling the XMLUI source code
+- Removing the unused part of the code (e.g., unused components of the framework and other component libraries)
+- Code minification
+

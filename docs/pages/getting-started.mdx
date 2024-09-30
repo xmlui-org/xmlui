@@ -2,64 +2,23 @@ import { Callout } from 'nextra/components'
 
 # Getting Started
 
-This section will help you grasp the main concepts of XMLUI. Start by experimenting with this intuitive UI framework by creating a few apps.
+This section will help you get your hands dirty and experiment with XMLUI by discovering and creating a few apps. 
 
-You can quickly get your hands dirty by trying to write an app with XMLUI. There are two ways to get a flying start:
-
-1. You can use a web server on your machine and download the starter samples in this section. These samples contain the XMLUI source code and a few other files to allow your app to be hosted on the web server. This article will introduce this approach.
-
-2. If you prefer using Node (and have it already installed on your machine), you can create the starter app with the command line using the `npx` utility and the `create-xmlui-app` tool. Find more details in another article [here](tools/create-xmlui-app/).
-
-Choose the option that best fits your development style. While getting acquainted with XMLUI, the first option is more straightforward: it does not require time-consuming installation or configuration; a single code editor is enough to create apps.
-
-<Callout type="info">
-The first approach makes app deployment straightforward. You grab the XMLUI folder and put it directly into a production web server. However, such an XMLUI app requires a few seconds to start up.
-
-The second option offers a development environment with hot module reloading, which you may prefer to the previous one. When your app is ready for distribution, running a command will create the folder structure to host on a production web server. This build optimizes your app, so startup is much faster.
+<Callout type="info" emoji="💡">
+You need only a **few steps** to play with them!
 </Callout>
 
-
-## Using XMLUI with a development web server
-
-XMLUI samples and applications are available as static files and are immediately ready to be hosted by a web server. Most samples are zipped files with a particular file structure; each file and folder has its specific role. When you download our [starter sample](#) (URL to be set later), the unzipped folder has this structure:
-
-```
-<XMLUI app folder>
-  ├── index.html (The web page that opens in the browser)
-  ├── Main.xmlui (The main XMLUI file with the app)
-  ├── config.json (The app's configuration file)
-  ├── components (The folder with the app's XMLUI components)
-  │   ├── ApiAware.xmlui
-  │   ├── Home.xmlui
-  │   ├── IncButton.xmlui
-  │   ├── PagePanel.xmlui
-  └── resources (Static app resources like images, logos, icons, etc.)
-      ├── favicon.ico
-      ├── xmlui-logo.svg
-      └── xmlui-logo-inverted.svg
-```
-
-The files with the `.xmlui` extension (and, as you will learn later, with the `.xmlui.xs` extension) are XMLUI source files. When you modify any of them and refresh the browser, the engine immediately compiles them and updates the page accordingly.
-
-The hosted web page loads a single JavaScript file with the XMLUI engine. When loaded, this file processes the source files and turns them into a working app.
-
-```html file=index.html
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://unpkg.com/xmlui@0.4.2-beta.1/dist/xmlui-standalone.umd.js"></script>
-</head>
-<body>
-</body>
-</html>
-```
-
-## Installing a web server on your machine
+1. Download the particular sample.
+2. Unzip the sample (each is a zipped file) into a working folder.
+3. Run your locally installed web server using the sample's working folder as the root of serving static files.
+4. Run your browser and visit the web server's default page.
 
 <Callout>
 If you do not have a web server on your machine or are unsure how to configure it, **we suggest you install the Simple Web Server**. It is a free tool with a graphical user interface. Visit this page to download it: https://simplewebserver.org/download.html
 
 After the installation, you can easily set up a new web server by selecting your preferred port number and the host directory. When using it with XMLUI, set the host directory to your XMLUI app's folder.
 </Callout> 
+
+<Callout type="info">
+If you prefer using Node (and have it already installed on your machine), you can create the starter app with the command line using the `npx` utility and the `create-xmlui-app` tool. Find more details in another article [here](tools/create-xmlui-app/).
+</Callout>
