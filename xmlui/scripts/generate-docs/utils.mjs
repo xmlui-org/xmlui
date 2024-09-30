@@ -8,7 +8,7 @@ export class ErrorWithSeverity extends Error {
   }
 }
 
-export function handleError(error) {
+export function processError(error) {
   if (error instanceof ErrorWithSeverity) {
     logger.log(error.severity, error.message);
   } else if (error instanceof Error) {
