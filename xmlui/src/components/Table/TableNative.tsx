@@ -1,5 +1,5 @@
-import { CSSProperties, forwardRef, ReactNode } from "react";
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
   CellContext,
@@ -29,8 +29,7 @@ import { orderBy } from "lodash-es";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import { ScrollContext } from "@components-core/ScrollContext";
-import { type OurColumnMetadata, TableContext } from "../Column/TableContext";
-import produce from "immer";
+import { type OurColumnMetadata } from "../Column/TableContext";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "@components-core/utils/hooks";
@@ -95,7 +94,6 @@ type TableProps = {
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
   hideHeader?: boolean;
-  children: ReactNode;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -153,25 +151,24 @@ export const Table = forwardRef(
       noDataRenderer,
       autoFocus = false,
       hideHeader = false,
-      children,
+      // cols
     }: TableProps,
     forwardedRef,
   ) => {
-    const [stableColumns, setStableColumns] = useState(columns);
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
-      if (stableColumns) {
-        return stableColumns;
+      if (columns) {
+        return columns;
       }
       if (!data.length) {
         return EMPTY_ARRAY;
       }
       return Object.keys(data[0]).map((key: string) => ({ header: key, accessorKey: key }));
-    }, [stableColumns, data]);
+    }, [columns, data]);
 
     useEffect(() => {
       if (autoFocus) {
@@ -254,7 +251,7 @@ export const Table = forwardRef(
         // Even if sorting is internal, we can notify other components through this callback
         sortingDidChange?.(newSortBy, newDirection);
       },
-      [sortingDidChange, _sortBy, _sortingDirection],
+      [_sortBy, willSort, sortingDidChange, _sortingDirection],
     );
 
     // --- Prepare column renderers according to columns defined in the table
@@ -317,7 +314,7 @@ export const Table = forwardRef(
           return { width, starSizedWidth };
         }
       });
-    }, [rowsSelectable, safeColumns]);
+    }, [safeColumns]);
 
     // --- Prepare column renderers according to columns defined in the table supporting optional row selection
     const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
@@ -468,32 +465,6 @@ export const Table = forwardRef(
             0)
         : 0;
 
-    const tableContextValue = useMemo(() => {
-      return {
-        registerColumn: (column: OurColumnMetadata) => {
-          // console.log("registering column", column);
-          setStableColumns(
-            produce((draft) => {
-              const existing = draft.findIndex((col) => col.id === column.id);
-              if (existing < 0) {
-                draft.push(column);
-              } else {
-                draft[existing] = column;
-              }
-              draft.sort((a, b) => a.index - b.index);
-            }),
-          );
-        },
-        unRegisterColumn: (id: string) => {
-          setStableColumns(
-            produce((draft) => {
-              return draft.filter((col) => col.id !== id);
-            }),
-          );
-        },
-      };
-    }, []);
-
     const hasData = data.length !== 0;
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
@@ -547,250 +518,245 @@ export const Table = forwardRef(
       queueMicrotask(() => {
         recalculateStarSizes();
       });
-    }, [recalculateStarSizes]);
+    }, [recalculateStarSizes, safeColumns]);
 
     return (
-      <TableContext.Provider value={tableContextValue}>
-        <div
-          className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
-          tabIndex={-1}
-          onKeyDown={onKeyDown}
-          ref={ref}
-          style={style}
-        >
-          {loading && !hasData && (
-            <div className={styles.loadingWrapper}>
-              <Spinner />
-            </div>
-          )}
-          {!loading &&
-            !hasData &&
-            (noDataRenderer ? (
-              noDataRenderer()
-            ) : (
-              <div className={styles.noRows}>No data available</div>
-            ))}
-          {hasData && (
-            <table className={styles.table} ref={tableRef}>
-              {!hideHeader && (
-                <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
-                  {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
-                    <tr
-                      key={`${headerGroup.id}-${headerGroupIndex}`}
-                      className={classnames(styles.headerRow, {
-                        [styles.allSelected]: table.getIsAllRowsSelected(),
-                      })}
-                    >
-                      {headerGroup.headers.map((header, headerIndex) => {
-                        const style = header.column.columnDef.meta?.style || {};
-                        const size = header.getSize();
-                        return (
-                          <th
-                            key={`${header.id}-${headerIndex}`}
-                            className={styles.columnCell}
-                            colSpan={header.colSpan}
-                            style={{
-                              position: "relative",
-                              width: size,
-                              ...getCommonPinningStyles(header.column),
-                            }}
+      <div
+        className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
+        tabIndex={-1}
+        onKeyDown={onKeyDown}
+        ref={ref}
+        style={style}
+      >
+        {loading && !hasData && (
+          <div className={styles.loadingWrapper}>
+            <Spinner />
+          </div>
+        )}
+        {!loading &&
+          !hasData &&
+          (noDataRenderer ? (
+            noDataRenderer()
+          ) : (
+            <div className={styles.noRows}>No data available</div>
+          ))}
+        {hasData && (
+          <table className={styles.table} ref={tableRef}>
+            {!hideHeader && (
+              <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
+                {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
+                  <tr
+                    key={`${headerGroup.id}-${headerGroupIndex}`}
+                    className={classnames(styles.headerRow, {
+                      [styles.allSelected]: table.getIsAllRowsSelected(),
+                    })}
+                  >
+                    {headerGroup.headers.map((header, headerIndex) => {
+                      const style = header.column.columnDef.meta?.style || {};
+                      const size = header.getSize();
+                      return (
+                        <th
+                          key={`${header.id}-${headerIndex}`}
+                          className={styles.columnCell}
+                          colSpan={header.colSpan}
+                          style={{
+                            position: "relative",
+                            width: size,
+                            ...getCommonPinningStyles(header.column),
+                          }}
+                        >
+                          <ClickableHeader
+                            hasSorting={header.column.columnDef.enableSorting}
+                            updateSorting={() => _updateSorting(header)}
                           >
-                            <ClickableHeader
-                              hasSorting={header.column.columnDef.enableSorting}
-                              updateSorting={() => _updateSorting(header)}
-                            >
-                              <div className={styles.headerContent} style={style}>
-                                {
-                                  flexRender(
-                                    header.column.columnDef.header,
-                                    header.getContext(),
-                                  ) as ReactNode
-                                }
-                                <span style={{ display: "inline-flex", maxWidth: 16 }}>
-                                  {header.column.columnDef.enableSorting && (
-                                    <ColumnOrderingIndicator
-                                      iconSortAsc={iconSortAsc}
-                                      iconSortDesc={iconSortDesc}
-                                      iconNoSort={iconNoSort}
-                                      direction={
-                                        header.column.columnDef.meta?.accessorKey === _sortBy
-                                          ? _sortingDirection
-                                          : undefined
-                                      }
-                                    />
-                                  )}
-                                </span>
-                              </div>
-                            </ClickableHeader>
-                            {header.column.getCanResize() && (
-                              <div
-                                {...{
-                                  onDoubleClick: () => {
-                                    touchedSizesRef.current[header.column.id] = false;
-                                    if (header.column.columnDef.size !== undefined) {
-                                      header.column.resetSize();
-                                    } else {
-                                      recalculateStarSizes();
+                            <div className={styles.headerContent} style={style}>
+                              {
+                                flexRender(
+                                  header.column.columnDef.header,
+                                  header.getContext(),
+                                ) as ReactNode
+                              }
+                              <span style={{ display: "inline-flex", maxWidth: 16 }}>
+                                {header.column.columnDef.enableSorting && (
+                                  <ColumnOrderingIndicator
+                                    iconSortAsc={iconSortAsc}
+                                    iconSortDesc={iconSortDesc}
+                                    iconNoSort={iconNoSort}
+                                    direction={
+                                      header.column.columnDef.meta?.accessorKey === _sortBy
+                                        ? _sortingDirection
+                                        : undefined
                                     }
-                                  },
-                                  onMouseDown: (event) => {
-                                    columnSizeTouched(header.column.id);
-                                    header.getResizeHandler()(event);
-                                  },
-                                  onTouchStart: (event) => {
-                                    columnSizeTouched(header.column.id);
-                                    header.getResizeHandler()(event);
-                                  },
-                                  className: classnames(styles.resizer, {
-                                    [styles.isResizing]: header.column.getIsResizing(),
-                                  }),
-                                }}
-                              />
-                            )}
-                          </th>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </thead>
+                                  />
+                                )}
+                              </span>
+                            </div>
+                          </ClickableHeader>
+                          {header.column.getCanResize() && (
+                            <div
+                              {...{
+                                onDoubleClick: () => {
+                                  touchedSizesRef.current[header.column.id] = false;
+                                  if (header.column.columnDef.size !== undefined) {
+                                    header.column.resetSize();
+                                  } else {
+                                    recalculateStarSizes();
+                                  }
+                                },
+                                onMouseDown: (event) => {
+                                  columnSizeTouched(header.column.id);
+                                  header.getResizeHandler()(event);
+                                },
+                                onTouchStart: (event) => {
+                                  columnSizeTouched(header.column.id);
+                                  header.getResizeHandler()(event);
+                                },
+                                className: classnames(styles.resizer, {
+                                  [styles.isResizing]: header.column.getIsResizing(),
+                                }),
+                              }}
+                            />
+                          )}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                ))}
+              </thead>
+            )}
+            <tbody className={styles.tableBody}>
+              {paddingTop > 0 && (
+                <tr>
+                  <td style={{ height: `${paddingTop}px` }} />
+                </tr>
               )}
-              <tbody className={styles.tableBody}>
-                {paddingTop > 0 && (
-                  <tr>
-                    <td style={{ height: `${paddingTop}px` }} />
-                  </tr>
-                )}
-                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                  const rowIndex = virtualRow.index;
-                  const row = rows[rowIndex];
-                  return (
-                    <tr
-                      data-index={rowIndex}
-                      key={`${row.id}-${rowIndex}`}
-                      className={classnames(styles.row, {
-                        [styles.selected]: row.getIsSelected(),
-                        [styles.focused]: focusedIndex === rowIndex,
-                        [styles.disabled]: rowDisabledPredicate(row.original),
-                      })}
-                      ref={(el) => {
-                        if (el && estimatedHeightRef.current === null) {
-                          estimatedHeightRef.current = Math.round(
-                            el.getBoundingClientRect().height,
-                          );
-                        }
-                        rowVirtualizer.measureElement(el);
-                      }}
-                      onClick={(event) => {
-                        if (event.defaultPrevented) {
-                          return;
-                        }
-                        toggleRow(row.original, {
-                          ...event,
-                          metaKey: enableMultiRowSelection,
-                          shiftKey: enableMultiRowSelection ? event.shiftKey : false,
-                        });
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell, i) => {
-                        const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                        const size = cell.column.getSize();
-                        return (
-                          <td
-                            className={styles.cell}
-                            key={`${cell.id}-${i}`}
-                            style={{
-                              // width: size,
-                              width: size,
-                              ...getCommonPinningStyles(cell.column),
-                            }}
-                          >
-                            {cellRenderer
-                              ? cellRenderer(cell.row.original)
-                              : (flexRender(
-                                  cell.column.columnDef.cell,
-                                  cell.getContext(),
-                                ) as ReactNode)}
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  );
-                })}
-                {paddingBottom > 0 && (
-                  <tr>
-                    <td style={{ height: `${paddingBottom}px` }} />
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          )}
-
-          {isPaginated && hasData && rows.length > 0 && (
-            // --- Render the pagination controls
-            <div className={styles.pagination}>
-              <div style={{ flex: 1 }}>
-                <span className={styles.paginationLabel}>
-                  Showing {rows[0].original.order} to {rows[rows.length - 1].original.order} of{" "}
-                  {data.length} entries
-                </span>
-              </div>
-              {pageSizes.length > 1 && (
-                <div>
-                  <span className={styles.paginationLabel}>Rows per page</span>
-                  <select
-                    className={styles.paginationSelect}
-                    value={pageSize}
-                    onChange={(e) => {
-                      table.setPageSize(Number(e.target.value));
+              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const rowIndex = virtualRow.index;
+                const row = rows[rowIndex];
+                return (
+                  <tr
+                    data-index={rowIndex}
+                    key={`${row.id}-${rowIndex}`}
+                    className={classnames(styles.row, {
+                      [styles.selected]: row.getIsSelected(),
+                      [styles.focused]: focusedIndex === rowIndex,
+                      [styles.disabled]: rowDisabledPredicate(row.original),
+                    })}
+                    ref={(el) => {
+                      if (el && estimatedHeightRef.current === null) {
+                        estimatedHeightRef.current = Math.round(el.getBoundingClientRect().height);
+                      }
+                      rowVirtualizer.measureElement(el);
+                    }}
+                    onClick={(event) => {
+                      if (event.defaultPrevented) {
+                        return;
+                      }
+                      toggleRow(row.original, {
+                        ...event,
+                        metaKey: enableMultiRowSelection,
+                        shiftKey: enableMultiRowSelection ? event.shiftKey : false,
+                      });
                     }}
                   >
-                    {pageSizes.map((pageSize) => (
-                      <option key={pageSize} value={pageSize}>
-                        {pageSize}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+                    {row.getVisibleCells().map((cell, i) => {
+                      const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                      const size = cell.column.getSize();
+                      return (
+                        <td
+                          className={styles.cell}
+                          key={`${cell.id}-${i}`}
+                          style={{
+                            // width: size,
+                            width: size,
+                            ...getCommonPinningStyles(cell.column),
+                          }}
+                        >
+                          {cellRenderer
+                            ? cellRenderer(cell.row.original)
+                            : (flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              ) as ReactNode)}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+              {paddingBottom > 0 && (
+                <tr>
+                  <td style={{ height: `${paddingBottom}px` }} />
+                </tr>
               )}
-              <div className={styles.paginationButtons}>
-                <Button
-                  onClick={() => table.setPageIndex(0)}
-                  disabled={!table.getCanPreviousPage()}
-                  type={"button"}
-                  variant={"ghost"}
-                >
-                  <FiChevronsLeft />
-                </Button>
-                <Button
-                  onClick={() => table.previousPage()}
-                  disabled={!table.getCanPreviousPage()}
-                  type={"button"}
-                  variant={"ghost"}
-                >
-                  <FiChevronLeft />
-                </Button>
-                <Button
-                  onClick={() => table.nextPage()}
-                  disabled={!table.getCanNextPage()}
-                  type={"button"}
-                  variant={"ghost"}
-                >
-                  <FiChevronRight />
-                </Button>
-                <Button
-                  onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-                  disabled={!table.getCanNextPage()}
-                  type={"button"}
-                  variant={"ghost"}
-                >
-                  <FiChevronsRight />
-                </Button>
-              </div>
+            </tbody>
+          </table>
+        )}
+
+        {isPaginated && hasData && rows.length > 0 && (
+          // --- Render the pagination controls
+          <div className={styles.pagination}>
+            <div style={{ flex: 1 }}>
+              <span className={styles.paginationLabel}>
+                Showing {rows[0].original.order} to {rows[rows.length - 1].original.order} of{" "}
+                {data.length} entries
+              </span>
             </div>
-          )}
-        </div>
-        {children}
-      </TableContext.Provider>
+            {pageSizes.length > 1 && (
+              <div>
+                <span className={styles.paginationLabel}>Rows per page</span>
+                <select
+                  className={styles.paginationSelect}
+                  value={pageSize}
+                  onChange={(e) => {
+                    table.setPageSize(Number(e.target.value));
+                  }}
+                >
+                  {pageSizes.map((pageSize) => (
+                    <option key={pageSize} value={pageSize}>
+                      {pageSize}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div className={styles.paginationButtons}>
+              <Button
+                onClick={() => table.setPageIndex(0)}
+                disabled={!table.getCanPreviousPage()}
+                type={"button"}
+                variant={"ghost"}
+              >
+                <FiChevronsLeft />
+              </Button>
+              <Button
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                type={"button"}
+                variant={"ghost"}
+              >
+                <FiChevronLeft />
+              </Button>
+              <Button
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                type={"button"}
+                variant={"ghost"}
+              >
+                <FiChevronRight />
+              </Button>
+              <Button
+                onClick={() => table.setPageIndex(table.getPageCount() - 1)}
+                disabled={!table.getCanNextPage()}
+                type={"button"}
+                variant={"ghost"}
+              >
+                <FiChevronsRight />
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
     );
   },
 );
