@@ -1,117 +1,64 @@
+import { Callout } from 'nextra/components'
+
 # Your First XMLUI App
 
-_This tutorial is about to be rewritten from scratch._
+<Callout type="info" emoji="💡">
+You are just a few steps away from running your **first XMLUI app**! 
+</Callout>
 
-XMLUI makes it easy to create apps. To get started, you need only a code editor, which can be as simple as a text editor. However, as you move on, you will work with multiple files, and managing them is easier with a tool created for that purpose. We recommend using VS Code as this free tool works on Windows, Mac, and Linux; XMLUI provides a tooling extension for Code.
+1. Download the zip file of the first app sample from here (link placeholder) and unzip it into a working folder.
+2. Start your web server using the unzipped sample folder as the root for serving static files.
+3. Start your browser and visit the web server's default page.
 
-## Using the create-xmlui-app Tool
+<Callout>
+If you do not have a web server on your machine or are unsure how to configure it, **we suggest you install the Simple Web Server**. It is a free tool with a graphical user interface. Visit this page to download it: https://simplewebserver.org/download.html
 
-Developing an XMLUI app is faster with a prepared development environment. XMLUI ships with a tool, the `create-xmlui-app` utility, a standard Node command line app. It creates the development environment in a few seconds.
+After the installation, you can easily set up a new web server by selecting your preferred port number and the host directory. When using it with XMLUI, set the host directory to your XMLUI app's folder.
+</Callout> 
 
-> **Note**: If you do not have Node installed, visit the [official Noje.js download site](https://nodejs.org/en/download/prebuilt-installer) to get the latest version for your platform. We suggest you obtain and install the newest LTS version.
-
-Before using XMLUI, prepare a directory in your preferred workspace to play with the framework. Each app you create will go into a separate folder.
-
-### Create the Boilerplate Code
-
-1. Open a command line tool (it may be the Terminal window in VS Code) and select your preferred working directory with the `cd` command.
-2. Execute this command to download and start `create-xmlui-app`
-
-```bash
-npx create-xmlui-app@latest
-```
-
-The `npx` utility (part of the Node toolset) will download the `create-xmlui-app` package. Before installing it to your machine, it asks for a confirmation:
-
-```
-Need to install the following package:
-  create-xmlui-app@<version>
-Ok to proceed? (y)
-```
-
-(Here, `<version>` is the current version of the package). Press enter or `y` to go on; `n` to abandon.
-
-1. After the package download (a few seconds), it starts and asks for your project name. Press Enter to accept the `my-app` default name or specify one. In this tutorial, we use the `my-first-app` project name.
-2. You can optionally initialize a Git repo with your project. Press Enter (sign no Git repo) to go on.
-3. The utility installs the `xmlui` package, the only direct dependency you need to develop XMLUI apps. That package will pull its dependencies automatically. After the download (it may take one or two minutes the first time), the tool sets up your XMLUI development project.
-4. The project you created goes into its separate folder within the working folder from which you ran the `create-xmlui-app` command.
-
-### The Boilerplate Structure
-
-Open the newly created `my-first-app` (use your project's name) folder in your coding tool. Using a simple text editor, utilize your operating system's file manager app to display the folder hierarchy. When you work with VS Code, you will see this structure:
-
-<br/>
-<Image alt="Boilerplate" src="/resources/images/get-started/boilerplate-structure.png" width={416} />
-
-The `index.html` file wraps your entire app served with a web server. 
-
-The `node_modules` folder stores the packages used with the XMLUI framework and the build tools, the utilities that will create the artifacts you can add to a web server to serve as static files at the end of the development process.
-
-The `package.json` and `package-lock.json` are the standard Node package descriptor files.
-
-Your primary focus is the `src` folder holding the application source code. Here, the `Main.xmlui` file contains the application's root component definition and may refer to other app components (besides the built-in XMLUI components). The app-specific components are in the `src/components` folder.
-
-The `config.ts` file describes a few configuration values, such as the application's name to display, its logo, the default theme, URLs to access backends, etc. When you build the app, this file is turned into a configuration file you can change according to your production environment.
-
-The `public` folder contains the static resources (such as images, logos, fonts, etc) your app uses.
-
-### Customize VS Code
-
-XMLUI has a VS Code extension that provides syntax highlighting for markup files (and other helpful features). So, if you intend to use VS Code, it is worth getting XMLUI Tools. If you do not have VS Code, you can skip this section.
-
-Go to the Extensions tab in the VS Code activity bar and search for XMLUI:
-
-<br/>
-<Image alt="Boilerplate" src="/resources/images/get-started/xmlui-tools.png" width={362} />
-
-Click Install to add XMLUI Tools to the VS Code extensions. In a few seconds, the toolset is ready.
-
-Open the `IncButton.xmlui` file from the `components` folder to see that the code editor supports syntax highlighting:
-
-<br/>
-<Image alt="Boilerplate" src="/resources/images/get-started/syntax-highlighting.png" />
-
-## Starting the App
-
-The newly generated app is ready to run. Execute the `npm start` command to execute it. In VS Code, use the terminal window (Terminal | New Terminal); it will automatically set your working folder to the app's root.
-
-```
-> my-first-app@0.1.0 start
-> xmlui start
-
-  ➜  Local:   http://localhost:5173/
-  ➜  Network: use --host to expose
-```
-
-Click the link displayed (http://localhost:5173/) to open the app in your default browser. (In VS Code, you need to press the Ctrl or Cmd button when clicking, depending on your OS).
-
-Your app starts:
+Your app starts displaying this page:
 
 <br/>
 <Image alt="App start" src="/resources/images/get-started/app-start.png" />
 
-Try the menu items, and they show you some cool features of XMLUI! Soon, you will learn about each code snippet that implements a particular feature.
+You can try some cool XMLUI features with the menu items. In the following section, you will change the apps.
 
-When you ran the app with `npm start`, the toolset started it in a development environment setup with _Hot Module Reloading (HRM)_. This nifty feature lets you modify your app and see changes on the fly.
+## Modify the App
 
-Open the `Main.xml` file in VS Code, and modify the `<Footer>` section at the bottom by changing the `Powered by XMLUI` text to something else:
+The sample's root folder contains a `Main.xmlui` file, which is the app's entry point. Open this file in your code editor.
 
-```ueml
-<Footer>
-  Powered by XMLUI -- I modified it!!!
-</Footer>
+<Callout type="info">
+  If you do not have a code editor, we suggest you use [Visual Studio Code](https://code.visualstudio.com/download). VS Code is a free tool running on Windows, Mac, and Linux. XMLUI has a VS Code extension (XMLUI Tools) with syntax highlighting.
+</Callout>
+
+Scroll down to the bottom of this file and modify the `<Footer>` element's content by changing the `Powered by XMLUI` text to something else:
+
+```ueml copy /I modified it!!!/ filename="Main.xmlui"
+<App>
+  <!-- ... -->
+  <Footer>
+    Powered by XMLUI -- I modified it!!!
+  </Footer>
+</App>
 ```
+
+Save the `Main.xmlui` file and refresh the app's page in the browser. The app now displays the modified footer.
 
 <br/>
 <Image alt="App modified" src="/resources/images/get-started/app-modified.png" />
 
 ## Extend the App
 
-Try how easy it is to extend the working app. You do not even have to stop the running app! Create a new file in the `components` folder named `MyBoxes.xmlui`, and copy this contents to it:
+<Callout type="info" emoji="💡">
+  You can **easily extend** an XMLUI working app.
+</Callout>
 
-```ueml copy
+In this section, you will add a new component to your app's page.
+Create a new file in the `components` folder named `MyBoxes.xmlui`, and copy this contents to it:
+
+```ueml copy filename="components/MyBoxes.xmlui"
 <Component name="MyBoxes">
-  <HStack padding="1rem" gap="1rem">
+  <HStack padding="12" gap="12">
     <Stack width="48" height="48" backgroundColor="red" />
     <Stack width="48" height="48" backgroundColor="green" />
     <Stack width="48" height="48" backgroundColor="blue" />
@@ -119,7 +66,7 @@ Try how easy it is to extend the working app. You do not even have to stop the r
 </Component>
 ```
 
-This code declares a reusable component named `MyBoxes`. We add this component to the menu with a few steps:
+This code declares a reusable component named `MyBoxes`. You add this component to the menu with a few steps:
 
 1. Open the `Main.xmlui` file and navigate to the `<NavPanel>` section. It contains several `<NavLink>` child items, each representing a menu item that can navigate to its corresponding UI page. Append a new one:
 
@@ -147,33 +94,118 @@ This code declares a reusable component named `MyBoxes`. We add this component t
   </Pages>
 ```
 
-Return to the browser and click the `My Boxes` item in the menu. You will see the newly added component works:
+Return to the browser and refresh the current page. Click the "My Boxes" item in the menu. You will see the newly added component works:
 
 <br/>
 <Image alt="App modified" src="/resources/images/get-started/app-with-boxes.png" />
 
-## Building and Deploying the App
+## How this App Works
 
-Use the `npm run build` command to create a distribution folder. This command builds the app and creates a `dist` folder within your app folder. You can copy the content of this folder into your web server static files folder to serve the app.
+<Callout type="info" emoji="💡">
+  Now that you have tried the app, it's time to learn how it works.
+</Callout>
 
-To test the build locally, run the `npm run preview` command. Similarly to `npm start`, it spins up a local web server and displays its URL you can use in the browser:
+Loading the app in the browser fetches the `index.html` file from the web server, which loads a single JavaScript file, `xmlui-standalone.umd.js`, from the app's root folder.
 
-```text {6}
-$ npm run preview
-
-> my-first-app@0.1.0 preview
-> xmlui preview
-
-  ➜  Local:   http://localhost:4173/
-  ➜  Network: use --host to expose
+```html filename="index.html" /xmlui-standalone.umd.js/
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="xmlui-standalone.umd.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
 ```
 
-> **Note**: This preview does not use HMR, so changing your app's code won't refresh the app in your browser, as it uses the files from the `dist` folder. If you have not built your app, the preview will display `Cannot /GET` as an indication of a 404 (Not Found) response status.
+The JavaScript file contains the XMLUI framework. When it starts, it fetches the `Main.xmlui` file from the root folder, compiles its contents, and runs the app. The `Main.xmlui` file uses XMLUI markup to declare the structure and the UI logic:
 
-Executing the `npm run build-prod` creates an optimized build with a flat distribution folder. Instead of grouping the app files into folders, every build file is directly within `dist`.
+```ueml filename="Main.xmlui"
+<App>
+  <AppHeader>
+    <SpaceFiller />
+    <ThemeChangerButton />
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Simple" to="/simple" />
+    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="Composable" to="/composable" />
+    <NavLink label="Themable" to="/themable" />
+  </NavPanel>
+  <Pages>
+    <Page url="/" >
+      <Home />
+    </Page>
+    <Page url="/simple">
+      <PagePanel>
+        <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+      </PagePanel> 
+    </Page>
+    <Page url="/apiaware">
+      <ApiAware />
+    </Page>
+    <Page url="/composable">
+      <PagePanel>
+        <VStack padding="1rem" gap="1rem">
+          <IncButton />
+          <IncButton label="Click me too" />
+          <IncButton label="And me" />
+        </VStack> 
+      </PagePanel>
+    </Page>  
+    <Page url="/themable">
+      <PagePanel>
+        <Theme color-primary="orangered">
+          <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+        </Theme>
+      </PagePanel> 
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI -- I modified it!!!
+  </Footer>
+</App>
+```
 
-> **Note**: You can use the `npm run preview` command to test the result of the production build.
+<Callout type="info" emoji="💡">
+  Each tag (`<App>`, `<AppHeader>`, `<NavPanel>`, `<Pages>`, and the others) represents a **component**. Attributes within the tags represent some traits (**properties**) of the particular tag. 
+</Callout>
 
-Use the `npm run release-ci` command to build a zipped distribution file ready for continuous integration. This command builds the same `dist` folder as `npm run build-prod` and adds a `ui.zip` file to the app folder.
+When you callapse the child components within `<App>`, you get a simple view describing the app's overall structure:
 
-> **Note**: You can use the `npm run preview` command to test the result of the CI build. However, it will use the `dist` folder, not the `ui.zip` file.
+```ueml filename="Main.xmlui"
+<App>
+  <AppHeader />
+  <NavPanel />
+  <Pages>
+  <Pages />
+  <Footer />
+</App>
+```
+
+Each component within `<App>` is responsible for declaring a particular part of the app. The `App` components implementation logic binds them and provides you with the overall behavior of the app. For example, an `<NavLink>` item within `<NavPanel>` acts as a menu item; clicking it will display the related `<Page>` within `<Pages>`:
+
+```ueml filename="Main.xmlui"
+<App>
+  <NavPanel>
+    <NavLink label="API-Aware" to="/apiaware" />
+    <!-- Other menu items omitted -->
+  </NavPanel>
+  <Pages>
+    <Page url="/apiaware">
+      <ApiAware />
+      <!-- Other page items omitted -->
+    </Page>
+  </Pages>
+  <!-- Other components omitted -->
+</App>
+```
+
+The app binds the `to` property of a `<NavLink>` with the `url` property of a `<Page>`. Thus, when you click the menu item, it will display the related page.
+
+The `<ApiAware>` component is not part of the XMLUI framework. It is a reusable component written entirely with the XMLUI markup. The framework looks up the definition of such components in the `component` folder within the app's root. The current implementation of `<ApiAware>` is in the `component/ApiAware.xmlui` file.
+
+In this short article, you won't dive deeper into the markup. The following article about the "Personal Todo App" will detail more concepts to guide you in creating XMLUI apps.

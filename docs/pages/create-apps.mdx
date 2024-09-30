@@ -1,9 +1,10 @@
 import { Callout } from 'nextra/components'
+import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
 
-# XMLUI Apps
+# Creating XMLUI Apps
 
 <Callout type="info" emoji="💡">
-  XMLUI apps have a simple file structure that can be directly hosted as a set of static files in a web server's folder. 
+  XMLUI apps have a **simple file structure** that can be directly hosted as static files in a web server's folder (without a build process). 
 </Callout>
 
 ## Application Files
@@ -23,6 +24,27 @@ An app has a mandatory file named `Main.xmlui`. When the app's `index.html` file
 ## Application Folders
 
 _TBD_
+
+XMLUI samples and applications are available as static files and are immediately ready to be hosted by a web server. Most samples are zipped files with a particular file structure; each file and folder has its specific role. When you download our [starter sample](#) (URL to be set later), the unzipped folder has this structure:
+
+```
+<XMLUI app folder>
+  ├── index.html (The web page that opens in the browser)
+  ├── Main.xmlui (The main XMLUI file with the app)
+  ├── config.json (The app's configuration file)
+  ├── components (The folder with the app's XMLUI components)
+  │   ├── ApiAware.xmlui
+  │   ├── Home.xmlui
+  │   ├── IncButton.xmlui
+  │   ├── PagePanel.xmlui
+  └── resources (Static app resources like images, logos, icons, etc.)
+      ├── favicon.ico
+      ├── xmlui-logo.svg
+      └── xmlui-logo-inverted.svg
+```
+
+The files with the `.xmlui` extension (and, as you will learn later, with the `.xmlui.xs` extension) are XMLUI source files. When you modify any of them and refresh the browser, the engine immediately compiles them and updates the page accordingly.
+
 
 
 
