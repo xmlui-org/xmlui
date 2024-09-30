@@ -551,7 +551,7 @@ const MemoizedContainer = memo(
             layoutContext: lc,
             parentRenderContext: pRenderContext,
             memoedVarsRef,
-            cleanup
+            cleanup,
           });
           if (renderedChild === undefined) {
             return undefined;
@@ -579,7 +579,6 @@ const MemoizedContainer = memo(
         return renderedChildren;
       },
       [
-        themeVars,
         componentState,
         dispatch,
         appContext,
@@ -627,11 +626,7 @@ const MemoizedContainer = memo(
           lookupAction,
           cleanup,
         })}
-        {stableRenderChild(
-          node.children,
-          layoutContextRef?.current,
-          parentRenderContext,
-        )}
+        {stableRenderChild(node.children, layoutContextRef?.current, parentRenderContext)}
       </Fragment>
     );
   }),
@@ -989,12 +984,8 @@ function renderChild({
   layoutContext,
   parentRenderContext,
   memoedVarsRef,
-  cleanup
+  cleanup,
 }: RenderChildContext): ReactNode {
-  if (!node) {
-    return null;
-  }
-
   // --- Render only visible components
   if (!shouldKeep(node.when, state, appContext)) {
     return null;
