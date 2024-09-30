@@ -12,6 +12,7 @@ export const SlotMd = createMetadata({
     name: d(`This optional property defines the name of the slot.`),
   },
   allowArbitraryProps: true,
+  opaque: true
 });
 
 export const SlotHolder = createPropHolderComponentNew(COMP, SlotMd);

@@ -5,6 +5,11 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Table } from "./TableNative";
 import { dAutoFocus, dComponent } from "@components/metadata-helpers";
+import { useMemo, useRef, useState } from "react";
+import type { OurColumnMetadata } from "@components/Column/TableContext";
+import { TableContext } from "@components/Column/TableContext";
+import produce from "immer";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 
 const COMP = "Table";
 
@@ -120,15 +125,88 @@ export const TableMd = createMetadata({
   },
 });
 
-export const tableComponentRenderer = createComponentRenderer(
-  COMP,
-  TableMd,
-  ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss }) => {
-    const data = extractValue(node.props.items) || extractValue(node.props.data);
+const TableWithColumns = ({
+  extractValue,
+  node,
+  renderChild,
+  lookupEventHandler,
+  lookupSyncCallback,
+  layoutCss,
+}) => {
+  const data = extractValue(node.props.items) || extractValue(node.props.data);
 
-    return (
+  const [columnIds, setColumnIds] = useState(EMPTY_ARRAY);
+  const [columnsByIds, setColumnByIds] = useState(EMPTY_OBJECT);
+  const columnIdsRef = useRef([]);
+  const [tableKey, setTableKey] = useState(0);
+  const tableContextValue = useMemo(() => {
+    return {
+      registerColumn: (column: OurColumnMetadata, id: string) => {
+        setColumnIds(
+          produce((draft) => {
+            const existing = draft.findIndex((colId) => colId === id);
+            if (existing < 0) {
+              draft.push(id);
+            }
+          }),
+        );
+        setColumnByIds(
+          produce((draft) => {
+            draft[id] = column;
+          }),
+        );
+      },
+      unRegisterColumn: (id: string) => {
+        setColumnIds(
+          produce((draft) => {
+            return draft.filter((colId) => colId !== id);
+          }),
+        );
+        setColumnByIds(
+          produce((draft) => {
+            delete draft[id];
+          }),
+        );
+      },
+    };
+  }, []);
+  const columnRefresherContextValue = useMemo(() => {
+    return {
+      registerColumn: (column: OurColumnMetadata, id: string) => {
+        if (!columnIdsRef.current.find((colId) => colId === id)) {
+          setTableKey((prev) => prev + 1);
+          columnIdsRef.current.push(id);
+        }
+      },
+      unRegisterColumn: (id: string) => {
+        if (columnIdsRef.current.find((colId) => colId === id)) {
+          columnIdsRef.current = columnIdsRef.current.filter((colId) => colId !== id);
+          setTableKey((prev) => prev + 1);
+        }
+      },
+    };
+  }, []);
+
+  const columns = useMemo(
+    () => columnIds.map((colId) => columnsByIds[colId]),
+    [columnIds, columnsByIds],
+  );
+
+  return (
+    <>
+      {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+            and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
+            This way the order of the columns is preserved.
+        */}
+      <TableContext.Provider value={tableContextValue} key={tableKey}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
+      <TableContext.Provider value={columnRefresherContextValue}>
+        {renderChild(node.children)}
+      </TableContext.Provider>
       <Table
         data={data}
+        columns={columns}
         pageSizes={extractValue(node.props.pageSizes)}
         rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
         noDataRenderer={
@@ -153,9 +231,24 @@ export const tableComponentRenderer = createComponentRenderer(
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
         enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
-      >
-        {renderChild(node.children)}
-      </Table>
+      />
+    </>
+  );
+};
+
+export const tableComponentRenderer = createComponentRenderer(
+  COMP,
+  TableMd,
+  ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss }) => {
+    return (
+      <TableWithColumns
+        node={node}
+        extractValue={extractValue}
+        lookupEventHandler={lookupEventHandler}
+        lookupSyncCallback={lookupSyncCallback}
+        layoutCss={layoutCss}
+        renderChild={renderChild}
+      />
     );
   },
 );
