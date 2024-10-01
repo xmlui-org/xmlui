@@ -20,7 +20,7 @@ export type CarouselProps = {
 };
 
 const CarouselComponent = ({
-  orientation = "horizontal",
+  orientation = "vertical",
   opts,
   setApi,
   plugins,

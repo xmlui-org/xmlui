@@ -26,14 +26,6 @@
   flex-basis: 100%;
 }
 
-/*.itemHorizontal {
-  padding-left: 1rem;
-}
-
-.itemVertical {
-  padding-top: 1rem;
-}*/
-
 .controlButton {
   z-index: 99;
   justify-content: center;
@@ -45,26 +37,26 @@
 }
 
 .controlPrevHorizontal {
-  left: -3rem;
+  left: 1rem;
   top: 50%;
   transform: translateY(-50%);
 }
 
 
 .controlPrevVertical {
-  top: 0;
+  top: 1rem;
   left: 50%;
   transform: translateX(-50%) rotate(90deg);
 }
 
 .controlNextHorizontal {
-  right: -3rem;
+  right: 1rem;
   top: 50%;
   transform: translateY(-50%);
 }
 
 .controlNextVertical {
-  bottom: 0;
+  bottom: 1rem;
   right: 50%;
   transform: translateX(50%) rotate(90deg);
 }
