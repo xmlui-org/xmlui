@@ -23,12 +23,31 @@ export const CarouselMd = createMetadata({
       null,
       "true",
     ),
+    controls: d("This property indicates whether the carousel displays the controls.", null, null, "true"),
+    autoplay: d(
+      "This property indicates whether the carousel automatically scrolls.",
+      null,
+      null,
+      "false",
+    ),
+    loop: d("This property indicates whether the carousel loops.", null, null, "false"),
+    startIndex: d(
+      "This property indicates the index of the first slide to display.",
+      null,
+      null,
+      "0",
+    ),
+    prevIcon: d("This property specifies the icon to display for the previous control."),
+    nextIcon: d("This property specifies the icon to display for the next control."),
+    keyboard: d("This property indicates whether the carousel responds to keyboard events."),
   },
   events: {
     displayDidChange: dDidChange(COMP),
   },
   apis: {
-    canScrollPrev: d("This method returns `true` if the carousel can scroll to the previous slide."),
+    canScrollPrev: d(
+      "This method returns `true` if the carousel can scroll to the previous slide.",
+    ),
     canScrollNext: d("This method returns `true` if the carousel can scroll to the next slide."),
     scrollTo: d("This method scrolls the carousel to the specified slide index."),
     scrollPrev: d("This method scrolls the carousel to the previous slide."),
@@ -67,9 +86,17 @@ export const carouselComponentRenderer = createComponentRenderer(
     return (
       <CarouselComponent
         style={layoutCss}
+        indicators={extractValue(node.props?.indicators)}
+        controls={extractValue(node.props?.controls)}
         orientation={extractValue(node.props?.orientation)}
         onDisplayDidChange={lookupEventHandler("displayDidChange")}
+        autoplay={extractValue.asOptionalBoolean(node.props?.autoplay)}
         registerComponentApi={registerComponentApi}
+        loop={extractValue.asOptionalBoolean(node.props?.loop)}
+        startIndex={extractValue.asOptionalNumber(node.props?.startIndex)}
+        prevIcon={extractValue(node.props?.prevIcon)}
+        nextIcon={extractValue(node.props?.nextIcon)}
+        keyboard={extractValue.asOptionalBoolean(node.props?.keyboard)}
       >
         {renderChild(node.children)}
       </CarouselComponent>

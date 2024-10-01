@@ -47,6 +47,7 @@ $componentName: "Carousel";
 }
 
 .controlButton {
+  transition: all .3s;
   justify-content: center;
   align-items: center;
   display: inline-flex;
@@ -72,14 +73,6 @@ $componentName: "Carousel";
   background-color: createThemeVar("color-bg-control-disabled-#{$componentName}");
 }
 
-.controlPrevVertical {
-  transform: rotate(90deg);
-}
-
-.controlNextVertical {
-  transform: rotate(90deg);
-}
-
 .indicators {
   position: absolute;
   bottom: 1rem;
@@ -88,6 +81,7 @@ $componentName: "Carousel";
 }
 
 .indicator {
+  transition: all .3s;
   width: createThemeVar("width-indicator-#{$componentName}");
   height: createThemeVar("height-indicator-#{$componentName}");
   border-radius: 2px;
