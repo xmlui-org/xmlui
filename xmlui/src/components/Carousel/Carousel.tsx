@@ -4,11 +4,36 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { CarouselComponent } from "./CarouselNative";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "@components/Carousel/Carousel.module.scss";
+import { dDidChange } from "@components/metadata-helpers";
 
 const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
   status: "in progress",
+  props: {
+    orientation: d(
+      "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",
+      ["horizontal", "vertical"],
+      null,
+      "horizontal",
+    ),
+    indicators: d(
+      "This property indicates whether the carousel displays the indicators.",
+      null,
+      null,
+      "true",
+    ),
+  },
+  events: {
+    displayDidChange: dDidChange(COMP),
+  },
+  apis: {
+    canScrollPrev: d("This method returns `true` if the carousel can scroll to the previous slide."),
+    canScrollNext: d("This method returns `true` if the carousel can scroll to the next slide."),
+    scrollTo: d("This method scrolls the carousel to the specified slide index."),
+    scrollPrev: d("This method scrolls the carousel to the previous slide."),
+    scrollNext: d("This method scrolls the carousel to the next slide."),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-control-${COMP}`]: "$color-bg-primary",
@@ -38,7 +63,16 @@ export const CarouselMd = createMetadata({
 export const carouselComponentRenderer = createComponentRenderer(
   COMP,
   CarouselMd,
-  ({ node, renderChild, layoutCss }) => {
-    return <CarouselComponent style={layoutCss}>{renderChild(node.children)}</CarouselComponent>;
+  ({ node, renderChild, layoutCss, extractValue, lookupEventHandler, registerComponentApi }) => {
+    return (
+      <CarouselComponent
+        style={layoutCss}
+        orientation={extractValue(node.props?.orientation)}
+        onDisplayDidChange={lookupEventHandler("displayDidChange")}
+        registerComponentApi={registerComponentApi}
+      >
+        {renderChild(node.children)}
+      </CarouselComponent>
+    );
   },
 );

@@ -10,10 +10,10 @@ $themeVars: ();
 $componentName: "Carousel";
 
 .carousel {
+  position: relative;
   overflow: hidden;
   width: createThemeVar("width-#{$componentName}");
   height: createThemeVar("height-#{$componentName}");
-  position: relative;
 }
 
 .carouselContentWrapper {
