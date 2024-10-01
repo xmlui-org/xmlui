@@ -12,6 +12,7 @@ export const PageMd = createMetadata({
     `The \`${PAGE}\` component defines what content is displayed when the user navigates ` +
     `to a particular URL that is associated with the page.`,  
   props: {
+      //TODO illesg rename to path
     url: d(`The URL of the route associated with the content.`),
   },
 });
