@@ -12,7 +12,7 @@ import {
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
-import { createTable, handleError, ErrorWithSeverity } from "./utils.mjs";
+import { createTable, processError, ErrorWithSeverity } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -86,7 +86,7 @@ export function processMdx(component, componentNames, metadata) {
       // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
       fileData = readFileContents(join(sourceFolder, component.descriptionRef));
     } catch (error) {
-      handleError(error);
+      processError(error);
     }
   }
 
@@ -114,11 +114,8 @@ export function processMdx(component, componentNames, metadata) {
 
     result += `# ${component.displayName}\n\n`;
 
-    if (component.nonVisual) {
-      result +=
-        "<Callout>**Note**: This component does does not show up on the UI; " +
-        "it merely helps implement UI logic.</Callout>\n\n";
-    }
+    result += addComponentStatusDisclaimer(component.status);
+    result += addNonVisualDisclaimer(component.nonVisual);
 
     result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
     result += "\n\n";
@@ -476,6 +473,40 @@ function isDirectory(filePath) {
   }
 }
 
+// --- Section helpers
+
+function addComponentStatusDisclaimer(status) {
+  let disclaimer = "";
+  switch (status) {
+    case "stable":
+      disclaimer = "";
+      break;
+    case "experimental":
+      disclaimer = "This component is in an **experimental** state; you can use it in your app. " +
+      "However, we may modify it, and it may even have breaking changes in the future.";
+      break;
+    case "deprecated":
+      disclaimer =
+        "This component has been **deprecated**. We may remove it in a future XMLUI version.";
+      break;
+    case "in progress":
+      disclaimer =
+        "This component's implementation is **in progress**. This documentation shows the component's planned interface.";
+      break;
+    default:
+      disclaimer = "";
+  }
+
+  return disclaimer !== "" ? `<Callout type="info" emoji="ℹ️">${disclaimer}</Callout>\n\n` : "";
+}
+
+function addNonVisualDisclaimer(isNonVisual) {
+  return isNonVisual
+    ? "<Callout>**Note**: This component does not show up on the UI; " +
+        "it merely helps implement UI logic.</Callout>\n\n"
+    : "";
+}
+
 function addDefaultValue(component) {
   const defaultValue = component.defaultValue;
   if (defaultValue === undefined) {
@@ -503,11 +534,16 @@ function addAvailableValues(component) {
   const valuesTypeIsPrimitive = valuesType === "string" || valuesType === "number";
 
   if (valuesType === "string" || valuesType === "number") {
-    availableValuesBuffer = component.availableValues.map((v) => `\`${v}\`${appendDefaultIndicator(v)}`).join(", ");
+    availableValuesBuffer = component.availableValues
+      .map((v) => `\`${v}\`${appendDefaultIndicator(v)}`)
+      .join(", ");
   } else if (valuesType === "object") {
     availableValuesBuffer = createTable({
       headers: ["Value", "Description"],
-      rows: component.availableValues.map((v) => [`\`${v.value}\``, `${v.description}${appendDefaultIndicator(v.value)}`]),
+      rows: component.availableValues.map((v) => [
+        `\`${v.value}\``,
+        `${v.description}${appendDefaultIndicator(v.value)}`,
+      ]),
     });
   }
 
@@ -536,6 +572,7 @@ function listThemeVars(component) {
 
   const varsWithDefaults = allThemeVars
     .sort()
+    // Only list theme vars that contain the component name
     .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
     .map((themeVar) => {
       const parts = themeVar.split(":");
@@ -546,11 +583,11 @@ function listThemeVars(component) {
       const defaultLightVar =
         component.defaultThemeVars?.["light"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)";
+        "<GrayText>none</GrayText>";
       const defaultDarkVar =
         component.defaultThemeVars?.["dark"]?.[themeVar] ??
         component.defaultThemeVars?.[themeVar] ??
-        "(fallback)";
+        "<GrayText>none</GrayText>";
 
       return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
     });

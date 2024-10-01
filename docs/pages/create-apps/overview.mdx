@@ -1,9 +1,5 @@
 import { Callout } from 'nextra/components'
-import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
-
-# Learning XMLUI
-
-After completing the first experiment with the framework, the articles in this section will help you master XMLUI. You can quickly understand the gist of XMLUI by going through the framework's fundamental concepts.
+import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui";
 
 ## Components
 
@@ -239,10 +235,10 @@ var countTimes3 = count * 3;
   </div>
 </div>
 
-When you click the button, it increments only the `count` variable. However, as countTimes3 is a reactive variable with `count` as a dependency, updating `count` triggers the re-evaluation of `countTimes3`. Thus, the second text will show three times the value of the first.
+When you click the button, it increments only the `count` variable. However, as `countTimes` is a reactive variable with `count` as a dependency, updating `count` triggers the re-evaluation of `countTimes3`. Thus, the second text will show three times the value of the first.
 
 <Callout type="info" emoji="💡">
-You can use **local variables** within (and only within) function declarations. The **`let` keyword** allows using a mutable variable; **`const`** declares an immutable one (following the JavaScript semantics).
+You can use **local variables** within (and only within) function declarations. The **`let` keyword** allows using a mutable variable; **`const`** declares an immutable one (following the JavaScript semantics). In contrast to `var`, variables declared with `let` and `const` are not reactive.
 </Callout>
 
 <br/>
@@ -336,7 +332,7 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
     </Theme>  
   `}
   components={[themeGallery]}
-  height={260}
+  height={272}
 />
 
 <Playground
@@ -348,7 +344,7 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
     </Theme>  
   `}
   components={[themeGallery]}
-  height={260}
+  height={272}
 />
 
 <Callout type="info" emoji="💡">
@@ -387,7 +383,7 @@ These modifications set the primary theme color to purplish and add a bigger cor
     </Theme>
   `}
   components={[themeGallery]}
-  height={260}
+  height={272}
 />
 
 <Playground
@@ -410,7 +406,7 @@ These modifications set the primary theme color to purplish and add a bigger cor
     </Theme>
   `}
   components={[themeGallery]}
-  height={260}
+  height={272}
 />
 
 <Callout type="info" emoji="💡">
@@ -440,7 +436,7 @@ These modifications set the primary theme color to purplish and add a bigger cor
       radius="3rem" />
   `}
   components={[themeGallery]}
-  height={100}
+  height={112}
 />
 
 <Callout emoji="⚠️">
@@ -454,13 +450,9 @@ These modifications set the primary theme color to purplish and add a bigger cor
 </Callout>
 
 <Callout type="info" emoji="💡">
-  You do not need to declare anything about the structure's content. **The framework will observe and process all source files into a working app**.
-</Callout>
-
-<Callout type="info" emoji="💡">
   XMLUI applications have a **simple folder structure**. You can copy this structure into the static files folder of your web server, and they are **ready to be hosted instantly** by a web server.
 </Callout>
 
-<Callout type="info" emoji="💡">
-  The framework offers several build methods that **optimize the static file structure for size and startup performance**. 
+<Callout emoji="💡">
+  **You do not need to build an app**. However, the framework offers several build methods that **optimize the static file structure for size and startup performance** if you need this feature. 
 </Callout>

@@ -1,6 +1,7 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { OurColumnMetadata, useTableContext } from "./TableContext";
-import { useCallback, useEffect, useId, useLayoutEffect, useMemo } from "react";
+import type { OurColumnMetadata } from "./TableContext";
+import { useTableContext } from "./TableContext";
+import { useCallback, useId, useLayoutEffect, useMemo } from "react";
 import { MemoizedItem } from "@components/container-helpers";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 
@@ -9,7 +10,7 @@ type Props = OurColumnMetadata & {
   renderChild: RenderChildFn;
 };
 
-export function Column({ nodeChildren, renderChild, index, ...columnMetadata }: Props) {
+export function Column({ nodeChildren, renderChild, ...columnMetadata }: Props) {
   const id = useId();
   const { registerColumn, unRegisterColumn } = useTableContext();
 
@@ -28,12 +29,10 @@ export function Column({ nodeChildren, renderChild, index, ...columnMetadata }: 
     registerColumn({
       ...columnMetadata,
       cellRenderer: safeCellRenderer,
-      id,
-      index,
-    });
-  }, [index, columnMetadata, id, registerColumn, safeCellRenderer]);
+    }, id);
+  }, [columnMetadata, id, registerColumn, safeCellRenderer]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     return () => {
       unRegisterColumn(id);
     };

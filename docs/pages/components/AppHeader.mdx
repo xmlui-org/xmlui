@@ -2,6 +2,8 @@ import { Callout } from "nextra/components";
 
 # AppHeader
 
+<Callout type="info" emoji="ℹ️">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
 `AppHeader` is a placeholder within `App` to define a custom application header.
 
 > **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
@@ -71,10 +73,6 @@ With this property, you can construct your custom logo instead of using a single
   `}
 />
 
-### `logoTitle`
-
-Title for the application logo
-
 ### `profileMenuTemplate`
 
 This property makes the profile menu slot of the `AppHeader` component customizable.
@@ -115,6 +113,14 @@ It accepts component definitions.
   </App>
   `}
 />
+
+### `title`
+
+Title for the application logo
+
+### `titleTemplate`
+
+This property defines the template to use for the title. With this property, you can construct your custom title instead of using a single image.
 
 ## Events
 
@@ -193,5 +199,5 @@ The `AppHeader` component allows these theme variables to customize the logo wit
 | [thickness-border-right](../styles-and-themes/common-units/#size-values)-AppHeader | 0 | 0 |
 | [thickness-border-top](../styles-and-themes/common-units/#size-values)-AppHeader | 0 | 0 |
 | [thickness-border-vertical](../styles-and-themes/common-units/#size-values)-AppHeader | 0 | 0 |
-| [width](../styles-and-themes/common-units/#size-values)-logo-AppHeader | (fallback) | (fallback) |
+| [width](../styles-and-themes/common-units/#size-values)-logo-AppHeader | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 

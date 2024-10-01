@@ -1,16 +1,17 @@
-import path from "path";
-import { fileURLToPath } from 'url';
-import { basename, join } from "path";
-import { readFile, writeFile } from "fs/promises";
+import { fileURLToPath } from "url";
+import { basename, join, dirname, extname } from "path";
+import { unlink, readdir, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
-import { handleError, createTable } from "./utils.mjs";
+import { processError, createTable, ErrorWithSeverity } from "./utils.mjs";
+import loadConfig from "./input-handler.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
 // get these variables from config
-const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
+const scriptFolder = import.meta.dirname;
+const projectRootFolder = join(dirname(fileURLToPath(import.meta.url)), "../../../");
 const docsFolderRoot = join(projectRootFolder, "docs");
 const componentDocsFolder = join(docsFolderRoot, "pages", "components");
 const componentDocsFolderName = basename(componentDocsFolder);
@@ -20,28 +21,71 @@ const inputComponentsFolder = join(projectRootFolder, "xmlui", "src", "component
 const componentSamplesFolder = join(docsFolderRoot, "component-samples");
 */
 
-logger.info("Extending component metadata with default values");
-const metadata = Object.entries(collectedComponentMetadata).map(([compName, compData]) => {
-  const displayName = compName;
-  const componentFolder = compData.specializedFrom || compData.docFolder || compName;
-  const descriptionRef = join(componentFolder, `${displayName}.mdx`);
+// --- Load Config
 
-  const extendedComponentData = {
-    ...compData,
-    displayName,
-    description: compData.description,
-    descriptionRef,
-    componentFolder,
-  };
+logger.info("Loading config");
 
-  const entries = addDescriptionRef(extendedComponentData, [
-    "props",
-    "events",
-    "api",
-    "contextVars",
-  ]);
-  return { ...extendedComponentData, ...entries };
-});
+let config = {};
+try {
+  config = await loadConfig(join(scriptFolder, "config.json"));
+} catch (error) {
+  processError("Error reading JSON file:", error);
+  throw error;
+}
+
+// --- Extend Metadata
+
+logger.info("Extending component metadata");
+
+const metadata = Object.entries(collectedComponentMetadata)
+  .filter(([_, compData]) => {
+    return !config.excludeComponentStatuses.includes(compData.status?.toLowerCase());
+  })
+  .map(([compName, compData]) => {
+    const displayName = compName;
+    const componentFolder = compData.specializedFrom || compData.docFolder || compName;
+    const descriptionRef = join(componentFolder, `${displayName}.mdx`);
+
+    const extendedComponentData = {
+      ...compData,
+      displayName,
+      description: compData.description,
+      descriptionRef,
+      componentFolder,
+    };
+
+    const entries = addDescriptionRef(extendedComponentData, [
+      "props",
+      "events",
+      "api",
+      "contextVars",
+    ]);
+    return { ...extendedComponentData, ...entries };
+  });
+
+// --- Clean Folder
+
+if (config.cleanFolder) {
+  logger.info(`Cleaning ${componentDocsFolderName}`);
+  try {
+    await removeAllFilesInFolder(componentDocsFolder);
+  } catch (error) {
+    processError(error);
+  }
+}
+
+// --- Export Metadata to JSON (Optional)
+
+if (config.exportToJson) {
+  logger.info("Exporting metadata to JSON");
+  try {
+    await writeFile(join(scriptFolder, "metadata.json"), JSON.stringify(collectedComponentMetadata, null, 2));
+  } catch (error) {
+    processError(error);
+  }
+}
+
+// --- Process Docs & Export Files
 
 logger.info("Processing MDX files");
 processDocfiles(metadata);
@@ -60,7 +104,7 @@ try {
   );
   await writeFile(join(docsFolderRoot, "pages", `${componentDocsFolderName}.mdx`), summary);
 } catch (error) {
-  handleError(error);
+  processError(error);
 }
 
 // --- Helpers
@@ -73,14 +117,14 @@ async function createSummary(
   const buffer = await readFile(filename, "utf8");
 
   const lines = strBufferToLines(buffer);
-  const startComponentsSection = lines.findIndex((line) => line.includes(`## ${sectionName}`));
-  const endComponentsSection = lines
-    .slice(startComponentsSection + 1)
+  const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
+  const componentSectionEndIdx = lines
+    .slice(componentSectionStartIdx + 1)
     .findIndex((line) => /^#+[\s\S]/.exec(line));
 
-  const beforeComponentsSection = lines.slice(0, startComponentsSection).join("\n");
+  const beforeComponentsSection = lines.slice(0, componentSectionStartIdx).join("\n");
   const afterComponentsSection = lines
-    .slice(startComponentsSection + 1, startComponentsSection + 1 + endComponentsSection)
+    .slice(componentSectionStartIdx + 1, componentSectionStartIdx + 1 + componentSectionEndIdx)
     .join("\n");
 
   const sortedMetadata = metadata.sort((a, b) => {
@@ -91,7 +135,11 @@ async function createSummary(
   table += `## ${sectionName}\n\n`;
   table += createTable({
     rowNums: true,
-    headers: [{ value: "Component", style: "center" }, "Description", { value: "Status", style: "center" }],
+    headers: [
+      { value: "Component", style: "center" },
+      "Description",
+      { value: "Status", style: "center" },
+    ],
     rows: sortedMetadata.map((component) => [
       `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
       component.description,
@@ -119,6 +167,25 @@ function addDescriptionRef(component, entries = []) {
   }
 
   return result;
+}
+
+async function removeAllFilesInFolder(folderPath) {
+  const files = await readdir(folderPath);
+
+  const unlinkPromises = files
+    .filter(
+      (file) =>
+        extname(file) === ".mdx" || extname(file) === ".md" || basename(file) === "_meta.json",
+    )
+    .map((file) => unlink(join(folderPath, file)));
+
+  await Promise.all(unlinkPromises)
+    .then(() => {
+      logger.info("All files have been successfully deleted");
+    })
+    .catch((err) => {
+      throw new ErrorWithSeverity(err.message, Logger.severity.error);
+    });
 }
 
 function strBufferToLines(buffer) {

@@ -1,4 +1,5 @@
-import { createContext, CSSProperties, ReactNode, useContext } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { createContext, useContext } from "react";
 
 export type OurColumnMetadata = {
   style?: CSSProperties;
@@ -13,11 +14,10 @@ export type OurColumnMetadata = {
   pinTo?: string;
   canResize?: boolean;
   cellRenderer?: (row: any) => ReactNode;
-  index: number;
 };
 
 export const TableContext = createContext({
-  registerColumn: (col: OurColumnMetadata) => {},
+  registerColumn: (col: OurColumnMetadata, id: string) => {},
   unRegisterColumn: (id: string) => {},
 });
 

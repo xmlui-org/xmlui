@@ -14,7 +14,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.width).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
@@ -23,7 +23,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.width).equal(c);
       expect(result.cssProps?.flexShrink).equal(c.endsWith("*") ? 1 : 0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
@@ -32,7 +32,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.width).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -40,7 +40,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ width: c });
       expect(result.cssProps?.width).equal(c);
       expect(result.issues?.["width"]).contains("Unexpected");
-    })
+    }),
   );
 
   sizeTailCases.forEach((c) =>
@@ -49,7 +49,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.width).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["width"]).contains("tail");
-    })
+    }),
   );
 
   // --- minWidth
@@ -59,16 +59,20 @@ describe("Style compiler", () => {
       expect(result.cssProps?.minWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`minWidth (horizontal parent): ${c}`, () => {
-      const result = compileLayout({ minWidth: c }, {}, { type: "Stack", orientation: "horizontal" });
+      const result = compileLayout(
+        { minWidth: c },
+        {},
+        { type: "Stack", orientation: "horizontal" },
+      );
       expect(result.cssProps?.minWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
@@ -77,7 +81,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.minWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -85,7 +89,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ minWidth: c });
       expect(result.cssProps?.minWidth).equal(c);
       expect(result.issues?.["minWidth"]).contains("Unexpected");
-    })
+    }),
   );
 
   // --- maxWidth
@@ -95,16 +99,20 @@ describe("Style compiler", () => {
       expect(result.cssProps?.maxWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`maxWidth (horizontal parent): ${c}`, () => {
-      const result = compileLayout({ maxWidth: c }, {}, { type: "Stack", orientation: "horizontal" });
+      const result = compileLayout(
+        { maxWidth: c },
+        {},
+        { type: "Stack", orientation: "horizontal" },
+      );
       expect(result.cssProps?.maxWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
@@ -113,7 +121,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.maxWidth).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -121,7 +129,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ maxWidth: c });
       expect(result.cssProps?.maxWidth).equal(c);
       expect(result.issues?.["maxWidth"]).contains("Unexpected");
-    })
+    }),
   );
 
   // --- height
@@ -131,7 +139,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.height).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
@@ -146,7 +154,7 @@ describe("Style compiler", () => {
         expect(result.cssProps?.flex).equal(undefined);
       }
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   it(`height (vertical parent): 25%`, () => {
@@ -163,7 +171,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.height).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -171,7 +179,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ height: c });
       expect(result.cssProps?.height).equal(c);
       expect(result.issues?.["height"]).contains("Unexpected");
-    })
+    }),
   );
 
   // --- minHeight
@@ -181,25 +189,33 @@ describe("Style compiler", () => {
       expect(result.cssProps?.minHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`minHeight (vertical parent): ${c}`, () => {
-      const result = compileLayout({ minHeight: c }, {}, { type: "Stack", orientation: "vertical" });
+      const result = compileLayout(
+        { minHeight: c },
+        {},
+        { type: "Stack", orientation: "vertical" },
+      );
       expect(result.cssProps?.minHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`minHeight (horizontal parent): ${c}`, () => {
-      const result = compileLayout({ minHeight: c }, {}, { type: "Stack", orientation: "horizontal" });
+      const result = compileLayout(
+        { minHeight: c },
+        {},
+        { type: "Stack", orientation: "horizontal" },
+      );
       expect(result.cssProps?.minHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -207,7 +223,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ minHeight: c });
       expect(result.cssProps?.minHeight).equal(c);
       expect(result.issues?.["minHeight"]).contains("Unexpected");
-    })
+    }),
   );
 
   // --- maxHeight
@@ -217,25 +233,33 @@ describe("Style compiler", () => {
       expect(result.cssProps?.maxHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`maxHeight (vertical parent): ${c}`, () => {
-      const result = compileLayout({ maxHeight: c }, {}, { type: "Stack", orientation: "vertical" });
+      const result = compileLayout(
+        { maxHeight: c },
+        {},
+        { type: "Stack", orientation: "vertical" },
+      );
       expect(result.cssProps?.maxHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeCases.forEach((c) =>
     it(`maxHeight (horizontal parent): ${c}`, () => {
-      const result = compileLayout({ maxHeight: c }, {}, { type: "Stack", orientation: "horizontal" });
+      const result = compileLayout(
+        { maxHeight: c },
+        {},
+        { type: "Stack", orientation: "horizontal" },
+      );
       expect(result.cssProps?.maxHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(0);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -244,7 +268,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.maxHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["maxHeight"]).contains("Unexpected");
-    })
+    }),
   );
 
   // --- top
@@ -254,7 +278,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.top).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -262,7 +286,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ top: c });
       expect(result.cssProps?.top).equal(c);
       expect(result.issues?.["top"]).contains("Unexpected");
-    })
+    }),
   );
 
   sizeTailCases.forEach((c) =>
@@ -271,7 +295,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.top).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["top"]).contains("tail");
-    })
+    }),
   );
 
   // --- right
@@ -281,7 +305,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.right).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -289,7 +313,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ right: c });
       expect(result.cssProps?.right).equal(c);
       expect(result.issues?.["right"]).contains("Unexpected");
-    })
+    }),
   );
 
   sizeTailCases.forEach((c) =>
@@ -298,7 +322,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.right).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["right"]).contains("tail");
-    })
+    }),
   );
 
   // --- bottom
@@ -308,7 +332,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.bottom).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -316,7 +340,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ bottom: c });
       expect(result.cssProps?.bottom).equal(c);
       expect(result.issues?.["bottom"]).contains("Unexpected");
-    })
+    }),
   );
 
   sizeTailCases.forEach((c) =>
@@ -325,7 +349,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.bottom).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["bottom"]).contains("tail");
-    })
+    }),
   );
 
   // --- left
@@ -335,7 +359,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.left).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   sizeErrorCases.forEach((c) =>
@@ -343,7 +367,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ left: c });
       expect(result.cssProps?.left).equal(c);
       expect(result.issues?.["left"]).contains("Unexpected");
-    })
+    }),
   );
 
   sizeTailCases.forEach((c) =>
@@ -352,7 +376,17 @@ describe("Style compiler", () => {
       expect(result.cssProps?.left).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues?.["left"]).contains("tail");
-    })
+    }),
+  );
+
+  // --- borderThickness
+  sizeCases.forEach((c) =>
+    it(`borderThickness: ${c}`, () => {
+      const result = compileLayout({ borderThickness: c });
+      expect(result.cssProps?.borderWidth).equal(c);
+      expect(result.cssProps?.flexShrink).equal(undefined);
+      expect(result.issues).equal(undefined);
+    }),
   );
 
   const scrollingCases = ["visible", "hidden", "scroll"];
@@ -367,7 +401,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ horizontalOverflow: c });
       expect(result.cssProps?.overflowX).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   scrollingErrorCases.forEach((c) =>
@@ -375,7 +409,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ horizontalOverflow: c });
       expect(result.cssProps?.overflowX).equal(c);
       expect(result.issues?.["horizontalOverflow"]).contains("scrolling");
-    })
+    }),
   );
 
   scrollingTailCases.forEach((c) =>
@@ -383,7 +417,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ horizontalOverflow: c });
       expect(result.cssProps?.overflowX).equal(c);
       expect(result.issues?.["horizontalOverflow"]).contains("tail");
-    })
+    }),
   );
 
   // --- verticalOverflow
@@ -392,7 +426,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ verticalOverflow: c });
       expect(result.cssProps?.overflowY).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   scrollingErrorCases.forEach((c) =>
@@ -400,7 +434,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ verticalOverflow: c });
       expect(result.cssProps?.overflowY).equal(c);
       expect(result.issues?.["verticalOverflow"]).contains("scrolling");
-    })
+    }),
   );
 
   const directionCases = ["ltr", "rtl"];
@@ -415,7 +449,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ direction: c });
       expect(result.cssProps?.direction).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   directionErrorCases.forEach((c) =>
@@ -423,7 +457,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ direction: c });
       expect(result.cssProps?.direction).equal(c);
       expect(result.issues?.["direction"]).contains("direction");
-    })
+    }),
   );
 
   directionTailCases.forEach((c) =>
@@ -431,7 +465,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ direction: c });
       expect(result.cssProps?.direction).equal(c);
       expect(result.issues?.["direction"]).contains("tail");
-    })
+    }),
   );
 
   // --- FontFamily
@@ -447,7 +481,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontFamily: c });
       expect(result.cssProps?.fontFamily).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   fontFamilyErrorCases.forEach((c) =>
@@ -455,7 +489,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontFamily: c });
       expect(result.cssProps?.fontFamily).equal(c);
       expect(result.issues?.["fontFamily"]).contains("fontFamily");
-    })
+    }),
   );
 
   fontFamilyTailCases.forEach((c) =>
@@ -463,7 +497,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontFamily: c });
       expect(result.cssProps?.fontFamily).equal(c);
       expect(result.issues?.["fontFamily"]).contains("tail");
-    })
+    }),
   );
 
   // --- FontWeight
@@ -479,7 +513,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontWeight: c });
       expect(result.cssProps?.fontWeight).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   fontWeightErrorCases.forEach((c) =>
@@ -487,7 +521,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontWeight: c });
       expect(result.cssProps?.fontWeight).equal(c);
       expect(result.issues?.["fontWeight"]).contains("fontWeight");
-    })
+    }),
   );
 
   fontWeightTailCases.forEach((c) =>
@@ -495,7 +529,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontWeight: c });
       expect(result.cssProps?.fontWeight).equal(c);
       expect(result.issues?.["fontWeight"]).contains("tail");
-    })
+    }),
   );
 
   // --- zIndex
@@ -511,7 +545,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ zIndex: c });
       expect(result.cssProps?.zIndex).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   zIndexErrorCases.forEach((c) =>
@@ -519,7 +553,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ zIndex: c });
       expect(result.cssProps?.zIndex).equal(c);
       expect(result.issues?.["zIndex"]).contains("zIndex");
-    })
+    }),
   );
 
   zIndexTailCases.forEach((c) =>
@@ -527,7 +561,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ zIndex: c });
       expect(result.cssProps?.zIndex).equal(c);
       expect(result.issues?.["zIndex"]).contains("tail");
-    })
+    }),
   );
 
   const borderCases = [
@@ -557,7 +591,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ border: c.src });
       expect(result.cssProps?.border).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   borderErrorCases.forEach((c) =>
@@ -565,7 +599,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ border: c });
       expect(result.cssProps?.border).equal(c);
       expect(result.issues?.["border"]).contains("Unexpected");
-    })
+    }),
   );
 
   borderTailCases.forEach((c) =>
@@ -573,7 +607,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ border: c });
       expect(result.cssProps?.border).equal(c);
       expect(result.issues?.["border"]).contains("tail");
-    })
+    }),
   );
 
   // --- borderTop
@@ -582,7 +616,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderTop: c.src });
       expect(result.cssProps?.borderTop).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   borderErrorCases.forEach((c) =>
@@ -590,7 +624,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderTop: c });
       expect(result.cssProps?.borderTop).equal(c);
       expect(result.issues?.["borderTop"]).contains("Unexpected");
-    })
+    }),
   );
 
   borderTailCases.forEach((c) =>
@@ -598,7 +632,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderTop: c });
       expect(result.cssProps?.borderTop).equal(c);
       expect(result.issues?.["borderTop"]).contains("tail");
-    })
+    }),
   );
 
   // --- borderRight
@@ -607,7 +641,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderRight: c.src });
       expect(result.cssProps?.borderRight).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   borderErrorCases.forEach((c) =>
@@ -615,7 +649,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderRight: c });
       expect(result.cssProps?.borderRight).equal(c);
       expect(result.issues?.["borderRight"]).contains("Unexpected");
-    })
+    }),
   );
 
   borderTailCases.forEach((c) =>
@@ -623,7 +657,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderRight: c });
       expect(result.cssProps?.borderRight).equal(c);
       expect(result.issues?.["borderRight"]).contains("tail");
-    })
+    }),
   );
 
   // --- borderBottom
@@ -632,7 +666,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderBottom: c.src });
       expect(result.cssProps?.borderBottom).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   borderErrorCases.forEach((c) =>
@@ -640,7 +674,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderBottom: c });
       expect(result.cssProps?.borderBottom).equal(c);
       expect(result.issues?.["borderBottom"]).contains("Unexpected");
-    })
+    }),
   );
 
   borderTailCases.forEach((c) =>
@@ -648,7 +682,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderBottom: c });
       expect(result.cssProps?.borderBottom).equal(c);
       expect(result.issues?.["borderBottom"]).contains("tail");
-    })
+    }),
   );
 
   // --- borderLeft
@@ -657,7 +691,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderLeft: c.src });
       expect(result.cssProps?.borderLeft).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   borderErrorCases.forEach((c) =>
@@ -665,7 +699,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderLeft: c });
       expect(result.cssProps?.borderLeft).equal(c);
       expect(result.issues?.["borderLeft"]).contains("Unexpected");
-    })
+    }),
   );
 
   borderTailCases.forEach((c) =>
@@ -673,7 +707,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ borderLeft: c });
       expect(result.cssProps?.borderLeft).equal(c);
       expect(result.issues?.["borderLeft"]).contains("tail");
-    })
+    }),
   );
 
   const textDecorationCases = [
@@ -703,7 +737,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ textDecoration: c.src });
       expect(result.cssProps?.textDecoration).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   textDecorationErrorCases.forEach((c) =>
@@ -711,7 +745,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ textDecoration: c });
       expect(result.cssProps?.textDecoration).equal(c);
       expect(result.issues?.["textDecoration"]).contains("Unexpected");
-    })
+    }),
   );
 
   textDecorationTailCases.forEach((c) =>
@@ -719,7 +753,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ textDecoration: c });
       expect(result.cssProps?.textDecoration).equal(c);
       expect(result.issues?.["textDecoration"]).contains("tail");
-    })
+    }),
   );
 
   const radiusCases = [
@@ -738,7 +772,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radius: c.src });
       expect(result.cssProps?.borderRadius).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   radiusErrorCases.forEach((c) =>
@@ -746,7 +780,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radius: c });
       expect(result.cssProps?.borderRadius).equal(c);
       expect(result.issues?.["radius"]).contains("numeric");
-    })
+    }),
   );
 
   radiusTailCases.forEach((c) =>
@@ -754,7 +788,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radius: c });
       expect(result.cssProps?.borderRadius).equal(c);
       expect(result.issues?.["radius"]).contains("tail");
-    })
+    }),
   );
 
   // --- radiusTopLeft
@@ -763,7 +797,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopLeft: c.src });
       expect(result.cssProps?.borderTopLeftRadius).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   radiusErrorCases.forEach((c) =>
@@ -771,7 +805,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopLeft: c });
       expect(result.cssProps?.borderTopLeftRadius).equal(c);
       expect(result.issues?.["radiusTopLeft"]).contains("numeric");
-    })
+    }),
   );
 
   radiusTailCases.forEach((c) =>
@@ -779,7 +813,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopLeft: c });
       expect(result.cssProps?.borderTopLeftRadius).equal(c);
       expect(result.issues?.["radiusTopLeft"]).contains("tail");
-    })
+    }),
   );
 
   // --- radiusTopRight
@@ -788,7 +822,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopRight: c.src });
       expect(result.cssProps?.borderTopRightRadius).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   radiusErrorCases.forEach((c) =>
@@ -796,7 +830,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopRight: c });
       expect(result.cssProps?.borderTopRightRadius).equal(c);
       expect(result.issues?.["radiusTopRight"]).contains("numeric");
-    })
+    }),
   );
 
   radiusTailCases.forEach((c) =>
@@ -804,7 +838,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusTopRight: c });
       expect(result.cssProps?.borderTopRightRadius).equal(c);
       expect(result.issues?.["radiusTopRight"]).contains("tail");
-    })
+    }),
   );
 
   // --- radiusBottomLeft
@@ -813,7 +847,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomLeft: c.src });
       expect(result.cssProps?.borderBottomLeftRadius).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   radiusErrorCases.forEach((c) =>
@@ -821,7 +855,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomLeft: c });
       expect(result.cssProps?.borderBottomLeftRadius).equal(c);
       expect(result.issues?.["radiusBottomLeft"]).contains("numeric");
-    })
+    }),
   );
 
   radiusTailCases.forEach((c) =>
@@ -829,7 +863,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomLeft: c });
       expect(result.cssProps?.borderBottomLeftRadius).equal(c);
       expect(result.issues?.["radiusBottomLeft"]).contains("tail");
-    })
+    }),
   );
 
   // --- radiusBottomRight
@@ -838,7 +872,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomRight: c.src });
       expect(result.cssProps?.borderBottomRightRadius).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   radiusErrorCases.forEach((c) =>
@@ -846,7 +880,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomRight: c });
       expect(result.cssProps?.borderBottomRightRadius).equal(c);
       expect(result.issues?.["radiusBottomRight"]).contains("numeric");
-    })
+    }),
   );
 
   radiusTailCases.forEach((c) =>
@@ -854,7 +888,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ radiusBottomRight: c });
       expect(result.cssProps?.borderBottomRightRadius).equal(c);
       expect(result.issues?.["radiusBottomRight"]).contains("tail");
-    })
+    }),
   );
 
   const shadowCases = [
@@ -880,7 +914,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ shadow: c });
       expect(result.cssProps?.boxShadow).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const alignmentCases = ["start", "center", "end"];
@@ -890,7 +924,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ horizontalAlignment: c });
       expect(result.nonCssProps.horizontalAlignment).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   alignmentCases.forEach((c) =>
@@ -898,7 +932,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ verticalAlignment: c });
       expect(result.nonCssProps.verticalAlignment).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const userSelectCases = ["none", "auto", "all", "text", "contain"];
@@ -908,17 +942,24 @@ describe("Style compiler", () => {
       const result = compileLayout({ userSelect: c });
       expect(result.cssProps?.userSelect).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
-  const textTransformCases = ["none", "capitalize", "uppercase", "lowercase", "full-width", "full-size-kana"];
+  const textTransformCases = [
+    "none",
+    "capitalize",
+    "uppercase",
+    "lowercase",
+    "full-width",
+    "full-size-kana",
+  ];
 
   textTransformCases.forEach((c) =>
     it(`textTransform: ${c}`, () => {
       const result = compileLayout({ textTransform: c });
       expect(result.cssProps?.textTransform).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const orientationCases = ["horizontal", "vertical"];
@@ -928,7 +969,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ orientation: c });
       expect(result.nonCssProps.orientation).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const paddingCases = ["0", "10px", "50%", "3rem"];
@@ -939,7 +980,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ padding: c });
       expect(result.cssProps?.padding).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- horizontalPadding
@@ -949,7 +990,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingLeft).equal(c);
       expect(result.cssProps?.paddingRight).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- verticalPadding
@@ -959,7 +1000,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingTop).equal(c);
       expect(result.cssProps?.paddingBottom).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- leftPadding
@@ -968,7 +1009,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ paddingLeft: c });
       expect(result.cssProps?.paddingLeft).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   paddingCases.forEach((c) =>
@@ -977,7 +1018,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingLeft).equal(c);
       expect(result.cssProps?.paddingRight).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- rightPadding
@@ -986,7 +1027,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ paddingRight: c });
       expect(result.cssProps?.paddingRight).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   it(`paddingRight #2: 50%`, () => {
@@ -1002,7 +1043,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingRight).equal(c);
       expect(result.cssProps?.paddingLeft).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- topPadding
@@ -1011,7 +1052,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ paddingTop: c });
       expect(result.cssProps?.paddingTop).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   paddingCases.forEach((c) =>
@@ -1020,7 +1061,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingTop).equal(c);
       expect(result.cssProps?.paddingBottom).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- bottomPadding
@@ -1029,7 +1070,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ paddingBottom: c });
       expect(result.cssProps?.paddingBottom).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   paddingCases.forEach((c) =>
@@ -1038,7 +1079,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.paddingBottom).equal(c);
       expect(result.cssProps?.paddingTop).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const colorCases = ["red", "rgb(100, 200, 250)", "#00aabbcc"];
@@ -1048,7 +1089,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ color: c });
       expect(result.cssProps?.color).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   colorCases.forEach((c) =>
@@ -1056,7 +1097,15 @@ describe("Style compiler", () => {
       const result = compileLayout({ backgroundColor: c });
       expect(result.cssProps?.backgroundColor).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
+  );
+
+  colorCases.forEach((c) =>
+    it(`borderColor: ${c}`, () => {
+      const result = compileLayout({ borderColor: c });
+      expect(result.cssProps?.borderColor).equal(c);
+      expect(result.issues).equal(undefined);
+    }),
   );
 
   const fontSizeCases = ["0", "10px", "50%", "3rem"];
@@ -1066,7 +1115,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ fontSize: c });
       expect(result.cssProps?.fontSize).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const italicCases = [
@@ -1083,7 +1132,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ italic: c.src });
       expect(result.cssProps?.fontStyle).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const wrapCases = [
@@ -1100,7 +1149,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ wrapContent: c.src });
       expect(result.cssProps?.flexWrap).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const shrinkCases = [
@@ -1117,7 +1166,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ canShrink: c.src });
       expect(result.cssProps?.flexShrink).equal(c.exp);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const marginCases = ["0", "10px", "50%", "3rem", "auto"];
@@ -1128,7 +1177,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ margin: c });
       expect(result.cssProps?.margin).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- horizontalMargin
@@ -1138,7 +1187,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginLeft).equal(c);
       expect(result.cssProps?.marginRight).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- verticalMargin
@@ -1148,7 +1197,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginTop).equal(c);
       expect(result.cssProps?.marginBottom).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- leftMargin
@@ -1157,7 +1206,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ marginLeft: c });
       expect(result.cssProps?.marginLeft).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   marginCases.forEach((c) =>
@@ -1166,7 +1215,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginLeft).equal(c);
       expect(result.cssProps?.marginRight).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- rightMargin
@@ -1175,7 +1224,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ marginRight: c });
       expect(result.cssProps?.marginRight).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   marginCases.forEach((c) =>
@@ -1184,7 +1233,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginRight).equal(c);
       expect(result.cssProps?.marginLeft).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- topMargin
@@ -1193,7 +1242,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ marginTop: c });
       expect(result.cssProps?.marginTop).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   marginCases.forEach((c) =>
@@ -1202,7 +1251,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginTop).equal(c);
       expect(result.cssProps?.marginBottom).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- bottomMargin
@@ -1211,7 +1260,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ marginBottom: c });
       expect(result.cssProps?.marginBottom).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   marginCases.forEach((c) =>
@@ -1220,7 +1269,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.marginBottom).equal(c);
       expect(result.cssProps?.marginTop).equal("20%");
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- letterSpacing
@@ -1230,7 +1279,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.letterSpacing).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   // --- lineHeight
@@ -1240,7 +1289,7 @@ describe("Style compiler", () => {
       expect(result.cssProps?.lineHeight).equal(c);
       expect(result.cssProps?.flexShrink).equal(undefined);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   it(`width (themeId)`, () => {
@@ -1250,8 +1299,13 @@ describe("Style compiler", () => {
   });
 
   it(`radiusBottomRight (theme ID)`, () => {
-    const result = compileLayout({ radiusBottomRight: "$myValue1 $myValue2" }, { myValue1: "3px", myValue2: "4px" });
-    expect(result.cssProps?.borderBottomRightRadius).equal("var(--xmlui-myValue1) / var(--xmlui-myValue2)");
+    const result = compileLayout(
+      { radiusBottomRight: "$myValue1 $myValue2" },
+      { myValue1: "3px", myValue2: "4px" },
+    );
+    expect(result.cssProps?.borderBottomRightRadius).equal(
+      "var(--xmlui-myValue1) / var(--xmlui-myValue2)",
+    );
   });
 
   it(`Default size unit is px`, () => {
@@ -1267,28 +1321,44 @@ describe("Style compiler", () => {
   });
 
   it(`Star size sets flex (horizontal) #1`, () => {
-    const result = compileLayout({ width: "12.3*" }, {}, { type: "Stack", orientation: "horizontal" });
+    const result = compileLayout(
+      { width: "12.3*" },
+      {},
+      { type: "Stack", orientation: "horizontal" },
+    );
     expect(result.cssProps?.width).equal("12.3*");
     expect(result.cssProps?.flex).equal(12.3);
     expect(result.issues).equal(undefined);
   });
 
   it(`Star size sets flex (horizontal) #2`, () => {
-    const result = compileLayout({ height: "12.3*" }, {}, { type: "Stack", orientation: "horizontal" });
+    const result = compileLayout(
+      { height: "12.3*" },
+      {},
+      { type: "Stack", orientation: "horizontal" },
+    );
     expect(result.cssProps?.height).equal("12.3*");
     expect(result.cssProps?.flex).equal(undefined);
     expect(result.issues).equal(undefined);
   });
 
   it(`Star size sets flex (vertical) #1`, () => {
-    const result = compileLayout({ width: "12.3*" }, {}, { type: "Stack", orientation: "vertical" });
+    const result = compileLayout(
+      { width: "12.3*" },
+      {},
+      { type: "Stack", orientation: "vertical" },
+    );
     expect(result.cssProps?.width).equal("12.3*");
     expect(result.cssProps?.flex).equal(undefined);
     expect(result.issues).equal(undefined);
   });
 
   it(`Star size sets flex (vertical) #2`, () => {
-    const result = compileLayout({ height: "12.3*" }, {}, { type: "Stack", orientation: "vertical" });
+    const result = compileLayout(
+      { height: "12.3*" },
+      {},
+      { type: "Stack", orientation: "vertical" },
+    );
     expect(result.cssProps?.height).equal("12.3*");
     expect(result.cssProps?.flex).equal(12.3);
     expect(result.issues).equal(undefined);
@@ -1302,7 +1372,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ opacity: c });
       expect(result.cssProps?.opacity).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const cursorCases = [
@@ -1350,7 +1420,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ cursor: c });
       expect(result.cssProps?.cursor).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   const textAlignCases = ["start", "center", "end", "left", "right", "justify"];
@@ -1360,7 +1430,7 @@ describe("Style compiler", () => {
       const result = compileLayout({ textAlign: c });
       expect(result.cssProps.textAlign).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
 
   textAlignCases.forEach((c) =>
@@ -1368,6 +1438,19 @@ describe("Style compiler", () => {
       const result = compileLayout({ textAlignLast: c });
       expect(result.cssProps.textAlignLast).equal(c);
       expect(result.issues).equal(undefined);
-    })
+    }),
   );
+
+  const borderStyleCases = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset"];
+
+  // --- opacity
+  borderStyleCases.forEach((c) =>
+    it(`borderStyle: ${c}`, () => {
+      const result = compileLayout({ borderStyle: c });
+      expect(result.cssProps?.borderStyle).equal(c);
+      expect(result.issues).equal(undefined);
+    }),
+  );
+
+
 });
