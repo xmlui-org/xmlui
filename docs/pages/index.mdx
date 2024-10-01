@@ -198,7 +198,8 @@ Create a new file in the `components` folder named `MyBox.xmlui`, and copy this 
 <Component name="MyBox">
   <Stack 
     padding="12"
-    border="8px solid {$props.color}">
+    borderColor="{$props.color}"
+    borderThickness="8"
     {$props.label}
   </Stack>
 </Component>
