@@ -50,6 +50,7 @@
     "dexie": "3.2.4",
     "dotenv": "16.3.1",
     "downshift": "8.2.3",
+    "embla-carousel-autoplay": "^8.3.0",
     "embla-carousel-react": "^8.3.0",
     "emoji-picker-react": "4.4.10",
     "glob": "7.2.0",

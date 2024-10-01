@@ -3,10 +3,11 @@ import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { CarouselContext, useCarouselContextValue } from "@components/Carousel/CarouselContext";
 import styles from "./Carousel.module.scss";
-import { CSSProperties, useCallback, useEffect, useRef } from "react";
+import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "@components/Icon/IconNative";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import Autoplay from "embla-carousel-autoplay";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
@@ -14,25 +15,73 @@ export type CarouselProps = {
   style?: CSSProperties;
   orientation?: "horizontal" | "vertical";
   indicators?: boolean;
+  controls?: boolean;
   children: React.ReactNode;
+  autoplay?: boolean;
+  loop?: boolean;
+  startIndex?: number;
+  prevIcon?: string;
+  nextIcon?: string;
   onDisplayDidChange?: (activeSlide: number) => void;
+  keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-const CarouselComponent = ({
+export const CarouselComponent = ({
   orientation = "horizontal",
   children,
   style,
   indicators = true,
   onDisplayDidChange = noop,
+  autoplay = false,
+  controls = true,
+  loop = false,
+  startIndex = 0,
+  prevIcon,
+  nextIcon,
   registerComponentApi,
 }: CarouselProps) => {
   const ref = useRef(null);
   const { carouselItems, carouselContextValue } = useCarouselContextValue();
-  const [activeSlide, setActiveSlide] = React.useState(0);
-  const [carouselRef, api] = useEmblaCarousel({
-    axis: orientation === "horizontal" ? "x" : "y",
-  });
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [plugins, setPlugins] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [carouselRef, api] = useEmblaCarousel(
+    {
+      axis: orientation === "horizontal" ? "x" : "y",
+      loop,
+      startIndex,
+    },
+    plugins,
+  );
+
+  const prevIconName = prevIcon || orientation === "horizontal" ? "arrowleft" : "arrowup";
+  const nextIconName = nextIcon || orientation === "horizontal" ? "arrowright" : "arrowdown";
+
+  useEffect(() => {
+    if (autoplay) {
+      setPlugins([Autoplay()]);
+    }
+  }, [autoplay]);
+
+  const toggleAutoplay = useCallback(() => {
+    const autoplay = api?.plugins()?.autoplay;
+    if (!autoplay) return;
+
+    const playOrStop = autoplay.isPlaying() ? autoplay.stop : autoplay.play;
+    playOrStop();
+  }, [api]);
+
+  useEffect(() => {
+    const autoplay = api?.plugins()?.autoplay;
+    if (!autoplay) return;
+
+    setIsPlaying(autoplay.isPlaying());
+    api
+      .on("autoplay:play", () => setIsPlaying(true))
+      .on("autoplay:stop", () => setIsPlaying(false))
+      .on("reInit", () => setIsPlaying(autoplay.isPlaying()));
+  }, [api]);
 
   const scrollTo = useCallback(
     (index: number) => {
@@ -57,22 +106,34 @@ const CarouselComponent = ({
     setCanScrollNext(api.canScrollNext());
   }, []);
 
-  const scrollPrev = React.useCallback(() => {
-    api?.scrollPrev();
+  const scrollPrev = useCallback(() => {
+    if (api) {
+      api?.scrollPrev();
+    }
   }, [api]);
 
-  const scrollNext = React.useCallback(() => {
+  const scrollNext = useCallback(() => {
     api?.scrollNext();
   }, [api]);
 
-  const handleKeyDown = React.useCallback(
+  const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === "ArrowLeft") {
-        event.preventDefault();
-        scrollPrev();
-      } else if (event.key === "ArrowRight") {
-        event.preventDefault();
-        scrollNext();
+      if (orientation === "horizontal") {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          scrollPrev();
+        } else if (event.key === "ArrowRight") {
+          event.preventDefault();
+          scrollNext();
+        }
+      } else {
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          scrollPrev();
+        } else if (event.key === "ArrowDown") {
+          event.preventDefault();
+          scrollNext();
+        }
       }
     },
     [scrollPrev, scrollNext],
@@ -102,15 +163,21 @@ const CarouselComponent = ({
     };
   }, [api, onSelect]);
 
+  useEffect(() => {
+    if (ref?.current) {
+      ref.current.addEventListener("keydown", handleKeyDown);
+    }
+  }, [ref, handleKeyDown]);
+
   return (
     <CarouselContext.Provider value={carouselContextValue}>
       {children}
       <div
         style={style}
         ref={ref}
-        onKeyDownCapture={handleKeyDown}
         className={classnames(styles.carousel)}
         role="region"
+        tabIndex={-1}
         aria-roledescription="carousel"
       >
         <div ref={carouselRef} className={styles.carouselContentWrapper}>
@@ -135,28 +202,21 @@ const CarouselComponent = ({
             ))}
           </div>
         </div>
-        <div className={styles.controls}>
-          <button
-            className={classnames(styles.controlButton, {
-              [styles.controlPrevHorizontal]: orientation === "horizontal",
-              [styles.controlPrevVertical]: orientation === "vertical",
-            })}
-            disabled={!canScrollPrev}
-            onClick={scrollPrev}
-          >
-            <Icon name={"arrowleft"} />
-          </button>
-          <button
-            className={classnames(styles.controlButton, {
-              [styles.controlNextHorizontal]: orientation === "horizontal",
-              [styles.controlNextVertical]: orientation === "vertical",
-            })}
-            onClick={scrollNext}
-            disabled={!canScrollNext}
-          >
-            <Icon name={"arrowright"} />
-          </button>
-        </div>
+        {controls && (
+          <div className={styles.controls}>
+            {autoplay && (
+              <button className={styles.controlButton} onClick={toggleAutoplay}>
+                {isPlaying ? <Icon name={"pause"} /> : <Icon name={"play"} />}
+              </button>
+            )}
+            <button className={styles.controlButton} disabled={!canScrollPrev} onClick={scrollPrev}>
+              <Icon name={prevIconName} />
+            </button>
+            <button className={styles.controlButton} onClick={scrollNext} disabled={!canScrollNext}>
+              <Icon name={nextIconName} />
+            </button>
+          </div>
+        )}
         {indicators && (
           <div className={styles.indicators}>
             {carouselItems.map((_, index) => (
@@ -176,5 +236,3 @@ const CarouselComponent = ({
     </CarouselContext.Provider>
   );
 };
-
-export { type CarouselApi, CarouselComponent };
