@@ -1,5 +1,19 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Carousel";
+
 .carousel {
   position: relative;
+  overflow: hidden;
+  width: createThemeVar("width-#{$componentName}");
+  height: createThemeVar("height-#{$componentName}");
 }
 
 .carouselContentWrapper {
@@ -10,9 +24,6 @@
 .carouselContent {
   display: flex;
   height: 100%;
-}
-
-.horizontal {
 }
 
 .vertical {
@@ -26,39 +37,79 @@
   flex-basis: 100%;
 }
 
-.controlButton {
+.controls {
   z-index: 99;
+  display: flex;
+  right: 1rem;
+  bottom: 1rem;
+  position: absolute;
+  gap: .6rem;
+}
+
+.controlButton {
   justify-content: center;
   align-items: center;
   display: inline-flex;
-  position: absolute;
-  height: 2rem;
-  width: 2rem;
+  height: createThemeVar("height-control-#{$componentName}");
+  width: createThemeVar("width-control-#{$componentName}");
+  color: createThemeVar("color-text-control-#{$componentName}");
+  background-color: createThemeVar("color-bg-control-#{$componentName}");;
+  border-radius: createThemeVar("radius-control-#{$componentName}");
 }
 
-.controlPrevHorizontal {
-  left: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+.controlButton:hover {
+  background-color: createThemeVar("color-bg-control-hover-#{$componentName}");
+  color: createThemeVar("color-text-control-hover-#{$componentName}");
 }
 
+.controlButton:active {
+  background-color: createThemeVar("color-bg-control-active-#{$componentName}");
+  color: createThemeVar("color-text-control-active-#{$componentName}");
+}
+
+.controlButton:disabled {
+  color: createThemeVar("color-text-control-disabled-#{$componentName}");
+  background-color: createThemeVar("color-bg-control-disabled-#{$componentName}");
+}
 
 .controlPrevVertical {
-  top: 1rem;
-  left: 50%;
-  transform: translateX(-50%) rotate(90deg);
-}
-
-.controlNextHorizontal {
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
+  transform: rotate(90deg);
 }
 
 .controlNextVertical {
-  bottom: 1rem;
-  right: 50%;
-  transform: translateX(50%) rotate(90deg);
+  transform: rotate(90deg);
 }
+
+.indicators {
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.indicator {
+  width: createThemeVar("width-indicator-#{$componentName}");
+  height: createThemeVar("height-indicator-#{$componentName}");
+  border-radius: 2px;
+  margin: 0 1px;
+  color: createThemeVar("color-text-indicator-#{$componentName}");
+  background-color: createThemeVar("color-bg-indicator-#{$componentName}");
+
+  &:hover {
+    background-color: createThemeVar("color-bg-indicator-hover-#{$componentName}");
+    color: createThemeVar("color-text-indicator-hover-#{$componentName}");
+  }
+
+  &.active {
+    background-color: createThemeVar("color-bg-indicator-active-#{$componentName}");
+    color: createThemeVar("color-text-indicator-active-#{$componentName}");
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+
 
 
