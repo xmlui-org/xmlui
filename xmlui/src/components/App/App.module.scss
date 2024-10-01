@@ -118,8 +118,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
       scrollbar-gutter: stable both-edges;
     }
     .PagesWrapperInner{
-      min-height: 0;
-      height: 100%;
+      min-height: 100%;
     }
   }
 }
@@ -176,12 +175,35 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
 }
 
 .PagesWrapperInner{
+  --page-padding-left: #{t.$space-4};
+  --page-padding-right: #{t.$space-4};
+  --page-padding-top: #{t.$space-5};
+  --page-padding-bottom: #{t.$space-5};
+  --page-gap: #{t.$space-5};
   max-width: $max-content-width-App;
   width: 100%;
   margin: 0 auto;
   //flex: 1;
   min-height: 100%;
-  //padding: 1rem;
+  padding-top: var(--page-padding-top);
+  padding-bottom: var(--page-padding-bottom);
+  padding-right: var(--page-padding-right);
+  padding-left: var(--page-padding-left);
+  gap: var(--page-gap);
+  display: flex;
+  flex-direction: column;
+
+  &>:global(.xmlui-page-root){
+    padding-top: var(--page-padding-top);
+    padding-bottom: var(--page-padding-bottom);
+    padding-right: var(--page-padding-right);
+    padding-left: var(--page-padding-left);
+    gap: var(--page-gap);
+    margin-top: calc(-1 * var(--page-padding-top));
+    margin-bottom: calc(-1 * var(--page-gap));
+    margin-left: calc(-1 * var(--page-padding-left));
+    margin-right: calc(-1 * var(--page-padding-right));
+  }
 }
 
 .footerWrapper {

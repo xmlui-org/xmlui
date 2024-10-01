@@ -1,21 +1,25 @@
-import { Fragment, ReactNode, useMemo } from "react";
-import { Navigate, Route, Routes } from "@remix-run/react";
+import type { CSSProperties, ReactNode } from "react";
+import { useMemo } from "react";
+import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { useParams } from "@remix-run/react";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
-import { PageMd } from "./Pages";
+import type { PageMd } from "./Pages";
+import styles from "./Pages.module.scss";
+import classnames from "classnames";
 
-// --- We need this component to make sure all the child routes are wrapped in a 
+// --- We need this component to make sure all the child routes are wrapped in a
 // --- container and  this way they can access the routeParams
 export function RouteWrapper({
   childRoute = EMPTY_ARRAY,
   renderChild,
   layoutContext,
+  style,
 }: {
   childRoute?: ComponentDef | Array<ComponentDef>;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
+  style?: CSSProperties;
 }) {
   const params = useParams();
   const wrappedWithContainer = useMemo(() => {
@@ -32,13 +36,17 @@ export function RouteWrapper({
   }, [childRoute]);
 
   return (
-    <Fragment key={JSON.stringify(params)}>
+    <div
+      key={JSON.stringify(params)}
+      className={classnames(styles.wrapper, "xmlui-page-root")}
+      style={style}
+    >
       {renderChild(wrappedWithContainer, layoutContext)}
-    </Fragment>
+    </div>
   );
 }
 
-type PageComponentDef = ComponentDef<typeof PageMd>
+type PageComponentDef = ComponentDef<typeof PageMd>;
 
 type PagesProps = {
   defaultRoute?: string;
