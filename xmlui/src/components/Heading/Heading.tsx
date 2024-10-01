@@ -65,8 +65,8 @@ export const H1Md = createMetadata({
     // letter-spacing
     [`font-size-${H1}`]: "$font-size-large",
     [`line-height-${H1}`]: "$line-height-loose",
-    [`margin-top-${H1}`]: "$space-3",
-    [`margin-bottom-${H1}`]: "$space-6",
+    [`margin-top-${H1}`]: "0",
+    [`margin-bottom-${H1}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -89,8 +89,8 @@ export const H2Md = createMetadata({
     // letter-spacing
     [`font-size-${H2}`]: "$font-size-medium",
     [`line-height-${H2}`]: "$line-height-snug",
-    [`margin-top-${H2}`]: "$space-2",
-    [`margin-bottom-${H2}`]: "$space-4",
+    [`margin-top-${H2}`]: "0",
+    [`margin-bottom-${H2}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -113,8 +113,8 @@ export const H3Md = createMetadata({
     // letter-spacing
     [`font-size-${H3}`]: "$font-size-normal",
     [`line-height-${H3}`]: "$line-height-normal",
-    [`margin-top-${H3}`]: "$space-1_5",
-    [`margin-bottom-${H3}`]: "$space-3",
+    [`margin-top-${H3}`]: "0",
+    [`margin-bottom-${H3}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -137,8 +137,8 @@ export const H4Md = createMetadata({
     // letter-spacing
     [`font-size-${H4}`]: "$font-size-small",
     [`line-height-${H4}`]: "$line-height-snug",
-    [`margin-top-${H4}`]: "$space-1",
-    [`margin-bottom-${H4}`]: "$space-2",
+    [`margin-top-${H4}`]: "0",
+    [`margin-bottom-${H4}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -161,8 +161,8 @@ export const H5Md = createMetadata({
     // letter-spacing
     [`font-size-${H5}`]: "$font-size-smaller",
     [`line-height-${H5}`]: "$line-height-tight",
-    [`margin-top-${H5}`]: "$space-0_5",
-    [`margin-bottom-${H5}`]: "$space-1",
+    [`margin-top-${H5}`]: "0",
+    [`margin-bottom-${H5}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
@@ -185,8 +185,8 @@ export const H6Md = createMetadata({
     // letter-spacing
     [`font-size-${H6}`]: "$font-size-tiny",
     [`line-height-${H6}`]: "$line-height-none",
-    [`margin-top-${H6}`]: "$space-0",
-    [`margin-bottom-${H6}`]: "$space-0",
+    [`margin-top-${H6}`]: "0",
+    [`margin-bottom-${H6}`]: "0",
     light: {
       // --- No light-specific theme vars
     },
