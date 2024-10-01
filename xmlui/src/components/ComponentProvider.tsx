@@ -130,6 +130,8 @@ import { rangeComponentRenderer } from "./Range/Range";
 import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
+import {carouselComponentRenderer} from "@components/Carousel/Carousel";
+import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -269,6 +271,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
       this.registerComponentRenderer(accordionItemComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
+      this.registerComponentRenderer(carouselItemComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
       this.registerComponentRenderer(fileUploadDropZoneComponentRenderer);
     }
@@ -348,6 +353,7 @@ export class ComponentRegistry {
     this.registerCompoundComponentRenderer(toolbarButtonRenderer);
 
     // --- New Bootstrap-inspired components
+    this.registerComponentRenderer(carouselComponentRenderer);
     this.registerComponentRenderer(accordionComponentRenderer);
     this.registerComponentRenderer(alertComponentRenderer);
     this.registerComponentRenderer(offCanvasComponentRenderer);
