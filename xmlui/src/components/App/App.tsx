@@ -74,7 +74,7 @@ export const appRenderer = createComponentRenderer(
 
     return (
       <App
-        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, false)}
+        scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}

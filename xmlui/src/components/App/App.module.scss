@@ -12,6 +12,7 @@ $shadow-header-App: createThemeVar("shadow-header-App");
 $shadow-pages-App: createThemeVar("shadow-pages-App");
 $max-content-width-App: createThemeVar("max-content-width-App");
 $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
+$border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 
 .wrapper {
   --footer-height: 0px;
@@ -30,6 +31,7 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
     .contentWrapper{
       overflow: auto;
       position: relative;
+      scrollbar-gutter: stable both-edges;
     }
     .navPanelWrapper {
       width: $width-navPanel-App;
@@ -68,6 +70,9 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
         bottom: 0;
       }
     }
+    .navPanelWrapper{
+      border-bottom: $border-bottom-NavPanel;
+    }
   }
   
   &.verticalFullHeader{
@@ -98,6 +103,28 @@ $color-bg-AppHeader: createThemeVar("color-bg-AppHeader");
       left: 0;
       right: 0;
       bottom: 0;
+    }
+
+  }
+
+  &.scrollWholePage{
+    scrollbar-gutter: stable both-edges;
+
+    .headerWrapper{
+      //padding-inline: var(--scrollbar-width);
+      &>div{
+        padding-inline: var(--scrollbar-width);
+      }
+      margin-inline: calc(-1 * var(--scrollbar-width));
+    }
+
+    .verticalFullHeader{
+      .content{
+        margin-inline: calc(-1* var(--scrollbar-width));
+      }
+      .contentWrapper{
+        padding-inline: var(--scrollbar-width);
+      }
     }
   }
 

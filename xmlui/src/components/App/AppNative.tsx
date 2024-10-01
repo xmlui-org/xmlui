@@ -16,6 +16,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import type { JSX } from "react/jsx-runtime";
 import {AppContextAwareAppHeader} from "@components/AppHeader/AppHeaderNative";
 import type {RenderChildFn} from "@abstractions/RendererDefs";
+import {useScrollbarWidth} from "@components-core/utils/css-utils";
 
 type Props = {
   children: ReactNode;
@@ -78,6 +79,7 @@ export function App({
   const scrollContainerRef = scrollWholePage ? scrollPageContainerRef : noScrollPageContainerRef;
   const [footerHeight, setFooterHeight] = useState(0);
   const [headerHeight, setHeaderHeight] = useState(0);
+  const scrollbarWidth = useScrollbarWidth();
 
   const footerRef = useRef<HTMLDivElement | null>();
   const footerRefCallback = useCallback((element: HTMLDivElement | null) => {
@@ -107,8 +109,9 @@ export function App({
     return {
       "--header-height": !scrollWholePage ? 0 : headerHeight + "px",
       "--footer-height": !scrollWholePage ? 0 : footerHeight + "px",
+      "--scrollbar-width": scrollbarWidth + "px",
     } as CSSProperties;
-  }, [footerHeight, headerHeight, scrollWholePage]);
+  }, [footerHeight, headerHeight, scrollWholePage, scrollbarWidth]);
 
   const [drawerVisible, setDrawerVisible] = useState(false);
   const location = useLocation();
@@ -284,7 +287,7 @@ export function App({
               ref={scrollPageContainerRef}
           >
             <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
-              <div>{header}</div>
+              {header}
               {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
@@ -310,7 +313,7 @@ export function App({
                 className={classnames(styles.headerWrapper, styles.sticky)}
                 ref={headerRefCallback}
             >
-              <div>{header}</div>
+              {header}
               {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
