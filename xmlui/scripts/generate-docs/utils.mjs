@@ -51,3 +51,22 @@ export function createTable({
   
   return table;
 }
+
+/**
+ * Multi-liner (commented and compatible with really old javascript versions)
+ * Source: https://stackoverflow.com/a/62732509
+ */
+export function convertPath(windowsPath) {
+  // handle the edge-case of Window's long file names
+  // See: https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file#short-vs-long-names
+  windowsPath = windowsPath.replace(/^\\\\\?\\/, "");
+
+  // convert the separators, valid since both \ and / can't be in a windows filename
+  windowsPath = windowsPath.replace(/\\/g, "/");
+
+  // compress any // or /// to be just /, which is a safe oper under POSIX
+  // and prevents accidental errors caused by manually doing path1+path2
+  windowsPath = windowsPath.replace(/\/\/+/g, "/");
+
+  return windowsPath;
+}

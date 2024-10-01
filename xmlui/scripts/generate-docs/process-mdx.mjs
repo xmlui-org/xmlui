@@ -58,13 +58,13 @@ const sectionNames = {
   contextVars: "Context Values",
 };
 
-export function processDocfiles(metadata) {
+export function processDocfiles(metadata, importsToInject) {
   // Check for docs already in the output folder
   const docFiles = readdirSync(outFolder).filter((file) => extname(file) === ".mdx");
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, metadata);
+    componentNames = processMdx(component, componentNames, metadata, importsToInject);
   });
 
   // Write the _meta.json file
@@ -76,7 +76,7 @@ export function processDocfiles(metadata) {
   }
 }
 
-export function processMdx(component, componentNames, metadata) {
+export function processMdx(component, componentNames, metadata, importsToInject) {
   let result = "";
   let fileData = "";
 
@@ -103,8 +103,8 @@ export function processMdx(component, componentNames, metadata) {
     logger.info(`Processing ${component.displayName}...`);
 
     logger.info("Processing imports section");
-    // Add the Callout component import to the top of the file
-    result += `import { Callout } from "nextra/components";\n\n`;
+
+    result += importsToInject;
 
     const { buffer, copyFilePaths } = addImportsSection(fileData, component);
     if (buffer) {
