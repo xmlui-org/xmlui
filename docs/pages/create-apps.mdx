@@ -3,6 +3,8 @@ import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui"
 
 # Creating XMLUI Apps
 
+_TODO: Review and update this page_
+
 <Callout type="info" emoji="💡">
   XMLUI apps have a **simple file structure** that can be directly hosted as static files in a web server's folder (without a build process). 
 </Callout>
@@ -63,3 +65,117 @@ With the framework's tools, you can build the XMLUI source code files into stati
 - Removing the unused part of the code (e.g., unused components of the framework and other component libraries)
 - Code minification
 
+_Saved from the tutorial:_
+
+## How this App Works
+
+<Callout type="info" emoji="💡">
+  Now that you have tried the app, it's time to learn how it works.
+</Callout>
+
+Loading the app in the browser fetches the `index.html` file from the web server, which loads a single JavaScript file, `xmlui-standalone.umd.js`, from the app's root folder.
+
+```html filename="index.html" /xmlui-standalone.umd.js/
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="xmlui-standalone.umd.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
+```
+
+The JavaScript file contains the XMLUI framework. When it starts, it fetches the `Main.xmlui` file from the root folder, compiles its contents, and runs the app. The `Main.xmlui` file uses XMLUI markup to declare the structure and the UI logic:
+
+```ueml filename="Main.xmlui"
+<App>
+  <AppHeader>
+    <SpaceFiller />
+    <ThemeChangerButton />
+  </AppHeader>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Simple" to="/simple" />
+    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="Composable" to="/composable" />
+    <NavLink label="Themable" to="/themable" />
+  </NavPanel>
+  <Pages>
+    <Page url="/" >
+      <Home />
+    </Page>
+    <Page url="/simple">
+      <PagePanel>
+        <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+      </PagePanel> 
+    </Page>
+    <Page url="/apiaware">
+      <ApiAware />
+    </Page>
+    <Page url="/composable">
+      <PagePanel>
+        <VStack padding="1rem" gap="1rem">
+          <IncButton />
+          <IncButton label="Click me too" />
+          <IncButton label="And me" />
+        </VStack> 
+      </PagePanel>
+    </Page>  
+    <Page url="/themable">
+      <PagePanel>
+        <Theme color-primary="orangered">
+          <Button label="Click to increment: {count}" var.count="{0}" onClick="count++" />
+        </Theme>
+      </PagePanel> 
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI -- I modified it!!!
+  </Footer>
+</App>
+```
+
+<Callout type="info" emoji="💡">
+  Each tag (`<App>`, `<AppHeader>`, `<NavPanel>`, `<Pages>`, and the others) represents a **component**. Attributes within the tags represent some traits (**properties**) of the particular tag. 
+</Callout>
+
+When you callapse the child components within `<App>`, you get a simple view describing the app's overall structure:
+
+```ueml filename="Main.xmlui"
+<App>
+  <AppHeader />
+  <NavPanel />
+  <Pages>
+  <Pages />
+  <Footer />
+</App>
+```
+
+Each component within `<App>` is responsible for declaring a particular part of the app. The `App` components implementation logic binds them and provides you with the overall behavior of the app. For example, an `<NavLink>` item within `<NavPanel>` acts as a menu item; clicking it will display the related `<Page>` within `<Pages>`:
+
+```ueml filename="Main.xmlui"
+<App>
+  <NavPanel>
+    <NavLink label="API-Aware" to="/apiaware" />
+    <!-- Other menu items omitted -->
+  </NavPanel>
+  <Pages>
+    <Page url="/apiaware">
+      <ApiAware />
+      <!-- Other page items omitted -->
+    </Page>
+  </Pages>
+  <!-- Other components omitted -->
+</App>
+```
+
+The app binds the `to` property of a `<NavLink>` with the `url` property of a `<Page>`. Thus, when you click the menu item, it will display the related page.
+
+The `<ApiAware>` component is not part of the XMLUI framework. It is a reusable component in the Starter App written entirely with the XMLUI markup. The framework looks up the definition of such components in the `component` folder within the app's root. The current implementation of `<ApiAware>` is in the `component/ApiAware.xmlui` file.
+
+
+
+In this short article, you won't dive deeper into the markup. The following article about the "Personal Todo App" will detail more concepts to guide you in creating XMLUI apps.
