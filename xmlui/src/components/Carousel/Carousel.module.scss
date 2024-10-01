@@ -1,0 +1,64 @@
+.carousel {
+  position: relative;
+}
+
+.carouselContentWrapper {
+  overflow: hidden;
+  height: 100%;
+}
+
+.carouselContent {
+  display: flex;
+  height: 100%;
+}
+
+.horizontal {
+}
+
+.vertical {
+  flex-direction: column;
+}
+
+.carouselItem {
+  min-width: 0;
+  flex-shrink: 0;
+  flex-grow: 0;
+  flex-basis: 100%;
+}
+
+.controlButton {
+  z-index: 99;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+  position: absolute;
+  height: 2rem;
+  width: 2rem;
+}
+
+.controlPrevHorizontal {
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+
+.controlPrevVertical {
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-50%) rotate(90deg);
+}
+
+.controlNextHorizontal {
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.controlNextVertical {
+  bottom: 1rem;
+  right: 50%;
+  transform: translateX(50%) rotate(90deg);
+}
+
+
