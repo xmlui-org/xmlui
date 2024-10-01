@@ -40,13 +40,15 @@ export const LinkMd = createMetadata({
     [`thickness-outline-${COMP}--focus`]: "$thickness-outline--focus",
     [`style-outline-${COMP}--focus`]: "$style-outline--focus",
     [`offset-outline-${COMP}--focus`]: "$offset-outline--focus",
+    [`font-size-${COMP}`]: "$font-size",
+
     light: {
       [`color-text-${COMP}`]: "$color-primary-500",
       [`color-text-${COMP}--active`]: "$color-primary-500",
     },
     dark: {
       [`color-text-${COMP}`]: "$color-primary-500",
-      [`ccolor-text-${COMP}--active`]: "$color-primary-500",
+      [`color-text-${COMP}--active`]: "$color-primary-500",
     },
   },
 });
