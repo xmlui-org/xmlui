@@ -3,7 +3,7 @@ import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import { CarouselContext, useCarouselContextValue } from "@components/Carousel/CarouselContext";
 import styles from "./Carousel.module.scss";
-import { CSSProperties, useRef } from "react";
+import { CSSProperties, useCallback, useEffect, useRef } from "react";
 import Icon from "@components/Icon/IconNative";
 
 type CarouselApi = UseEmblaCarouselType[1];
@@ -17,6 +17,7 @@ export type CarouselProps = {
   plugins?: CarouselPlugin;
   orientation?: "horizontal" | "vertical";
   setApi?: (api: CarouselApi) => void;
+  indicators?: boolean;
 };
 
 const CarouselComponent = ({
@@ -27,9 +28,11 @@ const CarouselComponent = ({
   className,
   children,
   style,
+  indicators = true,
 }: any) => {
   const ref = useRef(null);
   const { carouselItems, carouselContextValue } = useCarouselContextValue();
+  const [activeSlide, setActiveSlide] = React.useState(0);
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -37,6 +40,14 @@ const CarouselComponent = ({
     },
     plugins,
   );
+
+  const scrollTo = useCallback(
+    (index: number) => {
+      api?.scrollTo(index);
+    },
+    [api],
+  );
+
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
   const carouselOrientation = orientation || (opts?.axis === "y" ? "vertical" : "horizontal");
@@ -45,7 +56,7 @@ const CarouselComponent = ({
     if (!api) {
       return;
     }
-
+    setActiveSlide(api.selectedScrollSnap());
     setCanScrollPrev(api.canScrollPrev());
     setCanScrollNext(api.canScrollNext());
   }, []);
@@ -104,20 +115,6 @@ const CarouselComponent = ({
         role="region"
         aria-roledescription="carousel"
       >
-        <button
-          className={classnames(
-            styles.controlButton,
-            {
-              [styles.controlPrevHorizontal]: carouselOrientation === "horizontal",
-              [styles.controlPrevVertical]: carouselOrientation === "vertical",
-            },
-            className,
-          )}
-          disabled={!canScrollPrev}
-          onClick={scrollPrev}
-        >
-          <Icon name={"arrowleft"} />
-        </button>
         <div ref={carouselRef} className={styles.carouselContentWrapper}>
           <div
             className={classnames(
@@ -148,20 +145,51 @@ const CarouselComponent = ({
             ))}
           </div>
         </div>
-        <button
-          className={classnames(
-            styles.controlButton,
-            {
-              [styles.controlNextHorizontal]: carouselOrientation === "horizontal",
-              [styles.controlNextVertical]: carouselOrientation === "vertical",
-            },
-            className,
-          )}
-          onClick={scrollNext}
-          disabled={!canScrollNext}
-        >
-          <Icon name={"arrowright"} />
-        </button>
+        <div className={styles.controls}>
+          <button
+            className={classnames(
+              styles.controlButton,
+              {
+                [styles.controlPrevHorizontal]: carouselOrientation === "horizontal",
+                [styles.controlPrevVertical]: carouselOrientation === "vertical",
+              },
+              className,
+            )}
+            disabled={!canScrollPrev}
+            onClick={scrollPrev}
+          >
+            <Icon name={"arrowleft"} />
+          </button>
+          <button
+            className={classnames(
+              styles.controlButton,
+              {
+                [styles.controlNextHorizontal]: carouselOrientation === "horizontal",
+                [styles.controlNextVertical]: carouselOrientation === "vertical",
+              },
+              className,
+            )}
+            onClick={scrollNext}
+            disabled={!canScrollNext}
+          >
+            <Icon name={"arrowright"} />
+          </button>
+        </div>
+        {indicators && (
+          <div className={styles.indicators}>
+            {carouselItems.map((_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => scrollTo(index)}
+                className={classnames(styles.indicator, {
+                  [styles.active]: index === activeSlide,
+                })}
+                aria-current={index === activeSlide}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </CarouselContext.Provider>
   );
