@@ -1,484 +1,285 @@
 import { Callout } from 'nextra/components'
 import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
 
-# Introduction to XMLUI
+# Getting Started with XMLUI
 
-**XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to web APIs on the backend.**
-
-<Callout type="info" emoji="💡">
-  In contrast to other UI frameworks, XMLUI offers **simple concepts** to create apps quickly **without coping with the cumbersome peculiarities of web development**.
-</Callout>
+XMLUI is a declarative UI framework with a simple markup allowing you to create web apps directly bound to web APIs on the backend.
 
 <Callout type="info" emoji="💡">
-  It integrates with **web APIs** out of the box.
+  - XMLUI applications have a **simple structure**. You can copy the app files into your web server's static files folder, and they are ready to be hosted instantly.
+  - In contrast to other UI frameworks, XMLUI offers **simple concepts** to create apps quickly **without coping with the cumbersome peculiarities of web development**.
+  - It integrates with **web APIs** out of the box.
+  - You can create **reusable app components** to avoid markup repetition and improve maintainability.
+  - You can change an app's visual appearance by selecting a **built-in theme or creating or deriving a new one**.
 </Callout>
 
-<Callout type="info" emoji="💡">
-  You can create **reusable app components** to avoid markup repetition and improve maintainability.
-</Callout>
+After trying our Starter App, visit the [Dive Deeper](#dive-deeper) section of this article for suggestions on further steps to get acquainted with XMLUI.
 
-<Callout type="info" emoji="💡">
-  You can change an app's visual appearance by selecting a **built-in theme or creating or deriving a new one**.
-</Callout>
+## Try the Starter App
 
-This introduction familiarizes you with the framework's fundamental concepts. This documentation contains helpful information to help you start, learn, and master creating apps with XMLUI. After going through the concepts, follow these links to get a flying start:
+We have a starter app you can use to get acquainted with XMLUI. Download its zip file from here (link placeholder) and unzip it into a working folder.
 
+You need only a few things to try it:
+- Your favorite code editor. (We suggest you use [Visual Studio Code](https://code.visualstudio.com/download). It is a free tool running on Windows, Mac, and Linux.)
+- A local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
 
-- [Getting Started](./getting-started) - Create your first XMLUI app
-- Topic 2
+Start your web server using the unzipped sample folder as the root for serving static files, and visit the web server's default page in your browser.
 
-## Components
+When your app starts, it displays this page:
 
-<Callout type="info" emoji="💡">
-  **XMLUI apps** are declarative. You define an app with an XMLUI (XML) markup. [Learn more!](./learning/xmlui-markup)
-</Callout>
+<br/>
+<Image alt="App start" src="/resources/images/get-started/app-start.png" />
 
-```ueml
+You can try some simple and cool XMLUI features with the menu items.
+
+In the following sections, you will change and extend the app. During these slight changes, you will also learn some simple XMLUI concepts.
+
+## Modify the Displayed Text
+
+The sample's root folder contains a `Main.xmlui` file, which is the app's entry point. Open this file in your code editor. Scroll down to the bottom of this file and modify the `<Footer>` element's content by changing the "Powered by XMLUI" text to something else:
+
+```ueml copy /I modified it!!!/ filename="Main.xmlui"
 <App>
-  Hello, world!
+  <AppHeader>
+    <!-- ... -->
+  </AppHeader>
+  <NavPanel>
+    <!-- ... -->
+  </NavPanel>
+  <Pages>
+    <!-- ... -->
+  </Pages>  
+  <Footer>
+    Powered by XMLUI -- I modified it!!!
+  </Footer>
 </App>
 ```
+
+Save the `Main.xmlui` file and refresh the app's page in the browser. The app now displays the modified footer.
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/app-modified.png" />
+
 <Callout type="info" emoji="💡">
-  **Components** are the basic building blocks of XMLUI apps. A component is an XML element (tag) in the markup. [Learn more!](./learning/xmlui-markup/#tags)
+  Each tag (`<App>`, `<AppHeader>`, `<NavPanel>`, `<Pages>`, `<Footer>`, and the others) in the markup represents a **component**. Components are the basic building blocks of XMLUI apps. You can **nest them** to represent the hierarchy of UI elements.
 </Callout>
 
-```ueml /Avatar/
-<Avatar url="https://i.pravatar.cc/100" size="md" />
-```
+(Later, when we refer to a component, we omit the wrapping angle brackets and use only the name.)
 
-`Avatar` is a component that displays a user's profile picture.
+## Modify a List's Display
+
+When you click the "API-Aware" menu item, the app displays a list with data fetched from the SpaceX API.
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/spacex-list.png" />
+
+The SpaceX API endpoint in this sample retrieves other data fields, including links. After observing the markup, you will modify the UI to display those links and allow navigating to their targets.
+
+This functionality is a cooperation of a couple of components within `App`: `NavLink`, `Page`, and `ApiAware`:
+
+```ueml filename="Main.xmlui" {3,7,8}
+<App>
+  <NavPanel>
+    <NavLink label="API-Aware" to="/apiaware" />
+    <!-- Other menu items omitted -->
+  </NavPanel>
+  <Pages>
+    <Page url="/apiaware">
+      <ApiAware />
+      <!-- Other page items omitted -->
+    </Page>
+  </Pages>
+  <!-- Other components omitted -->
+</App>
+```
 
 <Callout type="info" emoji="💡">
   Components have **properties** that determine their appearance and behavior. Properties are declared as XML attributes when they can be represented with strings.
 </Callout>
 
-```ueml /url/ /size/
-<Avatar url="https://i.pravatar.cc/100" size="md" />
-```
+Components work together declaratively. `App` connects the `to` property of `NavLink` with the `url` property of `Page`. As a result, the particular page is displayed when you click the "API-Aware" menu item.
 
-`url` and `size` define the location and size of the `Avatar` component instance.
+### Extracting Components
 
-<Callout type="info" emoji="💡">
-  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. [Learn more!](./learning/xmlui-markup/#properties)
-</Callout>
+The page's content is outsourced into a reusable component, `ApiAware`, part of the application. Like other app-specific components, it is in the `components` folder.
 
-```ueml {2-4}
-<DropdownMenu>
-  <property name="triggerTemplate">
-    <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
-  </property>
-  <MenuItem>Item 1</MenuItem>
-  <MenuItem>Item 2</MenuItem>
-  <MenuItem>Item 3</MenuItem>
-</DropdownMenu>
-```
-
-`triggerTemplate` is a property of the `DropdownMenu` component that defines the UI for the trigger that opens the dropdown menu.
-
-<Callout type="info" emoji="💡">
-  Besides literal values, component property values may have **expressions** (wrapped between curly braces). These use simple expression syntax, and the engine will evaluate them.
-</Callout>
-
-```ueml /{customer.name}/
-<Button label="Click to delete {customer.name}" />
-```
-
-If the `customer.name` expression evaluates to "Jane Templeton", the button's label will be "Click to delete Jane Templeton."
-
-<Callout type="info" emoji="💡">
-  Components handle **user and system events**. As a consequence of these events, some components' properties may change. XMLUI evaluates these changes and refreshes the UI accordingly.
-
-  Defining **event handlers** with expressions or short scripts (with statements, loops, and other constructs) can change how components respond to particular events. [Learn more!](./learning/xmlui-markup/#event-handlers)
-</Callout>
-
-```ueml /onClick/
-<Button label="See order ID" onClick="toast('Current order: ' + orderId)" />
-```
-When the user clicks this button, the app will pop up a toast with the ID held by the `orderId` value.
-
-<Callout type="info" emoji="💡">
-  Components may have an **ID**. Other components can utilize this ID to refer to **exposed component members** (values and methods).
-</Callout>
-
-```ueml /id=myText/
-<TextBox id="myText" />
-<Text>Value in the textbox: {myText.value}</Text>
-```
-
-As the user types in the textbox, the text value is displayed in the `Text` component beneath it. 
-
-```ueml /id=myText/
-<List id="accountsList" />
-<!-- Some other components -->
-<Button label="Last account" onClick="accountsList.scrollToEnd()">
-```
-
-When the user clicks the button, the list above scrolls to the bottom to show the last item.
-
-<Callout type="info" emoji="💡">
-  Components can be hidden (or shown) in the UI conditionally. The **`when` attribute** of a component determines whether it is visible.
-</Callout>
-
-```ueml /when="{useCompression.value}"/
-<Checkbox id="useCompression" label="Use compression" />
-<Checkbox when="{useCompression.value}" label="Use lossless compression" />
-<Checkbox label="Convert to grayscale" />
-```
-
-The "Use lossless compression" checkbox is visible only when the "Use compression" checkbox is set.
-
-## Data and APIs
-
-<Callout type="info" emoji="💡">
-  Components working with data **can be bound to API endpoints**. Many XMLUI components (that may work with data) have a **`datasource` property** to define an API endpoint (GET) to fetch data.
-</Callout>
-
-```ueml copy
-<List datasource="https://api.spacexdata.com/v3/history">
-  <property name="itemTemplate">
-    <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </property>  
-</List>
-```
-
-The `List` component fetches data from the specified URL (an array of items). With a template definition (you will soon learn this concept in the following section), it displays the list item using the fetched data.
-
-
-<Callout type="info" emoji="💡">
-  Components can **invoke API endpoints that mutate data**. You can use the **`<event>` tag** to bind the invocation of a particular endpoint to a component's event handler. An **ApiAction component** can declare the details of the invocation.
-</Callout>
-
-```ueml copy
-<Button label="Delete completed tasks">
-  <event name="click">
-    <ApiAction url="/api/tasks/completed" method="delete" />
-  </event>
-</Button>
-```
-
-## Working with code
-
-<Callout type="info" emoji="💡">
-  You can put event handlers and other functions into **code-behind** files. Markup files (`.xmlui` extension) may have a code-behind file using the markup file name but the `.xmlui.xs` extension.
-
-  XMLUI **automatically binds event handlers** using the component's ID and the event name. While you follow the naming convention, you do not need to add event handlers to the component markup.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /calcButton/
-<Button id="calcButton" 
-  label="Calculate delay" />
-
-
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs (code-behind)" /calcButton_onClick/
-function calcButton_onClick() {
-  const delay = 500 * 2;
-  console.log('Delay calculated: ' + delay);
-}
-```
-  </div>
-</div>
-
-The button's ID is `calcButton`. The framework observes the `calcButton_onClick` function declaration in the code-behind file and binds it to handle the `click` event.
-
-<Callout type="info" emoji="💡">
-  You can name the **event handler function differently** if you find it more expressive. In this case, you must add the function's invocation to the component's event handler.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Calculate delay" 
-  onClick="handleOnClick()" />
-
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
-function handleClick() {
-  const delay = 500 * 2;
-  toast('Delay calculated: '+ delay);
-}
-```
-  </div>
-</div>
-
-The button is the `Main.xmlui` file utilizes the `handleOnClick` function declared in the `Main.xmlui.xs` code-behind file.
-
-<Callout type="info" emoji="💡">
-  Using wrapping braces, you can add **inline code expressions** to **property** and **element text values**. You can use the JavaScript syntax for them; the framework evaluates them using JavaScript semantics.
-</Callout>
-
-```ueml copy /{tasks.length}/ /initialValue="{customer.name}"/ /delay="{calculatedDelay * (1 + reservePercentage * 0.01)} minutes"/
-<Text>There are {tasks.length} tasks in the list.</Text>
-<TextBox initialValue="{customer.name}">
-```
-
-<Callout type="info" emoji="💡">
-  The event handler attributes accept **inline code scripts**. As in event handlers, you do not mix string elements with (brace-wrapped) expressions; the entire value of an event handler is considered code.
-  (You can break the code into multiple lines.)
-</Callout>
-
-```ueml copy /onClick/
-<Button label="Calculate delay" onClick="
-  const delay = 500 * 2;
-  toast('Delay calculated: ' + delay);
-" />
-```
-
-<Callout type="info" emoji="💡">
-  You can declare **variables** in code-behind files with the **`var` keyword** and optionally initialize them to a particular value (with an expression).
-
-  These variables are **reactive**: whenever any dependency in their initializing expression changes, the variable's value is reevaluated.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Click to increment!" 
-  onClick="count++" />
-<Text>Click count: {count}</Text>  
-<Text>Click count * 3: {countTimes3}</Text>  
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
-var count = 0;
-var countTimes3 = count * 3;
-
-
-
-```
-  </div>
-</div>
-
-When you click the button, it increments only the `count` variable. However, as `countTimes` is a reactive variable with `count` as a dependency, updating `count` triggers the re-evaluation of `countTimes3`. Thus, the second text will show three times the value of the first.
-
-<Callout type="info" emoji="💡">
-You can use **local variables** within (and only within) function declarations. The **`let` keyword** allows using a mutable variable; **`const`** declares an immutable one (following the JavaScript semantics). In contrast to `var`, variables declared with `let` and `const` are not reactive.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Calculate the sum of 1 to 10" 
-  onClick="calculate()" />
-<Text>Result: {sum}</Text>  
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
-var sum = 0;
-function calculate() {
-  for (let i = 1; i <= 10; i++) sum += i;
-}
-```
-  </div>
-</div>
-
-The calculate function uses the local variable `i` and stores the sum of values in the `sum` reactive variable. 
-
-## Component composition
-
-<Callout type="info" emoji="💡">
-  Components may have properties that accept other component definitions (markup) as their value. We call them **template properties**. 
-</Callout>
-
-```ueml copy {2-4} /property name="itemTemplate"/
-<List items="{['apple', 'banana', 'cherry', 'orange']}">
-  <property name="itemTemplate">
-    <Text variant="mono">{$item}</Text>
-  </property>
-</List>
-```
-
-This code snippet renders a list of the fruit items using monospace text to display a particular fruit name.
-
-<Callout type="info" emoji="💡">
-The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
-</Callout>
-
-In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a context value that holds the current iteration value of the list (a particular fruit name).
-
-<Callout type="info" emoji="💡">
-  To avoid code repetition, you can enclose frequently occurring markup snippets in **reusable component definitions**. When you change this component's definition, all occurrences will render the modified markup.
-
-  Reusable components go into a separate `.xmlui` file (with an arbitrary name). The framework observes them and uses them in the markup.
-</Callout>
-
-<br/>
-<div style={{display: "flex", flexDirection: "row"}}>
-  <div style={{width: "50%", paddingRight: "0.25rem"}}>
-```ueml copy filename="Main.xmlui (markup)" /calcButton/
-<InfoCard icon="email" label="Send email" />
-<InfoCard icon="phone" label="Start call" />
-<InfoCard icon="home" label="Back to home" />
-
-
-
-```
-  </div>
-  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-```ueml copy filename="InfoCard.xmlui (reusable component)"
-<Component name="InfoCard">
-  <Card>
-    <Icon name="{$props.icon}" />
-    <Text>{$props.label}</Text>
-  </Card>
+```ueml filename="components/ApiAware.xmlui"
+<Component name="ApiAware">
+  <List datasource="https://api.spacexdata.com/v3/history">
+    <property name="itemTemplate">
+      <Card title="{$item.title}" subTitle="{$item.details}" />
+    </property>
+  </List>
 </Component>
 ```
-  </div>
-</div>
-
-`Infocard` is a resusable component. In its definition, the `name` property of `<Component>` declares the name that can be used in the markup. The `$props` context value exposes the current property values defined for a particular `<InfoCard>` usage. This context value allows properties to be passed to the reusable component.
-
-## Theming and styling
 
 <Callout type="info" emoji="💡">
-**XMLUI supports themes**. You do not have to apply markup elements to set some style information, as the default theme has a consistent design. Themes support **light and dark tone variants**.
+  To avoid code repetition or organize your code, you can extract markup snippets in **reusable component definitions**. When you change this component's definition, all occurrences will render the modified markup.
+  Reusable components are stored in a separate `.xmlui` file within the `components` folder. The framework observes them and uses them in the markup.
 </Callout>
 
-<Playground
-  previewOnly
-  name="The default XMLUI theme (light)"
-  app={`
-    <Theme tone="light" themeId="xmlui">
-      <ThemeGallery />
-    </Theme>  
-  `}
-  components={[themeGallery]}
-  height={272}
-/>
+This component displays a `List` that uses templates. Its `datasource` property specifies a URL to fetch the list's data.
 
-<Playground
-  previewOnly
-  name="The default XMLUI theme (dark)"
-  app={`
-    <Theme tone="dark" themeId="xmlui">
-      <ThemeGallery />
-    </Theme>  
-  `}
-  components={[themeGallery]}
-  height={272}
-/>
+### Components with Templates
+
+`List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its `itemTemplate` property. 
+
+```ueml copy {2-4} filename="components/ApiAware.xmlui" /datasource/
+<List datasource="https://api.spacexdata.com/v3/history">
+  <property name="itemTemplate">
+    <Card title="{$item.title}" subTitle="{$item.details}" />
+  </property>
+</List>
+```
 
 <Callout type="info" emoji="💡">
-  You can easily create custom themes by adding a new **theme file** that changes a few **theme variables** (the ones you intend to modify). XMLUI automatically applies the changes to light and dark themes; you do not have to handle them separately.
+  Template properties cannot be represented with a string; thus, they cannot be given with an attribute. You nest them into their related component with the **`<property>` tag**.
 </Callout>
 
-```json copy {4-5} filename="themes/myCustomTheme.json"
+<Callout type="info" emoji="💡">
+  The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
+</Callout>
+
+The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subTitle` property to display two data entries. These use the fetched data list's `title` and `details` fields (through the `$item` context value).
+
+### Fetching Data from API Endpoints
+
+The specific endpoint of the SpaceX API (given in the `datasource` property of `List`) retrieves a list of event history items. A single item has this structure:
+
+```json
 {
-  "id": "myCustomTheme",
-  "themeVars": {
-    "color-primary": "#702F72",
-    "radius-Input": "12px"
+  "id": "<Record ID>",
+  "title": "<Short title>",
+  "event_date_utc": "<Event date>",
+  "event_date_unix": "<Event date in Unix format>",
+  "details": "<Event details>",
+  "links": {
+    "reddit": "<Reddit URL>",
+    "article": "<Article URL>",
+    "wikipedia": "<Wikipedia URL>"
   }
 }
 ```
 
-These modifications set the primary theme color to purplish and add a bigger corner radius to the input (and only to the input) components. Check the hover effect of the "outlined/primary" button in light and dark themes!
-
-<Playground
-  previewOnly
-  name="Modified theme (light)"
-  defaultTheme="myCustomTheme"
-  themes={[
-    {
-      name: "My Custom Theme",
-      id: "myCustomTheme",
-      themeVars: {
-        "color-primary": "#702F72",
-        "radius-Input": "12px",
-      },
-    },
-  ]}
-  app={`
-    <Theme tone="light" themeId="myCustomTheme">
-      <ThemeGallery />
-    </Theme>
-  `}
-  components={[themeGallery]}
-  height={272}
-/>
-
-<Playground
-  previewOnly
-  name="Modified theme (dark)"
-  defaultTheme="myCustomTheme"
-  themes={[
-    {
-      name: "My Custom Theme",
-      id: "myCustomTheme",
-      themeVars: {
-        "color-primary": "#702F72",
-        "radius-Input": "12px",
-      },
-    },
-  ]}
-  app={`
-    <Theme tone="dark" themeId="myCustomTheme">
-      <ThemeGallery />
-    </Theme>
-  `}
-  components={[themeGallery]}
-  height={272}
-/>
-
 <Callout type="info" emoji="💡">
-  You can use dozens of **inline layout properties** with components such as setting component dimensions, colors, typography, etc. 
+  Components working with data **can be bound to API endpoints**. Many XMLUI components (that may work with data) have a **`datasource` property** to define an API endpoint (GET) to fetch data. XMLUI manages all chores to fetch the data.
 </Callout>
 
-```ueml copy {3-7}
-<Button 
-  label="My custom style" 
-  color="yellow" 
-  fontFamily="serif" 
-  fontSize="3em"
-  horizontalPadding="5rem"
-  radius="3rem" />
+### Updating the Item Template
+
+Change the `Card` component to display the SpaceX and Wikipedia links and allow the user to navigate to them:
+
+```ueml copy {2-3} filename="components/ApiAware.xmlui"
+<Card title="{$item.title}" subTitle="{$item.details}">
+  <Link to="{$item.links.article}" target="_blank">SpaceX</Link>
+  <Link to="{$item.links.wikipedia}" target="_blank">Wikipedia</Link>
+</Card>
 ```
 
-<Playground
-  previewOnly
-  name="Adding layout properties to a Button"
-  app={`
-    <Button 
-      label="My custom style" 
-      color="yellow" 
-      fontFamily="serif" 
-      fontSize="3em"
-      horizontalPadding="5rem"
-      radius="3rem" />
-  `}
-  components={[themeGallery]}
-  height={112}
-/>
+When you refresh the app in the browser, it will display the links. Click a link to open it in a new browser tab.
 
-<Callout emoji="⚠️">
-  While these layout properties may be tempting for quick style modification (and helpful during development), they may cause a style maintenance nightmare in production. **Avoid using inline layout properties!**
-</Callout>
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/spacex-list-with-links.png" />
 
-## Deployment
+
+## Extend the App
 
 <Callout type="info" emoji="💡">
-  XMLUI apps have a **simple folder structure**. The app's root folder contains the `index.html` file that loads the framework as a single JavaScript file. The `Main.xmlui` (in the root) is the app's primary markup file. Other folders, like `components`, `resources`, and `themes`, contain simple markup and resource files. 
+  You can **easily extend** an XMLUI working app.
 </Callout>
+
+In this section, you will add a new component to your app's page to display three boxes. Their markup is similar; however, each has its particular color and text.
+
+### Define a Reusable Component
+
+Create a new file in the `components` folder named `MyBox.xmlui`, and copy this contents to it:
+
+```ueml copy filename="components/MyBox.xmlui"
+<Component name="MyBox">
+  <Stack 
+    padding="12"
+    border="8px solid {$props.color}">
+    {$props.label}
+  </Stack>
+</Component>
+```
+
+### Use the Reusable Component
+
+This code declares a reusable component named `MyBox` with two properties, `color` and `title`. You add a page displaying three instances of `MyBox` to the menu with a few steps:
+
+1. Open the `Main.xmlui` file and navigate to the `<NavPanel>` section. It contains several `<NavLink>` child items, each representing a menu item that can navigate to its corresponding UI page. Append a new one:
+
+```ueml copy {7}
+<!-- ... -->
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Simple" to="/simple" />
+    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="Composable" to="/composable" />
+    <NavLink label="My Boxes" to="/myboxes" />
+  </NavPanel>
+<!-- ... -->
+```
+
+2. Scroll down to the `<Pages>` section, which contains `<Page>` items. These items declare how the UI belonging to a particular navigation link should display.
+3. Append a new `<Page>` item to the bottom of the `<Pages>` section:
+
+```ueml copy {5-7}
+  <Pages>
+    <!-- Previous <Page> tags omitted -->
+    <Page url="/myboxes">
+      <HStack>
+        <MyBox color="red" label="Red box" />
+        <MyBox color="green" label="My green box" />
+        <MyBox color="blue" label="Our blue box" />
+      </HStack>
+    </Page>
+  </Pages>
+```
+
+Return to the browser and refresh the current page. Click the "My Boxes" item in the menu. You will see the newly added component works:
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/app-with-boxes.png" />
+
+### Respond to an Event
 
 <Callout type="info" emoji="💡">
-  XMLUI applications have a **simple folder structure**. You can copy this structure into the static files folder of your web server, and they are **ready to be hosted instantly** by a web server.
+  Components handle **user and system events**. You can declare **event handlers** to change how components respond to particular events. Handling events may change some components' properties. XMLUI observes these changes and refreshes the UI accordingly.
 </Callout>
 
-<Callout emoji="💡">
-  **You do not need to build an app**. However, the framework offers several build methods that **optimize the static file structure for size and startup performance** if you need this feature. 
-</Callout>
+Extend the `MyBox` component to display a toast when the box is clicked.
+
+```ueml copy filename="components/MyBox.xmlui" /onClick/ {5}
+<Component name="MyBox">
+  <Stack 
+    padding="12"
+    border="8px solid {$props.color}"
+    onClick="toast('You clicked ' + $props.label)">
+    {$props.label}
+  </Stack>
+</Component>
+```
+
+You can add event handlers to a component using an attribute with the `on` prefix followed by the event name (camel-casing). The attribute value is the script for the event handler code.
+
+In the code above, the `onClick` attribute is added to the `Stack` component. When the user clicks the stack, the `toast` function is called with a message.
+
+The code above executes the `toast('You clicked' + $props.label)` event handler, which displays a notification in the app's top-right corner.
+
+When you refresh the app in the browser and click a box, a toast will appear:
+
+<br/>
+<Image alt="App modified" src="/resources/images/get-started/app-with-toast.png" />
+
+## Diving Deeper into XMLUI [#dive-deeper]
+
+The Starter App introduced the framework's fundamental concepts. As you learned, everything revolves around the building blocks of an XMLUI app: components.
+
+Here are a few more actions you can take to dive deeper into XMLUI:
+
+- Discover the source code files of the Starter App that were not mentioned in this article. We suggest you check the markup files in the `components` folder.
+- Try the Personal Todo App tutorial. This article will teach you a few helpful components and simple patterns for creating apps.
+- Visit the articles in the Create XMLUI Apps topic to learn in-depth information about specific concepts and components of the framework.
+- Observe the How-to topic to learn about patterns that help you in a particular scenario.

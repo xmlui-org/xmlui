@@ -2,7 +2,7 @@ import { Callout } from 'nextra/components'
 
 # Markup
 
-The XMLUI markup is almost identical to the XML/XHTML markup; however, there are a few differences. This section explains the markup fundamentals and addresses the differences from XML/XHTML.
+This section details the XMLUI markup fundamentals. The markup is almost identical to the XML/XHTML; there are only a few points where XMLUI extends them.
 
 ## Comments
 
@@ -208,7 +208,7 @@ This markup will output the following:
 <Playground
     previewOnly={true}
     name="Using entity references in text"
-    height={300}
+    height={320}
     horizontal={true}
     app={`
     <VStack padding="8">
@@ -248,10 +248,10 @@ In the markup, you can **nest child items into any component**. Each of these ch
 <Playground
     previewOnly={true}
     name="Child items"
-    height={120}
+    height={180}
     horizontal={true}
     app={`
-    <VStack>
+    <VStack padding="1rem" gap="0.5rem">
       This is a text segment before a Button component.
       <Button label="I'm a non-functional Button"/>
       This is a text segment after a Button and before an Icon 
@@ -279,7 +279,7 @@ The engine will display the following text after collapsing whitespaces:
 <Playground
     previewOnly={true}
     name="Whitespace collapsing"
-    height={40}
+    height={60}
     horizontal={true}
     app={`
     <VStack padding="8">
@@ -306,7 +306,7 @@ You can use double quotes (`"`), single quotes (`'`), or backticks (`` ` ``) as 
 <Playground
     previewOnly={true}
     name="Wrapped text value"
-    height={40}
+    height={60}
     horizontal={true}
     app={`
     <VStack padding="8">
@@ -349,11 +349,12 @@ This sample uses the `Markdown` components where whitespaces are essential to di
 <Playground
     previewOnly={true}
     name="CDATA section"
-    height={260}
+    height={300}
     horizontal={true}
     app={`
-<Markdown>
-  <![CDATA[
+    <VStack padding="1rem">
+      <Markdown>
+        <![CDATA[
 # Who's that then?
     
 Well, she turned me into a newt. Burn her! We want a shrubbery!! Well, I got better. 
@@ -368,8 +369,9 @@ land.
 You don't frighten us, English pig-dogs! Go and boil your bottoms, sons of a silly person! 
 I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English 
 K-n-n-n-n-n-n-n-niggits! A newt?
-  ]]>
-</Markdown>
+    ]]>
+  </Markdown>
+</VStack>
 `}
 />
 
@@ -381,7 +383,7 @@ K-n-n-n-n-n-n-n-niggits! A newt?
 </Callout>
 
 ```ueml
-<HStack padding="8">
+<HStack>
   <VStack width="25%">
     This is Button #1!
     <Button label="Button #1" />
@@ -404,21 +406,21 @@ K-n-n-n-n-n-n-n-niggits! A newt?
 <Playground
     previewOnly={true}
     name="Child Hierarchy"
-    height={100}
+    height={120}
     horizontal={true}
     app={`
     <HStack padding="8">
-      <VStack width="25%">
+      <VStack width="25%" gap="0.5rem">
         This is Button #1!
         <Button label="Button #1" />
       </VStack>
-      <VStack width="25%">
+      <VStack width="25%" gap="0.5rem">
         This is Button #2!
         <Button label="Button #2" />
       </VStack>
-      <VStack width="25%">
+      <VStack width="25%" gap="0.5rem">
         Three Boxes
-        <HStack>
+        <HStack  gap="0.5rem">
           <Stack backgroundColor="red" width="36" height="36" />
           <Stack backgroundColor="green" width="36" height="36" />
           <Stack backgroundColor="blue" width="36" height="36" />
