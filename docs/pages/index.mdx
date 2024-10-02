@@ -193,13 +193,11 @@ This code declares a reusable component named `MyBox` with two properties, `colo
 
 1. Open the `Main.xmlui` file and navigate to the `<NavPanel>` section. It contains several `<NavLink>` child items, each representing a menu item that can navigate to its corresponding UI page. Append a new one:
 
-```ueml copy {7}
+```ueml copy {5}
 <!-- ... -->
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
-    <NavLink label="Simple" to="/simple" />
     <NavLink label="SpaceX List" to="/spacexlist" />
-    <NavLink label="Composable" to="/composable" />
     <NavLink label="My Boxes" to="/myboxes" />
   </NavPanel>
 <!-- ... -->
@@ -234,11 +232,12 @@ Return to the browser and refresh the current page. Click the "My Boxes" item in
 
 Extend the `MyBox` component to display a toast when the box is clicked.
 
-```ueml copy filename="components/MyBox.xmlui" /onClick/ {5}
+```ueml copy filename="components/MyBox.xmlui" /onClick/ {6}
 <Component name="MyBox">
   <Stack 
     padding="12"
-    border="8px solid {$props.color}"
+    borderColor="{$props.color}"
+    borderThickness="8"
     onClick="toast('You clicked ' + $props.label)">
     {$props.label}
   </Stack>

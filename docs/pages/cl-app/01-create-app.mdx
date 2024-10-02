@@ -132,7 +132,7 @@ Test the emulated backend by adding code that triggers invoking an endpoint. Rep
 
 ```ueml copy {3-4} filename="Main.xmlui"
 <!-- Omitted -->
-<Page url="/tasks">
+<Page url="/contacts">
   <Datasource id="categories" url="/api/categories" />
   <Text variant="codefence">{JSON.stringify(categories.value, null, 2)}</Text>
 </Page>
