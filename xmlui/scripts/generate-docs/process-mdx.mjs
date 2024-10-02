@@ -90,18 +90,28 @@ export function processMdx(component, componentNames, metadata, importsToInject)
     }
   }
 
+  logger.info(`Processing ${component.displayName}...`);
+
   const parent = component.specializedFrom
     ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
     : null;
 
   if (!!parent) {
     const parentDocs = `./${parent.displayName}.mdx`;
+
+    result += importsToInject;
+
+    result += `# ${component.displayName}`;
+    result += appendArticleId(component.displayName);
+    result += "\n\n";
+
+    result += addComponentStatusDisclaimer(component.status);
+    result += addNonVisualDisclaimer(component.nonVisual);
+
     result += fileData || "There is no documentation for this component as of yet.";
     result += `\n\n`;
-    result += `The parent component documentation can be found [here](${parentDocs}).`;
+    result += `The parent component documentation can be found <SmartLink href="${parentDocs}">here</SmartLink>.`;
   } else {
-    logger.info(`Processing ${component.displayName}...`);
-
     logger.info("Processing imports section");
 
     result += importsToInject;
@@ -112,7 +122,9 @@ export function processMdx(component, componentNames, metadata, importsToInject)
       copyImports(copyFilePaths);
     }
 
-    result += `# ${component.displayName}\n\n`;
+    result += `# ${component.displayName}`;
+    result += appendArticleId(component.displayName);
+    result += "\n\n";
 
     result += addComponentStatusDisclaimer(component.status);
     result += addNonVisualDisclaimer(component.nonVisual);
@@ -498,6 +510,11 @@ function addComponentStatusDisclaimer(status) {
   }
 
   return disclaimer !== "" ? `<Callout type="info" emoji="ℹ️">${disclaimer}</Callout>\n\n` : "";
+}
+
+function appendArticleId(articleId) {
+  if (!articleId) return "";
+  return ` [#component-${articleId.toLocaleLowerCase().replace(" ", "-")}]`;
 }
 
 function addNonVisualDisclaimer(isNonVisual) {

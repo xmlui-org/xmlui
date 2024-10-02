@@ -1,6 +1,7 @@
-import { writeFileSync, readdirSync, statSync } from "fs";
+import { writeFileSync, readdirSync, statSync, readFileSync } from "fs";
 import { posix, extname, parse } from "path";
-import { convertPath } from "./utils.mjs";
+import { convertPath, strBufferToLines } from "./utils.mjs";
+import { logger } from "./logger.mjs";
 
 const pathCutoff = "pages";
 const acceptedExtensions = [".mdx", ".md"];
@@ -22,12 +23,16 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
       // Node is a file
       const extension = extname(item.name);
       if (
-        (acceptedFileNames.includes(item.name) || acceptedExtensions.includes(extname(item.name))) &&
+        (acceptedFileNames.includes(item.name) ||
+          acceptedExtensions.includes(extname(item.name))) &&
         !rejectedFileNames.includes(item.name)
       ) {
-        pages += `export const ${parse(item.path).name.toLocaleUpperCase().replaceAll("-", "_")} = "${item.path
-          .split(pathCutoff)[1]
-          ?.replace(extension, "")}";\n`;
+        const articleId = getArticleId(item.path); /* ?? parse(item.path).name */
+        if (articleId) {
+          pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
+            .split(pathCutoff)[1]
+            ?.replace(extension, "")}";\n`;
+        }
       }
     }
   });
@@ -56,4 +61,26 @@ function traverseDirectory(node, visitor, level = 0) {
       traverseDirectory(childNode, visitor, level);
     }
   }
+}
+
+function getArticleId(articlePath) {
+  const content = readFileSync(articlePath, { encoding: "utf8" });
+  const lines = strBufferToLines(content);
+  for (const line of lines) {
+    // Detect lines like "# This is a Title [#this-is-a-title]"
+    const match = line.match(/^#\s+.+?(\s*\[#[\w-]+\])?$/);
+    if (!match) continue;
+    if (match[1]) {
+      // Has ID
+      return match[1].replace(/ \[#(.*?)\]/, (_, p1) => p1);
+    } else {
+      // Needs generated ID
+      logger.info("No ID found, generating new one");
+      return undefined;
+    }
+  }
+}
+
+function normalizeToArticleId(rawStr) {
+  return rawStr.trim().toLocaleUpperCase().replaceAll("-", "_");
 }

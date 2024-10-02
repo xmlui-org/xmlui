@@ -70,3 +70,13 @@ export function convertPath(windowsPath) {
 
   return windowsPath;
 }
+
+/**
+ * Simple but slow
+ */
+export function strBufferToLines(buffer) {
+  if (typeof buffer !== "string") {
+    throw new Error("Only string buffers are supported.");
+  }
+  return buffer.split(/\r?\n/);
+}
