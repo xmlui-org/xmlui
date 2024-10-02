@@ -3,9 +3,11 @@ import pages from "../../meta/pages.js";
 
 # CVStack [#component-cvstack]
 
-`CVStack` is a specialized, shorthand version for the regular [Stack](./Stack) component with a vertical orientation centered on its contents.
+This component is inherited from [Stack](./Stack.mdx)
 
-See also: [HStack](./HStack.mdx), [VStack](./VStack.mdx), [CHStack](./CHStack.mdx).
+See also: [CHStack](./CHStack.mdx), [HStack](./HStack.mdx), [VStack](./VStack.mdx)
+
+`CVStack` is a specialized, shorthand version for the regular `Stack` component with a vertical orientation centered on its contents.
 
 ```ueml copy
 <CVStack padding="1rem" width="33%" backgroundColor="cyan">
@@ -31,4 +33,3 @@ See also: [HStack](./HStack.mdx), [VStack](./VStack.mdx), [CHStack](./CHStack.md
 > **Note**: You cannot change the orientation of `CVStack` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
 
 
-The parent component documentation can be found [here](./Stack.mdx).
