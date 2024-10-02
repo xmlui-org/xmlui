@@ -12,13 +12,17 @@ This article will teach you the fundamental concepts and constructs of working w
 
 ## Component IDs
 
+<Callout type="info" emoji="💡">
 The nested tags in the XMLUI markup form a natural hierarchy of components. Parent components have children (directly or through their children or children's children, and so on).
+</Callout>
 
 When rendering an app, the engine uses this hierarchy as a declarative binding, rendering children within their parent.
 
 However, sometimes, you want to establish cooperation between two (or more) components that are not in a parent-child relationship. They may be siblings (having the same parent component) or can be in totally different branches of the markup.
 
-
+<Callout type="info" emoji="💡">
+With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to refer to that particular component in code (expressions).
+</Callout>
 
 ## Expressions
 

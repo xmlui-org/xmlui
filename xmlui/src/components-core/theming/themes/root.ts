@@ -212,6 +212,18 @@ export const RootThemeDefinition: ThemeDefinition = {
     // --- The default font size
     "font-size": "$font-size-normal",
 
+    // --- Predefined gap sizes
+    "gap-none": "$space-0",
+    "gap-tight": "$space-2",
+    "gap-normal": "$space-4",
+    "gap-loose": "$space-8",
+
+    // --- Predefined paddings
+    "padding-none": "$space-0",
+    "padding-tight": "$space-2",
+    "padding-normal": "$space-4",
+    "padding-loose": "$space-8",
+
     // --- Font used for body
     "font-weight": "$font-weight-normal",
 

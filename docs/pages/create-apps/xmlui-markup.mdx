@@ -184,23 +184,23 @@ In XMLUI text and attribute values, you **do not need to use entity references**
 So, each of these text pairs represents the same text:
 
 ```ueml
-<Stack>You're so beautiful</Stack>
-<Stack>You&apos;re so beautiful</Stack>
+<Text>You're so beautiful</Text>
+<Text>You&apos;re so beautiful</Text>
 
-<Stack>"Hello", she said</Stack>
-<Stack>&quot;Hello&quot;, she said</Stack>
+<Text>"Hello", she said</Text>
+<Text>&quot;Hello&quot;, she said</Text>
 
-<Stack>"2 < 3"</Stack>
-<Stack>2 &lt; 3</Stack>
+<Text>"2 < 3"</Text>
+<Text>2 &lt; 3</Text>
 
-<Stack>Go to --> Step #3</Stack>
-<Stack>Go to --&gt; Step #3</Stack>
+<Text>Go to --> Step #3</Text>
+<Text>Go to --&gt; Step #3</Text>
 
-<Stack>Mac & Jack</Stack>
-<Stack>Mac &amp; Jack</Stack>
+<Text>Mac & Jack</Text>
+<Text>Mac &amp; Jack</Text>
 
-<Stack>Keep&nbsp;going</Stack>
-<Stack>Keep{"\xa0"}going</Stack>
+<Text>Keep&nbsp;going</Text>
+<Text>Keep{"\\xa0"}going</Text>
 ```
 
 This markup will output the following:
@@ -208,23 +208,23 @@ This markup will output the following:
 <Playground
     previewOnly={true}
     name="Using entity references in text"
-    height={320}
+    height={400}
     horizontal={true}
     app={`
-    <VStack padding="8">
-      <Stack>You're so beautiful</Stack>
-      <Stack>You&apos;re so beautiful</Stack>
-      <Stack>"Hello", she said</Stack>
-      <Stack>&quot;Hello&quot;, she said</Stack>
-      <Stack>"2 < 3"</Stack>
-      <Stack>2 &lt; 3</Stack>
-      <Stack>Go to --> Step #3</Stack>
-      <Stack>Go to --&gt; Step #3</Stack>
-      <Stack>Mac & Jack</Stack>
-      <Stack>Mac &amp; Jack</Stack>
-      <Stack>Keep&nbsp;going</Stack>
-      <Stack>Keep{"\\xa0"}going</Stack>
-    </VStack>
+    <App gap="$gap-tight">
+      <Text>You're so beautiful</Text>
+      <Text>You&apos;re so beautiful</Text>
+      <Text>"Hello", she said</Text>
+      <Text>&quot;Hello&quot;, she said</Text>
+      <Text>"2 < 3"</Text>
+      <Text>2 &lt; 3</Text>
+      <Text>Go to --> Step #3</Text>
+      <Text>Go to --&gt; Step #3</Text>
+      <Text>Mac & Jack</Text>
+      <Text>Mac &amp; Jack</Text>
+      <Text>Keep&nbsp;going</Text>
+      <Text>Keep{"\\xa0"}going</Text>
+    </App>
 `}
 />
 
@@ -248,15 +248,15 @@ In the markup, you can **nest child items into any component**. Each of these ch
 <Playground
     previewOnly={true}
     name="Child items"
-    height={180}
+    height={240}
     horizontal={true}
     app={`
-    <VStack padding="1rem" gap="0.5rem">
+    <App>
       This is a text segment before a Button component.
       <Button label="I'm a non-functional Button"/>
       This is a text segment after a Button and before an Icon 
       <Icon name="user"/>
-    </VStack>
+    </App>
   `}
 />
 
@@ -279,15 +279,15 @@ The engine will display the following text after collapsing whitespaces:
 <Playground
     previewOnly={true}
     name="Whitespace collapsing"
-    height={60}
+    height={80}
     horizontal={true}
     app={`
-    <VStack padding="8">
+    <App>
       <Text>
         Though      this is a multiline text     declaration (with several line breaks), 
         the engine        collapses whitespaces.
       </Text>
-    </VStack>
+    </App>
   `}
 />
 
@@ -306,14 +306,14 @@ You can use double quotes (`"`), single quotes (`'`), or backticks (`` ` ``) as 
 <Playground
     previewOnly={true}
     name="Wrapped text value"
-    height={60}
+    height={80}
     horizontal={true}
     app={`
-    <VStack padding="8">
+    <App>
       <Text>
         "I'm a text containing a left angle: <"
       </Text>
-    </VStack>
+    </App>
   `}
 />
 
@@ -349,10 +349,10 @@ This sample uses the `Markdown` components where whitespaces are essential to di
 <Playground
     previewOnly={true}
     name="CDATA section"
-    height={300}
+    height={320}
     horizontal={true}
     app={`
-    <VStack padding="1rem">
+    <App>
       <Markdown>
         <![CDATA[
 # Who's that then?
@@ -371,7 +371,7 @@ I blow my nose at you, so-called Ah-thoor Keeng, you and all your silly English
 K-n-n-n-n-n-n-n-niggits! A newt?
     ]]>
   </Markdown>
-</VStack>
+</App>
 `}
 />
 
@@ -406,21 +406,21 @@ K-n-n-n-n-n-n-n-niggits! A newt?
 <Playground
     previewOnly={true}
     name="Child Hierarchy"
-    height={120}
+    height={140}
     horizontal={true}
     app={`
-    <HStack padding="8">
-      <VStack width="25%" gap="0.5rem">
+    <HStack padding="$padding-normal">
+      <VStack width="25%">
         This is Button #1!
         <Button label="Button #1" />
       </VStack>
-      <VStack width="25%" gap="0.5rem">
+      <VStack width="25%">
         This is Button #2!
         <Button label="Button #2" />
       </VStack>
-      <VStack width="25%" gap="0.5rem">
+      <VStack width="25%">
         Three Boxes
-        <HStack  gap="0.5rem">
+        <HStack>
           <Stack backgroundColor="red" width="36" height="36" />
           <Stack backgroundColor="green" width="36" height="36" />
           <Stack backgroundColor="blue" width="36" height="36" />
