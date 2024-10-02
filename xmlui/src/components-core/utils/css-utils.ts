@@ -1,4 +1,5 @@
-import {CSSProperties, useRef} from "react";
+import type {CSSProperties} from "react";
+import { useEffect, useRef} from "react";
 import Color from "color";
 
 import { getVarKey } from "@components-core/theming/themeVars";
@@ -138,6 +139,16 @@ export const useScrollbarWidth = () => {
   const didCompute = useRef(false);
   const widthRef = useRef(0);
 
+  useEffect(()=>{
+    function handleResize(){
+      didCompute.current = false;
+    }
+    window.addEventListener("resize", handleResize);
+    return ()=>{
+      window.removeEventListener("resize", handleResize);
+    }
+  }, []);
+
   if (didCompute.current) return widthRef.current;
 
   // Creating invisible container
@@ -146,12 +157,8 @@ export const useScrollbarWidth = () => {
   outer.style.overflow = 'scroll'; // forcing scrollbar to appear
   document.body.appendChild(outer);
 
-  // Creating inner element and placing it in the container
-  const inner = document.createElement('div');
-  outer.appendChild(inner);
-
   // Calculating difference between container's full width and the child width
-  const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+  const scrollbarWidth = outer.offsetWidth - outer.clientWidth;
 
   // Removing temporary elements from the DOM
   outer.parentNode.removeChild(outer);
