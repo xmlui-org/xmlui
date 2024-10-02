@@ -102,6 +102,12 @@ export function compileLayout(
   if (borderBottom) css.borderBottom = borderBottom;
   const borderLeft = compileBorder("borderLeft", layoutProps);
   if (borderLeft) css.borderLeft = borderLeft;
+  const borderColor = compileColor("borderColor", layoutProps);
+  if (borderColor) css.borderColor = borderColor;
+  const borderStyle = compileBorderStyle("borderStyle", layoutProps);
+  if (borderStyle) css.borderStyle = borderStyle;
+  const borderThickness = compileSize("borderThickness", layoutProps);
+  if (borderThickness.value) css.borderWidth = borderThickness.value;
 
   // --- Compile radius
   const radius = compileRadius("radius", layoutProps);
@@ -146,7 +152,6 @@ export function compileLayout(
   // --- Compile other
   const backgroundColor = compileColor("backgroundColor", layoutProps);
   if (backgroundColor) css.backgroundColor = backgroundColor;
-  //TODO illesg
   const background = compileBackground("background", layoutProps);
   if (background) css.background = background;
   const boxShadow = compileShadow("shadow", layoutProps);
@@ -534,6 +539,15 @@ export function compileLayout(
     );
   }
 
+  function compileBorderStyle(propName: string, layoutProps: LayoutProps): string | undefined {
+    return compile(
+      propName,
+      layoutProps,
+      (p) => p.parseBorderStyle(),
+      (n) => n.value,
+    );
+  }
+
   function compileTextDecoration(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
@@ -714,6 +728,9 @@ export type LayoutProps = {
   borderRight?: string;
   borderBottom?: string;
   borderLeft?: string;
+  borderColor?: string;
+  borderStyle?: string;
+  borderThickness?: string;
 
   // --- Border radius
   radius?: number | string;

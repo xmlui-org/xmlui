@@ -1,8 +1,7 @@
 {
-  "index": "Introduction",
-  "getting-started": "Getting Started",
-  "tutorials": "Tutorials",
-  "learning": "Learn XMLUI",
+  "index": "Getting Started",
+  "p2do-app": "Personal Todo App",
+  "create-apps": "Creating XMLUI Apps",
   "howto": "How-to Guides",
   "components": "Components",
   "styles-and-themes": "Themes",

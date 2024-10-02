@@ -1,0 +1,104 @@
+import { Callout } from 'nextra/components'
+import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
+
+# Creating XMLUI Apps
+
+In this section, you will find articles that teach you the details of creating apps with the XMLUI framework. If you have not experienced it before, we suggest you to read the Getting Started article and the Personal Todo App tutorial; these demonstrate the essential concepts through experimenting with simple apps.
+
+This article describes the structure of an XMLUI app by introducing its files and folders. After reading it, you can learn more details about the framework in these articles:
+- [Markup](/create-apps/xmlui-markup): Learn the essence of the XMLUI markup language
+- [Code](/create-apps/xmlui-code): Understand the coding fundamentals of XMLUI apps
+- etc.
+
+## XMLUI Application Structure
+
+<Callout type="info" emoji="💡">
+  XMLUI apps have a **simple file structure** that can be directly hosted as static files in a web server's folder (without a build process). 
+</Callout>
+
+Unless most modern web UI frameworks, XMLUI does not require you to go through a build process. You work with a simple file structure, where most files are XMLUI markup files; there are a few others.
+- You use a local web server that can host static files during development.
+- When your app is about to be released, you copy the same folder structure to a production web server.
+
+<Callout emoji="💡">
+  The framework offers several build methods that optimize the static file structure for size and startup performance. These are optional; you do not need them while developing an app.
+</Callout>
+
+
+Download the zip file of the Starter App from here (link placeholder) and unzip it into a working folder. Now, open this folder in your file management tool to check its contents. You will find several files in the folder:
+
+```
+<XMLUI app folder>
+  ├── index.html (The web page that opens in the browser)
+  ├── Main.xmlui (The main XMLUI file with the app)
+  ├── config.json (The app's configuration file)
+  ├── xmlui-standalone.umd.js (The framework's runtime)
+  ├── components (The folder with the app's XMLUI components)
+  │   ├── ApiAware.xmlui
+  │   ├── Home.xmlui
+  │   ├── IncButton.xmlui
+  └── resources (Static app resources like images, logos, icons, etc.)
+      ├── favicon.ico
+      ├── xmlui-logo.svg
+      └── xmlui-logo-dark.svg
+```
+
+## Application Files and Folders
+
+This folder contains an `index.html` file that loads a single JavaScript file (the XMLUI framework). It also contains your app's XMLUI source (the `Main.xmlui` file and other files within the `components` folder).
+
+The `index.html` file is simple:
+
+```html filename="index.html" /xmlui-standalone.umd.js/
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="xmlui-standalone.umd.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
+```
+
+The `index.html` file loads the `xmlui-standalone.umd.js`, which represents the entire framework. When this JavaScript file starts, it initializes the framework and ignites the app:
+- Loads and compiles the `Main.xmlui` file, the entry point of an XMLUI app.
+- When this app uses app-specific components, the framework loads and compiles them from the `components` folder.
+
+<Callout type="info" emoji="📔">
+  XMLUI supports apps that load the framework from a CDN. In these apps, `index.html` addresses the JavaScript file with the CDN's URL.
+</Callout>
+
+### The Configuration File
+
+When you start developing an XMLUI app, it comes with a simple file, `config.json,` which holds a few of your app's traits. You do not need to change this file; you can update a few entries to modify your app's working context.
+
+```json filename="config.json"
+{
+  "name": "Tutorial",
+  "version": "1.0.0",
+  "resources": {
+    "logo": "resources/xmlui-logo.svg",
+    "logo-dark": "resources/xmlui-logo-dark.svg",
+    "favicon": "resources/favicon.ico"
+  }
+}
+```
+
+The `name` property defines the text to display as the app's title in the browse tab. The `version` property helps query the current version number (and display it) within the app.
+
+The app may use a few resource files (you can declare them in the `resources` section of the file) that your app uses.
+
+### Application Folders
+
+The application structure has a few folders the framework uses for some specific purpose. Besides them, you can use other folders to organize your source code, store app resources, etc. The framework utilizes these folders:
+
+- **`components`**: This folder contains the XMLUI source files of the app-specific components. When the app uses a component, the framework looks up its definition in this folder.
+- **`resources`**: This folder contains static resources like images, logos, icons, etc. The framework uses these resources when the app needs them.
+- **`themes`**: This folder contains the XMLUI theme files. When the app starts, the framework looks for available theme definitions in this folder.
+
+
+<Callout type="info" emoji="📔">
+  You can use other folders within the app's root folder to store custom web fonts, unique resources, static data, etc. For more information, see this article (link placeholder).
+</Callout>

@@ -17,7 +17,7 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
   themeVars: {
     "shadow-header-App": "none",
     "font-size": "15px",
-    "shadow-Input": "$shadow-sm"
+    "shadow-Input": "$shadow-sm",
   },
   tones: {
     light: {

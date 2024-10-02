@@ -28,6 +28,9 @@ import {
 import { AiOutlineLike, AiOutlineMenu, AiOutlinePlusCircle, AiOutlineSend } from "react-icons/ai";
 import {
   BsArrowDownShort,
+  BsPause,
+  BsPlay,
+  BsArrowLeftShort,
   BsArrowRightShort,
   BsArrowUpShort,
   BsChatDots,
@@ -132,7 +135,10 @@ function registerIconRenderer(name: string | string[], renderer: IconRenderer<an
 
 registerIconRenderer("assign", (props: IconBaseProps) => <FiUser {...props} />);
 registerIconRenderer("arrowup", (props: IconBaseProps) => <BsArrowUpShort {...props} />);
+registerIconRenderer("arrowleft", (props: IconBaseProps) => <BsArrowLeftShort {...props} />);
 registerIconRenderer("arrowright", (props: IconBaseProps) => <BsArrowRightShort {...props} />);
+registerIconRenderer("pause", (props: IconBaseProps) => <BsPause {...props} />);
+registerIconRenderer("play", (props: IconBaseProps) => <BsPlay {...props} />);
 registerIconRenderer("hamburger", (props: IconBaseProps) => <AiOutlineMenu {...props} />);
 registerIconRenderer("send", (props: IconBaseProps) => <AiOutlineSend {...props} />);
 registerIconRenderer("users", (props: IconBaseProps) => <FiUsers {...props} />);
