@@ -2,7 +2,7 @@ import styles from "./Footer.module.scss";
 import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { paddingSubject } from "@components-core/theming/themes/base-utils";
+import {borderSubject, paddingSubject} from "@components-core/theming/themes/base-utils";
 import { Footer } from "./FooterNative";
 
 const COMP = "Footer";
@@ -16,7 +16,14 @@ export const FooterMd = createMetadata({
     [`font-size-${COMP}`]: "$font-size-small",
     [`color-text-${COMP}`]: "$color-text-secondary",
     [`max-content-width-${COMP}`]: "$max-content-width",
-    ...paddingSubject("Footer", { horizontal: "$space-4", vertical: "$space-2" }),
+    ...paddingSubject(COMP, { horizontal: "$space-4", vertical: "$space-2" }),
+    ...borderSubject(COMP, {
+      top: {
+        color: "$color-border",
+        thickness: "1px",
+        style: "solid",
+      },
+    }),
     light: {
       // --- No light-specific theme vars
     },

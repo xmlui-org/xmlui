@@ -16,4 +16,6 @@
   overflow: auto;
   direction: t.$direction;
   font-feature-settings: t.$font-feature-settings;
+
+  --stack-gap-default: #{t.$space-4};
 }

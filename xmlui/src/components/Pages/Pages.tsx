@@ -20,13 +20,14 @@ export const PageMd = createMetadata({
 export const pageRenderer = createComponentRenderer(
   PAGE,
   PageMd,
-  ({ node, extractValue, renderChild }) => {
+  ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <TableOfContentsProvider>
         <RouteWrapper
           childRoute={node.children}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
+          style={layoutCss}
         />
       </TableOfContentsProvider>
     );
