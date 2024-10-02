@@ -19,8 +19,8 @@ After trying our Starter App, visit the [Dive Deeper](#dive-deeper) section of t
 
 We have a starter app you can use to get acquainted with XMLUI. Download its zip file from here (link placeholder) and unzip it into a working folder.
 
-You need only a few things to try it:
-- Your favorite code editor. (We suggest you use [Visual Studio Code](https://code.visualstudio.com/download). It is a free tool running on Windows, Mac, and Linux.)
+You need only a couple of things to try it:
+- Your favorite text (code) editor.
 - A local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
 
 Start your web server using the unzipped sample folder as the root for serving static files, and visit the web server's default page in your browser.
@@ -68,26 +68,30 @@ Save the `Main.xmlui` file and refresh the app's page in the browser. The app no
 
 ## Modify a List's Display
 
-When you click the "API-Aware" menu item, the app displays a list with data fetched from the SpaceX API.
+When you click the "SpaceX List" menu item, the app displays a list with data fetched from the SpaceX API.
 
 <br/>
 <Image alt="App modified" src="/resources/images/get-started/spacex-list.png" />
 
 The SpaceX API endpoint in this sample retrieves other data fields, including links. After observing the markup, you will modify the UI to display those links and allow navigating to their targets.
 
-This functionality is a cooperation of a couple of components within `App`: `NavLink`, `Page`, and `ApiAware`:
+This functionality is a cooperation of a couple of components within `App`: `NavLink`, and `Page`:
 
-```ueml filename="Main.xmlui" {3,7,8}
+```ueml filename="Main.xmlui" {3,7-13} /NavLink/ /Page/
 <App>
   <NavPanel>
-    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="SpaceX List" to="/spacexlist" />
     <!-- Other menu items omitted -->
   </NavPanel>
   <Pages>
-    <Page url="/apiaware">
-      <ApiAware />
-      <!-- Other page items omitted -->
+    <Page url="/spacexlist">
+      <List datasource="https://api.spacexdata.com/v3/history">
+        <prop name="itemTemplate">
+          <Card title="{$item.title}" subTitle="{$item.details}" />
+        </prop>
+      </List>
     </Page>
+    <!-- Other Page items omitted -->
   </Pages>
   <!-- Other components omitted -->
 </App>
@@ -97,34 +101,13 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
   Components have **properties** that determine their appearance and behavior. Properties are declared as XML attributes when they can be represented with strings.
 </Callout>
 
-Components work together declaratively. `App` connects the `to` property of `NavLink` with the `url` property of `Page`. As a result, the particular page is displayed when you click the "API-Aware" menu item.
-
-### Extracting Components
-
-The page's content is outsourced into a reusable component, `ApiAware`, part of the application. Like other app-specific components, it is in the `components` folder.
-
-```ueml filename="components/ApiAware.xmlui"
-<Component name="ApiAware">
-  <List datasource="https://api.spacexdata.com/v3/history">
-    <property name="itemTemplate">
-      <Card title="{$item.title}" subTitle="{$item.details}" />
-    </property>
-  </List>
-</Component>
-```
-
-<Callout type="info" emoji="💡">
-  To avoid code repetition or organize your code, you can extract markup snippets in **reusable component definitions**. When you change this component's definition, all occurrences will render the modified markup.
-  Reusable components are stored in a separate `.xmlui` file within the `components` folder. The framework observes them and uses them in the markup.
-</Callout>
-
-This component displays a `List` that uses templates. Its `datasource` property specifies a URL to fetch the list's data.
+Components work together declaratively. `App` connects the `to` property of `NavLink` with the `url` property of `Page`. As a result, the particular page is displayed when you click the "SpaceX List" menu item.
 
 ### Components with Templates
 
 `List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its `itemTemplate` property. 
 
-```ueml copy {2-4} filename="components/ApiAware.xmlui" /datasource/
+```ueml copy {2-4} filename="Main.xmlui" /datasource/
 <List datasource="https://api.spacexdata.com/v3/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}" />
@@ -169,7 +152,7 @@ The specific endpoint of the SpaceX API (given in the `datasource` property of `
 
 Change the `Card` component to display the SpaceX and Wikipedia links and allow the user to navigate to them:
 
-```ueml copy {2-3} filename="components/ApiAware.xmlui"
+```ueml copy {2-3} filename="Main.xmlui"
 <Card title="{$item.title}" subTitle="{$item.details}">
   <Link to="{$item.links.article}" target="_blank">SpaceX</Link>
   <Link to="{$item.links.wikipedia}" target="_blank">Wikipedia</Link>
@@ -180,7 +163,6 @@ When you refresh the app in the browser, it will display the links. Click a link
 
 <br/>
 <Image alt="App modified" src="/resources/images/get-started/spacex-list-with-links.png" />
-
 
 ## Extend the App
 
@@ -216,7 +198,7 @@ This code declares a reusable component named `MyBox` with two properties, `colo
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
     <NavLink label="Simple" to="/simple" />
-    <NavLink label="API-Aware" to="/apiaware" />
+    <NavLink label="SpaceX List" to="/spacexlist" />
     <NavLink label="Composable" to="/composable" />
     <NavLink label="My Boxes" to="/myboxes" />
   </NavPanel>
