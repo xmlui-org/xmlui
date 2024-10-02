@@ -23,7 +23,12 @@ export const CarouselMd = createMetadata({
       null,
       "true",
     ),
-    controls: d("This property indicates whether the carousel displays the controls.", null, null, "true"),
+    controls: d(
+      "This property indicates whether the carousel displays the controls.",
+      null,
+      null,
+      "true",
+    ),
     autoplay: d(
       "This property indicates whether the carousel automatically scrolls.",
       null,
