@@ -165,6 +165,9 @@ export const useScrollbarWidth = () => {
 
   didCompute.current = true;
   widthRef.current = scrollbarWidth;
-
-  return scrollbarWidth;
+  if(window.devicePixelRatio !== Math.round(window.devicePixelRatio)){
+    //zoomed in a weird ratio, sometimes shows a horizontal scrollbar
+    widthRef.current = scrollbarWidth - 0.5;
+  }
+  return widthRef.current;
 };
