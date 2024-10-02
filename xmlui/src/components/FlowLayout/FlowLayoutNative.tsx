@@ -109,7 +109,7 @@ type FlowLayoutProps = {
   children: ReactNode;
 };
 
-export function FlowLayout({ style, columnGap, rowGap, children }: FlowLayoutProps) {
+export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps) {
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const safeColumnGap = numberOfChildren === 1 ? 0 : columnGap;
 

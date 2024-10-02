@@ -15,7 +15,7 @@ test("can render empty", async ({ page }) => {
 // "(horizontal) children with unspecified dimensions" -> width is content size, height is content size
 test("(horizontal) children with unspecified dimensions", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan">Text #1</Text>
     <Text testId="item_1" backgroundColor="yellow">Text #2</Text>
     <Text testId="item_2" backgroundColor="lightgreen">Text #3</Text>
@@ -47,7 +47,7 @@ test("(horizontal) children with unspecified dimensions", async ({ page }) => {
 // "(vertical) children with unspecified dimensions" -> width fills available space, height is content size
 test("(vertical) children with unspecified dimensions, orientation is implicit", async ({ page }) => {
   const code = `
-  <Stack testId="stack" backgroundColor="lightgray">
+  <Stack testId="stack" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan">Text #1</Text>
     <Text testId="item_1" backgroundColor="yellow">Text #2</Text>
     <Text testId="item_2" backgroundColor="lightgreen">Text #3</Text>
@@ -73,7 +73,7 @@ test("(vertical) children with unspecified dimensions, orientation is implicit",
 test("(horizontal) block children with unspecified dimensions", async ({ page }) => {
   const code = `
   <Fragment>
-    <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+    <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0">
       <Text testId="item_0" backgroundColor="cyan">Heading 1</Text>
       <Text testId="item_1" backgroundColor="yellow">Heading 2</Text>
       <Text testId="item_2" backgroundColor="lightgreen">Heading 3</Text>
@@ -102,7 +102,7 @@ test("(horizontal) block children with unspecified dimensions", async ({ page })
 // "(horizontal) children with fixed dimensions" -> Stack does not alter dimensions
 test("(horizontal) children with fixed dimensions", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal">
+  <Stack testId="stack" orientation="horizontal" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="72" height="36">72 x 36</Text>
     <Text testId="item_1" backgroundColor="yellow" width="144" height="72">144 x 72</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
@@ -131,7 +131,7 @@ test("(horizontal) children with fixed dimensions", async ({ page }) => {
 // "(vertical) children with fixed dimensions" -> Stack does not alter dimensions
 test("(vertical) children with fixed dimensions", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical">
+  <Stack testId="stack" orientation="vertical" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="72" height="36">72 x 36</Text>
     <Text testId="item_1" backgroundColor="yellow" width="144" height="72">144 x 72</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="64" height="48">64 x 48</Text>
@@ -159,7 +159,7 @@ test("(vertical) children with fixed dimensions", async ({ page }) => {
 // (horizontal) children with fixed width and unspecified height -> item height is the same as stack height
 test("(horizontal) children with fixed width and unspecified height", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal">
+  <Stack testId="stack" orientation="horizontal" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="72">W: 72</Text>
     <Text testId="item_1" backgroundColor="yellow" width="144">W: 144</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
@@ -189,7 +189,7 @@ test("(horizontal) children with fixed width and unspecified height", async ({ p
 // (vertical) children with fixed height and unspecified width -> width fills available space
 test("(vertical) children with fixed height and unspecified width ", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical">
+  <Stack testId="stack" orientation="vertical" gap="0">
     <Text testId="item_0" backgroundColor="cyan" height="36">H: 36</Text>
     <Text testId="item_1" backgroundColor="yellow" height="72">H: 72</Text>
     <Text testId="item_2" backgroundColor="lightgreen" height="48">H: 48 + long, long, long text</Text>
@@ -220,7 +220,7 @@ test("(vertical) children with fixed height and unspecified width ", async ({ pa
 // (horizontal) children with fixed height and unspecified width -> item widths are conent size, item heights are not altered
 test("(horizontal) children with fixed height and unspecified width", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal">
+  <Stack testId="stack" orientation="horizontal" gap="0">
     <Text testId="item_0" backgroundColor="cyan" height="36">H: 36</Text>
     <Text testId="item_1" backgroundColor="yellow" height="72">H: 72</Text>
     <Text testId="item_2" backgroundColor="lightgreen" height="48">H: 48</Text>
@@ -248,7 +248,7 @@ test("(horizontal) children with fixed height and unspecified width", async ({ p
 // (vertical) children with fixed width and unspecified height -> item heights are content size, widths are not altered
 test("(vertical) children with fixed width and unspecified height", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical">
+  <Stack testId="stack" orientation="vertical" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="72">W: 72</Text>
     <Text testId="item_1" backgroundColor="yellow" width="144">W: 144</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="48">W: 48 + long, long, long text</Text>
@@ -273,7 +273,7 @@ test("(vertical) children with fixed width and unspecified height", async ({ pag
 
 test("(horizontal) percentage sizing", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="20%">W: 20%</Text>
     <H2 testId="item_1" backgroundColor="yellow" width="50%">W: 50%</H2>
     <H5 testId="item_2" backgroundColor="lightgreen" width="20%">W: 20% + long, long, long text</H5>
@@ -296,7 +296,7 @@ test("(horizontal) percentage sizing", async ({ page }) => {
 
 test("(vertical) percentage sizing", async ({ page }) => {
   const code = `
-  <Stack testId="stack" height="180" orientation="vertical" backgroundColor="lightgray">
+  <Stack testId="stack" height="180" orientation="vertical" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" height="20%">W: 20%</Text>
     <Text testId="item_1" backgroundColor="yellow" height="50%">W: 50%</Text>
     <Text testId="item_2" backgroundColor="lightgreen" height="20%">W: 20% + long, long, long text</Text>
@@ -320,7 +320,7 @@ test("(vertical) percentage sizing", async ({ page }) => {
 
 test("(horizontal) percentage sizing fully filled", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="20%">W: 20%</Text>
     <H2 testId="item_1" backgroundColor="yellow" width="50%">W: 50%</H2>
     <H5 testId="item_2" backgroundColor="lightgreen" width="30%">W: 30% + long, long, long text</H5>
@@ -336,7 +336,7 @@ test("(horizontal) percentage sizing fully filled", async ({ page }) => {
 
 test("(vertical) percentage sizing fully filled", async ({ page }) => {
   const code = `
-  <Stack testId="stack" height="180" orientation="vertical" backgroundColor="lightgray">
+  <Stack testId="stack" height="180" orientation="vertical" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" height="20%">W: 20%</Text>
     <Text testId="item_1" backgroundColor="yellow" height="50%">W: 50%</Text>
     <Text testId="item_2" backgroundColor="lightgreen" height="30%">W: 30% + long, long, long text</Text>
@@ -353,7 +353,7 @@ test("(vertical) percentage sizing fully filled", async ({ page }) => {
 // (horizontal) percentage overflow X
 test("(horizontal) percentage overflow X", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray">
+  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="30%">W: 30%</Text>
     <H2 testId="item_1" backgroundColor="yellow" width="50%">W: 50%</H2>
     <H5 testId="item_2" backgroundColor="lightgreen" width="40%">W: 40% + long, long, long text</H5>
@@ -369,7 +369,7 @@ test("(horizontal) percentage overflow X", async ({ page }) => {
 // (vertical) percentage overflow Y
 test("(vertical) percentage overflow X", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical" height="180" backgroundColor="lightgray">
+  <Stack testId="stack" orientation="vertical" height="180" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" height="30%">H: 30%</Text>
     <H2 testId="item_1" backgroundColor="yellow" height="60%">H: 60%</H2>
     <H5 testId="item_2" backgroundColor="lightgreen" height="20%">H: 20% + long, long, long text</H5>
@@ -388,7 +388,7 @@ test("(vertical) percentage overflow X", async ({ page }) => {
 
 test("(horizontal) star sizing", async ({ page }) => {
   const code = `
-  <Stack testId="stack" width="100%" orientation="horizontal" backgroundColor="lightgray">
+  <Stack testId="stack" width="100%" orientation="horizontal" backgroundColor="lightgray" gap="0">
     <Text testId="item_0" backgroundColor="cyan" width="100">W: 100</Text>
     <Text testId="item_1" backgroundColor="yellow" width="3*">W: 3*</Text>
     <Text testId="item_2" backgroundColor="lightgreen" width="*">W: *</Text>
@@ -417,12 +417,12 @@ test("(horizontal) star sizing", async ({ page }) => {
 test("(horizontal) star sizing comparison", async ({ page }) => {
   const code = `
   <Fragment>
-    <Stack testId="stack_0" orientation="horizontal" width="600px">
+    <Stack testId="stack_0" orientation="horizontal" width="600px" gap="0">
       <Text testId="ref_item_0" backgroundColor="cyan" width="100">W: 100</Text>
       <Text testId="ref_item_1" backgroundColor="yellow" width="3*">W: 3*</Text>
       <Text testId="ref_item_2" backgroundColor="lightgreen" width="*">W: *</Text>
     </Stack>
-    <Stack testId="stack_1" orientation="horizontal" width="300px">
+    <Stack testId="stack_1" orientation="horizontal" width="300px" gap="0">
       <Text testId="item_0" backgroundColor="cyan" width="100">W: 100</Text>
       <Text testId="item_1" backgroundColor="yellow" width="3*">W: 3*</Text>
       <Text testId="item_2" backgroundColor="lightgreen" width="*">W: *</Text>
@@ -447,12 +447,12 @@ test("(horizontal) star sizing comparison", async ({ page }) => {
 test("(vertical) star sizing comparison", async ({ page }) => {
   const code = `
   <Fragment>
-    <Stack testId="stack_0" orientation="vertical" height="600px">
+    <Stack testId="stack_0" orientation="vertical" height="600px" gap="0">
       <Text testId="ref_item_0" backgroundColor="cyan" height="100">W: 100</Text>
       <Text testId="ref_item_1" backgroundColor="yellow" height="3*">W: 3*</Text>
       <Text testId="ref_item_2" backgroundColor="lightgreen" height="*">W: *</Text>
     </Stack>
-    <Stack testId="stack_1" orientation="vertical" height="300px">
+    <Stack testId="stack_1" orientation="vertical" height="300px" gap="0">
       <Text testId="item_0" backgroundColor="cyan" height="100">W: 100</Text>
       <Text testId="item_1" backgroundColor="yellow" height="3*">W: 3*</Text>
       <Text testId="item_2" backgroundColor="lightgreen" height="*">W: *</Text>
@@ -476,7 +476,7 @@ test("(vertical) star sizing comparison", async ({ page }) => {
 // (horizontal) gaps + percentage -> children use available space
 test("(horizontal) paddings + percentage", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray"
+  <Stack testId="stack" orientation="horizontal" backgroundColor="lightgray" gap="0"
     horizontalPadding="50" verticalPadding="50">
     <Text testId="item_0" backgroundColor="cyan" width="25%">W: 25%</Text>
     <Text testId="item_1" backgroundColor="yellow" width="50%">W: 50%</Text>
@@ -499,7 +499,7 @@ test("(horizontal) paddings + percentage", async ({ page }) => {
 // (vertical) gaps + percentage -> children use available space
 test("(vertical) paddings + percentage", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical" backgroundColor="lightgray"
+  <Stack testId="stack" orientation="vertical" backgroundColor="lightgray" gap="0"
     height="240" horizontalPadding="50" verticalPadding="50">
     <Text testId="item_0" backgroundColor="cyan" height="25%">H: 25%</Text>
     <Text testId="item_1" backgroundColor="yellow" height="50%">H: 50%</Text>
@@ -682,7 +682,7 @@ test("(horizontal) content wrapping", async ({ page }) => {
 
 test("(horizontal) horizontalAlignment center", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="horizontal" horizontalAlignment="center">
+  <Stack testId="stack" orientation="horizontal" horizontalAlignment="center" gap="0">
     <Stack testId="item_0" backgroundColor="red" height="36" width="36" />
     <Stack testId="item_1" backgroundColor="green" height="36" width="36" />
     <Stack testId="item_2" backgroundColor="blue" height="36" width="36" />
@@ -703,7 +703,7 @@ test("(horizontal) horizontalAlignment center", async ({ page }) => {
 
 test("(vertical) horizontal alignment end", async ({ page }) => {
   const code = `
-  <Stack testId="stack" orientation="vertical" horizontalAlignment="end">
+  <Stack testId="stack" orientation="vertical" horizontalAlignment="end" gap="0">
     <Stack testId="item_0" backgroundColor="red" height="36" width="36" />
     <Stack testId="item_1" backgroundColor="green" height="36" width="36" />
     <Stack testId="item_2" backgroundColor="blue" height="36" width="36" />
