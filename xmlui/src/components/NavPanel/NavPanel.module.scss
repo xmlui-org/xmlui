@@ -61,6 +61,8 @@ $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
 
 .logoWrapper{
   &:not(:empty){
+    display: flex;
+    justify-content: center;
     flex-shrink: 0;
     height: $height-NavPanel;
     padding-top: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});

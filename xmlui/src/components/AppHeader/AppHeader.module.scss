@@ -47,12 +47,14 @@ $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
 }
 
 .childrenWrapper {
+  --stack-gap-default: #{t.$space-2};
   display: flex;
   flex-direction: row;
   flex: 1;
   min-width: 0;
   height: 100%;
   align-items: center;
+  gap: var(--stack-gap-default);
 }
 
 .logoContainer:not(:empty) {

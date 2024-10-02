@@ -58,6 +58,17 @@ export function App({
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
+  const pagesWrapperInnerStyle = useMemo(()=>{
+    const {padding, paddingLeft, paddingRight, paddingTop,paddingBottom, ...rest} = style;
+    return {
+      ...rest,
+      "--page-padding-left": padding || paddingLeft,
+      "--page-padding-right": padding || paddingRight,
+      "--page-padding-top": padding || paddingTop,
+      "--page-padding-bottom": padding || paddingBottom
+    }
+  }, [style]);
+
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
@@ -182,7 +193,7 @@ export function App({
               </header>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
                 </ScrollContext.Provider>
               </div>
               <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -208,7 +219,7 @@ export function App({
               </header>
               <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                 <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
                 </ScrollContext.Provider>
               </div>
               <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -236,7 +247,7 @@ export function App({
               <main className={styles.contentWrapper}>
                 <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
                   <ScrollContext.Provider value={scrollContainerRef}>
-                    <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                    <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
                   </ScrollContext.Provider>
                 </div>
               </main>
@@ -270,7 +281,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
               </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -292,7 +303,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
               </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
@@ -318,7 +329,7 @@ export function App({
             </header>
             <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
               <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={style}>{children}</div>
+                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
               </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>

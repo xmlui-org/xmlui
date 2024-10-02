@@ -35,11 +35,22 @@ export function RouteWrapper({
     };
   }, [childRoute]);
 
+  const wrapperStyle = useMemo(()=>{
+    const {padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest} = style;
+    return {
+      ...rest,
+      "--page-padding-left-override": padding || paddingLeft,
+      "--page-padding-right-override": padding || paddingRight,
+      "--page-padding-top-override": padding || paddingTop,
+      "--page-padding-bottom-override": padding || paddingBottom
+    }
+  }, [style]);
+
   return (
     <div
       key={JSON.stringify(params)}
       className={classnames(styles.wrapper, "xmlui-page-root")}
-      style={style}
+      style={wrapperStyle}
     >
       {renderChild(wrappedWithContainer, layoutContext)}
     </div>

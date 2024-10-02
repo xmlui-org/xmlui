@@ -96,6 +96,9 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 
     .PagesWrapperInner{
       height: 100%;
+      &>:global(.xmlui-page-root){
+        height: 100%;
+      }
     }
 
     .footerWrapper{
@@ -116,6 +119,13 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
         padding-inline: var(--scrollbar-width);
       }
       margin-inline: calc(-1 * var(--scrollbar-width));
+    }
+
+    .footerWrapper{
+      margin-inline: calc(-1* var(--scrollbar-width));
+      &>div{
+        padding-inline: var(--scrollbar-width);
+      }
     }
 
     .verticalFullHeader{
@@ -221,10 +231,10 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
   flex-direction: column;
 
   &>:global(.xmlui-page-root){
-    padding-top: var(--page-padding-top);
-    padding-bottom: var(--page-padding-bottom);
-    padding-right: var(--page-padding-right);
-    padding-left: var(--page-padding-left);
+    padding-top: var(--page-padding-top-override, var(--page-padding-top));
+    padding-bottom: var(--page-padding-bottom-override, var(--page-padding-bottom));
+    padding-right: var(--page-padding-right-override, var(--page-padding-right));
+    padding-left: var(--page-padding-left-override, var(--page-padding-left));
     gap: var(--page-gap);
     margin-top: calc(-1 * var(--page-padding-top));
     margin-bottom: calc(-1 * var(--page-gap));

@@ -14,7 +14,8 @@ $themeVars: ();
   align-items: stretch;
   min-height: 0;
   min-width: 0;
-  
+  gap: var(--stack-gap-default);
+
   &.hoverContainer{
     :global(.display-on-hover){
       transition: opacity .1s;
@@ -40,7 +41,7 @@ $themeVars: ();
 .vertical {
   flex-direction: column;
   min-height: 0;
-  
+
   &.reverse{
     flex-direction: column-reverse;
   }

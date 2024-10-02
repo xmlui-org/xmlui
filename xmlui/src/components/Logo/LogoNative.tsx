@@ -7,5 +7,6 @@ export const Logo = ({ inDrawer, style }: { inDrawer?: boolean; style?: CSSPrope
   if (!logoUrl) {
     return null;
   }
-  return <Image src={logoUrl} alt={"Logo"} layout={style} />;
+  //width auto for safari
+  return <Image src={logoUrl} alt={"Logo"} layout={{ width: 'auto', ...style }} />;
 };
