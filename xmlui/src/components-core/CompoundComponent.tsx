@@ -52,6 +52,23 @@ export const CompoundComponent = forwardRef(
       return resolvedProps;
     }, [extractValue, lookupSyncCallback, node.props]);
 
+    // --- NI
+    const flattenedPropsInner = useMemo(() => {
+      const resolvedProps: any = {};
+      if (node.props) {
+        Object.entries(node.props).forEach(([key, value]) => {
+          const extractedProp = extractValue(value, true);
+          if (extractedProp?._ARROW_EXPR_) {
+            // --- Ensure arrow functions are called synchronously
+            resolvedProps[`$${key}`] = lookupSyncCallback(extractedProp);
+          } else {
+            resolvedProps[`$${key}`] = extractedProp;
+          }
+        });
+      }
+      return resolvedProps;
+    }, [extractValue, lookupSyncCallback, node.props]);
+
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
     // --- Wrap the `component` part with a container that manages the

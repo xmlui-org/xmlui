@@ -193,13 +193,11 @@ This code declares a reusable component named `MyBox` with two properties, `colo
 
 1. Open the `Main.xmlui` file and navigate to the `<NavPanel>` section. It contains several `<NavLink>` child items, each representing a menu item that can navigate to its corresponding UI page. Append a new one:
 
-```ueml copy {7}
+```ueml copy {5}
 <!-- ... -->
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
-    <NavLink label="Simple" to="/simple" />
     <NavLink label="SpaceX List" to="/spacexlist" />
-    <NavLink label="Composable" to="/composable" />
     <NavLink label="My Boxes" to="/myboxes" />
   </NavPanel>
 <!-- ... -->
@@ -234,11 +232,12 @@ Return to the browser and refresh the current page. Click the "My Boxes" item in
 
 Extend the `MyBox` component to display a toast when the box is clicked.
 
-```ueml copy filename="components/MyBox.xmlui" /onClick/ {5}
+```ueml copy filename="components/MyBox.xmlui" /onClick/ {6}
 <Component name="MyBox">
   <Stack 
     padding="12"
-    border="8px solid {$props.color}"
+    borderColor="{$props.color}"
+    borderThickness="8"
     onClick="toast('You clicked ' + $props.label)">
     {$props.label}
   </Stack>
@@ -262,7 +261,6 @@ The Starter App introduced the framework's fundamental concepts. As you learned,
 
 Here are a few more actions you can take to dive deeper into XMLUI:
 
-- Discover the source code files of the Starter App that were not mentioned in this article. We suggest you check the markup files in the `components` folder.
-- Try the [Personal Todo App](/p2do-app) tutorial. This article will teach you a few helpful components and simple patterns for creating apps.
+- Try the [Contact List Tutorial](/cl-app). This article will teach you a few helpful components and simple patterns for creating apps.
 - Visit the articles in the [Create XMLUI Apps](/create-apps) topic to learn in-depth information about specific concepts and components of the framework.
 - Observe the [How-to](/howto) section to learn about patterns that help you in a particular scenario.

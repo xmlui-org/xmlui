@@ -58,13 +58,13 @@ const sectionNames = {
   contextVars: "Context Values",
 };
 
-export function processDocfiles(metadata) {
+export function processDocfiles(metadata, importsToInject) {
   // Check for docs already in the output folder
   const docFiles = readdirSync(outFolder).filter((file) => extname(file) === ".mdx");
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, metadata);
+    componentNames = processMdx(component, componentNames, metadata, importsToInject);
   });
 
   // Write the _meta.json file
@@ -76,7 +76,7 @@ export function processDocfiles(metadata) {
   }
 }
 
-export function processMdx(component, componentNames, metadata) {
+export function processMdx(component, componentNames, metadata, importsToInject) {
   let result = "";
   let fileData = "";
 
@@ -90,21 +90,36 @@ export function processMdx(component, componentNames, metadata) {
     }
   }
 
-  const parent = component.specializedFrom
-    ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
-    : null;
+  logger.info(`Processing ${component.displayName}...`);
+
+  const parent = findParent(metadata, component);
+
+  // TODO: add check to throw warning if parent is not found
+  // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
 
   if (!!parent) {
     const parentDocs = `./${parent.displayName}.mdx`;
-    result += fileData || "There is no documentation for this component as of yet.";
-    result += `\n\n`;
-    result += `The parent component documentation can be found [here](${parentDocs}).`;
-  } else {
-    logger.info(`Processing ${component.displayName}...`);
 
+    result += importsToInject;
+
+    result += `# ${component.displayName}`;
+    result += appendArticleId(component.displayName);
+    result += "\n\n";
+
+    result += addComponentStatusDisclaimer(component.status);
+    result += addNonVisualDisclaimer(component.nonVisual);
+
+    result += addParentLinkLine(parent.displayName, parentDocs);
+
+    const siblings = findSiblings(metadata, component);
+    result += addSiblingLinkLine(siblings);
+
+    result += fileData || "There is no description for this component as of yet.";
+    result += `\n\n`;
+  } else {
     logger.info("Processing imports section");
-    // Add the Callout component import to the top of the file
-    result += `import { Callout } from "nextra/components";\n\n`;
+
+    result += importsToInject;
 
     const { buffer, copyFilePaths } = addImportsSection(fileData, component);
     if (buffer) {
@@ -112,7 +127,9 @@ export function processMdx(component, componentNames, metadata) {
       copyImports(copyFilePaths);
     }
 
-    result += `# ${component.displayName}\n\n`;
+    result += `# ${component.displayName}`;
+    result += appendArticleId(component.displayName);
+    result += "\n\n";
 
     result += addComponentStatusDisclaimer(component.status);
     result += addNonVisualDisclaimer(component.nonVisual);
@@ -428,6 +445,39 @@ function stripMetaDirectives(sectionLines) {
   return buffer;
 }
 
+function findParent(metadata, component) {
+  return component.specializedFrom
+    ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
+    : null;
+}
+
+function addParentLinkLine(parentName, parentDocs) {
+  const result = parentName
+    ? `This component is inherited from [${parentName}](${parentDocs})`  // temp: need to use SmartLink
+    : "";
+  return result ? `${result}\n\n` : "";
+}
+
+function findSiblings(metadata, component) {
+  return metadata.filter(
+    (otherComponent) =>
+      otherComponent.specializedFrom === component.specializedFrom &&
+      otherComponent.displayName !== component.displayName,
+  );
+}
+
+function addSiblingLinkLine(siblings = []) {
+  const result =
+    siblings?.length > 0
+      ? `See also: ${siblings
+          .map((sibling) => {
+            return `[${sibling.displayName}](./${sibling.displayName}.mdx)`;  // temp: need to use SmartLink
+          })
+          .join(", ")}`
+      : "";
+  return result ? `${result}\n\n` : "";
+}
+
 function copyImports(imports) {
   try {
     imports.forEach((importPath) => {
@@ -482,8 +532,9 @@ function addComponentStatusDisclaimer(status) {
       disclaimer = "";
       break;
     case "experimental":
-      disclaimer = "This component is in an **experimental** state; you can use it in your app. " +
-      "However, we may modify it, and it may even have breaking changes in the future.";
+      disclaimer =
+        "This component is in an **experimental** state; you can use it in your app. " +
+        "However, we may modify it, and it may even have breaking changes in the future.";
       break;
     case "deprecated":
       disclaimer =
@@ -498,6 +549,11 @@ function addComponentStatusDisclaimer(status) {
   }
 
   return disclaimer !== "" ? `<Callout type="info" emoji="ℹ️">${disclaimer}</Callout>\n\n` : "";
+}
+
+function appendArticleId(articleId) {
+  if (!articleId) return "";
+  return ` [#component-${articleId.toLocaleLowerCase().replace(" ", "-")}]`;
 }
 
 function addNonVisualDisclaimer(isNonVisual) {

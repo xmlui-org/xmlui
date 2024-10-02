@@ -1,25 +1,25 @@
 import { fileURLToPath } from "url";
-import { basename, join, dirname, extname } from "path";
+import { basename, join, dirname, extname, relative } from "path";
+import { existsSync } from "fs";
 import { unlink, readdir, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
-import { processError, createTable, ErrorWithSeverity } from "./utils.mjs";
+import { processError, createTable, ErrorWithSeverity, convertPath } from "./utils.mjs";
 import loadConfig from "./input-handler.mjs";
+import { buildPagesMap } from "./build-pages-map.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
-// get these variables from config
+// TODO: get these variables from config
 const scriptFolder = import.meta.dirname;
 const projectRootFolder = join(dirname(fileURLToPath(import.meta.url)), "../../../");
 const docsFolderRoot = join(projectRootFolder, "docs");
-const componentDocsFolder = join(docsFolderRoot, "pages", "components");
+const metaFolder = join(docsFolderRoot, "meta");
+const pagesMapFile = join(metaFolder, "pages.js");
+const pagesFolder = join(docsFolderRoot, "pages");
+const componentDocsFolder = join(pagesFolder, "components");
 const componentDocsFolderName = basename(componentDocsFolder);
-
-/*
-const inputComponentsFolder = join(projectRootFolder, "xmlui", "src", "components");
-const componentSamplesFolder = join(docsFolderRoot, "component-samples");
-*/
 
 // --- Load Config
 
@@ -69,6 +69,12 @@ if (config.cleanFolder) {
   logger.info(`Cleaning ${componentDocsFolderName}`);
   try {
     await removeAllFilesInFolder(componentDocsFolder);
+    
+    // recreate pages map file
+    if (existsSync(pagesMapFile)) {
+      await unlink(pagesMapFile);
+      await writeFile(pagesMapFile, "");  
+    }
   } catch (error) {
     processError(error);
   }
@@ -88,7 +94,11 @@ if (config.exportToJson) {
 // --- Process Docs & Export Files
 
 logger.info("Processing MDX files");
-processDocfiles(metadata);
+
+const pagesMapFileName = basename(pagesMapFile);
+const importsToInject = `import { Callout } from "nextra/components";\n` +
+  `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
+processDocfiles(metadata, importsToInject);
 
 // --- Create Summary
 
@@ -103,6 +113,15 @@ try {
     },
   );
   await writeFile(join(docsFolderRoot, "pages", `${componentDocsFolderName}.mdx`), summary);
+} catch (error) {
+  processError(error);
+}
+
+// --- Generate Pages Map
+
+logger.info("Generating Pages Map");
+try {
+  buildPagesMap(pagesFolder, pagesMapFile);
 } catch (error) {
   processError(error);
 }
