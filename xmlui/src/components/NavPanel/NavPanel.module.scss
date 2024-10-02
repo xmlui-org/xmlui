@@ -12,7 +12,6 @@ $themeVars: t.appendBorderVars($themeVars, $component) !global;
 $color-bg-NavPanel: createThemeVar("color-bg-#{$component}");
 $shadow-NavPanel: createThemeVar("shadow-#{$component}");
 $height-NavPanel: createThemeVar("height-AppHeader");
-$border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
 $max-content-width-NavPanel: createThemeVar("max-content-width-App");
 $padding-horizontal-NavPanel: createThemeVar("padding-horizontal-#{$component}");
 $padding-horizontal-logo-NavPanel: createThemeVar("padding-horizontal-logo-#{$component}");
@@ -42,10 +41,6 @@ $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
     box-shadow: none;
     height: $height-NavPanel;
 
-    &:not(.condensed){
-      border-bottom: $border-bottom-NavPanel;
-    }
-
     .wrapperInner{
       height: 100%;
       flex-direction: row;
@@ -66,6 +61,8 @@ $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
 
 .logoWrapper{
   &:not(:empty){
+    display: flex;
+    justify-content: center;
     flex-shrink: 0;
     height: $height-NavPanel;
     padding-top: calc(#{$padding-vertical-logo-NavPanel} + #{$padding-vertical-AppHeader});

@@ -10,6 +10,7 @@ $themeVars: ();
 // --- Theme vars for paddings
 $component: "Footer";
 $themeVars: t.appendPaddingVars($themeVars, $component) !global;
+$themeVars: t.appendBorderVars($themeVars, $component) !global;
 
 // --- Other theme vars
 $color-bg-Footer: createThemeVar("color-bg-#{$component}");
@@ -22,14 +23,16 @@ $vertical-alignment-Footer: createThemeVar("vertical-alignment-#{$component}");
 $max-content-width-Footer: createThemeVar("max-content-width-#{$component}");
 
 .outerWrapper{
+  @include t.borderVars($themeVars, $component);
   background-color: $color-bg-Footer;
+  height: $height-Footer;
 }
 
 .wrapper {
   width: 100%;
   display: flex;
   min-height: 0;
-  height: $height-Footer;
+  height: 100%;
   flex-direction: row;
   padding-left: $padding-horizontal-Footer;
   padding-right: $padding-horizontal-Footer;
