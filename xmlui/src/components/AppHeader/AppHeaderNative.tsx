@@ -10,8 +10,8 @@ import { useAppLayoutContext } from "@components/App/AppLayoutContext";
 import { Button } from "@components/Button/ButtonNative";
 import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
-import {NavLink} from "@components/NavLink/NavLinkNative";
-import {useAppContext} from "@components-core/AppContext";
+import { NavLink } from "@components/NavLink/NavLinkNative";
+import { useAppContext } from "@components-core/AppContext";
 
 type Props = {
   children?: ReactNode;
@@ -60,6 +60,7 @@ export const AppHeader = ({
   titleContent,
 }: Props) => {
   const { mediaSize } = useAppContext();
+  const logoUrl = useLogoUrl();
   const safeLogoTitle =
     mediaSize.sizeIndex < 2 ? null : !titleContent && title ? (
       <NavLink to={"/"} displayActive={false} style={{ paddingLeft: 0 }}>
@@ -68,6 +69,7 @@ export const AppHeader = ({
     ) : (
       titleContent
     );
+
   return (
     <div className={classnames(styles.header, className)} style={style}>
       <div
@@ -83,22 +85,26 @@ export const AppHeader = ({
             style={{ color: "inherit", flexShrink: 0 }}
           />
         )}
-        {(showLogo || !navPanelVisible) &&
-          (logoContent ? (
-            <>
-              <div className={styles.customLogoContainer}>{logoContent}</div>
-              {safeLogoTitle}
-            </>
-          ) : (
-            <>
-              <div className={styles.logoContainer}>
-                <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
-                  <Logo />
-                </NavLink>
-              </div>
-              {safeLogoTitle}
-            </>
-          ))}
+        <div className={styles.logoAndTitle}>
+          {(showLogo || !navPanelVisible) &&
+              (logoContent ? (
+                  <>
+                    <div className={styles.customLogoContainer}>{logoContent}</div>
+                    {safeLogoTitle}
+                  </>
+              ) : (
+                  <>
+                    {!!logoUrl && (
+                        <div className={styles.logoContainer}>
+                          <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
+                            <Logo />
+                          </NavLink>
+                        </div>
+                    )}
+                    {safeLogoTitle}
+                  </>
+              ))}
+        </div>
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
       </div>

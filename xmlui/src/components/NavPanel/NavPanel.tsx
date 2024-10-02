@@ -20,7 +20,7 @@ export const NavPanelMd = createMetadata({
   defaultThemeVars: {
     [`color-bg-${COMP}`]: "transparent",
     ...borderSubject(COMP, {}),
-    [`padding-horizontal-${COMP}`]: "$space-4",
+    [`padding-horizontal-${COMP}`]: "0",
     [`padding-vertical-logo-${COMP}`]: "$space-4",
     [`padding-horizontal-logo-${COMP}`]: "$space-4",
     [`margin-bottom-logo-${COMP}`]: "$space-4",
