@@ -91,8 +91,8 @@ export const carouselComponentRenderer = createComponentRenderer(
     return (
       <CarouselComponent
         style={layoutCss}
-        indicators={extractValue(node.props?.indicators)}
-        controls={extractValue(node.props?.controls)}
+        indicators={extractValue.asOptionalBoolean(node.props?.indicators)}
+        controls={extractValue.asOptionalBoolean(node.props?.controls)}
         orientation={extractValue(node.props?.orientation)}
         onDisplayDidChange={lookupEventHandler("displayDidChange")}
         autoplay={extractValue.asOptionalBoolean(node.props?.autoplay)}
