@@ -1,7 +1,6 @@
 import { writeFileSync, readdirSync, statSync, readFileSync } from "fs";
-import { posix, extname, parse } from "path";
+import { posix, extname } from "path";
 import { convertPath, strBufferToLines } from "./utils.mjs";
-import { logger } from "./logger.mjs";
 
 const pathCutoff = "pages";
 const acceptedExtensions = [".mdx", ".md"];
@@ -27,7 +26,7 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
           acceptedExtensions.includes(extname(item.name))) &&
         !rejectedFileNames.includes(item.name)
       ) {
-        const articleId = getArticleId(item.path); /* ?? parse(item.path).name */
+        const articleId = getArticleId(item.path);
         if (articleId) {
           pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
             .split(pathCutoff)[1]
@@ -71,16 +70,19 @@ function getArticleId(articlePath) {
     const match = line.match(/^#\s+.+?(\s*\[#[\w-]+\])?$/);
     if (!match) continue;
     if (match[1]) {
-      // Has ID
+      // Has ID, extract it and use that
       return match[1].replace(/ \[#(.*?)\]/, (_, p1) => p1);
     } else {
-      // Needs generated ID
-      logger.info("No ID found, generating new one");
-      return undefined;
+      // Generate new ID from the article title
+      return match[0].slice(1);
     }
   }
 }
 
 function normalizeToArticleId(rawStr) {
-  return rawStr.trim().toLocaleUpperCase().replaceAll("-", "_");
+  return rawStr
+    .trim()
+    .toLocaleUpperCase()
+    .replaceAll(/[^A-Za-z0-9_]/g, "_")
+    .replace(/__+/g, "_");  // <- remove duplicates
 }
