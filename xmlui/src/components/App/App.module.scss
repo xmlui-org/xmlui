@@ -128,7 +128,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
       }
     }
 
-    .verticalFullHeader{
+    &.verticalFullHeader{
       .content{
         margin-inline: calc(-1* var(--scrollbar-width));
       }
