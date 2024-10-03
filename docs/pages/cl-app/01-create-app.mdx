@@ -18,10 +18,14 @@ When your app starts, it displays this page:
 The app is straightforward, as its single markup file, `Main.xmlui` (the entry point of an XMLUI app), shows:
 
 ```ueml copy filename="Main.xmlui"
-<App>
-  <AppHeader title="Contact Management" />
+<App layout="vertical-sticky">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ThemeChangerButton showSettings="false" />
+  </AppHeader>  
   <NavPanel>
-    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="Home" to="/" />
   </NavPanel>
   <Pages>
     <Page url="/">Home</Page>
@@ -31,6 +35,8 @@ The app is straightforward, as its single markup file, `Main.xmlui` (the entry p
   </Footer>
 </App>
 ```
+
+The application uses the `vertical-sticky` layout, which renders a vertical menu on the left side of the app and provides a sticky header and footer above and below the main content area. The `AppHeader` defines a title and allows a `ThemeChangerButton` to choose between light and dark themes.
 
 <Callout type="info" emoji="💡">
   The `App` component automatically **displays a logo** when the configuration file contains a logo declaration.
@@ -43,8 +49,8 @@ The Contact List starter app has such a definition in the `config.json` file:
   "name": "Contact List Tutorial",
   "version": "1.0.0",
   "resources": {
-    "logo": "resources/xmlui-logo.svg",
-    "logo-dark": "resources/xmlui-logo-dark.svg",
+    "logo": "resources/crm-logo.svg",
+    "logo-dark": "resources/crm-logo-dark.svg",
     "favicon": "resources/favicon.ico",
   }
 }
@@ -91,9 +97,13 @@ The default app uses a horizontal layout with a single menu function, Home. The 
 
 Open the `Main.xmlui` file in your editor and change its contents to the following:
 
-```ueml copy filename="Main.xmlui" /layout="vertical-full-header"/ {3-10}
-<App layout="vertical-full-header">
-  <AppHeader title="Contact Management" />
+```ueml copy filename="Main.xmlui" /layout="vertical-full-header"/ {7-14}
+<App layout="vertical-sticky">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ThemeChangerButton showSettings="false" />
+  </AppHeader>  
   <NavPanel>
     <NavLink label="Dashboard" to="/" />
     <NavLink label="Contacts" to="/contacts" />

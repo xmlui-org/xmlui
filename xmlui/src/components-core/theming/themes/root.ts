@@ -224,6 +224,12 @@ export const RootThemeDefinition: ThemeDefinition = {
     "padding-normal": "$space-4",
     "padding-loose": "$space-8",
 
+    // --- Predefined spaces
+    "space-none": "$space-0",
+    "space-tight": "$space-2",
+    "space-normal": "$space-4",
+    "space-loose": "$space-8",
+
     // --- Font used for body
     "font-weight": "$font-weight-normal",
 

@@ -1,79 +1,90 @@
+import { Callout } from 'nextra/components'
+
 # Filter Data
 
-In the previous article, you created and customized a list of tasks. That list displayed all tasks retrieved from the database. However, you often want to display only a subset of tasks, such as overdue tasks. In this article, you will learn how you can filter data.
+In the previous article, you created and customized a list of contacts. That list displayed all contacts retrieved from the database. However, you often want to display only a subset of them, such as contacts with their review overdue. In this article, you will learn how you can filter data.
 
 Technically, you have two different options for data filtering in a client-server scenario:
 1. You call a particular API with the filter condition to retrieve only the requested data.
 2. You get the data from the backend and filter it on the client side.
 
-> **Note**: You may combine these two options: query some pre-filtered data from the backend and apply further filtering in the UI.
+<Callout type="info" emoji="📔">
+  You may combine these two options: query some pre-filtered data from the backend and apply further filtering in the UI.
+</Callout>
 
 In this article, you will implement the filtering functionality with both options.
 
 ## Create Filter Pages
 
-Add a few new menu functions with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/tasks` URL representing all tasks to `/tasks/all`. Set up each page to display only the related filter's name:
+Add a few new menu items with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/contacts` URL representing all contacts to `/contacts/all`. Set up each page to display only the related filter's name:
 
-```ueml copy {7-11, 15, 23-26} filename="Main.xmlui"
+```ueml copy {9-13, 16, 24-27} filename="Main.xmlui"
 <App layout="vertical-full-header">
   <AppHeader>
-    <Text variant="title">Personal Todo App</Text>
-  </AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ThemeChangerButton showSettings="false" />
+  </AppHeader>  
   <NavPanel>
     <NavLink label="Dashboard" to="/" />
-    <NavLink label="All Tasks" to="/tasks/all" />
-    <NavLink label="Overdue" to="/tasks/overdue"/>
-    <NavLink label="Today" to="/tasks/today"/>
-    <NavLink label="Upcoming" to="/tasks/upcoming"/>
-    <NavLink label="Completed" to="/tasks/completed"/>
-  </NavPanel>
+    <NavLink label="All Contacts" to="/contacts/all" />
+    <NavLink label="Overdue Reviews" to="/contacts/overdue"/>
+    <NavLink label="Today's Reviews" to="/contacts/today"/>
+    <NavLink label="Upcoming Reviews" to="/contacts/upcoming"/>
+    <NavLink label="Completed Reviews" to="/contacts/completed"/>  </NavPanel>
   <Pages>
     <Page url="/">Dashboard</Page>
-    <Page url="/tasks/all">
-      <Datasource id="topics" url="/api/topics" />
-      <List datasource="/api/tasks">
-        <prop name="itemTemplate">
-          <TaskRow item="{$item}" topicsList="{topics.value}" />
-        </prop>
+    <Page url="/contacts/all">
+      <Datasource id="categories" url="/api/categories" />
+      <List datasource="/api/contacts">
+        <property name="itemTemplate">
+          <ContactRow item="{$item}" categories="{categories.value}" />
+        </property>
       </List>
     </Page>
-    <Page url="/tasks/overdue">Overdue</Page>
-    <Page url="/tasks/today">Today</Page>
-    <Page url="/tasks/upcoming">Upcoming</Page>
-    <Page url="/tasks/completed">Completed</Page>
+    <Page url="/contacts/overdue">Overdue</Page>
+    <Page url="/contacts/today">Today</Page>
+    <Page url="/contacts/upcoming">Upcoming</Page>
+    <Page url="/contacts/completed">Completed</Page>
   </Pages>
-  <Footer>Powered by XMLUI</Footer>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
 </App>
 ```
 
-The URLs specified at a particular `NavLink` tag will navigate to the page determined by the matching `Page` tag. For example, selecting the Overdue menu item displays this UI:
+The URLs specified at a particular `NavLink` tag will navigate to the page determined by the matching `Page` tag. For example, selecting the Overdue Reviews menu item displays this UI:
 
 <br/>
-<Image alt="Task menus" src="/resources/images/get-started/task-menus.png" />
+<Image alt="Task menus" src="/resources/images/get-started/contact-menus.png" />
 
 ## Filter on the Client
 
-First, let's focus on filtering the data on the client side. In this scenario, you fetch all data from the backend but filter it before assigning it to the displayed list. All lists use the same logic; the only difference is how they filter the task data. 
+First, let's focus on filtering the data on the client side. In this scenario, you fetch all data from the backend but filter it before assigning it to the displayed list. All lists use the same logic; the only difference is how they filter the contact data. 
 
-### A Reusable `Tasks` Component
+### A Reusable `Contacts` Component
 
 Let's extract this functionality into a new component that receives a filtering function:
 
-Create a new file, `Tasks.xmlui` in the `components` folder, and add this content:
+Create a new file, `Contacts.xmlui` in the `components` folder, and add this content:
 
-```ueml copy filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <Datasource id="tasks" url="/api/tasks" />
-    <List items="{tasks.value.filter($props.predicate)}">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
+```ueml copy filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts" />
+    <List items="{contacts.value.filter($props.predicate)}">
+      <property name="itemTemplate">
+        <ContactRow item="{$item}" categories="{categories.value}" />
+      </property>
     </List>
 </Component>
 ```
 
-The `Tasks` component declares a new `Datasource` to fetch all tasks from the backend. Recall that previously, you set the `data source` property of the `List` to bind it to the fetched data. You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`. Instead, filter the tasks accordingly by using a predicate function (passed in the `predicate` component property).
+The `Contacts` component declares a new `Datasource` to fetch all contacts from the backend. Previously, you set the `datasource` property of the `List` to bind it to the fetched data. You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`. Instead, filter the contacts by using a predicate function (passed in the `predicate` component property).
+
+<Callout type="info" emoji="📔">
+  A predicate function accepts a contact record and retrieves a boolean value to indicate whether that particular contact should be in the filtered set.
+</Callout>
 
 Update all `Page` tags in the `Main.xmlui` file to use the new `Tasks` component:
 
@@ -81,34 +92,34 @@ Update all `Page` tags in the `Main.xmlui` file to use the new `Tasks` component
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
-  <Page url="/tasks/all">
-    <Tasks predicate="{t => true}"/>
+  <Page url="/contacts/all">
+    <Contacts predicate="{t => true}"/>
   </Page>
-  <Page url="/tasks/overdue">
-    <Tasks predicate="{t => true}"/>
+  <Page url="/contacts/overdue">
+    <Contacts predicate="{t => true}"/>
   </Page>
-  <Page url="/tasks/today">
-    <Tasks predicate="{t => true}"/>
+  <Page url="/contacts/today">
+    <Contacts predicate="{t => true}"/>
   </Page>
-  <Page url="/tasks/upcoming">
-    <Tasks predicate="{t => true}"/>
+  <Page url="/contacts/upcoming">
+    <Contacts predicate="{t => true}"/>
   </Page>
-  <Page url="/tasks/completed">
-    <Tasks predicate="{t => true}"/>
+  <Page url="/contacts/completed">
+    <Contacts predicate="{t => true}"/>
   </Page>
 </Pages>
 <!-- Omitted -->
 ```
 
-In this code, you use the same predicate, `t => true`, for each `Tasks` independently from the desired filtering. As it is evident, this predicate will match with every task, so using `Tasks` with the `t => true` predicate will represent all tasks.
+In this code, you use the same predicate, `t => true`, for each `Contacts` independently from the desired filtering. This predicate will match with every task, so using `Contacts` with the `t => true` predicate will represent all contacts retrieved from the backend.
 
-Now, when you visit any of the task-related menu functions, the UI displays all tasks.
+Now, when you visit any of the contact-related menu functions, the UI displays all contacts.
 
 <br/>
-<Image alt="Task predicates" src="/resources/images/get-started/task-predicates.png" />
+<Image alt="Contact predicates" src="/resources/images/get-started/contact-predicates.png" />
 
 
-Though tasks still need to be filtered, the new structure makes it easy. To implement a particular filter, you pass the appropriate predicate function to the `Task` component.
+Though contacts still need to be filtered, the new structure makes it easy. To implement a particular filter, you pass the appropriate predicate function to the `Contact` component.
 
 ### Update Predicates
 
@@ -117,129 +128,125 @@ Let's finish the job and create the appropriate predicates!
 Create a new `Main.xmlui.xs` file in the `src` folder. As you learned earlier, this is a code-behind file for `Main.xmlui`. Add this function definition to the file:
 
 ```javascript copy filename="Main.xmlui.xs"
-function getSection(task) {
-  if (task.completed) return 'Completed';
-  if (!task.dueDate) return 'No Due Date';
-  if (isToday(task.dueDate)) return 'Today';
-  return (getDate(task.dueDate) < getDate()) 
+function getSection(contact) {
+  if (contact.reviewCompleted) return 'Completed';
+  if (!contact.reviewDueDate) return 'No Due Date';
+  if (isToday(contact.reviewDueDate)) return 'Today';
+  return (getDate(contact.reviewDueDate) < getDate()) 
     ? 'Overdue' 
     : 'Upcoming'
 }
 ```
 
-This function returns one of these section values of the input task: `Completed`, `No Due Date`, `Today`, `Overdue`, or `Upcoming`.
+This function returns one of these section values of the input contact: `Completed`, `No Due Date`, `Today`, `Overdue`, or `Upcoming`.
 
-Change the `predicate` properties of `Tasks` components in `Main.xmlui`:
+Change the `predicate` properties of `Contacts` components in `Main.xmlui`:
 
 ```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
-  <Page url="/tasks/all">
-    <Tasks predicate="{t => true}" />
+  <Page url="/contacts/all">
+    <Contacts predicate="{t => true}"/>
   </Page>
-  <Page url="/tasks/overdue">
-    <Tasks predicate="{t => getSection(t) === 'Overdue'}" />
+  <Page url="/contacts/overdue">
+    <Contacts predicate="{t => getSection(t) === 'Overdue'}"/>
   </Page>
-  <Page url="/tasks/today">
-    <Tasks predicate="{t => getSection(t) === 'Today'}" />
+  <Page url="/contacts/today">
+    <Contacts predicate="{t => getSection(t) === 'Today'}"/>
   </Page>
-  <Page url="/tasks/upcoming">
-    <Tasks predicate="{t => getSection(t) === 'Upcoming'}" />
+  <Page url="/contacts/upcoming">
+    <Contacts predicate="{t => getSection(t) === 'Upcoming'}"/>
   </Page>
-  <Page url="/tasks/completed">
-    <Tasks predicate="{t => getSection(t) === 'Completed'}" />
+  <Page url="/contacts/completed">
+    <Contacts predicate="{t => getSection(t) === 'Completed'}"/>
   </Page>
 </Pages>
 <!-- Omitted -->
 ```
 
-Now, the task list filtering works as expected. When you check the list of overdue tasks, it contains only those tasks belonging to that category.
+Now, contact filtering works as expected. The list of today's reviews contains only contacts belonging to that category.
 
 <br/>
-<Image alt="Overdue tasks" src="/resources/images/get-started/task-overdue.png" />
+<Image alt="Today's Reviews" src="/resources/images/get-started/review-today.png" />
 
-### Display Task Counts
+### Display Contact Counts
 
-From a UX point of view, it would be excellent to display the number of tasks in a particular category with the menu items to indicate, for example, that today we have two tasks to complete.
+From a UX point of view, it would be excellent to display the number of contacts in a particular section with the menu items to indicate, for example, that today we have two reviews to complete.
 
-This feature requires a different approach: you cannot postpone getting a particular task category count while the user selects that category in the menu; we must query it when the app starts.
+This feature requires a different approach: you cannot postpone getting a particular contact section count while the user selects that section in the menu; we must query it when the app starts.
 
-These are the changes you carry out to implement this feature:
+With the following steps, you query all contacts when the app starts and create variables that hold the contact records for a particular section:
 
-1. Create a `Datasource` within the main component.
-2. Add variables that keep the records in a particular task category.
-3. Update the `Tasks` component to use those variables in the data source.
-4. Extend the menu item labels with task counts.
+1. Create a `Datasource` within the main component to fetch the count values for all sections.
+2. Add variables that keep the records in a particular contact section.
+3. Update the `Contacts` component to use those variables in the data source.
+4. Extend the menu item labels with contact counts.
 
 #### Create a `Datasource`
 
-Navigate to the `Main.xmlui` file and add this `Datasource` declaration:
+Navigate to the `Main.xmlui` file and add this `Datasource` declaration (after `AppHeader`):
 
-```ueml copy {4} filename="Main.xmlui"
-<AppHeader>
-  <Text variant="title">Personal Todo App</Text>
-</AppHeader>
-<Datasource id="tasks" url="/api/tasks" />
+```ueml copy {2} filename="Main.xmlui"
+<!-- Insert after AppHeader -->
+<Datasource id="contacts" url="/api/contacts" />
 <NavPanel>
   <!-- Omitted -->
 </NavPanel>
 <!-- Omitted -->
 ```
 
-You can access the current data under this `Datasource` using the `tasks.value` expression (`tasks` identifies the `Datasource`, `value` represents the fetched data).
+You can access the current data under this `Datasource` using the `contacts.value` expression (`contacxts` identifies the `Datasource`, `value` represents the fetched data).
 
 #### Add Task Category Variables
 
-Add these variable definitions to the `Main.xmlui.xs` file:
+Append these variable definitions to the `Main.xmlui.xs` file:
 
 ```javascript copy filename="Main.xmlui.xs"
-var allTasks = tasks.value.filter(t => true);
-var overdueTasks = tasks.value.filter(t => getSection(t) === "Overdue");
-var todayTasks = tasks.value.filter(t => getSection(t) === "Today");
-var upcomingTasks = tasks.value.filter(t => getSection(t) === "Upcoming");
-var completedTasks = tasks.value.filter(t => getSection(t) === "Completed");
+var allContacts = contacts.value.filter(t => true);
+var overdueContacts = contacts.value.filter(t => getSection(t) === "Overdue");
+var todayContacts = contacts.value.filter(t => getSection(t) === "Today");
+var upcomingContacts = contacts.value.filter(t => getSection(t) === "Upcoming");
+var completedContacts = contacts.value.filter(t => getSection(t) === "Completed");
 ```
 
 Each variable represents a particular task category. XMLUI variables are reactive variables: whenever a dependency on the right side (after the equal sign) of the variable definition changes, the engine re-evaluates the variable's values and ensures that all dependent objects, including the UI, are updated.
 
-These variable definitions cause the engine to recalculate all task categories whenever the tasks in the data source change.
+#### Update the `Contacts` Component
 
-#### Update the `Tasks` Component
+You moved the `Datasource` component to the main component, so you no longer need it in `Contacts`. You will pass the contacts to display in the `data` property (see `$props.data`) of `Contacts`:
 
-You moved the `Datasource` component to the main component, so you no longer need it in `Tasks`.  You will pass the tasks to display in the `data` property (see `$props.data`) of `Tasks`:
-
-```ueml copy filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-    <List items="{$props.data}">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-    </List>
+```ueml copy filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <List items="{$props.data}">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
+  </List>
 </Component>
 ```
 
-Update the occurrences of `Tasks` in `Main.xmlui` to pass the variables in `data`:
+Update the occurrences of `Contacts` in `Main.xmlui` to pass the variables in `data`:
 
 ```ueml copy {4, 7, 10, 13, 16} filename="Main.xmlui"
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
-  <Page url="/tasks/all">
-    <Tasks data="{allTasks}" />
+  <Page url="/contacts/all">
+    <Contacts data="{allContacts}" />
   </Page>
-  <Page url="/tasks/overdue">
-    <Tasks data="{overdueTasks}" />
+  <Page url="/contacts/overdue">
+    <Contacts data="{overdueContacts}" />
   </Page>
-  <Page url="/tasks/today">
-    <Tasks data="{todayTasks}" />
+  <Page url="/contacts/today">
+    <Contacts data="{todayContacts}" />
   </Page>
-  <Page url="/tasks/upcoming">
-    <Tasks data="{upcomingTasks}" />
+  <Page url="/contacts/upcoming">
+    <Contacts data="{upcomingContacts}" />
   </Page>
-  <Page url="/tasks/completed">
-    <Tasks data="{completedTasks}" />
+  <Page url="/contacts/completed">
+    <Contacts data="{completedContacts}" />
   </Page>
 </Pages>
 <!-- Omitted -->
@@ -247,55 +254,57 @@ Update the occurrences of `Tasks` in `Main.xmlui` to pass the variables in `data
 
 #### Extend the Menu Item Labels
 
-Only one step remains: extend the `NavItem` labels with the expressions to display the task counts:
+Only one step remains: extend the `NavItem` labels with the expressions to display the contact record counts:
 
 ```ueml copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />
-  <NavLink label="All Tasks ({allTasks.length})" to="/tasks/all" />
-  <NavLink label="Overdue ({overdueTasks.length})" to="/tasks/overdue"/>
-  <NavLink label="Today ({todayTasks.length})" to="/tasks/today"/>
-  <NavLink label="Upcoming ({upcomingTasks.length})" to="/tasks/upcoming"/>
-  <NavLink label="Completed ({completedTasks.length})" to="/tasks/completed"/>
+  <NavLink label="All Contacts ({allContacts.length})" to="/contacts/all" />
+  <NavLink label="Overdue Reviews ({overdueContacts.length})" to="/contacts/overdue"/>
+  <NavLink label="Today's Reviews ({todayContacts.length})" to="/contacts/today"/>
+  <NavLink label="Upcoming Reviews ({upcomingContacts.length})" to="/contacts/upcoming"/>
+  <NavLink label="Completed Reviews ({completedContacts.length})" to="/contacts/completed"/>
 </NavPanel>
 <!-- Omitted -->
 ```
 
-When you run the app, it displays the task counts in the menu item labels:
+When you run the app, it displays the contact record counts in the menu item labels:
 
 <br/>
-<Image alt="Completed tasks" src="/resources/images/get-started/task-counts.png" />
+<Image alt="Completed tasks" src="/resources/images/get-started/contact-counts.png" />
 
 ## Filter on the Server
 
-So far, the app has used a single API endpoint, `/api/tasks` to receive all task records. However, the API has other endpoints to get filtered data, as the following URLs suggest:
+So far, the app has used a single API endpoint, `/api/contacts` to receive all contact records. However, the API has other endpoints to get filtered data, as the following URLs suggest:
 
-- `/api/tasks/overdue`
-- `/api/tasks/today`
-- `/api/tasks/upcoming`
-- `/api/tasks/completed`
+- `/api/contacts/overdue`
+- `/api/contacts/today`
+- `/api/contacts/upcoming`
+- `/api/contacts/completed`
 
-In this section, you will change the code to get filtered task data from the backend.
+In this section, you will change the code to get filtered contact data from the backend.
 
-### Update `Tasks`
+### Update `Contacts`
 
-Change the definition of the `Tasks` component by removing the `Datasource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
+Change the definition of the `Contacts` component by removing the `Datasource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
 
-```ueml copy {3} filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-    <List datasource="/api/tasks/{$props.filter}">
-      <prop name="itemTemplate">
-        <TaskRow item="{$item}" topics="{topics.value}" />
-      </prop>
-    </List>
+```ueml copy {3} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <List datasource="/api/contacts/{$props.filter}">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
+  </List>
 </Component>
 ```
 
-> **Note**: If the changes are not complete, the app will stop working and display error messages. Ignore them; they will go away soon.
+<Callout>
+  At this point, the changes are not complete, the app will stop working and display error messages when you refresh the browser. Ignore them; they will go away soon.
+</Callout>
 
-The predicates you used with client-side filtering are now within the backend's logic. When you invoke a particular `/api/tasks/<filterTag>` endpoint, the backend will apply the proper filtering. The `Tasks` component receives its filter tag through the `filter` property.
+The predicates you used with client-side filtering are now within the backend's logic. When you invoke a particular `/api/contacts/<filterTag>` endpoint, the backend will apply the proper filtering. The `Contacts` component receives its filter tag through the `filter` property.
 
 ### Update Filter Tags
 
@@ -307,69 +316,65 @@ Change the `Main.xmlui` file to use the filter tags instead of predicates:
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
-  <Page url="/tasks/all">
-    <Tasks filter=""/>
+  <Page url="/contacts/all">
+    <Contacts filter="" />
   </Page>
-  <Page url="/tasks/overdue">
-    <Tasks filter="overdue" />
+  <Page url="/contacts/overdue">
+    <Contacts filter="overdue" />
   </Page>
-  <Page url="/tasks/today">
-    <Tasks filter="today" />
+  <Page url="/contacts/today">
+    <Contacts filter="today" />
   </Page>
-  <Page url="/tasks/upcoming">
-    <Tasks filter="upcoming" />
+  <Page url="/contacts/upcoming">
+    <Contacts filter="upcoming" />
   </Page>
-  <Page url="/tasks/completed">
-    <Tasks filter="completed" />
+  <Page url="/contacts/completed">
+    <Contacts filter="completed" />
   </Page>
 </Pages>
 <!-- Omitted -->
 ```
 
-Now, the app gets the task information filtered in the backend. To make sure the previous error messages (due to the incomplete app) go away, refresh the app in the browser:
+Now, the app gets the contact information filtered in the backend. To make sure the previous error messages (due to the incomplete app) go away, refresh the app in the browser:
 
 <br/>
 <Image alt="Completed tasks" src="/resources/images/get-started/filter-completed.png" />
 
-### Update Task Counts
+### Update Contact Counts
 
-You can see that the menu items show "(undefined)" instead of the current task count. This situation resulted from removing the `DataSource` from `Main.xmlui`, which was used to calculate task counts.
+You can see that the menu items show "(undefined)" instead of the current contact count. This situation resulted from removing the `DataSource` from `Main.xmlui`, which was used to calculate contact counts.
 
-The API has an endpoint, `/api/taskcounts`, retrieving the task category counts in an object with properties `all`, `overdue`, `today`, `upcoming`, and `completed`, each representing a particular task category.
+The API has an endpoint, `/api/contactcounts`, retrieving the task category counts in an object with properties `all`, `overdue`, `today`, `upcoming`, and `completed`, each representing a particular contact section.
 
-Add a new `Datasource` to the `Main.xmlui` file to fetch the task counts:
+Add a new `Datasource` to the `Main.xmlui` file to fetch the contact counts:
 
-```ueml copy {4} filename="Main.xmlui"
-<AppHeader>
-  <Text variant="title">Personal Todo App</Text>
-</AppHeader>
-<Datasource id="taskcounts" url="/api/taskcounts" />
+```ueml copy {2} filename="Main.xmlui"
+<AppHeader title="Contact Management" />
+<Datasource id="contactCounts" url="/api/contactcounts" />
 <NavPanel>
   <!-- Omitted -->
 </NavPanel>
 <!-- Omitted -->
 ```
 
-Update the menu item labels to use the task counts retrieved from the server:
+Update the menu item labels to use the contact counts retrieved from the server:
 
 ```ueml copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />
-  <NavLink label="All Tasks ({taskcounts.value.all})" to="/tasks/all" />
-  <NavLink label="Overdue ({taskcounts.value.overdue})" to="/tasks/overdue"/>
-  <NavLink label="Today ({taskcounts.value.today})" to="/tasks/today"/>
-  <NavLink label="Upcoming ({taskcounts.value.upcoming})" to="/tasks/upcoming"/>
-  <NavLink label="Completed ({taskcounts.value.completed})" to="/tasks/completed"/>
+  <NavLink label="All Contacts ({contactCounts.value.all})" to="/contacts/all" />
+  <NavLink label="Overdue Reviews ({contactCounts.value.overdue})" to="/contacts/overdue"/>
+  <NavLink label="Today's Reviews ({contactCounts.value.today})" to="/contacts/today"/>
+  <NavLink label="Upcoming Reviews ({contactCounts.value.upcoming})" to="/contacts/upcoming"/>
+  <NavLink label="Completed Reviews ({contactCounts.value.completed})" to="/contacts/completed"/>
 </NavPanel>
 <!-- Omitted -->
 ```
 
-When you run the app, the task counts are displayed in the menu item labels:
-
-With this step, the task counts are displayed again:
+With this step, the contact counts are displayed again (refresh the browser to see the changes):
 
 <br/>
-<Image alt="Completed tasks" src="/resources/images/get-started/task-counts.png" />
+<Image alt="Completed tasks" src="/resources/images/get-started/contact-counts.png" />
 
-Now that you learned how to retrieve and filter data on the client or the backend site, it is time to add a few polishing steps to the app. The following article will show you those steps.
+Now that you learned how to retrieve and filter data on the client or the backend site, it is time to add a few polishing steps to the app. The following article will show you them.

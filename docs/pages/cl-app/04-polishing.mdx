@@ -1,20 +1,22 @@
+import { Callout } from 'nextra/components'
+
 ## A Few Polishing Touches
 
 There are a few things to improve the user experience in our app. In this section, you will make minor changes to enhance the app's look and feel.
 
 ## Loading Label Counts
 
-When the app starts, it takes a fraction of a second to reach the backend and retrieve the task record counts to display. You may see an "(undefined)" label for task counts during this time. We can quickly fix it to show a "loading..." message while the task data is retrieved from the database.
+When the app starts, it takes a fraction of a second to reach the backend and retrieve the contact record counts to display. You may see an "(undefined)" label for contact counts during this time. We can quickly fix it to show a "loading..." message while the contact data is retrieved from the database.
 
-Add a new variable, `countLabel` to `Main.xmlui.xs`:
+Add a new function, `countLabel` to `Main.xmlui.xs`:
 
 ```javascript copy filename="Main.xmlui.xs"
-var countLabel = (cat) => taskcounts.inProgress 
-  ? "loading..." 
-  : taskcounts.value[cat];
+function countLabel(cat) { 
+  return contactCounts.inProgress ? "loading..." : contactCounts.value[cat];
+}
 ```
 
-This variable represents a function taking a name (the name of the task category) as its argument and retrieves the corresponding task category count. The `taskcounts.inProgress` property's "true" value indicates if the `Datasource` retrieving the task counts is fetching data.
+This function takes a name (the name of the contact section) as its argument and retrieves the corresponding contact category count. The `contactCounts.inProgress` property's "true" value indicates if the `Datasource` (with the `contactCounts` id) retrieving the contact counts is currently fetching data.
 
 Update the task count expression in the menu item labels to leverage the new, improved display:
 
@@ -22,88 +24,91 @@ Update the task count expression in the menu item labels to leverage the new, im
 <!-- Omitted -->
 <NavPanel>
   <NavLink label="Dashboard" to="/" />
-  <NavLink label="All Tasks ({countLabel('all')})" to="/tasks/all" />
-  <NavLink label="Overdue ({countLabel('overdue')})" to="/tasks/overdue"/>
-  <NavLink label="Today ({countLabel('today')})" to="/tasks/today"/>
-  <NavLink label="Upcoming ({countLabel('upcoming')})" to="/tasks/upcoming"/>
-  <NavLink label="Completed ({countLabel('completed')  })" to="/tasks/completed"/>
+  <NavLink label="All Contacts ({countLabel('all')})" to="/contacts/all" />
+  <NavLink label="Overdue Reviews ({countLabel('overdue')})" to="/contacts/overdue"/>
+  <NavLink label="Today's Reviews ({countLabel('today')})" to="/contacts/today"/>
+  <NavLink label="Upcoming Reviews ({countLabel('upcoming')})" to="/contacts/upcoming"/>
+  <NavLink label="Completed Reviews ({countLabel('completed')})" to="/contacts/completed"/>
 </NavPanel>
 <!-- Omitted -->
 ```
 
-Instead of "undefined", task count labels display "loading...":
+Instead of "undefined", contact count labels display "loading...":
 
 <br/>
 <Image alt="Completed tasks" src="/resources/images/get-started/loading-message.png" />
 
 ## Displaying List Sections
 
-The `List` component supports sections that group list items according to a particular section value. You will update the All Task list to leverage this feature.
+The `List` component supports sections that group list items according to a particular section value. You will update the All Contacts list to leverage this feature.
 
 ### Extending Tasks with Sections
 
 The `List` has a `sectionBy` property that you can set to one of the field names in the items to display. The `List` gets all distinct values of the `sectionBy` field and groups the items accordingly.
 
-We have already created the `getSections` function within `Main.xmlui.xs`, perfect as a sectioning expression. However, now it is in the `Main.xmlui.xs` file, though we need it in the `Tasks` component.
+We have already created the `getSections` function within `Main.xmlui.xs`, perfect as a sectioning expression. However, now it is in the `Main.xmlui.xs` file, though we need it in the `Contacts` component.
 
-Create a code-behind file for `Tasks` within the `components` folder (`Tasks.xmlui.xs`). Move the `getSections` function from `Main.xmlui.xs`:
+Create a code-behind file for `Contacts` within the `components` folder (`Contacts.xmlui.xs`). Move the `getSections` function from `Main.xmlui.xs`:
 
-```javascript copy filename="Tasks.xmlui.xs"
-function getSection(task) {
-  if (task.completed) return "Completed";
-  if (!task.dueDate) return "No Due Date";
-  if (isToday(task.dueDate)) return "Today";
-  return getDate(task.dueDate) < getDate() ? "Overdue" : "Upcoming";
+```javascript copy filename="Contacts.xmlui.xs"
+function getSection(contact) {
+  if (contact.reviewCompleted) return "Completed";
+  if (!contact.reviewDueDate) return "No Due Date";
+  if (isToday(contact.reviewDueDate)) return "Today";
+  return getDate(contact.reviewDueDate) < getDate() ? "Overdue" : "Upcoming";
 }
 ```
 
-Update the code of `Tasks` to add a `section` field to the task items:
+Update the code of `Contacts` to add a `section` field to the contact items:
 
-```ueml copy {3-4} filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-  <List items="{tasks.value.map(t => ({...t, section: getSection(t)}))}">
-    <prop name="itemTemplate">
-      <TaskRow item="{$item}" topics="{topics.value}" />
-    </prop>
+```ueml copy {3-4} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <List items="{contacts.value.map(t => ({...t, section: getSection(t)}))}">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
   </List>
 </Component>
 ```
 
-> **Note**: Here, the `items` property of `List` receives a list of items, each extended with the section information.
+<Callout type="info" emoji="📔">
+  Here, the `items` property of `List` receives a list of items, each extended with the section information.
+</Callout>
 
 ### Defining sections
 
 To display section information, add the `section` property to the `List` and define the template to display section headers:
 
-```ueml copy {6, 10-15} filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
+```ueml copy {6, 10-16} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
-    items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
-    <prop name="itemTemplate">
-      <TaskRow item="{$item}" topics="{topics.value}" />
-    </prop>
-    <prop name="sectionTemplate">
-      <HStack horizontalPadding="$space-4" verticalPadding="$space-2">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
+    <property name="sectionTemplate">
+      <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle" 
-          value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
+          value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
       </HStack>
-    </prop>
+    </property>
   </List>
 </Component>
 ```
+
 In the section template, you can utilize the `$item` property to access the section key and the items within that section.
 
-To complete this job, append the following function to `Tasks.xmlui.xs`:
+To complete this job, append the following function to `Contacts.xmlui.xs`:
 
-```javascript copy filename="Tasks.xmlui.xs"
-function loading(tasks, count) {
-  return tasks.inProgress ? "loading..." : count;
+```javascript copy filename="Contacts.xmlui.xs"
+function loading(contacts, count) {
+  return contacts.inProgress ? "loading..." : count;
 }
 ```
 
@@ -114,43 +119,43 @@ Now, When you display all tasks, you can see that items are sectioned:
 
 ### Expanding and Collapsing Sections
 
-The sections of a list can be expanded or collapsed. Unless you declare otherwise, all sections are expanded by default. Besides `$items`, each section receives a `$context` object, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
+The sections of a list can be expanded or collapsed. Unless you declare otherwise, all sections are expanded by default. Besides `$items`, each section receives a `$context` value, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
 
-Update the `List` definition in `Tasks`:
+Update the `List` definition in `Contacts`:
 
-```ueml copy {9-21} filename="Tasks.xmlui"
-<!-- Omitted -->
-<List 
-  items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
-  sectionBy="section">
-  <prop name="itemTemplate">
-    <TaskRow item="{$item}" topics="{topics.value}" />
-  </prop>
-  <prop name="sectionTemplate">
-    <HStack 
-      horizontalPadding="$space-4" 
-      verticalPadding="$space-2"
-      verticalAlignment="center"
-      onClick="() => $context.toggle()">
-        <Text 
-          variant="subtitle" 
-          value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
-      <SpaceFiller />
-      <Icon 
-        name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
-        size="md" />  
-    </HStack>
-  </prop>
-</List>
-<!-- Omitted -->
+```ueml copy {10-24} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <List 
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+    sectionBy="section">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
+    <property name="sectionTemplate">
+      <HStack 
+        horizontalPadding="$space-normal" 
+        verticalPadding="$space-tight"
+        verticalAlignment="center"
+        onClick="() => $context.toggle()">
+          <Text 
+            variant="subtitle" 
+            value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
+        <SpaceFiller />
+        <Icon 
+          name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
+          size="md" />  
+      </HStack>
+    </property>
+  </List>
+</Component>
 ```
 
 Now, you can expand or collapse sections by clicking them. The following figure shows the Completed section in its collapsed state:
 
 <br/>
 <Image alt="collapsed sections" src="/resources/images/get-started/section-collapsed.png" />
-
-> **Note**: You can set the `sectionsInitiallyExpanded` property to `false` to display all sections in a collapsed state when showing the list.
 
 ### Section Ordering
 
