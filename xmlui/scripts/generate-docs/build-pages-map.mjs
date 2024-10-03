@@ -1,5 +1,5 @@
 import { writeFileSync, readdirSync, statSync, readFileSync } from "fs";
-import { posix, extname, parse } from "path";
+import { posix, extname } from "path";
 import { convertPath, strBufferToLines } from "./utils.mjs";
 import { logger } from "./logger.mjs";
 
@@ -9,7 +9,8 @@ const acceptedFileNames = [];
 const rejectedFileNames = [];
 
 export function buildPagesMap(pagesFolder, outFilePathAndName) {
-  let pages = "";
+  //let pages = "";
+  const pages = [];
   traverseDirectory({ name: "", path: pagesFolder }, (item, _) => {
     /**
      * name: the folder's/file's name (eg. "hello-app-engine")
@@ -27,17 +28,31 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
           acceptedExtensions.includes(extname(item.name))) &&
         !rejectedFileNames.includes(item.name)
       ) {
-        const articleId = getArticleId(item.path); /* ?? parse(item.path).name */
+        const articleId = getArticleId(item.path);
         if (articleId) {
-          pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
-            .split(pathCutoff)[1]
-            ?.replace(extension, "")}";\n`;
+          pages.push({
+            id: normalizeToArticleId(articleId),
+            path: item.path.split(pathCutoff)[1]?.replace(extension, "")
+          });
         }
       }
     }
   });
 
-  writeFileSync(outFilePathAndName, pages);
+  const { pages: filteredPages, duplicates } = indicateAndRemoveDuplicateIds(pages);
+  if (duplicates.length) {
+    logger.warning(`Duplicate entries found when collecting article IDs and paths:`);
+    duplicates.forEach((item) => {
+      logger.warning(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
+    });
+  }
+
+  const pagesStr = filteredPages.reduce((acc, curr) => {
+    acc += `export const ${curr.id} = "${curr.path}";\n`;
+    return acc;
+  }, "");
+
+  writeFileSync(outFilePathAndName, pagesStr);
 }
 
 /**
@@ -71,16 +86,35 @@ function getArticleId(articlePath) {
     const match = line.match(/^#\s+.+?(\s*\[#[\w-]+\])?$/);
     if (!match) continue;
     if (match[1]) {
-      // Has ID
+      // Has ID, extract it and use that
       return match[1].replace(/ \[#(.*?)\]/, (_, p1) => p1);
     } else {
-      // Needs generated ID
-      logger.info("No ID found, generating new one");
-      return undefined;
+      // Generate new ID from the article title
+      return match[0].slice(1);
     }
   }
 }
 
 function normalizeToArticleId(rawStr) {
-  return rawStr.trim().toLocaleUpperCase().replaceAll("-", "_");
+  return rawStr
+    .trim()
+    .toLocaleUpperCase()
+    .replaceAll(/[^A-Za-z0-9_]/g, "_")
+    .replace(/__+/g, "_");  // <- remove duplicates
+}
+
+function indicateAndRemoveDuplicateIds(pagesData) {
+  const idSet = new Set();
+  const duplicates = [];
+  pagesData.forEach((item) => {
+    if (idSet.has(item.id)) {
+      duplicates.push(item);
+    }
+    idSet.add(item.id);
+  });
+
+  return {
+    pages: pagesData.filter((item) => !duplicates.includes(item)),
+    duplicates,
+  };
 }

@@ -48,6 +48,9 @@ export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
             },
             {
               type: "VStack",
+              props: {
+                gap: 0,
+              },
               children: [
                 {
                   type: "Slot",

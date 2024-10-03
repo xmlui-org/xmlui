@@ -12,7 +12,7 @@ import {
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
-import { createTable, processError, ErrorWithSeverity } from "./utils.mjs";
+import { createTable, processError, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -76,7 +76,7 @@ export function processDocfiles(metadata, importsToInject) {
   }
 }
 
-export function processMdx(component, componentNames, metadata, importsToInject) {
+function processMdx(component, componentNames, metadata, importsToInject) {
   let result = "";
   let fileData = "";
 
@@ -92,9 +92,10 @@ export function processMdx(component, componentNames, metadata, importsToInject)
 
   logger.info(`Processing ${component.displayName}...`);
 
-  const parent = component.specializedFrom
-    ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
-    : null;
+  const parent = findParent(metadata, component);
+
+  // TODO: add check to throw warning if parent is not found
+  // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
 
   if (!!parent) {
     const parentDocs = `./${parent.displayName}.mdx`;
@@ -108,9 +109,13 @@ export function processMdx(component, componentNames, metadata, importsToInject)
     result += addComponentStatusDisclaimer(component.status);
     result += addNonVisualDisclaimer(component.nonVisual);
 
-    result += fileData || "There is no documentation for this component as of yet.";
+    result += addParentLinkLine(parent.displayName, parentDocs);
+
+    const siblings = findSiblings(metadata, component);
+    result += addSiblingLinkLine(siblings);
+
+    result += fileData || "There is no description for this component as of yet.";
     result += `\n\n`;
-    result += `The parent component documentation can be found <SmartLink href="${parentDocs}">here</SmartLink>.`;
   } else {
     logger.info("Processing imports section");
 
@@ -413,7 +418,7 @@ function resolveSection(data, startDirective, endDirective) {
   }
 
   let section = match[1].substring(0, match[1].indexOf(endDirective));
-  let sectionLines = section.split(/\r?\n/);
+  let sectionLines = strBufferToLines(section);
 
   // Replace this with a function that handles META directives
   sectionLines = stripMetaDirectives(sectionLines);
@@ -438,6 +443,39 @@ function stripMetaDirectives(sectionLines) {
   });
 
   return buffer;
+}
+
+function findParent(metadata, component) {
+  return component.specializedFrom
+    ? metadata.find((otherComponent) => otherComponent.displayName === component.specializedFrom)
+    : null;
+}
+
+function addParentLinkLine(parentName, parentDocs) {
+  const result = parentName
+    ? `This component is inherited from [${parentName}](${parentDocs})`  // temp: need to use SmartLink
+    : "";
+  return result ? `${result}\n\n` : "";
+}
+
+function findSiblings(metadata, component) {
+  return metadata.filter(
+    (otherComponent) =>
+      otherComponent.specializedFrom === component.specializedFrom &&
+      otherComponent.displayName !== component.displayName,
+  );
+}
+
+function addSiblingLinkLine(siblings = []) {
+  const result =
+    siblings?.length > 0
+      ? `See also: ${siblings
+          .map((sibling) => {
+            return `[${sibling.displayName}](./${sibling.displayName}.mdx)`;  // temp: need to use SmartLink
+          })
+          .join(", ")}`
+      : "";
+  return result ? `${result}\n\n` : "";
 }
 
 function copyImports(imports) {
@@ -485,7 +523,7 @@ function isDirectory(filePath) {
   }
 }
 
-// --- Section helpers
+// --- Section helpers (string manipulation)
 
 function addComponentStatusDisclaimer(status) {
   let disclaimer = "";
@@ -494,8 +532,9 @@ function addComponentStatusDisclaimer(status) {
       disclaimer = "";
       break;
     case "experimental":
-      disclaimer = "This component is in an **experimental** state; you can use it in your app. " +
-      "However, we may modify it, and it may even have breaking changes in the future.";
+      disclaimer =
+        "This component is in an **experimental** state; you can use it in your app. " +
+        "However, we may modify it, and it may even have breaking changes in the future.";
       break;
     case "deprecated":
       disclaimer =

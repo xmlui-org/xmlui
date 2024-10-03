@@ -121,7 +121,7 @@ test("3 item 25% width, 1 item 25.1% wraps", async ({ page }) => {
   const itemWidthPercentBigger = "25.1%";
 
   const entryPoint = `
-  <FlowLayout testId="layout" width="${PAGE_WIDTH}">
+  <FlowLayout testId="layout" width="${PAGE_WIDTH}" gap="0">
     <Stack backgroundColor="red" height="${itemHeight}" width="${itemWidthPercent}">
     </Stack>
     <Stack backgroundColor="green" height="${itemHeight}" width="${itemWidthPercent}">
@@ -321,7 +321,7 @@ test("no horizontal overflow", async ({ page }) => {
   const itemHeight = 64;
   const bigWidths = { percent: "120%", px: "1000000000px", em: "1000000000em" };
   const entryPoint = `
-  <FlowLayout testId="layout">
+  <FlowLayout testId="layout" gap="0">
     <Stack testId="item0" border="solid 6px black" backgroundColor="red" height="${itemHeight}" width="${bigWidths.percent}">
     </Stack>                
     <Stack testId="item1" border="solid 6px black" backgroundColor="green" height="${itemHeight}" width="${bigWidths.px}">
@@ -352,7 +352,7 @@ test("SpaceFiller adds line break", async ({ page }) => {
   const itemWidth = "20%";
 
   const entryPoint = `
-  <FlowLayout testId="layout">
+  <FlowLayout testId="layout" gap="0">
     <Stack backgroundColor="red" height="${itemHeight}" width="${itemWidth}">
     </Stack>
     <Stack backgroundColor="blue" height="${itemHeight}" width="${itemWidth}">
