@@ -93,6 +93,8 @@ $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
 }
 
 .rightItems {
+  --stack-gap-default: #{t.$space-2};
+  gap: var(--stack-gap-default);
   height: 100%;
 
   &:not(:empty) {

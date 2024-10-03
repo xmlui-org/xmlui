@@ -41,11 +41,16 @@ $padding-vertical-AppHeader: createThemeVar("padding-vertical-AppHeader");
     box-shadow: none;
     height: $height-NavPanel;
 
+
+    &:not(.condensed){
+      .wrapperInner{
+        padding-inline: $padding-horizontal-NavPanel;
+      }
+    }
     .wrapperInner{
       height: 100%;
       flex-direction: row;
       max-width: $max-content-width-NavPanel;
-      padding-inline: $padding-horizontal-NavPanel;
       //align-items: center;
       width: 100%;
       margin: 0 auto;
