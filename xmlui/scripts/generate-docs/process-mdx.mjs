@@ -76,7 +76,7 @@ export function processDocfiles(metadata, importsToInject) {
   }
 }
 
-export function processMdx(component, componentNames, metadata, importsToInject) {
+function processMdx(component, componentNames, metadata, importsToInject) {
   let result = "";
   let fileData = "";
 

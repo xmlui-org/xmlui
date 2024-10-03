@@ -8,7 +8,8 @@ const acceptedFileNames = [];
 const rejectedFileNames = [];
 
 export function buildPagesMap(pagesFolder, outFilePathAndName) {
-  let pages = "";
+  //let pages = "";
+  const pages = [];
   traverseDirectory({ name: "", path: pagesFolder }, (item, _) => {
     /**
      * name: the folder's/file's name (eg. "hello-app-engine")
@@ -28,9 +29,10 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
       ) {
         const articleId = getArticleId(item.path);
         if (articleId) {
-          pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
+          pages.push({articleId: normalizeToArticleId(articleId), path: item.path.split(pathCutoff)[1]?.replace(extension, "")});
+          /* pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
             .split(pathCutoff)[1]
-            ?.replace(extension, "")}";\n`;
+            ?.replace(extension, "")}";\n`; */
         }
       }
     }
@@ -85,4 +87,16 @@ function normalizeToArticleId(rawStr) {
     .toLocaleUpperCase()
     .replaceAll(/[^A-Za-z0-9_]/g, "_")
     .replace(/__+/g, "_");  // <- remove duplicates
+}
+
+function handleDuplicateIds(pagesData) {
+  const idSet = new Set();
+  
+  for (const item of pagesData) {
+    if (idSet.has(item.id)) {
+      return true;
+    }
+    
+    idSet.add(item.id);
+  }
 }
