@@ -461,7 +461,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (errFromScanner !== undefined) {
         let err: GeneralDiagnosticMessage;
         if (errFromScanner.message.code === ErrCodes.invalidChar) {
-          err = MakeErr.invalidChar(scanner.getText());
+          err = MakeErr.invalidChar(scanner.getTokenText());
         } else {
           err = errFromScanner.message;
         }
