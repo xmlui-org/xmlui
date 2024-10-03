@@ -12,7 +12,7 @@ import {
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, Logger } from "./logger.mjs";
-import { createTable, processError, ErrorWithSeverity } from "./utils.mjs";
+import { createTable, processError, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
 
 // temp
 const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
@@ -418,7 +418,7 @@ function resolveSection(data, startDirective, endDirective) {
   }
 
   let section = match[1].substring(0, match[1].indexOf(endDirective));
-  let sectionLines = section.split(/\r?\n/);
+  let sectionLines = strBufferToLines(section);
 
   // Replace this with a function that handles META directives
   sectionLines = stripMetaDirectives(sectionLines);
@@ -523,7 +523,7 @@ function isDirectory(filePath) {
   }
 }
 
-// --- Section helpers
+// --- Section helpers (string manipulation)
 
 function addComponentStatusDisclaimer(status) {
   let disclaimer = "";

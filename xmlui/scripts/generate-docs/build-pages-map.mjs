@@ -1,6 +1,7 @@
 import { writeFileSync, readdirSync, statSync, readFileSync } from "fs";
 import { posix, extname } from "path";
 import { convertPath, strBufferToLines } from "./utils.mjs";
+import { logger } from "./logger.mjs";
 
 const pathCutoff = "pages";
 const acceptedExtensions = [".mdx", ".md"];
@@ -29,16 +30,29 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
       ) {
         const articleId = getArticleId(item.path);
         if (articleId) {
-          pages.push({articleId: normalizeToArticleId(articleId), path: item.path.split(pathCutoff)[1]?.replace(extension, "")});
-          /* pages += `export const ${normalizeToArticleId(articleId)} = "${item.path
-            .split(pathCutoff)[1]
-            ?.replace(extension, "")}";\n`; */
+          pages.push({
+            id: normalizeToArticleId(articleId),
+            path: item.path.split(pathCutoff)[1]?.replace(extension, "")
+          });
         }
       }
     }
   });
 
-  writeFileSync(outFilePathAndName, pages);
+  const { pages: filteredPages, duplicates } = indicateAndRemoveDuplicateIds(pages);
+  if (duplicates.length) {
+    logger.warning(`Duplicate entries found when collecting article IDs and paths:`);
+    duplicates.forEach((item) => {
+      logger.warning(`Removed duplicate ID: ${item.id} - Path: ${item.path}`);
+    });
+  }
+
+  const pagesStr = filteredPages.reduce((acc, curr) => {
+    acc += `export const ${curr.id} = "${curr.path}";\n`;
+    return acc;
+  }, "");
+
+  writeFileSync(outFilePathAndName, pagesStr);
 }
 
 /**
@@ -89,14 +103,18 @@ function normalizeToArticleId(rawStr) {
     .replace(/__+/g, "_");  // <- remove duplicates
 }
 
-function handleDuplicateIds(pagesData) {
+function indicateAndRemoveDuplicateIds(pagesData) {
   const idSet = new Set();
-  
-  for (const item of pagesData) {
+  const duplicates = [];
+  pagesData.forEach((item) => {
     if (idSet.has(item.id)) {
-      return true;
+      duplicates.push(item);
     }
-    
     idSet.add(item.id);
-  }
+  });
+
+  return {
+    pages: pagesData.filter((item) => !duplicates.includes(item)),
+    duplicates,
+  };
 }

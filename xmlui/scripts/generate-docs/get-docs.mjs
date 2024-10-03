@@ -5,7 +5,7 @@ import { unlink, readdir, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
-import { processError, createTable, ErrorWithSeverity, convertPath } from "./utils.mjs";
+import { processError, createTable, ErrorWithSeverity, convertPath, strBufferToLines } from "./utils.mjs";
 import loadConfig from "./input-handler.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 
@@ -205,8 +205,4 @@ async function removeAllFilesInFolder(folderPath) {
     .catch((err) => {
       throw new ErrorWithSeverity(err.message, Logger.severity.error);
     });
-}
-
-function strBufferToLines(buffer) {
-  return buffer.split(/\r?\n/);
 }
