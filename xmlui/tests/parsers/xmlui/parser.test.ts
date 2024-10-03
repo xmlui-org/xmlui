@@ -17,6 +17,9 @@ describe("Xmlui parser", () => {
 
     expect(errors.length).toEqual(1);
     expect(errors[0].code).toEqual(ErrCodes.invalidChar);
+    expect(errors[0].pos).toEqual(3);
+    expect(errors[0].end).toEqual(4);
+
   });
 
   it("unterminated comment", () => {
