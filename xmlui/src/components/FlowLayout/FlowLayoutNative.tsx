@@ -110,6 +110,11 @@ type FlowLayoutProps = {
 };
 
 export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps) {
+
+  console.log({
+    columnGap,
+    rowGap
+  })
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const safeColumnGap = numberOfChildren === 1 ? 0 : columnGap;
 

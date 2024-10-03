@@ -2,12 +2,13 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "re
 import { isEqual } from "lodash-es";
 
 import type { ComponentApi, ContainerState } from "@components-core/container/ContainerComponentDef";
-import type { ColorDef} from "./css-utils";
+import {ColorDef, getColor} from "./css-utils";
 
 import { shallowCompare, useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { getColors } from "./css-utils";
+import Color from "color";
 
 /**
  * This hook invokes a callback when the size of the specified DOM element changes.
@@ -184,12 +185,26 @@ export function useDeepCompareMemoize<T extends Record<any, any> | undefined>(va
 }
 
 export function useColors(...colorNames: (string | ColorDef)[]) {
-  const paramsRef = useRef(colorNames);
-  const { themeStyles } = useTheme();
-  const [colors, setColors] = useState(() => getColors(...paramsRef.current));
-  useEffect(() => {
-    setColors(getColors(...paramsRef.current));
-  }, [themeStyles]);
+  const {getThemeVar} = useTheme();
+  // const paramsRef = useRef(colorNames);
+  // const { themeStyles } = useTheme();
+  const colors = useMemo(() => {
+    const ret: Record<string, string> = {};
+    for (const color of colorNames) {
+      if (typeof color === "string") {
+        const col = getThemeVar(color);
+        ret[color] = Color(col).toString();
+      } else {
+        const col = getThemeVar(color.name);
+        ret[color.name] = Color(col).hex().toString();
+      }
+    }
+    return ret;
+  }, [colorNames, getThemeVar]);
+  
+  // useEffect(() => {
+  //   setColors(getColors(...paramsRef.current));
+  // }, [themeStyles]);
 
   return colors;
 }

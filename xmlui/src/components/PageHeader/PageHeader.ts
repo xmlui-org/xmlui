@@ -28,6 +28,9 @@ export const pageHeaderRenderer: CompoundComponentRendererInfo = {
       children: [
         {
           type: "VStack",
+          props: {
+            gap: 0,
+          },
           children: [
             {
               type: "Text",

@@ -26,6 +26,7 @@ $border-Card: createThemeVar("border-Card");
   border-radius: $radius-Card;
   display: flex;
   flex-direction: column;
+  gap: var(--stack-gap-default);
 
   &.isClickable {
     cursor: pointer;
