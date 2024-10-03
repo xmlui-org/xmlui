@@ -45,9 +45,9 @@ The default display of the list uses the `fullName` and then `categoryId` fields
 ```ueml copy {3-5} filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <prop name="itemTemplate">
+  <property name="itemTemplate">
     <Card title="{$item.fullName}" subTitle="{$item.comments}" />
-  </prop>
+  </property>
 </List>
 <!-- Omitted -->
 ```
@@ -64,11 +64,11 @@ Let's change the layout of the items to something more attractive and helpful. M
 ```ueml copy {4-15} filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <prop name="itemTemplate">
+  <property name="itemTemplate">
     <Card>
       <HStack verticalAlignment="center">
-        <Checkbox id="completedSelector" initialValue="{$item.completed}" />
-        <VStack width="*">
+        <Checkbox id="completedSelector" initialValue="{$item.reviewCompleted}" />
+        <VStack width="*" gap="0">
           <Text variant="strong">{$item.fullName}</Text>
           <Text>{$item.comments}</Text>
         </VStack>
@@ -77,7 +77,7 @@ Let's change the layout of the items to something more attractive and helpful. M
         </HStack>
       </HStack>
     </Card>
-  </prop>
+  </property>
 </List>
 <!-- Omitted -->
 ```
@@ -112,7 +112,7 @@ It is the best time to extract the item template of the list into a separate com
   <Card>
     <HStack verticalAlignment="center">
       <Checkbox id="completedSelector" initialValue="{$item.reviewCompleted}" />
-      <VStack width="*">
+      <VStack width="*" gap="0">
         <Text variant="strong">{$item.fullName}</Text>
         <Text>{$item.comments}</Text>
       </VStack>
@@ -124,102 +124,124 @@ It is the best time to extract the item template of the list into a separate com
 </Component>
 ```
 
-4. Go back to the `Main.xmlui` file and replace the item template with the new `ContactRow` component:
+4. The `$item` context value you used with the list's item template has no meaning within a reusable component's definition. Reusable components use the `$props` context value to refer to the properties passed in their markup instances. Thus, you need to replace the `$item` occurrences with `$props.item` to ensure the new extracted component works:
 
-```ueml copy filename="Main.xmlui"
-<!-- Omitted -->
-<List datasource="/api/contacts">
-  <prop name="itemTemplate">
-    <ContactRow item="{$item}" />
-  </prop>
-</List>
-<!-- Omitted -->
-```
-
-We still need to finish. The last code snippet passed the item to display (`$item`)  to the `TaskRow` component. However, `TaksRow` does not use this data. Go back to `TaskRow.xmlui`, and replace all occurrences of `$item` there to `$props.item`. This change instructs the component to use the value passed in its `item` property instead of `$item` (as `$item` does not have a valid meaning within the component):
-
-```ueml copy /$props.item/ filename="TaskRow.xmlui"
-<Component name="TaskRow">
+```ueml copy {2-13} filename="ContactRow.xmlui" /$props.item/
+<Component name="ContactRow">
   <Card>
-    <HStack gap="$space-4" verticalAlignment="center">
-      <Checkbox id="completedSelector" initialValue="{$props.item.completed}" />
-      <VStack width="*">
-        <Text variant="strong">{$props.item.title}</Text>
-        <Text>{$props.item.description}</Text>
+    <HStack verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$props.item.reviewCompleted}" />
+      <VStack width="*" gap="0">
+        <Text variant="strong">{$props.item.fullName}</Text>
+        <Text>{$props.item.comments}</Text>
       </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
-        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      <HStack verticalAlignment="center" horizontalAlignment="end">
+        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
       </HStack>
     </HStack>
   </Card>
 </Component>
+```
+
+5. Go back to the `Main.xmlui` file and replace the item template with the new `ContactRow` component:
+
+```ueml copy filename="Main.xmlui" {4}
+<!-- Omitted -->
+<List datasource="/api/contacts">
+  <property name="itemTemplate">
+    <ContactRow item="{$item}" />
+  </property>
+</List>
+<!-- Omitted -->
 ```
 
 The app should work as before; however, now, it uses an extracted component.
 
 ## Adding a Badge
 
-In the app's database, each task can be assigned a category. The available categories are stored in the database, each topic with this structure:
+In the app's database, each contact can be assigned a category. The available categories are stored in the database, each category with this structure:
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `id` | number | The unique identifier of the topic |
-| `name` | string | The name of the topic |
-| `color` | string | The color of the topic |
+| id | integer | The unique identifier of the category |
+| name | string | The category's name |
+| color | string | The category's color |
 
-XMLUI has a `Badge` component that can be set up to use a color map (name and color pairs). When you pass a value to a `Bagde`, it uses the color map to set up the component's background. In this section, you will add a `Badge` displaying the topic associated with a particular task:
+XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Bagde`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
 
-1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List`; identify it as `topics`. You can refer to the fetched value with `topics.value`; pass it to `TaskRow` in the `topicsList` property. This `Datasource` component will fetch all topic data from the backend. XMLUI will know when this request should be fired to fetch the data. Update the `TaskRow` component by setting the `topics` property:
+1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `Datasource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
 
 ```ueml copy {2, 5} filename="Main.xmlui"
-<Page url="/tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <List datasource="/api/tasks">
-    <prop name="itemTemplate">
-      <TaskRow item="{$item}" topics="{topics.value}" />
-    </prop>
+<Page url="/contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <List datasource="/api/contacts">
+    <property name="itemTemplate">
+      <ContactRow item="{$item}" categories="{categories.value}" />
+    </property>
   </List>
 </Page>
 ```
 
-2. Create a new `TaskRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `TaskRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `TaskRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
+2. Create a new `ContactRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `ContactRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `ContactRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
 
-```javascript copy filename="TaskRow.xmlui.xs"
+```javascript copy filename="ContactRow.xmlui.xs"
 // Topic record of the item
-var topic = $props.topics.find(t => t.id === $props.item.topicId);
+var category = $props.categories.find(t => t.id === $props.item.categoryId);
 
 // Create a color map for all topics
-var topicsColorMap = $props.topics.reduce((acc, topic) => {
-  return {...acc, [topic.name]:  topic.color };
+var categoriesColorMap = $props.categories.reduce((acc, topic) => {
+  return {...acc, [category.name]:  category.color };
 }, {});
 ```
 
-- The `topic` variable contains the topic record associated with the item. The variable has an undefined value if the item does not have a topic.
-- The `topicsColorMap` variable converts the list of topic records into a hash object (using the same semantics as JavaScript) with the topic name and color value pairs.
+The `category` variable contains the category record associated with the item. The variable has an undefined value if the item does not have a topic. The `categoriesColorMap` variable converts the list of topic records into a hash object (using the same semantics as JavaScript) with the topic name and color value pairs.
+
+<Callout type="info" emoji="📔">
+This transformation with the `reduce` JavaScript function converts category records from this format
+
+```json
+[
+  { "name": "<name1>", "color": "<color1>" },
+  { "name": "<name2>", "color": "<color2>" },
+  // ...
+]
+```
+
+into a hash object:
+
+```json
+{
+  "<name1>": "<color1>",
+  "<name2>": "<color2>",
+  // ...
+}
+```
+</Callout>
 
 3. Add a `Badge` component to the `TaskRow` definition and wire it up with the current item:
 
-```ueml copy {10} filename="TaskRow.xmlui"
+```ueml copy {10} filename="TaskRow.xmlui" /category/ /categoriesColorMap/
 <Component name="TaskRow">
   <Card>
-    <HStack gap="$space-4" verticalAlignment="center">
-      <Checkbox id="completedSelector" initialValue="{$props.item.completed}" />
-      <VStack width="*">
-        <Text variant="strong">{$props.item.title}</Text>
-        <Text>{$props.item.description}</Text>
+    <HStack verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$props.item.reviewCompleted}" />
+      <VStack width="*" gap="0">
+        <Text variant="strong">{$props.item.fullName}</Text>
+        <Text>{$props.item.comments}</Text>
       </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
-        <Badge when="{topic}" value="{topic.name}" colorMap="{topicsColorMap}"/>
-        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      <HStack verticalAlignment="center" horizontalAlignment="end">
+        <Badge when="{category}" value="{category.name}" colorMap="{categoriesColorMap}"/>
+        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
       </HStack>
     </HStack>
   </Card>
 </Component>
 ```
 
-- `when` is a Boolean property influencing when the component should be rendered (and displayed). If there is no topic associated with a particular task, the badge is not displayed.
-- `value` means the text to display in the badge; it is set to the topic's name.
-- `colormap` declares the mapping of values to background colors.
+The markup leverages these the `Badge` properties:
+- `when` is a Boolean property influencing when the component should be rendered (and displayed). If there is no category associated with a particular contact, the badge is not displayed.
+- `value` means the text to display in the badge; it is set to the category name.
+- `colorMap` declares the mapping of values to background colors.
 
 Now, running the app will display the topics of task items:
 

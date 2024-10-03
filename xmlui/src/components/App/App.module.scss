@@ -113,8 +113,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
   &.scrollWholePage{
     scrollbar-gutter: stable both-edges;
 
-    .headerWrapper{
-      //padding-inline: var(--scrollbar-width);
+    .headerWrapper {
       &>div{
         padding-inline: var(--scrollbar-width);
       }

@@ -1,4 +1,4 @@
-import { createMetadata, } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { DropdownMenu, MenuItem } from "@components/DropdownMenu/DropdownMenuNative";
 import { Button } from "@components/Button/ButtonNative";
 import { ContentSeparator } from "@components/ContentSeparator/ContentSeparatorNative";
@@ -16,6 +16,14 @@ export const ThemeChangerButtonMd = createMetadata({
   status: "experimental",
   docFolder: "ThemeChanger",
   description: `The \`${COMP}\` component is a component that allows the user to change the theme of the app.`,
+  props: {
+    showSettings: d(
+      "This property indicates if the Settings function of this component is displayed.",
+      null,
+      "boolean",
+      true,
+    ),
+  },
 });
 
 /**
@@ -24,7 +32,7 @@ export const ThemeChangerButtonMd = createMetadata({
 export const themeChangerButtonComponentRenderer = createComponentRenderer(
   COMP,
   ThemeChangerButtonMd,
-  ({ renderChild }) => {
+  ({ renderChild, node, extractValue }) => {
     const [isThemeSettingsOpen, setThemeSettingsOpen] = useState(false);
     const {
       activeThemeId,
@@ -116,6 +124,7 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
       });
     };
 
+    const showSettings = extractValue.asOptionalBoolean(node.props.showSettings, true);
     return (
       <>
         <DropdownMenu triggerTemplate={<Button variant="ghost" icon={<Icon name="palette" />} />}>
@@ -131,8 +140,12 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
             label="Dark"
             onClick={() => setActiveThemeTone("dark")}
           />
-          <ContentSeparator />
-          <MenuItem label="Theme Settings" onClick={() => setThemeSettingsOpen(true)} />
+          {showSettings && (
+            <>
+              <ContentSeparator />
+              <MenuItem label="Theme Settings" onClick={() => setThemeSettingsOpen(true)} />
+            </>
+          )}
         </DropdownMenu>
 
         {isThemeSettingsOpen && (
