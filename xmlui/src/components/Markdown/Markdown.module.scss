@@ -72,9 +72,14 @@ $padding-left-OrderedList: createThemeVar("padding-left-OrderedList");
 // --- ListItem
 
 $padding-left-ListItem: createThemeVar("padding-left-ListItem");
+$color-marker-ListItem: createThemeVar("color-marker-ListItem");
 
 .listItem {
   padding-left: $padding-left-ListItem;
+}
+
+.listItem::marker {
+  color: $color-marker-ListItem;
 }
 
 // --- We export the theme variables to add them to the component renderer
