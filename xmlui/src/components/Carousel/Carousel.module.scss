@@ -14,6 +14,14 @@ $componentName: "Carousel";
   overflow: hidden;
   width: createThemeVar("width-#{$componentName}");
   height: createThemeVar("height-#{$componentName}");
+  justify-content: center;
+  align-items: center;
+}
+
+.innerWrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
 }
 
 .carouselContentWrapper {
