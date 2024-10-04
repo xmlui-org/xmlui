@@ -64,7 +64,7 @@ export const H1Md = createMetadata({
   defaultThemeVars: {
     // letter-spacing
     [`font-size-${H1}`]: "$font-size-large",
-    [`line-height-${H1}`]: "$line-height-loose",
+    [`line-height-${H1}`]: "$line-height-none",
     [`margin-top-${H1}`]: "0",
     [`margin-bottom-${H1}`]: "0",
     light: {
@@ -88,7 +88,7 @@ export const H2Md = createMetadata({
   defaultThemeVars: {
     // letter-spacing
     [`font-size-${H2}`]: "$font-size-medium",
-    [`line-height-${H2}`]: "$line-height-snug",
+    [`line-height-${H2}`]: "$line-height-none",
     [`margin-top-${H2}`]: "0",
     [`margin-bottom-${H2}`]: "0",
     light: {
@@ -112,7 +112,7 @@ export const H3Md = createMetadata({
   defaultThemeVars: {
     // letter-spacing
     [`font-size-${H3}`]: "$font-size-normal",
-    [`line-height-${H3}`]: "$line-height-normal",
+    [`line-height-${H3}`]: "$line-height-none",
     [`margin-top-${H3}`]: "0",
     [`margin-bottom-${H3}`]: "0",
     light: {
@@ -136,7 +136,7 @@ export const H4Md = createMetadata({
   defaultThemeVars: {
     // letter-spacing
     [`font-size-${H4}`]: "$font-size-small",
-    [`line-height-${H4}`]: "$line-height-snug",
+    [`line-height-${H4}`]: "$line-height-none",
     [`margin-top-${H4}`]: "0",
     [`margin-bottom-${H4}`]: "0",
     light: {
@@ -160,7 +160,7 @@ export const H5Md = createMetadata({
   defaultThemeVars: {
     // letter-spacing
     [`font-size-${H5}`]: "$font-size-smaller",
-    [`line-height-${H5}`]: "$line-height-tight",
+    [`line-height-${H5}`]: "$line-height-none",
     [`margin-top-${H5}`]: "0",
     [`margin-bottom-${H5}`]: "0",
     light: {

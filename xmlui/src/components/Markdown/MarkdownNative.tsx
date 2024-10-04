@@ -21,42 +21,42 @@ export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
       components={{
         h1({ id, children }) {
           return (
-            <Heading uid={id} level="h1">
+            <Heading uid={id} level="h1" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
         },
         h2({ id, children }) {
           return (
-            <Heading uid={id} level="h2">
+            <Heading uid={id} level="h2" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
         },
         h3({ id, children }) {
           return (
-            <Heading uid={id} level="h3">
+            <Heading uid={id} level="h3" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
         },
         h4({ id, children }) {
           return (
-            <Heading uid={id} level="h4">
+            <Heading uid={id} level="h4" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
         },
         h5({ id, children }) {
           return (
-            <Heading uid={id} level="h5">
+            <Heading uid={id} level="h5" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
         },
         h6({ id, children }) {
           return (
-            <Heading uid={id} level="h6">
+            <Heading uid={id} level="h6" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
@@ -105,7 +105,9 @@ export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
         li({ children }) {
           return <ListItem>{children}</ListItem>;
         },
-        // del: variant="deleted" <-- This needs a parser plugin for ~ and ~~ signs that is available via react-markdown-gfm or we roll with an in-house one (?)
+        // This needs a parser plugin for the ~ and ~~ signs that are available via react-markdown-gfm
+        // or we implement our own parser?
+        // del: variant="deleted"
         hr() {
           return <HorizontalRule />;
         },
