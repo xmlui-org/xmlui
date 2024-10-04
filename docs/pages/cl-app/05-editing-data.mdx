@@ -75,7 +75,7 @@ When you add a new contact's details or edit a task, the app displays a form in 
   <ModalDialog id="dialog" title="Add a new Contact">
     <Text>Contact Form</Text>
   </ModalDialog>
-  <api name="open" value="dialog.open()" />
+  <method name="open" value="dialog.open()" />
 </Component>
 ```
 
@@ -159,7 +159,7 @@ The dialog always displays its title as Add a new Contact, whether you invoke it
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Text>Contact Form</Text>
   </ModalDialog>
-  <api name="open" value="(m) => { mode = m; dialog.open(); }" />
+  <method name="open" value="(m) => { mode = m; dialog.open(); }" />
 </Component>
 ```
 
@@ -232,7 +232,7 @@ The current contact dialog is functionless. Let's create a form that accepts dat
       </FormItem>
     </Form>
   </ModalDialog>
-  <api name="open" value="(m) => { mode = m; dialog.open(); }" />
+  <method name="open" value="(m) => { mode = m; dialog.open(); }" />
 </Component>
 ```
 
@@ -273,7 +273,7 @@ We should pass the initial data to the `Form` when we edit existing information.
       <!-- Unchanged -->
     </Form>
   </ModalDialog>
-  <api 
+  <method 
     name="open" 
     value="(m, d) => { mode = m; initialData = d; dialog.open(); }" />
 </Component>
