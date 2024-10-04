@@ -132,6 +132,7 @@ import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 import {carouselComponentRenderer} from "@components/Carousel/Carousel";
 import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
+import {createPropHolderComponentNew} from "@components-core/renderers";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -142,6 +143,11 @@ type ComponentProviderProps = {
   contributes: ContributesDefinition;
 };
 
+const textNodePropHolder = createPropHolderComponentNew("TextNode");
+const textNodeCDataPropHolder = createPropHolderComponentNew("TextNodeCData");
+
+
+
 export class ComponentRegistry {
   private pool = new Map<string, ComponentRegistryEntry>();
   private themeVars = new Set<string>();
@@ -150,7 +156,7 @@ export class ComponentRegistry {
   // --- The pool of available loader renderers
   private loaders = new Map<string, LoaderRenderer<any>>();
 
-  constructor(contributes: ContributesDefinition) {
+  constructor(contributes: ContributesDefinition = {}) {
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerComponentRenderer(stackComponentRenderer);
       this.registerComponentRenderer(vStackComponentRenderer);
@@ -160,6 +166,8 @@ export class ComponentRegistry {
     }
 
     this.registerComponentRenderer(SlotHolder);
+    this.registerComponentRenderer(textNodePropHolder);
+    this.registerComponentRenderer(textNodeCDataPropHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
       this.registerComponentRenderer(spaceFillerComponentRenderer);
     }
@@ -461,6 +469,10 @@ export class ComponentRegistry {
    */
   private registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
+  }
+
+  hasComponent(componentName: string) {
+    return this.pool.get(componentName) !== undefined || this.loaders.get(componentName) !== undefined || this.actionFns.get(componentName) !== undefined;
   }
 }
 

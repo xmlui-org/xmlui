@@ -1,7 +1,7 @@
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 
 import { parseParameterString } from "./script-runner/ParameterParser";
-import { Parser } from "@parsers/scripting/Parser";
+import { Parser } from "../parsers/scripting/Parser";
 import { layoutOptionKeys } from "./descriptorHelper";
 import { viewportSizeNames } from "@components/abstractions";
 
@@ -54,7 +54,7 @@ export function checkXmlUiMarkup(
 
   // --- Visit the root component
   if (rootDef) {
-    visitComponent(rootDef, null, componentDefVisitor, continuation);
+    visitComponent(rootDef, null, componentDefVisitor, continuation, metadataHandler);
   }
 
   // --- Visit the compound components
@@ -84,7 +84,7 @@ export function checkXmlUiMarkup(
       // --- Reset component ID scope
       componentIdsCollected.clear();
       // --- Visit the compount component's definition
-      visitComponent(component.component as ComponentDef, null, componentDefVisitor, continuation);
+      visitComponent(component.component as ComponentDef, null, componentDefVisitor, continuation, metadataHandler);
     }
   }
 
@@ -100,14 +100,14 @@ export function checkXmlUiMarkup(
   ): void {
     // --- This is the visitor function to check a ComponentDef markup
     if (!before) {
-      // --- Do not visit the component definition ater its children have been visited
+      // --- Do not visit the component definition after its children have been visited
       return;
     }
 
     // --- Rule: Component name must be registered
     if (!metadataHandler.componentRegistered(def.type)) {
       reportError("M001", parent?.type ?? "Root", def.type);
-      continuation.cancel = true;
+      // continuation.cancel = true;
       return;
     }
 
@@ -207,90 +207,6 @@ export function checkXmlUiMarkup(
     }
   }
 
-  // --- This function visits a component, its nested components and children
-  function visitComponent(
-    def: ComponentDef,
-    parent: ComponentDef | null | undefined,
-    visitor: (
-      def: ComponentDef,
-      parent: ComponentDef | null | undefined,
-      before: boolean,
-      continuation: VisitResult,
-    ) => void,
-    continuation: VisitResult,
-  ): void {
-    // --- Visit the component (before)
-    visitor(def, parent, true, continuation);
-    if (continuation.abort || continuation.cancel) {
-      // --- Stop the visit
-      return;
-    }
-
-    // --- Visit the properties with "ComponentDef" value
-    const propDescriptors = metadataHandler.getComponentProps(def.type) ?? {};
-    const currentProps = def.props ?? {};
-    for (const propName in Object.keys(currentProps)) {
-      const propDescriptor = propDescriptors[propName];
-      if (!propDescriptor) {
-        // --- No descriptor for the property, skip it
-        continue;
-      }
-
-      const propValue = currentProps[propName];
-      if (propDescriptor.type === "ComponentDef" && propValue.type) {
-        // --- This property holds a nested component, visit it
-        visitComponent(propValue, def, visitor, continuation);
-        if (continuation.abort || continuation.cancel) {
-          // --- Stop the visit
-          return;
-        }
-      }
-    }
-
-    // --- Visit events with nested components
-    const eventDescriptors = metadataHandler.getComponentEvents(def.type) ?? {};
-    const currentEvents = def.events ?? {};
-    for (const eventName of Object.keys(currentEvents)) {
-      const eventDescriptor = eventDescriptors[eventName];
-      if (!eventDescriptor) {
-        // --- No descriptor for the events, skip it
-        continue;
-      }
-
-      const eventValue = currentEvents[eventName];
-      if (typeof eventValue === "object" && eventValue.type) {
-        // --- This event holds a nested component, visit it
-        visitComponent(eventValue, def, visitor, continuation);
-        if (continuation.abort) {
-          // --- Stop visiting this component
-          return;
-        }
-        if (continuation.cancel) {
-          // --- Skip the remaining items
-          break;
-        }
-      }
-    }
-
-    // --- Visit the component children
-    if (def.children) {
-      for (const child of def.children) {
-        visitComponent(child, def, visitor, continuation);
-        if (continuation.abort) {
-          // --- Stop visiting this component
-          return;
-        }
-        if (continuation.cancel) {
-          // --- Skip the remaining items
-          break;
-        }
-      }
-    }
-
-    // --- Visit the component (after)
-    visitor(def, undefined, false, continuation);
-  }
-
   /**
    * Checks if a string is a valid JavaScript identifier.
    * @param identifier The string to check.
@@ -315,7 +231,7 @@ export function checkXmlUiMarkup(
       args.forEach((a: string, idx: number) => (errorText = replace(errorText, `{${idx}}`, args[idx].toString())));
     }
 
-    errorsCollected.push({ name, code, message: errorText, isWarning });
+    errorsCollected.push({ name, code, message: errorText, isWarning, args });
 
     function replace(input: string, placeholder: string, replacement: string): string {
       do {
@@ -325,12 +241,99 @@ export function checkXmlUiMarkup(
     }
   }
 }
+// --- This function visits a component, its nested components and children
+export function visitComponent(
+    def: ComponentDef,
+    parent: ComponentDef | null | undefined,
+    visitor: (
+        def: ComponentDef,
+        parent: ComponentDef | null | undefined,
+        before: boolean,
+        continuation: VisitResult,
+    ) => void,
+    continuation: VisitResult = {},
+    metadataHandler: MetadataHandler,
+): void {
+  // --- Visit the component (before)
+  visitor(def, parent, true, continuation);
+  if (continuation.abort || continuation.cancel) {
+    // --- Stop the visit
+    return;
+  }
+
+  // --- Visit the properties with "ComponentDef" value
+  const propDescriptors = metadataHandler.getComponentProps(def.type) ?? {};
+  const currentProps = def.props ?? {};
+  for (const propName in Object.keys(currentProps)) {
+    const propDescriptor = propDescriptors[propName];
+    if (!propDescriptor) {
+      // --- No descriptor for the property, skip it
+      continue;
+    }
+
+    const propValue = currentProps[propName];
+    if (propDescriptor.type === "ComponentDef" && propValue.type) {
+      // --- This property holds a nested component, visit it
+      visitComponent(propValue, def, visitor, continuation, metadataHandler);
+      if (continuation.abort || continuation.cancel) {
+        // --- Stop the visit
+        return;
+      }
+    }
+  }
+
+
+  // --- Visit events with nested components
+  const eventDescriptors = metadataHandler.getComponentEvents(def.type) ?? {};
+  const currentEvents = def.events ?? {};
+  for (const eventName of Object.keys(currentEvents)) {
+    const eventDescriptor = eventDescriptors[eventName];
+    if (!eventDescriptor) {
+      // --- No descriptor for the events, skip it
+      continue;
+    }
+
+    const eventValue = currentEvents[eventName];
+    if (typeof eventValue === "object" && eventValue.type) {
+      // --- This event holds a nested component, visit it
+      visitComponent(eventValue, def, visitor, continuation, metadataHandler);
+      if (continuation.abort) {
+        // --- Stop visiting this component
+        return;
+      }
+      if (continuation.cancel) {
+        // --- Skip the remaining items
+        break;
+      }
+    }
+  }
+
+  // --- Visit the component children
+  if (def.children) {
+    for (const child of def.children) {
+      visitComponent(child, def, visitor, continuation, metadataHandler);
+      if (continuation.abort) {
+        // --- Stop visiting this component
+        return;
+      }
+      if (continuation.cancel) {
+        // --- Skip the remaining items
+        break;
+      }
+    }
+  }
+
+  // --- Visit the component (after)
+  visitor(def, undefined, false, continuation);
+}
+
 
 export type MarkupCheckResult = {
   name: string;
   code: ErrorCode;
   message: string;
   isWarning?: boolean;
+  args?: Array<any>
 };
 
 // --- Available error codes

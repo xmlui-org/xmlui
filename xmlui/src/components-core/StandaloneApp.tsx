@@ -2,8 +2,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Root } from "react-dom/client";
 import ReactDOM from "react-dom/client";
 
-import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
-import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
+import type {
+  StandaloneAppDescription,
+  StandaloneJsonConfig,
+} from "@components-core/abstractions/standalone";
+import type {
+  ComponentDef,
+  CompoundComponentDef,
+  ComponentLike,
+} from "@abstractions/ComponentDefs";
 import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
@@ -15,10 +22,17 @@ import { ApiInterceptorProvider } from "@components-core/interception/ApiInterce
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
-import { componentFileExtension, codeBehindFileExtension } from "../parsers/xmlui-parser/fileExtensions";
-import {Parser} from "../parsers/scripting/Parser";
-import {collectCodeBehindFromSource, removeCodeBehindTokensFromTree} from "../parsers/scripting/code-behind-collect";
-
+import {
+  componentFileExtension,
+  codeBehindFileExtension,
+} from "../parsers/xmlui-parser/fileExtensions";
+import { Parser } from "../parsers/scripting/Parser";
+import {
+  collectCodeBehindFromSource,
+  removeCodeBehindTokensFromTree,
+} from "../parsers/scripting/code-behind-collect";
+import { ComponentRegistry } from "@components/ComponentProvider";
+import { checkXmlUiMarkup, visitComponent } from "@components-core/markup-check";
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -59,7 +73,7 @@ function StandaloneApp({
     entryPoint,
     components,
     themes,
-    sources
+    sources,
   } = standaloneApp;
 
   return (
@@ -99,14 +113,16 @@ async function parseComponentResp(response: Response) {
       component: parseXmlUiMarkup(code, fileId),
       src: code,
       file: fileId,
-    }
+    };
   }
-  if(response.url.toLowerCase().endsWith(".xmlui.xs")){
-    const code = await response.text()
+  if (response.url.toLowerCase().endsWith(".xmlui.xs")) {
+    const code = await response.text();
     const parser = new Parser(code);
     parser.parseStatements();
 
-    const codeBehind = collectCodeBehindFromSource("Main", code, ()=>{return ""});
+    const codeBehind = collectCodeBehindFromSource("Main", code, () => {
+      return "";
+    });
     removeCodeBehindTokensFromTree(codeBehind);
     return {
       codeBehind: codeBehind,
@@ -114,7 +130,7 @@ async function parseComponentResp(response: Response) {
     };
   }
   return {
-    component: await response.json()
+    component: await response.json(),
   };
 }
 
@@ -210,13 +226,13 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     components: components,
     themes: config?.themes || themes,
     apiInterceptor: config?.apiInterceptor || apiInterceptor,
-    sources
+    sources,
   };
 }
 
 function mergeGivenAppDefWithRuntime(
   resolvedRuntime: StandaloneAppDescription,
-  standaloneAppDef: StandaloneAppDescription | undefined
+  standaloneAppDef: StandaloneAppDescription | undefined,
 ) {
   if (!standaloneAppDef) {
     return resolvedRuntime;
@@ -232,7 +248,7 @@ function mergeGivenAppDefWithRuntime(
 
 function getStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
-  runtime: Record<string, any> = EMPTY_OBJECT
+  runtime: Record<string, any> = EMPTY_OBJECT,
 ) {
   //TODO read text/xmlui-config json
   const servedFromSingleFile =
@@ -257,7 +273,8 @@ function getStandalone(
       throw new Error("No App component specified");
     }
     const configNode = document.querySelector('script[type="text/xmlui-config"]');
-    const config: StandaloneJsonConfig = configNode === null ? {} : JSON.parse(configNode.textContent!);
+    const config: StandaloneJsonConfig =
+      configNode === null ? {} : JSON.parse(configNode.textContent!);
     const themes: Array<ThemeDefinition> = [];
     const themeNodes = document.querySelectorAll('script[type="text/xmlui-theme"]');
     themeNodes.forEach((value) => {
@@ -276,7 +293,10 @@ function getStandalone(
   const resolvedRuntime = resolveRuntime(runtime);
   const appDef = mergeGivenAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
-  if (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") {
+  if (
+    (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+    !process.env.VITE_STANDALONE
+  ) {
     if (!appDef) {
       throw new Error("couldn't find the application metadata");
     }
@@ -288,10 +308,10 @@ function getStandalone(
 // --- This React hook prepares the runtime environment of a standalone app using its definition
 function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
-  runtime: Record<string, any> = EMPTY_OBJECT
+  runtime: Record<string, any> = EMPTY_OBJECT,
 ) {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(
-    getStandalone(standaloneAppDef, runtime)
+    getStandalone(standaloneAppDef, runtime),
   );
 
   useIsomorphicLayoutEffect(() => {
@@ -318,7 +338,8 @@ function useStandalone(
           throw new Error("No App component specified");
         }
         const configNode = document.querySelector('script[type="text/xmlui-config"]');
-        const config: StandaloneJsonConfig = configNode === null ? {} : JSON.parse(configNode.textContent!);
+        const config: StandaloneJsonConfig =
+          configNode === null ? {} : JSON.parse(configNode.textContent!);
         const themes: Array<ThemeDefinition> = [];
         const themeNodes = document.querySelectorAll('script[type="text/xmlui-theme"]');
         themeNodes.forEach((value) => {
@@ -338,7 +359,10 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeGivenAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
-      if (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") {
+      if (
+        (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+        !process.env.VITE_STANDALONE
+      ) {
         if (!appDef) {
           throw new Error("couldn't find the application metadata");
         }
@@ -370,22 +394,38 @@ function useStandalone(
       // temp solution, needs refactor!!!
 
       //default mode: process.env.VITE_BUILD_MODE === "ALL"
-      const configResponse = await fetch(normalizePath("config.json")!);
-      const config: StandaloneJsonConfig = await configResponse.json();
-
-      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) => parseComponentResp(value));
-      const themePromises = config.themes?.map((themePath) => {
-        return fetch(normalizePath(themePath)!).then((value) => value.json()) as Promise<ThemeDefinition>;
+      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) =>
+          parseComponentResp(value),
+      );
+      const entryPointCodeBehindPromise = new Promise(async (resolve, reject)=>{
+        try{
+          const resp = await fetch(normalizePath("Main.xmlui.xs")!);
+          const codeBehind = await parseComponentResp(resp);
+          resolve(codeBehind.codeBehind);
+        } catch (e){
+          resolve(null);
+        }
       });
 
-      const componentPromises = config.components?.map((componentPath) => {
-        return fetch(normalizePath(componentPath)!).then((value) =>
-          parseComponentResp(value)
-        );
+      let config: StandaloneJsonConfig = undefined;
+      try{
+        const configResponse = await fetch(normalizePath("config.json")!);
+        config = await configResponse.json();
+      } catch(e){
+      }
+      const themePromises = config?.themes?.map((themePath) => {
+        return fetch(normalizePath(themePath)!).then((value) =>
+          value.json(),
+        ) as Promise<ThemeDefinition>;
       });
 
-      const [loadedEntryPoint, loadedComponents, themes] = await Promise.all([
+      const componentPromises = config?.components?.map((componentPath) => {
+        return fetch(normalizePath(componentPath)!).then((value) => parseComponentResp(value));
+      });
+
+      const [loadedEntryPoint, loadedEntryPointCodeBehind, loadedComponents, themes] = await Promise.all([
         entryPointPromise,
+        entryPointCodeBehindPromise,
         Promise.all(componentPromises || []),
         Promise.all(themePromises || []),
       ]);
@@ -396,41 +436,89 @@ function useStandalone(
         sources[loadedEntryPoint.file] = loadedEntryPoint.src;
       }
       loadedComponents.forEach((compWrapper) => {
-          if(compWrapper?.file?.endsWith(".xmlui.xs")){
-            codeBehinds[compWrapper.file] = compWrapper.codeBehind;
-          } else {
-            if (compWrapper.file) {
-              sources[compWrapper.file] = compWrapper.src;
-            }
+        if (compWrapper?.file?.endsWith(".xmlui.xs")) {
+          codeBehinds[compWrapper.file] = compWrapper.codeBehind;
+        } else {
+          if (compWrapper.file) {
+            sources[compWrapper.file] = compWrapper.src;
           }
+        }
       });
 
-      const entryPointCodeBehind = codeBehinds[loadedEntryPoint.file + ".xs"];
       const entryPointWithCodeBehind = {
         ...loadedEntryPoint.component,
         vars: {
-          ...entryPointCodeBehind?.vars,
+          ...loadedEntryPointCodeBehind?.vars,
           ...loadedEntryPoint.component.vars,
         },
-        functions: entryPointCodeBehind?.functions,
-        scriptError: entryPointCodeBehind?.moduleErrors,
-      }
+        functions: loadedEntryPointCodeBehind?.functions,
+        scriptError: loadedEntryPointCodeBehind?.moduleErrors,
+      };
 
-      const componentsWithCodeBehinds = loadedComponents.filter((compWrapper)=>!compWrapper?.file?.endsWith(".xmlui.xs")).map((compWrapper) => {
-        const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
-        return {
-          ...compWrapper.component,
-          component: {
-            ...compWrapper.component.component,
-            vars: {
-              ...compWrapper.component.component.vars,
-              ...componentCodeBehind?.vars,
+      const componentsWithCodeBehinds = loadedComponents
+        .filter((compWrapper) => !compWrapper?.file?.endsWith(".xmlui.xs"))
+        .map((compWrapper) => {
+          const componentCodeBehind = codeBehinds[compWrapper.file + ".xs"];
+          return {
+            ...compWrapper.component,
+            component: {
+              ...compWrapper.component.component,
+              vars: {
+                ...compWrapper.component.component.vars,
+                ...componentCodeBehind?.vars,
+              },
+              functions: componentCodeBehind?.functions,
+              scriptError: componentCodeBehind?.moduleErrors,
             },
-            functions: componentCodeBehind?.functions,
-            scriptError: componentCodeBehind?.moduleErrors,
-          },
-        };
-      });
+          };
+        });
+
+      let componentsToLoad = collectMissingComponents(
+        entryPointWithCodeBehind,
+        componentsWithCodeBehinds,
+      );
+      const componentsFailedToLoad = new Set();
+      while (componentsToLoad.size > 0) {
+        const componentPromises = [...componentsToLoad].map(async (componentPath) => {
+          try {
+            const componentPromise = fetch(normalizePath("/components/" + componentPath + ".xmlui")!);
+              const componentCodeBehindPromise = new Promise(async (resolve, reject)=>{
+                try{
+                  const codeBehindWrapper = await parseComponentResp(await fetch(normalizePath("/components/" + componentPath + ".xmlui.xs")!));
+                  const componentCodeBehind = codeBehindWrapper.codeBehind;
+                  resolve(componentCodeBehind);
+                } catch{
+                  resolve(null)
+                }
+              });
+            const [value, componentCodeBehind] = await Promise.all([componentPromise, componentCodeBehindPromise]);
+            const compWrapper = await parseComponentResp(value);
+            sources[compWrapper.file] = compWrapper.src;
+            return {
+              ...compWrapper.component,
+              component: {
+                ...compWrapper.component.component,
+                vars: {
+                  ...compWrapper.component.component.vars,
+                  ...componentCodeBehind?.vars,
+                },
+                functions: componentCodeBehind?.functions,
+                scriptError: componentCodeBehind?.moduleErrors,
+              },
+            };
+          } catch (e) {
+            componentsFailedToLoad.add(componentPath);
+            return null;
+          }
+        });
+        const componentWrappers = await Promise.all(componentPromises);
+        componentsWithCodeBehinds.push(...componentWrappers.filter(comp => !!comp));
+        componentsToLoad = collectMissingComponents(
+          entryPointWithCodeBehind,
+          componentsWithCodeBehinds,
+          componentsFailedToLoad
+        );
+      }
 
       setStandaloneApp({
         ...config,
@@ -442,6 +530,28 @@ function useStandalone(
     })();
   }, [runtime, standaloneAppDef]);
   return standaloneApp;
+}
+
+function collectMissingComponents(entryPoint, components, componentsFailedToLoad = new Set()) {
+  const componentRegistry = new ComponentRegistry({ compoundComponents: components });
+  const result = checkXmlUiMarkup(entryPoint, components, {
+    getComponentProps: (componentName) => {
+      return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
+    },
+    acceptArbitraryProps: (componentName) => {
+      return true;
+    },
+    getComponentValidator: (componentName) => {
+      return null;
+    },
+    getComponentEvents: (componentName) => {
+      return null;
+    },
+    componentRegistered: (componentName) => {
+      return componentRegistry.hasComponent(componentName);
+    },
+  });
+  return new Set(result.filter((r) => r.code === "M001").map((r) => r.args[0]).filter((comp) => !componentsFailedToLoad.has(comp)));
 }
 
 // --- This React hook logs the app's version number to the browser's console at startup
@@ -459,7 +569,7 @@ let contentRoot: Root | null = null;
 
 export function startApp(runtime?: any, components?: ComponentRendererDef[]) {
   let rootElement: HTMLElement | null = document.getElementById("root");
-  if(!rootElement){
+  if (!rootElement) {
     rootElement = document.createElement("div");
     rootElement.setAttribute("id", "root");
     document.body.appendChild(rootElement);
