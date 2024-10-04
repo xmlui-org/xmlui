@@ -37,6 +37,7 @@ export const UEMLGrammar: any = {
         { include: "@scriptTagStart" },
         { include: "@eventTagStart" },
         { include: "@apiTagStart" },
+        { include: "@methodTagStart" },
         { include: "@propOrVarTagStart" },
       ],
       eventTagStart: [
@@ -62,6 +63,24 @@ export const UEMLGrammar: any = {
       eventTagScriptContent: [
         [/<\/event\s*>/, { token: "@rematch", next: "@pop", nextEmbedded: "@pop" }],
         [/[^<]/, ""],
+      ],
+      methodTagStart: [
+        [
+          /(<)((?:[a-zA-Z_][\w\.\-]*?:)?)(method)/,
+          ["delimiter.angle", "namespace", { token: "tag-helper", next: "@methodTag" }],
+        ],
+      ],
+      methodTag: [
+        { include: "@commentStart" },
+        { include: "@valueAttributeScriptInsideStart" },
+        { include: "@attributeStart" },
+        [/\/>/, "delimiter.angle", "@pop"],
+        [/>/, { token: "delimiter.angle", next: "@methodTagScriptContent", nextEmbedded: "xmluiscript" }],
+        [/(<\/)(method)(\s*>)/, ["delimiter.angle", "tag-helper", { token: "delimiter.angle", next: "@pop" }]],
+      ],
+      methodTagScriptContent: [
+        [/<\/method\s*>/, { token: "@rematch", next: "@pop", nextEmbedded: "@pop" }],
+        [/[^</]/, ""],
       ],
       apiTagStart: [
         [

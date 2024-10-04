@@ -76,7 +76,7 @@ export function nodeToComponentDef(
 
       // --- Get "api" attributes
       let api: Record<string, any> | undefined;
-      const apiAttrs = attrs.filter((attr) => attr.startSegment === "api");
+      const apiAttrs = attrs.filter((attr) => refersToApi(attr.startSegment));
       if (apiAttrs.length > 0) {
         api = {};
         apiAttrs.forEach((attr) => {
@@ -325,6 +325,7 @@ export function nodeToComponentDef(
           collectUsesElements(comp, child);
           return;
 
+        case "method":
         case "api":
           collectElementHelper(
             usesStack,
@@ -377,7 +378,7 @@ export function nodeToComponentDef(
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && startSegment !== "api" && startSegment !== "var") {
+      if (startSegment && !refersToApi(startSegment) && startSegment !== "var") {
         reportError("T021");
         return;
       }
@@ -415,7 +416,7 @@ export function nodeToComponentDef(
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
-        } else if (startSegment === "api") {
+        } else if (refersToApi(startSegment)) {
           comp.api ??= {};
           comp.api[name] = value;
         } else if (startSegment === "event") {
@@ -716,8 +717,9 @@ export function nodeToComponentDef(
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getTagName(node);
     const hasComponentName = UCRegex.test(tagName);
-    const shouldUseTextNodeElement = hasComponentName || tagName === "prop" || tagName === "property";
-    const shouldCollapseWhitespace = tagName !== "event" && tagName !== "api";
+    const shouldUseTextNodeElement =
+      hasComponentName || tagName === "prop" || tagName === "property";
+    const shouldCollapseWhitespace = tagName !== "event" && !refersToApi(tagName);
     const attrs = getAttributes(node);
 
     desugarKeyOnlyAttrs(attrs);
@@ -1138,4 +1140,10 @@ function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
       attrValue.text = '"' + getText(attrValue) + '"';
     }
   }
+}
+
+/** Temporarily using 'method' as an alias to 'api'.
+ * In the future, 'api' may be completely removed.*/
+function refersToApi(word: string): boolean {
+  return word === "api" || word === "method";
 }

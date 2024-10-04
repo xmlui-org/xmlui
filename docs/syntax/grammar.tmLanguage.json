@@ -27,7 +27,7 @@
       ]
     },
     "apiTag": {
-      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(api)",
+      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },
@@ -42,7 +42,7 @@
         { "include": "#valueAttributeScriptInside" },
         { "include": "#attribute" },
         {
-          "begin": "(?<!/|(?:/\\s*api)\\s*)>",
+          "begin": "(?<!/|(?:/\\s*(?:api|method))\\s*)>",
           "beginCaptures": {
             "0": {
               "name": "punctuation.definition.tag.xmlui"
@@ -55,10 +55,10 @@
           },
           "contentName": "meta.embedded.block.javascript",
           "patterns": [{ "include": "source.js" }],
-          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(api)(?=\\s*>)"
+          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)(?=\\s*>)"
         }
       ],
-      "end": ">"
+      "end": "/?>"
     },
     "eventTag": {
       "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(event)",
@@ -326,3 +326,4 @@
     }
   }
 }
+
