@@ -1,6 +1,6 @@
 import { Callout } from 'nextra/components'
 
-## A Few Polishing Touches
+# A Few Polishing Touches
 
 There are a few things to improve the user experience in our app. In this section, you will make minor changes to enhance the app's look and feel.
 
@@ -40,11 +40,7 @@ Instead of "undefined", contact count labels display "loading...":
 
 ## Displaying List Sections
 
-The `List` component supports sections that group list items according to a particular section value. You will update the All Contacts list to leverage this feature.
-
-### Extending Tasks with Sections
-
-The `List` has a `sectionBy` property that you can set to one of the field names in the items to display. The `List` gets all distinct values of the `sectionBy` field and groups the items accordingly.
+The `List` component supports sections that group list items according to a particular section value. It has a `sectionBy` property that you can set to one of the field names in the items to display. The `List` gets all distinct values of the `sectionBy` field and groups the items accordingly.
 
 We have already created the `getSections` function within `Main.xmlui.xs`, perfect as a sectioning expression. However, now it is in the `Main.xmlui.xs` file, though we need it in the `Contacts` component.
 
@@ -76,8 +72,6 @@ Update the code of `Contacts` to add a `section` field to the contact items:
 <Callout type="info" emoji="📔">
   Here, the `items` property of `List` receives a list of items, each extended with the section information.
 </Callout>
-
-### Defining sections
 
 To display section information, add the `section` property to the `List` and define the template to display section headers:
 
@@ -117,7 +111,7 @@ Now, When you display all tasks, you can see that items are sectioned:
 <br/>
 <Image alt="Sectioned items" src="/resources/images/get-started/sectioned-items.png" />
 
-### Expanding and Collapsing Sections
+## Expanding and Collapsing Sections
 
 The sections of a list can be expanded or collapsed. Unless you declare otherwise, all sections are expanded by default. Besides `$items`, each section receives a `$context` value, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
 
@@ -157,7 +151,7 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 <br/>
 <Image alt="collapsed sections" src="/resources/images/get-started/section-collapsed.png" />
 
-### Section Ordering
+## Section Ordering
 
 The order of sections displayed above could be more helpful with a different order. With the help of the `defaultSections` property of `List`, you can define the order of sections. Modify the `List` accordingly:
 
@@ -177,9 +171,9 @@ You can see the updated section order:
 <br/>
 <Image alt="Sections ordered" src="/resources/images/get-started/sections-ordered.png" />
 
-### Omitting Empty Sections
+## Omitting Empty Sections
 
-By specifying the default sections, the filtered lists also display them. So when you visit a filtered list, such as Today, it displays the empty sections:
+By specifying the default sections, the filtered lists also display them. So when you visit a filtered list, such as Today's Reviews, it displays the empty sections:
 
 <br/>
 <Image alt="empty sections" src="/resources/images/get-started/empty-sections.png" />
@@ -203,46 +197,4 @@ Now, the empty sections are no longer displayed:
 <br/>
 <Image alt="no empty sections" src="/resources/images/get-started/no-empty-sections.png" />
 
-
-## Changing the Logo
-
-So far, you have used the default app logo offered by XMLUI. It is time to change it to a custom logo matching the Personal To-Do app.
-
-1. Download the [todo-logo.svg](/resources/files/tutorials/p2do/todo-logo.svg "download") file and put it into the `public/resources` folder.
-2. Open the `config.ts` file (from the `src` folder); it contains some resource definitions:
-
-```ts copy {6-8} filename="config.ts"
-import type { StandaloneAppDescription } from "xmlui";
-
-const App: StandaloneAppDescription = {
-  name: "Tutorial",
-  version: "0.0.1",
-  resources: {
-    logo: "resources/xmlui-logo.svg",
-    favicon: "resources/favicon.ico",
-  },
-};
-export default App;
-```
-
-Change the `logo` resource to the new file, `todo-logo.svg`:
-
-```ts copy {7} filename="config.ts"
-import type { StandaloneAppDescription } from "xmlui";
-
-const App: StandaloneAppDescription = {
-  name: "Tutorial",
-  version: "0.0.1",
-  resources: {
-    logo: "resources/todo-logo.svg",
-    favicon: "resources/favicon.ico",
-  },
-};
-export default App;
-```
-
-The app now uses the newly set logo:
-
-<br/>
-<Image alt="Todo logo" src="/resources/images/get-started/todo-logo.png" />
-
+So far, you have displayed only read-only data. In the following section, you will create, edit, and delete contact data.

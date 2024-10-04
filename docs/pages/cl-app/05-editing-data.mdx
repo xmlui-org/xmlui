@@ -1,26 +1,25 @@
+import { Callout } from 'nextra/components'
+
 # Editing Data
 
-In the previous sections, you created several views that display the existing task data. In this article, you will create, edit, and delete data.
+In the previous sections, you created several views that display the existing contact data. In this article, you will create, edit, and delete data.
 
 ## Preparing the Skeleton
 
-There are several ways to add data editing functionality to an app. In this article, you will use a modal dialog to add and edit task items. These dialogs will show up when you click a button to add a new item or select the edit or delete function from a context menu belonging to a particular item.
+There are several ways to add data editing functionality to an app. In this article, you will use a modal dialog to add and edit contact items. These dialogs will show up when you click a button to add a new item or select the edit or delete function from a context menu belonging to a particular item.
 
-### Button for New Tasks
+### Button for New Contacts
 
-Let's change the layout of the `Tasks` component to add a button above the list (and wrap the button and the list into a `VStack`). When you click this button, it will display the dialog for adding a new task item:
+Let's change the layout of the `Contact` component to add a button above the list (and wrap the button and the list into a `VStack`). When you click this button, it will display the dialog for adding a new contact item:
 
-```ueml copy {4-10, 14} filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-  <VStack 
-    padding="$space-4"
-    verticalPadding="$space-6"
-    gap="$space-6">
-    <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
-      <Button icon="plus">New</Button>
-    </HStack>        
+```ueml copy {4-7, 11} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus">New Contact</Button>
+    </HStack>
     <List 
       <!-- Unchanged -->
     </List>
@@ -31,29 +30,29 @@ Let's change the layout of the `Tasks` component to add a button above the list 
 This code provides a little gap around the list to make the page more airy. The `HStack` section adds the button above the list:
 
 <br/>
-<Image alt="New task button" src="/resources/images/get-started/new-task-button.png" />
+<Image alt="New task button" src="/resources/images/get-started/new-contact-button.png" />
 
 ### Triggers for Edit and Delete
 
-You add a context menu to each task item. This menu appears on the right side of an item with this additional markup in the `TaskRow` component:
+You add a context menu to each contact item. This menu appears on the right side of an item with this additional markup in the `ContactRow` component:
 
-```ueml copy {13-19} filename="TaskRow.xmlui"
-<Component name="TaskRow">
+```ueml copy {13-19} filename="ContactRow.xmlui"
+<Component name="ContactRow">
   <Card>
-    <HStack gap="$space-4" verticalAlignment="center">
-      <Checkbox id="completedSelector" initialValue="{$props.item.completed}" />
-      <VStack width="*">
-        <Text variant="strong">{$props.item.title}</Text>
-        <Text>{$props.item.description}</Text>
+    <HStack verticalAlignment="center">
+      <Checkbox id="completedSelector" initialValue="{$props.item.reviewCompleted}" />
+      <VStack width="*" gap="0">
+        <Text variant="strong">{$props.item.fullName}</Text>
+        <Text>{$props.item.comments}</Text>
       </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end" gap="$space-2">
-        <Badge when="{topic}" value="{topic.name}" colorMap="{topicsColorMap}"/>
-        <Text>{smartFormatDate($props.item.dueDate)}</Text>
+      <HStack verticalAlignment="center" horizontalAlignment="end">
+        <Badge when="{category}" value="{category.name}" colorMap="{categoriesColorMap}"/>
+        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
       </HStack>
       <DropdownMenu>
-        <prop name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </prop>
+        </property>
         <MenuItem label="Edit" />
         <MenuItem label="Delete" />
       </DropdownMenu>
@@ -62,175 +61,172 @@ You add a context menu to each task item. This menu appears on the right side of
 </Component>
 ```
 
-The `DropdownMenu` definition adds the context menu to the task items. You can reveal the menu by clicking the three dots to the right of a particular task item in the list:
+The `DropdownMenu` definition adds the context menu to the contact items. You can reveal the menu by clicking the three dots to the right of a particular contect item in the list:
 
 <br/>
 <Image alt="Context menu" src="/resources/images/get-started/context-menu.png" />
 
-## Task Data Dialog
+## Contact Data Dialog
 
-When you add a new task's details or edit a task, the app displays a form in a modal dialog. Create a component, `TaskForm`  (`TaskForm.xmlui` within the `components` folder), to display that:
+When you add a new contact's details or edit a task, the app displays a form in a modal dialog. Create a component, `ContactForm`  (`ContactForm.xmlui` within the `components` folder), to display that:
   
-```ueml copy filename="TaskForm.xmlui"
-<Component name="TaskForm">
-  <ModalDialog id="dialog" title="{$props.title}" >
-    <Text>Task Form</Text>
+```ueml copy filename="ContactForm.xmlui"
+<Component name="ContactForm">
+  <ModalDialog id="dialog" title="Add a new Contact">
+    <Text>Contact Form</Text>
   </ModalDialog>
   <api name="open" value="dialog.open()" />
 </Component>
 ```
 
-This component embeds a `ModalDialog` component to display a modal popup on demand. The component publishes an API endpoint, `open`, which can be invoked from outside to display the dialog.
+This component embeds a `ModalDialog` component to display a modal popup on demand. `ModalDialog` exposes an `open` method that can be invoked from outside to display the dialog.
 
 ### Displaying the Form
 
-Add the code to `Tasks` to display this dialog:
+Add the code to `Contacts` to display this dialog:
 
-```ueml copy {10, 16} filename="Tasks.xmlui"
-<Component name="Tasks">
-  <Datasource id="topics" url="/api/topics" />
-  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
-    <VStack 
-      padding="$space-4"
-      verticalPadding="$space-6"
-      gap="$space-6">
-      <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
-        <SpaceFiller/>
-        <Button icon="plus" onClick="taskForm.open()">New</Button>
-      </HStack>
+```ueml copy {4, 7} filename="Contacts.xmlui" /onClick="contactForm.open()"/
+<Component name="Contacts">
+  <Datasource id="categories" url="/api/categories" />
+  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <ContactForm id="contactForm" />
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus" onClick="contactForm.open()">New Contact</Button>
+    </HStack>
       <List>
         <!-- Unchanged -->
       </List>
-    </VStack>
-    <TaskForm id="taskForm" title="Add a new Task" />
+  </VStack>
 </Component>
 ```
 
-The code assigns an id (`taskForm`) to the dialog component. Through this identifier, clicking the New button displays the dialog through its `open` API endpoint (`taskForm.open()`):
+The code assigns an id (`contactForm`) to the dialog component. The dialog is not displayed unless you explicitly invoke its exposed `open` methods through its identifier by clicking the New Contact button(`contactForm.open()`):
 
 <br/>
-<Image alt="Task dialog" src="/resources/images/get-started/task-dialog.png" />
+<Image alt="Task dialog" src="/resources/images/get-started/contact-dialog.png" />
 
-The Edit Task function should also display this dialog. The triggering action happens within the `TaskRow` components. However, we intend to handle the action in the `Tasks` component, as it embeds the dialog to pop up. 
+The Edit Contact function should also display this dialog. The triggering action happens within the `ContactRow` components. However, we intend to handle the action in the `Contacts` component, as it embeds the dialog to pop up.
 
-It can be quickly done by a custom component event in `TaskRow`:
+There is a simple solution for this scenario. The `ContactRow` component will raise a custom event representing the edit action, and the `Contacts` component will respond. 
 
-```ueml copy {9-10} filename="TaskRow.xmlui"
-<Component name="TaskRow">
+Add the custom events to `ContactRow`:
+
+```ueml copy {9-10} filename="ContactRow.xmlui"
+<Component name="ContactRow">
   <Card>
-    <HStack gap="$space-4" verticalAlignment="center">
+    <HStack verticalAlignment="center">
       <!-- Unchanged -->
       <DropdownMenu>
-        <prop name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </prop>
+        </property>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked')}" />
-        <MenuItem label="Delete" onClick="{() => emitEvent('deleteClicked')}" />
-    </DropdownMenu>
+        <MenuItem label="Delete" />
+      </DropdownMenu>
     </HStack>
   </Card>
 </Component>
 ```
 
-The highlighted code exposes two events, `editClicked` and `deleteClicked`. We bind the dialog in `Tasks` to the `editClicked` event handler:
+The highlighted code exposes an event, `editClicked`. Bind the dialog in `Contacts` to the `editClicked` event handler:
 
-```ueml copy {8} filename="Tasks.xmlui"
+```ueml copy {8} filename="Contacts.xmlui"
 <!-- Omitted -->
 <List>
   <!-- Omitted -->
-  <prop name="itemTemplate">
-    <TaskRow 
+  <property name="itemTemplate">
+    <ContactRow 
       item="{$item}" 
-      topics="{topics.value}" 
-      onEditClicked="taskForm.open()" />
-  </prop>
+      categories="{categories.value}" 
+      onEditClicked="contactForm.open('edit')" />/>
+  </property>
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
 ```
 
-Now, clicking the Edit context menu of any task item displays the same dialog and the New button.
+Now, clicking the Edit context menu of any contact item displays the same dialog and the New Contact button.
 
 ### Context Sensitive Dialog
 
-The dialog always displays its title as Add a new Task, whether you invoke it with the Add button or the Edit menu command. Modify the dialog to accept a mode, which can be "add" or "edit":
+The dialog always displays its title as Add a new Contact, whether you invoke it with the Add button or the Edit menu command. Modify the dialog to accept a mode, which can be "add" or "edit":
 
-```ueml copy {1, 4, 7} filename="TaskForm.xmlui"
-<Component name="TaskForm" var.mode="">
+```ueml copy {1, 4, 7} filename="ContactForm.xmlui"
+<Component name="ContactForm" var.mode="">
   <ModalDialog 
-     id="dialog" 
-     title="{mode === 'add' ? 'Add a new Task' : 'Edit a Task'}" >
-    <Text>Task Form</Text>
+    id="dialog" 
+    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
+    <Text>Contact Form</Text>
   </ModalDialog>
   <api name="open" value="(m) => { mode = m; dialog.open(); }" />
 </Component>
 ```
 
-The component has a variable, `mode`, which stores the current operation mode. The code changes the `open` API method to use a parameter to pass the current mode. When displaying the dialog, its title is set up according to the specified mode.
+The component has a variable, `mode`, which stores the current operation mode. The code changes the `open` method to use a parameter (`m`) to pass the current mode. When displaying the dialog, its title is set up according to the specified mode.
 
 To work with the current mode, you have to change the invocations of `open` in `Tasks`:
 
-```ueml copy {5, 13, 18} filename="Tasks.xmlui"
-<Component name="Tasks">
+```ueml copy {5, 13, 18} filename="Contacts.xmlui"
+<Component name="Contacts">
   <!-- Unchanged -->
-      <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
-        <SpaceFiller/>
-        <Button icon="plus" onClick="taskForm.open('add')">New</Button>
-      </HStack>
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus" onClick="contactForm.open('add')">New Contact</Button>
+    </HStack>
     <List 
       <!-- Unchanged -->
-      <prop name="itemTemplate">
-        <TaskRow 
+      <property name="itemTemplate">
+        <ContactRow 
           item="{$item}" 
-          topics="{topics.value}" 
-          onEditClicked="taskForm.open('edit')" />
-      </prop>
+          categories="{categories.value}" 
+          onEditClicked="contactForm.open('edit')" />/>
+      </property>
       <!-- Unchanged -->
     </List>
   </VStack>
-  <TaskForm id="taskForm" />
 </Component>
 ```
 
 Now, when you display the dialog with the Edit menu, it will display the correct title:
 
 <br/>
-<Image alt="Task dialog" src="/resources/images/get-started/task-dialog-title.png" />
+<Image alt="Task dialog" src="/resources/images/get-started/contact-dialog-title.png" />
 
 ## Task Data Form
 
-The current task dialog is functionless. Let's create a form that accepts data entry! Add the highlighted elements to `TaskForm`:
+The current contact dialog is functionless. Let's create a form that accepts data entry! Add the highlighted elements to `ContactForm`:
 
-```ueml copy {5-32} filename="TaskForm.xmlui"
-<Component name="TaskForm" var.mode="">
+```ueml copy {5-32} filename="ContactForm.xmlui"
+<Component name="ContactForm" var.mode="">
   <ModalDialog 
-     id="dialog"
-     title="{mode === 'add' ? 'Add a new Task' : 'Edit a Task'}" >
+    id="dialog" 
+    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
-      id="taskForm" 
+      id="contactForm" 
       subject="{{}}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
       onCancel="dialog.close()" >
       <FormItem
-        label="Title" 
-        placeholder="Go to shop" 
-        bindTo="title" autoFocus="true"
+        label="Full name" 
+        placeholder="Specify the contact name" 
+        bindTo="fullName" autoFocus="true"
         maxLength="64" 
         required="true" />
-      <FormItem label="Due date" bindTo="dueDate" type="datePicker" />
+      <FormItem label="Review due date" bindTo="reviewDueDate" type="datePicker" />
       <FormItem
-        label="Description" 
-        placeholder="buy a toilet paper: 12-roll pack, double-ply"
-        bindTo="description"
+        label="Comments" 
+        placeholder="Add comments here"
+        bindTo="comments"
         type="textarea" 
         maxLength="256" />
-      <Datasource id="topics" method="get" url="/api/topics"/>
+      <Datasource id="categories" method="get" url="/api/categories"/>
       <FormItem 
-        placeholder="Select a topic" 
-        bindTo="topicId"
-        initialValue="{$props.task.topicId}"
+        placeholder="Select a category" 
+        bindTo="categoryId"
+        initialValue="{$props.contact.categoryId}"
         type="select">
-        <Items items="{topics.value}">
+        <Items items="{categories.value}">
           <Option label="{$item.name}" value="{$item.id}"/>
         </Items>
       </FormItem>
@@ -242,6 +238,10 @@ The current task dialog is functionless. Let's create a form that accepts data e
 
 The `Form` component is responsible for editing the nested data items. Its `subject` property describes the data to edit. Each of the embedded `FormItem` tags represents a single data item with the associated `bindTo` property naming the property of `subject` managed by the particular `FormItem`.
 
+<Callout type="info" emoji="📔">
+  The `FormItem` bound to the `categoryId` property is more complex. It displays a selection list and uses a `Datasource` (`categories`) to fetch this list's content (with IDs and names). The `initialValue` property of this `FormItem` ensures that the selected category is displayed when you edit a contact. In this case, `ContactForm` will receive the data to edit in its `contact` property. You will add this functionality soon.
+</Callout>
+
 The `submit` event handler of the `Form` (defined with the `onSubmit` attribute) defines the activity to execute when the form is saved.
 
 ### Form with Add
@@ -249,24 +249,24 @@ The `submit` event handler of the `Form` (defined with the `onSubmit` attribute)
 When you run the app, adding a new task displays an empty form to fill in:
 
 <br/>
-<Image alt="Add new task" src="/resources/images/get-started/add-new-task.png" />
+<Image alt="Add new task" src="/resources/images/get-started/add-new-contact.png" />
 
-Fill out the form with data and click the submit button. The current submit event handler displays the JSON representation of the data to save (it does not persist):
+Fill out the form with data and click the submit button. The current submit event handler displays the JSON representation of the data to save (it does not persist yet):
 
 <br/>
-<Image alt="Submit new task" src="/resources/images/get-started/submit-new-task.png" />
+<Image alt="Submit new task" src="/resources/images/get-started/submit-new-contact.png" />
 
 ### Form with Edit
 
-We should pass the initial data to the `Form` when we edit existing information. The current implementation of `TaskForm` starts with empty data, so you should change it:
+We should pass the initial data to the `Form` when we edit existing information. The current implementation of `ContactForm` starts with empty data, so you should change it:
 
-```ueml copy {1, 7, 15} filename="TaskForm.xmlui"
-<Component name="TaskForm" var.mode="" var.initialData="">
+```ueml copy {1, 7, 13-15} filename="ContactForm.xmlui" /var.initialData=""/ /initialData/
+<Component name="ContactForm" var.mode="" var.initialData="">
   <ModalDialog 
-     id="dialog"
-     title="{mode === 'add' ? 'Add a new Task' : 'Edit a Task'}" >
+    id="dialog" 
+    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
-      id="taskForm" 
+      id="contactForm" 
       subject="{initialData}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
       onCancel="dialog.close()" >
@@ -277,20 +277,19 @@ We should pass the initial data to the `Form` when we edit existing information.
     name="open" 
     value="(m, d) => { mode = m; initialData = d; dialog.open(); }" />
 </Component>
-
 ```
 
-The `initialData` variable will hold the data for editing. The form will use this data as the `subject`. The form's `open` API method received only the mode (add or edit) as its argument; the modified implementation now receives the initial data to use.
+The `initialData` variable will hold the data for editing. The form will use this data as the `subject`. The form's `open` method received only the mode (add or edit) as its argument; the modified implementation now receives the initial data to use.
 
-The `TaskRow` component should pass the details of data being edited in its editClicked event; modify the component accordingly:
+The `ContactRow` component should pass the details of data being edited in its editClicked event; modify the component accordingly:
 
-```ueml copy {7} filename="TaskRow.xmlui"
-<Component name="TaskRow">
+```ueml copy {7} filename="ContactRow.xmlui"
+<Component name="ContactRow">
   <!-- Unchanged -->
       <DropdownMenu>
-        <prop name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </prop>
+        </property>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props.item)}" />
         <MenuItem label="Delete" />
     </DropdownMenu>
@@ -299,67 +298,64 @@ The `TaskRow` component should pass the details of data being edited in its edit
 </Component>
 ```
 
-The last step is to update the changes of the `open` API (`TaskForm`) and the `editClicked` event handler (`TaskRow`) in the `Tasks` component:
+You must update the changes of the `open` method in `ContactForm` and modify the `editClicked` event handler of `ContactRow` within the `Contacts` component. You pass an empty record to add a new contact.
 
-```ueml copy {5, 16} filename="Tasks.xmlui"
-<Component name="Tasks">
+```ueml copy {4, 15} filename="Contacts.xmlui"
+<Component name="Contacts">
   <-- Unchanged -->
-      <HStack gap="$space-4" width="100%" verticalAlignment="center" horizontalAlignment="end">
-        <SpaceFiller/>
-        <Button icon="plus" onClick="taskForm.open('add', {})">New</Button>
-      </HStack>
-      <List 
-        items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
-        defaultSections="{$props.filter === 'all'
-          ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-        sectionBy="section">
-        <prop name="itemTemplate">
-          <TaskRow 
-            item="{$item}" 
-            topics="{topics.value}" 
-            onEditClicked="(selected) => taskForm.open('edit', selected)" />
-        </prop>
-        <!-- Unchanged -->
-      </List>
-    </VStack>
-    <TaskForm id="taskForm" />
+    <HStack horizontalAlignment="end">
+      <Button icon="plus" onClick="contactForm.open('add', {})">New Contact</Button>
+    </HStack>
+    <List 
+      items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+      defaultSections="{!$props.filter
+        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+      sectionBy="section">
+      <property name="itemTemplate">
+        <ContactRow 
+          item="{$item}" 
+          categories="{categories.value}" 
+          onEditClicked="(selected) => contactForm.open('edit', selected)" />
+      </property>
+      <!-- Unchanged -->
+    </List>
+  </VStack>
 </Component>
 ```
 
-Now, the `open` method explicitly gets a new empty object when we add a new task or the data of the item we edit a particular item.
+Now, the `open` method explicitly gets a new empty object when we add a new contact or the data of the item we edit a particular item.
 
-When you click the Edit context menu of a particular task, the form displays the task data properties in its items:
+When you click the Edit context menu of a particular contact, the form displays the task data properties in its items:
 
 <br/>
-<Image alt="edit task details" src="/resources/images/get-started/edit-task-details.png" />
+<Image alt="edit task details" src="/resources/images/get-started/edit-contact-details.png" />
 
 ## Saving Data
 
-You can edit the form data, but it must still be saved to the backend. The backend API provides three methods for adding and editing a task record:
+You can edit the form data, but it must still be saved to the backend. The backend API provides three methods for adding and editing a contact record:
 
-- The `POST /api/tasks` method inserts a new data record
-- The `PUT /api/tasks/{taskId}` method updates the task record with ID `taskId`
-- The `DELETE /api/tasks/{taskId}` method removes the task record with ID `taskId`
+- The `POST /api/contacts` method inserts a new data record
+- The `PUT /api/contacts/{contactId}` method updates the contact record with ID `contactId`
+- The `DELETE /api/tasks/{contactId}` method removes the contact record with ID `contactId`
 
-The first two methods accept the task details in their request bodies; the DELETE method does not need a body.
+The first two methods accept the contact details in their request bodies; the DELETE method does not need a body.
 
-### Add a New Task Record
+### Add a New Contact Record
 
-XMLUI has a versatile component, `ApiAction,` that invokes web APIs that modify some data in the backend. Change the `submit` event handler in the `TaskForm` component by removing the `onSubmit` attribute and adding the highlighted event:
+XMLUI has a versatile component, `ApiAction,` that invokes web API endpoints that modify some data in the backend. Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
 
-```ueml copy {10-18} filename="TaskForm.xmlui"
-<Component name="TaskForm" var.mode="" var.initialData="">
+```ueml copy {10-18} filename="ContactForm.xmlui"
+<Component name="ContactForm" var.mode="" var.initialData="">
   <ModalDialog 
-     id="dialog"
-     width="100%"
-     title="{mode === 'add' ? 'Add a new Task' : 'Edit a Task'}" >
+    id="dialog" 
+    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
-      id="taskForm" 
+      id="contactForm" 
       subject="{initialData}"
-      onCancel="dialog.close()" >
+      onCancel="dialog.close()">
       <event name="submit">
         <ApiAction
-          url="/api/tasks"
+          url="/api/contacts"
           method="post"
           body="{$eventArgs}"
           onSuccess="() => dialog.close()"
@@ -368,51 +364,51 @@ XMLUI has a versatile component, `ApiAction,` that invokes web APIs that modify 
       <!-- Unchanged -->
 </Component>
 ```
-The `$eventArgs` context variable within an event handler represents the arguments passed to the handler. The `submit` event uses the data to save as its `$eventArgs`; we send it in the request body. When the `ApiAction` has been completed, the code executes the `success` event handler and closes the dialog.
+The `$eventArgs` context value within an event handler represents the arguments passed to the handler. The `submit` event uses the data to save as its `$eventArgs`; we send it in the request body. When the `ApiAction` has been completed, the code executes the `success` event handler and closes the dialog.
 
 The following figure shows that a new task with its date set to the current calendar day will appear in the Today list after saving it:
 
 <br/>
-<Image alt="New task saved" src="/resources/images/get-started/new-task-saved.png" />
+<Image alt="New task saved" src="/resources/images/get-started/new-contact-saved.png" />
 
-### Edit a Task Record
+### Edit a Contact Record
 
-The `ApiAction` event handler now works only with the New button, and it will cause a faulty operation if you submit an edited Task record. Let's fix this by modifying the action:
+The `ApiAction` event handler now works only with the New Contact button, and it will cause a faulty operation if you submit an edited Contact record. Let's fix this by modifying the action:
 
-```ueml copy {2-3} filename="TaskForm.xmlui"
+```ueml copy {2-3} filename="ContactForm.xmlui"
 <ApiAction
-  url="{mode === 'add' ? '/api/tasks': '/api/tasks/' + initialData.id}"
+  url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
   method="{mode === 'add' ? 'post' : 'put'}"
   body="{$eventArgs}"
   onSuccess="() => dialog.close()"
 />
 ```
 
-This code uses the proper API method depending on the operation mode (add or edit). When you update a task record, the modifications will be displayed in the list immediately:
+This code uses the proper API endpoint depending on the operation mode (add or edit). When you contact a task record, the modifications will be displayed in the list immediately:
 
 <br/>
-<Image alt="Edited task saved" src="/resources/images/get-started/edited-task-saved.png" />
+<Image alt="Edited contact saved" src="/resources/images/get-started/edited-contact-saved.png" />
 
-### Delete a Task Record
+### Delete a Contact Record
 
-We invoke the API endpoint for the delete operation directly from the context menu defined in `TaskRow`.
+We invoke the API endpoint for the delete operation directly from the context menu defined in `ContactRow`.
 
-```ueml copy {11-16} filename="TaskRow.xmlui"
-<Component name="TaskRow">
+```ueml copy {11-16} filename="ContactRow.xmlui"
+<Component name="ContactRow">
   <Card>
       <!-- Unchanged -->
       <DropdownMenu>
-        <prop name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </prop>
+        </property>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props)}" />
         <MenuItem label="Delete">
           <event name="click">
             <ApiAction
-              url="/api/tasks/{$props.item.id}"
+              url="/api/contacts/{$props.item.id}"
               method="delete"
-              confirmTitle="Delete task"
-              confirmMessage="Are you sure you want to delete the task '{$props.item.title}' ?"
+              confirmTitle="Delete Contact {$props.item.fullName}"
+              confirmMessage="Are you sure you want to delete this contact?"
               confirmButtonLabel="Delete" />
           </event>
         </MenuItem>  
@@ -425,4 +421,6 @@ We invoke the API endpoint for the delete operation directly from the context me
 It is helpful to ask the user for confirmation before deleting a particular task. You can easily add a confirmation question to your app through `ApiAction`. Before invoking the specified API endpoint, `ApiAction` will display the confirmation. If confirmed, it will invoke the action; otherwise, it skips it:
 
 <br/>
-<Image alt="Delete task" src="/resources/images/get-started/delete-task.png" />
+<Image alt="Delete task" src="/resources/images/get-started/delete-contact.png" />
+
+Now that you have implemented contact management's core functionality let's add a dashboard to the app.
