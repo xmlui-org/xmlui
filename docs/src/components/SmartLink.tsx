@@ -12,9 +12,20 @@ const styles =
 export const SmartLink = ({ href, openInNewTab = false, ...props }: Props) => {
   const isInternalLink = href && (href.startsWith("/") || href.startsWith("#"));
 
-  if (isInternalLink) {
-    return <Link className={styles} href={href} rel={openInNewTab ? "noopener noreferrer" : undefined} {...props} />;
-  }
-
-  return <a className={styles} href={href} target="_blank" rel="noopener noreferrer" {...props} />;
+  return isInternalLink ? (
+    <Link
+      className={styles}
+      href={href}
+      rel={openInNewTab ? "noopener noreferrer" : undefined}
+      {...props}
+    />
+  ) : (
+    <a
+      className={styles}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      {...props}
+    />
+  );
 };
