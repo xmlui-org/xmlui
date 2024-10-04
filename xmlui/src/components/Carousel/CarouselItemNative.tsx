@@ -14,7 +14,9 @@ export const CarouselItemComponent = ({ content }: Props) => {
       aria-roledescription="slide"
       className={classnames(styles.carouselItem)}
     >
-      {content}
+      <div className={styles.innerWrapper}>
+        {content}
+      </div>
     </div>
   );
 };

@@ -290,7 +290,7 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-error": $colorDanger700,
 
         // --- Border colors
-        "color-border": $colorSurface100,
+        "color-border": $colorSurface200,
         "color-border--disabled": $colorSurface200,
         "color-border-dropdown-item": $colorSurface200,
 
