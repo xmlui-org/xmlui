@@ -99,6 +99,21 @@ function getArticleIds(article) {
       }
     }
   }
+
+  function getSubHeadingIds(lines) {
+    for (const line of lines) {
+      // We only gather headings which have an explicit ID defined and they are not leveled as h1
+      const match = line.match(/^##+\s+.+?\s*(\[#[\w-]+\])$/);
+      if (!match) continue;
+      if (match[1]) {
+        // Has ID, extract it and use that
+        return normalizeToHeadingId(match[1].replace(/\[#(.*?)\]/, (_, p1) => p1));
+      } else {
+        // Generate new ID from the heading title
+        return normalizeToHeadingId(match[0].slice(1));
+      }
+    }
+  }
 }
 
 function normalizeToHeadingId(rawStr) {

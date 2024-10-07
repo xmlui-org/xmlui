@@ -77,9 +77,9 @@ You can represent the `true` and `false` values with multiple keywords:
 ## Border Values
 
 When you specify the border of a component, you can use these three border properties:
-- **Border width**. The stroke [width](../reference/styling/common-units/#size-values) to draw the border.
-- **Border style**. The border [style pattern](../reference/styling/common-units/#border-style-values) to apply.
-- **Border color**. The [color](../reference/styling/common-units/#color-values) of the border.
+- **Border width**. The stroke <SmartLink href="#size-values">width</SmartLink> to draw the border.
+- **Border style**. The border <SmartLink href="#border-style-values">style pattern</SmartLink> to apply.
+- **Border color**. The <SmartLink href="#color-values">color</SmartLink> of the border.
 You must specify at least one of these properties to display a border. You can specify the border properties in any order; however, you can specify a property only once. All of these border specifications are correct:
 
 ```text
@@ -92,7 +92,7 @@ dashed 4px #f0cccc
 
 ## Border Rounding
 
-You can define border rounding values to round the corners of a component's outer border edge. You can set a single radius to make circular corners or two radii to make elliptical ones. Radius values use the [size value](#size-values) syntax and semantics.
+You can define border rounding values to round the corners of a component's outer border edge. You can set a single radius to make circular corners or two radii to make elliptical ones. Radius values use the <SmartLink href="#size-values">size value</SmartLink> syntax and semantics.
 
 When you specify multiple radii, the first value determines the horizontal rounding, and the second the vertical rounding.
 
@@ -151,7 +151,7 @@ The engine accepts several color value types:
 - **The `rgba` function**. Use the `rgba` function with four arguments. The first three arguments represent the color channels (see the `rgb` function). The alpha channel can have a percentage value (0% - 100%) or a float number between 0 and 1.
 - **The `hsl` function**. Describe a color with the `hsl` function with three arguments representing the Hue angle (units are `deg`, `rad`, `grad`, or `turn`), the Saturation percentage (0% - 100%), and the Lightness percentage(0% - 100%).
 - **The `hsla` function**. Describe a color with the `hsla` function with three arguments representing the H, S, and L values (see `hsl`) and the alpha channel (a percentage value (0% - 100%) or a float number between 0 and 1).
-- **Named colors**. You can use standard CSS color names (all lowercase letters). See the [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color) for more details.
+- **Named colors**. You can use standard CSS color names (all lowercase letters). See the <SmartLink href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color">MDN documentation</SmartLink> for more details.
 
 <Playground
     previewOnly
@@ -198,7 +198,7 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 |`alias`|An alias or shortcut is to be created.|
 |`copy`|Something is to be copied.|
 |`move`|Something is to be moved.|
-|`no‑drop`|An item may not be dropped at the current location. [Firefox bug 275173](https://bugzil.la/275173): On Windows and macOS, no-drop is the same as not-allowed.|
+|`no‑drop`|An item may not be dropped at the current location. <SmartLink href="https://bugzil.la/275173">Firefox bug 275173</SmartLink>: On Windows and macOS, no-drop is the same as not-allowed.|
 |`not‑allowed`|The requested action will not be carried out.|
 |`grab`|Something can be grabbed (dragged to be moved).|
 |`grabbing`|Something is being grabbed (dragged to be moved).|
@@ -207,7 +207,7 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 
 |Value|Description|
 |-|-|
-|`all‑scroll`|Something can be scrolled in any direction (panned). [Firefox bug 275174](https://bugzil.la/275174): On Windows, all-scroll is the same as move.|
+|`all‑scroll`|Something can be scrolled in any direction (panned). <SmartLink href="https://bugzil.la/275174">Firefox bug 275174</SmartLink>: On Windows, all-scroll is the same as move.|
 |`col‑resize`|The item/column can be resized horizontally. Often rendered as arrows pointing left and right with a vertical bar separating them.|
 |`row‑resize`|The item/row can be resized vertically. Often rendered as arrows pointing up and down with a horizontal bar separating them.|
 |`n‑resize`, `e‑resize`, `s‑resize`, `w‑resize`, `ne‑resize`, `nw‑resize`, `se‑resize`, `sw‑resize`, `ew‑resize`, `ns‑resize`, `nesw‑resize`, `nwse‑resize`|Some edge is to be moved. For example, the `se‑resize` cursor is used when the movement starts from the south-east corner of the box. In some environments, an equivalent bidirectional resize cursor is shown. For example, `n‑resize` and `s‑resize` are the same as `ns‑resize`.|
@@ -375,7 +375,7 @@ You can define shadow values with one or more shadow effects. If you use more th
 - Spread radius
 - Optional color
 
-The first up to four [size value](#size-values) segments are followed by the optional [color value](#color-values).
+The first up to four <SmartLink href="#size-values">size value</SmartLink> segments are followed by the optional <SmartLink href="#color-values">color value</SmartLink>.
 
 You can use two, three, or four size values.
 

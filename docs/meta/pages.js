@@ -1,6 +1,7 @@
 export const CREATE_THE_APP = "/cl-app/01-create-app";
 export const DISPLAY_DATA_IN_A_LIST = "/cl-app/02-use-list";
 export const FILTER_DATA = "/cl-app/03-filter-data";
+export const A_FEW_POLISHING_TOUCHES = "/cl-app/04-polishing";
 export const EDITING_DATA = "/cl-app/05-editing-data";
 export const CREATE_A_DASHBOARD = "/cl-app/06-dashboard";
 export const CONTACT_LIST_TUTORIAL = "/cl-app";

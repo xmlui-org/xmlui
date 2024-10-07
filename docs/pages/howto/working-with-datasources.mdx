@@ -1,13 +1,15 @@
+import { COMPONENT_DATASOURCE, COMPONENT_LIST, COMPONENT_TABLE, CREATE_THE_APP, DATA_MANIPULATION_WITH_APIACTION, GETTING_STARTED_WITH_XMLUI } from "../../meta/pages";
+
 # Data Fetching with Datasource
 
 In this tutorial, you will learn how to load data from external sources using the `Datasource` component and the `datasource` property.
 
-This tutorial assumes you already completed either the [Personal Todo App](../get-started/personal-todo/00-introduction.mdx) or [Your First XMLUI App](../get-started/first-app.mdx) tutorials.
+This tutorial assumes you already completed either the <SmartLink href={GETTING_STARTED_WITH_XMLUI}>Getting started</SmartLink> section or the <SmartLink href={CREATE_THE_APP}>Contact List</SmartLink> tutorial.
 Both provide foundational knowledge this tutorial will build upon.
 
-For a detailed rundown of the available properties, events and API for the `Datasource` component see the [`Datasource` reference docs](../components/Datasource.mdx).
+For a detailed rundown of the available properties, events and API for the `Datasource` component see the <SmartLink href={COMPONENT_DATASOURCE}>`Datasource` reference docs</SmartLink>.
 
-A companion tutorial is also available that deals with data manipulation titled [`Data Manipulation with ApiAction`](./working-with-apiactions.mdx).
+A companion tutorial is also available that deals with data manipulation titled <SmartLink href={DATA_MANIPULATION_WITH_APIACTION}>Data Manipulation with ApiAction</SmartLink>.
 
 Use the `create-xmlui-app` tool (as you learned from the earlier tutorials). Name your app as you prefer (e.g., `ds-tutorial`). After creating the code, open the app in your code editor (VS Code).
 
@@ -59,7 +61,7 @@ You are ready to learn using the `Datasource` component! In subsequent sections,
 
 ## Loading a List of Data
 
-XMLUI can quickly fetch data from an API. Most XMLUI components have a `datasource` property to handle API data loading conveniently. This property is useful for components that can display a list of items (such as the [`List`](../components/List.mdx) or [`Table`](../components/Table.mdx)).
+XMLUI can quickly fetch data from an API. Most XMLUI components have a `datasource` property to handle API data loading conveniently. This property is useful for components that can display a list of items (such as the <SmartLink href={COMPONENT_LIST}>`List`</SmartLink> or <SmartLink href={COMPONENT_TABLE}>`Table`</SmartLink>).
 
 Add the highlighted `NavLink` and `Page` components to the code in the Main.xmlui file to populate the `List` component with data! For the sake of brevity, from now on, we omit the majority of the existing code and shorten the instructions like here:
 
@@ -249,7 +251,7 @@ Using `resultSelector,` any consumers of the `Datasource` component will conside
 
 Query parameters are additional information sent to an API endpoint to fetch data. The backend filters the data using search parameters and transfers only the filtered result.
 
-In the [Filtering Incoming Data](#filtering-incoming-data) section, you filtered the response data on the client side; here, you will use query parameters to let the backend handle the filtering, sorting, and ordering.
+In the <SmartLink href="#filtering-incoming-data">Filtering Incoming Data</SmartLink> section, you filtered the response data on the client side; here, you will use query parameters to let the backend handle the filtering, sorting, and ordering.
 
 Add a new route with the URL `/query-params`:
 
