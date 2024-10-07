@@ -6,13 +6,13 @@ describe("Ueml transform - regression", () => {
   it("prop with multiple component #1", () => {
     const cd = transformSource(`
     <Table width="50%">
-      <prop name="items">
+      <property name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
-      </prop>
+      </property>
       <Column size="140">
-          <prop name="template">
+          <property name="template">
             <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-          </prop>
+          </property>
       </Column>
       <Column accessor="key" header="Header"/>
     </Table>
@@ -23,13 +23,13 @@ describe("Ueml transform - regression", () => {
   it("Element with attribute comment #1", () => {
     const cd = transformSource(`
     <Table width="50%" <!-- height="100%" --> >
-      <prop name="items">
+      <property name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
-      </prop>
+      </property>
       <Column size="140">
-        <prop name="template">
+        <property name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </prop>
+        </property>
       </Column>
       <Column accessor="key" header="Header"/>
     </Table>
@@ -40,13 +40,13 @@ describe("Ueml transform - regression", () => {
   it("Element with attribute comment #2", () => {
     const cd = transformSource(`
     <Table <!--width="50%"--> <!-- height="100%" --> >
-      <prop name="items">
+      <property name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
-      </prop>
+      </property>
       <Column size="140">
-        <prop name="template">
+        <property name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </prop>
+        </property>
       </Column>
       <Column accessor="key" header="Header"/>
     </Table>
@@ -57,13 +57,13 @@ describe("Ueml transform - regression", () => {
   it("Element with attribute comment #3", () => {
     const cd = transformSource(`
     <Table <!--width="50%"--> height="100%">
-      <prop name="items">
+      <property name="items">
         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
-      </prop>
+      </property>
       <Column size="140">
-        <prop name="template">
+        <property name="template">
           <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-        </prop>
+        </property>
       </Column>
       <Column accessor="key" header="Header"/>
     </Table>

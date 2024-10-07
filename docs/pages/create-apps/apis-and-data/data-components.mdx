@@ -14,9 +14,9 @@ _TBD_
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <prop name="itemTemplate">
+  <property name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -25,9 +25,9 @@ _TBD_
   name="Getting data from Spacex API"
   app={`
     <List datasource="https://api.spacexdata.com/v3/history">
-      <prop name="itemTemplate">
+      <property name="itemTemplate">
         <Card title="{$item.title}" subTitle="{$item.details}"/>
-      </prop>
+      </property>
     </List>
     `}
   height={300}
@@ -39,9 +39,9 @@ _TBD_
     app={`
     <List>
       <Datasource url="https://api.spacexdata.com/v3/history" />
-      <prop name="itemTemplate">
+      <property name="itemTemplate">
         <Card title="{$item.title}" subTitle="{$item.details}"/>
-      </prop>
+      </property>
     </List>
     `}
     height={300}

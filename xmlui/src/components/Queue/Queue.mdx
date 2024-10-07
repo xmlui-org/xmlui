@@ -28,12 +28,12 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
          processing.onProgress(processed)
       }
     ">
-    <prop name="progressFeedback">
+    <property name="progressFeedback">
       <Text value="{processed} / {queued}" />
-    </prop>
-    <prop name="resultFeedback">
+    </property>
+    <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
-    </prop>
+    </property>
   </Queue>
   <ChangeListener 
     listenTo="{myQueue.getQueueLength()}" 
@@ -67,12 +67,12 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
              processing.onProgress(processed)
           }
         ">
-        <prop name="progressFeedback">
+        <property name="progressFeedback">
           <Text value="{processed} / {queued}" />
-        </prop>
-        <prop name="resultFeedback">
+        </property>
+        <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
-        </prop>
+        </property>
       </Queue>
       <ChangeListener 
         listenTo="{myQueue.getQueueLength()}" 
@@ -173,9 +173,9 @@ The following example emulates a file-processing application. When a file is abo
         return false;
       }
     }">
-    <prop name="resultFeedback">
+    <property name="resultFeedback">
       <Text value="All items processed" />
-    </prop>
+    </property>
   </Queue>
   <Text>Items queued: {queued}</Text>
   <Text>Processed: {processed}</Text>
@@ -211,9 +211,9 @@ The following example emulates a file-processing application. When a file is abo
             return false;
           }
         }">
-        <prop name="resultFeedback">
+        <property name="resultFeedback">
           <Text value="All items processed" />
-        </prop>
+        </property>
       </Queue>
       <Text>Items queued: {queued}</Text>
       <Text>Processed: {processed}</Text>
@@ -244,9 +244,9 @@ The following sample displays a tick mark every time the queue is emptied:
       delay(1000); 
     }"
     onComplete="queueEmptied += '✅'" >
-    <prop name="resultFeedback">
+    <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
-    </prop>
+    </property>
   </Queue>
   <Text>Items queued: {queued}</Text>
   <Text>Current result: {result.toFixed(4)}</Text>
@@ -273,9 +273,9 @@ The following sample displays a tick mark every time the queue is emptied:
           delay(1000); 
         }"
         onComplete="queueEmptied += '✅'" >
-        <prop name="resultFeedback">
+        <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
-        </prop>
+        </property>
       </Queue>
       <Text>Items queued: {queued}</Text>
       <Text>Current result: {result.toFixed(4)}</Text>
@@ -312,9 +312,9 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
       delay(1000); 
     }"
     onDidProcess="progressLine += '✅'" >
-    <prop name="resultFeedback">
+    <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
-    </prop>
+    </property>
   </Queue>
   <Text>Items queued: {queued}</Text>
   <Text>Current result: {result.toFixed(4)}</Text>
@@ -341,9 +341,9 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
           delay(1000); 
         }"
         onDidProcess="progressLine += '✅'" >
-        <prop name="resultFeedback">
+        <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
-        </prop>
+        </property>
       </Queue>
       <Text>Items queued: {queued}</Text>
       <Text>Current result: {result.toFixed(4)}</Text>
@@ -397,9 +397,9 @@ The following sample generates an error for every fourth item, and gives an erro
     }"
     onDidProcess="progressLine += '✅'"
     onProcessError="progressLine += '❌'" >
-    <prop name="resultFeedback">
+    <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
-    </prop>
+    </property>
   </Queue>
   <Text>Items queued: {queued}</Text>
   <Text>Current result: {result.toFixed(4)}</Text>
@@ -432,9 +432,9 @@ Click the button several times to see how processing errors are handled in the U
         }"
         onDidProcess="progressLine += '✅'"
         onProcessError="progressLine += '❌'" >
-        <prop name="resultFeedback">
+        <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
-        </prop>
+        </property>
       </Queue>
       <Text>Items queued: {queued}</Text>
       <Text>Current result: {result.toFixed(4)}</Text>
@@ -473,9 +473,9 @@ The following sample declares a `willProcess` event handler that will skip proce
       result += processing.item;
       delay(1000); 
     }">
-    <prop name="resultFeedback">
+    <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
-    </prop>
+    </property>
   </Queue>
   <Text>Items queued: {queued}</Text>
   <Text>Items skipped: {skipped}</Text>
@@ -504,9 +504,9 @@ Click the button several times and see how the number of skipped items increment
           result += processing.item;
           delay(1000); 
         }">
-        <prop name="resultFeedback">
+        <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
-        </prop>
+        </property>
       </Queue>
       <Text>Items queued: {queued}</Text>
       <Text>Items skipped: {skipped}</Text>

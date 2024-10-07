@@ -55,11 +55,11 @@ Note the `meat` section header before all the others in the list below:
   defaultSections="{['meat']}"
   sectionBy="category"
 >
-  <prop name="sectionTemplate">
+  <property name="sectionTemplate">
     <Stack padding="$space-2">
       <Text variant="subtitle" value="{$item.sectionKey}" />
     </Stack>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -73,11 +73,11 @@ Note the `meat` section header before all the others in the list below:
     defaultSections="{['meat']}"
     sectionBy="category"
   >
-    <prop name="sectionTemplate">
+    <property name="sectionTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
-    </prop>
+    </property>
   </List>
   `}
 />
@@ -88,11 +88,11 @@ Note the `meat` section header before all the others in the list below:
 
 ```ueml copy
 <List>
-  <prop name="emptyListTemplate">
+  <property name="emptyListTemplate">
     <Stack width="100%" horizontalAlignment="center">
       <Text variant="strong" value="Empty..." />
     </Stack>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -102,11 +102,11 @@ Note the `meat` section header before all the others in the list below:
   height={100}
   app={`
   <List>
-    <prop name="emptyListTemplate">
+    <property name="emptyListTemplate">
       <Stack width="100%" horizontalAlignment="center">
         <Text variant="strong" value="Empty..." />
       </Stack>
-    </prop>
+    </property>
   </List>
   `}
 />
@@ -134,7 +134,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 
 ```ueml copy {2-12}
 <List data="{[...]}">
-  <prop name="itemTemplate">
+  <property name="itemTemplate">
     <Card>
       <HStack verticalAlignment="center" gap="0.5rem">
         <Icon name="info" />
@@ -145,7 +145,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
         <Text value="{$item.unit}" variant="em" />
       </HStack>
     </Card>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -155,7 +155,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   height={400}
   app={`
   <List data='{${JSON.stringify(data)}}'>
-    <prop name="itemTemplate">
+    <property name="itemTemplate">
       <Card>
         <HStack verticalAlignment="center" gap="0.5rem">
           <Icon name="info" />
@@ -166,7 +166,7 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
           <Text value="{$item.unit}" variant="em" />
         </HStack>
       </Card>
-    </prop>
+    </property>
   </List>
   `}
 />
@@ -242,11 +242,11 @@ It contains the following boolean attributes:
   defaultSections="{['meat']}"
   sectionBy="category"
 >
-  <prop name="sectionTemplate">
+  <property name="sectionTemplate">
     <Stack padding="$space-2">
       <Text variant="subtitle" value="{$item.sectionKey}" />
     </Stack>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -260,11 +260,11 @@ It contains the following boolean attributes:
     defaultSections="{['meat']}"
     sectionBy="category"
   >
-    <prop name="sectionTemplate">
+    <property name="sectionTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
-    </prop>
+    </property>
   </List>
   `}
 />
@@ -284,14 +284,14 @@ An `$item` here looks like the following:
 
 ```ueml copy {7-9}
 <List data='{${JSON.stringify(data)}}' sectionBy="category">
-  <prop name="sectionTemplate">
+  <property name="sectionTemplate">
     <Stack padding="$space-2">
       <Text variant="subtitle" value="{$item.sectionKey}" />
     </Stack>
-  </prop>
-  <prop name="sectionFooterTemplate">
+  </property>
+  <property name="sectionFooterTemplate">
     <ContentSeparator />
-  </prop>
+  </property>
 </List>
 ```
 
@@ -301,14 +301,14 @@ An `$item` here looks like the following:
   height={400}
   app={`
   <List data='{${JSON.stringify(data)}}' sectionBy="category">
-    <prop name="sectionTemplate">
+    <property name="sectionTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
-    </prop>
-    <prop name="sectionFooterTemplate">
+    </property>
+    <property name="sectionFooterTemplate">
       <ContentSeparator />
-    </prop>
+    </property>
   </List>
   `}
 />
@@ -328,11 +328,11 @@ An `$item` here looks like the following:
 
 ```ueml copy {2-6}
 <List data='{${JSON.stringify(data)}}' sectionBy="category">
-  <prop name="sectionTemplate">
+  <property name="sectionTemplate">
     <Stack padding="$space-2">
       <Text variant="subtitle" value="{$item.sectionKey}" />
     </Stack>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -342,11 +342,11 @@ An `$item` here looks like the following:
   height={400}
   app={`
   <List data='{${JSON.stringify(data)}}' sectionBy="category">
-    <prop name="sectionTemplate">
+    <property name="sectionTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
-    </prop>
+    </property>
   </List>
   `}
 />

@@ -1,6 +1,6 @@
 <Component name="TodoItems">
   <List maxHeight="300" items="{$props.items}" borderTop="$items-border">
-    <prop name="itemTemplate">
+    <property name="itemTemplate">
       <HStack verticalAlignment="center" gap="1rem" width="100%"
               padding="$container-padding" borderBottom="$items-border">
         <Checkbox initialValue="{$item.checked}" onDidChange="emitEvent('checkItem', $item.id)" />
@@ -9,6 +9,6 @@
         <Button size="xs" variant="ghost" themeColor="secondary" icon="close"
                 width="22" padding="0" onClick="emitEvent('removeItem', $item.id)" />
       </HStack>
-    </prop>
+    </property>
   </List>
 </Component>

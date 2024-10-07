@@ -21,12 +21,12 @@ With this property, you can construct your custom logo instead of using a single
 ```ueml copy {2-8}
 <App>
   <AppHeader>
-    <prop name="logoTemplate">
+    <property name="logoTemplate">
       <H3>
         <Icon name="drive" />
         DriveDiag
       </H3>
-    </prop>
+    </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -51,12 +51,12 @@ With this property, you can construct your custom logo instead of using a single
   app={`
   <App>
     <AppHeader>
-    <prop name="logoTemplate">
+    <property name="logoTemplate">
         <H3>
           <Icon name="drive" />
           DriveDiag
         </H3>
-    </prop>
+    </property>
     </AppHeader>
     <NavPanel>
       <NavLink label="Home" to="/" icon="home"/>
@@ -84,13 +84,13 @@ It accepts component definitions.
 ```ueml copy {3-9}
 <App>
   <AppHeader>
-    <prop name="profileMenuTemplate">
+    <property name="profileMenuTemplate">
       <DropdownMenu>
-        <prop name="triggerTemplate">
+        <property name="triggerTemplate">
           <Avatar name="Joe" size="xs" radius="50%"/>
-        </prop>
+        </property>
       </DropdownMenu>
-    </prop>
+    </property>
   </AppHeader>
 </App>
 ```
@@ -103,13 +103,13 @@ It accepts component definitions.
   app={`
   <App>
     <AppHeader>
-      <prop name="profileMenuTemplate">
+      <property name="profileMenuTemplate">
         <DropdownMenu>
-          <prop name="triggerTemplate">
+          <property name="triggerTemplate">
             <Avatar name="Joe" size="xs" radius="50%"/>
-          </prop>
+          </property>
         </DropdownMenu>
-      </prop>
+      </property>
     </AppHeader>
   </App>
   `}

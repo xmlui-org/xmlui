@@ -1,7 +1,7 @@
 <App layout="condensed">
-  <prop name="logoTemplate">
+  <property name="logoTemplate">
      <Heading level="h3" value="Example App"/>
-  </prop>
+  </property>
   <NavPanel>
       <NavLink label="Home" to="/" icon="home"/>
       <NavLink label="Page 1" to="/page1"/>
@@ -10,9 +10,9 @@
   <Pages defaultRoute="/">
       <Page url="/">
         <List datasource="https://api.spacexdata.com/v3/history">
-          <prop name="itemTemplate">
+          <property name="itemTemplate">
             <Card title="{$item.title}" subTitle="{$item.details}"/>
-          </prop>
+          </property>
         </List>
       </Page>
       <Page url="/page1">

@@ -286,10 +286,10 @@ Hello!
   it("Script creates Fragment #2", () => {
     const cd = transformSource(`
     <Items items="{['first', 'second', 'third']}">
-      <prop name="itemTemplate">
+      <property name="itemTemplate">
         <script>something</script>
         <Stack>{other}</Stack>
-      </prop>
+      </property>
     </Items>
     `) as ComponentDef;
     expect(cd.children).equal(undefined);

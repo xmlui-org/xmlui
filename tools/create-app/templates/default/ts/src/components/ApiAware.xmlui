@@ -1,9 +1,9 @@
 <Component name="ApiAware">
   <PagePanel>
     <List datasource="https://api.spacexdata.com/v3/history">
-      <prop name="itemTemplate">
+      <property name="itemTemplate">
         <Card title="{$item.title}" subTitle="{$item.details}"/>
-      </prop>
+      </property>
     </List>
   </PagePanel>
 </Component>

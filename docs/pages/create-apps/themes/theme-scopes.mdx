@@ -24,9 +24,9 @@ Often, apps display their headers in a contrasting tone; when the app's body is 
       <Pages defaultRoute="/">
         <Page url="/">
           <List datasource="https://api.spacexdata.com/v3/history">
-            <prop name="itemTemplate">
+            <property name="itemTemplate">
               <Card title="{$item.title}" subTitle="{$item.details}"/>
-            </prop>
+            </property>
           </List>
         </Page>
         <Page url="/page1">
@@ -58,9 +58,9 @@ XMLUI has a powerful component, `Theme,` that you can use to provide a particula
   <Pages defaultRoute="/">
     <Page url="/">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <prop name="itemTemplate">
+        <property name="itemTemplate">
           <Card title="{$item.title}" subTitle="{$item.details}"/>
-        </prop>
+        </property>
       </List>
     </Page>
     <Page url="/page1">

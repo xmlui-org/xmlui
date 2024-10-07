@@ -8,7 +8,7 @@ import palette from "./samples/color-palette.xmlui";
 Theme variables follow a naming convention that allows decode what components and visual traits they affect:
 
 ```
-<propertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
+<propertyertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
 ```
 
 In this convention, the `<ComponentId>` part is optional.
@@ -16,7 +16,7 @@ In this convention, the `<ComponentId>` part is optional.
 - Those theme variables that do not use the `<ComponentId>` segment are _app-bound_ variables, for they define visuals that can be applied to the entire application, including multiple types of components.
 - The variables with a `<ComponentId>` segment are _component-bound_ variables, which influence only the component's appearance defined by the corresponding ID.
 
-The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
+The `<propertyertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
 
 - `color-text`: Text color 
 - `color-bg`: Background color
@@ -25,7 +25,7 @@ The `<propertyName>` segment names a property (and optionally a part of a compon
 - `line-height`: The height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
 
-The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyName>`).
+The `<trait1>` and `<trait2>` segments describe one or two trait values regarding a particular property (`<propertyertyName>`).
 
 For example, the `Button` component has two traits that define its appearance. The `themeColor` trait defines the set of colors to use with the button; its available values are `primary`, `secondary`, and `attention`. The `variant` trait specifies the general appearance of the button (whether it has a border at all, etc.) with the values of `solid`, `outlined`, or `ghost`. The `themeColor` is the first trait, and `variant` is the second. So, we can use (among the others) these theme variables with button colors:
 
@@ -45,7 +45,7 @@ When defining a theme variable, you can define multiple state values (in any ord
 
 ## Property Names
 
-XMLUI utilizes numerous visual properties you can use in place of `<propertyName>`. The following list summarizes their names and description:
+XMLUI utilizes numerous visual properties you can use in place of `<propertyertyName>`. The following list summarizes their names and description:
 
 |Name|Description|
 |-|-|

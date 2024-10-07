@@ -376,9 +376,9 @@ To get acquainted with these layouts, the samples below show different layout se
   <Pages defaultRoute="/">
     <Page url="/">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <prop name="itemTemplate">
+        <property name="itemTemplate">
           <Card title="{$item.title}" subTitle="{$item.details}"/>
-        </prop>
+        </property>
       </List>
     </Page>
     <Page url="/About">
@@ -524,9 +524,9 @@ When the `App` does not contain an `AppHeader` placeholder, the app does not dis
   height={150}
   app={`
     <App layout="horizontal">
-      <prop name="logoTemplate">
+      <property name="logoTemplate">
         (Logo)
-      </prop>
+      </property>
       <CVStack backgroundColor="palegoldenrod" height="100%">
         MAIN CONTENT
       </CVStack>
@@ -678,12 +678,12 @@ The `AppHeader` component placeholder has a property, `logoTemplate`, which you 
 ```ueml copy
 <App>
   <AppHeader>
-    <prop name="logoTemplate">
+    <property name="logoTemplate">
       <HStack>
         <Stack width="16" height="16" backgroundColor="purple" />
         <Stack width="16" height="16" backgroundColor="green" />
       </HStack>
-    </prop>
+    </property>
     <H1>AcmeApp</H1>
   </AppHeader>
   <CVStack backgroundColor="palegoldenrod" height="100%">
@@ -703,12 +703,12 @@ The `AppHeader` component placeholder has a property, `logoTemplate`, which you 
   app={`
     <App>
       <AppHeader>
-        <prop name="logoTemplate">
+        <property name="logoTemplate">
           <HStack>
             <Stack width="16" height="16" backgroundColor="purple" />
             <Stack width="16" height="16" backgroundColor="green" />
           </HStack>
-        </prop>
+        </property>
         <H1>AcmeApp</H1>
       </AppHeader>
       <CVStack backgroundColor="palegoldenrod" height="100%">

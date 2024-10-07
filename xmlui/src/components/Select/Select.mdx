@@ -58,12 +58,12 @@ If the `label` is not specified `value` is shown.
 
 ```ueml copy
 <Select>
-  <prop name="optionTemplate">
+  <property name="optionTemplate">
     <HStack verticalAlignment="center" gap="$space-0_5">
       <Icon name="info" />
       <Text value="{$item.label}" variant="strong" />
     </HStack>
-  </prop>
+  </property>
   <Option value="opt1" label="first"/>
   <Option value="opt2" label="second"/>
   <Option value="opt3" label="third"/>
@@ -76,12 +76,12 @@ If the `label` is not specified `value` is shown.
   height={170}
   app={`
     <Select>
-      <prop name="optionTemplate">
+      <property name="optionTemplate">
         <HStack verticalAlignment="center" gap="$space-0_5">
           <Icon name="info" />
           <Text value="{$item.label}" variant="strong" />
         </HStack>
-      </prop>
+      </property>
       <Option value="opt1" label="first"/>
       <Option value="opt2" label="second"/>
       <Option value="opt3" label="third"/>
@@ -171,9 +171,9 @@ Click on the second field to see the custom empty list indicator.
   <VStack gap="$space-0_5">
     <Text value="Custom:" />
     <Select>
-      <prop name="emptyListTemplate">
+      <property name="emptyListTemplate">
         <Text variant="strong" value="Nothing to see here!" />
-      </prop>
+      </property>
     </Select>
   </VStack>
 </VStack>
@@ -192,9 +192,9 @@ Click on the second field to see the custom empty list indicator.
       <VStack gap="$space-0_5rem">
         <Text value="Custom:" />
         <Select>
-          <prop name="emptyListTemplate">
+          <property name="emptyListTemplate">
             <Text variant="strong" value="Nothing to see here!" />
-          </prop>
+          </property>
         </Select>
       </VStack>
     </VStack>

@@ -4,12 +4,12 @@ A unique feature of XMLUI is the ability to natively bind properties to results 
 
 ```ueml copy {3}
 <List>
-  <prop name=items>
+  <property name=items>
     <Datasource url="https://api.spacexdata.com/v3/history"/>
-  </prop>
-  <prop name=itemTemplate>
+  </property>
+  <property name=itemTemplate>
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </prop>
+  </property>
 </List>
 ```
 
@@ -24,12 +24,12 @@ Here is the app using the markup above:
     name="Getting data from Spacex API"
     app={`
     <List>
-      <prop name="data">
+      <property name="data">
         <Datasource url="https://api.spacexdata.com/v3/history"/>
-      </prop>
-      <prop name="itemTemplate">
+      </property>
+      <property name="itemTemplate">
         <Card title="{$item.title}" subTitle="{$item.details}"/>
-      </prop>
+      </property>
     </List>
     `}
     height={300}
@@ -55,9 +55,9 @@ Though it has no value, you can use the `Datasource` above to set the `value` pr
 
 ```ueml copy {3}
 <Text>
-  <prop name="value">
+  <property name="value">
     <Datasource url="https://api.spacexdata.com/v3/history"/>
-  </prop>
+  </property>
 </Text>
 ```
 
@@ -66,9 +66,9 @@ Though it has no value, you can use the `Datasource` above to set the `value` pr
     name="Getting data from Spacex API #2"
     app={`
     <Text>
-      <prop name="value">
+      <property name="value">
         <Datasource url="https://api.spacexdata.com/v3/history"/>
-      </prop>
+      </property>
     </Text>
     `}
     height={100}

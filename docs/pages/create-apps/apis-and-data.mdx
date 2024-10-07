@@ -20,9 +20,9 @@ This section will teach you how to access backend APIs through XMLUI components.
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <property name="itemTemplate">
+  <propertyerty name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </property>  
+  </propertyerty>  
 </List>
 ```
 
@@ -47,9 +47,9 @@ Let's repeat the `List` example using the `datasource` property earlier:
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <property name="itemTemplate">
+  <propertyerty name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </property>  
+  </propertyerty>  
 </List>
 ```
 
@@ -58,9 +58,9 @@ You can describe the same operation with the `Datasource` component this way:
 ```ueml copy /Datasource/ /{spaceXData.value}/
 <Datasource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
 <List data="{spaceXData.value}">
-  <property name="itemTemplate">
+  <propertyerty name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </property>  
+  </propertyerty>  
 </List>
 ```
 

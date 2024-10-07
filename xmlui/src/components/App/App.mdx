@@ -24,9 +24,9 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 <App layout="(specific layout value)">
   <!-- AppHeader omitted for "vertical" and "vertical-sticky" -->
   <AppHeader>
-    <prop name="logoTemplate">
+    <property name="logoTemplate">
       <Heading level="h3" value="Example App"/>
-    </prop>
+    </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -36,9 +36,9 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
   <Pages defaultRoute="/">
     <Page url="/">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <prop name="itemTemplate">
+        <property name="itemTemplate">
           <Card title="{$item.title}" subTitle="{$item.details}"/>
-        </prop>
+        </property>
       </List>
     </Page>
     <Page url="/page1">

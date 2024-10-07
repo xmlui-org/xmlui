@@ -85,7 +85,7 @@ describe("Ueml transform - errors", () => {
 
   it("Invalid attribute in prop", () => {
     try {
-      transformSource("<Stack><prop name='my' blabal='123'/></Stack>");
+      transformSource("<Stack><property name='my' blabal='123'/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T011")).equal(true);
@@ -112,7 +112,7 @@ describe("Ueml transform - errors", () => {
 
   it("Invalid attribute in api", () => {
     try {
-      transformSource("<Stack><prop name='my' blabal='123'/></Stack>");
+      transformSource("<Stack><property name='my' blabal='123'/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T011")).equal(true);
@@ -121,7 +121,7 @@ describe("Ueml transform - errors", () => {
 
   it("Name required in prop #1", () => {
     try {
-      transformSource("<Stack><prop /></Stack>");
+      transformSource("<Stack><property /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
@@ -130,7 +130,7 @@ describe("Ueml transform - errors", () => {
 
   it("Name required in prop #2", () => {
     try {
-      transformSource("<Stack><prop name='' /></Stack>");
+      transformSource("<Stack><property name='' /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
@@ -211,7 +211,7 @@ describe("Ueml transform - errors", () => {
 
   it("A 'value' can have 'field' and 'item' child", () => {
     try {
-      transformSource("<Stack><prop name='my'><dummy /></prop></Stack>");
+      transformSource("<Stack><property name='my'><dummy /></property></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T016")).equal(true);
@@ -220,7 +220,7 @@ describe("Ueml transform - errors", () => {
 
   it("Cannot mix field and item children #1", () => {
     try {
-      transformSource("<Stack><prop name='my'><field name='my' /><item value='3'/></prop></Stack>");
+      transformSource("<Stack><property name='my'><field name='my' /><item value='3'/></property></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T017")).equal(true);
@@ -229,7 +229,7 @@ describe("Ueml transform - errors", () => {
 
   it("Cannot mix field and item children #2", () => {
     try {
-      transformSource("<Stack><prop name='my'><item value='3'/><field name='my' /></prop></Stack>");
+      transformSource("<Stack><property name='my'><item value='3'/><field name='my' /></property></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T017")).equal(true);
@@ -238,7 +238,7 @@ describe("Ueml transform - errors", () => {
 
   it("Item cannot have a 'name' attribute", () => {
     try {
-      transformSource("<Stack><prop name='my'><item name='my' value='3'/></prop></Stack>");
+      transformSource("<Stack><property name='my'><item name='my' value='3'/></property></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T018")).equal(true);

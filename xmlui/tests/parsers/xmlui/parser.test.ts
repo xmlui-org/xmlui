@@ -544,7 +544,7 @@ describe("Xmlui parser - child nodes", () => {
 
   it("helper tags", () => {
     const { node, getText } = parseSource(
-      "<Stack><prop name='myProp'>hello</prop></Stack>",
+      "<Stack><property name='myProp'>hello</property></Stack>",
     );
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
@@ -566,7 +566,7 @@ describe("Xmlui parser - child nodes", () => {
     expect(child0.kind).toEqual(SyntaxKind.ElementNode);
     expect(child0NameNode.kind).toEqual(SyntaxKind.TagNameNode);
     expect(child0NameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(child0NameId)).equal("prop");
+    expect(getText(child0NameId)).equal("property");
     expect(getText(helloText)).equal("hello");
   });
 

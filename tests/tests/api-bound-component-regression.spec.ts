@@ -6,14 +6,14 @@ test("multiple api-bound component don't mix/overwrite state", async ({ page }) 
     entryPoint: `
     <Fragment>
         <Text testId='data1_text'>
-          <prop name="value">
+          <property name="value">
             <Datasource url="/data1"/>
-          </prop>
+          </property>
         </Text>
         <Text testId='data2_text'>
-          <prop name="value">
+          <property name="value">
             <Datasource url="/data2"/>
-          </prop>
+          </property>
         </Text>
     </Fragment>
     `,

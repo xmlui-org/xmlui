@@ -50,9 +50,9 @@ You add a context menu to each contact item. This menu appears on the right side
         <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
       </HStack>
       <DropdownMenu>
-        <property name="triggerTemplate">
+        <propertyerty name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </property>
+        </propertyerty>
         <MenuItem label="Edit" />
         <MenuItem label="Delete" />
       </DropdownMenu>
@@ -118,9 +118,9 @@ Add the custom events to `ContactRow`:
     <HStack verticalAlignment="center">
       <!-- Unchanged -->
       <DropdownMenu>
-        <property name="triggerTemplate">
+        <propertyerty name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </property>
+        </propertyerty>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked')}" />
         <MenuItem label="Delete" />
       </DropdownMenu>
@@ -135,12 +135,12 @@ The highlighted code exposes an event, `editClicked`. Bind the dialog in `Contac
 <!-- Omitted -->
 <List>
   <!-- Omitted -->
-  <property name="itemTemplate">
+  <propertyerty name="itemTemplate">
     <ContactRow 
       item="{$item}" 
       categories="{categories.value}" 
       onEditClicked="contactForm.open('edit')" />/>
-  </property>
+  </propertyerty>
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
@@ -176,12 +176,12 @@ To work with the current mode, you have to change the invocations of `open` in `
     </HStack>
     <List 
       <!-- Unchanged -->
-      <property name="itemTemplate">
+      <propertyerty name="itemTemplate">
         <ContactRow 
           item="{$item}" 
           categories="{categories.value}" 
           onEditClicked="contactForm.open('edit')" />/>
-      </property>
+      </propertyerty>
       <!-- Unchanged -->
     </List>
   </VStack>
@@ -287,9 +287,9 @@ The `ContactRow` component should pass the details of data being edited in its e
 <Component name="ContactRow">
   <!-- Unchanged -->
       <DropdownMenu>
-        <property name="triggerTemplate">
+        <propertyerty name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </property>
+        </propertyerty>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props.item)}" />
         <MenuItem label="Delete" />
     </DropdownMenu>
@@ -311,12 +311,12 @@ You must update the changes of the `open` method in `ContactForm` and modify the
       defaultSections="{!$props.filter
         ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
       sectionBy="section">
-      <property name="itemTemplate">
+      <propertyerty name="itemTemplate">
         <ContactRow 
           item="{$item}" 
           categories="{categories.value}" 
           onEditClicked="(selected) => contactForm.open('edit', selected)" />
-      </property>
+      </propertyerty>
       <!-- Unchanged -->
     </List>
   </VStack>
@@ -398,9 +398,9 @@ We invoke the API endpoint for the delete operation directly from the context me
   <Card>
       <!-- Unchanged -->
       <DropdownMenu>
-        <property name="triggerTemplate">
+        <propertyerty name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </property>
+        </propertyerty>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props)}" />
         <MenuItem label="Delete">
           <event name="click">

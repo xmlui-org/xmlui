@@ -112,9 +112,9 @@ Click on the second field to see the custom empty list indicator.
   <VStack gap="$space-0_5">
     <Text value="Custom:" />
     <MultiSelect>
-      <prop name="emptyListTemplate">
+      <property name="emptyListTemplate">
         <Text variant="strong" value="Nothing to see here!" />
-      </prop>
+      </property>
     </MultiSelect>
   </VStack>
 </VStack>
@@ -133,9 +133,9 @@ Click on the second field to see the custom empty list indicator.
     <VStack gap="$space-0_5">
       <Text value="Custom:" />
       <MultiSelect>
-        <prop name="emptyListTemplate">
+        <property name="emptyListTemplate">
           <Text variant="strong" value="Nothing to see here!" />
-        </prop>
+        </property>
       </MultiSelect>
     </VStack>
   </VStack>
@@ -212,12 +212,12 @@ This property sets the placeholder text displayed in the input field if no value
 
 ```ueml copy
 <MultiSelect>
-  <prop name="optionTemplate">
+  <property name="optionTemplate">
     <HStack verticalAlignment="center" gap="$space-1">
       <Icon name="info" />
       <Text value="{$item.label}" variant="strong" />
     </HStack>
-  </prop>
+  </property>
   <Option value="opt1" label="first"/>
   <Option value="opt2" label="second"/>
   <Option value="opt3" label="third"/>
@@ -230,12 +230,12 @@ This property sets the placeholder text displayed in the input field if no value
   height={200}
   app={`
   <MultiSelect>
-    <prop name="optionTemplate">
+    <property name="optionTemplate">
       <HStack verticalAlignment="center" gap="$space-1">
         <Icon name="info" />
         <Text value="{$item.label}" variant="strong" />
       </HStack>
-    </prop>
+    </property>
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>

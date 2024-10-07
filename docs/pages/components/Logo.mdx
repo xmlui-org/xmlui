@@ -36,12 +36,12 @@ It also uses the `Logo` component within the template definition:
 ```ueml copy {6}
 <App layout="horizontal">
   <AppHeader>
-    <prop name="logoTemplate">
+    <property name="logoTemplate">
        <Fragment>
          <Heading level="h2" value="MyApp"/>
          <Logo/>
        </Fragment>
-    </prop>
+    </property>
   </AppHeader>
   <NavPanel>
     <NavLink label="Home" to="/" icon="home"/>
@@ -66,12 +66,12 @@ The markup displays the app's logo:
   app={`
     <App layout="horizontal">
       <AppHeader>
-        <prop name="logoTemplate">
+        <property name="logoTemplate">
            <Fragment>
              <Heading level="h2" value="MyApp"/>
              <Logo/>
            </Fragment>
-        </prop>
+        </property>
       </AppHeader>
       <NavPanel>
           <NavLink label="Home" to="/" icon="home"/>

@@ -127,7 +127,7 @@ Adding a delete feature ensures unwanted shopping items can be removed. Change t
 ```ueml copy filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/shopping-list">
-  <prop name="itemTemplate">
+  <property name="itemTemplate">
     <Card>
       <HStack verticalAlignment="center" gap="0.5rem">
         <VStack>
@@ -145,7 +145,7 @@ Adding a delete feature ensures unwanted shopping items can be removed. Change t
         </Button>
       </HStack>
     </Card>
-  </prop>
+  </property>
 </List>
 <!-- Omitted -->
 ```
@@ -268,9 +268,9 @@ The `queryParam` property accepts a hash object with key and value pairs. Instea
     inPantry: false,
   }}"
   completedNotificationMessage="New item added">
-  <prop name="queryParams">
+  <property name="queryParams">
     <field name="highlight" value="false"/>
-  </prop>
+  </property>
 </ApiAction>
 ```
 
