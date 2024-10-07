@@ -346,7 +346,7 @@ function useStandalone(
           themes.push(JSON.parse(value.textContent!) as ThemeDefinition);
         });
 
-        let appDef: StandaloneAppDescription = {
+        const appDef: StandaloneAppDescription = {
           ...config,
           entryPoint,
           components,
@@ -405,7 +405,7 @@ function useStandalone(
         } catch (e){
           resolve(null);
         }
-      });
+      }) as Promise<CollectedDeclarations>;
 
       let config: StandaloneJsonConfig = undefined;
       try{
@@ -490,7 +490,7 @@ function useStandalone(
                 } catch{
                   resolve(null)
                 }
-              });
+              }) as Promise<CollectedDeclarations>;
             const [value, componentCodeBehind] = await Promise.all([componentPromise, componentCodeBehindPromise]);
             const compWrapper = await parseComponentResp(value);
             sources[compWrapper.file] = compWrapper.src;
