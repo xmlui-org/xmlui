@@ -10,7 +10,17 @@ However, there are a few occasions where you need to add code. XMLUI strives to 
 
 This article will teach you the fundamental concepts and constructs of working with XMLUI code.
 
-## Component IDs
+## Funcdamental Concepts
+
+There are a few fundamental concepts the understanding of which help you add UI logic to your apps.
+
+<Callout type="info" emoji="💡">
+  XMLUI has a scripting language (XmlUiScript), a **subset of JavaScript** that follows its syntax and semantics.
+</Callout>
+
+Do not feel intimidated if you do not have experience with JavaScript. Creating XMLUI apps requires you to write complex code rarely. In most cases, your intention can be described with short expressions.
+
+### Component IDs
 
 <Callout type="info" emoji="💡">
 The nested tags in the XMLUI markup form a natural hierarchy of components. Parent components have children (directly or through their children or children's children, and so on).
@@ -24,48 +34,267 @@ However, sometimes, you want to establish cooperation between two (or more) comp
 With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to refer to that particular component in code (expressions).
 </Callout>
 
-## Expressions
+### Expressions
 
 <Callout type="info" emoji="💡">
   Expressions are the primary tools for binding components to work one with the state of another.
 </Callout>
 
 ```ueml copy /myText/ /myText.value/
-<VStack>
+<App>
   <TextBox id="myText" initialValue="Hello!" />
   <Text>You typed: {myText.value}</Text>
-</VStack>
+</App>
 ```
 
 Type some text into the textbox to discover how this small example works.
 
 <Playground
   previewOnly={true}
-  name="Example: Setting property values"
-  height={120}
+  name="Example: Binding two components with an expression"
+  height={140}
   horizontal={true}
   app={`
-    <VStack padding="$space-4" gap="$space-2">
+    <App>
       <TextBox id="myText" initialValue="Hello!" />
       <Text>You typed: {myText.value}</Text>
-    </VStack>
+    </App>
   `}
 />
 
-The `{myText.value}` part in the Text component is a nested expression. The wrapping braces sign the engine that the content within will be evaluated as the app runs.
+The `{myText.value}` part in the Text component is an **expression**. The wrapping braces sign the engine that the content within will be evaluated as the app runs.
 
 The TextBox component's identifier is `myText`. You can access the TextBox's exposed values (and methods) through this ID. `myText.value` represents the current text content within the box. **So, this expression binds the TextBox's value to the Text's displayed label**.
 
 <Callout type="info" emoji="💡">
-  When the XMLUI engine observes that a dependency of an expression changes, it re-evaluates the expression and re-renders the affected part of the UI (and only that part).
+  When the XMLUI engine observes that a dependency of an expression changes, it **re-evaluates the expression** and re-renders the affected part of the UI (and only that part).
 </Callout>
 
+In the small app above, when you type something in the text box, every key you press triggers such a change.
 
-_This article is about to be reviewed._
+<Callout type="info" emoji="💡">
+When you set property values, you can mix literal strings with expressions.
+</Callout>
 
-Creating an app requires defining some UI logic that describes how to react (change the UI) to user interactions and system events. For example, pressing a button or selecting an item in a list should follow an app-specific flow.
+```ueml copy
+<App>
+  <Text>I am a string literal.</Text>
+  <Text>{"I am" + " an " + "expression."}</Text>
+  <Text>I see {2+3} apples and {3*4} oranges.</Text>
+</App>
+```
 
-XMLUI provides a scripting language (XMLUI Script) with syntax and semantics similar to JavaScript. When the engine detects it is time to run a particular code, it executes the precompiled script.
+Here, the first text uses a string literal, the second is a sheer expression, and the third combines string literals and expressions.
+
+<Playground
+  previewOnly={true}
+  name="Example: mixing string literals an expressions"
+  height={140}
+  horizontal={true}
+  app={`
+    <App gap="$space-tight">
+      <Text>I am a string literal.</Text>
+      <Text>{"I am" + " an " + "expression."}</Text>
+      <Text>I see {2+3} apples and {3*4} oranges.</Text>
+    </App>
+  `}
+/>
+
+### Variable Declarations
+
+Variables are indispensable to the UI logic as they store some state. You can use expressions to set a variable's initial value:
+
+```ueml copy {2}
+<App
+  var.myValue="{6 * 7}">
+  Life, universe, and everything: {myValue}
+</App>
+```
+
+Here, `var.myValue` is a variable declaration with a variable name (`myValue`) and an initial value (`{6 * 7}`). Before displaying the text, the engine initializes the `myValue` variable. Thus, when that is displayed, `{myValue}` is replaced with its current value, 42.
+
+<Playground
+  previewOnly={true}
+  name="Example: Initializing a variable"
+  height={88}
+  horizontal={true}
+  app={`
+    <App 
+      var.myValue="{6 * 7}">
+      Life, universe, and everything: {myValue}
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+  XMLUI attribute values are strings by default. While components transform string attribute values to the expected types, there is no such an expected type of the variable so that they will be initialized to a string. Use an expression to set the initial variable value to utilize the proper type.
+</Callout>
+
+The following sample demonstrates this concept:
+
+```ueml copy
+<App
+  var.stringValue="true"
+  var.boolValue="{true}"
+  var.num1Value="123"
+  var.num2Value="{123}">
+  <Text>'stringValue' is a {typeof stringValue}, it's value is {stringValue}</Text>
+  <Text>'boolValue' is a {typeof boolValue}, it's value is {boolValue}</Text>
+  <Text>'num1Value' is a {typeof num1Value}, it's value is {num1Value}</Text>
+  <Text>'num2Value' is a {typeof num2Value}, it's value is {num2Value}</Text>
+</App>
+```
+
+Check the variable types in the output:
+
+<Playground
+  previewOnly={true}
+  name="Example: Variables values and types"
+  height={168}
+  horizontal={true}
+  app={`
+    <App gap="$space-tight"
+      var.stringValue="true"
+      var.boolValue="{true}"
+      var.num1Value="123"
+      var.num2Value="{123}">
+      <Text>'stringValue' is a {typeof stringValue}, it's value is {stringValue}</Text>
+      <Text>'boolValue' is a {typeof boolValue}, it's value is {boolValue}</Text>
+      <Text>'num1Value' is a {typeof num1Value}, it's value is {num1Value}</Text>
+      <Text>'num2Value' is a {typeof num2Value}, it's value is {num2Value}</Text>
+    </App>
+  `}
+/>
+
+### Event Handlers
+
+<Callout type="info" emoji="💡">
+  When a user interaction or system event occurs, the XMLUI engine executes component **event handlers**. You can override the default event handler with your custom event handler.
+</Callout>
+
+In an event handler, the entire attribute value is an XMLUI Script code snippet, so you do not need to wrap the code into curly braces:
+
+```ueml copy {3}
+<App>
+  <Button
+  label="Greet me!"
+  onClick="toast('Howdy!')" />
+</App>
+```
+
+If you click the button, the engine executes the `toast('Howdy!')` code and displays a toast message.
+
+<Playground
+  previewOnly={true}
+  name="Example: Declaring an event handler"
+  height={140}
+  horizontal={true}
+  app={`
+    <App>
+      <Button
+      label="Greet me!"
+      onClick="toast('Howdy!')" />
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Event handlers may contain not only expressions but also **statements**.
+</Callout>
+
+```ueml copy {5-7}
+<App>
+  <Button
+    label="Sum numbers from 1 to 1000!"
+    onClick="
+      let sum = 0;
+      for (let i = 1; i <= 1000; i++) sum += i;
+      window.alert('1 + ... + 1000 = ' + sum);
+    "/>
+</App>
+```
+
+<Playground
+  previewOnly={true}
+  name="Example: Declaring an event handler with statements"
+  height={140}
+  horizontal={true}
+  app={`
+    <App>
+      <Button
+        label="Sum numbers from 1 to 1000!"
+        onClick="
+          let sum = 0;
+          for (let i = 1; i <= 1000; i++) sum += i;
+          toast('1 + ... + 1000 = ' + sum);
+        "/>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+Some event handlers may have **an argument (or multiple arguments)**.
+</Callout>
+
+In the following example, the `didChange` event of `TextBox` has a single argument: the new value after the change.
+
+```ueml copy
+<App var.message="(not changed yet)">
+  <TextBox 
+    initialValue="Hello!" 
+    onDidChange="(newValue) => message = newValue" />
+  <Text>The new TexBox value: {message}</Text>
+</App>
+```
+
+The `(newValue) => message = newValue` expression is an arrow function (with the same syntax as JavaScript). In the expression, `newValue` is the function argument, `message = newValue` is the function's body.
+
+When you change the text in the TextBox, the `message` variable is updated with the new value.
+
+<Playground
+  previewOnly={true}
+  name="Example: An event handler with argument"
+  height={140}
+  horizontal={true}
+  app={`
+    <App var.message="(not changed yet)">
+      <TextBox 
+        initialValue="Hello!" 
+        onDidChange="(newValue) => message = newValue" />
+      <Text id="myLabel">The new TexBox value: {message}</Text>
+    </App>
+  `}
+/>
+
+### Reactive Evaluation
+
+<Callout type="info" emoji="💡">
+  You can declare **variables** in code-behind files with the **`var` keyword** and optionally initialize them to a particular value (with an expression).
+
+  These variables are **reactive**: whenever any dependency in their initializing expression changes, the variable's value is reevaluated.
+</Callout>
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+  <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+<Button 
+  label="Click to increment!" 
+  onClick="count++" />
+<Text>Click count: {count}</Text>  
+<Text>Click count * 3: {countTimes3}</Text>  
+```
+  </div>
+  <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
+var count = 0;
+var countTimes3 = count * 3;
+
+
+
+```
+  </div>
+</div>
 
 ## Code Locations
 
@@ -147,73 +376,6 @@ You can nest text values into components. These texts can contain binding expres
   `}
 />
 
-### Variable Declarations
-
-Variables are indispensable to the UI logic as they store some state. You can use binding expressions to set a variable initial value:
-
-```ueml copy {2}
-<VStack
-  var.myValue="{6 * 7}">
-  Life, universe, and everything: {myValue}
-</VStack>
-```
-
-Here, `var.myValue` is a variable declaration with a variable name (`myValue`) and an initial value (`{6 * 7}`). Before displaying the `VStack` component, the engine initializes the `myValue` variable. Thus, when the text is displayed, `{myValue}` is replaced with its current value, 42.
-
-<Playground
-  previewOnly={true}
-  name="Example: Variables values"
-  height={40}
-  horizontal={true}
-  app={`
-    <VStack 
-      var.myValue="{6 * 7}">
-      Life, universe, and everything: {myValue}
-    </VStack>
-  `}
-/>
-
-XMLUI attribute values are strings by default. When you declare component properties, the components transform string attribute values to the native property types automatically. So, when you set a Boolean property's value to the `"true"` string, the component converts the string to a Boolean `true`. Similarly, components can handle numeric values.
-
-However, variables do not involve any particular logic; they just hold the value they are assigned to. When you initialize a variable value with a literal string, that variable will hold a string. You must use binding expressions to initial a variable with a number or boolean value.
-
-The following sample will demonstrate this concept:
-
-```ueml copy
-<VStack
-  var.stringValue="true"
-  var.boolValue="{true}"
-  var.num1Value="123"
-  var.num2Value="{123}">
-  <Text>'stringValue' is a {typeof stringValue}, it is {stringValue}</Text>
-  <Text>'boolValue' is a {typeof boolValue}, it is {boolValue}</Text>
-  <Text>'num1Value' is a {typeof num1Value}, it is {num1Value}</Text>
-  <Text>'num2Value' is a {typeof num2Value}, it is {num2Value}</Text>
-</VStack>
-```
-
-Check the variable types in the output:
-
-<Playground
-  previewOnly={true}
-  name="Example: Variables values and types"
-  height={100}
-  horizontal={true}
-  app={`
-    <VStack 
-      var.stringValue="true"
-      var.boolValue="{true}"
-      var.num1Value="123"
-      var.num2Value="{123}">
-      <Text>'stringValue' is a {typeof stringValue}, it is {stringValue}</Text>
-      <Text>'boolValue' is a {typeof boolValue}, it is {boolValue}</Text>
-      <Text>'num1Value' is a {typeof num1Value}, it is {num1Value}</Text>
-      <Text>'num2Value' is a {typeof num2Value}, it is {num2Value}</Text>
-    </VStack>
-  `}
-/>
-
-> **Note**: XMLUI variables have some particular (and helpful) traits. Later in this document, you will learn more details about them.
 
 ### Event Handlers
 
