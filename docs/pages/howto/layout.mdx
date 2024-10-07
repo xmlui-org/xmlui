@@ -1,8 +1,9 @@
 import data from "../../examples/list-component-data";
+import { COMPONENT_APP, LAYOUT_COMPONENTS } from "../../meta/pages";
 
 # How-To: Layout
 
-The [Layout Components](/learning/using-components/layout-components/) article explains the fundamentals of `Stack` and `FlowLayout` (and their derivatives), which are the primary layout components in XMLUI.
+The <SmartLink href={LAYOUT_COMPONENTS}>Layout Components</SmartLink> article explains the fundamentals of `Stack` and `FlowLayout` (and their derivatives), which are the primary layout components in XMLUI.
 
 In this article, you will learn more subtle details to help you establish well-controlled layouts.
 
@@ -369,7 +370,7 @@ Moreover, any of these changes will not help:
   `}
 />
 
-None of the potential resolutions work. The reason is in the way `App` (as a layout container) works: it ignores its explicit height to handle all available [layout modes](/components/App/#layout) (including the "sticky" layouts) consistently.
+None of the potential resolutions work. The reason is in the way `App` (as a layout container) works: it ignores its explicit height to handle all available <SmartLink href={COMPONENT_APP + "#layout"}>layout modes</SmartLink> (including the "sticky" layouts) consistently.
 
 How do we solve this issue? How can you create an app with its main content fill the available viewport? The `App` component is prepared for this situation. Setting its `scrollWholePage` property to `false` turns off scrolling the main contents; moreover, the main content fills the viewport's available space:
 

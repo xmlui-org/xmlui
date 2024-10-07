@@ -3,6 +3,7 @@ import mySimpleAppLight from "./samples/my-simple-app-light.xmlui";
 import gallery from "./samples/gallery.xmlui";
 import myThemedApp from "./samples/my-themed-app.xmlui";
 import inputs from "./samples/inputs.xmlui";
+import { RESOURCES, THEME_VARIABLES } from "../../../meta/pages";
 
 # Themes and Styling
 
@@ -18,9 +19,9 @@ You can use two fundamental strategies (or combine them) when dealing with visua
 
 Though the first method is faster while prototyping an app, you should use theme variables to avoid style maintenance hell.
 
-You can read more details about layout properties and their usage in the <SmartLink href={}>Component Appearance</SmartLink> [Component Appearance](./component-appearance) article. Here, you will learn how to use, create, and modify themes.
+You can read more details about layout properties and their usage in the <SmartLink href={"./component-appearance"}>Component Appearance</SmartLink> article. Here, you will learn how to use, create, and modify themes.
 
-Themes encapsulate not only the styles (colors, spacing, etc.) of components but also other resources, such as icons and fonts. This section will focus on the previous appearance category; however, you can learn more about using your custom fonts and icons in the [Resources](./resources) article.
+Themes encapsulate not only the styles (colors, spacing, etc.) of components but also other resources, such as icons and fonts. This section will focus on the previous appearance category; however, you can learn more about using your custom fonts and icons in the <SmartLink href={RESOURCES}>Resources</SmartLink> article.
 
 ## Using the Built-in Themes
 
@@ -181,7 +182,7 @@ Each theme has three optional keys:
 - `resources` for tone-independent resource definitions;
 - and `tone` for tone-specific theme variables and resources.
 
-> **Note**: We discuss resources in [this article](./resources).
+> **Note**: We discuss resources in <SmartLink href={RESOURCES}>this article</SmartLink>.
 
 When evaluating the value of a particular theme variable, XMLUI takes the theme-independent variable values and then overrides them with theme-specific values, provided they are defined.
 
@@ -242,7 +243,7 @@ Each theme variable is used to define the value of a property influencing the vi
 
 The `<propertyertyName>` segment should use lowercase letters and dashes.
 
-For the complete list of available `<propertyertyName>` values, see the [Theme Variables](/components/appearance/theme-variables/#property-names) article under "Component Reference".
+For the complete list of available `<propertyertyName>` values, see the <SmartLink href={THEME_VARIABLES + "#property-names"}>Theme Variables</SmartLink> article under "Component Reference".
 
 The `<trait1>` and `<trait2>` segments describe one or two traits regarding a particular property.
 
@@ -251,7 +252,7 @@ For example, the `Button` component has two traits that define its appearance. T
 - `color-bg-Button-primary-solid`: Defines the background color of a button that is set up to use the `primary` theme color, displayed with the `solid` variant.
 - `color-border-Button-attention-ghost`: Specifies the border color of a ghost button displayed with the `attention` theme color.
 
-See the [Theme Variables](/components/appearance/theme-variables/#app-bound-traits) article under "Component Reference" for the complete list of app-bound traits. You can check the traits of a particular component on its reference page.
+See the <SmartLink href={THEME_VARIABLES + "#app-bound-traits"}>Theme Variables</SmartLink> article under "Component Reference" for the complete list of app-bound traits. You can check the traits of a particular component on its reference page.
 
 The `<state1>`, ..., `<stateN>` values define visual states that may modify the appearance of a particular UI element or component (regarding a specific trait). Here are a few examples:
 
@@ -264,7 +265,7 @@ When defining a theme variable, you can define multiple state values (in any ord
 - `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button and with the `primary` theme color while the mouse hovers over it.
 - `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
-For the complete list of available `<state>` values, see the [Theme Variables](/components/appearance/theme-variables/#visual-states) article in the Component Reference.
+For the complete list of available `<state>` values, see the <SmartLink href={THEME_VARIABLES + "#visual-states"}>Theme Variables</SmartLink> article in the Component Reference.
 
 ### Theme Variable Chaining
 

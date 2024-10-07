@@ -1,3 +1,5 @@
+import { LAYOUT_PROPERTIES, REUSABLE_COMPONENTS } from "../../../meta/pages";
+
 # Layout Components
 
 XMLUI uses a few fundamental components to provide a particular layout when rendering child elements. In this article, you will learn about these components.
@@ -7,7 +9,7 @@ Layout components can nest other layout components in arbitrary depths. This arr
 ## Sizing and Placement
 
 Layout containers use a particular strategy to render their child components; part of their strategy is to set the children's dimensions.
-Child components may declare one or more of these [dimensions](./layout/#component-width-and-height): `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
+Child components may declare one or more of these <SmartLink href={LAYOUT_PROPERTIES + "#component-width-and-height"}>dimensions</SmartLink>: `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
 
 A child can declare one of these kind of values for a specific dimension:
 
@@ -20,7 +22,7 @@ While rendering the child components within the parent's viewport, specific comp
 
 All layout container renders their children in declaration order; they consider the current page direction (left-to-right or right-to-left).
 
-> **Note**: You should know a few additional layout-related things about [reusable components](./reusable-components/#reusable-components-in-layout-containers).
+> **Note**: You should know a few additional layout-related things about <SmartLink href={REUSABLE_COMPONENTS + "#reusable-components-in-layout-containers"}>reusable components</SmartLink>.
 
 ## Stack
 
