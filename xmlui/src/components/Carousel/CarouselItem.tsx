@@ -11,6 +11,9 @@ export const carouselItemComponentRenderer = createComponentRenderer(
   CarouselItemMd,
   (rendererContext) => {
     const { node, renderChild } = rendererContext;
-    return <CarouselItemComponent content={renderChild(node.children)} />;
+    return <CarouselItemComponent content={renderChild(node.children, {
+        type: "Stack",
+        orientation: "vertical",
+    })} />;
   },
 );
