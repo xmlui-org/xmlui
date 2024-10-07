@@ -1,4 +1,4 @@
-import { LAYOUT_PROPERTIES, REUSABLE_COMPONENTS } from "../../../meta/pages";
+import { LAYOUT_PROPERTIES, LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT, REUSABLE_COMPONENTS } from "../../../meta/pages";
 
 # Layout Components
 
@@ -9,7 +9,7 @@ Layout components can nest other layout components in arbitrary depths. This arr
 ## Sizing and Placement
 
 Layout containers use a particular strategy to render their child components; part of their strategy is to set the children's dimensions.
-Child components may declare one or more of these <SmartLink href={LAYOUT_PROPERTIES + "#component-width-and-height"}>dimensions</SmartLink>: `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
+Child components may declare one or more of these <SmartLink href={LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT}>dimensions</SmartLink>: `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
 
 A child can declare one of these kind of values for a specific dimension:
 
