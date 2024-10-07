@@ -26,8 +26,8 @@
         }
       ]
     },
-    "apiTag": {
-      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)",
+    "methodTag": {
+      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },
@@ -42,7 +42,7 @@
         { "include": "#valueAttributeScriptInside" },
         { "include": "#attribute" },
         {
-          "begin": "(?<!/|(?:/\\s*(?:api|method))\\s*)>",
+          "begin": "(?<!/|(?:/\\s*(?:method))\\s*)>",
           "beginCaptures": {
             "0": {
               "name": "punctuation.definition.tag.xmlui"
@@ -55,7 +55,7 @@
           },
           "contentName": "meta.embedded.block.javascript",
           "patterns": [{ "include": "source.js" }],
-          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)(?=\\s*>)"
+          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method)(?=\\s*>)"
         }
       ],
       "end": "/?>"
@@ -177,7 +177,7 @@
         { "include": "#eventTag" },
         { "include": "#fieldTag" },
         { "include": "#itemTag" },
-        { "include": "#apiTag" },
+        { "include": "#methodTag" },
         { "include": "#propOrVarTag" }
       ]
     },
