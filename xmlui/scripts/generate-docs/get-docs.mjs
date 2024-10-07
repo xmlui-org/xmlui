@@ -96,8 +96,8 @@ if (config.exportToJson) {
 logger.info("Processing MDX files");
 
 const pagesMapFileName = basename(pagesMapFile);
-const importsToInject = `import { Callout } from "nextra/components";\n` +
-  `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
+const importsToInject = `import { Callout } from "nextra/components";\n\n`
+  // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
 processDocfiles(metadata, importsToInject);
 
 // --- Create Summary

@@ -2,6 +2,7 @@ import spacingSizes from "./samples/spacing-sizes.xmlui";
 import shadowSizes from "./samples/shadow-sizes.xmlui";
 import swatch from "./samples/swatch.xmlui";
 import palette from "./samples/color-palette.xmlui";
+import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION } from "../../meta/pages";
 
 # Theme Variables
 
@@ -43,55 +44,55 @@ When defining a theme variable, you can define multiple state values (in any ord
 - `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
 - `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
-## Property Names
+## Property Names [#property-names]
 
 XMLUI utilizes numerous visual properties you can use in place of `<propertyertyName>`. The following list summarizes their names and description:
 
 |Name|Description|
 |-|-|
-|`color‑bg`|The [color](./common-units/#color-values) of the component border|
-|`color‑border`|The [border color](./common-units/#color-values) of the component. It uses the same value for the left, top, right, and bottom borders.|
-|`color‑border‑bottom`|This value specifies the bottom [border color](./common-units/#color-values) of the component.|
-|`color‑border‑horizontal`|This value specifies the horizontal [border color](./common-units/#color-values) of the component. It uses the same value for the left and right borders.|
-|`color‑border‑left`|This value specifies the left [border color](./common-units/#color-values) of the component.|
-|`color‑border‑right`|This value specifies the right [border color](./common-units/#color-values) of the component.|
-|`color‑border‑top`|This value specifies the top [border color](./common-units/#color-values) of the component.|
-|`color‑border‑vertical`|This value specifies the vertical [border color](./common-units/#color-values) of the component. It uses the same value for the top and bottom borders.|
-|`color‑decoration`|This value sets the [color](./common-units/#color-values) of the component's text decoration.|
-|`color‑text`|The text [color](./common-units/#color-values) the component diplays|
-|`font‑family`|The [font family](./common-units/#size-values) to display component text|
-|`font‑size`|The [size](./common-units/#size-values) of the font to display component text|
-|`font‑weight`|The [weight](./common-units/#font-weight-values) of the font displaying component text|
-|`line‑decoration`|This value sets the [line type](./common-units/#text-decoration-values) for the component's text decoration.|
-|`line‑height`|The [height](./common-units/#size-values) of the line that displays component text|
-|`offset‑decoration`|This value sets the [distance](./common-units/#size-values) of the component's text decoration from its text.|
-|`padding`|This variable specifies the [size](./common-units/#size-values) of the padding area. It uses the same value for the left, top, right, and bottom paddings.|
-|`padding‑bottom`|This variable specifies the [size](./common-units/#size-values) of the bottom padding area.|
-|`padding‑horizontal`|This variable specifies the [size](./common-units/#size-values) of the horizontal padding area. It uses the same value for the left and right paddings.|
-|`padding‑left`|This variable specifies the [size](./common-units/#size-values) of the left padding area.|
-|`padding‑right`|This variable specifies the [size](./common-units/#size-values) of the right padding area.|
-|`padding‑top`|This variable specifies the [size](./common-units/#size-values) of the top padding area.|
-|`padding‑vertical`|This variable specifies the [size](./common-units/#size-values) of the vertical padding area. It uses the same value for the top and bottom paddings.|
-|`radius`|The [rounding](./common-units/#border-rounding) of the component's border|
-|`shadow`|The [shadow](./common-units/#color-values) displayed with the component|
-|`style‑border`|The [style](./common-units/#border-style-values) of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
-|`style‑border‑bottom`|This value specifies the [style](./common-units/#border-style-values) of the component's bottom border.|
-|`style‑border‑horizontal`|This value specifies the [style](./common-units/#border-style-values) of the component's horizontal border. It uses the same value for the left and right borders.|
-|`style‑border‑left`|This value specifies the [style](./common-units/#border-style-values) of the component's left border.|
-|`style‑border‑right`|This value specifies the [style](./common-units/#border-style-values) of the component's right border.|
-|`style‑border‑top`|This value specifies the [style](./common-units/#border-style-values) of the component's top border.|
-|`style‑border‑vertical`|This value specifies the [style](./common-units/#border-style-values) of the component's vertical border. It uses the same value for the top and bottom borders.|
-|`style‑decoration`|This value sets the [style](./common-units/#text-decoration-values) for the component's text decoration.|
-|`thickness‑border`|The [thickness](./common-units/#size-values) of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
-|`thickness‑border‑bottom`|This value specifies the [thickness](./common-units/#size-values) of the component's bottom border.|
-|`thickness‑border‑horizontal`|This value specifies the [thickness](./common-units/#size-values) of the component's horizontal border. It uses the same value for the left and right borders.|
-|`thickness‑border‑left`|This value specifies the [thickness](./common-units/#size-values) of the component's left border.|
-|`thickness‑border‑right`|This value specifies the [thickness](./common-units/#size-values) of the component's right border.|
-|`thickness‑border‑top`|This value specifies the [thickness](./common-units/#size-values) of the component's top border.|
-|`thickness‑border‑vertical`|This value specifies the [thickness](./common-units/#size-values) of the component's vertical border. It uses the same value for the left and right borders.|
-|`thickness‑decoration`|This value sets the [thickness](./common-units/#sizw-values) for the component's text decoration line.|
+|`color‑bg`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the component border|
+|`color‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the left, top, right, and bottom borders.|
+|`color‑border‑bottom`|This value specifies the bottom <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
+|`color‑border‑horizontal`|This value specifies the horizontal <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the left and right borders.|
+|`color‑border‑left`|This value specifies the left <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
+|`color‑border‑right`|This value specifies the right <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
+|`color‑border‑top`|This value specifies the top <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component.|
+|`color‑border‑vertical`|This value specifies the vertical <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>border color</SmartLink> of the component. It uses the same value for the top and bottom borders.|
+|`color‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> of the component's text decoration.|
+|`color‑text`|The text <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> the component diplays|
+|`font‑family`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY }>font family</SmartLink> to display component text|
+|`font‑size`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the font to display component text|
+|`font‑weight`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT }>weight</SmartLink> of the font displaying component text|
+|`line‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION }>line type</SmartLink> for the component's text decoration.|
+|`line‑height`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of the line that displays component text|
+|`offset‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>distance</SmartLink> of the component's text decoration from its text.|
+|`padding`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the padding area. It uses the same value for the left, top, right, and bottom paddings.|
+|`padding‑bottom`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the bottom padding area.|
+|`padding‑horizontal`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the horizontal padding area. It uses the same value for the left and right paddings.|
+|`padding‑left`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the left padding area.|
+|`padding‑right`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the right padding area.|
+|`padding‑top`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the top padding area.|
+|`padding‑vertical`|This variable specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> of the vertical padding area. It uses the same value for the top and bottom paddings.|
+|`radius`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING }>rounding</SmartLink> of the component's border|
+|`shadow`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>shadow</SmartLink> displayed with the component|
+|`style‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
+|`style‑border‑bottom`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's bottom border.|
+|`style‑border‑horizontal`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's horizontal border. It uses the same value for the left and right borders.|
+|`style‑border‑left`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's left border.|
+|`style‑border‑right`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's right border.|
+|`style‑border‑top`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's top border.|
+|`style‑border‑vertical`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the component's vertical border. It uses the same value for the top and bottom borders.|
+|`style‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION }>style</SmartLink> for the component's text decoration.|
+|`thickness‑border`|The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's border line. It uses the same value for the left, top, right, and bottom borders.|
+|`thickness‑border‑bottom`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's bottom border.|
+|`thickness‑border‑horizontal`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's horizontal border. It uses the same value for the left and right borders.|
+|`thickness‑border‑left`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's left border.|
+|`thickness‑border‑right`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's right border.|
+|`thickness‑border‑top`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's top border.|
+|`thickness‑border‑vertical`|This value specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> of the component's vertical border. It uses the same value for the left and right borders.|
+|`thickness‑decoration`|This value sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>thickness</SmartLink> for the component's text decoration line.|
 
-## App-bound Traits
+## App-bound Traits [#app-bound-traits]
 
 Theme variables in this category are applied to the entire application, not just to particular components.
 
@@ -512,10 +513,10 @@ XMLUI has several components with dropdowns. The following theme variables help 
 Most components sign their focused state with an outline around them. These theme variables help style them:
 - `color-outline--focus`: The color of the outline
 - `thickness-outline--focus`: The thickness of the outline
-- `style-outline--focus`: The [style](./common-units/#border-style-values) of the outline
+- `style-outline--focus`: The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style</SmartLink> of the outline
 - `offset-outline--focus`: The offset value of the outline
 
-## Visual States
+## Visual States [#visual-states]
 
 XMLUI defines these visual states to use with styling component appearance:
 

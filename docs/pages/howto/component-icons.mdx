@@ -1,4 +1,5 @@
 import data from  "../../component-samples/Table/list-component-data.js";
+import { COMPONENT_TABLE, THEMES_AND_STYLING } from "../../meta/pages.js";
 import arrowIcon from "../../public/resources/files/howto/component-icons/up-arrow.svg";
 
 # Using Table-specific Icons
@@ -11,7 +12,7 @@ Changing the graphical element displayed by an `Icon` component is as easy as en
 
 Some components have icons already built into them like the ones in the `Table` component indicating sorting by a specific column.
 
-> **Note:** The following examples all use the same dataset that the `Table` component [reference documentation](../components/Table.mdx) uses.
+> **Note:** The following examples all use the same dataset that the `Table` component <SmartLink href={COMPONENT_TABLE}>reference documentation</SmartLink> uses.
 
 <Playground
   previewOnly
@@ -145,7 +146,7 @@ while the second `Table` to the right uses the `chevronup` icon instead.
 ## Fallbacks
 
 Scoped icons always fall back to a more generic alternative if a particular name is not found.
-XMLUI uses the same concept here as it does regarding [theme variable chaining](../learning/themes/themes-and-styling.mdx#theme-variable-chaining).
+XMLUI uses the same concept here as it does regarding <SmartLink href={THEMES_AND_STYLING + "#theme-variable-chaining"}>theme variable chaining</SmartLink>.
 From the most specific to the most generic the chain looks like the following for the Table's `sortasc` icon:
 
 1. XMLUI looks for the `sortasc:Table` icon name in the resources of the application config

@@ -22,18 +22,14 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
       // Node is a folder
     } else {
       // Node is a file
-      const extension = extname(item.name);
       if (
         (acceptedFileNames.includes(item.name) ||
           acceptedExtensions.includes(extname(item.name))) &&
         !rejectedFileNames.includes(item.name)
       ) {
-        const articleId = getArticleId(item.path);
-        if (articleId) {
-          pages.push({
-            id: normalizeToArticleId(articleId),
-            path: item.path.split(pathCutoff)[1]?.replace(extension, "")
-          });
+        const articleHeadings = getArticleIds(item);
+        if (articleHeadings) {
+          pages.push(...articleHeadings);
         }
       }
     }
@@ -78,29 +74,69 @@ function traverseDirectory(node, visitor, level = 0) {
   }
 }
 
-function getArticleId(articlePath) {
-  const content = readFileSync(articlePath, { encoding: "utf8" });
+function getArticleIds(article) {
+  const content = readFileSync(article.path, { encoding: "utf8" });
+  const relativeArticlePath = article.path.split(pathCutoff)[1]?.replace(extname(article.name), "");
+
   const lines = strBufferToLines(content);
-  for (const line of lines) {
-    // Detect lines like "# This is a Title [#this-is-a-title]"
-    const match = line.match(/^#\s+.+?(\s*\[#[\w-]+\])?$/);
-    if (!match) continue;
-    if (match[1]) {
-      // Has ID, extract it and use that
-      return match[1].replace(/ \[#(.*?)\]/, (_, p1) => p1);
-    } else {
-      // Generate new ID from the article title
-      return match[0].slice(1);
+
+  const titleId = getTitleId(lines);
+  if (!titleId) return null;
+
+  const subHeadingIds = getSubHeadingIds(lines);
+  return [
+    { id: toHeadingId(titleId), path: relativeArticlePath },
+    ...subHeadingIds.map((id) => ({
+      id: `${toHeadingId(titleId)}_${toHeadingId(id)}`,
+      path: `${relativeArticlePath}#${toHeadingPath(id)}`,
+    })),
+  ];
+
+  // ---
+
+  function getTitleId(lines) {
+    for (const line of lines) {
+      const match = line.match(/^#\s+.+?\s*(\[#[\w-]+\])?$/);
+      if (!match) continue;
+      if (match[1]) {
+        // Has ID, extract it and use that
+        return match[1].replace(/\[#(.*?)\]/, (_, p1) => p1);
+      } else {
+        // Generate new ID from the heading title
+        return match[0].slice(1);
+      }
     }
+  }
+
+  function getSubHeadingIds(lines) {
+    const headings = [];
+    for (const line of lines) {
+      // We only gather headings which have an explicit ID defined and they are not leveled as h1
+      const match = line.match(/^##+\s+.+?\s*(\[#[\w-]+\])$/);
+      if (!match) continue;
+      if (!match[1]) continue;
+      // Has ID, extract it and use that
+      headings.push(match[1].replace(/\[#(.*?)\]/, (_, p1) => p1));
+    }
+    return headings;
   }
 }
 
-function normalizeToArticleId(rawStr) {
+function toHeadingId(rawStr) {
   return rawStr
     .trim()
     .toLocaleUpperCase()
     .replaceAll(/[^A-Za-z0-9_]/g, "_")
-    .replace(/__+/g, "_");  // <- remove duplicates
+    .replaceAll(/__+/g, "_"); // <- remove duplicate underscores
+}
+
+function toHeadingPath(rawStr) {
+  return rawStr
+    .trim()
+    .toLocaleLowerCase()
+    .replaceAll(/[^A-Za-z0-9-]/g, "-")
+    .replaceAll(/--+/g, "-")
+    .replace(/^-|-$/, "");
 }
 
 function indicateAndRemoveDuplicateIds(pagesData) {
