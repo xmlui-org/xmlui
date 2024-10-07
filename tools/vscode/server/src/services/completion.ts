@@ -156,7 +156,7 @@ const componentNames: CompletionItem[] = [
   { label: "Tree" },
   { label: "VStack" },
   { label: "event" },
-  { label: "prop" },
+  { label: "property" },
   { label: "var" },
   { label: "script" },
 ];

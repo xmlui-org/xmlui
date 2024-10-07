@@ -74,7 +74,7 @@ export function nodeToComponentDef(
         return null;
       }
 
-      // --- Get "api" attributes
+      // --- Get "method" attributes
       let api: Record<string, any> | undefined;
       const apiAttrs = attrs.filter((attr) => refersToApi(attr.startSegment));
       if (apiAttrs.length > 0) {
@@ -267,7 +267,6 @@ export function nodeToComponentDef(
       // --- Element with a lowercase start letter, it must be some traits of the host component
       switch (childName) {
         case "property":
-        case "prop":
           collectElementHelper(
             usesStack,
             comp,
@@ -326,7 +325,6 @@ export function nodeToComponentDef(
           return;
 
         case "method":
-        case "api":
           collectElementHelper(
             usesStack,
             comp,
@@ -718,7 +716,7 @@ export function nodeToComponentDef(
     const tagName = getTagName(node);
     const hasComponentName = UCRegex.test(tagName);
     const shouldUseTextNodeElement =
-      hasComponentName || tagName === "prop" || tagName === "property";
+      hasComponentName || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && !refersToApi(tagName);
     const attrs = getAttributes(node);
 
@@ -1145,5 +1143,5 @@ function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
 /** Temporarily using 'method' as an alias to 'api'.
  * In the future, 'api' may be completely removed.*/
 function refersToApi(word: string): boolean {
-  return word === "api" || word === "method";
+  return word === "method";
 }

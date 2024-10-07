@@ -75,7 +75,7 @@ test("ChildSlot rendered in compound components", async ({ page }) => {
 test("$this works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
-        <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
+        <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
             <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
@@ -91,7 +91,7 @@ test("$this works in compound components", async ({ page }) => {
 test("call api with id works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
-        <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
+        <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
             <Button onClick="emitEvent('click')">Increment counter: {counter}</Button>
         </Component>
     `,
@@ -107,7 +107,7 @@ test("call api with id works in compound components", async ({ page }) => {
 test("$self works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `
-        <Component name="TestButton" var.counter="{0}" api.incrementInside="()=>counter++">
+        <Component name="TestButton" var.counter="{0}" method.incrementInside="()=>counter++">
             <Button onClick="$self.incrementInside()">Increment counter: {counter}</Button>
         </Component>
     `,
@@ -123,7 +123,7 @@ test("$self works in compound components", async ({ page }) => {
 test("$self works in compound components - implicit container", async ({ page }) => {
   await initApp(page, {
     components: `
-        <Component name="TestButton" api.incrementInside="()=>counter++">
+        <Component name="TestButton" method.incrementInside="()=>counter++">
             <Button var.counter="{0}" onClick="$self.incrementInside()">Increment counter: {counter}</Button>
         </Component>
     `,
@@ -140,13 +140,13 @@ test("$self and $this works in nested compound components", async ({ page }) => 
   await initApp(page, {
     components: [
       `
-        <Component name="TestButton1" var.counter="{0}" api.incrementInside="()=>counter++">
+        <Component name="TestButton1" var.counter="{0}" method.incrementInside="()=>counter++">
             <Button onClick="$self.incrementInside()" testId="buttonComponent1">Increment counter: {counter}</Button>
             <TestButton2 onClick="$this.incrementInside()" testId="buttonComponent2"/>
         </Component>
     `,
       `
-        <Component name="TestButton2" var.counter="{0}" api.incrementInside="()=>counter++">
+        <Component name="TestButton2" var.counter="{0}" method.incrementInside="()=>counter++">
             <Button onClick="$self.incrementInside()">TB2:Increment counter: {counter}</Button>
         </Component>
     `,

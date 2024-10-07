@@ -227,7 +227,7 @@ export class XmlUiHelper {
           componentNode.childNodes ??= [];
           const propWrapper: XmlUiElement = {
             type: "XmlUiElement",
-            name: "prop",
+            name: "property",
             attributes: [
               {
                 type: "XmlUiAttribute",
@@ -248,7 +248,7 @@ export class XmlUiHelper {
           if (propValue === null) {
             const nullPropElement: XmlUiElement = {
               type: "XmlUiElement",
-              name: "prop",
+              name: "property",
               attributes: [
                 {
                   type: "XmlUiAttribute",
@@ -266,7 +266,7 @@ export class XmlUiHelper {
           if (key === "id" || key === "when" || key === "testId" || options?.extractProps) {
             const idPropElement: XmlUiElement = {
               type: "XmlUiElement",
-              name: "prop",
+              name: "property",
             };
             this.addProperty(idPropElement, key, propValue, options);
             componentNode.childNodes ??= [];
@@ -511,7 +511,7 @@ export class XmlUiHelper {
       case "boolean":
       case "number":
       case "object":
-        const objElement = this.transformValue("prop", name, value, options);
+        const objElement = this.transformValue("property", name, value, options);
         if (objElement) {
           element.childNodes ??= [];
           element.childNodes.push(objElement);
