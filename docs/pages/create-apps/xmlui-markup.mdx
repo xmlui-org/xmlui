@@ -50,13 +50,13 @@ XML uses tags for components and helper tags.
   XMLUI tag names start with a letter and may be continued with letters, digits, and these characters: dash (`-`), underscore (`_`), dollar sign (`$`), and dot (`.`).
 </Callout>
 
-In the following code, `<property>` is a helper tag. XMLUI uses the `<property>` helper to specify the value of a property, which cannot be represented as a string.
+In the following code, `<propertyerty>` is a helper tag. XMLUI uses the `<propertyerty>` helper to specify the value of a property, which cannot be represented as a string.
 
 ```ueml /property/
 <DropdownMenu>
-  <property name="triggerTemplate">
+  <propertyerty name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
-  </property>
+  </propertyerty>
   <MenuItem>Item 1</MenuItem>
   <MenuItem>Item 2</MenuItem>
   <MenuItem>Item 3</MenuItem>
@@ -70,9 +70,9 @@ The order of component tags reflects their display order. However, the order of 
   <MenuItem>Item 1</MenuItem>
   <MenuItem>Item 2</MenuItem>
   <MenuItem>Item 3</MenuItem>
-  <property name="triggerTemplate">
+  <propertyerty name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
-  </property>
+  </propertyerty>
 </DropdownMenu>
 ```
 
@@ -477,14 +477,14 @@ The engine raises an error if the app or component markup contains multiple root
 ```
 
 <Callout type="info" emoji="💡">
-  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. Use the tag's **`name` attribute** to identify the property.
+  When properties cannot be represented with a string, you nest them into their related component with the **`<propertyerty>` tag**. Use the tag's **`name` attribute** to identify the property.
 </Callout>
 
 ```ueml {2-4} /property/
 <DropdownMenu>
-  <property name="triggerTemplate">
+  <propertyerty name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
-  </property>
+  </propertyerty>
   <MenuItem>Item 1</MenuItem>
   <MenuItem>Item 2</MenuItem>
   <MenuItem>Item 3</MenuItem>
@@ -494,17 +494,17 @@ The engine raises an error if the app or component markup contains multiple root
 `triggerTemplate` is a property of the `DropdownMenu` component that defines the UI for the trigger that opens the dropdown menu.
 
 <Callout type="info" emoji="💡">
-  If you prefer explicitly using the `<property>` tag, you can use it to represent string data; specify that with the `value` attribute.
+  If you prefer explicitly using the `<propertyerty>` tag, you can use it to represent string data; specify that with the `value` attribute.
 </Callout>
 
 ```ueml /property/ /name/ /value/
 <Button>
-  <property name="label" value="Click me!" />
+  <propertyerty name="label" value="Click me!" />
 </Button>
 ```
 
 <Callout type="info" emoji="💡">
-  You can use the `<property>` tag with nested text as an alternative to the `value` attribute.
+  You can use the `<propertyerty>` tag with nested text as an alternative to the `value` attribute.
 </Callout>
 
 
@@ -542,7 +542,7 @@ This markup assigns a variable named `greeting` to the `Button` with the initial
 </Button>
 ```
 
-And similarly to `<property>`, XMLUI accepts nested text for the variable's initial value.
+And similarly to `<propertyerty>`, XMLUI accepts nested text for the variable's initial value.
 
 ```ueml /var./
 <Button label="Click me!">

@@ -119,9 +119,9 @@ Content is provided to a tab via placing child components under the `TabItem`.
 
 ```ueml copy {2-4}
 <Tabs>
-  <prop name="tabTemplate">
+  <property name="tabTemplate">
     <Button variant="outlined" label="{$item.label}" />
-  </prop>
+  </property>
   <TabItem label="Account">
     <Text>Account</Text>
   </TabItem>
@@ -139,9 +139,9 @@ Content is provided to a tab via placing child components under the `TabItem`.
   name="Example: tabTemplate"
   app={`
   <Tabs>
-    <prop name="tabTemplate">
+    <property name="tabTemplate">
       <Button variant="outlined" label="{$item.label}" />
-    </prop>
+    </property>
     <TabItem label="Account">
       <Text>Account</Text>
     </TabItem>

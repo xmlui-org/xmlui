@@ -62,9 +62,9 @@ Update the code of `Contacts` to add a `section` field to the contact items:
   <Datasource id="categories" url="/api/categories" />
   <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
   <List items="{contacts.value.map(t => ({...t, section: getSection(t)}))}">
-    <property name="itemTemplate">
+    <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
+    </propertyerty>
   </List>
 </Component>
 ```
@@ -82,16 +82,16 @@ To display section information, add the `section` property to the `List` and def
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
-    <property name="itemTemplate">
+    <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
-    <property name="sectionTemplate">
+    </propertyerty>
+    <propertyerty name="sectionTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle" 
           value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
       </HStack>
-    </property>
+    </propertyerty>
   </List>
 </Component>
 ```
@@ -124,10 +124,10 @@ Update the `List` definition in `Contacts`:
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
-    <property name="itemTemplate">
+    <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
-    <property name="sectionTemplate">
+    </propertyerty>
+    <propertyerty name="sectionTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
@@ -141,7 +141,7 @@ Update the `List` definition in `Contacts`:
           name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
           size="md" />  
       </HStack>
-    </property>
+    </propertyerty>
   </List>
 </Component>
 ```

@@ -37,9 +37,9 @@ Add a few new menu items with their corresponding pages to the app definition in
     <Page url="/contacts/all">
       <Datasource id="categories" url="/api/categories" />
       <List datasource="/api/contacts">
-        <property name="itemTemplate">
+        <propertyerty name="itemTemplate">
           <ContactRow item="{$item}" categories="{categories.value}" />
-        </property>
+        </propertyerty>
       </List>
     </Page>
     <Page url="/contacts/overdue">Overdue</Page>
@@ -73,9 +73,9 @@ Create a new file, `Contacts.xmlui` in the `components` folder, and add this con
   <Datasource id="categories" url="/api/categories" />
   <Datasource id="contacts" url="/api/contacts" />
     <List items="{contacts.value.filter($props.predicate)}">
-      <property name="itemTemplate">
+      <propertyerty name="itemTemplate">
         <ContactRow item="{$item}" categories="{categories.value}" />
-      </property>
+      </propertyerty>
     </List>
 </Component>
 ```
@@ -220,9 +220,9 @@ You moved the `Datasource` component to the main component, so you no longer nee
 <Component name="Contacts">
   <Datasource id="categories" url="/api/categories" />
   <List items="{$props.data}">
-    <property name="itemTemplate">
+    <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
+    </propertyerty>
   </List>
 </Component>
 ```
@@ -293,9 +293,9 @@ Change the definition of the `Contacts` component by removing the `Datasource` q
 <Component name="Contacts">
   <Datasource id="categories" url="/api/categories" />
   <List datasource="/api/contacts/{$props.filter}">
-    <property name="itemTemplate">
+    <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
+    </propertyerty>
   </List>
 </Component>
 ```

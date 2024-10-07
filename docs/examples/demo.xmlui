@@ -77,14 +77,14 @@
                 </HStack>
             </Card>
             <List datasource="https://api.spacexdata.com/v3/rockets" height="300">
-                <prop name="itemTemplate">
+                <property name="itemTemplate">
                     <Card avatarUrl="{$item.flickr_images[0]}" title="{$item.rocket_name}" subTitle="{$item.company}">
                         <HStack gap="1rem" verticalAlignment="center">
                             <Icon name="info"/>
                             <Text value="{$item.description}" canShrink="true" />
                         </HStack>
                     </Card>
-                </prop>
+                </property>
             </List>
         </ComponentSection>
 
@@ -268,10 +268,10 @@
 
             <Form subject="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem label="Authentication Type" bindTo="asd" type="combobox">
-                    <prop name="validation">
+                    <property name="validation">
                         <field name="minLength" value="2"/>
                         <field name="severity" value="warning"/>
-                    </prop>
+                    </property>
                     <Option label="Password" value="0"/>
                     <Option label="Public Key" value="1"/>
                     <Option label="Keyboard (interactive)" value="2"/>
@@ -290,10 +290,10 @@
 
             <Form subject="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem label="Authentication Type" bindTo="asd" type="multiCombobox">
-                    <prop name="validation">
+                    <property name="validation">
                         <field name="minLength" value="2"/>
                         <field name="severity" value="warning"/>
-                    </prop>
+                    </property>
                     <Option label="Password" value="0"/>
                     <Option label="Public Key" value="1"/>
                     <Option label="Keyboard (interactive)" value="2"/>
@@ -838,9 +838,9 @@ console.log(foo(5));
         <ComponentSection heading="Table">
             <SelectionStore id="id">
                 <Table width="100%" isPaginated="{true}" rowsSelectable="{true}">
-                    <prop name="items">
+                    <property name="items">
                         <Datasource url="https://api.spacexdata.com/v3/rockets"/>
-                    </prop>
+                    </property>
                     <Column header="Image" size="140px">
                         <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
                     </Column>
@@ -852,18 +852,18 @@ console.log(foo(5));
 
         <ComponentSection heading="List">
             <List minWidth="200px">
-                <prop name="items">
+                <property name="items">
                     <item value="item1"/>
                     <item value="item2"/>
                     <item value="item3"/>
                     <item value="item4"/>
-                </prop>
-                <prop name="itemTemplate">
+                </property>
+                <property name="itemTemplate">
                     <HStack verticalAlignment="center">
                         <NavLink label="{$item}"/>
                         <Button variant="ghost" icon="dotmenu"/>
                     </HStack>
-                </prop>
+                </property>
             </List>
         </ComponentSection>
 
@@ -895,9 +895,9 @@ console.log(foo(5));
             <Subsection heading="Basic DropdownMenu with trigger template">
                 <HStack gap="2rem">
                     <DropdownMenu label="DropdownMenu">
-                        <prop name="triggerTemplate">
+                        <property name="triggerTemplate">
                             <Button label="Basic dropdown menu" icon="chevrondown" iconPosition="right"/>
-                        </prop>
+                        </property>
                         <MenuItem>Item 1</MenuItem>
                         <MenuItem>Item 2</MenuItem>
                         <MenuItem>Item 3</MenuItem>

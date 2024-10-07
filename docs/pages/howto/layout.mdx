@@ -108,11 +108,11 @@ When you nest components into each other, the vertical alignment may produce sur
 Here is an example using a Table. The unexpected result is when you click the `Clear data`, as the "Nothing here!" text appears at the top of the table's placeholder, though you use this definition for `noDataTemplate`:
 
 ```ueml copy /height="100%"/ /verticalAlignment="center"/
-<prop name="noDataTemplate">
+<property name="noDataTemplate">
   <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
     Nothing here!
   </VStack>
-</prop>
+</property>
 ```
 
 Click the Clear data (and the Reload data) buttons to check the issue:
@@ -138,11 +138,11 @@ Click the Clear data (and the Reload data) buttons to check the issue:
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
-        <prop name="noDataTemplate">
+        <property name="noDataTemplate">
           <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
             Nothing here!
           </VStack>
-        </prop>
+        </property>
       </Table>
     </VStack>
   `}
@@ -167,11 +167,11 @@ When you look at the markup, you can see that the outermost `VStack` has an expl
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
-    <prop name="noDataTemplate">
+    <property name="noDataTemplate">
       <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
         Nothing here!
       </VStack>
-    </prop>
+    </property>
   </Table>
 </VStack>
 ```
@@ -209,11 +209,11 @@ Check this out; now the `noDataTemplate` is rendered as expected:
         <Column bindTo="name"/>
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
-        <prop name="noDataTemplate">
+        <property name="noDataTemplate">
           <VStack height="100%" verticalAlignment="center" horizontalAlignment="center">
             Nothing here!
           </VStack>
-        </prop>
+        </property>
       </Table>
     </VStack>
   `}

@@ -86,9 +86,9 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
   <Pages>
     <Page url="/spacexlist">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <prop name="itemTemplate">
+        <property name="itemTemplate">
           <Card title="{$item.title}" subTitle="{$item.details}" />
-        </prop>
+        </property>
       </List>
     </Page>
     <!-- Other Page items omitted -->
@@ -109,14 +109,14 @@ Components work together declaratively. `App` connects the `to` property of `Nav
 
 ```ueml copy {2-4} filename="Main.xmlui" /datasource/
 <List datasource="https://api.spacexdata.com/v3/history">
-  <property name="itemTemplate">
+  <propertyerty name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}" />
-  </property>
+  </propertyerty>
 </List>
 ```
 
 <Callout type="info" emoji="💡">
-  Template properties cannot be represented with a string; thus, they cannot be given with an attribute. You nest them into their related component with the **`<property>` tag**.
+  Template properties cannot be represented with a string; thus, they cannot be given with an attribute. You nest them into their related component with the **`<propertyerty>` tag**.
 </Callout>
 
 <Callout type="info" emoji="💡">
