@@ -426,45 +426,45 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.type).equal("Stack");
   });
 
-  // --- Api
-  it("api fails with invalid attribute", () => {
+  // --- Method
+  it("method fails with invalid attribute", () => {
     try {
-      transformSource("<Stack><api blabla='123'/></Stack>");
+      transformSource("<Stack><method blabla='123'/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T011")).equal(true);
     }
   });
 
-  it("api/method fails with missing name attribute", () => {
+  it("method fails with missing name attribute", () => {
     try {
-      transformSource("<Stack><api><method/></api></Stack>");
+      transformSource("<Stack><method></method></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
     }
   });
 
-  it("api/method fails with empty name attribute", () => {
+  it("method fails with empty name attribute", () => {
     try {
-      transformSource("<Stack><api><method name=''/></api></Stack>");
+      transformSource("<Stack><method name=''/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
     }
   });
 
-  it("api with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><api name='set' value='do'/></Stack>") as ComponentDef;
+  it("method with name/value attr works #1", () => {
+    const cd = transformSource("<Stack><method name='set' value='do'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
   });
 
-  it("api with name/value attr works #2", () => {
+  it("method with name/value attr works #2", () => {
     const cd = transformSource(`
       <Stack>
-        <api name="set" value='do'/>
-        <api name="other" value='get'/>
+        <method name="set" value='do'/>
+        <method name="other" value='get'/>
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
@@ -478,14 +478,8 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.api! as any).myApi).equal("getCount()");
   });
 
-  it("api dotted attr works #1", () => {
-    const cd = transformSource("<Stack api.myApi='getCount()'></Stack>") as ComponentDef;
-    expect(cd.type).equal("Stack");
-    expect((cd.api! as any).myApi).equal("getCount()");
-  });
-
-  it("api with name and text works #1", () => {
-    const cd = transformSource("<Stack><api name='set'>do</api></Stack>") as ComponentDef;
+  it("method with name and text works #1", () => {
+    const cd = transformSource("<Stack><method name='set'>do</method></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal("do");
   });
@@ -496,11 +490,11 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.api! as any).set).equal("do");
   });
 
-  it("api with name and text works #2", () => {
+  it("method with name and text works #2", () => {
     const cd = transformSource(`
       <Stack>
-        <api name='set'>do</api>
-        <api name='other'>get</api>
+        <method name='set'>do</method>
+        <method name='other'>get</method>
       </Stack>
     `) as ComponentDef;
     expect(cd.type).equal("Stack");
@@ -508,24 +502,10 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.api! as any).other).equal("get");
   });
 
-  it("api with name results null", () => {
-    const cd = transformSource("<Stack><api name='set'/></Stack>") as ComponentDef;
-    expect(cd.type).equal("Stack");
-    expect((cd.api! as any).set).equal(null);
-  });
-
   it("method with name results null", () => {
     const cd = transformSource("<Stack><method name='set'/></Stack>") as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.api! as any).set).equal(null);
-  });
-
-  it("api becomes array #1", () => {
-    const cd = transformSource(
-      "<Stack><api name='myApi' value='123'/><api name='myApi' value='234'/></Stack>",
-    ) as ComponentDef;
-    expect(cd.type).equal("Stack");
-    expect((cd.api! as any).myApi).deep.equal(["123", "234"]);
   });
 
   it("method becomes array #1", () => {
@@ -949,7 +929,7 @@ describe("Xmlui transform - child elements", () => {
     const cd = transformSource(`
       <Component name="AttachFileContainer">
         <Text value="hello"/>
-        <api name="hello" value="console.log('hello')"/>
+        <method name="hello" value="console.log('hello')"/>
       </Component>
     `) as ComponentDef;
     expect(cd).toMatchObject({
@@ -966,9 +946,9 @@ describe("Xmlui transform - child elements", () => {
     });
   });
 
-  it("Compound component with dotted api #1", () => {
+  it("Compound component with dotted method #1", () => {
     const cd = transformSource(`
-      <Component name='MyComp' api.getIt="getIt()"><Stack /></Component>
+      <Component name='MyComp' method.getIt="getIt()"><Stack /></Component>
     `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
@@ -981,9 +961,9 @@ describe("Xmlui transform - child elements", () => {
     });
   });
 
-  it("Compound component with dotted api #2", () => {
+  it("Compound component with dotted method #2", () => {
     const cd = transformSource(`
-      <Component name='MyComp' api.getIt="getIt()" api.other="other()"><Stack /></Component>
+      <Component name='MyComp' method.getIt="getIt()" method.other="other()"><Stack /></Component>
     `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",
@@ -997,9 +977,9 @@ describe("Xmlui transform - child elements", () => {
     });
   });
 
-  it("Compound component with dotted api #3", () => {
+  it("Compound component with dotted method #3", () => {
     const cd = transformSource(`
-      <Component name='MyComp' api.getIt="getIt()"><api name="other" value="other()"/><Stack /></Component>
+      <Component name='MyComp' method.getIt="getIt()"><method name="other" value="other()"/><Stack /></Component>
     `) as ComponentDef;
     expect(cd).toMatchObject({
       name: "MyComp",

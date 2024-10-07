@@ -84,13 +84,13 @@ const b = 2;
     expect((cd.events as any).click).toBe("\nconst a = 1;\n\nconst b = 2;\n")
   });
 
-  it("Api keeps whitespaces", () => {
+  it("method keeps whitespaces", () => {
     const cd = transformSource(`
-    <Text><api name="myMethod">
+    <Text><method name="myMethod">
 const a = 1;
 
 const b = 2;
-</api>
+</method>
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");

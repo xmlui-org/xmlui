@@ -173,9 +173,9 @@ describe("Ueml transform - errors", () => {
     }
   });
 
-  it("Name required in api #1", () => {
+  it("Name required in method #1", () => {
     try {
-      transformSource("<Stack><api /></Stack>");
+      transformSource("<Stack><method /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
@@ -184,7 +184,7 @@ describe("Ueml transform - errors", () => {
 
   it("Name required in api #2", () => {
     try {
-      transformSource("<Stack><api name='' /></Stack>");
+      transformSource("<Stack><method name='' /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T012")).equal(true);
