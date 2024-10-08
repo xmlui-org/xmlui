@@ -1,9 +1,8 @@
 import { Callout } from "nextra/components";
-import pages from "../../meta/pages.js";
 
 # DataSource [#component-datasource]
 
-The `Datasource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`ApiAction`](./ApiAction.mdx) component.
+The `DataSource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component.
 
 ## Properties
 
@@ -31,17 +30,17 @@ This property defines the message to display while the fetch operation progresse
 
 By default, data fetching uses the `get` operation method. You can change it by setting this property to other supported methods, such as `post`, `put`, `delete`, and others.
 
-### `nextPageParamSelector`
+### `nextPageSelector`
 
-When using `Datasource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
+When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the next page information from the response deserialized to an object.
 
 ### `pollIntervalInSeconds`
 
-By setting this property, you can define periodic data fetching. The `Datasource` component will refresh its data according to the time specified as seconds. When the data changes during the refresh, it will trigger the update mechanism of XMLUI and re-render the UI accordingly.
+By setting this property, you can define periodic data fetching. The `DataSource` component will refresh its data according to the time specified as seconds. When the data changes during the refresh, it will trigger the update mechanism of XMLUI and re-render the UI accordingly.
 
-### `prevPageParamSelector`
+### `prevPageSelector`
 
-When using `Datasource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object.
+When using `DataSource` with paging, the response may contain information about the previous and next page. This property defines the selector that extracts the previous page information from the response deserialized to an object.
 
 ### `queryParams`
 

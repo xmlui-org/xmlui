@@ -3,9 +3,9 @@ import React, { useMemo } from "react";
 import type {ComponentDef, ParentRenderContext} from "@abstractions/ComponentDefs";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { MutableRefObject } from "react";
-import type { UploadActionComponent } from "@components-core/action/UploadAction";
-import type { DownloadActionComponent } from "@components-core/action/DownloadFileAction";
-import type { ApiActionComponent } from "@components-core/action/ApiAction";
+import type { UploadActionComponent } from "@components-core/action/FileUploadAction";
+import type { DownloadActionComponent } from "@components-core/action/FileDownloadAction";
+import type { ApiActionComponent } from "@components-core/action/APICall";
 import type { DynamicChildComponentDef } from "@abstractions/ComponentDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 
@@ -43,7 +43,7 @@ export function ApiBoundComponent({
       const { type } = node.events![key];
 
       switch (type) {
-        case "UploadAction": {
+        case "FileUpload": {
           const actionComponent = node.events![key] as UploadActionComponent;
           const { invalidates, asForm, formParams, queryParams, rawBody, body, url, headers, method, file } =
             actionComponent.props;
@@ -69,7 +69,7 @@ export function ApiBoundComponent({
           }`;
           break;
         }
-        case "DownloadAction": {
+        case "FileDownload": {
           const actionComponent = node.events![key] as DownloadActionComponent;
           const { url, queryParams, rawBody, body, headers, method, fileName } = actionComponent.props;
           events[key] = `(eventArgs) => {
@@ -86,7 +86,7 @@ export function ApiBoundComponent({
           }`;
           break;
         }
-        case "ApiAction": {
+        case "APICall": {
           const actionComponent = node.events![key] as ApiActionComponent;
           const { when, uid } = actionComponent;
 

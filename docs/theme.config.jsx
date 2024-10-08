@@ -4,6 +4,7 @@ import { StandalonePlayground } from "./src/components/StandalonePlayground";
 import { DocsImage } from "./src/components/DocsImage";
 import { GrayedOutText } from "./src/components/GrayedOutText";
 import { SmartLink } from "./src/components/SmartLink";
+import { DownloadLink } from "./src/components/DownloadLink";
 import { useRouter } from "next/router";
 import { useConfig } from 'nextra-theme-docs';
 
@@ -26,6 +27,7 @@ export default {
     Image: DocsImage,
     GrayText: GrayedOutText,
     SmartLink,
+    DownloadLink,
   },
   sidebar: {
     autoCollapse: true,

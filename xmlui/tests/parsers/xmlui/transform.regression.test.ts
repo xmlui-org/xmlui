@@ -7,7 +7,7 @@ describe("Ueml transform - regression", () => {
     const cd = transformSource(`
     <Table width="50%">
       <property name="items">
-        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
       </property>
       <Column size="140">
           <property name="template">
@@ -24,7 +24,7 @@ describe("Ueml transform - regression", () => {
     const cd = transformSource(`
     <Table width="50%" <!-- height="100%" --> >
       <property name="items">
-        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
       </property>
       <Column size="140">
         <property name="template">
@@ -41,7 +41,7 @@ describe("Ueml transform - regression", () => {
     const cd = transformSource(`
     <Table <!--width="50%"--> <!-- height="100%" --> >
       <property name="items">
-        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
       </property>
       <Column size="140">
         <property name="template">
@@ -58,7 +58,7 @@ describe("Ueml transform - regression", () => {
     const cd = transformSource(`
     <Table <!--width="50%"--> height="100%">
       <property name="items">
-        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
       </property>
       <Column size="140">
         <property name="template">

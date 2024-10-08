@@ -1,10 +1,22 @@
 {
+  "basics": {
+    "title": "Basics",
+    "type": "separator"
+  },
   "index": "Getting Started",
   "cl-app": "Contact List Tutorial",
   "create-apps": "Creating XMLUI Apps",
   "howto": "How-to Guides",
-  "components": "Components",
-  "styles-and-themes": "Themes",
-  "scripting": "Scripting",
-  "tools": "Tools"
+  "advanced-topics": {
+    "title": "Advanced Topics",
+    "type": "separator"
+  },
+  "advanced": "Advanced Topics",
+  "references": {
+    "title": "References",
+    "type": "separator"
+  },
+  "components": "Components Reference",
+  "styles-and-themes": "Themes Reference",
+  "scripting": "XMLUI Scripting Reference"
 }

@@ -1,13 +1,14 @@
 import { fileURLToPath } from "url";
-import { basename, join, dirname, extname, relative } from "path";
+import { basename, join, dirname, extname } from "path";
 import { existsSync } from "fs";
 import { unlink, readdir, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { Logger, logger } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
-import { processError, createTable, ErrorWithSeverity, convertPath, strBufferToLines } from "./utils.mjs";
+import { processError, createTable, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
 import loadConfig from "./input-handler.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
+import { buildDownloadsMap } from "./build-downloads-map.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
 
@@ -20,6 +21,8 @@ const pagesMapFile = join(metaFolder, "pages.js");
 const pagesFolder = join(docsFolderRoot, "pages");
 const componentDocsFolder = join(pagesFolder, "components");
 const componentDocsFolderName = basename(componentDocsFolder);
+const fileResourceFolder = join(docsFolderRoot, "public", "resources", "files");
+const downloadsMapFile = join(metaFolder, "downloads.js");
 
 // --- Load Config
 
@@ -96,8 +99,8 @@ if (config.exportToJson) {
 logger.info("Processing MDX files");
 
 const pagesMapFileName = basename(pagesMapFile);
-const importsToInject = `import { Callout } from "nextra/components";\n` +
-  `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
+const importsToInject = `import { Callout } from "nextra/components";\n\n`
+  // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
 processDocfiles(metadata, importsToInject);
 
 // --- Create Summary
@@ -119,9 +122,12 @@ try {
 
 // --- Generate Pages Map
 
-logger.info("Generating Pages Map");
 try {
+  logger.info("Generating link IDs for article headings");
   buildPagesMap(pagesFolder, pagesMapFile);
+
+  logger.info("Generating link IDs for article headings");
+  buildDownloadsMap(fileResourceFolder, downloadsMapFile);
 } catch (error) {
   processError(error);
 }

@@ -1,7 +1,8 @@
-import dimApp1 from "./samples/dimension-app-1.xmlui";
-import layout1 from "./samples/layout-prop-1.xmlui";
-import percentage from "./samples/percentage.xmlui";
-import minMax from "./samples/min-max.xmlui";
+import dimApp1 from "./samples/themes/dimension-app-1.xmlui";
+import layout1 from "./samples/themes/layout-prop-1.xmlui";
+import percentage from "./samples/themes/percentage.xmlui";
+import minMax from "./samples/themes/min-max.xmlui";
+import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN, COMMON_VISUAL_PROPERTY_UNITS_BORDER, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_CURSOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION, COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW, COMMON_VISUAL_PROPERTY_UNITS_SHADOW, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION, COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM, COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT, COMPONENT_HEADING, COMPONENT_TEXT } from "../../meta/pages";
 
 # Layout Properties
 
@@ -78,7 +79,7 @@ The type of a component determines how the engine renders it. Some components, l
 
 You can explicitly specify several dimensions of a particular component with the `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight` layout properties.
 
-The dimension properties use [size values](../../styles-and-themes/common-units.mdx#size-values), which contain a value and a unit that together determine the actual size. Here are a few examples of size values:
+The dimension properties use <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size values</SmartLink>, which contain a value and a unit that together determine the actual size. Here are a few examples of size values:
 
 ```text
 12px
@@ -114,7 +115,7 @@ The XMLUI percentage value is relative to the size of the viewport a parent cont
   height={92}
 />
 
-### Component Width and Height
+### Component Width and Height [#component-width-height]
 
 You can change the default component width and height with these layout properties:
 
@@ -150,12 +151,12 @@ Resize the screen to see how the sizes of colored boxes change.
 
 A component may not fit into the area its parent provides. This is called overflow.
 XMLUI provides a few properties to define how a particular component should behave in situations like these.
-Individual components, such as [`Text`](../../components/Text.mdx), [`Heading`](../../components/Heading.mdx), and others, provide further techniques to handle overflow.
+Individual components, such as <SmartLink href={COMPONENT_TEXT}>`Text`</SmartLink>, <SmartLink href={COMPONENT_HEADING}>`Heading`</SmartLink>, and others, provide further techniques to handle overflow.
 
 |Property|Description|
 |-|-|
-|`horizontalOverflow`| This property defines the [overflow](../../styles-and-themes/common-units.mdx#overflow-values) strategy when a component horizontally overflows the UI its parent provides. |
-|`verticalOverflow`| This property defines the [overflow](../../styles-and-themes/common-units.mdx#overflow-values) strategy when a component vertically overflows the UI its parent provides. |
+|`horizontalOverflow`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component horizontally overflows the UI its parent provides. |
+|`verticalOverflow`| This property defines the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW}>overflow</SmartLink> strategy when a component vertically overflows the UI its parent provides. |
 
 ### Horizontal Overflow
 
@@ -318,13 +319,13 @@ You can use these properties to define component margins:
 
 | Property | Description |
 |-|-|
-| `margin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the margin area; uses the same value for the left, top, right, and bottom margins. |
-| `horizontalMargin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the horizontal margins (left and right) to the specified value. |
-| `verticalMargin` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the vertical margins (top and bottom) to the specified value. |
-| `marginLeft` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the left margin to the specified value. |
-| `marginTop` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the top margin to the specified value. |
-| `marginRight` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the right margin to the specified value. |
-| `marginBottom` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the bottom margin to the specified value. |
+| `margin` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the margin area; uses the same value for the left, top, right, and bottom margins. |
+| `horizontalMargin` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the horizontal margins (left and right) to the specified value. |
+| `verticalMargin` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the vertical margins (top and bottom) to the specified value. |
+| `marginLeft` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the left margin to the specified value. |
+| `marginTop` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the top margin to the specified value. |
+| `marginRight` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the right margin to the specified value. |
+| `marginBottom` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the bottom margin to the specified value. |
 
 When you decorate a component with multiple properties setting the same margin, the most specific one prevails. For example, `marginLeft` overrides `horizontalMargin` and `margin`.
 
@@ -334,11 +335,11 @@ You can use these properties to define component borders:
 
 | Property | Description |
 |-|-|
-| `border` | Sets the value of the [border](../../styles-and-themes/common-units.mdx#border-values) area; uses the same value for the left, top, right, and bottom borders. |
-| `borderLeft` | Sets the value of the left [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
-| `borderTop` | Sets the value of the top [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
-| `borderRight` | Sets the value of the right [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
-| `borderBottom` | Sets the value of the bottom [border](../../styles-and-themes/common-units.mdx#border-values) to the specified one. |
+| `border` | Sets the value of the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>border</SmartLink> area; uses the same value for the left, top, right, and bottom borders. |
+| `borderLeft` | Sets the value of the left <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>border</SmartLink> to the specified one. |
+| `borderTop` | Sets the value of the top <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>border</SmartLink> to the specified one. |
+| `borderRight` | Sets the value of the right <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>border</SmartLink> to the specified one. |
+| `borderBottom` | Sets the value of the bottom <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>border</SmartLink> to the specified one. |
 
 When you decorate a component with multiple properties setting the same border segment, the most specific one prevails. For example, `borderLeft` overrides `border`.
 
@@ -346,11 +347,11 @@ You can also define the rounding of the border through a set of properties:
 
 | Property | Description |
 |-|-|
-| `radius` | This property rounds the corners of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
-| `radiusTopLeft` | This property rounds the top-left corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
-| `radiusTopRight` | This property rounds the top-right corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
-| `radiusBottomLeft` | This property rounds the bottom-left corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
-| `radiusBottomRight` | This property rounds the bottom-right corner of a component's outer border edge according to the specified [value](../../styles-and-themes/common-units.mdx#border-rounding). |
+| `radius` | This property rounds the corners of a component's outer border edge according to the specified <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING}>value</SmartLink>. |
+| `radiusTopLeft` | This property rounds the top-left corner of a component's outer border edge according to the specified <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING}>value</SmartLink>. |
+| `radiusTopRight` | This property rounds the top-right corner of a component's outer border edge according to the specified <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING}>value</SmartLink>. |
+| `radiusBottomLeft` | This property rounds the bottom-left corner of a component's outer border edge according to the specified <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING}>value</SmartLink>. |
+| `radiusBottomRight` | This property rounds the bottom-right corner of a component's outer border edge according to the specified <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING}>value</SmartLink>. |
 
 If you set `radius` and any other properties, the others overwrite `radius` for the particular corner.
 
@@ -360,13 +361,13 @@ You can use these properties to define component paddings:
 
 | Property | Description |
 |-|-|
-| `padding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the padding area; uses the same value for the left, top, right, and bottom paddings. |
-| `horizontalPadding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the horizontal padding (left and right) to the specified value. |
-| `verticalPadding` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the vertical paddings (top and bottom) to the specified value. |
-| `paddingLeft` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the left padding to the specified value. |
-| `paddingTop` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the top padding to the specified value. |
-| `paddingRight` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the right padding to the specified value. |
-| `paddingBottom` | Sets the [size](../../styles-and-themes/common-units.mdx#size-values) of the bottom padding to the specified value. |
+| `padding` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the padding area; uses the same value for the left, top, right, and bottom paddings. |
+| `horizontalPadding` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the horizontal padding (left and right) to the specified value. |
+| `verticalPadding` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the vertical paddings (top and bottom) to the specified value. |
+| `paddingLeft` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the left padding to the specified value. |
+| `paddingTop` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the top padding to the specified value. |
+| `paddingRight` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the right padding to the specified value. |
+| `paddingBottom` | Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of the bottom padding to the specified value. |
 
 When you decorate a component with multiple properties setting the same padding, the most specific one prevails. For example, `paddingLeft` overrides `horizontalPadding` and `padding`.
 
@@ -380,11 +381,11 @@ The engine supports these layout properties to set component colors:
 
 |Property|Descrition|
 |-|-|
-|`backgrounbdColor`| Sets the background [color](../../styles-and-themes/common-units.mdx#color-values) of a component. |
-|`color`| Sets the foreground [color](../../styles-and-themes/common-units.mdx#color-values) of a component's text and text decorations. |
+|`backgrounbdColor`| Sets the background <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> of a component. |
+|`color`| Sets the foreground <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color</SmartLink> of a component's text and text decorations. |
 |`opacity`| This property sets the opacity of an element. Opacity is the degree to which the content behind an element is hidden. The value is a number in the range 0.0 to 1.0, inclusive, or a percentage from 0% to 100%. |
 
-> **Note**: Besides these colors, [borders](#border) and [shadows](#shadow) also can declare their display colors.
+> **Note**: Besides these colors, <SmartLink href="#border">borders</SmartLink> and <SmartLink href="#shadow">shadows</SmartLink> also can declare their display colors.
 
 ```ueml copy
 <H3 backgroundColor="green" color="white">The Power of Green Economy</H3>
@@ -414,17 +415,17 @@ Several properties allow you to set the appearance of text elements displayed in
 
 |Property|Descrition|
 |-|-|
-|`fontFamily`|This property specifies a prioritized list of one or more [font family](../../styles-and-themes/common-units.mdx#font-family-values) names and/or generic family names for the selected component.|
-|`fontSize`|This property sets the size of the font. Changing the font [size](../../styles-and-themes/common-units.mdx#size-values) also updates the sizes of the font size-relative length units, such as em, ex, and so forth.|
-|`fontWeight`|Sets the [weight (or boldness)](../../styles-and-themes/common-units.mdx#font-weight-values) of the font. The weights available depend on the `fontFamily` that is currently set.|
-|`italic`| This [Boolean](../../styles-and-themes/common-units.mdx#boolean-values) property determines if the text should be displayed in italic style. |
-|`letterSpacing`|This property sets the horizontal [spacing](../../styles-and-themes/common-units.mdx#size-values) behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.|
-|`textDecoration`|This property sets the appearance of [decorative lines](../../styles-and-themes/common-units.mdx#text-decoration-values) on text.|
-|`textTransform`|This property specifies how to [capitalize](../../styles-and-themes/common-units.mdx#text-transform-values) an element's text.|
-|`userSelect`|This property controls whether the [user can select](../../styles-and-themes/common-units.mdx#user-select-values) text.|
+|`fontFamily`|This property specifies a prioritized list of one or more <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY}>font family</SmartLink> names and/or generic family names for the selected component.|
+|`fontSize`|This property sets the size of the font. Changing the font <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> also updates the sizes of the font size-relative length units, such as em, ex, and so forth.|
+|`fontWeight`|Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT}>weight (or boldness)</SmartLink> of the font. The weights available depend on the `fontFamily` that is currently set.|
+|`italic`| This <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN}>Boolean</SmartLink> property determines if the text should be displayed in italic style. |
+|`letterSpacing`|This property sets the horizontal <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>spacing</SmartLink> behavior between text characters. This value is added to the natural spacing between characters while rendering the text. Positive values cause characters to spread farther apart, while negative values bring characters closer together.|
+|`textDecoration`|This property sets the appearance of <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION}>decorative lines</SmartLink> on text.|
+|`textTransform`|This property specifies how to <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM}>capitalize</SmartLink> an element's text.|
+|`userSelect`|This property controls whether the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT}>user can select</SmartLink> text.|
 |`lineHeight`|This property sets the height of a line as a number relative to the normal height. For example, 0.5 means half-height; 2 is twice the normal height. It's commonly used to set the distance between lines of text.|
-|`textAlign`|This property sets the horizontal [alignment](../../styles-and-themes/common-units.mdx#text-alignment-values) of the inline-rendered content (e.g., text) inside its block-rendered parent.|
-|`textAlignLast`|This property sets how the last line of a block or a line, right before a forced line break, is [aligned](../../styles-and-themes/common-units.mdx#text-alignment-values).|
+|`textAlign`|This property sets the horizontal <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT}>alignment</SmartLink> of the inline-rendered content (e.g., text) inside its block-rendered parent.|
+|`textAlignLast`|This property sets how the last line of a block or a line, right before a forced line break, is <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT}>aligned</SmartLink>.|
 
 ```ueml copy
 <VStack>
@@ -461,7 +462,7 @@ Several properties allow you to set the appearance of text elements displayed in
 
 ### Shadow
 
-You can add [shadow effects](../../styles-and-themes/common-units.mdx#shadow-values) around a component's frame and set up one or more shadow effects.
+You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects</SmartLink> around a component's frame and set up one or more shadow effects.
 
 ```ueml copy {2}
 <Stack margin="24" width="200" padding="20" border="2px solid #202020"
@@ -492,8 +493,8 @@ Components that lay out their children according to their strategy (such as `Sta
 
 |Property|Description|
 |-|-|
-|horizontalAlignment| Specifies the horizontal [alignment](../../styles-and-themes/common-units.mdx#alignment-values) of child component within its parent. |
-|verticalAlignment| Specifies the vertical [alignment](../../styles-and-themes/common-units.mdx#alignment-values) of child component within its parent. |
+|horizontalAlignment| Specifies the horizontal <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT}>alignment</SmartLink> of child component within its parent. |
+|verticalAlignment| Specifies the vertical <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT}>alignment</SmartLink> of child component within its parent. |
 
 ### Direction
 
@@ -531,15 +532,15 @@ This property sets the direction of text, table columns, and horizontal overflow
 
 ### Gap
 
-Layout components use this property to define the [size](../../styles-and-themes/common-units.mdx#size-values) of space separating child components.
+Layout components use this property to define the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>size</SmartLink> of space separating child components.
 
 ### Cursor
 
-This layout property sets the mouse [cursor](../../styles-and-themes/common-units.mdx#cursor-values), if any, to show when the mouse pointer is over a particular component.
+This layout property sets the mouse <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_CURSOR}>cursor</SmartLink>, if any, to show when the mouse pointer is over a particular component.
 
 ### Orientation
 
-This property specifies a particular component's [orientation](../../styles-and-themes/common-units.mdx#orientation) when displaying its child components.
+This property specifies a particular component's <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION}>orientation</SmartLink> when displaying its child components.
 
 ### Z-Index
 

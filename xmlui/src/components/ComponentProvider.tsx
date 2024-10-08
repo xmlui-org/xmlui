@@ -95,9 +95,9 @@ import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryC
 import { columnComponentRenderer } from "@components/Column/Column";
 import { optionComponentRenderer } from "@components/Option/Option";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
-import { apiAction } from "@components-core/action/ApiAction";
-import { downloadAction } from "@components-core/action/DownloadFileAction";
-import { uploadAction } from "@components-core/action/UploadAction";
+import { apiAction } from "@components-core/action/APICall";
+import { downloadAction } from "@components-core/action/FileDownloadAction";
+import { uploadAction } from "@components-core/action/FileUploadAction";
 import { navigateAction } from "@components-core/action/NavigateAction";
 import { timedAction } from "@components-core/action/TimedAction";
 import type { LoaderRenderer, LoaderRendererDef } from "@components-core/abstractions/LoaderRenderer";

@@ -1029,7 +1029,7 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
   let loaders = node.loaders;
   let children: Array<ComponentDef> | undefined = undefined;
   node.children?.forEach((child) => {
-    if (child?.type === "Datasource") {
+    if (child?.type === "DataSource") {
       didResolve = true;
       if (!loaders) {
         loaders = [];
@@ -1065,7 +1065,7 @@ function transformNodeWithDatasourceProp(node: ComponentDef) {
       props: {
         ...node.props,
         datasource: {
-          type: "Datasource",
+          type: "DataSource",
           props: {
             url: node.props.datasource,
           },
@@ -1102,7 +1102,7 @@ const Node = memo(
     stableLayoutContext.current = layoutContext;
 
     const nodeWithTransformedLoaders = useMemo(() => {
-      let transformed = transformNodeWithChildDatasource(node); //if we have an Datasource child, we transform it to a loader on the node
+      let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
       transformed = transformNodeWithDatasourceProp(transformed);
 
       return transformed;

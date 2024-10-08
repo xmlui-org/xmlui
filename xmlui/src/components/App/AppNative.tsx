@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
@@ -14,9 +14,10 @@ import { ScrollContext } from "@components-core/ScrollContext";
 import { useResizeObserver } from "@components-core/utils/hooks";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import type { JSX } from "react/jsx-runtime";
-import {AppContextAwareAppHeader} from "@components/AppHeader/AppHeaderNative";
-import type {RenderChildFn} from "@abstractions/RendererDefs";
-import {useScrollbarWidth} from "@components-core/utils/css-utils";
+import { AppContextAwareAppHeader } from "@components/AppHeader/AppHeaderNative";
+import type { RenderChildFn } from "@abstractions/RendererDefs";
+import { useScrollbarWidth } from "@components-core/utils/css-utils";
+import { Helmet } from "react-helmet-async";
 
 type Props = {
   children: ReactNode;
@@ -33,40 +34,42 @@ type Props = {
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
+  name?: string;
 };
 
 export function App({
-               children,
-               style,
-               layout,
-               loggedInUser,
-               scrollWholePage,
-               onReady = noop,
-               header,
-               navPanel,
-               footer,
-               navPanelDef,
-               logoContentDef,
-               renderChild
-             }: Props) {
+  children,
+  style,
+  layout,
+  loggedInUser,
+  scrollWholePage,
+  onReady = noop,
+  header,
+  navPanel,
+  footer,
+  navPanelDef,
+  logoContentDef,
+  renderChild,
+  name,
+}: Props) {
   const { getThemeVar } = useTheme();
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue
-      ?.trim()
-      .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
+    ?.trim()
+    .replace(/[\u2013\u2014\u2011]/g, "-") as AppLayoutType; //It replaces all &ndash; (–) and &mdash; (—) and non-breaking hyphen '‑' symbols with simple dashes (-).
   const { setLoggedInUser, mediaSize } = useAppContext();
   const hasRegisteredHeader = header !== undefined;
   const hasRegisteredNavPanel = navPanelDef !== undefined;
 
-  const pagesWrapperInnerStyle = useMemo(()=>{
-    const {padding, paddingLeft, paddingRight, paddingTop,paddingBottom, ...rest} = style;
+  const pagesWrapperInnerStyle = useMemo(() => {
+    const { padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest } = style;
     return {
       ...rest,
       "--page-padding-left": padding || paddingLeft,
       "--page-padding-right": padding || paddingRight,
       "--page-padding-top": padding || paddingTop,
-      "--page-padding-bottom": padding || paddingBottom
-    }
+      "--page-padding-bottom": padding || paddingBottom,
+    };
   }, [style]);
 
   useEffect(() => {
@@ -81,8 +84,8 @@ export function App({
   // --- button. The exception is the condensed layout because we render a header in that case (otherwise,
   // --- we couldn't show the NavPanel)
   const navPanelVisible =
-      mediaSize.largeScreen ||
-      (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
+    mediaSize.largeScreen ||
+    (!hasRegisteredHeader && safeLayout !== "condensed" && safeLayout !== "condensed-sticky");
 
   const scrollPageContainerRef = useRef(null);
   const noScrollPageContainerRef = useRef(null);
@@ -103,17 +106,17 @@ export function App({
   }, []);
 
   useResizeObserver(
-      footerRef,
-      useCallback((entries) => {
-        setFooterHeight(entries?.[0]?.contentRect?.height);
-      }, []),
+    footerRef,
+    useCallback((entries) => {
+      setFooterHeight(entries?.[0]?.contentRect?.height);
+    }, []),
   );
 
   useResizeObserver(
-      headerRef,
-      useCallback((entries) => {
-        setHeaderHeight(entries?.[0]?.contentRect?.height);
-      }, []),
+    headerRef,
+    useCallback((entries) => {
+      setHeaderHeight(entries?.[0]?.contentRect?.height);
+    }, []),
   );
 
   const styleWithHelpers = useMemo(() => {
@@ -185,157 +188,169 @@ export function App({
   switch (safeLayout) {
     case "vertical":
       content = (
-          <div className={classnames(wrapperBaseClasses, styles.vertical)} style={styleWithHelpers}>
-            {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-            <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
-              <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
-                {header}
-              </header>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-                </ScrollContext.Provider>
-              </div>
-              <div className={styles.footerWrapper} ref={footerRefCallback}>
-                {footer}
-              </div>
-            </div>
-          </div>
-      );
-      break;
-    case "vertical-sticky":
-      content = (
-          <div
-              className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
-              style={styleWithHelpers}
-          >
-            {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
-            <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
-              <header
-                  ref={headerRefCallback}
-                  className={classnames(styles.headerWrapper, styles.sticky)}
-              >
-                {header}
-              </header>
-              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                <ScrollContext.Provider value={scrollContainerRef}>
-                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-                </ScrollContext.Provider>
-              </div>
-              <div className={styles.footerWrapper} ref={footerRefCallback}>
-                {footer}
-              </div>
-            </div>
-          </div>
-      );
-      break;
-    case "vertical-full-header":
-      content = (
-          <div
-              className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
-              style={styleWithHelpers}
-              ref={scrollPageContainerRef}
-          >
-            <header
-                className={classnames(styles.headerWrapper, styles.sticky)}
-                ref={headerRefCallback}
-            >
+        <div className={classnames(wrapperBaseClasses, styles.vertical)} style={styleWithHelpers}>
+          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
+          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
+            <header ref={headerRefCallback} className={classnames(styles.headerWrapper)}>
               {header}
             </header>
-            <div className={styles.content}>
-              {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
-              <main className={styles.contentWrapper}>
-                <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-                  <ScrollContext.Provider value={scrollContainerRef}>
-                    <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-                  </ScrollContext.Provider>
+            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+              <ScrollContext.Provider value={scrollContainerRef}>
+                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                  {children}
                 </div>
-              </main>
+              </ScrollContext.Provider>
             </div>
             <div className={styles.footerWrapper} ref={footerRefCallback}>
               {footer}
             </div>
           </div>
+        </div>
+      );
+      break;
+    case "vertical-sticky":
+      content = (
+        <div
+          className={classnames(wrapperBaseClasses, styles.vertical, styles.sticky)}
+          style={styleWithHelpers}
+        >
+          {navPanelVisible && <div className={classnames(styles.navPanelWrapper)}>{navPanel}</div>}
+          <div className={styles.contentWrapper} ref={scrollPageContainerRef}>
+            <header
+              ref={headerRefCallback}
+              className={classnames(styles.headerWrapper, styles.sticky)}
+            >
+              {header}
+            </header>
+            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+              <ScrollContext.Provider value={scrollContainerRef}>
+                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                  {children}
+                </div>
+              </ScrollContext.Provider>
+            </div>
+            <div className={styles.footerWrapper} ref={footerRefCallback}>
+              {footer}
+            </div>
+          </div>
+        </div>
+      );
+      break;
+    case "vertical-full-header":
+      content = (
+        <div
+          className={classnames(wrapperBaseClasses, styles.verticalFullHeader)}
+          style={styleWithHelpers}
+          ref={scrollPageContainerRef}
+        >
+          <header
+            className={classnames(styles.headerWrapper, styles.sticky)}
+            ref={headerRefCallback}
+          >
+            {header}
+          </header>
+          <div className={styles.content}>
+            {navPanelVisible && <aside className={styles.navPanelWrapper}>{navPanel}</aside>}
+            <main className={styles.contentWrapper}>
+              <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+                <ScrollContext.Provider value={scrollContainerRef}>
+                  <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                    {children}
+                  </div>
+                </ScrollContext.Provider>
+              </div>
+            </main>
+          </div>
+          <div className={styles.footerWrapper} ref={footerRefCallback}>
+            {footer}
+          </div>
+        </div>
       );
       break;
     case "condensed":
     case "condensed-sticky":
       content = (
-          <div
-              className={classnames(wrapperBaseClasses, styles.horizontal, {
-                [styles.sticky]: safeLayout === "condensed-sticky",
-              })}
-              style={styleWithHelpers}
-              ref={scrollPageContainerRef}
+        <div
+          className={classnames(wrapperBaseClasses, styles.horizontal, {
+            [styles.sticky]: safeLayout === "condensed-sticky",
+          })}
+          style={styleWithHelpers}
+          ref={scrollPageContainerRef}
+        >
+          <header
+            className={classnames("app-layout-condensed", styles.headerWrapper, {
+              [styles.sticky]: safeLayout === "condensed-sticky",
+            })}
+            ref={headerRefCallback}
           >
-            <header
-                className={classnames("app-layout-condensed", styles.headerWrapper, {
-                  [styles.sticky]: safeLayout === "condensed-sticky",
-                })}
-                ref={headerRefCallback}
-            >
-              {!hasRegisteredHeader && hasRegisteredNavPanel && (
-                  <AppContextAwareAppHeader renderChild={renderChild}/>
-              )}
-              {header}
-            </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-              </ScrollContext.Provider>
-            </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
-              {footer}
-            </div>
+            {!hasRegisteredHeader && hasRegisteredNavPanel && (
+              <AppContextAwareAppHeader renderChild={renderChild} />
+            )}
+            {header}
+          </header>
+          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <ScrollContext.Provider value={scrollContainerRef}>
+              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                {children}
+              </div>
+            </ScrollContext.Provider>
           </div>
+          <div className={styles.footerWrapper} ref={footerRefCallback}>
+            {footer}
+          </div>
+        </div>
       );
       break;
     case "horizontal": {
       content = (
-          <div
-              className={classnames(wrapperBaseClasses, styles.horizontal)}
-              style={styleWithHelpers}
-              ref={scrollPageContainerRef}
-          >
-            <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
-              {header}
-              {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
-            </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-              </ScrollContext.Provider>
-            </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
-              {footer}
-            </div>
+        <div
+          className={classnames(wrapperBaseClasses, styles.horizontal)}
+          style={styleWithHelpers}
+          ref={scrollPageContainerRef}
+        >
+          <header className={classnames(styles.headerWrapper)} ref={headerRefCallback}>
+            {header}
+            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
+          </header>
+          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <ScrollContext.Provider value={scrollContainerRef}>
+              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                {children}
+              </div>
+            </ScrollContext.Provider>
           </div>
+          <div className={styles.footerWrapper} ref={footerRefCallback}>
+            {footer}
+          </div>
+        </div>
       );
       break;
     }
     case "horizontal-sticky":
       content = (
-          <div
-              className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
-              style={styleWithHelpers}
-              ref={scrollPageContainerRef}
+        <div
+          className={classnames(wrapperBaseClasses, styles.horizontal, styles.sticky)}
+          style={styleWithHelpers}
+          ref={scrollPageContainerRef}
+        >
+          <header
+            className={classnames(styles.headerWrapper, styles.sticky)}
+            ref={headerRefCallback}
           >
-            <header
-                className={classnames(styles.headerWrapper, styles.sticky)}
-                ref={headerRefCallback}
-            >
-              {header}
-              {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
-            </header>
-            <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
-              <ScrollContext.Provider value={scrollContainerRef}>
-                <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>{children}</div>
-              </ScrollContext.Provider>
-            </div>
-            <div className={styles.footerWrapper} ref={footerRefCallback}>
-              {footer}
-            </div>
+            {header}
+            {navPanelVisible && <div className={styles.navPanelWrapper}>{navPanel}</div>}
+          </header>
+          <div className={styles.PagesWrapper} ref={noScrollPageContainerRef}>
+            <ScrollContext.Provider value={scrollContainerRef}>
+              <div className={styles.PagesWrapperInner} style={pagesWrapperInnerStyle}>
+                {children}
+              </div>
+            </ScrollContext.Provider>
           </div>
+          <div className={styles.footerWrapper} ref={footerRefCallback}>
+            {footer}
+          </div>
+        </div>
       );
       break;
     default:
@@ -343,14 +358,20 @@ export function App({
   }
 
   return (
+    <>
+      {name !== undefined && (
+        <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} />
+      )}
       <AppLayoutContext.Provider value={layoutContextValue}>
         <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
           <SheetContent side={"left"}>{renderChild(navPanelDef, { inDrawer: true })}</SheetContent>
         </Sheet>
         {content}
       </AppLayoutContext.Provider>
+    </>
   );
 }
+
 export function getAppLayoutOrientation(appLayout?: AppLayoutType) {
   switch (appLayout) {
     case "vertical":

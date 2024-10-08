@@ -1,10 +1,11 @@
+import { COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_SIZE } from "../../meta/pages";
 import colorValues from "./samples/color-values.xmlui";
 
 # Common Visual Property Units
 
 This article describes common values that you can use in layout properties.
 
-## Alignment values
+## Alignment values [#alignment]
 
 Position a child component within its parent to the start according to the current content direction.
 
@@ -65,21 +66,21 @@ Position a child component within its parent to the start according to the curre
     height={200}
 />
 
-## Boolean Values
+## Boolean Values [#boolean]
 
 You can represent the `true` and `false` values with multiple keywords:
 
 |Value|Description|
 |---|---|
 |true|Use a particular style feature. Accepted keywords: `true`, `yes`, or `on`.|
-|true|Do not use a particular style feature. Accepted keywords: `false`, `no`, or `off`.|
+|false|Do not use a particular style feature. Accepted keywords: `false`, `no`, or `off`.|
 
-## Border Values
+## Border Values [#border]
 
 When you specify the border of a component, you can use these three border properties:
-- **Border width**. The stroke [width](../reference/styling/common-units/#size-values) to draw the border.
-- **Border style**. The border [style pattern](../reference/styling/common-units/#border-style-values) to apply.
-- **Border color**. The [color](../reference/styling/common-units/#color-values) of the border.
+- **Border width**. The stroke <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> to draw the border.
+- **Border style**. The border <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE }>style pattern</SmartLink> to apply.
+- **Border color**. The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color</SmartLink> of the border.
 You must specify at least one of these properties to display a border. You can specify the border properties in any order; however, you can specify a property only once. All of these border specifications are correct:
 
 ```text
@@ -90,9 +91,9 @@ dashed 4px #f0cccc
 #f0f dotted
 ```
 
-## Border Rounding
+## Border Rounding [#border-rounding]
 
-You can define border rounding values to round the corners of a component's outer border edge. You can set a single radius to make circular corners or two radii to make elliptical ones. Radius values use the [size value](#size-values) syntax and semantics.
+You can define border rounding values to round the corners of a component's outer border edge. You can set a single radius to make circular corners or two radii to make elliptical ones. Radius values use the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size value</SmartLink> syntax and semantics.
 
 When you specify multiple radii, the first value determines the horizontal rounding, and the second the vertical rounding.
 
@@ -110,7 +111,7 @@ When you specify multiple radii, the first value determines the horizontal round
     height={80}
 />
 
-## Border Style Values
+## Border Style Values [#border-style]
 
 The engine supports these border style values:
 
@@ -143,7 +144,7 @@ The engine supports these border style values:
     height={164}
 />
 
-## Color Values
+## Color Values [#color]
 
 The engine accepts several color value types:
 - **Hexadecimal RGB/RGBA color definitions**. You can specify color values with RGB or ARGB codes using a `#` prefix and 3, 4, 6, or 8 hexadecimal digits.
@@ -151,7 +152,7 @@ The engine accepts several color value types:
 - **The `rgba` function**. Use the `rgba` function with four arguments. The first three arguments represent the color channels (see the `rgb` function). The alpha channel can have a percentage value (0% - 100%) or a float number between 0 and 1.
 - **The `hsl` function**. Describe a color with the `hsl` function with three arguments representing the Hue angle (units are `deg`, `rad`, `grad`, or `turn`), the Saturation percentage (0% - 100%), and the Lightness percentage(0% - 100%).
 - **The `hsla` function**. Describe a color with the `hsla` function with three arguments representing the H, S, and L values (see `hsl`) and the alpha channel (a percentage value (0% - 100%) or a float number between 0 and 1).
-- **Named colors**. You can use standard CSS color names (all lowercase letters). See the [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/CSS/named-color) for more details.
+- **Named colors**. You can use standard CSS color names (all lowercase letters). See the <SmartLink href="https://developer.mozilla.org/en-US/docs/Web/CSS/named-color">MDN documentation</SmartLink> for more details.
 
 <Playground
     previewOnly
@@ -160,7 +161,7 @@ The engine accepts several color value types:
     height={550}
 />
 
-## Cursor Values
+## Cursor Values [#cursor]
 
 This type of value sets the mouse cursor, if any, to show when the mouse pointer is over a particular component.
 
@@ -198,7 +199,7 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 |`alias`|An alias or shortcut is to be created.|
 |`copy`|Something is to be copied.|
 |`move`|Something is to be moved.|
-|`no‑drop`|An item may not be dropped at the current location. [Firefox bug 275173](https://bugzil.la/275173): On Windows and macOS, no-drop is the same as not-allowed.|
+|`no‑drop`|An item may not be dropped at the current location. <SmartLink href="https://bugzil.la/275173">Firefox bug 275173</SmartLink>: On Windows and macOS, no-drop is the same as not-allowed.|
 |`not‑allowed`|The requested action will not be carried out.|
 |`grab`|Something can be grabbed (dragged to be moved).|
 |`grabbing`|Something is being grabbed (dragged to be moved).|
@@ -207,7 +208,7 @@ This type of value sets the mouse cursor, if any, to show when the mouse pointer
 
 |Value|Description|
 |-|-|
-|`all‑scroll`|Something can be scrolled in any direction (panned). [Firefox bug 275174](https://bugzil.la/275174): On Windows, all-scroll is the same as move.|
+|`all‑scroll`|Something can be scrolled in any direction (panned). <SmartLink href="https://bugzil.la/275174">Firefox bug 275174</SmartLink>: On Windows, all-scroll is the same as move.|
 |`col‑resize`|The item/column can be resized horizontally. Often rendered as arrows pointing left and right with a vertical bar separating them.|
 |`row‑resize`|The item/row can be resized vertically. Often rendered as arrows pointing up and down with a horizontal bar separating them.|
 |`n‑resize`, `e‑resize`, `s‑resize`, `w‑resize`, `ne‑resize`, `nw‑resize`, `se‑resize`, `sw‑resize`, `ew‑resize`, `ns‑resize`, `nesw‑resize`, `nwse‑resize`|Some edge is to be moved. For example, the `se‑resize` cursor is used when the movement starts from the south-east corner of the box. In some environments, an equivalent bidirectional resize cursor is shown. For example, `n‑resize` and `s‑resize` are the same as `ns‑resize`.|
@@ -280,7 +281,7 @@ Move the mouse over the rectangles in the following example to check what the cu
     height={500}
 />
 
-## Font Family Values
+## Font Family Values [#font-family]
 
 Font family values are a prioritized list of one or more font family names and/or generic family names. Multiple names should be separated by commas. Font family names containing whitespace should be quoted.
 These are the generic family names:
@@ -312,7 +313,7 @@ Helvetica
 Bookville, "Times New Roman", serif
 ```
 
-## Font Weight Values
+## Font Weight Values [#font-weight]
 
 Font weight values set the font's weight (or boldness); the available values depend on the currently selected font family.
 
@@ -325,7 +326,7 @@ Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..
 |`lighter`| One relative font weight lighter than the parent element. |
 |`bolder`| One relative font weight heavier than the parent element. |
 
-## Orientation
+## Orientation [#orientation]
 
 Describes the orientation a particular component renders its content (child components).
 
@@ -355,7 +356,7 @@ Describes the orientation a particular component renders its content (child comp
     height={200}
 />
 
-## Overflow Values
+## Overflow Values [#overflow]
 
 A component may not fit into the viewport its parent provides. An overflow value specifies the engine's strategy in such a case.
 
@@ -365,7 +366,7 @@ A component may not fit into the viewport its parent provides. An overflow value
 |`hidden`| Overflow content is clipped at the element's padding box. There are no scroll bars, and the clipped content is not visible (i.e., clipped content is hidden), but the content still exists. |
 |`scroll`| Overflow content is clipped at the element's padding box, and overflow content can be scrolled into view using scroll bars. |
 
-## Shadow Values
+## Shadow Values [#shadow]
 
 You can define shadow values with one or more shadow effects. If you use more than one effect, you must separate them with a comma. A shadow effect is composed of these parts:
 
@@ -375,7 +376,8 @@ You can define shadow values with one or more shadow effects. If you use more th
 - Spread radius
 - Optional color
 
-The first up to four [size value](#size-values) segments are followed by the optional [color value](#color-values).
+The first up to four <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size value</SmartLink> 
+segments are followed by the optional <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_COLOR }>color value</SmartLink>.
 
 You can use two, three, or four size values.
 
@@ -426,7 +428,7 @@ When you prefix the shadow value with `inset`, it changes the shadow from an out
     height={360}
 />
 
-## Size Values
+## Size Values [#size]
 
 Size values are composed of a numeric value and an optional unit. Here are a few examples:
 
@@ -460,7 +462,7 @@ UI Engine uses these units with the CSS semantics:
 | `%` | The percentage value is relative to the parent container's viewport size offered for the particular child element. |
 | `*` | Start sizing: The size weight used when calculating the dimension of the particular child element. The base of the calculation is the remaining space size in the parent's viewport. | 
 
-## Text Alignment Values
+## Text Alignment Values [#text-alignment]
 
 This value sets the horizontal alignment of the inline-rendered content (e.g., text) inside its block-rendered parent.
 
@@ -487,7 +489,7 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
     height={180}
 />
 
-## Text Decoration Values
+## Text Decoration Values [#text-decoration]
 
 A text decoration value is composed of these segments:
 
@@ -532,7 +534,7 @@ You can use these style values:
     height={240}
 />
 
-## Text Transform Values
+## Text Transform Values [#text-transform]
 
 This value specifies how to capitalize a component's text. It can be used to make text appear in all-uppercase or all-lowercase, or with each word capitalized.
 
@@ -545,7 +547,7 @@ This value specifies how to capitalize a component's text. It can be used to mak
 |`full-width`| Forces the writing of a character — mainly ideograms and Latin scripts — inside a square, allowing them to be aligned in the usual East Asian scripts (like Chinese or Japanese). |
 |`full-size-kana`| Generally used for ruby annotation text, the keyword converts all small Kana characters to the equivalent full-size Kana, to compensate for legibility issues at the small font sizes typically used in ruby. |
 
-## User Select Values
+## User Select Values [#user-select]
 
 These values control whether the user can select text.
 

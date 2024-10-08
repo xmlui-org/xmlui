@@ -1,27 +1,17 @@
-# Data Manipulation with ApiAction
+import { COMPONENT_APIACTION, CREATE_THE_APP, DATA_FETCHING_WITH_DATASOURCE, GETTING_STARTED_WITH_XMLUI, USING_FORMS } from "../../meta/pages";
+
+# Data Manipulation with APICall
 
 ## Introduction
 
-In this tutorial, you will learn how to manipulate data on the backend using the `ApiAction` component.
+In this tutorial, you will learn how to manipulate data on the backend using the `APICall` component.
 
-This tutorial assumes you already completed either the [Personal Todo App](./personal-todo/00-introduction.mdx) or [Your First XMLUI App](./first-app.mdx) tutorials.
+This tutorial assumes you already completed either the <SmartLink href={GETTING_STARTED_WITH_XMLUI}>Getting started</SmartLink> section or the <SmartLink href={CREATE_THE_APP}>Contact List</SmartLink> tutorial.
 Both provide foundational knowledge this tutorial will build upon.
 
-For a detailed rundown of the available props, events and API for the `ApiAction` component see the [`ApiAction` reference docs](../components/ApiAction.mdx).
+For a detailed rundown of the available props, events and API for the `APICall` component see the <SmartLink href={COMPONENT_APIACTION}>`APICall` reference docs</SmartLink>.
 
-A companion tutorial is also available that deals with data loading titled [`Data Fetching with Datasource`](./working-with-datasources.mdx).
-
-## Environment Setup
-
-> **Note**: If you have the development environment already set up, you can skip this section.
-
-Details on the XMLUI development environment setup is covered [in this article](../get-started/prepare-env).
-
-## Project Setup
-
-> **Note**: If you have the project already generated with boilerplate code, you can skip this section.
-
-Setting up the project with the default boilerplate code is covered [in this article](../get-started/prepare-env). Name your app "apiaction-tutorial"
+A companion tutorial is also available that deals with data loading titled <SmartLink href={DATA_FETCHING_WITH_DATASOURCE}>Data Fetching with DataSource</SmartLink>.
 
 ## Emulating a Backend
 
@@ -42,7 +32,7 @@ To display the shopping list and test whether the emulated backend is working, c
 ```ueml copy filename="Main.xmlui"
 <App layout="vertical-full-header">
   <AppHeader>
-    <Text variant="title">ApiAction Tutorial</Text>
+    <Text variant="title">APICall Tutorial</Text>
   </AppHeader>
   <Pages>
     <Page url="/">
@@ -71,7 +61,7 @@ The "/api/shopping-list" endpoint returns a list of items which have the followi
 
 As you go along this tutorial, you will interact with this list of data and can see the changes in real time.
 
-> **Note:** You are using the same emulated backend API as the one in the [`Datasource` tutorial](./working-width-datasources.mdx).
+> **Note:** You are using the same emulated backend API as the one in the <SmartLink href={DATA_FETCHING_WITH_DATASOURCE}>`DataSource` tutorial</SmartLink>.
 
 ## Adding Items
 
@@ -84,7 +74,7 @@ The easiest way to do so is to create a `Button` component that will send some w
 <Page url="/">
   <Button label="Add New">
     <event name="click">
-      <ApiAction
+      <APICall
         url="/api/shopping-list"
         method="post"
         body="{{
@@ -103,9 +93,9 @@ The easiest way to do so is to create a `Button` component that will send some w
 <!-- Omitted -->
 ```
 
-The button `click` event handler contains an `ApiAction` component that sends the predefined data in its `body` property to the backend.
+The button `click` event handler contains an `APICall` component that sends the predefined data in its `body` property to the backend.
 
-It uses a `POST` HTTP method while calling the same API endpoint we used to list the groceries in the [Data Display section](#data-display).
+It uses a `POST` HTTP method while calling the same API endpoint we used to list the groceries in the <SmartLink href="#data-display">Data Display section</SmartLink>.
 Also, note that you did not need to specify the ID of the new shopping item since the backend will take care of that.
 
 Run the app and click the Add New button. When the new data item has been added to the inventory, the UI displays a toast with the success message:
@@ -118,11 +108,11 @@ When you scroll down to the bottom of the list, the newly added item is there:
 <br/>
 <Image alt="Adding Items" src="/resources/images/apiaction-tutorial/new-item-added.png" />
 
-In the real world, a form would be used to enter new data. Working with forms is a topic covered in the [Using Forms](../learning/using-components/forms) article.
+In the real world, a form would be used to enter new data. Working with forms is a topic covered in the <SmartLink href={USING_FORMS}>Using Forms</SmartLink> article.
 
 ## Deleting Items
 
-Adding a delete feature ensures unwanted shopping items can be removed. Change the item template of the `List` to display a Delete button to the right of each item with `ApiAction` set up to the URL that carries out the delete operation:
+Adding a delete feature ensures unwanted shopping items can be removed. Change the item template of the `List` to display a Delete button to the right of each item with `APICall` set up to the URL that carries out the delete operation:
 
 ```ueml copy filename="Main.xmlui"
 <!-- Omitted -->
@@ -137,7 +127,7 @@ Adding a delete feature ensures unwanted shopping items can be removed. Change t
         <SpaceFiller />
         <Button icon="trash">
           <event name="click">
-            <ApiAction
+            <APICall
               url="/api/shopping-list/{$item.id}"
               method="delete"
               completedNotificationMessage="Item {$item.name} removed" />
@@ -149,7 +139,7 @@ Adding a delete feature ensures unwanted shopping items can be removed. Change t
 </List>
 <!-- Omitted -->
 ```
-This ApiAction (according to REST conventions) uses the `delete` method and includes the ID of the item to delete in its URL.
+This APICall (according to REST conventions) uses the `delete` method and includes the ID of the item to delete in its URL.
 
 When you click the list's first item's (Carrots) delete button, the backend removes those items and confirms the success. The removed item is no longer in the list:
 
@@ -158,7 +148,7 @@ When you click the list's first item's (Carrots) delete button, the backend remo
 
 ## Confirmation
 
-In most cases, you only want the users to delete items after confirmation. `ApiAction` allows you to display a confirmation dialog by setting a few properties. Add the highlighted lines to `ApiAction`:
+In most cases, you only want the users to delete items after confirmation. `APICall` allows you to display a confirmation dialog by setting a few properties. Add the highlighted lines to `APICall`:
 
 ```ueml copy filename="Main.xmlui" {11-13}
 <!-- Omitted -->
@@ -168,7 +158,7 @@ In most cases, you only want the users to delete items after confirmation. `ApiA
     <SpaceFiller />
     <Button icon="trash">
       <event name="click">
-        <ApiAction
+        <APICall
           url="/api/shopping-list/{$item.id}"
           method="delete"
           confirmTitle="Delete Grocery Item"
@@ -182,14 +172,14 @@ In most cases, you only want the users to delete items after confirmation. `ApiA
 <!-- Omitted -->
 ```
 
-With this simple change, you need to confirm the deletion of an item; otherwise, `ApiAction` ignores invoking the requested backend API and, thus, does not delete the item:
+With this simple change, you need to confirm the deletion of an item; otherwise, `APICall` ignores invoking the requested backend API and, thus, does not delete the item:
 
 <br/>
 <Image alt="Confirmation Dialog" src="/resources/images/apiaction-tutorial/confirm-delete.png" />
 
 ## Updating Items
 
-It is also easy to use `ApiAction` to update data items. Update the markup according to the highlighted code to display a textbox with the item name and a button to save name changes:
+It is also easy to use `APICall` to update data items. Update the markup according to the highlighted code to display a textbox with the item name and a button to save name changes:
 
 ```ueml copy filename="Main.xmlui" {5, 7-15}
 <!-- Omitted -->
@@ -200,7 +190,7 @@ It is also easy to use `ApiAction` to update data items. Update the markup accor
       <Text value="{$item.quantity} {$item.unit}" />
       <Button label="Change Name">
         <event name="click">
-          <ApiAction
+          <APICall
             url="/api/shopping-list/{$item.id}"
             method="put"
             body="{{ name: itemName.value }}"
@@ -220,7 +210,7 @@ It is also easy to use `ApiAction` to update data items. Update the markup accor
 
 ## Query Parameters
 
-You can add query parameters to `ApiAction` using the `queryParams` property.
+You can add query parameters to `APICall` using the `queryParams` property.
 
 In the following example, the `POST /api/shopping-list` endpoint accepts a `highlight` query parameter, which indicates that the name of the newly added item should be highlighted (converted to all uppercase and added three exclamation marks for demonstration purposes):
 
@@ -229,7 +219,7 @@ In the following example, the `POST /api/shopping-list` endpoint accepts a `high
 <Page url="/">
   <Button label="Add New">
     <event name="click">
-      <ApiAction
+      <APICall
         url="/api/shopping-list"
         method="post"
         body="{{
@@ -249,7 +239,7 @@ In the following example, the `POST /api/shopping-list` endpoint accepts a `high
 </Page>
 <!-- Omitted -->
 ```
-When you click the Add New button, `ApiAction` will send a POST request with the `/api/shopping-list?highlight=true` URL, and the backend converts the name accordingly:
+When you click the Add New button, `APICall` will send a POST request with the `/api/shopping-list?highlight=true` URL, and the backend converts the name accordingly:
 
 <br/>
 <Image alt="Adding Items" src="/resources/images/apiaction-tutorial/apiaction-param.png" />
@@ -257,7 +247,7 @@ When you click the Add New button, `ApiAction` will send a POST request with the
 The `queryParam` property accepts a hash object with key and value pairs. Instead of using the JavaScript object literal syntax, you can use the XMLUI syntax to write the same object in a different way:
 
 ```ueml copy {12-14} filename="Main.xmlui"
-<ApiAction
+<APICall
   url="/api/shopping-list"
   method="post"
   body="{{
@@ -271,12 +261,12 @@ The `queryParam` property accepts a hash object with key and value pairs. Instea
   <property name="queryParams">
     <field name="highlight" value="false"/>
   </property>
-</ApiAction>
+</APICall>
 ```
 
 ## Adding Headers
 
-Several APIs require particular request headers to execute the operation. In such cases, you can use the `header` property of `ApiAction`.
+Several APIs require particular request headers to execute the operation. In such cases, you can use the `header` property of `APICall`.
 
 In the following example, the backend requires a header named `x-api-key` with the value of "1111" when you call `POST /api/shopping-list-headers` method (to authenticate the client); otherwise, it does not add a new item to the inventory:
 
@@ -285,7 +275,7 @@ In the following example, the backend requires a header named `x-api-key` with t
 <Page url="/">
   <Button label="Add New">
     <event name="click">
-      <ApiAction
+      <APICall
         url="/api/shopping-list-headers"
         headers="{{ 'x-api-key': '1111' }}"
         method="post"
@@ -317,7 +307,7 @@ Change the API key to something else, such as "2222". Clicking the Add New butto
 
 ## Reacting to Events
 
-The `ApiAction` component has several event handlers that the UI can utilize to perform additional activities, such as changing the UI.
+The `APICall` component has several event handlers that the UI can utilize to perform additional activities, such as changing the UI.
 
 In the following example, the UI will follow the state of the request and display a corresponding message. Add the `requestState` variable and the text messages to the markup:
 
@@ -338,14 +328,14 @@ In the following example, the UI will follow the state of the request and displa
 <!-- Omitted -->
 ```
 
-Finally, add the event handlers to the `ApiAction` component and update the `url` prop to target a demonstration version (running slower) of the endpoint previously used:
+Finally, add the event handlers to the `APICall` component and update the `url` prop to target a demonstration version (running slower) of the endpoint previously used:
   
 
 ```ueml copy filename="Main.xmlui" {5, 8-10}
 <!-- Omitted -->
 <Button label="Change Name">
   <event name="click">
-    <ApiAction
+    <APICall
       url="/api/shopping-list-slow/{$item.id}"
       method="put"
       body="{{ name: itemName.value }}"
@@ -375,7 +365,7 @@ Passing the "error" text to the backend produces an error for demonstration purp
 
 ## Feedback in Toasts
 
-The XMLUI framework has a built-in notification system that shows request information and status. The `ApiAction` component has two properties that display notifications. You already used the `completedNotificationMessage` property to pop up a toast when an action has been completed. There is another property, `inProgressNotificationMessage`, that is displayed while an action is being executed. If you do not set it (by default, it is empty), no in-progress notifications are shown.
+The XMLUI framework has a built-in notification system that shows request information and status. The `APICall` component has two properties that display notifications. You already used the `completedNotificationMessage` property to pop up a toast when an action has been completed. There is another property, `inProgressNotificationMessage`, that is displayed while an action is being executed. If you do not set it (by default, it is empty), no in-progress notifications are shown.
 
 The following example provides functionality similar to the previous example with event handlers. However, instead of event handlers, it uses notification messages:
 
@@ -389,7 +379,7 @@ The following example provides functionality similar to the previous example wit
       <Text value="{$item.quantity} {$item.unit}" />
       <Button label="Change Name">
         <event name="click">
-          <ApiAction
+          <APICall
             url="/api/shopping-list-slow/{$item.id}"
             method="put"
             body="{{ name: itemName.value }}"
@@ -415,6 +405,8 @@ Here, the user successfully updated the item name:
 <br/>
 <Image alt="Success" src="/resources/images/apiaction-tutorial/change-completed.png" />
 
-> **Note**: When `ApiAction` raises an error, it will display the error message.
+> **Note**: When `APICall` raises an error, it will display the error message.
 
-> **Note**: You can use the data in the API response when displaying feedback. See [`completedNotificationMessage`](../components/ApiAction/#completednotificationmessage) and [`errorNotificationMessage`](../components/ApiAction/#errornotificationmessage) in the `ApiAction` reference documentation for more information.
+> **Note**: You can use the data in the API response when displaying feedback.
+> See <SmartLink href={COMPONENT_APIACTION + "#completednotificationmessage"}>`completedNotificationMessage`</SmartLink> 
+> and <SmartLink href={COMPONENT_APIACTION + "#errornotificationmessage"}>`errorNotificationMessage`</SmartLink> in the `APICall` reference documentation for more information.

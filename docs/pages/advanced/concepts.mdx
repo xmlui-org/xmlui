@@ -119,13 +119,13 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 
 
 <Callout type="info" emoji="💡">
-  Components can **invoke API endpoints that mutate data**. You can use the **`<event>` tag** to bind the invocation of a particular endpoint to a component's event handler. An **ApiAction component** can declare the details of the invocation.
+  Components can **invoke API endpoints that mutate data**. You can use the **`<event>` tag** to bind the invocation of a particular endpoint to a component's event handler. An **APICall component** can declare the details of the invocation.
 </Callout>
 
 ```ueml copy
 <Button label="Delete completed tasks">
   <event name="click">
-    <ApiAction url="/api/tasks/completed" method="delete" />
+    <APICall url="/api/tasks/completed" method="delete" />
   </event>
 </Button>
 ```

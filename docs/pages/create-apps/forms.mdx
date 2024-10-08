@@ -1,3 +1,5 @@
+import { COMPONENT_TEXT } from "../../meta/pages";
+
 # Using Forms
 
 **XMLUI has a sound form infrastructure, allowing you to declare a form and remove the burden of managing, editing, validating, and saving the information you provide in the UI.**
@@ -333,7 +335,7 @@ The `FlowLayout` component can be used with star sizing (learn more about it her
 
 The `FormItem` component acts as an intermediary layer between the Form and whatever input control component is rendered under it. `FormItem is responsible for managing the data represented by the corresponding input component.
 
-The `type` property of `FormItem` specifies the input component to use. If this property is empty, `FormItem` uses a [`TextBox`](/components/TextBox).
+The `type` property of `FormItem` specifies the input component to use. If this property is empty, `FormItem` uses a <SmartLink href={COMPONENT_TEXT}>`TextBox`</SmartLink>.
 
 `FormItem` supports these input components:
 

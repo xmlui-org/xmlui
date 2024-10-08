@@ -32,7 +32,7 @@ The `Dashboard` component accepts a data source in its `contactsCountsSource` pr
 </App>
 ```
 
-Earlier, you already created a `Datasource` with the `taskcounts` ID, which retrieves several counters in an object. Here, you can reuse this data source. 
+Earlier, you already created a `DataSource` with the `taskcounts` ID, which retrieves several counters in an object. Here, you can reuse this data source. 
 
 When you navigate to the Dashboard page, it displays a few numeric information:
 
@@ -197,7 +197,7 @@ Create a new component, `CategoryBadge.xmlui` (within the `components` folder):
 
 ```ueml copy filename="CategoryBadge.xmlui"
 <Component name="CategoryBadge">
-  <Datasource id="categories" url="/api/categories" />
+  <DataSource id="categories" url="/api/categories" />
   <Badge when="{category.id}" value="{category.name}" colorMap="{categoriesColorMap}"/>
 </Component>
 ```
@@ -245,12 +245,12 @@ The new `CategoryBadge` component can replace the previous markup to display the
 <CategoryBadge categoryId="{$props.item.categoryId}" />
 ```
 
-You do not need the `categories` Datasource in `Contacts`, as `ContactRow` no longer utilizes it. You can remove the highlighted lines from `Contacts.xmlui`:
+You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer utilizes it. You can remove the highlighted lines from `Contacts.xmlui`:
 
 ```ueml copy {2, 13} filename="Contacts.xmlui"
 <Component name="Tasks">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="tasks" url="/api/tasks/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="tasks" url="/api/tasks/{$props.filter}" />
     <!-- Omitted -->
       <List 
         items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"

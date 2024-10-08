@@ -76,8 +76,11 @@ function StandaloneApp({
     sources,
   } = standaloneApp;
 
+  // @ts-ignore
+  const mockedApi = apiInterceptor || (typeof window !== "undefined" ? window.XMLUI_MOCK_API : undefined);
+
   return (
-    <ApiInterceptorProvider interceptor={apiInterceptor}>
+    <ApiInterceptorProvider interceptor={mockedApi}>
       <RootComponent
         servedFromSingleFile={servedFromSingleFile}
         decorateComponentsWithTestId={decorateComponentsWithTestId}

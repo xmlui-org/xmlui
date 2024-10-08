@@ -143,7 +143,7 @@ Test the emulated backend by adding code that triggers invoking an endpoint. Rep
 ```ueml copy {3-4} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
-  <Datasource id="categories" url="/api/categories" />
+  <DataSource id="categories" url="/api/categories" />
   <Text variant="codefence">{JSON.stringify(categories.value, null, 2)}</Text>
 </Page>
 <!-- Omitted -->
@@ -156,4 +156,4 @@ Turn to the app running in the browser and refresh. Click the "Contact List" men
 
 The highlighted markup lines access the `/categories` API endpoint, which retrieves a list of contact categories. The `Text` component converts the list to JSON and displays it.
 
-In the following article, you will learn how the `Datasource` component works together with others to fetch and leverage data from a backend.
+In the following article, you will learn how the `DataSource` component works together with others to fetch and leverage data from a backend.
