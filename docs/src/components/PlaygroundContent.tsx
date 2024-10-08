@@ -4,8 +4,7 @@ import { Splitter } from "@components/Splitter/SplitterNative";
 import styles from "@/src/components/PlaygroundContent.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import classnames from "classnames";
-import React, {useMemo} from "react";
-import { useTheme } from "nextra-theme-docs";
+import React from "react";
 
 type PlaygroundContentProps = {
   height?: number | string;
@@ -20,11 +19,6 @@ export const PlaygroundContent = ({
   standalone,
 }: PlaygroundContentProps) => {
   const { options, status } = usePlayground();
-  const { theme, systemTheme } = useTheme();
-
-  const isDark = useMemo(() => {
-    return theme === "dark" || (theme === "system" && systemTheme === "dark")
-  }, [theme, systemTheme]);
 
   return (
     <div

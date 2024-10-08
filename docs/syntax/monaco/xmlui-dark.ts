@@ -18,6 +18,7 @@ const darkTheme: any = {
         {token: "constant", foreground: "#FF00E8"},
     ],
     colors: {
+        "editor.background": "#17232b",
         "editor.foreground": "#497A48",
     }
 }
