@@ -200,7 +200,7 @@ const Component = forwardRef(function Component(
     [safeNode.props],
   );
   const apiBoundEvents = useMemo(
-    () => getApiBoundItems(safeNode.events, "ApiAction", "DownloadAction", "UploadAction"),
+    () => getApiBoundItems(safeNode.events, "APICall", "DownloadAction", "UploadAction"),
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;

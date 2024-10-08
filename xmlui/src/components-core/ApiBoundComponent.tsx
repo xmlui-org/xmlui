@@ -5,7 +5,7 @@ import type { LayoutContext } from "@abstractions/RendererDefs";
 import type { MutableRefObject } from "react";
 import type { UploadActionComponent } from "@components-core/action/UploadAction";
 import type { DownloadActionComponent } from "@components-core/action/DownloadFileAction";
-import type { ApiActionComponent } from "@components-core/action/ApiAction";
+import type { ApiActionComponent } from "@components-core/action/APICall";
 import type { DynamicChildComponentDef } from "@abstractions/ComponentDefs";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 
@@ -86,7 +86,7 @@ export function ApiBoundComponent({
           }`;
           break;
         }
-        case "ApiAction": {
+        case "APICall": {
           const actionComponent = node.events![key] as ApiActionComponent;
           const { when, uid } = actionComponent;
 

@@ -1,10 +1,10 @@
 import { Callout } from "nextra/components";
 
-# ApiAction [#component-apiaction]
+# APICall [#component-apiaction]
 
-`ApiAction` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.
+`APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend.
 
-See examples on using the `ApiAction` component in [this tutorial](../tutorials/working-with-apiactions.mdx).
+See examples on using the `APICall` component in [this tutorial](../tutorials/working-with-apiactions.mdx).
 
 ## Properties
 
@@ -19,7 +19,7 @@ This property defines the message to display automatically when the operation ha
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
 ```ueml copy
- <ApiAction
+ <APICall
   id="ds"
   method="post"
   url="/api/shopping-list" 
@@ -28,15 +28,15 @@ This property customizes the success message displayed in a toast after the fini
 
 ### `confirmButtonLabel`
 
-This optional string property enables the customization of the submit button in the confirmation dialog that is displayed before the `ApiAction` is executed.
+This optional string property enables the customization of the submit button in the confirmation dialog that is displayed before the `APICall` is executed.
 
 ### `confirmMessage`
 
-This optional string sets the message in the confirmation dialog that is displayed before the `ApiAction` is executed.
+This optional string sets the message in the confirmation dialog that is displayed before the `APICall` is executed.
 
 ### `confirmTitle`
 
-This optional string sets the title in the confirmation dialog that is displayed before the `ApiAction` is executed.
+This optional string sets the title in the confirmation dialog that is displayed before the `APICall` is executed.
 
 ### `errorNotificationMessage`
 
@@ -45,7 +45,7 @@ This property defines the message to display automatically when the operation re
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
 ```ueml copy
- <ApiAction
+ <APICall
   id="ds"
   method="post"
   url="/api/shopping-list" 

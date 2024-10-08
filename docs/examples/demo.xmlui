@@ -432,7 +432,7 @@
             <Form id="form"
                   subject="{{ text: 'some value here', integer: 123, number: 123.4, file: '', radio: '0', switcher: true, checkbox: true, select: '1' }}">
                 <event name="save">
-                    <ApiAction url="/form-test"
+                    <APICall url="/form-test"
                                 method="post"
                                 body="{subject}"/>
                 </event>

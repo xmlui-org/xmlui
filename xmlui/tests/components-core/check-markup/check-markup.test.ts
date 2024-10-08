@@ -365,7 +365,7 @@ describe("Markup checks", () => {
     expect(error.message).toContain("'click'");
   });
 
-  it("Event with ApiAction fails #2", () => {
+  it("Event with APICall fails #2", () => {
     // --- Arrange
     const source = `
       <Button>

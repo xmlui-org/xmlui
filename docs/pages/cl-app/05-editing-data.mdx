@@ -342,7 +342,7 @@ The first two methods accept the contact details in their request bodies; the DE
 
 ### Add a New Contact Record
 
-XMLUI has a versatile component, `ApiAction,` that invokes web API endpoints that modify some data in the backend. Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
+XMLUI has a versatile component, `APICall,` that invokes web API endpoints that modify some data in the backend. Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
 
 ```ueml copy {10-18} filename="ContactForm.xmlui"
 <Component name="ContactForm" var.mode="" var.initialData="">
@@ -354,7 +354,7 @@ XMLUI has a versatile component, `ApiAction,` that invokes web API endpoints tha
       subject="{initialData}"
       onCancel="dialog.close()">
       <event name="submit">
-        <ApiAction
+        <APICall
           url="/api/contacts"
           method="post"
           body="{$eventArgs}"
@@ -364,7 +364,7 @@ XMLUI has a versatile component, `ApiAction,` that invokes web API endpoints tha
       <!-- Unchanged -->
 </Component>
 ```
-The `$eventArgs` context value within an event handler represents the arguments passed to the handler. The `submit` event uses the data to save as its `$eventArgs`; we send it in the request body. When the `ApiAction` has been completed, the code executes the `success` event handler and closes the dialog.
+The `$eventArgs` context value within an event handler represents the arguments passed to the handler. The `submit` event uses the data to save as its `$eventArgs`; we send it in the request body. When the `APICall` has been completed, the code executes the `success` event handler and closes the dialog.
 
 The following figure shows that a new task with its date set to the current calendar day will appear in the Today list after saving it:
 
@@ -373,10 +373,10 @@ The following figure shows that a new task with its date set to the current cale
 
 ### Edit a Contact Record
 
-The `ApiAction` event handler now works only with the New Contact button, and it will cause a faulty operation if you submit an edited Contact record. Let's fix this by modifying the action:
+The `APICall` event handler now works only with the New Contact button, and it will cause a faulty operation if you submit an edited Contact record. Let's fix this by modifying the action:
 
 ```ueml copy {2-3} filename="ContactForm.xmlui"
-<ApiAction
+<APICall
   url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
   method="{mode === 'add' ? 'post' : 'put'}"
   body="{$eventArgs}"
@@ -404,7 +404,7 @@ We invoke the API endpoint for the delete operation directly from the context me
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props)}" />
         <MenuItem label="Delete">
           <event name="click">
-            <ApiAction
+            <APICall
               url="/api/contacts/{$props.item.id}"
               method="delete"
               confirmTitle="Delete Contact {$props.item.fullName}"
@@ -418,7 +418,7 @@ We invoke the API endpoint for the delete operation directly from the context me
 </Component>
 ```
 
-It is helpful to ask the user for confirmation before deleting a particular task. You can easily add a confirmation question to your app through `ApiAction`. Before invoking the specified API endpoint, `ApiAction` will display the confirmation. If confirmed, it will invoke the action; otherwise, it skips it:
+It is helpful to ask the user for confirmation before deleting a particular task. You can easily add a confirmation question to your app through `APICall`. Before invoking the specified API endpoint, `APICall` will display the confirmation. If confirmed, it will invoke the action; otherwise, it skips it:
 
 <br/>
 <Image alt="Delete task" src="/resources/images/get-started/delete-contact.png" />

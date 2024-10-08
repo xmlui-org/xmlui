@@ -6,7 +6,7 @@ export const DataSourceMd = createMetadata({
   description:
     `The \`${COMP}\` component manages fetching data from a web API endpoint. This component ` +
     `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
-    `on the backend, use the [\`ApiAction\`](./ApiAction.mdx) component.`,
+    `on the backend, use the [\`APICall\`](./APICall.mdx) component.`,
   props: {
     method: d(
       `By default, data fetching uses the \`get\` operation method. You can change it by ` +
