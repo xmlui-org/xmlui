@@ -218,6 +218,7 @@ type DynamicHeightListProps = {
   availableSections?: string[];
   scrollAnchor?: "top" | "bottom";
   requestFetchPrevPage?: () => any;
+  requestFetchNextPage?: () => any;
   selectedIndex?: number;
   resetSelectedIndex?: () => void;
   pageInfo?: PageInfo;
@@ -241,6 +242,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     availableSections,
     scrollAnchor = "top",
     requestFetchPrevPage = noop,
+    requestFetchNextPage = noop,
     selectedIndex,
     resetSelectedIndex = noop,
     pageInfo,
@@ -257,7 +259,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
   const rowsContainerRef = useRef<HTMLDivElement | null>(null);
-  const [suspendInfiniteLoad, setSuspendInfiniteLoad] = useState(true);
+  const [suspendInfiniteLoad, setSuspendInfiniteLoad] = useState(scrollAnchor === "bottom");
 
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
@@ -394,6 +396,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
 
   const prevTotalSize = usePrevious(totalSize);
   const firstRenderedItem = virtualItems[0];
+  const lastRenderedItem = virtualItems[virtualItems.length - 1];
 
   useLayoutEffect(() => {
     if (
@@ -462,6 +465,42 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
       })();
     }
   }, [firstRenderedItem, pageInfo, requestFetchPrevPage, suspendInfiniteLoad]);
+
+  useEffect(() => {
+    // console.log({
+    //   suspendState: suspendInfiniteLoad,
+    //   pageInfo,
+    //   lastRenderedItem,
+    //   itemsLength: items.length
+    //   // visibleRange
+    // });
+
+    if (suspendInfiniteLoad) {
+      return;
+    }
+    if (!pageInfo) {
+      return;
+    }
+
+    if (!lastRenderedItem) {
+      return;
+    }
+
+    if (lastRenderedItem.index === (items.length - 1) && pageInfo.hasNextPage && !pageInfo.isFetchingNextPage) {
+      (async () => {
+        setSuspendInfiniteLoad(true);
+        if (suspendTimerRef.current) {
+          clearTimeout(suspendTimerRef.current);
+        }
+        // console.log("fetching prev page START", pageInfo);
+        await requestFetchNextPage();
+        // console.log("fetching prev page END", pageInfo);
+        suspendTimerRef.current = setTimeout(() => {
+          setSuspendInfiniteLoad(false);
+        }, 500);
+      })();
+    }
+  }, [items.length, lastRenderedItem, pageInfo, requestFetchNextPage, suspendInfiniteLoad]);
 
   return (
     <ListContext.Provider value={expandContextValue}>

@@ -98,7 +98,8 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     layoutContext,
     lookupEventHandler,
   }) => {
-    return (
+      const itemTemplate = node.props.itemTemplate || node.children;
+      return (
       <DynamicHeightList
         layout={layoutCss}
         loading={extractValue.asOptionalBoolean(node.props.loading)}
@@ -111,6 +112,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         pageInfo={extractValue(node.props.pageInfo)}
         idKey={extractValue(node.props.idKey)}
         requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
+        requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}
         selectedIndex={extractValue(node.props.selectedIndex)}
         resetSelectedIndex={lookupAction(node.events?.resetSelectedIndex)}
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
@@ -119,11 +121,11 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         )}
         defaultSections={extractValue(node.props.defaultSections)}
         itemRenderer={
-          node.props.itemTemplate &&
+          itemTemplate &&
           ((item) => {
             return (
               <MemoizedItem
-                node={node.props.itemTemplate as any}
+                node={itemTemplate as any}
                 item={item}
                 renderChild={renderChild}
                 layoutContext={layoutContext}

@@ -51,7 +51,8 @@ export default ({ mode }) => {
       mode === "standalone" || mode === "metadata"
         ? {
             "process.env": {
-                'NODE_ENV': env.NODE_ENV
+                'NODE_ENV': env.NODE_ENV,
+                'VITE_MOCK_ENABLED': true
             }
         } : undefined,
         esbuild: {

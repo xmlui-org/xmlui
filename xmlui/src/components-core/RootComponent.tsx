@@ -481,7 +481,7 @@ const RootComponent = ({
     HelmetProvider.canUseDOM = false;
   }
 
-  const siteName = globalProps?.name || "NS app";
+  const siteName = (globalProps?.name || "XMLUI app");
 
   const dynamicChildren = (
     <HelmetProvider>
@@ -513,7 +513,7 @@ const RootComponent = ({
 
   const Router = previewMode
     ? MemoryRouter
-    : servedFromSingleFile || globalProps?.useHashBasedRouting
+    : servedFromSingleFile || (globalProps?.useHashBasedRouting ?? true)
       ? HashRouter
       : BrowserRouter;
 
