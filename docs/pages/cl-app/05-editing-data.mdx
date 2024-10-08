@@ -14,8 +14,8 @@ Let's change the layout of the `Contact` component to add a button above the lis
 
 ```ueml copy {4-7, 11} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <VStack>
     <HStack horizontalAlignment="end">
       <Button icon="plus">New Contact</Button>
@@ -87,8 +87,8 @@ Add the code to `Contacts` to display this dialog:
 
 ```ueml copy {4, 7} filename="Contacts.xmlui" /onClick="contactForm.open()"/
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <ContactForm id="contactForm" />
   <VStack>
     <HStack horizontalAlignment="end">
@@ -220,7 +220,7 @@ The current contact dialog is functionless. Let's create a form that accepts dat
         bindTo="comments"
         type="textarea" 
         maxLength="256" />
-      <Datasource id="categories" method="get" url="/api/categories"/>
+      <DataSource id="categories" method="get" url="/api/categories"/>
       <FormItem 
         placeholder="Select a category" 
         bindTo="categoryId"
@@ -239,7 +239,7 @@ The current contact dialog is functionless. Let's create a form that accepts dat
 The `Form` component is responsible for editing the nested data items. Its `subject` property describes the data to edit. Each of the embedded `FormItem` tags represents a single data item with the associated `bindTo` property naming the property of `subject` managed by the particular `FormItem`.
 
 <Callout type="info" emoji="📔">
-  The `FormItem` bound to the `categoryId` property is more complex. It displays a selection list and uses a `Datasource` (`categories`) to fetch this list's content (with IDs and names). The `initialValue` property of this `FormItem` ensures that the selected category is displayed when you edit a contact. In this case, `ContactForm` will receive the data to edit in its `contact` property. You will add this functionality soon.
+  The `FormItem` bound to the `categoryId` property is more complex. It displays a selection list and uses a `DataSource` (`categories`) to fetch this list's content (with IDs and names). The `initialValue` property of this `FormItem` ensures that the selected category is displayed when you edit a contact. In this case, `ContactForm` will receive the data to edit in its `contact` property. You will add this functionality soon.
 </Callout>
 
 The `submit` event handler of the `Form` (defined with the `onSubmit` attribute) defines the activity to execute when the form is saved.

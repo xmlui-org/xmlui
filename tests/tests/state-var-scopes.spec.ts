@@ -43,7 +43,7 @@ test("inner datasource is available in the file (implicit containers because of 
       <Fragment>
           <Stack var.x="x in outer stack" var.y="y in outer stack">
               <Stack var.y="y in inner stack">
-                  <Datasource url="/data1" id="explicitDataSource"/>
+                  <DataSource url="/data1" id="explicitDataSource"/>
               </Stack>
           </Stack>
           <Text testId="datasource_value_outside">{explicitDataSource.value}</Text>

@@ -196,7 +196,7 @@ const Component = forwardRef(function Component(
   );
 
   const apiBoundProps = useMemo(
-    () => getApiBoundItems(safeNode.props, "Datasource"),
+    () => getApiBoundItems(safeNode.props, "DataSource"),
     [safeNode.props],
   );
   const apiBoundEvents = useMemo(

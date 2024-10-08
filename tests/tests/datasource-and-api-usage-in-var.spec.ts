@@ -9,7 +9,7 @@ test("regression: datasource usage in compound component var", async ({ page }) 
     components: `
       <Component name="TestComp">
       <Fragment var.sortFiles="{(files)=> files}">
-          <Datasource url="/data1" id="datasource"/>
+          <DataSource url="/data1" id="datasource"/>
           <var name="x" value="{datasource.value.listing[0].name + '_transformed'}"/>
           <Text testId="transformed_text" value="{x}"/>
       </Fragment>

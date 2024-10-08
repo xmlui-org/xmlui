@@ -839,7 +839,7 @@ console.log(foo(5));
             <SelectionStore id="id">
                 <Table width="100%" isPaginated="{true}" rowsSelectable="{true}">
                     <property name="items">
-                        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+                        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
                     </property>
                     <Column header="Image" size="140px">
                         <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
