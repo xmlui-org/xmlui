@@ -212,7 +212,7 @@ async function updateQueriesWithOptimisticValue({
   return { queryKeysToUpdate, optimisticValuesByQueryKeys };
 }
 
-type ApiAction = {
+type APICall = {
   invalidates?: string | string[];
   updates?: string | string[];
   confirmTitle?: string;
@@ -284,7 +284,7 @@ async function callApi(
     rawBody,
     method,
     body,
-  }: ApiAction,
+  }: APICall,
   { resolveBindingExpressions }: ApiActionOptions = {}
 ) {
   const uid = Symbol(actionUid);

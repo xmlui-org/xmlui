@@ -5,7 +5,7 @@ test("context vars dont get resolved multiple times", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
     <Fragment>
-        <Datasource url="/data1" id="stringsLoader"/>
+        <DataSource url="/data1" id="stringsLoader"/>
         <Items items="{stringsLoader.value}">
           <Text testId="text-{$itemIndex}">{$item}</Text>
         </Items>
@@ -34,7 +34,7 @@ test("can use context vars in simple var declarations", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
     <Fragment>
-        <Datasource url="/data1" id="stringsLoader"/>
+        <DataSource url="/data1" id="stringsLoader"/>
         <Items items="{stringsLoader.value}">
           <script>
            var something = $item + '_modified';
@@ -69,7 +69,7 @@ test("can use context vars in combination with vars and calculated props", async
         <script>
          var something = 'modified';
         </script>
-        <Datasource url="/data1" id="stringsLoader"/>
+        <DataSource url="/data1" id="stringsLoader"/>
         <Items items="{stringsLoader.value}">
           <Text testId="text-{$itemIndex}">{$item}_{something}</Text>
         </Items>

@@ -169,11 +169,11 @@ In the app's database, each contact can be assigned a category. The available ca
 
 XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Bagde`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
 
-1. Navigate to the `Main.xmlui` file and add a `Datasource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `Datasource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
+1. Navigate to the `Main.xmlui` file and add a `DataSource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `DataSource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
 
 ```ueml copy {2, 5} filename="Main.xmlui"
 <Page url="/contacts">
-  <Datasource id="categories" url="/api/categories" />
+  <DataSource id="categories" url="/api/categories" />
   <List datasource="/api/contacts">
     <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />

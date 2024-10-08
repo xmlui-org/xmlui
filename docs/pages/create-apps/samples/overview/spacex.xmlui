@@ -1,6 +1,6 @@
 <List>
   <property name=items>
-    <Datasource url="https://api.spacexdata.com/v3/history"/>
+    <DataSource url="https://api.spacexdata.com/v3/history"/>
   </property>
   <property name=itemTemplate>
     <HStack verticalPadding=.2rem>

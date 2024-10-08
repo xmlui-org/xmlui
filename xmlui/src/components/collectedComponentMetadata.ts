@@ -71,10 +71,10 @@ import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "@components-core/Fragment";
 import { SlotMd } from "@components-core/Slot";
 import { TreeMd } from "./Tree/TreeComponent";
-import { ApiActionMd } from "./ApiAction/ApiAction";
+import { APICallMd } from "./APICall/APICall";
 import { BarChartMd } from "./BarChart/BarChart";
 import { ChartMd } from "./Chart/Chart";
-import { DataSourceMd } from "./Datasource/Datasource";
+import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
 import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
 import { PageHeaderMd } from "./PageHeader/PageHeader";
@@ -87,7 +87,7 @@ import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
   Alert: AlertMd,
-  ApiAction: ApiActionMd,
+  APICall: APICallMd,
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,

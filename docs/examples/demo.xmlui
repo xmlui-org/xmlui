@@ -432,7 +432,7 @@
             <Form id="form"
                   subject="{{ text: 'some value here', integer: 123, number: 123.4, file: '', radio: '0', switcher: true, checkbox: true, select: '1' }}">
                 <event name="save">
-                    <ApiAction url="/form-test"
+                    <APICall url="/form-test"
                                 method="post"
                                 body="{subject}"/>
                 </event>
@@ -839,7 +839,7 @@ console.log(foo(5));
             <SelectionStore id="id">
                 <Table width="100%" isPaginated="{true}" rowsSelectable="{true}">
                     <property name="items">
-                        <Datasource url="https://api.spacexdata.com/v3/rockets"/>
+                        <DataSource url="https://api.spacexdata.com/v3/rockets"/>
                     </property>
                     <Column header="Image" size="140px">
                         <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>

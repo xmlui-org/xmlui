@@ -196,11 +196,11 @@ const Component = forwardRef(function Component(
   );
 
   const apiBoundProps = useMemo(
-    () => getApiBoundItems(safeNode.props, "Datasource"),
+    () => getApiBoundItems(safeNode.props, "DataSource"),
     [safeNode.props],
   );
   const apiBoundEvents = useMemo(
-    () => getApiBoundItems(safeNode.events, "ApiAction", "DownloadAction", "UploadAction"),
+    () => getApiBoundItems(safeNode.events, "APICall", "FileDownload", "FileUpload"),
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
