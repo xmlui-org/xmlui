@@ -41,6 +41,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
     // --- Only calculate column gaps if there are more than 1 child
     const columnGap = extractValue.asSize(node.props?.columnGap) || layoutCss.gap || extractValue.asSize("$space-4");
     const rowGap = extractValue.asSize(node.props?.rowGap) || layoutCss.gap || extractValue.asSize("$space-4");
+    // TODO illesg: try to do it with grid (count the children?, give it to flowLayout?);
+
     return (
       <FlowLayout style={layoutCss} columnGap={columnGap} rowGap={rowGap}>
         {renderChild(node.children, {

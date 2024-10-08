@@ -24,6 +24,7 @@ export const AppMd = createMetadata({
     ),
     loggedInUser: d(`Stores information about the currently logged in user.`),
     logoTemplate: dComponent("Optional template of the app logo"),
+    name: d("Optional application name (visible in the browser tab)"),
     scrollWholePage: d(
       `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
         `the content area (\`false\`). The default value is \`true\`.`,
@@ -85,6 +86,7 @@ export const appRenderer = createComponentRenderer(
         navPanelDef={NavPanel}
         logoContentDef={node.props.logoTemplate}
         renderChild={renderChild}
+        name={extractValue(node.props.name)}
       >
         {renderChild(restChildren)}
       </App>

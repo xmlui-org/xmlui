@@ -16,7 +16,7 @@ export const PageMetaTitleMd = createMetadata({
 export const pageMetaTitleComponentRenderer = createComponentRenderer(
   COMP,
   PageMetaTitleMd,
-  ({ node, extractValue }) => {
-    return <PageMetaTitle title={extractValue(node.props.value)} />;
+  ({ node, extractValue, renderChild }) => {
+    return <PageMetaTitle title={extractValue(node.props.value) || renderChild(node.children)} />;
   },
 );
