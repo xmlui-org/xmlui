@@ -1,8 +1,15 @@
 {
   "xmlui-markup": "Markup",
   "xmlui-code": "Code",
-  "using-components": "Using Components",
-  "apis-and-data": "APIs & Data",
-  "themes": "Themes & Styling",
-  "build-and-deploy": "Build & Deploy"
+  "app-component": "The App Component",
+  "layout": "Layout",
+  "text": "Working with Text",
+  "basic-components": "Basic Components",
+  "data": "Working with Data",
+  "routing": "Routing",
+  "forms": "Forms",
+  "dialogs": "Modal Dialogs",
+  "reusable-components": "Reusable Components",
+  "themes": "Themes",
+  "layout-props": "Layout Properties"
 }

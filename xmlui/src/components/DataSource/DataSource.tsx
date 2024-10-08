@@ -1,12 +1,12 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 
-const COMP = "Datasource";
+const COMP = "DataSource";
 
 export const DataSourceMd = createMetadata({
   description:
     `The \`${COMP}\` component manages fetching data from a web API endpoint. This component ` +
     `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
-    `on the backend, use the [\`ApiAction\`](./ApiAction.mdx) component.`,
+    `on the backend, use the [\`APICall\`](./APICall.mdx) component.`,
   props: {
     method: d(
       `By default, data fetching uses the \`get\` operation method. You can change it by ` +
@@ -34,7 +34,7 @@ export const DataSourceMd = createMetadata({
         `the particular header and the value is that header's value.`,
     ),
     pollIntervalInSeconds: d(
-      `By setting this property, you can define periodic data fetching. The \`Datasource\` ` +
+      `By setting this property, you can define periodic data fetching. The \`DataSource\` ` +
         `component will refresh its data according to the time specified as seconds. When the ` +
         `data changes during the refresh, it will trigger the update mechanism of XMLUI and ` +
         `re-render the UI accordingly.`,
@@ -55,12 +55,12 @@ export const DataSourceMd = createMetadata({
         `the UI cannot (or does not intend) to process. With this property, you can define ` +
         `a selector that extracts the data from the response body.`,
     ),
-    prevPageParamSelector: d(
+    prevPageSelector: d(
       `When using \`${COMP}\` with paging, the response may contain information about the ` +
         `previous and next page. This property defines the selector that extracts the ` +
         `previous page information from the response deserialized to an object.`,
     ),
-    nextPageParamSelector: d(
+    nextPageSelector: d(
       `When using \`${COMP}\` with paging, the response may contain information about ` +
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,

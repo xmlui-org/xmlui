@@ -186,7 +186,7 @@ The following code snippet shows a modified `<IncButton>` component that offers 
 <Component 
   name="IncButton" 
   var.count="{0}" 
-  api.setValue="v => count = v">
+  method.setValue="v => count = v">
   <Button label="Click to increment: {count}" onClick="count++" />
 </Component>
 ```
@@ -215,7 +215,7 @@ Try using this simple app:
     previewOnly
     name="IncButton with an API"
     components={[`
-      <Component name="IncButton" var.count="{0}" api.setValue="v => count = v">
+      <Component name="IncButton" var.count="{0}" method.setValue="v => count = v">
         <Button label="Click to increment: {count}" onClick="count++" />
       </Component>
 `]}

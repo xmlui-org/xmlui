@@ -49,17 +49,17 @@ function DataLoader({
   const queryParams = useShallowCompareMemoize(queryParamsInner);
 
   const pagingDirection: LoaderDirections | null = useMemo(() => {
-    if (loader.props.prevPageParamSelector && loader.props.nextPageParamSelector) {
+    if (loader.props.prevPageSelector && loader.props.nextPageSelector) {
       return "BIDIRECTIONAL";
     }
-    if (loader.props.prevPageParamSelector) {
+    if (loader.props.prevPageSelector) {
       return "BACKWARD";
     }
-    if (loader.props.nextPageParamSelector) {
+    if (loader.props.nextPageSelector) {
       return "FORWARD";
     }
     return null;
-  }, [loader.props.nextPageParamSelector, loader.props.prevPageParamSelector]);
+  }, [loader.props.nextPageSelector, loader.props.prevPageSelector]);
 
   const hasPaging = pagingDirection !== null;
 
@@ -86,19 +86,19 @@ function DataLoader({
       );
     }
     let prevPageParam = undefined;
-    const prevPageParamSelector = loader.props.prevPageParamSelector;
-    if (prevPageParamSelector) {
+    const prevPageSelector = loader.props.prevPageSelector;
+    if (prevPageSelector) {
       prevPageParam = extractParam(
         { $response: response },
-        prevPageParamSelector.startsWith("{") ? prevPageParamSelector : `{$response.${prevPageParamSelector}}`
+        prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`
       );
     }
     let nextPageParam = undefined;
-    const nextPageParamSelector = loader.props.nextPageParamSelector;
-    if (nextPageParamSelector) {
+    const nextPageSelector = loader.props.nextPageSelector;
+    if (nextPageSelector) {
       nextPageParam = extractParam(
         { $response: response },
-        nextPageParamSelector.startsWith("{") ? nextPageParamSelector : `{$response.${nextPageParamSelector}}`
+        nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`
       );
     }
     if (hasPaging) {
@@ -245,8 +245,8 @@ export const DataLoaderMd = createMetadata({
     headers: d("Headers to send with the request"),
     pollIntervalInSeconds: d("The interval in seconds to poll the API for refreshing data"),
     resultSelector: d("An expression to extract the result from the response"),
-    prevPageParamSelector: d("An expression to extract the previous page parameter from the response"),
-    nextPageParamSelector: d("An expression to extract the next page parameter from the response"),
+    prevPageSelector: d("An expression to extract the previous page parameter from the response"),
+    nextPageSelector: d("An expression to extract the next page parameter from the response"),
     inProgressNotificationMessage: d("The message to show when the loader is in progress"),
     completedNotificationMessage: d("The message to show when the loader completes"),
     errorNotificationMessage: d("The message to show when an error occurs"),

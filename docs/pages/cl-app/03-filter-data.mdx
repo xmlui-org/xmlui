@@ -35,7 +35,7 @@ Add a few new menu items with their corresponding pages to the app definition in
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts/all">
-      <Datasource id="categories" url="/api/categories" />
+      <DataSource id="categories" url="/api/categories" />
       <List datasource="/api/contacts">
         <propertyerty name="itemTemplate">
           <ContactRow item="{$item}" categories="{categories.value}" />
@@ -70,8 +70,8 @@ Create a new file, `Contacts.xmlui` in the `components` folder, and add this con
 
 ```ueml copy filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts" />
     <List items="{contacts.value.filter($props.predicate)}">
       <propertyerty name="itemTemplate">
         <ContactRow item="{$item}" categories="{categories.value}" />
@@ -80,7 +80,7 @@ Create a new file, `Contacts.xmlui` in the `components` folder, and add this con
 </Component>
 ```
 
-The `Contacts` component declares a new `Datasource` to fetch all contacts from the backend. Previously, you set the `datasource` property of the `List` to bind it to the fetched data. You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`. Instead, filter the contacts by using a predicate function (passed in the `predicate` component property).
+The `Contacts` component declares a new `DataSource` to fetch all contacts from the backend. Previously, you set the `datasource` property of the `List` to bind it to the fetched data. You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`. Instead, filter the contacts by using a predicate function (passed in the `predicate` component property).
 
 <Callout type="info" emoji="📔">
   A predicate function accepts a contact record and retrieves a boolean value to indicate whether that particular contact should be in the filtered set.
@@ -178,25 +178,25 @@ This feature requires a different approach: you cannot postpone getting a partic
 
 With the following steps, you query all contacts when the app starts and create variables that hold the contact records for a particular section:
 
-1. Create a `Datasource` within the main component to fetch the count values for all sections.
+1. Create a `DataSource` within the main component to fetch the count values for all sections.
 2. Add variables that keep the records in a particular contact section.
 3. Update the `Contacts` component to use those variables in the data source.
 4. Extend the menu item labels with contact counts.
 
-#### Create a `Datasource`
+#### Create a `DataSource`
 
-Navigate to the `Main.xmlui` file and add this `Datasource` declaration (after `AppHeader`):
+Navigate to the `Main.xmlui` file and add this `DataSource` declaration (after `AppHeader`):
 
 ```ueml copy {2} filename="Main.xmlui"
 <!-- Insert after AppHeader -->
-<Datasource id="contacts" url="/api/contacts" />
+<DataSource id="contacts" url="/api/contacts" />
 <NavPanel>
   <!-- Omitted -->
 </NavPanel>
 <!-- Omitted -->
 ```
 
-You can access the current data under this `Datasource` using the `contacts.value` expression (`contacxts` identifies the `Datasource`, `value` represents the fetched data).
+You can access the current data under this `DataSource` using the `contacts.value` expression (`contacxts` identifies the `DataSource`, `value` represents the fetched data).
 
 #### Add Task Category Variables
 
@@ -214,11 +214,11 @@ Each variable represents a particular task category. XMLUI variables are reactiv
 
 #### Update the `Contacts` Component
 
-You moved the `Datasource` component to the main component, so you no longer need it in `Contacts`. You will pass the contacts to display in the `data` property (see `$props.data`) of `Contacts`:
+You moved the `DataSource` component to the main component, so you no longer need it in `Contacts`. You will pass the contacts to display in the `data` property (see `$props.data`) of `Contacts`:
 
 ```ueml copy filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
+  <DataSource id="categories" url="/api/categories" />
   <List items="{$props.data}">
     <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
@@ -287,11 +287,11 @@ In this section, you will change the code to get filtered contact data from the 
 
 ### Update `Contacts`
 
-Change the definition of the `Contacts` component by removing the `Datasource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
+Change the definition of the `Contacts` component by removing the `DataSource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
 
 ```ueml copy {3} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
+  <DataSource id="categories" url="/api/categories" />
   <List datasource="/api/contacts/{$props.filter}">
     <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
@@ -308,7 +308,7 @@ The predicates you used with client-side filtering are now within the backend's 
 
 ### Update Filter Tags
 
-Remove the `Datasource` tag from `Main.xmlui`, as you no longer need to invoke the `/api/tasks` endpoint.
+Remove the `DataSource` tag from `Main.xmlui`, as you no longer need to invoke the `/api/tasks` endpoint.
 
 Change the `Main.xmlui` file to use the filter tags instead of predicates:
 
@@ -346,11 +346,11 @@ You can see that the menu items show "(undefined)" instead of the current contac
 
 The API has an endpoint, `/api/contactcounts`, retrieving the task category counts in an object with properties `all`, `overdue`, `today`, `upcoming`, and `completed`, each representing a particular contact section.
 
-Add a new `Datasource` to the `Main.xmlui` file to fetch the contact counts:
+Add a new `DataSource` to the `Main.xmlui` file to fetch the contact counts:
 
 ```ueml copy {2} filename="Main.xmlui"
 <AppHeader title="Contact Management" />
-<Datasource id="contactCounts" url="/api/contactcounts" />
+<DataSource id="contactCounts" url="/api/contactcounts" />
 <NavPanel>
   <!-- Omitted -->
 </NavPanel>

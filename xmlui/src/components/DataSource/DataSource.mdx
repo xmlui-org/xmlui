@@ -3,7 +3,7 @@
 This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
 
 ```ueml copy
- <Datasource
+ <DataSource
   id="ds"
   url="/api/shopping-list" 
   completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
@@ -16,7 +16,7 @@ This property customizes the success message displayed in a toast after the fini
 This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
 
 ```ueml copy
- <Datasource
+ <DataSource
   id="ds"
   method="post"
   url="/api/shopping-list" 

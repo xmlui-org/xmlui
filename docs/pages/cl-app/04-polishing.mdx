@@ -16,7 +16,7 @@ function countLabel(cat) {
 }
 ```
 
-This function takes a name (the name of the contact section) as its argument and retrieves the corresponding contact category count. The `contactCounts.inProgress` property's "true" value indicates if the `Datasource` (with the `contactCounts` id) retrieving the contact counts is currently fetching data.
+This function takes a name (the name of the contact section) as its argument and retrieves the corresponding contact category count. The `contactCounts.inProgress` property's "true" value indicates if the `DataSource` (with the `contactCounts` id) retrieving the contact counts is currently fetching data.
 
 Update the task count expression in the menu item labels to leverage the new, improved display:
 
@@ -59,8 +59,8 @@ Update the code of `Contacts` to add a `section` field to the contact items:
 
 ```ueml copy {3-4} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List items="{contacts.value.map(t => ({...t, section: getSection(t)}))}">
     <propertyerty name="itemTemplate">
       <ContactRow item="{$item}" categories="{categories.value}" />
@@ -77,8 +77,8 @@ To display section information, add the `section` property to the `List` and def
 
 ```ueml copy {6, 10-16} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
@@ -119,8 +119,8 @@ Update the `List` definition in `Contacts`:
 
 ```ueml copy {10-24} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <Datasource id="categories" url="/api/categories" />
-  <Datasource id="contacts" url="/api/contacts/{$props.filter}" />
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">

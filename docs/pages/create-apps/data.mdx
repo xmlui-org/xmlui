@@ -1,4 +1,14 @@
 import { Callout } from 'nextra/components'
+import { THE_APP_COMPONENT } from "../../meta/pages.js";
+import {  } from "../../meta/pages.js";
+
+# Working with data
+
+_TBD_
+
+---
+
+_Obsolete contents below:_
 
 # APIs and Data
 
@@ -31,7 +41,7 @@ In the above example, the `List` component fetches data from the SpaceX API and 
 The framework decides how it gets the data; **it is just there without any imperative code**. The code binds the properties of the retrieved data through the `$item` context value to the `Card` component.
 
 
-### Leveraging the Datasource Component
+### Leveraging the DataSource Component
 
 Though using the `data source` property is extremely easy, there are situations when you need more control over the fetched data than just automatically getting it. Here are a few of them:
 - You need to extract some part of the response and consider that part as the data you want to display.
@@ -40,7 +50,7 @@ Though using the `data source` property is extremely easy, there are situations 
 - Initiating the fetch request is more complex than issuing a GET request with the specified URL; for example, you must pass some information in the request header.  
 
 <Callout type="info" emoji="💡">
-  The `Datasource` component provides **more control of the fetch operation** with its methods and state information.
+  The `DataSource` component provides **more control of the fetch operation** with its methods and state information.
 </Callout>
 
 Let's repeat the `List` example using the `datasource` property earlier:
@@ -53,10 +63,10 @@ Let's repeat the `List` example using the `datasource` property earlier:
 </List>
 ```
 
-You can describe the same operation with the `Datasource` component this way:
+You can describe the same operation with the `DataSource` component this way:
 
-```ueml copy /Datasource/ /{spaceXData.value}/
-<Datasource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+```ueml copy /DataSource/ /{spaceXData.value}/
+<DataSource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
 <List data="{spaceXData.value}">
   <propertyerty name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
@@ -68,14 +78,14 @@ You can describe the same operation with the `Datasource` component this way:
   XMLUI internally uses a similar representation for components with the `datasource` property.
 </Callout>
 
-When the framework renders the component (it can be the app's main component) and processes `Datasource`, it initiates the fetch. When the data retrieval has been completed, the `spaceXData.value` expression changes, and this change updates the List's UI; the data appears.
+When the framework renders the component (it can be the app's main component) and processes `DataSource`, it initiates the fetch. When the data retrieval has been completed, the `spaceXData.value` expression changes, and this change updates the List's UI; the data appears.
 
-So far, using the `Datasource` component does not add any value over using the `data source` property. Moreover, the markup became more verbose. However, it allows other components more information and control about the data fetch. Let's see a few examples!
+So far, using the `DataSource` component does not add any value over using the `data source` property. Moreover, the markup became more verbose. However, it allows other components more information and control about the data fetch. Let's see a few examples!
 
-**Example #1**: You can use the `inProgress` value of a `Datasource` to check if the fetch operation is going on. This following markup snippet displays progress text below the list while its data is being fetched.
+**Example #1**: You can use the `inProgress` value of a `DataSource` to check if the fetch operation is going on. This following markup snippet displays progress text below the list while its data is being fetched.
 
 ```ueml copy /loading="spaceXData.inProgress"/
-<Datasource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+<DataSource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
 <List data="{spaceXData.value}" />
 <Text when="{spaceXData.inProgress}">Data fetch is in progress</Text>
 ```
@@ -83,7 +93,7 @@ So far, using the `Datasource` component does not add any value over using the `
 **Example #2**:This sample sets up request headers to fetch the data, for the backend API expects the header for its operation:
 
 ```ueml /headers="{{ 'x-api-key': '0001' }}"/
-<Datasource 
+<DataSource 
   id="groceriesWithHeaders" 
   url="/api/shopping-list-headers" 
   headers="{{ 'x-api-key': '0001' }}" />
@@ -104,12 +114,12 @@ So far, using the `Datasource` component does not add any value over using the `
 We want to display only `shoppingItems` in the list, so we must extract it from the response:
 
 ```ueml /shoppingList/
-<Datasource id="selectedGroceries" url="/api/shopping-list-meta" />
+<DataSource id="selectedGroceries" url="/api/shopping-list-meta" />
 <List data="{selectedGroceries.value.shoppingList}" />
 ```
 
 <Callout>
-  Each of the `Datasource` and `List` (like other data-aware) components expose a `refresh` method that can be invoked to re-query the data. `Datasource` can be configured with a poll interval to periodically re-fetch the data.
+  Each of the `DataSource` and `List` (like other data-aware) components expose a `refresh` method that can be invoked to re-query the data. `DataSource` can be configured with a poll interval to periodically re-fetch the data.
 </Callout>
 
 ## Persisting Data
@@ -117,25 +127,25 @@ We want to display only `shoppingItems` in the list, so we must extract it from 
 In contrast to fetching data, where the framework can be smart about when to initiate the data fetch operation, persisting data requires an explicit user (or system) trigger to invoke a related API endpoint.
 
 <Callout type="info" emoji="💡">
-  XMLUI has an **`ApiAction` component** that manages API endpoint invocations that persist data (or cause other state changes at the backend).
+  XMLUI has an **`APICall` component** that manages API endpoint invocations that persist data (or cause other state changes at the backend).
 </Callout>
 
-An `ApiAction` component requires a URL and an operation method (such as POST, PUT, DELETE, etc.) to do its job. It must also be configured with other details to convey the request information between the UI and the backend.
+An `APICall` component requires a URL and an operation method (such as POST, PUT, DELETE, etc.) to do its job. It must also be configured with other details to convey the request information between the UI and the backend.
 
-Besides managing the request-response protocol, `ApiAction` provides a few UI services:
+Besides managing the request-response protocol, `APICall` provides a few UI services:
 
 - It can ask you for confirmation and cancel the operation on refusing it.
 - You can check if an operation is in progress.
 - It may display toast messages (if you ask so) when the operation is completed.
 - You can define a toast message to show while the operation is in progress.
-- Other components may ask the ApiAction whether it is in progress.
+- Other components may ask the APICall whether it is in progress.
 - You can define event handlers for handling successful/failed operations.
 
 <Callout>
-So far, we used `ApiAction` components within `<event>` tags to execute a particular action. However, this approach is perplexing. In the future, we will only allow event handlers with code.
+So far, we used `APICall` components within `<event>` tags to execute a particular action. However, this approach is perplexing. In the future, we will only allow event handlers with code.
 
 ```ueml /submitForm/
-<ApiAction url="/api/server/settings" id="submitForm" />
+<APICall url="/api/server/settings" id="submitForm" />
 <Form onSubmit="submitForm.execute()">
   <!-- Nested form items -->
 </Form>
@@ -144,9 +154,9 @@ So far, we used `ApiAction` components within `<event>` tags to execute a partic
 We may implment this pattern too:
 
 ```ueml /on="submit"/
-<ApiAction url="/api/server/settings" method="post" id="submitForm" />
+<APICall url="/api/server/settings" method="post" id="submitForm" />
 <Form>
-  <ApiAction 
+  <APICall 
     url="/api/server/settings" 
     method="post" 
     on="submit" />
@@ -154,5 +164,3 @@ We may implment this pattern too:
 </Form>
 ```
 </Callout>
-
-

@@ -3,8 +3,8 @@
   "cl-app": "Contact List Tutorial",
   "create-apps": "Creating XMLUI Apps",
   "howto": "How-to Guides",
-  "components": "Components",
-  "styles-and-themes": "Themes",
-  "scripting": "Scripting",
-  "tools": "Tools"
+  "advanced": "Advanced Topics",
+  "components": "Components Reference",
+  "styles-and-themes": "Themes Reference",
+  "scripting": "XMLUI Scripting Reference"
 }

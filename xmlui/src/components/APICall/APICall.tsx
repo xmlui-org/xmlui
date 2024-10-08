@@ -1,11 +1,11 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 
-const COMP = "ApiAction";
+const COMP = "APICall";
 
-export const ApiActionMd = createMetadata({
+export const APICallMd = createMetadata({
   description:
     `\`${COMP}\` is used to mutate (create, update or delete) some data on the backend. It ` +
-    `is similar in nature to the \`Datasource\` component which retrieves data from the backend.`,
+    `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
   props: {
     confirmTitle: d(
       `This optional string sets the title in the confirmation dialog that is displayed before ` +
