@@ -74,7 +74,7 @@ import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { BarChartMd } from "./BarChart/BarChart";
 import { ChartMd } from "./Chart/Chart";
-import { DataSourceMd } from "./DataSource/Datasource2";
+import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
 import { IconInfoCardMd } from "./IconInfoCard/IconInfoCard";
 import { PageHeaderMd } from "./PageHeader/PageHeader";
