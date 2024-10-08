@@ -133,6 +133,7 @@ import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 import {carouselComponentRenderer} from "@components/Carousel/Carousel";
 import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
 import {createPropHolderComponentNew} from "@components-core/renderers";
+import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -348,6 +349,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
+      this.registerComponentRenderer(breakoutComponentRenderer);
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
