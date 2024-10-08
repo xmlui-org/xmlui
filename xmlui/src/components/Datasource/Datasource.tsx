@@ -55,12 +55,12 @@ export const DataSourceMd = createMetadata({
         `the UI cannot (or does not intend) to process. With this property, you can define ` +
         `a selector that extracts the data from the response body.`,
     ),
-    prevPageParamSelector: d(
+    prevPageSelector: d(
       `When using \`${COMP}\` with paging, the response may contain information about the ` +
         `previous and next page. This property defines the selector that extracts the ` +
         `previous page information from the response deserialized to an object.`,
     ),
-    nextPageParamSelector: d(
+    nextPageSelector: d(
       `When using \`${COMP}\` with paging, the response may contain information about ` +
         `the previous and next page. This property defines the selector that extracts ` +
         `the next page information from the response deserialized to an object.`,

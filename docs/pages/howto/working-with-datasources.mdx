@@ -448,7 +448,7 @@ First, add a new `Page` with a simple data list:
 
 > **Note**: At this point, the `/API/shopping-list-pagination` API will not work, as it expects additional information.
 
-Next, you will set the page size in the request query parameters (`queryParams`) and also set the next page selector (`nextPageParamSelector`):
+Next, you will set the page size in the request query parameters (`queryParams`) and also set the next page selector (`nextPageSelector`):
 
 ```ueml copy filename="Main.xmlui" {6-7}
 <!-- Omitted -->
@@ -457,17 +457,17 @@ Next, you will set the page size in the request query parameters (`queryParams`)
     id="pagedGroceries"
     url="/api/shopping-list-pagination"
     queryParams="{{ size: 4, nextPageParam: $pageParams.nextPageParam }}"
-    nextPageParamSelector="{$response[$response.length-1].id}"
+    nextPageSelector="{$response[$response.length-1].id}"
   />
   <List data="{pagedGroceries.value}" />
 </Page>
 <!-- Omitted -->
 ```
 
-The `nextPageParamSelector` property indicates what part of the API response contains the next page information (e.g. a cursor or an item index). In this case, the API expects the last item's ID from the loaded datalist and responds with a slice of the original grocery list using the ID and the size.
+The `nextPageSelector` property indicates what part of the API response contains the next page information (e.g. a cursor or an item index). In this case, the API expects the last item's ID from the loaded datalist and responds with a slice of the original grocery list using the ID and the size.
 
 The `queryParams` will append two query parameters to the request URL:
-the first is the page size (`size`), the second is the item ID set in the `nextPageParamSelector` (accessed via `$pageParams.nextPageParam`). Note the special `$pageParams` context variable that is provided by the `DataSource` component. It is there so that you can access information on the previous or next pages.
+the first is the page size (`size`), the second is the item ID set in the `nextPageSelector` (accessed via `$pageParams.nextPageParam`). Note the special `$pageParams` context variable that is provided by the `DataSource` component. It is there so that you can access information on the previous or next pages.
 
 One last thing is to create a trigger to keep fetching new pages. Add a `Button` component with the following `click` event and a `Text` component to display the number of loaded items:
 
@@ -482,7 +482,7 @@ One last thing is to create a trigger to keep fetching new pages. Add a `Button`
     id="pagedGroceries"
     url="/api/shopping-list-pagination"
     queryParams="{{ size: 4, nextPageParam: $pageParams.nextPageParam }}"
-    nextPageParamSelector="{$response[$response.length-1].id}"
+    nextPageSelector="{$response[$response.length-1].id}"
   />
   <List data="{pagedGroceries.value}" />
 </Page>
