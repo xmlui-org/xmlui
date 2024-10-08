@@ -1,15 +1,18 @@
-import { writeFileSync, readdirSync, statSync, readFileSync } from "fs";
-import { posix, extname } from "path";
-import { convertPath, strBufferToLines } from "./utils.mjs";
+import { writeFileSync, statSync, readFileSync } from "fs";
+import { extname } from "path";
+import {
+  gatherAndRemoveDuplicates,
+  strBufferToLines,
+  toHeadingPath,
+  toNormalizedUpperCase,
+  traverseDirectory,
+} from "./utils.mjs";
 import { logger } from "./logger.mjs";
 
 const pathCutoff = "pages";
-const acceptedExtensions = [".mdx", ".md"];
-const acceptedFileNames = [];
-const rejectedFileNames = [];
+const includedFileExtensions = [".mdx", ".md"];
 
 export function buildPagesMap(pagesFolder, outFilePathAndName) {
-  //let pages = "";
   const pages = [];
   traverseDirectory({ name: "", path: pagesFolder }, (item, _) => {
     /**
@@ -22,11 +25,7 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
       // Node is a folder
     } else {
       // Node is a file
-      if (
-        (acceptedFileNames.includes(item.name) ||
-          acceptedExtensions.includes(extname(item.name))) &&
-        !rejectedFileNames.includes(item.name)
-      ) {
+      if (includedFileExtensions.includes(extname(item.name))) {
         const articleHeadings = getArticleIds(item);
         if (articleHeadings) {
           pages.push(...articleHeadings);
@@ -35,7 +34,7 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
     }
   });
 
-  const { pages: filteredPages, duplicates } = indicateAndRemoveDuplicateIds(pages);
+  const { filtered: filteredPages, duplicates } = gatherAndRemoveDuplicates(pages);
   if (duplicates.length) {
     logger.warning(`Duplicate entries found when collecting article IDs and paths:`);
     duplicates.forEach((item) => {
@@ -51,29 +50,6 @@ export function buildPagesMap(pagesFolder, outFilePathAndName) {
   writeFileSync(outFilePathAndName, pagesStr);
 }
 
-/**
- * Recursive function that traverses a given folder and applies an optional function on
- * each of the folders/files found inside.
- */
-function traverseDirectory(node, visitor, level = 0) {
-  level++;
-  const dirContents = readdirSync(node.path);
-  if (!node.children) node.children = dirContents;
-  for (const itemName of dirContents) {
-    const itemPath = [convertPath(node.path), itemName].join(posix.sep);
-    const itemIsDir = statSync(itemPath).isDirectory();
-    const childNode = {
-      name: itemName,
-      path: itemPath,
-      parent: node,
-    };
-    visitor && visitor(childNode, level);
-    if (itemIsDir) {
-      traverseDirectory(childNode, visitor, level);
-    }
-  }
-}
-
 function getArticleIds(article) {
   const content = readFileSync(article.path, { encoding: "utf8" });
   const relativeArticlePath = article.path.split(pathCutoff)[1]?.replace(extname(article.name), "");
@@ -85,9 +61,9 @@ function getArticleIds(article) {
 
   const subHeadingIds = getSubHeadingIds(lines);
   return [
-    { id: toHeadingId(titleId), path: relativeArticlePath },
+    { id: toNormalizedUpperCase(titleId), path: relativeArticlePath },
     ...subHeadingIds.map((id) => ({
-      id: `${toHeadingId(titleId)}_${toHeadingId(id)}`,
+      id: `${toNormalizedUpperCase(titleId)}_${toNormalizedUpperCase(id)}`,
       path: `${relativeArticlePath}#${toHeadingPath(id)}`,
     })),
   ];
@@ -120,37 +96,4 @@ function getArticleIds(article) {
     }
     return headings;
   }
-}
-
-function toHeadingId(rawStr) {
-  return rawStr
-    .trim()
-    .toLocaleUpperCase()
-    .replaceAll(/[^A-Za-z0-9_]/g, "_")
-    .replaceAll(/__+/g, "_"); // <- remove duplicate underscores
-}
-
-function toHeadingPath(rawStr) {
-  return rawStr
-    .trim()
-    .toLocaleLowerCase()
-    .replaceAll(/[^A-Za-z0-9-]/g, "-")
-    .replaceAll(/--+/g, "-")
-    .replace(/^-|-$/, "");
-}
-
-function indicateAndRemoveDuplicateIds(pagesData) {
-  const idSet = new Set();
-  const duplicates = [];
-  pagesData.forEach((item) => {
-    if (idSet.has(item.id)) {
-      duplicates.push(item);
-    }
-    idSet.add(item.id);
-  });
-
-  return {
-    pages: pagesData.filter((item) => !duplicates.includes(item)),
-    duplicates,
-  };
 }
