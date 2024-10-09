@@ -25,7 +25,7 @@ export function componentFromXmlUiMarkupWithErrRendered(
   if (errors.length === 0) {
     return component;
   }
-  return errReportComponent(errors, fileName, "TODO");
+  return errReportComponent(errors, fileId, fileName);
 }
 
 export function xmlUiMarkupToComponent(

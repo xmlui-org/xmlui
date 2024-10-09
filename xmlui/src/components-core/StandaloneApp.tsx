@@ -114,10 +114,11 @@ function StandaloneApp({
 
 async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
+    const compName = response.url.substring(response.url.lastIndexOf("/") + 1, response.url.length - ".xmlui".length)
     const code = await response.text();
     const fileId = response.url;
     return {
-      component: componentFromXmlUiMarkupWithErrRendered(code, fileId, "unspecified"),
+      component: componentFromXmlUiMarkupWithErrRendered(code, fileId, compName),
       src: code,
       file: fileId,
     };
@@ -519,15 +520,15 @@ function useStandalone(
         const componentPromises = [...componentsToLoad].map(async (componentPath) => {
           try {
             const componentPromise = fetch(normalizePath("/components/" + componentPath + ".xmlui")!);
-              const componentCodeBehindPromise = new Promise(async (resolve, reject)=>{
-                try{
-                  const codeBehindWrapper = await parseComponentResp(await fetch(normalizePath("/components/" + componentPath + ".xmlui.xs")!));
-                  const componentCodeBehind = codeBehindWrapper.codeBehind;
-                  resolve(componentCodeBehind);
-                } catch{
-                  resolve(null)
-                }
-              }) as Promise<CollectedDeclarations>;
+            const componentCodeBehindPromise = new Promise(async (resolve, reject)=>{
+              try{
+                const codeBehindWrapper = await parseComponentResp(await fetch(normalizePath("/components/" + componentPath + ".xmlui.xs")!));
+                const componentCodeBehind = codeBehindWrapper.codeBehind;
+                resolve(componentCodeBehind);
+              } catch{
+                resolve(null)
+              }
+            }) as Promise<CollectedDeclarations>;
             const [value, componentCodeBehind] = await Promise.all([componentPromise, componentCodeBehindPromise]);
             const compWrapper = await parseComponentResp(value);
             sources[compWrapper.file] = compWrapper.src;
