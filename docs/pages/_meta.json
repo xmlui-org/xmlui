@@ -1,22 +1,22 @@
 {
-  "basics": {
-    "title": "Basics",
-    "type": "separator"
-  },
-  "index": "Getting Started",
+  "index": "Concepts",
+  "getting-started": "Getting Started",
   "cl-app": "Contact List Tutorial",
   "create-apps": "Creating XMLUI Apps",
   "howto": "How-to Guides",
-  "advanced-topics": {
-    "title": "Advanced Topics",
-    "type": "separator"
-  },
-  "advanced": "Advanced Topics",
   "references": {
     "title": "References",
     "type": "separator"
   },
-  "components": "Components Reference",
-  "styles-and-themes": "Themes Reference",
-  "scripting": "XMLUI Scripting Reference"
+  "components": "Components",
+  "styles-and-themes": "Themes",
+  "scripting": "XMLUI Scripting",
+  "extensibility": {
+    "title": "Extensibility",
+    "type": "separator"
+  },
+  "overview-devs": "Overview",
+  "theme-devs": "Theme Development",
+  "component-devs": "Custom Components",
+  "js-library-devs": "Using JS Libraries"
 }

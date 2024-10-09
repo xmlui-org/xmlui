@@ -518,6 +518,20 @@ The engine raises an error if the app or component markup contains multiple root
 <Button label="Click me!" onClick="console.log('Clicked!')"/>
 ```
 
+There are a few components (for example, `APICall`) the framework can resolve as the value of an event handler (these components declare the particular activity to execute). 
+
+<Callout type="info" emoji="💡">
+In such a case, you can use the `<event>` tag to set the event handler:
+</Callout>
+
+```ueml copy /onClick/
+<Button label="Save">
+  <event name="click">
+    <ApiAction url="/api/customer" method="post" body="{customerData}">
+  </event>
+</Button>
+```
+
 ### Variable declarations
 
 
