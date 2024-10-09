@@ -1,5 +1,9 @@
 @import 'nextra-theme-docs/style.css';
 
+article {
+  scrollbar-gutter: stable both-edges;
+}
+
 :root {
   --nextra-primary-hue: 212deg;
   --nextra-primary-saturation: 100%;

@@ -191,7 +191,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         icon={iconName && <Icon name={iconName} />}
         iconPosition={extractValue(node.props.iconPosition)}
         contentPosition={extractValue(node.props.contentPosition)}
-        disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
+        disabled={!extractValue(node.props.enabled ?? true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
