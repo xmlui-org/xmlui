@@ -4,6 +4,7 @@ const withTM = require("next-transpile-modules")([
 const withSvgr = require("next-plugin-svgr");
 const shiki = require("shiki");
 const fs = require("fs");
+const theme = require("./syntax/textMate/xmlui.json");
 
 const withNextra = require("nextra")({
   theme: "nextra-theme-docs",
@@ -23,6 +24,7 @@ const withNextra = require("nextra")({
 
         const highlighter = await shiki.getHighlighter({
           ...options,
+          theme,
           langs: [...shiki.BUNDLED_LANGUAGES],
         });
         await highlighter.loadLanguage(uemlLanguage);
