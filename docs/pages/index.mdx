@@ -80,7 +80,7 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ## Data
 
 <Callout type="info" emoji="💡">
-Data is at the heart of XMLUI. You can quickly **access and display data from any web API**.
+  Data is at the heart of XMLUI. You can quickly **access and display data from any web API**.
 </Callout>
 
 ```ueml copy /data=/
@@ -104,41 +104,48 @@ Data is at the heart of XMLUI. You can quickly **access and display data from an
   height={300}
 />
 
-```ueml copy {6}
+<Callout type="info" emoji="💡">
+  You can call web API endpoints that persist (mutate) data with the **`APICall` component**.
+</Callout>
+
+```ueml copy {6-7}
 <App>
   <HStack verticalAlignment="center">
     <TextBox id="fruitName" placeholder="Type a fruit name"/>
     <Button enabled="{fruitName.value.trim()}" label="Add fruit">
       <event name="click">
-        <ApiCall url="/api/fruits" method="post" body="{fruitName.value}">
+        <ApiCall url="/api/fruits" method="post" body="{fruitName.value}" 
+          onSuccess="fruitName = ''">
       </event>
     </Button>
   </HStack>  
   <List data="/api/fruits" height="80">
-    <Text variant="strong">{$item}</Text>
+    <Text>{$item}</Text>
   </List>
 </App>
 ```
+
+The engine is smart enough to invalidate the part of the UI that may have changed due to the API invocation. For example, in this sample, the list is automatically refreshed after you add a new item through the API. 
 
 <Playground
   previewOnly
   name="Example: Fetch, display, and change data"
   app={`
-    <App var.fruits="{['apple', 'orange', 'banana', 'pear', 'plum']}" >
+    <App var.fruits="{['apple', 'orange', 'banana']}" >
       <HStack verticalAlignment="center">
         <TextBox id="fruitName" placeholder="Type a fruit name" width="*"/>
         <Button 
           enabled="{fruitName.value.trim()}" 
-          onClick="fruits.push(fruitName.value)" 
+          onClick="fruits.unshift(fruitName.value); fruitName.setValue('')" 
           label="Add fruit" />
       </HStack>
       <H3>My favorite fruits:</H3>
-      <List items="{fruits}" height="100" scrollAnchor="bottom">
+      <List items="{fruits}" height="140">
         <Text variant="strong">{$item}</Text>
       </List>
     </App>
   `}
-  height={260}
+  height={300}
 />
 
 ## Code
