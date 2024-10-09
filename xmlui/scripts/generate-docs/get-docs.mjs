@@ -57,12 +57,15 @@ const metadata = Object.entries(collectedComponentMetadata)
       componentFolder,
     };
 
-    const entries = addDescriptionRef(extendedComponentData, [
-      "props",
-      "events",
-      "api",
-      "contextVars",
-    ]);
+    const entries = addDescriptionRef(
+      extendedComponentData,
+      [
+        "props",
+        "events",
+        "api",
+        "contextVars",
+      ],
+    );
     return { ...extendedComponentData, ...entries };
   });
 
@@ -77,6 +80,10 @@ if (config.cleanFolder) {
     if (existsSync(pagesMapFile)) {
       await unlink(pagesMapFile);
       await writeFile(pagesMapFile, "");  
+    }
+    if (existsSync(downloadsMapFile)) {
+      await unlink(downloadsMapFile);
+      await writeFile(downloadsMapFile, "");
     }
   } catch (error) {
     processError(error);
@@ -101,7 +108,7 @@ logger.info("Processing MDX files");
 const pagesMapFileName = basename(pagesMapFile);
 const importsToInject = `import { Callout } from "nextra/components";\n\n`
   // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
-processDocfiles(metadata, importsToInject);
+processDocfiles(metadata, importsToInject, componentDocsFolderName);
 
 // --- Create Summary
 
@@ -120,13 +127,13 @@ try {
   processError(error);
 }
 
-// --- Generate Pages Map
+// --- Generate Article ID and Download ID Maps
 
 try {
   logger.info("Generating link IDs for article headings");
   buildPagesMap(pagesFolder, pagesMapFile);
 
-  logger.info("Generating link IDs for article headings");
+  logger.info("Generating link IDs for downloadable files");
   buildDownloadsMap(fileResourceFolder, downloadsMapFile);
 } catch (error) {
   processError(error);

@@ -13,7 +13,7 @@ const styles =
  * Use it only for downloading local files from the docs site
  */
 export const DownloadLink = ({ href, openInNewTab = false, ...props }: Props) => {
-  const _href = `resources/files/${href}`;
+  const _href = ["resources", "files"].concat(href).join("/").replaceAll(/\/\/+/g, "/");
   return (
     <Link
       className={styles}

@@ -58,13 +58,13 @@ const sectionNames = {
   contextVars: "Context Values",
 };
 
-export function processDocfiles(metadata, importsToInject) {
+export function processDocfiles(metadata, importsToInject, relativeComponentFolderPath) {
   // Check for docs already in the output folder
   const docFiles = readdirSync(outFolder).filter((file) => extname(file) === ".mdx");
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, metadata, importsToInject);
+    componentNames = processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath);
   });
 
   // Write the _meta.json file
@@ -76,7 +76,7 @@ export function processDocfiles(metadata, importsToInject) {
   }
 }
 
-function processMdx(component, componentNames, metadata, importsToInject) {
+function processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath) {
   let result = "";
   let fileData = "";
 
@@ -98,8 +98,6 @@ function processMdx(component, componentNames, metadata, importsToInject) {
   // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
 
   if (!!parent) {
-    const parentDocs = `./${parent.displayName}.mdx`;
-
     result += importsToInject;
 
     result += `# ${component.displayName}`;
@@ -109,10 +107,10 @@ function processMdx(component, componentNames, metadata, importsToInject) {
     result += addComponentStatusDisclaimer(component.status);
     result += addNonVisualDisclaimer(component.nonVisual);
 
-    result += addParentLinkLine(parent.displayName, parentDocs);
+    result += addParentLinkLine(parent.displayName, relativeComponentFolderPath);
 
     const siblings = findSiblings(metadata, component);
-    result += addSiblingLinkLine(siblings);
+    result += addSiblingLinkLine(siblings, relativeComponentFolderPath);
 
     result += fileData || "There is no description for this component as of yet.";
     result += `\n\n`;
@@ -451,9 +449,9 @@ function findParent(metadata, component) {
     : null;
 }
 
-function addParentLinkLine(parentName, parentDocs) {
+function addParentLinkLine(parentName, componentDocsFolder) {
   const result = parentName
-    ? `This component is inherited from [${parentName}](${parentDocs})`  // temp: need to use SmartLink
+    ? `This component is inherited from <SmartLink href="/${componentDocsFolder}/${parentName}">${parentName}</SmartLink>`
     : "";
   return result ? `${result}\n\n` : "";
 }
@@ -466,12 +464,12 @@ function findSiblings(metadata, component) {
   );
 }
 
-function addSiblingLinkLine(siblings = []) {
+function addSiblingLinkLine(siblings = [], componentDocsFolder) {
   const result =
     siblings?.length > 0
       ? `See also: ${siblings
           .map((sibling) => {
-            return `[${sibling.displayName}](./${sibling.displayName}.mdx)`;  // temp: need to use SmartLink
+            return `<SmartLink href="/${componentDocsFolder}/${sibling.displayName}">${sibling.displayName}</SmartLink>`;
           })
           .join(", ")}`
       : "";
