@@ -11,5 +11,8 @@
   "dialogs": "Modal Dialogs",
   "reusable-components": "Reusable Components",
   "themes": "Themes",
-  "layout-props": "Layout Properties"
+  "layout-props": "Layout Properties",
+  "resources": "Working with Resources",
+  "build-and-deploy": "Build & Deploy"
+
 }
