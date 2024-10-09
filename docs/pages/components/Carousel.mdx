@@ -1,0 +1,95 @@
+import { Callout } from "nextra/components";
+
+# Carousel [#component-carousel]
+
+<Callout type="info" emoji="ℹ️">This component's implementation is **in progress**. This documentation shows the component's planned interface.</Callout>
+
+This component displays a slideshow by cycling through elements (images, text, or custom slides) like a carousel.
+
+## Properties
+
+### `autoplay`
+
+This property indicates whether the carousel automatically scrolls.
+
+Default value: `"false"`.
+
+### `controls`
+
+This property indicates whether the carousel displays the controls.
+
+Default value: `"true"`.
+
+### `indicators`
+
+This property indicates whether the carousel displays the indicators.
+
+Default value: `"true"`.
+
+### `keyboard`
+
+This property indicates whether the carousel responds to keyboard events.
+
+### `loop`
+
+This property indicates whether the carousel loops.
+
+Default value: `"false"`.
+
+### `nextIcon`
+
+This property specifies the icon to display for the next control.
+
+### `orientation`
+
+This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.
+
+Default value: `"horizontal"`.
+
+Available values: `horizontal` **(default)**, `vertical`
+
+### `prevIcon`
+
+This property specifies the icon to display for the previous control.
+
+### `startIndex`
+
+This property indicates the index of the first slide to display.
+
+Default value: `"0"`.
+
+## Events
+
+### `displayDidChange`
+
+This event is triggered when value of Carousel has changed.
+
+## Context Values
+
+This component does not have any context values.
+
+## Exposed Members
+
+### `canScrollNext`
+
+This method returns `true` if the carousel can scroll to the next slide.
+
+### `canScrollPrev`
+
+This method returns `true` if the carousel can scroll to the previous slide.
+
+### `scrollNext`
+
+This method scrolls the carousel to the next slide.
+
+### `scrollPrev`
+
+This method scrolls the carousel to the previous slide.
+
+### `scrollTo`
+
+This method scrolls the carousel to the specified slide index.
+
+## Styling
+
+This component does not have any theme variables.
