@@ -70,7 +70,7 @@ type PagesProps = {
 export function Pages({ node, renderChild, extractValue, defaultRoute }: PagesProps) {
   const routes: Array<PageComponentDef> = [];
   const restChildren: Array<ComponentDef> = [];
-  node.children.map((child) => {
+  node.children?.forEach((child) => {
     if (child.type === "Page") {
       routes.push(child as PageComponentDef);
     } else {
