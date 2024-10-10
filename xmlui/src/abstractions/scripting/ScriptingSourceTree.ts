@@ -1,6 +1,6 @@
 import type { ScriptParserErrorMessage } from "./ScriptParserError";
 
-import {BlockScope} from "./BlockScope";
+import { BlockScope } from "./BlockScope";
 import { Token } from "./Token";
 
 // All binding expression tree node types
@@ -69,7 +69,7 @@ export type Statement =
   | ArrowExpressionStatement
   | LetStatement
   | ConstStatement
-  | VarStatement  
+  | VarStatement
   | IfStatement
   | ReturnStatement
   | BreakStatement
@@ -122,29 +122,29 @@ export interface ArrowExpressionStatement extends StatementBase {
 export interface VarDeclaration extends ExpressionBase {
   type: "VarD";
   id?: string;
-  arrayDestruct?: ArrayDestructure[],
-  objectDestruct?: ObjectDestructure[],
+  arrayDestruct?: ArrayDestructure[];
+  objectDestruct?: ObjectDestructure[];
   expression?: Expression;
 }
 
 export interface DestructureBase extends ExpressionBase {
-  id?: string,
+  id?: string;
   arrayDestruct?: ArrayDestructure[];
   objectDestruct?: ObjectDestructure[];
 }
 
 export interface Destructure extends DestructureBase {
-  type: "Destr"
+  type: "Destr";
   arrayDestruct?: ArrayDestructure[];
   objectDestruct?: ObjectDestructure[];
 }
 
 export interface ArrayDestructure extends DestructureBase {
-  type: "ADestr",
+  type: "ADestr";
 }
 
 export interface ObjectDestructure extends DestructureBase {
-  type: "ODestr",
+  type: "ODestr";
   id: string;
   alias?: string;
 }
@@ -305,11 +305,12 @@ export type Expression =
   | ArrowExpression
   | PrefixOpExpression
   | PostfixOpExpression
-  | ReactiveVarDeclaration  
+  | ReactiveVarDeclaration
   | VarDeclaration
-  | Destructure  
+  | Destructure
   | ObjectDestructure
   | ArrayDestructure
+  | TemplateLiteralExpression;
 
 // Common base node for all expression syntax nodes
 export interface ExpressionBase extends BaseNode {
@@ -476,6 +477,11 @@ export interface PostfixOpExpression extends ExpressionBase {
   operand: Expression;
 }
 
+export interface TemplateLiteralExpression extends ExpressionBase {
+  type: "TempLitE";
+  segments: (Literal | Expression)[];
+}
+
 /**
  * Represents a parsed and resolved module
  */
@@ -507,6 +513,3 @@ export type CodeDeclaration = {
   tree: Expression;
   [x: string]: unknown;
 };
-
-
-

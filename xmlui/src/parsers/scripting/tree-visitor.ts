@@ -589,6 +589,10 @@ export function visitNode<TState = any>(
       return state;
     }
 
+    case "TempLitE":
+      // TODO: Implement this
+      return state;
+
     default:
       unreachable(subject);
       return state;
