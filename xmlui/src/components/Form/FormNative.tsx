@@ -1,4 +1,4 @@
-import type { CSSProperties, Dispatch, FormEvent, ForwardedRef, ReactNode } from "react";
+import {CSSProperties, Dispatch, FormEvent, ForwardedRef, ReactNode, useImperativeHandle, useRef} from "react";
 import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import styles from "./Form.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
@@ -12,7 +12,7 @@ import type { GenericBackendError } from "@components-core/EngineError";
 import { ValidationSummary } from "@components/ValidationSummary/ValidationSummary";
 import { useEvent } from "@components-core/utils/misc";
 import { groupInvalidValidationResultsBySeverity } from "@components/FormItem/Validations";
-import type { FormAction } from "@components/Form/formActions";
+import {FormAction, formReset} from "@components/Form/formActions";
 import {
   backendValidationArrived,
   FormActionKind,
@@ -30,6 +30,7 @@ import type {
   ValueExtractor,
 } from "@abstractions/RendererDefs";
 import { FormMd } from "./Form";
+import {useModalFormClose} from "@components/ModalDialog/ModalVisibilityContext";
 
 const setByPath = (obj: any, path: string, val: any) => {
   const keys = path.split(".");
@@ -162,6 +163,14 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       );
       break;
     }
+    case FormActionKind.RESET: {
+      const {originalSubject} = action.payload;
+      return {
+        ...initialState,
+        subject: originalSubject,
+      }
+      break;
+    }
     default:
   }
 });
@@ -230,7 +239,10 @@ const Form = forwardRef(function (
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
+  const formRef = useRef<HTMLFormElement>(null);
+  useImperativeHandle(ref, () => formRef.current!);
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
+  const requestModalFormClose = useModalFormClose();
 
   const formContextValue = useMemo(() => {
     return {
@@ -253,6 +265,11 @@ const Form = forwardRef(function (
     itemLabelPosition,
     itemLabelWidth,
   ]);
+
+  const doCancel = useEvent(()=>{
+    onCancel?.();
+    requestModalFormClose();
+  });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
@@ -277,6 +294,11 @@ const Form = forwardRef(function (
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
+      requestModalFormClose();
+      // we only reset the form automatically if the initial value is empty ()
+      if(initialValue === EMPTY_OBJECT){
+        doReset();
+      }
     } catch (e: any) {
       const generalValidationResults: Array<SingleValidationResult> = [];
       const fieldValidationResults: Record<string, Array<SingleValidationResult>> = {};
@@ -318,9 +340,8 @@ const Form = forwardRef(function (
     }
   });
 
-  const [key, setKey] = useState(1);
   const doReset = useEvent(() => {
-    setKey((prev) => prev + 1);
+    dispatch(formReset(initialValue));
     onReset?.();
   });
 
@@ -330,7 +351,7 @@ const Form = forwardRef(function (
       type="button"
       themeColor={"secondary"}
       variant={"ghost"}
-      onClick={onCancel}
+      onClick={doCancel}
     >
       {cancelLabel}
     </Button>
@@ -358,8 +379,7 @@ const Form = forwardRef(function (
         onSubmit={doSubmit}
         onReset={doReset}
         id={id}
-        ref={ref}
-        key={key}
+        ref={formRef}
       >
         <ValidationSummary generalValidationResults={formState.generalValidationResults} />
         <FormContext.Provider value={formContextValue}>{children}</FormContext.Provider>

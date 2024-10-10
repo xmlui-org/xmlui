@@ -1,3 +1,54 @@
 # Modal Dialogs
 
 _TBD_
+
+```ueml copy
+<App>
+  <script>
+    var declarativeVisible = false;
+    var declarativeVisible2 = false;
+  </script>
+  <Button onClick="imperativeModal.open()">imperative modal</Button>
+  <Button onClick="declarativeVisible = true">declarative modal</Button>
+  <Button onClick="declarativeVisible2 = true">declarative modal (multiple forms)</Button>
+  declarativeVisible: {declarativeVisible}
+  declarativeVisible2: {declarativeVisible2}
+
+
+  <ModalDialog id="imperativeModal">
+    <Form>
+      <FormItem label="Name" bindTo="name"/>
+      <event name="submit">
+        <APICall url="/api/willNotThrow" method="post"/>
+      </event>
+    </Form>
+  </ModalDialog>
+
+
+  <ModalDialog when="{declarativeVisible}" onClose="declarativeVisible = false">
+    <Form>
+      <FormItem bindTo="name"/>
+      <event name="submit">
+        <APICall url="/api/willNotThrow" method="post"/>
+      </event>
+    </Form>
+  </ModalDialog>
+
+  <ModalDialog when="{declarativeVisible2}" onClose="declarativeVisible2 = false">
+    <Form>
+      <FormItem bindTo="name"/>
+      <event name="submit">
+        <APICall url="/api/willNotThrow" method="post"/>
+      </event>
+    </Form>
+    <Form>
+      I'm another form
+      <FormItem bindTo="name"/>
+      <event name="submit">
+        <APICall url="/api/willNotThrow" method="post"/>
+      </event>
+    </Form>
+  </ModalDialog>
+</App>
+```
+
