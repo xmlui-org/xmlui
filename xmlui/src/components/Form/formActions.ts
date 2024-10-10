@@ -10,6 +10,7 @@ export enum FormActionKind {
     BACKEND_VALIDATION_ARRIVED = "FormActionKind:BACKEND_VALIDATION_ARRIVED",
     SUBMITTING = "FormActionKind:SUBMITTING",
     SUBMITTED = "FormActionKind:SUBMITTED",
+    RESET = "FormActionKind:RESET",
 }
 
 export type FormAction = {
@@ -90,6 +91,15 @@ export function formSubmitted() {
     return {
         type: FormActionKind.SUBMITTED,
         payload: {},
+    };
+}
+
+export function formReset(originalSubject) {
+    return {
+        type: FormActionKind.RESET,
+        payload: {
+            originalSubject
+        },
     };
 }
 
