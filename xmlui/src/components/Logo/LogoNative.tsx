@@ -2,8 +2,8 @@ import { Image } from "@components/Image/ImageNative";
 import { useLogoUrl } from "@components/AppHeader/AppHeaderNative";
 import type { CSSProperties } from "react";
 
-export const Logo = ({ inDrawer, style }: { inDrawer?: boolean; style?: CSSProperties }) => {
-  const logoUrl = useLogoUrl(inDrawer);
+export const Logo = ({ style }: { style?: CSSProperties }) => {
+  const logoUrl = useLogoUrl();
   if (!logoUrl) {
     return null;
   }

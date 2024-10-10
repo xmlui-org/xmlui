@@ -264,7 +264,7 @@ export function visitComponent(
   // --- Visit the properties with "ComponentDef" value
   const propDescriptors = metadataHandler.getComponentProps(def.type) ?? {};
   const currentProps = def.props ?? {};
-  for (const propName in Object.keys(currentProps)) {
+  for (const propName of Object.keys(currentProps)) {
     const propDescriptor = propDescriptors[propName];
     if (!propDescriptor) {
       // --- No descriptor for the property, skip it
