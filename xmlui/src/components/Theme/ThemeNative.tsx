@@ -149,7 +149,7 @@ export function Theme({
   ]);
 
   if (isRoot) {
-    const faviconUrl = getResourceUrl("resource:favicon");
+    const faviconUrl = getResourceUrl("resource:favicon") || "/resources/favicon.ico";
     return (
       <>
         <Helmet>
