@@ -300,7 +300,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
       return scrollElementRef.current;
     }, [scrollElementRef]),
     estimateSize: useCallback(() => {
-      return 30;
+      return 10;
     }, []),
     rangeExtractor: useCallback((range: Range) => {
       return defaultRangeExtractor(range);
@@ -326,14 +326,18 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
-    tryToScrollToIndex(rows.length - 1);
+    if(rows.length){
+      tryToScrollToIndex(rows.length - 1);
+    }
   });
 
   const scrollToTop = useEvent(() => {
-    tryToScrollToIndex(0);
+    if(rows.length) {
+      tryToScrollToIndex(0);
+    }
   });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     registerComponentApi?.({
       scrollToBottom,
       scrollToTop,
