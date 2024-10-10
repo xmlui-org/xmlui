@@ -32,6 +32,12 @@ export default {
   sidebar: {
     autoCollapse: true,
     defaultMenuCollapseLevel: 1,
+    titleComponent({ title, type }) {
+      if (type === "separator") {
+        return <div data-role="separator-content">{title}</div>
+      }
+      return <>{title}</>
+    }
   },
   head: () => {
     const { frontMatter } = useConfig()
