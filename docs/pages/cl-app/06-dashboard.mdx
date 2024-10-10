@@ -108,9 +108,9 @@ Prepare the `InfoCard` component to receive a `link` property and navigate to th
     onClick="{Actions.navigate('/contacts/' + $props.link)}">
     <H4 value="{$props.title}"/>
     <CVStack width="100%">
-      <H1 fontSize="3em" color="{$props.color}">
+      <H2 color="{$props.color}" fontSize="4em">
         {$props.isLoading ? "..." : $props.value}
-      </H1>
+      </H2>
     </CVStack>
   </Card>
 </Component>
@@ -248,7 +248,7 @@ The new `CategoryBadge` component can replace the previous markup to display the
 You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer utilizes it. You can remove the highlighted lines from `Contacts.xmlui`:
 
 ```ueml copy {2, 13} filename="Contacts.xmlui"
-<Component name="Tasks">
+<Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="tasks" url="/api/tasks/{$props.filter}" />
     <!-- Omitted -->
@@ -273,7 +273,3 @@ You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no lo
 <Callout type="info" emoji="📔">
   The task list will work correctly even if you do not delete those lines. Nonetheless, they execute an unnecessary query.
 </Callout>
-
-## Adding a PieChart
-
-_TODO_

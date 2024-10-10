@@ -11,7 +11,6 @@ The unzipped content has the following folders and files:
 | --- | --- |
 | `index.html` | The default webpage to display |
 | `Main.xmlui` | The XMLUI app's entry point |
-| `config.json` | The app's configuration file |
 | `components` | The folder with the app's XMLUI components (empty) |
 | `resources` | The folder with static app resources like images, logos, icons, etc. |
 | `xmlui-standalone.umd.js` | The XMLUI framework's runtime |
@@ -59,20 +58,8 @@ The application uses the `vertical-sticky` layout, which renders a vertical menu
 The `AppHeader` defines a title and allows a `ThemeChangerButton` to choose between light and dark themes.
 
 <Callout type="info" emoji="💡">
-  The `App` component automatically **displays a logo** when the configuration file contains a logo declaration.
+  The `App` component automatically **displays a logo** using the `resources/logo.svg` and `resources/logo-dark.svg` files.
 </Callout>
-
-The Contact List starter app has such a definition in the `config.json` file:
-
-```json copy filename="config.json" {3-4}
-{
-  "resources": {
-    "logo": "resources/crm-logo.svg",
-    "logo-dark": "resources/crm-logo-dark.svg",
-    "favicon": "resources/favicon.ico",
-  }
-}
-```
 
 ## Setting Up the Scenario
 

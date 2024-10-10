@@ -50,9 +50,9 @@ You add a context menu to each contact item. This menu appears on the right side
         <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
       </HStack>
       <DropdownMenu>
-        <propertyerty name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </propertyerty>
+        </property>
         <MenuItem label="Edit" />
         <MenuItem label="Delete" />
       </DropdownMenu>
@@ -112,15 +112,15 @@ There is a simple solution for this scenario. The `ContactRow` component will ra
 
 Add the custom events to `ContactRow`:
 
-```ueml copy {9-10} filename="ContactRow.xmlui"
+```ueml copy {9} filename="ContactRow.xmlui"
 <Component name="ContactRow">
   <Card>
     <HStack verticalAlignment="center">
       <!-- Unchanged -->
       <DropdownMenu>
-        <propertyerty name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </propertyerty>
+        </property>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked')}" />
         <MenuItem label="Delete" />
       </DropdownMenu>
@@ -135,12 +135,12 @@ The highlighted code exposes an event, `editClicked`. Bind the dialog in `Contac
 <!-- Omitted -->
 <List>
   <!-- Omitted -->
-  <propertyerty name="itemTemplate">
+  <property name="itemTemplate">
     <ContactRow 
       item="{$item}" 
       categories="{categories.value}" 
-      onEditClicked="contactForm.open('edit')" />/>
-  </propertyerty>
+      onEditClicked="contactForm.open('edit')" />
+  </property>
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
@@ -152,7 +152,7 @@ Now, clicking the Edit context menu of any contact item displays the same dialog
 
 The dialog always displays its title as Add a new Contact, whether you invoke it with the Add button or the Edit menu command. Modify the dialog to accept a mode, which can be "add" or "edit":
 
-```ueml copy {1, 4, 7} filename="ContactForm.xmlui"
+```ueml copy {1, 4, 7} filename="ContactForm.xmlui" /var.mode=""/
 <Component name="ContactForm" var.mode="">
   <ModalDialog 
     id="dialog" 
@@ -176,12 +176,12 @@ To work with the current mode, you have to change the invocations of `open` in `
     </HStack>
     <List 
       <!-- Unchanged -->
-      <propertyerty name="itemTemplate">
+      <property name="itemTemplate">
         <ContactRow 
           item="{$item}" 
           categories="{categories.value}" 
-          onEditClicked="contactForm.open('edit')" />/>
-      </propertyerty>
+          onEditClicked="contactForm.open('edit')" />
+      </property>
       <!-- Unchanged -->
     </List>
   </VStack>
@@ -205,8 +205,7 @@ The current contact dialog is functionless. Let's create a form that accepts dat
     <Form 
       id="contactForm" 
       subject="{{}}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-      onCancel="dialog.close()" >
+      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
       <FormItem
         label="Full name" 
         placeholder="Specify the contact name" 
@@ -268,8 +267,7 @@ We should pass the initial data to the `Form` when we edit existing information.
     <Form 
       id="contactForm" 
       subject="{initialData}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-      onCancel="dialog.close()" >
+      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
       <!-- Unchanged -->
     </Form>
   </ModalDialog>
@@ -344,22 +342,19 @@ The first two methods accept the contact details in their request bodies; the DE
 
 XMLUI has a versatile component, `APICall,` that invokes web API endpoints that modify some data in the backend. Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
 
-```ueml copy {10-18} filename="ContactForm.xmlui"
+```ueml copy {8-13} filename="ContactForm.xmlui"
 <Component name="ContactForm" var.mode="" var.initialData="">
   <ModalDialog 
     id="dialog" 
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
       id="contactForm" 
-      subject="{initialData}"
-      onCancel="dialog.close()">
+      subject="{initialData}">
       <event name="submit">
         <APICall
           url="/api/contacts"
           method="post"
-          body="{$eventArgs}"
-          onSuccess="() => dialog.close()"
-        />
+          body="{$eventArgs}" />
       </event>
       <!-- Unchanged -->
 </Component>
@@ -379,9 +374,7 @@ The `APICall` event handler now works only with the New Contact button, and it w
 <APICall
   url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
   method="{mode === 'add' ? 'post' : 'put'}"
-  body="{$eventArgs}"
-  onSuccess="() => dialog.close()"
-/>
+  body="{$eventArgs}" />
 ```
 
 This code uses the proper API endpoint depending on the operation mode (add or edit). When you contact a task record, the modifications will be displayed in the list immediately:

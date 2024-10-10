@@ -42,12 +42,10 @@ The list component is versatile and provides several services, making it easy to
 
 The default display of the list uses the `fullName` and then `categoryId` fields. If you want to change the default view of an item, you can modify the template used to show a particular item. Modify the `List` component's definition to use a different template:
 
-```ueml copy {3-5} filename="Main.xmlui"
+```ueml copy {3} filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <property name="itemTemplate">
-    <Card title="{$item.fullName}" subTitle="{$item.comments}" />
-  </property>
+  <Card title="{$item.fullName}" subTitle="{$item.comments}" />
 </List>
 <!-- Omitted -->
 ```
@@ -59,25 +57,23 @@ The code utilizes the `Card` component, a simple container to display cohesive d
 
 ## Adding and Formatting Fields
 
-Let's change the layout of the items to something more attractive and helpful. Modify the `itemTemplate` as in the following code snippet:
+Let's change the layout of the items to something more attractive and helpful. Modify the nested items of `List` as in the following code snippet:
 
-```ueml copy {4-15} filename="Main.xmlui"
+```ueml copy {3-14} filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <property name="itemTemplate">
-    <Card>
-      <HStack verticalAlignment="center">
-        <Checkbox initialValue="{$item.reviewCompleted}" />
-        <VStack width="*" gap="0">
-          <Text variant="strong">{$item.fullName}</Text>
-          <Text>{$item.comments}</Text>
-        </VStack>
-        <HStack verticalAlignment="center" horizontalAlignment="end">
-          <Text>{smartFormatDate($item.reviewDueDate)}</Text>
-        </HStack>
+  <Card>
+    <HStack verticalAlignment="center">
+      <Checkbox initialValue="{$item.reviewCompleted}" />
+      <VStack width="*" gap="0">
+        <Text variant="strong">{$item.fullName}</Text>
+        <Text>{$item.comments}</Text>
+      </VStack>
+      <HStack verticalAlignment="center" horizontalAlignment="end">
+        <Text>{smartFormatDate($item.reviewDueDate)}</Text>
       </HStack>
-    </Card>
-  </property>
+    </HStack>
+  </Card>
 </List>
 <!-- Omitted -->
 ```
@@ -148,9 +144,7 @@ It is the best time to extract the item template of the list into a separate com
 ```ueml copy filename="Main.xmlui" {4}
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <property name="itemTemplate">
-    <ContactRow item="{$item}" />
-  </property>
+  <ContactRow item="{$item}" />
 </List>
 <!-- Omitted -->
 ```
@@ -171,13 +165,11 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 
 1. Navigate to the `Main.xmlui` file and add a `DataSource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `DataSource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
 
-```ueml copy {2, 5} filename="Main.xmlui"
+```ueml copy {2, 4} filename="Main.xmlui"
 <Page url="/contacts">
   <DataSource id="categories" url="/api/categories" />
   <List datasource="/api/contacts">
-    <property name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </property>
+    <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Page>
 ```
@@ -185,10 +177,10 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 2. Create a new `ContactRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `ContactRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `ContactRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
 
 ```javascript copy filename="ContactRow.xmlui.xs"
-// Topic record of the item
+// Category record of the item
 var category = $props.categories.find(t => t.id === $props.item.categoryId);
 
-// Create a color map for all topics
+// Create a color map for all categories
 var categoriesColorMap = $props.categories.reduce((acc, topic) => {
   return {...acc, [category.name]:  category.color };
 }, {});
@@ -218,13 +210,13 @@ into a hash object:
 ```
 </Callout>
 
-3. Add a `Badge` component to the `TaskRow` definition and wire it up with the current item:
+3. Add a `Badge` component to the `ContactRow` definition and wire it up with the current item:
 
-```ueml copy {10} filename="TaskRow.xmlui" /category/ /categoriesColorMap/
-<Component name="TaskRow">
+```ueml copy {10} filename="ContactRow.xmlui" /category/ /categoriesColorMap/
+<Component name="ContactRow">
   <Card>
     <HStack verticalAlignment="center">
-      <Checkbox id="completedSelector" initialValue="{$props.item.reviewCompleted}" />
+      <Checkbox initialValue="{$props.item.reviewCompleted}" />
       <VStack width="*" gap="0">
         <Text variant="strong">{$props.item.fullName}</Text>
         <Text>{$props.item.comments}</Text>
