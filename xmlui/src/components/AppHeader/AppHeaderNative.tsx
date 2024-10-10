@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import classnames from "@components-core/utils/classnames";
 
 import styles from "./AppHeader.module.scss";
@@ -28,21 +28,48 @@ type Props = {
   titleContent?: ReactNode;
 };
 
-export function useLogoUrl(inDrawer?: boolean) {
-  const { activeThemeId, activeThemeTone } = useTheme();
-  const logoResourceString = "resource:logo";
-  const drawerLogoResourceString = "resource:logo.drawer";
-  const tonedLogoResourceString = `resource:logo-${activeThemeTone}`;
-  const themedLogoResourceString = `resource:logo-${activeThemeId}`;
+function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
+  const img = new Image();
+  img.src = url;
+  img.onload = () => {
+    onLoaded();
+  };
+  img.onerror = () => {
+    onError();
+  };
+}
 
-  const baseLogoUrl = useResourceUrl(logoResourceString);
-  const drawerLogoUrl = useResourceUrl(drawerLogoResourceString);
-  const toneLogoUrl = useResourceUrl(tonedLogoResourceString); //TODO illesg review, it's for light/dark built in themes
-  const themeLogoUrl = useResourceUrl(themedLogoResourceString); //TODO illesg review, it's for light/dark built in themes
-  if (inDrawer) {
-    return drawerLogoUrl || baseLogoUrl;
-  }
-  return themeLogoUrl || toneLogoUrl || baseLogoUrl;
+export function useLogoUrl() {
+  const [autoLogoUrl, setAutoLogoUrl] = useState<string>(undefined);
+  const [logoUrlByTone, setLogoUrlByTone] = useState<Record<string, string>>({});
+  const { activeThemeTone } = useTheme();
+
+  const baseLogoUrl = useResourceUrl("resource:logo");
+  const toneLogoUrl = useResourceUrl(`resource:logo-${activeThemeTone}`);
+
+  const givenUrl = toneLogoUrl || baseLogoUrl;
+
+  useEffect(() => {
+    if (!givenUrl) {
+      if(autoLogoUrl === undefined){
+        const defaultUrl = "/resources/logo.svg";
+        tryLoadImage(defaultUrl, ()=>{
+          setAutoLogoUrl(defaultUrl);
+        }, ()=>{
+          setAutoLogoUrl(null);
+        });
+      }
+      if(logoUrlByTone[activeThemeTone] === undefined){
+        const defaultUrl = `/resources/logo-${activeThemeTone}.svg`;
+        tryLoadImage(defaultUrl, ()=>{
+          setLogoUrlByTone((prev)=>({...prev, [activeThemeTone]: defaultUrl}));
+        }, ()=>{
+          setLogoUrlByTone((prev)=>({...prev, [activeThemeTone]: null}));
+        });
+      }
+    }
+  }, [activeThemeTone, autoLogoUrl, givenUrl, logoUrlByTone]);
+  return givenUrl || logoUrlByTone[activeThemeTone] || autoLogoUrl;
 }
 
 export const AppHeader = ({
@@ -87,23 +114,23 @@ export const AppHeader = ({
         )}
         <div className={styles.logoAndTitle}>
           {(showLogo || !navPanelVisible) &&
-              (logoContent ? (
-                  <>
-                    <div className={styles.customLogoContainer}>{logoContent}</div>
-                    {safeLogoTitle}
-                  </>
-              ) : (
-                  <>
-                    {!!logoUrl && (
-                        <div className={styles.logoContainer}>
-                          <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
-                            <Logo />
-                          </NavLink>
-                        </div>
-                    )}
-                    {safeLogoTitle}
-                  </>
-              ))}
+            (logoContent ? (
+              <>
+                <div className={styles.customLogoContainer}>{logoContent}</div>
+                {safeLogoTitle}
+              </>
+            ) : (
+              <>
+                {!!logoUrl && (
+                  <div className={styles.logoContainer}>
+                    <NavLink to={"/"} displayActive={false} style={{ padding: 0, height: "100%" }}>
+                      <Logo />
+                    </NavLink>
+                  </div>
+                )}
+                {safeLogoTitle}
+              </>
+            ))}
         </div>
         <div className={styles.childrenWrapper}>{children}</div>
         {profileMenu && <div className={styles.rightItems}>{profileMenu}</div>}
