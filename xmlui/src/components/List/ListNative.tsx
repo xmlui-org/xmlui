@@ -1,4 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
+import type {
+  CSSProperties,
+  ReactNode} from "react";
 import React, {
   forwardRef,
   useCallback,
@@ -312,20 +314,6 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     overscan: overscan,
   });
 
-  // useSyncListViewState({
-  //   offsetTop: offsetTopRef.current,
-  //   rowVirtualizer: rowVirtualizer,
-  //   estimateRowSize,
-  //   estimatedRowSize: estimatedRowSizeRef.current,
-  //   uid,
-  //   scrollElementRef,
-  //   trackViewState,
-  //   setExpanded,
-  //   expanded,
-  // });
-
-  const prevRows = usePrevious(rows);
-
   const tryToScrollToIndex = useCallback(
     (index: number, onFinished?: () => void) => {
       // console.log("SCROLLING TO INDEX", index);
@@ -333,18 +321,6 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
       requestAnimationFrame(() => {
         onFinished?.();
       });
-      // requestAnimationFrame(() => {
-      //   requestAnimationFrame(() => {
-      //     const {startIndex, endIndex} = visibleRangeRef.current;
-      //     const isVisible = index >= startIndex && index <= endIndex;
-      //
-      //     if (!isVisible) {
-      //       tryToScrollToIndex(index, onFinished);
-      //     } else {
-      //       onFinished?.();
-      //     }
-      //   });
-      // });
     },
     [rowVirtualizer],
   );
@@ -378,6 +354,14 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   const prevTotalSize = usePrevious(totalSize);
   const firstRenderedItem = virtualItems[0];
   const lastRenderedItem = virtualItems[virtualItems.length - 1];
+
+  const initiallyScrolledToBottom = useRef(false);
+  useLayoutEffect(() => {
+    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
+      initiallyScrolledToBottom.current = true;
+      tryToScrollToIndex(rows.length - 1);
+    }
+  }, [rows.length, scrollAnchor, tryToScrollToIndex]);
 
   // restore scroll position when total size changes
   useLayoutEffect(() => {
