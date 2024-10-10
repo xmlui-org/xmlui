@@ -1,3 +1,87 @@
+import { Callout } from 'nextra/components'
+import { COMPONENT_BUTTON } from "../../meta/pages"
+
 # Basic Components
 
-_TBD_
+## Button
+
+Use the `Button` component to let users trigger various actions on the UI.
+
+```ueml copy
+<App>
+  <Button label="Click me!" onClick="toast('Button clicked')" />
+  <Button label="Can't Click Here" enabled="{false}" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Trigger Actions"
+  app={`
+    <App>
+      <Button label="Click me!" onClick="toast('Button clicked')" />
+      <Button label="Can't Click Here" enabled="{false}" />
+    </App>
+  `}
+  height={160}
+/>
+
+<Callout type="info" emoji="💡">
+  Certain buttons can be emphasized by using properties such as `variant`, `themeColor` and `size`.
+</Callout>
+
+```ueml copy
+<App>
+  <HStack verticalAlignment="center">
+    <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
+    <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
+    <Button label="Update" size="md" variant="solid" themeColor="primary" />
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Order of Importance"
+  app={`
+    <App>
+      <HStack verticalAlignment="center">
+        <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
+        <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
+        <Button label="Update" size="md" variant="solid" themeColor="primary" />
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Buttons can also have icons to provide visual cues.
+</Callout>
+
+```ueml copy
+<App>
+  <HStack>
+    <Button icon="close" variant="ghost" themeColor="secondary" />
+    <Button label="Clear Text Field" icon="trash" iconPosition="end"
+      variant="outlined" themeColor="secondary" />
+    <Button label="Update" icon="pen" />
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Icons"
+  app={`
+    <App>
+      <HStack>
+        <Button icon="close" variant="ghost" themeColor="secondary" />
+        <Button label="Clear Text Field" icon="trash" iconPosition="end"
+          variant="outlined" themeColor="secondary" />
+        <Button label="Update" icon="pen" />
+      </HStack>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_BUTTON}>component reference</SmartLink>.
