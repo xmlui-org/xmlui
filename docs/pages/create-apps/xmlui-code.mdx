@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components'
-import { REUSABLE_COMPONENTS, SCRIPT_SYNTAX, SCRIPT_SYNTAX_EVENT_HANDLERS, XMLUI_EXPRESSIONS } from '../../meta/pages'
+import { GLOBAL_FUNCTIONS_AND_VARIABLES, REUSABLE_COMPONENTS, REUSABLE_COMPONENTS_EXPOSING_METHODS, SCRIPT_SYNTAX, SCRIPT_SYNTAX_EVENT_HANDLERS, XMLUI_EXPRESSIONS } from '../../meta/pages'
 
 # Coding with XMLUI
 
@@ -467,7 +467,60 @@ XMLUI understands your intention when defining an event handler. In addition to 
   Reusable components can expose methods to other components.
 </Callout>
 
-These methods can use XMLUI Script statements like event handler functions. You can learn more about APIs in the <SmartLink href={REUSABLE_COMPONENTS}>Reusable Components</SmartLink> article.
+These methods can use XMLUI Script statements like event handler functions. You can learn more about them in the <SmartLink href={REUSABLE_COMPONENTS_EXPOSING_METHODS}>Reusable Components</SmartLink> article.
+
+## Code-Behind Variables and Functions
+
+<Callout type="info" emoji="💡">
+Code-behind files may contain only reactive variables (`var` keyword) and function declarations on their top-level scope. Any other statement or expression declaration is forbidden.
+</Callout>
+
+Thus, the following code-behind file is valid:
+
+```js
+var count = 0;
+
+function increment() {
+  count++;
+}
+```
+
+However, this declaration is not, as it contains a local variable and an expression statement: 
+
+```js {3-4}
+var selectedIndex = -1;
+
+const MY_LABEL = "My label";
+selectedIndex++;
+
+function selectItem(index) {
+  selectedIndex = index;
+}
+```
+
+<Callout type="info" emoji="💡">
+Function declarations can be nested in other functions.
+</Callout>
+
+In this case, markup files can see only the outermost declarations; inner functions are unavailable.
+
+While the following code-behind file exposes the `calculateValue` function, it hides `square`:
+
+```js
+function calculateValue(n) {
+  function square(x) {
+    return x * x;
+  }
+
+  let sum = 0;
+  for (let i = 1; i <= n; i++) sum += square(i);
+  return sum;
+}
+```
+
+<Callout>
+  Currently, XMLUI does not implement the concept of imports, so you cannot create code files and import them into code-behind files (for example, to share utility functions). This feature is being added to the framework in the future.
+</Callout>
 
 ## How XMLUI Code Runs
 
@@ -554,11 +607,20 @@ For example, in the following markup, using the `delay()` function would raise a
 <Playground
   previewOnly={true}
   name="Example: Property cannot use async evaluation"
-  height={88}
+  height={120}
   horizontal={true}
   app={`
-    <VStack>
+    <App>
       <Text value="My value {delay(100), 123}" />
-    </VStack>
+    </App>
   `}
 />
+
+### Identifier Resolution
+
+When you refer to a particular variable, XMLUI starts resolving it from the innermost scope of its usage (exactly like JavaScript). If an identifier cannot be resolved in its local scope (inline expression, inline event handler, or code-behind file), the engine tries to resolve it in other scopes in this order:
+
+- Context values (such as `$props` for reusable components, `$item` for lists, etc.
+- Declarations in the current markup file (for example, the markup file may declare component IDs or variables.
+- XMLUI utility functions. The framework provides several <SmartLink href={GLOBAL_FUNCTIONS_AND_VARIABLES}>global utility functions</SmartLink>.
+- The global JavaScript scope (`window`).
