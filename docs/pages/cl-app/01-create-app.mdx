@@ -1,8 +1,22 @@
 import { Callout } from 'nextra/components'
+import { CL_TUTORIAL } from '../../meta/downloads'
 
 # Create The App
 
-Download the contact list app's starter zip file from here (link placeholder) and unzip it into a working folder.
+Download the contact list app's starter zip file from <DownloadLink href={CL_TUTORIAL}>here</DownloadLink> and unzip it into a working folder.
+
+The unzipped content has the following folders and files:
+
+| File/Folder | Description |
+| --- | --- |
+| `index.html` | The default webpage to display |
+| `Main.xmlui` | The XMLUI app's entry point |
+| `config.json` | The app's configuration file |
+| `components` | The folder with the app's XMLUI components (empty) |
+| `resources` | The folder with static app resources like images, logos, icons, etc. |
+| `xmlui-standalone.umd.js` | The XMLUI framework's runtime |
+| `mockServiceWorker.js` | The mock service worker for emulated backend |
+| `mock.js` | The API for the emulated backend |
 
 <Callout emoji="💡">
   Remember, you need a local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
@@ -15,10 +29,14 @@ When your app starts, it displays this page:
 <br/>
 <Image alt="App start" src="/resources/images/get-started/cl-start.png" />
 
+<Callout type="info" emoji="💡">
+  This app uses an emulated backend that persists data. XMLUI has a built-in emulation technology for this purpose.
+</Callout>
+
 The app is straightforward, as its single markup file, `Main.xmlui` (the entry point of an XMLUI app), shows:
 
 ```ueml copy filename="Main.xmlui"
-<App layout="vertical-sticky">
+<App layout="vertical-sticky" name="Contact List Tutorial">
   <AppHeader>
     <H2>Contact Management</H2>
     <SpaceFiller />
@@ -36,7 +54,9 @@ The app is straightforward, as its single markup file, `Main.xmlui` (the entry p
 </App>
 ```
 
-The application uses the `vertical-sticky` layout, which renders a vertical menu on the left side of the app and provides a sticky header and footer above and below the main content area. The `AppHeader` defines a title and allows a `ThemeChangerButton` to choose between light and dark themes.
+The application uses the `vertical-sticky` layout, which renders a vertical menu on the left side of the app and provides a sticky header and footer above and below the main content area. The `name` property of `App` defines the title to display in the browser tab.
+
+The `AppHeader` defines a title and allows a `ThemeChangerButton` to choose between light and dark themes.
 
 <Callout type="info" emoji="💡">
   The `App` component automatically **displays a logo** when the configuration file contains a logo declaration.
@@ -44,10 +64,8 @@ The application uses the `vertical-sticky` layout, which renders a vertical menu
 
 The Contact List starter app has such a definition in the `config.json` file:
 
-```json copy filename="config.json" {5-6}
+```json copy filename="config.json" {3-4}
 {
-  "name": "Contact List Tutorial",
-  "version": "1.0.0",
   "resources": {
     "logo": "resources/crm-logo.svg",
     "logo-dark": "resources/crm-logo-dark.svg",
@@ -55,10 +73,6 @@ The Contact List starter app has such a definition in the `config.json` file:
   }
 }
 ```
-
-<Callout type="info" emoji="💡">
-The `name` property in the configuration contains the **title the browser displays** in the app's tab.
-</Callout>
 
 ## Setting Up the Scenario
 
@@ -98,7 +112,7 @@ The default app uses a horizontal layout with a single menu function, Home. The 
 Open the `Main.xmlui` file in your editor and change its contents to the following:
 
 ```ueml copy filename="Main.xmlui" /layout="vertical-full-header"/ {7-14}
-<App layout="vertical-sticky">
+<App layout="vertical-sticky" name="Contact List Tutorial">
   <AppHeader>
     <H2>Contact Management</H2>
     <SpaceFiller />
@@ -122,13 +136,6 @@ Refresh the browser; as a result of the changes in `Main.xmlui`, you will see a 
 
 <br/>
 <Image alt="Initial P2DO" src="/resources/images/get-started/cl-initial.png" />
-
-The `App` component represents the entire app. It provides several layout placeholders (such as a header, a footer, a navigation panel, etc.) that you can fill with content. Its `layout` property determines how the placeholders are combined into a working app; this value determines the layout and some subtle app behavior details.
-
-- The `vertical-full-header` layout docks the app header to the top and the footer to the bottom. The navigation panel and the main content share the remaining area.
-- The `AppHeader` placeholder defines the app's header (title) to display. In the header, you see a logo from the app's resources.
-- XMLUI uses URLs for in-app navigation. The two `NavLink` components within `NavPanel` declare the app's simple menu structure. Each `NavLink` has a `to` property with the corresponding target URL.
-- The `NavLink` counterpart is the two `Page` components within `Pages`. They describe the "page" that will load when a particular menu item is selected. In this phase, these pages just display their names.
 
 ## Using an Emulated Backend
 

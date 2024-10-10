@@ -418,6 +418,25 @@ describe("Markup checks", () => {
     // --- Assert
     expect(errors.length).equal(0);
   });
+
+  it("Visits List's itemTemplate", () => {
+    // --- Arrange
+    const source = `
+    <List>
+      <property name="itemTemplate">
+        <Button some="dummy" />
+      </property>
+    </List>
+    `;
+    const def = transformSource(source) as ComponentDef;
+
+    // --- Act
+    const errors = checkXmlUiMarkup(def, [], metadataHandler);
+
+    // --- Assert
+    expect(errors.length).equal(1);
+  });
+
 });
 
 function transformSource(source: string): ComponentDef | CompoundComponentDef | null {
