@@ -630,4 +630,31 @@ You can add the new component to your app with the `<IncButton>` tag.
 </App>  
 ```
 
+<Callout type="info" emoji="💡">
+  Reusable components can expose custom methods from a particular component. 
+</Callout>
 
+To declare them, you can use two notations (according to your preference):
+
+With `method.` prefix:
+
+```ueml copy {4}  /method.setValue/
+<Component 
+  name="IncButton" 
+  var.count="{0}" 
+  method.setValue="v => count = v">
+  <Button label="Click to increment: {count}" onClick="count++" />
+</Component>
+```
+
+With the `<method>` tag:
+
+```ueml copy {3}  /value="v => count = v"/ /setValue/
+<Component name="IncButton" 
+  <var name="count" value="{0}" />
+  <method name="setValue" value="v => count = v" />
+  <Button label="Click to increment: {count}" onClick="count++" />
+</Component>
+```
+
+These two notations are equivalent.
