@@ -1,20 +1,18 @@
-import type { CSSProperties, ReactNode } from "react";
-import { useLayoutEffect } from "react";
+import type {
+  CSSProperties,
+  ReactNode} from "react";
 import React, {
   forwardRef,
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import type { Range, Virtualizer } from "@tanstack/react-virtual";
-import {
-  defaultRangeExtractor,
-  observeElementOffset,
-  useVirtualizer,
-} from "@tanstack/react-virtual";
+import type { Range } from "@tanstack/react-virtual";
+import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import styles from "./List.module.scss";
 import { get, groupBy, noop, omit, orderBy as lodashOrderBy, sortBy, uniq } from "lodash-es";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
@@ -25,8 +23,9 @@ import { Text } from "@components/Text/TextNative";
 import { Spinner } from "@components/Spinner/SopinnerNative";
 import { usePrevious, useResizeObserver } from "@components-core/utils/hooks";
 import { MemoizedItem } from "@components/container-helpers";
-import { ComponentDef } from "@abstractions/ComponentDefs";
-import { RenderChildFn } from "@abstractions/RendererDefs";
+import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { RegisterComponentApiFn, RenderChildFn } from "@abstractions/RendererDefs";
+import { useEvent } from "@components-core/utils/misc";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
@@ -43,12 +42,9 @@ const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
 
   useResizeObserver(
     ref,
-    useCallback(
-      () => {
-        onHeightChanged?.(ref.current);
-      },
-      [onHeightChanged],
-    ),
+    useCallback(() => {
+      onHeightChanged?.(ref.current);
+    }, [onHeightChanged]),
   );
   return (
     <div
@@ -223,10 +219,11 @@ type DynamicHeightListProps = {
   resetSelectedIndex?: () => void;
   pageInfo?: PageInfo;
   idKey?: string;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   emptyListPlaceholder?: ReactNode;
   sectionsInitiallyExpanded?: boolean;
   defaultSections: Array<string>;
+  registerComponentApi?: RegisterComponentApiFn;
 };
 
 export const DynamicHeightList = forwardRef(function DynamicHeightList(
@@ -247,10 +244,11 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     resetSelectedIndex = noop,
     pageInfo,
     idKey = "id",
-    layout,
+    style,
     emptyListPlaceholder,
     sectionsInitiallyExpanded = true,
     defaultSections = EMPTY_ARRAY,
+    registerComponentApi,
   }: DynamicHeightListProps,
   ref,
 ) {
@@ -287,35 +285,22 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
 
   const hasOutsideScroll =
     scrollRef &&
-    layout?.maxHeight === undefined &&
-    layout?.height === undefined &&
-    layout?.flex === undefined;
+    style?.maxHeight === undefined &&
+    style?.height === undefined &&
+    style?.flex === undefined;
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const overscan = 5;
-  const myObserveElementOffset = useCallback(
-    (
-      instance: Virtualizer<HTMLDivElement, HTMLDivElement>,
-      cb: (offset: number, isScrolling: boolean) => void,
-    ) => {
-      return observeElementOffset(instance, (offset, isScrolling) => {
-        //based on this: https://github.com/TanStack/virtual/issues/387
-        const parentContainerOffset = !hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0;
-        cb(offset - parentContainerOffset, isScrolling);
-      });
-    },
-    [hasOutsideScroll],
-  );
   const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
     count: rows.length,
     // paddingStart: scrollPaddingStart,
     // paddingEnd: scrollPaddingEnd,
-    observeElementOffset: myObserveElementOffset,
+    scrollMargin: !hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0,
     getScrollElement: useCallback(() => {
       return scrollElementRef.current;
     }, [scrollElementRef]),
     estimateSize: useCallback(() => {
-      return 30;
+      return 10;
     }, []),
     rangeExtractor: useCallback((range: Range) => {
       return defaultRangeExtractor(range);
@@ -329,59 +314,35 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     overscan: overscan,
   });
 
-  // useSyncListViewState({
-  //   offsetTop: offsetTopRef.current,
-  //   rowVirtualizer: rowVirtualizer,
-  //   estimateRowSize,
-  //   estimatedRowSize: estimatedRowSizeRef.current,
-  //   uid,
-  //   scrollElementRef,
-  //   trackViewState,
-  //   setExpanded,
-  //   expanded,
-  // });
-
-  const prevRows = usePrevious(rows);
-
   const tryToScrollToIndex = useCallback(
     (index: number, onFinished?: () => void) => {
+      // console.log("SCROLLING TO INDEX", index);
       rowVirtualizer.scrollToIndex(index);
       requestAnimationFrame(() => {
         onFinished?.();
       });
-      // requestAnimationFrame(() => {
-      //   requestAnimationFrame(() => {
-      //     const {startIndex, endIndex} = visibleRangeRef.current;
-      //     const isVisible = index >= startIndex && index <= endIndex;
-      //
-      //     if (!isVisible) {
-      //       tryToScrollToIndex(index, onFinished);
-      //     } else {
-      //       onFinished?.();
-      //     }
-      //   });
-      // });
     },
     [rowVirtualizer],
   );
 
-  useEffect(() => {
-    if (scrollAnchor === "bottom") {
-      if (
-        rows.length &&
-        (!prevRows ||
-          !prevRows.length ||
-          rows[rows.length - 1][idKey] !== prevRows[prevRows.length - 1][idKey])
-      ) {
-        setSuspendInfiniteLoad(true);
-
-        // console.log("TRying to scroll to index");
-        tryToScrollToIndex(rows.length - 1, () => {
-          setSuspendInfiniteLoad(false);
-        });
-      }
+  const scrollToBottom = useEvent(() => {
+    if(rows.length){
+      tryToScrollToIndex(rows.length - 1);
     }
-  }, [idKey, prevRows, rows, scrollAnchor, tryToScrollToIndex]);
+  });
+
+  const scrollToTop = useEvent(() => {
+    if(rows.length) {
+      tryToScrollToIndex(0);
+    }
+  });
+
+  useLayoutEffect(() => {
+    registerComponentApi?.({
+      scrollToBottom,
+      scrollToTop,
+    });
+  }, [registerComponentApi, scrollToBottom, scrollToTop]);
 
   const virtualItems = rowVirtualizer.getVirtualItems();
   const totalSize = rowVirtualizer.getTotalSize();
@@ -398,22 +359,23 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   const firstRenderedItem = virtualItems[0];
   const lastRenderedItem = virtualItems[virtualItems.length - 1];
 
+  const initiallyScrolledToBottom = useRef(false);
+  useLayoutEffect(() => {
+    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
+      initiallyScrolledToBottom.current = true;
+      tryToScrollToIndex(rows.length - 1);
+    }
+  }, [rows.length, scrollAnchor, tryToScrollToIndex]);
+
+  // restore scroll position when total size changes
   useLayoutEffect(() => {
     if (
       prevTotalSize &&
       prevTotalSize !== totalSize &&
-      scrollAnchor === "bottom" &&
-      firstRenderedItem?.index === 0
+      scrollAnchor === "bottom" //&&
     ) {
       const delta2 = totalSize - prevTotalSize;
-      // console.log("restore scroll pos", {
-      //   prevTotalSize: prevTotalSize,
-      //   totalSize: totalSize,
-      //   scrollTop: scrollElementRef.current.scrollTop,
-      //   delta: delta2,
-      //   newScrollTop: scrollElementRef.current.scrollTop + delta2,
-      // });
-
+      setSuspendInfiniteLoad(true);
       queueMicrotask(() => {
         scrollElementRef.current!.scrollBy({ left: 0, top: delta2 });
         // console.log("scrolled to", scrollElementRef.current.scrollTop);
@@ -486,7 +448,11 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
       return;
     }
 
-    if (lastRenderedItem.index === (items.length - 1) && pageInfo.hasNextPage && !pageInfo.isFetchingNextPage) {
+    if (
+      lastRenderedItem.index === items.length - 1 &&
+      pageInfo.hasNextPage &&
+      !pageInfo.isFetchingNextPage
+    ) {
       (async () => {
         setSuspendInfiniteLoad(true);
         if (suspendTimerRef.current) {
@@ -502,6 +468,9 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     }
   }, [items.length, lastRenderedItem, pageInfo, requestFetchNextPage, suspendInfiniteLoad]);
 
+  const listContainerTransformY = !firstRenderedItem
+    ? 0
+    : firstRenderedItem.start - rowVirtualizer.options.scrollMargin;
   return (
     <ListContext.Provider value={expandContextValue}>
       <div
@@ -510,7 +479,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
         style={{
           overflow: hasOutsideScroll ? "initial" : "auto",
           maxHeight: "100%",
-          ...layout,
+          ...style,
         }}
       >
         {loading && virtualItems.length === 0 && (
@@ -542,7 +511,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
                 top: 0,
                 left: 0,
                 width: "100%",
-                transform: `translateY(${firstRenderedItem?.start ?? 0}px)`,
+                transform: `translateY(${listContainerTransformY}px)`,
               }}
             >
               {virtualItems.map((virtualItem) => {
@@ -583,19 +552,28 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
 });
 
 // --- Helper function for List item rendering
-export function MemoizedSection({ node, renderChild, item }: { node: ComponentDef; item: any; renderChild: RenderChildFn }) {
-    const { isExpanded, toggleExpanded } = useContext(ListContext);
-    const id = item.id;
-    const expanded = isExpanded(id);
-    const sectionContext = useMemo(() => {
-      return {
-        isExpanded: expanded,
-        toggle: () => {
-          toggleExpanded(id, !expanded);
-        },
-      };
-    }, [expanded, id, toggleExpanded]);
-  
-    return <MemoizedItem node={node} renderChild={renderChild} item={item} context={sectionContext} />;
-  }
-  
+export function MemoizedSection({
+  node,
+  renderChild,
+  item,
+}: {
+  node: ComponentDef;
+  item: any;
+  renderChild: RenderChildFn;
+}) {
+  const { isExpanded, toggleExpanded } = useContext(ListContext);
+  const id = item.id;
+  const expanded = isExpanded(id);
+  const sectionContext = useMemo(() => {
+    return {
+      isExpanded: expanded,
+      toggle: () => {
+        toggleExpanded(id, !expanded);
+      },
+    };
+  }, [expanded, id, toggleExpanded]);
+
+  return (
+    <MemoizedItem node={node} renderChild={renderChild} item={item} context={sectionContext} />
+  );
+}
