@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./ModalDialog.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { Icon } from "@components/Icon/IconNative";
@@ -9,6 +9,7 @@ import { Button } from "@components/Button/ButtonNative";
 import { useEvent } from "@components-core/utils/misc";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import * as Dialog from "@radix-ui/react-dialog";
+import { ModalVisibilityContext } from "./ModalVisibilityContext";
 
 // =====================================================================================================================
 // React component definition
@@ -97,6 +98,24 @@ export const ModalDialog = React.forwardRef(
       }
     }, [isOpen]);
 
+    const registeredForms = useRef(new Set());
+    const modalVisibilityContextValue = useMemo(() => {
+      return {
+        registerForm: (id: string) => {
+          registeredForms.current.add(id);
+        },
+        unRegisterForm: (id: string) => {
+          registeredForms.current.delete(id);
+        },
+        amITheSingleForm: (id) => {
+          return registeredForms.current.size === 1 && registeredForms.current.has(id);
+        },
+        requestClose: () => {
+          return doClose();
+        },
+      };
+    }, [doClose]);
+
     if (!root) {
       return null;
     }
@@ -132,7 +151,9 @@ export const ModalDialog = React.forwardRef(
                 </Dialog.Title>
               )}
               <div className={styles.innerContent}>
-                {isOpen && (typeof children === "function" ? children?.(modalContext) : children)}
+                <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
+                  {isOpen && (typeof children === "function" ? children?.(modalContext) : children)}
+                </ModalVisibilityContext.Provider>
               </div>
               {closeButtonVisible && (
                 <Dialog.Close asChild={true}>
