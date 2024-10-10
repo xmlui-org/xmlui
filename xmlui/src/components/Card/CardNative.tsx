@@ -57,7 +57,7 @@ export const Card = forwardRef(function Card(
             ) : (
               <Heading {...titleProps}>{title}</Heading>
             )}
-            <Text variant="small">{subTitle}</Text>
+              {subTitle !== undefined && <Text variant="small">{subTitle}</Text>}
           </Stack>
         </Stack>
       )}

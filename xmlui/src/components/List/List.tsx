@@ -97,11 +97,13 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     layoutCss,
     layoutContext,
     lookupEventHandler,
+    registerComponentApi
   }) => {
       const itemTemplate = node.props.itemTemplate || node.children;
       return (
       <DynamicHeightList
-        layout={layoutCss}
+        registerComponentApi={registerComponentApi}
+        style={layoutCss}
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         items={extractValue(node.props.items) || extractValue(node.props.data)}
         limit={extractValue(node.props.limit)}
