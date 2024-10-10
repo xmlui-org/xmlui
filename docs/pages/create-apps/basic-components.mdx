@@ -5,84 +5,83 @@ import { COMPONENT_BUTTON } from "../../meta/pages"
 
 ## Button
 
-See <SmartLink href={COMPONENT_BUTTON}>component reference</SmartLink>
-
 Use the `Button` component to let users trigger various actions on the UI.
 
 ```ueml copy
-<HStack>
-  <Button label="Click me!" onClick="window.alert('Button clicked')" />
+<App>
+  <Button label="Click me!" onClick="toast('Button clicked')" />
   <Button label="Can't Click Here" enabled="{false}" />
-</HStack>
+</App>
 ```
 
 <Playground
   previewOnly
   name="Example: Trigger Actions"
   app={`
-    <HStack>
-      <Button label="Click me!" onClick="window.alert('Button clicked')" />
+    <App>
+      <Button label="Click me!" onClick="toast('Button clicked')" />
       <Button label="Can't Click Here" enabled="{false}" />
-    </HStack>
+    </App>
   `}
+  height={160}
 />
 
 <Callout type="info" emoji="💡">
-  Properties such as `variant`, `themeColor` and `size` provide ways to emphasize certain actions.
+  Certain buttons can be emphasized by using properties such as `variant`, `themeColor` and `size`.
 </Callout>
 
-```ueml copy {7, 10-11}
-<Card>
-  <TextBox id="field" initialValue="John Doe" />
-  <CHStack>
-    <Button
-      label="Clear Text Field"
-      onClick="field.setValue('')"
-      size="xs" variant="ghost" themeColor="attention"
-    />
-    <SpaceFiller />
-    <Button label="Cancel" variant="outlined" themeColor="secondary" />
-    <Button label="Update" onClick="toast('Updated value: ' + field.value)" />
-  </CHStack>
-</Card>
+```ueml copy
+<App>
+  <HStack verticalAlignment="center">
+    <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
+    <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
+    <Button label="Update" size="md" variant="solid" themeColor="primary" />
+  </HStack>
+</App>
 ```
 
 <Playground
   previewOnly
   name="Example: Order of Importance"
   app={`
-    <Card>
-      <TextBox id="field" initialValue="John Doe" />
-      <CHStack>
-        <Button label="Clear Text Field" onClick="field.setValue('')" size="xs" variant="ghost" themeColor="attention" />
-        <SpaceFiller />
-        <Button label="Cancel" variant="outlined" themeColor="secondary" />
-        <Button label="Update" onClick="toast('Updated value: ' + field.value)" />
-      </CHStack>
-    </Card>
+    <App>
+      <HStack verticalAlignment="center">
+        <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
+        <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
+        <Button label="Update" size="md" variant="solid" themeColor="primary" />
+      </HStack>
+    </App>
   `}
 />
 
 <Callout type="info" emoji="💡">
-  Buttons can also have icons to provide visual cues for actions.
+  Buttons can also have icons to provide visual cues.
 </Callout>
 
 ```ueml copy
-<HStack>
-  <Button icon="close" variant="ghost" themeColor="secondary" />
-  <Button label="Clear Text Field" icon="trash" iconPosition="end" variant="outlined" themeColor="secondary" />
-  <Button label="Update" icon="pen" />
-</HStack>
+<App>
+  <HStack>
+    <Button icon="close" variant="ghost" themeColor="secondary" />
+    <Button label="Clear Text Field" icon="trash" iconPosition="end"
+      variant="outlined" themeColor="secondary" />
+    <Button label="Update" icon="pen" />
+  </HStack>
+</App>
 ```
 
 <Playground
   previewOnly
   name="Example: Icons"
   app={`
-    <HStack>
-      <Button icon="close" variant="ghost" themeColor="secondary" />
-      <Button label="Clear" icon="trash" iconPosition="end" variant="outlined" themeColor="secondary" />
-      <Button label="Update" icon="pen" />
-    </HStack>
+    <App>
+      <HStack>
+        <Button icon="close" variant="ghost" themeColor="secondary" />
+        <Button label="Clear Text Field" icon="trash" iconPosition="end"
+          variant="outlined" themeColor="secondary" />
+        <Button label="Update" icon="pen" />
+      </HStack>
+    </App>
   `}
 />
+
+For further details see the <SmartLink href={COMPONENT_BUTTON}>component reference</SmartLink>.
