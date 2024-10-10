@@ -207,8 +207,56 @@ article {
       background-color: inherit;
     }
   }
+
+  ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li:has(div[data-role="separator-content"]) {
+    padding-top: 20px;
+    padding-bottom: 8px;
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li > div[data-role="separator-content"] {
+    font-weight: 700;
+  }
+
+  article[class^='nextra-content'], article[class*=' nextra-content'] {
+    table, thead, tbody, th, td, tr {
+      border: none;
+    }
+  }
 }
 
+:is(html[class~=light]) {
+  article[class^='nextra-content'], article[class*=' nextra-content'] {
+    thead > tr {
+      background-color: rgba(243,244,246, 1);
+    }
+    
+    tr {
+      border: 1px solid rgba(209,213,219, 1);
+    }
+
+    img {
+      box-shadow: 0 0 24px rgba(0, 0, 0, .15);
+    }
+  }
+}
+
+:is(html[class~=dark]) {
+  article[class^='nextra-content'], article[class*=' nextra-content'] {
+    thead > tr {
+      background-color: rgba(75,85,99,.2);
+    }
+    
+    tr {
+      border: 1px solid rgba(75,85,99, 1);
+    }
+
+    img {
+      box-shadow: 0 0 24px rgba(0, 0, 0, .3);
+    }
+  }
+}
 
 html,
 body,
