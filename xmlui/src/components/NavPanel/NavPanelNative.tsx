@@ -35,7 +35,7 @@ function DrawerNavPanel({
       <div ref={scrollContainerRef} className={classnames(styles.wrapper, className)}>
         <ScrollContext.Provider value={scrollContainerRef}>
           <div className={classnames(styles.logoWrapper, styles.inDrawer)}>
-            {logoContent || <Logo inDrawer={true} />}
+            {logoContent || <Logo />}
           </div>
           <div className={styles.wrapperInner} style={style}>
             {children}
