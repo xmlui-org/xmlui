@@ -83,6 +83,9 @@ import { ToolbarMd } from "./Toolbar/Toolbar";
 import { ToolbarButtonMd } from "./ToolbarButton/ToolbarButton";
 import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
+import { BreakoutMd } from "./Breakout/Breakout";
+import { CarouselMd } from "./Carousel/Carousel";
+import { CarouselItemMd } from "./Carousel/CarouselItem";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -95,9 +98,11 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Badge: BadgeMd,
   BarChart: BarChartMd,
   Bookmark: BookmarkMd,
+  Breakout: BreakoutMd,
   Button: ButtonMd,
   ButtonGroup: ButtonGroupMd,
   Card: CardMd,
+  Carousel: CarouselMd,
   ChangeListener: ChangeListenerMd,
   Chart: ChartMd,
   Checkbox: CheckboxMd,

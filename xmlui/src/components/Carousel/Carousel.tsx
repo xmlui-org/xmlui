@@ -10,6 +10,9 @@ const COMP = "Carousel";
 
 export const CarouselMd = createMetadata({
   status: "in progress",
+  description:
+    `This component displays a slideshow by cycling through elements (images, text, or ` +
+    `custom slides) like a carousel.`,
   props: {
     orientation: d(
       "This property indicates the orientation of the carousel. The `horizontal` value indicates that the carousel moves horizontally, and the `vertical` value indicates that the carousel moves vertically.",

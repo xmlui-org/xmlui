@@ -51,12 +51,14 @@ export const Card = forwardRef(function Card(
           {showAvatar && <Avatar url={avatarUrl} name={title} />}
           <Stack orientation="vertical">
             {linkTo ? (
-              <LocalLink to={linkTo + ""}>
-                <Heading {...titleProps}>{title}</Heading>
-              </LocalLink>
-            ) : (
+              title ? (
+                <LocalLink to={linkTo + ""}>
+                  <Heading {...titleProps}>{title}</Heading>
+                </LocalLink>
+              ) : null
+            ) : title ? (
               <Heading {...titleProps}>{title}</Heading>
-            )}
+            ) : null}
               {subTitle !== undefined && <Text variant="small">{subTitle}</Text>}
           </Stack>
         </Stack>
