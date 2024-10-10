@@ -57,14 +57,12 @@ function getSection(contact) {
 
 Update the code of `Contacts` to add a `section` field to the contact items:
 
-```ueml copy {3-4} filename="Contacts.xmlui"
+```ueml copy {4} filename="Contacts.xmlui" /section: getSection(t)/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List items="{contacts.value.map(t => ({...t, section: getSection(t)}))}">
-    <propertyerty name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </propertyerty>
+    <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Component>
 ```
@@ -75,23 +73,21 @@ Update the code of `Contacts` to add a `section` field to the contact items:
 
 To display section information, add the `section` property to the `List` and define the template to display section headers:
 
-```ueml copy {6, 10-16} filename="Contacts.xmlui"
+```ueml copy {6, 8-14} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
-    <propertyerty name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </propertyerty>
-    <propertyerty name="sectionTemplate">
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="sectionTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle" 
           value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
       </HStack>
-    </propertyerty>
+    </property>
   </List>
 </Component>
 ```
@@ -117,17 +113,15 @@ The sections of a list can be expanded or collapsed. Unless you declare otherwis
 
 Update the `List` definition in `Contacts`:
 
-```ueml copy {10-24} filename="Contacts.xmlui"
+```ueml copy {8-22} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     sectionBy="section">
-    <propertyerty name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </propertyerty>
-    <propertyerty name="sectionTemplate">
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="sectionTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
@@ -141,7 +135,7 @@ Update the `List` definition in `Contacts`:
           name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
           size="md" />  
       </HStack>
-    </propertyerty>
+    </property>
   </List>
 </Component>
 ```
@@ -155,10 +149,10 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 
 The order of sections displayed above could be more helpful with a different order. With the help of the `defaultSections` property of `List`, you can define the order of sections. Modify the `List` accordingly:
 
-```ueml copy {4} filename="Tasks.xmlui"
+```ueml copy {4} filename="Contacts.xmlui"
 <!-- Omitted -->
 <List 
-  items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+  items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
   defaultSections="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
   sectionBy="section">
   <!-- Omitted -->

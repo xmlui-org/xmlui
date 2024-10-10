@@ -18,7 +18,7 @@ In this article, you will implement the filtering functionality with both option
 
 Add a few new menu items with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/contacts` URL representing all contacts to `/contacts/all`. Set up each page to display only the related filter's name:
 
-```ueml copy {9-13, 16, 24-27} filename="Main.xmlui"
+```ueml copy {9-13, 16, 22-25} filename="Main.xmlui"
 <App layout="vertical-full-header">
   <AppHeader>
     <H2>Contact Management</H2>
@@ -37,9 +37,7 @@ Add a few new menu items with their corresponding pages to the app definition in
     <Page url="/contacts/all">
       <DataSource id="categories" url="/api/categories" />
       <List datasource="/api/contacts">
-        <propertyerty name="itemTemplate">
-          <ContactRow item="{$item}" categories="{categories.value}" />
-        </propertyerty>
+        <ContactRow item="{$item}" categories="{categories.value}" />
       </List>
     </Page>
     <Page url="/contacts/overdue">Overdue</Page>
@@ -72,11 +70,9 @@ Create a new file, `Contacts.xmlui` in the `components` folder, and add this con
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="contacts" url="/api/contacts" />
-    <List items="{contacts.value.filter($props.predicate)}">
-      <propertyerty name="itemTemplate">
-        <ContactRow item="{$item}" categories="{categories.value}" />
-      </propertyerty>
-    </List>
+  <List items="{contacts.value.filter($props.predicate)}">
+    <ContactRow item="{$item}" categories="{categories.value}" />
+  </List>
 </Component>
 ```
 
@@ -220,9 +216,7 @@ You moved the `DataSource` component to the main component, so you no longer nee
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <List items="{$props.data}">
-    <propertyerty name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </propertyerty>
+    <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Component>
 ```
@@ -293,9 +287,7 @@ Change the definition of the `Contacts` component by removing the `DataSource` q
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <List datasource="/api/contacts/{$props.filter}">
-    <propertyerty name="itemTemplate">
-      <ContactRow item="{$item}" categories="{categories.value}" />
-    </propertyerty>
+    <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Component>
 ```
@@ -349,7 +341,7 @@ The API has an endpoint, `/api/contactcounts`, retrieving the task category coun
 Add a new `DataSource` to the `Main.xmlui` file to fetch the contact counts:
 
 ```ueml copy {2} filename="Main.xmlui"
-<AppHeader title="Contact Management" />
+<!-- After AppHeader -->
 <DataSource id="contactCounts" url="/api/contactcounts" />
 <NavPanel>
   <!-- Omitted -->
