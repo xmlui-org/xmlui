@@ -28,6 +28,10 @@
   background-color: #E0EDF9;
 }
 
+.standalone {
+  padding: 0;
+}
+
 :is(html[class~=dark]) {
   .playgroundContent {
     background-color: #020B1A;
