@@ -12,7 +12,6 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
-import {Text} from "@components/Text/TextNative";
 import styles from "./Playground.module.scss";
 import {Header} from "@/src/components/Header";
 
