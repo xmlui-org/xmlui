@@ -24,6 +24,7 @@ article {
   --syntax-token-cdata: #079CF1;
   --syntax-token-delimiter-curly: #000000;
   --syntax-token-text: #4e5fb3;
+  --syntax-token-string-quoted: #c17a1d;
 }
 
 :is(html[class~=dark]) {
@@ -40,6 +41,7 @@ article {
   --syntax-token-cdata: #5CC1F9;
   --syntax-token-delimiter-curly: #FFFFFF;
   --syntax-token-text: #f5f5ff;
+  --syntax-token-string-quoted: #d1953e;
 
   --color-background-secondary: #121b28;
   --color-background-primary: #1e2734;
@@ -231,7 +233,7 @@ article {
     thead > tr {
       background-color: rgba(243,244,246, 1);
     }
-    
+
     tr {
       border: 1px solid rgba(209,213,219, 1);
     }
@@ -247,7 +249,7 @@ article {
     thead > tr {
       background-color: rgba(75,85,99,.2);
     }
-    
+
     tr {
       border: 1px solid rgba(75,85,99, 1);
     }
