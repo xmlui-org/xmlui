@@ -26,7 +26,9 @@ export const PlaygroundContent = ({
         [styles.standalone]: standalone,
       })}
     >
-      <div className={styles.playgroundContent} style={{ height }}>
+      <div className={classnames(styles.playgroundContent, {
+        [styles.standalone]: standalone,
+      })} style={{ height }}>
         {options.previewMode && status === "loaded" ? (
           <Preview />
         ) : (

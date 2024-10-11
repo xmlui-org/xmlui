@@ -25,7 +25,11 @@
   width: 100%;
   height: 100%;
   padding: 0 16px 16px 16px;
-  background-color: #cddbe4;
+  background-color: #E0EDF9;
+}
+
+.standalone {
+  padding: 0;
 }
 
 :is(html[class~=dark]) {
