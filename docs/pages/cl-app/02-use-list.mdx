@@ -25,7 +25,7 @@ If the app is not running yet, start it on your web server and visit the app's p
 
 The `List` component does not know anything about the semantics and structure of the data. Unless you provide some hints (or a sophisticated description) of the UI to display a particular data item, `List` will display a simple layout selecting a field as a title and another as a subtitle.
 
-The default layout is excellent for experimenting, but in a current application, you need better UX!
+The default layout is good for quick prototyping, but in this case, you need a better way to display fetched data!
 
 ## Customizing the List
 
@@ -141,7 +141,7 @@ It is the best time to extract the item template of the list into a separate com
 
 5. Go back to the `Main.xmlui` file and replace the item template with the new `ContactRow` component:
 
-```ueml copy filename="Main.xmlui" {4}
+```ueml copy filename="Main.xmlui" {3}
 <!-- Omitted -->
 <List datasource="/api/contacts">
   <ContactRow item="{$item}" />
@@ -149,11 +149,11 @@ It is the best time to extract the item template of the list into a separate com
 <!-- Omitted -->
 ```
 
-The app should work as before; however, now, it uses an extracted component.
+The app should work as before; however, now, it uses the extracted component.
 
-## Adding a Badge
+## Categorizing Data
 
-In the app's database, each contact can be assigned a category. The available categories are stored in the database, each category with this structure:
+In the app's database, each contact can be assigned a category. The available categories are stored in the database with the following structure:
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -161,7 +161,7 @@ In the app's database, each contact can be assigned a category. The available ca
 | name | string | The category's name |
 | color | string | The category's color |
 
-XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Bagde`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
+XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Badge`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
 
 1. Navigate to the `Main.xmlui` file and add a `DataSource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `DataSource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
 
