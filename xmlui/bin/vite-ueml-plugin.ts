@@ -5,7 +5,7 @@ import { codeBehindFileExtension, componentFileExtension, moduleFileExtension } 
 import { Parser } from "../src/parsers/scripting/Parser";
 import * as fs from "fs";
 import * as path from "path";
-import { parseXmlUiMarkup } from "../src/components-core/xmlui-parser";
+import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
 
 export type PluginOptions = {
   withLegacyParser?: boolean;
@@ -44,9 +44,12 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
-        const componentDef = parseXmlUiMarkup(code, fileId, moduleResolver);
+        let { component, errors, erroneousCompoundComponentName} = xmlUiMarkupToComponent(code, fileId, moduleResolver)
+        if (errors.length>0){
+          component = errReportComponent(errors, id, erroneousCompoundComponentName)
+        }
         const file = {
-          component: componentDef,
+          component,
           src: code,
           file: fileId,
         }
