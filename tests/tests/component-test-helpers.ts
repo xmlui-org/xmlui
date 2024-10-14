@@ -1,6 +1,6 @@
 import { BrowserContext, Locator, Page } from "@playwright/test";
 import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
-import { parseXmlUiMarkup } from "../../xmlui/src/components-core/xmlui-parser";
+import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 import type { ThemeDefinition } from "xmlui";
 
 type EntryPoint = string | Record<string, any>;
@@ -17,7 +17,7 @@ export type ThemeTestDesc = {
 
 function parseComponent(entryPoint: ComponentDefNew<any> | string) {
   if (typeof entryPoint === "string") {
-    return parseXmlUiMarkup(entryPoint);
+    return xmlUiMarkupToComponent(entryPoint);
   }
   return entryPoint;
 }

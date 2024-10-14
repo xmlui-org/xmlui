@@ -5,12 +5,16 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { PlaygroundState } from "@/src/state/store";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
-import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
+import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
 
 export function parseFromEditorText(value: string = "") {
   try {
-    return parseXmlUiMarkup(value);
+    const {component, errors} =  xmlUiMarkupToComponent(value);
+    if (errors.length > 0) {
+      return {}
+    }
+    return component
   } catch (e) {
     console.log(e);
     return {};
