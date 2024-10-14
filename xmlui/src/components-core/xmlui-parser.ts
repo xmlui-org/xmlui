@@ -13,21 +13,6 @@ interface ErrorWithLineColInfo extends ParseError {
   col: number;
 }
 
-/** Finding any error while parsing / transforming will result
- * in a custom error reporting component being returned with the errors inside it. */
-export function componentFromXmlUiMarkupWithErrRendered(
-  source: string,
-  fileId: string | number = 0,
-  fileName: string,
-  moduleResolver?: ModuleResolver,
-) {
-  const { errors, component } = xmlUiMarkupToComponent(source, fileId, moduleResolver);
-  if (errors.length === 0) {
-    return component;
-  }
-  return errReportComponent(errors, fileId, fileName);
-}
-
 export function xmlUiMarkupToComponent(
   source: string,
   fileId: string | number = 0,
@@ -72,34 +57,6 @@ export function xmlUiMarkupToComponent(
   }
 }
 
-function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithLineColInfo[] {
-  if (newlinePositions.length === 0) {
-    for (let err of errors) {
-      (err as ErrorWithLineColInfo).line = 1;
-      (err as ErrorWithLineColInfo).col = err.pos + 1;
-    }
-    return errors as ErrorWithLineColInfo[];
-  }
-
-  for (let err of errors) {
-    let i = 0;
-    for (; i < newlinePositions.length; ++i) {
-      const newlinePos = newlinePositions[i];
-      if (err.pos < newlinePos) {
-        (err as ErrorWithLineColInfo).line = i + 1;
-        (err as ErrorWithLineColInfo).col = err.pos - (newlinePositions[i - 1] ?? 0) + 1;
-        break;
-      }
-    }
-    const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
-    if (err.pos >= lastNewlinePos) {
-      (err as ErrorWithLineColInfo).line = newlinePositions.length + 1;
-      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos + 0;
-    }
-  }
-  return errors as ErrorWithLineColInfo[];
-}
-
 /** returns a component definition containing the errors.
  * It is a component and a compound component definition at the same time,
  * so that it can be used to render the errors for a compound component as well*/
@@ -112,6 +69,7 @@ export function errReportComponent(
     const errList = errors.map((e) => {
       return {
         type: "VStack",
+        props: { gap: "0px"},
         children: [
           {
             type: "Text",
@@ -142,6 +100,36 @@ export function errReportComponent(
   comp.component = makeComponent();
   return comp;
 }
+
+
+function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithLineColInfo[] {
+  if (newlinePositions.length === 0) {
+    for (let err of errors) {
+      (err as ErrorWithLineColInfo).line = 1;
+      (err as ErrorWithLineColInfo).col = err.pos + 1;
+    }
+    return errors as ErrorWithLineColInfo[];
+  }
+
+  for (let err of errors) {
+    let i = 0;
+    for (; i < newlinePositions.length; ++i) {
+      const newlinePos = newlinePositions[i];
+      if (err.pos < newlinePos) {
+        (err as ErrorWithLineColInfo).line = i + 1;
+        (err as ErrorWithLineColInfo).col = err.pos - (newlinePositions[i - 1] ?? 0) + 1;
+        break;
+      }
+    }
+    const lastNewlinePos = newlinePositions[newlinePositions.length - 1];
+    if (err.pos >= lastNewlinePos) {
+      (err as ErrorWithLineColInfo).line = newlinePositions.length + 1;
+      (err as ErrorWithLineColInfo).col = err.pos - lastNewlinePos + 0;
+    }
+  }
+  return errors as ErrorWithLineColInfo[];
+}
+
 function getCompoundCompName(node: Node, getText: GetText) {
   const rootTag = node?.children?.[0];
   const rootTagNameTokens = rootTag?.children?.find(
