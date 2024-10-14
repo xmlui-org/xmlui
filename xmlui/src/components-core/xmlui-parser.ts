@@ -1,27 +1,18 @@
 import { ModuleResolver } from "@abstractions/scripting/modules";
-import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
+import type { Error } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
-import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
-import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parser";
-import { ParserError } from "../parsers/xmlui-parser/ParserError";
-import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
-import { Node } from "../parsers/xmlui-parser/syntax-node";
 
-interface ErrorWithLineColInfo extends ParseError {
+interface ErrorWithLineColInfo extends Error {
   line: number;
   col: number;
 }
 
-export function xmlUiMarkupToComponent(
+export function parseXmlUiMarkup(
   source: string,
   fileId: string | number = 0,
   moduleResolver?: ModuleResolver,
-): {
-  component: null | ComponentDef | CompoundComponentDef;
-  errors: ErrorWithLineColInfo[];
-  erroneousCompoundComponentName?: string;
-} {
+) {
   const { parse, getText } = createXmlUiParser(source);
   const { node, errors } = parse();
 
@@ -32,78 +23,21 @@ export function xmlUiMarkupToComponent(
         newlinePositions.push(i);
       }
     }
-    const errorsWithLines = addPositions(errors, newlinePositions);
-    const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    return { component: null, errors: errorsWithLines, erroneousCompoundComponentName };
+    const errorWithLines = addPositions(errors, newlinePositions);
+    const errorMessages = errorWithLines
+      .map(
+        (e) => `Error at line: ${e.line}, column: ${e.col}:\n   ${e.message}\n`,
+      )
+      .join("\n");
+    throw new Error(errorMessages);
   }
-  try {
-    return { component: nodeToComponentDef(node, getText, fileId, moduleResolver), errors: [] };
-  } catch (e) {
-    const erroneousCompoundComponentName = getCompoundCompName(node, getText);
-    const singleErr: ErrorWithLineColInfo = {
-      message: (e as ParserError).message,
-      col: 0,
-      line: 0,
-      code: ErrCodes.expEq,
-      category: DiagnosticCategory.Error,
-      pos: 0,
-      end: 0,
-    };
-    return {
-      component: null,
-      erroneousCompoundComponentName,
-      errors: [singleErr],
-    };
-  }
+  return nodeToComponentDef(node, getText, fileId, moduleResolver);
 }
 
-/** returns a component definition containing the errors.
- * It is a component and a compound component definition at the same time,
- * so that it can be used to render the errors for a compound component as well*/
-export function errReportComponent(
-  errors: ErrorWithLineColInfo[],
-  fileName: number | string,
-  compoundCompName: string | undefined,
-) {
-  function makeComponent() {
-    const errList = errors.map((e) => {
-      return {
-        type: "VStack",
-        props: { gap: "0px"},
-        children: [
-          {
-            type: "Text",
-            props: { value: `Error at file '${fileName}'` },
-          },
-          {
-            type: "Text",
-            props: { value: `line ${e.line}, column ${e.col}:` },
-          },
-          {
-            type: "Text",
-            props: { value: `${e.message}` },
-          },
-        ],
-      };
-    });
-    const comp: ComponentDef = {
-      type: "VStack",
-      props: { backgroundColor: "#ff4747"},
-      children: [
-        { type: "H1", props: { value: "Error while processing xmlui markup." } },
-        { type: "VStack", props: { gap: "2rem" }, children: errList },
-      ],
-    };
-    return comp;
-  }
-  const comp = makeComponent() as any;
-  comp.name = compoundCompName;
-  comp.component = makeComponent();
-  return comp;
-}
-
-
-function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithLineColInfo[] {
+function addPositions(
+  errors: Error[],
+  newlinePositions: number[],
+): ErrorWithLineColInfo[] {
   if (newlinePositions.length === 0) {
     for (let err of errors) {
       (err as ErrorWithLineColInfo).line = 1;
@@ -118,7 +52,8 @@ function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWi
       const newlinePos = newlinePositions[i];
       if (err.pos < newlinePos) {
         (err as ErrorWithLineColInfo).line = i + 1;
-        (err as ErrorWithLineColInfo).col = err.pos - (newlinePositions[i - 1] ?? 0) + 1;
+        (err as ErrorWithLineColInfo).col =
+          err.pos - (newlinePositions[i - 1] ?? 0) + 1;
         break;
       }
     }
@@ -129,27 +64,4 @@ function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWi
     }
   }
   return errors as ErrorWithLineColInfo[];
-}
-
-function getCompoundCompName(node: Node, getText: GetText) {
-  const rootTag = node?.children?.[0];
-  const rootTagNameTokens = rootTag?.children?.find(
-    (c) => c.kind === SyntaxKind.TagNameNode,
-  )?.children;
-  const rootTagName = rootTagNameTokens?.[rootTagNameTokens.length - 1];
-
-  if (rootTagName === undefined || getText(rootTagName) !== "Component") {
-    return undefined;
-  }
-
-  const attrs = rootTag.children?.find((c) => c.kind === SyntaxKind.AttributeListNode)?.children;
-  const nameAttrTokens = attrs?.find(
-    (c) => c.kind === SyntaxKind.AttributeNode && getText(c?.children[0]) === "name",
-  )?.children;
-  const nameValueToken = nameAttrTokens?.[nameAttrTokens.length - 1];
-  if (nameValueToken !== undefined && nameValueToken.kind === SyntaxKind.StringLiteral) {
-    const strLit = getText(nameValueToken);
-    return strLit.substring(1, strLit.length - 1);
-  }
-  return undefined;
 }
