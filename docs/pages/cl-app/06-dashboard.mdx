@@ -2,11 +2,14 @@ import { Callout } from 'nextra/components'
 
 # Create a Dashboard
 
-Though you created a Dashboard page when starting with this tutorial, that page still displays a placeholder. It is time to create a dashboard with a few numbers and fancy charts.
+Though you created a Dashboard page when starting with this tutorial, that page is still empty.
+It is time to create a dashboard with some information and charts.
 
 ## A Rudimentary Dashboard
 
-The dashboard will display indicative numbers of significant review counts. You will show them in boxes, and when you click any of them, it will navigate to the list of corresponding contact items.
+The dashboard will display indicative numbers of significant review counts.
+These indicators will be housed in interactive cards.
+By clicking on a card, the app will navigate to the list of the corresponding contacts.
 
 Create a new file, `Dashboard.xmlui` within the `components` folder:
 
@@ -19,7 +22,8 @@ Create a new file, `Dashboard.xmlui` within the `components` folder:
 </Component>
 ```
 
-The `Dashboard` component accepts a data source in its `contactsCountsSource` property and utilizes it to extract the significant numbers to display. Use the new component instead of the placeholder text within `Main.xmlui`:
+The `Dashboard` component accepts a data source in its `contactsCountsSource` property and uses it to discern what numbers to display.
+Use the new component instead of the placeholder text within `Main.xmlui`:
 
 ```ueml copy {5} filename="Main.xmlui"
 <App layout="vertical-full-header">
@@ -32,16 +36,19 @@ The `Dashboard` component accepts a data source in its `contactsCountsSource` pr
 </App>
 ```
 
-Earlier, you already created a `DataSource` with the `taskcounts` ID, which retrieves several counters in an object. Here, you can reuse this data source. 
+Earlier, you already created a `DataSource` with the `contactCounts` ID, which retrieves several counters in an object.
+Here, you can also reuse this data source.
 
-When you navigate to the Dashboard page, it displays a few numeric information:
+When you navigate to the Dashboard page, it displays a some numeric information:
 
 <br/>
 <Image alt="Rudimentary dashboard" src="/resources/images/get-started/rudimentary-dashboard.png" />
 
 ## Cards with Numbers
 
-This view needs to look more exciting and helpful. Create a card that highlights the significant counters! Start with the `InfoCard` component, adding the `InfoCard.xmlui` file to the `components` folder:
+This user interface needs to look more exciting and helpful.
+Your next task will be to create a card that highlights useful numerical information.
+Start with the `InfoCard` component by adding the `InfoCard.xmlui` file to the `components` folder with the following code:
 
 ```ueml copy filename="InfoCard.xmlui"
 <Component name="InfoCard">
@@ -55,7 +62,7 @@ This view needs to look more exciting and helpful. Create a card that highlights
   </Card>
 </Component>
 ```
-`InforCard` allows you to set its title text, color, and number to display. 
+`InforCard` allows you to set its title text, color, and a number to display. 
 
 Change the dashboard to use the `InfoCard` component:
 
@@ -91,16 +98,18 @@ Change the dashboard to use the `InfoCard` component:
 </Component>
 ```
 
-Each `InfoCard` displays its associated value. Their wrapping `Flowlayout` ensures each of them will use 25% of the available width:
+Each `InfoCard` displays its associated value.
+The `FlowLayout` component and setting a width of 25% ensures items placed inside will use 25% of the available width of available space:
 
 <br/>
 <Image alt="Dashboard numbers" src="/resources/images/get-started/dashboard-numbers.png" />
 
 ## Adding Navigation
 
-The dashboard is just a summary of essential counters. To look behind them, you want to navigate to the list of corresponding contacts.
+The dashboard is just a summary of essential numbers.
+To let the user investiage what is behind the number, you need to let them navigate to the list of corresponding contacts.
 
-Prepare the `InfoCard` component to receive a `link` property and navigate to that link when its surface is clicked:
+Prepare the `InfoCard` component to receive a `link` property and navigate to that link when it is clicked:
 
 ```ueml copy {3} filename="InfoCard.xmlui"
 <Component name="InfoCard">
@@ -116,9 +125,10 @@ Prepare the `InfoCard` component to receive a `link` property and navigate to th
 </Component>
 ```
 
-The `Actions.navigate` method visits the specified link. Remember, the `<NavPanel>` section of `Main.xmlui` contains the links in the menu; all of them start with `/contacts.`
+The `Actions.navigate` method visits the specified link.
+Remember, the `<NavPanel>` section of `Main.xmlui` contains the links in the menu; all of them start with `/contacts.`
 
-Set the `link` property's value for each `InfoCard` in the dashboard:
+Set the `link` property's value for each `InfoCard` on the dashboard:
 
 ```ueml copy {10, 17, 23, 30} filename="Dashboard.xmlui"
 <Component 
@@ -156,11 +166,12 @@ Set the `link` property's value for each `InfoCard` in the dashboard:
 </Component>
 ```
 
-When you click a dashboard item, the UI logic will take you to the corresponding task list.
+When you click a dashboard item, the UI logic will take you to the corresponding contact list.
 
 ## Recent Contacts
 
-It would be great to see the recently added contacts on the dashboard. In this section, you will add a table displaying the last five contacts added in descending order.
+It would be great to see the recently added contacts on the dashboard.
+In this section, you will add a table displaying the last five contacts added in descending order.
 
 Update the `Dashboard.xmlui` file by appending a new `Card` component after the last `InfoCard`:
 
@@ -186,12 +197,14 @@ Update the `Dashboard.xmlui` file by appending a new `Card` component after the 
 </Component>
 ```
 
-This code renders a `Card` (the same layout container type used within `InfoCard`) and a `Table` bound to the `GET /api/contacts-recent` endpoint. The `Table` has two column definition items (`Column`) to name the columns to display in the table:
+This code renders a `Card` (the same layout container type used within `InfoCard`) and a `Table` bound to the `GET /api/contacts-recent` endpoint.
+The `Table` has two column definition items (`Column`) to name the columns to display in the table:
 
 <br/>
 <Image alt="Initial table" src="/resources/images/get-started/initial-table.png" />
 
-Category IDs do not give you a hint about a particular category. It would be great if the first column displayed the category's name with a color badge as in the contact list.
+Category IDs do not give you a hint about a particular category.
+It would be great if the first column displayed the category's name with a color badge as in the contact list.
 
 Create a new component, `CategoryBadge.xmlui` (within the `components` folder):
 
@@ -202,7 +215,7 @@ Create a new component, `CategoryBadge.xmlui` (within the `components` folder):
 </Component>
 ```
 
-Add a code-behind file, `CategoryBadge.xmlui.xs`, to the new component using the similar technique you learned in the [Adding a Badge](./02-use-list/#adding-a-badge) section:
+Add a code-behind file, `CategoryBadge.xmlui.xs`, to the new component using the similar technique you learned in the [Adding a Badge](./02-use-list/#categorizing-data) section:
 
 ```js copy filename="CategoryBadge.xmlui.xs"
 var category = categories.value.find(t => t.id === $props.categoryId);
@@ -221,8 +234,8 @@ Change the `Text` element within the first `Columnn` to the new `CategoryBadge` 
   var.isLoading="{$props.contactCountsSource.inProgress}">
       <!-- Omitted -->
       <Card width="50%" height="350px">
-        <H4>Recent Tasks</H4>
-        <Table datasource="/api/tasks-recent" height="*">
+        <H4>Recent Contacts</H4>
+        <Table datasource="/api/contacts-recent" height="*">
           <Column header="Category" width="200">
             <CategoryBadge categoryId="{$item.categoryId}" />
           </Column>
@@ -239,21 +252,23 @@ Change the `Text` element within the first `Columnn` to the new `CategoryBadge` 
 <br/>
 <Image alt="Table with badge" src="/resources/images/get-started/table-with-badge.png" />
 
-The new `CategoryBadge` component can replace the previous markup to display the category in `ContactRow.xmlui`.  Change `Badge` to `CategoryBadge`:
+The new `CategoryBadge` component can replace the previous markup to display the category in `ContactRow.xmlui`.
+Change `Badge` to `CategoryBadge`:
 
 ```ueml copy filename="ContactRow.xmlui"
 <CategoryBadge categoryId="{$props.item.categoryId}" />
 ```
 
-You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer utilizes it. You can remove the highlighted lines from `Contacts.xmlui`:
+You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer uses it.
+You can remove the highlighted lines from `Contacts.xmlui`:
 
 ```ueml copy {2, 13} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
-  <DataSource id="tasks" url="/api/tasks/{$props.filter}" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
     <!-- Omitted -->
       <List 
-        items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+        items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
         defaultSections="{$props.filter === 'all'
           ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
         sectionBy="section">
@@ -271,5 +286,12 @@ You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no lo
 ```
 
 <Callout type="info" emoji="📔">
-  The task list will work correctly even if you do not delete those lines. Nonetheless, they execute an unnecessary query.
+  The contact list will work correctly even if you do not delete those lines. Nonetheless, they execute an unnecessary query.
 </Callout>
+
+## Conclusion
+
+This concludes the step-by-step tutorial.
+
+See the [How to](../howto.mdx) section for shorter, concise code snippets showcasing common UI building patterns.
+To see the basic use case of different components found in XMLUI, see the [Basic Components](../create-apps/basic-components.mdx) article.
