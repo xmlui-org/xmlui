@@ -5,21 +5,7 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { PlaygroundState } from "@/src/state/store";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
-import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
-
-export function parseFromEditorText(value: string = "") {
-  try {
-    const {component, errors} =  xmlUiMarkupToComponent(value);
-    if (errors.length > 0) {
-      return {}
-    }
-    return component
-  } catch (e) {
-    console.log(e);
-    return {};
-  }
-}
 
 export function serialize(component: ComponentDef | CompoundComponentDef): string {
   if (component) {

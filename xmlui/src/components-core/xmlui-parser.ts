@@ -88,6 +88,7 @@ export function errReportComponent(
     });
     const comp: ComponentDef = {
       type: "VStack",
+      props: { backgroundColor: "#ff4747"},
       children: [
         { type: "H1", props: { value: "Error while processing xmlui markup." } },
         { type: "VStack", props: { gap: "2rem" }, children: errList },
