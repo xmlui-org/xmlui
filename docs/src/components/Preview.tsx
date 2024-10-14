@@ -3,10 +3,10 @@ import RootComponent from "@components-core/RootComponent";
 import React, { useRef, useEffect } from "react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import ReactDOM, { Root } from "react-dom/client";
-import { CompoundComponentDef } from "xmlui";
+import { parseFromEditorText } from "../utils/helpers";
+import { CompoundComponentDef, ComponentLike } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
-import { errReportComponent, xmlUiMarkupToComponent } from "@src/components-core/xmlui-parser";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -17,32 +17,14 @@ export function Preview() {
     if (!contentRootRef.current && rootRef.current) {
       contentRootRef.current = ReactDOM.createRoot(rootRef.current);
     }
-    let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-      appDescription.app,
-    );
-    if (errors.length > 0) {
-      component = errReportComponent(
-        errors,
-        "somewhere in preview",
-        erroneousCompoundComponentName,
-      );
-    }
-    const compoundComponents: CompoundComponentDef[] = appDescription.components.map(
-      (src: string) => {
-        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src);
-        if (errors.length > 0) {
-          return errReportComponent(errors, "somewhere in preview", erroneousCompoundComponentName);
-        }
-        return component;
-      },
-    );
+    const parsedNode = parseFromEditorText(appDescription.app) as ComponentLike;
     contentRootRef.current?.render(
-      <ErrorBoundary node={component}>
+      <ErrorBoundary node={parsedNode}>
         <RootComponent
           key={`app-${options.id}`}
           previewMode={true}
           standalone={true}
-          node={component}
+          node={parsedNode}
           globalProps={{
             name: appDescription.config?.name,
             ...(appDescription.config?.globals || {}),
@@ -50,7 +32,9 @@ export function Preview() {
           defaultTheme={options.activeTheme || appDescription.config?.defaultTheme}
           defaultTone={(options.activeTone || appDescription.config?.defaultTone) as ThemeTone}
           contributes={{
-            compoundComponents,
+            compoundComponents: appDescription.components.map((component: string) =>
+              parseFromEditorText(component),
+            ) as CompoundComponentDef[],
             themes: appDescription.config?.themes,
           }}
           resources={appDescription.config?.resources}

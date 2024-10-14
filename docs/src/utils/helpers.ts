@@ -5,7 +5,17 @@ import { ThemeDefinition } from "@components-core/theming/abstractions";
 import { PlaygroundState } from "@/src/state/store";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
+import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
 import { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
+
+export function parseFromEditorText(value: string = "") {
+  try {
+    return parseXmlUiMarkup(value);
+  } catch (e) {
+    console.log(e);
+    return {};
+  }
+}
 
 export function serialize(component: ComponentDef | CompoundComponentDef): string {
   if (component) {
