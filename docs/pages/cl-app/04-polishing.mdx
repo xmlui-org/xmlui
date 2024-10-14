@@ -2,11 +2,14 @@ import { Callout } from 'nextra/components'
 
 # A Few Finishing Touches
 
-There are a few things to improve the user experience in our app. In this section, you will make minor changes to enhance the app's look and feel.
+There are a few things left to improve the user experience in our app.
+In this section, you will make minor changes to enhance the app's look and feel.
 
-## Loading Label Counts
+## Fetching the Number of Records
 
-When the app starts, it takes a fraction of a second to reach the backend and retrieve the contact record counts to display. You may see an "(undefined)" label for contact counts during this time. We can quickly fix it to show a "loading..." message while the contact data is retrieved from the database.
+When the app starts, it takes a fraction of a second to reach the backend and retrieve the number of contact records to display.
+You may still see an "(undefined)" label while the data loads.
+We can quickly fix this by showing a "loading..." message while the contact data is retrieved from the database.
 
 Add a new function, `countLabel` to `Main.xmlui.xs`:
 
@@ -16,7 +19,8 @@ function countLabel(cat) {
 }
 ```
 
-This function takes a name (the name of the contact section) as its argument and retrieves the corresponding contact category count. The `contactCounts.inProgress` property's "true" value indicates if the `DataSource` (with the `contactCounts` id) retrieving the contact counts is currently fetching data.
+This function takes a name (the name of the contact section) as its argument and retrieves the corresponding number of contact categories. 
+The "true" value of the `contactCounts.inProgress` property indicates whether the `DataSource` (with the `contactCounts` id) retrieving the contact counts is currently fetching data.
 
 Update the task count expression in the menu item labels to leverage the new, improved display:
 
@@ -33,18 +37,22 @@ Update the task count expression in the menu item labels to leverage the new, im
 <!-- Omitted -->
 ```
 
-Instead of "undefined", contact count labels display "loading...":
+Now, instead of "undefined", labels display "loading...":
 
 <br/>
-<Image alt="Completed tasks" src="/resources/images/get-started/loading-message.png" />
+<Image alt="Loading message" src="/resources/images/get-started/loading-message.png" />
 
 ## Displaying List Sections
 
-The `List` component supports sections that group list items according to a particular section value. It has a `sectionBy` property that you can set to one of the field names in the items to display. The `List` gets all distinct values of the `sectionBy` field and groups the items accordingly.
+The `List` component supports the grouping of list items according to a specified attribute.
+It has a `sectionBy` property that enables this grouping.
+The `List` identifies each unique value of the attribute given to `sectionBy` and groups the items accordingly.
 
-We have already created the `getSections` function within `Main.xmlui.xs`, perfect as a sectioning expression. However, now it is in the `Main.xmlui.xs` file, though we need it in the `Contacts` component.
+We have already created the `getSections` function within `Main.xmlui.xs`, which comes in handy for grouping.
+It is currently in the `Main.xmlui.xs` file, but we need it in the `Contacts` component.
 
-Create a code-behind file for `Contacts` within the `components` folder (`Contacts.xmlui.xs`). Move the `getSections` function from `Main.xmlui.xs`:
+Create a code-behind file for `Contacts` within the `components` folder called `Contacts.xmlui.xs`.
+Move the `getSections` function from `Main.xmlui.xs` to this file:
 
 ```javascript copy filename="Contacts.xmlui.xs"
 function getSection(contact) {
@@ -55,7 +63,7 @@ function getSection(contact) {
 }
 ```
 
-Update the code of `Contacts` to add a `section` field to the contact items:
+Update the code in `Contacts` to add a `section` field to the contact items:
 
 ```ueml copy {4} filename="Contacts.xmlui" /section: getSection(t)/
 <Component name="Contacts">
@@ -71,7 +79,7 @@ Update the code of `Contacts` to add a `section` field to the contact items:
   Here, the `items` property of `List` receives a list of items, each extended with the section information.
 </Callout>
 
-To display section information, add the `section` property to the `List` and define the template to display section headers:
+To display the section information, add the `section` property to the `List` and define the template to display section headers:
 
 ```ueml copy {6, 8-14} filename="Contacts.xmlui"
 <Component name="Contacts">
@@ -84,7 +92,7 @@ To display section information, add the `section` property to the `List` and def
     <property name="sectionTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
-          variant="subtitle" 
+          variant="subtitle"
           value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
       </HStack>
     </property>
@@ -94,7 +102,7 @@ To display section information, add the `section` property to the `List` and def
 
 In the section template, you can utilize the `$item` property to access the section key and the items within that section.
 
-To complete this job, append the following function to `Contacts.xmlui.xs`:
+To finish up, add the following function to `Contacts.xmlui.xs`:
 
 ```javascript copy filename="Contacts.xmlui.xs"
 function loading(contacts, count) {
@@ -102,14 +110,16 @@ function loading(contacts, count) {
 }
 ```
 
-Now, When you display all tasks, you can see that items are sectioned:
+Now, When you display all contacts, you can see that items are sectioned:
 
 <br/>
 <Image alt="Sectioned items" src="/resources/images/get-started/sectioned-items.png" />
 
 ## Expanding and Collapsing Sections
 
-The sections of a list can be expanded or collapsed. Unless you declare otherwise, all sections are expanded by default. Besides `$items`, each section receives a `$context` value, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
+The sections of a list can be expanded or collapsed.
+Unless you declare otherwise, all sections are expanded by default.
+Besides `$items`, each section receives a `$context` value, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
 
 Update the `List` definition in `Contacts`:
 
@@ -129,7 +139,7 @@ Update the `List` definition in `Contacts`:
         onClick="() => $context.toggle()">
           <Text 
             variant="subtitle" 
-            value="{$item.sectionKey} ({loading(tasks, $item.sectionItems.length ?? 0)})" />
+            value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
         <SpaceFiller />
         <Icon 
           name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
@@ -147,7 +157,10 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 
 ## Section Ordering
 
-The order of sections displayed above could be more helpful with a different order. With the help of the `defaultSections` property of `List`, you can define the order of sections. Modify the `List` accordingly:
+The order of sections displayed above could be more helpful using a different ordering.
+With the help of the `defaultSections` property of the `List`, you can define the ordering.
+
+Modify the `List` accordingly:
 
 ```ueml copy {4} filename="Contacts.xmlui"
 <!-- Omitted -->
@@ -167,7 +180,8 @@ You can see the updated section order:
 
 ## Omitting Empty Sections
 
-By specifying the default sections, the filtered lists also display them. So when you visit a filtered list, such as Today's Reviews, it displays the empty sections:
+By specifying the default sections, the filtered lists also display them.
+So when you visit a filtered list, such as "Today's Reviews", it displays empty sections:
 
 <br/>
 <Image alt="empty sections" src="/resources/images/get-started/empty-sections.png" />
@@ -177,7 +191,7 @@ Modify the code to omit them whenever we display a filtered list:
 ```ueml copy {4-5} filename="Tasks.xmlui"
 <!-- Omitted -->
 <List 
-  items="{tasks.value.map(t => ({...t, section: getSection(t)}))}"
+  items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
   defaultSections="{!$props.filter
     ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
   sectionBy="section">
