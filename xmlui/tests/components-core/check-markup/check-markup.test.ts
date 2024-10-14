@@ -3,7 +3,7 @@ import type { ComponentDef, CompoundComponentDef } from "@abstractions/Component
 import { checkXmlUiMarkup } from "@components-core/markup-check";
 import { createTestMetadataHandler } from "../test-metadata-handler";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
-import { parseXmlUiMarkup } from "@components-core/xmlui-parser";
+import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import { metadataHash } from "./metadata-hash";
 import { viewportSizeNames } from "@components/abstractions";
 
@@ -440,5 +440,5 @@ describe("Markup checks", () => {
 });
 
 function transformSource(source: string): ComponentDef | CompoundComponentDef | null {
-  return parseXmlUiMarkup(source);
+  return xmlUiMarkupToComponent(source).component;
 }
