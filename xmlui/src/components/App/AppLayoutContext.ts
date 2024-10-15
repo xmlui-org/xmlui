@@ -10,7 +10,7 @@ const appLayoutNames = [
   "horizontal",
   "horizontal-sticky",
 ] as const;
-export const appLayoutMd: PropertyValueDescription[] = [
+export const appLayoutMd: readonly PropertyValueDescription[] = [
   {
     value: "vertical",
     description:
@@ -59,8 +59,11 @@ export interface IAppLayoutContext {
   toggleDrawer: () => void;
   hasRegisteredNavPanel: boolean;
   hasRegisteredHeader: boolean;
-  navPanelDef?: ComponentDef
-  logoContentDef?: ComponentDef
+  navPanelDef?: ComponentDef;
+  logoContentDef?: ComponentDef;
+  logo?: string;
+  logoDark?: string;
+  logoLight?: string;
 }
 
 export const AppLayoutContext = createContext<IAppLayoutContext | null>(null);

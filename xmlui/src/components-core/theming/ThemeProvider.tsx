@@ -31,7 +31,6 @@ import {
 } from "@components-core/theming/extendThemeUtils";
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import {
-  XmlUiBlueThemeDefinition,
   XmlUiCyanThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiGreenThemeDefinition,
@@ -240,7 +239,6 @@ export function useCompiledTheme(
 
 const builtInThemes: Array<ThemeDefinition> = [
   XmlUiThemeDefinition,
-  XmlUiBlueThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiGrayThemeDefinition,
   XmlUiOrangeThemeDefinition,
@@ -284,7 +282,6 @@ function ThemeProvider({
         ...customThemeUids,
         "solid",
         "xmlui",
-        "xmlui-blue",
         "xmlui-green",
         "xmlui-gray",
         "xmlui-orange",
@@ -421,12 +418,12 @@ function resolveThemeVarsWithCssVars(theme?: Record<string, string>) {
 
   function replaceThemeVar(input: string) {
     const regex = /\$([a-zA-Z0-9_-]+)/gi;
-    let matches = input.matchAll(regex);
+    const matches = input.matchAll(regex);
 
     //we go from 1, because result[1] is the whole stuff
     if (matches) {
       let ret = input;
-      for (let match of matches) {
+      for (const match of matches) {
         const varName = match[1];
         if (varName) {
           ret = ret.replace(match[0], `var(${getVarKey(varName)})`);

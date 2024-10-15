@@ -35,6 +35,9 @@ type Props = {
   logoContentDef?: ComponentDef;
   renderChild?: RenderChildFn;
   name?: string;
+  logo?: string;
+  logoDark?: string;
+  logoLight?: string;
 };
 
 export function App({
@@ -49,6 +52,9 @@ export function App({
   footer,
   navPanelDef,
   logoContentDef,
+  logo,
+  logoDark,
+  logoLight,
   renderChild,
   name,
 }: Props) {
@@ -141,6 +147,9 @@ export function App({
       navPanelVisible,
       drawerVisible,
       layout: safeLayout,
+      logo: logo,
+      logoDark: logoDark,
+      logoLight: logoLight,
       showDrawer: () => {
         setDrawerVisible(true);
       },
@@ -151,16 +160,7 @@ export function App({
       navPanelDef,
       logoContentDef,
     };
-  }, [
-    hasRegisteredNavPanel,
-    hasRegisteredHeader,
-    navPanelVisible,
-    drawerVisible,
-    safeLayout,
-    toggleDrawer,
-    navPanelDef,
-    logoContentDef,
-  ]);
+  }, [hasRegisteredNavPanel, hasRegisteredHeader, navPanelVisible, drawerVisible, safeLayout, logo, logoDark, logoLight, toggleDrawer, navPanelDef, logoContentDef]);
 
   useEffect(() => {
     if (navPanelVisible) {

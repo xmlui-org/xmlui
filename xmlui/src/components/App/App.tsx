@@ -24,6 +24,9 @@ export const AppMd = createMetadata({
     ),
     loggedInUser: d(`Stores information about the currently logged in user.`),
     logoTemplate: dComponent("Optional template of the app logo"),
+    logo: d("Optional logo path"),
+    "logo-dark": d("Optional logo path in dark tone"),
+    "logo-light": d("Optional logo path in light tone"),
     name: d("Optional application name (visible in the browser tab)"),
     scrollWholePage: d(
       `This boolean property specifies whether the whole page should scroll (\`true\`) or just ` +
@@ -87,6 +90,9 @@ export const appRenderer = createComponentRenderer(
         logoContentDef={node.props.logoTemplate}
         renderChild={renderChild}
         name={extractValue(node.props.name)}
+        logo={extractValue(node.props.logo)}
+        logoDark={extractValue(node.props["logo-dark"])}
+        logoLight={extractValue(node.props["logo-light"])}
       >
         {renderChild(restChildren)}
       </App>

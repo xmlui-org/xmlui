@@ -40,36 +40,17 @@ function tryLoadImage(url: string, onLoaded: () => void, onError: () => void) {
 }
 
 export function useLogoUrl() {
-  const [autoLogoUrl, setAutoLogoUrl] = useState<string>(undefined);
-  const [logoUrlByTone, setLogoUrlByTone] = useState<Record<string, string>>({});
+  const {logo, logoLight, logoDark} = useAppLayoutContext() || {};
+  const logoUrlByTone = {
+    light: logoLight,
+    dark: logoDark,
+  };
   const { activeThemeTone } = useTheme();
 
-  const baseLogoUrl = useResourceUrl("resource:logo");
-  const toneLogoUrl = useResourceUrl(`resource:logo-${activeThemeTone}`);
+  const baseLogoUrl = useResourceUrl("resource:logo") || logo;
+  const toneLogoUrl = useResourceUrl(`resource:logo-${activeThemeTone}`) || logoUrlByTone[activeThemeTone];
 
-  const givenUrl = toneLogoUrl || baseLogoUrl;
-
-  useEffect(() => {
-    if (!givenUrl) {
-      if(autoLogoUrl === undefined){
-        const defaultUrl = "/resources/logo.svg";
-        tryLoadImage(defaultUrl, ()=>{
-          setAutoLogoUrl(defaultUrl);
-        }, ()=>{
-          setAutoLogoUrl(null);
-        });
-      }
-      if(logoUrlByTone[activeThemeTone] === undefined){
-        const defaultUrl = `/resources/logo-${activeThemeTone}.svg`;
-        tryLoadImage(defaultUrl, ()=>{
-          setLogoUrlByTone((prev)=>({...prev, [activeThemeTone]: defaultUrl}));
-        }, ()=>{
-          setLogoUrlByTone((prev)=>({...prev, [activeThemeTone]: null}));
-        });
-      }
-    }
-  }, [activeThemeTone, autoLogoUrl, givenUrl, logoUrlByTone]);
-  return givenUrl || logoUrlByTone[activeThemeTone] || autoLogoUrl;
+  return toneLogoUrl || baseLogoUrl;
 }
 
 export const AppHeader = ({

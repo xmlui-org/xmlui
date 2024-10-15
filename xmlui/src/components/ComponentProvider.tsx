@@ -134,6 +134,7 @@ import {carouselComponentRenderer} from "@components/Carousel/Carousel";
 import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
 import {createPropHolderComponentNew} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
+import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -336,6 +337,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(selectComponentRenderer);
       this.registerComponentRenderer(dropdownMenuComponentRenderer);
       this.registerComponentRenderer(themeChangerButtonComponentRenderer);
+      this.registerComponentRenderer(toneChangerButtonComponentRenderer);
       this.registerCompoundComponentRenderer(formSectionRenderer);
       this.registerComponentRenderer(dropdownMenuComponentRenderer);
       this.registerComponentRenderer(menuItemRenderer);
