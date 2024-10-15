@@ -17,7 +17,7 @@ export type ThemeTestDesc = {
 
 function parseComponent(entryPoint: ComponentDefNew<any> | string) {
   if (typeof entryPoint === "string") {
-    return xmlUiMarkupToComponent(entryPoint);
+    return xmlUiMarkupToComponent(entryPoint).component;
   }
   return entryPoint;
 }
