@@ -1,6 +1,5 @@
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import {
-  blueThemeColors,
   cyanThemeColors,
   grayThemeColors,
   greenThemeColors,
@@ -34,12 +33,6 @@ export const XmlUiThemeDefinition: ThemeDefinition = {
       }
     }
   }
-};
-
-export const XmlUiBlueThemeDefinition: ThemeDefinition = {
-  id: "xmlui-blue",
-  extends: "xmlui",
-  themeVars: { ...blueThemeColors },
 };
 
 export const XmlUiGreenThemeDefinition: ThemeDefinition = {

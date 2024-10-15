@@ -51,7 +51,7 @@ export const ModalDialogMd = createMetadata({
     [`color-text-${COMP}`]: "$color-text-primary",
     [`radius-${COMP}`]: "$radius",
     [`font-family-${COMP}`]: "$font-family",
-    [`max-width-${COMP}`]: "768px",
+    [`max-width-${COMP}`]: "450px",
     [`margin-bottom-title-${COMP}`]: "0",
     dark: {
       [`color-bg-${COMP}`]: "$color-bg-primary",

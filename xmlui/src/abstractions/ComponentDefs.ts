@@ -206,7 +206,7 @@ export type ComponentPropertyMetadata = {
   readonly valueType?: PropertyValueType;
 
   // What are the available values of this property?
-  readonly availableValues?: PropertyValueDescription[];
+  readonly availableValues?: readonly PropertyValueDescription[];
 
   // The default property value (if there is any)
   defaultValue?: any;
@@ -314,7 +314,7 @@ export function createMetadata<
 
 export function d(
   description: string,
-  availableValues?: PropertyValueDescription[],
+  availableValues?: readonly PropertyValueDescription[],
   valueType?: PropertyValueType,
   defaultValue?: any,
   isValid?: IsValidFunction<any>,

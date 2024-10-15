@@ -76,8 +76,9 @@ function StandaloneApp({
     sources,
   } = standaloneApp;
 
-  // @ts-ignore
-  const mockedApi = apiInterceptor || (typeof window !== "undefined" ? window.XMLUI_MOCK_API : undefined);
+  const mockedApi =
+      // @ts-ignore
+    apiInterceptor || (typeof window !== "undefined" ? window.XMLUI_MOCK_API : undefined);
 
   return (
     <ApiInterceptorProvider interceptor={mockedApi}>
@@ -154,7 +155,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
   let config: StandaloneAppDescription | undefined;
   let entryPoint: ComponentDef | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
-  let themes: Array<ThemeDefinition> = [];
+  const themes: Array<ThemeDefinition> = [];
   let apiInterceptor;
 
   const sources: Record<string, string> = {};
@@ -247,6 +248,14 @@ function mergeGivenAppDefWithRuntime(
     themes: standaloneAppDef.themes || resolvedRuntime.themes,
     apiInterceptor: standaloneAppDef.apiInterceptor || resolvedRuntime.apiInterceptor,
   };
+}
+
+async function fetchWithoutCache(url: string) {
+  return fetch(normalizePath(url), {
+    headers: {
+      "Cache-Control": "no-cache, no-store",
+    },
+  });
 }
 
 function getStandalone(
@@ -374,12 +383,12 @@ function useStandalone(
       }
 
       if (process.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
-        const configResponse = await fetch(normalizePath("config.json")!);
+        const configResponse = await fetchWithoutCache("config.json");
         const config: StandaloneJsonConfig = await configResponse.json();
 
         const themePromises: Promise<ThemeDefinition>[] = [];
         config.themes?.forEach((theme) => {
-          themePromises.push(fetch(normalizePath(theme)!).then((value) => value.json()));
+          themePromises.push(fetchWithoutCache(theme).then((value) => value.json()));
         });
         const themes = await Promise.all(themePromises);
         setStandaloneApp({
@@ -397,41 +406,41 @@ function useStandalone(
       // temp solution, needs refactor!!!
 
       //default mode: process.env.VITE_BUILD_MODE === "ALL"
-      const entryPointPromise = fetch(normalizePath("Main.xmlui")!).then((value) =>
-          parseComponentResp(value),
+      const entryPointPromise = fetchWithoutCache("Main.xmlui").then((value) =>
+        parseComponentResp(value),
       );
-      const entryPointCodeBehindPromise = new Promise(async (resolve, reject)=>{
-        try{
-          const resp = await fetch(normalizePath("Main.xmlui.xs")!);
+      const entryPointCodeBehindPromise = new Promise(async (resolve, reject) => {
+        try {
+          const resp = await fetchWithoutCache("Main.xmlui.xs");
           const codeBehind = await parseComponentResp(resp);
           resolve(codeBehind.codeBehind);
-        } catch (e){
+        } catch (e) {
           resolve(null);
         }
       }) as Promise<CollectedDeclarations>;
 
       let config: StandaloneJsonConfig = undefined;
-      try{
-        const configResponse = await fetch(normalizePath("config.json")!);
+      try {
+        const configResponse = await fetchWithoutCache("config.json");
         config = await configResponse.json();
-      } catch(e){
-      }
+      } catch (e) {}
       const themePromises = config?.themes?.map((themePath) => {
-        return fetch(normalizePath(themePath)!).then((value) =>
+        return fetchWithoutCache(themePath).then((value) =>
           value.json(),
         ) as Promise<ThemeDefinition>;
       });
 
       const componentPromises = config?.components?.map((componentPath) => {
-        return fetch(normalizePath(componentPath)!).then((value) => parseComponentResp(value));
+        return fetchWithoutCache(componentPath).then((value) => parseComponentResp(value));
       });
 
-      const [loadedEntryPoint, loadedEntryPointCodeBehind, loadedComponents, themes] = await Promise.all([
-        entryPointPromise,
-        entryPointCodeBehindPromise,
-        Promise.all(componentPromises || []),
-        Promise.all(themePromises || []),
-      ]);
+      const [loadedEntryPoint, loadedEntryPointCodeBehind, loadedComponents, themes] =
+        await Promise.all([
+          entryPointPromise,
+          entryPointCodeBehindPromise,
+          Promise.all(componentPromises || []),
+          Promise.all(themePromises || []),
+        ]);
 
       const sources: Record<string, string> = {};
       const codeBehinds: any = {};
@@ -484,17 +493,22 @@ function useStandalone(
       while (componentsToLoad.size > 0) {
         const componentPromises = [...componentsToLoad].map(async (componentPath) => {
           try {
-            const componentPromise = fetch(normalizePath("/components/" + componentPath + ".xmlui")!);
-              const componentCodeBehindPromise = new Promise(async (resolve, reject)=>{
-                try{
-                  const codeBehindWrapper = await parseComponentResp(await fetch(normalizePath("/components/" + componentPath + ".xmlui.xs")!));
-                  const componentCodeBehind = codeBehindWrapper.codeBehind;
-                  resolve(componentCodeBehind);
-                } catch{
-                  resolve(null)
-                }
-              }) as Promise<CollectedDeclarations>;
-            const [value, componentCodeBehind] = await Promise.all([componentPromise, componentCodeBehindPromise]);
+            const componentPromise = fetchWithoutCache("/components/" + componentPath + ".xmlui");
+            const componentCodeBehindPromise = new Promise(async (resolve, reject) => {
+              try {
+                const codeBehindWrapper = await parseComponentResp(
+                  await fetchWithoutCache("/components/" + componentPath + ".xmlui.xs"),
+                );
+                const componentCodeBehind = codeBehindWrapper.codeBehind;
+                resolve(componentCodeBehind);
+              } catch {
+                resolve(null);
+              }
+            }) as Promise<CollectedDeclarations>;
+            const [value, componentCodeBehind] = await Promise.all([
+              componentPromise,
+              componentCodeBehindPromise,
+            ]);
             const compWrapper = await parseComponentResp(value);
             sources[compWrapper.file] = compWrapper.src;
             return {
@@ -515,11 +529,11 @@ function useStandalone(
           }
         });
         const componentWrappers = await Promise.all(componentPromises);
-        componentsWithCodeBehinds.push(...componentWrappers.filter(comp => !!comp));
+        componentsWithCodeBehinds.push(...componentWrappers.filter((comp) => !!comp));
         componentsToLoad = collectMissingComponents(
           entryPointWithCodeBehind,
           componentsWithCodeBehinds,
-          componentsFailedToLoad
+          componentsFailedToLoad,
         );
       }
 
@@ -554,7 +568,12 @@ function collectMissingComponents(entryPoint, components, componentsFailedToLoad
       return componentRegistry.hasComponent(componentName);
     },
   });
-  return new Set(result.filter((r) => r.code === "M001").map((r) => r.args[0]).filter((comp) => !componentsFailedToLoad.has(comp)));
+  return new Set(
+    result
+      .filter((r) => r.code === "M001")
+      .map((r) => r.args[0])
+      .filter((comp) => !componentsFailedToLoad.has(comp)),
+  );
 }
 
 // --- This React hook logs the app's version number to the browser's console at startup
