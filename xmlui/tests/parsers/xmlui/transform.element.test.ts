@@ -107,16 +107,6 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.children![3].type).equal("Icon");
   });
 
-  // --- Namespaces
-  it("namespaces fails with compound component", () => {
-    try {
-      transformSource("<Component myns:name='MyComp'><Stack/></Component>");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("identifier expected")).equal(true);
-    }
-  });
-
   // --- Vars
   it("vars fails with compound component", () => {
     try {
@@ -249,6 +239,12 @@ describe("Xmlui transform - child elements", () => {
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
     expect((cd.props! as any).other).equal("234");
+  });
+
+  it("implicit props namespace is ignored (yet)", () => { 
+    const cd = transformSource("<Stack ns1.ns:myProp='123'/>") as ComponentDef;
+    expect(cd.type).equal("Stack");
+    expect((cd.props).myProp).equal("123");
   });
 
   it("prop with name/value attr works #1", () => {

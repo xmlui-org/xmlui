@@ -87,7 +87,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   const parents: (IncompleteNode | Node)[] = [];
   let peekedToken: Node | undefined;
   let node: Node | IncompleteNode = { children: [] };
-  let errFromScanner: { message: DiagnosticMessageFromScanner; prefixLength: number } | undefined = undefined;
+  let errFromScanner: { message: DiagnosticMessageFromScanner; prefixLength: number } | undefined =
+    undefined;
 
   const onScannerErr: ScannerErrorCallback = function (message, length) {
     errFromScanner = {
@@ -171,7 +172,8 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       if (eat(SyntaxKind.CloseNodeStart)) {
         if (at(SyntaxKind.Identifier)) {
           const closeTagName = parseTagName();
-          const namesMismatch = openTagName !== undefined && !tagNameNodesMatch(openTagName, closeTagName, getText);
+          const namesMismatch =
+            openTagName !== undefined && !tagNameNodesMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
             error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
           }
@@ -204,16 +206,18 @@ export function parseXmlUiMarkup(text: string): ParseResult {
 
   function parseAttrList() {
     startNode();
-    const attrNames: any[] = [];
+    const attrNames: { ns?: string; name: string }[] = [];
     while (!atAnyOf([SyntaxKind.EndOfFileToken, SyntaxKind.NodeEnd, SyntaxKind.NodeClose])) {
-      if (at(SyntaxKind.Identifier)) {
-        parseAttr(attrNames);
-      } else {
-        const atTagLike = errRecover(Diag_Attr_Identifier_Expected, firstSetTagLike);
-        if (atTagLike) {
-          parseTagLike();
-        }
-      }
+      parseAttr(attrNames);
+      // todo: was this usefuel?
+      // if (at(SyntaxKind.Identifier)) {
+      //   parseAttr(attrNames);
+      // } else {
+      //   const atTagLike = errRecover(Diag_Attr_Identifier_Expected, firstSetTagLike);
+      //   if (atTagLike) {
+      //     parseTagLike();
+      //   }
+      // }
     }
 
     if (node.children!.length === 0) {
@@ -223,40 +227,67 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
-  function parseAttr(attrNames: string[]) {
-    //todo: make this recovery set actualy true (like implement handling cdata ,...)
-    const attrListFollow = [
-      // FOLLOW(AttrList) when a Tag is correct
-      SyntaxKind.NodeClose,
-      SyntaxKind.NodeEnd,
-      // FOLLOW(AttrList) when a Tag contains incorrect, but still parsed tokens for resilience
-      SyntaxKind.CData,
-      // todo
-      // SyntaxKind.ScriptLiteral,
-      SyntaxKind.OpenNodeStart,
-    ];
-    const attrFollow = attrListFollow.concat(SyntaxKind.Identifier);
-
-    const attrIdent = peek();
-    const attrName = getText(attrIdent);
-    if (attrNames.includes(attrName)) {
-      errorAt(MakeErr.duplAttr(attrName), attrIdent.pos, attrIdent.end);
-    } else if (attrName[0] >= "A" && attrName[0] <= "Z") {
-      errorAt(MakeErr.uppercaseAttr(attrName), attrIdent.pos, attrIdent.end);
-    } else {
-      attrNames.push(attrName);
-    }
-
+  function parseAttr(attrNames: { ns?: string; name: string }[]) {
     startNode();
-    bump(SyntaxKind.Identifier);
+    if (at(SyntaxKind.Identifier)) {
+      parseAttrName(attrNames);
+    } else {
+      const attrNameFollow = [SyntaxKind.Equal];
+      const eqFollows = errRecover(Diag_Attr_Identifier_Expected, attrNameFollow);
+      if (!eqFollows) {
+        return;
+      }
+    }
 
     if (eat(SyntaxKind.Equal)) {
       if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
-        errRecover(Diag_Attr_Value_Expected, attrFollow);
+        const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
+        errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent);
       }
     }
 
     completeNode(SyntaxKind.AttributeNode);
+  }
+
+  function parseAttrName(attrNames: { ns?: string; name: string }[]) {
+    const nameIdent = peek();
+    let nsIdent = undefined;
+
+    startNode();
+    bump(SyntaxKind.Identifier);
+    if (eat(SyntaxKind.Colon)) {
+      if (at(SyntaxKind.Identifier)) {
+        nsIdent = bump(SyntaxKind.Identifier);
+      } else {
+        errRecover(Diag_Attr_Identifier_Expected, [
+          SyntaxKind.NodeClose,
+          SyntaxKind.NodeEnd,
+          SyntaxKind.Equal,
+        ]);
+      }
+    }
+    checkAttrName(attrNames, { nsIdent, nameIdent });
+    completeNode(SyntaxKind.AttributeKeyNode);
+  }
+
+  /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
+  function checkAttrName(attrNames, { nameIdent, nsIdent }: { nameIdent: Node; nsIdent: Node }) {
+    const attrName = getText(nameIdent);
+    const attrNs = nsIdent === undefined ? undefined : getText(nsIdent);
+    const attrKeyMatches = ({ ns, name }) => name === attrName && ns === attrNs;
+    const isDuplicate = attrNames.findIndex(attrKeyMatches) !== -1;
+    const nameStartsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
+    const faultyName = isDuplicate || nameStartsWithUppercase;
+
+    if (isDuplicate) {
+      errorAt(MakeErr.duplAttr(attrName), nameIdent.pos, nameIdent.end);
+    }
+    if (nameStartsWithUppercase) {
+      errorAt(MakeErr.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
+    }
+    if (!faultyName) {
+      attrNames.push({ name: attrName });
+    }
   }
 
   function at(kindToCheck: SyntaxKind): boolean {
@@ -276,11 +307,15 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   }
 
   /**
-   * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode
-   * @returns true if the current token is in the recovery set, otherwise false
+   * report an error and skip the next token if it isn't in the recoveryTokens. EoF isn't skipped.
+   * @param recoveryTokens the [FollowSet](https://www.geeksforgeeks.org/follow-set-in-syntax-analysis/) of the parsed InnerNode. These tokens (or the EoF token) won't be skipped
+   * @returns true if the current token is in the recovery set or EoF
    * */
 
-  function errRecover(errCodeAndMsg: GeneralDiagnosticMessage, recoveryTokens: SyntaxKind[]): boolean {
+  function errRecover(
+    errCodeAndMsg: GeneralDiagnosticMessage,
+    recoveryTokens: SyntaxKind[],
+  ): boolean {
     if (atAnyOf(recoveryTokens) || at(SyntaxKind.EndOfFileToken)) {
       error(errCodeAndMsg);
       return true;
@@ -304,7 +339,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     });
   }
 
-  function errorAt({ code, message, category }: GeneralDiagnosticMessage, pos: number, end: number) {
+  function errorAt(
+    { code, message, category }: GeneralDiagnosticMessage,
+    pos: number,
+    end: number,
+  ) {
     errors.push({
       category,
       code,
@@ -413,8 +452,11 @@ export function parseXmlUiMarkup(text: string): ParseResult {
   function bump(kind: SyntaxKind) {
     const token = bumpAny();
     if (token.kind !== kind) {
-      throw new Error(`expected ${getSyntaxKindStrRepr(kind)}, bumped a ${getSyntaxKindStrRepr(token.kind)}`);
+      throw new Error(
+        `expected ${getSyntaxKindStrRepr(kind)}, bumped a ${getSyntaxKindStrRepr(token.kind)}`,
+      );
     }
+    return token;
   }
 
   function bumpAny(): Node {
@@ -516,6 +558,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
     }
   }
 
+  /** Bumps over the next token and marks it as an error node while adding an error to the error list*/
   function errorAndBump(errCodeAndMsg: GeneralDiagnosticMessage) {
     errRecover(errCodeAndMsg, []);
   }
