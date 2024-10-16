@@ -239,40 +239,50 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
 
-    bump(SyntaxKind.Equal);
-    if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
-      const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
-      errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent)
+    if (eat(SyntaxKind.Equal)) {
+      if (!eat(SyntaxKind.StringLiteral) && !eat(SyntaxKind.Identifier)) {
+        const attrFollowWithoutIdent = [SyntaxKind.NodeEnd, SyntaxKind.NodeClose];
+        errRecover(Diag_Attr_Value_Expected, attrFollowWithoutIdent);
+      }
     }
 
     completeNode(SyntaxKind.AttributeNode);
   }
 
   function parseAttrName(attrNames: { ns?: string; name: string }[]) {
+    const nameIdent = peek();
+    let nsIdent = undefined;
+
     startNode();
     bump(SyntaxKind.Identifier);
-    if(eat(SyntaxKind.Colon)){
-      if(eat(SyntaxKind.Identifier)){
-
+    if (eat(SyntaxKind.Colon)) {
+      if (at(SyntaxKind.Identifier)) {
+        nsIdent = bump(SyntaxKind.Identifier);
+      } else {
+        errRecover(Diag_Attr_Identifier_Expected, [
+          SyntaxKind.NodeClose,
+          SyntaxKind.NodeEnd,
+          SyntaxKind.Equal,
+        ]);
       }
     }
-    if (at(SyntaxKind.Equal)) {
-      checkAttrName(attrNames, { nameIdent: peek() });
-      completeNode(SyntaxKind.AttributeNameNode);
-    } else {
-    }
+    checkAttrName(attrNames, { nsIdent, nameIdent });
+    completeNode(SyntaxKind.AttributeNameNode);
   }
 
   /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
-  function checkAttrName(attrNames, { nameIdent }) {
+  function checkAttrName(attrNames, { nameIdent, nsIdent }: { nameIdent: Node; nsIdent: Node }) {
     const attrName = getText(nameIdent);
-    const isDuplicate = attrNames.findIndex((attr) => attr.name === attrName) !== -1;
-    const startsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
-    const faultyName = isDuplicate || startsWithUppercase;
+    const attrNs = nsIdent === undefined ? undefined : getText(nsIdent);
+    const attrKeyMatches = ({ ns, name }) => name === attrName && ns === attrNs;
+    const isDuplicate = attrNames.findIndex(attrKeyMatches) !== -1;
+    const nameStartsWithUppercase = "A" <= attrName[0] && attrName[0] <= "Z";
+    const faultyName = isDuplicate || nameStartsWithUppercase;
+
     if (isDuplicate) {
       errorAt(MakeErr.duplAttr(attrName), nameIdent.pos, nameIdent.end);
     }
-    if (startsWithUppercase) {
+    if (nameStartsWithUppercase) {
       errorAt(MakeErr.uppercaseAttr(attrName), nameIdent.pos, nameIdent.end);
     }
     if (!faultyName) {
@@ -446,6 +456,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         `expected ${getSyntaxKindStrRepr(kind)}, bumped a ${getSyntaxKindStrRepr(token.kind)}`,
       );
     }
+    return token;
   }
 
   function bumpAny(): Node {

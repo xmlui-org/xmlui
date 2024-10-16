@@ -153,7 +153,8 @@ describe("Xmlui parser", () => {
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
     const attr0Value = attr0.children[2];
 
     expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
@@ -175,7 +176,8 @@ describe("Xmlui parser", () => {
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
     const attr0Value = attr0.children[2];
 
     expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
@@ -197,7 +199,8 @@ describe("Xmlui parser", () => {
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
     const attr0Value = attr0.children[2];
 
     expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
@@ -213,13 +216,15 @@ describe("Xmlui parser", () => {
   });
 
   it("Attribute key-only", () => {
-    const { node, getText, errors } = parseSource("<Stack attr/>");
+    const { node, getText, errors } = parseSource("<Stack attr/>", true);
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
+
     const close = rootElem.children[3];
 
     expect(errors.length).toEqual(0);
@@ -230,6 +235,7 @@ describe("Xmlui parser", () => {
     expect(getText(nameId)).equal("Stack");
 
     expect(attr0.kind).toEqual(SyntaxKind.AttributeNode);
+    expect(attr0Key.kind).toEqual(SyntaxKind.AttributeNameNode);
     expect(attr0Name.kind).toEqual(SyntaxKind.Identifier);
     expect(getText(attr0Name)).equal("attr");
 
@@ -243,7 +249,8 @@ describe("Xmlui parser", () => {
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
     const attr0Value = attr0.children[2];
     const close = rootElem.children[3];
 
@@ -271,7 +278,8 @@ describe("Xmlui parser", () => {
     const nameId = nameNode.children[0];
     const attrList = rootElem.children[2];
     const attr0 = attrList.children[0];
-    const attr0Name = attr0.children[0];
+    const attr0Key = attr0.children[0];
+    const attr0Name = attr0Key.children[0];
     const attr0Value = attr0.children[2];
 
     expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
@@ -614,19 +622,31 @@ describe("namescpaces", () =>{
     expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
   });
 
-  it("has ns on attribute", () =>{
+  it("has namespace on attribute", () =>{
     const { node, getText, errors } = parseSource(`
       <Stack ns1:item1="value1"/>
-    `);
-    expect(errors).toHaveLength(0)
+    `, true);
     const rootElem = node.children![0];
-    const attrList = rootElem.children![3]
+    const attrList = rootElem.children![2]
     const attr1 = attrList.children![0]
-    // what here? should I extend an attr to be ident colon ident eq string|ident 
-    // or be an attrNameNode eq string|ident ?
-    // second approach is the correct, first is faster
-    // try the second one (should modify the syntax kind from ident to this name node) and see where it breaks
+    const attr1Key = attr1.children![0]
+    const attr1Ns = attr1Key.children![0]
+    const attr1Colon = attr1Key.children![1]
+    const attr1Name = attr1Key.children![2]
+    const attrEq = attr1.children![1]
+    const attrValue = attr1.children![2]
 
+    expect(errors).toHaveLength(0)
+    expect(attr1Key.kind).toEqual(SyntaxKind.AttributeNameNode)
+    expect(attr1Ns.kind).toEqual(SyntaxKind.Identifier)
+    expect(attr1Colon.kind).toEqual(SyntaxKind.Colon)
+    expect(attr1Name.kind).toEqual(SyntaxKind.Identifier)
+
+    expect(attrEq.kind).toEqual(SyntaxKind.Equal)
+    expect(attrValue.kind).toEqual(SyntaxKind.StringLiteral)
+
+    expect(getText(attr1Ns)).toEqual("ns1")
+    expect(getText(attr1Name)).toEqual("item1")
   })
 })
 const selfCloseTag = '<A b="c"/> ';
