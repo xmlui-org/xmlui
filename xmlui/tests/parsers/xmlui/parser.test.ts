@@ -216,7 +216,7 @@ describe("Xmlui parser", () => {
   });
 
   it("Attribute key-only", () => {
-    const { node, getText, errors } = parseSource("<Stack attr/>", true);
+    const { node, getText, errors } = parseSource("<Stack attr/>");
     const rootElem = node.children![0];
     const nameNode = rootElem.children[1];
     const nameId = nameNode.children[0];
@@ -235,7 +235,7 @@ describe("Xmlui parser", () => {
     expect(getText(nameId)).equal("Stack");
 
     expect(attr0.kind).toEqual(SyntaxKind.AttributeNode);
-    expect(attr0Key.kind).toEqual(SyntaxKind.AttributeNameNode);
+    expect(attr0Key.kind).toEqual(SyntaxKind.AttributeKeyNode);
     expect(attr0Name.kind).toEqual(SyntaxKind.Identifier);
     expect(getText(attr0Name)).equal("attr");
 
@@ -625,7 +625,7 @@ describe("namescpaces", () =>{
   it("has namespace on attribute", () =>{
     const { node, getText, errors } = parseSource(`
       <Stack ns1:item1="value1"/>
-    `, true);
+    `);
     const rootElem = node.children![0];
     const attrList = rootElem.children![2]
     const attr1 = attrList.children![0]
@@ -637,7 +637,7 @@ describe("namescpaces", () =>{
     const attrValue = attr1.children![2]
 
     expect(errors).toHaveLength(0)
-    expect(attr1Key.kind).toEqual(SyntaxKind.AttributeNameNode)
+    expect(attr1Key.kind).toEqual(SyntaxKind.AttributeKeyNode)
     expect(attr1Ns.kind).toEqual(SyntaxKind.Identifier)
     expect(attr1Colon.kind).toEqual(SyntaxKind.Colon)
     expect(attr1Name.kind).toEqual(SyntaxKind.Identifier)

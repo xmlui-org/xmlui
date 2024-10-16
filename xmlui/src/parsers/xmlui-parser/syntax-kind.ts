@@ -33,7 +33,7 @@ export const enum SyntaxKind {
   // Syntax node types
   ElementNode,
   AttributeNode,
-  AttributeNameNode,
+  AttributeKeyNode,
   ContentListNode,
   AttributeListNode,
   TagNameNode,
@@ -105,8 +105,8 @@ export function getSyntaxKindStrRepr(kind: SyntaxKind): string {
       return "TagNameNode";
     case SyntaxKind.ErrorNode:
       return "ErrorNode";
-    case SyntaxKind.AttributeNameNode:
-      return "AttributeNameNode";
+    case SyntaxKind.AttributeKeyNode:
+      return "AttributeKeyNode";
   }
   return assertUnreachable(kind);
 }

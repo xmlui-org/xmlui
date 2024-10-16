@@ -680,14 +680,19 @@ export function nodeToComponentDef(
   }
 
   function segmentAttr(attr: Node) {
-    let key = getText(attr.children![0]);
-    const segments = key.split(".");
+    let key = attr.children![0];
+    const hasNamespace = key.children!.length === 3;
+    let namespace: undefined | string;
+    if (hasNamespace) {
+      namespace = getText(key.children![0]);
+    }
+    let name = getText(key.children![key.children!.length - 1]);
+    const segments = name.split(".");
     if (segments.length > 2) {
       reportError("T007", attr, key);
     }
 
     let startSegment: string | undefined;
-    let name = key;
 
     if (segments.length === 2) {
       startSegment = segments[0];
@@ -715,8 +720,7 @@ export function nodeToComponentDef(
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getTagName(node);
     const hasComponentName = UCRegex.test(tagName);
-    const shouldUseTextNodeElement =
-      hasComponentName || tagName === "property";
+    const shouldUseTextNodeElement = hasComponentName || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && !refersToApi(tagName);
     const attrs = getAttributes(node);
 
@@ -992,7 +996,10 @@ function createTextNodeCDataElement(textValue: string): Node {
           {
             kind: SyntaxKind.AttributeNode,
             children: [
-              { kind: SyntaxKind.Identifier, text: "value" },
+              {
+                kind: SyntaxKind.AttributeKeyNode,
+                children: [{ kind: SyntaxKind.Identifier, text: "value" }],
+              },
               { kind: SyntaxKind.Equal },
               { kind: SyntaxKind.Identifier, text: `"${textValue}"` },
             ],
@@ -1019,7 +1026,10 @@ function createTextNodeElement(textValue: string): Node {
           {
             kind: SyntaxKind.AttributeNode,
             children: [
-              { kind: SyntaxKind.Identifier, text: "value" },
+              {
+                kind: SyntaxKind.AttributeKeyNode,
+                children: [{ kind: SyntaxKind.Identifier, text: "value" }],
+              },
               { kind: SyntaxKind.Equal },
               { kind: SyntaxKind.Identifier, text: `"${textValue}"` },
             ],

@@ -267,7 +267,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
       }
     }
     checkAttrName(attrNames, { nsIdent, nameIdent });
-    completeNode(SyntaxKind.AttributeNameNode);
+    completeNode(SyntaxKind.AttributeKeyNode);
   }
 
   /** emits errors when the attribute name is incorrect. Otherwise adds the attribute name to the list of valid names*/
