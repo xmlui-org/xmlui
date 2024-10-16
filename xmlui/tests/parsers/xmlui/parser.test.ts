@@ -146,87 +146,6 @@ describe("Xmlui parser", () => {
     expect(getText(nameIdClosing)).equal("Stack");
   });
 
-  it("Single node with namespace works #1", () => {
-    const { node, getText } = parseSource("<ns:Stack />");
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameNs = nameNode.children[0];
-    const colon = nameNode.children[1];
-    const nameId = nameNode.children[2];
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
-    expect(colon.kind).toEqual(SyntaxKind.Colon);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameNs)).equal("ns");
-    expect(getText(nameId)).equal("Stack");
-  });
-
-  it("Single node with namespace works #3", () => {
-    const { node, getText } = parseSource(`
-      <!-- Comment -->
-      <ns:Stack />
-      <!-- Other comment -->
-    `);
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameNs = nameNode.children[0];
-    const colon = nameNode.children[1];
-    const nameId = nameNode.children[2];
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
-    expect(colon.kind).toEqual(SyntaxKind.Colon);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameNs)).equal("ns");
-    expect(getText(nameId)).equal("Stack");
-  });
-
-  it("Single node with namespace works #4", () => {
-    const { node, getText } = parseSource(`
-      <ns:Stack></ns:Stack>
-    `);
-    const rootElem = node.children![0];
-    const nameNode = rootElem.children[1];
-    const nameNs = nameNode.children[0];
-    const colon = nameNode.children[1];
-    const nameId = nameNode.children[2];
-
-    const nameNodeClosing = rootElem.children[4];
-    const nameNsClosing = nameNodeClosing.children[0];
-    const colonClosing = nameNodeClosing.children[1];
-    const nameIdClosing = nameNodeClosing.children[2];
-
-    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
-    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
-    expect(colon.kind).toEqual(SyntaxKind.Colon);
-    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameNs)).equal("ns");
-    expect(getText(nameId)).equal("Stack");
-
-    expect(nameNodeClosing.kind).toEqual(SyntaxKind.TagNameNode);
-    expect(nameNsClosing.kind).toEqual(SyntaxKind.Identifier);
-    expect(colonClosing.kind).toEqual(SyntaxKind.Colon);
-    expect(nameIdClosing.kind).toEqual(SyntaxKind.Identifier);
-    expect(getText(nameNsClosing)).equal("ns");
-    expect(getText(nameIdClosing)).equal("Stack");
-  });
-
-  it("Single node with namespace fails #1", () => {
-    const { errors } = parseSource("<ns:Stack></Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
-  });
-  it("Single node with namespace fails #2", () => {
-    const { errors } = parseSource("<Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
-  });
-
-  it("Single node with namespace fails #3", () => {
-    const { errors } = parseSource("<other:Stack></ns:Stack>");
-    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
-  });
-
   it("Attribute works #1", () => {
     const { node, getText } = parseSource("<Stack attr='val' />");
     const rootElem = node.children![0];
@@ -613,6 +532,103 @@ describe("Xmlui parser - child nodes", () => {
   });
 });
 
+describe("namescpaces", () =>{
+  it("Single node with namespace works #1", () => {
+    const { node, getText } = parseSource("<ns:Stack />");
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameNs = nameNode.children[0];
+    const colon = nameNode.children[1];
+    const nameId = nameNode.children[2];
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
+    expect(colon.kind).toEqual(SyntaxKind.Colon);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameNs)).equal("ns");
+    expect(getText(nameId)).equal("Stack");
+  });
+
+  it("Single node with namespace works #3", () => {
+    const { node, getText } = parseSource(`
+      <!-- Comment -->
+      <ns:Stack />
+      <!-- Other comment -->
+    `);
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameNs = nameNode.children[0];
+    const colon = nameNode.children[1];
+    const nameId = nameNode.children[2];
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
+    expect(colon.kind).toEqual(SyntaxKind.Colon);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameNs)).equal("ns");
+    expect(getText(nameId)).equal("Stack");
+  });
+
+  it("Single node with namespace works #4", () => {
+    const { node, getText } = parseSource(`
+      <ns:Stack></ns:Stack>
+    `);
+    const rootElem = node.children![0];
+    const nameNode = rootElem.children[1];
+    const nameNs = nameNode.children[0];
+    const colon = nameNode.children[1];
+    const nameId = nameNode.children[2];
+
+    const nameNodeClosing = rootElem.children[4];
+    const nameNsClosing = nameNodeClosing.children[0];
+    const colonClosing = nameNodeClosing.children[1];
+    const nameIdClosing = nameNodeClosing.children[2];
+
+    expect(rootElem.kind).toEqual(SyntaxKind.ElementNode);
+    expect(nameNode.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameNs.kind).toEqual(SyntaxKind.Identifier);
+    expect(colon.kind).toEqual(SyntaxKind.Colon);
+    expect(nameId.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameNs)).equal("ns");
+    expect(getText(nameId)).equal("Stack");
+
+    expect(nameNodeClosing.kind).toEqual(SyntaxKind.TagNameNode);
+    expect(nameNsClosing.kind).toEqual(SyntaxKind.Identifier);
+    expect(colonClosing.kind).toEqual(SyntaxKind.Colon);
+    expect(nameIdClosing.kind).toEqual(SyntaxKind.Identifier);
+    expect(getText(nameNsClosing)).equal("ns");
+    expect(getText(nameIdClosing)).equal("Stack");
+  });
+
+  it("Single node with namespace fails #1", () => {
+    const { errors } = parseSource("<ns:Stack></Stack>");
+    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+  });
+  it("Single node with namespace fails #2", () => {
+    const { errors } = parseSource("<Stack></ns:Stack>");
+    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+  });
+
+  it("Single node with namespace fails #3", () => {
+    const { errors } = parseSource("<other:Stack></ns:Stack>");
+    expect(errors[0].code).toBe(ErrCodes.tagNameMismatch);
+  });
+
+  it("has ns on attribute", () =>{
+    const { node, getText, errors } = parseSource(`
+      <Stack ns1:item1="value1"/>
+    `);
+    expect(errors).toHaveLength(0)
+    const rootElem = node.children![0];
+    const attrList = rootElem.children![3]
+    const attr1 = attrList.children![0]
+    // what here? should I extend an attr to be ident colon ident eq string|ident 
+    // or be an attrNameNode eq string|ident ?
+    // second approach is the correct, first is faster
+    // try the second one (should modify the syntax kind from ident to this name node) and see where it breaks
+
+  })
+})
 const selfCloseTag = '<A b="c"/> ';
 describe("find token at pos", () => {
   it("before first token", () => {
