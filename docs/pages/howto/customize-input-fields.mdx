@@ -1,0 +1,73 @@
+import { COMPONENT_COMBOBOX, COMPONENT_TEXTBOX } from "../../meta/pages";
+
+# Customizing Input Fields
+
+Components with an input field, like <SmartLink href={COMPONENT_TEXTBOX}>TextBox</SmartLink> and <SmartLink href={COMPONENT_COMBOBOX}>Combobox</SmartLink>
+can be customized with icons and adornment texts.
+
+Combobox example:
+
+```ueml copy
+<App>
+  <Combobox
+    initialValue="js"
+    placeholder="Select a user"
+    startIcon="user"
+    endIcon="globe"
+    endText="Globally"
+    readOnly="false">
+    <Option label="Jane Arrington" value="ja" />
+    <Option label="John Sniper" value="js" />
+    <Option label="Emily Gold" value="eg" />
+  </Combobox>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Combobox Input Field Customization"
+  height={260}
+  app={`
+    <App>
+      <Combobox
+        initialValue="js"
+        placeholder="Select a user"
+        startIcon="user"
+        endIcon="globe"
+        endText="Globally"
+        readOnly="false">
+        <Option label="Jane Arrington" value="ja" />
+        <Option label="John Sniper" value="js" />
+        <Option label="Emily Gold" value="eg" />
+      </Combobox>
+    </App>
+  `}
+/>
+
+NumberBox example:
+
+```ueml copy
+<App>
+  <NumberBox 
+    placeholder="Enter amount"
+    startText="Global Stocks"
+    startIcon="globe"
+    endText="HUF"
+    readOnly="false" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: NumberBox Adornments"
+  app={`
+    <App>
+      <NumberBox 
+        placeholder="Enter amount"
+        startText="Global Stocks"
+        startIcon="globe"
+        endText="HUF"
+        readOnly="false" />
+    </App>
+  `}
+/>

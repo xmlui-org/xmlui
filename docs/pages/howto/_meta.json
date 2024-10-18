@@ -1,4 +1,5 @@
 {
   "layout": "Layout",
-  "events": "Events"
+  "events": "Events",
+  "complex-radiogroup-layout": "Complex RadioGroup Layouts"
 }

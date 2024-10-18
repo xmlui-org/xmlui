@@ -1,0 +1,51 @@
+# Complex RadioGroup Layouts
+
+`RadioGroupOptions` always store their value in the nearest `RadioGroup` parent and can be placed in elaborate layouts.
+
+```ueml copy
+<App>
+  <RadioGroup initialValue="first">
+    Group #1
+    <Card gap="$space-2">
+      <RadioGroupOption label="First Item" value="first"/>
+      <Stack backgroundColor="$color-bg-overlay">
+        <RadioGroupOption label="Second Item" value="second"/>
+      </Stack>
+      <RadioGroupOption label="Third Item" value="third"/>
+      <RadioGroup initialValue="second">
+        Group #2
+        <Card gap="$space-2">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+        </Card>
+      </RadioGroup>
+    </Card>
+  </RadioGroup>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: RadioGroup Layout"
+  app={`
+    <App>
+      <RadioGroup initialValue="first">
+        Group #1
+        <Card gap="$space-2">
+          <RadioGroupOption label="First Item" value="first"/>
+          <Stack backgroundColor="$color-bg-overlay">
+            <RadioGroupOption label="Second Item" value="second"/>
+          </Stack>
+          <RadioGroupOption label="Third Item" value="third"/>
+          <RadioGroup initialValue="second">
+            Group #2
+            <Card gap="$space-2">
+              <RadioGroupOption label="First Item" value="first"/>
+              <RadioGroupOption label="Second Item" value="second"/>
+            </Card>
+          </RadioGroup>
+        </Card>
+      </RadioGroup>
+    </App>
+  `}
+/>
