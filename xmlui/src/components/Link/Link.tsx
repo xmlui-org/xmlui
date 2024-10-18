@@ -4,6 +4,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { LocalLink } from "./LinkNative";
 import { dEnabled, dLabel } from "@components/metadata-helpers";
+import { LinkTargetMd } from "@components/abstractions";
 
 const COMP = "Link";
 
@@ -15,12 +16,17 @@ export const LinkMd = createMetadata({
     to: d(`This property defines the URL of the link.`),
     enabled: dEnabled(),
     active: d(
-      `This Boolean property indicates if the particular navigation is an active link ` +
-        `(\`false\`, by default). An active link has a particular visual appearance.`,
+      `Indicates whether this link is active or not. If so, it will have a distinct visual appearance.`,
+      null,
+      "boolean",
+      false
     ),
     target: d(
       `This property specifies where to open the link represented by the \`${COMP}\`. This ` +
         `property accepts the following values (in accordance with the HTML standard):`,
+      LinkTargetMd,
+      "string",
+      "_self",
     ),
     label: dLabel(),
     icon: d(`This property allows you to add an icon (specify the icon's name) to the link.`),

@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components'
-import { COMPONENT_BUTTON, COMPONENT_CHECKBOX, COMPONENT_COMBOBOX, COMPONENT_DATEPICKER, COMPONENT_MULTICOMBOBOX, COMPONENT_MULTISELECT, COMPONENT_NUMBERBOX, COMPONENT_RADIOGROUP, COMPONENT_SELECT, COMPONENT_SWITCH, COMPONENT_TEXTAREA } from "../../meta/pages"
+import { COMPONENT_BUTTON, COMPONENT_CHECKBOX, COMPONENT_COMBOBOX, COMPONENT_DATEPICKER, COMPONENT_LINK, COMPONENT_MULTICOMBOBOX, COMPONENT_MULTISELECT, COMPONENT_NUMBERBOX, COMPONENT_RADIOGROUP, COMPONENT_SELECT, COMPONENT_SWITCH, COMPONENT_TEXTAREA, ROUTING } from "../../meta/pages"
 
 # Basic Components
 
@@ -39,23 +39,57 @@ Use the `Button` component to let users trigger various actions on the UI.
 
 ```ueml copy
 <App>
+  <HStack>
+    <Button label="Solid" themeColor="primary" />
+    <Button label="Solid" themeColor="secondary" />
+    <Button label="Solid" themeColor="attention" />
+  </HStack>
+  <HStack>
+    <Button label="Outlined" variant="outlined" themeColor="primary" />
+    <Button label="Outlined" variant="outlined" themeColor="secondary" />
+    <Button label="Outlined" variant="outlined" themeColor="attention" />
+  </HStack>
+  <HStack>
+    <Button label="Ghost" variant="ghost" themeColor="primary" />
+    <Button label="Ghost" variant="ghost" themeColor="secondary" />
+    <Button label="Ghost" variant="ghost" themeColor="attention" />
+  </HStack>
+
   <HStack verticalAlignment="center">
-    <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
-    <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
-    <Button label="Update" size="md" variant="solid" themeColor="primary" />
+    <Button label="Size xs" size="xs" />
+    <Button label="Size sm" size="sm" />
+    <Button label="Size md" size="md" />
+    <Button label="Size lg" size="lg" />
   </HStack>
 </App>
 ```
 
 <Playground
   previewOnly
-  name="Example: Order of Importance"
+  name="Example: Button Variants"
   app={`
     <App>
+      <HStack>
+        <Button label="Solid" themeColor="primary" />
+        <Button label="Solid" themeColor="secondary" />
+        <Button label="Solid" themeColor="attention" />
+      </HStack>
+      <HStack>
+        <Button label="Outlined" variant="outlined" themeColor="primary" />
+        <Button label="Outlined" variant="outlined" themeColor="secondary" />
+        <Button label="Outlined" variant="outlined" themeColor="attention" />
+      </HStack>
+      <HStack>
+        <Button label="Ghost" variant="ghost" themeColor="primary" />
+        <Button label="Ghost" variant="ghost" themeColor="secondary" />
+        <Button label="Ghost" variant="ghost" themeColor="attention" />
+      </HStack>
+
       <HStack verticalAlignment="center">
-        <Button label="Clear Text Field" size="xs" variant="ghost" themeColor="attention" />
-        <Button label="Cancel" size="sm" variant="outlined" themeColor="secondary" />
-        <Button label="Update" size="md" variant="solid" themeColor="primary" />
+        <Button label="Size xs" size="xs" />
+        <Button label="Size sm" size="sm" />
+        <Button label="Size md" size="md" />
+        <Button label="Size lg" size="lg" />
       </HStack>
     </App>
   `}
@@ -142,14 +176,11 @@ This state is visual only, the actual value of the checkbox is still either `tru
 
 ```ueml copy {5}
 <App>
-  <Checkbox id="selectable" label="Selectable" initialValue="true" />
-  <Card>
-    <Checkbox
-      indeterminate="{selectable.value === true}"
-      label="Indeterminate Indicator"
-      initialValue="true"
-      readOnly="true" />
-  </Card>
+  <Checkbox
+    indeterminate="true"
+    label="Indeterminate Indicator"
+    initialValue="true"
+    readOnly="true" />
 </App>
 ```
 
@@ -158,14 +189,11 @@ This state is visual only, the actual value of the checkbox is still either `tru
   name="Example: Indeterminate State"
   app={`
     <App>
-      <Checkbox id="selectable" label="Selectable" initialValue="true" />
-      <Card>
-        <Checkbox
-          indeterminate="{selectable.value === true}"
-          label="Indeterminate Indicator"
-          initialValue="true"
-          readOnly="true" />
-      </Card>
+      <Checkbox
+        indeterminate="true"
+        label="Indeterminate Indicator"
+        initialValue="true"
+        readOnly="true" />
     </App>
   `}
 />
@@ -846,3 +874,57 @@ The TextBox is an input component that allows users to input and edit textual da
 />
 
 For details, see the <SmartLink href={COMPONENT_TEXTAREA}>TextBox component reference</SmartLink>.
+
+## Link
+
+A `Link` component represents a hyperlink used to link from one page to another (can be a subpage of the app or external).
+
+```ueml copy
+<App>
+  <Link to="https://docs.xmlui.com/">XMLUI introduction</Link>
+  <Link to="https://docs.xmlui.com/" enabled="false">Disabled XMLUI introduction</Link>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Link"
+  app={`
+    <App>
+      <Link to="https://docs.xmlui.com/">XMLUI introduction</Link>
+      <Link to="https://docs.xmlui.com/" enabled="false">Disabled XMLUI introduction</Link>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Add an icon and text via relevant properties to leverage built-in styling.
+</Callout>
+
+```ueml copy
+<App>
+  <Link 
+    label="XMLUI introduction"
+    icon="star"
+    to="https://docs.xmlui.com/" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Link Customization"
+  app={`
+    <App>
+      <Link 
+        label="XMLUI introduction"
+        icon="star"
+        to="https://docs.xmlui.com/" />
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  The `Link` component is hooked up the the XMLUI routing system. See <SmartLink href={ROUTING}>this article</SmartLink> for details.
+</Callout>
+
+Also see the <SmartLink href={COMPONENT_LINK}>Link component reference</SmartLink> to know more about the component itself.
