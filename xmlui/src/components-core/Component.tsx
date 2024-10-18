@@ -97,6 +97,7 @@ const Component = forwardRef(function Component(
     parentRenderContext,
     memoedVarsRef,
     onUnmount,
+    uidInfoRef,
     ...rest
   }: ComponentProps,
   ref: React.ForwardedRef<any>,
@@ -190,13 +191,13 @@ const Component = forwardRef(function Component(
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
     (children, lc, pRenderContext) => {
-      return renderChild(children, lc, pRenderContext || parentRenderContext);
+      return renderChild(children, lc, pRenderContext || parentRenderContext, uidInfoRef);
     },
-    [renderChild, parentRenderContext],
+    [renderChild, parentRenderContext, uidInfoRef],
   );
 
   const apiBoundProps = useMemo(
-    () => getApiBoundItems(safeNode.props, "DataSource"),
+    () => getApiBoundItems(safeNode.props, "DataSource", "DataSourceRef"),
     [safeNode.props],
   );
   const apiBoundEvents = useMemo(

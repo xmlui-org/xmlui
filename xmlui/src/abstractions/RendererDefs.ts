@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import type {CSSProperties, ReactNode, RefObject} from "react";
 import type { AppContextObject } from "./AppContextDefs";
 import type {
   ComponentDef,
@@ -161,6 +161,7 @@ export type RenderChildFn<L extends ComponentDef = ComponentDef> = (
     | string,
   layoutContext?: LayoutContext<L>,
   parentRenderContext?: ParentRenderContext,
+  uidInfoRef?: RefObject<Record<string, any>>
 ) => ReactNode | ReactNode[];
 
 /**

@@ -147,7 +147,8 @@ export function ApiBoundComponent({
     });
 
     apiBoundProps.forEach((key) => {
-      const loaderUid = generateloaderUid(key);
+      const isDatasourceRef = node.props![key]?.type === "DataSourceRef";
+      const loaderUid = node.props![key].uid || generateloaderUid(key);
       const { transformResult, ...operation } = node.props![key].props || node.props![key];
       const loaderEvents: Record<string, any> = {};
       Object.entries(node.events || {}).forEach(([eventKey, value]) => {
@@ -157,29 +158,33 @@ export function ApiBoundComponent({
           loaderEvents[eventName] = value;
         }
       });
-      loaders.push({
-        type: "DataLoader",
-        uid: loaderUid,
-        props: {
-          ...operation,
-        },
-        events: loaderEvents,
-      });
-      if (transformResult) {
-        vars[`transform_${loaderUid}`] = transformResult;
-      }
-      api[`fetch_${key}`] = `() => { ${loaderUid}.refetch(); }`;
-      api[`update_${key}`] = `(updaterFn) => { ${loaderUid}.update(updaterFn); }`;
-      api[`addItem_${key}`] = `(element, index) => {  ${loaderUid}.addItem(element, index); }`;
-      api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
-      api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
-
       let propKey = key;
       if (key === "datasource") {
         props![key] = undefined;
         propKey = "data";
       }
-      props[propKey] = `{ !!transform_${loaderUid} ? transform_${loaderUid}(${loaderUid}.value) : ${loaderUid}.value }`;
+      if(!isDatasourceRef){
+        loaders.push({
+          type: "DataLoader",
+          uid: loaderUid,
+          props: {
+            ...operation,
+          },
+          events: loaderEvents,
+        });
+        if (transformResult) {
+          vars[`transform_${loaderUid}`] = transformResult;
+        }
+        api[`fetch_${key}`] = `() => { ${loaderUid}.refetch(); }`;
+        api[`update_${key}`] = `(updaterFn) => { ${loaderUid}.update(updaterFn); }`;
+        api[`addItem_${key}`] = `(element, index) => {  ${loaderUid}.addItem(element, index); }`;
+        api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
+        api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
+        props[propKey] = `{ !!transform_${loaderUid} ? transform_${loaderUid}(${loaderUid}.value) : ${loaderUid}.value }`;
+      } else {
+        props[propKey] = `{ ${loaderUid}.value }`;
+      }
+
       props.loading = `{${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;

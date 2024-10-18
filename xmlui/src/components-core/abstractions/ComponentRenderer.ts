@@ -1,4 +1,4 @@
-import type { Dispatch, MutableRefObject } from "react";
+import type {Dispatch, MutableRefObject, RefObject} from "react";
 import type { ContainerAction } from "@components-core/abstractions/containers";
 import type {
   ComponentApi,
@@ -42,6 +42,8 @@ export interface InnerRendererContext<T extends ComponentMetadata = ComponentMet
   memoedVarsRef: MutableRefObject<MemoedVars>;
 
   parentRenderContext?: ParentRenderContext;
+
+  uidInfoRef?: RefObject<Record<string, any>>
 }
 
 /**
