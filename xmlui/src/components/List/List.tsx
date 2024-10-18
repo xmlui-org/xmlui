@@ -100,6 +100,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     registerComponentApi
   }) => {
       const itemTemplate = node.props.itemTemplate || node.children;
+      console.log("itemTemplate", itemTemplate);
       return (
       <DynamicHeightList
         registerComponentApi={registerComponentApi}

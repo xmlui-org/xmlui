@@ -33,14 +33,14 @@ import themeGallery from "../styles-and-themes/samples/theme-gallery-brief.xmlui
 `url` and `size` define the location and size of the `Avatar` component instance.
 
 <Callout type="info" emoji="💡">
-  When properties cannot be represented with a string, you nest them into their related component with the **`<propertyerty>` tag**. [Learn more!](./learning/xmlui-markup/#properties)
+  When properties cannot be represented with a string, you nest them into their related component with the **`<property>` tag**. [Learn more!](./learning/xmlui-markup/#properties)
 </Callout>
 
 ```ueml {2-4}
 <DropdownMenu>
-  <propertyerty name="triggerTemplate">
+  <property name="triggerTemplate">
     <Button label="My Menu" icon="chevrondown" iconPosition="right"/>
-  </propertyerty>
+  </property>
   <MenuItem>Item 1</MenuItem>
   <MenuItem>Item 2</MenuItem>
   <MenuItem>Item 3</MenuItem>
@@ -109,9 +109,9 @@ The "Use lossless compression" checkbox is visible only when the "Use compressio
 
 ```ueml copy
 <List datasource="https://api.spacexdata.com/v3/history">
-  <propertyerty name="itemTemplate">
+  <property name="itemTemplate">
     <Card title="{$item.title}" subTitle="{$item.details}"/>
-  </propertyerty>  
+  </property>  
 </List>
 ```
 
@@ -271,9 +271,9 @@ The calculate function uses the local variable `i` and stores the sum of values 
 
 ```ueml copy {2-4} /property name="itemTemplate"/
 <List items="{['apple', 'banana', 'cherry', 'orange']}">
-  <propertyerty name="itemTemplate">
+  <property name="itemTemplate">
     <Text variant="mono">{$item}</Text>
-  </propertyerty>
+  </property>
 </List>
 ```
 
