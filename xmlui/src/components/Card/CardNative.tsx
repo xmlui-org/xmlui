@@ -13,7 +13,7 @@ type Props = {
   style?: CSSProperties;
   children?: ReactNode;
   title?: string;
-  subTitle?: string;
+  subtitle?: string;
   linkTo?: string;
   avatarUrl?: string;
   showAvatar?: boolean;
@@ -25,7 +25,7 @@ export const Card = forwardRef(function Card(
     children,
     style,
     title,
-    subTitle,
+    subtitle,
     linkTo,
     avatarUrl,
     showAvatar = !!avatarUrl || false,
@@ -46,7 +46,7 @@ export const Card = forwardRef(function Card(
       style={style}
       onClick={onClick}
     >
-      {[title, subTitle, avatarUrl, showAvatar].some(Boolean) && (
+      {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
         <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "1rem" }}>
           {showAvatar && <Avatar url={avatarUrl} name={title} />}
           <Stack orientation="vertical">
@@ -59,7 +59,7 @@ export const Card = forwardRef(function Card(
             ) : title ? (
               <Heading {...titleProps}>{title}</Heading>
             ) : null}
-              {subTitle !== undefined && <Text variant="small">{subTitle}</Text>}
+              {subtitle !== undefined && <Text variant="small">{subtitle}</Text>}
           </Stack>
         </Stack>
       )}

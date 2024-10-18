@@ -86,7 +86,7 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ```ueml copy /data=/
 <App>
   <List data="https://api.spacexdata.com/v3/history">
-    <Card title="{$item.title}" subTitle="{$item.details}"/>
+    <Card title="{$item.title}" subtitle="{$item.details}"/>
   </List>
 </App>
 ```
@@ -97,7 +97,7 @@ XMLUI applications have a **simple structure** with static files ready to be hos
   app={`
     <App>
       <List datasource="https://api.spacexdata.com/v3/history">
-        <Card title="{$item.title}" subTitle="{$item.details}"/>
+        <Card title="{$item.title}" subtitle="{$item.details}"/>
       </List>
     </App>
   `}

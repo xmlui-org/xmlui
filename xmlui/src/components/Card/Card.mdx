@@ -41,7 +41,7 @@ Prestyled elements always appear above other children.
   <Card
     avatarUrl="https://i.pravatar.cc/100"
     title="Example Title"
-    subTitle="Predefined subtitle"
+    subtitle="Predefined subtitle"
     maxWidth="300px"
   >
     <HStack gap="1rem" verticalAlignment="center">
@@ -60,7 +60,7 @@ Prestyled elements always appear above other children.
       <Card
         avatarUrl="https://i.pravatar.cc/100"
         title="Example Title"
-        subTitle="Predefined subtitle"
+        subtitle="Predefined subtitle"
         maxWidth="300px"
       >
         <HStack gap="1rem" verticalAlignment="center">
@@ -100,22 +100,22 @@ Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is aut
 
 %-PROP-END
 
-%-PROP-START subTitle
+%-PROP-START subtitle
 
 This prop sets the prestyled subtitle.
 
-```ueml copy /subTitle="Example Subtitle"/
+```ueml copy /subtitle="Example Subtitle"/
 <Stack padding="1rem">
-  <Card maxWidth="300px" subTitle="Example Subtitle" />
+  <Card maxWidth="300px" subtitle="Example Subtitle" />
 </Stack>
 ```
 
 <Playground
-  name="Example: subTitle"
+  name="Example: subtitle"
   previewOnly
   app={`
     <Stack padding="1rem">
-      <Card maxWidth="300px" subTitle="Example Subtitle" />
+      <Card maxWidth="300px" subtitle="Example Subtitle" />
     </Stack>
   `}
 />

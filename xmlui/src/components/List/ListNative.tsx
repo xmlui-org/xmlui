@@ -181,25 +181,25 @@ const defaultItemRenderer = (item: any, id: any) => {
     return null;
   }
   let title: string | undefined;
-  let subTitle: string | undefined;
+  let subtitle: string | undefined;
   if (typeof item === "object") {
     const values = Object.values(omit(item, "id"));
     if (!values.length) {
       return null;
     }
     title = values[0] as string;
-    subTitle = undefined;
+    subtitle = undefined;
     if (values.length > 1) {
-      subTitle = values[1] as string;
+      subtitle = values[1] as string;
     }
   } else if (typeof item === "string" || typeof item === "number") {
     title = item + "";
-    subTitle = undefined;
+    subtitle = undefined;
   } else {
     return null;
   }
 
-  return <Card title={title} subTitle={subTitle} />;
+  return <Card title={title} subtitle={subtitle} />;
 };
 
 type DynamicHeightListProps = {

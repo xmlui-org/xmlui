@@ -93,7 +93,7 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
   <Pages>
     <Page url="/spacexlist">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <Card title="{$item.title}" subTitle="{$item.details}" />
+        <Card title="{$item.title}" subtitle="{$item.details}" />
       </List>
     </Page>
     <!-- Other Page items omitted -->
@@ -114,7 +114,7 @@ Components work together declaratively. `App` connects the `to` property of `Nav
 
 ```ueml copy {2} filename="Main.xmlui" /datasource/
 <List datasource="https://api.spacexdata.com/v3/history">
-  <Card title="{$item.title}" subTitle="{$item.details}" />
+  <Card title="{$item.title}" subtitle="{$item.details}" />
 </List>
 ```
 
@@ -128,7 +128,7 @@ The `title` and `subtitle` property values of `Card` are expressions, `{$item.ti
   The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
 </Callout>
 
-The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subTitle` property to display two data entries. The `$item` context value represents the current item of the list to be displayed. So, `$item.title` and `$item.details` represent the current item's `title` and `details` fields in the fetched data list.
+The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subtitle` property to display two data entries. The `$item` context value represents the current item of the list to be displayed. So, `$item.title` and `$item.details` represent the current item's `title` and `details` fields in the fetched data list.
 
 ### Fetching Data from API Endpoints
 
@@ -158,7 +158,7 @@ The specific endpoint of the SpaceX API (given in the `datasource` property of `
 Change the `Card` component to display the SpaceX and Wikipedia links and allow the user to navigate to them:
 
 ```ueml copy {2-3} filename="Main.xmlui"
-<Card title="{$item.title}" subTitle="{$item.details}">
+<Card title="{$item.title}" subtitle="{$item.details}">
   <Link to="{$item.links.article}" target="_blank">SpaceX</Link>
   <Link to="{$item.links.wikipedia}" target="_blank">Wikipedia</Link>
 </Card>

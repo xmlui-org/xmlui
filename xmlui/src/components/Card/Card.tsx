@@ -16,7 +16,7 @@ export const CardMd = createMetadata({
     ),
     showAvatar: d(`Indicates whether the ${COMP} should be displayed`, null, "boolean"),
     title: d(`This prop sets the prestyled title.`),
-    subTitle: d(`This prop sets the prestyled subtitle.`),
+    subtitle: d(`This prop sets the prestyled subtitle.`),
     linkTo: d(
       `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
     ),
@@ -53,7 +53,7 @@ export const cardComponentRenderer = createComponentRenderer(
         style={layoutCss}
         title={extractValue.asOptionalString(node.props.title)}
         linkTo={extractValue.asOptionalString(node.props.linkTo)}
-        subTitle={extractValue.asOptionalString(node.props.subTitle)}
+        subtitle={extractValue.asOptionalString(node.props.subtitle)}
         avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
       >
