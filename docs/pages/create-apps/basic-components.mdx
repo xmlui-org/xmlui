@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components'
-import { COMPONENT_BUTTON } from "../../meta/pages"
+import { COMPONENT_BUTTON, COMPONENT_CHECKBOX, COMPONENT_COMBOBOX, COMPONENT_DATEPICKER, COMPONENT_MULTICOMBOBOX, COMPONENT_RADIOGROUP, COMPONENT_SWITCH } from "../../meta/pages"
 
 # Basic Components
 
@@ -78,7 +78,7 @@ Use the `Button` component to let users trigger various actions on the UI.
 
 <Playground
   previewOnly
-  name="Example: Icons"
+  name="Example: Button Icons"
   app={`
     <App>
       <HStack>
@@ -92,3 +92,579 @@ Use the `Button` component to let users trigger various actions on the UI.
 />
 
 For further details see the <SmartLink href={COMPONENT_BUTTON}>component reference</SmartLink>.
+
+## Checkbox
+
+The `Checkbox` component allows users to make binary choices by toggling an input control on or off.
+
+It works the same way as the [Switch](#switch) component - the only difference is that the `Checkbox` also has an indeterminate state.
+
+```ueml copy 
+<App>
+  <HStack gap="$space-2">
+    Enabled checkboxes:
+    <Checkbox initialValue="true" enabled="true" />
+    <Checkbox initialValue="false" enabled="true" />
+  </HStack>
+  <HStack gap="$space-2">
+    Disabled checkboxes:
+    <Checkbox initialValue="true" enabled="false" />
+    <Checkbox initilaValue="false" enabled="false" />
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Checkboxes"
+  app={`
+    <App>
+      <HStack gap="$space-2">
+        Enabled checkboxes:
+        <Checkbox initialValue="true" enabled="true" />
+        <Checkbox initialValue="false" enabled="true" />
+      </HStack>
+      <HStack gap="$space-2">
+        Disabled checkboxes:
+        <Checkbox initialValue="true" enabled="false" />
+        <Checkbox initilaValue="false" enabled="false" />
+      </HStack>
+    </App>
+  `}
+/>
+
+The `Checkbox` component can indicate the state of a group of other checkboxes.
+This state is visual only, the actual value of the checkbox is still either `true` or `false`.
+
+The demo app below uses an XNOR operator as an example.
+
+<Callout type="info" emoji="💡">
+  Get the data of an input control by assigning an ID to it and using dot notation to access its `value`.
+</Callout>
+
+```ueml copy {3}
+<App>
+  <Checkbox
+    indeterminate="{![item1.value, item2.value, item3.value].every((value) => value === item1.value)}"
+    label="Indeterminate Indicator"
+    initialValue="true"
+    readOnly="true" />
+  <Card>
+    <HStack>
+      <Checkbox id="item1" initialValue="true" />
+      <Checkbox id="item2" initialValue="false" />
+      <Checkbox id="item3" initialValue="true" />
+    </HStack>
+  </Card>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Indeterminate State"
+  app={`
+    <App>
+      <Checkbox indeterminate="{![item1.value, item2.value, item3.value].every((value) => value === item1.value)}" label="Indeterminate Indicator" initialValue="true" readOnly="true" />
+      <Card>
+        <HStack>
+          <Checkbox id="item1" initialValue="true" />
+          <Checkbox id="item2" initialValue="false" />
+          <Checkbox id="item3" initialValue="true" />
+        </HStack>
+      </Card>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_CHECKBOX}>component reference</SmartLink>.
+
+## Switch
+
+The `Switch` component allows users to make binary choices by toggling an input control on or off.
+
+It works the same way as the [Checkbox](#checkbox) component - the only difference is that the `Checkbox` also has an indeterminate state.
+
+```ueml copy 
+<App>
+  <HStack gap="$space-2">
+    Enabled switches:
+    <Switch initialValue="true" enabled="true" />
+    <Switch initialValue="false" enabled="true" />
+  </HStack>
+  <HStack gap="$space-2">
+    Disabled switches:
+    <Switch initialValue="true" enabled="false" />
+    <Switch initilaValue="false" enabled="false" />
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Switches"
+  app={`
+    <App>
+      <HStack gap="$space-2">
+        Enabled switches:
+        <Switch initialValue="true" enabled="true" />
+        <Switch initialValue="false" enabled="true" />
+      </HStack>
+      <HStack gap="$space-2">
+        Disabled switches:
+        <Switch initialValue="true" enabled="false" />
+        <Switch initilaValue="false" enabled="false" />
+      </HStack>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_SWITCH}>component reference</SmartLink>.
+
+## RadioGroup
+
+This component can contain a set of radio group buttons (`RadioGroupOption`) and enable the selection of only one of them at any one time.
+
+```ueml copy
+<App>
+  <RadioGroup initialValue="first">
+    <HStack gap="$space-2">
+      <RadioGroupOption label="First Item" value="first"/>
+      <RadioGroupOption label="Second Item" value="second"/>
+      <RadioGroupOption label="Third Item" value="third"/>
+    </HStack>
+  </RadioGroup>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: RadioGroup"
+  app={`
+    <App>
+      <RadioGroup initialValue="first">
+        <HStack gap="$space-2">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+          <RadioGroupOption label="Third Item" value="third"/>
+        </HStack>
+      </RadioGroup>
+    </App>
+  `}
+/>
+
+Both the grouping component (`RadioGroup`) and its options (`RadioGroupOption`) can be enabled and disabled.
+
+```ueml copy /enabled="false"/
+<App>
+  <HStack gap="$space-2">
+    <RadioGroup initialValue="first">
+      <VStack gap="$space-2">
+        <RadioGroupOption label="First Item" value="first" enabled="false" />
+        <RadioGroupOption label="Second Item" value="second" enabled="false" />
+        <RadioGroupOption label="Third Item" value="third" />
+      </VStack>
+    </RadioGroup>
+    <RadioGroup initialValue="first" enabled="false">
+      <VStack gap="$space-2">
+        <RadioGroupOption label="First Item" value="first"/>
+        <RadioGroupOption label="Second Item" value="second"/>
+        <RadioGroupOption label="Third Item" value="third"/>
+      </VStack>
+    </RadioGroup>
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: RadioGroup"
+  app={`
+    <App>
+      <HStack gap="$space-2">
+        <RadioGroup initialValue="first">
+          <VStack gap="$space-2">
+            <RadioGroupOption label="First Item" value="first" />
+            <RadioGroupOption label="Second Item" value="second" enabled="false" />
+            <RadioGroupOption label="Third Item" value="third" />
+          </VStack>
+        </RadioGroup>
+        <RadioGroup initialValue="first" enabled="false">
+          <VStack gap="$space-2">
+            <RadioGroupOption label="First Item" value="first"/>
+            <RadioGroupOption label="Second Item" value="second"/>
+            <RadioGroupOption label="Third Item" value="third"/>
+          </VStack>
+        </RadioGroup>
+      </HStack>
+    </App>
+  `}
+/>
+
+`RadioGroupOptions` always store their value in the nearest `RadioGroup` parent and can be placed in elaborate layouts.
+
+```ueml copy
+<App>
+  <RadioGroup initialValue="first">
+    Group #1
+    <Card gap="$space-2">
+      <RadioGroupOption label="First Item" value="first"/>
+      <Stack backgroundColor="$color-bg-overlay">
+        <RadioGroupOption label="Second Item" value="second"/>
+      </Stack>
+      <RadioGroupOption label="Third Item" value="third"/>
+      <RadioGroup initialValue="second">
+        Group #2
+        <Card gap="$space-2">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+        </Card>
+      </RadioGroup>
+    </Card>
+  </RadioGroup>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: RadioGroup Layout"
+  app={`
+    <App>
+      <RadioGroup initialValue="first">
+        Group #1
+        <Card gap="$space-2">
+          <RadioGroupOption label="First Item" value="first"/>
+          <Stack backgroundColor="$color-bg-overlay">
+            <RadioGroupOption label="Second Item" value="second"/>
+          </Stack>
+          <RadioGroupOption label="Third Item" value="third"/>
+          <RadioGroup initialValue="second">
+            Group #2
+            <Card gap="$space-2">
+              <RadioGroupOption label="First Item" value="first"/>
+              <RadioGroupOption label="Second Item" value="second"/>
+            </Card>
+          </RadioGroup>
+        </Card>
+      </RadioGroup>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_RADIOGROUP}>component reference</SmartLink>.
+
+## Combobox
+
+This component provides a list of selectable options and the ability to filter these options using its input field so that one can select an item from the list.
+For selecting multiple items from a list, refer to the [Multicombobox component](#multicombobox).
+
+```ueml copy 
+<App>
+  <HStack gap="$space-loose">
+    <Combobox>
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+    </Combobox>
+    <Combobox>
+      <Items items="{['Jane', 'John', 'Emily']}">
+        <Option label="Option {$item}" value="{$item}" />
+      </Items>
+    </Combobox>
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Combobox"
+  height={260}
+  app={`
+    <App>
+      <HStack gap="$space-loose">
+        <Combobox>
+          <Option label="Jane Arrington" value="ja" />
+          <Option label="John Sniper" value="js" />
+          <Option label="Emily Gold" value="eg" />
+        </Combobox>
+        <Combobox>
+          <Items items="{['Jane', 'John', 'Emily']}">
+            <Option label="Option {$item}" value="{$item}" />
+          </Items>
+        </Combobox>
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  The `Combobox` lets you customize its list items and even how an empty list is displayed.
+</Callout>
+
+```ueml copy {5-7}
+<App>
+  <HStack gap="$space-loose">
+    <Combobox placeholder="Default empty list" />
+    <Combobox placeholder="Custom empty list">
+      <property name="emptyListTemplate">
+        <Text variant="strong" value="Sadly, no items found..." />
+      </property>
+    </Combobox>
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Custom Empty Combobox"
+  height={260}
+  app={`
+    <App>
+      <HStack gap="$space-loose">
+        <Combobox placeholder="Default empty list" />
+        <Combobox placeholder="Custom empty list">
+          <property name="emptyListTemplate">
+            <Text variant="strong" value="Sadly, no items found..." />
+          </property>
+        </Combobox>
+      </HStack>
+    </App>
+  `}
+/>
+
+```ueml copy {3-8}
+<App>
+  <Combobox placeholder="Custom list item display">
+    <property name="optionTemplate">
+      <HStack gap="$space-normal">
+        <Icon name="user" />
+        <Text variant="strong" value="{$item.label}" />
+      </HStack>
+    </property>
+    <Option label="Jane Arrington" value="ja" />
+    <Option label="John Sniper" value="js" />
+    <Option label="Emily Gold" value="eg" />
+  </Combobox>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Custom Combobox List Item"
+  height={260}
+  app={`
+    <App>
+      <Combobox placeholder="Custom list item display">
+        <property name="optionTemplate">
+          <HStack gap="$space-normal">
+            <Icon name="user" />
+            <Text variant="strong" value="{$item.label}" />
+          </HStack>
+        </property>
+        <Option label="Jane Arrington" value="ja" />
+        <Option label="John Sniper" value="js" />
+        <Option label="Emily Gold" value="eg" />
+      </Combobox>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  The input field itself can also be customized: specify an initial value, placeholder text, icons and whether the field is read only or not.
+</Callout>
+
+```ueml copy
+<App>
+  <Combobox
+    initialValue="js"
+    placeholder="Select a user"
+    startIcon="user"
+    endIcon="globe"
+    endText="Globally"
+    readOnly="false">
+    <Option label="Jane Arrington" value="ja" />
+    <Option label="John Sniper" value="js" />
+    <Option label="Emily Gold" value="eg" />
+  </Combobox>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Combobox Input Field Customization"
+  height={260}
+  app={`
+    <App>
+      <Combobox
+        initialValue="js"
+        placeholder="Select a user"
+        startIcon="user"
+        endIcon="globe"
+        endText="Globally"
+        readOnly="false">
+        <Option label="Jane Arrington" value="ja" />
+        <Option label="John Sniper" value="js" />
+        <Option label="Emily Gold" value="eg" />
+      </Combobox>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_COMBOBOX}>component reference</SmartLink>.
+
+## DatePicker
+
+Enables the selection of a date or a range of dates in a specified format from an interactive display.
+
+```ueml copy
+<App>
+  <DatePicker dateFormat="dd/MM/yyyy" initialValue="25/05/2024" />
+  <DatePicker dateFormat="yyyy-MM-dd" initialValue="25/05/2024" />
+  <DatePicker dateFormat="MMddyyyy" initialValue="25/05/2024" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: DatePicker and Date Formatting"
+  height={260}
+  app={`
+    <App>
+      <DatePicker dateFormat="dd/MM/yyyy" initialValue="25/05/2024" />
+      <DatePicker dateFormat="yyyy-MM-dd" initialValue="25/05/2024" />
+      <DatePicker dateFormat="MMddyyyy" initialValue="25/05/2024" />
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Use the `mode` property to specify the number of selectable dates: "single" or "range".
+</Callout>
+
+```ueml copy
+<App>
+  <DatePicker initialValue="25/05/2024" mode="single" />
+  <DatePicker initialValue="{{ from: '25/05/2024', to: '25/07/2024' }}" mode="range" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: DatePicker mode"
+  height={160}
+  app={`
+    <App>
+      <DatePicker initialValue="25/05/2024" mode="single" />
+      <DatePicker initialValue="{{ from: '25/05/2024', to: '25/07/2024' }}" mode="range" />
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Control the selectable dates with a number of properties.
+</Callout>
+
+```ueml copy
+<App>
+  <DatePicker
+    initialValue="25/05/2024"
+    fromDate="20/05/2024"
+    toDate="30/05/2024"
+    disabledDates="{['22/05/2024', '27/05/2024']}" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: DatePicker Restrictions"
+  height={160}
+  app={`
+    <App>
+      <DatePicker
+        initialValue="25/05/2024"
+        fromDate="20/05/2024"
+        toDate="30/05/2024"
+        disabledDates="{['22/05/2024', '27/05/2024']}" />
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_DATEPICKER}>component reference</SmartLink>.
+
+## Multicombobox
+
+This component provides a list of selectable options and the ability to filter these options using its input field so that one can select a subset of the original list.
+
+For selecting only one item from a list, refer to the [Combobox component](#combobox).
+
+```ueml copy
+<App>
+  <HStack gap="$space-loose">
+    <Multicombobox>
+      <Option label="Jane Arrington" value="ja" />
+      <Option label="John Sniper" value="js" />
+      <Option label="Emily Gold" value="eg" />
+    </Multicombobox>
+    <Multicombobox>
+      <Items items="{['Jane', 'John', 'Emily']}">
+        <Option label="Option {$item}" value="{$item}" />
+      </Items>
+    </Multicombobox>
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Multicombobox"
+  height={260}
+  app={`
+    <App>
+      <HStack gap="$space-loose">
+        <Multicombobox>
+          <Option label="Jane Arrington" value="ja" />
+          <Option label="John Sniper" value="js" />
+          <Option label="Emily Gold" value="eg" />
+        </Multicombobox>
+        <Multicombobox>
+          <Items items="{['Jane', 'John', 'Emily']}">
+            <Option label="Option {$item}" value="{$item}" />
+          </Items>
+        </Multicombobox>
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  The initial value of a `MultiCombobox` is an array of values.
+</Callout>
+
+```ueml copy
+<App>
+  <Multicombobox initialValue="{['ja', 'eg']}">
+    <Option label="Jane Arrington" value="ja" />
+    <Option label="John Sniper" value="js" />
+    <Option label="Emily Gold" value="eg" />
+  </Multicombobox>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Multicombobox initialValue"
+  height={100}
+  app={`
+    <App>
+      <Multicombobox initialValue="{['ja', 'eg']}">
+        <Option label="Jane Arrington" value="ja" />
+        <Option label="John Sniper" value="js" />
+        <Option label="Emily Gold" value="eg" />
+      </Multicombobox>
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_MULTICOMBOBOX}>component reference</SmartLink>.
+
+## MultiSelect
+

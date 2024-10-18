@@ -11,7 +11,6 @@ import {
   dInitialValue,
   dLabelId,
   dLostFocus,
-  dMaxLength,
   dReadonly,
   dRequired,
   dValidationStatus,
@@ -79,7 +78,6 @@ export const RadioGroupMd = createMetadata({
   props: {
     initialValue: dInitialValue(),
     labelId: dLabelId(),
-    maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),

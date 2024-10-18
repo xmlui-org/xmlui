@@ -19,7 +19,7 @@ const COMP = "DatePicker";
 
 export const DatePickerMd = createMetadata({
   status: "experimental",
-  description: "A datepicker component",
+  description: "A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

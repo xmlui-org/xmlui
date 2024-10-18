@@ -1,6 +1,6 @@
 import React, {
   createContext,
-  CSSProperties,
+  type CSSProperties,
   useCallback,
   useContext,
   useEffect,
@@ -11,7 +11,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./RadioGroup.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import { ValidationStatus } from "@components/abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { useEvent } from "@components-core/utils/misc";
 
