@@ -312,9 +312,9 @@ Modify the component accordingly:
 ```ueml copy {7} filename="ContactRow.xmlui"
 <!-- Omitted -->
 <DropdownMenu>
-  <propertyerty name="triggerTemplate">
+  <property name="triggerTemplate">
     <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-  </propertyerty>
+  </property>
   <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props.item)}" />
   <MenuItem label="Delete" />
 </DropdownMenu>
@@ -335,12 +335,12 @@ Pass an empty record to add a new contact.
       defaultSections="{!$props.filter
         ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
       sectionBy="section">
-      <propertyerty name="itemTemplate">
+      <property name="itemTemplate">
         <ContactRow 
           item="{$item}" 
           categories="{categories.value}" 
           onEditClicked="(selected) => contactForm.open('edit', selected)" />
-      </propertyerty>
+      </property>
       <!-- Unchanged -->
     </List>
   </VStack>
@@ -425,9 +425,9 @@ To delete a record, invoke the API endpoint directly from the context menu defin
   <Card>
       <!-- Unchanged -->
       <DropdownMenu>
-        <propertyerty name="triggerTemplate">
+        <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </propertyerty>
+        </property>
         <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props)}" />
         <MenuItem label="Delete">
           <event name="click">

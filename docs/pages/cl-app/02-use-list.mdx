@@ -45,7 +45,7 @@ The default display of the list uses the `fullName` and then `categoryId` fields
 ```ueml copy {3} filename="Main.xmlui"
 <!-- Omitted -->
 <List datasource="/api/contacts">
-  <Card title="{$item.fullName}" subTitle="{$item.comments}" />
+  <Card title="{$item.fullName}" subtitle="{$item.comments}" />
 </List>
 <!-- Omitted -->
 ```
@@ -53,7 +53,7 @@ The default display of the list uses the `fullName` and then `categoryId` fields
 <br/>
 <Image alt="Template with Card" src="/resources/images/get-started/template-with-card.png" />
 
-The code utilizes the `Card` component, a simple container to display cohesive data, such as record fields. This component has a predefined layout we can leverage through the `title` and `subTitle` fields. Take note of the `$item` context value; it represents the current item the template should display. So `$item.fullName` and `$item.comments` are the fields of the current contact record.
+The code utilizes the `Card` component, a simple container to display cohesive data, such as record fields. This component has a predefined layout we can leverage through the `title` and `subtitle` fields. Take note of the `$item` context value; it represents the current item the template should display. So `$item.fullName` and `$item.comments` are the fields of the current contact record.
 
 ## Adding and Formatting Fields
 

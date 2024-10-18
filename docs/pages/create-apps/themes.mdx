@@ -479,7 +479,7 @@ The theming engine in XMLUI is built to allow the creation of new themes and the
 Each theme variable name follows a naming convention to leverage the arsenal of features the theming engine provides:
 
 ```text
-<propertyertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
+<propertyName>-<ComponentId>-<trait1>-<trait2>--<state1>--<state2>--<stateN>
 ```
 
 In this convention, the `<ComponentId>` part is optional.
@@ -491,7 +491,7 @@ In this convention, the `<ComponentId>` part is optional.
 
 ### Properties, Traits, and States
 
-Each theme variable is used to define the value of a property influencing the visual appearance of a particular part of the UI. The `<propertyertyName>` segment defines such a visual property. Here are a few examples:
+Each theme variable is used to define the value of a property influencing the visual appearance of a particular part of the UI. The `<propertyName>` segment defines such a visual property. Here are a few examples:
 
 - `color-text`: text color (or forecolor)
 - `color-bg`: background color
@@ -499,9 +499,9 @@ Each theme variable is used to define the value of a property influencing the vi
 - `line-height`: the height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
 
-The `<propertyertyName>` segment should use lowercase letters and dashes.
+The `<propertyName>` segment should use lowercase letters and dashes.
 
-For the complete list of available `<propertyertyName>` values, see the <SmartLink href={THEME_VARIABLES_PROPERTY_NAMES}>Theme Variables</SmartLink> article under "Component Reference".
+For the complete list of available `<propertyName>` values, see the <SmartLink href={THEME_VARIABLES_PROPERTY_NAMES}>Theme Variables</SmartLink> article under "Component Reference".
 
 The `<trait1>` and `<trait2>` segments describe one or two traits regarding a particular property.
 
@@ -1194,7 +1194,7 @@ Often, apps display their headers in a contrasting tone; when the app's body is 
         <Page url="/">
           <List datasource="https://api.spacexdata.com/v3/history">
             <property name="itemTemplate">
-              <Card title="{$item.title}" subTitle="{$item.details}"/>
+              <Card title="{$item.title}" subtitle="{$item.details}"/>
             </property>
           </List>
         </Page>
@@ -1228,7 +1228,7 @@ XMLUI has a powerful component, `Theme,` that you can use to provide a particula
     <Page url="/">
       <List datasource="https://api.spacexdata.com/v3/history">
         <property name="itemTemplate">
-          <Card title="{$item.title}" subTitle="{$item.details}"/>
+          <Card title="{$item.title}" subtitle="{$item.details}"/>
         </property>
       </List>
     </Page>
@@ -1274,7 +1274,7 @@ Often, apps display their headers in a contrasting tone; when the app's body is 
         <Page url="/">
           <List datasource="https://api.spacexdata.com/v3/history">
             <property name="itemTemplate">
-              <Card title="{$item.title}" subTitle="{$item.details}"/>
+              <Card title="{$item.title}" subtitle="{$item.details}"/>
             </property>
           </List>
         </Page>
@@ -1308,7 +1308,7 @@ XMLUI has a powerful component, `Theme,` that you can use to provide a particula
     <Page url="/">
       <List datasource="https://api.spacexdata.com/v3/history">
         <property name="itemTemplate">
-          <Card title="{$item.title}" subTitle="{$item.details}"/>
+          <Card title="{$item.title}" subtitle="{$item.details}"/>
         </property>
       </List>
     </Page>

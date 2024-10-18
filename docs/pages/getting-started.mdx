@@ -31,6 +31,12 @@ When your app starts, it displays this page:
 <br/>
 <Image alt="App start" src="/resources/images/get-started/app-start.png" />
 
+<Callout type="info" emoji="📔">
+Later, when you modify the code, refresh the browser page to reload the page with the changes. In some cases, depending on your settings, the browser caches the page, so the refresh will not respond to your markup changes. If you experience this, the browser caching may be turned on; turn it off.
+
+Check your browser's documentation for details. If you use Chrome, turn on Developer Tools (F12), go to the Network tab, and set the "Disable cache" checkbox.
+</Callout>
+
 You can try some simple and cool XMLUI features with the menu items.
 
 In the following sections, you will change and extend the app. During these slight changes, you will also learn some simple XMLUI concepts.
@@ -78,7 +84,7 @@ The SpaceX API endpoint in this sample retrieves other data fields, including li
 
 This functionality is a cooperation of a couple of components within `App`: `NavLink`, and `Page`:
 
-```ueml filename="Main.xmlui" {3,7-13} /NavLink/ /Page/
+```ueml filename="Main.xmlui" {3,7-11} /NavLink/ /Page/
 <App>
   <NavPanel>
     <NavLink label="SpaceX List" to="/spacexlist" />
@@ -87,9 +93,7 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
   <Pages>
     <Page url="/spacexlist">
       <List datasource="https://api.spacexdata.com/v3/history">
-        <property name="itemTemplate">
-          <Card title="{$item.title}" subTitle="{$item.details}" />
-        </property>
+        <Card title="{$item.title}" subtitle="{$item.details}" />
       </List>
     </Page>
     <!-- Other Page items omitted -->
@@ -104,27 +108,27 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
 
 Components work together declaratively. `App` connects the `to` property of `NavLink` with the `url` property of `Page`. As a result, the particular page is displayed when you click the "SpaceX List" menu item.
 
-### Components with Templates
+### Components with Children
 
-`List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its `itemTemplate` property. 
+`List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its nested children. 
 
-```ueml copy {2-4} filename="Main.xmlui" /datasource/
+```ueml copy {2} filename="Main.xmlui" /datasource/
 <List datasource="https://api.spacexdata.com/v3/history">
-  <propertyerty name="itemTemplate">
-    <Card title="{$item.title}" subTitle="{$item.details}" />
-  </propertyerty>
+  <Card title="{$item.title}" subtitle="{$item.details}" />
 </List>
 ```
 
 <Callout type="info" emoji="💡">
-  Template properties cannot be represented with a string; thus, they cannot be given with an attribute. You nest them into their related component with the **`<propertyerty>` tag**.
+  You can use **expressions** in property values. Expressions are wrapped in curly braces.
 </Callout>
+
+The `title` and `subtitle` property values of `Card` are expressions, `{$item.title}` and `{$item.details}`, respectively.
 
 <Callout type="info" emoji="💡">
   The component definitions within the template properties can access information in the hosting component (the one using the template's content) through identifiers starting with `$`. We call them **context values**.
 </Callout>
 
-The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subTitle` property to display two data entries. These use the fetched data list's `title` and `details` fields (through the `$item` context value).
+The list uses a `Card` component to display a particular item. `Card` has a `title` and a `subtitle` property to display two data entries. The `$item` context value represents the current item of the list to be displayed. So, `$item.title` and `$item.details` represent the current item's `title` and `details` fields in the fetched data list.
 
 ### Fetching Data from API Endpoints
 
@@ -154,7 +158,7 @@ The specific endpoint of the SpaceX API (given in the `datasource` property of `
 Change the `Card` component to display the SpaceX and Wikipedia links and allow the user to navigate to them:
 
 ```ueml copy {2-3} filename="Main.xmlui"
-<Card title="{$item.title}" subTitle="{$item.details}">
+<Card title="{$item.title}" subtitle="{$item.details}">
   <Link to="{$item.links.article}" target="_blank">SpaceX</Link>
   <Link to="{$item.links.wikipedia}" target="_blank">Wikipedia</Link>
 </Card>

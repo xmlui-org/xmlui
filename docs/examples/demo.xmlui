@@ -78,7 +78,7 @@
             </Card>
             <List datasource="https://api.spacexdata.com/v3/rockets" height="300">
                 <property name="itemTemplate">
-                    <Card avatarUrl="{$item.flickr_images[0]}" title="{$item.rocket_name}" subTitle="{$item.company}">
+                    <Card avatarUrl="{$item.flickr_images[0]}" title="{$item.rocket_name}" subtitle="{$item.company}">
                         <HStack gap="1rem" verticalAlignment="center">
                             <Icon name="info"/>
                             <Text value="{$item.description}" canShrink="true" />

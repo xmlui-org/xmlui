@@ -272,12 +272,12 @@ You can remove the highlighted lines from `Contacts.xmlui`:
         defaultSections="{$props.filter === 'all'
           ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
         sectionBy="section">
-        <propertyerty name="itemTemplate">
+        <property name="itemTemplate">
           <ContactRow 
             item="{$item}" 
             categories="{categories.value}" 
             onEditClicked="(selected) => contactForm.open('edit', selected)" />
-        </propertyerty>
+        </property>
         <!-- Omitted -->
       </List>
     </VStack>
