@@ -4,7 +4,7 @@ import styles from "./TextBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import type { LookupActionOptions } from "@abstractions/ActionDefs";
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dDidChange,
@@ -46,26 +46,6 @@ export const TextBoxMd = createMetadata({
     startIcon: dStartIcon(),
     endText: dEndText(),
     endIcon: dEndIcon(),
-    hasSpinBox: d(
-      `This boolean prop shows (\`true\`) or hides (\`false\`) the spinner buttons for the input field.`,
-    ),
-    step: d(`This prop governs how big the step when clicking on the spinner of the field.`),
-    integersOnly: d(
-      `This boolean property signs whether the input field accepts integers only (\`true\`) ` +
-        `or not (\`false\`).`,
-    ),
-    zeroOrPositive: d(
-      `This boolean property determines whether the input value can only be 0 or positive numbers ` +
-        `(\`true\`) or also negative (\`false\`).`,
-    ),
-    minValue: d(
-      `The minimum value the input field allows. Can be a float or an integer if ` +
-        `[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer.`,
-    ),
-    maxValue: d(
-      `The maximum value the input field allows. Can be a float or an integer if ` +
-        `[\`integersOnly\`](#integersonly) is set to \`false\`, otherwise it can only be an integer.`,
-    ),
   },
   events: {
     gotFocus: dGotFocus(COMP),

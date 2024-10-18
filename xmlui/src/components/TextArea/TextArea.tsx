@@ -52,6 +52,9 @@ export const TextAreaMd = createMetadata({
     autoSize: d(
       `If set to \`true\`, this boolean property enables the \`${COMP}\` to resize ` +
         `automatically based on the number of lines inside it.`,
+      null,
+      "boolean",
+      false,
     ),
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

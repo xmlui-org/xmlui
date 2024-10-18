@@ -1,0 +1,31 @@
+# Apply Selection Limits to DatePicker
+
+You can control the selectable dates with a number of properties:
+- `fromDate`: specify the date from when the user can select dates (default is undefined)
+- `toDate`: specify the date until when the user can select dates (default is undefined)
+- `disabledDates`: specify a list of dates that are unselectable in the available date range (governed by `fromDate` and `toDate`)
+
+```ueml copy
+<App>
+  <DatePicker
+    initialValue="25/05/2024"
+    fromDate="20/05/2024"
+    toDate="30/05/2024"
+    disabledDates="{['22/05/2024', '27/05/2024']}" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: DatePicker Restrictions"
+  height={160}
+  app={`
+    <App>
+      <DatePicker
+        initialValue="25/05/2024"
+        fromDate="20/05/2024"
+        toDate="30/05/2024"
+        disabledDates="{['22/05/2024', '27/05/2024']}" />
+    </App>
+  `}
+/>
