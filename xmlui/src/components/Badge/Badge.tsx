@@ -3,7 +3,7 @@ import styles from "./Badge.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Badge, BadgeColors } from "./BadgeNative";
+import { Badge, type BadgeColors } from "./BadgeNative";
 
 const COMP = "Badge";
 

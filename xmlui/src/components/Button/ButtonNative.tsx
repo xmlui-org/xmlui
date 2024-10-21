@@ -1,7 +1,7 @@
 import styles from "./Button.module.scss";
 
 import classnames from "@components-core/utils/classnames";
-import {
+import type {
   ButtonType,
   ButtonVariant,
   ButtonThemeColor,
@@ -11,7 +11,7 @@ import {
   OrientationOptions,
   ButtonAria,
 } from "@components/abstractions";
-import React, { CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
+import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
 
 type Props = {
   id?: string;

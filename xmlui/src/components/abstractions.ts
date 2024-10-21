@@ -52,7 +52,26 @@ export type Tab = {
   content: ReactNode;
 };
 
-export type LinkTarget = "_self" | "_blank" | "_parent" | "_top";
+export const LinkTargetNames = ["_self", "_blank", "_parent", "_top"] as const;
+export type LinkTarget = (typeof LinkTargetNames)[number];
+export const LinkTargetMd: PropertyValueDescription[] = [
+  {
+    value: "_self",
+    description: "The link will open in the same frame as it was clicked.",
+  },
+  {
+    value: "_blank",
+    description: "The link will open in a new window or tab.",
+  },
+  {
+    value: "_parent",
+    description: "The link will open in the parent frame. If no parent, behaves as _self.",
+  },
+  {
+    value: "_top",
+    description: "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
+  }
+] as const;
 
 /**
  * Describes the common properties of a link component types.
@@ -112,14 +131,14 @@ export const sizeMd: PropertyValueDescription[] = [
   { value: "sm", description: "Small button" },
   { value: "md", description: "Medium button" },
   { value: "lg", description: "Large button" },
-];
+] as const;
 const sizeValues = Object.keys(sizeMd);
-export const sizeNames: string[] = [...sizeValues];
+export const sizeNames = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
 
 // --- Available button themes
 const buttonThemeValues = ["attention", "primary", "secondary"] as const;
-export const buttonThemeNames: string[] = [...buttonThemeValues];
+export const buttonThemeNames = [...buttonThemeValues];
 export type ButtonThemeColor = (typeof buttonThemeValues)[number];
 export const buttonThemeMd: PropertyValueDescription[] = [
   { value: "attention", description: "Attention state theme color" },
@@ -129,7 +148,7 @@ export const buttonThemeMd: PropertyValueDescription[] = [
 
 // --- Available button types
 const buttonTypeValues = ["button", "submit", "reset"] as const;
-export const buttonTypeNames: string[] = [...buttonTypeValues];
+export const buttonTypeNames = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
 export const buttonTypesMd: PropertyValueDescription[] = [
   { value: "button", description: "Regular behavior that only executes logic if explicitly determined." },
@@ -139,7 +158,7 @@ export const buttonTypesMd: PropertyValueDescription[] = [
 
 // --- Available button variants
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
-export const buttonVariantNames: string[] = [...buttonVariantValues];
+export const buttonVariantNames = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
 export const buttonVariantMd: PropertyValueDescription[] = [
   { value: "solid", description: "A button with a border and a filled background." },
@@ -149,12 +168,12 @@ export const buttonVariantMd: PropertyValueDescription[] = [
 
 // --- Available button aria attributes
 const buttonAriaValues = ["aria-controls", "aria-expanded", "aria-disabled", "aria-label"] as const;
-export const buttonAriaNames: string[] = [...buttonAriaValues];
+export const buttonAriaNames = [...buttonAriaValues];
 export type ButtonAria = (typeof buttonAriaValues)[number];
 
 // --- Available alignment options
 const alignmentOptionValues = ["start", "center", "end"] as const;
-export const alignmentOptionNames: string[] = [...alignmentOptionValues];
+export const alignmentOptionNames = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
 export const alignmentOptionMd: PropertyValueDescription[] = [
   { value: "center", description: "Place the content in the middle" },
@@ -164,7 +183,7 @@ export const alignmentOptionMd: PropertyValueDescription[] = [
 
 // --- Available orientation options
 const orientationOptionValues = ["horizontal", "vertical"] as const;
-export const orientationOptionNames: string[] = [...orientationOptionValues];
+export const orientationOptionNames = [...orientationOptionValues];
 export type OrientationOptions = (typeof orientationOptionValues)[number];
 export const orientationOptionMd: PropertyValueDescription[] = [
   { value: "horizontal", description: "The component will fill the available space horizontally" },
@@ -173,7 +192,7 @@ export const orientationOptionMd: PropertyValueDescription[] = [
 
 // --- Available icon positions
 const iconPositionValues = ["left", "right", "start", "end"] as const;
-export const iconPositionNames: string[] = [...iconPositionValues];
+export const iconPositionNames = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
 export const iconPositionMd: PropertyValueDescription[] = [
   { value: "left", description: "The icon will appear on the left side" },
@@ -193,7 +212,7 @@ const statusColorValues = [
   "light",
   "dark",
 ] as const;
-export const statusColorNames: string[] = [...statusColorValues];
+export const statusColorNames = [...statusColorValues];
 export type StatusColor = (typeof statusColorValues)[number];
 export const statusColorMd: PropertyValueDescription[] = [
   { value: "primary", description: "Primary theme color, no default icon" },
@@ -208,7 +227,7 @@ export const statusColorMd: PropertyValueDescription[] = [
 
 // --- Available placements
 const placementValues = ["start", "end", "top", "bottom"] as const;
-export const placementNames: string[] = [...placementValues];
+export const placementNames = [...placementValues];
 export type Placement = (typeof placementValues)[number];
 export const placementMd: PropertyValueDescription[] = [
   { value: "start", description: "The left side of the window (left-to-right) or the right side of the window (right-to-left)" },
@@ -219,12 +238,12 @@ export const placementMd: PropertyValueDescription[] = [
 
 // --- Available trigger positions
 const triggerPositionValues = ["start", "end"] as const;
-export const triggerPositionNames: string[] = [...triggerPositionValues];
+export const triggerPositionNames = [...triggerPositionValues];
 export type TriggerPosition = (typeof triggerPositionValues)[number];
 
 // --- The state of a validated UI element
 const validationStatusValues = ["none", "error", "warning", "valid"] as const;
-export const validationStatusNames: string[] = [...validationStatusValues];
+export const validationStatusNames = [...validationStatusValues];
 export type ValidationStatus = (typeof validationStatusValues)[number];
 export const validationStatusMd: PropertyValueDescription[] = [
   // { value: "none", description: "No indicator" },

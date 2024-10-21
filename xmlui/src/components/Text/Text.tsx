@@ -2,7 +2,7 @@ import styles from "./Text.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Text, VariantProps, VariantPropsKeys } from "./TextNative";
+import { Text, type VariantProps, VariantPropsKeys } from "./TextNative";
 
 const COMP = "Text";
 

@@ -37,7 +37,9 @@ You can use the `label` and `icon` properties of a `Link` to set its text and ic
 
 ### `active`
 
-This Boolean property indicates if the particular navigation is an active link (`false`, by default). An active link has a particular visual appearance.
+Indicates whether this link is active or not. If so, it will have a distinct visual appearance.
+
+Default value: `false`.
 
 ```ueml copy
 <VStack>
@@ -112,12 +114,17 @@ This property sets the label of the component.
 
 This property specifies where to open the link represented by the `Link`. This property accepts the following values (in accordance with the HTML standard):
 
-| Value     | Description                                                   |
-| --------- | ------------------------------------------------------------- |
-| `_blank`  | Opens the link in a new window or tab                         |
-| `_self`   | Opens the link in the same frame as it was clicked (default)  |
-| `_parent` | Opens the link in the parent frame                            |
-| `_top`    | Opens the link in the full body of the current browser window |
+Default value: `"_self"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `_self` | The link will open in the same frame as it was clicked. **(default)** |
+| `_blank` | The link will open in a new window or tab. |
+| `_parent` | The link will open in the parent frame. If no parent, behaves as _self. |
+| `_top` | The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self. |
+
 
 The following sample opens its link in a new tab:
 
