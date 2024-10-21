@@ -13,12 +13,16 @@ The unzipped content has the following folders and files:
 | `Main.xmlui` | The XMLUI app's entry point |
 | `components` | The folder with the app's XMLUI components (empty) |
 | `resources` | The folder with static app resources like images, logos, icons, etc. |
-| `xmlui-standalone.umd.js` | The XMLUI framework's runtime |
+| `xmlui‑standalone.umd.js` | The XMLUI framework's runtime |
 | `mockServiceWorker.js` | The mock service worker for emulated backend |
 | `mock.js` | The API for the emulated backend |
+| `start.bat` | The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
+| `start.sh` | The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
 
 <Callout emoji="💡">
   Remember, you need a local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
+
+  If you have Node.js installed on your machine, you can use the `start.bat` or `start.sh` files (from the app's directory) to ignite the web server and open the app in the browser.
 </Callout>
 
 Spin up your web server pointing to the unzipped folder where the sample code of the starter app is located.
@@ -36,11 +40,15 @@ This is how the sample app should appear:
 The app is straightforward as it only contains one single markup file (`Main.xmlui`) which acts as the entry point for an XMLUI app:
 
 ```ueml copy filename="Main.xmlui"
-<App layout="vertical-sticky" name="Contact List Tutorial">
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
   <AppHeader>
     <H2>Contact Management</H2>
     <SpaceFiller />
-    <ThemeChangerButton showSettings="false" />
+    <ToneChangerButton />
   </AppHeader>  
   <NavPanel>
     <NavLink label="Home" to="/" />
@@ -56,10 +64,10 @@ The app is straightforward as it only contains one single markup file (`Main.xml
 
 The application uses the `vertical-sticky` layout, which renders a vertical menu on the left side of the app and provides a sticky header and footer above and below the main content area. The `name` property of `App` defines the title to display in the browser tab.
 
-The `AppHeader` defines a title and allows a `ThemeChangerButton` to choose between light and dark themes.
+The `AppHeader` defines a title and allows a `ToneChangerButton` to choose between light and dark themes.
 
 <Callout type="info" emoji="💡">
-  The `App` component automatically **displays a logo** using the `resources/logo.svg` and `resources/logo-dark.svg` files.
+  The `logo` and `logo-dark` properties set the resource files to **display a logo**. If you omit them, the app will not show a logo.
 </Callout>
 
 ## Setting Up the Scenario
@@ -102,12 +110,16 @@ You can modify the default app structure in a few steps:
 
 First, open the `Main.xmlui` file in your text editor and change its contents to the following:
 
-```ueml copy filename="Main.xmlui" /layout="vertical-full-header"/ {7-14}
-<App layout="vertical-sticky" name="Contact List Tutorial">
+```ueml copy filename="Main.xmlui" /layout="vertical-full-header"/ {11-18}
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
   <AppHeader>
     <H2>Contact Management</H2>
     <SpaceFiller />
-    <ThemeChangerButton showSettings="false" />
+    <ToneChangerButton />
   </AppHeader>  
   <NavPanel>
     <NavLink label="Dashboard" to="/" />

@@ -18,12 +18,16 @@ In this article, you will implement the filtering functionality with both option
 
 Add a few new menu items with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/contacts` URL representing all contacts to `/contacts/all`. Set up each page to display only the related filter's name:
 
-```ueml copy {9-13, 16, 22-25} filename="Main.xmlui"
-<App layout="vertical-full-header">
+```ueml copy {13-17, 21, 26-29} filename="Main.xmlui"
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
   <AppHeader>
     <H2>Contact Management</H2>
     <SpaceFiller />
-    <ThemeChangerButton showSettings="false" />
+    <ToneChangerButton />
   </AppHeader>  
   <NavPanel>
     <NavLink label="Dashboard" to="/" />
@@ -89,7 +93,7 @@ Instead, filter the contacts by using a predicate function (passed in the `predi
   A predicate function accepts a contact record and returns a boolean value to indicate whether that particular contact should be in the filtered set.
 </Callout>
 
-Update all `Page` tags in the `Main.xmlui` file to use the new `Tasks` component:
+Update all `Page` tags in the `Main.xmlui` file to use the new `Contacts` component:
 
 ```ueml copy {5, 8, 11, 14,17} filename="Main.xmlui"
 <!-- Omitted -->

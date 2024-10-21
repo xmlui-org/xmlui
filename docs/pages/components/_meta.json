@@ -93,6 +93,7 @@
   "TextBox": "TextBox",
   "Theme": "Theme",
   "ThemeChangerButton": "ThemeChangerButton",
+  "ToneChangerButton": "ToneChangerButton",
   "Toolbar": "Toolbar",
   "ToolbarButton": "ToolbarButton",
   "Tree": "Tree",
