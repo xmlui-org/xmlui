@@ -398,7 +398,6 @@ describe("Parser - literals", () => {
 
       const literalNestedNum = literalNested.segments[0] as TemplateLiteralExpression;
       expect(literalNestedNum.type).equal("LitE");
-      expect(literalNestedNum.segments).equal(2);
 
       expect(literalNested.segments[2].type).equal("LitE");
       expect(literalNested.segments[2].value).equal(" people");

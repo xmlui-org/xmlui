@@ -744,12 +744,15 @@ export class Lexer {
           break;
 
         case LexerPhase.StringTemplateLiteral:
-          switch (ch){
-            case '`': return completeToken(TokenType.Backtick)
-            case '$': 
+          switch (ch) {
+            case "`":
+              return completeToken(TokenType.Backtick);
+            case "$":
               const charAhead = this.input.ahead(0);
-              if(charAhead === "{"){
-                return completeToken(TokenType.DollarLBrace)
+              if (charAhead === "{") {
+                appendTokenChar();
+                this.fetchNextChar();
+                return completeToken(TokenType.DollarLBrace);
               }
           }
           const charAhead1 = this.input.ahead(0);
