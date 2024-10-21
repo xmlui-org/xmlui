@@ -125,7 +125,7 @@ The `ContactRow` component will raise a custom event representing the edit actio
 
 Add the following custom event to `ContactRow`:
 
-```ueml copy {9} filename="ContactRow.xmlui"
+```ueml copy {6} filename="ContactRow.xmlui"
 <!-- Omitted -->
 <DropdownMenu>
   <property name="triggerTemplate">
@@ -140,16 +140,14 @@ Add the following custom event to `ContactRow`:
 The highlighted code exposes an event, `editClicked`.
 Bind the dialog in `Contacts` to the `editClicked` event handler:
 
-```ueml copy {8} filename="Contacts.xmlui"
+```ueml copy {7} filename="Contacts.xmlui"
 <!-- Omitted -->
 <List>
   <!-- Omitted -->
-  <property name="itemTemplate">
-    <ContactRow 
-      item="{$item}" 
-      categories="{categories.value}" 
-      onEditClicked="contactForm.open('edit')" />
-  </property>
+  <ContactRow 
+    item="{$item}" 
+    categories="{categories.value}" 
+    onEditClicked="contactForm.open()" />
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
@@ -179,7 +177,7 @@ When displaying the dialog, its title is set up according to the mode specified.
 
 To work with the current mode, you have to change the invocations of `open` in `Contacts`:
 
-```ueml copy {5, 13, 18} filename="Contacts.xmlui"
+```ueml copy {5, 13} filename="Contacts.xmlui"
 <Component name="Contacts">
   <!-- Unchanged -->
   <VStack>
@@ -282,7 +280,7 @@ The current submit event handler displays the JSON representation of the data to
 Here, you need to pass the data to the `Form` when you edit existing information.
 The current implementation of `ContactForm` starts with empty data, so you should change it:
 
-```ueml copy {1, 7, 13-15} filename="ContactForm.xmlui" /var.initialData=""/ /initialData/
+```ueml copy {1, 7, 12-14} filename="ContactForm.xmlui" /var.initialData=""/ /initialData/
 <Component name="ContactForm" var.mode="" var.initialData="">
   <ModalDialog 
     id="dialog" 
@@ -309,7 +307,7 @@ The `ContactRow` component should pass the details of the data being edited in i
 
 Modify the component accordingly:
 
-```ueml copy {7} filename="ContactRow.xmlui"
+```ueml copy {6} filename="ContactRow.xmlui"
 <!-- Omitted -->
 <DropdownMenu>
   <property name="triggerTemplate">

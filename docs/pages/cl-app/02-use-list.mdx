@@ -179,14 +179,12 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 ```javascript copy filename="ContactRow.xmlui.xs"
 // Category record of the item
 var category = $props.categories.find(t => t.id === $props.item.categoryId);
-
+ 
 // Create a color map for all categories
-var categoriesColorMap = $props.categories.reduce((acc, topic) => {
-  return {...acc, [category.name]:  category.color };
-}, {});
+var categoriesColorMap = toHashObject($props.categories, "name", "color");
 ```
 
-The `category` variable contains the category record associated with the item. The variable has an undefined value if the item does not have a topic. The `categoriesColorMap` variable converts the list of topic records into a hash object (using the same semantics as JavaScript) with the topic name and color value pairs.
+The `category` variable contains the category record associated with the item. If the item does not have a topic, the variable has an undefined value. The `categoriesColorMap` variable converts the list of topic records into a hash object with the topic name and color value pairs.
 
 <Callout type="info" emoji="📔">
 This transformation with the `reduce` JavaScript function converts category records from this format
