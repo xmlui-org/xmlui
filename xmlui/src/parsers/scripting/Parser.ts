@@ -40,6 +40,7 @@ import type {
   Statement,
   SwitchCase,
   SwitchStatement,
+  TemplateLiteralExpression,
   ThrowStatement,
   TryStatement,
   UnaryExpression,
@@ -48,7 +49,10 @@ import type {
   WhileStatement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { Token } from "@abstractions/scripting/Token";
-import type { ScriptParserErrorMessage, ScriptParsingErrorCodes } from "@abstractions/scripting/ScriptParserError";
+import type {
+  ScriptParserErrorMessage,
+  ScriptParsingErrorCodes,
+} from "@abstractions/scripting/ScriptParserError";
 
 import { TokenType } from "../../abstractions/scripting/Token";
 import { InputStream } from "../common/InputStream";
@@ -248,7 +252,7 @@ export class Parser {
             expression,
           },
           startToken,
-          expression.endToken
+          expression.endToken,
         )
       : null;
   }
@@ -275,7 +279,8 @@ export class Parser {
         declarationProps = {
           objectDestruct,
         };
-        endToken = objectDestruct.length > 0 ? objectDestruct[objectDestruct.length - 1].endToken : endToken;
+        endToken =
+          objectDestruct.length > 0 ? objectDestruct[objectDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.LSquare) {
         // --- This is array destructure
         endToken = this._lexer.ahead(1);
@@ -284,7 +289,8 @@ export class Parser {
         declarationProps = {
           arrayDestruct,
         };
-        endToken = arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
+        endToken =
+          arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.Identifier) {
         endToken = this._lexer.get();
         declarationProps = {
@@ -310,7 +316,9 @@ export class Parser {
       }
 
       // --- New declaration reached
-      declarations.push(this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken));
+      declarations.push(
+        this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken),
+      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -324,7 +332,7 @@ export class Parser {
         declarations,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -350,7 +358,8 @@ export class Parser {
         declarationProps = {
           objectDestruct,
         };
-        endToken = objectDestruct.length > 0 ? objectDestruct[objectDestruct.length - 1].endToken : endToken;
+        endToken =
+          objectDestruct.length > 0 ? objectDestruct[objectDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.LSquare) {
         // --- This is array destructure
         endToken = this._lexer.ahead(1);
@@ -359,7 +368,8 @@ export class Parser {
         declarationProps = {
           arrayDestruct,
         };
-        endToken = arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
+        endToken =
+          arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.Identifier) {
         endToken = this._lexer.get();
         declarationProps = {
@@ -377,7 +387,9 @@ export class Parser {
       endToken = expression.endToken;
 
       // --- New declaration reached
-      declarations.push(this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken));
+      declarations.push(
+        this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken),
+      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -391,7 +403,7 @@ export class Parser {
         declarations,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -427,7 +439,12 @@ export class Parser {
       endToken = expression.endToken;
       // --- New declaration reached
       declarations.push(
-        this.createExpressionNode<ReactiveVarDeclaration>("RVarD", declarationProps, declStart, endToken)
+        this.createExpressionNode<ReactiveVarDeclaration>(
+          "RVarD",
+          declarationProps,
+          declStart,
+          endToken,
+        ),
       );
 
       // --- Check for more declarations
@@ -442,7 +459,7 @@ export class Parser {
         declarations,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -493,8 +510,8 @@ export class Parser {
             "ODestr",
             { id, alias, arrayDestruct, objectDestruct },
             startToken,
-            endToken
-          )
+            endToken,
+          ),
         );
 
         if (nextToken.type === TokenType.Comma) {
@@ -544,8 +561,8 @@ export class Parser {
             "ADestr",
             { id, arrayDestruct, objectDestruct },
             startToken,
-            endToken
-          )
+            endToken,
+          ),
         );
         this._lexer.get();
       } else if (nextToken.type === TokenType.RSquare) {
@@ -556,8 +573,8 @@ export class Parser {
               "ADestr",
               { id, arrayDestruct, objectDestruct },
               startToken,
-              endToken
-            )
+              endToken,
+            ),
           );
         }
         break;
@@ -635,7 +652,7 @@ export class Parser {
         elseBranch,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -662,7 +679,7 @@ export class Parser {
         body,
       },
       startToken,
-      body.endToken
+      body.endToken,
     );
   }
 
@@ -694,7 +711,7 @@ export class Parser {
         body,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -720,7 +737,7 @@ export class Parser {
         expression,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -833,7 +850,7 @@ export class Parser {
         body,
       },
       startToken,
-      body.endToken
+      body.endToken,
     );
   }
 
@@ -852,7 +869,7 @@ export class Parser {
     startToken: Token,
     varBinding: ForVarBinding,
     id: string,
-    type: string
+    type: string,
   ): ForInStatement | ForOfStatement | null {
     if (varBinding !== "none") {
       // --- Skip variable binding type
@@ -883,7 +900,7 @@ export class Parser {
             body,
           },
           startToken,
-          body.endToken
+          body.endToken,
         )
       : this.createStatementNode<ForOfStatement>(
           "ForOfS",
@@ -894,7 +911,7 @@ export class Parser {
             body,
           },
           startToken,
-          body.endToken
+          body.endToken,
         );
   }
 
@@ -917,7 +934,7 @@ export class Parser {
         expression,
       },
       startToken,
-      expression.endToken
+      expression.endToken,
     );
   }
 
@@ -992,7 +1009,7 @@ export class Parser {
         finallyBlock,
       },
       startToken,
-      endToken
+      endToken,
     );
 
     function getBlock(): BlockStatement | null {
@@ -1087,8 +1104,8 @@ export class Parser {
             caseExpression,
             statements,
           },
-          startToken
-        )
+          startToken,
+        ),
       );
     }
 
@@ -1102,7 +1119,7 @@ export class Parser {
         cases,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -1217,7 +1234,7 @@ export class Parser {
         statement: body,
       },
       startToken,
-      body.endToken
+      body.endToken,
     );
   }
 
@@ -1324,7 +1341,7 @@ export class Parser {
         moduleFile: literal.value,
       },
       startToken,
-      moduleToken
+      moduleToken,
     );
   }
 
@@ -1339,7 +1356,9 @@ export class Parser {
    *   ;
    */
   parseExpr(allowSequence = true): Expression | null {
-    return allowSequence ? this.parseSequenceExpression() : this.parseCondOrSpreadOrAsgnOrArrowExpr();
+    return allowSequence
+      ? this.parseSequenceExpression()
+      : this.parseCondOrSpreadOrAsgnOrArrowExpr();
   }
 
   /**
@@ -1363,7 +1382,9 @@ export class Parser {
         if (this._lexer.peek().type === TokenType.Comma) {
           loose = true;
           endToken = this._lexer.peek();
-          expressions.push(this.createExpressionNode<NoArgExpression>("NoArgE", {}, endToken, endToken));
+          expressions.push(
+            this.createExpressionNode<NoArgExpression>("NoArgE", {}, endToken, endToken),
+          );
         } else {
           const nextExpr = this.parseCondOrSpreadOrAsgnOrArrowExpr();
           if (!nextExpr) {
@@ -1388,7 +1409,7 @@ export class Parser {
         loose,
       },
       start,
-      endToken
+      endToken,
     );
 
     // --- Check for "loose" sequence expression
@@ -1420,7 +1441,7 @@ export class Parser {
               operand: spreadOperand,
             },
             startToken,
-            spreadOperand.endToken
+            spreadOperand.endToken,
           )
         : null;
     }
@@ -1451,7 +1472,7 @@ export class Parser {
           alternate: falseExpr,
         },
         startToken,
-        falseExpr!.endToken
+        falseExpr!.endToken,
       );
     }
 
@@ -1468,7 +1489,7 @@ export class Parser {
               operand,
             },
             startToken,
-            operand.endToken
+            operand.endToken,
           )
         : null;
     }
@@ -1560,7 +1581,7 @@ export class Parser {
             statement,
           },
           start,
-          statement.endToken
+          statement.endToken,
         )
       : null;
   }
@@ -1591,7 +1612,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1624,7 +1645,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1657,7 +1678,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1690,7 +1711,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1723,7 +1744,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1756,7 +1777,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1776,7 +1797,12 @@ export class Parser {
 
     let opType: Token | null;
     while (
-      (opType = this.skipTokens(TokenType.Equal, TokenType.StrictEqual, TokenType.NotEqual, TokenType.StrictNotEqual))
+      (opType = this.skipTokens(
+        TokenType.Equal,
+        TokenType.StrictEqual,
+        TokenType.NotEqual,
+        TokenType.StrictNotEqual,
+      ))
     ) {
       const rightExpr = this.parseRelOrInExpr();
       if (!rightExpr) {
@@ -1793,7 +1819,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1818,7 +1844,7 @@ export class Parser {
         TokenType.LessThanOrEqual,
         TokenType.GreaterThan,
         TokenType.GreaterThanOrEqual,
-        TokenType.In
+        TokenType.In,
       ))
     ) {
       const rightExpr = this.parseShiftExpr();
@@ -1835,7 +1861,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1854,7 +1880,13 @@ export class Parser {
     }
 
     let opType: Token | null;
-    while ((opType = this.skipTokens(TokenType.ShiftLeft, TokenType.ShiftRight, TokenType.SignedShiftRight))) {
+    while (
+      (opType = this.skipTokens(
+        TokenType.ShiftLeft,
+        TokenType.ShiftRight,
+        TokenType.SignedShiftRight,
+      ))
+    ) {
       const rightExpr = this.parseAddExpr();
       if (!rightExpr) {
         this.reportError("W001");
@@ -1869,7 +1901,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1903,7 +1935,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1937,7 +1969,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1973,7 +2005,7 @@ export class Parser {
             right: rightExpr,
           },
           startToken,
-          endToken
+          endToken,
         );
       } else {
         const prevLeft = leftExpr as BinaryExpression;
@@ -1990,7 +2022,7 @@ export class Parser {
             },
           },
           startToken,
-          endToken
+          endToken,
         );
       }
       count++;
@@ -2019,7 +2051,7 @@ export class Parser {
           operand: unaryOperand,
         },
         startToken,
-        unaryOperand.endToken
+        unaryOperand.endToken,
       );
     }
 
@@ -2036,7 +2068,7 @@ export class Parser {
           operand: prefixOperand,
         },
         startToken,
-        prefixOperand.endToken
+        prefixOperand.endToken,
       );
     }
 
@@ -2084,7 +2116,7 @@ export class Parser {
               arguments: args,
             },
             startToken,
-            endToken
+            endToken,
           );
           break;
         }
@@ -2106,7 +2138,7 @@ export class Parser {
               isOptional: currentStart.type === TokenType.OptionalChaining,
             },
             startToken,
-            member
+            member,
           );
           break;
 
@@ -2125,7 +2157,7 @@ export class Parser {
               member: memberExpr,
             },
             startToken,
-            endToken
+            endToken,
           );
           break;
 
@@ -2146,7 +2178,7 @@ export class Parser {
           operand: primary,
         },
         startToken,
-        nextToken
+        nextToken,
       );
     }
 
@@ -2202,7 +2234,7 @@ export class Parser {
             name: idToken.text,
           },
           idToken,
-          idToken
+          idToken,
         );
       }
 
@@ -2220,9 +2252,13 @@ export class Parser {
             isGlobal: true,
           },
           idToken,
-          idToken
+          idToken,
         );
       }
+      case TokenType.Backtick:
+        const startToken = this._lexer.get();
+        return this.parseTemplateLiteral(startToken);
+
       case TokenType.False:
       case TokenType.True:
         this._lexer.get();
@@ -2232,7 +2268,7 @@ export class Parser {
             value: start.type === TokenType.True,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.BinaryLiteral:
@@ -2263,7 +2299,7 @@ export class Parser {
             value: Infinity,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.NaN:
@@ -2274,7 +2310,7 @@ export class Parser {
             value: NaN,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.Null:
@@ -2285,7 +2321,7 @@ export class Parser {
             value: null,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.Undefined:
@@ -2296,7 +2332,7 @@ export class Parser {
             value: undefined,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.LSquare:
@@ -2310,6 +2346,40 @@ export class Parser {
     }
 
     return null;
+  }
+
+  private parseTemplateLiteral(startToken: Token): TemplateLiteralExpression {
+    this._lexer.setStartingPhaseToTemplateLiteral();
+    const segments: (Literal | Expression)[] = [];
+    loop: while (true) {
+      let nextToken = this._lexer.peek();
+      switch (nextToken.type) {
+        case TokenType.StringLiteral:
+          this._lexer.get();
+          const str = this.parseStringLiteral(nextToken, false);
+          segments.push(str);
+          break;
+        case TokenType.DollarLBrace:
+          this._lexer.get();
+          const innerExpr = this.parseExpr();
+          segments.push(innerExpr);
+          this.expectToken(TokenType.RBrace, "W004");
+          this._lexer.setStartingPhaseToTemplateLiteral()
+          break;
+        case TokenType.Backtick:
+          break loop;
+        default:
+          this.reportError("W004");
+          
+      }
+    }
+    const endToken = this._lexer.get()
+    return this.createExpressionNode<TemplateLiteralExpression>(
+      "TempLitE",
+      { segments },
+      startToken,
+      endToken,
+    );
   }
 
   /**
@@ -2332,7 +2402,7 @@ export class Parser {
         items: expressions,
       },
       start,
-      endToken
+      endToken,
     );
   }
 
@@ -2363,14 +2433,18 @@ export class Parser {
               {
                 expressions: [nameExpr],
               },
-              start
+              start,
             );
           } else if (traits.isPropLiteral) {
             nameExpr = this.getExpression(false);
             if (!nameExpr) {
               return null;
             }
-            if (nameExpr.type !== "IdE" && nameExpr.type !== "LitE" && nameExpr.type !== "SpreadE") {
+            if (
+              nameExpr.type !== "IdE" &&
+              nameExpr.type !== "LitE" &&
+              nameExpr.type !== "SpreadE"
+            ) {
               this.reportError("W007");
               return null;
             }
@@ -2420,7 +2494,10 @@ export class Parser {
 
           if (nameType === "IdE") {
             const nameFollowerToken = this._lexer.peek();
-            if (nameFollowerToken.type === TokenType.Comma || nameFollowerToken.type === TokenType.RBrace) {
+            if (
+              nameFollowerToken.type === TokenType.Comma ||
+              nameFollowerToken.type === TokenType.RBrace
+            ) {
               valueExpr = { ...nameExpr };
             }
           }
@@ -2457,7 +2534,7 @@ export class Parser {
         props,
       },
       start,
-      endToken
+      endToken,
     );
   }
 
@@ -2471,7 +2548,7 @@ export class Parser {
           value: new RegExp(result.pattern!, result.flags),
         },
         startToken,
-        this._lexer.peek()
+        this._lexer.peek(),
       );
     }
     this.reportError("W002", startToken, result.pattern ?? "");
@@ -2499,7 +2576,11 @@ export class Parser {
    * @param errorCode Error to raise if the next token is not expected
    * @param allowEof Allow an EOF instead of the expected token?
    */
-  private expectToken(type: TokenType, errorCode?: ScriptParsingErrorCodes, allowEof?: boolean): Token | null {
+  private expectToken(
+    type: TokenType,
+    errorCode?: ScriptParsingErrorCodes,
+    allowEof?: boolean,
+  ): Token | null {
     const next = this._lexer.peek();
     if (next.type === type || (allowEof && next.type === TokenType.Eof)) {
       // --- Skip the expected token
@@ -2546,7 +2627,9 @@ export class Parser {
   private reportError(errorCode: ScriptParsingErrorCodes, token?: Token, ...options: any[]): void {
     let errorText: string = errorMessages[errorCode] ?? "Unkonwn error";
     if (options) {
-      options.forEach((o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())));
+      options.forEach(
+        (o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())),
+      );
     }
     if (!token) {
       token = this._lexer.peek();
@@ -2581,7 +2664,7 @@ export class Parser {
     stump: any,
     startToken: Token,
     endToken?: Token,
-    source?: string
+    source?: string,
   ): T {
     if (!endToken) {
       endToken = this._lexer.peek();
@@ -2613,7 +2696,7 @@ export class Parser {
     stump: any = {},
     startToken?: Token,
     endToken?: Token,
-    source?: string
+    source?: string,
   ): T {
     if (!endToken) {
       endToken = this._lexer.peek();
@@ -2648,15 +2731,15 @@ export class Parser {
     type: Statement["type"],
     stump: any,
     startToken?: Token,
-    endToken?: Token
+    endToken?: Token,
   ): T {
     const startPosition = startToken?.location?.startPosition;
     const currentToken = this._lexer.peek();
     const endPosition = endToken
       ? endToken.location.endPosition
       : currentToken.type === TokenType.Eof
-      ? currentToken.location.startPosition + 1
-      : currentToken.location.startPosition;
+        ? currentToken.location.startPosition + 1
+        : currentToken.location.startPosition;
     return Object.assign({}, stump, {
       type,
       startPosition,
@@ -2683,7 +2766,7 @@ export class Parser {
   private getSource(start: Token, end: Token): string {
     return this.source.substring(
       start.location.startPosition,
-      end.type === TokenType.Eof ? end.location.startPosition : end.location.endPosition
+      end.type === TokenType.Eof ? end.location.startPosition : end.location.endPosition,
     );
   }
 
@@ -2705,7 +2788,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2727,7 +2810,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2749,7 +2832,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2765,7 +2848,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2773,8 +2856,11 @@ export class Parser {
    * Converts a string token to intrinsic string
    * @param token Literal token
    */
-  private parseStringLiteral(token: Token): Literal {
-    const input = token.text.length < 2 ? "" : token.text.substring(1, token.text.length - 1);
+  private parseStringLiteral(token: Token, quoteSurrounded: boolean = true): Literal {
+    let input = token.text;
+    if (quoteSurrounded) {
+      input = token.text.length < 2 ? "" : input.substring(1, input.length - 1);
+    }
     let result = "";
     let state: StrParseState = StrParseState.Normal;
     let collect = 0;
@@ -3001,7 +3087,7 @@ export class Parser {
         value: result,
       },
       token,
-      token
+      token,
     );
 
     function isHexaDecimal(ch: string): boolean {
@@ -3011,21 +3097,31 @@ export class Parser {
 
   private convertToArrayDestructure(seq: SequenceExpression | ArrayLiteral): Destructure | null {
     const items = seq.type === "SeqE" ? seq.expressions : seq.items;
-    const result = this.createExpressionNode<Destructure>("Destr", { arrayDestruct: [] }, seq.startToken, seq.endToken);
+    const result = this.createExpressionNode<Destructure>(
+      "Destr",
+      { arrayDestruct: [] },
+      seq.startToken,
+      seq.endToken,
+    );
 
     // --- Convert all items
     for (const item of items) {
       let arrayD: ArrayDestructure | undefined;
       switch (item.type) {
         case "NoArgE":
-          arrayD = this.createExpressionNode<ArrayDestructure>("ADestr", {}, item.startToken, item.endToken);
+          arrayD = this.createExpressionNode<ArrayDestructure>(
+            "ADestr",
+            {},
+            item.startToken,
+            item.endToken,
+          );
           break;
         case "IdE":
           arrayD = this.createExpressionNode<ArrayDestructure>(
             "ADestr",
             { id: item.name },
             item.startToken,
-            item.endToken
+            item.endToken,
           );
           break;
         case "Destr":
@@ -3043,7 +3139,7 @@ export class Parser {
                 arrayDestruct: destructure.arrayDestruct,
               },
               item.startToken,
-              item.endToken
+              item.endToken,
             );
           }
           break;
@@ -3055,7 +3151,7 @@ export class Parser {
               objectDestruct: item,
             },
             item.startToken,
-            item.endToken
+            item.endToken,
           );
           break;
         case "OLitE": {
@@ -3067,7 +3163,7 @@ export class Parser {
                 objectDestruct: destructure.objectDestruct,
               },
               item.startToken,
-              item.endToken
+              item.endToken,
             );
           }
           break;
@@ -3089,7 +3185,7 @@ export class Parser {
       "Destr",
       { objectDestruct: [] },
       objLit.startToken,
-      objLit.endToken
+      objLit.endToken,
     );
 
     // --- Convert all items
@@ -3114,7 +3210,7 @@ export class Parser {
               "ODestr",
               { id: propKey.name },
               propValue.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           } else {
             objD = this.createExpressionNode<ObjectDestructure>(
@@ -3124,7 +3220,7 @@ export class Parser {
                 alias: propValue.name,
               },
               propValue.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;
@@ -3136,7 +3232,7 @@ export class Parser {
               arrayDestruct: propValue,
             },
             propKey.startToken,
-            propValue.endToken
+            propValue.endToken,
           );
           break;
         }
@@ -3150,7 +3246,7 @@ export class Parser {
                 arrayDestruct: destructure.arrayDestruct,
               },
               propKey.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;
@@ -3168,7 +3264,7 @@ export class Parser {
                 objectDestruct: destructure.objectDestruct,
               },
               propKey.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;
@@ -3191,3 +3287,4 @@ export class Parser {
     return tokenTraits[token.type]?.expressionStart ?? false;
   }
 }
+"TypeError: Cannot read properties of undefined (reading 'canBeUnary')\n    at Parser.parseUnaryOrPrefixExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:2041:38)\n    at Parser.parseExponentialExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1985:25)\n    at Parser.parseMultExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1951:25)\n    at Parser.parseAddExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1917:25)\n    at Par…nExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1835:25)\n    at Parser.parseEquExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1793:25)\n    at Parser.parseBitwiseAndExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1760:25)\n    at Parser.parseBitwiseXorExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1727:25)\n    at Parser.parseBitwiseOrExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1694:25)"
