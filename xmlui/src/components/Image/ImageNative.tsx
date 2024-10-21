@@ -28,7 +28,7 @@ export const Image = forwardRef(function Img(
       className={classnames(styles.img, {
         [styles.clickable]: !!onClick,
       })}
-      style={{ objectFit: fit, ...layout, aspectRatio: aspectRatio }}
+      style={{ objectFit: fit, boxShadow: "none", ...layout, aspectRatio: aspectRatio }}
       onClick={onClick}
     />
   );

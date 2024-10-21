@@ -137,8 +137,13 @@ It works the same way as the [Switch](#switch) component - the only difference i
 <App>
   <HStack>
     Enabled checkboxes:
-    <Checkbox initialValue="true" enabled="true" />
-    <Checkbox initialValue="false" enabled="true" />
+    <Checkbox id="check1" initialValue="true" enabled="true" />
+    <Checkbox id="check2" initialValue="false" enabled="true" />
+  </HStack>
+  <HStack>
+    Checkbox values:
+    <Text value="{check1.value}" />
+    <Text value="{check2.value}" />
   </HStack>
   <HStack>
     Disabled checkboxes:
@@ -155,8 +160,13 @@ It works the same way as the [Switch](#switch) component - the only difference i
     <App>
       <HStack>
         Enabled checkboxes:
-        <Checkbox initialValue="true" enabled="true" />
-        <Checkbox initialValue="false" enabled="true" />
+        <Checkbox id="check1" initialValue="true" enabled="true" />
+        <Checkbox id="check2" initialValue="false" enabled="true" />
+      </HStack>
+      <HStack>
+        Checkbox values:
+        <Text value="{check1.value}" />
+        <Text value="{check2.value}" />
       </HStack>
       <HStack>
         Disabled checkboxes:
@@ -210,8 +220,13 @@ It works the same way as the [Checkbox](#checkbox) component - the only differen
 <App>
   <HStack>
     Enabled switches:
-    <Switch initialValue="true" enabled="true" />
-    <Switch initialValue="false" enabled="true" />
+    <Switch id="switch1" initialValue="true" enabled="true" />
+    <Switch id="switch2" initialValue="false" enabled="true" />
+  </HStack>
+  <HStack>
+    Switch values:
+    <Text value="{switch1.value}" />
+    <Text value="{switch2.value}" />
   </HStack>
   <HStack>
     Disabled switches:
@@ -228,8 +243,13 @@ It works the same way as the [Checkbox](#checkbox) component - the only differen
     <App>
       <HStack>
         Enabled switches:
-        <Switch initialValue="true" enabled="true" />
-        <Switch initialValue="false" enabled="true" />
+        <Switch id="switch1" initialValue="true" enabled="true" />
+        <Switch id="switch2" initialValue="false" enabled="true" />
+      </HStack>
+      <HStack>
+        Switch values:
+        <Text value="{switch1.value}" />
+        <Text value="{switch2.value}" />
       </HStack>
       <HStack>
         Disabled switches:
@@ -248,13 +268,14 @@ This component can contain a set of radio group buttons (`RadioGroupOption`) and
 
 ```ueml copy
 <App>
-  <RadioGroup initialValue="first">
+  <RadioGroup id="group1" initialValue="first">
     <HStack>
       <RadioGroupOption label="First Item" value="first"/>
       <RadioGroupOption label="Second Item" value="second"/>
       <RadioGroupOption label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
+  <Text value="RadioGroup value: {group1.value}" />
 </App>
 ```
 
@@ -263,13 +284,14 @@ This component can contain a set of radio group buttons (`RadioGroupOption`) and
   name="Example: RadioGroup"
   app={`
     <App>
-      <RadioGroup initialValue="first">
+      <RadioGroup id="group1" initialValue="first">
         <HStack>
           <RadioGroupOption label="First Item" value="first"/>
           <RadioGroupOption label="Second Item" value="second"/>
           <RadioGroupOption label="Third Item" value="third"/>
         </HStack>
       </RadioGroup>
+      <Text value="RadioGroup value: {group1.value}" />
     </App>
   `}
 />
@@ -369,7 +391,7 @@ For selecting multiple items from a list, refer to the [MultiCombobox component]
 />
 
 <Callout type="info" emoji="💡">
-  The `Combobox` lets you customize its list items and even how an empty list is displayed.
+  The `Combobox` lets you customize how an empty list is displayed.
 </Callout>
 
 ```ueml copy {5-7}
@@ -418,6 +440,10 @@ For selecting multiple items from a list, refer to the [MultiCombobox component]
   </Combobox>
 </App>
 ```
+
+<Callout type="info" emoji="💡">
+  The `Combobox` also lets you customize its list items.
+</Callout>
 
 <Playground
   previewOnly
@@ -733,7 +759,7 @@ For selecting multiple items from a list, refer to the [MultiSelect component](#
 />
 
 The list items and the empty list display are both customizable.
-For examples, see the [Combobox section](#combobox).
+For examples, see the <SmartLink href="#combobox">Combobox section</SmartLink>.
 
 See the <SmartLink href={COMPONENT_SELECT}>Select component reference</SmartLink> to know more.
 
@@ -767,9 +793,11 @@ To add new lines to the input field, press `Shift` + `Enter`.
   Note that if either `autoSize`, `maxRows` or `minRows` is set, the `rows` property has no effect.
 </Callout>
 
-```ueml copy {4, 11} /rows="3"/
+```ueml copy {6, 14} /rows="3"/
 <App>
+  <!-- Display exactly three rows no matter the content -->
   <TextArea rows="3" initialValue="Lorem ipsum dolor sit amet..." />
+  <!-- Display at most three rows but show less if there is not enough content -->
   <TextArea
     maxRows="3"
     initialValue="Lorem ipsum dolor sit amet,
@@ -777,6 +805,7 @@ To add new lines to the input field, press `Shift` + `Enter`.
     sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
     Ut enim ad minim veniam,
     quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
+  <!-- Display at least three rows and grow if necessary -->
   <TextArea
     minRows="3"
     initialValue="Lorem ipsum dolor sit amet,
@@ -809,7 +838,7 @@ To add new lines to the input field, press `Shift` + `Enter`.
         quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
     </App>
   `}
-  height={400}
+  height={460}
 />
 
 <Callout type="info" emoji="💡">
@@ -820,13 +849,13 @@ To add new lines to the input field, press `Shift` + `Enter`.
 <App>
   <TextArea
     resize="vertical"
-    initialValue="Lorem ipsum dolor sit amet..." />
+    initialValue="You can resize me vertically" />
   <TextArea
     resize="horizontal"
-    initialValue="Lorem ipsum dolor sit amet..." />
+    initialValue="You can resize me horizontally" />
   <TextArea
     resize="both"
-    initialValue="Lorem ipsum dolor sit amet..." />
+    initialValue="You can resize me both ways" />
 </App>
 ```
 
@@ -837,13 +866,13 @@ To add new lines to the input field, press `Shift` + `Enter`.
     <App>
       <TextArea
         resize="vertical"
-        initialValue="Lorem ipsum dolor sit amet..." />
+        initialValue="You can resize me vertically" />
       <TextArea
         resize="horizontal"
-        initialValue="Lorem ipsum dolor sit amet..." />
+        initialValue="You can resize me horizontally" />
       <TextArea
         resize="both"
-        initialValue="Lorem ipsum dolor sit amet..." />
+        initialValue="You can resize me both ways" />
     </App>
   `}
   height={340}
@@ -879,10 +908,18 @@ For details, see the <SmartLink href={COMPONENT_TEXTAREA}>TextBox component refe
 
 A `Link` component represents a hyperlink used to link from one page to another (can be a subpage of the app or external).
 
+<Callout type="info" emoji="💡">
+  **Note:** The `target` property set to "_blank" ensures the link opens in a new tab.
+</Callout>
+
 ```ueml copy
 <App>
-  <Link to="https://docs.xmlui.com/">XMLUI introduction</Link>
-  <Link to="https://docs.xmlui.com/" enabled="false">Disabled XMLUI introduction</Link>
+  <Link to="https://docs.xmlui.com/" target="_blank">
+    XMLUI introduction
+  </Link>
+  <Link to="https://docs.xmlui.com/" enabled="false" target="_blank">
+    Disabled XMLUI introduction
+  </Link>
 </App>
 ```
 
@@ -891,8 +928,8 @@ A `Link` component represents a hyperlink used to link from one page to another 
   name="Example: Using Link"
   app={`
     <App>
-      <Link to="https://docs.xmlui.com/">XMLUI introduction</Link>
-      <Link to="https://docs.xmlui.com/" enabled="false">Disabled XMLUI introduction</Link>
+      <Link to="https://docs.xmlui.com/" target="_blank">XMLUI introduction</Link>
+      <Link to="https://docs.xmlui.com/" enabled="false" target="_blank">Disabled XMLUI introduction</Link>
     </App>
   `}
 />
@@ -901,11 +938,12 @@ A `Link` component represents a hyperlink used to link from one page to another 
   Add an icon and text via relevant properties to leverage built-in styling.
 </Callout>
 
-```ueml copy
+```ueml copy {3-4}
 <App>
   <Link 
     label="XMLUI introduction"
     icon="star"
+    target="_blank"
     to="https://docs.xmlui.com/" />
 </App>
 ```
@@ -918,6 +956,7 @@ A `Link` component represents a hyperlink used to link from one page to another 
       <Link 
         label="XMLUI introduction"
         icon="star"
+        target="_blank"
         to="https://docs.xmlui.com/" />
     </App>
   `}
@@ -960,6 +999,11 @@ The `Badge` is a text label that accepts a color map to define its background co
     <App>
       <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
       Regular Badge
+      <HStack>
+        <Badge value="no mapped color" />
+        <Badge variant="pill" value="no mapped color" />
+      </HStack>
+      With "colorMap"
       <HStack>
         <Badge value="no mapped color" colorMap="{simpleColorMap}" />
         <Badge value="important" colorMap="{simpleColorMap}" />
@@ -1014,14 +1058,12 @@ It visually separates its content from its surroundings.
 
 <Callout type="info" emoji="💡">
   The component also provides prestyled elements that are accessible via the Card properties.
-  Note, that the `linkTo` property only works if the `title` property is set.
 </Callout>
 
 ```ueml copy
 <App>
   <Card
     avatarUrl="https://i.pravatar.cc/100"
-    linkTo="https://docs.xmlui.com/"
     title="Predefined Title"
     subtitle="Predefined Subtitle">
     <HStack>
@@ -1091,9 +1133,13 @@ This component is the representation of an icon.
 ```ueml copy
 <App>
   <HStack>
-    <Icon name="non-existing-icon" backgroundColor="olive" />
+    No icon displayed:
+    <Icon name="non-existing-icon" />
+  </HStack>
+  <HStack>
+    Fallback displayed:
     <Icon name="non-existing-icon-with-fallback" fallback="trash" />
-  </Hstack>
+  </HStack>
 </App>
 ```
 
@@ -1103,7 +1149,11 @@ This component is the representation of an icon.
   app={`
     <App>
       <HStack>
-        <Icon name="non-existing-icon" backgroundColor="olive" />
+        No icon displayed:
+        <Icon name="non-existing-icon" />
+      </HStack>
+      <HStack>
+        Fallback displayed:
         <Icon name="non-existing-icon-with-fallback" fallback="trash" />
       </HStack>
     </App>
@@ -1135,7 +1185,7 @@ It functions as a container for a picture.
   app={`
     <App>
       <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
-      <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" />
+      <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" shadow="$shadow-spread" />
     </App>
   `}
 />
@@ -1205,8 +1255,6 @@ See the <SmartLink href={COMPONENT_PROGRESSBAR}>ProgressBar component reference<
 
 The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
 
-> **Note**: `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
-
 ```ueml copy
 <App>
   <Spinner />
@@ -1274,7 +1322,7 @@ For further details see the <SmartLink href={COMPONENT_SPINNER}>Spinner componen
 
 A `ContentSeparator` is a component that divides or separates content visually within a layout.
 
-```ueml copy
+```ueml copy {5, 10, 15}
 <App>
   <Heading level="h2">
     Lorem Ipsum
@@ -1368,6 +1416,13 @@ Its behavior depends on the layout container.
 
 ```ueml copy
 <App>
+  <!-- FlowLayout without SpaceFiller -->
+  <FlowLayout>
+    <Text width="20%">First Element</Text>
+    <Text width="20%">Second Element</Text>
+  </FlowLayout>
+  <ContentSeparator />
+  <!-- FlowLayout with SpaceFiller -->
   <FlowLayout>
     <Text width="20%">First Element</Text>
     <SpaceFiller />
@@ -1381,6 +1436,11 @@ Its behavior depends on the layout container.
   previewOnly
   app={`
   <App>
+    <FlowLayout>
+      <Text width="20%">First Element</Text>
+      <Text width="20%">Second Element</Text>
+    </FlowLayout>
+    <ContentSeparator />
     <FlowLayout>
       <Text width="20%">First Element</Text>
       <SpaceFiller />
