@@ -1,5 +1,8 @@
 {
+  "AppHeader": "Using AppHeader",
+  "Footer": "Using Footer",
   "layout": "Layout",
+  "menus": "Menus",
   "events": "Events",
   "complex-radiogroup-layout": "Complex RadioGroup Layouts"
 }

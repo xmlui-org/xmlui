@@ -120,6 +120,18 @@ export const AppHeader = ({
   );
 };
 
+type AppContextAwareAppHeaderProps = {
+  children?: ReactNode;
+  profileMenu?: ReactNode;
+  style?: React.CSSProperties;
+  logoContent?: ReactNode;
+  className?: string;
+  title?: string;
+  titleContent?: ReactNode;
+  showLogo?: boolean;
+  renderChild: RenderChildFn;
+};
+
 export function AppContextAwareAppHeader({
   children,
   logoContent,
@@ -128,17 +140,9 @@ export function AppContextAwareAppHeader({
   className,
   title,
   titleContent,
+  showLogo = true,
   renderChild,
-}: {
-  children?: ReactNode;
-  profileMenu?: ReactNode;
-  style?: React.CSSProperties;
-  logoContent?: ReactNode;
-  className?: string;
-  title?: string;
-  titleContent?: ReactNode;
-  renderChild: RenderChildFn;
-}) {
+}: AppContextAwareAppHeaderProps) {
   const appLayoutContext = useAppLayoutContext();
 
   const {
@@ -151,7 +155,7 @@ export function AppContextAwareAppHeader({
   } = appLayoutContext || {};
 
   // console.log("APP LAYOUT CONTEXT", appLayoutContext);
-  const showLogo = layout !== "vertical" && layout !== "vertical-sticky";
+  const displayLogo = layout !== "vertical" && layout !== "vertical-sticky" && showLogo;
   const canRestrictContentWidth = layout !== "vertical-full-header";
 
   return (
@@ -160,7 +164,7 @@ export function AppContextAwareAppHeader({
       navPanelVisible={navPanelVisible}
       toggleDrawer={toggleDrawer}
       canRestrictContentWidth={canRestrictContentWidth}
-      showLogo={showLogo}
+      showLogo={displayLogo}
       logoContent={logoContent || renderChild(logoContentDef)}
       profileMenu={profileMenu}
       style={style}

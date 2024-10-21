@@ -27,6 +27,7 @@ export const AppHeaderMd = createMetadata({
         `construct your custom title instead of using a single image.`,
     ),
     title: d("Title for the application logo"),
+    showLogo: d("Show the logo in the header", null, "boolean", true),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -67,6 +68,7 @@ export const appHeaderComponentRenderer = createComponentRenderer(
       <AppContextAwareAppHeader
         profileMenu={renderChild(extractValue(node.props.profileMenuTemplate, true))}
         title={extractValue(node.props.title)}
+        showLogo={extractValue.asOptionalBoolean(node.props.showLogo, true)}
         titleContent={
           titleTemplate && (
             <SlotItem
