@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components'
-import { COMPONENT_BUTTON, COMPONENT_CHECKBOX, COMPONENT_COMBOBOX, COMPONENT_DATEPICKER, COMPONENT_LINK, COMPONENT_MULTICOMBOBOX, COMPONENT_MULTISELECT, COMPONENT_NUMBERBOX, COMPONENT_RADIOGROUP, COMPONENT_SELECT, COMPONENT_SWITCH, COMPONENT_TEXTAREA, ROUTING } from "../../meta/pages"
+import { COMPONENT_BADGE, COMPONENT_BUTTON, COMPONENT_CHECKBOX, COMPONENT_COMBOBOX, COMPONENT_CONTENTSEPARATOR, COMPONENT_DATEPICKER, COMPONENT_ICON, COMPONENT_IMAGE, COMPONENT_LINK, COMPONENT_MULTICOMBOBOX, COMPONENT_MULTISELECT, COMPONENT_NUMBERBOX, COMPONENT_PROGRESSBAR, COMPONENT_RADIOGROUP, COMPONENT_SELECT, COMPONENT_SPACEFILLER, COMPONENT_SPINNER, COMPONENT_SWITCH, COMPONENT_TEXTAREA, ROUTING, WORKING_WITH_RESOURCES } from "../../meta/pages"
 
 # Basic Components
 
@@ -928,3 +928,466 @@ A `Link` component represents a hyperlink used to link from one page to another 
 </Callout>
 
 Also see the <SmartLink href={COMPONENT_LINK}>Link component reference</SmartLink> to know more about the component itself.
+
+## Badge
+
+The `Badge` is a text label that accepts a color map to define its background color and, optionally, its label color.
+
+```ueml copy
+<App>
+  <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+  Regular Badge
+  <HStack>
+    <Badge value="no mapped color" colorMap="{simpleColorMap}" />
+    <Badge value="important" colorMap="{simpleColorMap}" />
+    <Badge value="regular" colorMap="{simpleColorMap}" />
+    <Badge value="unimportant" colorMap="{simpleColorMap}" />
+  </HStack>
+  Pill Shaped Badge
+  <HStack>
+    <Badge variant="pill" value="no mapped color" colorMap="{simpleColorMap}" />
+    <Badge variant="pill" value="important" colorMap="{simpleColorMap}" />
+    <Badge variant="pill" value="regular" colorMap="{simpleColorMap}" />
+    <Badge variant="pill" value="unimportant" colorMap="{simpleColorMap}" />
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Badge"
+  app={`
+    <App>
+      <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+      Regular Badge
+      <HStack>
+        <Badge value="no mapped color" colorMap="{simpleColorMap}" />
+        <Badge value="important" colorMap="{simpleColorMap}" />
+        <Badge value="regular" colorMap="{simpleColorMap}" />
+        <Badge value="unimportant" colorMap="{simpleColorMap}" />
+      </HStack>
+      Pill Shaped Badge
+      <HStack>
+        <Badge variant="pill" value="no mapped color" colorMap="{simpleColorMap}" />
+        <Badge variant="pill" value="important" colorMap="{simpleColorMap}" />
+        <Badge variant="pill" value="regular" colorMap="{simpleColorMap}" />
+        <Badge variant="pill" value="unimportant" colorMap="{simpleColorMap}" />
+      </HStack>
+    </App>
+  `}
+/>
+
+Also see the <SmartLink href={COMPONENT_BADGE}>Badge component reference</SmartLink> to know more about the component itself.
+
+## Card
+
+The `Card` component is a container for grouping other UI elements.
+It visually separates its content from its surroundings.
+
+```ueml copy
+<App>
+  <Card>
+    <HStack>
+      <Icon name="info" />
+      <Text value="Information" variant="strong" />
+    </HStack>
+    This is an example text
+  </Card>
+</App>
+```
+
+<Playground
+  name="Example: Using Card"
+  previewOnly
+  app={`
+    <App>
+      <Card>
+        <HStack>
+          <Icon name="info" />
+          <Text value="Information" variant="strong" />
+        </HStack>
+        This is an example text
+      </Card>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  The component also provides prestyled elements that are accessible via the Card properties.
+  Note, that the `linkTo` property only works if the `title` property is set.
+</Callout>
+
+```ueml copy
+<App>
+  <Card
+    avatarUrl="https://i.pravatar.cc/100"
+    linkTo="https://docs.xmlui.com/"
+    title="Predefined Title"
+    subtitle="Predefined Subtitle">
+    <HStack>
+      <Icon name="info"/>
+      This is the content of the card. You can place anything here.
+      Currently, it contains an icons with some example text.
+    </HStack>
+  </Card>
+</App>
+```
+
+<Playground
+  name="Example: Prestyled Elements in Card"
+  previewOnly
+  app={`
+    <App>
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        linkTo="https://docs.xmlui.com/"
+        title="Predefined Title"
+        subtitle="Predefined Subtitle">
+        <HStack>
+          <Icon name="info"/>
+          This is the content of the card. You can place anything here.
+          Currently, it contains an icons with some example text.
+        </HStack>
+      </Card>
+    </App>
+  `}
+/>
+
+## Icon
+
+This component is the representation of an icon.
+
+```ueml copy
+<App>
+  <HStack>
+    <Icon name="message" />
+    <Icon name="note" />
+    <Icon name="cog" />
+    <Icon name="start" />
+  </Hstack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Icon"
+  app={`
+    <App>
+      <HStack>
+        <Icon name="message" />
+        <Icon name="note" />
+        <Icon name="cog" />
+        <Icon name="start" />
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  If an icon name does not correspond to a valid graphical element, you can use a fallback icon.
+  No icon is rendered if no fallback is specified.
+</Callout>
+
+```ueml copy
+<App>
+  <HStack>
+    <Icon name="non-existing-icon" backgroundColor="olive" />
+    <Icon name="non-existing-icon-with-fallback" fallback="trash" />
+  </Hstack>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Fallback Icon"
+  app={`
+    <App>
+      <HStack>
+        <Icon name="non-existing-icon" backgroundColor="olive" />
+        <Icon name="non-existing-icon-with-fallback" fallback="trash" />
+      </HStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  It is possible to use your own icons instead of the built-in ones and
+  also define new icons <SmartLink href={WORKING_WITH_RESOURCES}>using the resource attribute</SmartLink> in the app config file.
+</Callout>
+
+See the <SmartLink href={COMPONENT_ICON}>Icon component reference</SmartLink> to know more.
+
+## Image
+
+The `Image` component can display complex graphical images.
+It functions as a container for a picture.
+
+```ueml copy
+<App>
+  <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
+  <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Using Image"
+  app={`
+    <App>
+      <Image src="/resources/images/components/image/breakfast.jpg" width="240px" />
+      <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" width="240px" />
+    </App>
+  `}
+/>
+
+{/* <Callout type="info" emoji="💡">
+  How the Image component displays a picture can be affected by these properties: `fit`, `aspectRatio`.
+</Callout>
+
+
+```ueml copy
+<App>
+  <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
+  <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
+  <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" width="240px" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Sizing Images"
+  app={`
+  <App>
+    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
+    <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
+    <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" width="240px" />
+  </App>
+  `}
+/> */}
+
+See the <SmartLink href={COMPONENT_IMAGE}>Image component reference</SmartLink> to know more.
+
+## ProgressBar
+
+A `ProgressBar` component visually represents the progress of a task or process.
+
+```ueml copy
+<App>
+  <ProgressBar value="0"/>
+  <ProgressBar value="0.2"/>
+  <ProgressBar value="0.6"/>
+  <ProgressBar value="1"/>
+  <ProgressBar value="1.2"/>
+</App>
+```
+
+<Playground
+  name="Example: Using ProgressBar"
+  previewOnly
+  app={`
+    <App>
+      <ProgressBar value="0"/>
+      <ProgressBar value="0.2"/>
+      <ProgressBar value="0.6"/>
+      <ProgressBar value="1"/>
+      <ProgressBar value="1.2"/>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Use some kind of logic when setting the `value` property to represent change.
+</Callout>
+
+See the <SmartLink href={COMPONENT_PROGRESSBAR}>ProgressBar component reference</SmartLink> to know more.
+
+## Spinner
+
+The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value.
+
+> **Note**: `Spinner` ignores the `width`, `minWidth`, `maxWidth`, `height`, `minHeight`, and `maxHeight` properties. If you want to change its size, use the `size-Spinner` theme variable (see details is the [Styling](#styling) section).
+
+```ueml copy
+<App>
+  <Spinner />
+</App>
+```
+
+<Playground
+  name="Example: Using Spinner"
+  previewOnly
+  app={`
+  <App>
+    <Spinner />
+  </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  Use the `delay` property to control when the Spinner is displayed.
+</Callout>
+
+Use the buttons to toggle between the two `Spinners` in the demo app:
+
+```ueml copy
+<App>
+  <var name="noDelay" value="{true}" />
+  <var name="yesDelay" value="{false}" />
+  <HStack>
+    <Button
+      label="No delay"
+      onClick="noDelay = true; yesDelay = false;" />
+    <Button
+      label="1000 ms delay"
+      onClick="noDelay = false; yesDelay = true;" />
+  </HStack>
+  <Spinner when="{noDelay}" delay="0" />
+  <Spinner when="{yesDelay}" delay="1000" />
+</App>
+```
+
+<Playground
+  name="Example: Delayed Spinner Display"
+  previewOnly
+  height={200}
+  app={`
+    <App>
+      <var name="noDelay" value="{true}" />
+      <var name="yesDelay" value="{false}" />
+      <HStack>
+        <Button
+          label="No delay"
+          onClick="noDelay = true; yesDelay = false;" />
+        <Button
+          label="1000 ms delay"
+          onClick="noDelay = false; yesDelay = true;" />
+      </HStack>
+      <Spinner when="{noDelay}" delay="0" />
+      <Spinner when="{yesDelay}" delay="1000" />
+    </App>
+  `}
+/>
+
+For further details see the <SmartLink href={COMPONENT_SPINNER}>Spinner component reference</SmartLink>.
+
+## ContentSeparator
+
+A `ContentSeparator` is a component that divides or separates content visually within a layout.
+
+```ueml copy
+<App>
+  <Heading level="h2">
+    Lorem Ipsum
+  </Heading>
+  <ContentSeparator />
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
+  ut aliquip ex ea commodo consequat.
+  <ContentSeparator orientation="horizontal" />
+  <HStack>
+    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+    dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+    non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    <ContentSeparator orientation="vertical" />
+    Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+    accusantium doloremque laudantium, totam rem aperiam,
+    eaque ipsa quae ab illo inventore veritatis et quasi architecto
+    beatae vitae dicta sunt explicabo.
+  </HStack>
+</App>
+```
+
+<Playground
+  previewOnly
+  height={360}
+  name="Example: Using ContentSeparator"
+  app={`
+  <App>
+    <Heading level="h2">
+      Lorem Ipsum
+    </Heading>
+    <ContentSeparator />
+    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi
+    ut aliquip ex ea commodo consequat.
+    <ContentSeparator orientation="horizontal" />
+    <HStack>
+      Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+      dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat
+      non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      <ContentSeparator orientation="vertical" />
+      Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+      accusantium doloremque laudantium, totam rem aperiam,
+      eaque ipsa quae ab illo inventore veritatis et quasi architecto
+      beatae vitae dicta sunt explicabo.
+    </HStack>
+  </App>
+  `}
+/>
+
+See the <SmartLink href={COMPONENT_CONTENTSEPARATOR}>ContentSeparator component reference</SmartLink> to know more.
+
+## SpaceFiller
+
+The `SpaceFiller` is a component that is used to fill the remaining (unused) space in layout containers.
+Its behavior depends on the layout container.
+
+<Callout type="info" emoji="💡">
+  In a `Stack`, it pushes other elements to the other end of the container.
+</Callout>
+
+```ueml copy
+<App>
+  <HStack>
+    First element
+    <SpaceFiller />
+    Second element
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: Using SpaceFiller in Stack"
+  previewOnly
+  app={`
+  <App>
+    <HStack>
+      First element
+      <SpaceFiller />
+      Second element
+    </HStack>
+  </App>
+  `}
+/>
+
+<Callout type="info" emoji="💡">
+  In a `FlowLayout`, it acts as a line break in a row.
+</Callout>
+
+```ueml copy
+<App>
+  <FlowLayout>
+    <Text width="20%">First Element</Text>
+    <SpaceFiller />
+    <Text width="20%">Second Element</Text>
+  </FlowLayout>
+</App>
+```
+
+<Playground
+  name="Example: Using SpaceFiller in FlowLayout"
+  previewOnly
+  app={`
+  <App>
+    <FlowLayout>
+      <Text width="20%">First Element</Text>
+      <SpaceFiller />
+      <Text width="20%">Second Element</Text>
+    </FlowLayout>
+  </App>
+  `}
+/>
+
+See the <SmartLink href={COMPONENT_SPACEFILLER}>SpaceFiller component reference</SmartLink> to know more.
