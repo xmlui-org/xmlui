@@ -219,10 +219,8 @@ Add a code-behind file, `CategoryBadge.xmlui.xs`, to the new component using the
 
 ```js copy filename="CategoryBadge.xmlui.xs"
 var category = categories.value.find(t => t.id === $props.categoryId);
-
-var categoriesColorMap = categories.value.reduce((acc, category) => {
-  return {...acc, [category.name]:  category.color };
-}, {});
+ 
+var categoriesColorMap = toHashObject(categories.value, "name", "color");
 ```
 
 Change the `Text` element within the first `Columnn` to the new `CategoryBadge` element and update the width of the Category column:

@@ -33,7 +33,7 @@ const defaultOptionRenderer = {
 };
 
 export const SelectMd = createMetadata({
-  description: "A dropdown list of options",
+  description: "Provides a dropdown with a list of options to choose from.",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),

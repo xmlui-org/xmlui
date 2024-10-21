@@ -120,7 +120,7 @@ export const NumberBox = ({
       const repr = value;
       updateValue(value, repr);
     },
-    [integersOnly, updateValue, min, max, zeroOrPositive, value],
+    [updateValue],
   );
 
   // --- Stepper logic
@@ -148,7 +148,7 @@ export const NumberBox = ({
   const handleOnBeforeInput = (event: any) => {
     // --- Prevent the default behavior for some characters
     let shouldPreventDefault = false;
-    let currentValue: string = event.target.value ?? "";
+    const currentValue: string = event.target.value ?? "";
     const currentPos = event.target.selectionStart;
 
     // --- Are the caret after the exponential separator?
@@ -382,7 +382,7 @@ function applyStep(
   if (isEmptyLike(currentValue)) {
     return;
   }
-  let newValue = clamp(currentValue + step, min, max);
+  const newValue = clamp(currentValue + step, min, max);
   return newValue;
 }
 

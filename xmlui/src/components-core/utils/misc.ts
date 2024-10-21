@@ -463,6 +463,13 @@ export function pluralize(number: number, singular: string, plural: string) {
   return `${number} ${plural}`;
 }
 
+export function toHashObject(arr: any[], keyProp: string, valueProp: string) {
+  return (arr ?? []).reduce((acc, item) => {
+    acc[item[keyProp]] = item[valueProp];
+    return acc;
+  }, {});
+}
+
 // from here: https://github.com/lodash/lodash/issues/4815
 /**
  * Throttles an async function in a way that can be awaited.

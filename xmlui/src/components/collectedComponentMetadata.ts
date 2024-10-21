@@ -86,6 +86,7 @@ import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { CarouselItemMd } from "./Carousel/CarouselItem";
+import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -192,5 +193,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   TrendLabel: TrendLabelMd,
   Theme: ThemeMd,
   ThemeChangerButton: ThemeChangerButtonMd,
+  ToneChangerButton: ToneChangerButtonMd,
   Tree: TreeMd,
 };
