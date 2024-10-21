@@ -1,4 +1,4 @@
-import type { Dispatch, MutableRefObject, ReactNode, SetStateAction } from "react";
+import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
 import React, {
   forwardRef,
   Fragment,
@@ -92,7 +92,7 @@ import {
   useShallowCompareMemoize,
 } from "@components-core/utils/hooks";
 import { LoaderComponent } from "@components-core/LoaderComponent";
-import { AppContextObject } from "@abstractions/AppContextDefs";
+import type { AppContextObject } from "@abstractions/AppContextDefs";
 
 /**
  * This function signature is used whenever the engine wants to sign that an object's field (property),
@@ -523,7 +523,7 @@ const MemoizedContainer = memo(
     });
 
     const stableRenderChild: RenderChildFn = useCallback(
-      (childNode, lc, pRenderContext) => {
+      (childNode, lc, pRenderContext, uidInfoRef) => {
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
         }
@@ -552,6 +552,7 @@ const MemoizedContainer = memo(
             parentRenderContext: pRenderContext,
             memoedVarsRef,
             cleanup,
+            uidInfoRef,
           });
           if (renderedChild === undefined) {
             return undefined;
@@ -605,6 +606,8 @@ const MemoizedContainer = memo(
     // --- may use the same UID.
     const uidInfo: Record<string, string> = {};
 
+    const uidInfoRef = useRef({});
+
     return (
       <Fragment
         key={
@@ -615,6 +618,7 @@ const MemoizedContainer = memo(
       >
         {renderLoaders({
           uidInfo,
+          uidInfoRef,
           loaders: node.loaders,
           componentState,
           //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
@@ -624,9 +628,15 @@ const MemoizedContainer = memo(
             : registerComponentApi,
           appContext,
           lookupAction,
+          lookupSyncCallback,
           cleanup,
         })}
-        {stableRenderChild(node.children, layoutContextRef?.current, parentRenderContext)}
+        {stableRenderChild(
+          node.children,
+          layoutContextRef?.current,
+          parentRenderContext,
+          uidInfoRef,
+        )}
       </Fragment>
     );
   }),
@@ -985,6 +995,7 @@ function renderChild({
   parentRenderContext,
   memoedVarsRef,
   cleanup,
+  uidInfoRef,
 }: RenderChildContext): ReactNode {
   // --- Render only visible components
   if (!shouldKeep(node.when, state, appContext)) {
@@ -1020,6 +1031,7 @@ function renderChild({
       renderChild={renderChild}
       layoutContext={layoutContext}
       parentRenderContext={parentRenderContext}
+      uidInfoRef={uidInfoRef}
     />
   );
 }
@@ -1058,8 +1070,25 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
   return node;
 }
 
-function transformNodeWithDatasourceProp(node: ComponentDef) {
+function transformNodeWithDatasourceProp(
+  node: ComponentDef,
+  uidInfoRef: RefObject<Record<string, any>>,
+) {
   if (node.props && "datasource" in node.props && typeof node.props.datasource === "string") {
+    const uidInfoForDatasource = extractParam(uidInfoRef.current, node.props.datasource);
+    if (uidInfoForDatasource?.type === "loader") {
+      return {
+        ...node,
+        props: {
+          ...node.props,
+          datasource: {
+            type: "DataSourceRef",
+            uid: uidInfoForDatasource.uid,
+          },
+        },
+      };
+    }
+
     return {
       ...node,
       props: {
@@ -1093,6 +1122,7 @@ const Node = memo(
       memoedVarsRef,
       resolvedKey,
       cleanup,
+      uidInfoRef,
       ...rest
     }: RenderChildContext & { resolvedKey: string },
     ref,
@@ -1101,15 +1131,17 @@ const Node = memo(
     const stableLayoutContext = useRef(layoutContext);
     stableLayoutContext.current = layoutContext;
 
+    // console.log("uidInfoRef", uidInfoRef);
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
-      transformed = transformNodeWithDatasourceProp(transformed);
+      transformed = transformNodeWithDatasourceProp(transformed, uidInfoRef);
 
       return transformed;
-    }, [node]);
+    }, [node, uidInfoRef]);
 
     let renderedChild = null;
     if (isContainerLike(nodeWithTransformedLoaders)) {
+      // console.log("ContainerLike", { nodeWithTransformedLoaders, state });
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
@@ -1139,6 +1171,7 @@ const Node = memo(
           parentRenderContext={parentRenderContext}
           layoutContextRef={stableLayoutContext}
           ref={ref}
+          uidInfoRef={uidInfoRef}
           {...rest}
         />
       );
@@ -1194,8 +1227,8 @@ function useMergedState(localVars: ContainerState, componentState: ContainerStat
       } else {
         if (isPlainObject(ret[key]) && isPlainObject(value)) {
           ret[key] = merge(cloneDeep(ret[key]), value);
-        } else if(Array.isArray(ret[key]) && Array.isArray(value)){
-          ret[key] =  Object.assign([], ret[key], value);
+        } else if (Array.isArray(ret[key]) && Array.isArray(value)) {
+          ret[key] = Object.assign([], ret[key], value);
         } else {
           ret[key] = value;
         }
@@ -1495,23 +1528,27 @@ export const containerReducer = produce((state: ContainerState, action: Containe
 
 interface LoaderRenderContext {
   uidInfo: Record<string, string>;
+  uidInfoRef: RefObject<Record<string, any>>;
   loaders?: ComponentDef[];
   componentState: ContainerState;
   dispatch: ContainerDispatcher;
   appContext: AppContextObject;
   registerComponentApi: RegisterComponentApiFnInner;
   lookupAction: LookupAsyncFnInner;
+  lookupSyncCallback: LookupSyncFnInner;
   cleanup: ComponentCleanupFn;
 }
 
 export function renderLoaders({
   uidInfo,
+  uidInfoRef,
   loaders = EMPTY_ARRAY,
   componentState,
   dispatch,
   appContext,
   registerComponentApi,
   lookupAction,
+  lookupSyncCallback,
   cleanup,
 }: LoaderRenderContext) {
   return loaders.map((loader: ComponentDef) => {
@@ -1524,6 +1561,10 @@ export function renderLoaders({
         );
       }
       uidInfo[loader.uid] = "loader";
+      uidInfoRef.current[loader.uid] = {
+        type: "loader",
+        uid: loader.uid,
+      };
     }
 
     // --- Render the current loader
@@ -1534,6 +1575,7 @@ export function renderLoaders({
       appContext,
       registerComponentApi,
       lookupAction,
+      lookupSyncCallback,
       cleanup,
     });
 
@@ -1553,6 +1595,7 @@ export function renderLoaders({
     appContext,
     registerComponentApi,
     lookupAction,
+    lookupSyncCallback,
     cleanup,
   }: {
     loader: ComponentDef;
@@ -1561,6 +1604,7 @@ export function renderLoaders({
     appContext: AppContextObject;
     registerComponentApi: RegisterComponentApiFnInner;
     lookupAction: LookupAsyncFnInner;
+    lookupSyncCallback: LookupSyncFnInner;
     cleanup: ComponentCleanupFn;
   }) {
     // --- For the sake of avoiding further issues
@@ -1583,6 +1627,7 @@ export function renderLoaders({
         dispatch={dispatch}
         registerComponentApi={registerComponentApi}
         lookupAction={lookupAction}
+        lookupSyncCallback={lookupSyncCallback}
       />
     );
   }
