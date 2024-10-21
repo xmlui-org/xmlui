@@ -8,7 +8,7 @@ import type { ContainerState } from "@components-core/container/ContainerCompone
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
-  LoaderLoadedFn,
+  LoaderLoadedFn, TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 
@@ -30,6 +30,7 @@ type LoaderProps = {
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  transformResult?: TransformResultFn;
 };
 
 export function PageableLoader({
@@ -44,6 +45,7 @@ export function PageableLoader({
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
+  transformResult
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
@@ -128,6 +130,10 @@ export function PageableLoader({
     return data.pages.flatMap((d) => d.result);
   }, [data]);
 
+  const transformedData = useMemo(()=>{
+    return transformResult ? transformResult(flatData) : flatData;
+  }, [flatData, transformResult]);
+
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
 
@@ -153,8 +159,8 @@ export function PageableLoader({
     //   pageInfo,
     // });
     if (status === "success" && (prevData !== data || prevPageInfo !== pageInfo)) {
-      loaderLoaded(flatData, pageInfo);
-      onLoaded?.(flatData);
+      loaderLoaded(transformedData, pageInfo);
+      onLoaded?.(transformedData);
     } else if (status === "error" && prevError !== error) {
       loaderError(error);
     }
@@ -162,7 +168,7 @@ export function PageableLoader({
     appContext,
     data,
     error,
-    flatData,
+    transformedData,
     loaderError,
     loaderLoaded,
     onLoaded,
@@ -265,7 +271,7 @@ export function PageableLoader({
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
       getItems: () => {
-        return flatData;
+        return transformedData;
       },
       deleteItem: async (element: any) => {
         throw new Error("not implemented");
@@ -274,7 +280,7 @@ export function PageableLoader({
   }, [
     appContext.queryClient,
     fetchPrevPage,
-    flatData,
+    transformedData,
     loader.uid,
     queryId,
     queryKey,

@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect } from "react";
+import {useEffect, useLayoutEffect, useMemo} from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
@@ -6,7 +6,7 @@ import type { ContainerState } from "@components-core/container/ContainerCompone
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
-  LoaderLoadedFn,
+  LoaderLoadedFn, TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 
@@ -29,6 +29,7 @@ type LoaderProps = {
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  transformResult?: TransformResultFn;
 };
 
 /**
@@ -47,6 +48,7 @@ export function Loader({
   loaderLoaded,
   loaderInProgressChanged,
   loaderError,
+  transformResult
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
@@ -94,14 +96,19 @@ export function Loader({
 
   // --- Respond to the state changes whenever the uid of the loader instance, the data, the dispatcher,
   // --- or the data query status changes.
+
+  const transformedData = useMemo(()=>{
+    return transformResult ? transformResult(data) : data;
+  }, [data, transformResult]);
+
   useLayoutEffect(() => {
     if (status === "success" && data !== prevData) {
-      loaderLoaded(data);
-      onLoaded?.(data);
+      loaderLoaded(transformedData);
+      onLoaded?.(transformedData);
     } else if (status === "error" && error !== prevError) {
       loaderError(error);
     }
-  }, [appContext, data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status]);
+  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, transformedData]);
 
   useLayoutEffect(() => {
     return () => {
@@ -145,13 +152,13 @@ export function Loader({
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
       getItems: async () => {
-        return data;
+        return transformedData;
       },
       deleteItem: async (element: any) => {
         throw new Error("not implemented");
       },
     });
-  }, [appContext.queryClient, data, loader.uid, queryId, refetch, registerComponentApi]);
+  }, [appContext.queryClient, queryId, refetch, registerComponentApi, transformedData]);
 
   return null;
 }

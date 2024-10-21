@@ -6,7 +6,7 @@ import type {
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type { ContainerState, RegisterComponentApiFnInner } from "@components-core/container/ContainerComponentDef";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { LookupAsyncFn, LookupAsyncFnInner } from "@abstractions/ActionDefs";
+import type {LookupAsyncFn, LookupAsyncFnInner, LookupSyncFn, LookupSyncFnInner} from "@abstractions/ActionDefs";
 
 import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
 import { ContainerActionKind } from "./abstractions/containers";
@@ -17,6 +17,7 @@ interface LoaderRendererContext {
   dispatch: ContainerDispatcher;
   registerComponentApi: RegisterComponentApiFnInner;
   lookupAction: LookupAsyncFnInner;
+  lookupSyncCallback: LookupSyncFnInner;
   onUnmount: (uid: symbol) => void;
 }
 
@@ -25,6 +26,7 @@ export function LoaderComponent({
   state,
   dispatch,
   lookupAction,
+  lookupSyncCallback,
   registerComponentApi,
   onUnmount,
 }: LoaderRendererContext) {
@@ -51,6 +53,14 @@ export function LoaderComponent({
       return lookupAction(action, uid, actionOptions);
     },
     [lookupAction, uid]
+  );
+
+  // --- Memoizes the action resolution by action definition value
+  const memoedLookupSyncCallback: LookupSyncFn = useCallback(
+      (action) => {
+        return lookupSyncCallback(action, uid);
+      },
+      [lookupSyncCallback, uid]
   );
 
   const memoedLoaderInProgressChanged = useCallback((isInProgress: boolean) => {
@@ -86,6 +96,7 @@ export function LoaderComponent({
     loaderError: memoedLoaderError,
     registerComponentApi: memoedRegisterComponentApi,
     lookupAction: memoedLookupAction,
+    lookupSyncCallback: memoedLookupSyncCallback,
   });
 }
 

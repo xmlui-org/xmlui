@@ -1,13 +1,11 @@
+import type { MutableRefObject } from "react";
 import React, { useMemo } from "react";
 
-import type {ComponentDef, ParentRenderContext} from "@abstractions/ComponentDefs";
-import type { LayoutContext } from "@abstractions/RendererDefs";
-import type { MutableRefObject } from "react";
+import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
+import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import type { UploadActionComponent } from "@components-core/action/FileUploadAction";
 import type { DownloadActionComponent } from "@components-core/action/FileDownloadAction";
 import type { ApiActionComponent } from "@components-core/action/APICall";
-import type { DynamicChildComponentDef } from "@abstractions/ComponentDefs";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -26,7 +24,7 @@ export function ApiBoundComponent({
   apiBoundEvents,
   renderChild,
   layoutContextRef,
-  parentRendererContext
+  parentRendererContext,
 }: ApiBoundComponentProps) {
   const wrappedWithAdapter = useMemo(() => {
     function generateloaderUid(key: string) {
@@ -45,8 +43,18 @@ export function ApiBoundComponent({
       switch (type) {
         case "FileUpload": {
           const actionComponent = node.events![key] as UploadActionComponent;
-          const { invalidates, asForm, formParams, queryParams, rawBody, body, url, headers, method, file } =
-            actionComponent.props;
+          const {
+            invalidates,
+            asForm,
+            formParams,
+            queryParams,
+            rawBody,
+            body,
+            url,
+            headers,
+            method,
+            file,
+          } = actionComponent.props;
           const { success, error } = actionComponent.events || {};
           events[key] = `(eventArgs) => {
             return Actions.upload({
@@ -71,7 +79,8 @@ export function ApiBoundComponent({
         }
         case "FileDownload": {
           const actionComponent = node.events![key] as DownloadActionComponent;
-          const { url, queryParams, rawBody, body, headers, method, fileName } = actionComponent.props;
+          const { url, queryParams, rawBody, body, headers, method, fileName } =
+            actionComponent.props;
           events[key] = `(eventArgs) => {
             return Actions.download({
               queryParams: ${JSON.stringify(queryParams)}, 
@@ -149,12 +158,13 @@ export function ApiBoundComponent({
     apiBoundProps.forEach((key) => {
       const isDatasourceRef = node.props![key]?.type === "DataSourceRef";
       const loaderUid = node.props![key].uid || generateloaderUid(key);
-      const { transformResult, ...operation } = node.props![key].props || node.props![key];
+      const operation = node.props![key].props || node.props![key];
       const loaderEvents: Record<string, any> = {};
       Object.entries(node.events || {}).forEach(([eventKey, value]) => {
         if (eventKey.startsWith(key)) {
           const capitalizedEventName = eventKey.substring(key.length);
-          const eventName = capitalizedEventName.charAt(0).toLowerCase() + capitalizedEventName.slice(1);
+          const eventName =
+            capitalizedEventName.charAt(0).toLowerCase() + capitalizedEventName.slice(1);
           loaderEvents[eventName] = value;
         }
       });
@@ -163,28 +173,20 @@ export function ApiBoundComponent({
         props![key] = undefined;
         propKey = "data";
       }
-      if(!isDatasourceRef){
+      if (!isDatasourceRef) {
         loaders.push({
           type: "DataLoader",
           uid: loaderUid,
-          props: {
-            ...operation,
-          },
+          props: operation,
           events: loaderEvents,
         });
-        if (transformResult) {
-          vars[`transform_${loaderUid}`] = transformResult;
-        }
         api[`fetch_${key}`] = `() => { ${loaderUid}.refetch(); }`;
         api[`update_${key}`] = `(updaterFn) => { ${loaderUid}.update(updaterFn); }`;
         api[`addItem_${key}`] = `(element, index) => {  ${loaderUid}.addItem(element, index); }`;
         api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
         api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
-        props[propKey] = `{ !!transform_${loaderUid} ? transform_${loaderUid}(${loaderUid}.value) : ${loaderUid}.value }`;
-      } else {
-        props[propKey] = `{ ${loaderUid}.value }`;
       }
-
+      props[propKey] = `{ ${loaderUid}.value }`;
       props.loading = `{${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
@@ -217,6 +219,10 @@ export function ApiBoundComponent({
   //   console.log("wrapped with adapter changed", wrappedWithAdapter);
   // }, [wrappedWithAdapter]);
 
-  const renderedChild = renderChild(wrappedWithAdapter, layoutContextRef?.current, parentRendererContext);
+  const renderedChild = renderChild(
+    wrappedWithAdapter,
+    layoutContextRef?.current,
+    parentRendererContext,
+  );
   return React.isValidElement(renderedChild) ? renderedChild : <>{renderedChild}</>;
 }

@@ -5,7 +5,7 @@ import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
-  LoaderLoadedFn,
+  LoaderLoadedFn, TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
 import type { LoaderDirections } from "@components-core/loader/PageableLoader";
@@ -29,6 +29,7 @@ type LoaderProps = {
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;
   loaderError: LoaderErrorFn;
+  transformResult?: TransformResultFn;
 };
 
 function DataLoader({
@@ -40,6 +41,7 @@ function DataLoader({
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
+  transformResult
 }: LoaderProps) {
   const appContext = useAppContext();
   const url = extractParam(state, loader.props.url, appContext);
@@ -201,6 +203,7 @@ function DataLoader({
     [appContext, loader.props.errorNotificationMessage, loaderError, onError]
   );
 
+
   const pollIntervalInSeconds = extractParam(state, loader.props.pollIntervalInSeconds, appContext);
   return hasPaging ? (
     <PageableLoader
@@ -216,6 +219,7 @@ function DataLoader({
       pollIntervalInSeconds={pollIntervalInSeconds}
       onLoaded={onLoaded}
       direction={pagingDirection}
+      transformResult={transformResult}
     />
   ) : (
     <Loader
@@ -230,6 +234,7 @@ function DataLoader({
       pollIntervalInSeconds={pollIntervalInSeconds}
       registerComponentApi={registerComponentApi}
       onLoaded={onLoaded}
+      transformResult={transformResult}
     />
   );
 }
@@ -250,6 +255,7 @@ export const DataLoaderMd = createMetadata({
     inProgressNotificationMessage: d("The message to show when the loader is in progress"),
     completedNotificationMessage: d("The message to show when the loader completes"),
     errorNotificationMessage: d("The message to show when an error occurs"),
+    transformResult: d("Function for transforming the datasource result"),
   },
   events: {
     loaded: d("Event to trigger when the data is loaded"),
@@ -261,7 +267,7 @@ type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
 export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",
-  ({ loader, state, loaderLoaded, loaderInProgressChanged, loaderError, registerComponentApi, lookupAction }) => {
+  ({ loader, state, loaderLoaded, loaderInProgressChanged, loaderError, registerComponentApi, lookupAction, lookupSyncCallback }) => {
     return (
       <DataLoader
         loader={loader}
@@ -270,6 +276,7 @@ export const dataLoaderRenderer = createLoaderRenderer(
         loaderLoaded={loaderLoaded}
         loaderError={loaderError}
         registerComponentApi={registerComponentApi}
+        transformResult={lookupSyncCallback(loader.props.transformResult)}
         onLoaded={lookupAction(loader.events?.loaded, { eventName: "loaded" })}
         onError={lookupAction(loader.events?.error, { eventName: "error" })}
       />

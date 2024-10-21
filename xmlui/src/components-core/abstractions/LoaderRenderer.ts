@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { ContainerDispatcher } from "./ComponentRenderer";
 import type { ContainerState } from "../container/ContainerComponentDef";
-import type { LookupAsyncFn } from "@abstractions/ActionDefs";
+import type {LookupAsyncFn, LookupSyncFn} from "@abstractions/ActionDefs";
 import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
@@ -25,6 +25,7 @@ export interface LoaderRendererDef {
 export type LoaderInProgressChangedFn = (isInProgress: boolean) => void;
 export type LoaderLoadedFn = (data: any, pageInfo?: any) => void;
 export type LoaderErrorFn = (error: any) => void;
+export type TransformResultFn = (data: any) => any;
 
 // The context in which a particular component is rendered
 type RendererContext<TMd extends ComponentMetadata> = {
@@ -39,6 +40,7 @@ type RendererContext<TMd extends ComponentMetadata> = {
 
   registerComponentApi: RegisterComponentApiFn;
   lookupAction: LookupAsyncFn;
+  lookupSyncCallback: LookupSyncFn;
 
   loaderInProgressChanged: LoaderInProgressChangedFn;
   loaderLoaded: LoaderLoadedFn;

@@ -1,9 +1,4 @@
-import type {
-  Dispatch,
-  MutableRefObject,
-  ReactNode,
-  RefObject,
-  SetStateAction} from "react";
+import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
 import React, {
   forwardRef,
   Fragment,
@@ -633,6 +628,7 @@ const MemoizedContainer = memo(
             : registerComponentApi,
           appContext,
           lookupAction,
+          lookupSyncCallback,
           cleanup,
         })}
         {stableRenderChild(
@@ -1135,7 +1131,7 @@ const Node = memo(
     const stableLayoutContext = useRef(layoutContext);
     stableLayoutContext.current = layoutContext;
 
-    console.log("uidInfoRef", uidInfoRef);
+    // console.log("uidInfoRef", uidInfoRef);
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
       transformed = transformNodeWithDatasourceProp(transformed, uidInfoRef);
@@ -1145,7 +1141,7 @@ const Node = memo(
 
     let renderedChild = null;
     if (isContainerLike(nodeWithTransformedLoaders)) {
-      console.log("ContainerLike", { nodeWithTransformedLoaders, state });
+      // console.log("ContainerLike", { nodeWithTransformedLoaders, state });
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
@@ -1539,6 +1535,7 @@ interface LoaderRenderContext {
   appContext: AppContextObject;
   registerComponentApi: RegisterComponentApiFnInner;
   lookupAction: LookupAsyncFnInner;
+  lookupSyncCallback: LookupSyncFnInner;
   cleanup: ComponentCleanupFn;
 }
 
@@ -1551,6 +1548,7 @@ export function renderLoaders({
   appContext,
   registerComponentApi,
   lookupAction,
+  lookupSyncCallback,
   cleanup,
 }: LoaderRenderContext) {
   return loaders.map((loader: ComponentDef) => {
@@ -1577,6 +1575,7 @@ export function renderLoaders({
       appContext,
       registerComponentApi,
       lookupAction,
+      lookupSyncCallback,
       cleanup,
     });
 
@@ -1596,6 +1595,7 @@ export function renderLoaders({
     appContext,
     registerComponentApi,
     lookupAction,
+    lookupSyncCallback,
     cleanup,
   }: {
     loader: ComponentDef;
@@ -1604,6 +1604,7 @@ export function renderLoaders({
     appContext: AppContextObject;
     registerComponentApi: RegisterComponentApiFnInner;
     lookupAction: LookupAsyncFnInner;
+    lookupSyncCallback: LookupSyncFnInner;
     cleanup: ComponentCleanupFn;
   }) {
     // --- For the sake of avoiding further issues
@@ -1626,6 +1627,7 @@ export function renderLoaders({
         dispatch={dispatch}
         registerComponentApi={registerComponentApi}
         lookupAction={lookupAction}
+        lookupSyncCallback={lookupSyncCallback}
       />
     );
   }
