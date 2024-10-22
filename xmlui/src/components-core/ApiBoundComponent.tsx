@@ -168,10 +168,8 @@ export function ApiBoundComponent({
           loaderEvents[eventName] = value;
         }
       });
-      let propKey = key;
-      if (key === "datasource") {
-        props![key] = undefined;
-        propKey = "data";
+      if(key === "data"){
+        props.__DATA_RESOLVED = true;
       }
       if (!isDatasourceRef) {
         loaders.push({
@@ -186,7 +184,7 @@ export function ApiBoundComponent({
         api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
         api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
       }
-      props[propKey] = `{ ${loaderUid}.value }`;
+      props[key] = `{ ${loaderUid}.value }`;
       props.loading = `{${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;

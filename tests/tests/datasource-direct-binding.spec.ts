@@ -6,7 +6,7 @@ test("directly bound datasource doesn't show empty list template during load", a
     entryPoint: `
     <Fragment>
         <DataSource url="/data1" id="data"/>
-        <List datasource="{data}" testId="list">
+        <List data="{data}" testId="list">
           <property name="emptyListTemplate">
             <Text testId="emptyLabel">Empty</Text>
           </property>
