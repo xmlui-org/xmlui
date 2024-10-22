@@ -70,7 +70,7 @@ Add the highlighted `NavLink` and `Page` components to the code in the Main.xmlu
 <NavLink label="Simple Data Load" to="/get-data" />
 <!-- Append this Page as the last within Pages -->
 <Page url="/get-data">
-  <List datasource="/api/shopping-list" />
+  <List data="/api/shopping-list" />
 </Page>
 <!-- Omitted -->
 ```
@@ -92,7 +92,7 @@ This short form replaces the entire contents of the `Main.xmlui` file, which sho
       <H1>{test.value.message}</H1>
     </Page>
     <Page url="/get-data">
-      <List datasource="/api/shopping-list" />
+      <List data="/api/shopping-list" />
     </Page>
   </Pages>
   <Footer>Powered by XMLUI</Footer>
@@ -160,7 +160,7 @@ By default, the `List` has a loading spinner that is automatically rendered when
 <NavLink label="Loading Indicators" to="/loading" />
 <!-- Append this Page as the last within Pages -->
 <Page url="/loading">
-  <List datasource="/api/shopping-list-slow" />
+  <List data="/api/shopping-list-slow" />
 </Page>
 <!-- Omitted -->
 ```

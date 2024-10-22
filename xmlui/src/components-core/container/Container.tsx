@@ -140,6 +140,7 @@ type ContainerProps = {
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
+  uidInfoRef?: RefObject<Record<string, any>>
 };
 
 // React component to display a view container and implement its behavior
@@ -160,6 +161,7 @@ const MemoizedContainer = memo(
       parentRenderContext,
       memoedVarsRef,
       isImplicit,
+      uidInfoRef: parentUidInfoRef
     }: ContainerProps,
     ref,
   ) {
@@ -606,7 +608,8 @@ const MemoizedContainer = memo(
     // --- may use the same UID.
     const uidInfo: Record<string, string> = {};
 
-    const uidInfoRef = useRef({});
+    const thisUidInfoRef = useRef({});
+    const uidInfoRef = isImplicit ? parentUidInfoRef : thisUidInfoRef;
 
     return (
       <Fragment
@@ -693,6 +696,7 @@ type ErrorProneContainerProps = {
   parentRenderContext?: ParentRenderContext;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
+  uidInfoRef?: RefObject<Record<string, any>>
 };
 
 // A React component that wraps a view container into an error boundary
@@ -709,6 +713,7 @@ const MemoizedErrorProneContainer = memo(
       parentRenderContext,
       isImplicit,
       parentDispatch,
+      uidInfoRef
     }: ErrorProneContainerProps,
     ref,
   ) {
@@ -856,12 +861,11 @@ const MemoizedErrorProneContainer = memo(
           registerComponentApi={registerComponentApi}
           parentRegisterComponentApi={parentRegisterComponentApi}
           layoutContextRef={layoutContextRef}
-          // dynamicChildren={dynamicChildren}
-          // dynamicSlots={dynamicSlots}
           parentRenderContext={parentRenderContext}
           memoedVarsRef={memoedVars}
           isImplicit={isImplicit}
           ref={ref}
+          uidInfoRef={uidInfoRef}
         />
       </ErrorBoundary>
     );
@@ -935,6 +939,7 @@ type ComponentContainerProps = {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
+  uidInfoRef?: RefObject<Record<string, any>>
 };
 
 const ComponentContainer = memo(
@@ -948,6 +953,7 @@ const ComponentContainer = memo(
       layoutContextRef,
       parentRenderContext,
       parentDispatch,
+      uidInfoRef
     }: ComponentContainerProps,
     ref,
   ) {
@@ -967,6 +973,7 @@ const ComponentContainer = memo(
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
           ref={ref}
+          uidInfoRef={uidInfoRef}
         />
       </ErrorBoundary>
     );
@@ -1070,35 +1077,76 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
   return node;
 }
 
-function transformNodeWithDatasourceProp(
-  node: ComponentDef,
-  uidInfoRef: RefObject<Record<string, any>>,
+function transformNodeWithDataSourceRefProp(
+    node: ComponentDef,
+    uidInfoRef: RefObject<Record<string, any>>,
 ) {
-  if (node.props && "datasource" in node.props && typeof node.props.datasource === "string") {
-    const uidInfoForDatasource = extractParam(uidInfoRef.current, node.props.datasource);
+  if(!node.props){
+    return node;
+  }
+  let ret = { ...node };
+  let resolved = false;
+  Object.entries(node.props).forEach(([key, value]) => {
+    let uidInfoForDatasource;
+    try{
+      uidInfoForDatasource = extractParam(uidInfoRef.current, value);
+    } catch (e) {}
+
     if (uidInfoForDatasource?.type === "loader") {
-      return {
-        ...node,
+      resolved = true;
+      ret = {
+        ...ret,
         props: {
-          ...node.props,
-          datasource: {
+          ...ret.props,
+          [key]: {
             type: "DataSourceRef",
             uid: uidInfoForDatasource.uid,
           },
         },
       };
     }
+  });
+  if (resolved) {
+    return ret;
+  }
+  return node;
+}
 
+function transformNodeWithDataProp(
+    node: ComponentDef,
+    resolvedDataPropIsString: boolean,
+    uidInfoRef: RefObject<Record<string, any>>
+) {
+  if (!node.props?.__DATA_RESOLVED && node.props && "data" in node.props && resolvedDataPropIsString) {
+    //we skip the transformation if the data prop is a binding expression for a loader value
+    if(extractParam(uidInfoRef.current, node.props.data) === "loaderValue"){
+      return node;
+    }
+    console.log("transforming node with data prop", node);
     return {
       ...node,
       props: {
         ...node.props,
-        datasource: {
+        data: {
           type: "DataSource",
           props: {
-            url: node.props.datasource,
+            url: node.props.data,
           },
         },
+      },
+    };
+  }
+  return node;
+}
+
+function transformNodeWithRawDataProp(node){
+  if (node.props && "raw_data" in node.props) {
+    return {
+      ...node,
+      props: {
+        ...node.props,
+        __DATA_RESOLVED: true,
+        data: node.props.raw_data,
       },
     };
   }
@@ -1134,24 +1182,34 @@ const Node = memo(
     // console.log("uidInfoRef", uidInfoRef);
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
-      transformed = transformNodeWithDatasourceProp(transformed, uidInfoRef);
-
+      transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
+      transformed = transformNodeWithRawDataProp(transformed);
       return transformed;
     }, [node, uidInfoRef]);
 
+    const resolvedDataPropIsString = useMemo(() => {
+      const resolvedDataProp = extractParam(state, nodeWithTransformedLoaders.props?.data, appContext, true);
+      return typeof resolvedDataProp === "string";
+    }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
+
+    const nodeWithTransformedDatasourceProp = useMemo(() => {
+      return transformNodeWithDataProp(nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef);
+    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
+
     let renderedChild = null;
-    if (isContainerLike(nodeWithTransformedLoaders)) {
-      // console.log("ContainerLike", { nodeWithTransformedLoaders, state });
+    if (isContainerLike(nodeWithTransformedDatasourceProp)) {
+      // console.log("ContainerLike", { nodeWithTransformedDatasourceProp, state });
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
-          node={nodeWithTransformedLoaders as ContainerComponentDef}
+          node={nodeWithTransformedDatasourceProp as ContainerComponentDef}
           parentState={state}
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}
           parentStateFieldPartChanged={stateFieldPartChanged}
           parentRegisterComponentApi={registerComponentApi}
+          uidInfoRef={uidInfoRef}
           ref={ref}
         />
       );
@@ -1160,7 +1218,7 @@ const Node = memo(
         <Component
           onUnmount={cleanup}
           memoedVarsRef={memoedVarsRef}
-          node={nodeWithTransformedLoaders}
+          node={nodeWithTransformedDatasourceProp}
           state={state}
           dispatch={dispatch}
           appContext={appContext}
@@ -1563,6 +1621,7 @@ export function renderLoaders({
       uidInfo[loader.uid] = "loader";
       uidInfoRef.current[loader.uid] = {
         type: "loader",
+        value: "loaderValue",
         uid: loader.uid,
       };
     }

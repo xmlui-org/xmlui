@@ -155,6 +155,7 @@ export const Table = forwardRef(
     }: TableProps,
     forwardedRef,
   ) => {
+    const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
@@ -164,11 +165,11 @@ export const Table = forwardRef(
       if (columns) {
         return columns;
       }
-      if (!data.length) {
+      if (!safeData.length) {
         return EMPTY_ARRAY;
       }
-      return Object.keys(data[0]).map((key: string) => ({ header: key, accessorKey: key }));
-    }, [columns, data]);
+      return Object.keys(safeData[0]).map((key: string) => ({ header: key, accessorKey: key }));
+    }, [columns, safeData]);
 
     useEffect(() => {
       if (autoFocus) {
@@ -185,13 +186,13 @@ export const Table = forwardRef(
 
     // --- Create data with order information whenever the items in the table change
     const dataWithOrder = useMemo(() => {
-      return data.map((item, index) => {
+      return safeData.map((item, index) => {
         return {
           ...item,
           order: index + 1,
         };
       });
-    }, [data]);
+    }, [safeData]);
 
     // --- Local or external sorting of data
     const [_sortBy, _setSortBy] = useState(sortBy);
@@ -465,7 +466,7 @@ export const Table = forwardRef(
             0)
         : 0;
 
-    const hasData = data.length !== 0;
+    const hasData = safeData.length !== 0;
 
     const touchedSizesRef = useRef<Record<string, boolean>>({});
     const columnSizeTouched = useCallback((id: string) => {
@@ -699,7 +700,7 @@ export const Table = forwardRef(
             <div style={{ flex: 1 }}>
               <span className={styles.paginationLabel}>
                 Showing {rows[0].original.order} to {rows[rows.length - 1].original.order} of{" "}
-                {data.length} entries
+                {safeData.length} entries
               </span>
             </div>
             {pageSizes.length > 1 && (

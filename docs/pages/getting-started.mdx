@@ -92,7 +92,7 @@ This functionality is a cooperation of a couple of components within `App`: `Nav
   </NavPanel>
   <Pages>
     <Page url="/spacexlist">
-      <List datasource="https://api.spacexdata.com/v3/history">
+      <List data="https://api.spacexdata.com/v3/history">
         <Card title="{$item.title}" subtitle="{$item.details}" />
       </List>
     </Page>
@@ -113,7 +113,7 @@ Components work together declaratively. `App` connects the `to` property of `Nav
 `List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its nested children. 
 
 ```ueml copy {2} filename="Main.xmlui" /datasource/
-<List datasource="https://api.spacexdata.com/v3/history">
+<List data="https://api.spacexdata.com/v3/history">
   <Card title="{$item.title}" subtitle="{$item.details}" />
 </List>
 ```

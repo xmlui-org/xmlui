@@ -26,7 +26,7 @@ Whenever the user changes the selection state of a particular row, the `Selectio
     <Table 
       width="100%" 
       rowsSelectable="{true}" 
-      datasource="https://api.spacexdata.com/v3/rockets" 
+      data="https://api.spacexdata.com/v3/rockets"
       height="300px">
       <Column header="Image" size="80px">
         <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>
@@ -56,7 +56,7 @@ The UI refreshes the number of selected items as you check or uncheck the rows i
       <Table 
         width="100%" 
         rowsSelectable="{true}" 
-        datasource="https://api.spacexdata.com/v3/rockets" 
+        data="https://api.spacexdata.com/v3/rockets"
         height="300px">
         <Column header="Image" size="80px">
           <Image height="80px" fit="cover" src="{$item.flickr_images[0]}"/>

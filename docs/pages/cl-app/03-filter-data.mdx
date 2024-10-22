@@ -41,7 +41,7 @@ Add a few new menu items with their corresponding pages to the app definition in
     <Page url="/">Dashboard</Page>
     <Page url="/contacts/all">
       <DataSource id="categories" url="/api/categories" />
-      <List datasource="/api/contacts">
+      <List data="/api/contacts">
         <ContactRow item="{$item}" categories="{categories.value}" />
       </List>
     </Page>
@@ -301,7 +301,7 @@ Change the definition of the `Contacts` component by removing the `DataSource` q
 ```ueml copy {3} filename="Contacts.xmlui"
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
-  <List datasource="/api/contacts/{$props.filter}">
+  <List data="/api/contacts/{$props.filter}">
     <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Component>

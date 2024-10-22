@@ -30,7 +30,7 @@ This section will teach you how to access backend APIs through XMLUI components.
 </Callout>
 
 ```ueml copy
-<List datasource="https://api.spacexdata.com/v3/history">
+<List data="https://api.spacexdata.com/v3/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
   </property>  
@@ -57,7 +57,7 @@ Though using the `data source` property is extremely easy, there are situations 
 Let's repeat the `List` example using the `datasource` property earlier:
 
 ```ueml copy
-<List datasource="https://api.spacexdata.com/v3/history">
+<List data="https://api.spacexdata.com/v3/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
   </property>  

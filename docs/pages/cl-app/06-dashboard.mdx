@@ -183,7 +183,7 @@ Update the `Dashboard.xmlui` file by appending a new `Card` component after the 
       <!-- Omitted -->
       <Card width="50%" height="350px">
         <H4>Recent Contacts</H4>
-        <Table datasource="/api/contacts-recent" height="*">
+        <Table data="/api/contacts-recent" height="*">
           <Column header="Category" width="80">
             <Text>{$item.categoryId}</Text>
           </Column>
@@ -233,7 +233,7 @@ Change the `Text` element within the first `Columnn` to the new `CategoryBadge` 
       <!-- Omitted -->
       <Card width="50%" height="350px">
         <H4>Recent Contacts</H4>
-        <Table datasource="/api/contacts-recent" height="*">
+        <Table data="/api/contacts-recent" height="*">
           <Column header="Category" width="200">
             <CategoryBadge categoryId="{$item.categoryId}" />
           </Column>

@@ -90,8 +90,8 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
 To provide the `Table` with data directly from an API, use the `datasource` prop.
 Here, the component displays rocket information coming from the official SpaceX API. 
 
-```ueml copy /datasource='https://api.spacexdata.com/v3/rockets'/
-<Table datasource='https://api.spacexdata.com/v3/rockets'>
+```ueml copy /data='https://api.spacexdata.com/v3/rockets'/
+<Table data='https://api.spacexdata.com/v3/rockets'>
   <Column header="Image" size="140px">
     <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
   </Column>
@@ -105,7 +105,7 @@ Here, the component displays rocket information coming from the official SpaceX 
   name="Example: datasource"
   height={400}
   app={`
-  <Table datasource='https://api.spacexdata.com/v3/rockets'>
+  <Table data='https://api.spacexdata.com/v3/rockets'>
     <Column header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Column>
