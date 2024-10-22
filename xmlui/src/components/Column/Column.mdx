@@ -115,7 +115,7 @@ This prop provides customization to render any sort of components in the cells o
 Access the data's attributes via the `$item` in a binding expression.
 
 ```ueml copy {3-5}
-<Table datasource="https://api.spacexdata.com/v3/rockets">
+<Table data="https://api.spacexdata.com/v3/rockets">
     <Column header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Column>
@@ -127,7 +127,7 @@ Access the data's attributes via the `$item` in a binding expression.
   previewOnly
   name="Example: template"
   height={300}
-  app={`<Table datasource="https://api.spacexdata.com/v3/rockets">
+  app={`<Table data="https://api.spacexdata.com/v3/rockets">
     <Column header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Column>

@@ -1087,7 +1087,11 @@ function transformNodeWithDataSourceRefProp(
   let ret = { ...node };
   let resolved = false;
   Object.entries(node.props).forEach(([key, value]) => {
-    const uidInfoForDatasource = extractParam(uidInfoRef.current, value);
+    let uidInfoForDatasource;
+    try{
+      uidInfoForDatasource = extractParam(uidInfoRef.current, value);
+    } catch (e) {}
+
     if (uidInfoForDatasource?.type === "loader") {
       resolved = true;
       ret = {

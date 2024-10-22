@@ -13,7 +13,7 @@ Replace the `Page` tag with the `/contacts` URL to use the following contents:
 ```ueml copy {3} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
-  <List datasource="/api/contacts" />
+  <List data="/api/contacts" />
 </Page>
 <!-- Omitted -->
 ```
@@ -44,7 +44,7 @@ The default display of the list uses the `fullName` and then `categoryId` fields
 
 ```ueml copy {3} filename="Main.xmlui"
 <!-- Omitted -->
-<List datasource="/api/contacts">
+<List data="/api/contacts">
   <Card title="{$item.fullName}" subtitle="{$item.comments}" />
 </List>
 <!-- Omitted -->
@@ -61,7 +61,7 @@ Let's change the layout of the items to something more attractive and helpful. M
 
 ```ueml copy {3-14} filename="Main.xmlui"
 <!-- Omitted -->
-<List datasource="/api/contacts">
+<List data="/api/contacts">
   <Card>
     <HStack verticalAlignment="center">
       <Checkbox initialValue="{$item.reviewCompleted}" />
@@ -143,7 +143,7 @@ It is the best time to extract the item template of the list into a separate com
 
 ```ueml copy filename="Main.xmlui" {3}
 <!-- Omitted -->
-<List datasource="/api/contacts">
+<List data="/api/contacts">
   <ContactRow item="{$item}" />
 </List>
 <!-- Omitted -->
@@ -168,7 +168,7 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 ```ueml copy {2, 4} filename="Main.xmlui"
 <Page url="/contacts">
   <DataSource id="categories" url="/api/categories" />
-  <List datasource="/api/contacts">
+  <List data="/api/contacts">
     <ContactRow item="{$item}" categories="{categories.value}" />
   </List>
 </Page>

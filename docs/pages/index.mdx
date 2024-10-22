@@ -96,7 +96,7 @@ XMLUI applications have a **simple structure** with static files ready to be hos
   name="Example: Fetch and display data"
   app={`
     <App>
-      <List datasource="https://api.spacexdata.com/v3/history">
+      <List data="https://api.spacexdata.com/v3/history">
         <Card title="{$item.title}" subtitle="{$item.details}"/>
       </List>
     </App>

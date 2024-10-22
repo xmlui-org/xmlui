@@ -36,7 +36,7 @@ To display the shopping list and test whether the emulated backend is working, c
   </AppHeader>
   <Pages>
     <Page url="/">
-      <List datasource="/api/shopping-list" />
+      <List data="/api/shopping-list" />
     </Page>
   </Pages>
   <Footer>Powered by XMLUI</Footer>
@@ -88,7 +88,7 @@ The easiest way to do so is to create a `Button` component that will send some w
       />
     </event>
   </Button>
-  <List datasource="/api/shopping-list" />
+  <List data="/api/shopping-list" />
 </Page>
 <!-- Omitted -->
 ```
@@ -116,7 +116,7 @@ Adding a delete feature ensures unwanted shopping items can be removed. Change t
 
 ```ueml copy filename="Main.xmlui"
 <!-- Omitted -->
-<List datasource="/api/shopping-list">
+<List data="/api/shopping-list">
   <property name="itemTemplate">
     <Card>
       <HStack verticalAlignment="center" gap="0.5rem">
@@ -233,7 +233,7 @@ In the following example, the `POST /api/shopping-list` endpoint accepts a `high
         completedNotificationMessage="New item added" />
     </event>
   </Button>
-  <List datasource="/api/shopping-list">
+  <List data="/api/shopping-list">
     <!-- Omitted -->
   </List>
 </Page>
@@ -289,7 +289,7 @@ In the following example, the backend requires a header named `x-api-key` with t
       />
     </event>
   </Button>
-  <List datasource="/api/shopping-list">
+  <List data="/api/shopping-list">
     <!-- Omitted -->
   </List>
 </Page>
