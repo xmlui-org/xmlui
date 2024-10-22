@@ -6,80 +6,83 @@ import { Callout } from 'nextra/components';
   This article is about to be reviewed.
 </Callout>
 
-Text elements are frequently used in most apps as a part of the UI in menu items, titles, headings, labels, descriptions, etc. This article treats the gritty-nitty details of working with text components.
+Text elements are frequently used in most apps as a part of the UI:
+in menu items, titles, headings, labels, descriptions, etc.
+This article treats the nitty-gritty details of working with text components.
 
 ## Implicit and Explicit Text
 
-The engine makes it easy to use text. When you nest text into any component that renders its children (such as layout containers and many others), the engine convert them to body text:
+The engine makes it easy to use text.
+When you nest text in any component that renders its children (such as layout containers and many others), the engine converts them to a body of text:
 
 ```ueml copy {2, 4}
-<VStack>
+<App>
   This is a text!
   <Button label="I'm just a button" />
   This is another text!
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Implicit text"
-  height={100}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       This is a text!
       Another line
       <Button label="I'm just a button" />
       This is another text!
-    </VStack>
+    </App>
   `}
 />
 
-The implicit text is often unsuitable for the particular context, as you intend to modify its appearance or attach events to that. In this case, you can use the `Text` component to allow such customization. The following example shows how you can use `Text`:
+This "implicit" text is often unsuitable for a particular context, as you intend to modify the appearance of the text or attach events to it.
+In this case, you can use the `Text` component to handle such customization.
+The following example shows how you can use `Text`:
 
 ```ueml copy {2, 4}
-<VStack>
+<App>
   <Text fontSize="1.5rem" color="purple">This is a text!</Text>
   <Button label="I'm just a button" />
   <Text backgroundColor="green">This is another text!</Text>
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Explicit text"
-  height={130}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       <Text fontSize="1.5rem" color="purple">This is a text!</Text>
       <Button label="I'm just a button" />
       <Text backgroundColor="green">This is another text!</Text>
-    </VStack>
+    </App>
   `}
 />
 
-Besides the `Text` component, others render text with their custom formatting. For example, the heading family of components (`Heading`, `H1`, `H2`, ..., and `H6`) displays the text as headings:
+Besides the `Text` component, other components rendering text do so with custom formatting.
+For example, the heading family of components (`Heading`, `H1`, `H2`, ..., and `H6`) display the text as headings:
 
 ```ueml copy {2, 4}
-<VStack>
+<App>
   <H1>My Main Title</H1>
   This document contains several sections.
   <H2>Section Title</H2>
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Explicit text with Headings"
-  height={170}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       <H1>My Main Title</H1>
       This document contains several sections.
       <H2>Section Title</H2>
-    </VStack>
+    </App>
   `}
 />
 
@@ -88,43 +91,43 @@ Besides the `Text` component, others render text with their custom formatting. F
 Components displaying text offer two ways to set the content to display:
 
 - **Using a component property.** You can set the value of this property to tell the component what to display.
-- **Nested text**. You nest the text to display into the component.
+- **Nested text**. You nest the text to display in the component.
 
 > **Note**: All the examples shown earlier in this article used the nested text approach.
 
-In the following example, all text-related components use their corresponding property to set the text contents:
+In the following example, all text-related components use their corresponding property to set their text:
 
 ```ueml copy {2, 3}
-<VStack>
+<App>
   <H2 value="Text Content with Properties" />
   <Text value="This text is set in the 'value' property of 'Text'." />
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Using Properties for Text Contents"
-  height={100}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       <H2 value="Text Content with Properties" />
       <Text value="This text is set in the 'value' property of 'Text'." />
-    </VStack>
+    </App>
   `}
 />
 
-There is a significant difference between the two ways you can define text contents:
+There is a significant difference between the two ways you can define text:
 
 - The nested text uses HTML whitespace collapsing.
-- The property value ignores HTML whitespace collapsing.
+- The `value` property ignores HTML whitespace collapsing.
 
-> **Note**: If you add extra or consecutive white spaces or newlines to the code, HTML will regard it as one white space. This feature is known as HTML whitespace collapsing.
+> **Note**: If you add extra or consecutive white spaces or newlines to the code, HTML will regard it as one white space.
+> This feature is known as HTML whitespace collapsing.
 
-Whitespace collapsing is a helpful feature. The following code shows that this feature combines text broken into multiple lines (for better readability) into a continuous text:
+Whitespace collapsing is a helpful feature. The following code shows how this feature combines text into one continuous text that is broken into multiple lines (this ensures better readability):
 
 ```ueml copy
-<VStack>
+<App>
   This is a long text broken into multiple lines
 
   to demonstrate HTML whitespace collapsing.  The
@@ -136,16 +139,15 @@ Whitespace collapsing is a helpful feature. The following code shows that this f
   Breaking into lines helps this situation, and the
 
   text renders neatly.
-</VStack>
+</App>
 ```
 
 <Playground
-    previewOnly={true}
+    previewOnly
     name="HTML Whitespace Collapsing"
-    height={90}
-    horizontal={true}
+    horizontal
     app={`
-    <VStack>
+    <App>
      This is a long text broken into multiple lines
 
      to demonstrate HTML whitespace collapsing.  The
@@ -157,263 +159,291 @@ Whitespace collapsing is a helpful feature. The following code shows that this f
      Breaking into lines helps this situation, and the
 
      text renders neatly.
-    </VStack>
-
-`}
+    </App>
+  `}
 />
 
 The following sample demonstrates the differences between the two ways of specifying text content:
 
 ```ueml copy
-<VStack>
+<App>
   <H3 value="       Text with a lot   of   spaces (property)    "></H3>
   <H3>     Text with a lot   of
      spaces (nested)
   </H3>
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Properties versus Nested text"
-  height={80}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       <H3 value="       Text with a lot   of   spaces (property)    "></H3>
       <H3>  Text with a lot   of   spaces (nested)  </H3>
-    </VStack>
+    </App>
   `}
 />
 
 ## Using Binding Expressions
 
-You can utilize binding expressions to define text contents, like in the following example:
+You can utilize binding expressions to define text content, like in the following example:
 
 ```ueml copy
-<VStack>
+<App>
   <var name="myValue"
     value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
   <H3 value="{myValue}" />
   <H3>{myValue}</H3>
-</VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Vertical Stack (by default)"
-  height={80}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
+    <App>
       <var name="myValue" 
         value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
       <H3 value="{myValue}" />
       <H3>{myValue}</H3>
-    </VStack>
+    </App>
   `}
 />
 
 You can use binding expressions in property values and nested content like text literals. They handle whitespace collapsing the same way as if you used text literals.
 
-> **Note**: You can click the **Reset** button to run the load the app again. You can observe that the `getDate().getSeconds()` expression is evaluated at every load.
+> **Note**: You can click the **Reset** button to load the app again.
+> You can observe that the `getDate().getSeconds()` expression is evaluated at every load.
 
 ## Inline and Block Rendering
 
-When you render text, it accommodates the current layout context. If that context uses inline rendering, the text is rendered inline; otherwise, it renders as a block.
+When you render text, it accommodates the current layout context.
+If that context uses inline rendering, the text is rendered inline; otherwise, it renders as a block.
 
-In the following sample, `HStack` uses an inline context. So, the engine renders the text segments inline:
+In the following sample, `HStack` uses an inline context, so the text segments render in a line:
 
-```ueml copy {1, 5}
-<HStack>
-  Show me a trash
-  <Icon name="trash"/>
-  icon!
-</HStack>
+```ueml copy
+<App>
+  <HStack>
+    Show me a trash
+    <Icon name="trash"/>
+    icon!
+  </HStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Text Rendering in Inline Context"
-  height={40}
-  horizontal={true}
+  horizontal
   app={`
-    <HStack>
-      Show me a trash
-      <Icon name="trash"/>
-      icon!
-    </HStack>
+    <App>
+      <HStack>
+        Show me a trash
+        <Icon name="trash"/>
+        icon!
+      </HStack>
+    </App>
   `}
 />
 
-In the following sample, `VStack` uses a block context. So, the engine renders the text segments as blocks:
+In the following sample, `VStack` uses a block context.
+So, the engine renders the text segments as blocks in new lines:
 
-```ueml copy {1, 5}
-<VStack>
-  Show me a trash
-  <Icon name="trash"/>
-  icon!
-</VStack>
+```ueml copy
+<App>
+  <VStack>
+    Show me a trash
+    <Icon name="trash"/>
+    icon!
+  </VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
+  previewOnly
   name="Text Rendering in Block Context"
-  height={80}
-  horizontal={true}
+  horizontal
   app={`
-    <VStack>
-      Show me a trash
-      <Icon name="trash"/>
-      icon!
-    </VStack>
+    <App>
+      <VStack>
+        Show me a trash
+        <Icon name="trash"/>
+        icon!
+      </VStack>
+    </App>
   `}
 />
 
 ## Non-Breakable Spaces
 
-You can use the `&nbsp;` entity declaration to specify non-breakable spaces within a text. They behave the same way as then `&nbsp;` HTML entity.
+You can use the `&nbsp;` character entity declaration to specify non-breakable spaces within a text.
+They behave the same way as the `&nbsp;` HTML entity.
 
 ```ueml copy
-<H2>Here are four non-breakable spaces between square brackets: [&nbsp;&nbsp;&nbsp;&nbsp;]</H2>
+<App>
+  <H2>Here are four non-breakable spaces between square brackets: [&nbsp;&nbsp;&nbsp;&nbsp;]</H2>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Rendering Non-Breakable spaces"
-  height={40}
-  horizontal={true}
+  previewOnly
+  name="Rendering Non-Breakable Spaces"
+  horizontal
   app={`
-    <H2>Here are four non-breakable spaces between square brackets: [&nbsp;&nbsp;&nbsp;&nbsp;]</H2>
+    <App>
+      <H2>Here are four non-breakable spaces between square brackets: [&nbsp;&nbsp;&nbsp;&nbsp;]</H2>
+    </App>
   `}
 />
 
 ## Working with Long Text
 
-Everything works intuitively when the text fits in its container (a single line). However, with long text, you need to control how that text is broken into lines (if at all) and how to handle overflows.
+Everything works intuitively when the text fits in its container (a single line).
+However, with long text, you need to control how that text is broken into new lines (if at all) and how to handle overflows.
 
-By default, a long text breaks into multiple lines (sensing word boundaries):
+By default, a long text breaks into multiple lines (understanding word boundaries):
 
 ```ueml copy
-<Text width="200" backgroundColor="cyan">
-  This long text does not fit into a viewport with a 200-pixel width.
-</Text>
+<App>
+  <Text width="200" backgroundColor="olive">
+    This long text does not fit into a width constraint of 200 pixels.
+  </Text>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Rendering long text #1"
-  height={80}
-  horizontal={true}
+  previewOnly
+  name="Example: Rendering Long Text #1"
+  horizontal
   app={`
-    <Text width="200" backgroundColor="cyan">
-      This long text does not fit into a viewport with a 200-pixel width.
-    </Text>
+    <App>
+      <Text width="200" backgroundColor="goldenrod">
+        This long text does not fit into a width constraint of 200 pixels.
+      </Text>
+    </App>
   `}
 />
 
 With very long words, where word boundaries do not work, the text is broken within a word:
 
 ```ueml copy
-<Text width="200" backgroundColor="cyan">
-  ThisLongTextDoesNotFitIntoItsViewPort with a 200-pixel width (and long words).
-</Text>
+<App>
+  <Text width="200" backgroundColor="goldenrod">
+    ThisLongTextDoesNotFitInTheGivenContrants of a 200 pixel width (and long words).
+  </Text>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Rendering long text #2"
-  height={80}
-  horizontal={true}
+  previewOnly
+  name="Example: Rendering Long Text #2"
+  horizontal
   app={`
-    <Text width="200" backgroundColor="cyan">
-      ThisLongTextDoesNotFitIntoItsViewPort with a 200-pixel width (and long words).
-    </Text>
+    <App>
+      <Text width="200" backgroundColor="goldenrod">
+        ThisLongTextDoesNotFitInTheGivenContrants of a 200 pixel width (and long words).
+      </Text>
+    </App>
   `}
 />
 
 ### Disable Breaking the Text
 
-You can set the `maxLines` property of a `Text` instance to 1 to avoid breaking it into multiple lines. If the text does not fit into a single line, its end will be cropped, and the crop is indicated with ellipsis:
+You can set the `maxLines` property of a `Text` component to **1** to avoid breaking it into multiple lines.
+If the text does not fit into a single line its ending will be cropped and the cropping is indicated by ellipses:
 
-
-```ueml copy {4}
-<Text 
-  width="200" 
-  backgroundColor="cyan"
-  maxLines="1">
-  Though this long text does not fit into a single line, please do not break it!
-</Text>
+```ueml copy {5}
+<App>
+  <Text 
+    width="200" 
+    backgroundColor="goldenrod"
+    maxLines="1">
+    Though this long text does not fit into a single line, please do not break it!
+  </Text>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Avoid breaking long text"
-  height={40}
-  horizontal={true}
+  previewOnly
+  name="Example: Avoid Breaking Long Text"
+  horizontal
   app={`
-    <Text 
-      width="200" 
-      backgroundColor="cyan"
-      maxLines="1">
-      Though this long text does not fit into a single line, please do not break it!
-    </Text>
+    <App>
+      <Text 
+        width="200" 
+        backgroundColor="goldenrod"
+        maxLines="1">
+        Though this long text does not fit into a single line, please do not break it!
+      </Text>
+    </App>
   `}
 />
 
 If you do want to hide the ellipses, set the `ellipses` property to `false`:
 
-```ueml copy {5}
-<Text 
-  width="200" 
-  backgroundColor="cyan"
-  maxLines="1"
-  ellipses="false">
-  Though this long text does not fit into a single line, please do not break it!
-</Text>
+```ueml copy {6}
+<App>
+  <Text 
+    width="200" 
+    backgroundColor="goldenrod"
+    maxLines="1"
+    ellipses="false">
+    Though this long text does not fit into a single line, please do not break it!
+  </Text>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Ignoring ellipses"
-  height={40}
-  horizontal={true}
+  previewOnly
+  name="Example: No Ellipses"
+  horizontal
   app={`
-    <Text 
-      width="200" 
-      backgroundColor="cyan"
-      maxLines="1"
-      ellipses="false">
-      Though this long text does not fit into a single line, please do not break it!
-    </Text>
+    <App>
+      <Text 
+        width="200" 
+        backgroundColor="goldenrod"
+        maxLines="1"
+        ellipses="false">
+        Though this long text does not fit into a single line, please do not break it!
+      </Text>
+    </App>
   `}
 />
 
 ### Limiting the Rendered Lines
 
-You can use the `maxLines` property to set the maximum number of lines to display the long text. If the text fits into the allowed range, it is fully rendered; otherwise, it will be cropped at the specified maximum. For example, the following sample allows up to two lines:
+Use the `maxLines` property to set the maximum number of lines when displaying long text.
+If the text fits into the allowed range, it is fully rendered.
+Otherwise, it will be cropped at the maximum specified. For example, the following sample allows up to two lines:
 
 ```ueml copy {2}
-<Text
-  width="200"
-  backgroundColor="cyan"
-  maxLines="2">
-  This long text does not fit into a viewport with a 200-pixel width, even with two lines.
-</Text>
+<App>
+  <Text
+    width="200"
+    backgroundColor="goldenrod"
+    maxLines="2">
+    This long text does not fit into a width constraint of 200 pixels, even with two lines.
+  </Text>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Limiting the displayed lines"
-  height={60}
-  horizontal={true}
+  previewOnly
+  name="Example: Limiting the Number of Lines"
+  horizontal
   app={`
-    <Text
-      width="200"
-      backgroundColor="cyan"
-      maxLines="2">
-      This long text does not fit into a viewport with a 200-pixel width, even with two lines.
-    </Text>
+    <App>
+      <Text
+        width="200"
+        backgroundColor="goldenrod"
+        maxLines="2">
+        This long text does not fit into a width constraint of 200 pixels, even with two lines.
+      </Text>
+    </App>
   `}
 />
 
@@ -421,210 +451,239 @@ You can use the `maxLines` property to set the maximum number of lines to displa
 
 ### Preserving Linebreaks
 
-Occasionally, you need to preserve linebreaks within a text. You can set the `preserveLinebreaks` property to `true` to achieve this behavior:
+Occasionally, you need to preserve linebreaks within a text.
+You can set the `preserveLinebreaks` property to `true` to achieve this behavior:
 
-```ueml copy {5}
-<HStack gap="1rem">
+```ueml copy {4}
+<App>
   <Text
-    width="200"
-    backgroundColor="cyan"
+    backgroundColor="goldenrod"
     preserveLinebreaks="true"
     value="(preserve) This long text
-    with several line breaks
-            does not fit into a viewport with a 200-pixel width." />
+with several line breaks
+        does not fit into its container." />
   <Text
-    width="200"
-    backgroundColor="cyan"
+    backgroundColor="goldenrod"
     value="(do not preserve) This long text
-    with several line breaks
-            does not fit into a viewport with a 200-pixel width." />
- </HStack>
+with several line breaks
+        does not fit into its container." />
+</App>
 ```
-You can observe the effect of using `preserveLinebreaks`:
+Observe the effect of using `preserveLinebreaks`:
 
 <Playground
-    previewOnly={true}
-    name="Example: Preserve whitespaces"
-    height={180}
-    horizontal={true}
+    previewOnly
+    name="Example: Preserve Linebreaks"
+    horizontal
     app={`
-    <HStack gap="1rem">
+    <App>
       <Text
-        width="200"
-        backgroundColor="cyan"
+        backgroundColor="goldenrod"
         preserveLinebreaks="true"
         value="(preserve) This long text
     with several line breaks
-            does not fit into a viewport with a 200-pixel width." />
+            does not fit into its container." />
       <Text
-        width="200"
-        backgroundColor="cyan"
+        backgroundColor="goldenrod"
         value="(do not preserve) This long text
     with several line breaks
-            does not fit into a viewport with a 200-pixel width." />
-     </HStack>
+            does not fit into its container." />
+    </App>
   `}
 />
 
-> **Note**: Remember to use the `value` property of `Text`. Linebreaks are converted to spaces when nesting the text into the `Text` component.
+> **Note**: Remember to use the `value` property of `Text`.
+> Linebreaks are converted to spaces when nesting the text into the `Text` component.
 
 ## Working with Overflowing Text
 
-In the previous section, the text was its own container. Most containers (e.g., `Stack`) automatically grow in size (height) to embed the entire text. However, when the container width and height are constrained, it cannot accommodate the entire text.
+In the previous sections, the text was its own container.
+Most containers (e.g., `Stack`) automatically grow in size (like in height) to embed the entire text.
+However, when the container width and height are constrained, it cannot accommodate the entire text.
 
-The following example tries to coop up a long text into a 200x60 pixel box:
+The following example tries to contain a long text into a 200x60 pixel box:
 
-```ueml
-<VStack width="200" height="60" backgroundColor="cyan" >
-  <Text>
-    As its container width and height are fixed, this long text does not
-    fit into it; it will overflow.
-  </Text>
-</VStack>
+```ueml copy
+<App>
+  <VStack width="200" height="60" backgroundColor="goldenrod" >
+    <Text>
+      As its container width and height are fixed, this long text does not
+      fit into it; it will overflow.
+    </Text>
+  </VStack>
+</App>
 ```
 
-The text does not fit, and it overflows its container. This behavior is not a design flaw or a bug; it is intentional. You will perceive the overflow and decide how to handle it.
+The text does not fit, and it overflows its container.
+This behavior is not a design flaw or a bug; it is intentional.
+By perceiving the overflow, you can decide how to handle it.
 
 <Playground
-  previewOnly={true}
-  name="Example: Text overflow"
-  height={120}
-  horizontal={true}
+  previewOnly
+  name="Example: Text Overflow"
+  horizontal
   app={`
-    <VStack width="200" height="60" backgroundColor="cyan" >
-      <Text>
-        As its container width and height are fixed, this long text does not 
-        fit into it; it will overflow.
-      </Text>
-    </VStack>
-`}
+    <App>
+      <VStack width="200" height="60" backgroundColor="goldenrod" >
+        <Text>
+          As its container width and height are fixed, this long text does not
+          fit into it; it will overflow.
+        </Text>
+      </VStack>
+    </App>
+  `}
 />
 
 ### Hiding the Overflown Text
 
-The `verticalOverflow` layout property of containers allows for defining their behavior in case of overflow. By default, this value is set to `visible`, so the container displays the overflown text.
+The `verticalOverflow` layout property of container component allows for defining their behavior in case of overflow.
+By default, this value is set to `visible`, so the container displays the overflown text.
 
-By setting its value to `hidden`, the container crops the overflown part of the text. Observe, not the text, but its container sets the `verticalOverflow` property:
+By setting its value to `hidden`, the container crops the overflown part of the text.
+Observe in the sample below, not the text, but how the `verticalOverflow` property of the container is set:
 
-```ueml copy {2}
-<VStack width="200" height="60" backgroundColor="cyan"
-  verticalOverflow="hidden">
-  <Text>
-    As its container width and height are fixed, this long text does not
-    fit into it; it will overflow.
-  </Text>
-</VStack>
+```ueml copy {3}
+<App>
+  <VStack
+    verticalOverflow="hidden"
+    width="200" height="60" backgroundColor="goldenrod">
+    <Text>
+      As its container width and height are fixed, this long text does not
+      fit into it; it will overflow.
+    </Text>
+  </VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Hiding text overflow"
-  height={80}
-  horizontal={true}
+  previewOnly
+  name="Example: Hiding Text Overflow"
+  horizontal
   app={`
-    <VStack width="200" height="60" backgroundColor="cyan"
-      verticalOverflow="hidden">
-      <Text>
-        As its container width and height are fixed, this long text does not 
-        fit into it; it will overflow.
-      </Text>
-    </VStack>
-`}
+    <App>
+      <VStack
+        verticalOverflow="hidden"
+        width="200" height="60" backgroundColor="goldenrod">
+        <Text>
+          As its container width and height are fixed, this long text does not
+          fit into it; it will overflow.
+        </Text>
+      </VStack>
+    </App>
+  `}
 />
 
 ### Scrolling the Text
 
-You can set `verticalOverflow` to `scroll`. In this case, the container will display a vertical scrollbar to reach the non-visible parts of the overflowing text:
+You can set `verticalOverflow` to `scroll`.
+In this case, the container will display a vertical scrollbar to reach the non-visible parts of the overflowing text:
 
 ```ueml copy {2}
-<VStack width="200" height="60" backgroundColor="cyan"
-  verticalOverflow="scroll">
-  <Text>
-    As its container width and height are fixed, this long text does not
-    fit into it; it will overflow.
-  </Text>
-</VStack>
+<App>
+  <VStack 
+    verticalOverflow="scroll"
+    width="200" height="60" backgroundColor="goldenrod">
+    <Text>
+      As its container width and height are fixed, this long text does not
+      fit into it; it will overflow.
+    </Text>
+  </VStack>
+</App>
 ```
 
 <Playground
-  previewOnly={true}
-  name="Example: Scrolling the text"
-  height={80}
-  horizontal={true}
+  previewOnly
+  name="Example: Scrolling the Text"
+  horizontal
   app={`
-    <VStack width="200" height="60" backgroundColor="cyan"
-      verticalOverflow="scroll">
-      <Text>
-        As its container width and height are fixed, this long text does not 
-        fit into it; it will overflow.
-      </Text>
-    </VStack>
-`}
+    <App>
+      <VStack 
+        verticalOverflow="scroll"
+        width="200" height="60" backgroundColor="goldenrod">
+        <Text>
+          As its container width and height are fixed, this long text does not
+          fit into it; it will overflow.
+        </Text>
+      </VStack>
+    </App>
+  `}
 />
 
 ### Overflowing Dimensions
 
-The text accommodates its container's viewport. However, you can change this behavior by setting the text dimensions to overflow from the container:
+The text accommodates the available space of the container.
+However, you can change this behavior by setting the text dimensions to be bigger than the container:
 
-```ueml copy {3}
-<VStack height="40" width="300" backgroundColor="cyan">
-  <Text
-    width="400"
-    backgroundColor="silver" opacity="0.8">
-    This text sets its size explicitly bigger than its container.
-    As it does not fit into the container's viewport, it overflows.
-  </Text>
-</VStack>
+```ueml copy {4}
+<App>
+  <VStack height="40" width="300" backgroundColor="goldenrod">
+    <Text
+      width="400"
+      backgroundColor="silver" opacity="0.7">
+      This text sets its size explicitly bigger than its container.
+      As it does not fit into the space provided by its container - thus it overflows.
+    </Text>
+  </VStack>
+</App>
 ```
 
-Behind the semi-transparent background of the text, you can see its container's viewport in a blueish shade:
+Behind the semi-transparent background of the text, you can see its container in a blueish shade:
 
 <Playground
-  previewOnly={true}
-  name="Example: Explicit text dimensions"
-  height={80}
-  horizontal={true}
+  previewOnly
+  name="Example: Explicit Text Dimensions"
+  horizontal
   app={`
-    <VStack height="40" width="300" backgroundColor="cyan">
-      <Text width="400" backgroundColor="silver" opacity="0.8">
-        This text sets its size explicitly bigger than its container. 
-        As it does not fit into the container's viewport, it overflows.
-      </Text>
-    </VStack>
-`}
+    <App>
+      <VStack height="40" width="300" backgroundColor="goldenrod">
+        <Text
+          width="400"
+          backgroundColor="silver" opacity="0.7">
+          This text sets its size explicitly bigger than its container.
+          As it does not fit into the space provided by its container - thus it overflows.
+        </Text>
+      </VStack>
+    </App>
+  `}
 />
 
 ### Horizontal Scrolling
 
-Besides `verticalOverflow`, XMLUI containers provide another layout property, `horizontalOverflow`, which has the same values (`visible`, `hidden`, `scroll`). The following sample allows horizontal scrolling:
+Besides `verticalOverflow`, XMLUI containers provide another layout property, `horizontalOverflow`, which has the same values (`visible`, `hidden`, `scroll`).
+The following sample allows horizontal scrolling:
 
 ```ueml copy
-<VStack height="60" width="300" backgroundColor="cyan"
-  horizontalOverflow="scroll">
-  <Text width="400" backgroundColor="silver" opacity="0.8">
-    This text sets its size explicitly bigger than its container. 
-    As it does not fit into the container's viewport, it overflows.
-    However, its container supports horizontal scrolling so you can 
-    see its content.
-  </Text>
-</VStack>
+<App>
+  <VStack
+    horizontalOverflow="scroll"
+    height="60" width="300" backgroundColor="goldenrod">
+    <Text width="400" backgroundColor="silver" opacity="0.7">
+      This text sets its size explicitly bigger than its container. 
+      As it does not fit into the container, it overflows.
+      However, its container supports horizontal scrolling so you can 
+      see its content.
+    </Text>
+  </VStack>
+</App>
 ```
-> **Note**: When you set `horizontalOverflow` to `scroll,` it will automatically set `verticalOverflow` to `scroll` if the text exceeds the viewport vertically.
+> **Note**: When you set `horizontalOverflow` to `scroll,` it will automatically set `verticalOverflow` to `scroll` if the text exceeds its container vertically.
 
 <Playground
-  previewOnly={true}
-  name="Example: Scrolling the text horizontally"
-  height={100}
-  horizontal={true}
+  previewOnly
+  name="Example: Scrolling the Text Horizontally"
+  horizontal
   app={`
-    <VStack height="80" width="300" backgroundColor="cyan"
-      horizontalOverflow="scroll">
-      <Text width="400" backgroundColor="silver" opacity="0.8">
-        This text sets its size explicitly bigger than its container. 
-        As it does not fit into the container's viewport, it overflows.
-        However, its container supports horizontal scrolling so you can 
-        see its content.
-      </Text>
-    </VStack>
+    <App>
+      <VStack
+        horizontalOverflow="scroll"
+        height="60" width="300" backgroundColor="goldenrod">
+        <Text width="400" backgroundColor="silver" opacity="0.7">
+          This text sets its size explicitly bigger than its container. 
+          As it does not fit into the container, it overflows.
+          However, its container supports horizontal scrolling so you can 
+          see its content.
+        </Text>
+      </VStack>
+    </App>
 `}
 />
