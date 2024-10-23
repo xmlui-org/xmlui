@@ -1,19 +1,18 @@
 import { Callout } from 'nextra/components';
+import { COMPONENT_HEADING, COMPONENT_MARKDOWN, COMPONENT_TEXT } from "../../meta/pages";
 
 # Working with Text
 
-<Callout type="warning" emoji="⚠️">
-  This article is about to be reviewed.
-</Callout>
-
 Text elements are frequently used in most apps as a part of the UI:
 in menu items, titles, headings, labels, descriptions, etc.
-This article treats the nitty-gritty details of working with text components.
+This article goes into the nitty-gritty details of working with text components.
 
 ## Implicit and Explicit Text
 
-The engine makes it easy to use text.
-When you nest text in any component that renders its children (such as layout containers and many others), the engine converts them to a body of text:
+<Callout type="info" emoji="💡">
+  The engine makes it easy to use text.
+  When you nest text in any component that renders its children (such as layout containers and many others), the engine converts them to a body of text.
+</Callout>
 
 ```ueml copy {2, 4}
 <App>
@@ -38,8 +37,12 @@ When you nest text in any component that renders its children (such as layout co
 />
 
 This "implicit" text is often unsuitable for a particular context, as you intend to modify the appearance of the text or attach events to it.
-In this case, you can use the `Text` component to handle such customization.
-The following example shows how you can use `Text`:
+
+<Callout type="info" emoji="💡">
+  Use the `Text` component to explicitly style text.
+</Callout>
+
+The following example shows how you can use the `Text` component:
 
 ```ueml copy {2, 4}
 <App>
@@ -63,7 +66,10 @@ The following example shows how you can use `Text`:
 />
 
 Besides the `Text` component, other components rendering text do so with custom formatting.
-For example, the heading family of components (`Heading`, `H1`, `H2`, ..., and `H6`) display the text as headings:
+
+<Callout type="info" emoji="💡">
+  Use the heading family of components (`Heading`, `H1`, `H2`, ..., and `H6`) display the text as headings.
+</Callout>
 
 ```ueml copy {2, 4}
 <App>
@@ -88,12 +94,14 @@ For example, the heading family of components (`Heading`, `H1`, `H2`, ..., and `
 
 ## Specifying Text Content
 
-Components displaying text offer two ways to set the content to display:
+Components displaying text offer two ways to do so:
 
 - **Using a component property.** You can set the value of this property to tell the component what to display.
 - **Nested text**. You nest the text to display in the component.
 
-> **Note**: All the examples shown earlier in this article used the nested text approach.
+<Callout type="info" emoji="📔">
+  All the examples shown earlier in this article used the nested text approach.
+</Callout>
 
 In the following example, all text-related components use their corresponding property to set their text:
 
@@ -121,8 +129,10 @@ There is a significant difference between the two ways you can define text:
 - The nested text uses HTML whitespace collapsing.
 - The `value` property ignores HTML whitespace collapsing.
 
-> **Note**: If you add extra or consecutive white spaces or newlines to the code, HTML will regard it as one white space.
-> This feature is known as HTML whitespace collapsing.
+<Callout type="info" emoji="📔">
+  If you add extra or consecutive white spaces or newlines to the code, HTML will regard it as one white space.
+  This feature is known as HTML whitespace collapsing.
+</Callout>
 
 Whitespace collapsing is a helpful feature. The following code shows how this feature combines text into one continuous text that is broken into multiple lines (this ensures better readability):
 
@@ -188,7 +198,11 @@ The following sample demonstrates the differences between the two ways of specif
 
 ## Using Binding Expressions
 
-You can utilize binding expressions to define text content, like in the following example:
+<Callout type="info" emoji="💡">
+  You can utilize binding expressions to define text content.
+</Callout>
+
+See this in action in the following example:
 
 ```ueml copy
 <App>
@@ -215,15 +229,17 @@ You can utilize binding expressions to define text content, like in the followin
 
 You can use binding expressions in property values and nested content like text literals. They handle whitespace collapsing the same way as if you used text literals.
 
-> **Note**: You can click the **Reset** button to load the app again.
-> You can observe that the `getDate().getSeconds()` expression is evaluated at every load.
+<Callout type="info" emoji="📔">
+  You can click the **Reset** button to load the app again.
+  You can observe that the `getDate().getSeconds()` expression is evaluated at every load.
+</Callout>
 
 ## Inline and Block Rendering
 
 When you render text, it accommodates the current layout context.
 If that context uses inline rendering, the text is rendered inline; otherwise, it renders as a block.
 
-In the following sample, `HStack` uses an inline context, so the text segments render in a line:
+In the following sample, `HStack` uses an inline context, so text segments render in a line:
 
 ```ueml copy
 <App>
@@ -251,7 +267,7 @@ In the following sample, `HStack` uses an inline context, so the text segments r
 />
 
 In the following sample, `VStack` uses a block context.
-So, the engine renders the text segments as blocks in new lines:
+So, the engine renders text segments as blocks in new lines:
 
 ```ueml copy
 <App>
@@ -280,7 +296,10 @@ So, the engine renders the text segments as blocks in new lines:
 
 ## Non-Breakable Spaces
 
-You can use the `&nbsp;` character entity declaration to specify non-breakable spaces within a text.
+<Callout type="info" emoji="💡">
+  Use the `&nbsp;` character entity declaration to specify non-breakable spaces within a text.
+</Callout>
+
 They behave the same way as the `&nbsp;` HTML entity.
 
 ```ueml copy
@@ -353,8 +372,10 @@ With very long words, where word boundaries do not work, the text is broken with
 
 ### Disable Breaking the Text
 
-You can set the `maxLines` property of a `Text` component to **1** to avoid breaking it into multiple lines.
-If the text does not fit into a single line its ending will be cropped and the cropping is indicated by ellipses:
+<Callout type="info" emoji="💡">
+  You can set the `maxLines` property of a `Text` component to **1** to avoid breaking it into multiple lines.
+  If the text does not fit into a single line its ending will be cropped and the cropping is indicated by ellipses.
+</Callout>
 
 ```ueml copy {5}
 <App>
@@ -383,7 +404,9 @@ If the text does not fit into a single line its ending will be cropped and the c
   `}
 />
 
-If you do want to hide the ellipses, set the `ellipses` property to `false`:
+<Callout type="info" emoji="💡">
+  If you do want to hide the ellipses, set the `ellipses` property to `false`.
+</Callout>
 
 ```ueml copy {6}
 <App>
@@ -416,7 +439,10 @@ If you do want to hide the ellipses, set the `ellipses` property to `false`:
 
 ### Limiting the Rendered Lines
 
-Use the `maxLines` property to set the maximum number of lines when displaying long text.
+<Callout type="info" emoji="💡">
+  Use the `maxLines` property to set the maximum number of lines when displaying long text.
+</Callout>
+
 If the text fits into the allowed range, it is fully rendered.
 Otherwise, it will be cropped at the maximum specified. For example, the following sample allows up to two lines:
 
@@ -447,12 +473,17 @@ Otherwise, it will be cropped at the maximum specified. For example, the followi
   `}
 />
 
-> **Note**: Remember, you can use the `ellipses` prop to remove the ellipses from the end of the cropped text.
+<Callout type="info" emoji="📔">
+  Remember, you can use the `ellipses` prop to remove the ellipses from the end of the cropped text.
+</Callout>
 
 ### Preserving Linebreaks
 
 Occasionally, you need to preserve linebreaks within a text.
-You can set the `preserveLinebreaks` property to `true` to achieve this behavior:
+
+<Callout type="info" emoji="💡">
+  You can set the `preserveLinebreaks` property to `true` to preserve line breaks in a text.
+</Callout>
 
 ```ueml copy {4}
 <App>
@@ -492,8 +523,10 @@ Observe the effect of using `preserveLinebreaks`:
   `}
 />
 
-> **Note**: Remember to use the `value` property of `Text`.
-> Linebreaks are converted to spaces when nesting the text into the `Text` component.
+<Callout type="info" emoji="📔">
+  Remember to use the `value` property of `Text`.
+  Linebreaks are converted to spaces when nesting text into the `Text` component.
+</Callout>
 
 ## Working with Overflowing Text
 
@@ -539,7 +572,10 @@ By perceiving the overflow, you can decide how to handle it.
 The `verticalOverflow` layout property of container component allows for defining their behavior in case of overflow.
 By default, this value is set to `visible`, so the container displays the overflown text.
 
-By setting its value to `hidden`, the container crops the overflown part of the text.
+<Callout type="info" emoji="💡">
+  Set the `verticalOverflow` property value to `hidden` to make the container crop the overflown part of a text.
+</Callout>
+
 Observe in the sample below, not the text, but how the `verticalOverflow` property of the container is set:
 
 ```ueml copy {3}
@@ -575,8 +611,9 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 
 ### Scrolling the Text
 
-You can set `verticalOverflow` to `scroll`.
-In this case, the container will display a vertical scrollbar to reach the non-visible parts of the overflowing text:
+<Callout type="info" emoji="💡">
+  You can set `verticalOverflow` to `scroll` to make the container display a vertical scrollbar to reach the non-visible parts of the overflowing text.
+</Callout>
 
 ```ueml copy {2}
 <App>
@@ -611,8 +648,11 @@ In this case, the container will display a vertical scrollbar to reach the non-v
 
 ### Overflowing Dimensions
 
-The text accommodates the available space of the container.
-However, you can change this behavior by setting the text dimensions to be bigger than the container:
+The text accommodates the available space of the container if not specified otherwise on the component housing the text.
+
+<Callout type="info" emoji="💡">
+  Change the size constraints of the component to make text adhere to those constraints rather than the ones of the parent component.
+</Callout>
 
 ```ueml copy {4}
 <App>
@@ -650,7 +690,10 @@ Behind the semi-transparent background of the text, you can see its container in
 ### Horizontal Scrolling
 
 Besides `verticalOverflow`, XMLUI containers provide another layout property, `horizontalOverflow`, which has the same values (`visible`, `hidden`, `scroll`).
-The following sample allows horizontal scrolling:
+
+<Callout type="info" emoji="💡">
+  To enable and handle horizontal scrolling, use the `horizontalOverflow` property.
+</Callout>
 
 ```ueml copy
 <App>
@@ -666,7 +709,10 @@ The following sample allows horizontal scrolling:
   </VStack>
 </App>
 ```
-> **Note**: When you set `horizontalOverflow` to `scroll,` it will automatically set `verticalOverflow` to `scroll` if the text exceeds its container vertically.
+
+<Callout type="info" emoji="📔">
+  When you set `horizontalOverflow` to `scroll,` it will automatically set `verticalOverflow` to `scroll` if the text exceeds its container vertically.
+</Callout>
 
 <Playground
   previewOnly
@@ -687,3 +733,233 @@ The following sample allows horizontal scrolling:
     </App>
 `}
 />
+
+## Text Components
+
+### Text
+
+The `Text` component is useful to render a body of text.
+It provides a number of style variants for customization, all of which can be set via the `variant` property:
+
+```ueml copy
+<Text variant="paragraph">This is an example paragraph</Text>
+```
+
+See some of these styles below:
+
+<Playground
+  name="Example: Text Variants"
+  previewOnly
+  app={`
+    <App>
+      <HStack>
+        <Text width="150">default:</Text>
+        <Text>This is an example text</Text>
+      </HStack>
+      <HStack>
+        <Text width="150">paragraph:</Text>
+        <Text variant="paragraph">This is an example paragraph</Text>
+      </HStack>
+      <HStack>
+        <Text width="150">placeholder:</Text>
+        <Text variant="placeholder">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">secondary:</Text>
+        <Text variant="secondary">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">code:</Text>
+        <Text variant="code">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">codefence + code:</Text>
+        <Text variant="codefence">
+          <Text variant="code">
+            This is an example text
+          </Text>
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">keyboard:</Text>
+        <Text variant="keyboard">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">sup:</Text>
+        <Text>
+          This is an example text
+          <Text variant="sup">(with some additional text)</Text>
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">sub:</Text>
+        <Text>
+          This is an example text
+          <Text variant="sub">(with some additional text)</Text>
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">mono:</Text>
+        <Text variant="mono">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">strong:</Text>
+        <Text variant="strong">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">small:</Text>
+        <Text variant="small">
+          This is an example text
+        </Text>
+      </HStack>
+      <HStack>
+        <Text width="150">caption:</Text>
+        <Text variant="caption">
+          This is an example text
+        </Text>
+      </HStack>
+    </App>
+  `}
+/>
+
+See the <SmartLink href={COMPONENT_TEXT}>Text component reference</SmartLink> for a more comprehensive list of variants and details on the component properties.
+
+### Heading
+
+The `Heading` component renders text as headings.
+It is useful for sectioning a body of text.
+It has the same heading levels as the ones you can find in HTML set by the `level` property:
+
+```ueml copy
+<Heading level="h2" value="Heading Level 2" />
+```
+
+See all heading levels compared to regular text:
+
+<Playground
+  previewOnly
+  name="Example: Headings with Levels"
+  app={`
+  <App>
+    <Heading level="h1" value="Heading Level 1" />
+    <Text>Text following H1</Text>    
+    <Heading level="h2" value="Heading Level 2" />
+    <Text>Text following H2</Text>    
+    <Heading level="h3" value="Heading Level 3" />
+    <Text>Text following H3</Text>    
+    <Heading level="h4" value="Heading Level 4" />
+    <Text>Text following H4</Text>    
+    <Heading level="h5" value="Heading Level 5" />
+    <Text>Text following H5</Text>    
+    <Heading level="h6" value="Heading Level 6" />
+    <Text>Text following H6</Text>    
+  </App>
+  `}
+/>
+
+See more in the <SmartLink href={COMPONENT_HEADING}>Heading component reference</SmartLink>.
+
+### Markdown
+
+This component lets you write text which can be styled using markdown.
+
+<Callout type="info" emoji="💡">
+  The text needs to be wrapped in `<![CDATA[` and `]]>` XMLUI tags to preserve whitespaces.
+</Callout>
+
+```ueml copy
+<Markdown>
+  <![CDATA[
+# This is a heading
+
+Just some plain old text.
+
+1. List item #1
+2. List item #2
+  ]]>
+</Markdown>
+```
+
+The example below shows all supported markdown syntax elements:
+
+<Playground
+  height={500}
+  previewOnly
+  horizontal
+  name="Example: Using Markdown"
+  app={`
+<App>
+  <Markdown>
+    <![CDATA[
+# My Adventure in Markdown Land
+
+## The Beginning
+
+In the bustling city of Markdownville, I embarked on a journey to discover the secrets of Markdown.
+My adventure started in the heart of the city, where the first rule of Markdown was inscribed in stone:
+
+"To create a heading, add number signs (#) in front of a word or phrase.
+The number of number signs you use should correspond to the heading level."
+
+Headings give hierarchy to text but sometimes **emphasizing something with bold is just enough**.
+
+If not bold, then simply *italic letters give visual diversity*.
+
+## Exploring Blockquotes
+
+As I journeyed further, I encountered blockquotes that spoke of the beauty of simplicity:
+
+> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between the paragraphs.
+> > Like so
+
+## The Power of Lists
+
+I also discovered the power of lists, which were as versatile as the inhabitants of Markdownville:
+
+- This is the first list item.
+- Here's the second list item.
+    - A subsection here would look great below the second list item.
+- And here's the third list item.
+
+I found that I can create ordered lists as well:
+
+1. The first item.
+2. The second item.
+3. Third item.
+
+## The Image
+
+Text is not the only thing I found through my journey. The power of images materialized in front of me:
+
+![Colors image](/resources/images/components/markdown/colors.png)
+
+## Navigating with Hyperlinks
+
+Hyperlinks, like signposts, marked other paths that branched off from the road I was treading:
+- [Source of all truth](https://github.com/xmlui-com/xmlui)
+- [Back to where we started](https://ncrm.azurewebsites.net/)
+
+## The Horizontal Rule
+
+In the quiet corners of Markdownville, I found the Horizontal Rule, a line that symbolizes the end of a section:
+
+***
+    ]]>
+  </Markdown>
+</App>  
+  `}
+/>
+
+See the <SmartLink href={COMPONENT_MARKDOWN}>Markdown component reference</SmartLink> docs for details.
