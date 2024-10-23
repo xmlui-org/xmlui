@@ -26,7 +26,7 @@ export const Bookmark = ({ uid, level, children }: Props) => {
   }, [uid, observeIntersection, registerHeading, level]);
 
   return (
-    <span ref={elementRef} style={{ width: 0, height: 0 }} id={uid}>
+    <span ref={elementRef} id={uid}>
       {children}
     </span>
   );
