@@ -1,4 +1,4 @@
-<VStack>
+<App>
   <HStack padding="1.5rem" gap="1.5rem">
       <Stack minWidth="36px" minHeight="36px" padding="8px" width="30%" shadow="$shadow" >
         shadow
@@ -25,4 +25,4 @@
         shadow-spread-2-xl
       </Stack>
 </HStack>
-</VStack>
+</App>

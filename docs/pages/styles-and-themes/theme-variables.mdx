@@ -44,7 +44,7 @@ When defining a theme variable, you can define multiple state values (in any ord
 - `color-bg-Button-primary-solid--hover`: The background color to use with a `solid` button with the `primary` theme color while the mouse hovers over it.
 - `color-border-Button-attention-ghost--focus`: Specifies the border color of a focused ghost button displayed with the `attention` theme color.
 
-## Property Names [#property-names]
+## Theme Property Names [#property-names]
 
 XMLUI utilizes numerous visual properties you can use in place of `<propertyName>`. The following list summarizes their names and description:
 
@@ -114,18 +114,10 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
   previewOnly
   name="Custom primary color shades"
   components={[swatch, palette]}
-  defaultTheme="custom"
-  themes={[
-    {
-      name: "Custom Theme",
-      id: "custom",
-        themeVars: {
-          "color-primary": "#008000",
-        },
-      },
-    ]}
   app={`
+    <Theme color-primary="#008000">
       <Palette name="primary" />
+    </Theme>
   `}
 />
 
@@ -134,18 +126,10 @@ When selecting the primary color, choose one representing the middle shade (500)
   previewOnly
   name="Unuseful primary color shades"
   components={[swatch, palette]}
-  defaultTheme="custom"
-  themes={[
-    {
-      name: "Custom Theme",
-      id: "custom",
-        themeVars: {
-          "color-primary": "#001000",
-        },
-      },
-    ]}
   app={`
+    <Theme color-primary="#001000">
       <Palette name="primary" />
+    </Theme>  
   `}
 />
 
@@ -476,7 +460,7 @@ XMLUI defines a few stock shadow resources:
 <Playground
   previewOnly
   name="Shadows"
-  height={180}
+  height={260}
   app={shadowSizes}
 />
 
