@@ -327,10 +327,18 @@ function addStylesSection(data, component) {
   const fileBuffer = getSection(data, component[SECTION_DESCRIPTION_REF], STYLES);
   const varsTable = listThemeVars(component);
 
-  buffer +=
-    fileBuffer && varsTable
-      ? fileBuffer + "\n\n### Theme Variables\n\n" + varsTable
-      : "This component does not have any theme variables.";
+  let hasStylesSection = false;
+  if (fileBuffer) {
+    buffer += fileBuffer;
+    hasStylesSection = true;
+  }
+  if (varsTable) {
+    buffer += "\n\n### Theme Variables\n\n" + varsTable;
+    hasStylesSection = true;
+  }
+  if (!hasStylesSection) {
+    buffer += "This component does not have any styles.";
+  }
 
   return buffer;
 }

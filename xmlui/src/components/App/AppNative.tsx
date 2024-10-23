@@ -30,6 +30,7 @@ type Props = {
   layout?: AppLayoutType;
   loggedInUser?: any;
   scrollWholePage: boolean;
+  noScrollbarGutters?: boolean;
   onReady?: () => void;
   navPanelDef?: ComponentDef;
   logoContentDef?: ComponentDef;
@@ -46,6 +47,7 @@ export function App({
   layout,
   loggedInUser,
   scrollWholePage,
+  noScrollbarGutters = false,
   onReady = noop,
   header,
   navPanel,
@@ -176,6 +178,7 @@ export function App({
     styles.wrapper,
     {
       [styles.scrollWholePage]: scrollWholePage,
+      [styles.noScrollbarGutters]: noScrollbarGutters,
       "media-large": mediaSize.largeScreen,
       "media-small": mediaSize.smallScreen,
       "media-desktop": mediaSize.desktop,

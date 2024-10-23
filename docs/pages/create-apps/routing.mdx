@@ -297,45 +297,10 @@ Query parameters are not considered to be part of the route. So, in this sample,
 
 ### Nested routes
 
-_Issue: Discuss how nested routes work_
+<Callout type="warning" emoji="⚠️">
+XMLUI does not support nested routes. In the future, we may add this functionality to the framework.
+</Callout>
 
-<Playground
-  previewOnly
-  height={300}
-  name="Example: multiples active links simultaneously"
-  app={`
-    <App layout="vertical">
-      <NavPanel>
-        <NavLink to="/">Home</NavLink>
-        <NavLink to="/sales">Sales</NavLink>
-        <NavLink to="/support">Support</NavLink>
-      </NavPanel>
-      <Pages>
-        <Page url="/">
-          Home
-        </Page>
-        <Page url="/sales">
-          <H2>Sales</H2>
-          <NavPanel>
-            <NavLink to="accounts">Accounts</NavLink>
-            <NavLink to="reports">Reports</NavLink>
-          </NavPanel>
-          <Pages>
-            <Page url="accounts">
-              <H3>Accounts</H3>
-            </Page>
-            <Page url="reports">
-              <H3>Reports</H3>
-            </Page>
-          </Pages>  
-        </Page>
-        <Page url="/support">
-          <H2>Support</H2>
-        </Page>
-      </Pages>
-    </App>
-  `}
-/>
 
 ## Working with bookmarks
 

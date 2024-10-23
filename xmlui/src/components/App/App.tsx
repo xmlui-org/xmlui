@@ -18,8 +18,8 @@ export const AppMd = createMetadata({
   props: {
     layout: d(
       `This property sets the layout template of the app. This setting determines the position ` +
-      `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
-      `scroll behavior.`,
+        `and size of the app parts (such as header, navigation bar, footer, etc.) and the app's ` +
+        `scroll behavior.`,
       appLayoutMd,
     ),
     loggedInUser: d(`Stores information about the currently logged in user.`),
@@ -34,6 +34,12 @@ export const AppMd = createMetadata({
       null,
       "boolean",
       true,
+    ),
+    noScrollbarGutters: d(
+      "This boolean property specifies whether the scrollbar gutters should be hidden.",
+      null,
+      "boolean",
+      false,
     ),
   },
   events: {
@@ -79,6 +85,7 @@ export const appRenderer = createComponentRenderer(
     return (
       <App
         scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
+        noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
