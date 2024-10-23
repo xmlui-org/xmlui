@@ -4,7 +4,9 @@
 
 Use `Bookmark` as a standalone tag or wrap children with it.
 
-> **Note**: We suggest using a standalone bookmark, which does not increase the nesting depth.
+<Callout type="info" emoji="💡">
+We suggest using a standalone bookmark, which does not increase the nesting depth.
+</Callout>
 
 ### Standalone
 
@@ -64,9 +66,9 @@ Alternatively, you can nest components into `Bookmark`:
 ```ueml copy /#red/ /#green/ /#blue/ /id="red"/ /id="green"/ /id="blue"/
 <App layout="vertical-full-header" scrollWholePage="false">
   <NavPanel>
-    <Link to="/#red1">Jump to red</Link>
+    <Link to="/#red">Jump to red</Link>
     <Link to="/#green">Jump to green</Link>
-    <Link to="/#blue1">Jump to blue</Link>
+    <Link to="/#blue">Jump to blue</Link>
   </NavPanel>
   <Pages>
     <Page url="/">
