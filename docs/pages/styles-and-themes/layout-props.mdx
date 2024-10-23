@@ -1,8 +1,12 @@
-import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN, COMMON_VISUAL_PROPERTY_UNITS_BORDER, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_CURSOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION, COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW, COMMON_VISUAL_PROPERTY_UNITS_SHADOW, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION, COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM, COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT } from "../../meta/pages";
+import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_BOOLEAN, COMMON_VISUAL_PROPERTY_UNITS_BORDER, COMMON_VISUAL_PROPERTY_UNITS_BORDER_ROUNDING, COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_CURSOR, COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY, COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT, COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION, COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW, COMMON_VISUAL_PROPERTY_UNITS_SHADOW, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION, COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM, COMMON_VISUAL_PROPERTY_UNITS_TEXT_WRAP, COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT } from "../../meta/pages";
 
 # Layout Properties [#layout-summary]
 
 This document summarizes the layout properties you can use for UI Engine components.
+
+## `background`
+
+Sets the background color <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color value</SmartLink> of a component (shortcut to `backgroundColor`).
 
 ## `backgroundColor`
 
@@ -44,6 +48,10 @@ Sets the value of the top <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_BORDER}>
 
 Sets the <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>bottom</SmartLink> position of the component to the specified value.
 
+## `canShrink`
+
+This boolean property indicates if a component can shrink its size when its parent container is resized.
+
 ## `color`
 
 Sets the foreground <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_COLOR}>color value</SmartLink> of a component's text and text decorations.
@@ -74,7 +82,7 @@ Layout components use this property to define the <SmartLink href={ COMMON_VISUA
 
 ## `height`
 
-Specifies the height (vertical dimension) of the component.
+Specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> (vertical dimension) of the component.
 
 ## `horizontalAlignment`
 
@@ -130,19 +138,19 @@ Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>size</SmartLink> 
 
 ## `maxHeight`
 
-Specifies the maximum height of an element. It prevents the current value of the height property from becoming larger than the value specified.
+Specifies the maximum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of an element. It prevents the current value of the height property from becoming larger than the value specified.
 
 ## `maxWidth`
 
-Specifies the maximum width of an element. It prevents the current value of the width property from becoming larger than the value specified.
+Specifies the maximum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element. It prevents the current value of the width property from becoming larger than the value specified.
 
 ## `minHeight`
 
-Specifies the minimum height of an element. It prevents the current value of the height property from becoming smaller than the value specified.
+Specifies the minimum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>height</SmartLink> of an element. It prevents the current value of the height property from becoming smaller than the value specified.
 
 ## `minWidth`
 
-Specifies the minimum width of an element. It prevents the current value of the width property from becoming smaller than the value specified.
+Specifies the minimum <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> of an element. It prevents the current value of the width property from becoming smaller than the value specified.
 
 ## `opacity`
 
@@ -216,6 +224,10 @@ This property sets the appearance of <SmartLink href={ COMMON_VISUAL_PROPERTY_UN
 
 This property specifies how to <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM }>capitalize</SmartLink> an element's text.
 
+## `textWrap`
+
+The <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_TEXT_WRAP }>value</SmartLink> of this property controls how text inside an element is wrapped.
+
 ## `top`
 
 Sets the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>top</SmartLink> position of the component to the specified value.
@@ -242,7 +254,11 @@ This property defines the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_OVERFLO
 
 ## `width`
 
-Specifies the width (horizontal dimension) of the component.
+Specifies the <SmartLink href={ COMMON_VISUAL_PROPERTY_UNITS_SIZE }>width</SmartLink> (horizontal dimension) of the component.
+
+## `wrapContent`
+
+This boolean property indicates if a layout container can wrap its content into multiple lines.
 
 ## `zIndex`
 

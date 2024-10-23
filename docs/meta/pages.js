@@ -166,6 +166,7 @@ export const COMMON_VISUAL_PROPERTY_UNITS_SIZE = "/styles-and-themes/common-unit
 export const COMMON_VISUAL_PROPERTY_UNITS_TEXT_ALIGNMENT = "/styles-and-themes/common-units#text-alignment";
 export const COMMON_VISUAL_PROPERTY_UNITS_TEXT_DECORATION = "/styles-and-themes/common-units#text-decoration";
 export const COMMON_VISUAL_PROPERTY_UNITS_TEXT_TRANSFORM = "/styles-and-themes/common-units#text-transform";
+export const COMMON_VISUAL_PROPERTY_UNITS_TEXT_WRAP = "/styles-and-themes/common-units#text-wrap";
 export const COMMON_VISUAL_PROPERTY_UNITS_USER_SELECT = "/styles-and-themes/common-units#user-select";
 export const LAYOUT_SUMMARY = "/styles-and-themes/layout-props";
 export const THEME_VARIABLES = "/styles-and-themes/theme-variables";

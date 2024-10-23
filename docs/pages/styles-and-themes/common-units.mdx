@@ -547,6 +547,19 @@ This value specifies how to capitalize a component's text. It can be used to mak
 |`full-width`| Forces the writing of a character — mainly ideograms and Latin scripts — inside a square, allowing them to be aligned in the usual East Asian scripts (like Chinese or Japanese). |
 |`full-size-kana`| Generally used for ruby annotation text, the keyword converts all small Kana characters to the equivalent full-size Kana, to compensate for legibility issues at the small font sizes typically used in ruby. |
 
+## Text Wrap Values [#text-wrap]
+
+This value controls how text inside an element is wrapped.
+
+|Value|Description|
+|-|-|
+|`wrap`| Text is wrapped across lines at appropriate characters (for example, spaces in languages like English that use space separators) to minimize overflow. (**default**) |
+|`nowrap`| The text does not wrap across lines. It will overflow its containing element rather than breaking onto a new line. |
+|`balance`| The text is wrapped in a way that best balances the number of characters on each line, enhancing layout quality and legibility. |
+|`pretty`| Results in the same behavior as `wrap`, except that the user agent will use a slower algorithm that favors better layout over speed. |
+|`stable`| Results in the same behavior as `wrap`, except that when the user is editing the content, the lines that come before the lines they are editing remain static rather than the whole block of text re-wrapping. |
+
+
 ## User Select Values [#user-select]
 
 These values control whether the user can select text.
