@@ -2,54 +2,58 @@
 
 ## Using `SpaceFiller`
 
-### In `Stack`
+In a `Stack`, `SpaceFiller` pushes the children following it to the other end of the container:
 
-The `SpaceFiller` in a `Stack` component pushes the components after the `SpaceFiller` to the other end of the container.
-
-```ueml copy
+```ueml copy {3}
 <HStack>
-  <Stack width="64" height="64" backgroundColor="red" />
+  <Stack width="36" height="36" backgroundColor="red" />
   <SpaceFiller />
-  <Stack width="64" height="64" backgroundColor="blue" />
+  <Stack width="36" height="36" backgroundColor="blue" />
 </HStack>
 ```
 
 <Playground
-  name="Example: in a Stack"
+  name="SpaceFiller in an HStack"
   previewOnly
   height={80}
   app={`
   <HStack>
-    <Stack width="64" height="64" backgroundColor="red" />
+    <Stack width="36" height="36" backgroundColor="red" />
     <SpaceFiller />
-    <Stack width="64" height="64" backgroundColor="blue" />
+    <Stack width="36" height="36" backgroundColor="blue" />
   </HStack>
   `}
 />
 
-### In `FlowLayout`
+In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children following the `SpaceFiller` enters a new line.
 
-The `SpaceFiller` in a `FlowLayout` component acts as a line break for a row. All components after it start from a new line.
-
-```ueml copy
+```ueml copy {3}
 <FlowLayout>
-  <Stack width="20%" height="30" backgroundColor="red" />
+  <Stack width="20%" height="36" backgroundColor="red" />
   <SpaceFiller />
-  <Stack width="20%" height="30" backgroundColor="blue" />
+  <Stack width="20%" height="36" backgroundColor="green" />
+  <Stack width="20%" height="36" backgroundColor="blue" />
 </FlowLayout>
 ```
 
 <Playground
   name="Example: in a FlowLayout"
   previewOnly
-  height={80}
+  height={120}
   app={`
   <FlowLayout>
-    <Stack width="20%" height="30" backgroundColor="red" />
+    <Stack width="20%" height="36" backgroundColor="red" />
     <SpaceFiller />
-    <Stack width="20%" height="30" backgroundColor="blue" />
+    <Stack width="20%" height="36" backgroundColor="green" />
+    <Stack width="20%" height="36" backgroundColor="blue" />
   </FlowLayout>
   `}
 />
 
 %-DESC-END
+
+%-STYLE-START
+
+`SpaceFiller` ignores all layout properties; it cannot be styled.
+
+%-STYLE-END

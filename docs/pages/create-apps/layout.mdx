@@ -1,11 +1,7 @@
-import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_SIZE, LAYOUT_PROPERTIES, LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT, REUSABLE_COMPONENTS, THEME_VARIABLES_SPACING_IN_LAYOUT_CONTAINERS } from "../../meta/pages";
+import { COMMON_VISUAL_PROPERTY_UNITS, COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT, COMMON_VISUAL_PROPERTY_UNITS_SIZE, COMPONENT_SPLITTER, LAYOUT_PROPERTIES, LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT, REUSABLE_COMPONENTS, THEME_VARIABLES_SPACING_IN_LAYOUT_CONTAINERS } from "../../meta/pages";
 import { Callout } from 'nextra/components';
 
 # Layout
-
-<Callout type="warning" emoji="⚠️">
-  This article is about to be reviewed.
-</Callout>
 
 An XMLUI app is a **hierarchical component tree** where parent components nest their children. While displaying children, each component arranges them with a particular strategy. For example, it puts children from in the same row horizontally, providing some gap among them.
 
@@ -243,7 +239,9 @@ Later in this article, you will learn how to establish the markup for such a lay
 
 ## Fundamental Layout Containers
 
+<Callout type="info" emoji="💡">
 XMLUI uses only two fundamental layout containers, `Stack`, and `FlowLayout`. All other container-like components (such as `Card`, `List`, and others) apply these to establish more sophisticated layout arrangements.
+</Callout>
 
 `Stack` is a layout container that uses a particular orientation (vertical or horizontal) to render its children in a single column or row. If the children do not fit into the viewport, they overflow. `Stack` has two specialized variants, `HStack` (horizontal stack) and `VStack` (vertical stack), the orientation of which is suggested by their names.
 
@@ -253,9 +251,15 @@ XMLUI uses only two fundamental layout containers, `Stack`, and `FlowLayout`. Al
 Your application markup must have a single root component. The browser window is an implicit `VStack` layout container with that root element as its single child. 
 </Callout>
 
+There are two other components used frequently with these layout containers, `SpaceFiller`, and `Splitter`. In this article, you will learn how to use them.
+
 ### Dimension Units
 
-Layout containers use a particular strategy to render their child components; they calculate their children's dimensions. Sometimes, you want to set a child's dimensions explicitly (not about the content of the particular child). You can set one or more of these component properties to set a particular <SmartLink href={LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT}>dimension</SmartLink>: `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
+<Callout type="info" emoji="💡">
+Layout containers use a particular strategy to render their child components; they calculate their children's dimensions.
+</Callout>
+
+In specific layouts, you want to set a child's dimensions explicitly (and not determined by the content of the particular child). You can set one or more of these component properties to set a particular <SmartLink href={LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT}>dimension</SmartLink>: `width`, `height`, `minWidth`, `minHeight`, `maxWidth`, and `maxHeight`.
 
 A child can declare one of these kind of <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}>values</SmartLink> for a specific dimension:
 
@@ -646,6 +650,145 @@ You can assign the `horizontal` or `vertical` values to the `Stack` component's 
 Use the Stack component when its `orientation` property comes from an expression evaluated run time. If the orientation is static (it does not change run time), use `VStack` (equivalent with `<Stack orientation="vertical">`) and `HStack` (`<Stack orientation="horizontal">`). This style is straightforward and concise.
 </Callout>
 
+### Content Alignment
+
+<Callout type="info" emoji="💡">
+With the `horizontalAlignment` and `verticalAlignment` properties, you can define the corresponding alignment of children within a stack.
+</Callout>
+
+You can find more information about the values of `horizontalAlignment` and `verticalAlignment` <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_ALIGNMENT}>here</SmartLink>.
+
+Here are a few samples. The following aligns the children of an `HStack` horizontally in the center:
+
+```ueml copy /horizontalAlignment="center"/
+<HStack horizontalAlignment="center">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="HStack with centered contents"
+  height={80}
+  horizontal={true}
+  app={`
+    <HStack horizontalAlignment="center">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </HStack>
+  `}
+/>
+
+This sample aligns the children of a `VStack` horizontally to the end (right edge):
+
+```ueml copy /horizontalAlignment="end"/
+<VStack  horizontalAlignment="end">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="VStack with right-aligned contents"
+  height={180}
+  horizontal={true}
+  app={`
+    <VStack  horizontalAlignment="end">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </VStack>
+  `}
+/>
+
+This sample aligns the children of an `HStack` vertically in the center:
+
+```ueml copy /verticalAlignment="center"/
+<HStack verticalAlignment="center">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="72" width="36" />
+  <Stack backgroundColor="blue" height="48" width="36" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="HStack with vertically centered contents"
+  height={110}
+  horizontal={true}
+  app={`
+    <HStack verticalAlignment="center">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="72" width="36" />
+      <Stack backgroundColor="blue" height="48" width="36" />
+    </HStack>
+  `}
+/>
+
+### Reverse Child Order
+
+<Callout type="info" emoji="💡">
+`Stack` has a property, `reverse`, which you can use to reverse the rendering order.
+</Callout>
+
+With this flag set, a `HStack` renders its items in the opposite reading order of the current (for example, instead of left-to-right, it uses right-to-left). `VStack` starts rendering the last items and moves toward the first.
+
+See the following example for `HStack`:
+
+```ueml copy /reverse="true"/
+<HStack reverse="true">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</HStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Horizontal Stack with the reverse flag"
+  height={80}
+  horizontal={true}
+  app={`
+    <HStack reverse="true">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </HStack>
+  `}
+/>
+
+This example uses a `VStack`:
+
+```ueml copy /reverse="true"/
+
+```ueml copy /reverse="true"/
+<VStack reverse="true">
+  <Stack backgroundColor="red" height="36" width="36" />
+  <Stack backgroundColor="green" height="36" width="36" />
+  <Stack backgroundColor="blue" height="36" width="36" />
+</VStack>
+```
+
+<Playground
+  previewOnly={true}
+  name="Vertical Stack with the reverse flag"
+  height={180}
+  horizontal={true}
+  app={`
+    <VStack reverse="true">
+      <Stack backgroundColor="red" height="36" width="36" />
+      <Stack backgroundColor="green" height="36" width="36" />
+      <Stack backgroundColor="blue" height="36" width="36" />
+    </VStack>
+  `}
+/>
+
+
 ## VStack
 
 <Callout type="info" emoji="💡">
@@ -678,7 +821,7 @@ The `H2` component has no explicit size, so its width is set to the width of the
 ### VStack with Percentage Height
 
 <Callout type="info" emoji="💡">
-When you use a `VStack` child with percentage height, the child's height is calculated from the entire stack height.
+When you use a `VStack` child with percentage height, the effective height is calculated from the entire stack height.
 </Callout>
 
 Such a setup may cause overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. The following example demonstrates an overflow:
@@ -726,7 +869,7 @@ When the stack does not apply gaps, there is no overflow:
 ### VStack with Star Height
 
 <Callout type="info" emoji="💡">
-When you use a `VStack` child height with star-sizing, the child's height is calculated from the remaining height of the entire stack after subtracting the heights of explicitly sized children and gaps.
+When you use a `VStack` child height with star-sizing, the effective height is calculated from the remaining height of the entire stack after subtracting the heights of explicitly sized children and gaps.
 </Callout>
 
 Such a configuration will not cause overflow. Here is a sample:
@@ -783,88 +926,86 @@ The `H2` component has no explicit size, so it's stretched to the viewport width
 
 ### HStack with Percentage Width
 
-_To review_
-
 <Callout type="info" emoji="💡">
-When you use a `VStack` child with percentage height, the child's height is calculated from the entire stack height.
+When you use a `HStack` child with percentage width, the effective width is calculated from the stack's viewport width.
 </Callout>
 
-Such a setup may cause overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. The following example demonstrates an overflow:
+Such a setup may cause horizontal overflow if the sum of percentages equals 100%, as the gaps between children are also included in the stack height. The following example demonstrates this effect:
 
 ```ueml copy
-<VStack height="200px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="50%" />
-  <Stack backgroundColor="orangered" height="50%" />
-</VStack>
+<HStack border="4px dotted green" height="200px">
+  <Stack backgroundColor="cyan" width="50%" />
+  <Stack backgroundColor="orangered" width="50%" />
+</HStack>
 ```
 
 <Playground
   previewOnly
-  name="Example: VStack with percentage height (with gaps)"
+  name="Example: HStack with percentage height (with gaps)"
   height={240}
   app={`
-    <VStack height="200px" border="4px dotted green">
-      <Stack backgroundColor="cyan" height="50%" />
-      <Stack backgroundColor="orangered" height="50%" />
-    </VStack>
+    <HStack border="4px dotted green" height="200px">
+      <Stack backgroundColor="cyan" width="50%" />
+      <Stack backgroundColor="orangered" width="50%" />
+    </HStack>
   `}
 />
 
 When the stack does not apply gaps, there is no overflow:
 
 ```ueml copy /gap="0"/
-<VStack gap="0" height="200px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="50%" />
-  <Stack backgroundColor="orangered" height="50%" />
-</VStack>
+<HStack gap="0" border="4px dotted green" height="200px">
+  <Stack backgroundColor="cyan" width="50%" />
+  <Stack backgroundColor="orangered" width="50%" />
+</HStack>
 ```
 
 <Playground
   previewOnly
-  name="Example: VStack with percentage height (no gaps)"
+  name="Example: HStack with percentage height (no gaps)"
   height={240}
   app={`
-    <VStack gap="0" height="200px" border="4px dotted green">
-      <Stack backgroundColor="cyan" height="50%" />
-      <Stack backgroundColor="orangered" height="50%" />
-    </VStack>
+    <HStack gap="0" border="4px dotted green" height="200px">
+      <Stack backgroundColor="cyan" width="50%" />
+      <Stack backgroundColor="orangered" width="50%" />
+    </HStack>
   `}
 />
 
 ### HStack with Star Width
 
-_To review_
-
 <Callout type="info" emoji="💡">
-When you use a `VStack` child height with star-sizing, the child's height is calculated from the remaining height of the entire stack after subtracting the heights of explicitly sized children and gaps.
+When you use a `HStack` child width with star-sizing, the effective height is calculated from the remaining width of the stack's viewport width after subtracting the widths of explicitly sized children and gaps.
 </Callout>
 
 Such a configuration will not cause overflow. Here is a sample:
 
 ```ueml copy
-<VStack height="240px" border="4px dotted green">
-  <Stack backgroundColor="cyan" height="*" />
+<HStack height="60px" border="4px dotted green">
+  <Stack backgroundColor="cyan" width="*" />
   <H3>I'm a heading</H3>
-  <Stack backgroundColor="orangered" height="2*" />
-</VStack>
+  <Stack backgroundColor="orangered" width="2*" />
+</HStack>
 ```
 
 <Playground
   previewOnly
   name="Example: VStack with percentage height (with gaps)"
-  height={260}
+  height={100}
   app={`
-    <VStack height="240px" border="4px dotted green">
-      <Stack backgroundColor="cyan" height="*" />
+    <HStack height="60px" border="4px dotted green">
+      <Stack backgroundColor="cyan" width="*" />
       <H3>I'm a heading</H3>
-      <Stack backgroundColor="orangered" height="2*" />
-    </VStack>
+      <Stack backgroundColor="orangered" width="2*" />
+    </HStack>
   `}
 />
 
 ### Content Wrapping
 
+<Callout type="info" emoji="💡">
 `HStack` has a `wrapContent` property. If you set it to `true`, the engine starts a new line (or column) when the subsequent child to render would overflow in the current line.
+</Callout>
 
 In the following example, the fourth child does not fit in the first line entirely, so it overflows:
 
@@ -918,330 +1059,33 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
   `}
 />
 
-
-### Stack with Paddings
-
-When you apply paddings, the available space of the Stack is decreased with the size of the corresponding paddings. The following example uses a stack with horizontal and vertical paddings and three children that fill the available space.
-
-```ueml copy {2}
-<Stack orientation="horizontal" backgroundColor="lightgray"
-  horizontalPadding="4rem" verticalPadding="1rem">
-  <Text backgroundColor="cyan" width="25%">W: 25%</Text>
-  <Text backgroundColor="yellow" width="50%">W: 50%</Text>
-  <Text backgroundColor="lightgreen" width="25%">W: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with paddings"
-  height={68}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" backgroundColor="lightgray"
-      horizontalPadding="4rem" verticalPadding="1rem">
-      <Text backgroundColor="cyan" width="25%">W: 25%</Text>
-      <Text backgroundColor="yellow" width="50%">W: 50%</Text>
-      <Text backgroundColor="lightgreen" width="25%">W: 25%</Text>
-    </Stack>
-  `}
-/>
-
-The stack has a light gray background, indicating the padded area. Of course, the same concept works with vertical stacks:
-
-```ueml copy {3}
-<Stack orientation="vertical" backgroundColor="lightgray"
-  height="240"
-  horizontalPadding="4rem" verticalPadding="1rem">
-  <Text backgroundColor="cyan" height="25%">H: 25%</Text>
-  <Text backgroundColor="yellow" height="50%">H: 50%</Text>
-  <Text backgroundColor="lightgreen" height="25%">H: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with paddings"
-  height={250}
-  horizontal={true}
-  app={`
-    <Stack orientation="vertical" backgroundColor="lightgray"
-      height="240"
-      horizontalPadding="4rem" verticalPadding="1rem">
-      <Text backgroundColor="cyan" height="25%">W: 25%</Text>
-      <Text backgroundColor="yellow" height="50%">W: 50%</Text>
-      <Text backgroundColor="lightgreen" height="25%">W: 25%</Text>
-    </Stack>
-  `}
-/>
-
-### Items with Paddings
-
-Setting paddings in nested items does not change their rendering.
-
-```ueml copy
-<Stack orientation="horizontal" backgroundColor="lightgray">
-  <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-  <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-  <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal stack, items have paddings"
-  height={68}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" backgroundColor="lightgray">
-      <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-      <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-      <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-    </Stack>
-  `}
-/>
-
-```ueml copy
-<Stack orientation="vertical" backgroundColor="lightgray">
-  <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-  <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-  <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Vertical stack, items have paddings"
-  height={160}
-  horizontal={true}
-  app={`
-    <Stack orientation="vertical" backgroundColor="lightgray">
-      <Text padding="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-      <Text padding="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-      <Text padding="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-    </Stack>
-  `}
-/>
-
-### Items with Margins
-
-Item margins are not considered as spacing between items; the `Stack` does not calculate with them when sizing the item. Margins may cause overflow with percentage sizing, as the following sample indicates:
-
-```ueml copy
-<Stack orientation="horizontal" backgroundColor="lightgray">
-  <Text margin="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-  <Text margin="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-  <Text margin="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal stack, items with margins"
-  height={68}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" backgroundColor="lightgray">
-      <Text margin="12" backgroundColor="cyan" width="25%">W: 25%</Text>
-      <Text margin="12" backgroundColor="yellow" width="50%">W: 50%</Text>
-      <Text margin="12" backgroundColor="lightgreen" width="25%">W: 25%</Text>
-    </Stack>
-  `}
-/>
-
-However, with star sizing, when spaces are not considered during the size calculation, they work without overflow:
-
-```ueml copy
-<Stack orientation="horizontal" backgroundColor="lightgray">
-  <Text margin="12" backgroundColor="cyan" width="*">W: 25%</Text>
-  <Text margin="12" backgroundColor="yellow" width="2*">W: 50%</Text>
-  <Text margin="12" backgroundColor="lightgreen" width="*">W: 25%</Text>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal stack, items with margins"
-  height={68}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" backgroundColor="lightgray">
-      <Text margin="12" backgroundColor="cyan" width="*">W: * (25%)</Text>
-      <Text margin="12" backgroundColor="yellow" width="3*">W: 2* (50%)</Text>
-      <Text margin="12" backgroundColor="lightgreen" width="2*">W: * (25%)</Text>
-    </Stack>
-  `}
-/>
-
-### Stack with Gaps
-
-You can define gaps (with the `gap` property) between the child components of a stack; they can use the size units the same way as the children.
-
-```ueml copy {2}
-<Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-  gap="2rem">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with gaps"
-  height={80}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-      gap="2rem">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
-  `}
-/>
-
-```ueml copy {2}
-<Stack orientation="vertical" backgroundColor="lightgray" padding="1rem"
-  gap="2rem">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Vertical Stack with gaps"
-  height={216}
-  horizontal={true}
-  app={`
-    <Stack orientation="vertical" backgroundColor="lightgray" padding="1rem"
-      gap="2rem">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
-  `}
-/>
-
-#### Gaps and Percentage Sizing
-
-**Unlike paddings, gaps are omitted when calculating the _available space_ of a particular stack dimension**. A significant consequence of using gaps is that you must consider gap size when using percentage sizes. The following example shows what happens when you use three percentage-sized children (sum width is 100%) with and without gaps:
-
-```ueml copy
-<Stack gap="0.5rem">
-  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-    gap="2rem">
-    <Stack backgroundColor="red" height="36" width="25%" />
-    <Stack backgroundColor="green" height="36" width="50%" />
-    <Stack backgroundColor="blue" height="36" width="25%" />
-  </Stack>
-  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
-    <Stack backgroundColor="red" height="36" width="25%" />
-    <Stack backgroundColor="green" height="36" width="50%" />
-    <Stack backgroundColor="blue" height="36" width="25%" />
-  </Stack>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with and without gaps"
-  height={180}
-  horizontal={true}
-  app={`
-    <Stack gap="0.5rem">
-      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-        gap="2rem">
-        <Stack backgroundColor="red" height="36" width="25%" />
-        <Stack backgroundColor="green" height="36" width="50%" />
-        <Stack backgroundColor="blue" height="36" width="25%" />
-      </Stack>
-      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
-        <Stack backgroundColor="red" height="36" width="25%" />
-        <Stack backgroundColor="green" height="36" width="50%" />
-        <Stack backgroundColor="blue" height="36" width="25%" />
-      </Stack>
-    </Stack>
-  `}
-/>
-
-While the second stack (with no gaps) is rendered as expected, the first one overflows with the size of the two gaps applied.
-
-#### Gaps and Star Sizing
-
-You can resolve the overflow issue with gaps and percentage sizing. To remove the overflow issue, you should use star sizing as in the following example:
-
-```ueml copy
-<Stack gap="0.5rem">
-  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-    gap="2rem">
-    <Stack backgroundColor="red" height="36" width="*" />
-    <Stack backgroundColor="green" height="36" width="*" />
-    <Stack backgroundColor="blue" height="36" width="*" />
-    <Stack backgroundColor="purple" height="36" width="*" />
-  </Stack>
-  <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
-    <Stack backgroundColor="red" height=36 width="*" />
-    <Stack backgroundColor="green" height=36 width="*" />
-    <Stack backgroundColor="blue" height=36 width="*" />
-    <Stack backgroundColor="purple" height=36 width="*" />
-  </Stack>
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with and without gaps"
-  height={180}
-  horizontal={true}
-  app={`
-    <Stack gap="0.5rem">
-      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem"
-        gap="2rem">
-        <Stack backgroundColor="red" height="36" width="*" />
-        <Stack backgroundColor="green" height="36" width="*" />
-        <Stack backgroundColor="blue" height="36" width="*" />
-        <Stack backgroundColor="purple" height="36" width="*" />
-      </Stack>
-      <Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem">
-        <Stack backgroundColor="red" height="36" width="*" />
-        <Stack backgroundColor="green" height="36" width="*" />
-        <Stack backgroundColor="blue" height="36" width="*" />
-        <Stack backgroundColor="purple" height="36" width="*" />
-      </Stack>
-    </Stack>
-  `}
-/>
-
 ### Rendering Direction
 
-The Stack component respects the reading direction set for the browser. If that is from right to left, the Stack renders its children accordingly.
+<Callout type="info" emoji="💡">
+The `HStack` component respects the reading direction set in the browser and renders its children accordingly.
+</Callout>
 
-The following example shows how a language with the right-to-left reading renders the Stack (look at the `direction` property's `rtl` value):
+The following example shows how a the right-to-left reading direction renders the Stack:
 
-```ueml copy {2}
-<Stack orientation="horizontal" padding="1rem" gap="1rem"
-  direction="rtl">
+```ueml copy {2} /direction="rtl"/
+<HStack direction="rtl">
   <Stack backgroundColor="red" height="36" width="36" />
   <Stack backgroundColor="green" height="36" width="36" />
   <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
+</HStack>
 ```
 
 <Playground
   previewOnly={true}
-  name="Horizontal Stack with right to left reading direction"
-  height={80}
+  name="Horizontal Stack with right-to-left reading direction"
+  height={60}
   horizontal={true}
   app={`
-    <Stack orientation="horizontal" padding="1rem" gap="1rem"
-      direction="rtl">
+    <HStack direction="rtl">
       <Stack backgroundColor="red" height="36" width="36" />
       <Stack backgroundColor="green" height="36" width="36" />
       <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
+    </HStack>
   `}
 />
 
@@ -1355,82 +1199,6 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 
 > **Note**: Content wrapping is unavailable with the vertical stack.
 
-### Content Alignment
-
-With the `horizontalAlignment` and `verticalAlignment` properties, you can define the corresponding alignment of children within a stack.
-
-```ueml copy {2}
-<Stack orientation="horizontal" gap="1rem"
-  horizontalAlignment="center">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with centered contents"
-  height={80}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" gap="1rem"
-      horizontalAlignment="center">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
-  `}
-/>
-
-```ueml copy {2}
-<Stack orientation="vertical" gap="1rem"
-  horizontalAlignment="end">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Verical Stack with right-aligned contents"
-  height={180}
-  horizontal={true}
-  app={`
-    <Stack orientation="vertical" gap="1rem"
-      horizontalAlignment="end">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
-  `}
-/>
-
-```ueml copy {2}
-<Stack orientation="horizontal" gap="1rem"
-  verticalAlignment="center">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="72" width="36" />
-  <Stack backgroundColor="blue" height="48" width="36" />
-</Stack>
-```
-
-<Playground
-  previewOnly={true}
-  name="Horizontal Stack with vertically centered contents"
-  height={80}
-  horizontal={true}
-  app={`
-    <Stack orientation="horizontal" gap="1rem"
-      verticalAlignment="center">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="72" width="36" />
-      <Stack backgroundColor="blue" height="48" width="36" />
-    </Stack>
-  `}
-/>
-
 ## CHStack
 
 <Callout type="info" emoji="💡">
@@ -1509,60 +1277,47 @@ Here is an example:
 
 ## FlowLayout
 
-The `FlowLayout` component resembles a horizontal stack by way of content wrapping.
-It implements the same behavior: automatically breaking overflowing components into a new line.
-Besides this behavior, it adds some quality of life features when sizing components:
+The `FlowLayout` component resembles a horizontal stack with content wrapping. Though it implements the same behavior, it has extra features:
 
 - **Percentage sizing**: `FlowLayout` considers the gaps between child elements when using percentage sizing, unlike `Stack`.
 - **Responsiveness**: `FlowLayout` resizes percentage-sized children on mobile devices.
 
-<Playground
-  previewOnly={true}
-  name="FlowLayout"
-  height={120}
-  horizontal={true}
-  app={`
-    <FlowLayout padding="1rem" gap="1rem">
-      <Stack backgroundColor="red" height="36" width="25%" />
-      <Stack backgroundColor="green" height="36" width="40%" />
-      <Stack backgroundColor="blue" height="36" width="20%" />
-      <Stack backgroundColor="purple" height="36" width="30%" />
-    </FlowLayout>
-  `}
-/>
-
 ### Aligned Percentage Sizing
 
-An overflow can occur when you render multiple children in a row while using percentage sizing and gaps.
-The following sample (similar to the one above with the Stack) demonstrates such a situation:
+<Callout type="info" emoji="💡">
+When you use an `HStack` with percentage sizing and the sum width of children is 100%, an overflow will occur because gaps require extra space.
+</Callout>
+
+The following sample demonstrates such a situation:
 
 ```ueml copy
-<Stack orientation="horizontal" backgroundColor="lightgray" padding="1rem" gap="1rem">
+<HStack>
   <Stack backgroundColor="red" height="36" width="25%" />
   <Stack backgroundColor="green" height="36" width="50%" />
   <Stack backgroundColor="blue" height="36" width="25%" />
-</Stack>
+</HStack>  
 ```
 
 <Playground
   previewOnly={true}
-  name="Horizontal Stack with percentage widths and overflow"
-  height={100}
+  name="HStack with percentage widths and overflow"
+  height={80}
   horizontal={true}
   app={`
-      <Stack orientation="horizontal" backgroundColor="lightgray" 
-        padding="1rem" gap="1rem">
+      <HStack>
         <Stack backgroundColor="red" height="36" width="25%" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
-      </Stack>  
+      </HStack>  
     `}
 />
 
-The FlowLayout component handles this sizing issue by adjusting the child component dimensions accounting for the gaps:
+<Callout type="info" emoji="💡">
+The `FlowLayout` component handles this sizing issue by adjusting the child component dimensions accounting for the gaps.
+</Callout>
 
 ```ueml copy
-<FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+<FlowLayout>
   <Stack backgroundColor="red" height="36" width="25%" />
   <Stack backgroundColor="green" height="36" width="50%" />
   <Stack backgroundColor="blue" height="36" width="25%" />
@@ -1572,10 +1327,10 @@ The FlowLayout component handles this sizing issue by adjusting the child compon
 <Playground
   previewOnly={true}
   name="FlowLayout children with 100% combined widths"
-  height={100}
+  height={80}
   horizontal={true}
   app={`
-      <FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
+      <FlowLayout>
         <Stack backgroundColor="red" height="36" width="25%" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
@@ -1585,17 +1340,21 @@ The FlowLayout component handles this sizing issue by adjusting the child compon
 
 ### Size Capping
 
-The FlowLayout component caps the size of items exceeding the available width:
+<Callout type="info" emoji="💡">
+The FlowLayout component caps the size of items exceeding the available width.
+</Callout>
 
-```ueml copy {2}
-<FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
-  <Stack backgroundColor="red" height="36" width="1000000rem" />
+In the following sample, the red box is too wide. Nonetheless, the `FlowLayout` trims it back to 100% width:
+
+```ueml copy /width="1000000px"/
+<FlowLayout>
+  <Stack backgroundColor="red" height="36" width="1000000px" />
   <Stack backgroundColor="green" height="36" width="50%" />
   <Stack backgroundColor="blue" height="36" width="25%" />
-</FlowLayout>
+</FlowLayout>  
 ```
 
-Note how the extreme width of the first child is capped to the space available for the FlowLayout, while the other children's sizes remain unmodified:
+Note how the extreme width of the first child is capped to the space available for the `FlowLayout`, while the other children's sizes remain unmodified:
 
 <Playground
   previewOnly={true}
@@ -1603,10 +1362,101 @@ Note how the extreme width of the first child is capped to the space available f
   height={150}
   horizontal={true}
   app={`
-      <FlowLayout backgroundColor="lightgray" padding="1rem" gap="1rem">
-        <Stack backgroundColor="red" height="36" width="1000000rem" />
+      <FlowLayout>
+        <Stack backgroundColor="red" height="36" width="1000000px" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
       </FlowLayout>  
   `}
 />
+
+## SpaceFiller
+
+<Callout type="info" emoji="💡">
+`SpaceFiller` is a component that fills the remaining (unused) space in layout containers. Its behavior depends on the layout container in which it is used.
+</Callout>
+
+In a `Stack`, `SpaceFiller` pushes the children following it to the other end of the container:
+
+```ueml copy {3}
+<HStack>
+  <Stack width="36" height="36" backgroundColor="red" />
+  <SpaceFiller />
+  <Stack width="36" height="36" backgroundColor="blue" />
+</HStack>
+```
+
+<Playground
+  name="SpaceFiller in an HStack"
+  previewOnly
+  height={80}
+  app={`
+  <HStack>
+    <Stack width="36" height="36" backgroundColor="red" />
+    <SpaceFiller />
+    <Stack width="36" height="36" backgroundColor="blue" />
+  </HStack>
+  `}
+/>
+
+In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children following the `SpaceFiller` enters a new line.
+
+```ueml copy {3}
+<FlowLayout>
+  <Stack width="20%" height="36" backgroundColor="red" />
+  <SpaceFiller />
+  <Stack width="20%" height="36" backgroundColor="green" />
+  <Stack width="20%" height="36" backgroundColor="blue" />
+</FlowLayout>
+```
+
+<Playground
+  name="Example: in a FlowLayout"
+  previewOnly
+  height={120}
+  app={`
+  <FlowLayout>
+    <Stack width="20%" height="36" backgroundColor="red" />
+    <SpaceFiller />
+    <Stack width="20%" height="36" backgroundColor="green" />
+    <Stack width="20%" height="36" backgroundColor="blue" />
+  </FlowLayout>
+  `}
+/>
+
+## Splitter
+
+The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections (a primary and a secondary) and puts a draggable bar between them. 
+
+`Splitter` has two specialized variants, `HSplitter` and `VSplitter`, which separate the two sections vertically and horizontally.
+
+The following example demonstrates a horizontal splitter, which sets some constraints on the size of the primary section:
+
+```ueml copy /orientation="horizontal"/
+<HSplitter 
+  height="100%"
+  minPrimarySize="10%"
+  maxPrimarySize="90%">
+  <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>
+  <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>
+</HSplitter>
+```
+
+Try dragging the splitter bar between the sections to experience how it works.
+
+<Playground
+  previewOnly
+  height={150}
+  name="HSplitter example"
+  app={`
+  <HSplitter 
+    height="100%"
+    minPrimarySize="10%"
+    maxPrimarySize="90%">
+    <CVStack backgroundColor="lightblue" height="100%">Primary</CVStack>
+    <CVStack backgroundColor="darksalmon" height="100%">Secondary</CVStack>
+  </HSplitter>
+  `}
+/>
+
+See the <SmartLink href={COMPONENT_SPLITTER}>Splitter reference documentation</SmartLink> to learn more about this component.
