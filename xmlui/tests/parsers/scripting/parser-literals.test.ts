@@ -235,7 +235,7 @@ describe("Parser - literals", () => {
     { src: '"Hello\\r1"', exp: "Hello\r1" },
     { src: '"Hello\\\\r1"', exp: "Hello\\r1" },
 
-    { src: '"Hello\\q"', exp: "Hello\\q" },
+    { src: '"Hello\\q"', exp: "Hello\q" },
 
     { src: '"Hello\t"', exp: "Hello\t" },
     { src: '"Hello\\t"', exp: "Hello\t" },
