@@ -1,54 +1,136 @@
 # Modal Dialogs
 
-_TBD_
+Dialog windows are an inherent part of XMLUI.
+Dialogs can be invoked both declaratively in markup, or imperatively in codebehind.
+They are also containers for custom content, such as forms, depending on the situation.
 
-```ueml copy
+## Declarative Approach
+
+The most straightforward way of using dialogs in XMLUI is like using other components:
+by adding them to a page in markup and controlling their appearance through the `when` attribute:
+
+```ueml copy {4-7}
 <App>
-  <script>
-    var declarativeVisible = false;
-    var declarativeVisible2 = false;
-  </script>
-  <Button onClick="imperativeModal.open()">imperative modal</Button>
-  <Button onClick="declarativeVisible = true">declarative modal</Button>
-  <Button onClick="declarativeVisible2 = true">declarative modal (multiple forms)</Button>
-  declarativeVisible: {declarativeVisible}
-  declarativeVisible2: {declarativeVisible2}
+  <var name="isDialogShown" value="{false}"/>
+  <Button label="Open Dialog" onClick="isDialogShown = true" />
+  <ModalDialog
+    when="{isDialogShown}"
+    title="Example Dialog"
+    onClose="isDialogShown = false" />
+</App>
+```
 
+Click on the button in the demo below to open the modal dialog.
+Click anywhere outside the opened dialog or the close button on the dialog itself to close it.
 
-  <ModalDialog id="imperativeModal">
-    <Form>
-      <FormItem label="Name" bindTo="name"/>
-      <event name="submit">
-        <APICall url="/api/willNotThrow" method="post"/>
-      </event>
-    </Form>
-  </ModalDialog>
+<Playground
+  name="Example: Declarative Dialog"
+  previewOnly
+  app={`
+  <App>
+    <var name="isDialogShown" value="{false}"/>
+    <Button label="Open Dialog" onClick="isDialogShown = true" />
+    <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
+  </App>
+  `}
+/>
 
+## Imperative Approach
 
-  <ModalDialog when="{declarativeVisible}" onClose="declarativeVisible = false">
-    <Form>
-      <FormItem bindTo="name"/>
-      <event name="submit">
-        <APICall url="/api/willNotThrow" method="post"/>
-      </event>
-    </Form>
-  </ModalDialog>
+In cases where a dialog should be raised in code, an imperative approach is a good idea.
+Most of the time, this may happen in codebehind.
 
-  <ModalDialog when="{declarativeVisible2}" onClose="declarativeVisible2 = false">
-    <Form>
-      <FormItem bindTo="name"/>
-      <event name="submit">
-        <APICall url="/api/willNotThrow" method="post"/>
-      </event>
-    </Form>
-    <Form>
-      I'm another form
-      <FormItem bindTo="name"/>
-      <event name="submit">
-        <APICall url="/api/willNotThrow" method="post"/>
-      </event>
-    </Form>
+```ueml copy 
+<App>
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
   </ModalDialog>
 </App>
 ```
 
+<Playground
+  name="Example: Imperative Dialog"
+  previewOnly
+  app={`
+  <App>
+    <Button label="Open Dialog" onClick="dialog.open()" />
+    <ModalDialog id="dialog" title="Example Dialog">
+      <Button label="Close Dialog" onClick="dialog.close()" />
+    </ModalDialog>
+  </App>
+  `}
+/>
+
+## Confirmation for API Calls
+
+The `ModalDialog` component is also used for confirming certain actions such as API requests.
+The component itself is built into the `APICall` component and by calling exposed properties,
+you can do simple customizations to a dialog which needed to be displayed before the request is sent. 
+
+```ueml copy {4-6}
+<App>
+  <Form>
+    <H2>Send Request</H2>
+    Click on the `Save` button to trigger the confirmation dialog.
+    Reload the application to try again after clicking "Yes!" in the dialog.
+    <event name="submit">
+      <APICall
+        url="/api/will-not-throw"
+        method="post"
+        confirmTitle="Save Data"
+        confirmMessage="Are you sure you want to send this request and close the dialog?"
+        confirmButtonLabel="Yes!" />
+    </event>
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: Confirmation Dialog"
+  previewOnly
+  app={`
+  <App>
+    <Form>
+      <H2>Send Request</H2>
+      Click on the \`Save\` button to trigger the confirmation dialog.
+      Reload the application to try again after clicking "Yes!" in the dialog.
+      <event name="submit">
+        <APICall
+          url="/api/will-not-throw"
+          method="post"
+          confirmTitle="Save Data"
+          confirmMessage="Are you sure you want to send this request and close the dialog?"
+          confirmButtonLabel="Yes!" />
+      </event>
+    </Form>
+  </App>
+  `}
+/>
+
+## Further Customization
+
+The `ModalDialog` component lets you customize some parts of it directly.
+For example, the cancel button can be hidden and a prestyled title can also be added to dialogs.
+
+```ueml copy /title="Example Dialog"/ /closeButtonVisible="false"/
+<App>
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="true">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+</App>
+```
+
+<Playground
+  name="Example: Customization"
+  previewOnly
+  app={`
+  <App>
+    <Button label="Open Dialog" onClick="dialog.open()" />
+    <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="true">
+      <Button label="Close Dialog" onClick="dialog.close()" />
+    </ModalDialog>
+  </App>
+  `}
+/>
