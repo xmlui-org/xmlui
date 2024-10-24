@@ -144,7 +144,7 @@ export const ModalDialog = React.forwardRef(
               style={style}
             >
               {!!title && (
-                <Dialog.Title>
+                <Dialog.Title style={{ marginTop: 0 }}>
                   <header id="dialogTitle" className={styles.dialogTitle}>
                     {title}
                   </header>

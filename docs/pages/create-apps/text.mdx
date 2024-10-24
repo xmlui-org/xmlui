@@ -1,5 +1,15 @@
 import { Callout } from 'nextra/components';
-import { COMPONENT_HEADING, COMPONENT_MARKDOWN, COMPONENT_TEXT } from "../../meta/pages";
+import {
+  COMPONENT_H1,
+  COMPONENT_H2,
+  COMPONENT_H3,
+  COMPONENT_H4,
+  COMPONENT_H5,
+  COMPONENT_H6,
+  COMPONENT_HEADING,
+  COMPONENT_MARKDOWN,
+  COMPONENT_TEXT,
+} from "../../meta/pages";
 
 # Working with Text
 
@@ -838,9 +848,10 @@ See the <SmartLink href={COMPONENT_TEXT}>Text component reference</SmartLink> fo
 
 ### Heading
 
-The `Heading` component renders text as headings.
-It is useful for sectioning a body of text.
-It has the same heading levels as the ones you can find in HTML set by the `level` property:
+The `Heading` component renders text as headings and is useful for sectioning a body of text.
+It has the same heading levels as the ones you can find in HTML.
+
+The `level` property to sets the level of a heading:
 
 ```ueml copy
 <Heading level="h2" value="Heading Level 2" />
@@ -870,6 +881,37 @@ See all heading levels compared to regular text:
 />
 
 See more in the <SmartLink href={COMPONENT_HEADING}>Heading component reference</SmartLink>.
+
+<Callout type="info" emoji="💡">
+  You can also use specialized components named after the levels for a shorthand version.
+</Callout>
+
+```ueml copy
+<App>
+  <!-- Both render the a level 2 heading -->
+  <Heading level="h2" value="Heading Level 2" />
+  <H2 value="Heading Level 2" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Specialized Headings"
+  app={`
+  <App>
+    <Heading level="h2" value="Heading Level 2" />
+    <H2 value="Heading Level 2" />
+  </App>
+  `}
+/>
+
+The reference documentation of the shorthand versions of the `Heading` can be found here:
+<SmartLink href={COMPONENT_H1}>H1</SmartLink>,
+ <SmartLink href={COMPONENT_H2}>H2</SmartLink>,
+ <SmartLink href={COMPONENT_H3}>H3</SmartLink>,
+ <SmartLink href={COMPONENT_H4}>H4</SmartLink>,
+ <SmartLink href={COMPONENT_H5}>H5</SmartLink>,
+ <SmartLink href={COMPONENT_H6}>H6</SmartLink>.
 
 ### Markdown
 
