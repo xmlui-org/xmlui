@@ -32,6 +32,7 @@ export const CompoundComponent = forwardRef(
       extractValue,
       layoutContext,
       uid,
+      updateState,
     }: CompoundComponentProps<T>,
     forwardedRef: React.ForwardedRef<any>,
   ) => {
@@ -46,23 +47,6 @@ export const CompoundComponent = forwardRef(
             resolvedProps[key] = lookupSyncCallback(extractedProp);
           } else {
             resolvedProps[key] = extractedProp;
-          }
-        });
-      }
-      return resolvedProps;
-    }, [extractValue, lookupSyncCallback, node.props]);
-
-    // --- NI
-    const flattenedPropsInner = useMemo(() => {
-      const resolvedProps: any = {};
-      if (node.props) {
-        Object.entries(node.props).forEach(([key, value]) => {
-          const extractedProp = extractValue(value, true);
-          if (extractedProp?._ARROW_EXPR_) {
-            // --- Ensure arrow functions are called synchronously
-            resolvedProps[`$${key}`] = lookupSyncCallback(extractedProp);
-          } else {
-            resolvedProps[`$${key}`] = extractedProp;
           }
         });
       }
@@ -104,11 +88,12 @@ export const CompoundComponent = forwardRef(
     const vars = useMemo(() => {
       return {
         $props: resolvedProps,
+        ...containerNode.vars,
         emitEvent,
         hasEventHandler,
-        ...containerNode.vars,
+        updateState,
       };
-    }, [containerNode.vars, emitEvent, hasEventHandler, resolvedProps]);
+    }, [containerNode.vars, emitEvent, hasEventHandler, resolvedProps, updateState]);
     const stableVars = useShallowCompareMemoize(vars);
 
     // --- Inject implicit variable into the container of the compound component
