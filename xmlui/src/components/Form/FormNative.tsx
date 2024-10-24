@@ -201,6 +201,7 @@ type Props = {
   enabled?: boolean;
   cancelLabel?: string;
   saveLabel?: string;
+  saveInProgressLabel?: string;
   saveIcon?: string;
   swapCancelAndSave?: boolean;
   onSubmit?: (
@@ -226,6 +227,7 @@ const Form = forwardRef(function (
     enabled = true,
     cancelLabel = "Cancel",
     saveLabel = "Save",
+    saveInProgressLabel = "Saving...",
     swapCancelAndSave,
     onSubmit,
     onCancel,
@@ -359,10 +361,10 @@ const Form = forwardRef(function (
   const submitButton = useMemo(
     () => (
       <Button key="submit" type={"submit"} disabled={formState.submitInProgress}>
-        {saveLabel}
+        {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
-    [formState.submitInProgress, saveLabel],
+    [formState.submitInProgress, saveLabel, saveInProgressLabel],
   );
 
   useEffect(() => {
@@ -465,6 +467,7 @@ export function FormWithContextVar({
       style={layoutCss}
       cancelLabel={extractValue(node.props.cancelLabel)}
       saveLabel={extractValue(node.props.saveLabel)}
+      saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
       swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
       onSubmit={lookupEventHandler("submit")}
       onCancel={lookupEventHandler("cancel")}

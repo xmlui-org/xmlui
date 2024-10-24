@@ -35,6 +35,10 @@ export const FormMd = createMetadata({
     ),
     cancelLabel: d(`This property defines the label of the Cancel button, by default, "Cancel".`),
     saveLabel: d(`This property defines the label of the Save button, by default, "Save".`),
+    saveInProgressLabel: d(
+      "This property defines the label of the Save button to display during the " +
+        "form data submit (save) operation. By default, the value of `saveLabel`.",
+    ),
     swapCancelAndSave: d(
       `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
