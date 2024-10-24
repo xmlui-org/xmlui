@@ -17,6 +17,7 @@ import type {
   ReturnStatement,
   SequenceExpression,
   Statement,
+  TemplateLiteralExpression,
   UnaryExpression,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
@@ -44,7 +45,7 @@ type EvaluatorFunction = (
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ) => any;
 
 /**
@@ -57,7 +58,7 @@ type EvaluatorFunction = (
 export function evalBindingExpression(
   source: string,
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
+  thread?: LogicalThread,
 ): any {
   // --- Use the main thread by default
   thread ??= evalContext.mainThread;
@@ -85,7 +86,11 @@ export function evalBindingExpression(
  * @param evalContext Evaluation context to use
  * @param thread The logical thread to use for evaluation
  */
-export function evalBinding(expr: Expression, evalContext: BindingTreeEvaluationContext, thread?: LogicalThread): any {
+export function evalBinding(
+  expr: Expression,
+  evalContext: BindingTreeEvaluationContext,
+  thread?: LogicalThread,
+): any {
   const thisStack: any[] = [];
   ensureMainThread(evalContext);
   thread ??= evalContext.mainThread;
@@ -137,7 +142,7 @@ function evalBindingExpressionTree(
   thisStack: any[],
   expr: Expression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   if (!evalContext.options) {
     evalContext.options = { defaultToOptionalMemberAccess: true };
@@ -152,6 +157,8 @@ function evalBindingExpressionTree(
 
   // --- Process the expression according to its type
   switch (expr.type) {
+    case "TempLitE":
+      return evalTemplateLiteral(evaluator, thisStack, expr, evalContext, thread);
     case "LitE":
       return evalLiteral(thisStack, expr);
 
@@ -209,12 +216,31 @@ function evalBindingExpressionTree(
   }
 }
 
+function evalTemplateLiteral(
+  evaluator: EvaluatorFunction,
+  thisStack: any[],
+  expr: TemplateLiteralExpression,
+  evalContext: BindingTreeEvaluationContext,
+  thread: LogicalThread,
+): any {
+  const segmentValues: any[] = []
+  for (let segment of expr.segments){
+    let segmentValue = evaluator(thisStack, segment, evalContext, thread);
+    thisStack.pop()
+    if(typeof segmentValue !== "string"){
+      segmentValue = `${segmentValue}`
+    }
+    segmentValues.push(segmentValue)
+  }
+  return segmentValues.join('')
+}
+
 function evalMemberAccess(
   evaluator: EvaluatorFunction,
   thisStack: any[],
   expr: MemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const parentObj = evaluator(thisStack, expr.object, evalContext, thread);
   return evalMemberAccessCore(parentObj, thisStack, expr, evalContext);
@@ -225,7 +251,7 @@ function evalCalculatedMemberAccess(
   thisStack: any[],
   expr: CalculatedMemberAccessExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const parentObj = evaluator(thisStack, expr.object, evalContext, thread);
 
@@ -242,7 +268,7 @@ function evalSequence(
   thisStack: any[],
   expr: SequenceExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   if (!expr.expressions || expr.expressions.length === 0) {
     throw new Error(`Missing expression sequence`);
@@ -262,7 +288,7 @@ function evalArrayLiteral(
   thisStack: any[],
   expr: ArrayLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const arrayValue: any[] = [];
   for (const item of expr.items) {
@@ -287,7 +313,7 @@ function evalObjectLiteral(
   thisStack: any[],
   expr: ObjectLiteral,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const objectHash: any = {};
   for (const prop of expr.props) {
@@ -336,7 +362,7 @@ function evalUnary(
   customOp: ICustomOperations | null,
   expr: UnaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const operand = evaluator(thisStack, expr.operand, evalContext, thread);
   thisStack.pop();
@@ -349,7 +375,7 @@ function evalBinary(
   customOp: ICustomOperations | null,
   expr: BinaryExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const l = evaluator(thisStack, expr.left, evalContext, thread);
   thisStack.pop();
@@ -371,7 +397,7 @@ function evalConditional(
   thisStack: any[],
   expr: ConditionalExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const condition = evaluator(thisStack, expr.condition, evalContext, thread);
   thisStack.pop();
@@ -383,7 +409,7 @@ function evalAssignment(
   thisStack: any[],
   expr: AssignmentExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const leftValue = expr.leftValue;
   evaluator(thisStack, leftValue, evalContext, thread);
@@ -398,7 +424,7 @@ function evalPreOrPost(
   thisStack: any[],
   expr: PrefixOpExpression | PostfixOpExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   const operand = expr.operand;
   evaluator(thisStack, operand, evalContext, thread);
@@ -411,7 +437,7 @@ function evalFunctionInvocation(
   thisStack: any[],
   expr: FunctionInvocationExpression,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): any {
   let functionObj: any;
   let implicitContextObject: any = null;
@@ -438,7 +464,7 @@ function evalFunctionInvocation(
       functionObj.args,
       evalContext,
       thread,
-      ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true }))
+      ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
     functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression);
   } else if (expr.object.type === "ArrowE") {
@@ -448,7 +474,7 @@ function evalFunctionInvocation(
       expr.object.args,
       evalContext,
       thread,
-      ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true }))
+      ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })),
     );
   } else {
     // --- We evaluate the argument values to pass to a JavaScript function
@@ -469,7 +495,8 @@ function evalFunctionInvocation(
           const funcArg = evaluator([], arg, evalContext, thread);
           if (funcArg?._ARROW_EXPR_) {
             const wrappedFuncArg = createArrowFunction(evaluator, funcArg);
-            const wrappedFunc = (...args: any[]) => wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
+            const wrappedFunc = (...args: any[]) =>
+              wrappedFuncArg(funcArg.args, evalContext, thread, ...args);
             functionArgs.push(wrappedFunc);
           } else {
             functionArgs.push(funcArg);
@@ -493,7 +520,9 @@ function evalFunctionInvocation(
   // --- Check if the function is banned from running
   const bannedInfo = isBannedFunction(functionObj);
   if (bannedInfo.banned) {
-    throw new Error(`Function ${bannedInfo.func?.name ?? "unknown"} is not allowed to call. ${bannedInfo?.help ?? ""}`);
+    throw new Error(
+      `Function ${bannedInfo.func?.name ?? "unknown"} is not allowed to call. ${bannedInfo?.help ?? ""}`,
+    );
   }
 
   // --- We use context for "this"
@@ -560,7 +589,15 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
         if (argVal?._EXPRESSION_) {
           argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
         }
-        processDeclarations(arrowBlock, runTimeEvalContext, runtimeThread, [decl], false, true, argVal);
+        processDeclarations(
+          arrowBlock,
+          runTimeEvalContext,
+          runtimeThread,
+          [decl],
+          false,
+          true,
+          argVal,
+        );
       }
     }
 
@@ -586,7 +623,9 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
         statements = expr.statement.statements;
         break;
       default:
-        throw new Error(`Arrow expression with a body of '${expr.statement.type}' is not supported yet.`);
+        throw new Error(
+          `Arrow expression with a body of '${expr.statement.type}' is not supported yet.`,
+        );
     }
 
     // --- Process the statement with a new processor

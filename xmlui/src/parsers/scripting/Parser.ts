@@ -2256,8 +2256,7 @@ export class Parser {
         );
       }
       case TokenType.Backtick:
-        const startToken = this._lexer.get();
-        return this.parseTemplateLiteral(startToken);
+        return this.parseTemplateLiteral();
 
       case TokenType.False:
       case TokenType.True:
@@ -2348,7 +2347,8 @@ export class Parser {
     return null;
   }
 
-  private parseTemplateLiteral(startToken: Token): TemplateLiteralExpression {
+  private parseTemplateLiteral(): TemplateLiteralExpression {
+    const startToken = this._lexer.get()
     this._lexer.setStartingPhaseToTemplateLiteral();
     const segments: (Literal | Expression)[] = [];
     loop: while (true) {
@@ -2370,7 +2370,6 @@ export class Parser {
           break loop;
         default:
           this.reportError("W004");
-          
       }
     }
     const endToken = this._lexer.get()
@@ -2917,7 +2916,7 @@ export class Parser {
               state = StrParseState.UX1;
               break;
             default:
-              result += "\\" + ch;
+              result += ch;
               break;
           }
           break;

@@ -282,7 +282,7 @@ describe("Parser - literals", () => {
 
   it("template string, no placeholder", () => {
     // --- Arrange
-    const wParser = new Parser("`hi`");
+    const wParser = new Parser("`hi\\n\\x41`");
 
     // --- Act
     const expr = wParser.parseExpr();
@@ -293,7 +293,7 @@ describe("Parser - literals", () => {
     const literal = expr as TemplateLiteralExpression;
     expect(literal.segments).toHaveLength(1);
     expect(literal.segments[0].type).equal("LitE");
-    expect(literal.segments[0].value).equal("hi");
+    expect(literal.segments[0].value).equal("hi\nA");
   });
 
   it("template string, expr placeholder", () => {

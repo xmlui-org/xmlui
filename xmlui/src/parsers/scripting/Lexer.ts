@@ -50,6 +50,7 @@ enum LexerPhase {
   RealExponentSign,
   RealExponentTail,
   StringTemplateLiteral,
+  StringTemplateLiteralBackSlash,
   String,
   StringBackSlash,
   StringHexa1,
@@ -238,7 +239,7 @@ export class Lexer {
       }
 
       // --- Follow the lexer state machine
-      switch (phase) {
+      phaseSwitch: switch (phase) {
         // ====================================================================
         // Process the first character
         case LexerPhase.Start:
@@ -743,8 +744,23 @@ export class Lexer {
           }
           break;
 
+        case LexerPhase.StringTemplateLiteralBackSlash: {
+          phase = LexerPhase.StringTemplateLiteral;
+          const charAhead1 = this.input.ahead(0);
+          const charAhead2 = this.input.ahead(1);
+
+          if (charAhead1 === "`" || (charAhead1 === "$" && charAhead2 === "{")) {
+            return completeToken(TokenType.StringLiteral);
+          }
+          break;
+        }
+
         case LexerPhase.StringTemplateLiteral:
           switch (ch) {
+            case "\\":
+              phase = LexerPhase.StringTemplateLiteralBackSlash;
+              tokenType = TokenType.Unknown;
+              break phaseSwitch;
             case "`":
               return completeToken(TokenType.Backtick);
             case "$":

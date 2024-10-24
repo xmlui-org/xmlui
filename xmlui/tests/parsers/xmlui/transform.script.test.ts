@@ -234,7 +234,7 @@ Hello!
       <Stack>
         <script>
           function a() { let x = 3; return x * 2 }
-          function b(c,d,e) { return c + d + e }\`;
+          function b(c,d,e) { return c + d + e };
         </script>
       </Stack>
     `) as ComponentDef;
@@ -254,7 +254,7 @@ Hello!
       <Stack>
         <script>
           function a() {}
-          function a() { return Math.floor(c/d); }\`;
+          function a() { return Math.floor(c/d); };
         </script>
       </Stack>
     `) as ComponentDef;
