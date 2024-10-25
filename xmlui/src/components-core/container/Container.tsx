@@ -1122,7 +1122,6 @@ function transformNodeWithDataProp(
     if(extractParam(uidInfoRef.current, node.props.data) === "loaderValue"){
       return node;
     }
-    console.log("transforming node with data prop", node);
     return {
       ...node,
       props: {

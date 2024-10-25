@@ -201,22 +201,11 @@ export const Table = forwardRef(
 
     useLayoutEffect(() => {
       _setSortBy(sortBy);
-      console.log('setting _sortBy', {sortBy})
     }, [sortBy]);
 
     useLayoutEffect(() => {
       _setSortingDirection(sortingDirection);
-      console.log('setting _sortDirection', {sortingDirection})
     }, [sortingDirection]);
-
-    useEffect(()=>{
-      console.log({
-        sortBy,
-        sortingDirection,
-        _sortBy,
-        _sortingDirection
-      })
-    }, [_sortBy, _sortingDirection, sortBy, sortingDirection]);
 
     const [sortedData, setSortedData] = useState(dataWithOrder);
 
@@ -245,7 +234,6 @@ export const Table = forwardRef(
           }
         }
 
-        console.log("before willSort in table", newSortBy, newDirection);
         // --- Check if sorting is allowed
         const result = await willSort?.(newSortBy, newDirection);
         if (result === false) {
@@ -255,7 +243,6 @@ export const Table = forwardRef(
         _setSortingDirection(newDirection);
         _setSortBy(newSortBy);
 
-        console.log("before sortingDidChange in table", newSortBy, newDirection);
         // External callback function is always called.
         // Even if sorting is internal, we can notify other components through this callback
         sortingDidChange?.(newSortBy, newDirection);
