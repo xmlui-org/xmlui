@@ -45,6 +45,7 @@ $color-MenuSeparator: createThemeVar("color-MenuSeparator");
   border-radius: $radius-DropdownMenu;
   min-width: $min-width-DropdowMenu;
   box-shadow: $shadow-DropdownMenu;
+  overflow: hidden;
   animation-duration: 400ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;

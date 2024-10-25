@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, ReactNode, useLayoutEffect} from "react";
 import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
@@ -160,6 +160,7 @@ export const Table = forwardRef(
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
     const tableRef = useRef<HTMLTableElement>(null);
     const estimatedHeightRef = useRef<number | null>(null);
+    const isSortControlled = sortBy !== undefined;
 
     const safeColumns: OurColumnMetadata[] = useMemo(() => {
       if (columns) {
@@ -198,39 +199,27 @@ export const Table = forwardRef(
     const [_sortBy, _setSortBy] = useState(sortBy);
     const [_sortingDirection, _setSortingDirection] = useState(sortingDirection);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       _setSortBy(sortBy);
     }, [sortBy]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       _setSortingDirection(sortingDirection);
     }, [sortingDirection]);
 
-    const [sortedData, setSortedData] = useState(dataWithOrder);
-
-    useEffect(() => {
-      if (!_sortBy) {
-        setSortedData(dataWithOrder);
-        return;
+    const sortedData = useMemo(()=>{
+      if (!_sortBy || isSortControlled) {
+        return dataWithOrder;
       }
-      (async () => {
-        const result = await willSort?.(_sortBy, _sortingDirection);
-        if (result === false) {
-          setSortedData(dataWithOrder);
-        } else {
-          setSortedData(
-            orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc"),
-          );
-        }
-      })();
-    }, [_sortBy, _sortingDirection, dataWithOrder, willSort]);
+      return orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc");
+    }, [_sortBy, _sortingDirection, dataWithOrder, isSortControlled]);
 
     const _updateSorting = useCallback(
-      async (header: Header<RowWithOrder, unknown>) => {
+      async (accessorKey) => {
         let newDirection: SortingDirection = "ascending";
-        let newSortBy = header.column.columnDef.meta?.accessorKey;
+        let newSortBy = accessorKey;
         // The current key is the same as the last -> the user clicked on the same header twice
-        if (_sortBy === header.column.columnDef.meta?.accessorKey) {
+        if (_sortBy === accessorKey) {
           // The last sorting direction was ascending -> make it descending
           if (_sortingDirection === "ascending") {
             newDirection = "descending";
@@ -248,6 +237,7 @@ export const Table = forwardRef(
 
         _setSortingDirection(newDirection);
         _setSortBy(newSortBy);
+
         // External callback function is always called.
         // Even if sorting is internal, we can notify other components through this callback
         sortingDidChange?.(newSortBy, newDirection);
@@ -355,7 +345,7 @@ export const Table = forwardRef(
         ),
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
-    }, [columnsWithCustomCell, toggleRow, rowsSelectable, checkAllRows]);
+    }, [rowsSelectable, columnsWithCustomCell, enableMultiRowSelection, checkAllRows, toggleRow]);
 
     // --- Set up page information (using the first page size option)
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -553,7 +543,7 @@ export const Table = forwardRef(
                     })}
                   >
                     {headerGroup.headers.map((header, headerIndex) => {
-                      const style = header.column.columnDef.meta?.style || {};
+                      const { width, ...style } = header.column.columnDef.meta?.style || {};
                       const size = header.getSize();
                       return (
                         <th
@@ -568,7 +558,7 @@ export const Table = forwardRef(
                         >
                           <ClickableHeader
                             hasSorting={header.column.columnDef.enableSorting}
-                            updateSorting={() => _updateSorting(header)}
+                            updateSorting={() => _updateSorting(header.column.columnDef.meta?.accessorKey)}
                           >
                             <div className={styles.headerContent} style={style}>
                               {
