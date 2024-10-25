@@ -207,17 +207,12 @@ export const Table = forwardRef(
       _setSortingDirection(sortingDirection);
     }, [sortingDirection]);
 
-    const [sortedData, setSortedData] = useState(dataWithOrder);
-
-    useEffect(() => {
+    const sortedData = useMemo(()=>{
       if (!_sortBy || isSortControlled) {
-        setSortedData(dataWithOrder);
-        return;
+        return dataWithOrder;
       }
-      setSortedData(
-          orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc"),
-      );
-    }, [_sortBy, _sortingDirection, dataWithOrder, isSortControlled, willSort]);
+      return orderBy(dataWithOrder, _sortBy, _sortingDirection === "ascending" ? "asc" : "desc");
+    }, [_sortBy, _sortingDirection, dataWithOrder, isSortControlled]);
 
     const _updateSorting = useCallback(
       async (accessorKey) => {
