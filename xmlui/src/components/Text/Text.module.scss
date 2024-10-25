@@ -213,6 +213,7 @@ See this source for details: https://css-tricks.com/line-clampin/
   overflow: hidden;
   overflow-wrap: break-word;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .preserveLinebreaks {
