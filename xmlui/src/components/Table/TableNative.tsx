@@ -350,7 +350,7 @@ export const Table = forwardRef(
         ),
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
-    }, [columnsWithCustomCell, toggleRow, rowsSelectable, checkAllRows]);
+    }, [rowsSelectable, columnsWithCustomCell, enableMultiRowSelection, checkAllRows, toggleRow]);
 
     // --- Set up page information (using the first page size option)
     const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
@@ -548,7 +548,7 @@ export const Table = forwardRef(
                     })}
                   >
                     {headerGroup.headers.map((header, headerIndex) => {
-                      const style = header.column.columnDef.meta?.style || {};
+                      const { width, ...style } = header.column.columnDef.meta?.style || {};
                       const size = header.getSize();
                       return (
                         <th
