@@ -118,11 +118,235 @@ When you define theme variables, you can separate tone-independent values from t
 
 ## Theme Scopes
 
-You can quickly change an app's theme by configuring a different theme in the app's configuration file. Besides using the app-level theme, you can apply other themes for a particular part of the app.
-
 You can quickly change an app's theme by configuring a different theme in the app's configuration file. In addition to using the app-level theme, you can apply other themes for a particular part of the app.
 
-_TBD_
+Use the `Theme` component to wrap a part of the markup and apply a modified theme. With `Theme`, you can change the theme, modify the tone, or even alter particular theme variables.
+
+Let's see a few samples!
+
+The following markup displays the first button's panel with the default theme and the second panel with the "xmlui-green" theme:
+
+```ueml copy /themeId="xmlui-green"/
+  <App>
+    <HStack>
+      <Button>Button with default theme</Button>
+      <Theme themeId="xmlui-green">
+        <Button>Button with xmlui-green theme</Button>
+      </Theme>
+    </HStack>
+  </App>
+```
+
+<Playground
+  previewOnly
+  name="Theme component with a new theme"
+  app={`
+    <App>
+      <HStack>
+        <Button>Button with default theme</Button>
+        <Theme themeId="xmlui-green">
+          <Button>Button with xmlui-green theme</Button>
+        </Theme>
+      </HStack>
+    </App>
+    `}
+  height={100}
+/>
+
+The next sample demonstrates that you can use the `tone` property of `Theme` to set a different tone for a UI patch.
+
+```ueml copy /tone="dark"/ /tone="light"/
+<App>
+  <Theme tone="light">
+    <Card title="Card with light tone" />
+  </Theme>
+  <Theme tone="dark">
+    <Card title="Card with dark tone" />
+  </Theme>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Theme component with a new tone"
+  app={`
+    <App>
+      <Theme tone="light">
+        <Card title="Card with light tone" />
+      </Theme>
+      <Theme tone="dark">
+        <Card title="Card with dark tone" />
+      </Theme>
+    </App>
+  `}
+  height={200}
+/>
+
+In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
+
+```ueml copy /color-text-primary="orangered"/ /radius-Card="40px"/ /color-text-primary="mediumpurple"/
+<App>
+  <Theme color-text-primary="orangered" radius-Card="40px">
+    <Card title="Card with custom text color and border radius" />
+  </Theme>
+  <Theme tone="dark" color-text-primary="mediumpurple">
+    <Card title="Card with dark tone and custom text color" />
+  </Theme>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Theme component with modified theme variables"
+  app={`
+    <App>
+      <Theme color-text-primary="orangered" radius-Card="40px">
+        <Card title="Card with custom text color and border radius" />
+      </Theme>
+      <Theme tone="dark" color-text-primary="mediumpurple">
+        <Card title="Card with dark tone and custom text color" />
+      </Theme>
+    </App>
+  `}
+  height={200}
+/>
+
+## Creating Themes
+
+You can quickly create new themes by adding a theme file (with a `.json` extension and JSON syntax) to the app's `themes` folder. The file name should be the same as the `id` within the theme file.
+
+<Callout type="info" emoji="📔">
+XMLUI fetches theme files automatically using this naming convention and looks for them in the `themes` folder. You can change the location and the name of the theme file, but in this case, you need to modify the app's configuration file. For more information, see the article.
+</Callout>
+
+Earlier, you learned that an XMLUI theme file contains theme variables with their theme-specific values. Though the framework works with several hundred theme variables, creating a new theme does not require defining each of them!
+
+When you create a new theme, XMLUI automatically inherits from the default theme, and thus, you need to list only the altered theme variable values.
+
+Let's assume you run this app with the default theme:
+
+```ueml copy
+<App>
+  <H1>AcmeUI App</H1>
+  <Text>Welcome to the AcmeUI intranet home page!</Text>
+  <Button label="Search for more information" />
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Simple app with the default theme"
+  height={180}
+  horizontal
+  app={myThemedApp}
+/>
+
+Create a new theme named "my-brand" and save it into the `themes/my-brand.json` file within the app's folder:
+
+```json filename="themes/my-brand.json"
+{
+  "id": "my-brand",
+  "name": "My Brand Theme",
+  "themeVars": {
+    "font-family": "serif",
+    "font-size": "1.2rem",
+    "font-family-Heading": "sans-serif",
+    "font-weight-H1": "font-weight-medium",
+    "radius": "8px",
+    "light": {
+      "color-primary": "purple",
+      "color-text": "black",
+    },
+    "dark": {
+      "color-primary": "mediumpurple",
+      "color-text": "white",
+    }
+  }
+}
+```
+
+<Callout type="info" emoji="📔">
+This theme definition declares color variants for the light and dark tones. Do not worry if you miss the exact meaning of theme variable values. Later in this article, you will learn about how to understand them.
+</Callout>
+
+Set this new theme as the default in your app's configuration file:
+
+```json
+{
+  "defaultTheme": "my-brand"
+}
+```
+
+Now, your new theme displays the app in a light tone like this:
+
+<Playground
+  previewOnly
+  name="Simple app with the default theme"
+  height={240}
+  horizontal
+  app={`
+    <Theme tone="light">
+      <App>
+        <H1>AcmeUI App</H1>
+        <Text>Welcome to the AcmeUI intranet home page!</Text>
+        <Button label="Search for more information" />
+      </App>
+    </Theme>
+  `}
+  defaultTheme="my-brand"
+  defaultTone="light"
+  themes={[
+    {
+      name: "My Brand Theme",
+      id: "my-brand",
+      themeVars: {
+        "space-base": "0.35rem",
+        "font-family": "serif",
+        "font-size": "1.2rem",
+        "font-family-Heading": "sans-serif",
+        "font-weight-H1": "font-weight-medium",
+        radius: "8px",
+        "color-text": "black",
+        "color-primary": "purple",
+      },
+    }
+  ]}
+/>
+
+It also handles the dark tone:
+
+<Playground
+  previewOnly
+  name="Simple app with the default theme"
+  height={240}
+  horizontal
+  app={`
+    <Theme tone="dark">
+      <App>
+        <H1>AcmeUI App</H1>
+        <Text>Welcome to the AcmeUI intranet home page!</Text>
+        <Button label="Search for more information" />
+      </App>
+    </Theme>
+  `}
+  defaultTheme="my-brand"
+  themes={[
+    {
+      name: "My Brand Theme",
+      id: "my-brand",
+      themeVars: {
+        "space-base": "0.35rem",
+        "font-family": "serif",
+        "font-size": "1.2rem",
+        "font-family-Heading": "sans-serif",
+        "font-weight-H1": "font-weight-medium",
+        radius: "8px",
+        "color-text": "white",
+        "color-primary": "mediumpurple",
+      },
+    }
+  ]}
+/>
 
 ## Theme Variable Semantics
 
@@ -484,356 +708,3 @@ radius
 <Callout type="info" emoji="📔">
 The reference information of components describes the theme classes a particular component inherits from.
 </Callout>
-
-## Theme Inheritance
-
-You can descend new themes from existing themes. This pattern helps in the creation and maintainability of different theme variations.
-
-Suppose you need to construct new theme variants (e.g. multiple color options) for your product leveraging your brand design. You can create a new theme for the primary brand elements, such as fonts, sizes, spacing, and other typography styles. Then, you can derive a few others to have different color options using the newly created theme as a base. In the derived themes, you define only the colors that distinguish the inherited theme from the base.
-
-### Theme Inheritance Example
-
-Let's create a new theme that applies typography elements according to your company's brand design. This theme defines some font-specific settings, spacings, and a few other traits:
-
-```json
-{
-  "id": "brand-base",
-  "name": "Brand Base Theme",
-  "themeVars": {
-    "space-base": "0.5rem",
-    "font-family": "serif",
-    "font-family-Heading": "sans-serif",
-    "font-weight-H1": "font-weight-medium",
-    "radius": "8px"
-  }
-}
-```
-
-Note how this theme modification changes the font (now it uses a serif font), lightens the heading text's weight, and increases spacing (see the Button).
-
-<Playground
-    previewOnly
-    name="Base theme according the company brand design"
-    height={200}
-    horizontal
-    app={myThemedApp}
-    defaultTheme="brand-base"
-    themes={[
-        {
-            name: "Brand Base Theme",
-            id: "brand-base",
-            themeVars: {
-                "space-base": "0.5rem",
-                "font-family": "serif",
-                "font-family-Heading": "sans-serif",
-                "font-weight-H1": "font-weight-medium",
-                radius: "8px",
-            },
-        },
-    ]}
-/>
-
-Leveraging theme inheritance, we can create several new themes based on the new company brand design:
-
-```json
-[
-  {
-    "id": "brand-purple",
-    "name": "Brand Purple",
-    "extends": ["brand-base"],
-    "themeVars": {
-      "color-primary": "purple"
-    }
-  },
-  {
-    "id": "brand-green",
-    "name": "Brand Green",
-    "extends": ["brand-base"],
-    "themeVars": {
-      "color-primary": "green"
-    }
-  }
-]
-```
-
-All themes use the `extends` property to declare their base theme:
-
-- `brand-purple` inherits `brand-base`. It overrides `color-primary` to get a purplish color.
-- `brand-green` is derived from `brand-base`; it changes the primary color to green.
-
-Let's see how the new themes alter the app's appearance:
-
-<Playground
-    previewOnly={true}
-    name="Purple theme based on the basic brand design"
-    height={200}
-    horizontal={true}
-    app={myThemedApp}
-    defaultTheme="brand-purple"
-    themes={[
-        {
-            name: "Brand Base Theme",
-            id: "brand-base",
-            themeVars: {
-                "space-base": "0.5rem",
-                "font-family": "serif",
-                "font-family-Heading": "sans-serif",
-                "font-weight-H1": "font-weight-medium",
-                radius: "8px",
-            },
-        },
-        {
-            name: "Brand Purple",
-            id: "brand-purple",
-            extends: ["brand-base"],
-            themeVars: {
-                "color-primary": "purple",
-            },
-        },
-    ]}
-/>
-
-<Playground
-    previewOnly={true}
-    name="Green theme based on the basic brand design"
-    height={200}
-    horizontal={true}
-    app={myThemedApp}
-    defaultTheme="brand-green"
-    themes={[
-        {
-            name: "Brand Base Theme",
-            id: "brand-base",
-            themeVars: {
-                "space-base": "0.5rem",
-                "font-family": "serif",
-                "font-family-Heading": "sans-serif",
-                "font-weight-H1": "font-weight-medium",
-                radius: "8px",
-            },
-        },
-        {
-            name: "Brand Green",
-            id: "brand-green",
-            extends: ["brand-base"],
-            themeVars: {
-                "color-primary": "green",
-            },
-        },
-    ]}
-/>
-
-### Resolving Tone Conflicts
-
-When deriving a new theme from an existing one, theme variable changes may cause undesired effects when the inherited theme changes its tone (for example, from light to dark). Let's see an example demonstrating such a situation!
-
-We change the default theme of the app to emphasize button borders:
-
-```json {5-7}
-{
-  "id": "em-border",
-  "name": "Emphasized Button Border Theme",
-  "themeVars": {
-    "color-border-Button-primary-solid": "navy",
-    "color-border-Button-primary-solid--hover": "purple",
-    "thickness-border-Button": "0.25em"
-  }
-}
-```
-
-When you move the mouse over the button (try it!), the border changes to a purple color:
-
-<Playground
-    previewOnly={true}
-    name="Custom theme"
-    height={230}
-    horizontal={true}
-    app={myThemedApp}
-    defaultTheme="em-border"
-    themes={[
-        {
-            name: "Emphasized Button border theme",
-            id: "em-border",
-            themeVars: {
-                "color-border-Button-primary-solid": "navy",
-                "color-border-Button-primary-solid--hover": "purple",
-                "thickness-border-Button": "0.25em",
-            },
-        },
-    ]}
-/>
-
-Now, create a variant of this theme with the following definition, which changes the Button's color from blue to contrasting orange and adds a darker border color:
-
-```json {6-7}
-{
-  "id": "em-border-orange",
-  "name": "Emphasized Button border with orange",
-  "extends": ["em-border"],
-  "themeVars": {
-    "color-Button": "orange",
-    "color-border-Button-primary-solid": "orangered"
-  }
-}
-```
-
-Because the base theme defines the `color-border-Button-primary-solid--hover` theme variable with the `purple` value, we expect that due to the inheritance, the dark theme uses this value and displays a purple color when you hover the mouse over the button.
-
-However, when you try the modified theme, the hover effect changes the border to an orangish color, reflecting the buttons's base color:
-
-<Playground
-    previewOnly={true}
-    name="Emphasized Button border with orange"
-    height={230}
-    horizontal={true}
-    app={myThemedApp}
-    defaultTheme="em-border-orange"
-    themes={[
-        {
-            name: "Emphasized Button Border Theme",
-            id: "em-border",
-            themeVars: {
-                "color-border-Button-primary-solid": "navy",
-                "color-border-Button-primary-solid--hover": "mediumorchid",
-                "thickness-border-Button": "0.25em",
-            },
-        },
-        {
-            name: "Emphasized Button border dark theme",
-            id: "em-border-orange",
-            extends: ["em-border"],
-            themeVars: {
-                "color-Button": "orange",
-                "color-border-Button-primary-solid": "orangered",
-            },
-        },
-    ]}
-/>
-
-*This is not a bug!* When you override the `color-border-Button-primary-solid` theme variable in the derived theme to reflect the dark nature of the theme, the theming engine applies tail pruning and undefines all theme variables behind `color-border-Button-primary-solid` in the theme variable chain. The hovered border color is (`color-border-Button-primary-solid
---hovered`) among the undefined ones; thus, the hovered color does not reflect the purple color declared in the base theme.
-
-You can easily handle tail pruning; add the pruned theme variable definition with a new value that matches the dark theme. In this case, use medium-purple instead of purple:
-
-```json {8}
-{
-  "id": "em-border-orange",
-  "name": "Emphasized Button border orange theme",
-  "extends": ["em-border"],
-  "themeVars": {
-    "color-Button": "orange",
-    "color-border-Button-primary-solid": "orangered",
-    "color-border-Button-primary-solid--hover": "mediumpurple"
-  }
-}
-```
-
-<Playground
-    previewOnly={true}
-    name="Emphasized Button border with fixed orange"
-    height={230}
-    horizontal={true}
-    app={myThemedApp}
-    defaultTheme="em-border-dark"
-    themes={[
-        {
-            name: "Emphasized Button Border Theme",
-            id: "em-border",
-            themeVars: {
-                "color-border-Button-primary-solid": "navy",
-                "color-border-Button-primary-solid--hover": "purple",
-                "thickness-border-Button": "0.25em",
-            },
-        },
-        {
-            name: "Emphasized Button border dark theme",
-            id: "em-border-dark",
-            tone: "dark",
-            extends: ["em-border"],
-            themeVars: {
-                "color-Button": "orange",
-                "color-border-Button-primary-solid": "orangered",
-                "color-border-Button-primary-solid--hover": "mediumpurple",
-            },
-        },
-    ]}
-/>
-
-### Inheriting from Multiple Themes
-
-XMLUI supports multiple theme inheritance. You can create a new theme by inheriting properties from more than one theme. This feature is beneficial when you create theme matrixes.
-
-When you create multiple templates for an app, those can be divided into two main groups. Some theme groups define the general appearance, such as font, spacing, sizes, etc. Other groups define only colors. This division offers an opportunity to create theme matrixes where rows convey the general appearance and columns represent the different color variants.
-
-With the multiple theme inheritance in XMLUI, it is easy to create such theme matrixes. Assume you want to define a small theme matrix with three general appearance theme types and three color variants:
-
-| Themes           | Color #1      | Color #2      | Color #3      |
-| ---------------- | ------------- | ------------- | ------------- |
-| **Apperance #1** | `app1-color1` | `app1-color2` | `app1-color3` |
-| **Apperance #2** | `app2-color1` | `app2-color2` | `app2-color3` |
-| **Apperance #3** | `app3-color1` | `app3-color2` | `app3-color3` |
-
-By defining six base themes (three for the general appearance and three for the color variants), you can leverage multiple theme inheritance:
-
-- `app1-base`: the theme variants for the first general appearance theme variants with no colors.
-- `app2-base`: the theme variants for the second general appearance theme variants with no colors.
-- `app3-base`: the theme variants for the third general appearance theme variants with no colors.
-- `color1`: the theme variants for the colors variants #1.
-- `color2`: the theme variants for the colors variants #2.
-- `color3`: the theme variants for the colors variants #3.
-
-Now, you can define the theme matrix cell-by-cell using multiple inheritance:
-
-```json
-[
-  {
-    "id": "app1-color1",
-    "name": "App1-Color1",
-    "extends": ["app1-base", "color1"]
-  },
-  {
-    "id": "app1-color2",
-    "name": "App1-Color2",
-    "extends": ["app1-base", "color2"]
-  },
-  {
-    "id": "app1-color3",
-    "name": "App1-Color3",
-    "extends": ["app1-base", "color3"]
-  },
-  {
-    "id": "app2-color1",
-    "name": "App2-Color1",
-    "extends": ["app2-base", "color1"]
-  },
-  {
-    "id": "app2-color2",
-    "name": "App2-Color2",
-    "extends": ["app2-base", "color2"]
-  },
-  {
-    "id": "app2-color3",
-    "name": "App2-Color3",
-    "extends": ["app2-base", "color3"]
-  },
-  {
-    "id": "app3-color1",
-    "name": "App3-Color1",
-    "extends": ["app3-base", "color1"]
-  },
-  {
-    "id": "app3-color2",
-    "name": "App3-Color2",
-    "extends": ["app3-base", "color2"]
-  },
-  {
-    "id": "app3-color3",
-    "name": "App3-Color3",
-    "extends": ["app3-base", "color3"]
-  }
-]
-```
-
-Though you have nine themes, if, for some reason, you need to modify any of them, it is usually enough to change two of the base themes: one for the general appearance traits and another for colors.
-
-Due to the multiple inheritance, you can be sure that changes in the base themes flow down to derived themes; you do not have to cope with maintaining nine separate themes.
