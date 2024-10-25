@@ -197,7 +197,10 @@ export const buttonComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         style={layoutCss}
       >
-        {renderChild(node.children) || label}
+        {renderChild(node.children, {
+          type: "Stack",
+          orientation: "horizontal"
+        }) || label}
       </Button>
     );
   },
