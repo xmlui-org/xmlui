@@ -291,20 +291,27 @@ it still provides properties that open a modal dialog before a request is sent.
 
 See an example below:
 
-```ueml copy {9-11}
+```ueml copy {14-16}
 <App>
-  <Form>
-    <H2>Save User</H2>
-    Click on the `Save` button to trigger the confirmation dialog.
-    <event name="submit">
-      <APICall
-        url="/api/save-user"
-        method="post"
-        confirmTitle="Save User"
-        confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
-        confirmButtonLabel="Yes!" />
-    </event>
-  </Form>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Form>
+        <H2>Save User</H2>
+        Click on the `Save` button to trigger the confirmation dialog.
+        <event name="submit">
+          <APICall
+            url="/api/save-user"
+            method="post"
+            confirmTitle="Save User"
+            confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
+            confirmButtonLabel="Yes!" />
+        </event>
+      </Form>
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -313,18 +320,27 @@ See an example below:
   previewOnly
   app={`
   <App>
-    <Form>
-      <H2>Save User</H2>
-      Click on the \`Save\` button to trigger the confirmation dialog.
-      <event name="submit">
-        <APICall
-          url="/api/save-user"
-          method="post"
-          confirmTitle="Save User"
-          confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
-          confirmButtonLabel="Yes!" />
-      </event>
-    </Form>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Form>
+          <H2>Save User</H2>
+          Click on the \`Save\` button to trigger the confirmation dialog.
+          <event name="submit">
+            <APICall
+              url="/api/save-user"
+              method="post"
+              confirmTitle="Save User"
+              confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
+              confirmButtonLabel="Yes!">
+              <event name="beforeRequest" value="toast.success('Data saved!'); return false;" />
+            </APICall>
+          </event>
+        </Form>
+      </Page>
+    </Pages>
   </App>
   `}
 />
