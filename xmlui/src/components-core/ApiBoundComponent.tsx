@@ -189,6 +189,10 @@ export function ApiBoundComponent({
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
       events.requestFetchNextPage = `${loaderUid}.fetchNextPage()`;
+      // TODO if the user provides a requestRefetch handler, we should call it
+      //  and then call the loader's refetch method if it returns !false;
+      //  requestRefetch could receive parameters to select which apibound props to refetch
+      events.requestRefetch = `()=> ${loaderUid}.refetch();`;
     });
 
     const wrapped = {
