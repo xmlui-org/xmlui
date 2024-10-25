@@ -221,17 +221,29 @@ ModalDialogs also have a button row with a confirmation button and a cancellatio
 
 Note how clicking outside the dialog or on any one of the buttons in the dialog window will automatically close it.
 
-```ueml copy {4-6}
+```ueml copy {2-8}
 <App>
-  <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog">
     <Form
-      subject="{{ name: 'Joe', age: 43 }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      subject="{{ name: 'John', age: 43 }}">
       <FormItem bindTo="name" label="User Name" />
       <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
     </Form>
   </ModalDialog>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="John Doe"
+        subtitle="Executive Manager">
+        John is pretty smart when it comes to business.
+        <Button label="Details" onClick="dialog.open()" />
+      </Card>
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -240,14 +252,27 @@ Note how clicking outside the dialog or on any one of the buttons in the dialog 
   previewOnly
   app={`
   <App>
-    <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog">
       <Form
-        subject="{{ name: 'Joe', age: 43 }}">
+        subject="{{ name: 'John', age: 43 }}">
         <FormItem bindTo="name" label="User Name" />
         <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
       </Form>
     </ModalDialog>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Card
+          avatarUrl="https://i.pravatar.cc/100"
+          title="John Doe"
+          subtitle="Executive Manager">
+          John is pretty smart when it comes to business.
+          <Button label="Details" onClick="dialog.open()" />
+        </Card>
+      </Page>
+    </Pages>
   </App>
   `}
 />
@@ -266,18 +291,17 @@ it still provides properties that open a modal dialog before a request is sent.
 
 See an example below:
 
-```ueml copy {4-6}
+```ueml copy {9-11}
 <App>
   <Form>
-    <H2>Send Request</H2>
+    <H2>Save User</H2>
     Click on the `Save` button to trigger the confirmation dialog.
-    Reload the application to try again after clicking "Yes!" in the dialog.
     <event name="submit">
       <APICall
         url="/api/save-user"
         method="post"
-        confirmTitle="Save Data"
-        confirmMessage="Are you sure you want to send this request and close the dialog?"
+        confirmTitle="Save User"
+        confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
         confirmButtonLabel="Yes!" />
     </event>
   </Form>
@@ -290,18 +314,15 @@ See an example below:
   app={`
   <App>
     <Form>
-      <H2>Send Request</H2>
+      <H2>Save User</H2>
       Click on the \`Save\` button to trigger the confirmation dialog.
-      Reload the application to try again after clicking "Yes!" in the dialog.
       <event name="submit">
         <APICall
-          url="/api/will-not-throw"
+          url="/api/save-user"
           method="post"
-          confirmTitle="Save Data"
-          confirmMessage="Are you sure you want to send this request and close the dialog?"
-          confirmButtonLabel="Yes!">
-          <event name="beforeRequest" value="toast.success('Data saved!'); return false;" />
-        </APICall>
+          confirmTitle="Save User"
+          confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
+          confirmButtonLabel="Yes!" />
       </event>
     </Form>
   </App>
@@ -337,5 +358,4 @@ For example, the cancel button can be hidden and a prestyled title can also be a
 
 ---
 
-To see all properties and events a `ModalDialog` provides, see its
-<SmartLink href={COMPONENT_MODALDIALOG}>reference article</SmartLink>.
+See the <SmartLink href={COMPONENT_MODALDIALOG}>ModalDialog reference article</SmartLink> to see all properties and events.
