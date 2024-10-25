@@ -268,8 +268,10 @@ div#__next > div {
   height: 100%;
 }
 
+html,
 body {
-  font-feature-settings: "cv03", "cv04", "cv11"
+  font-feature-settings: "cv03", "cv04", "cv11";
+  scrollbar-gutter: stable;
 }
 
 :is(html[class~=dark] .nextra-toc *) {

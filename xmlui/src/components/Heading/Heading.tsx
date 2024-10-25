@@ -40,7 +40,7 @@ export const HeadingMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`font-family-${COMP}`]: "$font-family",
-    [`color-text-${COMP}`]: "inherit",
+    [`color-text-${COMP}`]: "$color-text-primary",
     [`font-weight-${COMP}`]: "$font-weight-bold",
     [`letter-spacing-${COMP} `]: "0",
     light: {
