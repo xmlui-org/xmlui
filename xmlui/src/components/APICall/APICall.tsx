@@ -59,7 +59,10 @@ export const APICallMd = createMetadata({
     ),
   },
   events: {
-    beforeRequest: d(`This event fires before the request is sent.`),
+    beforeRequest: d(
+      `This event fires before the request is sent. Returning an explicit boolean` +
+      `'false' value will prevent the request from being sent.`
+    ),
     success: d(`This event fires when a request results in a success.`),
     /**
      * This event fires when a request results in an error.

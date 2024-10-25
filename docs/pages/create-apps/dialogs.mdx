@@ -1,27 +1,114 @@
-# Modal Dialogs
+import { Callout } from 'nextra/components'
+import { COMPONENT_MODALDIALOG } from "../../meta/pages"
 
-Dialog windows are an inherent part of XMLUI.
-Dialogs can be invoked both declaratively in markup, or imperatively in codebehind.
-They are also containers for custom content, such as forms, depending on the situation.
+# Using Modal Dialogs
 
-## Declarative Approach
+Modal dialogs communicate some information and require a response or confirmation from the user.
+Modal means that the user is unable to continue their work and must address the information in the dialog window before continuing.
+They are useful to request confirmation for a critical action, show a form or other easily closable content.
 
-The most straightforward way of using dialogs in XMLUI is like using other components:
-by adding them to a page in markup and controlling their appearance through the `when` attribute:
+<Callout type="info" emoji="📔">
+  Modal dialogs are an inherent part of XMLUI.
+  Dialogs can be invoked both declaratively in markup, or imperatively in both codebehind and markup.
+</Callout>
 
-```ueml copy {4-7}
+The following example shows a simple example of a dialog with details about a user.
+
+> **Note:** Click anywhere outside an opened dialog or on the close button of a dialog itself to close it.
+
+```ueml copy
 <App>
   <var name="isDialogShown" value="{false}"/>
-  <Button label="Open Dialog" onClick="isDialogShown = true" />
   <ModalDialog
     when="{isDialogShown}"
-    title="Example Dialog"
-    onClose="isDialogShown = false" />
+    onClose="isDialogShown = false">
+    John is always number one to the coffee machine.
+    He has a competitive personality but gets along with a lot people.
+  </ModalDialog>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="John Doe"
+        subtitle="Executive Manager">
+        John is pretty smart when it comes to business.
+        <Button label="Details" onClick="isDialogShown = true" />
+      </Card>
+    </Page>
+  </Pages>
 </App>
 ```
 
-Click on the button in the demo below to open the modal dialog.
-Click anywhere outside the opened dialog or the close button on the dialog itself to close it.
+<Playground
+  name="Example: Simple Dialog"
+  previewOnly
+  app={`
+  <App>
+    <var name="isDialogShown" value="{false}"/>
+    <ModalDialog
+      when="{isDialogShown}"
+      onClose="isDialogShown = false">
+      John is always number one to the coffee machine.
+      He has a competitive personality but gets along with a lot people.
+    </ModalDialog>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Card
+          avatarUrl="https://i.pravatar.cc/100"
+          title="John Doe"
+          subtitle="Executive Manager">
+          John is pretty smart when it comes to business.
+          <Button label="Details" onClick="isDialogShown = true" />
+        </Card>
+      </Page>
+    </Pages>
+  </App>
+  `}
+/>
+
+## Declarative Approach
+
+The example in the introduction uses a `ModelDialog` component with the `when` property to toggle the visibility of the dialog component.
+The `isDialogShown` variable is a boolean that is linked to the display of the dialog: if the variable is set to `true`, the dialog is shown.
+
+<Callout type="info" emoji="💡">
+  Using the `when` property to show/hide a dialog window is a declarative approach to display it in XMLUI.
+  This approach is useful when you also update the URL and provide query params for the dialog to use.
+</Callout>
+
+```ueml copy {5,22}
+<App>
+  <var name="isDialogShown" value="{false}"/>
+  <ModalDialog
+    when="{isDialogShown}"
+    title="{$queryParams.userName}"
+    onClose="isDialogShown = false">
+    John is always number one to the coffee machine.
+    He has a competitive personality but gets along with a lot people.
+  </ModalDialog>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="John Doe"
+        subtitle="Executive Manager">
+        John is pretty smart when it comes to business.
+        <Button label="Details" onClick="isDialogShown = true" />
+      </Card>
+      <Redirect when="{isDialogShown}" to="/?userName=John+Doe" />
+    </Page>
+  </Pages>
+</App>
+```
 
 <Playground
   name="Example: Declarative Dialog"
@@ -29,23 +116,66 @@ Click anywhere outside the opened dialog or the close button on the dialog itsel
   app={`
   <App>
     <var name="isDialogShown" value="{false}"/>
-    <Button label="Open Dialog" onClick="isDialogShown = true" />
-    <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
+    <ModalDialog
+      when="{isDialogShown}"
+      title="{$queryParams.userName}"
+      onClose="isDialogShown = false">
+      John is always number one to the coffee machine.
+      He has a competitive personality but gets along with a lot people.
+    </ModalDialog>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Card
+          avatarUrl="https://i.pravatar.cc/100"
+          title="John Doe"
+          subtitle="Executive Manager">
+          John is pretty smart when it comes to business.
+          <Button label="Details" onClick="isDialogShown = true" />
+        </Card>
+        <Redirect when="{isDialogShown}" to="/?userName=John+Doe" />
+      </Page>
+    </Pages>
   </App>
   `}
 />
 
 ## Imperative Approach
 
-In cases where a dialog should be raised in code, an imperative approach is a good idea.
-Most of the time, this may happen in codebehind.
+The `ModalDialog` component supports an imperative approach to toggling its visibility as well.
 
-```ueml copy 
+<Callout type="info" emoji="💡">
+  The imperative approach is done by calling the `open()` and `close()` exported member functions of the `ModalDialog` component via a given ID.
+  This approach can also be used in codebehind.
+</Callout>
+
+The only downside to this approach is that there is no way to provide the `ModalDialog` with query parameters.
+
+```ueml copy {3} /onClick="dialog.open()"/ /onClick="dialog.close()"/
 <App>
-  <Button label="Open Dialog" onClick="dialog.open()" />
-  <ModalDialog id="dialog" title="Example Dialog">
-    <Button label="Close Dialog" onClick="dialog.close()" />
+  <ModalDialog
+    id="dialog"
+    title="John Doe">
+    John is always number one to the coffee machine.
+    He has a competitive personality but gets along with a lot people.
+    <Button label="Close" onClick="dialog.close()" />
   </ModalDialog>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="John Doe"
+        subtitle="Executive Manager">
+        John is pretty smart when it comes to business.
+        <Button label="Details" onClick="dialog.open()" />
+      </Card>
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -54,35 +184,134 @@ Most of the time, this may happen in codebehind.
   previewOnly
   app={`
   <App>
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog">
-      <Button label="Close Dialog" onClick="dialog.close()" />
+    <ModalDialog
+      id="dialog"
+      title="John Doe">
+      John is always number one to the coffee machine.
+      He has a competitive personality but gets along with a lot people.
+      <Button label="Close" onClick="dialog.close()" />
     </ModalDialog>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Card
+          avatarUrl="https://i.pravatar.cc/100"
+          title="John Doe"
+          subtitle="Executive Manager">
+          John is pretty smart when it comes to business.
+          <Button label="Details" onClick="dialog.open()" />
+        </Card>
+      </Page>
+    </Pages>
+  </App>
+  `}
+/>
+
+## Interoperability with Forms
+
+Forms in XMLUI have built in submit and cancel operation buttons, these buttons are inherent parts of our `Form` component.
+ModalDialogs also have a button row with a confirmation button and a cancellation button.
+
+<Callout type="info" emoji="💡">
+  When embedding a form in a dialog, the `ModalDialog` understands that the `Form` button row is of higher precedence
+  and is able to associate the close operation with the pressing of these buttons.
+</Callout>
+
+Note how clicking outside the dialog or on any one of the buttons in the dialog window will automatically close it.
+
+```ueml copy {2-8}
+<App>
+  <ModalDialog id="dialog">
+    <Form
+      subject="{{ name: 'John', age: 43 }}">
+      <FormItem bindTo="name" label="User Name" />
+      <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+    </Form>
+  </ModalDialog>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Card
+        avatarUrl="https://i.pravatar.cc/100"
+        title="John Doe"
+        subtitle="Executive Manager">
+        John is pretty smart when it comes to business.
+        <Button label="Details" onClick="dialog.open()" />
+      </Card>
+    </Page>
+  </Pages>
+</App>
+```
+
+<Playground
+  name="Example: Form in ModalDialog"
+  previewOnly
+  app={`
+  <App>
+    <ModalDialog id="dialog">
+      <Form
+        subject="{{ name: 'John', age: 43 }}">
+        <FormItem bindTo="name" label="User Name" />
+        <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+      </Form>
+    </ModalDialog>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Card
+          avatarUrl="https://i.pravatar.cc/100"
+          title="John Doe"
+          subtitle="Executive Manager">
+          John is pretty smart when it comes to business.
+          <Button label="Details" onClick="dialog.open()" />
+        </Card>
+      </Page>
+    </Pages>
   </App>
   `}
 />
 
 ## Confirmation for API Calls
 
-The `ModalDialog` component is also used for confirming certain actions such as API requests.
-The component itself is built into the `APICall` component and by calling exposed properties,
-you can do simple customizations to a dialog which needed to be displayed before the request is sent. 
+It is good practice to provide confirmation before executing a critical action, like deleting a user from a database.
+Most actions are done so using the `APICall` component.
+Although this component does not use `ModalDialog` outright,
+it still provides properties that open a modal dialog before a request is sent.
 
-```ueml copy {4-6}
+<Callout type="info" emoji="💡">
+  Using confirmation-related properties on the `APICall` component ensures
+  that you do not need to create a dialog in markup just to provide confirmation to an API call.
+</Callout>
+
+See an example below:
+
+```ueml copy {14-16}
 <App>
-  <Form>
-    <H2>Send Request</H2>
-    Click on the `Save` button to trigger the confirmation dialog.
-    Reload the application to try again after clicking "Yes!" in the dialog.
-    <event name="submit">
-      <APICall
-        url="/api/will-not-throw"
-        method="post"
-        confirmTitle="Save Data"
-        confirmMessage="Are you sure you want to send this request and close the dialog?"
-        confirmButtonLabel="Yes!" />
-    </event>
-  </Form>
+  <NavPanel>
+    <NavLink label="Users" to="/" icon="user" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Form>
+        <H2>Save User</H2>
+        Click on the `Save` button to trigger the confirmation dialog.
+        <event name="submit">
+          <APICall
+            url="/api/save-user"
+            method="post"
+            confirmTitle="Save User"
+            confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
+            confirmButtonLabel="Yes!" />
+        </event>
+      </Form>
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -91,19 +320,27 @@ you can do simple customizations to a dialog which needed to be displayed before
   previewOnly
   app={`
   <App>
-    <Form>
-      <H2>Send Request</H2>
-      Click on the \`Save\` button to trigger the confirmation dialog.
-      Reload the application to try again after clicking "Yes!" in the dialog.
-      <event name="submit">
-        <APICall
-          url="/api/will-not-throw"
-          method="post"
-          confirmTitle="Save Data"
-          confirmMessage="Are you sure you want to send this request and close the dialog?"
-          confirmButtonLabel="Yes!" />
-      </event>
-    </Form>
+    <NavPanel>
+      <NavLink label="Users" to="/" icon="user" />
+    </NavPanel>
+    <Pages>
+      <Page url="/">
+        <Form>
+          <H2>Save User</H2>
+          Click on the \`Save\` button to trigger the confirmation dialog.
+          <event name="submit">
+            <APICall
+              url="/api/save-user"
+              method="post"
+              confirmTitle="Save User"
+              confirmMessage="Are you sure you want to save user 'John Doe' and close the dialog?"
+              confirmButtonLabel="Yes!">
+              <event name="beforeRequest" value="toast.success('Data saved!'); return false;" />
+            </APICall>
+          </event>
+        </Form>
+      </Page>
+    </Pages>
   </App>
   `}
 />
@@ -116,7 +353,7 @@ For example, the cancel button can be hidden and a prestyled title can also be a
 ```ueml copy /title="Example Dialog"/ /closeButtonVisible="false"/
 <App>
   <Button label="Open Dialog" onClick="dialog.open()" />
-  <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="true">
+  <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="false">
     <Button label="Close Dialog" onClick="dialog.close()" />
   </ModalDialog>
 </App>
@@ -128,9 +365,13 @@ For example, the cancel button can be hidden and a prestyled title can also be a
   app={`
   <App>
     <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="true">
+    <ModalDialog id="dialog" title="Example Dialog" closeButtonVisible="false">
       <Button label="Close Dialog" onClick="dialog.close()" />
     </ModalDialog>
   </App>
   `}
 />
+
+---
+
+See the <SmartLink href={COMPONENT_MODALDIALOG}>ModalDialog reference article</SmartLink> to see all properties and events.

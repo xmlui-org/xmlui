@@ -307,7 +307,10 @@ async function callApi(
 
   const clientTxId = randomUUID();
   const beforeRequestFn = lookupAction(beforeRequest, uid);
-  await beforeRequestFn?.();
+  const beforeRequestResult = await beforeRequestFn?.();
+  if (typeof beforeRequestResult === "boolean" && beforeRequestResult === false) {
+    return;
+  }
 
   const { queryKeysToUpdate, optimisticValuesByQueryKeys } = await updateQueriesWithOptimisticValue({
     stateContext,
