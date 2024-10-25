@@ -9,14 +9,14 @@ In this article, you will learn how to manage a few typical situations related t
 In the following example, a button's click event handler runs for 3 seconds. Nonetheless, you can click the button several times before the 3 seconds expires:
 
 ```ueml copy
-<VStack padding="1rem" gap="1rem" var.logClick="">
+<App var.logClick="">
   <Button label="I'm running for 3 seconds, click me!" 
     onClick="
       logClick += '+';
       delay(3000);
     " />
   <Text>Clicks: {logClick}</Text>  
-</VStack>
+</App>
 ```
 
 Click the button several times quickly:
@@ -24,17 +24,17 @@ Click the button several times quickly:
 <Playground
     previewOnly={true}
     name="Simultaneously running event handlers"
-    height={120}
+    height={140}
     horizontal={true}
     app={`
-      <VStack padding="1rem" gap="1rem" var.logClick="">
+      <App var.logClick="">
         <Button label="I'm running for 3 seconds, click me!" 
           onClick="
             logClick += '+';
             delay(3000);
           " />
         <Text>Clicks: {logClick}</Text>  
-      </VStack>
+      </App>
   `}
 />
 
@@ -45,7 +45,7 @@ XMLUI has built-in support to check if a particular event handler is in progress
 The following sample demonstrates how you can use it. Here, the button is enabled only if the click event handler is not running:
 
 ```ueml copy {4} /clickInProgress/
-<VStack padding="1rem" gap="1rem" var.logClick="">
+<App var.logClick="">
   <Button 
     id="myButton" 
     enabled="{!myButton.clickInProgress}" 
@@ -55,7 +55,7 @@ The following sample demonstrates how you can use it. Here, the button is enable
       delay(3000);
     " />
   <Text>Clicks: {logClick}</Text>  
-</VStack>
+</App>
 ```
 
 When you click the button, it remains disabled while the event handler runs, so you cannot start simultaneous click events.
@@ -63,10 +63,10 @@ When you click the button, it remains disabled while the event handler runs, so 
 <Playground
   previewOnly={true}
   name="Howto: Test if an event handler is in progress"
-  height={120}
+  height={140}
   horizontal={true}
   app={`
-    <VStack padding="1rem" gap="1rem" var.logClick="">
+    <App var.logClick="">
       <Button 
         id="myButton" 
         enabled="{!myButton.clickInProgress}" 
@@ -76,7 +76,7 @@ When you click the button, it remains disabled while the event handler runs, so 
           delay(3000);
         " />
       <Text>Clicks: {logClick}</Text>  
-    </VStack>
+    </App>
 `}
 />
 
@@ -87,7 +87,7 @@ Though the `<event>InProgress` property (see <SmartLink href="#test-if-an-event-
 For this purpose, you must use a variable tracking the progress as the following sample demonstrates:
 
 ```ueml copy /phase/
-<VStack padding="1rem" gap="1rem" var.phase="n/a">
+<App var.phase="n/a">
   <Button 
     id="myButton" 
     enabled="{!myButton.clickInProgress}" 
@@ -101,8 +101,8 @@ For this purpose, you must use a variable tracking the progress as the following
       delay(1000);
       phase = 'Completed';
     " />
-  <Text>Current progress: {phase}</Text>
-</VStack>
+  <Text>Current phase: {phase}</Text>  
+</App>
 ```
 
 Click the button and check how it reports progress:
@@ -110,10 +110,10 @@ Click the button and check how it reports progress:
 <Playground
   previewOnly={true}
   name="Howto: reporting progress"
-  height={120}
+  height={140}
   horizontal={true}
   app={`
-    <VStack padding="1rem" gap="1rem" var.phase="n/a">
+    <App var.phase="n/a">
       <Button 
         id="myButton" 
         enabled="{!myButton.clickInProgress}" 
@@ -128,7 +128,7 @@ Click the button and check how it reports progress:
           phase = 'Completed';
         " />
       <Text>Current phase: {phase}</Text>  
-    </VStack>
+    </App>
 `}
 />
 
@@ -137,7 +137,7 @@ Click the button and check how it reports progress:
 You can combine the report progress mechanism with a `ChangeListener` component to catch progress change events:
 
 ```ueml copy
-<VStack padding="1rem" gap="1rem" var.phase="n/a" var.logEntries="">
+<App var.phase="n/a" var.logEntries="">
   <ChangeListener 
     listenTo="{phase}" 
     onDidChange="() => logEntries += myButton.clickInProgress ? ' ' + phase : ''" />
@@ -156,7 +156,7 @@ You can combine the report progress mechanism with a `ChangeListener` component 
     " />
   <Text>Current phase: {phase}</Text>  
   <Text>Log: {logEntries}</Text>  
-</VStack>
+</App>
 ```
 
 The code collects progress phase changes in the `logEntries` variable and displays them:
@@ -164,10 +164,10 @@ The code collects progress phase changes in the `logEntries` variable and displa
 <Playground
   previewOnly={true}
   name="Howto: reporting progress"
-  height={160}
+  height={180}
   horizontal={true}
   app={`
-    <VStack padding="1rem" gap="1rem" var.phase="n/a" var.logEntries="">
+    <App var.phase="n/a" var.logEntries="">
       <ChangeListener 
         listenTo="{phase}" 
         onDidChange="() => logEntries += myButton.clickInProgress ? ' ' + phase : ''" />
@@ -186,7 +186,7 @@ The code collects progress phase changes in the `logEntries` variable and displa
         " />
       <Text>Current phase: {phase}</Text>  
       <Text>Log: {logEntries}</Text>  
-    </VStack>
+    </App>
 `}
 />
 

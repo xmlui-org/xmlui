@@ -1,6 +1,7 @@
 import data from  "../../component-samples/Table/list-component-data.js";
 import { COMPONENT_TABLE, THEMES_AND_STYLING } from "../../meta/pages.js";
 import arrowIcon from "../../public/resources/files/howto/component-icons/up-arrow.svg";
+import { Callout } from 'nextra/components'
 
 # Using Table-specific Icons
 
@@ -12,18 +13,22 @@ Changing the graphical element displayed by an `Icon` component is as easy as en
 
 Some components have icons already built into them like the ones in the `Table` component indicating sorting by a specific column.
 
-> **Note:** The following examples all use the same dataset that the `Table` component <SmartLink href={COMPONENT_TABLE}>reference documentation</SmartLink> uses.
+<Callout type="info" emoji="📔">
+The following examples all use the same dataset that the `Table` component <SmartLink href={COMPONENT_TABLE}>reference documentation</SmartLink> uses.
+</Callout>
 
 <Playground
   previewOnly
   name="Example: Sorting icons in Table column headers"
-  height={360}
+  height={340}
   app={`
-    <Table data='{${JSON.stringify(data)}}'>
-      <Column bindTo="name" canSort="true"/>
-      <Column bindTo="quantity" canSort="true"/>
-      <Column bindTo="unit" canSort="true"/>
-    </Table>
+    <App>
+      <Table data='{${JSON.stringify(data)}}'>
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
+      </Table>
+    </App>
   `}
 />
 
@@ -48,8 +53,10 @@ However, this would change all icons using the name `arrowup`.
 
 ## Component-specific Custom Icons
 
+<Callout type="info" emoji="💡">
 In situations where you would want to change only the icon(s) of a particular component, like the `Table`,
 you can use icon names scoped specifically to that component.
+</Callout>
 
 Component-scoped icon names follow the same signature:
 
@@ -81,11 +88,13 @@ This ensures that only the `sortasc` icon found in the `Table` component is affe
   height={360}
   resources={{ "icon.sortasc:Table": arrowIcon }}
   app={`
-    <Table data='{${JSON.stringify(data)}}'>
-      <Column bindTo="name" canSort="true"/>
-      <Column bindTo="quantity" canSort="true"/>
-      <Column bindTo="unit" canSort="true"/>
-    </Table>
+    <App>
+      <Table data='{${JSON.stringify(data)}}'>
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
+      </Table>
+    </App>
   `}
 />
 
@@ -101,45 +110,49 @@ In the next example, the first `Table` component to the left retains the default
 while the second `Table` to the right uses the `chevronup` icon instead.
 
 ```ueml copy /iconSortAsc="chevronup"/
-<HStack>
-  <VStack width="50%">
-    Default icon:
-    <Table data='{[...]}' sortBy="name">
-      <Column bindTo="name" canSort="true"/>
-      <Column bindTo="quantity" canSort="true"/>
-    </Table>
-  </VStack>
-  <VStack width="50%">
-    Instance-specific icon:
-    <Table data='{[...]}' iconSortAsc="chevronup" sortBy="name">
-      <Column bindTo="name" canSort="true"/>
-      <Column bindTo="quantity" canSort="true"/>
-    </Table>
-  </VStack>
-</HStack>
+<App>
+  <HStack>
+    <VStack width="50%">
+      Default icon:
+      <Table data='{...}' sortBy="name">
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    </VStack>
+    <VStack width="50%">
+      Instance-specific icon:
+      <Table data='{...}' iconSortAsc="chevronup" sortBy="name">
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+      </Table>
+    </VStack>
+  </HStack>
+</App>
 ```
 
 <Playground
   previewOnly
   name="Example: Instance-specific icon customization"
-  height={360}
+  height={380}
   app={`
-    <HStack>
-      <VStack width="50%">
-        Default icon:
-        <Table data='{${JSON.stringify(data)}}' sortBy="name">
-          <Column bindTo="name" canSort="true"/>
-          <Column bindTo="quantity" canSort="true"/>
-        </Table>
-      </VStack>
-      <VStack width="50%">
-        Instance-specific icon:
-        <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
-          <Column bindTo="name" canSort="true"/>
-          <Column bindTo="quantity" canSort="true"/>
-        </Table>
-      </VStack>
-    </HStack>
+    <App>
+      <HStack>
+        <VStack width="50%">
+          Default icon:
+          <Table data='{${JSON.stringify(data)}}' sortBy="name">
+            <Column bindTo="name" canSort="true"/>
+            <Column bindTo="quantity" canSort="true"/>
+          </Table>
+        </VStack>
+        <VStack width="50%">
+          Instance-specific icon:
+          <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
+            <Column bindTo="name" canSort="true"/>
+            <Column bindTo="quantity" canSort="true"/>
+          </Table>
+        </VStack>
+      </HStack>
+    </App>
   `}
 />
 
@@ -189,24 +202,26 @@ Note, how the icon resource only appears in the left `Table` and not on the righ
 <Playground
   previewOnly
   name="Example: Instance- and Component-specific icon customizations"
-  height={360}
+  height={380}
   resources={{ "icon.sortasc:Table": arrowIcon }}
   app={`
-    <HStack>
-      <VStack width="50%">
-        Component-specific icon:
-        <Table data='{${JSON.stringify(data)}}' sortBy="name">
-          <Column bindTo="name" canSort="true"/>
-          <Column bindTo="quantity" canSort="true"/>
-        </Table>
-      </VStack>
-      <VStack width="50%">
-        Instance-specific icon:
-        <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
-          <Column bindTo="name" canSort="true"/>
-          <Column bindTo="quantity" canSort="true"/>
-        </Table>
-      </VStack>
-    </HStack>
+    <App>
+      <HStack>
+        <VStack width="50%">
+          Component-specific icon:
+          <Table data='{${JSON.stringify(data)}}' sortBy="name">
+            <Column bindTo="name" canSort="true"/>
+            <Column bindTo="quantity" canSort="true"/>
+          </Table>
+        </VStack>
+        <VStack width="50%">
+          Instance-specific icon:
+          <Table data='{${JSON.stringify(data)}}' iconSortAsc="chevronup" sortBy="name">
+            <Column bindTo="name" canSort="true"/>
+            <Column bindTo="quantity" canSort="true"/>
+          </Table>
+        </VStack>
+      </HStack>
+    </App>
   `}
 />
