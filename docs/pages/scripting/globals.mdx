@@ -181,7 +181,42 @@ Navigate to the specified URL.
 ### `pluralize`
 
 ```ts
-function pluralize(value: number, singular: string, plural: string);
+function pluralize(value: number, singular: string, plural: string): string;
 ```
 
 When the value is equal to one, returns `singular`; otherwise, `plural.`
+
+### `toHashObject`
+
+```ts
+function toHashObject(arr: any[], keyProp: string, valueProp: string): any;
+```
+
+This function converts an array of objects into a hash object.
+- `keyProp`: The name of the object property that acts as the key
+- `valueProp`: The name of the object property that acts as the value
+
+Let's assume the following array of objects:
+```json
+[
+  { "key": "key1", "value": "value1" },
+  { "key": "key2", "value": "value2" },
+  { "key": "key3", "value": "value3" }
+]
+
+Invoking `toHashObject` with the following parameters:
+
+```ts
+toHashObject(arr, "key", "value");
+```
+
+Returns the following object:
+
+```json
+{
+  "key1": "value1",
+  "key2": "value2",
+  "key3": "value3"
+}
+```
+
