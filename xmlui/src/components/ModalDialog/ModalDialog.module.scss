@@ -87,6 +87,7 @@ $margin-bottom-title-ModalDialog: createThemeVar("Dialog:margin-bottom-title-#{$
   display: flex;
   flex-direction: column;
   min-height: 0;
+  gap: var(--stack-gap-default);
   flex: 1;
 }
 
