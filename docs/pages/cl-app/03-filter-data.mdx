@@ -90,8 +90,8 @@ Create a new file, `Contacts.xmlui` in the `components` folder, and add this pie
 ```
 
 The `Contacts` component declares a new `DataSource` component to fetch all contacts from the backend.
-Previously, you set the `datasource` property of the `List` binding it to the fetched data.
-You cannot do this direct binding now, as you have to filter the fetched data before passing it to `List`.
+Previously, you used the `data` property of the `List` by pointing it to an API endpoint to fetch data.
+You cannot do so in this situation, as you have to filter the fetched data before passing it to `List`.
 Instead, filter the contacts by using a predicate function (passed in the `predicate` component property).
 
 <Callout type="info" emoji="📔">
@@ -301,7 +301,7 @@ In this section, you will change the code to get filtered contact data from the 
 
 ### Update `Contacts`
 
-Change the definition of the `Contacts` component by removing the `DataSource` querying all tasks and setting the `datasource` property of the `List` to accept a filter tag:
+Change the definition of the `Contacts` component by removing the `DataSource` querying all tasks and setting the `data` property of the `List` to accept a filter tag:
 
 ```ueml copy {3} filename="Contacts.xmlui"
 <Component name="Contacts">

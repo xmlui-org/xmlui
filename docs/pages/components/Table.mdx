@@ -63,8 +63,7 @@ If this boolean prop is set to true, the `Table` will be focused when appearing 
 
 ### `data`
 
-The `data` property specifies the information the `Table` should display.
-If the data comes from an API directly, you should use a [`datasource`](#datasource) instead.
+The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
 ```ueml copy /data='{[...]}'/
 <Table data='{[...]}'>
@@ -81,6 +80,34 @@ If the data comes from an API directly, you should use a [`datasource`](#datasou
     <Column bindTo="name"/>
     <Column bindTo="quantity"/>
     <Column bindTo="unit"/>
+  </Table>`
+  }
+/>
+
+You can also provide the `Table` with data directly from an API via this property.
+Here, the component displays rocket information coming from the official SpaceX API. 
+
+```ueml copy /data='https://api.spacexdata.com/v3/rockets'/
+<Table data='https://api.spacexdata.com/v3/rockets'>
+  <Column header="Image" size="140px">
+    <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+  </Column>
+  <Column canSort="true" bindTo="country"/>
+  <Column canSort="true" bindTo="company"/>
+</Table>
+```
+
+<Playground
+  previewOnly
+  name="Example: data API Call"
+  height={400}
+  app={`
+  <Table data='https://api.spacexdata.com/v3/rockets'>
+    <Column header="Image" size="140px">
+      <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+    </Column>
+    <Column canSort="true" bindTo="country"/>
+    <Column canSort="true" bindTo="company"/>
   </Table>`
   }
 />
@@ -277,13 +304,7 @@ This property adds pagination controls to the `Table`.
 
 ### `items`
 
-You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `datasource` property to a URL to fetch the data from), `data` represents the information obtained from the API.
-
-You can use `items` as an alias for the `data` property. When you bind the table to a data source (for example, you set the `data source` property to a URL to fetch the data from), `data` represents the information obtained from the API.
-
-By convention, when you use direct data (set manually or assembled by code), you pass it in the `items` property.
-
-When both `items` and `data` are used, `items` has priority.
+You can use `items` as an alias for the `data` property. When you bind the table to a data source (e.g. an API endpoint), the `data` acts as the property that accepts a URL to fetch information from an API. When both `items` and `data` are used, `items` has priority.
 
 ### `loading`
 

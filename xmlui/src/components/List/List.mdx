@@ -23,9 +23,6 @@ The data is provided as JSON.
 
 %-PROP-START data
 
-The component receives its data via this property.
-The `data` property is an array of items that the `List` can display.
-
 Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
 
@@ -38,6 +35,44 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
   name="Example: data"
   height={400}
   app={`<List data='{${JSON.stringify(data)}}' />`}
+/>
+
+You can also provide the `List` with data directly from an API via this property.
+
+In the example below, the `List` also uses the `itemTemplate` property to access the data attributes as well.
+See the [itemTemplate section](#itemtemplate).
+
+```ueml copy {2}
+<App>
+  <List data='https://api.spacexdata.com/v3/rockets'>
+    <property name="itemTemplate">
+      <Card>
+        <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+        <Text value="{$item.country}" />
+        <Text value="{$item.company}" variant="strong" />
+      </Card>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: data API Call"
+  height={400}
+  app={`
+  <App>
+    <List data='https://api.spacexdata.com/v3/rockets'>
+      <property name="itemTemplate">
+        <Card>
+          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+          <Text value="{$item.country}" />
+          <Text value="{$item.company}" variant="strong" />
+        </Card>
+      </property>
+    </List>
+  </App>
+  `}
 />
 
 %-PROP-END

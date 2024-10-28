@@ -20,9 +20,10 @@ export const ListMd = createMetadata({
         `that the \`List\` can display.`,
     ),
     items: d(
-      `You can use \`items\` as an alias for the \`data\` property. When you bind the table to a ` +
-        `data source (for example, you set the \`datasource\` property to a URL to fetch the data ` +
-        `from), \`data\` represents the information obtained from the API.`,
+      `You can use \`items\` as an alias for the \`data\` property. ` +
+      `When you bind the list to a data source (e.g. an API endpoint), ` +
+      `the \`data\` acts as the property that accepts a URL to fetch information from an API.` +
+      `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
     loading: d(
       `This property delays the rendering of children until it is set to \`false\`, or the ` +

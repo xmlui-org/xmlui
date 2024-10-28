@@ -1,8 +1,8 @@
 import { COMPONENT_DATASOURCE, COMPONENT_LIST, COMPONENT_TABLE, CREATE_THE_APP, DATA_MANIPULATION_WITH_APIACTION, GETTING_STARTED_WITH_XMLUI } from "../../meta/pages";
 
-# Data Fetching with DataSource
+# Data Fetching
 
-In this tutorial, you will learn how to load data from external sources using the `DataSource` component and the `datasource` property.
+In this tutorial, you will learn how to load data from external sources using the `DataSource` component and the `data` property.
 
 This tutorial assumes you already completed either the <SmartLink href={GETTING_STARTED_WITH_XMLUI}>Getting started</SmartLink> section or the <SmartLink href={CREATE_THE_APP}>Contact List</SmartLink> tutorial.
 Both provide foundational knowledge this tutorial will build upon.
@@ -61,9 +61,12 @@ You are ready to learn using the `DataSource` component! In subsequent sections,
 
 ## Loading a List of Data
 
-XMLUI can quickly fetch data from an API. Most XMLUI components have a `datasource` property to handle API data loading conveniently. This property is useful for components that can display a list of items (such as the <SmartLink href={COMPONENT_LIST}>`List`</SmartLink> or <SmartLink href={COMPONENT_TABLE}>`Table`</SmartLink>).
+XMLUI can quickly fetch data from an API.
+Most XMLUI components have a `data` property to provide them with data - both local and external via API calls.
+This property is useful for components that can display a list of items (such as the <SmartLink href={COMPONENT_LIST}>`List`</SmartLink> or <SmartLink href={COMPONENT_TABLE}>`Table`</SmartLink>).
 
-Add the highlighted `NavLink` and `Page` components to the code in the Main.xmlui file to populate the `List` component with data! For the sake of brevity, from now on, we omit the majority of the existing code and shorten the instructions like here:
+Add the highlighted `NavLink` and `Page` components to the code in the "Main.xmlui" file to populate the `List` component with data!
+For the sake of brevity, from now on, we omit the majority of the existing code and shorten the instructions like here:
 
 ```ueml copy filename="Main.xmlui" {2, 4-6}
 <!-- Append this NavLink to the bottom of existing ones -->
@@ -102,9 +105,9 @@ This short form replaces the entire contents of the `Main.xmlui` file, which sho
 When you select the Simple Data Load menu item (navigate to the `/get-data` page), it will show a list of grocery items:
 
 <br/>
-<Image alt="Using datasource prop" src="/resources/images/datasource-tutorial/list-items.png" />
+<Image alt="Using the data prop" src="/resources/images/datasource-tutorial/list-items.png" />
 
-The `datasource` prop is used the same way as the `data` prop but its value is an URL instead of an inline list.
+The `data` property is capable of handling the fetching of external data from an API endpoint.
 Here, the URL points to the local "shopping-list" endpoint that returns a list of grocery items which look like so:
 
 | Attribute | Type    |
@@ -118,7 +121,8 @@ Here, the URL points to the local "shopping-list" endpoint that returns a list o
 
 ## Filtering Incoming Data
 
-A typical pattern involves filtering a list of data after fetching it and passing it to the component to render. However, you have to use the `DataSource` component instead of the `datasource` property to do that.
+A typical pattern involves filtering a list of data after fetching it and passing it to the component to render.
+However, you have to use the `DataSource` component instead of the `data` property to do that.
 
 In the `Main.xmlui` file, create a new page with a `DataSource` component and a `List` using the `data` property:
 
@@ -153,7 +157,8 @@ The filtered list contains fewer items, only those for which the `inPantry` prop
 
 ## Loading Indicators
 
-By default, the `List` has a loading spinner that is automatically rendered when data is loaded via the `datasource` prop. You can try it with this code:
+By default, the `List` has a loading spinner that is automatically rendered when data is loaded via the `data` prop.
+You can try it with this code:
 
 ```ueml copy filename="Main.xmlui" {2, 4-6}
 <!-- Append this NavLink to the bottom of existing ones -->
@@ -170,7 +175,7 @@ As the name in the URL suggests, this API endpoint imitates a slow load operatio
 <br/>
 <Image alt="Filtering Data #2" src="/resources/images/datasource-tutorial/slow-loading.png" />
 
-This behavior is available when you use the `datasource` prop of `List`. In this case, the `List` component manages the data fetching and knows when the data is being loaded. Thus, it can display the loading indicator.
+This behavior is available when you use the `data` prop of `List`. In this case, the `List` component manages the data fetching and knows when the data is being loaded. Thus, it can display the loading indicator.
 
 However, if you use the `data` property of `List` to specify the data, the component does not know if the data is being fetched. The list simply observes that the `data` properties value has been changed.
 

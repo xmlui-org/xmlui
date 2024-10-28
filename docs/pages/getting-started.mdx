@@ -118,7 +118,7 @@ Components work together declaratively. `App` connects the `to` property of `Nav
 
 `List` is a component that works with data items and renders them into a scrollable list. You can define the UI for a particular item with its nested children. 
 
-```ueml copy {2} filename="Main.xmlui" /datasource/
+```ueml copy {2} filename="Main.xmlui" /data/
 <List data="https://api.spacexdata.com/v3/history">
   <Card title="{$item.title}" subtitle="{$item.details}" />
 </List>
@@ -138,7 +138,7 @@ The list uses a `Card` component to display a particular item. `Card` has a `tit
 
 ### Fetching Data from API Endpoints
 
-The specific endpoint of the SpaceX API (given in the `datasource` property of `List`) retrieves a list of event history items. A single item has this structure:
+The specific endpoint of the SpaceX API (given in the `data` property of `List`) retrieves a list of event history items. A single item has this structure:
 
 ```json
 {
@@ -156,7 +156,8 @@ The specific endpoint of the SpaceX API (given in the `datasource` property of `
 ```
 
 <Callout type="info" emoji="💡">
-  Components working with data **can be bound to API endpoints**. Many XMLUI components (that may work with data) have a **`datasource` property** to define an API endpoint (GET) to fetch data. XMLUI manages all chores to fetch the data.
+  Components working with data **can be bound to API endpoints** as well.
+  Many XMLUI components handle data fetching from an API (using GET) in the `data` property.
 </Callout>
 
 ### Updating the Item Template
