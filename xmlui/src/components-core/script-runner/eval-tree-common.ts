@@ -268,6 +268,8 @@ export function evalMemberAccessCore(
   return memberObj;
 }
 
+
+
 // --- Evaluates a calculated member access expression (sync & async context)
 export function evalCalculatedMemberAccessCore(
   parentObj: any,
@@ -571,4 +573,8 @@ export function evalArrow(thisStack: any[], expr: ArrowExpression, thread: Logic
   } as ArrowExpression;
   thisStack.push(lazyArrow);
   return lazyArrow;
+}
+
+export function evalTemplateLiteralCore(segmentValues: any[]): string {
+  return segmentValues.map((value) => (typeof value === "string" ? value : `${value}`)).join("");
 }

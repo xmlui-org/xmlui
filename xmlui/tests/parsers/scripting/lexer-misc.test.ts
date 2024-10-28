@@ -214,4 +214,55 @@ describe("Lexer - miscellaneous", () => {
       expect(trail3.type).equal(TokenType.Eof);
     });
   });
+  it("template string", () =>{
+    const source = "`a${b}c`"
+    const wLexer = new Lexer(new InputStream(source));
+
+    const tick1 = wLexer.get()
+    wLexer.setStartingPhaseToTemplateLiteral()
+    const a = wLexer.get()
+    const dollarLBrace = wLexer.get()
+    const b = wLexer.get()
+    const RBrace = wLexer.get()
+    wLexer.setStartingPhaseToTemplateLiteral()
+    const c = wLexer.get()
+    const tick2 = wLexer.get()
+
+    expect(tick1.type).equal(TokenType.Backtick)
+    expect(tick1.text).equal("`")
+    expect(tick1.location.startPosition).equal(0);
+    expect(tick1.location.endPosition).equal(1);
+
+    expect(a.type).equal(TokenType.StringLiteral)
+    expect(a.text).equal("a")
+    expect(a.location.startPosition).equal(1);
+    expect(a.location.endPosition).equal(2);
+
+    expect(dollarLBrace.type).equal(TokenType.DollarLBrace)
+    expect(dollarLBrace.text).equal("${")
+    expect(dollarLBrace.location.startPosition).equal(2);
+    expect(dollarLBrace.location.endPosition).equal(4);
+
+    expect(b.type).equal(TokenType.Identifier)
+    expect(b.text).equal("b")
+    expect(b.location.startPosition).equal(4);
+    expect(b.location.endPosition).equal(5);
+
+    expect(RBrace.type).equal(TokenType.RBrace)
+    expect(RBrace.text).equal("}")
+    expect(RBrace.location.startPosition).equal(5);
+    expect(RBrace.location.endPosition).equal(6);
+
+    expect(c.type).equal(TokenType.StringLiteral)
+    expect(c.text).equal("c")
+    expect(c.location.startPosition).equal(6);
+    expect(c.location.endPosition).equal(7);
+
+    expect(tick2.type).equal(TokenType.Backtick)
+    expect(tick2.text).equal("`")
+    expect(tick2.location.startPosition).equal(7);
+    expect(tick2.location.endPosition).equal(8);
+
+
+  })
 });

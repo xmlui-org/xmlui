@@ -13,6 +13,8 @@ type TokenTrait = {
 export const tokenTraits: Record<TokenType, TokenTrait> = {
   [TokenType.Eof]: {},
   [TokenType.Ws]: {},
+  [TokenType.DollarLBrace]: {},
+  [TokenType.Backtick]: {expressionStart: true},
   [TokenType.BlockComment]: {},
   [TokenType.EolComment]: {},
   [TokenType.Unknown]: {},

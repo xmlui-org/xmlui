@@ -22,6 +22,7 @@ enum LexerPhase {
 
   // Multi-char tokens
   Slash,
+  Dollar,
   Or,
   Asterisk,
   Ampersand,
@@ -48,6 +49,8 @@ enum LexerPhase {
   RealExponent,
   RealExponentSign,
   RealExponentTail,
+  StringTemplateLiteral,
+  StringTemplateLiteralBackSlash,
   String,
   StringBackSlash,
   StringHexa1,
@@ -99,6 +102,8 @@ export class Lexer {
 
   // --- input position at the beginning of last fetch
   private _lastFetchPosition = 0;
+
+  private _phaseExternallySet: null | LexerPhase = null;
 
   /**
    * Initializes the tokenizer with the input stream
@@ -174,6 +179,15 @@ export class Lexer {
   }
 
   /**
+   * Parsing template literals requires a context sensitive lexer.
+   * This method has to be called by the parser when the lexer needs to scan a string inside a template literal.
+   * Call this after the first opening backing and after the parser is done with parsing a placeholder, after the right brace.
+   */
+  setStartingPhaseToTemplateLiteral() {
+    this._phaseExternallySet = LexerPhase.StringTemplateLiteral;
+  }
+
+  /**
    * Fetches the next character from the input stream
    */
   private fetchNextChar(): string | null {
@@ -207,7 +221,7 @@ export class Lexer {
     let useResolver = false;
 
     // --- Start from the beginning
-    let phase: LexerPhase = LexerPhase.Start;
+    let phase: LexerPhase = this.getStartingPhaseThenReset();
 
     // --- Process all token characters
     while (true) {
@@ -225,7 +239,7 @@ export class Lexer {
       }
 
       // --- Follow the lexer state machine
-      switch (phase) {
+      phaseSwitch: switch (phase) {
         // ====================================================================
         // Process the first character
         case LexerPhase.Start:
@@ -243,6 +257,11 @@ export class Lexer {
             case "/":
               phase = LexerPhase.Slash;
               tokenType = TokenType.Divide;
+              break;
+
+            case "$":
+              phase = LexerPhase.Dollar;
+              tokenType = TokenType.Identifier;
               break;
 
             case "*":
@@ -305,6 +324,9 @@ export class Lexer {
               phase = LexerPhase.Colon;
               tokenType = TokenType.Colon;
               break;
+
+            case "`":
+              return completeToken(TokenType.Backtick);
 
             case "[":
               return completeToken(TokenType.LSquare);
@@ -381,6 +403,18 @@ export class Lexer {
         // ====================================================================
         // Process comments
 
+        // A dollar sign is also a valid variable name. When it isn't a dollar left brace, we continue as if it was an identifier
+        case LexerPhase.Dollar:
+          if (ch === "{") {
+            return completeToken(TokenType.DollarLBrace);
+          }
+          phase = LexerPhase.IdTail;
+          useResolver = true;
+          tokenType = TokenType.Identifier;
+          if (!isIdContinuation(ch)) {
+            makeToken();
+          }
+          break;
         // --- Looking for the end of whitespace
         case LexerPhase.InWhiteSpace:
           if (ch !== " " && ch !== "\t" && ch !== "\r" && ch !== "\n") {
@@ -650,7 +684,10 @@ export class Lexer {
         case LexerPhase.DecimalOrReal:
           if (isDecimalDigit(ch) || ch === "_") {
             break;
-          } else if (ch === "." && (this.input.peek() === null || isDecimalDigit(this.input.peek()!))) {
+          } else if (
+            ch === "." &&
+            (this.input.peek() === null || isDecimalDigit(this.input.peek()!))
+          ) {
             phase = LexerPhase.RealFractionalFirst;
             tokenType = TokenType.Unknown;
           } else if (ch === "e" || ch === "E") {
@@ -704,6 +741,41 @@ export class Lexer {
         case LexerPhase.RealExponentTail:
           if (!isDecimalDigit(ch)) {
             return makeToken();
+          }
+          break;
+
+        case LexerPhase.StringTemplateLiteralBackSlash: {
+          phase = LexerPhase.StringTemplateLiteral;
+          const charAhead1 = this.input.ahead(0);
+          const charAhead2 = this.input.ahead(1);
+
+          if (charAhead1 === "`" || (charAhead1 === "$" && charAhead2 === "{")) {
+            return completeToken(TokenType.StringLiteral);
+          }
+          break;
+        }
+
+        case LexerPhase.StringTemplateLiteral:
+          switch (ch) {
+            case "\\":
+              phase = LexerPhase.StringTemplateLiteralBackSlash;
+              tokenType = TokenType.Unknown;
+              break phaseSwitch;
+            case "`":
+              return completeToken(TokenType.Backtick);
+            case "$":
+              const charAhead = this.input.ahead(0);
+              if (charAhead === "{") {
+                appendTokenChar();
+                this.fetchNextChar();
+                return completeToken(TokenType.DollarLBrace);
+              }
+          }
+          const charAhead1 = this.input.ahead(0);
+          const charAhead2 = this.input.ahead(1);
+
+          if (charAhead1 === "`" || (charAhead1 === "$" && charAhead2 === "{")) {
+            return completeToken(TokenType.StringLiteral);
           }
           break;
 
@@ -909,7 +981,9 @@ export class Lexer {
       if (useResolver) {
         tokenType =
           resolverHash.get(text) ??
-          (isIdStart(text[0]) && text[text.length - 1] !== "'" ? TokenType.Identifier : TokenType.Unknown);
+          (isIdStart(text[0]) && text[text.length - 1] !== "'"
+            ? TokenType.Identifier
+            : TokenType.Unknown);
       }
       return {
         text,
@@ -939,12 +1013,22 @@ export class Lexer {
     }
   }
 
+  getStartingPhaseThenReset(): LexerPhase {
+    if (this._phaseExternallySet !== null) {
+      const phase = this._phaseExternallySet;
+      this._phaseExternallySet = null;
+      return phase;
+    }
+    return LexerPhase.Start;
+  }
+
   /**
    * Fetches the next RegEx token from the input stream
    */
   private fetchRegEx(): RegExpLexerResult {
     // --- Get the tail
-    const tailPosition = this._ahead.length > 0 ? this._ahead[0].location.startPosition : this._lastFetchPosition;
+    const tailPosition =
+      this._ahead.length > 0 ? this._ahead[0].location.startPosition : this._lastFetchPosition;
     const tail = this.input.getTail(tailPosition);
 
     // --- Parse the tail. If no error, the entire tail is the RegExp
@@ -1086,7 +1170,13 @@ function isIdStart(ch: string): boolean {
  * @param ch Character to test
  */
 function isIdContinuation(ch: string): boolean {
-  return (ch >= "a" && ch <= "z") || (ch >= "A" && ch <= "Z") || (ch >= "0" && ch <= "9") || ch === "_" || ch === "$";
+  return (
+    (ch >= "a" && ch <= "z") ||
+    (ch >= "A" && ch <= "Z") ||
+    (ch >= "0" && ch <= "9") ||
+    ch === "_" ||
+    ch === "$"
+  );
 }
 
 /**
