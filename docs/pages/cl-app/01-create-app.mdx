@@ -20,13 +20,10 @@ The unzipped content has the following folders and files:
 | `start.sh` | The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
 
 <Callout emoji="💡">
-  Remember, you need a local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
+Remember, you need a local web server to run the XMLUI app. Install the LTS version of Node.js on your machine (https://nodejs.org/en), for you will use the **http-server** Node package to host the tutorial.
 
-  If you have Node.js installed on your machine, you can use the `start.bat` or `start.sh` files (from the app's directory) to ignite the web server and open the app in the browser.
+In your command prompt, select the downloaded sample's unzipped folder (with the cd command), and run `start.bat` on Windows or `start.sh` on Mac or Linux, which will start the web server and open your browser with the app.
 </Callout>
-
-Spin up your web server pointing to the unzipped folder where the sample code of the starter app is located.
-Then, visit the server's default page in your browser.
 
 This is how the sample app should appear:
 
@@ -54,7 +51,9 @@ The app is straightforward as it only contains one single markup file (`Main.xml
     <NavLink label="Home" to="/" />
   </NavPanel>
   <Pages>
-    <Page url="/">Home</Page>
+    <Page url="/">
+      Home
+    </Page>
   </Pages>
   <Footer>
     Powered by XMLUI

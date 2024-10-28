@@ -1,9 +1,14 @@
 import { Callout } from 'nextra/components'
+import { CL_TUTORIAL_4 } from '../../meta/downloads'
 
 # A Few Finishing Touches
 
 There are a few things left to improve the user experience in our app.
 In this section, you will make minor changes to enhance the app's look and feel.
+
+<Callout type="info" emoji="📔">
+You can continue working with the code you completed in the previous tutorial section. Alternatively, you can download the code from <DownloadLink href={CL_TUTORIAL_4}>here</DownloadLink> and carry on. 
+</Callout>
 
 ## Fetching the Number of Records
 
@@ -65,7 +70,7 @@ function getSection(contact) {
 
 Update the code in `Contacts` to add a `section` field to the contact items:
 
-```ueml copy {4} filename="Contacts.xmlui" /section: getSection(t)/
+```ueml copy {3-4} filename="Contacts.xmlui" /section: getSection(t)/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
