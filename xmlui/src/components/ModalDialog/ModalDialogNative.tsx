@@ -141,7 +141,7 @@ export const ModalDialog = React.forwardRef(
                 }
               }}
               ref={composedRef}
-              style={style}
+              style={{...style, gap: undefined}}
             >
               {!!title && (
                 <Dialog.Title style={{ marginTop: 0 }}>
@@ -150,7 +150,7 @@ export const ModalDialog = React.forwardRef(
                   </header>
                 </Dialog.Title>
               )}
-              <div className={styles.innerContent}>
+              <div className={styles.innerContent} style={{gap: style.gap}}>
                 <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
                   {isOpen && (typeof children === "function" ? children?.(modalContext) : children)}
                 </ModalVisibilityContext.Provider>
