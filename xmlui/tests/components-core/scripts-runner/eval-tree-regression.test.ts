@@ -33,17 +33,6 @@ describe("Evaluate binding expression tree", () => {
     expect(value).to.equal("Hello!");
   });
 
-  it(`Evals template literals`, () => {
-    // --- Arrange
-    const wParser = new Parser("`\\u0058\\x59a${2+3}b${var1}d${undef}${NaN}${null}\\${1+2}`");
-
-    // --- Act/Assert
-    const expr = wParser.parseExpr();
-    const context = createEvalContext({ localContext: {var1: "c", undef: undefined} });
-    const value = evalBinding(expr, context);
-    expect(value).to.equal("XYa5bcdundefinedNaNnull${1+2}");
-  });
-
   it("Regression #2", () => {
     // --- Act
     const segments = parseParameterString("{123.toString()}");

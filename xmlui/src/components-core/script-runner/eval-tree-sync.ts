@@ -34,6 +34,7 @@ import {
   evalPreOrPostCore,
   evalUnaryCore,
   isPromise,
+  evalTemplateLiteralCore,
 } from "./eval-tree-common";
 import { Parser } from "../../parsers/scripting/Parser";
 import { ensureMainThread } from "./process-statement-common";
@@ -223,16 +224,12 @@ function evalTemplateLiteral(
   evalContext: BindingTreeEvaluationContext,
   thread: LogicalThread,
 ): any {
-  const segmentValues: any[] = []
-  for (let segment of expr.segments){
-    let segmentValue = evaluator(thisStack, segment, evalContext, thread);
-    thisStack.pop()
-    if(typeof segmentValue !== "string"){
-      segmentValue = `${segmentValue}`
-    }
-    segmentValues.push(segmentValue)
-  }
-  return segmentValues.join('')
+  const segmentValues = expr.segments.map((s) => {
+    const evaledValue = evaluator(thisStack, s, evalContext, thread);
+    thisStack.pop();
+    return evaledValue;
+  });
+  return evalTemplateLiteralCore(segmentValues);
 }
 
 function evalMemberAccess(
