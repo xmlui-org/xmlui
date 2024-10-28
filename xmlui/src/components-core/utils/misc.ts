@@ -456,14 +456,14 @@ export function getFileExtension(fileName: string, mimeType?: string) {
   return checkFileType(fileName, mimeType);
 }
 
-export function pluralize(number: number, singular: string, plural: string) {
+export function pluralize(number: number, singular: string, plural: string): string {
   if (number === 1) {
     return `${number} ${singular}`;
   }
   return `${number} ${plural}`;
 }
 
-export function toHashObject(arr: any[], keyProp: string, valueProp: string) {
+export function toHashObject(arr: any[], keyProp: string, valueProp: string): any {
   return (arr ?? []).reduce((acc, item) => {
     acc[item[keyProp]] = item[valueProp];
     return acc;
