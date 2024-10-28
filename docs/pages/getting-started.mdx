@@ -22,9 +22,15 @@ We have a starter app you can use to get acquainted with XMLUI. Download its zip
 
 You need only a couple of things to try it:
 - Your favorite text (code) editor.
-- A local web server to run the XMLUI app. (If you do not have a web server on your machine or are unsure how to configure it, we suggest you install the [Simple Web Server](https://simplewebserver.org/download.html). It is a free tool with a graphical user interface.)
+- A local web server to run the XMLUI app. 
 
-Start your web server using the unzipped sample folder as the root for serving static files, and visit the web server's default page in your browser.
+Install the LTS version of Node.js on your machine (https://nodejs.org/en). Then, you will use the HTTP Node package to host the tutorial.
+
+Open a command line prompt and select the unzipped sample folder as your working folder (you must find `index.html` in the working folder). Type this command line to start the web server and open your default browser with the app:
+
+```bash copy
+npx -y http-server -o
+```
 
 When your app starts, it displays this page:
 
