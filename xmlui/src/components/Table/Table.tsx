@@ -19,11 +19,15 @@ export const TableMd = createMetadata({
     `component is virtualized so it only renders visible cells.`,
   props: {
     items: d(
-      `You can use \`items\` as an alias for the \`data\` property. When you bind the table to a ` +
-        `data source (for example, you set the \`datasource\` property to a URL to fetch the data ` +
-        `from), \`data\` represents the information obtained from the API.`,
+      `You can use \`items\` as an alias for the \`data\` property. ` +
+      `When you bind the table to a data source (e.g. an API endpoint), ` +
+      `the \`data\` acts as the property that accepts a URL to fetch information from an API. ` +
+      `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
-    data: d(``),
+    data: d(
+      `The component receives data via this property. The \`data\` property is a list of items ` +
+        `that the \`Table\` can display.`,
+    ),
     isPaginated: d(`This property adds pagination controls to the \`${COMP}\`.`),
     loading: d(
       `This boolean property indicates if the component is fetching (or processing) data. This ` +

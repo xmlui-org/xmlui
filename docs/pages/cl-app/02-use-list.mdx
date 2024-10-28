@@ -9,9 +9,11 @@ At the end of the previous article, you fetched data from the emulated backend a
 You can continue working with the code you completed in the previous tutorial section. Alternatively, you can download the code from <DownloadLink href={CL_TUTORIAL_2}>here</DownloadLink> and carry on. 
 </Callout>
 
-## Using a Data Source
+## Fetching Data from API
 
-With XMLUI, fetching data from a REST API is straightforward. Many components have a `datasource` property, which accepts a URL pointing to the API retrieving data. These components manage all aspects of the fetch operation.
+With XMLUI, fetching data from a REST API is straightforward.
+The `data` property, which accepts local data, also handles data fetching if the value provided looks like a URL string.
+Components manage all aspects of the data fetching operation.
 
 Replace the `Page` tag with the `/contacts` URL to use the following contents:
 
