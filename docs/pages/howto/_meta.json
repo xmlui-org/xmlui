@@ -1,9 +1,12 @@
 {
   "App": "Using App",
   "AppHeader": "Using AppHeader",
+  "DatePicker": "Using DatePicker",
   "Footer": "Using Footer",
+  "RadioGroup": "Using RadioGroup",
   "layout": "Layout",
   "menus": "Menus",
   "events": "Events",
-  "RadioGroup": "Using RadioGroup"
+  "component-icons": "Component Icons",
+  "customize-input-fields": "Customizing Input Fields"
 }
