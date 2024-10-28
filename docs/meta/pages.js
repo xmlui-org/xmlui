@@ -123,6 +123,7 @@ export const REUSABLE_COMPONENTS_EXPOSING_METHODS = "/create-apps/reusable-compo
 export const ROUTING_AND_LINKS = "/create-apps/routing";
 export const WORKING_WITH_TEXT = "/create-apps/text";
 export const THEMES = "/create-apps/themes";
+export const THEMES_WHAT_A_THEME_CONTAINS = "/create-apps/themes#what-a-theme-contains";
 export const CODING_WITH_XMLUI = "/create-apps/xmlui-code";
 export const MARKUP = "/create-apps/xmlui-markup";
 export const CREATING_XMLUI_APPS = "/create-apps";
