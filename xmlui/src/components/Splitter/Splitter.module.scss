@@ -41,15 +41,6 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Split
   &.horizontal {
     flex-direction: row;
   }
-
-  &.swapped {
-    .primaryPanel {
-      order: 3;
-    }
-    .secondaryPanel {
-      order: 1;
-    }
-  }
 }
 
 .panel {
