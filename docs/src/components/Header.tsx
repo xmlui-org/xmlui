@@ -7,12 +7,14 @@ import { CodeSelector } from "@/src/components/CodeSelector";
 import { Tooltip } from "@/src/components/Tooltip";
 import { MdSwapHoriz, MdSwapVert } from "react-icons/md";
 import { PiSquareSplitHorizontalLight, PiSquareSplitVerticalLight } from "react-icons/pi";
-import { RxOpenInNewWindow, RxReset } from "react-icons/rx";
+import { RxOpenInNewWindow, RxReset, RxDownload } from "react-icons/rx";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { ThemeSwitcher } from "./ThemeSwitcher";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 
 export const Header = () => {
   const { theme, systemTheme } = useTheme();
@@ -43,6 +45,27 @@ export const Header = () => {
     options.orientation,
     options.content,
   ]);
+
+  const handleDownloadZip = async () => {
+    const zip = new JSZip();
+
+    zip.file("Main.xmlui", appDescription.app);
+    zip.file("config.json", JSON.stringify(appDescription.config, null, 2));
+
+    if (appDescription.components.length > 0) {
+      const components = zip.folder("components");
+      appDescription.components.forEach((component, index) => {
+        components.file(`${component.name}.xmlui`, component.component);
+      });
+    }
+    try {
+      const content = await zip.generateAsync({ type: "blob" });
+
+      saveAs(content, `${(appDescription.config.name).trim()}.zip`);
+    } catch (error) {
+      console.error("An error occurred while generating the ZIP:", error);
+    }
+  };
 
   return (
     <div
@@ -98,6 +121,14 @@ export const Header = () => {
             </button>
           }
           label="Reset the app"
+        />
+        <Tooltip
+          trigger={
+            <button className={styles.button} onClick={() => handleDownloadZip()}>
+              <RxDownload />
+            </button>
+          }
+          label="Download app"
         />
       </div>
       {appDescription.config?.description && (
