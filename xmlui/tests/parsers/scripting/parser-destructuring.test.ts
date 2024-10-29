@@ -42,6 +42,20 @@ describe("Parser - destructuring", () => {
     expect(od.objectDestruct).equal(undefined);
   });
 
+  it("let, object, single ID with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("let {$a} = expr;");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
+  });
+
   it("let, object, multiple IDs #1", () => {
     // --- Arrange
     const wParser = new Parser("let {a, b} = expr;");
@@ -290,6 +304,20 @@ describe("Parser - destructuring", () => {
     expect(ad.objectDestruct).equal(undefined);
   });
 
+  it("let, array, single ID with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("let [$a] = expr;");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
+  });
+
   it("let, array, multiple IDs #1", () => {
     // --- Arrange
     const wParser = new Parser("let [a, b] = expr;");
@@ -499,6 +527,34 @@ describe("Parser - destructuring", () => {
     expect(od.alias).equal(undefined);
     expect(od.arrayDestruct).equal(undefined);
     expect(od.objectDestruct).equal(undefined);
+  });
+
+  it("const, object, single ID with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("const {$a} = expr;");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
+  });
+
+  it("const, array, single ID with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("const [$a] = expr;");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
   });
 
   it("const, array in object #1", () => {

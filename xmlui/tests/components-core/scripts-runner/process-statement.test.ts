@@ -1999,7 +1999,6 @@ describe("Process statements", () => {
     }
     assert.fail("Exception expected");
   });
-
 });
 
 function getComponentStateClone(orig: any): any {
