@@ -12,6 +12,7 @@ import { usePlayground } from "@/src/hooks/usePlayground";
 import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { ThemeSwitcher } from "./ThemeSwitcher";
+import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 
 export const Header = () => {
   const { theme, systemTheme } = useTheme();
@@ -49,57 +50,54 @@ export const Header = () => {
       })}
     >
       <div className={styles.box}>
-        <div>
-          <Text>{appDescription.config?.name}</Text>
-          {!options.previewMode && <CodeSelector />}
-        </div>
-        <div>
-          {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
-            <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
-          )}
-          {!options.previewMode && show && (
-            <>
-              <Tooltip
-                trigger={
-                  <button className={styles.button} onClick={() => dispatch(swapApp())}>
-                    {options.orientation === "vertical" ? <MdSwapHoriz /> : <MdSwapVert />}
-                  </button>
-                }
-                label="Swap editor and preview"
-              />
-              <Tooltip
-                trigger={
-                  <button className={styles.button} onClick={() => dispatch(changeOrientation())}>
-                    {options.orientation === "vertical" ? (
-                      <PiSquareSplitHorizontalLight />
-                    ) : (
-                      <PiSquareSplitVerticalLight />
-                    )}
-                  </button>
-                }
-                label="Toggle orientation"
-              />
-            </>
-          )}
-          {options.allowStandalone && (
+        <Text>{appDescription.config?.name}</Text>
+        {!options.previewMode && <CodeSelector />}
+        <SpaceFiller />
+        {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
+          <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+        )}
+        {!options.previewMode && show && (
+          <>
             <Tooltip
               trigger={
-                <button className={styles.button} onClick={() => openStandaloneApp()}>
-                  <RxOpenInNewWindow />
+                <button className={styles.button} onClick={() => dispatch(swapApp())}>
+                  {options.orientation === "vertical" ? <MdSwapHoriz /> : <MdSwapVert />}
                 </button>
               }
-              label="Open in new window"
+              label="Swap editor and preview"
             />
-          )}
+            <Tooltip
+              trigger={
+                <button className={styles.button} onClick={() => dispatch(changeOrientation())}>
+                  {options.orientation === "vertical" ? (
+                    <PiSquareSplitHorizontalLight />
+                  ) : (
+                    <PiSquareSplitVerticalLight />
+                  )}
+                </button>
+              }
+              label="Toggle orientation"
+            />
+          </>
+        )}
+        {options.allowStandalone && (
           <Tooltip
             trigger={
-              <button className={styles.button} onClick={() => dispatch(resetApp())}>
-                <RxReset />
+              <button className={styles.button} onClick={() => openStandaloneApp()}>
+                <RxOpenInNewWindow />
               </button>
             }
-            label="Reset the app"
+            label="Open in new window"
           />
-        </div>
+        )}
+        <Tooltip
+          trigger={
+            <button className={styles.button} onClick={() => dispatch(resetApp())}>
+              <RxReset />
+            </button>
+          }
+          label="Reset the app"
+        />
       </div>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>

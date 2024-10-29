@@ -22,26 +22,25 @@ export const PlaygroundContent = ({
 
   return (
     <div
-      className={classnames(styles.playground, {
-        [styles.standalone]: standalone,
+      className={classnames(styles.playgroundContent, {
+        [styles.standaloneMode]: standalone,
       })}
+      style={{ height }}
     >
-      <div className={classnames(styles.playgroundContent, {
-        [styles.standalone]: standalone,
-      })} style={{ height }}>
-        {options.previewMode && status === "loaded" ? (
-          <Preview />
-        ) : (
-          <Splitter
-            orientation={options.orientation}
-            swapped={options.swapped}
-            initialPrimarySize={initialPrimarySize}
-          >
-            <Editor />
+      {options.previewMode && status === "loaded" ? (
+        <Preview />
+      ) : (
+        <Splitter
+          orientation={options.orientation}
+          swapped={options.swapped}
+          initialPrimarySize={initialPrimarySize}
+        >
+          <Editor />
+          <div style={{height: "100%", overflow: "hidden"}}>
             {status === "loaded" && <Preview />}
-          </Splitter>
-        )}
-      </div>
+          </div>
+        </Splitter>
+      )}
     </div>
   );
 };

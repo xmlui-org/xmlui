@@ -1,35 +1,19 @@
-.playground {
-  height: auto;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-}
-
-.playground:focus-within {
-  z-index: 2;
-}
-
-.playground.standalone {
-  height: 100vh;
-  width: 100vw;
-  margin-top: 0;
-  border-radius: 0;
-  box-shadow: none;
-}
-
 .playgroundContent {
-  width: 100%;
-  height: 100%;
+  flex-grow: 1;
   padding: 0 16px 16px 16px;
   background-color: #E0EDF9;
 }
 
-.standalone {
+.playgroundContent:focus-within {
+  z-index: 2;
+}
+
+.standaloneMode {
+  height: 100%;
   padding: 0;
+  margin-top: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 :is(html[class~=dark]) {
