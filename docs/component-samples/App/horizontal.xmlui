@@ -11,11 +11,12 @@
   </NavPanel>
   <Pages defaultRoute="/">
       <Page url="/">
-        <List data="https://api.spacexdata.com/v3/history">
+          <Test />
+       <!-- <List data="https://api.spacexdata.com/v3/history">
           <property name="itemTemplate">
             <Card title="{$item.title}" subtitle="{$item.details}"/>
           </property>
-        </List>
+        </List>-->
       </Page>
       <Page url="/page1">
         <Text value="Page 1" />

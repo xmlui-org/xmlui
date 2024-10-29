@@ -3,6 +3,7 @@ import RootComponent from "@components-core/RootComponent";
 import React, { useRef, useEffect } from "react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import ReactDOM, { Root } from "react-dom/client";
+import { CompoundComponentDef } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
 import { errReportComponent, xmlUiMarkupToComponent } from "@src/components-core/xmlui-parser";
@@ -26,7 +27,15 @@ export function Preview() {
         erroneousCompoundComponentName,
       );
     }
-
+    const compoundComponents: CompoundComponentDef[] = appDescription.components.map(
+      (src: {name: string, component: string}) => {
+        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src.component);
+        if (errors.length > 0) {
+          return errReportComponent(errors, "somewhere in preview", erroneousCompoundComponentName);
+        }
+        return component;
+      },
+    );
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <RootComponent
@@ -41,7 +50,7 @@ export function Preview() {
           defaultTheme={options.activeTheme || appDescription.config?.defaultTheme}
           defaultTone={(options.activeTone || appDescription.config?.defaultTone) as ThemeTone}
           contributes={{
-            compoundComponents: appDescription.components,
+            compoundComponents,
             themes: appDescription.config?.themes,
           }}
           resources={appDescription.config?.resources}

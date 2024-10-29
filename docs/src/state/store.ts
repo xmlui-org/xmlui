@@ -172,16 +172,23 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       state.status = "loading";
       if (action.payload.appDescription) {
         const compoundComponents: CompoundComponentDef[] =
-          action.payload.appDescription.components.map((src: string) => {
-            let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src);
-            if (errors.length > 0) {
-              return errReportComponent(
-                errors,
-                "somewhere in preview",
-                erroneousCompoundComponentName,
-              );
+          action.payload.appDescription.components.map((src) => {
+            if (typeof src === "string") {
+              let { errors, component, erroneousCompoundComponentName } =
+                xmlUiMarkupToComponent(src);
+              if (errors.length > 0) {
+                return errReportComponent(
+                  errors,
+                  "somewhere in preview",
+                  erroneousCompoundComponentName,
+                );
+              }
+              return {
+                name: (component as CompoundComponentDef).name,
+                component: src,
+              };
             }
-            return component;
+            return src;
           });
         state.appDescription.components = compoundComponents;
         state.appDescription.app = action.payload.appDescription.app;
@@ -232,17 +239,22 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
     }
     case PlaygroundActionKind.CONTENT_CHANGED: {
       state.options.content = action.payload.content || "app";
-      switch (state.options.content) {
-        case "app": {
-          state.text = state.appDescription.app;
-          state.options.language = "ueml";
-          break;
-        }
-        case "config": {
-          state.text = JSON.stringify(state.appDescription.config, null, 2);
-          state.options.language = "json";
-          break;
-        }
+      if (state.options.content === "app") {
+        state.text = state.appDescription.app;
+        state.options.language = "ueml";
+      } else if (state.options.content === "config") {
+        state.text = JSON.stringify(state.appDescription.config, null, 2);
+        state.options.language = "json";
+      } else if (
+        state.appDescription.components
+          .map((c) => c.name.toLowerCase())
+          .includes(state.options.content?.toLowerCase())
+      ) {
+        state.text =
+          state.appDescription.components.find(
+            (component: CompoundComponentDef) => component.name === state.options.content,
+          )?.component || "";
+        state.options.language = "ueml";
       }
       break;
     }
@@ -272,7 +284,10 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           state.appDescription.components = state.appDescription.components.map(
             (component: CompoundComponentDef) => {
               if (component.name === state.options.content) {
-                return state.text;
+                return {
+                  name: component.name,
+                  component: state.text || "",
+                };
               }
               return component;
             },
