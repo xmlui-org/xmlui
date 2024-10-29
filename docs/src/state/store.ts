@@ -2,10 +2,10 @@ import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { createContext, Dispatch } from "react";
 import produce from "immer";
 import { CompoundComponentDef } from "@abstractions/ComponentDefs";
-import {builtInThemes} from "../utils/helpers";
+import { builtInThemes } from "../utils/helpers";
+import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 
 type Orientation = "horizontal" | "vertical";
-
 
 type Options = {
   previewMode?: boolean;
@@ -20,18 +20,18 @@ type Options = {
 };
 
 type AppDescription = {
-    config: {
-        name: string;
-        description?: string;
-        globals: any;
-        resources: any;
-        themes: ThemeDefinition[];
-        defaultTheme?: string;
-        defaultTone?: string;
-    };
-    components: any[];
-    app: any;
-    availableThemes?: Array<ThemeDefinition>;
+  config: {
+    name: string;
+    description?: string;
+    globals: any;
+    resources: any;
+    themes: ThemeDefinition[];
+    defaultTheme?: string;
+    defaultTone?: string;
+  };
+  components: any[];
+  app: any;
+  availableThemes?: Array<ThemeDefinition>;
 };
 
 export interface IPlaygroundContext {
@@ -43,7 +43,9 @@ export interface IPlaygroundContext {
   options: Options;
 }
 
-export const PlaygroundContext = createContext<IPlaygroundContext>(undefined as unknown as IPlaygroundContext);
+export const PlaygroundContext = createContext<IPlaygroundContext>(
+  undefined as unknown as IPlaygroundContext,
+);
 
 enum PlaygroundActionKind {
   TEXT_CHANGED = "PlaygroundActionKind:TEXT_CHANGED",
@@ -147,13 +149,12 @@ export function appDescriptionInitialized(appDescription: any) {
 }
 
 export function optionsInitialized(options: Options) {
-    return {
-        type: PlaygroundActionKind.OPTIONS_INITIALIZED,
-        payload: {
-        options,
-        },
-    };
-
+  return {
+    type: PlaygroundActionKind.OPTIONS_INITIALIZED,
+    payload: {
+      options,
+    },
+  };
 }
 
 export function activeThemeChanged(activeTheme: string) {
@@ -170,21 +171,34 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
     case PlaygroundActionKind.APP_DESCRIPTION_INITIALIZED: {
       state.status = "loading";
       if (action.payload.appDescription) {
+        const compoundComponents: CompoundComponentDef[] =
+          action.payload.appDescription.components.map((src: string) => {
+            let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src);
+            if (errors.length > 0) {
+              return errReportComponent(
+                errors,
+                "somewhere in preview",
+                erroneousCompoundComponentName,
+              );
+            }
+            return component;
+          });
+        state.appDescription.components = compoundComponents;
         state.appDescription.app = action.payload.appDescription.app;
         state.appDescription.config = action.payload.appDescription.config;
-        state.appDescription.components = action.payload.appDescription.components;
         state.text = action.payload.appDescription.app;
         const themes = action.payload.appDescription.config.themes || [];
         state.appDescription.availableThemes = themes.length > 0 ? themes : builtInThemes;
-        state.options.activeTheme = state.appDescription.config.defaultTheme || state.appDescription.availableThemes[0].id;
-        state.originalAppDescription = {...state.appDescription};
+        state.options.activeTheme =
+          state.appDescription.config.defaultTheme || state.appDescription.availableThemes[0].id;
+        state.originalAppDescription = { ...state.appDescription };
       }
       state.status = "loaded";
       break;
     }
     case PlaygroundActionKind.OPTIONS_INITIALIZED: {
-        state.options = action.payload.options || state.options;
-        break;
+      state.options = action.payload.options || state.options;
+      break;
     }
     case PlaygroundActionKind.ACTIVE_THEME_CHANGED: {
       if (action.payload.activeTheme) {
@@ -201,12 +215,13 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       break;
     }
     case PlaygroundActionKind.ORIENTATION_CHANGED: {
-      state.options.orientation = state.options.orientation === "horizontal" ? "vertical" : "horizontal";
+      state.options.orientation =
+        state.options.orientation === "horizontal" ? "vertical" : "horizontal";
       break;
     }
     case PlaygroundActionKind.RESET_APP: {
       state.options.id = state.options.id + 1;
-      state.appDescription = {...state.originalAppDescription};
+      state.appDescription = { ...state.originalAppDescription };
       if (state.options.content === "app") {
         state.text = state.originalAppDescription.app;
       }
@@ -224,11 +239,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           break;
         }
         case "config": {
-          state.text = JSON.stringify(
-            state.appDescription.config,
-            null,
-            2
-          );
+          state.text = JSON.stringify(state.appDescription.config, null, 2);
           state.options.language = "json";
           break;
         }
@@ -254,22 +265,32 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           }
         }
         if (
-          state.appDescription.components?.some((component: CompoundComponentDef) => component.name === state.options.content)
+          state.appDescription.components?.some(
+            (component: CompoundComponentDef) => component.name === state.options.content,
+          )
         ) {
-          state.appDescription.components = state.appDescription.components.map((component: CompoundComponentDef) => {
-            if (component.name === state.options.content) {
-              return state.text;
-            }
-            return component;
-          });
+          state.appDescription.components = state.appDescription.components.map(
+            (component: CompoundComponentDef) => {
+              if (component.name === state.options.content) {
+                return state.text;
+              }
+              return component;
+            },
+          );
         }
-        if (state.appDescription.config.themes?.some((theme: ThemeDefinition) => theme.name === state.options.content)) {
-          state.appDescription.config.themes = state.appDescription.config.themes.map((theme: ThemeDefinition) => {
-            if (theme.name === state.options.content) {
-              return JSON.parse(state.text || "");
-            }
-            return theme;
-          });
+        if (
+          state.appDescription.config.themes?.some(
+            (theme: ThemeDefinition) => theme.name === state.options.content,
+          )
+        ) {
+          state.appDescription.config.themes = state.appDescription.config.themes.map(
+            (theme: ThemeDefinition) => {
+              if (theme.name === state.options.content) {
+                return JSON.parse(state.text || "");
+              }
+              return theme;
+            },
+          );
         }
       }
       break;
