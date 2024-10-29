@@ -1,3 +1,4 @@
+import { Callout } from 'nextra/components';
 import { XMLUI_EXPRESSIONS } from "../../meta/pages";
 
 # Script Syntax
@@ -38,6 +39,10 @@ let y = 0, z; // Multiple declarations
 let sum = 0; // Initialize sum to zero
 const factor = 1.5; // Factor cannot be changed later
 ```
+
+<Callout type="info" emoji="📔">
+Though identifiers can start with a dollar sign (`$`), variable declarations do not allow you to start variable names with a dollar sign. `$` is reserved for context values.
+</Callout>
 
 ### Destructuring
 

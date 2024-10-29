@@ -292,6 +292,10 @@ export class Parser {
         endToken =
           arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.Identifier) {
+        if (declStart.text.startsWith("$")) {
+          this.reportError("W031");
+          return null;
+        }
         endToken = this._lexer.get();
         declarationProps = {
           id: declStart.text,
@@ -371,6 +375,10 @@ export class Parser {
         endToken =
           arrayDestruct.length > 0 ? arrayDestruct[arrayDestruct.length - 1].endToken : endToken;
       } else if (declStart.type === TokenType.Identifier) {
+        if (declStart.text.startsWith("$")) {
+          this.reportError("W031");
+          return null;
+        }
         endToken = this._lexer.get();
         declarationProps = {
           id: declStart.text,
@@ -422,6 +430,10 @@ export class Parser {
       const declStart = this._lexer.peek();
       let declarationProps: any = {};
       if (declStart.type === TokenType.Identifier) {
+        if (declStart.text.startsWith("$")) {
+          this.reportError("W031");
+          return null;
+        }
         endToken = this._lexer.get();
         declarationProps = {
           id: declStart.text,
@@ -477,6 +489,11 @@ export class Parser {
     while (nextToken.type === TokenType.Identifier) {
       // --- Obtain the ID
       const id = nextToken.text;
+      if (id.startsWith("$")) {
+        this.reportError("W031");
+        return null;
+      }
+
       let alias: string | undefined;
       let arrayDestruct: ArrayDestructure[] | undefined | null;
       let objectDestruct: ObjectDestructure[] | undefined | null;
@@ -541,6 +558,11 @@ export class Parser {
       let objectDestruct: ObjectDestructure[] | undefined | null;
       if (nextToken.type === TokenType.Identifier) {
         id = nextToken.text;
+        if (id.startsWith("$")) {
+          this.reportError("W031");
+          return null;
+        }
+  
         endToken = nextToken;
         nextToken = this._lexer.get();
       } else if (nextToken.type === TokenType.LSquare) {
@@ -872,6 +894,11 @@ export class Parser {
     type: string,
   ): ForInStatement | ForOfStatement | null {
     if (varBinding !== "none") {
+      if (id.startsWith("$")) {
+        this.reportError("W031");
+        return null;
+      }
+      
       // --- Skip variable binding type
       this._lexer.get();
     }

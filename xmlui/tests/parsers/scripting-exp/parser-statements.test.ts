@@ -130,6 +130,20 @@ describe("Parser - statements", () => {
     expect(letStmt.decls[0].expr!.type).equal("LitE");
   });
 
+  it("Let statement - with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("let $x = 3");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
   it("Const statement #1", () => {
     // --- Arrange
     const wParser = new Parser("const x = 3");
@@ -145,6 +159,20 @@ describe("Parser - statements", () => {
     expect(constStmt.decls[0].id).equal("x");
     expect(constStmt.decls[0].expr).not.equal(null);
     expect(constStmt.decls[0].expr!.type).equal("LitE");
+  });
+
+  it("Const statement with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("const $x = 3");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return;
+    }
+    assert.fail("Exception expected");
   });
 
   it("Const statement #2", () => {
@@ -166,6 +194,20 @@ describe("Parser - statements", () => {
     expect(constStmt.decls[1].id).equal("y");
     expect(constStmt.decls[1].expr).not.equal(null);
     expect(constStmt.decls[1].expr!.type).equal("LitE");
+  });
+
+  it("Var statement with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("var $x = 3");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
   });
 
   it("Var statement #1", () => {
@@ -658,6 +700,20 @@ describe("Parser - statements", () => {
     expect(forStmt.cond!.type).equal("BinaryE");
     expect(forStmt.upd!.type).equal("PostfE");
     expect(forStmt.body.type).equal("EmptyS");
+  });
+
+  it("for loop - let init with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("for (let $x = 0; x < 3; x++);");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
   });
 
   it("for loop - single statement body", () => {
@@ -1189,6 +1245,20 @@ describe("Parser - statements", () => {
     expect(forStmt.body.type).equal("EmptyS");
   });
 
+  it("for..in loop - 'let' binding with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("for (let $myVar in collection);");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
+  });
+
   it("for..in loop - 'const' binding, no body", () => {
     // --- Arrange
     const wParser = new Parser("for (const myVar in collection);");
@@ -1205,6 +1275,20 @@ describe("Parser - statements", () => {
     expect(forStmt.id.name).equal("myVar");
     expect(forStmt.expr.type).equal("IdE");
     expect(forStmt.body.type).equal("EmptyS");
+  });
+
+  it("for..in loop - 'const' binding with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("for (const $myVar in collection);");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
   });
 
   it("for..in loop - no var binding, body", () => {
@@ -1297,6 +1381,20 @@ describe("Parser - statements", () => {
     expect(forStmt.body.type).equal("EmptyS");
   });
 
+  it("for..of loop - 'let' binding with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("for (let $myVar of collection);");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
+  });
+
   it("for..of loop - 'const' binding, no body", () => {
     // --- Arrange
     const wParser = new Parser("for (const myVar of collection);");
@@ -1313,6 +1411,20 @@ describe("Parser - statements", () => {
     expect(forStmt.id.name).equal("myVar");
     expect(forStmt.expr.type).equal("IdE");
     expect(forStmt.body.type).equal("EmptyS");
+  });
+
+  it("for..of loop - 'const' binding with '$'", () => {
+    // --- Arrange
+    const wParser = new Parser("for (const $myVar of collection);");
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      expect(wParser.errors[0].code).equal("W031");
+      return; 
+    }
+    assert.fail("Exception expected");
   });
 
   it("for..of loop - no var binding, body", () => {
