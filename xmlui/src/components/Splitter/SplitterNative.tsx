@@ -30,22 +30,24 @@ export const Splitter = ({
   splitterTemplate,
   resize = noop,
 }: SplitterProps) => {
-  const panels = useMemo(
-    () => (swapped ? React.Children.toArray(children).reverse() : React.Children.toArray(children)),
-    [children, swapped],
-  );
   const [size, setSize] = useState(0);
   const [splitter, setSplitter] = useState<HTMLDivElement | null>(null);
   const [resizerVisible, setResizerVisible] = useState(false);
   const [resizer, setResizer] = useState<HTMLDivElement | null>(null);
   const [floatingResizer, setFloatingResizer] = useState<HTMLDivElement | null>(null);
-  const resizerElement = useMemo(() => (floating ? floatingResizer : resizer), [floating, resizer, floatingResizer]);
+  const resizerElement = useMemo(
+    () => (floating ? floatingResizer : resizer),
+    [floating, resizer, floatingResizer],
+  );
 
   useEffect(() => {
     if (splitter) {
       const containerSize =
-        orientation === "horizontal" ? splitter.getBoundingClientRect().width : splitter.getBoundingClientRect().height;
+        orientation === "horizontal"
+          ? splitter.getBoundingClientRect().width
+          : splitter.getBoundingClientRect().height;
       const initialParsedSize = parseSize(initialPrimarySize, containerSize);
+
       setSize(initialParsedSize);
       if (resize) {
         resize([
@@ -54,7 +56,7 @@ export const Splitter = ({
         ]);
       }
     }
-  }, [initialPrimarySize, orientation, resize, splitter]);
+  }, [initialPrimarySize, orientation, resize, splitter, swapped]);
 
   useEffect(() => {
     const handleMouseMove = (event: MouseEvent) => {
@@ -79,9 +81,13 @@ export const Splitter = ({
                 ),
                 parseSize(maxPrimarySize, containerSize),
               );
+
         setSize(newSize);
         if (resize) {
-          resize([toPercentage(newSize, containerSize), toPercentage(containerSize - newSize, containerSize)]);
+          resize([
+            toPercentage(newSize, containerSize),
+            toPercentage(containerSize - newSize, containerSize),
+          ]);
         }
       }
     };
@@ -114,7 +120,9 @@ export const Splitter = ({
       const cursorPosition = orientation === "horizontal" ? event.clientX : event.clientY;
       if (splitter) {
         const paneStart =
-          orientation === "horizontal" ? splitter.getBoundingClientRect().left : splitter.getBoundingClientRect().top;
+          orientation === "horizontal"
+            ? splitter.getBoundingClientRect().left
+            : splitter.getBoundingClientRect().top;
         const resizerPosition = paneStart + size;
         // Check if the cursor is near the resizer (within 20 pixels)
         if (cursorPosition > resizerPosition - 20 && cursorPosition < resizerPosition + 20) {
@@ -153,10 +161,16 @@ export const Splitter = ({
       })}
       style={layout}
     >
-      {panels.length > 1 ? (
+      {React.Children.count(children) > 1 ? (
         <>
-          <div style={{ flexBasis: size }} className={styles.primaryPanel}>
-            {panels[0]}
+          <div
+            style={!swapped ? { flexBasis: size } : {}}
+            className={classnames({
+              [styles.primaryPanel]: !swapped,
+              [styles.secondaryPanel]: swapped,
+            })}
+          >
+            {React.Children.toArray(children)[0]}
           </div>
           {!floating && (
             <div
@@ -169,7 +183,15 @@ export const Splitter = ({
               {splitterTemplate}
             </div>
           )}
-          <div className={styles.secondaryPanel}>{panels[1]}</div>
+          <div
+            className={classnames({
+              [styles.primaryPanel]: swapped,
+              [styles.secondaryPanel]: !swapped,
+            })}
+            style={swapped ? { flexBasis: size } : {}}
+          >
+            {React.Children.toArray(children)[1]}
+          </div>
           {floating && (
             <div
               ref={(fr) => setFloatingResizer(fr)}
@@ -187,9 +209,12 @@ export const Splitter = ({
           )}
         </>
       ) : (
-        <>{panels?.[0] && <div className={styles.panel}>{panels[0]}</div>}</>
+        <>
+          {React.Children.toArray(children)?.[0] && (
+            <div className={styles.panel}>{React.Children.toArray(children)[0]}</div>
+          )}
+        </>
       )}
     </div>
   );
 };
-
