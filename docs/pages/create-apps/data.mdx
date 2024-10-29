@@ -8,15 +8,138 @@ import { THE_APP_COMPONENT } from "../../meta/pages.js";
   The article contents below are obsolete.
 </Callout>
 
----
-
-_Obsolete contents below:_
-
-# APIs and Data
-
 Real apps consume data. XMLUI provides a straightforward way to reach data from the backend and display them in the UI. It also lets you execute actions that change backend data.
 
-This section will teach you how to access backend APIs through XMLUI components.
+This section will teach you how to access backend APIs through XMLUI components. In addition to the data access techniques, you will learn about a few data-aware components, such as `List` and `Table`.
+
+## The `data` property
+
+Each component in the framework (including the built-in and reusable components ) may have a `data` property. XMLUI specially handles this property:
+- First, it gets the property values; if it is an expression, it evaluates it.
+- If the property value is a string, the framework handles it as a URL and fetches the data from it. The retrieved data is passed to the component when the fetch is completed.
+- If the value is a `DataSource,` the framework fetches the data from that `DataSource` and passes it to the component when the fetch is completed.
+- In other cases, the value is passed to the component.
+
+As you learned, property changes trigger UI refresh, so when the `data` property's value gets the actual data, the UI is updated accordingly.
+
+### Using `data` with Explicit Value
+
+When you pass an explicit (non-string) value to the `data` property, the framework directly passes it to the component, which renders it.
+
+Here is a sample demonstrating this case:
+
+```ueml copy
+<App>
+  <List data="{['one', 'two', 'three']}">
+    <Card title="{$item}" />
+  </List>
+</App>  
+```
+
+This code passes an array of strings to `data`. A `List` component displays each item in `data` according to the template described by its children. The `$item` context value in the template represents the current item to display.
+
+<Playground
+  previewOnly
+  name="Example: Explicit data"
+  app={`
+    <App>
+      <List data="{['one', 'two', 'three']}">
+        <Card title="{$item}" />
+      </List>
+    </App>  
+  `}
+  height={240}
+/>
+
+### Using `data` with a valid URL
+
+When you pass a string value to `data`, XMLUI considers it a URL and fetches the data from it. When the fetch is complete, the UI is refreshed accordingly.
+
+```ueml copy
+<App>
+  <List data="https://api.spacexdata.com/v4/launchpads">
+    <Card title="{$item.name}" />
+  </List>
+</App>  
+```
+
+This markup uses the endpoint in `data` to fetch launchpad information from the SpaceX API.
+
+<Playground
+  previewOnly
+  name="Example: Data with a URL"
+  app={`
+    <App>
+      <List data="https://api.spacexdata.com/v4/launchpads">
+        <Card title="{$item.name}" />
+      </List>
+    </App>  
+  `}
+  height={240}
+/>
+
+### Using `data` with a non-functional URL
+
+When you use a string value in `data` but not a valid URL or the data fetch results in an error, the `data` is set to an empty value. The following example demonstrates this case:
+
+```ueml copy
+<App var.myData="{[]}">
+  <Button label="Fetch Data" onClick="myData = 'bla-bla-bla'" />
+  <List data="{myData}">
+    <Card title="{$item}" />
+  </List>
+</App>  
+```
+
+By default, the value passed to `data` is an empty list (the UI displays "No data available"); however, when you click the button that sets the `data` property to an invalid URL ("bla-bla-bla"), an error is raised while the framework fetches the data from that URL.
+
+<Playground
+  previewOnly
+  name="Example: Data with a non-functional URL"
+  app={`
+    <App var.myData="{[]}">
+      <Button label="Fetch Data" onClick="myData = 'bla-bla-bla'" />
+      <List data="{myData}">
+        <Card title="{$item}" />
+      </List>
+    </App>  
+  `}
+  height={180}
+/>
+
+<Callout type="info" emoji="📔">
+When you click the button again, the value of `data` does not change (it remains "bla-bla-bla"), so the framework does not trigger the fetch again.
+</Callout>
+
+### Using `data` with a `DataSource`
+
+You can bind the `data` property to a `DataSource` instance. Similarly to a single URL, `DataSource` fetches the data from that URL. However, when you need some additional configuration to issue a fetch request (for example, changing the `GET` method or adding some custom headers), `DataSource` provides that flexibility over a single string URL.
+
+```ueml copy /rocketsData/
+<App>
+  <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
+  <List data="{rocketsData}">
+    <Card title="{$item.rocket_name}" subtitle="{$item.success_rate_pct}%" />
+  </List>
+</App>  
+```
+
+You can refer to the `DataSource` instance with its identifier, `rocketsData`.
+
+<Playground
+  previewOnly
+  name="Example: Data with a URL"
+  app={`
+    <App>
+      <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" fetchDelay="{3000}" />
+      <List data="{rocketsData}">
+        <Card title="{$item.name}" subtitle="{$item.success_rate_pct}%" />
+      </List>
+    </App>  
+  `}
+  height={260}
+/>
+
 
 ## Fetching Data
 
@@ -31,7 +154,7 @@ This section will teach you how to access backend APIs through XMLUI components.
 </Callout>
 
 ```ueml copy
-<List data="https://api.spacexdata.com/v3/history">
+<List data="https://api.spacexdata.com/v4/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
   </property>  
@@ -58,7 +181,7 @@ Though using the `data source` property is extremely easy, there are situations 
 Let's repeat the `List` example using the `datasource` property earlier:
 
 ```ueml copy
-<List data="https://api.spacexdata.com/v3/history">
+<List data="https://api.spacexdata.com/v4/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
   </property>  
@@ -68,7 +191,7 @@ Let's repeat the `List` example using the `datasource` property earlier:
 You can describe the same operation with the `DataSource` component this way:
 
 ```ueml copy /DataSource/ /{spaceXData.value}/
-<DataSource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+<DataSource id="spaceXData" url="https://api.spacexdata.com/v4/history" />
 <List data="{spaceXData.value}">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
@@ -87,7 +210,7 @@ So far, using the `DataSource` component does not add any value over using the `
 **Example #1**: You can use the `inProgress` value of a `DataSource` to check if the fetch operation is going on. This following markup snippet displays progress text below the list while its data is being fetched.
 
 ```ueml copy /loading="spaceXData.inProgress"/
-<DataSource id="spaceXData" url="https://api.spacexdata.com/v3/history" />
+<DataSource id="spaceXData" url="https://api.spacexdata.com/v4/history" />
 <List data="{spaceXData.value}" />
 <Text when="{spaceXData.inProgress}">Data fetch is in progress</Text>
 ```
