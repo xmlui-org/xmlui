@@ -27,6 +27,7 @@ export const Header = () => {
     const data = {
       standalone: appDescription,
       options: {
+        swapped: options.swapped,
         previewMode: options.previewMode,
         orientation: options.orientation,
         activeTheme: options.activeTheme,

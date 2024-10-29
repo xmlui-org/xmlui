@@ -234,7 +234,16 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       }
       if (state.options.content === "config") {
         state.text = JSON.stringify(state.originalAppDescription.config, null, 2);
-      }
+      } else if (
+        state.appDescription.components
+            .map((c) => c.name.toLowerCase())
+            .includes(state.options.content?.toLowerCase())
+    ) {
+      state.text =
+          state.originalAppDescription.components.find(
+              (component: CompoundComponentDef) => component.name === state.options.content,
+          )?.component || "";
+    }
       break;
     }
     case PlaygroundActionKind.CONTENT_CHANGED: {
