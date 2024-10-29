@@ -3,11 +3,6 @@ import { THE_APP_COMPONENT } from "../../meta/pages.js";
 
 # Working with data
 
-<Callout type="warning" emoji="⚠️">
-  This article is about to be reviewed.
-  The article contents below are obsolete.
-</Callout>
-
 Real apps consume data. XMLUI provides a straightforward way to reach data from the backend and display them in the UI. It also lets you execute actions that change backend data.
 
 This section will teach you how to access backend APIs through XMLUI components. In addition to the data access techniques, you will learn about a few data-aware components, such as `List` and `Table`.
@@ -113,7 +108,7 @@ When you click the button again, the value of `data` does not change (it remains
 
 ### Using `data` with a `DataSource`
 
-You can bind the `data` property to a `DataSource` instance. Similarly to a single URL, `DataSource` fetches the data from that URL. However, when you need some additional configuration to issue a fetch request (for example, changing the `GET` method or adding some custom headers), `DataSource` provides that flexibility over a single string URL.
+You can bind the `data` property to a `DataSource` instance. Similarly to a single URL, `DataSource` fetches the data from that URL. 
 
 ```ueml copy /rocketsData/
 <App>
@@ -128,10 +123,10 @@ You can refer to the `DataSource` instance with its identifier, `rocketsData`.
 
 <Playground
   previewOnly
-  name="Example: Data with a URL"
+  name="Example: Using DataSource in Data"
   app={`
     <App>
-      <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" fetchDelay="{3000}" />
+      <DataSource id="rocketsData" url="https://api.spacexdata.com/v4/rockets" />
       <List data="{rocketsData}">
         <Card title="{$item.name}" subtitle="{$item.success_rate_pct}%" />
       </List>
@@ -140,35 +135,11 @@ You can refer to the `DataSource` instance with its identifier, `rocketsData`.
   height={260}
 />
 
+This sample has the same effect as using a URL in the `data` property. However, when you need additional configuration to issue a fetch request (for example, changing the `GET` method or adding some custom headers), `DataSource` provides that flexibility over a single string URL.
 
-## Fetching Data
+## Using `DataSource`
 
-<Callout type="info" emoji="💡">
-  Getting data from the backend is as easy as **specifying the URL** to invoke with a GET operation to fetch the data. **You do not need to initiate the fetch explicitly**; the framework will do it for you and manage the request-response protocol with all its bells and whistles.
-</Callout>
-
-### Using the `datasource` Property
-
-<Callout type="info" emoji="💡">
-  Data-aware components (like `List`) support a `datasource` property to specify a URL for a fetch operation. When the particular component needs to display its content, the framework fetches the data.
-</Callout>
-
-```ueml copy
-<List data="https://api.spacexdata.com/v4/history">
-  <property name="itemTemplate">
-    <Card title="{$item.title}" subtitle="{$item.details}"/>
-  </property>  
-</List>
-```
-
-In the above example, the `List` component fetches data from the SpaceX API and displays it using the `Card` component.
-
-The framework decides how it gets the data; **it is just there without any imperative code**. The code binds the properties of the retrieved data through the `$item` context value to the `Card` component.
-
-
-### Leveraging the DataSource Component
-
-Though using the `data source` property is extremely easy, there are situations when you need more control over the fetched data than just automatically getting it. Here are a few of them:
+Though using the `data` property is extremely easy, there are situations when you need more control over the fetched data than just automatically getting it. Here are a few of them:
 - You need to extract some part of the response and consider that part as the data you want to display.
 - You need to transform the data from the backend before displaying it.
 - You want to know that the data is being fetched to indicate that the fetch operation is in progress.
@@ -178,74 +149,152 @@ Though using the `data source` property is extremely easy, there are situations 
   The `DataSource` component provides **more control of the fetch operation** with its methods and state information.
 </Callout>
 
-Let's repeat the `List` example using the `datasource` property earlier:
+### Accessing the Data
+
+You can use `DataSource` with any component that does not handle data natively. The `value` property represents retrieved data when the fetch is complete.
+
+For example, the following component uses a public API to query and show registered brewery information for Los Angeles:
+
+```ueml copy /breweries.value.length/
+<App>
+  <DataSource id="breweries" url="https://api.openbrewerydb.org/breweries?by_city=Los%20Angeles" />
+  <H2>Number of registered open breweries in Los Angeles: {breweries.value.length}</H2>
+</App>  
+```
+
+This data query retrieves an array; thus, `breweries.value.length` represents the number of entries in the response.
+
+<Playground
+  previewOnly
+  name="Example: Using value"
+  app={`
+    <App>
+      <DataSource id="breweries" url="https://api.openbrewerydb.org/breweries?by_city=Los%20Angeles" />
+      <H2>Number of registered open breweries in Los Angeles: {breweries.value.length}</H2>
+    </App>  
+  `}
+  height={100}
+/>
+
+### Refreshing the data
+
+`DataSource` exposes a method, `refetch`, which you can use imperatively to re-query the data. The following markup demonstrates using it:
+
+```ueml copy /issData.refetch/
+<App>
+  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+  <DataSource id="quoteData" url="https://api.quotable.io/random" />
+  <H2>{quoteData.value.content}</H2>
+</App>  
+```
+
+This app uses a public API to obtain a random quote. Here, `quoteData.value` represents the data retrieved from the URL; the text displays the `content` field.
+
+<Playground
+  previewOnly
+  name="Example: Using refetch()"
+  app={`
+    <App>
+      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+      <DataSource id="quoteData" url="https://api.quotable.io/random" />
+      <H2>{quoteData.value.content}</H2>
+    </App>  
+  `}
+  height={180}
+/>
+
+### In-Progress State
+
+You can quickly determine if a data fetch operation is in progress. `DataSource` offers a property, `inProgress,` which indicates whether the data is currently being fetched. The following sample shows using this property:
+
+```ueml copy /when="{!issData.inProgress}"/ /when="{issData.inProgress}"/
+<App>
+  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+  <DataSource id="quoteData" url="https://api.quotable.io/random" />
+  <Text when="{quoteData.inProgress}">Loading...</Text>
+  <H2 when="{!quoteData.inProgress}">{quoteData.value.content}</H2>
+</App>  
+```
+
+The app displays a "Loading..." message during the fetch. When the data is obtained, the app displays the ISS coordinates. Check how the markup leverages components' `when` attributes to hide and show them.
+
+<Playground
+  previewOnly
+  name="Example: Testing whether data fetch is in progress"
+  app={`
+    <App>
+      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+      <DataSource id="quoteData" url="https://api.quotable.io/random" />
+      <Text when="{quoteData.inProgress}">Loading...</Text>
+      <H2 when="{!quoteData.inProgress}">{quoteData.value.content}</H2>
+    </App>  
+  `}
+  height={180}
+/>
+
+### Polling a DataSource
+
+Instead of manual polling, you can set a `DataSource` to use automatic, periodic polling. Use the `pollIntervalInSeconds` property as the following example shows:
 
 ```ueml copy
-<List data="https://api.spacexdata.com/v4/history">
-  <property name="itemTemplate">
-    <Card title="{$item.title}" subtitle="{$item.details}"/>
-  </property>  
-</List>
+<App>
+  <DataSource id="issData" url="http://api.open-notify.org/iss-now.json" 
+    pollIntervalInSeconds="2"/>
+  <H1>Polling ISS location every 2 seconds</H1>  
+  <H2>Latitude: {issData.value.iss_position.latitude}</H2>
+  <H2>Longitude: {issData.value.iss_position.longitude}</H2>
+</App>  
 ```
 
-You can describe the same operation with the `DataSource` component this way:
+This sample uses a public API to query the International Space Station's current coordinates. The code refreshes this data every two seconds.
 
-```ueml copy /DataSource/ /{spaceXData.value}/
-<DataSource id="spaceXData" url="https://api.spacexdata.com/v4/history" />
-<List data="{spaceXData.value}">
-  <property name="itemTemplate">
-    <Card title="{$item.title}" subtitle="{$item.details}"/>
-  </property>  
-</List>
+<Playground
+  previewOnly
+  name="Example: Automatic polling"
+  app={`
+    <App>
+      <DataSource id="issData" url="http://api.open-notify.org/iss-now.json" 
+        pollIntervalInSeconds="2"/>
+      <H1>Polling ISS location every 2 seconds</H1>  
+      <H2>Latitude: {issData.value.iss_position.latitude}</H2>
+      <H2>Longitude: {issData.value.iss_position.longitude}</H2>
+    </App>  
+  `}
+  height={180}
+/>
+
+### Binding Component Properties to DataSource
+
+### Binding Component Properties to DataSource
+
+When you bind a `DataSource` component instance to a property, XMLUI starts the data fetch and changes the component property as soon as the retrieval has been completed.
+
+The following sample demonstrates this scenario:
+
+```ueml copy /quoteData/
+<App>
+  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+  <DataSource id="quoteData" url="https://api.quotable.io/random" 
+  resultSelector="content"/>
+  <H2 value="{quoteData}" />
+</App>  
 ```
 
-<Callout type="info" emoji="💡">
-  XMLUI internally uses a similar representation for components with the `datasource` property.
-</Callout>
+Here, the `value` property of `H2` is set to the data retrieved by the `quoteData` data source.
 
-When the framework renders the component (it can be the app's main component) and processes `DataSource`, it initiates the fetch. When the data retrieval has been completed, the `spaceXData.value` expression changes, and this change updates the List's UI; the data appears.
-
-So far, using the `DataSource` component does not add any value over using the `data source` property. Moreover, the markup became more verbose. However, it allows other components more information and control about the data fetch. Let's see a few examples!
-
-**Example #1**: You can use the `inProgress` value of a `DataSource` to check if the fetch operation is going on. This following markup snippet displays progress text below the list while its data is being fetched.
-
-```ueml copy /loading="spaceXData.inProgress"/
-<DataSource id="spaceXData" url="https://api.spacexdata.com/v4/history" />
-<List data="{spaceXData.value}" />
-<Text when="{spaceXData.inProgress}">Data fetch is in progress</Text>
-```
-
-**Example #2**:This sample sets up request headers to fetch the data, for the backend API expects the header for its operation:
-
-```ueml /headers="{{ 'x-api-key': '0001' }}"/
-<DataSource 
-  id="groceriesWithHeaders" 
-  url="/api/shopping-list-headers" 
-  headers="{{ 'x-api-key': '0001' }}" />
-<List data="{groceriesWithHeaders.value}" />
-```
-
-**Example #3**: Let's assume an API endpoint retrieves data with this structure:
-
-```json
-{
-  "shoppingList": "<shopping list items>",
-  "meta": {
-    "totalItems": "<#of item in the shopping list>",
-  },
-}
-```
-
-We want to display only `shoppingItems` in the list, so we must extract it from the response:
-
-```ueml /shoppingList/
-<DataSource id="selectedGroceries" url="/api/shopping-list-meta" />
-<List data="{selectedGroceries.value.shoppingList}" />
-```
-
-<Callout>
-  Each of the `DataSource` and `List` (like other data-aware) components expose a `refresh` method that can be invoked to re-query the data. `DataSource` can be configured with a poll interval to periodically re-fetch the data.
-</Callout>
+<Playground
+  previewOnly
+  name="Example: Testing whether data fetch is in progress"
+  app={`
+    <App>
+      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
+      <DataSource id="quoteData" url="https://api.quotable.io/random" 
+      resultSelector="content"/>
+      <H2 value="{quoteData}" />
+    </App>  
+  `}
+  height={200}
+/>
 
 ## Persisting Data
 
@@ -266,26 +315,4 @@ Besides managing the request-response protocol, `APICall` provides a few UI serv
 - Other components may ask the APICall whether it is in progress.
 - You can define event handlers for handling successful/failed operations.
 
-<Callout>
-So far, we used `APICall` components within `<event>` tags to execute a particular action. However, this approach is perplexing. In the future, we will only allow event handlers with code.
-
-```ueml /submitForm/
-<APICall url="/api/server/settings" id="submitForm" />
-<Form onSubmit="submitForm.execute()">
-  <!-- Nested form items -->
-</Form>
-```
-
-We may implment this pattern too:
-
-```ueml /on="submit"/
-<APICall url="/api/server/settings" method="post" id="submitForm" />
-<Form>
-  <APICall 
-    url="/api/server/settings" 
-    method="post" 
-    on="submit" />
-  <!-- Nested form items -->
-</Form>
-```
-</Callout>
+_TODO: Add examples of APICall usage when API interceptor can be used with the documentation platform._
