@@ -57,8 +57,14 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
 
     if (appDescription.components.length > 0) {
       const components = zip.folder("components");
-      appDescription.components.forEach((component, index) => {
+      appDescription.components.forEach((component) => {
         components.file(`${component.name}.xmlui`, component.component);
+      });
+    }
+    if (appDescription.config.themes.length > 0) {
+      const components = zip.folder("themes");
+      appDescription.config.themes.forEach((theme) => {
+        components.file(`${theme.id}.json`, JSON.stringify(theme, null, 2));
       });
     }
     try {
