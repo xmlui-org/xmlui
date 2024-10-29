@@ -47,7 +47,8 @@ export type ErrorCodes =
   | "W027"
   | "W028"
   | "W029"
-  | "W030";
+  | "W030"
+  | "W031";
 
 // Error message type description
 type ErrorText = Record<string, string>;
@@ -84,4 +85,5 @@ export const errorMessages: ErrorText = {
   W028: "Invalid statement used in a module: '{0}'",
   W029: "An imported module can contain only exported functions",
   W030: "Nested declarations cannot be exported",
+  W031: "An identifier in a declaration cannot start with '$'"
 };
