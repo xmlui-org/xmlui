@@ -3,7 +3,7 @@ import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import { useToast } from "@/src/hooks/useToast";
 import {
-  appDescriptionInitialized,
+  appDescriptionInitialized, contentChanged,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
@@ -30,6 +30,7 @@ export const StandalonePlayground = () => {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         dispatch(appDescriptionInitialized(data.standalone));
         dispatch(optionsInitialized({ ...playgroundState.options, ...data.options }));
+        dispatch(contentChanged(data.options.content))
       } catch (e) {
         showToast({
           type: "error",
