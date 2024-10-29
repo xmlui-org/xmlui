@@ -62,7 +62,7 @@ export const Header = () => {
             <Tooltip
               trigger={
                 <button className={styles.button} onClick={() => dispatch(swapApp())}>
-                  {options.orientation === "vertical" ? <MdSwapHoriz /> : <MdSwapVert />}
+                  {options.orientation === "horizontal" ? <MdSwapHoriz /> : <MdSwapVert />}
                 </button>
               }
               label="Swap editor and preview"
