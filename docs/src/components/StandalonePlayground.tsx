@@ -68,7 +68,7 @@ export const StandalonePlayground = () => {
       <PlaygroundContext.Provider value={playgroundContextValue}>
         <ErrorBoundary>
           <div className={styles.standalonePlayground}>
-            {!playgroundState.options.previewMode && <Header />}
+            {!playgroundState.options.previewMode && <Header standalone={true}/>}
             <div style={{ flexGrow: 1, overflow: "auto" }}>
               <PlaygroundContent standalone={true} />
             </div>

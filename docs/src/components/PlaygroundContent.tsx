@@ -27,20 +27,24 @@ export const PlaygroundContent = ({
       })}
       style={{ height }}
     >
-      {options.previewMode && status === "loaded" ? (
-        <Preview />
-      ) : (
-        <Splitter
-          orientation={options.orientation}
-          swapped={options.swapped}
-          initialPrimarySize={initialPrimarySize}
-        >
-          <Editor />
-          <div style={{height: "100%", overflow: "hidden"}}>
-            {status === "loaded" && <Preview />}
-          </div>
-        </Splitter>
-      )}
+      {
+        standalone ? (
+            options.previewMode && status === "loaded" ? (
+                <Preview />
+            ) : (
+                <Splitter
+                    orientation={options.orientation}
+                    swapped={options.swapped}
+                    initialPrimarySize={initialPrimarySize}
+                >
+                  <Editor />
+                  <div style={{height: "100%", overflow: "hidden"}}>
+                    {status === "loaded" && <Preview />}
+                  </div>
+                </Splitter>
+            )
+        ) :  <Preview />
+      }
     </div>
   );
 };
