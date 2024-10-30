@@ -394,6 +394,7 @@ function RootContentComponent({
       apiInterceptorContext,
       setTheme: setActiveThemeId,
       setTone: setActiveThemeTone,
+      toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light"),
     };
     return ret;
   }, [
