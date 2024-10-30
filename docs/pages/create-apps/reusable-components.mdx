@@ -11,7 +11,7 @@ This article will teach you the gritty-nitty details of component creation and c
 ## Defining Reusable Components
 
 <Callout type="info" emoji="💡">
-  Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component. 
+  Use the `<Component>` tag to declare a reusable component in the markup. This tag has a mandatory attribute, `name`, a unique identifier to the component.
 </Callout>
 
 ```ueml copy filename="components/LabeledValue.xmlui"
@@ -36,7 +36,6 @@ You can immediately use the new component type, `LabeledValue`, putting it into 
 The XMLUI engine displays all `LabeledValue` component instances:
 
 <Playground
-    previewOnly
     name="LabeledText"
     components={[`
       <Component name="LabeledValue">
@@ -94,7 +93,6 @@ Use the same markup to pass property values to reusable components as you do for
 ```
 
 <Playground
-    previewOnly
     name="LabeledText with properties"
     components={[`
       <Component name="LabeledValue">
@@ -127,7 +125,6 @@ Sometimes, it is helpful to have default values for properties. XMLUI makes it s
 ```
 
 <Playground
-    previewOnly
     name="LabeledText with default property values"
     components={[`
       <Component name="LabeledValue">
@@ -157,8 +154,8 @@ Create a new reusable component, `<IncButton>`, which increments its value for e
 
 ```ueml copy {4}
 <Component name="IncButton">
-  <Button 
-    label="Click to increment: {count}" var.count="{0}" 
+  <Button
+    label="Click to increment: {count}" var.count="{0}"
     onClick="count++; emitEvent('incremented', count)" />
 </Component>
 ```
@@ -177,12 +174,11 @@ The following app uses the new event to append the number of clicks to a text. T
 Try using `<IncButton>` with the `incremented` event:
 
 <Playground
-    previewOnly
     name="IncButton with an event"
     components={[`
       <Component name="IncButton">
-        <Button 
-          label="Click to increment: {count}" var.count="{0}" 
+        <Button
+          label="Click to increment: {count}" var.count="{0}"
           onClick="count++; emitEvent('incremented', count)" />
       </Component>
     `]}
@@ -198,17 +194,17 @@ Try using `<IncButton>` with the `incremented` event:
 ## Exposing Component Methods [#exposing-methods]
 
 <Callout type="info" emoji="💡">
-  In addition to properties and events, you can expose custom methods from a particular component. 
+  In addition to properties and events, you can expose custom methods from a particular component.
 </Callout>
 
 You can invoke these methods in other components to execute an operation or query some information in the exposing component.
 
 The following code snippet shows a modified `<IncButton>` component that exposes a method, `setValue`, to set the button's counter value from outside the component:
 
-```ueml copy {4} 
-<Component 
-  name="IncButton" 
-  var.count="{0}" 
+```ueml copy {4}
+<Component
+  name="IncButton"
+  var.count="{0}"
   method.setValue="v => count = v">
   <Button label="Click to increment: {count}" onClick="count++" />
 </Component>
@@ -226,8 +222,8 @@ The following app adds a second button to set the current value of `<IncButton>`
 <App>
   <HStack>
     <IncButton id="myIncButton" />
-    <Button 
-      label="Set count to 123!" 
+    <Button
+      label="Set count to 123!"
       onClick="myIncButton.setValue(123)" />
   </HStack>
 </App>
@@ -237,7 +233,6 @@ The click event handler (`onClick`) of the second button uses the `myIncButton.s
 Try using this simple app:
 
 <Playground
-    previewOnly
     name="IncButton with an exposed method"
     components={[`
       <Component name="IncButton" var.count="{0}" method.setValue="v => count = v">
@@ -258,7 +253,7 @@ Try using this simple app:
 ## `<Slot>`
 
 <Callout type="info" emoji="💡">
-  You can use the `Slot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected. 
+  You can use the `Slot` placeholder within a reusable component's definition to mark the location when the reusable component's children should be injected.
 </Callout>
 
 Here, `Slot` is nested into `VStack` to mark the location to inject `MyStack` children:
@@ -287,7 +282,7 @@ This sample injects children into `MyStack`:
 `MyStack` puts the children into the location designated by `Slot`:
 
 <Playground
-    previewOnly={true}
+
     name="Example: Using Slot"
     horizontal={true}
     height={200}
@@ -317,7 +312,7 @@ _TODO: Now that we allow named slots for reusable components with template prope
 ## Reusable Components in Layout Containers
 
 <Callout type="info" emoji="💡">
-  When the engine renders a reusable component in a particular layout container, the rendered component **accommodates its container's layout context**. 
+  When the engine renders a reusable component in a particular layout container, the rendered component **accommodates its container's layout context**.
 </Callout>
 
 Let's create a reusable component, `MyBoxes`, with this markup:
@@ -331,7 +326,7 @@ Let's create a reusable component, `MyBoxes`, with this markup:
 
 `MyBoxes` displays two boxes with different sizes and background color settings. This declaration does not specify how these two boxes should relate to each other; it only says the orange box follows the purple box.
 
-Nest `MyBoxes` instances into an `HStack`: 
+Nest `MyBoxes` instances into an `HStack`:
 
 ```ueml copy
 <App>
@@ -345,7 +340,7 @@ Nest `MyBoxes` instances into an `HStack`:
 It results in this output:
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a HStack"
     horizontal={true}
     height={100}
@@ -380,7 +375,7 @@ Now, use a `VStack`:
 The previous output changes to this:
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a VStack"
     horizontal={true}
     height={260}
@@ -413,7 +408,7 @@ Using a `FlowLayout` wrapper results in a third display:
 ```
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in FlowLayout"
     horizontal={true}
     height={230}
@@ -450,7 +445,7 @@ Each layout container uses its strategy to render the nested children. Though a 
 ```
 
 <Playground
-    previewOnly={true}
+
     name="Example: flattening MyBoxes in an HStack"
     horizontal={true}
     height={100}
@@ -466,7 +461,7 @@ Each layout container uses its strategy to render the nested children. Though a 
   `}
 />
 
-The same flattening happens with a `VStack`. 
+The same flattening happens with a `VStack`.
 
 However, the `FlowLayout` container does not flatten the children. It keeps the two `MyBoxes` instances as separate entities.
 
@@ -490,7 +485,7 @@ Use an explicit layout container within the component definition to avoid child 
 Now, the output is different. You see this with an `HStack`:
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a HStack (explicit layout)"
     horizontal={true}
     height={100}
@@ -516,7 +511,7 @@ Now, the output is different. You see this with an `HStack`:
 With a `VStack`, this is the output:
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a VStack (explicit layout)"
     horizontal={true}
     height={160}
@@ -542,7 +537,7 @@ With a `VStack`, this is the output:
 The display with a `FlowLayout`:
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a FlowLayout (explicit layout)"
     horizontal={true}
     height={160}
@@ -579,7 +574,7 @@ Because `MyBoxes` does not use an explicit component width, nesting them into a 
 ```
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a HStack (explicit width)"
     horizontal={true}
     height={100}
@@ -603,7 +598,7 @@ Because `MyBoxes` does not use an explicit component width, nesting them into a 
 />
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a VStack (explicit width)"
     horizontal={true}
     height={160}
@@ -629,7 +624,7 @@ Because `MyBoxes` does not use an explicit component width, nesting them into a 
 _We have a bug in FlowLayout; it should respect the "180px" width value, but it does not. TODO: Check the sample after fixing the bug._
 
 <Playground
-    previewOnly={true}
+
     name="Example: MyBoxes in a FlowLayout (explicit width)"
     horizontal={true}
     height={160}

@@ -33,7 +33,6 @@ This article goes into the nitty-gritty details of working with text components.
 ```
 
 <Playground
-  previewOnly
   name="Implicit text"
   horizontal
   app={`
@@ -63,7 +62,6 @@ The following example shows how you can use the `Text` component:
 ```
 
 <Playground
-  previewOnly
   name="Explicit text"
   horizontal
   app={`
@@ -90,7 +88,6 @@ Besides the `Text` component, other components rendering text do so with custom 
 ```
 
 <Playground
-  previewOnly
   name="Explicit text with Headings"
   horizontal
   app={`
@@ -123,7 +120,6 @@ In the following example, all text-related components use their corresponding pr
 ```
 
 <Playground
-  previewOnly
   name="Using Properties for Text Contents"
   horizontal
   app={`
@@ -163,7 +159,6 @@ Whitespace collapsing is a helpful feature. The following code shows how this fe
 ```
 
 <Playground
-    previewOnly
     name="HTML Whitespace Collapsing"
     horizontal
     app={`
@@ -195,7 +190,6 @@ The following sample demonstrates the differences between the two ways of specif
 ```
 
 <Playground
-  previewOnly
   name="Properties versus Nested text"
   horizontal
   app={`
@@ -224,12 +218,11 @@ See this in action in the following example:
 ```
 
 <Playground
-  previewOnly
   name="Vertical Stack (by default)"
   horizontal
   app={`
     <App>
-      <var name="myValue" 
+      <var name="myValue"
         value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
       <H3 value="{myValue}" />
       <H3>{myValue}</H3>
@@ -262,7 +255,6 @@ In the following sample, `HStack` uses an inline context, so text segments rende
 ```
 
 <Playground
-  previewOnly
   name="Text Rendering in Inline Context"
   horizontal
   app={`
@@ -290,7 +282,6 @@ So, the engine renders text segments as blocks in new lines:
 ```
 
 <Playground
-  previewOnly
   name="Text Rendering in Block Context"
   horizontal
   app={`
@@ -319,7 +310,6 @@ They behave the same way as the `&nbsp;` HTML entity.
 ```
 
 <Playground
-  previewOnly
   name="Rendering Non-Breakable Spaces"
   horizontal
   app={`
@@ -345,7 +335,6 @@ By default, a long text breaks into multiple lines (understanding word boundarie
 ```
 
 <Playground
-  previewOnly
   name="Example: Rendering Long Text #1"
   horizontal
   app={`
@@ -368,7 +357,6 @@ With very long words, where word boundaries do not work, the text is broken with
 ```
 
 <Playground
-  previewOnly
   name="Example: Rendering Long Text #2"
   horizontal
   app={`
@@ -389,8 +377,8 @@ With very long words, where word boundaries do not work, the text is broken with
 
 ```ueml copy {5}
 <App>
-  <Text 
-    width="200" 
+  <Text
+    width="200"
     backgroundColor="goldenrod"
     maxLines="1">
     Though this long text does not fit into a single line, please do not break it!
@@ -399,13 +387,12 @@ With very long words, where word boundaries do not work, the text is broken with
 ```
 
 <Playground
-  previewOnly
   name="Example: Avoid Breaking Long Text"
   horizontal
   app={`
     <App>
-      <Text 
-        width="200" 
+      <Text
+        width="200"
         backgroundColor="goldenrod"
         maxLines="1">
         Though this long text does not fit into a single line, please do not break it!
@@ -420,8 +407,8 @@ With very long words, where word boundaries do not work, the text is broken with
 
 ```ueml copy {6}
 <App>
-  <Text 
-    width="200" 
+  <Text
+    width="200"
     backgroundColor="goldenrod"
     maxLines="1"
     ellipses="false">
@@ -431,13 +418,12 @@ With very long words, where word boundaries do not work, the text is broken with
 ```
 
 <Playground
-  previewOnly
   name="Example: No Ellipses"
   horizontal
   app={`
     <App>
-      <Text 
-        width="200" 
+      <Text
+        width="200"
         backgroundColor="goldenrod"
         maxLines="1"
         ellipses="false">
@@ -468,7 +454,6 @@ Otherwise, it will be cropped at the maximum specified. For example, the followi
 ```
 
 <Playground
-  previewOnly
   name="Example: Limiting the Number of Lines"
   horizontal
   app={`
@@ -513,7 +498,6 @@ with several line breaks
 Observe the effect of using `preserveLinebreaks`:
 
 <Playground
-    previewOnly
     name="Example: Preserve Linebreaks"
     horizontal
     app={`
@@ -562,7 +546,6 @@ This behavior is not a design flaw or a bug; it is intentional.
 By perceiving the overflow, you can decide how to handle it.
 
 <Playground
-  previewOnly
   name="Example: Text Overflow"
   horizontal
   app={`
@@ -602,7 +585,6 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 ```
 
 <Playground
-  previewOnly
   name="Example: Hiding Text Overflow"
   horizontal
   app={`
@@ -627,7 +609,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 
 ```ueml copy {2}
 <App>
-  <VStack 
+  <VStack
     verticalOverflow="scroll"
     width="200" height="60" backgroundColor="goldenrod">
     <Text>
@@ -639,12 +621,11 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 ```
 
 <Playground
-  previewOnly
   name="Example: Scrolling the Text"
   horizontal
   app={`
     <App>
-      <VStack 
+      <VStack
         verticalOverflow="scroll"
         width="200" height="60" backgroundColor="goldenrod">
         <Text>
@@ -680,7 +661,6 @@ The text accommodates the available space of the container if not specified othe
 Behind the semi-transparent background of the text, you can see its container in a blueish shade:
 
 <Playground
-  previewOnly
   name="Example: Explicit Text Dimensions"
   horizontal
   app={`
@@ -711,9 +691,9 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
     horizontalOverflow="scroll"
     height="60" width="300" backgroundColor="goldenrod">
     <Text width="400" backgroundColor="silver" opacity="0.7">
-      This text sets its size explicitly bigger than its container. 
+      This text sets its size explicitly bigger than its container.
       As it does not fit into the container, it overflows.
-      However, its container supports horizontal scrolling so you can 
+      However, its container supports horizontal scrolling so you can
       see its content.
     </Text>
   </VStack>
@@ -725,7 +705,6 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
 </Callout>
 
 <Playground
-  previewOnly
   name="Example: Scrolling the Text Horizontally"
   horizontal
   app={`
@@ -734,9 +713,9 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
         horizontalOverflow="scroll"
         height="60" width="300" backgroundColor="goldenrod">
         <Text width="400" backgroundColor="silver" opacity="0.7">
-          This text sets its size explicitly bigger than its container. 
+          This text sets its size explicitly bigger than its container.
           As it does not fit into the container, it overflows.
-          However, its container supports horizontal scrolling so you can 
+          However, its container supports horizontal scrolling so you can
           see its content.
         </Text>
       </VStack>
@@ -759,7 +738,6 @@ See some of these styles below:
 
 <Playground
   name="Example: Text Variants"
-  previewOnly
   app={`
     <App>
       <HStack>
@@ -860,22 +838,21 @@ The `level` property to sets the level of a heading:
 See all heading levels compared to regular text:
 
 <Playground
-  previewOnly
   name="Example: Headings with Levels"
   app={`
   <App>
     <Heading level="h1" value="Heading Level 1" />
-    <Text>Text following H1</Text>    
+    <Text>Text following H1</Text>
     <Heading level="h2" value="Heading Level 2" />
-    <Text>Text following H2</Text>    
+    <Text>Text following H2</Text>
     <Heading level="h3" value="Heading Level 3" />
-    <Text>Text following H3</Text>    
+    <Text>Text following H3</Text>
     <Heading level="h4" value="Heading Level 4" />
-    <Text>Text following H4</Text>    
+    <Text>Text following H4</Text>
     <Heading level="h5" value="Heading Level 5" />
-    <Text>Text following H5</Text>    
+    <Text>Text following H5</Text>
     <Heading level="h6" value="Heading Level 6" />
-    <Text>Text following H6</Text>    
+    <Text>Text following H6</Text>
   </App>
   `}
 />
@@ -895,7 +872,6 @@ See more in the <SmartLink href={COMPONENT_HEADING}>Heading component reference<
 ```
 
 <Playground
-  previewOnly
   name="Example: Specialized Headings"
   app={`
   <App>
@@ -938,7 +914,6 @@ The example below shows all supported markdown syntax elements:
 
 <Playground
   height={500}
-  previewOnly
   horizontal
   name="Example: Using Markdown"
   app={`
@@ -1000,7 +975,7 @@ In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
 ***
     ]]>
   </Markdown>
-</App>  
+</App>
   `}
 />
 

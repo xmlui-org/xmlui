@@ -28,8 +28,8 @@ export function Preview() {
       );
     }
     const compoundComponents: CompoundComponentDef[] = appDescription.components.map(
-      (src: string) => {
-        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src);
+      (src: {name: string, component: string}) => {
+        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src.component);
         if (errors.length > 0) {
           return errReportComponent(errors, "somewhere in preview", erroneousCompoundComponentName);
         }

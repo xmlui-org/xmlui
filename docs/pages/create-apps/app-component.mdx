@@ -14,12 +14,11 @@ import { COMPONENT_APP, COMPONENT_APPHEADER, COMPONENT_FOOTER, COMPONENT_NAVPANE
 
 You can use any component as your app's root. For example, you can display a simple text with this markup:
 
-```ueml copy 
+```ueml copy
 <Text>Hello from XMLUI!</Text>
 ```
 
 <Playground
-    previewOnly={true}
     name="Example: Text as the root component"
     height={60}
     app={`
@@ -31,7 +30,7 @@ You can use any component as your app's root. For example, you can display a sim
 Nonetheless, we suggest you create an app using XMLUI's `App` component as the root.
 
 <Callout type="info" emoji="💡">
-The **`App` component** gives you a flying start when creating a new application. 
+The **`App` component** gives you a flying start when creating a new application.
 </Callout>
 
 With `App`, your application immediately has a boilerplate for its essential UI parts, including headers, navigation, content, and others.
@@ -79,7 +78,6 @@ You can use these placeholder components:
 When all placeholders are empty (like in the previous sample markup), `App` renders an empty header and an empty main content section below the empty header:
 
 <Playground
-    previewOnly={true}
     name="Example: App with empty layout elements"
     height={150}
     app={`
@@ -112,7 +110,6 @@ You can set the application logo using the `logo` property of `App`:
 When the engine finds a logo in the app's manifest, it displays it in its header. So, the previous markup displays this UI after setting the logo resource:
 
 <Playground
-    previewOnly={true}
     name="Example: App with empty layout elements and logo"
     resources={{ logo: xmluiLogo }}
     height={150}
@@ -154,7 +151,6 @@ Look at this example:
 This markup declares only a footer placeholder. The `<H1>` and `<H3>` components represent the main content. XMLUI renders this app, putting the main content and the footer in their expected place:
 
 <Playground
-  previewOnly={true}
   name="Example: App with content outside of placeholders"
   height={240}
   app={`
@@ -220,7 +216,6 @@ XMLUI supports several layouts that organize the app's navigation sections (head
 The navigation panel displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
 
 <Playground
-  previewOnly={true}
   name="Example: 'horizontal' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -232,7 +227,6 @@ The navigation panel displays the items horizontally. When you scroll the conten
 The navigation panel displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
 
 <Playground
-  previewOnly={true}
   name="Example: 'horizontal-sticky' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -244,7 +238,6 @@ The navigation panel displays the items horizontally. When you scroll the conten
 The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, all layout sections scroll with the app.
 
 <Playground
-  previewOnly={true}
   name="Example: 'condensed' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -256,7 +249,6 @@ The app header is merged with the navigation panel, which displays the items hor
 The app header is merged with the navigation panel, which displays the items horizontally. When you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
 
 <Playground
-  previewOnly={true}
   name="Example: 'condensed-sticky' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -283,7 +275,6 @@ The following vertical layout examples use the same markup as the horizontal one
 Here, the app logo and the menu are docked to the left. On the right, the header, the main content, and the footer scroll with the app. Observe the empty app header! Now, the logo is moved to above the navigation panel.
 
 <Playground
-  previewOnly={true}
   name="Example: 'vertical' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -295,7 +286,6 @@ Here, the app logo and the menu are docked to the left. On the right, the header
 This layout is similar to the previous (`horizontal`) one. However, the app header sticks to the top of the main content (to the right), while the footer docks to the bottom.
 
 <Playground
-  previewOnly={true}
   name="Example: 'vertical-sticky' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -307,7 +297,6 @@ This layout is similar to the previous (`horizontal`) one. However, the app head
 This layout docks the app header to the top and the footer to the bottom. The navigation panel and the main content share the remaining area. When you scroll, only the main content moves; the other sections stick to the app's window.
 
 <Playground
-  previewOnly={true}
   name="Example: 'vertical-full-header' layout"
   height={350}
   resources={{ logo: xmluiLogo }}
@@ -342,7 +331,6 @@ When the `App` does not contain an `AppHeader` placeholder, the app does not dis
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: No AppHeader"
   height={200}
   app={`
@@ -370,7 +358,6 @@ If the `App` contains an `AppHeader` empty placeholder, it displays an empty hea
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Empty AppHeader"
   height={200}
   app={`
@@ -399,7 +386,6 @@ If the `App` contains an empty `AppHeader` placeholder but defines a logo, the h
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Empty AppHeader"
   height={200}
   resources={{ logo: xmluiLogo }}
@@ -433,7 +419,6 @@ When the `AppHeader` section contains a definition, the `App` component displays
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Explicit AppHeader"
   height={200}
   app={`
@@ -459,11 +444,11 @@ You can display a logo in the app's header. There are several ways to define the
 
 The `App` Component has these properties to define a logo resource:
 - `logo`: the URI of the logo relative to the app's root folder
-- `logo-dark`: the URI of the logo to be used when the current theme uses a dark tone. This property overrides - `logo` when the dark tone is active. 
+- `logo-dark`: the URI of the logo to be used when the current theme uses a dark tone. This property overrides - `logo` when the dark tone is active.
 - `logo-light`: the URI of the logo to be used with a light tone. This property overrides `logo` when the dark tone is active.
 
 ```ueml copy {3-4}
-<App 
+<App
   layout="condensed"
   logo="resources/logo.svg"
   logo-dark="resources/logo-dark.svg">
@@ -475,7 +460,6 @@ The `App` Component has these properties to define a logo resource:
 This app uses a light tone:
 
 <Playground
-  previewOnly={true}
   name="Example: Logo specified in the App component (light tone)"
   height={150}
   resources={{ logo: xmluiLogo }}
@@ -490,7 +474,6 @@ This app uses a light tone:
 The logo is different when a dark tone is used:
 
 <Playground
-  previewOnly={true}
   name="Example: Logo specified in the App component (dark tone)"
   height={150}
   resources={{ logo: xmluiLogoDark }}
@@ -510,7 +493,7 @@ The logo is different when a dark tone is used:
 You can set app logos through the `config.json` file in the app's root folder too.
 </Callout>
 
-Instead of using the `App` components `logo`, `logo-dark`, and `logo-light` properties, you can set these resource URIs in the app's optional configuration file. 
+Instead of using the `App` components `logo`, `logo-dark`, and `logo-light` properties, you can set these resource URIs in the app's optional configuration file.
 
 The following entries in `config.json` display the same logo as the examples in the previous section.
 
@@ -531,7 +514,7 @@ Though your app contains a logo definition, you can prevent it from displaying i
 </Callout>
 
 ```ueml copy /showLogo="false"/
-<App 
+<App
   layout="condensed"
   logo="resources/logo.svg"
   logo-dark="resources/logo-dark.svg">
@@ -541,7 +524,6 @@ Though your app contains a logo definition, you can prevent it from displaying i
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Hiding the Logo"
   height={200}
   resources={{ logo: xmluiLogo }}
@@ -562,7 +544,7 @@ You can show the app's logo not only in the header but in other parts of the app
 The following example turns off the logo in the header and displays it in the main content:
 
 ```ueml {11} copy
-<App 
+<App
   layout="condensed"
   logo="resources/logo.svg"
   logo-dark="resources/logo-dark.svg">
@@ -580,7 +562,6 @@ The following example turns off the logo in the header and displays it in the ma
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Using logo in placeholders"
   height={280}
   resources={{ logo: xmluiLogo }}
@@ -626,7 +607,6 @@ The `AppHeader` component placeholder has a property, `logoTemplate`, which you 
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Custom Logo"
   height={200}
   resources={{ logo: xmluiLogo }}
@@ -671,12 +651,11 @@ The links and the targets are bound through URLs. When the user selects a naviga
     <Page url="/flights">Flights Page</Page>
     <Page url="/hotels">Hotels Page</Page>
     <Page url="/cars/:id">Car Rentals Page {$routeParams.id}</Page>
-  </Pages>  
+  </Pages>
 </App>
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Navigation"
   height={250}
   app={`
@@ -693,7 +672,7 @@ The links and the targets are bound through URLs. When the user selects a naviga
         <Page url="/flights">Flights Page</Page>
         <Page url="/hotels">Hotels Page</Page>
         <Page url="/cars/:id">Car Rentals Page {$routeParams.id}</Page>
-      </Pages>  
+      </Pages>
     </App>
   `}
 />
@@ -725,7 +704,6 @@ Here is an example:
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Footer"
   height={200}
   app={`

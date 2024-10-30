@@ -6,20 +6,19 @@ The following sample demonstrates using this property. Every time the user click
 <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
   <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
   <ChangeListener
-    listenTo="{list.length}" 
+    listenTo="{list.length}"
     onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
   <Text>{toDisplay.toFixed(4)}</Text>
 </VStack>
 ```
 
 <Playground
-    previewOnly
     name="Example: listenTo"
     app={`
     <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}">
       <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
       <ChangeListener
-        listenTo="{list.length}" 
+        listenTo="{list.length}"
         onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
       <Text>{toDisplay.toFixed(4)}</Text>
     </VStack>
@@ -39,7 +38,7 @@ The following example works like the previous one (in the `listen` prop's descri
     <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
     <Button label="Reset throttling" onClick="throttle = 0" />
     <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
-  </HStack> 
+  </HStack>
   <ChangeListener
     listenTo="{list.length}"
     throttleWaitInMs="{throttle}"
@@ -48,7 +47,6 @@ The following example works like the previous one (in the `listen` prop's descri
 </VStack>
 ```
 <Playground
-    previewOnly
     name="Example: listenTo"
     app={`
     <VStack padding="1rem" gap="0.5rem" var.list="{[]}" var.toDisplay="{0}" var.throttle="{0}">
@@ -56,7 +54,7 @@ The following example works like the previous one (in the `listen` prop's descri
         <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
         <Button label="Reset throttling" onClick="throttle = 0" />
         <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
-      </HStack> 
+      </HStack>
       <ChangeListener
         listenTo="{list.length}"
         throttleWaitInMs="{throttle}"

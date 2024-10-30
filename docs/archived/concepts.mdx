@@ -79,7 +79,7 @@ When the user clicks this button, the app will pop up a toast with the ID held b
 <Text>Value in the textbox: {myText.value}</Text>
 ```
 
-As the user types in the textbox, the text value is displayed in the `Text` component beneath it. 
+As the user types in the textbox, the text value is displayed in the `Text` component beneath it.
 
 ```ueml /id=myText/
 <List id="accountsList" />
@@ -112,7 +112,7 @@ The "Use lossless compression" checkbox is visible only when the "Use compressio
 <List data="https://api.spacexdata.com/v3/history">
   <property name="itemTemplate">
     <Card title="{$item.title}" subtitle="{$item.details}"/>
-  </property>  
+  </property>
 </List>
 ```
 
@@ -143,7 +143,7 @@ The `List` component fetches data from the specified URL (an array of items). Wi
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
 ```ueml copy filename="Main.xmlui (markup)" /calcButton/
-<Button id="calcButton" 
+<Button id="calcButton"
   label="Calculate delay" />
 
 
@@ -169,8 +169,8 @@ The button's ID is `calcButton`. The framework observes the `calcButton_onClick`
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
 ```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Calculate delay" 
+<Button
+  label="Calculate delay"
   onClick="handleOnClick()" />
 
 ```
@@ -218,11 +218,11 @@ The button is the `Main.xmlui` file utilizes the `handleOnClick` function declar
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
 ```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Click to increment!" 
+<Button
+  label="Click to increment!"
   onClick="count++" />
-<Text>Click count: {count}</Text>  
-<Text>Click count * 3: {countTimes3}</Text>  
+<Text>Click count: {count}</Text>
+<Text>Click count * 3: {countTimes3}</Text>
 ```
   </div>
   <div style={{width: "50%", paddingLeft: "0.25rem"}}>
@@ -246,10 +246,10 @@ You can use **local variables** within (and only within) function declarations. 
 <div style={{display: "flex", flexDirection: "row"}}>
   <div style={{width: "50%", paddingRight: "0.25rem"}}>
 ```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-<Button 
-  label="Calculate the sum of 1 to 10" 
+<Button
+  label="Calculate the sum of 1 to 10"
   onClick="calculate()" />
-<Text>Result: {sum}</Text>  
+<Text>Result: {sum}</Text>
 ```
   </div>
   <div style={{width: "50%", paddingLeft: "0.25rem"}}>
@@ -262,12 +262,12 @@ function calculate() {
   </div>
 </div>
 
-The calculate function uses the local variable `i` and stores the sum of values in the `sum` reactive variable. 
+The calculate function uses the local variable `i` and stores the sum of values in the `sum` reactive variable.
 
 ## Component composition
 
 <Callout type="info" emoji="💡">
-  Components may have properties that accept other component definitions (markup) as their value. We call them **template properties**. 
+  Components may have properties that accept other component definitions (markup) as their value. We call them **template properties**.
 </Callout>
 
 ```ueml copy {2-4} /property name="itemTemplate"/
@@ -325,24 +325,22 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
 </Callout>
 
 <Playground
-  previewOnly
   name="The default XMLUI theme (light)"
   app={`
     <Theme tone="light" themeId="xmlui">
       <ThemeGallery />
-    </Theme>  
+    </Theme>
   `}
   components={[themeGallery]}
   height={272}
 />
 
 <Playground
-  previewOnly
   name="The default XMLUI theme (dark)"
   app={`
     <Theme tone="dark" themeId="xmlui">
       <ThemeGallery />
-    </Theme>  
+    </Theme>
   `}
   components={[themeGallery]}
   height={272}
@@ -365,7 +363,6 @@ In the markup above, `$item` in `<Text variant="mono">{$item}</Text>` is a conte
 These modifications set the primary theme color to purplish and add a bigger corner radius to the input (and only to the input) components. Check the hover effect of the "outlined/primary" button in light and dark themes!
 
 <Playground
-  previewOnly
   name="Modified theme (light)"
   defaultTheme="myCustomTheme"
   themes={[
@@ -388,7 +385,6 @@ These modifications set the primary theme color to purplish and add a bigger cor
 />
 
 <Playground
-  previewOnly
   name="Modified theme (dark)"
   defaultTheme="myCustomTheme"
   themes={[
@@ -411,27 +407,26 @@ These modifications set the primary theme color to purplish and add a bigger cor
 />
 
 <Callout type="info" emoji="💡">
-  You can use dozens of **inline layout properties** with components such as setting component dimensions, colors, typography, etc. 
+  You can use dozens of **inline layout properties** with components such as setting component dimensions, colors, typography, etc.
 </Callout>
 
 ```ueml copy {3-7}
-<Button 
-  label="My custom style" 
-  color="yellow" 
-  fontFamily="serif" 
+<Button
+  label="My custom style"
+  color="yellow"
+  fontFamily="serif"
   fontSize="3em"
   horizontalPadding="5rem"
   radius="3rem" />
 ```
 
 <Playground
-  previewOnly
   name="Adding layout properties to a Button"
   app={`
-    <Button 
-      label="My custom style" 
-      color="yellow" 
-      fontFamily="serif" 
+    <Button
+      label="My custom style"
+      color="yellow"
+      fontFamily="serif"
       fontSize="3em"
       horizontalPadding="5rem"
       radius="3rem" />
@@ -447,7 +442,7 @@ These modifications set the primary theme color to purplish and add a bigger cor
 ## Deployment
 
 <Callout type="info" emoji="💡">
-  XMLUI apps have a **simple folder structure**. The app's root folder contains the `index.html` file that loads the framework as a single JavaScript file. The `Main.xmlui` (in the root) is the app's primary markup file. Other folders, like `components`, `resources`, and `themes`, contain simple markup and resource files. 
+  XMLUI apps have a **simple folder structure**. The app's root folder contains the `index.html` file that loads the framework as a single JavaScript file. The `Main.xmlui` (in the root) is the app's primary markup file. Other folders, like `components`, `resources`, and `themes`, contain simple markup and resource files.
 </Callout>
 
 <Callout type="info" emoji="💡">
@@ -455,5 +450,5 @@ These modifications set the primary theme color to purplish and add a bigger cor
 </Callout>
 
 <Callout emoji="💡">
-  **You do not need to build an app**. However, the framework offers several build methods that **optimize the static file structure for size and startup performance** if you need this feature. 
+  **You do not need to build an app**. However, the framework offers several build methods that **optimize the static file structure for size and startup performance** if you need this feature.
 </Callout>

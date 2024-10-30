@@ -31,7 +31,6 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
 ```
 
 <Playground
-  previewOnly
   name="Example: data"
   height={400}
   app={`<List data='{${JSON.stringify(data)}}' />`}
@@ -57,7 +56,6 @@ See the [itemTemplate section](#itemtemplate).
 ```
 
 <Playground
-  previewOnly
   name="Example: data API Call"
   height={400}
   app={`
@@ -85,7 +83,7 @@ Note the `meat` section header before all the others in the list below:
 > and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
-<List 
+<List
   data='{${JSON.stringify(data)}}'
   defaultSections="{['meat']}"
   sectionBy="category"
@@ -99,11 +97,10 @@ Note the `meat` section header before all the others in the list below:
 ```
 
 <Playground
-  previewOnly
   name="Example: defaultSections"
   height={400}
   app={`
-  <List 
+  <List
     data='{${JSON.stringify(data)}}'
     defaultSections="{['meat']}"
     sectionBy="category"
@@ -132,7 +129,6 @@ Note the `meat` section header before all the others in the list below:
 ```
 
 <Playground
-  previewOnly
   name="Example: emptyListTemplate"
   height={100}
   app={`
@@ -155,7 +151,6 @@ Note the `meat` section header before all the others in the list below:
 ```
 
 <Playground
-  previewOnly
   name="Example: idKey"
   height={400}
   app={`<List idKey="key" data='{${JSON.stringify(data)}}' />`}
@@ -185,7 +180,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 ```
 
 <Playground
-  previewOnly
   name="Example: itemTemplate"
   height={400}
   app={`
@@ -215,7 +209,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 ```
 
 <Playground
-  previewOnly
   name="Example: limit"
   height={400}
   app={`<List limit="4" data='{${JSON.stringify(data)}}' />`}
@@ -230,7 +223,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 ```
 
 <Playground
-  previewOnly
   name="Example: loading"
   height={60}
   app={`<List loading="true" />`}
@@ -245,7 +237,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 ```
 
 <Playground
-  previewOnly
   name="Example: orderBy"
   height={400}
   app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
@@ -272,7 +263,7 @@ It contains the following boolean attributes:
 > or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
-<List 
+<List
   data='{${JSON.stringify(data)}}'
   defaultSections="{['meat']}"
   sectionBy="category"
@@ -286,11 +277,10 @@ It contains the following boolean attributes:
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionBy"
   height={400}
   app={`
-  <List 
+  <List
     data='{${JSON.stringify(data)}}'
     defaultSections="{['meat']}"
     sectionBy="category"
@@ -331,7 +321,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionFooterTemplate"
   height={400}
   app={`
@@ -372,7 +361,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionTemplate"
   height={400}
   app={`
@@ -395,7 +383,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: selectedIndex"
   height={400}
   app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
@@ -410,7 +397,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: scrollAnchor"
   height={400}
   app={`<List scrollAnchor="bottom" data='{${JSON.stringify(data)}}' />`}
@@ -431,7 +417,6 @@ Adds padding to the bottom of the list which is also included in the scroll area
 ```
 
 <Playground
-  previewOnly
   name="Example: scrollAnchor"
   height={400}
   app={`
@@ -454,7 +439,6 @@ Adds padding to the top of the list which is also included in the scroll area.
 ```
 
 <Playground
-  previewOnly
   name="Example: scrollPaddingStart"
   height={400}
   app={`<List scrollPaddingStart="20" data='{${JSON.stringify(data)}}' />`}

@@ -16,22 +16,22 @@ The following sample demonstrates these concepts. When the user clicks the butto
 A `ChangeListener` instance observes queue length changes and stores the actual length to display that in the UI.
 
 ```ueml copy {11-26}
-<VStack 
-  padding="1rem" 
-  gap="0.5rem" 
-  var.queued="{0}" 
-  var.queueLength="{0}" 
+<VStack
+  padding="1rem"
+  gap="0.5rem"
+  var.queued="{0}"
+  var.queueLength="{0}"
   var.processed="{0}"
   var.result="{0}">
   <Button
-    label="Add a new item to the queue" 
+    label="Add a new item to the queue"
     onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
   <Queue id="myQueue"
-    onProcess="processing => 
+    onProcess="processing =>
       {
          result += processing.item;
-         delay(1000); 
-         processed++; 
+         delay(1000);
+         processed++;
          processing.onProgress(processed)
       }
     ">
@@ -42,8 +42,8 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
       <Text value="{result.toFixed(4)}" />
     </property>
   </Queue>
-  <ChangeListener 
-    listenTo="{myQueue.getQueueLength()}" 
+  <ChangeListener
+    listenTo="{myQueue.getQueueLength()}"
     onDidChange="l => queueLength = l.newValue"/>
   <Text>Items queued: {queued}</Text>
   <Text>Current queue length: {queueLength}</Text>
@@ -52,25 +52,24 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
 ```
 
 <Playground
-    previewOnly
     name="Example: using Queue"
     app={`
-    <VStack 
-      padding="1rem" 
-      gap="0.5rem" 
-      var.queued="{0}" 
-      var.queueLength="{0}" 
+    <VStack
+      padding="1rem"
+      gap="0.5rem"
+      var.queued="{0}"
+      var.queueLength="{0}"
       var.processed="{0}"
       var.result="{0}">
       <Button
-        label="Add a new item to the queue" 
+        label="Add a new item to the queue"
         onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
       <Queue id="myQueue"
-        onProcess="processing => 
+        onProcess="processing =>
           {
              result += processing.item;
-             delay(1000); 
-             processed++; 
+             delay(1000);
+             processed++;
              processing.onProgress(processed)
           }
         ">
@@ -81,8 +80,8 @@ A `ChangeListener` instance observes queue length changes and stores the actual 
           <Text value="{result.toFixed(4)}" />
         </property>
       </Queue>
-      <ChangeListener 
-        listenTo="{myQueue.getQueueLength()}" 
+      <ChangeListener
+        listenTo="{myQueue.getQueueLength()}"
         onDidChange="l => queueLength = l.newValue;"/>
       <Text>Items queued: {queued}</Text>
       <Text>Current queue length: {queueLength}</Text>
@@ -117,19 +116,19 @@ The queue fires this event when the queue gets empty after processing all items.
 The following sample displays a tick mark every time the queue is emptied:
 
 ```ueml copy {15}
-<VStack 
-  padding="1rem" 
-  gap="0.5rem" 
-  var.queued="{0}" 
-  var.queueEmptied="" 
+<VStack
+  padding="1rem"
+  gap="0.5rem"
+  var.queued="{0}"
+  var.queueEmptied=""
   var.result="{0}">
   <Button
-    label="Add a new item to the queue" 
+    label="Add a new item to the queue"
     onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
   <Queue id="myQueue"
     onProcess="processing => {
       result += processing.item;
-      delay(1000); 
+      delay(1000);
     }"
     onComplete="queueEmptied += '✅'" >
     <property name="resultFeedback">
@@ -143,22 +142,21 @@ The following sample displays a tick mark every time the queue is emptied:
 ```
 
 <Playground
-    previewOnly
     name="Example: complete"
     app={`
-    <VStack 
-      padding="1rem" 
-      gap="0.5rem" 
-      var.queued="{0}" 
-      var.queueEmptied="" 
+    <VStack
+      padding="1rem"
+      gap="0.5rem"
+      var.queued="{0}"
+      var.queueEmptied=""
       var.result="{0}">
       <Button
-        label="Add a new item to the queue" 
+        label="Add a new item to the queue"
         onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
       <Queue id="myQueue"
         onProcess="processing => {
           result += processing.item;
-          delay(1000); 
+          delay(1000);
         }"
         onComplete="queueEmptied += '✅'" >
         <property name="resultFeedback">
@@ -185,19 +183,19 @@ The parameter of the event handler is an object with these properties:
 The following sample uses the `didProcess` event handler to add a tick symbol to the progress whenever an item has been processed:
 
 ```ueml copy {15}
-<VStack 
-  padding="1rem" 
-  gap="0.5rem" 
-  var.queued="{0}" 
-  var.progressLine="" 
+<VStack
+  padding="1rem"
+  gap="0.5rem"
+  var.queued="{0}"
+  var.progressLine=""
   var.result="{0}">
   <Button
-    label="Add a new item to the queue" 
+    label="Add a new item to the queue"
     onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
   <Queue id="myQueue"
     onProcess="processing => {
       result += processing.item;
-      delay(1000); 
+      delay(1000);
     }"
     onDidProcess="progressLine += '✅'" >
     <property name="resultFeedback">
@@ -211,22 +209,21 @@ The following sample uses the `didProcess` event handler to add a tick symbol to
 ```
 
 <Playground
-    previewOnly
     name="Example: didProcess"
     app={`
-    <VStack 
-      padding="1rem" 
-      gap="0.5rem" 
-      var.queued="{0}" 
-      var.progressLine="" 
+    <VStack
+      padding="1rem"
+      gap="0.5rem"
+      var.queued="{0}"
+      var.progressLine=""
       var.result="{0}">
       <Button
-        label="Add a new item to the queue" 
+        label="Add a new item to the queue"
         onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
       <Queue id="myQueue"
         onProcess="processing => {
           result += processing.item;
-          delay(1000); 
+          delay(1000);
         }"
         onDidProcess="progressLine += '✅'" >
         <property name="resultFeedback">
@@ -266,14 +263,14 @@ If the event handler returns false, the queue does not sign the error in the UI.
 The following sample generates an error for every fourth item, and gives an error feedback with the `processError` event handler:
 
 ```ueml copy {12-14, 19}
-<VStack 
-  padding="1rem" 
-  gap="0.5rem" 
-  var.queued="{0}" 
-  var.progressLine="" 
+<VStack
+  padding="1rem"
+  gap="0.5rem"
+  var.queued="{0}"
+  var.progressLine=""
   var.result="{0}">
   <Button
-    label="Add a new item to the queue" 
+    label="Add a new item to the queue"
     onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
   <Queue id="myQueue"
     onProcess="processing => {
@@ -281,7 +278,7 @@ The following sample generates an error for every fourth item, and gives an erro
         throw 'Item cannot be processed';
       }
       result += processing.item;
-      delay(1000); 
+      delay(1000);
     }"
     onDidProcess="progressLine += '✅'"
     onProcessError="progressLine += '❌'" >
@@ -298,17 +295,16 @@ The following sample generates an error for every fourth item, and gives an erro
 Click the button several times to see how processing errors are handled in the UI.
 
 <Playground
-    previewOnly
     name="Example: processError"
     app={`
-    <VStack 
-      padding="1rem" 
-      gap="0.5rem" 
-      var.queued="{0}" 
-      var.progressLine="" 
+    <VStack
+      padding="1rem"
+      gap="0.5rem"
+      var.queued="{0}"
+      var.progressLine=""
       var.result="{0}">
       <Button
-        label="Add a new item to the queue" 
+        label="Add a new item to the queue"
         onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
       <Queue id="myQueue"
         onProcess="processing => {
@@ -316,7 +312,7 @@ Click the button several times to see how processing errors are handled in the U
             throw 'Item cannot be processed';
           }
           result += processing.item;
-          delay(1000); 
+          delay(1000);
         }"
         onDidProcess="progressLine += '✅'"
         onProcessError="progressLine += '❌'" >
@@ -346,20 +342,20 @@ The parameter of the event handler is an object with these properties:
 The following sample declares a `willProcess` event handler that will skip processing (summing) items less than 0.5; the handler counts the number of skipped items.
 
 ```ueml copy {11}
-<VStack 
-  padding="1rem" 
-  gap="0.5rem" 
-  var.queued="{0}" 
-  var.skipped="{0}" 
+<VStack
+  padding="1rem"
+  gap="0.5rem"
+  var.queued="{0}"
+  var.skipped="{0}"
   var.result="{0}">
   <Button
-    label="Add a new item to the queue" 
+    label="Add a new item to the queue"
     onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
   <Queue id="myQueue"
     onWillProcess="toProcess => toProcess.item < 0.5 ? (skipped++, false) : true"
     onProcess="processing => {
       result += processing.item;
-      delay(1000); 
+      delay(1000);
     }">
     <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
@@ -374,23 +370,22 @@ The following sample declares a `willProcess` event handler that will skip proce
 Click the button several times and see how the number of skipped items increments.
 
 <Playground
-    previewOnly
     name="Example: willProcess"
     app={`
-    <VStack 
-      padding="1rem" 
-      gap="0.5rem" 
-      var.queued="{0}" 
-      var.skipped="{0}" 
+    <VStack
+      padding="1rem"
+      gap="0.5rem"
+      var.queued="{0}"
+      var.skipped="{0}"
       var.result="{0}">
       <Button
-        label="Add a new item to the queue" 
+        label="Add a new item to the queue"
         onClick="{myQueue.enqueueItem(Math.random()); queued++; }" />
       <Queue id="myQueue"
         onWillProcess="toProcess => toProcess.item < 0.5 ? (skipped++, false) : true"
         onProcess="processing => {
           result += processing.item;
-          delay(1000); 
+          delay(1000);
         }">
         <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />

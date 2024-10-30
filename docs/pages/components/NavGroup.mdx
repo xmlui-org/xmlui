@@ -37,7 +37,6 @@ The primary use of a `NavGroup` is to create an application menu with submenus, 
 Here, the highlighted `NavGroup` element nests other `NavLink` and `NavGroup` elements to create a hierarchical menu:
 
 <Playground
-  previewOnly={true}
   name="Example: NavGroup in App"
   height={200}
   app={`
@@ -86,7 +85,6 @@ You do not have to use `NavGroup` with `App`; you can nest it into other compone
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: NavGroup in a Stack"
   height={220}
   app={`
@@ -131,7 +129,6 @@ Look at this example:
 ```
 
 <Playground
-    previewOnly
     name="Example: label and icon"
     height={220}
     app={`
@@ -180,7 +177,7 @@ You can use these properties to change the styling of the `NavGroup` component:
 The following sample demonstrates using these theme variables and the `Theme` component:
 
 ```ueml copy
-<Theme 
+<Theme
   color-bg-dropdown-NavGroup="cyan"
   shadow-dropdown-NavGroup="$shadow-xxl"
   radius-dropdown-NavGroup="4px">
@@ -199,11 +196,10 @@ The following sample demonstrates using these theme variables and the `Theme` co
 ```
 
 <Playground
-  previewOnly
   name="Example: styling"
   height={220}
   app={`
-  <Theme 
+  <Theme
     color-bg-dropdown-NavGroup="cyan"
     shadow-dropdown-NavGroup="$shadow-xxl"
     radius-dropdown-NavGroup="4px">

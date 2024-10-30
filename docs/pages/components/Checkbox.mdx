@@ -40,7 +40,6 @@ Default value: `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: enabled"
   height={160}
   app={`
@@ -88,18 +87,17 @@ The following sample binds the state of two checkboxes to one and updates the st
 Try this sample by clicking the bottom group of checkboxes.
 
 <Playground
-  previewOnly
   name="Example: indeterminate"
   height={140}
   app={`
     <VStack margin="1rem" gap="0.8rem" var.indeterminate="{false}">
-      <Checkbox 
-        label="Indeterminate Checkbox" 
-        indeterminate="{indeterminate}" 
+      <Checkbox
+        label="Indeterminate Checkbox"
+        indeterminate="{indeterminate}"
         initialValue="{cb1.value}"
         readOnly="true" />
       <ChangeListener
-        listenTo="{ { v1: cb1.value, v2: cb2.value } }" 
+        listenTo="{ { v1: cb1.value, v2: cb2.value } }"
         onDidChange="indeterminate = cb1.value !== cb2.value" />
       Group of checkboxes:
       <HStack gap="0.5rem">
@@ -128,7 +126,6 @@ This property sets the label of the component.
 ```
 
 <Playground
-  previewOnly
   name="Example: label"
   height={90}
   app={`
@@ -161,7 +158,6 @@ Available values: `top`, `right` **(default)**, `bottom`, `left`
 ```
 
 <Playground
-  previewOnly
   name="Example: labelPosition"
   height={200}
   app={`
@@ -210,7 +206,6 @@ This event is triggered when value of Checkbox has changed.
 ```
 
 <Playground
-  previewOnly
   name="Example: didChange"
   height={110}
   app={`
@@ -240,7 +235,6 @@ Click the `Checkbox` in the example demo to change the label text. Note how clic
 ```
 
 <Playground
-  previewOnly
   name="Example: gotFocus/lostFocus"
   height={72}
   app={`

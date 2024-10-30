@@ -13,7 +13,7 @@ import { INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
-import {Header} from "@/src/components/Header";
+import { Header } from "@/src/components/Header";
 
 type PlaygroundProps = {
   name: string;
@@ -41,7 +41,7 @@ export const Playground = ({
   defaultTheme,
   defaultTone,
   resources = {},
-  previewOnly = true,
+  previewOnly = false,
   components = [],
   height,
   initialEditorHeight = "50%",

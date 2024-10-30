@@ -53,14 +53,18 @@ $cursor-resizer-vertical-Splitter: createThemeVar("cursor-resizer-vertical-Split
 .primaryPanel {
   flex-shrink: 0;
   flex-grow: 0;
-  overflow: hidden;
+  overflow: auto;
+  order: 1;
 }
 
 .secondaryPanel {
   flex: 1;
+  overflow: auto;
+  order: 3;
 }
 
 .resizer {
+  order: 2;
   overflow: hidden;
   background-color: t.useVar($color-bg-resizer-Splitter, transparent);
 

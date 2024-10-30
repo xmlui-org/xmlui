@@ -9,23 +9,22 @@ Represents a heading text
 For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
 <Playground
-  previewOnly
   name="Example: Headings with levels"
   height={400}
   app={`
   <VStack>
     <Heading level="h1" value="Heading Level 1" />
-    <Text>Text following H1</Text>    
+    <Text>Text following H1</Text>
     <Heading level="h2" value="Heading Level 2" />
-    <Text>Text following H2</Text>    
+    <Text>Text following H2</Text>
     <Heading level="h3" value="Heading Level 3" />
-    <Text>Text following H3</Text>    
+    <Text>Text following H3</Text>
     <Heading level="h4" value="Heading Level 4" />
-    <Text>Text following H4</Text>    
+    <Text>Text following H4</Text>
     <Heading level="h5" value="Heading Level 5" />
-    <Text>Text following H5</Text>    
+    <Text>Text following H5</Text>
     <Heading level="h6" value="Heading Level 6" />
-    <Text>Text following H6</Text>    
+    <Text>Text following H6</Text>
   </VStack>
   `}
 />
@@ -38,14 +37,14 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 
 ```ueml copy {4}
 <VStack width="200" gap="0.5rem">
-  <H3 
-    backgroundColor="blue" 
+  <H3
+    backgroundColor="blue"
     maxLines="1"
     ellipses="false">
     Though this long text does is about to crop!
   </H3>
-  <H3 
-    backgroundColor="blue" 
+  <H3
+    backgroundColor="blue"
     maxLines="1">
     Though this long text does is about to crop!
   </H3>
@@ -53,20 +52,19 @@ This property indicates whether ellipses should be displayed (`true`) when the h
 ```
 
 <Playground
-  previewOnly
   name="Example: ellipses"
   height={100}
   horizontal
   app={`
   <VStack width="200" gap="0.5rem">
     <H3
-      backgroundColor="blue" 
+      backgroundColor="blue"
       maxLines="1"
       ellipses="false">
       Though this long text does is about to crop!
     </H3>
-    <H3 
-      backgroundColor="blue" 
+    <H3
+      backgroundColor="blue"
       maxLines="1">
       Though this long text does is about to crop!
     </H3>
@@ -94,19 +92,18 @@ For a visual example, see the component description.
 This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
 
 ```ueml copy
-<H2 
-  maxWidth="160" 
+<H2
+  maxWidth="160"
   backgroundColor="blue"
   value="A long heading text that will likely overflow" maxLines="2" />
 ```
 
 <Playground
-  previewOnly
   name="Example: maxLines"
   height={90}
   app={`
-  <H2 
-    maxWidth="160" 
+  <H2
+    maxWidth="160"
     backgroundColor="blue"
     value="A long heading text that will likely overflow" maxLines="2" />
   `}
@@ -136,7 +133,6 @@ with several line breaks
 You can observe the effect of using `preserveLinebreaks`:
 
 <Playground
-  previewOnly
   name="Example: preserveLinebreaks"
   height={160}
   horizontal
@@ -175,7 +171,6 @@ This property determines the text displayed in the heading. `Heading` also accep
 ```
 
 <Playground
-  previewOnly
   height={140}
   name="Example: value"
   app={`

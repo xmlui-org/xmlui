@@ -2,10 +2,17 @@ import React, { useEffect, useMemo, useReducer } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import { useToast } from "@/src/hooks/useToast";
-import { appDescriptionInitialized, optionsInitialized, PlaygroundContext, playgroundReducer } from "@/src/state/store";
+import {
+  appDescriptionInitialized, contentChanged,
+  optionsInitialized,
+  PlaygroundContext,
+  playgroundReducer,
+} from "@/src/state/store";
 import { decompressData, INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
+import { Header } from "@/src/components/Header";
+import styles from "./StandalonePlayground.module.scss";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
@@ -23,6 +30,7 @@ export const StandalonePlayground = () => {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         dispatch(appDescriptionInitialized(data.standalone));
         dispatch(optionsInitialized({ ...playgroundState.options, ...data.options }));
+        dispatch(contentChanged(data.options.content))
       } catch (e) {
         showToast({
           type: "error",
@@ -58,7 +66,14 @@ export const StandalonePlayground = () => {
   return (
     <ToastProvider>
       <PlaygroundContext.Provider value={playgroundContextValue}>
-        <ErrorBoundary>{<PlaygroundContent standalone={true} />}</ErrorBoundary>
+        <ErrorBoundary>
+          <div className={styles.standalonePlayground}>
+            {!playgroundState.options.previewMode && <Header standalone={true}/>}
+            <div style={{ flexGrow: 1, overflow: "auto" }}>
+              <PlaygroundContent standalone={true} />
+            </div>
+          </div>
+        </ErrorBoundary>
       </PlaygroundContext.Provider>
     </ToastProvider>
   );

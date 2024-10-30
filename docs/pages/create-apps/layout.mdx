@@ -7,7 +7,7 @@ An XMLUI app is a **hierarchical component tree** where parent components nest t
 
 Some components' only role is to arrange their nested children in a particular layout. We call them **layout components**. They can nest other layout components in arbitrary depths. This arrangement allows the creation of complex app and component layouts.
 
-In this article, you will learn the basics of the XMLUI layout system and get acquainted with the fundamental layout components. 
+In this article, you will learn the basics of the XMLUI layout system and get acquainted with the fundamental layout components.
 
 ## Layout Terminology
 
@@ -28,7 +28,6 @@ The following app contains two components, an `App`, and a `Text`:
 ```
 
 <Playground
-  previewOnly={true}
   name="Component viewports"
   height={108}
   horizontal={true}
@@ -47,7 +46,7 @@ The borders mark the viewport boundaries of the components:
 ### Orientation
 
 <Callout type="info" emoji="💡">
-When rendering its children, a component may render them with vertical or horizontal orientation. 
+When rendering its children, a component may render them with vertical or horizontal orientation.
 </Callout>
 
 - Vertical orientation: Each child enters a new row when its parent displays it.
@@ -68,7 +67,6 @@ When rendering its children, a component may render them with vertical or horizo
 ```
 
 <Playground
-  previewOnly={true}
   name="Orientation"
   height={160}
   horizontal={true}
@@ -106,7 +104,6 @@ This example shows what happens when the browser uses right-to-left direction:
 ```
 
 <Playground
-  previewOnly={true}
   name="Right-to-left direction"
   height={160}
   horizontal={true}
@@ -126,7 +123,7 @@ This example shows what happens when the browser uses right-to-left direction:
 ### Paddings and Gaps
 
 <Callout type="info" emoji="💡">
-Each component may apply padding and constrain the viewport its children can use. They can also add gaps between adjacent children. 
+Each component may apply padding and constrain the viewport its children can use. They can also add gaps between adjacent children.
 </Callout>
 
 The following sample demonstrates it:
@@ -144,7 +141,6 @@ The following sample demonstrates it:
 ```
 
 <Playground
-  previewOnly={true}
   name="Paddings and gaps"
   height={200}
   horizontal={true}
@@ -189,7 +185,6 @@ By default, the VStack component determines its dimensions according to its cont
 ```
 
 <Playground
-  previewOnly={true}
   name="Dimensions"
   height={100}
   horizontal={true}
@@ -209,7 +204,6 @@ Components can align their children in the viewport both vertically and horizont
 The following sample demonstrates it:
 
 <Playground
-  previewOnly={true}
   name="Alignment"
   height={260}
   horizontal={true}
@@ -248,7 +242,7 @@ XMLUI uses only two fundamental layout containers, `Stack`, and `FlowLayout`. Al
 `FlowLayout` is a layout container that renders its children horizontally while they fit into the current row; otherwise, the child enters a new row. If the children do not fit into the viewport, they overflow.
 
 <Callout type="info" emoji="📔">
-Your application markup must have a single root component. The browser window is an implicit `VStack` layout container with that root element as its single child. 
+Your application markup must have a single root component. The browser window is an implicit `VStack` layout container with that root element as its single child.
 </Callout>
 
 There are two other components used frequently with these layout containers, `SpaceFiller`, and `Splitter`. In this article, you will learn how to use them.
@@ -291,7 +285,6 @@ The following sample shows how a `HStack` renders button children:
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Layout containers use default gaps"
   height={100}
   horizontal={true}
@@ -319,7 +312,6 @@ You can remove the gaps if you intend to omit them entirely:
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Layout containers with no gaps"
   height={100}
   horizontal={true}
@@ -356,7 +348,6 @@ The following sample demonstrated using them:
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: Layout containers with theme-controlled gaps"
   height={150}
   horizontal={true}
@@ -390,7 +381,7 @@ All layout container renders their children in declaration order; they consider 
 Let's see a few samples to see how they work! The samples use the following code (replacing `Some_Container`) with a particular layout container:
 
 ```ueml copy /Some_Container/ /width="80%"/
-<App> 
+<App>
   <Some_Container>
     <Stack height="20px" width="20%" backgroundColor="orangered" />
     <Stack height="20px" width="20%" backgroundColor="orangered" />
@@ -406,7 +397,6 @@ This markup displays five boxes; the third is four times wider than the others.
 **Vertical stack**: Each child takes a new row.
 
 <Playground
-  previewOnly={true}
   name="Example: Vertical stack (VStack)"
   height={240}
   horizontal={true}
@@ -428,7 +418,6 @@ This markup displays five boxes; the third is four times wider than the others.
 Observe that the content overflows the width of a single row, and the app displays a horizontal scrollbar.
 
 <Playground
-  previewOnly={true}
   name="Example: Horizontal stack (HStack)"
   height={100}
   horizontal={true}
@@ -448,7 +437,6 @@ Observe that the content overflows the width of a single row, and the app displa
 **FlowLayout**: The component breaks a child into a new row when it does not fit into the remaining part of the row.
 
 <Playground
-  previewOnly={true}
   name="Example: FlowLayout"
   height={160}
   horizontal={true}
@@ -468,28 +456,27 @@ Observe that the content overflows the width of a single row, and the app displa
 ### Container Height
 
 <Callout type="info" emoji="💡">
-If you set an explicit height (with the `height` layout property), the layout container will use that height; otherwise, it accommodates its content (children) height. 
+If you set an explicit height (with the `height` layout property), the layout container will use that height; otherwise, it accommodates its content (children) height.
 </Callout>
 
 Check these examples:
 
 ```ueml copy
-<VStack 
-  backgroundColor="cyan" 
-  horizontalAlignment="center" 
+<VStack
+  backgroundColor="cyan"
+  horizontalAlignment="center"
   verticalAlignment="center">
   This is some text within a VStack
 </VStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with implicit height"
   height={80}
   app={`
-    <VStack 
-      backgroundColor="cyan" 
-      horizontalAlignment="center" 
+    <VStack
+      backgroundColor="cyan"
+      horizontalAlignment="center"
       verticalAlignment="center">
       This is some text within a VStack
     </VStack>
@@ -497,24 +484,23 @@ Check these examples:
 />
 
 ```ueml copy /height="160px"/
-<VStack 
-  height="160px" 
-  backgroundColor="cyan" 
-  horizontalAlignment="center" 
+<VStack
+  height="160px"
+  backgroundColor="cyan"
+  horizontalAlignment="center"
   verticalAlignment="center">
   This is some text within a VStack
 </VStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with *explicit* height"
   height={180}
   app={`
-    <VStack 
-      height="160px" 
-      backgroundColor="cyan" 
-      horizontalAlignment="center" 
+    <VStack
+      height="160px"
+      backgroundColor="cyan"
+      horizontalAlignment="center"
       verticalAlignment="center">
       This is some text within a Stack
     </VStack>
@@ -532,7 +518,6 @@ When you explicitly set the height of a layout container, and the content is tal
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with vertical content overflow"
   height={120}
   app={`
@@ -551,22 +536,21 @@ Unless you use an explicit width, a layout container uses the entire width of it
 Check these examples:
 
 ```ueml copy
-<VStack 
-  backgroundColor="cyan" 
-  horizontalAlignment="center" 
+<VStack
+  backgroundColor="cyan"
+  horizontalAlignment="center"
   verticalAlignment="center">
   This is some text within a VStack
 </VStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with implicit width"
   height={80}
   app={`
-    <VStack 
-      backgroundColor="cyan" 
-      horizontalAlignment="center" 
+    <VStack
+      backgroundColor="cyan"
+      horizontalAlignment="center"
       verticalAlignment="center">
       This is some text within a VStack
     </VStack>
@@ -574,24 +558,23 @@ Check these examples:
 />
 
 ```ueml copy /height="200px"/
-<VStack 
-  width="400px" 
-  backgroundColor="cyan" 
-  horizontalAlignment="center" 
+<VStack
+  width="400px"
+  backgroundColor="cyan"
+  horizontalAlignment="center"
   verticalAlignment="center">
   This is some text within a VStack
 </VStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with *explicit* width"
   height={100}
   app={`
-    <VStack 
+    <VStack
       width="400px"
-      backgroundColor="cyan" 
-      horizontalAlignment="center" 
+      backgroundColor="cyan"
+      horizontalAlignment="center"
       verticalAlignment="center">
       This is some text within a Stack
     </VStack>
@@ -611,7 +594,6 @@ For example, when you use text, the content can be broken into multiple lines, l
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack and text with *explicit* width"
   height={160}
   app={`
@@ -630,7 +612,6 @@ Other components, such as a box, may overflow horizontally:
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack and text with *explicit* width"
   height={80}
   app={`
@@ -669,7 +650,7 @@ Here are a few samples. The following aligns the children of an `HStack` horizon
 ```
 
 <Playground
-  previewOnly={true}
+
   name="HStack with centered contents"
   height={80}
   horizontal={true}
@@ -693,7 +674,7 @@ This sample aligns the children of a `VStack` horizontally to the end (right edg
 ```
 
 <Playground
-  previewOnly={true}
+
   name="VStack with right-aligned contents"
   height={180}
   horizontal={true}
@@ -717,7 +698,7 @@ This sample aligns the children of an `HStack` vertically in the center:
 ```
 
 <Playground
-  previewOnly={true}
+
   name="HStack with vertically centered contents"
   height={110}
   horizontal={true}
@@ -749,7 +730,7 @@ See the following example for `HStack`:
 ```
 
 <Playground
-  previewOnly={true}
+
   name="Horizontal Stack with the reverse flag"
   height={80}
   horizontal={true}
@@ -775,7 +756,7 @@ This example uses a `VStack`:
 ```
 
 <Playground
-  previewOnly={true}
+
   name="Vertical Stack with the reverse flag"
   height={180}
   horizontal={true}
@@ -807,7 +788,6 @@ Here is an example:
 The `H2` component has no explicit size, so its width is set to the width of the text content (as the background color indicates). Though the `Button` component has no explicit size, it has a component-specific one (according to its content), so it is not stretched horizontally. The button is taller than the `VStack`, so its height determines the `VStack` height, and the text height is stretched to that.
 
 <Playground
-  previewOnly
   name="Example: VStack children width"
   height={120}
   app={`
@@ -834,7 +814,6 @@ Such a setup may cause overflow if the sum of percentages equals 100%, as the ga
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with percentage height (with gaps)"
   height={240}
   app={`
@@ -855,7 +834,6 @@ When the stack does not apply gaps, there is no overflow:
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with percentage height (no gaps)"
   height={240}
   app={`
@@ -883,7 +861,6 @@ Such a configuration will not cause overflow. Here is a sample:
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with percentage height (with gaps)"
   height={260}
   app={`
@@ -913,7 +890,6 @@ Here is an example:
 The `H2` component has no explicit size, so it's stretched to the viewport width (as the background color indicates). Though `Button` has no explicit size, it has a component-specific one (according to its content), so it is not stretched.
 
 <Playground
-  previewOnly
   name="Example: HStack children width"
   height={80}
   app={`
@@ -940,7 +916,6 @@ Such a setup may cause horizontal overflow if the sum of percentages equals 100%
 ```
 
 <Playground
-  previewOnly
   name="Example: HStack with percentage height (with gaps)"
   height={240}
   app={`
@@ -961,7 +936,6 @@ When the stack does not apply gaps, there is no overflow:
 ```
 
 <Playground
-  previewOnly
   name="Example: HStack with percentage height (no gaps)"
   height={240}
   app={`
@@ -989,7 +963,6 @@ Such a configuration will not cause overflow. Here is a sample:
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with percentage height (with gaps)"
   height={100}
   app={`
@@ -1019,7 +992,6 @@ In the following example, the fourth child does not fit in the first line entire
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal stack with overflow"
   height={90}
   horizontal={true}
@@ -1045,7 +1017,6 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal Stack with content wrapping"
   height={120}
   horizontal={true}
@@ -1076,7 +1047,6 @@ The following example shows how a the right-to-left reading direction renders th
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal Stack with right-to-left reading direction"
   height={60}
   horizontal={true}
@@ -1101,7 +1071,6 @@ The Stack has a property, `reverse`, which you can use to reverse the rendering 
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal Stack with the reverse flag"
   height={80}
   horizontal={true}
@@ -1125,7 +1094,6 @@ The Stack has a property, `reverse`, which you can use to reverse the rendering 
 ```
 
 <Playground
-  previewOnly={true}
   name="Vertical Stack with the reverse flag"
   height={180}
   horizontal={true}
@@ -1155,7 +1123,6 @@ In the following example, the fourth child does not fit in the first line entire
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal Stack with overflow"
   height={90}
   horizontal={true}
@@ -1182,7 +1149,6 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 ```
 
 <Playground
-  previewOnly={true}
   name="Horizontal Stack with content wrapping"
   height={120}
   horizontal={true}
@@ -1224,7 +1190,6 @@ Here is an example:
 ```
 
 <Playground
-  previewOnly={true}
   name="CHStack example"
   height={120}
   horizontal={true}
@@ -1262,7 +1227,6 @@ Here is an example:
 ```
 
 <Playground
-  previewOnly={true}
   name="CVStack example"
   height={220}
   horizontal={true}
@@ -1295,11 +1259,10 @@ The following sample demonstrates such a situation:
   <Stack backgroundColor="red" height="36" width="25%" />
   <Stack backgroundColor="green" height="36" width="50%" />
   <Stack backgroundColor="blue" height="36" width="25%" />
-</HStack>  
+</HStack>
 ```
 
 <Playground
-  previewOnly={true}
   name="HStack with percentage widths and overflow"
   height={80}
   horizontal={true}
@@ -1308,7 +1271,7 @@ The following sample demonstrates such a situation:
         <Stack backgroundColor="red" height="36" width="25%" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
-      </HStack>  
+      </HStack>
     `}
 />
 
@@ -1325,7 +1288,6 @@ The `FlowLayout` component handles this sizing issue by adjusting the child comp
 ```
 
 <Playground
-  previewOnly={true}
   name="FlowLayout children with 100% combined widths"
   height={80}
   horizontal={true}
@@ -1334,7 +1296,7 @@ The `FlowLayout` component handles this sizing issue by adjusting the child comp
         <Stack backgroundColor="red" height="36" width="25%" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
-      </FlowLayout>  
+      </FlowLayout>
   `}
 />
 
@@ -1351,13 +1313,12 @@ In the following sample, the red box is too wide. Nonetheless, the `FlowLayout` 
   <Stack backgroundColor="red" height="36" width="1000000px" />
   <Stack backgroundColor="green" height="36" width="50%" />
   <Stack backgroundColor="blue" height="36" width="25%" />
-</FlowLayout>  
+</FlowLayout>
 ```
 
 Note how the extreme width of the first child is capped to the space available for the `FlowLayout`, while the other children's sizes remain unmodified:
 
 <Playground
-  previewOnly={true}
   name="FlowLayout with sum of 100% percentage widths"
   height={150}
   horizontal={true}
@@ -1366,7 +1327,7 @@ Note how the extreme width of the first child is capped to the space available f
         <Stack backgroundColor="red" height="36" width="1000000px" />
         <Stack backgroundColor="green" height="36" width="50%" />
         <Stack backgroundColor="blue" height="36" width="25%" />
-      </FlowLayout>  
+      </FlowLayout>
   `}
 />
 
@@ -1388,7 +1349,6 @@ In a `Stack`, `SpaceFiller` pushes the children following it to the other end of
 
 <Playground
   name="SpaceFiller in an HStack"
-  previewOnly
   height={80}
   app={`
   <HStack>
@@ -1412,7 +1372,6 @@ In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children fo
 
 <Playground
   name="Example: in a FlowLayout"
-  previewOnly
   height={120}
   app={`
   <FlowLayout>
@@ -1426,14 +1385,14 @@ In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children fo
 
 ## Splitter
 
-The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections (a primary and a secondary) and puts a draggable bar between them. 
+The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections (a primary and a secondary) and puts a draggable bar between them.
 
 `Splitter` has two specialized variants, `HSplitter` and `VSplitter`, which separate the two sections vertically and horizontally.
 
 The following example demonstrates a horizontal splitter, which sets some constraints on the size of the primary section:
 
 ```ueml copy /orientation="horizontal"/
-<HSplitter 
+<HSplitter
   height="100%"
   minPrimarySize="10%"
   maxPrimarySize="90%">
@@ -1445,11 +1404,10 @@ The following example demonstrates a horizontal splitter, which sets some constr
 Try dragging the splitter bar between the sections to experience how it works.
 
 <Playground
-  previewOnly
   height={150}
   name="HSplitter example"
   app={`
-  <HSplitter 
+  <HSplitter
     height="100%"
     minPrimarySize="10%"
     maxPrimarySize="90%">

@@ -19,7 +19,6 @@ This is useful in two cases:
 ```
 
 <Playground
-  previewOnly
   name="Example: alt"
   height={60}
   app={`<Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />`}
@@ -34,7 +33,6 @@ This property sets a preferred aspect ratio for the image, which will be used in
 ```
 
 <Playground
-  previewOnly
   name="Example: aspectRatio"
   height={300}
   app={` <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" /> `}
@@ -57,7 +55,6 @@ This property sets how the image content should be resized to fit its container.
 ```
 
 <Playground
-  previewOnly
   name="Example: fit"
   height={300}
   app={`
@@ -98,7 +95,6 @@ This event is triggered when the image is clicked.
 ```
 
 <Playground
-  previewOnly
   name="Example: click"
   height={300}
   app={`
@@ -128,9 +124,9 @@ The following markup uses the `radius` layout property to set rounded borders:
 
 ```ueml copy {6}
 <Stack padding="1rem" height="280px" width="400px" >
-  <Image 
+  <Image
     src="/resources/images/components/image/breakfast.jpg"
-    fit="cover" 
+    fit="cover"
     radius="400px"
     border="$border-MyImage"
   />
@@ -147,7 +143,6 @@ which is defined in the custom theme set in the App Manifest:
 This example shows the result:
 
 <Playground
-  previewOnly
   name="Example: styling with layout properties"
   defaultTheme="custom"
   height={300}

@@ -41,7 +41,6 @@ Available values:
 ```
 
 <Playground
-  previewOnly
   height={230}
   name="Example: content position"
   app={`
@@ -71,7 +70,6 @@ Default value: `true`.
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: enabled"
   app={`
     <HStack gap="1rem" >
@@ -96,7 +94,6 @@ This string value denotes an icon name. The framework will render an icon if XML
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: icon"
   app={`
     <HStack gap="1rem" >
@@ -142,7 +139,6 @@ Available values:
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: iconPosition"
   app={`
     <VStack gap="1rem">
@@ -180,7 +176,6 @@ This property is an optional string to set a label for the Button. If no label i
 ```
 
 <Playground
-  previewOnly={true}
   name="Button label"
   app={`
     <VStack gap="1rem" >
@@ -230,7 +225,6 @@ Available values:
 ```
 
 <Playground
-  previewOnly
   height={140}
   name="Example: size"
   app={`<Stack gap="4px">
@@ -275,7 +269,6 @@ Available values:
 ```
 
 <Playground
-    previewOnly
     name="Example: theme colors"
     app={`
     <Stack orientation="horizontal" gap="10px">
@@ -326,7 +319,6 @@ Available values:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: variant"
   app={`
@@ -350,7 +342,6 @@ This event is triggered when the Button is clicked.
 ```
 
 <Playground
-  previewOnly
   name="Example: click"
   app={`
     <Button label="Click me!" onClick="window.alert('Button clicked')" />
@@ -365,8 +356,8 @@ This event is triggered when the Button has received the focus.
 ```ueml copy
 <VStack gap="1rem" var.text="No event" >
   <HStack gap="1rem" verticalAlignment="center" >
-    <Button label="First, click me!" 
-      onGotFocus="text = 'Focus received'" 
+    <Button label="First, click me!"
+      onGotFocus="text = 'Focus received'"
       onLostFocus="text = 'Focus lost'" />
     <Text value="Then, me!"/>
   </HStack>
@@ -375,7 +366,6 @@ This event is triggered when the Button has received the focus.
 ```
 
 <Playground
-    previewOnly
     name="Example: gotFocus/lostFocus"
     app={`
     <VStack gap="1rem" var.text="No event" >
@@ -494,7 +484,6 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 ```
 
 <Playground
-    previewOnly
     name="Example: Buttons with fixed width"
     app={`
     <HStack gap="1rem" padding="1rem">

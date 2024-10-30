@@ -11,9 +11,9 @@ In the following example, the main file of the app declares a variable, `enhance
 ```ueml copy filename="Main.xmlui" /enhancedMode/
 <App var.enhancedMode="{false}">
   <VStack gap="$space-4" padding="$space-4">
-    <Checkbox 
-      label="Enhanced mode" 
-      initialValue="{enhancedMode}" 
+    <Checkbox
+      label="Enhanced mode"
+      initialValue="{enhancedMode}"
       onDidChange="v => enhancedMode = v" />
     <Component1 enhancedMode="{enhancedMode}" />
     <Component2 enhancedMode="{enhancedMode}" />
@@ -42,7 +42,6 @@ When you define an `AppState`, you can set its `initialValue` property to initia
 You can try how this app works:
 
 <Playground
-  previewOnly
   height={170}
   name="Example: AppState"
   components={[`
@@ -53,16 +52,16 @@ You can try how this app works:
   `,
   `
     <Component name="Component2">
-      <Button enabled="{$props.enhancedMode}">Set enhanced options</Button> 
+      <Button enabled="{$props.enhancedMode}">Set enhanced options</Button>
     </Component>
   `
   ]}
   app={`
     <App var.enhancedMode="{false}">
       <VStack gap="$space-4" padding="$space-4">
-        <Checkbox 
-          label="Enhanced mode" 
-          initialValue="{enhancedMode}" 
+        <Checkbox
+          label="Enhanced mode"
+          initialValue="{enhancedMode}"
           onDidChange="v => enhancedMode = v" />
         <Component1 enhancedMode="{enhancedMode}" />
         <Component2 enhancedMode="{enhancedMode}" />
@@ -85,9 +84,9 @@ Let's turn the previous example into one using `AppState`! The following code sh
 <App>
   <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
   <VStack gap="$space-4" padding="$space-4">
-    <Checkbox 
-      label="Enhanced mode" 
-      initialValue="{appState.value.enhancedMode}" 
+    <Checkbox
+      label="Enhanced mode"
+      initialValue="{appState.value.enhancedMode}"
       onDidChange="v => appState.update({ enhancedMode: v})" />
     <Component1 />
     <Component2 />
@@ -116,7 +115,6 @@ The components may use their own `AppState` object to access the state value:
 The modified app works the same way as the previous one (using variables):
 
 <Playground
-  previewOnly
   height={170}
   name="Example: AppState"
   components={[`
@@ -129,7 +127,7 @@ The modified app works the same way as the previous one (using variables):
   `
     <Component name="Component2">
       <AppState id="state" />
-      <Button enabled="{state.value.enhancedMode}">Set enhanced options</Button> 
+      <Button enabled="{state.value.enhancedMode}">Set enhanced options</Button>
     </Component>
   `
   ]}
@@ -137,9 +135,9 @@ The modified app works the same way as the previous one (using variables):
     <App var.enhancedMode="{false}">
       <AppState id="appState" initialValue="{{ enhancedMode: false }}"/>
       <VStack gap="$space-4" padding="$space-4">
-        <Checkbox 
-          label="Enhanced mode" 
-          initialValue="{enhancedMode}" 
+        <Checkbox
+          label="Enhanced mode"
+          initialValue="{enhancedMode}"
           onDidChange="v => appState.update({ enhancedMode: v})" />
         <Component1 />
         <Component2 />

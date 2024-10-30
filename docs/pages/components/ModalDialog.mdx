@@ -15,10 +15,10 @@ Event-driven display of the `ModalDialog` dialog is also possible using imperati
 This method is a good way to toggle the display of the `ModalDialog` if no deep linking is necessary.
 It also lends to itself that these events can be triggered programmatically from codebehind.
 
-Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api) 
+Note the `id` property of the `ModalDialog` in the example below and how it is used to call the [`open`](#open-api) and [`close`](#close-api)
 operations of the component in the `onClick` event handlers.
 
-```ueml copy 
+```ueml copy
 <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" title="Example Dialog">
@@ -29,7 +29,6 @@ operations of the component in the `onClick` event handlers.
 
 <Playground
   name="Example: imperative API"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -62,7 +61,6 @@ Click on the button in the demo below to open the modal dialog. Click anywhere o
 
 <Playground
   name="Example: when"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -103,8 +101,8 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
-    <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}" 
-      onCancel="dialog.close()" 
+    <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}"
+      onCancel="dialog.close()"
       onSubmit="dialog.close()">
       <FormItem bindTo="firstName" required="true" />
       <FormItem bindTo="lastName" required="true" />
@@ -115,14 +113,13 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 
 <Playground
   name="Example: children"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" title="Example Dialog">
-      <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}" 
-        onCancel="dialog.close()" 
+      <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}"
+        onCancel="dialog.close()"
         onSubmit="dialog.close()">
         <FormItem bindTo="firstName" required="true" />
         <FormItem bindTo="lastName" required="true" />
@@ -149,7 +146,6 @@ Click outside the dialog to close it.
 
 <Playground
   name="Example: closeButtonVisible"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -174,7 +170,6 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 <Playground
   name="Example: fullScreen"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -212,7 +207,6 @@ Provides a prestyled heading to display the intent of the dialog.
 
 <Playground
   name="Example: title"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -249,7 +243,6 @@ Open and close the dialog several times to test that it changes the counter.
 
 <Playground
   name="Example: open/close events"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
@@ -290,7 +283,6 @@ Open and close the dialog several times to test that it changes the counter.
 
 <Playground
   name="Example: open/close events"
-  previewOnly
   height={120}
   app={`
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">

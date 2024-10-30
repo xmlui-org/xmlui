@@ -25,14 +25,15 @@ export const Editor = () => {
       monaco.languages.setLanguageConfiguration(UEMLGrammar.id, UEMLGrammar.config);
       monaco.editor.defineTheme("ueml-light", xmluiLight);
       monaco.editor.defineTheme("ueml-dark", xmluiDark);
-      monaco.editor.setTheme(isDark ? "ueml-dark" : "ueml-light")
-
+      if (options.language === "ueml") {
+        monaco.editor.setTheme(isDark ? "ueml-dark" : "ueml-light")
+      }
       //xmluiscript
       monaco.languages.register({ id: XmluiScripGrammar.id });
       monaco.languages.setMonarchTokensProvider(XmluiScripGrammar.id, XmluiScripGrammar.language);
       monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
     }
-  }, [monaco, isDark]);
+  }, [monaco, isDark, options.language]);
 
   return (
     <MonacoEditor

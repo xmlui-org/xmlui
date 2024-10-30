@@ -5,7 +5,6 @@
 ```
 
 <Playground
-  previewOnly
   name="Example: placeholder"
   height={60}
   app={`<TextBox placeholder="This is a placeholder" />`}
@@ -20,7 +19,6 @@
 ```
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   height={60}
   app={`<TextBox initialValue="Example text" />`}
@@ -37,7 +35,6 @@ Try to enter a longer value into the input field below.
 ```
 
 <Playground
-  previewOnly
   name="Example: maxLength"
   height={60}
   app={`<TextBox maxLength="16" />`}
@@ -52,7 +49,6 @@ Try to enter a longer value into the input field below.
 ```
 
 <Playground
-  previewOnly
   name="Example: readOnly"
   height={60}
   app={`<TextBox initialValue="Example text" readOnly="true" />`}
@@ -67,7 +63,6 @@ Try to enter a longer value into the input field below.
 ```
 
 <Playground
-  previewOnly
   name="Example: enabled"
   height={60}
   app={`<TextBox enabled="false" />`}
@@ -87,7 +82,6 @@ Try to enter a longer value into the input field below.
 ```
 
 <Playground
-  previewOnly
   name="Example: validationStatus"
   height={200}
   app={`
@@ -109,7 +103,6 @@ Try to enter a longer value into the input field below.
 ```
 
 <Playground
-  previewOnly
   name="Example: startText"
   height={60}
   app={`<TextBox startText="www." />`}
@@ -122,7 +115,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -137,7 +129,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: startIcon"
   height={60}
   app={`<TextBox startIcon="hyperlink" />`}
@@ -150,7 +141,6 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -165,7 +155,6 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: endText"
   height={60}
   app={`<TextBox endText=".com" />`}
@@ -178,7 +167,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -193,7 +181,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: endIcon"
   height={60}
   app={`<TextBox endIcon="email" />`}
@@ -206,7 +193,6 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -226,7 +212,6 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ```
 
 <Playground
-  previewOnly
   name="Example: didChange"
   height={100}
   app={`
@@ -254,7 +239,6 @@ Note how clicking elsewhere resets the text to its original.
 ```
 
 <Playground
-  previewOnly
   name="Example: gotFocus/lostFocus"
   height={72}
   app={`
@@ -281,7 +265,6 @@ In the example below, typing in the `TextBox` will also display the length of th
 ```
 
 <Playground
-  previewOnly
   name="Example: value"
   height={100}
   app={`
@@ -298,14 +281,14 @@ In the example below, typing in the `TextBox` will also display the length of th
 
 ```ueml copy {10}
 <VStack margin="$space-1" gap="$space-0_5" var.changes="">
-  <TextBox 
-    id="inputField" 
-    readOnly="true" 
+  <TextBox
+    id="inputField"
+    readOnly="true"
     onDidChange="changes++"
   />
   <HStack gap="$space-1">
-    <Button 
-      label="Check" 
+    <Button
+      label="Check"
       onClick="inputField.setValue('example ')"
     />
     <Text value="Number of changes: {changes}" />
@@ -314,18 +297,17 @@ In the example below, typing in the `TextBox` will also display the length of th
 ```
 
 <Playground
-  previewOnly
   name="Example: setValue"
   app={`
   <VStack margin="$space-1" gap="$space-0_5" var.changes="">
-    <TextBox 
-      id="inputField" 
-      readOnly="true" 
+    <TextBox
+      id="inputField"
+      readOnly="true"
       onDidChange="changes++"
     />
     <HStack gap="$space-1">
-      <Button 
-        label="Check" 
+      <Button
+        label="Check"
         onClick="inputField.setValue('example ')"
       />
       <Text value="Number of changes: {changes}" />
@@ -346,7 +328,6 @@ In the example below, typing in the `TextBox` will also display the length of th
 ```
 
 <Playground
-  previewOnly
   name="Example: focus"
   height={100}
   app={`
@@ -412,7 +393,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  previewOnly
   height={200}
   defaultTheme="custom"
   themes={[

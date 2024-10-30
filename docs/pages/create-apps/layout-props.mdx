@@ -3,9 +3,9 @@ import { Callout } from 'nextra/components';
 
 # Layout Properties
 
-Each component has a particular visual appearance by default; this default display is often the best the component can have in a particular context. 
+Each component has a particular visual appearance by default; this default display is often the best the component can have in a particular context.
 
-However, as you change an application's layout, you may need to change some visual properties of components. 
+However, as you change an application's layout, you may need to change some visual properties of components.
 
 <Callout type="info" emoji="💡">
 Layout properties allow you to set up the visual appearance of components on a component instance basis.
@@ -20,7 +20,6 @@ This code snippet renders a text:
 ```
 
 <Playground
-  previewOnly
   name="Text without layout properties"
   app={`
     <App>
@@ -43,7 +42,6 @@ This sample explicitly sets a few layout properties of Text:
 ```
 
 <Playground
-  previewOnly
   name="Setting a few layout properties of Text"
   app={`
     <App>
@@ -52,8 +50,8 @@ This sample explicitly sets a few layout properties of Text:
         width="320px"
         padding="2rem">
         I'm a Text with explicit layout properties
-      </Text>  
-    </App>  
+      </Text>
+    </App>
   `}
   height={160}
 />
@@ -62,7 +60,7 @@ In this article, you will learn about available layout properties. Before treati
 
 ## Proper Use of Layout Properties
 
-Layout properties are easy to use; adding simple property values can quickly change the visuals of a particular component. 
+Layout properties are easy to use; adding simple property values can quickly change the visuals of a particular component.
 
 However, this ease comes at a high price: the more individual layout properties there are, the more tedious the application maintenance is if you need to change the app's appearance.
 
@@ -91,7 +89,7 @@ In the following example, all properties of the `HStack` and `CHStack` component
 Also, the `height` property of `HStack` is a layout property. However, its "100%" value represents a layout constraint (use the full application height for the stack), so it is not likely to change.
 
 <Playground
-  previewOnly={true}
+
   name="Example: Styling with layout properties"
   height={100}
   horizontal={true}
@@ -146,7 +144,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
 
 ```ueml copy {6} filename="MyBox.xmlui"
 <Component name="MyBox">
-  <CHStack 
+  <CHStack
     border="{$props.border}"
     backgroundColor="{$props.bgColor}"
     color="{$props.color ?? 'white'}"
@@ -157,14 +155,14 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
 ```
 
 <Playground
-  previewOnly={true}
+
   name="Example: Styling with reusable components"
   height={120}
   horizontal={true}
   components={[
     `
     <Component name="MyBox">
-      <CHStack 
+      <CHStack
         border="{$props.border}"
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
@@ -195,11 +193,11 @@ You can extract the values of layout properties into theme variables. For exampl
 
 ```ueml copy /$width-MyBox/ /$height-MyBox/
 <Component name="MyBox">
-  <CHStack 
+  <CHStack
     border="{$props.border}"
     backgroundColor="{$props.bgColor}"
     color="{$props.color}"
-    width="$width-MyBox" 
+    width="$width-MyBox"
     height="$height-MyBox">
     <Slot />
   </CHStack>
@@ -227,7 +225,7 @@ Changing the dimensions of `MyBox` is pretty straightforward by setting the appr
 ```
 
 <Playground
-  previewOnly={true}
+
   name="Example: Reusable components with theme variables"
   height={100}
   horizontal={true}
@@ -245,7 +243,7 @@ Changing the dimensions of `MyBox` is pretty straightforward by setting the appr
   components={[
     `
     <Component name="MyBox">
-      <CHStack 
+      <CHStack
         border="{$props.border}"
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
@@ -307,7 +305,6 @@ The XMLUI percentage value is relative to the size of the viewport a parent cont
 ```
 
 <Playground
-  previewOnly
   name="Using percentage size values"
   app={`
   <App>
@@ -343,22 +340,21 @@ The following sample demonstrates the width-related properties.
 
 ```ueml copy
 <App>
-  <VStack width="50%" height="36px" backgroundColor="red" /> 
-  <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" /> 
-  <VStack width="75%" minWidth="200px" maxWidth="300px" height="36px" backgroundColor="blue" /> 
+  <VStack width="50%" height="36px" backgroundColor="red" />
+  <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" />
+  <VStack width="75%" minWidth="200px" maxWidth="300px" height="36px" backgroundColor="blue" />
 </App>
 ```
 
 Resize the screen to see how the sizes of colored boxes change.
 
 <Playground
-  previewOnly
   name="width, minWidth, and maxWidth"
   app={`
     <App>
-      <VStack width="50%" height="36px" backgroundColor="red" /> 
-      <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" /> 
-      <VStack width="75%" minWidth="200px" maxWidth="300px" height="36px" backgroundColor="blue" /> 
+      <VStack width="50%" height="36px" backgroundColor="red" />
+      <VStack width="30%" minWidth="200px" height="36px" backgroundColor="green" />
+      <VStack width="75%" minWidth="200px" maxWidth="300px" height="36px" backgroundColor="blue" />
     </App>
   `}
   height={220}
@@ -403,7 +399,6 @@ Observe the second text's width, which is set to 1000px, to ensure it won't be t
 Due to the `horizontalOverflow="scroll"` setting, you can see a horizontal scrollbar at the bottom of the light green box. The last text has no `horizontalOverflow` value or `width` constraint, so the engine breaks it into multiple lines. As it has no `verticalOverflow` value, the engine lets it flow out of its container.
 
 <Playground
-  previewOnly
   name="Example: horizontalOverflow"
   app={`
   <App>
@@ -453,7 +448,6 @@ The following example demonstrates how the vertical overflow property works:
 Each of the three text fragments is enclosed in a box with a fixed size (180 x 40 pixels). Observe the effect of different `verticalOverflow` values. The last box uses no `verticalOverflow`, which has the same effect as `verticalOverflow="visible"`.
 
 <Playground
-  previewOnly
   name="Example: verticalOverflow"
   app={`
     <App>
@@ -494,36 +488,35 @@ The engine defines several layout properties to set up the box model of a partic
 
 ```ueml copy
 <App height="100%" backgroundColor="cyan">
-  <VStack height="85%" 
+  <VStack height="85%"
     backgroundColor="red"
-    margin="20" 
+    margin="20"
     padding="60"
     border="8px dashed blue">
     <VStack width="100%" height="100%" backgroundColor="green" />
-  </VStack>  
+  </VStack>
 </App>
 ```
 
 <Playground
-  previewOnly
   height={250}
   name="Box Model"
   app={`
     <App height="100%" backgroundColor="cyan">
-      <VStack height="85%" 
+      <VStack height="85%"
         backgroundColor="red"
-        margin="20" 
+        margin="20"
         padding="60"
         border="8px dashed blue">
         <VStack width="100%" height="100%" backgroundColor="green" />
-      </VStack>  
+      </VStack>
     </App>
   `}
 />
 
 The point of interest in the code snippet is the red rectangle; the markup contains styling to showcase all parts of the box model:
 
-`App` has a cyan background and encompasses the whole app area because its height is set to `100%` and being a block level element, it fills in the available horizontal space as well. 
+`App` has a cyan background and encompasses the whole app area because its height is set to `100%` and being a block level element, it fills in the available horizontal space as well.
 
 The child with the red background has a margin of `20px` and is smaller than its parent (its height is also 85% of its parent). This child also has a dashed border (`border="8 dashed blue"`), and has a padding of `60px` that squishes its own child to occupy less space inside of it (the one with the green background).
 
@@ -615,7 +608,6 @@ The engine supports these layout properties to set component colors:
 ```
 
 <Playground
-  previewOnly
   name="Setting text colors"
   app={`
     <App>
@@ -634,7 +626,6 @@ The engine supports these layout properties to set component colors:
 ```
 
 <Playground
-  previewOnly
   name="Setting text colors with 50% opacity"
   app={`
     <App>
@@ -679,7 +670,6 @@ Several properties allow you to set the appearance of text elements displayed in
 ```
 
 <Playground
-  previewOnly
   name="Setting text properties"
   app={`
     <App>
@@ -702,24 +692,23 @@ Several properties allow you to set the appearance of text elements displayed in
 You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects</SmartLink> around a component's frame and set up one or more shadow effects.
 
 ```ueml copy {2}
-<App>  
+<App>
   <VStack width="200" padding="20" border="2px solid #202020"
     shadow="12px 12px 5px orangered" >
     <Text>This is a box with a shadow around it.</Text>
   </VStack>
-</App>  
+</App>
 ```
 
 <Playground
-  previewOnly
   name="Using shadow effect"
   app={`
-    <App>  
+    <App>
       <VStack width="200" padding="20" border="2px solid #202020"
         shadow="12px 12px 5px orangered" >
         <Text>This is a box with a shadow around it.</Text>
       </VStack>
-    </App>  
+    </App>
   `}
   height={160}
 />
@@ -754,7 +743,6 @@ This property sets the direction of text, table columns, and horizontal overflow
 ```
 
 <Playground
-  previewOnly
   name="Using shadow effect"
   app={`
     <App>

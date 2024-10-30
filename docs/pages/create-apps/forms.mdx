@@ -47,25 +47,24 @@ You can try the form in action! A few things are worth checking:
 - With a valid form, the Save button displays a dialog imitating a successful save.
 
 <Playground
-  previewOnly={true}
   name="Example: A simple XMLUI form"
   height={220}
   app={`
-      <Form padding="0.5rem" 
-        subject="{{ name: 'Joe', age: 43 }}" 
+      <Form padding="0.5rem"
+        subject="{{ name: 'Joe', age: 43 }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FlowLayout columnGap="12px" paddingBottom="6px">
           <H3>Customer information</H3>
-          <FormItem 
-            bindTo="name" 
-            label="Customer name" 
-            width="50%" 
+          <FormItem
+            bindTo="name"
+            label="Customer name"
+            width="50%"
             minLength="3" />
-          <FormItem 
-            bindTo="age" 
-            label="Age" 
+          <FormItem
+            bindTo="age"
+            label="Age"
             type="integer"
-            width="50%" 
+            width="50%"
             zeroOrPositive="true" />
         </FlowLayout>
       </Form>
@@ -109,18 +108,17 @@ This form contains two `FromItem` components and an extra button. The button is 
 When you click the Search Button, the data managed by the `FormItem` instances is saved.
 
 <Playground
-  previewOnly={true}
   name="Example: Form with FormItems"
   app={`
-    <Form padding="0.5rem" 
-      subject="{{ search: 'Seattle', matching: 'Contains' }}" 
+    <Form padding="0.5rem"
+      subject="{{ search: 'Seattle', matching: 'Contains' }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
       saveLabel="Search" >
         <Text>Please specify the name to include in the search:</Text>
         <HStack>
           <FormItem bindTo="search" width="280px" />
-          <Button 
-            label="Select from dictionary" 
+          <Button
+            label="Select from dictionary"
             variant="outlined"
             onClick="window.alert('Displaying dictionary')"/>
         </HStack>
@@ -156,11 +154,10 @@ The following example contains a checkbox.
 Though you can click the checkbox and toggle it, its value is ignored. When you click Search, the saved data structure does not contain the `caseSensitive` field.
 
 <Playground
-  previewOnly={true}
   name="Example: Form with other input component"
   app={`
-    <Form padding="0.5rem" 
-      subject="{{ search: 'Seattle', caseSensitive: 'false' }}" 
+    <Form padding="0.5rem"
+      subject="{{ search: 'Seattle', caseSensitive: 'false' }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
       saveLabel="Search" >
         <Text>Please specify the name to include in the search:</Text>
@@ -184,7 +181,7 @@ Unless you specify an explicit item width, each nested `FormItem` (within a `Flo
 
 ```ueml
 <Form padding="0.5rem"
-  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}" 
+  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout gap="1rem">
     <FormItem label="Firstname" bindTo="firstname" />
@@ -198,12 +195,11 @@ Unless you specify an explicit item width, each nested `FormItem` (within a `Flo
 When you display them, each input has its separate row with a gap between the rows, as declared in the `Form`:
 
 <Playground
-  previewOnly={true}
   name="Example: Single-column form"
   height={410}
   app={`
-    <Form padding="0.5rem" 
-      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}" 
+    <Form padding="0.5rem"
+      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout gap="1rem">
         <FormItem label="Firstname" bindTo="firstname" />
@@ -221,7 +217,7 @@ Unless you specify an explicit item width, each nested `FormItem` (within a `Flo
 
 ```ueml
 <Form padding="0.5rem"
-  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}" 
+  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout gap="1rem">
     <FormItem label="Firstname" bindTo="firstname" width="50%" />
@@ -235,11 +231,10 @@ Unless you specify an explicit item width, each nested `FormItem` (within a `Flo
 When you display them, each input has its separate row with a gap between the rows, as declared in the `Form`:
 
 <Playground
-  previewOnly={true}
   name="Example: Two-column form"
   app={`
-    <Form padding="0.5rem" 
-      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}" 
+    <Form padding="0.5rem"
+      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout gap="1rem">
         <FormItem label="Firstname" bindTo="firstname" width="50%" />
@@ -256,14 +251,14 @@ When you display them, each input has its separate row with a gap between the ro
 The `FlowLayout` component can be used with star sizing (learn more about it here). With this feature, you can place items with a fixed width and allow other items to share the remaining space in the row:
 
 ```ueml copy
-<Form padding="0.5rem" 
-  subject="{{ 
-    title: 'Mr.', 
-    firstname: 'Jake', 
-    lastname: 'Hard', 
-    jobTitle: 'janitor', 
-    experience: 'broom' 
-  }}" 
+<Form padding="0.5rem"
+  subject="{{
+    title: 'Mr.',
+    firstname: 'Jake',
+    lastname: 'Hard',
+    jobTitle: 'janitor',
+    experience: 'broom'
+  }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout gap="1rem">
     <HStack gap="$gap-Form">
@@ -278,17 +273,16 @@ The `FlowLayout` component can be used with star sizing (learn more about it her
 ```
 
 <Playground
-    previewOnly={true}
     name="Example: Single-column form"
     app={`
-    <Form padding="0.5rem" 
-      subject="{{ 
-        title: 'Mr.', 
-        firstname: 'Jake', 
-        lastname: 'Hard', 
-        jobTitle: 'janitor', 
-        experience: 'broom' 
-      }}" 
+    <Form padding="0.5rem"
+      subject="{{
+        title: 'Mr.',
+        firstname: 'Jake',
+        lastname: 'Hard',
+        jobTitle: 'janitor',
+        experience: 'broom'
+      }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout gap="1rem">
         <HStack gap="$gap-Form">
@@ -307,8 +301,8 @@ The `FlowLayout` component can be used with star sizing (learn more about it her
 ### In-Row Labels (Issue)
 
 ```ueml copy
-<Form padding="0.5rem" 
-  subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}" 
+<Form padding="0.5rem"
+  subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout gap="1rem">
     <FormItem label="Firstname" labelPosition="left" bindTo="firstname" />
@@ -320,11 +314,10 @@ The `FlowLayout` component can be used with star sizing (learn more about it her
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: In-row labels"
   app={`
-    <Form padding="0.5rem" 
-      subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}" 
+    <Form padding="0.5rem"
+      subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout gap="1rem">
         <FormItem label="Firstname" labelPosition="left" bindTo="firstname" />
@@ -370,8 +363,8 @@ If you use a `type` value not in this table, `FromItem` renders a read-only text
 The `checkbox` type represents a checkbox input component:
 
 ```ueml copy {6-8}
-<Form 
-  subject="{{ option1: true, option2: false, option3: true }}" 
+<Form
+  subject="{{ option1: true, option2: false, option3: true }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -383,11 +376,10 @@ The `checkbox` type represents a checkbox input component:
 
 <Playground
   name="Example: Checkbox input component"
-  previewOnly={true}
   height={200}
   app={`
-    <Form 
-      subject="{{ option1: true, option2: false, option3: true }}" 
+    <Form
+      subject="{{ option1: true, option2: false, option3: true }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -403,8 +395,8 @@ The `checkbox` type represents a checkbox input component:
 The `combobox` type represents a combobox input component. It combines a textbox with a dropdown list:
 
 ```ueml copy {6-11}
-<Form 
-  subject="{{ title: 'Mr.' }}" 
+<Form
+  subject="{{ title: 'Mr.' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -419,11 +411,10 @@ The `combobox` type represents a combobox input component. It combines a textbox
 
 <Playground
   name="Example: Combobox input component"
-  previewOnly={true}
   height={260}
   app={`
-    <Form 
-      subject="{{ title: 'Mr.' }}" 
+    <Form
+      subject="{{ title: 'Mr.' }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -442,8 +433,8 @@ The `combobox` type represents a combobox input component. It combines a textbox
 The `datePicker` type represents a date picker input component:
 
 ```ueml copy {6}
-<Form 
-  subject="{{ birthDate: '2021-04-08' }}" 
+<Form
+  subject="{{ birthDate: '2021-04-08' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -453,11 +444,10 @@ The `datePicker` type represents a date picker input component:
 
 <Playground
   name="Example: DatePicker input component"
-  previewOnly={true}
   height={420}
   app={`
-    <Form 
-      subject="{{ birthDate: '2021-04-08' }}" 
+    <Form
+      subject="{{ birthDate: '2021-04-08' }}"
       gap="0.5rem"
       padding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -471,8 +461,8 @@ The `datePicker` type represents a date picker input component:
 The `file` type represents an input component allowing you to select a file:
 
 ```ueml copy {6}
-<Form 
-  subject="{{ articles: null }}" 
+<Form
+  subject="{{ articles: null }}"
   gap="0.5rem"
   padding="1rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -482,11 +472,10 @@ The `file` type represents an input component allowing you to select a file:
 
 <Playground
   name="Example: File input component"
-  previewOnly={true}
   height={200}
   app={`
-    <Form 
-      subject="{{ articles: null }}" 
+    <Form
+      subject="{{ articles: null }}"
       gap="0.5rem"
       padding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -500,8 +489,8 @@ The `file` type represents an input component allowing you to select a file:
 The `integer` type represents an input component for integer values:
 
 ```ueml copy {6}
-<Form 
-  subject="{{ age: 30 }}" 
+<Form
+  subject="{{ age: 30 }}"
   gap="0.5rem"
   padding="1rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -511,11 +500,10 @@ The `integer` type represents an input component for integer values:
 
 <Playground
   name="Example: Integer input component"
-  previewOnly={true}
   height={180}
   app={`
-    <Form 
-      subject="{{ persons: 123 }}" 
+    <Form
+      subject="{{ persons: 123 }}"
       gap="0.5rem"
       padding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -534,11 +522,10 @@ The `number` type represents an input component for numeric values (integer or f
 
 <Playground
   name="Example: Number input component"
-  previewOnly={true}
   height={180}
   app={`
-    <Form 
-      subject="{{ distance: 192.5 }}" 
+    <Form
+      subject="{{ distance: 192.5 }}"
       gap="0.5rem"
       padding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -552,8 +539,8 @@ The `number` type represents an input component for numeric values (integer or f
 The `radioGroup` type represents a group of mutually exclusive radio buttons (only one of them can be selected):
 
 ```ueml copy {6-11}
-<Form 
-  subject="{{ title: 'Mr.' }}" 
+<Form
+  subject="{{ title: 'Mr.' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -568,11 +555,10 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 
 <Playground
   name="Example: RadioGroup input component"
-  previewOnly={true}
   height={160}
   app={`
-    <Form 
-      subject="{{ title: 'Mr.' }}" 
+    <Form
+      subject="{{ title: 'Mr.' }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -593,8 +579,8 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 The `select` type represents a dropdown list; only the listed items can be selected:
 
 ```ueml copy {6-11}
-<Form 
-  subject="{{ size: 'xs' }}" 
+<Form
+  subject="{{ size: 'xs' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -609,11 +595,10 @@ The `select` type represents a dropdown list; only the listed items can be selec
 
 <Playground
   name="Example: Select input component"
-  previewOnly={true}
   height={260}
   app={`
-    <Form 
-      subject="{{ size: 'xs' }}" 
+    <Form
+      subject="{{ size: 'xs' }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -632,8 +617,8 @@ The `select` type represents a dropdown list; only the listed items can be selec
 The `switch` type represents a switch component to toggle a boolean value:
 
 ```ueml copy {6-8}
-<Form 
-  subject="{{ showBorder: true, showText: false, hideShadow: true }}" 
+<Form
+  subject="{{ showBorder: true, showText: false, hideShadow: true }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -645,11 +630,10 @@ The `switch` type represents a switch component to toggle a boolean value:
 
 <Playground
   name="Example: Switch input component"
-  previewOnly={true}
   height={200}
   app={`
-    <Form 
-      subject="{{ showBorder: true, showText: false, hideShadow: true }}" 
+    <Form
+      subject="{{ showBorder: true, showText: false, hideShadow: true }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -665,8 +649,8 @@ The `switch` type represents a switch component to toggle a boolean value:
 The `text` type represents a textbox to enter textual data:
 
 ```ueml copy {6}
-<Form 
-  subject="{{ name: 'Joe' }}" 
+<Form
+  subject="{{ name: 'Joe' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -676,11 +660,10 @@ The `text` type represents a textbox to enter textual data:
 
 <Playground
   name="Example: Text input component"
-  previewOnly={true}
   height={180}
   app={`
-    <Form 
-      subject="{{ name: 'Joe' }}" 
+    <Form
+      subject="{{ name: 'Joe' }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -694,8 +677,8 @@ The `text` type represents a textbox to enter textual data:
 The `textarea` type represents a multiline textbox to enter textual data:
 
 ```ueml copy {6}
-<Form 
-  subject="{{ description: 'This is a description' }}" 
+<Form
+  subject="{{ description: 'This is a description' }}"
   padding="1rem"
   gap="0.5rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -705,11 +688,10 @@ The `textarea` type represents a multiline textbox to enter textual data:
 
 <Playground
   name="Example: TextArea input component"
-  previewOnly={true}
   height={200}
   app={`
-    <Form 
-      subject="{{ description: 'This is a description' }}" 
+    <Form
+      subject="{{ description: 'This is a description' }}"
       padding="1rem"
       gap="0.5rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
@@ -723,12 +705,12 @@ The `textarea` type represents a multiline textbox to enter textual data:
 You can create your custom input component leveraging the XMLUI forms infrastructure. You can nest your custom component's markup into the wrapping `FormItem` as the following sample shows:
 
 ```ueml copy {4-12}
-<Form 
+<Form
   subject="{{ userAvailable: false }}" horizontalPadding="1rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FormItem bindTo="userAvailable">
     <HStack>
-      <Button 
+      <Button
         label="Toggle"
         backgroundColor="{$value === false ? 'red' : 'green'}"
         onClick="$setValue(!$value)"
@@ -744,15 +726,14 @@ Try this simple form and check how the toggle's value is saved:
 
 <Playground
   name="Example: custom input component"
-  previewOnly={true}
   height={160}
   app={`
-    <Form 
+    <Form
       subject="{{ userAvailable: false }}" horizontalPadding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FormItem bindTo="userAvailable">
         <HStack>
-          <Button 
+          <Button
             label="Toggle"
             backgroundColor="{$value === false ? 'red' : 'green'}"
             onClick="$setValue(!$value)"
@@ -770,7 +751,7 @@ When you work with forms, the UI's appearance and behavior often depend on the c
 The following sample demonstrates enabling a field according to another's current value.
 
 ```ueml copy {4}
-<Form 
+<Form
   subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
   <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
   <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
@@ -779,10 +760,9 @@ The following sample demonstrates enabling a field according to another's curren
 
 <Playground
   name="Example: referencing field values"
-  previewOnly={true}
   height={250}
   app={`
-    <Form 
+    <Form
       subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
       <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
       <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
@@ -793,7 +773,7 @@ The following sample demonstrates enabling a field according to another's curren
 You can reference field values in any other component within the form:
 
 ```ueml copy {4}
-<Form 
+<Form
   subject="{{ firstname: 'John', lastname: 'Doe' }}" horizontalPadding="1rem">
   <FormItem label="Firstname" bindTo="firstname" />
   <FormItem label="Lastname" bindTo="lastname" />
@@ -805,10 +785,9 @@ As you update any field, the full name text will follow the changes:
 
 <Playground
   name="Example: referencing field values"
-  previewOnly={true}
   height={250}
   app={`
-    <Form 
+    <Form
       subject="{{ firstname: 'John', lastname: 'Doe' }}" horizontalPadding="1rem">
       <FormItem label="Firstname" bindTo="firstname" />
       <FormItem label="Lastname" bindTo="lastname" />
@@ -823,11 +802,11 @@ As you update any field, the full name text will follow the changes:
 The XMLUI forms infrastructure helps you manage the form data easily. The form has a `subject` property defining a compound data structure. Individual `FormItem` instances can bind themselves to a particular property of `subject`, as the following example shows:
 
 ```ueml copy
-<Form 
+<Form
   subject="{{
-    name: 'John smith', 
+    name: 'John smith',
     address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-  }}" 
+  }}"
   horizontalPadding="1rem"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FormItem bindTo="name" label="Name" />
@@ -837,14 +816,13 @@ The XMLUI forms infrastructure helps you manage the form data easily. The form h
 
 <Playground
   name="Example: Using subject"
-  previewOnly={true}
   height={270}
   app={`
-    <Form 
+    <Form
       subject="{{
-        name: 'John smith', 
+        name: 'John smith',
         address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-      }}" 
+      }}"
       horizontalPadding="1rem"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FormItem bindTo="name" label="Name" />
@@ -903,7 +881,7 @@ The only difference is that the callback function receives the `eventArgs` param
 Call `eventArgs.subject` to access it:
 
 ```ueml copy
-<Form 
+<Form
   subject="{{ name: 'Joe', age: 43 }}"
   onSave="(eventArgs) => console.log(JSON.stringify(eventArgs.subject))" />
 ```
@@ -930,7 +908,6 @@ Delete at least 5 characters from the input field below and click outside the fi
 
 <Playground
   name="Field Validation: Inline"
-  previewOnly={true}
   height={180}
   app={`
   <Form subject="{{ name: 'Billy Bob' }}">
@@ -953,7 +930,6 @@ The input must be no longer than the specified length. Do not try to enter more 
 
 <Playground
   name="Validation Example: maxLength"
-  previewOnly={true}
   height={180}
   app={`
     <Form subject="{{ name: 'Billy Bob' }}">
@@ -973,7 +949,6 @@ Now, you can type more than 11 characters into the box. However, as you click ou
 
 <Playground
   name="Validation Example: maxLength with syncToValidation off"
-  previewOnly={true}
   height={180}
   app={`
     <Form subject="{{ name: 'Billy Bob' }}">
@@ -994,7 +969,6 @@ The input value must be at least the specified value. The given value is inclusi
 
 <Playground
   name="Validation Example: minValue"
-  previewOnly={true}
   height={180}
   app={`
     <Form subject="{{ age: 30 }}">
@@ -1015,7 +989,6 @@ The input value must be smaller than the specified value. The given value is inc
 
 <Playground
   name="Validation Example: maxValue"
-  previewOnly={true}
   height={180}
   app={`
     <Form subject="{{ age: 30 }}">
@@ -1029,10 +1002,10 @@ The input value must be smaller than the specified value. The given value is inc
 Evaluate predefined regex patterns that include the following: "email", "url", "phone".
 
 ```ueml copy
-<Form subject="{{ 
-    mobile: '+13456123456', 
-    website: 'http://www.blogsite.com', 
-    email: 'myemail@mail.com' 
+<Form subject="{{
+    mobile: '+13456123456',
+    website: 'http://www.blogsite.com',
+    email: 'myemail@mail.com'
   }}">
   <FormItem bindTo="mobile" pattern="phone" />
   <FormItem bindTo="website" pattern="url" />
@@ -1042,13 +1015,12 @@ Evaluate predefined regex patterns that include the following: "email", "url", "
 
 <Playground
   name="Validation Example: pattern"
-  previewOnly={true}
   height={350}
   app={`
-    <Form subject="{{ 
-        mobile: '+13456123456', 
-        website: 'http://www.blogsite.com', 
-        email: 'myemail@mail.com' 
+    <Form subject="{{
+        mobile: '+13456123456',
+        website: 'http://www.blogsite.com',
+        email: 'myemail@mail.com'
       }}">
       <FormItem bindTo="mobile" pattern="phone" />
       <FormItem bindTo="website" pattern="url" />
@@ -1073,7 +1045,6 @@ Here, we specify a simple password regular expression that is at least 8 charact
 
 <Playground
     name="Validation Example: regex"
-    previewOnly={true}
     height={300}
     app={`
       <Form subject="{{ password: 'hElLo123' }}">

@@ -23,7 +23,6 @@ If this boolean prop is set to true, the `NumberBox` input will be focused when 
 ```
 
 <Playground
-  previewOnly
   name="Example: autoFocus"
   height={60}
   app={`<NumberBox autoFocus="true" />`}
@@ -42,7 +41,6 @@ Controls whether the input field is enabled (`true`) or disabled (`false`).
 ```
 
 <Playground
-  previewOnly
   name="Example: enabled"
   height={60}
   app={`<NumberBox enabled="false" />`}
@@ -59,7 +57,6 @@ This string prop enables the display of an icon on the right side (left-to-right
 ```
 
 <Playground
-  previewOnly
   name="Example: endIcon"
   height={60}
   app={`<NumberBox endIcon="email" />`}
@@ -72,7 +69,6 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -89,7 +85,6 @@ This string prop enables the display of a custom string on the right side (left-
 ```
 
 <Playground
-  previewOnly
   name="Example: endText"
   height={60}
   app={`<NumberBox endText=".com" />`}
@@ -102,7 +97,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -122,7 +116,6 @@ Default value: `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: hasSpinBox"
   height={100}
   app={`<Stack gap="0.5rem">
@@ -142,7 +135,6 @@ The initial value displayed in the input field.
 ```
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   height={60}
   app={`<NumberBox initialValue="123" />`}
@@ -162,7 +154,6 @@ Default value: `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: integersOnly"
   height={100}
   app={`
@@ -196,7 +187,6 @@ Try to enter a bigger value into the input field below than the maximum allowed.
 ```
 
 <Playground
-  previewOnly
   name="Example: maxValue"
   height={60}
   app={`<NumberBox maxValue="100" initialValue="99" />`}
@@ -213,7 +203,6 @@ Try to enter a bigger value into the input field below than the minimum allowed.
 ```
 
 <Playground
-  previewOnly
   name="Example: minValue"
   height={60}
   app={`<NumberBox minValue="-100" initialValue="-99" />`}
@@ -230,7 +219,6 @@ A placeholder text that is visible in the input field when its empty.
 ```
 
 <Playground
-  previewOnly
   name="Example: placeholder"
   height={60}
   app={`<NumberBox placeholder="This is a placeholder" />`}
@@ -247,7 +235,6 @@ If true, the component's value cannot be modified with user interactions.
 ```
 
 <Playground
-  previewOnly
   name="Example: readOnly"
   height={60}
   app={`<NumberBox initialValue="123" readOnly="true" />`}
@@ -268,7 +255,6 @@ This string prop enables the display of an icon on the left side (left-to-right 
 ```
 
 <Playground
-  previewOnly
   name="Example: startIcon"
   height={60}
   app={`<NumberBox startIcon="hyperlink" />`}
@@ -281,7 +267,6 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -298,7 +283,6 @@ This string prop enables the display of a custom string on the left side (left-t
 ```
 
 <Playground
-  previewOnly
   name="Example: startText"
   height={60}
   app={`<NumberBox startText="www." />`}
@@ -311,7 +295,6 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 ```
 
 <Playground
-  previewOnly
   name="Example: all adornments"
   height={60}
   app={`<NumberBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
@@ -330,7 +313,6 @@ Note that only integers are allowed to be entered.
 ```
 
 <Playground
-  previewOnly
   name="Example: step"
   height={60}
   app={`<NumberBox initialValue="10" step="10" />`}
@@ -367,7 +349,6 @@ This prop is used to visually indicate status changes reacting to form field val
 ```
 
 <Playground
-  previewOnly
   name="Example: validationStatus"
   height={200}
   app={`<VStack gap="0.5rem">
@@ -392,7 +373,6 @@ By default, this property is set to `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: zeroOrPositive"
   height={60}
   app={`<NumberBox initialValue="123" zeroOrPositive="true" />`}
@@ -416,7 +396,6 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ```
 
 <Playground
-  previewOnly
   name="Example: didChange"
   height={80}
   app={`<VStack gap="0.5rem" var.field="0">
@@ -443,7 +422,6 @@ This event is triggered when the `NumberBox` receives focus. The following sampl
 Click into the `NumberBox` (and then click the text below):
 
 <Playground
-  previewOnly
   name="Example: gotFocus/lostFocus"
   height={100}
   app={`
@@ -508,7 +486,6 @@ The `NumberBox` component uses these theme variables to customize its appearance
 
 <Playground
   name="Example: styling"
-  previewOnly
   height={60}
   defaultTheme="custom"
   themes={[

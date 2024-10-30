@@ -20,7 +20,6 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 ```
 
 <Playground
-  previewOnly
   height={40}
   name="Example: only background color"
   app={`<Stack var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
@@ -48,12 +47,11 @@ The `Badge` component supports the mapping of a list of colors using the `value`
 ```
 
 <Playground
-  previewOnly
   height={120}
   name="Example: background and label color"
   app={`
   <Stack gap="0.5rem">
-    <var name="simpleColorMap" 
+    <var name="simpleColorMap"
     value="{ { important: { label: 'red', background: 'pink' }, unimportant: { label: 'black', background: 'gray' } } }" />
     <Badge value="important" colorMap="{simpleColorMap}" />
     <Badge value="unimportant" colorMap="{simpleColorMap}" />
@@ -101,7 +99,7 @@ The text that the component displays
 <Badge value="Example badge" />
 ```
 
-<Playground previewOnly height={40} name="Example: value" app={`<Badge value="Example badge" />`} />
+<Playground height={40} name="Example: value" app={`<Badge value="Example badge" />`} />
 
 ### `variant`
 
@@ -113,7 +111,6 @@ Modifies the shape of the component. Comes in the regular `badge` variant or the
 ```
 
 <Playground
-  previewOnly
   height={90}
   name="Example: variant"
   app={`
