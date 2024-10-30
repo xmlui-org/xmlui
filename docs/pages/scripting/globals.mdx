@@ -2,6 +2,104 @@
 
 XMLUI offers dozens of global functions and properties for use in XMLScript code. This document provides a detailed description of them.
 
+## App-Specific Globals
+
+### `activeThemeId`
+
+```ts
+get activeThemeId: string;
+```
+
+This property returns the ID of the currently active theme.
+
+### `availableThemeIds`
+
+```ts
+get availableThemeIds: string[];
+```
+
+This property returns an array of all available theme IDs.
+
+
+### `activeThemeTone`
+
+```ts
+get activeThemeTone: string;
+```
+
+This property returns the tone of the currently active theme ("light" or "dark").
+
+This property returns an object with some properties of the current API interceptor context.
+
+### `environment`
+
+```ts
+get environment: {
+  isWindowFocused: boolean;
+};
+```
+
+Returns an object with some properties of the current environment.
+
+### `globals`
+
+```ts
+get globals: any;
+```
+
+A hash object containing all global settings defined in the app's configuration file.
+
+### `mediaSize`
+
+```ts
+get mediaSize: {
+  phone: boolean;
+  landscapePhone: boolean;
+  tablet: boolean;
+  desktop: boolean;
+  largeDesktop: boolean;
+  xlDesktop: boolean;
+  smallScreen: boolean;
+  largeScreen: boolean;
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+};
+```
+
+This property returns an object with information about the current media size. The `phone`, `landscapePhone`, `tablet`, `desktop`, `largeDesktop`, and `xlDesktop` flogs indicate the current app window's viewport size. Only one of these flags is `true`; the others are `false`.
+`smallScreen` is set to `true` if the current size is less than `desktop`. `largeScreen` is set to `true` if the current size is `desktop` or bigger.
+
+### `setTheme`
+
+```ts
+function setTheme(themeId: string): void;
+```
+
+This function sets the active theme to the specified theme ID.
+
+### `setThemeTone`
+
+```ts
+function setThemeTone(tone: string): void;
+```
+
+This function sets the active theme tone to the specified value ("light" or "dark").
+
+### `toggleThemeTone`
+
+```ts
+function toggleThemeTone(): void;
+```
+
+This function toggles the active theme tone between "light" and "dark."
+
+### `standalone`
+
+```ts
+get standalone: boolean;
+```
+
+This property returns `true` if the app is a standalone XMLUI app; otherwise (for example, as part of a website), it returns `false`.
+
 ## Date Utilities
 
 ### `formatDate`
@@ -136,12 +234,131 @@ Returns the type of the specified file.
 - If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
 - Otherwise, it returns undefined.
 
+## Navigation Utilities
+
+### `navigate`
+
+```ts
+function navigate(url: string): void;
+```
+
+Navigate to the specified URL.
+
+### `routerBaseName`
+
+```ts
+get routerBaseName: string;
+```
+
+Returns the base name of the current router.
+
+## Users
+
+XMLUI does not constrain what user information may contain; it may be a single identifier or a set of user-specific properties. The app is responsible for processing and displaying this information.
+
+### `loggedInUser`
+
+```ts
+get loggedInUser: any;
+```
+
+This property queries the information about the current user.
+
+### `setLoggedInUser`
+
+```ts 
+function setLoggedInUser(user: any): void;
+```
+
+This app sets the currently logged-in user's information (usually after login). 
+
+## Actions Namespace
+
+XMLUI provides an `Actions` namespace to collect frequently used application actions you can invoke from scripts. When calling them, use the `Actions` namespace like in the following example:
+
+```ts
+Actions.callApi({ url: "/api/contacts/123", method: "delete" });
+```
+
+### `Actions.callApi`
+
+```ts
+function Actions.callApi(options: { 
+  method: "get" | "post" | "put" | "delete";
+  url: string;
+  rawBody?: any;
+  body?: any;
+  queryParams?: Record<string, any>;
+  headers?: Record<string, any>;
+  payloadType?: string;
+  invalidates?: string | string[];
+  updates?: string | string[];
+  confirmTitle?: string;
+  confirmMessage?: string;
+  confirmButtonLabel?: string;
+  beforeRequest?: string;
+  onSuccess?: string;
+  onProgress?: string;
+  onError?: string;
+  params: any;
+  optimisticValue: any;
+  when: string;
+  getOptimisticValue: string;
+  inProgressNotificationMessage?: string;
+  completedNotificationMessage?: string;
+  errorNotificationMessage?: string;
+  uid?: string;
+}): Promise<any>;
+```
+
+Invokes an API endpoint with the specified options.
+
+### `Actions.download`
+
+```ts
+function Actions.download(options: { 
+  fileName: string;
+  params: any;
+  method: "get" | "post" | "put" | "delete";
+  url: string;
+  rawBody?: any;
+  body?: any;
+  queryParams?: Record<string, any>;
+  headers?: Record<string, any>;
+  payloadType?: string;
+}): Promise<any>;
+```
+
+Downloads a file from the specified URL.
+
+### `Actions.upload`
+
+```ts 
+function Actions.upload(options: { 
+  file: File;
+  formParams?: Record<string, any>;
+  asForm?: boolean;
+  method: "get" | "post" | "put" | "delete";
+  url: string;
+  rawBody?: any;
+  body?: any;
+  queryParams?: Record<string, any>;
+  headers?: Record<string, any>;
+  payloadType?: string;
+  invalidates?: string | string[];
+  params: any;
+  chunkSizeInBytes?: number;
+  onError?: string;
+  onProgress?: (...args: any) => void;
+}): Promise<any>;
+```
+
 ## Various Functions
 
 ### `capitalize`
 
 ```ts
-function capitalize(string?: string): string;
+function capitalize(input?: string): string;
 ```
 
 Converts the first character of string to upper case and the remaining to lower case.
@@ -162,6 +379,14 @@ function defaultTo(value: any, defaultValue: any): any;
 
 Provides a fallback value (`defaultValue`) if the specified `value` is null or undefined.
 
+### `delay`
+
+```ts
+function delay(ms: number): Promise<void>;
+```
+
+Delays the execution of the next line of code by the specified number of milliseconds.
+
 ### `handleError`
 
 ```ts
@@ -170,14 +395,6 @@ function handleError(errorObj: any): void;
 
 Displays an error toast with a message. If the provided `errorObj` is a string, it uses it as a message; otherwise, it displays "Something went wrong."
 
-### `navigate`
-
-```ts
-function navigate(url: string): void;
-```
-
-Navigate to the specified URL.
-
 ### `pluralize`
 
 ```ts
@@ -185,6 +402,20 @@ function pluralize(value: number, singular: string, plural: string): string;
 ```
 
 When the value is equal to one, returns `singular`; otherwise, `plural.`
+
+### `signError`
+
+```ts
+function signError(message: string): void;
+```
+
+### `toast`
+
+```ts
+function toast(message: string): void;
+```
+
+Displays a toast with the specified message.
 
 ### `toHashObject`
 
@@ -220,3 +451,13 @@ Returns the following object:
 }
 ```
 
+<Playground
+  previewOnly
+  name="Example: Using DataSource in Data"
+  app={`
+    <App>
+      <Text value="'{routerBaseName}'"/>
+    </App>  
+  `}
+  height={260}
+/>
