@@ -110,8 +110,8 @@ export type AppContextObject = {
     ): Promise<T>;
   };
 
-  readonly activeThemeUid: string;
-  readonly availableThemeUids: string[];
+  readonly activeThemeId: string;
+  readonly availableThemeIds: string[];
   readonly setTheme: (newTheme: string) => void;
   readonly globals?: Record<string, any>;
   readonly resources?: Record<string, string>;
