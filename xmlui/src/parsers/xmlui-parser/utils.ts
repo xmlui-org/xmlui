@@ -25,7 +25,7 @@ export function toDbgString(
 }
 
 /** Disregards error nodes amongst the children of the 2 compared name node. (Those reported an error earlyer anyways)*/
-export function tagNameNodesWithoutErrorMatch(name1: Node, name2: Node, getText: GetText): boolean {
+export function tagNameNodesWithoutErrorsMatch(name1: Node, name2: Node, getText: GetText): boolean {
   const children1 = name1.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
   const children2 = name2.children?.filter((c) => c.kind !== SyntaxKind.ErrorNode) ?? [];
 

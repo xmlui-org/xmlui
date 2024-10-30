@@ -5,7 +5,7 @@ import type { DiagnosticMessageFromScanner, GeneralDiagnosticMessage } from "./d
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
-import { tagNameNodesWithoutErrorMatch   } from "./utils";
+import { tagNameNodesWithoutErrorsMatch   } from "./utils";
 import {
   Diag_Attr_Identifier_Expected,
   Diag_Attr_Value_Expected,
