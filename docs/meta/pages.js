@@ -113,6 +113,7 @@ export const BASIC_COMPONENTS = "/create-apps/basic-components";
 export const BUILD_AND_DEPLOY = "/create-apps/build-and-deploy";
 export const WORKING_WITH_DATA = "/create-apps/data";
 export const USING_MODAL_DIALOGS = "/create-apps/dialogs";
+export const USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS = "/create-apps/dialogs#interoperability-with-forms";
 export const USING_FORMS = "/create-apps/forms";
 export const LAYOUT_PROPERTIES = "/create-apps/layout-props";
 export const LAYOUT_PROPERTIES_COMPONENT_WIDTH_HEIGHT = "/create-apps/layout-props#component-width-height";
