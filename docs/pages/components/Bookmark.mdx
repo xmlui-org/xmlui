@@ -39,7 +39,6 @@ Add an `id` property to `Bookmark` instances and use the same identifiers in lin
 Clicking a link scrolls the bookmarked component adjacent to the corresponding `Bookmark` tag into the view:
 
 <Playground
-  previewOnly
   height={300}
   name="Example: standalone Bookmark"
   app={`
@@ -78,13 +77,13 @@ Alternatively, you can nest components into `Bookmark`:
     <Page url="/">
       <Bookmark id="red">
         <VStack height="200px" backgroundColor="red" />
-      </Bookmark>  
+      </Bookmark>
       <Bookmark id="green">
         <VStack height="200px" backgroundColor="green" />
-      </Bookmark>  
+      </Bookmark>
       <Bookmark id="blue">
         <VStack height="200px" backgroundColor="blue" />
-      </Bookmark>  
+      </Bookmark>
     </Page>
   </Pages>
 </App>
@@ -93,7 +92,6 @@ Alternatively, you can nest components into `Bookmark`:
 You can try; this example works like the previous one:
 
 <Playground
-  previewOnly
   height={300}
   name="Example: Bookmark with nested children"
   app={`
@@ -107,13 +105,13 @@ You can try; this example works like the previous one:
         <Page url="/">
           <Bookmark id="red1">
             <VStack height="200px" backgroundColor="red" />
-          </Bookmark>  
+          </Bookmark>
           <Bookmark id="green1">
             <VStack height="200px" backgroundColor="green" />
-          </Bookmark>  
+          </Bookmark>
           <Bookmark id="blue1">
             <VStack height="200px" backgroundColor="blue" />
-          </Bookmark>  
+          </Bookmark>
         </Page>
       </Pages>
     </App>

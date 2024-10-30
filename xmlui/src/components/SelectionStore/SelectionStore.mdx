@@ -23,9 +23,9 @@ Whenever the user changes the selection state of a particular row, the `Selectio
     <Button label="Clear Selection" onClick="rockets.clearSelection()" />
   </HStack>
   <SelectionStore id="rockets">
-    <Table 
-      width="100%" 
-      rowsSelectable="{true}" 
+    <Table
+      width="100%"
+      rowsSelectable="{true}"
       data="https://api.spacexdata.com/v3/rockets"
       height="300px">
       <Column header="Image" size="80px">
@@ -42,7 +42,6 @@ The UI refreshes the number of selected items as you check or uncheck the rows i
 
 <Playground
   name="Example: using SelectionStore"
-  previewOnly
   height={400}
   app={`
   <VStack padding="$space-1">
@@ -53,9 +52,9 @@ The UI refreshes the number of selected items as you check or uncheck the rows i
       <Button label="Clear Selection" onClick="rockets.clearSelection()" />
     </HStack>
     <SelectionStore id="rockets">
-      <Table 
-        width="100%" 
-        rowsSelectable="{true}" 
+      <Table
+        width="100%"
+        rowsSelectable="{true}"
         data="https://api.spacexdata.com/v3/rockets"
         height="300px">
         <Column header="Image" size="80px">

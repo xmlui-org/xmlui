@@ -19,9 +19,9 @@ In this convention, the `<ComponentId>` part is optional.
 
 The `<propertyName>` segment names a property (and optionally a part of a component) the particular theme variable affects. This segment should use lowercase letters and dashes. The property name can be a single word or multiple words separated with a dash (`-`). Here are a few examples:
 
-- `color-text`: Text color 
+- `color-text`: Text color
 - `color-bg`: Background color
-- `color-bg-indicator`: The background color of the "indicator" part of a specific component. 
+- `color-bg-indicator`: The background color of the "indicator" part of a specific component.
 - `text-size`: The size of the text
 - `line-height`: The height of a text line
 - `padding-horizontal`: The value declaring the horizontal padding space
@@ -111,7 +111,6 @@ These are base colors; when you specify them, XMLUI automatically creates severa
 For example, when you set the the `color-primary` variable to `#008000`, XMLUI creates these shades:
 
 <Playground
-  previewOnly
   name="Custom primary color shades"
   components={[swatch, palette]}
   app={`
@@ -123,13 +122,12 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
 
 When selecting the primary color, choose one representing the middle shade (500). Otherwise, you may end up with an unuseful set of shades. For example, setting `surface-color` to `#001000` will create too many dark shades.
 <Playground
-  previewOnly
   name="Unuseful primary color shades"
   components={[swatch, palette]}
   app={`
     <Theme color-primary="#001000">
       <Palette name="primary" />
-    </Theme>  
+    </Theme>
   `}
 />
 
@@ -140,7 +138,6 @@ XMLUI declares these default color shade sets:
 #### Surface
 
 <Playground
-  previewOnly
   name="Surface Colors"
   components={[swatch, palette]}
   app={`<Palette name="surface" />`}
@@ -149,7 +146,6 @@ XMLUI declares these default color shade sets:
 #### Primary
 
 <Playground
-  previewOnly
   name="Primary Colors"
   components={[swatch, palette]}
   app={`<Palette name="primary" />`}
@@ -158,7 +154,6 @@ XMLUI declares these default color shade sets:
 #### Secondary
 
 <Playground
-  previewOnly
   name="Secondary Colors"
   components={[swatch, palette]}
   app={`<Palette name="secondary" />`}
@@ -167,7 +162,6 @@ XMLUI declares these default color shade sets:
 #### Warn
 
 <Playground
-  previewOnly
   name="Warn Colors"
   components={[swatch, palette]}
   app={`<Palette name="warn" />`}
@@ -176,7 +170,6 @@ XMLUI declares these default color shade sets:
 #### Danger
 
 <Playground
-  previewOnly
   name="Danger Colors"
   components={[swatch, palette]}
   app={`<Palette name="danger" />`}
@@ -185,7 +178,6 @@ XMLUI declares these default color shade sets:
 #### Success
 
 <Playground
-  previewOnly
   name="Success Colors"
   components={[swatch, palette]}
   app={`<Palette name="success" />`}
@@ -200,7 +192,6 @@ XMLUI declares these default color shade sets:
 - `color-text--disabled`: Text color representing the disabled state of a component
 
 <Playground
-  previewOnly
   name="Default Text Colors"
   components={[swatch]}
   app={`
@@ -246,7 +237,6 @@ XMLUI declares these default color shade sets:
 - `color-bg-dropdown-item--active`: The background color of active items in dropdown containers
 
 <Playground
-  previewOnly
   name="Default Background Colors"
   components={[swatch]}
   app={`
@@ -273,7 +263,6 @@ These colors represent validation states:
 - `color-error`: Color signing some error
 
 <Playground
-  previewOnly
   name="Validation Colors"
   components={[swatch]}
   app={`
@@ -296,7 +285,6 @@ These theme variables set the default font styles:
 - `font-family-monospace`: The default monospace font family used in the app
 
 <Playground
-  previewOnly
   name="Font Family"
   app={`
   <VStack padding="1rem" gap="0.5rem">
@@ -323,7 +311,6 @@ These theme variables set the default font styles:
 These theme variables define a set of line heights:
 
 <Playground
-  previewOnly
   name="Line Height"
   app={`
   <VStack padding="1rem" gap="0.5rem">
@@ -365,7 +352,6 @@ These theme variables define a set of line heights:
 The `font-size` theme variables allow you to set your themes' normal font size (`font-size-normal`). You can use this set of theme variables to define font sizes relative to `font-size`:
 
 <Playground
-  previewOnly
   name="Font Size"
   app={`
   <VStack padding="1rem" gap="0.5rem">
@@ -412,7 +398,6 @@ The `font-size` theme variables allow you to set your themes' normal font size (
 The `font-weight` theme variables allow you to set your themes' normal font weight (`font-weight-normal`). You can use this set of theme variables to define font sizes relative to `font-weight`:
 
 <Playground
-  previewOnly
   name="Font Weight"
   app={`
   <VStack padding="1rem" gap="0.5rem">
@@ -458,7 +443,6 @@ XMLUI defines a few stock shadow resources:
 ```
 
 <Playground
-  previewOnly
   name="Shadows"
   height={260}
   app={shadowSizes}
@@ -469,7 +453,6 @@ XMLUI defines a few stock shadow resources:
 XMLUI uses a relative scale with spacing (paddings, margins, gaps, etc.). This scale uses a unit defined with `space-base`, which you can set in your theme. When referring to a particular spacing, you can use values like `space-0`, `space-1`, ..., `space-12`, ..., and `space-96`, as the following example shows:
 
 <Playground
-  previewOnly
   name="Spacings"
   app={spacingSizes}
 />

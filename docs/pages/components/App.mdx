@@ -7,7 +7,6 @@ import condensedSticky from  "../../component-samples/App/condensed-sticky.xmlui
 import vertical from  "../../component-samples/App/vertical.xmlui";
 import verticalSticky from  "../../component-samples/App/vertical-sticky.xmlui";
 import verticalFullHeader from  "../../component-samples/App/vertical-full-header.xmlui";
-import Test from "../../component-samples/App/test.xmlui";
 
 # App [#component-app]
 
@@ -72,28 +71,27 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 
 #### `horizontal`
 
-<Playground previewOnly={false} name="Example: 'horizontal' layout" height={350} app={horizontal} components={[Test]}/>
+<Playground name="Example: 'horizontal' layout" height={350} app={horizontal} />
 
 #### `horizontal-sticky`
 
-<Playground previewOnly={true} name="Example: 'horizontal-sticky' layout" height={350} app={horizontalSticky} />
+<Playground name="Example: 'horizontal-sticky' layout" height={350} app={horizontalSticky} />
 
 #### `condensed`
 
-<Playground previewOnly={true} name="Example: 'condensed' layout" height={350} app={condensed} />
+<Playground name="Example: 'condensed' layout" height={350} app={condensed} />
 
 #### `condensed-sticky`
 
-<Playground previewOnly={true} name="Example: 'condensed-sticky' layout" height={350} app={condensedSticky} />
+<Playground name="Example: 'condensed-sticky' layout" height={350} app={condensedSticky} />
 
 #### `vertical`
 
-<Playground previewOnly={true} name="Example: 'vertical' layout" horizontal={true} height={300} app={vertical} />
+<Playground name="Example: 'vertical' layout" horizontal={true} height={300} app={vertical} />
 
 #### `vertical-sticky`
 
 <Playground
-  previewOnly={true}
   name="Example: 'vertical-sticky' layout"
   horizontal={true}
   height={300}
@@ -103,7 +101,6 @@ Here are a few samples demonstrating the usage of the `layout` property. All sam
 #### `vertical-full-header`
 
 <Playground
-  previewOnly={true}
   name="Example: 'vertical-full-header' layout"
   horizontal={true}
   height={300}
@@ -134,7 +131,6 @@ Currently, there is no restriction on what the user data must look like.
 ```
 
 <Playground
-  previewOnly
   height={150}
   name="Example: loggedInUser"
   horizontal
@@ -207,7 +203,6 @@ The default value is `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: scrollWholePage"
   horizontal
   height={150}
@@ -247,7 +242,6 @@ Use it as `onReady` when inlining it on the component.
 ```
 
 <Playground
-  previewOnly
   height={150}
   name="Example: ready"
   horizontal

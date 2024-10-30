@@ -41,7 +41,7 @@ export const Playground = ({
   defaultTheme,
   defaultTone,
   resources = {},
-  previewOnly = true,
+  previewOnly = false,
   components = [],
   height,
   initialEditorHeight = "50%",

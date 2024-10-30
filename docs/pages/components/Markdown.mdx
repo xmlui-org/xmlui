@@ -6,7 +6,7 @@ import { Callout } from "nextra/components";
 
 The \`Markdown\` component does not have properties. You must provide the text to display nested between an opening and a closing tag `<Markdown>`.
 
-## Specifying the Text 
+## Specifying the Text
 
 As whitespaces (such as spaces and line breaks) have significance in Markdown, you should wrap the text between the `<![CDATA[` and `]]>` XMLUI tags, which preserve all whitespaces.
 
@@ -14,7 +14,6 @@ Indentation is also essential in Markdown. Start the markdown text in the first 
 
 <Playground
   height={500}
-  previewOnly={false}
   horizontal={true}
   name="Example: setting text"
   app={`
@@ -76,7 +75,7 @@ In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
 ***
     ]]>
   </Markdown>
-</App>  
+</App>
   `}
 />
 
@@ -117,7 +116,7 @@ These markdown-specific components are the following:
 ### Blockquote
 
 A blockquote is a sentence or paragraph that's been specially formatted to draw attention to the reader.
-Use the following styles to 
+Use the following styles to
 
 - `accent-Blockquote`: sets the color of the strip running down on the left side of the block
 - `color-bg-Blockquote`: sets the background color
@@ -137,7 +136,6 @@ Use the following styles to
 
 <Playground
   name="Example: styling a horizontal rule"
-  previewOnly={true}
   height={220}
   app={`<Markdown>
     <![CDATA[
@@ -182,7 +180,6 @@ The following determine how the rule should look like:
 
 <Playground
   name="Example: styling a horizontal rule"
-  previewOnly={true}
   height={100}
   app={`<Markdown>
     <![CDATA[
@@ -223,7 +220,6 @@ These are the elements in an ordered or unordered list.
 
 <Playground
   name="Example: styling a list item"
-  previewOnly={true}
   height={100}
   app={`<Markdown>
     <![CDATA[
@@ -260,7 +256,6 @@ If nested, the counter will start anew.
 
 <Playground
   name="Example: styling an ordered list"
-  previewOnly={true}
   height={100}
   app={`<Markdown>
     <![CDATA[
@@ -297,7 +292,6 @@ Different levels of nested lists will have different markers.
 
 <Playground
   name="Example: styling an unordered list"
-  previewOnly={true}
   height={200}
   app={`<Markdown>
     <![CDATA[

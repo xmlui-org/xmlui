@@ -5,7 +5,6 @@
 ```
 
 <Playground
-  previewOnly
   height={88}
   name="Example: name"
   app={`<VStack padding="$space-2"><Avatar name="John, Doe" /></VStack>`}
@@ -26,7 +25,6 @@
 ```
 
 <Playground
-  previewOnly
   height={136}
   name="Example: size"
   app={`
@@ -45,7 +43,6 @@
 %-PROP-START url
 
 <Playground
-  previewOnly
   height={108}
   name="Example: url"
   app={`<VStack padding="$space-2"><Avatar url="https://i.pravatar.cc/100" size="md" /></VStack>`}
@@ -56,17 +53,16 @@
 %-EVENT-START click
 
 ```ueml copy
-<HStack verticalAlignment="center">   
+<HStack verticalAlignment="center">
   <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
     Click the avatar!
 </HStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: click"
   app={`
-    <HStack gap="1rem" verticalAlignment="center" padding="$space-2">   
+    <HStack gap="1rem" verticalAlignment="center" padding="$space-2">
       <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
       Click the avatar!
     </HStack>

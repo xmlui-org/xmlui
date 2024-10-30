@@ -7,18 +7,17 @@
     readOnly="true"
   />
   <HStack gap="0.5rem">
-    <Button 
-      label="Add Text" 
+    <Button
+      label="Add Text"
       onClick="picker.setValue('05/25/2024')" />
-    <Button 
-      label="Remove Text" 
+    <Button
+      label="Remove Text"
       onClick="picker.setValue('')" />
   </HStack>
 </VStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: value and setValue"
   app={`
   <VStack gap="0.5rem">
@@ -27,11 +26,11 @@
       readOnly="true"
     />
     <HStack gap="0.5rem">
-      <Button 
-        label="Add Text" 
+      <Button
+        label="Add Text"
         onClick="picker.setValue('05/25/2024')" />
-      <Button 
-        label="Remove Text" 
+      <Button
+        label="Remove Text"
         onClick="picker.setValue('')" />
     </HStack>
   </VStack>`}
@@ -46,7 +45,6 @@
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: initialValue"
   app={`<DatePicker initialValue="05/25/2024" />`}
@@ -61,7 +59,6 @@
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: placeholder"
   app={`<DatePicker placeholder="This is a placeholder" />`}
@@ -76,7 +73,6 @@
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: enabled"
   app={`<DatePicker enabled="false" />`}
@@ -102,7 +98,6 @@
 ```
 
 <Playground
-  previewOnly
   name="Example: validationStatus"
   height={200}
   app={`
@@ -126,7 +121,6 @@
 ```
 
 <Playground
-  previewOnly
   height={120}
   name="Example: mode"
   app={`
@@ -161,7 +155,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: dateFormat"
   app={`<DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />`}
@@ -176,7 +169,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: showWeekNumber"
   app={`<DatePicker showWeekNumber="true" />`}
@@ -201,7 +193,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   name="Example: weekStartsOn"
   height={60}
   app={`<DatePicker weekStartsOn="1" />`}
@@ -216,7 +207,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: fromDate"
   app={`<DatePicker fromDate="05/24/2024" />`}
@@ -231,7 +221,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: toDate"
   app={`<DatePicker toDate="05/26/2024" />`}
@@ -246,7 +235,6 @@ The table below shows the available date formats:
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: disabledDates"
   app={`<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />`}
@@ -266,7 +254,6 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ```
 
 <Playground
-  previewOnly
   height={120}
   name="Example: didChange"
   app={`
@@ -294,7 +281,6 @@ Note how clicking elsewhere resets the text to the original.
 ```
 
 <Playground
-  previewOnly
   height={120}
   name="Example: gotFocus/lostFocus"
   app={`
@@ -345,7 +331,6 @@ The `DatePicker` component provides these theme variables to customize its appea
 
 <Playground
   name="Example: styling"
-  previewOnly
   height={60}
   defaultTheme="custom"
   themes={[

@@ -30,7 +30,7 @@ All samples use table columns with the following definition unless noted otherwi
 </Table>
 ```
 
-> **Note**: See the [`TableColumnDef` reference](./TableColumnDef) to learn more about table columns. 
+> **Note**: See the [`TableColumnDef` reference](./TableColumnDef) to learn more about table columns.
 
 %-DESC-END
 
@@ -45,7 +45,6 @@ If this boolean prop is set to true, the `Table` will be focused when appearing 
 ```
 
 <Playground
-  previewOnly
   name="Example: autoFocus"
   height={300}
   app={`
@@ -68,7 +67,6 @@ If this boolean prop is set to true, the `Table` will be focused when appearing 
 ```
 
 <Playground
-  previewOnly
   name="Example: data"
   height={300}
   app={`
@@ -81,7 +79,7 @@ If this boolean prop is set to true, the `Table` will be focused when appearing 
 />
 
 You can also provide the `Table` with data directly from an API via this property.
-Here, the component displays rocket information coming from the official SpaceX API. 
+Here, the component displays rocket information coming from the official SpaceX API.
 
 ```ueml copy /data='https://api.spacexdata.com/v3/rockets'/
 <Table data='https://api.spacexdata.com/v3/rockets'>
@@ -94,7 +92,6 @@ Here, the component displays rocket information coming from the official SpaceX 
 ```
 
 <Playground
-  previewOnly
   name="Example: data API Call"
   height={400}
   app={`
@@ -130,7 +127,6 @@ By default, the value of this property is `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: rowsSelectable"
   height={300}
   app={`
@@ -157,7 +153,6 @@ It accepts common [size values](./appearance/common-units.mdx#size-values).
 ```
 
 <Playground
-  previewOnly
   name="Example: headerHeight"
   height={320}
   app={`
@@ -183,7 +178,6 @@ The default value is `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: hideHeader"
   height={300}
   app={`
@@ -206,7 +200,6 @@ The default value is `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: isPaginated"
   height={240}
   app={`
@@ -230,7 +223,6 @@ This property is useful when data is loaded conditionally or receiving it takes 
 ```
 
 <Playground
-  previewOnly
   name="Example: loading"
   height={60}
   app={`<Table loading="true" />`}
@@ -249,7 +241,6 @@ This property is useful when data is loaded conditionally or receiving it takes 
 ```
 
 <Playground
-  previewOnly
   name="Example: noDataTemplate"
   height={60}
   app={`
@@ -276,7 +267,6 @@ Note that this property only works if the [`isPaginated`](#ispaginated) property
 ```
 
 <Playground
-  previewOnly
   name="Example: pageSizes"
   height={300}
   app={`
@@ -306,11 +296,10 @@ The following example disables all table rows where the item's quantity exceeds 
 > **Note:** Disabled items are rendered with a different color.
 
 <Playground
-  previewOnly
   name="Example: rowDisabledPredicate"
   height={300}
   app={`
-    <Table data='{${JSON.stringify(data)}}' 
+    <Table data='{${JSON.stringify(data)}}'
       rowDisabledPredicate="{(item) => item.quantity > 6}">
       <Column bindTo="name"/>
       <Column bindTo="quantity"/>
@@ -337,7 +326,6 @@ The default value is `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: rowsSelectable"
   height={300}
   app={`
@@ -362,7 +350,6 @@ The default value is `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: sortBy"
   height={300}
   app={`
@@ -385,7 +372,6 @@ The default value is `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: sortDirection"
   height={300}
   app={`
@@ -401,7 +387,7 @@ The default value is `false`.
 
 %-PROP-START iconSortAsc
 
-Allows the customization of the icon displayed in a Table column header when sorting is enabled, 
+Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in ascending order.
 
 ```ueml copy /iconSortAsc="chevronup"/
@@ -411,7 +397,6 @@ sorting is done according to the column, and the column is sorted in ascending o
 ```
 
 <Playground
-  previewOnly
   name="Example: iconSortAsc"
   height={300}
   app={`
@@ -427,7 +412,7 @@ sorting is done according to the column, and the column is sorted in ascending o
 
 %-PROP-START iconSortDesc
 
-Allows the customization of the icon displayed in a Table column header when sorting is enabled, 
+Allows the customization of the icon displayed in a Table column header when sorting is enabled,
 sorting is done according to the column, and the column is sorted in descending order.
 
 ```ueml copy /iconSortDesc="chevrondown"/
@@ -436,10 +421,9 @@ sorting is done according to the column, and the column is sorted in descending 
 </Table>
 ```
 
-Select a column header and set it to descending ordering. 
+Select a column header and set it to descending ordering.
 
 <Playground
-  previewOnly
   name="Example: iconSortDesc"
   height={300}
   app={`
@@ -455,7 +439,7 @@ Select a column header and set it to descending ordering.
 
 %-PROP-START iconNoSort
 
-Allows the customization of the icon displayed in a Table column header when when sorting is enabled 
+Allows the customization of the icon displayed in a Table column header when when sorting is enabled
 and sorting is not done according to the column.
 
 ```ueml copy /iconNoSort="close"/
@@ -465,7 +449,6 @@ and sorting is not done according to the column.
 ```
 
 <Playground
-  previewOnly
   name="Example: iconNoSort"
   height={300}
   app={`
@@ -498,13 +481,12 @@ Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColum
 Click on any of the column headers to trigger a new sorting:
 
 <Playground
-  previewOnly
   name="Example: sortingDidChange"
   height={360}
   app={`
     <Stack var.sortedBy="" gap="1rem">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data)}}' 
+      <Table data='{${JSON.stringify(data)}}'
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
         <Column bindTo="quantity" canSort="true"/>
@@ -538,13 +520,12 @@ Though sorting is enabled in the `TableColumnnDef` component of the "name" colum
 clicking that column header still does not sort because `willSort` prevents it:
 
 <Playground
-  previewOnly
   name="Example: willSort"
   height={360}
   app={`
     <Stack var.sortedBy="" gap="1rem">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data)}}' 
+      <Table data='{${JSON.stringify(data)}}'
         onWillSort="(by, dir) => by !== 'name'"
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
@@ -616,7 +597,6 @@ Heading theme variables:
 ```
 
 <Playground
-  previewOnly
   name="Example: styling"
   height={340}
   defaultTheme="custom"

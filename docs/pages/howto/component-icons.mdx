@@ -1,7 +1,7 @@
-import data from  "../../component-samples/Table/list-component-data.js";
-import { COMPONENT_TABLE, THEMES_AND_STYLING } from "../../meta/pages.js";
+import data from "../../component-samples/Table/list-component-data.js";
+import {COMPONENT_TABLE, THEMES_AND_STYLING} from "../../meta/pages.js";
 import arrowIcon from "../../public/resources/files/howto/component-icons/up-arrow.svg";
-import { Callout } from 'nextra/components'
+import {Callout} from 'nextra/components'
 
 # Using Table-specific Icons
 
@@ -14,14 +14,14 @@ Changing the graphical element displayed by an `Icon` component is as easy as en
 Some components have icons already built into them like the ones in the `Table` component indicating sorting by a specific column.
 
 <Callout type="info" emoji="📔">
-The following examples all use the same dataset that the `Table` component <SmartLink href={COMPONENT_TABLE}>reference documentation</SmartLink> uses.
+    The following examples all use the same dataset that the `Table` component <SmartLink href={COMPONENT_TABLE}>reference
+    documentation</SmartLink> uses.
 </Callout>
 
 <Playground
-  previewOnly
-  name="Example: Sorting icons in Table column headers"
-  height={340}
-  app={`
+    name="Example: Sorting icons in Table column headers"
+    height={340}
+    app={`
     <App>
       <Table data='{${JSON.stringify(data)}}'>
         <Column bindTo="name" canSort="true"/>
@@ -54,8 +54,8 @@ However, this would change all icons using the name `arrowup`.
 ## Component-specific Custom Icons
 
 <Callout type="info" emoji="💡">
-In situations where you would want to change only the icon(s) of a particular component, like the `Table`,
-you can use icon names scoped specifically to that component.
+    In situations where you would want to change only the icon(s) of a particular component, like the `Table`,
+    you can use icon names scoped specifically to that component.
 </Callout>
 
 Component-scoped icon names follow the same signature:
@@ -83,11 +83,10 @@ Use the same method for overwriting these icons as you would do with other icons
 This ensures that only the `sortasc` icon found in the `Table` component is affected by the change.
 
 <Playground
-  previewOnly
-  name="Example: Component-specific icon customization"
-  height={360}
-  resources={{ "icon.sortasc:Table": arrowIcon }}
-  app={`
+    name="Example: Component-specific icon customization"
+    height={360}
+    resources={{"icon.sortasc:Table": arrowIcon}}
+    app={`
     <App>
       <Table data='{${JSON.stringify(data)}}'>
         <Column bindTo="name" canSort="true"/>
@@ -131,10 +130,9 @@ while the second `Table` to the right uses the `chevronup` icon instead.
 ```
 
 <Playground
-  previewOnly
-  name="Example: Instance-specific icon customization"
-  height={380}
-  app={`
+    name="Example: Instance-specific icon customization"
+    height={380}
+    app={`
     <App>
       <HStack>
         <VStack width="50%">
@@ -200,11 +198,10 @@ Note, how the icon resource only appears in the left `Table` and not on the righ
 ```
 
 <Playground
-  previewOnly
-  name="Example: Instance- and Component-specific icon customizations"
-  height={380}
-  resources={{ "icon.sortasc:Table": arrowIcon }}
-  app={`
+    name="Example: Instance- and Component-specific icon customizations"
+    height={380}
+    resources={{"icon.sortasc:Table": arrowIcon}}
+    app={`
     <App>
       <HStack>
         <VStack width="50%">

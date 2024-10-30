@@ -28,7 +28,6 @@ In this case, the stack's height is the same as its contents, so all vertical al
 Though you expect the text to be aligned vertically in the middle of the app, it is not: the stack's height is the height of the text.
 
 <Playground
-  previewOnly
   name="Example: VStack with implicit height and vertical alignment"
   height={180}
   app={`
@@ -51,7 +50,6 @@ With an explicit size, you will see the effect of `verticalAlignment`:
 ```
 
 <Playground
-  previewOnly
   name="Example: VStack with *explicit* height and vertical alignment"
   height={180}
   app={`
@@ -82,7 +80,6 @@ Here is an example using a Table. The unexpected result is when you click Clear 
 Click the Clear data (and the Reload data) buttons to check the issue:
 
 <Playground
-  previewOnly
   name="Example: issue with vertical alignment in nested components"
   height={380}
   app={`
@@ -148,7 +145,6 @@ You can quickly fix this issue by specifying the table height explicitly:
 Check this out; now the `noDataTemplate` is rendered as expected:
 
 <Playground
-  previewOnly
   name="Example: fix the issue with vertical alignment in nested components"
   height={240}
   app={`
@@ -210,10 +206,10 @@ You can easily create complex layouts with a few layout containers within `App`,
         <VStack height="100%" backgroundColor="cyan">
           <H3>Left panel</H3>
         </VStack>
-        <VSplitter 
-          height="100%" 
+        <VSplitter
+          height="100%"
           floating="true"
-          initialPrimarySize="20%" 
+          initialPrimarySize="20%"
           minPrimarySize="10%"
           maxPrimarySize="90%">
           <VStack height="100%" backgroundColor="lightcoral">
@@ -240,7 +236,6 @@ You can easily create complex layouts with a few layout containers within `App`,
 Try the example! When you move the mouse to the boundary between the panels, you can drag the splitters to resize them.
 
 <Playground
-  previewOnly
   name="Example: desktop-like layout with resizable panels"
   height={400}
   app={`
@@ -267,10 +262,10 @@ Try the example! When you move the mouse to the boundary between the panels, you
             <VStack height="100%" backgroundColor="cyan">
               <H3>Left panel</H3>
             </VStack>
-            <VSplitter 
-              height="100%" 
+            <VSplitter
+              height="100%"
               floating="true"
-              initialPrimarySize="20%" 
+              initialPrimarySize="20%"
               minPrimarySize="10%"
               maxPrimarySize="90%">
               <VStack height="100%" backgroundColor="lightcoral">

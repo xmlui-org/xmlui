@@ -12,7 +12,7 @@ You can use a `Combobox` to select a text from a dropdown list (click the compon
 
 Define the list of available options with the nested `Option` component, as this example shows:
 
-```ueml copy 
+```ueml copy
 <Combobox id="myCombo">
   <Option label="Jane Arrington" value="ja" />
   <Option label="John Sniper" value="js" />
@@ -22,7 +22,6 @@ Define the list of available options with the nested `Option` component, as this
 ```
 
 <Playground
-  previewOnly
   name="Example: using Combobox"
   height={200}
   app={`
@@ -46,7 +45,6 @@ Combobox supports data binding. The following example shows how you can programm
 ```
 
 <Playground
-  previewOnly
   name="Example: Combobox with data"
   height={220}
   app={`
@@ -85,7 +83,6 @@ With this property, you can define the template to display when the search list 
 Type a "w" to display an empty list:
 
 <Playground
-  previewOnly
   name="Example: emptyListTemplate"
   height={200}
   app={`
@@ -131,7 +128,6 @@ This property sets the component's initial value.
 The following list will show the item with "eg" as its initial value:
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   height={200}
   app={`
@@ -171,7 +167,6 @@ You can define a template for the option items of the `Combobox`.
 Click the `Combobox` to display its options:
 
 <Playground
-  previewOnly
   name="Example: optionTemplate"
   height={200}
   app={`
@@ -240,7 +235,6 @@ This event is triggered when value of Combobox has changed.
 Select an option and see how the text underneath is updated in parallel.
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   height={200}
   app={`
@@ -275,7 +269,6 @@ This event is triggered when the Combobox has received the focus.
 ```
 
 <Playground
-  previewOnly
   name="Example: gotFocus/lostFocus"
   height={200}
   app={`

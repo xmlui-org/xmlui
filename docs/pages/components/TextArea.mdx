@@ -23,7 +23,6 @@ Default value: `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: autoFocus"
   height={80}
   app={`<TextArea autoFocus="true" />`}
@@ -44,7 +43,6 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 ```
 
 <Playground
-  previewOnly
   name="Example: autoSize"
   height={100}
   app={`<TextArea autoSize="true" />`}
@@ -61,7 +59,6 @@ Default value: `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: enabled"
   app={`<TextArea enabled="false" />`}
   height={80}
@@ -85,7 +82,6 @@ See [Using Forms](../learning/forms.mdx) for details.
 ```
 
 <Playground
-  previewOnly
   name="Example: enterSubmits"
   app={`<Form onSubmit="window.alert(address.value)">
     <TextArea
@@ -111,7 +107,6 @@ The initial value displayed in the input field.
 ```
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   height={80}
   app={`<TextArea initialValue="Example text" />`}
@@ -143,7 +138,6 @@ This optional number property maximizes the number of lines the `TextArea` can g
 ```
 
 <Playground
-  previewOnly
   name="Example: maxRows"
   app={`<TextArea
   maxRows="3"
@@ -167,7 +161,6 @@ This optional number property indicates the minimum number of lines the `TextAre
 ```
 
 <Playground
-  previewOnly
   name="Example: minRows"
   app={`<TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />`}
   height={100}
@@ -182,7 +175,6 @@ A placeholder text that is visible in the input field when its empty.
 ```
 
 <Playground
-  previewOnly
   name="Example: placeholder"
   height={80}
   app={`<TextArea placeholder="This is a placeholder" />`}
@@ -197,7 +189,6 @@ Set this property to `true` to disallow changing the component value.
 ```
 
 <Playground
-  previewOnly
   name="Example: readOnly"
   height={80}
   app={`<TextArea initialValue="Example text" readOnly="{true}" />`}
@@ -230,7 +221,7 @@ Available values:
 
 If you allow resizing, the `TextArea` turns off automatic sizing.
 
-When you allow vertical resizing, you can limit the sizable range according to `minRows` and `maxRows`. 
+When you allow vertical resizing, you can limit the sizable range according to `minRows` and `maxRows`.
 
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
@@ -242,7 +233,6 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 ```
 
 <Playground
-  previewOnly
   name="Example: resize"
   app={`<VStack gap="0.5rem">
     <TextArea resize="vertical" minRows="1" maxRows="8" />
@@ -262,7 +252,6 @@ Specifies the number of lines or rows (and thus, its size) the component has.
 ```
 
 <Playground
-  previewOnly
   name="Example: rows"
   app={`<TextArea rows="10" />`}
   height={300}
@@ -299,7 +288,6 @@ This prop is used to visually indicate status changes reacting to form field val
 ```
 
 <Playground
-  previewOnly
   name="Example: validationStatus"
   height={300}
   app={`
@@ -328,7 +316,6 @@ Write in the input field and see how the `Text` underneath it is updated in para
 ```
 
 <Playground
-  previewOnly
   name="Example: didChange"
   height={100}
   app={`
@@ -356,7 +343,6 @@ Note how clicking elsewhere resets the text to the original.
 ```
 
 <Playground
-  previewOnly
   name="Example: gotFocus/lostFocus"
   height={100}
   app={`
@@ -444,7 +430,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  previewOnly
   height={200}
   defaultTheme="custom"
   themes={[

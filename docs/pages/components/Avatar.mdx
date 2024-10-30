@@ -15,7 +15,6 @@ This property sets the name value the Avatar uses to display initials.
 ```
 
 <Playground
-  previewOnly
   height={88}
   name="Example: name"
   app={`<VStack padding="$space-2"><Avatar name="John, Doe" /></VStack>`}
@@ -48,7 +47,6 @@ Available values:
 ```
 
 <Playground
-  previewOnly
   height={136}
   name="Example: size"
   app={`
@@ -67,7 +65,6 @@ Available values:
 This property specifies the URL of the image to display in the Avatar.
 
 <Playground
-  previewOnly
   height={108}
   name="Example: url"
   app={`<VStack padding="$space-2"><Avatar url="https://i.pravatar.cc/100" size="md" /></VStack>`}
@@ -80,17 +77,16 @@ This property specifies the URL of the image to display in the Avatar.
 This event is triggered when the avatar is clicked.
 
 ```ueml copy
-<HStack verticalAlignment="center">   
+<HStack verticalAlignment="center">
   <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
     Click the avatar!
 </HStack>
 ```
 
 <Playground
-  previewOnly
   name="Example: click"
   app={`
-    <HStack gap="1rem" verticalAlignment="center" padding="$space-2">   
+    <HStack gap="1rem" verticalAlignment="center" padding="$space-2">
       <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
       Click the avatar!
     </HStack>

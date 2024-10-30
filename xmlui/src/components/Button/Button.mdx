@@ -22,7 +22,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly
   height={230}
   name="Example: content position"
   app={`
@@ -49,7 +48,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: icon"
   app={`
     <HStack gap="1rem" >
@@ -83,7 +81,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: iconPosition"
   app={`
     <VStack gap="1rem">
@@ -121,7 +118,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly={true}
   name="Button label"
   app={`
     <VStack gap="1rem" >
@@ -151,7 +147,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly
   height={60}
   name="Example: variant"
   app={`
@@ -177,7 +172,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-    previewOnly
     name="Example: theme colors"
     app={`
     <Stack orientation="horizontal" gap="10px">
@@ -201,7 +195,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly={true}
   name="Example: enabled"
   app={`
     <HStack gap="1rem" >
@@ -236,7 +229,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly
   height={140}
   name="Example: size"
   app={`<Stack gap="4px">
@@ -266,7 +258,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-  previewOnly
   name="Example: click"
   app={`
     <Button label="Click me!" onClick="window.alert('Button clicked')" />
@@ -281,8 +272,8 @@ Use the `Button` component to trigger various actions.
 ```ueml copy
 <VStack gap="1rem" var.text="No event" >
   <HStack gap="1rem" verticalAlignment="center" >
-    <Button label="First, click me!" 
-      onGotFocus="text = 'Focus received'" 
+    <Button label="First, click me!"
+      onGotFocus="text = 'Focus received'"
       onLostFocus="text = 'Focus lost'" />
     <Text value="Then, me!"/>
   </HStack>
@@ -291,7 +282,6 @@ Use the `Button` component to trigger various actions.
 ```
 
 <Playground
-    previewOnly
     name="Example: gotFocus/lostFocus"
     app={`
     <VStack gap="1rem" var.text="No event" >
@@ -404,7 +394,6 @@ Avoid setting the `width-Button` and `height-Button` styles in the theme definit
 ```
 
 <Playground
-    previewOnly
     name="Example: Buttons with fixed width"
     app={`
     <HStack gap="1rem" padding="1rem">

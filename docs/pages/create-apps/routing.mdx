@@ -16,10 +16,10 @@ Client-side routing allows your app to update the URL from a link click without 
 ## Routing mechanisms
 
 <Callout type="info" emoji="💡">
-You can use two different routing mechanisms: *standard* and *hash* routing. 
+You can use two different routing mechanisms: *standard* and *hash* routing.
 </Callout>
 
-Both store the current location in the browser's address bar using clean URLs and navigate using the browser's built-in history stack. However, they differ in the URLs they send to the backend server. 
+Both store the current location in the browser's address bar using clean URLs and navigate using the browser's built-in history stack. However, they differ in the URLs they send to the backend server.
 
 ### Standard routing
 
@@ -62,7 +62,7 @@ You can turn it off in the app's configuration file, as this example shows:
 
 XMLUI uses the specified links as absolute links (starting with a slash) or relative links, as the following example shows:
 
-```ueml copy 
+```ueml copy
 <App layout="vertical">
   <NavPanel>
     <NavLink to="/">Home</NavLink>
@@ -83,11 +83,10 @@ XMLUI uses the specified links as absolute links (starting with a slash) or rela
 </App>
 ```
 
-Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL. 
+Here, `/` and `/contacts` are absolute links within the app, `about` is a relative link. As then `NavPanel` hierarchy is at the root level within the app, `/contacts` and `contacts` is the same URL.
 You can test it running the app; the `/contacts` link will match the related `Page` object's `contact` URL:
 
 <Playground
-  previewOnly
   height={160}
   name="Example: Links"
   app={`
@@ -138,7 +137,6 @@ You can use parameter placeholders in the URLs as part of the route. These place
 The following example demonstrates using them:
 
 <Playground
-  previewOnly
   height={180}
   name="Example: dynamic route segments"
   app={`
@@ -190,7 +188,6 @@ Besides rout parameters, XMLUI supports using query parameters with routes, as t
 The third link uses two query parameters, "from" and "to". The target page uses the `$queryParams` context variable to access them (try clicking the "Winter Report" link):
 
 <Playground
-  previewOnly
   height={200}
   name="Example: query parameters"
   app={`
@@ -239,7 +236,6 @@ When the app visits a particular target in its available routes, the `NavLink` c
 When you start the app, the route is "/" (by default) and matches the Home page's route specification. Thus, Home is marked as the active link. When you click About, the route changes to "/about," so the active link becomes About (its route specification matches the current route):
 
 <Playground
-  previewOnly
   height={120}
   name="Example: active links"
   app={`
@@ -283,7 +279,6 @@ As a `NavLink` activity is based on matching, multiple active links may exist si
 Query parameters are not considered to be part of the route. So, in this sample, the Winter report and Summer report match the same route, "/report." If you select any of them, both links are marked active:
 
 <Playground
-  previewOnly
   height={140}
   name="Example: multiples active links simultaneously"
   app={`

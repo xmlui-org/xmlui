@@ -17,8 +17,8 @@ This property sets the label of the component.
 Default value: `false`.
 
 ```ueml copy /autoFocus="true"/
-<Form padding="0.5rem" 
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}" 
+<Form padding="0.5rem"
+  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
@@ -27,10 +27,9 @@ Default value: `false`.
 ```
 
 <Playground
-  previewOnly
   name="Example: autoFocus"
-  app={`<Form padding="0.5rem" 
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}" 
+  app={`<Form padding="0.5rem"
+  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
@@ -46,7 +45,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 
 ```ueml copy /bindTo="firstname"/
 <Form padding="0.5rem"
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}" 
+  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" />
@@ -55,10 +54,9 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 ```
 
 <Playground
-  previewOnly
   name="Example: bindTo"
-  app={`<Form padding="0.5rem" 
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}" 
+  app={`<Form padding="0.5rem"
+  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" />
@@ -91,7 +89,6 @@ Note how changing the input in the demo below will result in a slight delay of i
 ```
 
 <Playground
-  previewOnly
   name="Example: customValidationsDebounce"
   app={`<Form
   var.validations="Validations: "
@@ -122,7 +119,6 @@ Default value: `true`.
 ```
 
 <Playground
-  previewOnly
   name="Example: enabled"
   app={`<Form padding="0.5rem">
   <FormItem label="Firstname" enabled="true" />
@@ -137,7 +133,7 @@ This property sets the component's initial value.
 ```ueml copy {3} /initialValue/
 <Form
   padding="0.5rem"
-  subject="{{ firstname: 'Michael', lastname: undefined }}" 
+  subject="{{ firstname: 'Michael', lastname: undefined }}"
 >
   <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
   <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
@@ -145,11 +141,10 @@ This property sets the component's initial value.
 ```
 
 <Playground
-  previewOnly
   name="Example: initialValue"
   app={`<Form
   padding="0.5rem"
-  subject="{{ firstname: 'Michael', lastname: undefined }}" 
+  subject="{{ firstname: 'Michael', lastname: undefined }}"
 >
   <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
   <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
@@ -167,7 +162,6 @@ This property sets the label of the component.
 ```
 
 <Playground
-  previewOnly
   name="Example: label"
   app={`<Form padding="0.5rem">
   <FormItem label="Firstname" />
@@ -197,7 +191,6 @@ Different input components have different layout methods
 ```
 
 <Playground
-  previewOnly
   name="Example: labelPosition"
   app={`<Form padding="0.5rem">
   <FormItem label="Left Label" labelPosition="left" />
@@ -229,7 +222,6 @@ In the app, type a name longer than four characters in both fields, then leave t
 ```
 
 <Playground
-  previewOnly
   name="Example: lengthInvalidMessage"
   app={`<Form
   subject="{{ firstname: 'James', lastname: 'Clewell' }}"
@@ -262,7 +254,6 @@ In the app, type a name longer than four characters in both fields, then leave t
 ```
 
 <Playground
-  previewOnly
   name="Example: lengthInvalidSeverity"
   app={`<Form
   subject="{{ firstname: 'James', lastname: 'Clewell' }}"
@@ -294,7 +285,6 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 ```
 
 <Playground
-  previewOnly
   name="Example: maxLength"
   app={`<Form
   subject="{{ firstname: 'James' }}"
@@ -329,7 +319,6 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 ```
 
 <Playground
-  previewOnly
   name="Example: maxValue"
   app={`<Form
   subject="{{ age: 100 }}"
@@ -357,7 +346,6 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 ```
 
 <Playground
-  previewOnly
   name="Example: minLength"
   app={`<Form
   subject="{{ firstname: '' }}"
@@ -388,7 +376,6 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 ```
 
 <Playground
-  previewOnly
   name="Example: minValue"
   app={`<Form
   subject="{{ age: 0 }}"
@@ -424,7 +411,6 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 ```
 
 <Playground
-  previewOnly
   name="Example: regex"
   app={`<Form
   subject="{{ userEmail: 'mailto' }}"
@@ -453,7 +439,6 @@ In the demo below, enter anything that does not look like an email and click out
 ```
 
 <Playground
-  previewOnly
   name="Example: patternInvalidMessage"
   app={`<Form
   subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
@@ -486,7 +471,6 @@ In the demo below, enter a string of characters that does not look like an email
 ```
 
 <Playground
-  previewOnly
   name="Example: patternInvalidSeverity"
   app={`<Form
   subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
@@ -517,7 +501,6 @@ Just submitting the form as is also produces the same error.
 ```
 
 <Playground
-  previewOnly
   name="Example: rangeInvalidMessage"
   app={`<Form
   subject="{{ age: 100, customAge: 100 }}"
@@ -551,7 +534,6 @@ Just submitting the form as is also produces the same error.
 ```
 
 <Playground
-  previewOnly
   name="Example: rangeInvalidSeverity"
   app={`<Form
   subject="{{ age: 100, customAge: 100 }}"
@@ -580,7 +562,6 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 ```
 
 <Playground
-  previewOnly
   name="Example: regex"
   app={`<Form
   subject="{{ password: 'PASSWORD123' }}"
@@ -609,7 +590,6 @@ In the demo below, enter a password that is not a lowercase string and click out
 ```
 
 <Playground
-  previewOnly
   name="Example: regexInvalidMessage"
   app={`<Form
   subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
@@ -643,7 +623,6 @@ Just submitting the form as is also produces the same error.
 ```
 
 <Playground
-  previewOnly
   name="Example: regexInvalidSeverity"
   app={`<Form
   subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
@@ -670,7 +649,6 @@ Set this property to `true` to indicate it must have a value before submitting t
 ```
 
 <Playground
-  previewOnly
   name="Example: required"
   app={`<Form
   subject="{{ name: undefined }}"
@@ -699,7 +677,6 @@ In the demo below, leave the field empty and click outside to see the regular an
 ```
 
 <Playground
-  previewOnly
   name="Example: requiredInvalidMessage"
   app={`<Form
   subject="{{ firstname: undefined, lastname: undefined }}"
@@ -775,7 +752,6 @@ In the demo below, leave the field as is and submit the form or enter an input t
 ```
 
 <Playground
-  previewOnly
   name="Example: validate"
   app={`<Form
   subject="{{ name: 'James' }}"

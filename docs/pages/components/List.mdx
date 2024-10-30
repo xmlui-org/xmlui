@@ -39,7 +39,6 @@ To tweak what data and how it is displayed, see the [`itemTemplate` section](#it
 ```
 
 <Playground
-  previewOnly
   name="Example: data"
   height={400}
   app={`<List data='{${JSON.stringify(data)}}' />`}
@@ -65,7 +64,6 @@ See the [itemTemplate section](#itemtemplate).
 ```
 
 <Playground
-  previewOnly
   name="Example: data API Call"
   height={400}
   app={`
@@ -93,7 +91,7 @@ Note the `meat` section header before all the others in the list below:
 > and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
-<List 
+<List
   data='{${JSON.stringify(data)}}'
   defaultSections="{['meat']}"
   sectionBy="category"
@@ -107,11 +105,10 @@ Note the `meat` section header before all the others in the list below:
 ```
 
 <Playground
-  previewOnly
   name="Example: defaultSections"
   height={400}
   app={`
-  <List 
+  <List
     data='{${JSON.stringify(data)}}'
     defaultSections="{['meat']}"
     sectionBy="category"
@@ -140,7 +137,6 @@ This property defines the template to display when the list is empty.
 ```
 
 <Playground
-  previewOnly
   name="Example: emptyListTemplate"
   height={100}
   app={`
@@ -163,7 +159,6 @@ Denotes which attribute of an item acts as the ID or key of the item. Default is
 ```
 
 <Playground
-  previewOnly
   name="Example: idKey"
   height={400}
   app={`<List idKey="key" data='{${JSON.stringify(data)}}' />`}
@@ -193,7 +188,6 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
 ```
 
 <Playground
-  previewOnly
   name="Example: itemTemplate"
   height={400}
   app={`
@@ -227,7 +221,6 @@ This property limits the number of items displayed in the `List`.
 ```
 
 <Playground
-  previewOnly
   name="Example: limit"
   height={400}
   app={`<List limit="4" data='{${JSON.stringify(data)}}' />`}
@@ -242,7 +235,6 @@ This property delays the rendering of children until it is set to `false`, or th
 ```
 
 <Playground
-  previewOnly
   name="Example: loading"
   height={60}
   app={`<List loading="true" />`}
@@ -257,7 +249,6 @@ This property enables the ordering of list items by specifying an attribute in t
 ```
 
 <Playground
-  previewOnly
   name="Example: orderBy"
   height={400}
   app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
@@ -285,7 +276,6 @@ This property pins the scroll position to either the `top` or the `bottom` of th
 ```
 
 <Playground
-  previewOnly
   name="Example: scrollAnchor"
   height={400}
   app={`<List scrollAnchor="bottom" data='{${JSON.stringify(data)}}' />`}
@@ -299,7 +289,7 @@ This property set which attribute of the data is used to group or section the li
 > or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 ```ueml copy {3}
-<List 
+<List
   data='{${JSON.stringify(data)}}'
   defaultSections="{['meat']}"
   sectionBy="category"
@@ -313,11 +303,10 @@ This property set which attribute of the data is used to group or section the li
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionBy"
   height={400}
   app={`
-  <List 
+  <List
     data='{${JSON.stringify(data)}}'
     defaultSections="{['meat']}"
     sectionBy="category"
@@ -358,7 +347,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionFooterTemplate"
   height={400}
   app={`
@@ -399,7 +387,6 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  previewOnly
   name="Example: sectionTemplate"
   height={400}
   app={`
@@ -426,7 +413,6 @@ This property scrolls to a specific item indicated by its index.
 ```
 
 <Playground
-  previewOnly
   name="Example: selectedIndex"
   height={400}
   app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}

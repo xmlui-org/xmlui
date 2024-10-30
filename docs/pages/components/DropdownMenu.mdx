@@ -22,7 +22,6 @@ Try this dropdown menu:
 
 <Playground
   name="Example: Using DropdownMenu"
-  previewOnly
   height={240}
   app={`
     <VStack padding="1rem">
@@ -56,8 +55,8 @@ Available values are:
     <MenuItem>Item 2</MenuItem>
     <MenuItem>Item 3</MenuItem>
   </DropdownMenu>
-  <DropdownMenu 
-    label="End-aligned menu" 
+  <DropdownMenu
+    label="End-aligned menu"
     alignment="end">
     <MenuItem>Item 1</MenuItem>
     <MenuItem>Item 2</MenuItem>
@@ -68,7 +67,6 @@ Available values are:
 
 <Playground
   name="Example: alignment"
-  previewOnly
   height={200}
   app={`
     <HStack padding="1rem" gap="2rem">
@@ -104,7 +102,7 @@ Default value: `true`.
   </DropdownMenu>
   <DropdownMenu
     enabled="false"
-    label="Disabled Dropdown" 
+    label="Disabled Dropdown"
   >
     <MenuItem>Item 1</MenuItem>
     <MenuItem>Item 2</MenuItem>
@@ -115,7 +113,6 @@ Default value: `true`.
 
 <Playground
   name="Example: enabled"
-  previewOnly
   height={200}
   app={`
   <HStack padding="1rem" gap="2rem">
@@ -129,7 +126,7 @@ Default value: `true`.
     </DropdownMenu>
     <DropdownMenu
       enabled="false"
-      label="Disabled Dropdown" 
+      label="Disabled Dropdown"
     >
       <MenuItem>Item 1</MenuItem>
       <MenuItem>Item 2</MenuItem>
@@ -178,7 +175,6 @@ This property allows you to define a custom trigger instead of the default one p
 
 <Playground
   name="Example: triggerTemplate"
-  previewOnly
   height={200}
   app={`
   <VStack padding="1rem">
@@ -217,7 +213,6 @@ This event fires when the `DropdownMenu` component is opened.
 
 <Playground
   name="Example: willOpen"
-  previewOnly
   height={200}
   app={`
   <VStack padding="1rem" gap="2rem">
