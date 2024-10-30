@@ -1080,13 +1080,12 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
 ### `regex`
 
 Evaluate a user-defined custom regex pattern.
-Here, we specify a simple password regular expression that is at least 8 characters long and contains at least one upper case letter and a number:
 
 ```ueml copy
 <App>
-  <Form subject="{{ password: 'hElLo123' }}">
-    <!-- 8 letter password, with lower case letters and at least 1 upper case letter and a number -->
-    <FormItem bindTo="password" regex="{/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/}" />
+  <Form subject="{{ password: 'hello' }}">
+    <!-- Only all uppercase letters are accepted -->
+    <FormItem bindTo="password" regex="/^[A-Z]+$/" />
   </Form>
 </App>
 ```
@@ -1096,8 +1095,7 @@ Here, we specify a simple password regular expression that is at least 8 charact
   previewOnly
   app={`
   <App>
-    <Form subject="{{ password: 'hElLo123' }}">
-      <!-- 8 letter password, with lower case letters and at least 1 upper case letter and a number -->
+    <Form subject="{{ password: 'hello' }}">
       <FormItem bindTo="password" regex="/^[A-Z]+$/" />
     </Form>
   </App>
