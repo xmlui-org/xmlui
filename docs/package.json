@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "rm -rf .next/cache",
     "start": "next start",
     "release-ci": "npm run build && xmlui zip-dist"
   },

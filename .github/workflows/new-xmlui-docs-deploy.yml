@@ -40,11 +40,6 @@ jobs:
         run: npm run release-ci
         working-directory: docs
 
-      - name: Remove .next/cache
-        shell: bash
-        run: rm -rf .next/cache
-        working-directory: docs
-
       - name: 'Run Azure webapp deploy action using publish profile credentials'
         uses: azure/webapps-deploy@v2
         with:
