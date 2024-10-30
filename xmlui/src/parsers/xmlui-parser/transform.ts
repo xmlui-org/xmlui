@@ -354,7 +354,7 @@ export function nodeToComponentDef(
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
-      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script, moduleResolver);
+      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script, moduleResolver, (a) => a);
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         comp.scriptError = parser.errors;

@@ -29,9 +29,7 @@ import { BlockScope } from "@abstractions/scripting/BlockScope";
  * @param result Result to check
  * @returns True if the result is a module error
  */
-export function isModuleErrors(
-  result: ScriptModule | ModuleErrors
-): result is ModuleErrors {
+export function isModuleErrors(result: ScriptModule | ModuleErrors): result is ModuleErrors {
   return (result as any).type !== "ScriptModule";
 }
 
@@ -46,23 +44,21 @@ export function parseScriptModule(
   moduleName: string,
   source: string,
   moduleResolver: ModuleResolver,
-  restrictiveMode = false
+  restrictiveMode = false,
 ): ScriptModule | ModuleErrors {
   // --- Keep track of parsed modules to avoid circular references
   const parsedModules = new Map<string, ScriptModule>();
   const moduleErrors: ModuleErrors = {};
 
   const parsedModule = doParseModule(moduleName, source, moduleResolver, true);
-  return !parsedModule || Object.keys(moduleErrors).length > 0
-    ? moduleErrors
-    : parsedModule;
+  return !parsedModule || Object.keys(moduleErrors).length > 0 ? moduleErrors : parsedModule;
 
   // --- Do the parsing, allow recursion
   function doParseModule(
     moduleName: string,
     source: string,
     moduleResolver: ModuleResolver,
-    topLevel = false
+    topLevel = false,
   ): ScriptModule | null | undefined {
     // --- Do not parse the same module twice
     if (parsedModules.has(moduleName)) {
@@ -101,88 +97,48 @@ export function parseScriptModule(
       cancel: false,
       skipChildren: false,
     };
-    visitNode(
-      statements,
-      emptyState,
-      (before, stmt, state, parent, tag?: string) => {
-        if (!before) return state;
-        if (topLevel) {
-          // --- Restrict top-level statements
-          switch (stmt.type) {
-            case "VarS":
-              // --- Allow on top-level var declarations in a top-level module
-              if (parent) {
-                addErrorMessage("W027", stmt);
-              }
-              break;
-            case "FuncD":
-            case "ImportD":
-              break;
-            default:
-              if (restrictiveMode && !parent) {
-                addErrorMessage("W028", stmt, stmt.type);
-              }
-              break;
-          }
-        } else {
-          switch (stmt.type) {
-            case "VarS":
+    visitNode(statements, emptyState, (before, stmt, state, parent, tag?: string) => {
+      if (!before) return state;
+      if (topLevel) {
+        // --- Restrict top-level statements
+        switch (stmt.type) {
+          case "VarS":
+            // --- Allow on top-level var declarations in a top-level module
+            if (parent) {
               addErrorMessage("W027", stmt);
-              break;
-            case "FuncD":
-              if (restrictiveMode && !stmt.isExported) {
-                addErrorMessage("W029", stmt);
-              }
-              break;
-            case "ImportD":
-              break;
-            default:
-              if (restrictiveMode && !parent) {
-                addErrorMessage("W028", stmt, stmt.type);
-              }
-              break;
-          }
+            }
+            break;
+          case "FuncD":
+          case "ImportD":
+            break;
+          default:
+            if (restrictiveMode && !parent) {
+              addErrorMessage("W028", stmt, stmt.type);
+            }
+            break;
         }
-
-        return state;
+      } else {
+        switch (stmt.type) {
+          case "VarS":
+            addErrorMessage("W027", stmt);
+            break;
+          case "FuncD":
+            if (restrictiveMode && !stmt.isExported) {
+              addErrorMessage("W029", stmt);
+            }
+            break;
+          case "ImportD":
+            break;
+          default:
+            if (restrictiveMode && !parent) {
+              addErrorMessage("W028", stmt, stmt.type);
+            }
+            break;
+        }
       }
-    );
 
-    // // --- Check for forbidden "var" declarations
-    // statements.forEach((stmt) => {
-    //   if (topLevel) {
-    //     // --- Restrict top-level statements
-    //     switch (stmt.type) {
-    //       case "VarS":
-    //       case "FuncD":
-    //       case "ImportD":
-    //         break;
-    //       default:
-    //         if (restrictiveMode) {
-    //           addErrorMessage("W028", stmt, stmt.type);
-    //         }
-    //         break;
-    //     }
-    //   } else {
-    //     switch (stmt.type) {
-    //       case "VarS":
-    //         addErrorMessage("W027", stmt);
-    //         break;
-    //       case "FuncD":
-    //         if (restrictiveMode && !stmt.isExported) {
-    //           addErrorMessage("W029", stmt);
-    //         }
-    //         break;
-    //       case "ImportD":
-    //         break;
-    //       default:
-    //         if (restrictiveMode) {
-    //           addErrorMessage("W028", stmt, stmt.type);
-    //         }
-    //         break;
-    //     }
-    //   }
-    // });
+      return state;
+    });
 
     // --- Hoist functions
     const functions: Record<string, FunctionDeclaration> = {};
@@ -223,7 +179,7 @@ export function parseScriptModule(
       name: moduleName,
       exports,
       importedModules: [],
-      imports: [],
+      imports: {},
       functions,
       statements,
       executed: false,
@@ -234,7 +190,7 @@ export function parseScriptModule(
 
     // --- Load imported modules and resolve imports
     const importedModules: ScriptModule[] = [];
-    const imports: Record<string, any> = {};
+    const imports: Record<string, Record<string, any>> = {};
     for (let i = 0; i < statements.length; i++) {
       const stmt = statements[i];
       if (stmt.type !== "ImportD") {
@@ -260,9 +216,13 @@ export function parseScriptModule(
       importedModules.push(imported);
 
       // --- Extract imported names
-      for (const key in stmt.imports) {
+      const importedItems = Object.keys(stmt.imports);
+      if (importedItems.length > 0) {
+        imports[stmt.moduleFile] ??= {};
+      }
+      for (const key of importedItems) {
         if (imported.exports.has(stmt.imports[key])) {
-          imports[key] = imported.exports.get(stmt.imports[key]);
+          imports[stmt.moduleFile][key] = imported.exports.get(stmt.imports[key]);
         } else {
           addErrorMessage("W023", stmt, stmt.moduleFile, key);
         }
@@ -283,24 +243,16 @@ export function parseScriptModule(
     parsedModule.imports = imports;
     return parsedModule;
 
-    function addErrorMessage(
-      code: ScriptParsingErrorCodes,
-      stmt: Statement,
-      ...args: any[]
-    ): void {
+    function addErrorMessage(code: ScriptParsingErrorCodes, stmt: Statement, ...args: any[]): void {
       let errorText = errorMessages[code];
       if (args) {
         args.forEach(
-          (o, idx) =>
-            (errorText = errorText.replaceAll(`{${idx}}`, args[idx].toString()))
+          (o, idx) => (errorText = errorText.replaceAll(`{${idx}}`, args[idx].toString())),
         );
       }
       errors.push({
         code,
-        text: errorMessages[code].replace(
-          /\{(\d+)}/g,
-          (_, index) => args[index]
-        ),
+        text: errorMessages[code].replace(/\{(\d+)}/g, (_, index) => args[index]),
         position: stmt.startPosition,
         line: stmt.startLine,
         column: stmt.startColumn,
@@ -311,9 +263,7 @@ export function parseScriptModule(
 
 export function obtainClosures(thread: LogicalThread): BlockScope[] {
   const closures = thread.blocks?.slice(0) ?? [];
-  return thread.parent
-    ? [...obtainClosures(thread.parent), ...closures]
-    : closures;
+  return thread.parent ? [...obtainClosures(thread.parent), ...closures] : closures;
 }
 
 /**
@@ -328,7 +278,7 @@ type IdDeclarationVisitor = (id: string) => void;
  */
 export function visitLetConstDeclarations(
   declaration: LetStatement | ConstStatement,
-  visitor: IdDeclarationVisitor
+  visitor: IdDeclarationVisitor,
 ): void {
   for (let i = 0; i < declaration.declarations.length; i++) {
     let value: any;
@@ -336,10 +286,7 @@ export function visitLetConstDeclarations(
     visitDeclaration(decl, visitor);
   }
 
-  function visitDeclaration(
-    varDecl: VarDeclaration,
-    visitor: IdDeclarationVisitor
-  ): void {
+  function visitDeclaration(varDecl: VarDeclaration, visitor: IdDeclarationVisitor): void {
     // --- Process each declaration
     if (varDecl.id) {
       visitor(varDecl.id);
@@ -353,10 +300,7 @@ export function visitLetConstDeclarations(
   }
 
   // --- Visits an array destructure declaration
-  function visitArrayDestruct(
-    arrayD: ArrayDestructure[],
-    visitor: IdDeclarationVisitor
-  ): void {
+  function visitArrayDestruct(arrayD: ArrayDestructure[], visitor: IdDeclarationVisitor): void {
     for (let i = 0; i < arrayD.length; i++) {
       const arrDecl = arrayD[i];
       if (arrDecl.id) {
@@ -370,10 +314,7 @@ export function visitLetConstDeclarations(
   }
 
   // --- Visits an object destructure declaration
-  function visitObjectDestruct(
-    objectD: ObjectDestructure[],
-    visitor: IdDeclarationVisitor
-  ): void {
+  function visitObjectDestruct(objectD: ObjectDestructure[], visitor: IdDeclarationVisitor): void {
     for (let i = 0; i < objectD.length; i++) {
       const objDecl = objectD[i];
       if (objDecl.arrayDestruct) {

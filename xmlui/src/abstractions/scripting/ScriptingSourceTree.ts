@@ -490,7 +490,7 @@ export type ScriptModule = {
   name: string;
   parent?: ScriptModule | null;
   exports: Map<string, any>;
-  imports: Record<string, any>;
+  imports: Record<string, Record<string, any>>;
   importedModules: ScriptModule[];
   functions: Record<string, FunctionDeclaration>;
   statements: Statement[];
