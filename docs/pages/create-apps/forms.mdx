@@ -1098,7 +1098,7 @@ Here, we specify a simple password regular expression that is at least 8 charact
   <App>
     <Form subject="{{ password: 'hElLo123' }}">
       <!-- 8 letter password, with lower case letters and at least 1 upper case letter and a number -->
-      <FormItem bindTo="password" regex="{/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/}" />
+      <FormItem bindTo="password" regex="/^[A-Z]+$/" />
     </Form>
   </App>
   `}
@@ -1189,7 +1189,8 @@ The `Form` component can receive and display a server-side validation response.
 - Field related issues are shown just like client-side validation errors, removed when a field is edited.
 - Non-field related issues are displayed in a validation summary view.
 
-// TODO: Place image here with ValidationSummary and some field errors
+<br/>
+<Image alt="Server-side Validation" src="/resources/images/create-apps/using-forms.png" />
 
 ## User Feedback with APICall
 
@@ -1197,15 +1198,27 @@ Submitting the form via the `APICall` component triggers a visual confirmation o
 If the submission is successful, a success `Toast` component will appear for a few seconds.
 Otherwise, an error `Toast` component will show the error that occured.
 
-```ueml copy
+```ueml copy {3-8, 15-20}
 <App>
   <Form subject="{{ name: 'Joe' }}">
+    <event name="submit">
+      <APICall
+        url="/api/contacts/name"
+        method="POST"
+        body="{$eventArgs}" />
+    </event>
     <FlowLayout>
       <H3>Customer Name</H3>
       <FormItem bindTo="name" label="Customer name" />
     </FlowLayout>
   </Form>
-  <Form subject="{{ age: 243 }}">
+  <Form subject="{{ age: 43 }}">
+    <event name="submit">
+      <APICall
+        url="/api/contacts/age"
+        method="POST"
+        body="{$eventArgs}" />
+    </event>
     <FlowLayout>
       <H3>Customer Age</H3>
       <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
@@ -1218,15 +1231,20 @@ Otherwise, an error `Toast` component will show the error that occured.
   previewOnly
   name="Example: Feedback"
   app={`
-    <App>
-      <Form subject="{{ name: 'Joe', age: 43 }}">
-        <FlowLayout>
-          <H3>Customer information</H3>
-          <FormItem bindTo="name" label="Customer name" />
-          <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
-        </FlowLayout>
-      </Form>
-    </App>
+  <App>
+    <Form subject="{{ name: 'Joe' }}" onSubmit="(toSave) => toast.success('Data saved!')">
+      <FlowLayout>
+        <H3>Customer Name</H3>
+        <FormItem bindTo="name" label="Customer name" />
+      </FlowLayout>
+    </Form>
+    <Form subject="{{ age: 43 }}" onSubmit="(toSave) => toast.error('Network error!')">
+      <FlowLayout>
+        <H3>Customer Age</H3>
+        <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+      </FlowLayout>
+    </Form>
+  </App>
   `}
 />
 
