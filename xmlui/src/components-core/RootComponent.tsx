@@ -379,9 +379,9 @@ function RootContentComponent({
       standalone,
       decorateComponentsWithTestId,
       debugEnabled,
-      activeThemeUid: activeThemeId,
+      activeThemeId: activeThemeId,
       activeThemeTone: activeThemeTone,
-      availableThemeUids: availableThemeIds,
+      availableThemeIds: availableThemeIds,
       globals,
       delay,
       Actions,
@@ -393,7 +393,7 @@ function RootContentComponent({
       mediaSize,
       apiInterceptorContext,
       setTheme: setActiveThemeId,
-      setTone: setActiveThemeTone,
+      setThemeTone: setActiveThemeTone,
       toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light"),
     };
     return ret;
