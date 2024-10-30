@@ -1,5 +1,9 @@
 import { Callout } from 'nextra/components';
-import { COMPONENT_TEXT } from "../../meta/pages";
+import { 
+  COMPONENT_TEXT,
+  LAYOUT_DIMENSION_UNITS,
+  USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS
+} from "../../meta/pages";
 
 # Using Forms
 
@@ -7,417 +11,382 @@ import { COMPONENT_TEXT } from "../../meta/pages";
   This article is about to be reviewed.
 </Callout>
 
-**XMLUI has a sound form infrastructure, allowing you to declare a form and remove the burden of managing, editing, validating, and saving the information you provide in the UI.**
+<Callout type="info" emoji="💡">
+  XMLUI has a robust form infrastructure allowing you to create forms without the hassle of managing, editing, validating, and saving the information you provide in the UI.
+</Callout>
 
-The following example demonstrates the fundamental XMLUI forms concepts:
-
-The `Form` component encapsulates the UI and the data management. It has a `subject` that defines the initial data to display in the form. The data is usually a compound structure; in this example, it is a customer's name and age.
-
-A `FormItem` component manages an individual element of the compound data structure. The form below uses two items: one for the name and another for the age. Each `FormItem` has properties to define a few attributes of a particular data item:
-
-- `bindTo` specifies the property name within the `subject` to bind the corresponding field.
-- `label`, `type`, and `width` set the field's visual properties and behavior attributes.
-- `minLength` and `zeroOrPositive` are validation attributes that influence what values are valid in the form. XMLUI uses it to notify the user about invalid data items.
+The following example demonstrates the fundamental XMLUI concepts regarding forms:
 
 ```ueml copy
-<Form padding="0.5rem"
-  subject="{{ name: 'Joe', age: 43 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout columnGap="12px" paddingBottom="6px">
-    <H3>Customer information</H3>
-    <FormItem
-      bindTo="name"
-      label="Customer name"
-      width="50%"
-      minLength="3" />
-    <FormItem
-      bindTo="age"
-      label="Age"
-      type="integer"
-      width="50%"
-      zeroOrPositive="true" />
-  </FlowLayout>
-</Form>
+<App>
+  <Form subject="{{ name: 'Joe', age: 43 }}">
+    <FlowLayout>
+      <H3>Customer information</H3>
+      <FormItem bindTo="name" label="Customer name" />
+      <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>
 ```
 
-You can try the form in action! A few things are worth checking:
-
-- An error message appears when you type a name shorter than three characters and leave the customer name field.
-- You cannot type a negative number into the age field.
-- With a valid form, the Save button displays a dialog imitating a successful save.
-
 <Playground
-  name="Example: A simple XMLUI form"
-  height={220}
+  previewOnly
+  name="Example: XMLUI Form"
   app={`
-      <Form padding="0.5rem"
-        subject="{{ name: 'Joe', age: 43 }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-        <FlowLayout columnGap="12px" paddingBottom="6px">
+    <App>
+      <Form subject="{{ name: 'Joe', age: 43 }}">
+        <FlowLayout>
           <H3>Customer information</H3>
-          <FormItem
-            bindTo="name"
-            label="Customer name"
-            width="50%"
-            minLength="3" />
-          <FormItem
-            bindTo="age"
-            label="Age"
-            type="integer"
-            width="50%"
-            zeroOrPositive="true" />
+          <FormItem bindTo="name" label="Customer name" />
+          <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
         </FlowLayout>
       </Form>
+    </App>
   `}
 />
 
-## Form with FormItem
+The code can be broken down into the following:
 
-There is no restriction on what components you can use within a form. However, the infrastructure involves only the nested `FormItem` components in the automatic mechanisms (displaying, validating, and saving data).
+- The `Form` component encapsulates the management of form UI elements and data handling; the `subject` property is used to provide the data object to the form. In this example, the subject is a customer's name and age.
+- The `FormItem` component manages an individual attribute in the subject. The form in the example uses two fields: one for the name and another for the age. Each `FormItem` has properties in order to handle data:
+  - `bindTo` specifies the property name within the `subject` to bind the corresponding field
+  - `type` determines the type of the input field that should be used in order to modify a given piece of data (number field, text area field, radio buttons, etc.)
+  - other properties are generally either for styling or to provide further constraints and arguments for a given input field (e.g. accept only 0 or positive numbers if a field has the number field type)
 
-### Nested `FormItem`
+## Form with FormItems
 
-The following form uses some input components in a particular arrangement:
+<Callout type="info" emoji="💡">
+  The `Form` component is designed to work with `FormItem` components inside it to utilize all built-in features
+  that help in managing forms: displaying, validating, and saving data.
 
-```ueml copy
-<Form padding="0.5rem"
-  subject="{{ search: 'Seattle', matching: 'Contains' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  saveLabel="Search" >
-    <Text>Please specify the name to include in the search:</Text>
-    <HStack>
-      <FormItem bindTo="search" width="280px" />
+  However, there is no restriction on what components you can use within a form.
+</Callout>
+
+```ueml copy {9-11}
+<App>
+  <Form
+    subject="{{ search: 'Seattle' }}"
+    onSubmit="toast.success('Searching!')"
+    saveLabel="Search">
+      Please specify the name to include in the search:
+      <FormItem bindTo="search" />
       <Button
         label="Select from dictionary"
-        variant="outlined"
-        onClick="window.alert('Displaying dictionary')"/>
-    </HStack>
-    <Text>How would you match the search pattern with the name?</Text>
-    <FormItem type="radioGroup" bindTo="matching">
-      <HStack gap="1rem">
-        <RadioGroupOption value="Starts" />
-        <RadioGroupOption value="Contains" />
-        <RadioGroupOption value="Ends" />
-      </HStack>
-    </FormItem>
-</Form>
+        onClick="toast('Displaying dictionary')" />
+  </Form>
+</App>
 ```
 
-This form contains two `FromItem` components and an extra button. The button is a helper for selecting search strings from a dictionary (not implemented). It is not part of the form infrastructure; however, it can be used to manipulate the form data programmatically (when implemented).
-
-When you click the Search Button, the data managed by the `FormItem` instances is saved.
-
 <Playground
-  name="Example: Form with FormItems"
+  previewOnly
+  name="Example: Form with non-FormItem #1"
   app={`
-    <Form padding="0.5rem"
-      subject="{{ search: 'Seattle', matching: 'Contains' }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-      saveLabel="Search" >
-        <Text>Please specify the name to include in the search:</Text>
-        <HStack>
-          <FormItem bindTo="search" width="280px" />
-          <Button
-            label="Select from dictionary"
-            variant="outlined"
-            onClick="window.alert('Displaying dictionary')"/>
-        </HStack>
-        <Text>How would you match the search pattern with the name?</Text>
-        <FormItem type="radioGroup" bindTo="matching">
-          <HStack gap="1rem">
-            <RadioGroupOption value="Starts" />
-            <RadioGroupOption value="Contains" />
-            <RadioGroupOption value="Ends" />
-          </HStack>
-        </FormItem>
+  <App>
+    <Form
+      subject="{{ search: 'Seattle' }}"
+      onSubmit="toast.success('Searching!')"
+      saveLabel="Search">
+        Please specify the name to include in the search:
+        <FormItem bindTo="search" />
+        <Button
+          label="Select from dictionary"
+          onClick="toast('Displaying dictionary')" />
     </Form>
+  </App>
   `}
 />
 
-### Other Input Components
+<Callout type="info" emoji="💡">
+  Non-`FormItem` input components are not integrated into the form infrastructure.
+</Callout>
 
-When you use other (non-' FormItem`) components, they operate as expected. However, they are not managed by the form infrastructure and integrated into it.
+The following example shows this by placing a regular `Checkbox` component in the `Form`.
 
-The following example contains a checkbox.
-
-```ueml copy {9}
-<Form padding="0.5rem"
-  subject="{{ search: 'Seattle', caseSensitive: 'false' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  saveLabel="Search" >
-    <Text>Please specify the name to include in the search:</Text>
-    <FormItem bindTo="search" width="280px" />
-    <Checkbox label="Case sensitive?" initialValue="true" />
-</Form>
+```ueml copy {7}
+<App>
+  <Form
+    subject="{{ search: 'Seattle', caseSensitive: 'false' }}"
+    onSubmit="(toSave) => toast.success('Searching for ' + JSON.stringify(toSave))"
+    saveLabel="Search" >
+      Please specify the name to include in the search:
+      <FormItem bindTo="search" />
+      <Checkbox label="Case sensitive?" initialValue="true" />
+  </Form>
+</App>
 ```
 
-Though you can click the checkbox and toggle it, its value is ignored. When you click Search, the saved data structure does not contain the `caseSensitive` field.
+When you click "Search", the saved data structure does not contain the `caseSensitive` field.
 
 <Playground
-  name="Example: Form with other input component"
+  previewOnly
+  name="Example: Form with non-FormItem #2"
   app={`
-    <Form padding="0.5rem"
+  <App>
+    <Form
       subject="{{ search: 'Seattle', caseSensitive: 'false' }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
+      onSubmit="(toSave) => toast.success('Searching for ' + JSON.stringify(toSave))"
       saveLabel="Search" >
-        <Text>Please specify the name to include in the search:</Text>
-        <FormItem bindTo="search" width="280px" />
+        Please specify the name to include in the search:
+        <FormItem bindTo="search" />
         <Checkbox label="Case sensitive?" initialValue="true" />
     </Form>
+  </App>
   `}
 />
 
-> **Note**: Adding other input components (as helpers) may still be helpful. You can use them to manipulate form data. For example, you can use the value of a checkbox to specify some logic (such as copying some data fields into others automatically).
+<Callout type="info" emoji="💡">
+  Adding other input components (as helpers) may still be helpful.
+  You can use them to manipulate form data.
+  For example, you can use the value of a checkbox to add some logic,
+  such as copying some data fields into other fields automatically.
+</Callout>
 
-## Form Layout
+## Form Layouts
 
-You can create any layout within a `Form` component to display and use `FormItem` or other input components. Instead of manually placing the components within a form, you can nest a form's content into a `FlowLayout` and use the width property of individual `FormItem` components with percentage or star sizing.
+You can create any layout within a `Form` component.
+Instead of manually placing the components within a form,
+you can nest a form's content into a `FlowLayout` and use the width property of individual `FormItem` components with <SmartLink href="">percentage or star sizing</SmartLink>.
 
-`FlowLayout` is a responsive component. It ensures that your form is displayed correctly in mobile view. In this section, you will learn a few layout tips.
+<Callout type="info" emoji="💡">
+  `FlowLayout` is a responsive component. It ensures that your form is displayed correctly in mobile view as well.
+</Callout>
 
 ### Single-Column Forms
 
-Unless you specify an explicit item width, each nested `FormItem` (within a `FlowLayout`) will fill the entire width of the form:
+<Callout type="info" emoji="💡">
+  Unless you specify an explicit item width, each nested `FormItem` (within a `FlowLayout`) will fill the entire width of the form.
+</Callout>
 
-```ueml
-<Form padding="0.5rem"
-  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout gap="1rem">
-    <FormItem label="Firstname" bindTo="firstname" />
-    <FormItem label="Lastname" bindTo="lastname" />
-    <FormItem label="Job Title" bindTo="jobTitle" />
-    <FormItem label="Experience" bindTo="experience" />
-  </FlowLayout>
-</Form>
+```ueml copy
+<App>
+  <Form subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
+    <FlowLayout>
+      <FormItem label="Firstname" bindTo="firstname" />
+      <FormItem label="Lastname" bindTo="lastname" />
+      <FormItem label="Job Title" bindTo="jobTitle" />
+      <FormItem label="Experience" bindTo="experience" />
+    </FlowLayout>
+  </Form>
+</App>
 ```
 
-When you display them, each input has its separate row with a gap between the rows, as declared in the `Form`:
-
 <Playground
-  name="Example: Single-column form"
-  height={410}
+  previewOnly
+  name="Example: Single-column Form Layout"
   app={`
-    <Form padding="0.5rem"
-      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FlowLayout gap="1rem">
+  <App>
+    <Form subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
+      <FlowLayout>
         <FormItem label="Firstname" bindTo="firstname" />
         <FormItem label="Lastname" bindTo="lastname" />
         <FormItem label="Job Title" bindTo="jobTitle" />
         <FormItem label="Experience" bindTo="experience" />
       </FlowLayout>
     </Form>
+  </App>
   `}
 />
 
 ### Two-Column Forms
 
-Unless you specify an explicit item width, each nested `FormItem` (within a `FlowLayout`) will fill the entire width of the form:
+Set each item's width to "50%" to create a two-column layout:
 
-```ueml
-<Form padding="0.5rem"
-  subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout gap="1rem">
-    <FormItem label="Firstname" bindTo="firstname" width="50%" />
-    <FormItem label="Lastname" bindTo="lastname" width="50%" />
-    <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-    <FormItem label="Experience" bindTo="experience" width="50%" />
-  </FlowLayout>
-</Form>
+```ueml copy
+<App>
+  <Form
+    subject="{{
+      firstname: 'Jake',
+      lastname: 'Hard',
+      jobTitle: 'janitor',
+      experience: 'broom'
+    }}">
+    <FlowLayout>
+      <FormItem label="Firstname" bindTo="firstname" width="50%" />
+      <FormItem label="Lastname" bindTo="lastname" width="50%" />
+      <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
+      <FormItem label="Experience" bindTo="experience" width="50%" />
+    </FlowLayout>
+  </Form>
+</App>
 ```
 
-When you display them, each input has its separate row with a gap between the rows, as declared in the `Form`:
-
 <Playground
-  name="Example: Two-column form"
+  previewOnly
+  name="Example: Two-column Form Layout"
   app={`
-    <Form padding="0.5rem"
-      subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FlowLayout gap="1rem">
-        <FormItem label="Firstname" bindTo="firstname" width="50%" />
-        <FormItem label="Lastname" bindTo="lastname" width="50%" />
-        <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-        <FormItem label="Experience" bindTo="experience" width="50%" />
-      </FlowLayout>
-    </Form>
+    <App>
+      <Form
+        subject="{{ firstname: 'Jake', lastname: 'Hard', jobTitle: 'janitor', experience: 'broom' }}">
+        <FlowLayout>
+          <FormItem label="Firstname" bindTo="firstname" width="50%" />
+          <FormItem label="Lastname" bindTo="lastname" width="50%" />
+          <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
+          <FormItem label="Experience" bindTo="experience" width="50%" />
+        </FlowLayout>
+      </Form>
+    </App>
   `}
 />
 
-### Multiple Items with Star Sizing (Issue)
+### Multiple Items with Star Sizing
 
-The `FlowLayout` component can be used with star sizing (learn more about it here). With this feature, you can place items with a fixed width and allow other items to share the remaining space in the row:
+<Callout type="info" emoji="💡">
+  XMLUI has layout containers that support <SmartLink href={LAYOUT_DIMENSION_UNITS}>star sizing</SmartLink> for their children.
+  This feature tells a component to fill up all remaining space in a row if other sibling component have their sizes specified.
+</Callout>
 
-```ueml copy
-<Form padding="0.5rem"
-  subject="{{
-    title: 'Mr.',
-    firstname: 'Jake',
-    lastname: 'Hard',
-    jobTitle: 'janitor',
-    experience: 'broom'
-  }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout gap="1rem">
-    <HStack gap="$gap-Form">
-      <FormItem label="Title" bindTo="title" width="100px" />
-      <FormItem label="Firstname" bindTo="firstname" width="*" />
-      <FormItem label="Lastname" bindTo="lastname" width="*" />
-    </HStack>
-    <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-    <FormItem label="Experience" bindTo="experience" width="50%" />
-  </FlowLayout>
-</Form>
+```ueml copy {13-14}
+<App>
+  <Form
+    subject="{{ 
+      title: 'Mr.', 
+      firstname: 'Jake', 
+      lastname: 'Hard', 
+      jobTitle: 'janitor', 
+      experience: 'broom' 
+    }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FlowLayout>
+      <HStack>
+        <FormItem label="Title" bindTo="title" width="100px" />
+        <FormItem label="Firstname" bindTo="firstname" width="*" />
+        <FormItem label="Lastname" bindTo="lastname" width="*" />
+      </HStack>
+      <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
+      <FormItem label="Experience" bindTo="experience" width="50%" />
+    </FlowLayout>
+  </Form>
+</App>
 ```
 
 <Playground
-    name="Example: Single-column form"
+    previewOnly
+    name="Example: Star Sizing"
     app={`
-    <Form padding="0.5rem"
-      subject="{{
-        title: 'Mr.',
-        firstname: 'Jake',
-        lastname: 'Hard',
-        jobTitle: 'janitor',
-        experience: 'broom'
-      }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FlowLayout gap="1rem">
-        <HStack gap="$gap-Form">
-          <FormItem label="Title" bindTo="title" width="100px" />
-          <FormItem label="Firstname" bindTo="firstname" width="*" />
-          <FormItem label="Lastname" bindTo="lastname" width="*" />
-        </HStack>
-        <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
-        <FormItem label="Experience" bindTo="experience" width="50%" />
-      </FlowLayout>
-    </Form>
+    <App>
+      <Form
+        subject="{{ 
+          title: 'Mr.', 
+          firstname: 'Jake', 
+          lastname: 'Hard', 
+          jobTitle: 'janitor', 
+          experience: 'broom' 
+        }}" 
+        onSubmit="(toSave) => toast.success(.stringify(toSave))">
+        <FlowLayout>
+          <HStack>
+            <FormItem label="Title" bindTo="title" width="100px" />
+            <FormItem label="Firstname" bindTo="firstname" width="*" />
+            <FormItem label="Lastname" bindTo="lastname" width="*" />
+          </HStack>
+          <FormItem label="Job Title" bindTo="jobTitle" width="50%" />
+          <FormItem label="Experience" bindTo="experience" width="50%" />
+        </FlowLayout>
+      </Form>
+    </App>
   `}
 />
 
+## Input Components within FormItem
 
-### In-Row Labels (Issue)
+<Callout type="info" emoji="💡">
+  The `FormItem` component acts as an intermediary layer between the Form and whatever input control component is rendered through it.
+  It is responsible for managing the data represented by the corresponding input component.
+</Callout>
 
-```ueml copy
-<Form padding="0.5rem"
-  subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout gap="1rem">
-    <FormItem label="Firstname" labelPosition="left" bindTo="firstname" />
-    <FormItem label="Lastname" labelPosition="left" bindTo="lastname" />
-    <FormItem label="Job Title" labelPosition="left" bindTo="jobTitle" />
-    <FormItem label="Experience" labelPosition="left" bindTo="experience" />
-  </FlowLayout>
-</Form>
-```
+The `type` property of a `FormItem` specifies what input component to render.
+If this property is empty, `FormItem` uses a <SmartLink href={COMPONENT_TEXT}>`TextBox`</SmartLink> as the input field.
 
-<Playground
-  name="Example: In-row labels"
-  app={`
-    <Form padding="0.5rem"
-      subject="{{ search: 'Seattle', matching: 'Contains', caseSensitive: 'false' }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FlowLayout gap="1rem">
-        <FormItem label="Firstname" labelPosition="left" bindTo="firstname" />
-        <FormItem label="Lastname" labelPosition="left" bindTo="lastname" />
-        <FormItem label="Job Title" labelPosition="left" bindTo="jobTitle" />
-        <FormItem label="Experience" labelPosition="left" bindTo="experience" />
-      </FlowLayout>
-    </Form>
-  `}
-/>
+The `FormItem` supports these input components:
 
-## Input components with FormItem
-
-The `FormItem` component acts as an intermediary layer between the Form and whatever input control component is rendered under it. `FormItem is responsible for managing the data represented by the corresponding input component.
-
-The `type` property of `FormItem` specifies the input component to use. If this property is empty, `FormItem` uses a <SmartLink href={COMPONENT_TEXT}>`TextBox`</SmartLink>.
-
-`FormItem` supports these input components:
-
-| `type` value | Description |
+| `type` Value | Description |
 | --- | --- |
-| `checkbox` | A checkbox representing a flag value |
-| `combobox` | An input component that combines textual input with a dropdown list |
-| `custom` | A custom input component. The definition is nested into the `FormItem` component. |
-| `datePicker` | An input to select a particular date |
-| `file` | An input to select a file |
-| `integer` | An input for integer values |
-| `multiSelect` | A multi-select dropdown list |
-| `number` | An input for numeric values (integer or floating-point) |
-| `radioGroup` | A group of mutually exclusive radio buttons (only one of them can be selected) |
-| `select` | A dropdown list; only the listed items can be selected |
-| `switch` | A switch component to toggle a boolean value |
-| `text` | A textbox to enter textual data |
-| `textarea` | A multiline textbox to enter textual data |
+| `checkbox` | A checkbox representing a boolean value. |
+| `combobox` | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
+| `custom` | A custom input component to enable developers to specify their own input fields. |
+| `datePicker` | An input to select dates. |
+| `file` | An input to select a file or folder from the local machine. |
+| `integer` | An input for integer values. |
+| `multiCombobox` | Lets the user select mulitple items from a filterable dropdown list. Use the input field to filter the list. |
+| `multiSelect` | Lets the user select mulitple items from a dropdown list. |
+| `number` | An input for numeric values (integer or floating-point). |
+| `radioGroup` | A group of radio buttons (only one can be selected). |
+| `select` | Lets the user select an item from a dropdown list. |
+| `switch` | A switch component to toggle a boolean value. |
+| `text` | A textbox to enter text. |
+| `textarea` | A multiline textbox to enter text. |
 
+<Callout type="warning" emoji="⚠️">
+  `FromItem` renders a read-only text if you use a `type` value not in this table.
+</Callout>
 
-If you use a `type` value not in this table, `FromItem` renders a read-only text.
+<Callout type="info" emoji="💡">
+  If you omit `type`, `FormItem` renders a textbox.
+  However, if you nest a custom component into `FormItem`, it behaves as if you set `type` to `custom`.
+</Callout>
 
-> **Note**: If you omit `type`, `FormItem` renders a textbox. However, if you nest a custom component into `FormItem`, it behaves as if you set `type` to `custom`.
+The following sections contain examples of using `FormItem` with different input types.
 
 ### Checkbox
 
 The `checkbox` type represents a checkbox input component:
 
 ```ueml copy {6-8}
-<Form
-  subject="{{ option1: true, option2: false, option3: true }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="checkbox" bindTo="option1" label="Option #1" />
-  <FormItem type="checkbox" bindTo="option2" label="Option #2" />
-  <FormItem type="checkbox" bindTo="option3" label="Option #3" />
-</Form>
+<App>
+  <Form 
+    subject="{{ option1: true, option2: false, option3: true }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="checkbox" bindTo="option1" label="Option #1" />
+    <FormItem type="checkbox" bindTo="option2" label="Option #2" />
+    <FormItem type="checkbox" bindTo="option3" label="Option #3" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Checkbox input component"
-  height={200}
+  name="Example: Checkbox"
+  previewOnly
   app={`
-    <Form
-      subject="{{ option1: true, option2: false, option3: true }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+  <App>
+    <Form 
+      subject="{{ option1: true, option2: false, option3: true }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="checkbox" bindTo="option1" label="Option #1" />
       <FormItem type="checkbox" bindTo="option2" label="Option #2" />
       <FormItem type="checkbox" bindTo="option3" label="Option #3" />
     </Form>
+  </App>
   `}
 />
 
 ### Combobox
 
-The `combobox` type represents a combobox input component. It combines a textbox with a dropdown list:
+The `combobox` type represents a Combobox input component.
+It combines a textbox with a dropdown list:
 
-```ueml copy {6-11}
-<Form
-  subject="{{ title: 'Mr.' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="combobox" bindTo="title" label="Title">
-    <Option label="Mr." value="Mr." />
-    <Option label="Mrs." value="Mrs." />
-    <Option label="Ms." value="Ms." />
-    <Option label="Dr." value="Dr." />
-  </FormItem>
-</Form>
+```ueml copy {6-9}
+<App>
+  <Form
+    subject="{{ title: 'Mr.' }}"
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="combobox" bindTo="title" label="Title">
+      <Option label="Mr." value="Mr." />
+      <Option label="Mrs." value="Mrs." />
+      <Option label="Ms." value="Ms." />
+      <Option label="Dr." value="Dr." />
+    </FormItem>
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Combobox input component"
-  height={260}
+  name="Example: Combobox"
+  previewOnly
   app={`
+  <App>
     <Form
       subject="{{ title: 'Mr.' }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="combobox" bindTo="title" label="Title">
         <Option label="Mr." value="Mr." />
         <Option label="Mrs." value="Mrs." />
@@ -425,6 +394,7 @@ The `combobox` type represents a combobox input component. It combines a textbox
         <Option label="Dr." value="Dr." />
       </FormItem>
     </Form>
+  </App>
   `}
 />
 
@@ -432,55 +402,55 @@ The `combobox` type represents a combobox input component. It combines a textbox
 
 The `datePicker` type represents a date picker input component:
 
-```ueml copy {6}
-<Form
-  subject="{{ birthDate: '2021-04-08' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form
+    subject="{{ birthDate: '2021-04-08' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: DatePicker input component"
-  height={420}
+  name="Example: DatePicker"
+  previewOnly
   app={`
+  <App>
     <Form
-      subject="{{ birthDate: '2021-04-08' }}"
-      gap="0.5rem"
-      padding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      subject="{{ birthDate: '2021-04-08' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
     </Form>
+  </App>
   `}
 />
 
 ### File
 
-The `file` type represents an input component allowing you to select a file:
+The `file` type represents an input component allowing you to select one or multiple files:
 
-```ueml copy {6}
-<Form
-  subject="{{ articles: null }}"
-  gap="0.5rem"
-  padding="1rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="file" bindTo="articles" label="Articles file" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form 
+    subject="{{ articles: null }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="file" bindTo="articles" label="Articles file" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: File input component"
-  height={200}
+  name="Example: File Input"
+  previewOnly
   app={`
-    <Form
-      subject="{{ articles: null }}"
-      gap="0.5rem"
-      padding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+  <App>
+    <Form 
+      subject="{{ articles: null }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="file" bindTo="articles" label="Articles file" />
     </Form>
+  </App>
   `}
 />
 
@@ -488,49 +458,93 @@ The `file` type represents an input component allowing you to select a file:
 
 The `integer` type represents an input component for integer values:
 
-```ueml copy {6}
-<Form
-  subject="{{ age: 30 }}"
-  gap="0.5rem"
-  padding="1rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="integer" bindTo="age" label="Age" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form 
+    subject="{{ age: 30 }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="integer" bindTo="age" label="Age" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Integer input component"
-  height={180}
+  name="Example: Integer Input"
+  previewOnly
   app={`
-    <Form
-      subject="{{ persons: 123 }}"
-      gap="0.5rem"
-      padding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FormItem type="integer" bindTo="persons" label="Persons visiting the event" />
+  <App>
+    <Form 
+      subject="{{ age: 30 }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+      <FormItem type="integer" bindTo="age" label="Age" />
     </Form>
+  </App>
   `}
 />
 
 ### MultiSelect
 
-_TBD_
+The `multiSelect` type represents a dropdown list with selectable items. You can select multiple of these items:
+
+```ueml copy {5-10}
+<App>
+  <Form
+    subject="{{ size: 'xs' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="multiSelect" bindTo="size" label="Box size">
+      <Option label="Extra small" value="xs" />
+      <Option label="Small" value="sm" />
+      <Option label="Medium" value="md" />
+      <Option label="Large" value="lg" />
+    </FormItem>
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: MultiSelect"
+  previewOnly
+  app={`
+  <App>
+    <Form
+      subject="{{ size: 'xs' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+      <FormItem type="multiSelect" bindTo="size" label="Box size">
+        <Option label="Extra small" value="xs" />
+        <Option label="Small" value="sm" />
+        <Option label="Medium" value="md" />
+        <Option label="Large" value="lg" />
+      </FormItem>
+    </Form>
+  </App>
+  `}
+/>
 
 ### Number
 
 The `number` type represents an input component for numeric values (integer or floating-point):
 
+```ueml copy {5}
+<App>
+  <Form 
+    subject="{{ distance: 192.5 }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="number" bindTo="distance" label="Distance in miles" />
+  </Form>
+</App>
+```
+
 <Playground
-  name="Example: Number input component"
-  height={180}
+  name="Example: Number Input"
+  previewOnly
   app={`
-    <Form
-      subject="{{ distance: 192.5 }}"
-      gap="0.5rem"
-      padding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+  <App>
+    <Form 
+      subject="{{ distance: 192.5 }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="number" bindTo="distance" label="Distance in miles" />
     </Form>
+  </App>
   `}
 />
 
@@ -538,39 +552,37 @@ The `number` type represents an input component for numeric values (integer or f
 
 The `radioGroup` type represents a group of mutually exclusive radio buttons (only one of them can be selected):
 
-```ueml copy {6-11}
-<Form
-  subject="{{ title: 'Mr.' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="radioGroup" bindTo="title" label="Title">
-    <RadioGroupOption label="Mr." value="Mr." />
-    <RadioGroupOption label="Mrs." value="Mrs." />
-    <RadioGroupOption label="Ms." value="Ms." />
-    <RadioGroupOption label="Dr." value="Dr." />
-  </FormItem>
-</Form>
+```ueml copy {5-10}
+<App>
+  <Form
+    subject="{{ title: 'Mr.' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="radioGroup" bindTo="title" label="Title">
+      <RadioGroupOption label="Mr." value="Mr." />
+      <RadioGroupOption label="Mrs." value="Mrs." />
+      <RadioGroupOption label="Ms." value="Ms." />
+      <RadioGroupOption label="Dr." value="Dr." />
+    </FormItem>
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: RadioGroup input component"
-  height={160}
+  name="Example: RadioGroup"
+  previewOnly
   app={`
+  <App>
     <Form
-      subject="{{ title: 'Mr.' }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      subject="{{ title: 'Mr.' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="radioGroup" bindTo="title" label="Title">
-        <HStack gap="1rem">
-          <RadioGroupOption label="Mr." value="Mr." />
-          <RadioGroupOption label="Mrs." value="Mrs." />
-          <RadioGroupOption label="Ms." value="Ms." />
-          <RadioGroupOption label="Dr." value="Dr." />
-        </HStack>
+        <RadioGroupOption label="Mr." value="Mr." />
+        <RadioGroupOption label="Mrs." value="Mrs." />
+        <RadioGroupOption label="Ms." value="Ms." />
+        <RadioGroupOption label="Dr." value="Dr." />
       </FormItem>
     </Form>
+  </App>
   `}
 />
 
@@ -578,37 +590,37 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 
 The `select` type represents a dropdown list; only the listed items can be selected:
 
-```ueml copy {6-11}
-<Form
-  subject="{{ size: 'xs' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="select" bindTo="size" label="Box size">
-    <Option label="Extra small" value="xs" />
-    <Option label="Small" value="sm" />
-    <Option label="Medium" value="md" />
-    <Option label="Large" value="lg" />
-  </FormItem>
-</Form>
+```ueml copy {5-10}
+<App>
+  <Form
+    subject="{{ size: 'xs' }}"
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="select" bindTo="size" label="Box size">
+      <Option label="Extra small" value="xs" />
+      <Option label="Small" value="sm" />
+      <Option label="Medium" value="md" />
+      <Option label="Large" value="lg" />
+    </FormItem>
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Select input component"
-  height={260}
+  name="Example: Select"
+  previewOnly
   app={`
+  <App>
     <Form
       subject="{{ size: 'xs' }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FormItem type="select" bindTo="title" label="Box size">
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+      <FormItem type="select" bindTo="size" label="Box size">
         <Option label="Extra small" value="xs" />
         <Option label="Small" value="sm" />
         <Option label="Medium" value="md" />
         <Option label="Large" value="lg" />
       </FormItem>
     </Form>
+  </App>
   `}
 />
 
@@ -616,31 +628,31 @@ The `select` type represents a dropdown list; only the listed items can be selec
 
 The `switch` type represents a switch component to toggle a boolean value:
 
-```ueml copy {6-8}
-<Form
-  subject="{{ showBorder: true, showText: false, hideShadow: true }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
-  <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
-  <FormItem type="switch" bindTo="hideShadow" label="Hide shadow" labelPosition="right" />
-</Form>
+```ueml copy {5-7}
+<App>
+  <Form 
+    subject="{{ showBorder: true, showText: false, hideShadow: true }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
+    <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
+    <FormItem type="switch" bindTo="hideShadow" label="Hide shadow" labelPosition="right" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Switch input component"
-  height={200}
+  name="Example: Switch"
+  previewOnly
   app={`
-    <Form
-      subject="{{ showBorder: true, showText: false, hideShadow: true }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+  <App>
+    <Form 
+      subject="{{ showBorder: true, showText: false, hideShadow: true }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
       <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
       <FormItem type="switch" bindTo="hideShadow" label="Hide shadow" labelPosition="right" />
     </Form>
+  </App>
   `}
 />
 
@@ -648,27 +660,27 @@ The `switch` type represents a switch component to toggle a boolean value:
 
 The `text` type represents a textbox to enter textual data:
 
-```ueml copy {6}
-<Form
-  subject="{{ name: 'Joe' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="text" bindTo="name" label="Name" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form
+    subject="{{ name: 'Joe' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="text" bindTo="name" label="Name" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Text input component"
-  height={180}
+  name="Example: Text Input"
+  previewOnly
   app={`
+  <App>
     <Form
-      subject="{{ name: 'Joe' }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      subject="{{ name: 'Joe' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="text" bindTo="name" label="Name" />
     </Form>
+  </App>
   `}
 />
 
@@ -676,61 +688,67 @@ The `text` type represents a textbox to enter textual data:
 
 The `textarea` type represents a multiline textbox to enter textual data:
 
-```ueml copy {6}
-<Form
-  subject="{{ description: 'This is a description' }}"
-  padding="1rem"
-  gap="0.5rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem type="textarea" bindTo="description" label="Description" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form 
+    subject="{{ description: 'This is a description' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="textarea" bindTo="description" label="Description" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: TextArea input component"
-  height={200}
+  name="Example: TextArea"
+  previewOnly
   app={`
-    <Form
-      subject="{{ description: 'This is a description' }}"
-      padding="1rem"
-      gap="0.5rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+  <App>
+    <Form 
+      subject="{{ description: 'This is a description' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="textarea" bindTo="description" label="Description" />
     </Form>
+  </App>
   `}
 />
 
 ### Custom Input Components
 
-You can create your custom input component leveraging the XMLUI forms infrastructure. You can nest your custom component's markup into the wrapping `FormItem` as the following sample shows:
+You can create your custom input component leveraging the XMLUI forms infrastructure.
+You can nest your custom component's markup into the wrapping `FormItem` as the following sample shows:
 
-```ueml copy {4-12}
-<Form
-  subject="{{ userAvailable: false }}" horizontalPadding="1rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem bindTo="userAvailable">
-    <HStack>
-      <Button
-        label="Toggle"
-        backgroundColor="{$value === false ? 'red' : 'green'}"
-        onClick="$setValue(!$value)"
-      />
-    </HStack>
-  </FormItem>
-</Form>
+```ueml copy {5-13}
+<App>
+  <Form
+    subject="{{ userAvailable: false }}"
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem bindTo="userAvailable">
+      <HStack>
+        <Button
+          label="Toggle"
+          backgroundColor="{$value === false ? 'red' : 'green'}"
+          onClick="$setValue(!$value)"
+        />
+      </HStack>
+    </FormItem>
+  </Form>
+</App>
 ```
 
-The custom input component can use a simple API to communicate with the form infrastructure. The `#value` identifier represents the current value of the component. The custom component can use the `#setValue` method to change the component value.
+Custom input fields can use a simple API to communicate with the form infrastructure.
+The `#value` identifier represents the current value of the component.
+The custom component can use the `#setValue` method to change the component value.
 
-Try this simple form and check how the toggle's value is saved:
+The following example shows a toggle button created using a regular `Button` component using the form API:
 
 <Playground
-  name="Example: custom input component"
-  height={160}
+  name="Example: Custom Input Field"
+  previewOnly
   app={`
+  <App>
     <Form
-      subject="{{ userAvailable: false }}" horizontalPadding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      subject="{{ userAvailable: false }}"
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem bindTo="userAvailable">
         <HStack>
           <Button
@@ -741,109 +759,118 @@ Try this simple form and check how the toggle's value is saved:
         </HStack>
       </FormItem>
     </Form>
+  </App>
   `}
 />
 
-## Referencing to Form Values
+## Referencing Subject
 
-When you work with forms, the UI's appearance and behavior often depend on the current field values. The `$subject` context variable allows you to access the current data within the form.
+When you work with forms, the UI's appearance and behavior often depends on the current field values.
+The `$subject` context variable allows you to access the current data within the form.
 
-The following sample demonstrates enabling a field according to another's current value.
+The following example demonstrates how you can enable a field according to another's value.
 
-```ueml copy {4}
-<Form
-  subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
-  <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
-</Form>
+```ueml copy
+<App>
+  <Form subject="{{ isEnabled: true, name: 'Joe' }}">
+    <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+    <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: referencing field values"
-  height={250}
+  name="Example: Referencing Subject"
+  previewOnly
   app={`
-    <Form
-      subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+  <App>
+    <Form subject="{{ isEnabled: true, name: 'Joe' }}">
       <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
       <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
     </Form>
+  </App>
   `}
 />
 
-You can reference field values in any other component within the form:
+You can reference field values in any other component within the form as well:
 
-```ueml copy {4}
-<Form
-  subject="{{ firstname: 'John', lastname: 'Doe' }}" horizontalPadding="1rem">
-  <FormItem label="Firstname" bindTo="firstname" />
-  <FormItem label="Lastname" bindTo="lastname" />
-  <Text>Full name: {$subject.firstname} {$subject.lastname}</Text>
-</Form>
+```ueml copy {5}
+<App>
+  <Form subject="{{ firstname: 'John', lastname: 'Doe' }}">
+    <FormItem label="Firstname" bindTo="firstname" />
+    <FormItem label="Lastname" bindTo="lastname" />
+    <Text>Full name: {$subject.firstname} {$subject.lastname}</Text>
+  </Form>
+</App>
 ```
 
-As you update any field, the full name text will follow the changes:
+By updating any input field, the text with the full name will update accordingly:
 
 <Playground
-  name="Example: referencing field values"
-  height={250}
+  name="Example: Referencing Field Values"
+  previewOnly
   app={`
-    <Form
-      subject="{{ firstname: 'John', lastname: 'Doe' }}" horizontalPadding="1rem">
+  <App>
+    <Form subject="{{ firstname: 'John', lastname: 'Doe' }}">
       <FormItem label="Firstname" bindTo="firstname" />
       <FormItem label="Lastname" bindTo="lastname" />
       <Text>Full name: {$subject.firstname} {$subject.lastname}</Text>
     </Form>
+  </App>
   `}
 />
 
-
 ## Managing Data
 
-The XMLUI forms infrastructure helps you manage the form data easily. The form has a `subject` property defining a compound data structure. Individual `FormItem` instances can bind themselves to a particular property of `subject`, as the following example shows:
+The XMLUI forms infrastructure helps you manage the form data easily.
+The `subject` property can be accessed and you can drill down to relevant data aatributes:
 
-```ueml copy
-<Form
-  subject="{{
-    name: 'John smith',
-    address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-  }}"
-  horizontalPadding="1rem"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FormItem bindTo="name" label="Name" />
-  <FormItem bindTo="address.street" label="Street" />
-</Form>
+```ueml copy /street/
+<App>
+  <Form
+    subject="{{
+      name: 'John smith', 
+      address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
+    }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem bindTo="name" label="Name" />
+    <FormItem bindTo="address.street" label="Street" />
+  </Form>
+</App>
 ```
 
 <Playground
-  name="Example: Using subject"
-  height={270}
+  name="Example: Using Subject"
+  previewOnly
   app={`
+  <App>
     <Form
       subject="{{
         name: 'John smith',
         address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-      }}"
-      horizontalPadding="1rem"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+      }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem bindTo="name" label="Name" />
       <FormItem bindTo="address.street" label="Street" />
     </Form>
+  </App>
   `}
 />
 
-There are two ways to provide data to an XMLUI component. One of which is defining the data directly:
+There are two ways to provide data to an XMLUI component.
+The first is by defining the data directly:
 
 ```ueml copy
 <Form subject="{{ name: 'Joe', age: 43 }}" />
 ```
 
-The other is to use a URL to get data from an API endpoint:
+The second is to use a URL to get data from an API endpoint:
 
 ```ueml
 <Form subject="/path/to/resource" />
 ```
 
-The provided data's attributes can be easily accessed using the `FormItem` component via the `bindTo` property.
+The attributes of the provided data can be accessed using the `FormItem` component via the `bindTo` property.
 The `FormItem` is designed to work with the `Form` component and access the value that it is "bound to" from an arbitrary depth in the component tree under the `Form`.
 
 ```ueml {2} copy
@@ -855,64 +882,61 @@ The `FormItem` is designed to work with the `Form` component and access the valu
 ## Submitting Data
 
 By default, the `Form` component provides a submit button to save the modified data.
-However, the means of how this data will be used is customized via the `onSave` event:
+How this data will be used can be customized via the `onSubmit` event.
+All examples below are equal:
 
 ```ueml copy
-<Form onSave="console.log('Saved!')" />
+<App>
+  <Form onSubmit="toast('Saved!')" />
+  <Form event:submit="toast('Saved!')" />
+  <Form>
+    <event name="submit" value="toast('Saved!')" />
+  </Form>
+</App>
 ```
 
-Or you can use the domain scoped version:
+The event accepts either a block of code or a callback function.
+In both cases, you use our Javascript-like scripting language to describe the logic.
 
-```ueml copy
-<Form event:save="console.log('Saved!')" />
-```
-
-Alternatively, you can opt to use the standalone version of the `onSave` event called `save`:
-
-```ueml copy
-<Form>
-  <event name="save" value="console.log('Saved!')" />
-</Form>
-```
-
-Both versions of the event accept either a block of code or a callback function.
-In both cases you use our Javascript-like scripting language to describe your logic.
-The only difference is that the callback function receives the `eventArgs` parameter, which has access to the data specified in `subject`.
-Call `eventArgs.subject` to access it:
+When working with the callback function, you can access a `toSave` function parameter that contains the form data:
 
 ```ueml copy
 <Form
   subject="{{ name: 'Joe', age: 43 }}"
-  onSave="(eventArgs) => console.log(JSON.stringify(eventArgs.subject))" />
+  onSubmit="(toSave) => toast(JSON.stringify(toSave))" />
 ```
 
 ## Validation
 
-Probably the most useful feature of the `Form` and the `FormItem` components is handling client- and server-side validation.
+The `Form` handles client-side validation as you edit the form and shows any issues under the input fields.
+Server-side validation happens when the form data is sent to the server.
+The `Form` handles the server-side validation response and displays it in a summary or below input fields (depends on response).
 
-The `Form` applies client-side validation as you edit the form. Server-side validation happens when the form data is sent to the server. The `Form` extracts server-side validation issues from the returned response and displays them, as you will learn later.
-
-A `FormItem` has several properties related to validation. In this section, you will learn about them.
+A `FormItem` has several properties related to validation, all of which will be outlined in the following sections.
 
 ### `minLength`
 
 This property defines the minimum length of a text input value.
 
 ```ueml copy
-<Form subject="{{ name: 'Billy Bob' }}">
-  <FormItem bindTo="name" minLength="5" />
-</Form>
-```
-
-Delete at least 5 characters from the input field below and click outside the field. An error message should pop up under the field indicating the error.
-
-<Playground
-  name="Field Validation: Inline"
-  height={180}
-  app={`
+<App>
   <Form subject="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" minLength="5" />
   </Form>
+</App>
+```
+
+Delete at least 5 characters from the input field below and click outside the field.
+
+<Playground
+  name="Field Validation: minLength"
+  previewOnly
+  app={`
+  <App>
+    <Form subject="{{ name: 'Billy Bob' }}">
+      <FormItem bindTo="name" minLength="5" />
+    </Form>
+  </App>
   `}
 />
 
@@ -921,39 +945,51 @@ Delete at least 5 characters from the input field below and click outside the fi
 This property defines the maximum length of a text input value.
 
 ```ueml copy
-<Form subject="{{ name: 'Billy Bob' }}">
-  <FormItem bindTo="name" maxLength="11" />
-</Form>
+<App>
+  <Form subject="{{ name: 'Billy Bob' }}">
+    <FormItem bindTo="name" maxLength="11" />
+  </Form>
+</App>
 ```
 
-The input must be no longer than the specified length. Do not try to enter more than 11 characters in the input field below. The control does not allow you to enter more than 11 characters.
+The input must be no longer than the specified length.
+Try to enter more than 11 characters in the input field below - the input field will not let you.
 
 <Playground
   name="Validation Example: maxLength"
-  height={180}
+  previewOnly
   app={`
+  <App>
     <Form subject="{{ name: 'Billy Bob' }}">
       <FormItem bindTo="name" maxLength="11" />
     </Form>
+  </App>
   `}
 />
-Sometimes, you do not want to constrain the number of characters in the text box; however, you want longer text to be marked as invalid. By setting the `syncToValidation` property to false, you can set this behavior.
 
-```ueml copy
+Sometimes, you do not want to constrain the number of characters in the text box; however, you want longer text to be marked as invalid.
+Set the `syncToValidation` property to "false" in order to do so.
+
+```ueml copy /syncToValidation="false"/
+<App>
   <Form subject="{{ name: 'Billy Bob' }}">
     <FormItem bindTo="name" maxLength="11" syncToValidation="false" />
   </Form>
+</App>
 ```
 
-Now, you can type more than 11 characters into the box. However, as you click outside, the validation message will indicate that the text is longer than expected.
+Now, you can type more than 11 characters into the box.
+However, as you click outside, the validation message will indicate that the text is longer than expected.
 
 <Playground
   name="Validation Example: maxLength with syncToValidation off"
-  height={180}
+  previewOnly
   app={`
+  <App>
     <Form subject="{{ name: 'Billy Bob' }}">
       <FormItem bindTo="name" maxLength="11" syncToValidation="false" />
     </Form>
+  </App>
   `}
 />
 
@@ -962,18 +998,22 @@ Now, you can type more than 11 characters into the box. However, as you click ou
 The input value must be at least the specified value. The given value is inclusive.
 
 ```ueml copy
-<Form subject="{{ age: 30 }}">
-  <FormItem bindTo="age" type="number" minValue="18" />
-</Form>
+<App>
+  <Form subject="{{ age: 30 }}">
+    <FormItem bindTo="age" type="number" minValue="18" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Validation Example: minValue"
-  height={180}
+  previewOnly
   app={`
+  <App>
     <Form subject="{{ age: 30 }}">
       <FormItem bindTo="age" type="number" minValue="18" />
     </Form>
+  </App>
   `}
 />
 
@@ -982,140 +1022,233 @@ The input value must be at least the specified value. The given value is inclusi
 The input value must be smaller than the specified value. The given value is inclusive.
 
 ```ueml copy
-<Form subject="{{ age: 30 }}">
-  <FormItem bindTo="age" type="number" maxValue="61" />
-</Form>
+<App>
+  <Form subject="{{ age: 30 }}">
+    <FormItem bindTo="age" type="number" maxValue="61" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Validation Example: maxValue"
-  height={180}
+  previewOnly
   app={`
+  <App>
     <Form subject="{{ age: 30 }}">
-      <FormItem bindTo="age" type="number" maxValue="60" />
+      <FormItem bindTo="age" type="number" maxValue="61" />
     </Form>
+  </App>
   `}
 />
 
 ### `pattern`
 
-Evaluate predefined regex patterns that include the following: "email", "url", "phone".
+Evaluate predefined regex patterns. These patterns are the following: "email", "url", "phone".
 
 ```ueml copy
-<Form subject="{{
-    mobile: '+13456123456',
-    website: 'http://www.blogsite.com',
-    email: 'myemail@mail.com'
+<App>
+  <Form subject="{{ 
+    mobile: '+13456123456', 
+    website: 'http://www.blogsite.com', 
+    email: 'myemail@mail.com' 
   }}">
-  <FormItem bindTo="mobile" pattern="phone" />
-  <FormItem bindTo="website" pattern="url" />
-  <FormItem bindTo="email" pattern="email" />
-</Form>
+    <FormItem bindTo="mobile" pattern="phone" />
+    <FormItem bindTo="website" pattern="url" />
+    <FormItem bindTo="email" pattern="email" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Validation Example: pattern"
-  height={350}
+  previewOnly
   app={`
-    <Form subject="{{
-        mobile: '+13456123456',
-        website: 'http://www.blogsite.com',
-        email: 'myemail@mail.com'
-      }}">
+  <App>
+    <Form subject="{{ 
+      mobile: '+13456123456', 
+      website: 'http://www.blogsite.com', 
+      email: 'myemail@mail.com' 
+    }}">
       <FormItem bindTo="mobile" pattern="phone" />
       <FormItem bindTo="website" pattern="url" />
       <FormItem bindTo="email" pattern="email" />
     </Form>
+  </App>
   `}
 />
 
 ### `regex`
 
 Evaluate a user-defined custom regex pattern.
-Here, we specify a simple password regular expression that is at least 8 characters long and contains at least one upper case letter and a number:
-
 
 ```ueml copy
-<Form subject="{{ password: 'hElLo123' }}">
-  <!-- 8 letter password, with lower case letters and at least 1 upper case letter and a number -->
-  <FormItem bindTo="password" regex="{/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/}" />
-</Form>
+<App>
+  <Form subject="{{ password: 'hello' }}">
+    <!-- Only all uppercase letters are accepted -->
+    <FormItem bindTo="password" regex="/^[A-Z]+$/" />
+  </Form>
+</App>
 ```
-*TODO: Fix this sample, it does not work*
 
 <Playground
-    name="Validation Example: regex"
-    height={300}
-    app={`
-      <Form subject="{{ password: 'hElLo123' }}">
-        <!-- 8 letter password, with lower case letters and at least 1 upper case letter and a number -->
-        <FormItem bindTo="password" regex="{/^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/}" />
-      </Form>
-    `}
+  name="Validation Example: regex"
+  previewOnly
+  app={`
+  <App>
+    <Form subject="{{ password: 'hello' }}">
+      <FormItem bindTo="password" regex="/^[A-Z]+$/" />
+    </Form>
+  </App>
+  `}
 />
 
-You also can combine more than one validation function on a `FormItem`:
+### Combining Multiple Validations
+
+You also can combine more than one validation on a `FormItem`:
+
+```ueml copy
+<App>
+  <Form subject="{{ site: 'http://www.example.com' }}">
+    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" />
+  </Form>
+</App>
+```
 
 <Playground
   name="Multiple Validations"
-  app={`<Form subject="{{ site: 'http://www.example.com' }}">
-    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" />
-</Form>
-    `}
+  previewOnly
+  app={`
+  <App>
+    <Form subject="{{ site: 'http://www.example.com' }}">
+      <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" />
+    </Form>
+  </App>
+  `}
 />
 
-### Other Validation Properties
+## Other Validation Properties
 
-- `severity`
+### `severity`
 
-By default, all validations have a severity level of **"error"**.
-You can set whether a validation should have a level of **"warning"** or **"error"**:
+<Callout type="info" emoji="💡">
+  By default, all validations have a severity level of **"error"**.
+  You can set whether a validation should have a level of **"warning"** or **"error"**.
+</Callout>
+
+```ueml copy
+<App>
+  <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}">
+    <FormItem bindTo="mobile" pattern="phone" severity="warning" />
+    <FormItem bindTo="website" pattern="url" severity="error" />
+  </Form>
+</App>
+```
 
 <Playground
   name="Validation Severity"
-  height={200}
-  app={`<Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}">
-    <FormItem bindTo="mobile" pattern="phone" severity="warning" />
-    <FormItem bindTo="website" pattern="url" severity="error" />
-</Form>
-    `}
+  app={`
+  <App>
+    <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}">
+      <FormItem bindTo="mobile" pattern="phone" severity="warning" />
+      <FormItem bindTo="website" pattern="url" severity="error" />
+    </Form>
+  </App>
+  `}
 />
 
-- `invalidMessage`
+### `invalidMessage`
 
-Sets what message to display when an error is encountered. Predefined validations already have a built-in message but you can customize it as necessary:
+Sets what message to display when there's an error.
+Predefined validations already have a built-in message but you can customize it as necessary:
+
+```ueml copy
+<App>
+  <Form subject="{{ age: 20 }}">
+    <FormItem bindTo="age" type="number" minValue="18" invalidMessage="The given age is too low!" />
+  </Form>
+</App>
+```
 
 <Playground
   name="Validation Message"
-  app={`<Form subject="{{ age: 20 }}">
-    <FormItem bindTo="age" type="number" minValue="18" invalidMessage="The given age is too low!" />
-</Form>
-    `}
+  app={`
+  <App>
+    <Form subject="{{ age: 20 }}">
+      <FormItem bindTo="age" type="number" minValue="18" invalidMessage="The given age is too low!" />
+    </Form>
+  </App>
+  `}
 />
-
-#### Handling Warnings
-
-It is possible to save and submit a form with warnings present.
-If this is the case, the user will be prompted by a confirmation dialog to proceed with sending the data to the backend.
-
-// TODO: Fix the empty ValidationSummary to display it in the confirmation dialog
-// Place image here of confirmation dialog
 
 ### Server-side Validation
 
-After form submission, the backend may also validate the data and respond if any issues arise. The response can be non-field related or field related.
+The `Form` component can receive and display a server-side validation response.
 
-- Field related issues are shown just like client-side field validation errors. After updating the input, the server-side issue will be removed until the form is submitted again.
-- If it is non-field related, a `ValidationSummary` component will open either at the top or the bottom of the form with warnings and issues in separate, closable containers listed.
+- Field related issues are shown just like client-side validation errors, removed when a field is edited.
+- Non-field related issues are displayed in a validation summary view.
 
-// Place image here of CBDrive issues
+<br/>
+<Image alt="Server-side Validation" src="/resources/images/create-apps/using-forms.png" />
 
-The location of the `ValidationSummary` component can be configured using the `validationSummaryPosition` prop. The property can be set to **"top"** (default) or **"bottom"**.
+## User Feedback with APICall
 
-## Feedback
-
-Submitting the form triggers a visual feedback provided on the UI.
+Submitting the form via the `APICall` component triggers a visual confirmation of the operation's success.
 If the submission is successful, a success `Toast` component will appear for a few seconds.
-Otherwise, an error `Toast` component will show the error message of the event.
+Otherwise, an error `Toast` component will show the error that occured.
 
-// Place image here for success and error Toast states
+```ueml copy {3-8, 15-20}
+<App>
+  <Form subject="{{ name: 'Joe' }}">
+    <event name="submit">
+      <APICall
+        url="/api/contacts/name"
+        method="POST"
+        body="{$eventArgs}" />
+    </event>
+    <FlowLayout>
+      <H3>Customer Name</H3>
+      <FormItem bindTo="name" label="Customer name" />
+    </FlowLayout>
+  </Form>
+  <Form subject="{{ age: 43 }}">
+    <event name="submit">
+      <APICall
+        url="/api/contacts/age"
+        method="POST"
+        body="{$eventArgs}" />
+    </event>
+    <FlowLayout>
+      <H3>Customer Age</H3>
+      <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>
+```
+
+<Playground
+  previewOnly
+  name="Example: Feedback"
+  app={`
+  <App>
+    <Form subject="{{ name: 'Joe' }}" onSubmit="(toSave) => toast.success('Data saved!')">
+      <FlowLayout>
+        <H3>Customer Name</H3>
+        <FormItem bindTo="name" label="Customer name" />
+      </FlowLayout>
+    </Form>
+    <Form subject="{{ age: 43 }}" onSubmit="(toSave) => toast.error('Network error!')">
+      <FlowLayout>
+        <H3>Customer Age</H3>
+        <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
+      </FlowLayout>
+    </Form>
+  </App>
+  `}
+/>
+
+## Using in Modal Dialogs
+
+The `ModalDialog` component supports `Form`s as a first-class citizen component:
+if a `Form` is provided as a direct child to a `ModalDialog`, it dialog's button row is replaced with the form's own button row.
+
+See a working example in <SmartLink href={USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS}>this article</SmartLink>.
