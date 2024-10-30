@@ -5,7 +5,7 @@ import type { DiagnosticMessageFromScanner, GeneralDiagnosticMessage } from "./d
 import { CharacterCodes } from "./CharacterCodes";
 import { createScanner } from "./scanner";
 import { SyntaxKind, getSyntaxKindStrRepr } from "./syntax-kind";
-import { tagNameNodesMatch } from "./utils";
+import { tagNameNodesWithoutErrorMatch   } from "./utils";
 import {
   Diag_Attr_Identifier_Expected,
   Diag_Attr_Value_Expected,
@@ -173,7 +173,7 @@ export function parseXmlUiMarkup(text: string): ParseResult {
         if (at(SyntaxKind.Identifier)) {
           const closeTagName = parseTagName();
           const namesMismatch =
-            openTagName !== undefined && !tagNameNodesMatch(openTagName, closeTagName, getText);
+            openTagName !== undefined && !tagNameNodesWithoutErrorsMatch(openTagName, closeTagName, getText);
           if (namesMismatch) {
             error(MakeErr.tagNameMismatch(getText(openTagName!), getText(closeTagName)));
           }
