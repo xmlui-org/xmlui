@@ -232,39 +232,6 @@ The app displays a "Loading..." message during the fetch. When the data is obtai
   height={180}
 />
 
-### Polling a DataSource
-
-Instead of manual polling, you can set a `DataSource` to use automatic, periodic polling. Use the `pollIntervalInSeconds` property as the following example shows:
-
-```ueml copy
-<App>
-  <DataSource id="issData" url="http://api.open-notify.org/iss-now.json" 
-    pollIntervalInSeconds="2"/>
-  <H1>Polling ISS location every 2 seconds</H1>  
-  <H2>Latitude: {issData.value.iss_position.latitude}</H2>
-  <H2>Longitude: {issData.value.iss_position.longitude}</H2>
-</App>  
-```
-
-This sample uses a public API to query the International Space Station's current coordinates. The code refreshes this data every two seconds.
-
-<Playground
-  previewOnly
-  name="Example: Automatic polling"
-  app={`
-    <App>
-      <DataSource id="issData" url="http://api.open-notify.org/iss-now.json" 
-        pollIntervalInSeconds="2"/>
-      <H1>Polling ISS location every 2 seconds</H1>  
-      <H2>Latitude: {issData.value.iss_position.latitude}</H2>
-      <H2>Longitude: {issData.value.iss_position.longitude}</H2>
-    </App>  
-  `}
-  height={180}
-/>
-
-### Binding Component Properties to DataSource
-
 ### Binding Component Properties to DataSource
 
 When you bind a `DataSource` component instance to a property, XMLUI starts the data fetch and changes the component property as soon as the retrieval has been completed.
