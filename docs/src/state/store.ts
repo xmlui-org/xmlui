@@ -179,7 +179,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
               if (errors.length > 0) {
                 return errReportComponent(
                   errors,
-                  "somewhere in preview",
+                  "Preview source file",
                   erroneousCompoundComponentName,
                 );
               }
