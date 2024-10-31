@@ -1,3 +1,87 @@
+import { Callout } from 'nextra/components';
+import { THEMES_DEFINITIONS, THEMES_WHAT_A_THEME_CONTAINS } from "../../meta/pages.js";
+
 # Build and deploy
 
-_TBD_
+XMLUI allows you to create apps without building the source files. You can copy the file app's file structure into a web server configured for static file hosting, and your app will immediately work.
+
+Besides this simple deployment model, XMLUI offers another using a build process to optimize the code for startup speed and bundle size.
+
+When your app is deployed, you still have the opportunity to change its appearance and behavior through configuration.
+
+This article will teach you the details of building and deploying apps.
+
+## "No-build" App Structure
+
+The simple structure of XMLUI apps contains a few folders and files, as this table summarizes:
+
+| File/Folder | Description |
+| --- | --- |
+| **`index.html`** | The default webpage to display |
+| **`Main.xmlui`** | The XMLUI app's entry point |
+| **`Main.xmlui.xs`** | Optional code-behind file for the app's entry point |
+| **`components`** | The folder with the app's XMLUI components (empty) |
+| **`resources`** | The folder with static app resources like images, logos, icons, etc. |
+| **`themes`** | The folder theme files. |
+| **`xmlui`** | The folder with XMLUI core framework, optional features, and third-party components |
+| **`start.bat`** | The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
+| **`start.sh`** | The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
+
+All folders except `xmlui` are optional as your app may not contain resources, app-specific components, or themes.
+
+### Component files
+
+The `components` folder contains XMLUI component files. Each file represents a component that you can use in your app. The component files are XMLUI markup files with the `.xmlui` extension.
+
+While you work with XMLUI in "no-build" mode, your components must follow this naming convention:
+
+- The component file name must be in PascalCase.
+- The component file name must match the component's name in the XMLUI markup.
+- You must place the component file directly in the `components` folder (and not in a nested folder).
+
+For example, if you have a component named `MyComponent`, the file name must be `MyComponent.xmlui`:
+
+```ueml copy filename="components/MyComponent.xmlui"
+<Component name="MyComponent">
+  <!-- Component content -->
+</Component>
+```
+
+<Callout type="info" emoji="📔">
+As an XMLUI app is served from a web server, the browser does not know the file structure on the server. So, when the engine finds a reference to an unknown component (for example, `SomeComponent`), it considers it an app-specific component and tries to fetch it from the `/components/SomeComponents.xmlui` URL. If the fetch is not successful, the engine raises an error.
+</Callout>
+
+If you need to use a component that does not follow the default convention, you can use the configuration file to describe its location.
+
+### Code-behind files
+
+XMLUI supports code-behind files. These files must use the same name and location as the markup file with the `.xmlui.xs` extension. So, if you have a code-behind file for the app, that file must be in the app's root folder with the `Main.xmlui.xs` name. Similarly, if you have a component in `MyComponent.xmlui` (within the `components` folder), the corresponding code-behind file must be `MyComponent.xmlui.xs`.
+
+### Theme Files
+
+XMLUI ships with several built-in <SmartLink href={THEMES_DEFINITIONS}>themes</SmartLink>; however, you can add extra themes to your app. These are JSON files and must be located within the `themes` folder. You can learn more about the theme files' format <SmartLink href={THEMES_WHAT_A_THEME_CONTAINS}>here</SmartLink>.
+
+While you work with XMLUI in "no-build" mode, your themes must follow this naming convention:
+
+- The theme file name must match the theme ID in the JSON file (and have a `.json` extension).
+- You must place the theme file directly in the `themes` folder (and not in a nested folder).
+
+### The configuration file
+
+<Callout type="warning">
+We are working to finalize the structure of the app configuration file; it will be done in a few days, and then we update this documentation section.
+</Callout>
+
+## Optimizing Apps
+
+<Callout type="warning">
+We are still working on the build tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+</Callout>
+
+## Developing Apps with HMR
+
+XMLUI supports using a development environment (with a similar structure to the "no-build" mode, which has some extra files), which supports hot module reloading (HMR). Optionally, use this mode and its build process to create optimized files.
+
+<Callout type="warning">
+We are still working on the HMR environment and building tools that optimize the application structure. When these tools are ready, we update this part of the documentation.
+</Callout>
