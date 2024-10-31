@@ -25,6 +25,14 @@ export const StandalonePlayground = () => {
   }, []);
 
   useEffect(() => {
+    document.documentElement.style.scrollbarGutter = 'auto';
+
+    return () => {
+      document.documentElement.style.scrollbarGutter = '';
+    };
+  }, []);
+
+  useEffect(() => {
     const getApp = async () => {
       try {
         const data = JSON.parse(await decompressData(queryParams.app as string));
