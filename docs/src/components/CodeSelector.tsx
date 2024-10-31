@@ -60,9 +60,9 @@ export const CodeSelector = () => {
               <SelectItem value="app" key="app">
                 Main.xmlui
               </SelectItem>
-              <SelectItem value="config" key="config">
+{/*              <SelectItem value="config" key="config">
                 config.json
-              </SelectItem>
+              </SelectItem>*/}
             </RadixSelect.Group>
             {appDescription.config?.themes?.length > 0 && (
               <RadixSelect.Group>
