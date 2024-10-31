@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
 import selectStyles from "./Select.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { contentChanged } from "@/src/state/store";
+import {HiChevronDown, HiChevronUp} from "react-icons/hi";
 
 export const SelectItem = React.forwardRef(
   ({ children, className, ...props }: any, forwardedRef) => {
@@ -19,7 +19,7 @@ export const SelectItem = React.forwardRef(
 
 export const CodeSelector = () => {
   const { appDescription, options, dispatch } = usePlayground();
-
+  const [open, setOpen] = React.useState(false);
   const selectedValue = useMemo(() => {
     let content = "";
     switch (options.content) {
@@ -37,13 +37,15 @@ export const CodeSelector = () => {
 
   return (
     <RadixSelect.Root
+      open={open}
+      onOpenChange={(open) => setOpen(open)}
       value={options.content}
       onValueChange={(value) => dispatch(contentChanged(value))}
     >
       <RadixSelect.Trigger className={selectStyles.SelectTrigger} aria-label="component">
         <RadixSelect.Value>{selectedValue}</RadixSelect.Value>
         <RadixSelect.Icon className={selectStyles.SelectIcon}>
-          <ChevronDownIcon />
+          {open ? <HiChevronUp /> : <HiChevronDown />}
         </RadixSelect.Icon>
       </RadixSelect.Trigger>
       <RadixSelect.Portal>
