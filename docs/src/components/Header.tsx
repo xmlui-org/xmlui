@@ -11,10 +11,11 @@ import { RxOpenInNewWindow, RxReset, RxDownload, RxCode } from "react-icons/rx";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
-import { ThemeSwitcher } from "./ThemeSwitcher";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { Box } from "@/src/components/Box";
+import {ToneSwitcher} from "@/src/components/ToneSwitcher";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -82,12 +83,14 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         [styles.dark]: theme === "dark" || (theme === "system" && systemTheme === "dark"),
       })}
     >
-      <div className={styles.box}>
-        <Text>{appDescription.config?.name}</Text>
-        {!options.previewMode && <CodeSelector />}
+      <Box>
+        <Box styles={{ gap: "1rem" }}>
+          <Text>{appDescription.config?.name}</Text>
+          {!options.previewMode && standalone && <CodeSelector />}
+        </Box>
         <SpaceFiller />
         {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
-          <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+          <Tooltip trigger={<ToneSwitcher />} label="Change theme" />
         )}
         {!options.previewMode && show && (
           <>
@@ -153,7 +156,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           }
           label="Download app"
         />
-      </div>
+      </Box>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>
       )}
