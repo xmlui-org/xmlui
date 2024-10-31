@@ -140,10 +140,6 @@ const Transforms = {
   unPackTree,
 };
 
-const Utils = {
-  getByPath: get,
-};
-
 const DateUtils = {
   differenceInMinutes: (date1: string | Date, date2: string | Date) => {
     return differenceInMinutes(new Date(date1), new Date(date2));
@@ -197,6 +193,7 @@ function RootContentComponent({
     setActiveThemeTone,
     availableThemeIds,
     root,
+    toggleThemeTone,
   } = useThemes();
 
   useDocumentKeydown((event: KeyboardEvent) => {
@@ -386,7 +383,6 @@ function RootContentComponent({
       delay,
       Actions,
       Transforms,
-      Utils,
       DateUtils,
       embed,
       environment,
@@ -394,7 +390,8 @@ function RootContentComponent({
       apiInterceptorContext,
       setTheme: setActiveThemeId,
       setThemeTone: setActiveThemeTone,
-      toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light"),
+      toggleThemeTone,
+      getPropertyByPath: get,
     };
     return ret;
   }, [
@@ -416,6 +413,7 @@ function RootContentComponent({
     setActiveThemeId,
     setActiveThemeTone,
     standalone,
+    get,
   ]);
 
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);

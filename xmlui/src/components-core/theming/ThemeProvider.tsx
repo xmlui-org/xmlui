@@ -309,7 +309,7 @@ function ThemeProvider({
   }, [availableThemeIds, defaultTheme]);
 
   const activeTheme: ThemeDefinition = useMemo(() => {
-    let foundTheme;
+    let foundTheme: ThemeDefinition;
     if (activeThemeId) {
       foundTheme = themes.find((theme) => theme.id === activeThemeId);
     }
@@ -350,6 +350,7 @@ function ThemeProvider({
       setActiveThemeTone,
       availableThemeIds,
       activeTheme,
+      toggleThemeTone: () => setActiveThemeTone(activeThemeTone === "light" ? "dark" : "light")
     };
     return themeVal;
   }, [
