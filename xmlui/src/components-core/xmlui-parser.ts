@@ -7,6 +7,7 @@ import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parse
 import { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
+import { paddingSubject } from "./theming/themes/base-utils";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;
@@ -66,32 +67,54 @@ export function errReportComponent(
   compoundCompName: string | undefined,
 ) {
   function makeComponent() {
-    const errList = errors.map((e) => {
-      return {
-        type: "VStack",
-        props: { gap: "0px"},
-        children: [
-          {
-            type: "Text",
-            props: { value: `Error at file '${fileName}'` },
-          },
-          {
-            type: "Text",
-            props: { value: `line ${e.line}, column ${e.col}:` },
-          },
-          {
-            type: "Text",
-            props: { value: `${e.message}` },
-          },
-        ],
-      };
-    });
+    const errList = errors
+      .sort((a, b) => a.pos - b.pos)
+      .map((e, idx) => {
+        return {
+          type: "VStack",
+          props: { gap: "0px" },
+          children: [
+            {
+              type: "HStack",
+              props: { gap: "0" },
+              children: [
+                {
+                  type: "Text",
+                  props: {
+                    value: `#${idx + 1}: ${fileName} (${e.line}:${e.col}):\xa0`,
+                    color: "$color-info",
+                  },
+                },
+                {
+                  type: "Text",
+                  props: { value: ` ${e.message}`, fontWeight: "bold" },
+                },
+              ],
+            },
+          ],
+        };
+      });
     const comp: ComponentDef = {
       type: "VStack",
-      props: { backgroundColor: "#ff4747"},
+      props: { padding: "$padding-normal", gap: 0 },
       children: [
-        { type: "H1", props: { value: "Error while processing xmlui markup." } },
-        { type: "VStack", props: { gap: "2rem" }, children: errList },
+        {
+          type: "H1",
+          props: {
+            value: `${errList.length} ${errList.length > 1 ? "Errors" : "Error"} found while processing XMLUI markup`,
+            padding: "$padding-normal",
+            backgroundColor: "$color-error",
+            color: "white",
+          },
+        },
+        {
+          type: "VStack",
+          props: {
+            gap: "$gap-tight",
+            padding: "$padding-normal",
+          },
+          children: errList,
+        },
       ],
     };
     return comp;
@@ -101,7 +124,6 @@ export function errReportComponent(
   comp.component = makeComponent();
   return comp;
 }
-
 
 function addPositions(errors: ParseError[], newlinePositions: number[]): ErrorWithLineColInfo[] {
   if (newlinePositions.length === 0) {

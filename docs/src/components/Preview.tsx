@@ -23,7 +23,7 @@ export function Preview() {
     if (errors.length > 0) {
       component = errReportComponent(
         errors,
-        "somewhere in preview",
+        "Preview source file",
         erroneousCompoundComponentName,
       );
     }
@@ -31,7 +31,7 @@ export function Preview() {
       (src: {name: string, component: string}) => {
         let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src.component);
         if (errors.length > 0) {
-          return errReportComponent(errors, "somewhere in preview", erroneousCompoundComponentName);
+          return errReportComponent(errors, "Preview source file", erroneousCompoundComponentName);
         }
         return component;
       },
