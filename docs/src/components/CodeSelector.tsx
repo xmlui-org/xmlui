@@ -10,7 +10,7 @@ import { contentChanged } from "@/src/state/store";
 export const SelectItem = React.forwardRef(
   ({ children, className, ...props }: any, forwardedRef) => {
     return (
-      <RadixSelect.Item className={selectStyles.SelectItem} {...props} ref={forwardedRef}>
+      <RadixSelect.Item className={selectStyles.RadixMenuItem} {...props} ref={forwardedRef}>
         <RadixSelect.ItemText>{children}</RadixSelect.ItemText>
       </RadixSelect.Item>
     );
@@ -21,16 +21,18 @@ export const CodeSelector = () => {
   const { appDescription, options, dispatch } = usePlayground();
 
   const selectedValue = useMemo(() => {
+    let content = "";
     switch (options.content) {
       case "app":
-        "Main.xmlui";
+        content = "Main.xmlui";
         break;
       case "config":
-        "config.json";
+        content = "config.json";
         break;
       default:
-        return `${options.content}.xmlui`;
+        content = `${options.content}.xmlui`;
     }
+    return content;
   }, [options.content]);
 
   return (
@@ -46,7 +48,7 @@ export const CodeSelector = () => {
       </RadixSelect.Trigger>
       <RadixSelect.Portal>
         <RadixSelect.Content
-          className={selectStyles.SelectContent}
+          className={selectStyles.RadixMenuContent}
           side="bottom"
           align="start"
           position="popper"

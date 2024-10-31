@@ -40,14 +40,22 @@
   color: rgba(249,250,251,var(--tw-text-opacity));
 }
 
-.SelectContent {
-  overflow: hidden;
-  background-color: hsl(var(--nextra-primary-hue), var(--nextra-primary-saturation), 100%, 1);;
+.RadixMenuContent {
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+  width: fit-content;
+  background-color: hsl(var(--nextra-primary-hue), var(--nextra-primary-saturation), 100%, 1);
   border-radius: 6px;
+  padding: 6px;
+  gap: 5rem;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35), 0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  animation-duration: 400ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
 }
 
-:is(html[class~=dark] .SelectContent) {
+:is(html[class~=dark] .RadixMenuContent) {
   background-color: rgba(17,17,17,var(--tw-bg-opacity));
 }
 
@@ -60,7 +68,7 @@
   background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)77%/.1);
 }
 
-.SelectItem {
+.RadixMenuItem {
   font-size: 1rem;
   line-height: 1;
   --tw-text-opacity: 1;
@@ -68,34 +76,34 @@
   border-radius: 3px;
   display: flex;
   align-items: center;
-  padding: 0.375rem 0.5rem;
+  padding: .5rem;
   position: relative;
   user-select: none;
   cursor: pointer;
 }
 
-:is(html[class~=dark] .SelectItem) {
+:is(html[class~=dark] .RadixMenuItem) {
   --tw-text-opacity: 1;
   color: rgba(163,163,163,var(--tw-text-opacity));
 }
 
-.SelectItem[data-highlighted] {
+.RadixMenuItem[data-highlighted] {
   outline: none;
   background-color: rgba(243,244,246,var(--tw-bg-opacity));
   color: rgba(51,65,85,var(--tw-text-opacity));
 }
 
-:is(html[class~=dark] .SelectItem[data-highlighted]) {
+:is(html[class~=dark] .RadixMenuItem[data-highlighted]) {
   background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/.05);
 }
 
-.SelectItem[data-state=checked] {
+.RadixMenuItem[data-state=checked] {
   background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)94%/var(--tw-bg-opacity));
   --tw-text-opacity: 1;
   color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)32%/var(--tw-text-opacity));
 }
 
-:is(html[class~=dark] .SelectItem[data-state=checked]) {
+:is(html[class~=dark] .RadixMenuItem[data-state=checked]) {
   --tw-text-opacity: 1;
   color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/var(--tw-text-opacity));
   background-color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)66%/.1);
@@ -116,11 +124,71 @@
   color: rgba(163,163,163,var(--tw-text-opacity));
 }
 
-.SelectItemIndicator {
+.RadixMenuItemIndicator {
   position: absolute;
   left: 0;
   width: 25px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.RadixMenuContent[data-side='top'] {
+  animation-name: slideDownAndFade;
+}
+
+.RadixMenuContent[data-side='right'] {
+  animation-name: slideLeftAndFade;
+}
+
+.RadixMenuContent[data-side='bottom'] {
+  animation-name: slideUpAndFade;
+}
+
+.RadixMenuContent[data-side='left'] {
+  animation-name: slideRightAndFade;
+}
+
+@keyframes slideUpAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideRightAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideDownAndFade {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideLeftAndFade {
+  from {
+    opacity: 0;
+    transform: translateX(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
