@@ -20,6 +20,7 @@ You can use any component as your app's root. For example, you can display a sim
 
 <Playground
     name="Example: Text as the root component"
+    horizontal={true}
     height={60}
     app={`
       <Text>Hello from XMLUI!</Text>
@@ -301,16 +302,6 @@ This layout docks the app header to the top and the footer to the bottom. The na
   height={350}
   resources={{ logo: xmluiLogo }}
   app={verticalFullHeader}
-  defaultTheme="custom"
-  themes={[
-    {
-      name: "Custom Theme",
-      id: "custom",
-      themeVars: {
-        layout: "vertical-full-header",
-      },
-    },
-  ]}
 />
 
 ## AppHeader
