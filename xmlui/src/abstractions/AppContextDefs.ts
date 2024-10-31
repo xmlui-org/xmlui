@@ -128,7 +128,6 @@ export type AppContextObject = {
   readonly getDateUntilNow: (date?: string | number | Date, nowLabel?: string, time?: string) => string;
   readonly Actions: Record<string, ActionFunction>;
   readonly Transforms: Record<string, any>;
-  readonly Utils: Record<string, any>;
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
   readonly environment: { isWindowFocused: boolean };

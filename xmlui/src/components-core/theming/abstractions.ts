@@ -97,6 +97,11 @@ export type AppThemes = {
   setActiveThemeTone: (newTone: ThemeTone) => void;
 
   /**
+   * Toggles the current theme tone
+   */
+  toggleThemeTone: () => void;
+
+  /**
    * Gets the id of the active theme
    */
   activeThemeId: string;
