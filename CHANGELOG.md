@@ -1,5 +1,11 @@
 # xmlui Changelog
 
+## v0.6.1
+
+### Breaking changes:
+
+- `Utils` namespace removed. Replace `Utils.getByPath` with `getPropertyByPath`.
+
 ## v0.6.0
 
 ### Breaking changes:
