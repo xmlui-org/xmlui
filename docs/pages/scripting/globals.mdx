@@ -387,6 +387,14 @@ function delay(ms: number): Promise<void>;
 
 Delays the execution of the next line of code by the specified number of milliseconds.
 
+### `getPropertyByPath`
+
+```ts
+function getPropertyByPath(obj: any, path: string): any;
+```
+
+Gets the property of `obj` at the specified `path`. `path` is a string with the chained property names separated by dots.
+
 ### `handleError`
 
 ```ts
