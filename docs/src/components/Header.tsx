@@ -15,6 +15,7 @@ import { ThemeSwitcher } from "./ThemeSwitcher";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import { Box } from "@/src/components/Box";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -82,9 +83,11 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         [styles.dark]: theme === "dark" || (theme === "system" && systemTheme === "dark"),
       })}
     >
-      <div className={styles.box}>
-        <Text>{appDescription.config?.name}</Text>
-        {!options.previewMode && <CodeSelector />}
+      <Box>
+        <Box styles={{ gap: "1rem" }}>
+          <Text>{appDescription.config?.name}</Text>
+          {!options.previewMode && standalone && <CodeSelector />}
+        </Box>
         <SpaceFiller />
         {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
           <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
@@ -153,7 +156,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           }
           label="Download app"
         />
-      </div>
+      </Box>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>
       )}
