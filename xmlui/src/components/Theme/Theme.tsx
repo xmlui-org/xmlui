@@ -29,13 +29,17 @@ export const themeComponentRenderer = createComponentRenderer(
   ({ node, extractValue, renderChild, layoutContext, appContext }) => {
     const { tone, ...restProps } = node.props;
     const toastDuration = appContext?.globals?.notifications?.duration;
+    let themeTone = extractValue.asOptionalString(tone);
+    if (themeTone && themeTone !== "dark") {
+      themeTone = "light";
+    }
     return (
       <Theme
         id={extractValue.asOptionalString(node.props.themeId)}
         isRoot={extractValue.asOptionalBoolean(node.props.root)}
         layoutContext={layoutContext}
         renderChild={renderChild}
-        tone={extractValue.asOptionalString(tone) as ThemeTone}
+        tone={themeTone as ThemeTone}
         toastDuration={toastDuration}
         themeVars={extractValue(restProps)}
         node={node}
