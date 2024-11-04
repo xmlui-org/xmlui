@@ -69,8 +69,8 @@ function DataLoader({
     return new RestApiProxy(appContext);
   }, [appContext]);
 
-  const doLoad = async (abortSignal?: AbortSignal, pageParams?: any) => {
-    const response = await api.execute({
+  const doLoad = useCallback(async (abortSignal?: AbortSignal, pageParams?: any) => {
+    return await api.execute({
       abortSignal,
       operation: loader.props as any,
       params: {
@@ -79,39 +79,7 @@ function DataLoader({
       },
       resolveBindingExpressions: true,
     });
-    let result = response;
-    const resultSelector = loader.props.resultSelector;
-    if (resultSelector) {
-      result = extractParam(
-        { $response: response },
-        resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`
-      );
-    }
-    let prevPageParam = undefined;
-    const prevPageSelector = loader.props.prevPageSelector;
-    if (prevPageSelector) {
-      prevPageParam = extractParam(
-        { $response: response },
-        prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`
-      );
-    }
-    let nextPageParam = undefined;
-    const nextPageSelector = loader.props.nextPageSelector;
-    if (nextPageSelector) {
-      nextPageParam = extractParam(
-        { $response: response },
-        nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`
-      );
-    }
-    if (hasPaging) {
-      return {
-        result,
-        prevPageParam,
-        nextPageParam,
-      };
-    }
-    return result;
-  };
+  }, [api, loader.props, state]);
 
   const queryId = useMemo(() => {
     return new DataLoaderQueryKeyGenerator(url, queryParams).asKey();
@@ -218,7 +186,6 @@ function DataLoader({
       registerComponentApi={registerComponentApi}
       pollIntervalInSeconds={pollIntervalInSeconds}
       onLoaded={onLoaded}
-      direction={pagingDirection}
       transformResult={transformResult}
     />
   ) : (

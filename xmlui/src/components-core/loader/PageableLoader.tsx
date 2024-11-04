@@ -8,13 +8,15 @@ import type { ContainerState } from "@components-core/container/ContainerCompone
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
-  LoaderLoadedFn, TransformResultFn,
+  LoaderLoadedFn,
+  TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 
 import { extractParam } from "@components-core/utils/extractParam";
 import { useAppContext } from "@components-core/AppContext";
 import { usePrevious } from "@components-core/utils/hooks";
+import type {QueryFunction} from "@tanstack/query-core/src/types";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -23,7 +25,6 @@ type LoaderProps = {
   loader: ComponentDef;
   loaderFn: (abortSignal: AbortSignal | undefined, pageParam: string) => Promise<any>;
   queryId?: readonly any[];
-  direction?: LoaderDirections;
   registerComponentApi: RegisterComponentApiFn;
   pollIntervalInSeconds?: number;
   onLoaded?: (...args: any[]) => void;
@@ -38,23 +39,60 @@ export function PageableLoader({
   loader,
   loaderFn,
   queryId,
-  direction = "BACKWARD",
   registerComponentApi,
   pollIntervalInSeconds,
   onLoaded,
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
-  transformResult
+  transformResult,
 }: LoaderProps) {
   const { uid } = loader;
   const appContext = useAppContext();
   const queryKey = useMemo(
     () => (queryId ? queryId : [uid, extractParam(state, loader.props, appContext)]),
-    [appContext, loader.props, queryId, state, uid]
+    [appContext, loader.props, queryId, state, uid],
   );
   const thizRef = useRef(queryKey);
 
+  const getPreviousPageParam = useCallback(
+      (firstPage: any) => {
+        let prevPageParam = undefined;
+        const prevPageSelector = loader.props.prevPageSelector;
+        if (prevPageSelector) {
+          prevPageParam = extractParam(
+              { $response: firstPage },
+              prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
+          );
+        }
+        if (!prevPageParam) {
+          return undefined;
+        }
+        return {
+          prevPageParam: prevPageParam,
+        };
+      },
+      [loader.props.prevPageSelector],
+  );
+  const getNextPageParam = useCallback(
+      (lastPage: any) => {
+        let nextPageParam = undefined;
+        const nextPageSelector = loader.props.nextPageSelector;
+        if (nextPageSelector) {
+          nextPageParam = extractParam(
+              { $response: lastPage },
+              nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`,
+          );
+        }
+        if (!nextPageParam) {
+          return undefined;
+        }
+        return {
+          nextPageParam: nextPageParam,
+        };
+      },
+      [loader.props.nextPageSelector],
+  );
   const {
     data,
     status,
@@ -69,35 +107,28 @@ export function PageableLoader({
     fetchNextPage,
   } = useInfiniteQuery({
     queryKey,
-    queryFn: async ({ signal, pageParam }) => {
-      // console.log("FETCHING PAGE: ", pageParam);
-      const { result, prevPageParam, nextPageParam } = await loaderFn(signal, pageParam);
-      // console.log("fetched PAGE: ", { result, prevPageParam, nextPageParam });
-      return { result, prevPageParam, nextPageParam };
-    },
-    getPreviousPageParam:
-      direction === "BACKWARD" || direction === "BIDIRECTIONAL"
-        ? (firstPage, a) => {
-            if (!firstPage.prevPageParam) {
-              return undefined;
-            }
-            // console.log("getting previous page param", { firstPage, a });
-            return {
-              prevPageParam: firstPage.prevPageParam,
-            };
-          }
-        : undefined,
-    getNextPageParam:
-      direction === "FORWARD" || direction === "BIDIRECTIONAL"
-        ? (lastPage) => {
-            if (!lastPage.nextPageParam) {
-              return undefined;
-            }
-            return {
-              nextPageParam: lastPage.nextPageParam,
-            };
-          }
-        : undefined,
+    queryFn: useCallback<QueryFunction>(async ({ signal, pageParam }) => {
+      return await loaderFn(signal, pageParam);
+    }, [loaderFn]),
+    select: useCallback(
+      (data: any) => {
+        let result = [];
+        if (data) {
+          result = data.pages.flatMap((d) => d);
+        }
+        const resultSelector = loader.props.resultSelector;
+        if (resultSelector) {
+          result = extractParam(
+            { $response: result },
+            resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`,
+          );
+        }
+        return transformResult ? transformResult(result) : result;
+      },
+      [loader.props.resultSelector, transformResult],
+    ),
+    getPreviousPageParam: loader.props.prevPageSelector === undefined ? undefined : getPreviousPageParam,
+    getNextPageParam: loader.props.nextPageSelector === undefined ? undefined : getNextPageParam,
   });
 
   //TODO revisit
@@ -123,17 +154,6 @@ export function PageableLoader({
     };
   }, [appContext.queryClient, loaderLoaded, uid]);
 
-  const flatData = useMemo(() => {
-    if (!data) {
-      return [];
-    }
-    return data.pages.flatMap((d) => d.result);
-  }, [data]);
-
-  const transformedData = useMemo(()=>{
-    return transformResult ? transformResult(flatData) : flatData;
-  }, [flatData, transformResult]);
-
   const prevData = usePrevious(data);
   const prevError = usePrevious(error);
 
@@ -155,20 +175,18 @@ export function PageableLoader({
   useLayoutEffect(() => {
     // console.log("data changed", {
     //   status,
-    //   flatData,
+    //   data,
     //   pageInfo,
     // });
     if (status === "success" && (prevData !== data || prevPageInfo !== pageInfo)) {
-      loaderLoaded(transformedData, pageInfo);
-      onLoaded?.(transformedData);
+      loaderLoaded(data, pageInfo);
+      onLoaded?.(data);
     } else if (status === "error" && prevError !== error) {
       loaderError(error);
     }
   }, [
-    appContext,
     data,
     error,
-    transformedData,
     loaderError,
     loaderLoaded,
     onLoaded,
@@ -228,7 +246,7 @@ export function PageableLoader({
 
         if (flatItems.length !== originalFlatItems.length) {
           throw new Error(
-            "Use this method for update only. If you want to add or delete, call the addItem/deleteItem method."
+            "Use this method for update only. If you want to add or delete, call the addItem/deleteItem method.",
           );
         }
         const newData = finishDraft(draft);
@@ -271,7 +289,7 @@ export function PageableLoader({
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
       getItems: () => {
-        return transformedData;
+        return data;
       },
       deleteItem: async (element: any) => {
         throw new Error("not implemented");
@@ -280,7 +298,7 @@ export function PageableLoader({
   }, [
     appContext.queryClient,
     fetchPrevPage,
-    transformedData,
+    data,
     loader.uid,
     queryId,
     queryKey,

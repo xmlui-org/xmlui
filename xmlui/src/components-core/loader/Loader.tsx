@@ -1,4 +1,4 @@
-import {useEffect, useLayoutEffect, useMemo} from "react";
+import {useCallback, useEffect, useLayoutEffect, useMemo} from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
@@ -14,6 +14,7 @@ import { extractParam } from "@components-core/utils/extractParam";
 import { createDraft, finishDraft } from "immer";
 import { useAppContext } from "@components-core/AppContext";
 import { usePrevious } from "@components-core/utils/hooks";
+import type {QueryFunction} from "@tanstack/query-core/src/types";
 
 /**
  * The properties of the Loader component
@@ -61,14 +62,25 @@ export function Loader({
   // --- refetch: The function that can be used to re-fetch the data (because of data/state changes)
   const { data, status, isFetching, error, refetch } = useQuery(
       {
-        queryKey: queryId ? queryId : [uid, extractParam(state, loader.props, appContext)],
-        queryFn: async ({ signal }) => {
-          const newVar = await loaderFn(signal);
+        queryKey: useMemo(()=>queryId ? queryId : [uid, extractParam(state, loader.props, appContext)], [appContext, loader.props, queryId, state, uid]),
+        queryFn: useCallback<QueryFunction>(async ({ signal }) => {
+          const newVar: any = await loaderFn(signal);
           if (newVar === undefined) {
             return null;
           }
           return newVar;
-        },
+        }, [loaderFn]),
+        select: useCallback((data: any)=>{
+          let result = data;
+          const resultSelector = loader.props.resultSelector;
+          if (resultSelector) {
+            result = extractParam(
+                { $response: data },
+                resultSelector.startsWith("{") ? resultSelector : `{$response.${resultSelector}}`
+            );
+          }
+          return transformResult ? transformResult(result) : result;
+        }, [loader.props.resultSelector, transformResult]),
         retry: false
       }
   );
@@ -94,21 +106,15 @@ export function Loader({
     loaderInProgressChanged(isFetching);
   }, [isFetching, loaderInProgressChanged]);
 
-  // --- Respond to the state changes whenever the uid of the loader instance, the data, the dispatcher,
-  // --- or the data query status changes.
-
-  const transformedData = useMemo(()=>{
-    return transformResult ? transformResult(data) : data;
-  }, [data, transformResult]);
 
   useLayoutEffect(() => {
     if (status === "success" && data !== prevData) {
-      loaderLoaded(transformedData);
-      onLoaded?.(transformedData);
+      loaderLoaded(data);
+      onLoaded?.(data);
     } else if (status === "error" && error !== prevError) {
       loaderError(error);
     }
-  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status, transformedData]);
+  }, [data, error, loaderError, loaderLoaded, onLoaded, prevData, prevError, status]);
 
   useLayoutEffect(() => {
     return () => {
@@ -152,13 +158,13 @@ export function Loader({
         appContext.queryClient?.setQueryData(queryId!, newData);
       },
       getItems: async () => {
-        return transformedData;
+        return data;
       },
       deleteItem: async (element: any) => {
         throw new Error("not implemented");
       },
     });
-  }, [appContext.queryClient, queryId, refetch, registerComponentApi, transformedData]);
+  }, [appContext.queryClient, queryId, refetch, registerComponentApi, data]);
 
   return null;
 }
