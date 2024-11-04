@@ -66,7 +66,7 @@ async function prepareOptimisticValuesForQueries(
         return;
       }
       const currentData = queryClient.getQueryData(queryKey) as any;
-      const flatData = currentData?.pages ? currentData.pages.flatMap((page: any) => page.result) : currentData;
+      const flatData = currentData?.pages ? currentData.pages.flatMap((page: any) => page) : currentData;
       const optimisticValue = await optimisticValueGetter(flatData, stateContext["$eventArgs"]);
       if (optimisticValue) {
         ret.set(queryKey, prepareOptimisticValue(optimisticValue, clientTxId));
@@ -90,7 +90,7 @@ async function doOptimisticUpdate(optimisticValuesByQueryKeys: Map<QueryKey, any
     if (draft.pages) {
       let updated = false;
       draft.pages.forEach((page: any) => {
-        page.result?.forEach((item: any) => {
+        page.forEach((item: any) => {
           if (item.id === optimisticValue.id) {
             Object.assign(item, optimisticValue);
             updated = true;
@@ -98,7 +98,7 @@ async function doOptimisticUpdate(optimisticValuesByQueryKeys: Map<QueryKey, any
         });
       });
       if (!updated) {
-        draft.pages[draft.pages.length - 1].result.push(optimisticValue);
+        draft.pages[draft.pages.length - 1].push(optimisticValue);
       }
     } else {
       let updated = false;
@@ -135,13 +135,13 @@ function updateQueriesWithResult(
     if (draft.pages) {
       //pageable loader
       if (optimisticValue) {
-        draft.pages[draft.pages.length - 1].result = draft.pages[draft.pages.length - 1].result.map((item: any) =>
+        draft.pages[draft.pages.length - 1] = draft.pages[draft.pages.length - 1].map((item: any) =>
           item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId ? result : item
         );
       } else {
         let updated = false;
         draft.pages.forEach((page: any) => {
-          page.result?.forEach((item: any) => {
+          page?.forEach((item: any) => {
             if (item.id === result.id) {
               Object.assign(item, result);
               updated = true;
@@ -149,7 +149,7 @@ function updateQueriesWithResult(
           });
         });
         if (!updated) {
-          draft.pages[draft.pages.length - 1].result.push(result);
+          draft.pages[draft.pages.length - 1].push(result);
         }
       }
     } else {
