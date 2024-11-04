@@ -1,4 +1,4 @@
-import {CSSProperties, ReactNode, useLayoutEffect} from "react";
+import { CSSProperties, ReactNode, useLayoutEffect } from "react";
 import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
@@ -207,7 +207,7 @@ export const Table = forwardRef(
       _setSortingDirection(sortingDirection);
     }, [sortingDirection]);
 
-    const sortedData = useMemo(()=>{
+    const sortedData = useMemo(() => {
       if (!_sortBy || isSortControlled) {
         return dataWithOrder;
       }
@@ -558,7 +558,9 @@ export const Table = forwardRef(
                         >
                           <ClickableHeader
                             hasSorting={header.column.columnDef.enableSorting}
-                            updateSorting={() => _updateSorting(header.column.columnDef.meta?.accessorKey)}
+                            updateSorting={() =>
+                              _updateSorting(header.column.columnDef.meta?.accessorKey)
+                            }
                           >
                             <div className={styles.headerContent} style={style}>
                               {
@@ -786,5 +788,9 @@ function ColumnOrderingIndicator({
   } else if (direction === "descending") {
     return <Icon name={iconSortDesc} fallback="sortdesc" size="12" />; //sortdesc
   }
-  return <Icon name={iconNoSort} fallback="nosort" size="12" />; //nosort
+  return iconNoSort !== "-" ? (
+    <Icon name={iconNoSort} fallback="nosort" size="12" />
+  ) : (
+    <Icon name={iconNoSort} size="12" />
+  ); //nosort
 }
