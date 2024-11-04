@@ -1,15 +1,12 @@
 import { Callout } from 'nextra/components';
 import { 
+  COMPONENT_FORMITEM,
   COMPONENT_TEXT,
   LAYOUT_DIMENSION_UNITS,
   USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS
 } from "../../meta/pages";
 
 # Using Forms
-
-<Callout type="warning" emoji="⚠️">
-  This article is about to be reviewed.
-</Callout>
 
 <Callout type="info" emoji="💡">
   XMLUI has a robust form infrastructure allowing you to create forms without the hassle of managing, editing, validating, and saving the information you provide in the UI.
@@ -34,10 +31,10 @@ The following example demonstrates the fundamental XMLUI concepts regarding form
   name="Example: XMLUI Form"
   app={`
     <App>
-      <Form subject="{{ name: 'Joe', age: 43 }}">
+      <Form subject="{{ name: 'Joe', age: 43 }}" >
         <FlowLayout>
           <H3>Customer information</H3>
-          <FormItem bindTo="name" label="Customer name" />
+          <FormItem bindTo="name" label="Customer name" minLength="2" />
           <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
         </FlowLayout>
       </Form>
@@ -62,7 +59,7 @@ The code can be broken down into the following:
   However, there is no restriction on what components you can use within a form.
 </Callout>
 
-```ueml copy {9-11}
+```ueml copy {8-10}
 <App>
   <Form
     subject="{{ search: 'Seattle' }}"
@@ -102,7 +99,7 @@ The code can be broken down into the following:
 
 The following example shows this by placing a regular `Checkbox` component in the `Form`.
 
-```ueml copy {7}
+```ueml copy {8}
 <App>
   <Form
     subject="{{ search: 'Seattle', caseSensitive: 'false' }}"
@@ -235,7 +232,7 @@ Set each item's width to "50%" to create a two-column layout:
   This feature tells a component to fill up all remaining space in a row if other sibling component have their sizes specified.
 </Callout>
 
-```ueml copy {13-14}
+```ueml copy {14-15}
 <App>
   <Form
     subject="{{ 
@@ -299,22 +296,22 @@ If this property is empty, `FormItem` uses a <SmartLink href={COMPONENT_TEXT}>`T
 
 The `FormItem` supports these input components:
 
-| `type` Value | Description |
-| --- | --- |
-| `checkbox` | A checkbox representing a boolean value. |
-| `combobox` | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
-| `custom` | A custom input component to enable developers to specify their own input fields. |
-| `datePicker` | An input to select dates. |
-| `file` | An input to select a file or folder from the local machine. |
-| `integer` | An input for integer values. |
+| `type` Value    | Description |
+| --------------- | ----------- |
+| `checkbox`      | A checkbox representing a boolean value. |
+| `combobox`      | Lets the user select an item from a dropdown list of filterable items. Use the input field to filter the list. |
+| `custom`        | A custom input component to enable developers to specify their own input fields. |
+| `datePicker`    | An input to select dates. |
+| `file`          | An input to select a file or folder from the local machine. |
+| `integer`       | An input for integer values. |
 | `multiCombobox` | Lets the user select mulitple items from a filterable dropdown list. Use the input field to filter the list. |
-| `multiSelect` | Lets the user select mulitple items from a dropdown list. |
-| `number` | An input for numeric values (integer or floating-point). |
-| `radioGroup` | A group of radio buttons (only one can be selected). |
-| `select` | Lets the user select an item from a dropdown list. |
-| `switch` | A switch component to toggle a boolean value. |
-| `text` | A textbox to enter text. |
-| `textarea` | A multiline textbox to enter text. |
+| `multiSelect`   | Lets the user select mulitple items from a dropdown list. |
+| `number`        | An input for numeric values (integer or floating-point). |
+| `radioGroup`    | A group of radio buttons (only one can be selected). |
+| `select`        | Lets the user select an item from a dropdown list. |
+| `switch`        | A switch component to toggle a boolean value. |
+| `text`          | A textbox to enter text. |
+| `textarea`      | A multiline textbox to enter text. |
 
 <Callout type="warning" emoji="⚠️">
   `FromItem` renders a read-only text if you use a `type` value not in this table.
@@ -364,7 +361,7 @@ The `checkbox` type represents a checkbox input component:
 The `combobox` type represents a Combobox input component.
 It combines a textbox with a dropdown list:
 
-```ueml copy {6-9}
+```ueml copy {5-10}
 <App>
   <Form
     subject="{{ title: 'Mr.' }}"
@@ -381,6 +378,7 @@ It combines a textbox with a dropdown list:
 
 <Playground
   name="Example: Combobox"
+  height={240}
   previewOnly
   app={`
   <App>
@@ -482,6 +480,46 @@ The `integer` type represents an input component for integer values:
   `}
 />
 
+### MultiCombobox
+
+The `multiCombobox` type represents a dropdown list with selectable items which can be filtered using the input field of the input control (similarly to the [Combobox](#combobox)).
+You can select multiple items as well:
+
+```ueml copy {5-10}
+<App>
+  <Form
+    subject="{{ size: 'xs' }}" 
+    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+    <FormItem type="multiCombobox" bindTo="size" label="Box size">
+      <Option label="Extra small" value="xs" />
+      <Option label="Small" value="sm" />
+      <Option label="Medium" value="md" />
+      <Option label="Large" value="lg" />
+    </FormItem>
+  </Form>
+</App>
+```
+
+<Playground
+  name="Example: MultiCombobox"
+  previewOnly
+  height={240}
+  app={`
+  <App>
+    <Form
+      subject="{{ size: 'xs' }}" 
+      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
+      <FormItem type="multiCombobox" bindTo="size" label="Box size">
+        <Option label="Extra small" value="xs" />
+        <Option label="Small" value="sm" />
+        <Option label="Medium" value="md" />
+        <Option label="Large" value="lg" />
+      </FormItem>
+    </Form>
+  </App>
+  `}
+/>
+
 ### MultiSelect
 
 The `multiSelect` type represents a dropdown list with selectable items. You can select multiple of these items:
@@ -504,6 +542,7 @@ The `multiSelect` type represents a dropdown list with selectable items. You can
 <Playground
   name="Example: MultiSelect"
   previewOnly
+  height={240}
   app={`
   <App>
     <Form
@@ -608,6 +647,7 @@ The `select` type represents a dropdown list; only the listed items can be selec
 <Playground
   name="Example: Select"
   previewOnly
+  height={240}
   app={`
   <App>
     <Form
@@ -921,7 +961,7 @@ This property defines the minimum length of a text input value.
 ```ueml copy
 <App>
   <Form subject="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" minLength="5" />
+    <FormItem bindTo="name" minLength="10" label="minLength" />
   </Form>
 </App>
 ```
@@ -934,7 +974,7 @@ Delete at least 5 characters from the input field below and click outside the fi
   app={`
   <App>
     <Form subject="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" minLength="5" />
+      <FormItem bindTo="name" minLength="10" label="minLength" />
     </Form>
   </App>
   `}
@@ -947,7 +987,7 @@ This property defines the maximum length of a text input value.
 ```ueml copy
 <App>
   <Form subject="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" maxLength="11" />
+    <FormItem bindTo="name" maxLength="11" label="maxLength" />
   </Form>
 </App>
 ```
@@ -961,7 +1001,7 @@ Try to enter more than 11 characters in the input field below - the input field 
   app={`
   <App>
     <Form subject="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" maxLength="11" />
+      <FormItem bindTo="name" maxLength="11" label="maxLength" />
     </Form>
   </App>
   `}
@@ -973,7 +1013,7 @@ Set the `syncToValidation` property to "false" in order to do so.
 ```ueml copy /syncToValidation="false"/
 <App>
   <Form subject="{{ name: 'Billy Bob' }}">
-    <FormItem bindTo="name" maxLength="11" syncToValidation="false" />
+    <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
   </Form>
 </App>
 ```
@@ -987,7 +1027,7 @@ However, as you click outside, the validation message will indicate that the tex
   app={`
   <App>
     <Form subject="{{ name: 'Billy Bob' }}">
-      <FormItem bindTo="name" maxLength="11" syncToValidation="false" />
+      <FormItem bindTo="name" maxLength="11" syncToValidation="false" label="maxLength" />
     </Form>
   </App>
   `}
@@ -1000,7 +1040,7 @@ The input value must be at least the specified value. The given value is inclusi
 ```ueml copy
 <App>
   <Form subject="{{ age: 30 }}">
-    <FormItem bindTo="age" type="number" minValue="18" />
+    <FormItem bindTo="age" type="number" minValue="32" label="minValue" />
   </Form>
 </App>
 ```
@@ -1010,8 +1050,8 @@ The input value must be at least the specified value. The given value is inclusi
   previewOnly
   app={`
   <App>
-    <Form subject="{{ age: 30 }}">
-      <FormItem bindTo="age" type="number" minValue="18" />
+    <Form subject="{{ age: 30 }}" >
+      <FormItem bindTo="age" type="number" minValue="32" label="minValue" />
     </Form>
   </App>
   `}
@@ -1023,8 +1063,8 @@ The input value must be smaller than the specified value. The given value is inc
 
 ```ueml copy
 <App>
-  <Form subject="{{ age: 30 }}">
-    <FormItem bindTo="age" type="number" maxValue="61" />
+  <Form subject="{{ age: 30 }}" >
+    <FormItem bindTo="age" type="number" maxValue="29" label="maxValue" />
   </Form>
 </App>
 ```
@@ -1034,8 +1074,8 @@ The input value must be smaller than the specified value. The given value is inc
   previewOnly
   app={`
   <App>
-    <Form subject="{{ age: 30 }}">
-      <FormItem bindTo="age" type="number" maxValue="61" />
+    <Form subject="{{ age: 30 }}" >
+      <FormItem bindTo="age" type="number" maxValue="29" label="maxValue" />
     </Form>
   </App>
   `}
@@ -1048,13 +1088,13 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
 ```ueml copy
 <App>
   <Form subject="{{ 
-    mobile: '+13456123456', 
-    website: 'http://www.blogsite.com', 
-    email: 'myemail@mail.com' 
-  }}">
-    <FormItem bindTo="mobile" pattern="phone" />
-    <FormItem bindTo="website" pattern="url" />
-    <FormItem bindTo="email" pattern="email" />
+      mobile: '+13456123456', 
+      website: 'http://www.blogsite.com', 
+      email: 'myemail@mail.com' 
+    }}">
+    <FormItem bindTo="mobile" pattern="phone" label="mobilePattern" />
+    <FormItem bindTo="website" pattern="url" label="websitePattern" />
+    <FormItem bindTo="email" pattern="email" label="emailPattern" />
   </Form>
 </App>
 ```
@@ -1069,13 +1109,15 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
       website: 'http://www.blogsite.com', 
       email: 'myemail@mail.com' 
     }}">
-      <FormItem bindTo="mobile" pattern="phone" />
-      <FormItem bindTo="website" pattern="url" />
-      <FormItem bindTo="email" pattern="email" />
+      <FormItem bindTo="mobile" pattern="phone" label="mobilePattern" />
+      <FormItem bindTo="website" pattern="url" label="websitePattern" />
+      <FormItem bindTo="email" pattern="email" label="emailPattern" />
     </Form>
   </App>
   `}
 />
+
+See the <SmartLink href={COMPONENT_FORMITEM}>pattern property of the FormItem</SmartLink> for details.
 
 ### `regex`
 
@@ -1085,7 +1127,7 @@ Evaluate a user-defined custom regex pattern.
 <App>
   <Form subject="{{ password: 'hello' }}">
     <!-- Only all uppercase letters are accepted -->
-    <FormItem bindTo="password" regex="/^[A-Z]+$/" />
+    <FormItem bindTo="password" regex="/^[A-Z]+$/" label="regex" />
   </Form>
 </App>
 ```
@@ -1096,11 +1138,16 @@ Evaluate a user-defined custom regex pattern.
   app={`
   <App>
     <Form subject="{{ password: 'hello' }}">
-      <FormItem bindTo="password" regex="/^[A-Z]+$/" />
+      <FormItem bindTo="password" regex="/^[A-Z]+$/" label="regex" />
     </Form>
   </App>
   `}
 />
+
+<Callout type="warning" emoji="⚠️">
+  When setting custom regular expressions, be sure only set the pattern itself.
+  There is no need to provide dashes, which may result in incorrect validation.
+</Callout>
 
 ### Combining Multiple Validations
 
@@ -1109,7 +1156,7 @@ You also can combine more than one validation on a `FormItem`:
 ```ueml copy
 <App>
   <Form subject="{{ site: 'http://www.example.com' }}">
-    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" />
+    <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
   </Form>
 </App>
 ```
@@ -1120,7 +1167,7 @@ You also can combine more than one validation on a `FormItem`:
   app={`
   <App>
     <Form subject="{{ site: 'http://www.example.com' }}">
-      <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" />
+      <FormItem bindTo="site" minLength="10" maxLength="30" pattern="url" label="Multiple Validations" />
     </Form>
   </App>
   `}
@@ -1128,18 +1175,29 @@ You also can combine more than one validation on a `FormItem`:
 
 ## Other Validation Properties
 
-### `severity`
+### Validation-specific Severity
 
 <Callout type="info" emoji="💡">
   By default, all validations have a severity level of **"error"**.
   You can set whether a validation should have a level of **"warning"** or **"error"**.
 </Callout>
 
-```ueml copy
+Every validation type has a corresponding severity associated with it.
+See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
+
+```ueml copy /patternInvalidSeverity/
 <App>
-  <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}">
-    <FormItem bindTo="mobile" pattern="phone" severity="warning" />
-    <FormItem bindTo="website" pattern="url" severity="error" />
+  <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
+    <FormItem
+      bindTo="mobile"
+      pattern="phone"
+      patternInvalidSeverity="warning"
+      label="mobilePattern" />
+    <FormItem
+      bindTo="website"
+      pattern="url"
+      patternInvalidSeverity="error"
+      label="websitePattern" />
   </Form>
 </App>
 ```
@@ -1148,23 +1206,33 @@ You also can combine more than one validation on a `FormItem`:
   name="Validation Severity"
   app={`
   <App>
-    <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}">
-      <FormItem bindTo="mobile" pattern="phone" severity="warning" />
-      <FormItem bindTo="website" pattern="url" severity="error" />
+    <Form subject="{{ mobile: '+13456123456', website: 'http://www.blogsite.com' }}" >
+      <FormItem bindTo="mobile" pattern="phone" patternInvalidSeverity="warning" label="mobilePattern" />
+      <FormItem bindTo="website" pattern="url" patternInvalidSeverity="error" label="websitePattern" />
     </Form>
   </App>
   `}
 />
 
-### `invalidMessage`
+### Validation-specific Messages
 
-Sets what message to display when there's an error.
-Predefined validations already have a built-in message but you can customize it as necessary:
+<Callout type="info" emoji="💡">
+  Sets what message to display as the result of validation.
+  Predefined validations already have a built-in message but you can customize it as necessary.
+</Callout>
 
-```ueml copy
+Every validation type has a corresponding severity associated with it.
+See the <SmartLink href={COMPONENT_FORMITEM}>FormItem article</SmartLink> for each.
+
+```ueml copy {7}
 <App>
-  <Form subject="{{ age: 20 }}">
-    <FormItem bindTo="age" type="number" minValue="18" invalidMessage="The given age is too low!" />
+  <Form subject="{{ age: 20 }}" >
+    <FormItem
+      bindTo="age"
+      type="number"
+      minValue="21"
+      rangeInvalidMessage="The given age is too low!"
+      label="Invalid Message" />
   </Form>
 </App>
 ```
@@ -1173,8 +1241,13 @@ Predefined validations already have a built-in message but you can customize it 
   name="Validation Message"
   app={`
   <App>
-    <Form subject="{{ age: 20 }}">
-      <FormItem bindTo="age" type="number" minValue="18" invalidMessage="The given age is too low!" />
+    <Form subject="{{ age: 20 }}" >
+      <FormItem
+        bindTo="age"
+        type="number"
+        minValue="21"
+        rangeInvalidMessage="The given age is too low!"
+        label="Invalid Message" />
     </Form>
   </App>
   `}
