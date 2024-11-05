@@ -39,8 +39,8 @@ import {
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
 
-const MAIN_FILE = "Main.xmlui";
-const MAIN_CODE_BEHIND_FILE = "Main.xmlui.xs";
+const MAIN_FILE = "Main." + componentFileExtension;
+const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
 const CONFIG_FILE = "config.json";
 
 // --- The properties of the standalone app
@@ -142,6 +142,7 @@ type ParsedResponse = {
   hasError?: boolean;
 };
 
+// --- Parses the response of a component markup file
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
   const code = await response.text();
   const fileId = response.url;
@@ -163,6 +164,7 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   };
 }
 
+// --- Parses the response of a code-behind file
 async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
   const code = await response.text();
   const parser = new Parser(code);
@@ -193,48 +195,6 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   return {
     codeBehind: codeBehind,
     file: response.url,
-  };
-}
-
-async function parseComponentResp(response: Response) {
-  if (response.url.toLowerCase().endsWith(".xmlui")) {
-    const code = await response.text();
-    const fileId = response.url;
-    let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
-      code,
-      fileId,
-    );
-    if (errors.length > 0) {
-      const compName =
-        erroneousCompoundComponentName ??
-        response.url.substring(
-          response.url.lastIndexOf("/") + 1,
-          response.url.length - ".xmlui".length,
-        );
-      component = errReportComponent(errors, fileId, compName);
-    }
-    return {
-      component,
-      src: code,
-      file: fileId,
-    };
-  }
-  if (response.url.toLowerCase().endsWith(".xmlui.xs")) {
-    const code = await response.text();
-    const parser = new Parser(code);
-    parser.parseStatements();
-
-    const codeBehind = collectCodeBehindFromSource("Main", code, () => {
-      return "";
-    });
-    removeCodeBehindTokensFromTree(codeBehind);
-    return {
-      codeBehind: codeBehind,
-      file: response.url,
-    };
-  }
-  return {
-    component: await response.json(),
   };
 }
 
@@ -522,10 +482,17 @@ function useStandalone(
         ) as Promise<ThemeDefinition>;
       });
 
-      const componentPromises = config?.components?.map((componentPath) => {
-        return fetchWithoutCache(componentPath).then((value) => parseComponentResp(value));
+      // --- Fetch component files according to the configuration
+      const componentPromises = config?.components?.map(async (componentPath) => {
+        const value = await fetchWithoutCache(componentPath);
+        if (componentPath.endsWith(`.${componentFileExtension}`)) {
+          return await parseComponentMarkupResponse(value);
+        } else {
+          return await parseCodeBehindResponse(value);
+        }
       });
 
+      // --- Let the promises resolve
       const [loadedEntryPoint, loadedEntryPointCodeBehind, loadedComponents, themes] =
         await Promise.all([
           entryPointPromise,
@@ -545,13 +512,25 @@ function useStandalone(
         errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
       }
 
+      // --- Check if any of the components have markup errors
+      loadedComponents.forEach((compWrapper) => {
+        if (compWrapper.hasError) {
+          errorComponents.push(compWrapper.component as ComponentDef);
+        }
+      });
+
+      // --- Collect the sources and code-behinds
       const sources: Record<string, string> = {};
       const codeBehinds: any = {};
+
+      // --- The main component source
       if (loadedEntryPoint.file) {
         sources[loadedEntryPoint.file] = loadedEntryPoint.src;
       }
+
+      // --- Components may have code-behind files
       loadedComponents.forEach((compWrapper) => {
-        if (compWrapper?.file?.endsWith(".xmlui.xs")) {
+        if (compWrapper?.file?.endsWith(`.${codeBehindFileExtension}`)) {
           codeBehinds[compWrapper.file] = compWrapper.codeBehind;
         } else {
           if (compWrapper.file) {
@@ -560,6 +539,7 @@ function useStandalone(
         }
       });
 
+      // --- Assemble the runtime for the main app file
       const entryPointWithCodeBehind = {
         ...loadedEntryPoint.component,
         vars: {
@@ -570,6 +550,7 @@ function useStandalone(
         scriptError: loadedEntryPointCodeBehind?.moduleErrors,
       };
 
+      // --- Assemble the runtime for the components
       const componentsWithCodeBehinds = loadedComponents
         .filter((compWrapper) => !compWrapper?.file?.endsWith(".xmlui.xs"))
         .map((compWrapper) => {
@@ -577,9 +558,9 @@ function useStandalone(
           return {
             ...compWrapper.component,
             component: {
-              ...compWrapper.component.component,
+              ...(compWrapper.component as any).component,
               vars: {
-                ...compWrapper.component.component.vars,
+                ...(compWrapper.component as any).component.vars,
                 ...componentCodeBehind?.vars,
               },
               functions: componentCodeBehind?.functions,
@@ -588,38 +569,63 @@ function useStandalone(
           };
         });
 
+      // --- We may have components that are not in the configuration file. We need to load them
+      // --- and their code-behinds. First, we collect the components to load.
       let componentsToLoad = collectMissingComponents(
         entryPointWithCodeBehind,
         componentsWithCodeBehinds,
       );
+
+      // --- Try to load the components referenced in the markup, collect those that failed
       const componentsFailedToLoad = new Set();
       while (componentsToLoad.size > 0) {
         const componentPromises = [...componentsToLoad].map(async (componentPath) => {
           try {
-            const componentPromise = fetchWithoutCache("/components/" + componentPath + ".xmlui");
-            const componentCodeBehindPromise = new Promise(async (resolve, reject) => {
+            // --- Promises for the component markup files
+            const componentPromise = fetchWithoutCache(
+              `/components/${componentPath}.${componentFileExtension}`,
+            );
+
+            // --- Promises for the component code-behind files
+            const componentCodeBehindPromise = new Promise(async (resolve) => {
               try {
-                const codeBehindWrapper = await parseComponentResp(
-                  await fetchWithoutCache("/components/" + componentPath + ".xmlui.xs"),
+                const codeBehindWrapper = await parseCodeBehindResponse(
+                  await fetchWithoutCache(
+                    `/components/${componentPath}.${codeBehindFileExtension}`,
+                  ),
                 );
-                const componentCodeBehind = codeBehindWrapper.codeBehind;
-                resolve(componentCodeBehind);
+                if (codeBehindWrapper.hasError) {
+                  errorComponents.push(codeBehindWrapper.component as ComponentDef);
+                }
+                resolve(
+                  codeBehindWrapper.hasError
+                    ? codeBehindWrapper.component
+                    : (codeBehindWrapper.codeBehind as any),
+                );
               } catch {
                 resolve(null);
               }
             }) as Promise<CollectedDeclarations>;
-            const [value, componentCodeBehind] = await Promise.all([
+
+            // --- Let the promises resolve
+            const [componentMarkup, componentCodeBehind] = await Promise.all([
               componentPromise,
               componentCodeBehindPromise,
             ]);
-            const compWrapper = await parseComponentResp(value);
+
+            // --- Parse the component markup and check for errors
+            const compWrapper = await parseComponentMarkupResponse(componentMarkup);
+            if (compWrapper.hasError) {
+              errorComponents.push(compWrapper.component as ComponentDef);
+            }
             sources[compWrapper.file] = compWrapper.src;
+
             return {
               ...compWrapper.component,
               component: {
-                ...compWrapper.component.component,
+                ...(compWrapper.component as any).component,
                 vars: {
-                  ...compWrapper.component.component.vars,
+                  ...(compWrapper.component as any).component.vars,
                   ...componentCodeBehind?.vars,
                 },
                 functions: componentCodeBehind?.functions,
@@ -649,13 +655,12 @@ function useStandalone(
               children: errorComponents,
             }
           : null;
-      console.log("errorComponent", errorComponent);
 
       setStandaloneApp({
         ...config,
         themes,
         sources,
-        components: componentsWithCodeBehinds,
+        components: componentsWithCodeBehinds as any,
         entryPoint: errorComponent || entryPointWithCodeBehind,
       });
     })();
@@ -663,29 +668,41 @@ function useStandalone(
   return standaloneApp;
 }
 
+/**
+ * Collect the missing components renferenced by any part of the app
+ * @param entryPoint The app's main markup
+ * @param components The component markups
+ * @param componentsFailedToLoad The components that failed to load here
+ * @returns The components that are still missing
+ */
 function collectMissingComponents(
   entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
 ) {
+  // --- Add the discovered compound components to the registry
   const componentRegistry = new ComponentRegistry({ compoundComponents: components });
+
+  // --- Check the xmlui markup. This check will find all unloaded components
   const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
     getComponentProps: (componentName) => {
       return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
     },
-    acceptArbitraryProps: (componentName) => {
+    acceptArbitraryProps: () => {
       return true;
     },
-    getComponentValidator: (componentName) => {
+    getComponentValidator: () => {
       return null;
     },
-    getComponentEvents: (componentName) => {
+    getComponentEvents: () => {
       return null;
     },
     componentRegistered: (componentName) => {
       return componentRegistry.hasComponent(componentName);
     },
   });
+
+  // --- Collect all missing components.Omit the components that failed to load
   return new Set(
     result
       .filter((r) => r.code === "M001")
