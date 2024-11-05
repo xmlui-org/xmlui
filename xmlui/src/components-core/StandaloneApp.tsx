@@ -20,7 +20,12 @@ import RootComponent from "@components-core/RootComponent";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import {
+  errReportComponent,
+  errReportModuleErrors,
+  errReportScriptError,
+  xmlUiMarkupToComponent,
+} from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   componentFileExtension,
@@ -33,6 +38,10 @@ import {
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
+
+const MAIN_FILE = "Main.xmlui";
+const MAIN_CODE_BEHIND_FILE = "Main.xmlui.xs";
+const CONFIG_FILE = "config.json";
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
@@ -53,11 +62,11 @@ type StandaloneAppProps = {
 };
 
 /**
- * This React component represents a standalone app connected with its 
- * environment. It uses the XMLUI RootComponent wrapped into an ApiInterceptor. 
- * The standalone application can display itself within a React app and use an 
+ * This React component represents a standalone app connected with its
+ * environment. It uses the XMLUI RootComponent wrapped into an ApiInterceptor.
+ * The standalone application can display itself within a React app and use an
  * optional API interceptor.
- * 
+ *
  * See the `startApp` function for more details
  */
 function StandaloneApp({
@@ -123,6 +132,68 @@ function StandaloneApp({
       />
     </ApiInterceptorProvider>
   );
+}
+
+type ParsedResponse = {
+  component?: ComponentDef | CompoundComponentDef;
+  codeBehind?: CollectedDeclarations;
+  src?: string;
+  file?: string;
+  hasError?: boolean;
+};
+
+async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
+  const code = await response.text();
+  const fileId = response.url;
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
+  if (errors.length > 0) {
+    const compName =
+      erroneousCompoundComponentName ??
+      response.url.substring(
+        response.url.lastIndexOf("/") + 1,
+        response.url.length - ".xmlui".length,
+      );
+    component = errReportComponent(errors, fileId, compName);
+  }
+  return {
+    component,
+    src: code,
+    file: fileId,
+    hasError: errors.length > 0,
+  };
+}
+
+async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
+  const code = await response.text();
+  const parser = new Parser(code);
+  try {
+    parser.parseStatements();
+  } catch (e) {
+    if (parser.errors.length > 0) {
+      return {
+        component: errReportScriptError(parser.errors[0], response.url),
+        file: response.url,
+        hasError: true,
+      };
+    }
+  }
+
+  const codeBehind = collectCodeBehindFromSource("Main", code, () => {
+    return "";
+  });
+  if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+    return {
+      component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
+      file: response.url,
+      hasError: true,
+    };
+  }
+
+  removeCodeBehindTokensFromTree(codeBehind);
+  return {
+    codeBehind: codeBehind,
+    file: response.url,
+  };
 }
 
 async function parseComponentResp(response: Response) {
@@ -403,7 +474,7 @@ function useStandalone(
         // --- In config-only mode, we override the pre-compiled app definition
         // --- with elements from the configuration file. Note that we do not
         // --- check whether the config file's content is semantically valid.
-        const configResponse = await fetchWithoutCache("config.json");
+        const configResponse = await fetchWithoutCache(CONFIG_FILE);
         const config: StandaloneJsonConfig = await configResponse.json();
 
         const themePromises: Promise<ThemeDefinition>[] = [];
@@ -423,25 +494,26 @@ function useStandalone(
         return;
       }
 
-      // temp solution, needs refactor!!!
-
-      //default mode: process.env.VITE_BUILD_MODE === "ALL"
-      const entryPointPromise = fetchWithoutCache("Main.xmlui").then((value) =>
-        parseComponentResp(value),
+      // --- Fetch the main file
+      const entryPointPromise = fetchWithoutCache(MAIN_FILE).then((value) =>
+        parseComponentMarkupResponse(value),
       );
-      const entryPointCodeBehindPromise = new Promise(async (resolve, reject) => {
+
+      // --- Fetch the main code-behind file (if any)
+      const entryPointCodeBehindPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache("Main.xmlui.xs");
-          const codeBehind = await parseComponentResp(resp);
-          resolve(codeBehind.codeBehind);
+          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+          const codeBehind = await parseCodeBehindResponse(resp);
+          resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
         } catch (e) {
           resolve(null);
         }
-      }) as Promise<CollectedDeclarations>;
+      }) as any;
 
+      // --- Fethc the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
-        const configResponse = await fetchWithoutCache("config.json");
+        const configResponse = await fetchWithoutCache(CONFIG_FILE);
         config = await configResponse.json();
       } catch (e) {}
       const themePromises = config?.themes?.map((themePath) => {
@@ -461,6 +533,17 @@ function useStandalone(
           Promise.all(componentPromises || []),
           Promise.all(themePromises || []),
         ]);
+
+      // --- Collect the elements of the standalone app (and potential errors)
+      const errorComponents: ComponentDef[] = [];
+
+      // --- Check if the main component has errors
+      if (loadedEntryPoint.hasError) {
+        errorComponents.push(loadedEntryPoint!.component as ComponentDef);
+      }
+      if (loadedEntryPointCodeBehind?.hasError) {
+        errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
+      }
 
       const sources: Record<string, string> = {};
       const codeBehinds: any = {};
@@ -557,12 +640,23 @@ function useStandalone(
         );
       }
 
+      // --- Let's check for errors to display
+      const errorComponent: ComponentDef | null =
+        errorComponents.length > 0
+          ? {
+              type: "VStack",
+              props: { gap: 0, padding: 0 },
+              children: errorComponents,
+            }
+          : null;
+      console.log("errorComponent", errorComponent);
+
       setStandaloneApp({
         ...config,
         themes,
         sources,
         components: componentsWithCodeBehinds,
-        entryPoint: entryPointWithCodeBehind,
+        entryPoint: errorComponent || entryPointWithCodeBehind,
       });
     })();
   }, [runtime, standaloneAppDef]);
@@ -570,12 +664,12 @@ function useStandalone(
 }
 
 function collectMissingComponents(
-  entryPoint: ComponentDef,
+  entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
 ) {
   const componentRegistry = new ComponentRegistry({ compoundComponents: components });
-  const result = checkXmlUiMarkup(entryPoint, components, {
+  const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
     getComponentProps: (componentName) => {
       return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
     },
@@ -614,9 +708,9 @@ function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
 let contentRoot: Root | null = null;
 
 /**
- * This function injects the StandaloneApp component into a React app. It looks 
- * up a component with the "root" id as the host of the standalone app. If such 
- * an element does not exist, it creates a `<div id="root">` element. 
+ * This function injects the StandaloneApp component into a React app. It looks
+ * up a component with the "root" id as the host of the standalone app. If such
+ * an element does not exist, it creates a `<div id="root">` element.
  * @param runtime The app's runtime representation
  * @param components The related component's runtime representation
  * @returns The content's root element

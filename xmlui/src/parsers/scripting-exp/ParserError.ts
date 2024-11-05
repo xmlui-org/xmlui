@@ -82,7 +82,7 @@ export const errorMessages: ErrorText = {
   W025: "'from' expected",
   W026: "A string literal expected",
   W027: "Cannot declare var ('{0}') in an imported module",
-  W028: "Invalid statement used in a module: '{0}'",
+  W028: "Invalid statement used in a module.",
   W029: "An imported module can contain only exported functions",
   W030: "Nested declarations cannot be exported",
   W031: "An identifier in a declaration cannot start with '$'"
