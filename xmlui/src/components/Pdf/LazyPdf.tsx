@@ -9,6 +9,7 @@ export const PdfMd = createMetadata({
   props: {
     src: d(`This property defines the source URL of the pdf document stream to display.`),
   },
+  status: "in progress",
 });
 
 export const pdfComponentRenderer = createComponentRenderer(

@@ -11,6 +11,8 @@ import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 
 logger.setLevels(Logger.levels.warning, Logger.levels.error);
+const acceptedStatuses = ["stable", "experimental", "deprecated", "in progress"];
+const defaultStatus = "stable";
 
 // TODO: get these variables from config
 const scriptFolder = import.meta.dirname;
@@ -120,6 +122,7 @@ try {
     {
       sectionName: "Components",
       componentFolder: componentDocsFolderName,
+      //excludeStatuses: ["in progress"],
     },
   );
   await writeFile(join(docsFolderRoot, "pages", `${componentDocsFolderName}.mdx`), summary);
@@ -144,7 +147,7 @@ try {
 async function createSummary(
   metadata,
   filename,
-  { sectionName = "Components", componentFolder = componentDocsFolderName },
+  { sectionName = "Components", componentFolder = componentDocsFolderName, excludeStatuses = [] },
 ) {
   const buffer = await readFile(filename, "utf8");
 
@@ -172,11 +175,18 @@ async function createSummary(
       "Description",
       { value: "Status", style: "center" },
     ],
-    rows: sortedMetadata.map((component) => [
-      `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
-      component.description,
-      component.status ?? "stable",
-    ]),
+    rows: sortedMetadata
+    .filter((component) => {
+      const componentStatus = component.status ?? defaultStatus;
+      return !acceptedStatuses.includes(componentStatus) ? false : true;
+    })
+    .map((component) => {
+      return [
+        `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
+        component.description,
+        component.status ?? defaultStatus,
+      ];
+    }),
   });
 
   return beforeComponentsSection + "\n" + table + afterComponentsSection;
