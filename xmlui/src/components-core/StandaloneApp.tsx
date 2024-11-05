@@ -142,6 +142,7 @@ type ParsedResponse = {
   hasError?: boolean;
 };
 
+// <<<<<<< HEAD
 // --- Parses the response of a component markup file
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
   const code = await response.text();
@@ -182,7 +183,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
 
   const codeBehind = collectCodeBehindFromSource("Main", code, () => {
     return "";
-  });
+    }, a => a);
   if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
     return {
       component: errReportModuleErrors(codeBehind.moduleErrors, response.url),

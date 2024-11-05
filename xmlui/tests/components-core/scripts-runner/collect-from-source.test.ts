@@ -290,6 +290,82 @@ describe("Parser - collect code-behind from source", () => {
     expect(collected.functions.square.source).equal("(x) => { return x * x; }");
     expect((collected.functions.square.tree as Expression).type).equal("ArrowE");
   });
+
+  it("collect functions from imports cyclic", () => {
+    const result = collect(`import { a } from "module1"`, {
+      module1: `
+        import { b } from "module2"
+
+        export function a(){
+            console.log("from a");
+            return b();
+        }
+
+        export function a2(){
+            console.log("from a2")
+        }
+      `,
+      module2: `
+        import {a2} from "module1"
+
+        export function b(){
+            console.log("from b");
+            return "return from b";
+        }
+      `,
+    });
+    expect(Object.keys(result.functions).length).toBe(3);
+  });
+
+  it("collect functions from imports cycle including main module", () => {
+    const result = collect(
+      `
+        import { b } from "module1"
+
+        export function a(){
+            console.log("from a");
+            return b();
+        }
+
+        export function a2(){
+            console.log("from a2")
+        }
+      `,
+      {
+        module1: `
+        import {a2} from "${ROOT_MODULE}"
+
+        export function b(){
+            console.log("from b");
+            return "return from b";
+        }
+      `,
+      },
+    );
+    expect(Object.keys(result.functions).length).toBe(3);
+  });
+
+  it.skip("collect functions multiple times imported", () => {
+    const result = collect(`import { a } from "module1"`, {
+      module1: `
+        import { b } from "module2"
+
+        export function a(){
+            console.log("from a");
+            return b();
+        }
+      `,
+      module2: `
+        import {a} from "module1"
+
+        export function b(){
+            console.log("from b");
+            return "return from b";
+        }
+      `,
+    });
+    expect(Object.keys(result.functions).length).toBe(2);
+  });
 });
 
 function collect(source: string, modules: Record<string, string> = {}): CollectedDeclarations {
@@ -300,5 +376,11 @@ function collect(source: string, modules: Record<string, string> = {}): Collecte
   return collectCodeBehindFromSource(
     ROOT_MODULE,
     source,
-    (parentModule: string, moduleName: string) => modules[moduleName] ?? null);
+    (parentModule: string, moduleName: string) => {
+      if (moduleName === ROOT_MODULE) {
+        return source;
+      }
+      return modules[moduleName] ?? null;
+    },
+    (a) => a);
 }

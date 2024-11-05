@@ -1,7 +1,14 @@
 import { dataToEsm } from "@rollup/pluginutils";
 import type { Plugin } from "vite";
-import { collectCodeBehindFromSource, removeCodeBehindTokensFromTree } from "../src/parsers/scripting/code-behind-collect";
-import { codeBehindFileExtension, componentFileExtension, moduleFileExtension } from "../src/parsers/xmlui-parser/fileExtensions";
+import {
+  collectCodeBehindFromSource,
+  removeCodeBehindTokensFromTree,
+} from "../src/parsers/scripting/code-behind-collect";
+import {
+  codeBehindFileExtension,
+  componentFileExtension,
+  moduleFileExtension,
+} from "../src/parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../src/parsers/scripting/Parser";
 import * as fs from "fs";
 import * as path from "path";
@@ -24,18 +31,27 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
     name: "vite:transform-ueml",
 
     async transform(code: string, id: string, options) {
+      const moduleNameResolver = (moduleName: string) => {
+        return path.resolve(path.dirname(id), moduleName);
+      };
       const moduleResolver = (parentModule: string, moduleName: string) => {
         // --- Try with .xmlui.xs extension, and then with .xs.
         try {
-          const modulePath = path.resolve(path.dirname(id), `${moduleName}.${codeBehindFileExtension}`);
+          const modulePath = path.resolve(
+            path.dirname(id),
+            `${moduleName}.${codeBehindFileExtension}`,
+          );
           return fs.readFileSync(modulePath, {
             encoding: "utf8",
           });
         } catch {
           try {
-            return fs.readFileSync(path.resolve(path.dirname(id), `${moduleName}.${moduleFileExtension}`), {
-              encoding: "utf8",
-            });
+            return fs.readFileSync(
+              path.resolve(path.dirname(id), `${moduleName}.${moduleFileExtension}`),
+              {
+                encoding: "utf8",
+              },
+            );
           } catch (err) {
             throw err;
           }
@@ -44,15 +60,19 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
 
       if (xmluiExtension.test(id)) {
         const fileId = "" + itemIndex++;
-        let { component, errors, erroneousCompoundComponentName} = xmlUiMarkupToComponent(code, fileId, moduleResolver)
-        if (errors.length>0){
-          component = errReportComponent(errors, id, erroneousCompoundComponentName)
+        let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+          code,
+          fileId,
+          moduleResolver,
+        );
+        if (errors.length > 0) {
+          component = errReportComponent(errors, id, erroneousCompoundComponentName);
         }
         const file = {
           component,
           src: code,
           file: fileId,
-        }
+        };
 
         return {
           code: dataToEsm(file),
@@ -60,12 +80,23 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
         };
       }
 
-      if (xmluiScriptExtension.test(id) || moduleScriptExtension.test(id)) {
+      const hasXmluiScriptExtension = xmluiScriptExtension.test(id);
+      const hasModuleScriptExtension = moduleScriptExtension.test(id);
+      if (hasXmluiScriptExtension || hasModuleScriptExtension) {
         // --- We parse the module file to catch parsing errors
+
         const parser = new Parser(code);
         parser.parseStatements();
+        const moduleName = hasXmluiScriptExtension
+          ? id.substring(0, id.length - (codeBehindFileExtension.length + 1))
+          : id.substring(0, id.length - (moduleFileExtension.length + 1));
 
-        const codeBehind = collectCodeBehindFromSource("Main", code, moduleResolver);
+        const codeBehind = collectCodeBehindFromSource(
+          moduleNameResolver(moduleName),
+          code,
+          moduleResolver,
+          moduleNameResolver,
+        );
         removeCodeBehindTokensFromTree(codeBehind);
 
         // TODO: Add error handling.
@@ -84,4 +115,3 @@ export default function viteUemlPlugin(pluginOptions: PluginOptions = {}): Plugi
     // }
   };
 }
-
