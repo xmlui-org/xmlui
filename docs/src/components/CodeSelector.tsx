@@ -5,7 +5,7 @@ import { usePlayground } from "@/src/hooks/usePlayground";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
 import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { contentChanged } from "@/src/state/store";
-import {HiChevronDown, HiChevronUp} from "react-icons/hi";
+import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 
 export const SelectItem = React.forwardRef(
   ({ children, className, ...props }: any, forwardedRef) => {
@@ -22,15 +22,20 @@ export const CodeSelector = () => {
   const [open, setOpen] = React.useState(false);
   const selectedValue = useMemo(() => {
     let content = "";
-    switch (options.content) {
-      case "app":
-        content = "Main.xmlui";
-        break;
-      case "config":
-        content = "config.json";
-        break;
-      default:
-        content = `${options.content}.xmlui`;
+    if (options.content === "app") {
+      content = "Main.xmlui";
+    } else if (content === "config") {
+      content = "config.json";
+    } else if (
+      appDescription.config?.themes?.some((theme: ThemeDefinition) => theme.id === options.content)
+    ) {
+      content = `${options.content}.json`;
+    } else if (
+      appDescription.components?.some(
+        (component: CompoundComponentDef) => component.name === options.content,
+      )
+    ) {
+      content = `${options.content}.xmlui`;
     }
     return content;
   }, [options.content]);
@@ -60,16 +65,13 @@ export const CodeSelector = () => {
               <SelectItem value="app" key="app">
                 Main.xmlui
               </SelectItem>
-{/*              <SelectItem value="config" key="config">
-                config.json
-              </SelectItem>*/}
             </RadixSelect.Group>
             {appDescription.config?.themes?.length > 0 && (
               <RadixSelect.Group>
                 <RadixSelect.Label className={selectStyles.SelectLabel}>Themes</RadixSelect.Label>
                 {appDescription.config?.themes?.map((theme: ThemeDefinition, index: number) => (
-                  <SelectItem value={theme.name} key={index}>
-                    {theme.name}
+                  <SelectItem value={theme.id} key={index}>
+                    {`${theme.id}.json`}
                   </SelectItem>
                 ))}
               </RadixSelect.Group>

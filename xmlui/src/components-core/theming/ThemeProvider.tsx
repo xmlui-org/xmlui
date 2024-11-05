@@ -237,7 +237,7 @@ export function useCompiledTheme(
   };
 }
 
-const builtInThemes: Array<ThemeDefinition> = [
+export const builtInThemes: Array<ThemeDefinition> = [
   XmlUiThemeDefinition,
   XmlUiGreenThemeDefinition,
   XmlUiGrayThemeDefinition,

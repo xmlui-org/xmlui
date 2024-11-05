@@ -2,7 +2,7 @@ import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { createContext, Dispatch } from "react";
 import produce from "immer";
 import { CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { builtInThemes } from "../utils/helpers";
+import { builtInThemes } from "@components-core/theming/ThemeProvider";
 import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 
 type Orientation = "horizontal" | "vertical";
@@ -195,7 +195,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
         state.appDescription.config = action.payload.appDescription.config;
         state.text = action.payload.appDescription.app;
         const themes = action.payload.appDescription.config.themes || [];
-        state.appDescription.availableThemes = themes.length > 0 ? themes : builtInThemes;
+        state.appDescription.availableThemes = [...themes, ...builtInThemes];
         state.options.activeTheme =
           state.appDescription.config.defaultTheme || state.appDescription.availableThemes[0].id;
         state.originalAppDescription = { ...state.appDescription };
@@ -264,6 +264,18 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
             (component: CompoundComponentDef) => component.name === state.options.content,
           )?.component || "";
         state.options.language = "ueml";
+      } else if (state.appDescription.config.themes
+        .map((t) => t.id.toLowerCase())
+        .includes(state.options.content?.toLowerCase())) {
+        state.text = JSON.stringify(
+          state.appDescription.config.themes.find(
+            (theme: ThemeDefinition) => theme.id === state.options.content,
+          ),
+          null,
+          2,
+        );
+        state.options.language = "json";
+
       }
       break;
     }
@@ -273,19 +285,20 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
       break;
     }
     case PlaygroundActionKind.TEXT_CHANGED:
+      state.options.id = state.options.id + 1;
       {
         state.text = action.payload.text || "";
         if (state.options.content === "app") {
           state.appDescription.app = state.text;
         }
-        if (state.options.content === "config") {
+        else if (state.options.content === "config") {
           try {
             state.appDescription.config = JSON.parse(state.text || "");
           } catch (e) {
             console.log(e);
           }
         }
-        if (
+        else if (
           state.appDescription.components?.some(
             (component: CompoundComponentDef) => component.name === state.options.content,
           )
@@ -302,19 +315,23 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
             },
           );
         }
-        if (
+        else if (
           state.appDescription.config.themes?.some(
-            (theme: ThemeDefinition) => theme.name === state.options.content,
+            (theme: ThemeDefinition) => theme.id === state.options.content,
           )
         ) {
-          state.appDescription.config.themes = state.appDescription.config.themes.map(
-            (theme: ThemeDefinition) => {
-              if (theme.name === state.options.content) {
-                return JSON.parse(state.text || "");
-              }
-              return theme;
-            },
-          );
+          try {
+            state.appDescription.config.themes = state.appDescription.config.themes.map(
+                (theme: ThemeDefinition) => {
+                  if (theme.id === state.options.content) {
+                    return JSON.parse(state.text || "");
+                  }
+                  return theme;
+                },
+            );
+          } catch (e) {
+            console.log(e);
+          }
         }
       }
       break;

@@ -21,21 +21,20 @@ export function Preview() {
       appDescription.app,
     );
     if (errors.length > 0) {
-      component = errReportComponent(
-        errors,
-        "Main.xmlui",
-        erroneousCompoundComponentName,
-      );
+      component = errReportComponent(errors, "Main.xmlui", erroneousCompoundComponentName);
     }
     const compoundComponents: CompoundComponentDef[] = appDescription.components.map(
-      (src: {name: string, component: string}) => {
-        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(src.component);
+      (src: { name: string; component: string }) => {
+        let { errors, component, erroneousCompoundComponentName } = xmlUiMarkupToComponent(
+          src.component,
+        );
         if (errors.length > 0) {
           return errReportComponent(errors, `${src.name}.xmlui`, erroneousCompoundComponentName);
         }
         return component;
       },
     );
+
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <RootComponent
