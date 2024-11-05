@@ -32,7 +32,7 @@ export const ThemeSwitcher = React.forwardRef(() => {
             {appDescription.availableThemes && appDescription.availableThemes.length > 0 &&
               appDescription.availableThemes.map((theme, index) => (
                 <RadixMenu.RadioItem className={styles.RadixMenuRadioItem} value={theme.id} key={index}>
-                  {theme.name}
+                  {theme.id}
                   <RadixMenu.ItemIndicator className={styles.RadixMenuItemIndicator}>
                     <FiCheck />
                   </RadixMenu.ItemIndicator>

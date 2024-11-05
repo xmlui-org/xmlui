@@ -16,6 +16,7 @@ import JSZip from "jszip";
 import { saveAs } from "file-saver";
 import { Box } from "@/src/components/Box";
 import {ToneSwitcher} from "@/src/components/ToneSwitcher";
+import {ThemeSwitcher} from "@/src/components/ThemeSwitcher";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -89,8 +90,9 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && standalone && <CodeSelector />}
         </Box>
         <SpaceFiller />
+        <Tooltip trigger={<ToneSwitcher />} label="Change tone" />
         {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
-          <Tooltip trigger={<ToneSwitcher />} label="Change theme" />
+            <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
         )}
         {!options.previewMode && show && (
           <>

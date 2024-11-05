@@ -2,7 +2,7 @@ import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { createContext, Dispatch } from "react";
 import produce from "immer";
 import { CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { builtInThemes } from "../utils/helpers";
+import { builtInThemes } from "@components-core/theming/ThemeProvider";
 import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 
 type Orientation = "horizontal" | "vertical";
