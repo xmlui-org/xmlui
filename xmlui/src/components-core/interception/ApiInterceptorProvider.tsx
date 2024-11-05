@@ -33,6 +33,9 @@ export function ApiInterceptorProvider({
               onUnhandledRequest: "bypass",
               waitUntilReady: true,
               quiet: true,
+              serviceWorker: {
+                url: process.env.VITE_MOCK_WORKER_LOCATION || "/mockServiceWorker.js",
+              }
             });
           }
         }
