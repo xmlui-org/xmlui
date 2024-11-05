@@ -345,9 +345,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuSeparatorRenderer);
       this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
-      this.registerComponentRenderer(pieChartComponentRenderer);
-      this.registerComponentRenderer(barChartComponentRenderer);
-      this.registerComponentRenderer(mapComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
@@ -376,6 +373,9 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
+      this.registerComponentRenderer(pieChartComponentRenderer);
+      this.registerComponentRenderer(barChartComponentRenderer);
+      this.registerComponentRenderer(mapComponentRenderer);
     }
 
     contributes.components?.forEach((renderer) => {

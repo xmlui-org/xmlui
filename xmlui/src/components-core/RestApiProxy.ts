@@ -1,6 +1,5 @@
 import type { AxiosResponse } from "axios";
-import { isUndefined, omitBy } from "lodash-es";
-import isPlainObject from "lodash/isPlainObject";
+import {isPlainObject, isUndefined, omitBy} from "lodash-es";
 
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";

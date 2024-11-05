@@ -1,4 +1,4 @@
-import isPlainObject from "lodash/isPlainObject"; //doesn't work when we import it through lodash-es (build.ts uses it...)
+import { isPlainObject } from "lodash-es";
 
 import type {
   ArrayLiteral,
