@@ -7,7 +7,10 @@ import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parse
 import { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
-import { paddingSubject } from "./theming/themes/base-utils";
+import { ScriptParserErrorMessage } from "@abstractions/scripting/ScriptParserError";
+import { ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
+import { k } from "vitest/dist/reporters-LqC_WI4d";
+import { keyBy } from "lodash-es";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;
@@ -121,6 +124,124 @@ export function errReportComponent(
   }
   const comp = makeComponent() as any;
   comp.name = compoundCompName;
+  comp.component = makeComponent();
+  return comp;
+}
+
+/** returns a component definition containing the errors.
+ * It is a component and a compound component definition at the same time,
+ * so that it can be used to render the errors for a compound component as well*/
+export function errReportScriptError(error: ScriptParserErrorMessage, fileName: number | string) {
+  function makeComponent() {
+    const comp: ComponentDef = {
+      type: "VStack",
+      props: { padding: "$padding-normal", gap: 0 },
+      children: [
+        {
+          type: "H1",
+          props: {
+            value: `An error found while processing XMLUI code-behind script`,
+            padding: "$padding-normal",
+            backgroundColor: "$color-error",
+            color: "white",
+          },
+        },
+        {
+          type: "VStack",
+          props: {
+            gap: "$gap-tight",
+            padding: "$padding-normal",
+          },
+          children: [
+            {
+              type: "HStack",
+              props: { gap: "0" },
+              children: [
+                {
+                  type: "Text",
+                  props: {
+                    value: `${fileName} (${error.line}:${error.column}):\xa0`,
+                    color: "$color-info",
+                  },
+                },
+                {
+                  type: "Text",
+                  props: { value: ` ${error.text}`, fontWeight: "bold" },
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    return comp;
+  }
+  const comp = makeComponent() as any;
+  comp.component = makeComponent();
+  return comp;
+}
+
+/** returns a component definition containing the errors.
+ * It is a component and a compound component definition at the same time,
+ * so that it can be used to render the errors for a compound component as well*/
+export function errReportModuleErrors(errors: ModuleErrors, fileName: number | string) {
+  function makeComponent() {
+    const errList: ComponentDef[] = [];
+    let idx = 1;
+    Object.keys(errors).map((key) => {
+      const e = errors[key];
+      for (let err of e) {
+        errList.push({
+          type: "VStack",
+          props: { gap: "0px" },
+          children: [
+            {
+              type: "HStack",
+              props: { gap: "0" },
+              children: [
+                {
+                  type: "Text",
+                  props: {
+                    value: `#${idx++}: ${fileName} (${err.line}:${err.column}):\xa0`,
+                    color: "$color-info",
+                  },
+                },
+                {
+                  type: "Text",
+                  props: { value: ` ${err.text}`, fontWeight: "bold" },
+                },
+              ],
+            },
+          ],
+        });
+      }
+    });
+    const comp: ComponentDef = {
+      type: "VStack",
+      props: { padding: "$padding-normal", gap: 0 },
+      children: [
+        {
+          type: "H1",
+          props: {
+            value: `${errList.length} ${errList.length > 1 ? "Errors" : "Error"} found while processing XMLUI code-behind script`,
+            padding: "$padding-normal",
+            backgroundColor: "$color-error",
+            color: "white",
+          },
+        },
+        {
+          type: "VStack",
+          props: {
+            gap: "$gap-tight",
+            padding: "$padding-normal",
+          },
+          children: errList,
+        },
+      ],
+    };
+    return comp;
+  }
+  const comp = makeComponent() as any;
   comp.component = makeComponent();
   return comp;
 }

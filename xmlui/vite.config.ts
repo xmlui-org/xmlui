@@ -11,6 +11,7 @@ import * as packageJson from "./package.json";
 export default ({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   let lib;
+  let define;
   switch (mode) {
     case "standalone": {
       lib = {
@@ -18,6 +19,18 @@ export default ({ mode }) => {
         name: "xmlui-standalone",
         formats: ["umd"],
         fileName: (format) => `xmlui-standalone.${format}.js`,
+      };
+      define = {
+        "process.env": {
+          NODE_ENV: env.NODE_ENV,
+          VITE_MOCK_ENABLED: true,
+          VITE_MOCK_WORKER_LOCATION: "/emulatedApiWorker.js",
+          VITE_USED_COMPONENTS_Pdf: "false",
+          VITE_USED_COMPONENTS_Chart: "false",
+          VITE_USER_COMPONENTS_XmluiCodeHightlighter: "false",
+          VITE_USED_COMPONENTS_Tree: "false",
+          VITE_USER_COMPONENTS_Inspect: "false",
+        },
       };
       break;
     }
@@ -27,13 +40,18 @@ export default ({ mode }) => {
         name: "xmlui-metadata",
         fileName: "xmlui-metadata",
       };
+      define = {
+        "process.env": {
+          NODE_ENV: env.NODE_ENV,
+        },
+      };
       break;
     }
     default: {
       lib = {
         entry: [path.resolve("src", "index.ts")],
-          name: "xmlui",
-          fileName: "xmlui",
+        name: "xmlui",
+        fileName: "xmlui",
       };
     }
   }
@@ -45,43 +63,40 @@ export default ({ mode }) => {
         "@abstractions": path.resolve(__dirname, "./src/abstractions"),
         "@core": path.resolve(__dirname, "./src/core"),
         "@parsers": path.resolve(__dirname, "./src/parsers"),
+        lodash: "lodash-es",
       },
     },
-    define:
-      mode === "standalone" || mode === "metadata"
-        ? {
-            "process.env": {
-                'NODE_ENV': env.NODE_ENV,
-                'VITE_MOCK_ENABLED': true
-            }
-        } : undefined,
-        esbuild: {
-            target: "es2020",
+    define,
+    esbuild: {
+      target: "es2020",
+    },
+    optimizeDeps: {
+      esbuildOptions: {
+        target: "es2020",
+      },
+    },
+    build: {
+      emptyOutDir: false,
+      outDir: "dist",
+      lib: lib,
+      rollupOptions: {
+        treeshake: mode === "metadata" ? "smallest" : undefined,
+        external:
+          mode === "standalone"
+            ? []
+            : [...Object.keys(packageJson.dependencies), "react/jsx-runtime"],
+        output: {
+          globals: {
+            react: "React",
+            "react-dom": "ReactDOM",
+            "react/jsx-runtime": "react/jsx-runtime",
+          },
         },
-        optimizeDeps: {
-            esbuildOptions: {
-                target: "es2020",
-            },
-        },
-        build: {
-            emptyOutDir: false,
-            outDir: "dist",
-            lib: lib,
-            rollupOptions: {
-                treeshake: mode === "metadata" ? "smallest" : undefined,
-                external: mode === 'standalone' ? [] : [
-                    ...Object.keys(packageJson.dependencies),
-                    "react/jsx-runtime",
-                ],
-                output: {
-                    globals: {
-                        react: "React",
-                        "react-dom": "ReactDOM",
-                        'react/jsx-runtime': 'react/jsx-runtime',
-                    },
-                },
-            },
-        },
-      plugins: mode === "metadata" ? [dts({ rollupTypes: true })] : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
-    })
+      },
+    },
+    plugins:
+      mode === "metadata"
+        ? [dts({ rollupTypes: true })]
+        : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
+  });
 };

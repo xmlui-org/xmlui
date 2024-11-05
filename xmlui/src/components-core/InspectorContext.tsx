@@ -68,7 +68,7 @@ export function InspectorProvider({
   return (
     <InspectorContext.Provider value={contextValue}>
       {children}
-      {inspectable &&
+      {process.env.VITE_USER_COMPONENTS_Inspect !== 'false' && inspectable &&
         Object.values(inspectable).map((item: any) => {
           return <InspectButton key={item.inspectId + +"-" + item.key} inspectId={item.inspectId} node={item.node} />;
         })}
