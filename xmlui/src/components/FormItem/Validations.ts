@@ -1,17 +1,17 @@
 import { isArray, isEmpty, isNumber } from "lodash-es";
 import {
-  FormItemValidations,
-  SingleValidationResult,
   useFormContextPart,
-  ValidateEventHandler,
-  ValidationMode,
-  ValidationResult,
-  ValidationSeverity
+  type FormItemValidations,
+  type SingleValidationResult,
+  type ValidateEventHandler,
+  type ValidationMode,
+  type ValidationResult,
+  type ValidationSeverity
 } from "@components/Form/FormContext";
-import { Dispatch, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { type Dispatch, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { asyncThrottle } from "@components-core/utils/misc";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { fieldValidated, FormAction } from "@components/Form/formActions";
+import { fieldValidated, type FormAction } from "@components/Form/formActions";
 import type { ContainerAction } from "@components-core/abstractions/containers";
 
 function isInputEmpty (value: any) {
@@ -53,10 +53,17 @@ function isMaxValueValid (value: any = "", maxValue: number) {
 
 function isRegexValid (value: any = "", regex: string) {
   if (typeof value === "string") {
-    return new RegExp(regex).test(value);
+    const _value = stringToRegex(regex).test(value);
+    return _value;
   }
   console.warn("Regex can only be used on strings");
   return true;
+
+  // Source: https://stackoverflow.com/questions/17250815/how-to-check-if-the-input-string-is-a-valid-regular-expression
+  function stringToRegex(s: string) {
+    const m = s.match(/^([/~@;%#'])(.*?)\1([gimsuy]*)$/);
+    return m ? new RegExp(m[2], m[3]) : new RegExp(s);
+ }
 }
 
 class FormItemValidator {

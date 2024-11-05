@@ -42,13 +42,13 @@ This is a fast way to add any static files to your project:
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
   </AppHeader>  
-  <Image src="resources/hero-img.jpg" />
+  <Image src="/resources/breakfast.jpg" fit="contain" width="240px" />
 </App>
 ```
 
 <Playground
-  previewOnly
   name="Example: Using Resources Directly"
+  previewOnly
   resources={{ logo: xmluiLogo }}
   height={300}
   app={`
@@ -57,7 +57,7 @@ This is a fast way to add any static files to your project:
     <AppHeader>
       <H2>Using Resources Tutorial</H2>
     </AppHeader>  
-    <Image src="/resources/images/components/image/breakfast.jpg" />
+    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px"/>
   </App>
   `}
 />
@@ -78,7 +78,7 @@ the configuration object in the file gets a `resources` entry which looks like s
     "favicon": "resources/favicon.ico",
     "custom-logo": "resources/custom-logo.svg",
     "icon.empty-folder": "resources/empty-folder.svg",
-    "heroImg": "resources/hero-img.jpg"
+    "breakfastImg": "resources/breakfast.jpg"
   }
 }
 ```
@@ -94,7 +94,7 @@ Finally, you can access newly added resources by their handles defined in the co
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
   </AppHeader>  
-  <Image src="resource:heroImg" />
+  <Image src="resource:breakfastImg" />
 </App>
 ```
 
@@ -110,7 +110,7 @@ Finally, you can access newly added resources by their handles defined in the co
     <AppHeader>
       <H2>Using Resources Tutorial</H2>
     </AppHeader>  
-    <Image src="/resources/images/components/image/breakfast.jpg" />
+    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
   </App>
   `}
 />
