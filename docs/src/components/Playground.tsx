@@ -14,7 +14,6 @@ import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
 import { Header } from "@/src/components/Header";
-import {builtInThemes} from "@components-core/theming/ThemeProvider";
 
 type PlaygroundProps = {
   name: string;
@@ -62,9 +61,9 @@ export const Playground = ({
             logo: null,
             globals: {},
             resources,
-            themes: [...themes, ...builtInThemes],
+            themes,
             defaultTone,
-            defaultTheme,
+            defaultTheme
           },
           components,
           app,
@@ -89,7 +88,9 @@ export const Playground = ({
 
   useEffect(() => {
     const nextraTone = theme === "system" ? systemTheme : theme;
-    dispatch(toneChanged(nextraTone!));
+    if (!defaultTone) {
+      dispatch(toneChanged(nextraTone!));
+    }
   }, [theme, systemTheme]);
 
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);

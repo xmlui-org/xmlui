@@ -7,7 +7,6 @@ import { CompoundComponentDef } from "xmlui";
 import { ThemeTone } from "@components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
 import { errReportComponent, xmlUiMarkupToComponent } from "@src/components-core/xmlui-parser";
-import { builtInThemes } from "@components-core/theming/ThemeProvider";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
@@ -51,7 +50,7 @@ export function Preview() {
           defaultTone={(options.activeTone || appDescription.config?.defaultTone) as ThemeTone}
           contributes={{
             compoundComponents,
-            themes: appDescription.config?.themes || builtInThemes,
+            themes: appDescription.config?.themes,
           }}
           resources={appDescription.config?.resources}
         />
