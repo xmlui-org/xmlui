@@ -20,7 +20,12 @@ import RootComponent from "@components-core/RootComponent";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import {
+  errReportComponent,
+  errReportModuleErrors,
+  errReportScriptError,
+  xmlUiMarkupToComponent,
+} from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   componentFileExtension,
@@ -32,18 +37,38 @@ import {
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "@components/ComponentProvider";
-import { checkXmlUiMarkup, visitComponent } from "@components-core/markup-check";
+import { checkXmlUiMarkup } from "@components-core/markup-check";
+
+const MAIN_FILE = "Main.xmlui";
+const MAIN_CODE_BEHIND_FILE = "Main.xmlui.xs";
+const CONFIG_FILE = "config.json";
 
 // --- The properties of the standalone app
 type StandaloneAppProps = {
+  // --- The standalone app description (the engine renders this definition)
   appDef?: StandaloneAppDescription;
+
+  // --- In E2E tests, we can decorate the components with test IDs
   decorateComponentsWithTestId?: boolean;
+
+  // --- Debugging can be enabled or disabled
   debugEnabled?: boolean;
+
+  // --- The runtime environment of the standalone app (for pre-compiled apps)
   runtime?: any;
+
+  // --- Custom components to be added
   components?: ComponentRendererDef[];
 };
 
-// --- This react component represents a standalone app connected with its environment
+/**
+ * This React component represents a standalone app connected with its
+ * environment. It uses the XMLUI RootComponent wrapped into an ApiInterceptor.
+ * The standalone application can display itself within a React app and use an
+ * optional API interceptor.
+ *
+ * See the `startApp` function for more details
+ */
 function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
@@ -109,6 +134,68 @@ function StandaloneApp({
   );
 }
 
+type ParsedResponse = {
+  component?: ComponentDef | CompoundComponentDef;
+  codeBehind?: CollectedDeclarations;
+  src?: string;
+  file?: string;
+  hasError?: boolean;
+};
+
+async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
+  const code = await response.text();
+  const fileId = response.url;
+  let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
+  if (errors.length > 0) {
+    const compName =
+      erroneousCompoundComponentName ??
+      response.url.substring(
+        response.url.lastIndexOf("/") + 1,
+        response.url.length - ".xmlui".length,
+      );
+    component = errReportComponent(errors, fileId, compName);
+  }
+  return {
+    component,
+    src: code,
+    file: fileId,
+    hasError: errors.length > 0,
+  };
+}
+
+async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
+  const code = await response.text();
+  const parser = new Parser(code);
+  try {
+    parser.parseStatements();
+  } catch (e) {
+    if (parser.errors.length > 0) {
+      return {
+        component: errReportScriptError(parser.errors[0], response.url),
+        file: response.url,
+        hasError: true,
+      };
+    }
+  }
+
+  const codeBehind = collectCodeBehindFromSource("Main", code, () => {
+    return "";
+  });
+  if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
+    return {
+      component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
+      file: response.url,
+      hasError: true,
+    };
+  }
+
+  removeCodeBehindTokensFromTree(codeBehind);
+  return {
+    codeBehind: codeBehind,
+    file: response.url,
+  };
+}
+
 async function parseComponentResp(response: Response) {
   if (response.url.toLowerCase().endsWith(".xmlui")) {
     const code = await response.text();
@@ -151,6 +238,7 @@ async function parseComponentResp(response: Response) {
   };
 }
 
+// --- Tests is the given path matches the speified file name
 function matchesFileName(path: string, fileName: string) {
   return (
     path.endsWith(`/${fileName}.ts`) ||
@@ -160,52 +248,91 @@ function matchesFileName(path: string, fileName: string) {
   );
 }
 
+// --- Tests if the given path contains the specified folder
 function matchesFolder(path: string, folderName: string) {
   return path.includes(`/${folderName}/`);
 }
 
+/**
+ * This function turns a collection of runtime file declarations into a standalone
+ * app description.
+ * @param runtime A hash object containing the runtime files. The keys are the file
+ * paths and the values are the file contents.
+ * @returns The standalone app description.
+ *
+ * When the standalone app is pre-compiled, each property in `runtime` holds such a
+ * pre-compiled item. Otherwise, `runtime` is an empty object.
+ *
+ * While processing the files here, we can assume they are free from compilation
+ * errors, as such errors would be observed in the compile phase.
+ */
 function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription {
+  // --- Collect the components and their sources. We pass the sources to the standalone app
+  // --- so that it can be used for error display and debugging purposes.
+  const sources: Record<string, string> = {};
+  const componentsByFileName: Record<string, CompoundComponentDef> = {};
+  const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
+  const themes: Array<ThemeDefinition> = [];
+
+  // --- Some working variables
   let config: StandaloneAppDescription | undefined;
   let entryPoint: ComponentDef | undefined;
   let entryPointCodeBehind: CollectedDeclarations | undefined;
-  const themes: Array<ThemeDefinition> = [];
-  let apiInterceptor;
+  let apiInterceptor: any;
 
-  const sources: Record<string, string> = {};
-
-  const componentsByFileName: Record<string, CompoundComponentDef> = {};
-  const codeBehindsByFileName: Record<string, CollectedDeclarations> = {};
-
+  // --- Process the runtime files
   for (const [key, value] of Object.entries(runtime)) {
     if (matchesFileName(key, "config")) {
+      // --- We assume that the config file has a default export and this
+      // --- export is the standalone app's configuration.
       config = value.default;
     }
+
+    // --- We assume that the entry point is either named "Main" or "App".
     if (matchesFileName(key, "Main") || matchesFileName(key, "App")) {
       if (key.endsWith(codeBehindFileExtension)) {
+        // --- "default" contains the functions and variables declared in the
+        // --- code behind file.
         entryPointCodeBehind = value.default;
       } else {
+        // --- "default" contains the component definition, the file index,
+        // --- and the source code.
         entryPoint = value.default.component;
         if (value.default.file) {
           sources[value.default.file] = value.default.src;
         }
       }
     }
+
+    // --- Use API emulation if available
     if (matchesFileName(key, "api")) {
       apiInterceptor = value.default;
     }
+
+    // --- Collect the components and their code behinds
     if (matchesFolder(key, "components")) {
       if (key.endsWith(codeBehindFileExtension)) {
+        // --- "default" contains the functions and variables declared in the
+        // --- component's code behind file.
         codeBehindsByFileName[key] = value.default;
       } else {
+        // --- "default" contains the component definition, the file index,
+        // --- and the source code.
         componentsByFileName[key] = value.default.component;
         sources[value.default.file] = value.default.src;
       }
     }
+
+    // --- Collect the themes declared with the app
     if (matchesFolder(key, "themes")) {
       themes.push(value.default);
     }
   }
+
+  // --- We have an entry point defined in the configuration file or in the main app file.
   const safeEntryPoint = config?.entryPoint || entryPoint;
+
+  // --- We may have a code-behind file. If so, we merge the variables and functions
   const entryPointWithCodeBehind = {
     ...safeEntryPoint,
     vars: {
@@ -215,12 +342,19 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     functions: entryPointCodeBehind?.functions,
     scriptError: entryPointCodeBehind?.moduleErrors,
   } as ComponentLike;
+
+  // --- Collect the component definition we pass to the rendering engine
   let components: Array<CompoundComponentDef> = [];
   if (config?.components) {
+    // --- We have a list of components defined in the configuration file
     components = config.components;
   } else {
+    // --- Use the components collected from the runtime files; merge the components
+    // --- with their code behinds
     Object.entries(componentsByFileName).forEach(([key, compound]) => {
-      const componentCodeBehind = codeBehindsByFileName[`${key}.xs`]; //TODO illesg temp, (use codebehindFileExtension)
+      const fileParts = key.split(".");
+      const codeBehindFile = `${fileParts[0]}.${codeBehindFileExtension}`;
+      const componentCodeBehind = codeBehindsByFileName[codeBehindFile];
       const componentWithCodeBehind = {
         ...compound,
         component: {
@@ -237,17 +371,24 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     });
   }
 
+  // --- Done.
   return {
     ...config,
     entryPoint: entryPointWithCodeBehind,
-    components: components,
+    components,
     themes: config?.themes || themes,
     apiInterceptor: config?.apiInterceptor || apiInterceptor,
     sources,
   };
 }
 
-function mergeGivenAppDefWithRuntime(
+/**
+ * Merges app definitions
+ * @param resolvedRuntime Standalone app definition coming from the resolved runtime
+ * @param standaloneAppDef Standalode app definition coming from the source
+ * @returns Merged standalone app definition
+ */
+function mergeAppDefWithRuntime(
   resolvedRuntime: StandaloneAppDescription,
   standaloneAppDef: StandaloneAppDescription | undefined,
 ) {
@@ -263,6 +404,11 @@ function mergeGivenAppDefWithRuntime(
   };
 }
 
+/**
+ * Fetch the up-to-date state of the source file
+ * @param url The URL to fetch the source file from
+ * @returns The source file contents response
+ */
 async function fetchWithoutCache(url: string) {
   return fetch(normalizePath(url), {
     headers: {
@@ -271,149 +417,45 @@ async function fetchWithoutCache(url: string) {
   });
 }
 
-function getStandalone(
-  standaloneAppDef: StandaloneAppDescription | undefined,
-  runtime: Record<string, any> = EMPTY_OBJECT,
-) {
-  //TODO read text/xmlui-config json
-  const servedFromSingleFile =
-    typeof document !== "undefined" && document.querySelector('script[type="text/xmlui"]') !== null;
-  if (servedFromSingleFile) {
-    let entryPoint: ComponentDef | null = null;
-    const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
-    const components: Array<CompoundComponentDef> = [];
-    const errorsAggregated = [];
-    const erroneousCompNamesAggr = [];
-    for (let i = 0; i < componentNodes.length; i++) {
-      const value = componentNodes[i];
-      const {
-        component: componentDef,
-        errors,
-        erroneousCompoundComponentName,
-      } = xmlUiMarkupToComponent(value.textContent!, 0);
-      if (errors.length > 0) {
-        errorsAggregated.push(...errors);
-        erroneousCompNamesAggr.push(erroneousCompoundComponentName);
-        continue;
-      }
-      if ("type" in componentDef && componentDef.type === "App") {
-        entryPoint = componentDef as ComponentDef;
-      } else {
-        components.push(componentDef as CompoundComponentDef);
-      }
-    }
-    if (errorsAggregated.length > 0) {
-      entryPoint = errReportComponent(
-        errorsAggregated,
-        "Standalone-html-file",
-        erroneousCompNamesAggr.join(", "),
-      );
-    }
-    if (entryPoint === null) {
-      throw new Error("No App component specified");
-    }
-    const configNode = document.querySelector('script[type="text/xmlui-config"]');
-    const config: StandaloneJsonConfig =
-      configNode === null ? {} : JSON.parse(configNode.textContent!);
-    const themes: Array<ThemeDefinition> = [];
-    const themeNodes = document.querySelectorAll('script[type="text/xmlui-theme"]');
-    themeNodes.forEach((value) => {
-      themes.push(JSON.parse(value.textContent!) as ThemeDefinition);
-    });
-
-    const appDef: StandaloneAppDescription = {
-      ...config,
-      entryPoint,
-      components,
-      themes,
-    };
-    return appDef;
-  }
-
-  const resolvedRuntime = resolveRuntime(runtime);
-  const appDef = mergeGivenAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
-
-  if (
-    (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
-    !process.env.VITE_STANDALONE
-  ) {
-    if (!appDef) {
-      throw new Error("couldn't find the application metadata");
-    }
-    return appDef;
-  }
-  return null;
-}
-
-// --- This React hook prepares the runtime environment of a standalone app using its definition
+/**
+ * Using its definition, this React hook prepares the runtime environment of a
+ * standalone app. It runs every time an app source file changes.
+ * @param standaloneAppDef The standalone app description
+ * @param runtime The pre-compiled runtime environment
+ * @returns The prepared StandaloneAppDescription
+ */
 function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
 ) {
-  const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(
-    getStandalone(standaloneAppDef, runtime),
-  );
+  const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
+    // --- Initialize the standalone app
+    const resolvedRuntime = resolveRuntime(runtime);
+    const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
+
+    // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
+    // --- we must have the app definition available.
+    if (
+      (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
+      !process.env.VITE_STANDALONE
+    ) {
+      if (!appDef) {
+        throw new Error("couldn't find the application metadata");
+      }
+      return appDef;
+    }
+
+    // --- No standalone app yet, we need to get that from the fetched source code
+    return null;
+  });
 
   useIsomorphicLayoutEffect(() => {
     (async function () {
-      //TODO read text/xmlui-config json
-      const servedFromSingleFile = document.querySelector('script[type="text/xmlui"]') !== null;
-      if (servedFromSingleFile) {
-        let entryPoint: ComponentDef | null = null;
-        const componentNodes = document.querySelectorAll('script[type="text/xmlui"]');
-        const components: Array<CompoundComponentDef> = [];
-        const errorsAggregated = [];
-        const erroneousCompNamesAggr = [];
-        for (let i = 0; i < componentNodes.length; i++) {
-          const value = componentNodes[i];
-          const {
-            component: componentDef,
-            errors,
-            erroneousCompoundComponentName,
-          } = xmlUiMarkupToComponent(value.textContent!, 0);
-          if (errors.length > 0) {
-            errorsAggregated.push(...errors);
-            erroneousCompNamesAggr.push(erroneousCompoundComponentName);
-            continue;
-          }
-          if ("type" in componentDef && componentDef.type === "App") {
-            entryPoint = componentDef as ComponentDef;
-          } else {
-            components.push(componentDef as CompoundComponentDef);
-          }
-        }
-        if (errorsAggregated.length > 0) {
-          entryPoint = errReportComponent(
-            errorsAggregated,
-            "Standalone-html-file",
-            erroneousCompNamesAggr.join(", "),
-          );
-        }
-        if (entryPoint === null) {
-          throw new Error("No App component specified");
-        }
-        const configNode = document.querySelector('script[type="text/xmlui-config"]');
-        const config: StandaloneJsonConfig =
-          configNode === null ? {} : JSON.parse(configNode.textContent!);
-        const themes: Array<ThemeDefinition> = [];
-        const themeNodes = document.querySelectorAll('script[type="text/xmlui-theme"]');
-        themeNodes.forEach((value) => {
-          themes.push(JSON.parse(value.textContent!) as ThemeDefinition);
-        });
-
-        const appDef: StandaloneAppDescription = {
-          ...config,
-          entryPoint,
-          components,
-          themes,
-        };
-        setStandaloneApp(appDef);
-        return;
-      }
-
       const resolvedRuntime = resolveRuntime(runtime);
-      const appDef = mergeGivenAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
+      const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
+      // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
+      // --- we must have the app definition available.
       if (
         (process.env.VITE_DEV_MODE || process.env.VITE_BUILD_MODE === "INLINE_ALL") &&
         !process.env.VITE_STANDALONE
@@ -425,8 +467,14 @@ function useStandalone(
         return;
       }
 
+      // --- In standalone mode, we must fetch the XMLUI app's source files,
+      // --- compile them, and prepare the app's definition for the rendering
+      // --- engine.
       if (process.env.VITE_BUILD_MODE === "CONFIG_ONLY") {
-        const configResponse = await fetchWithoutCache("config.json");
+        // --- In config-only mode, we override the pre-compiled app definition
+        // --- with elements from the configuration file. Note that we do not
+        // --- check whether the config file's content is semantically valid.
+        const configResponse = await fetchWithoutCache(CONFIG_FILE);
         const config: StandaloneJsonConfig = await configResponse.json();
 
         const themePromises: Promise<ThemeDefinition>[] = [];
@@ -446,25 +494,26 @@ function useStandalone(
         return;
       }
 
-      // temp solution, needs refactor!!!
-
-      //default mode: process.env.VITE_BUILD_MODE === "ALL"
-      const entryPointPromise = fetchWithoutCache("Main.xmlui").then((value) =>
-        parseComponentResp(value),
+      // --- Fetch the main file
+      const entryPointPromise = fetchWithoutCache(MAIN_FILE).then((value) =>
+        parseComponentMarkupResponse(value),
       );
-      const entryPointCodeBehindPromise = new Promise(async (resolve, reject) => {
+
+      // --- Fetch the main code-behind file (if any)
+      const entryPointCodeBehindPromise = new Promise(async (resolve) => {
         try {
-          const resp = await fetchWithoutCache("Main.xmlui.xs");
-          const codeBehind = await parseComponentResp(resp);
-          resolve(codeBehind.codeBehind);
+          const resp = await fetchWithoutCache(MAIN_CODE_BEHIND_FILE);
+          const codeBehind = await parseCodeBehindResponse(resp);
+          resolve(codeBehind.hasError ? codeBehind : codeBehind.codeBehind);
         } catch (e) {
           resolve(null);
         }
-      }) as Promise<CollectedDeclarations>;
+      }) as any;
 
+      // --- Fethc the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
-        const configResponse = await fetchWithoutCache("config.json");
+        const configResponse = await fetchWithoutCache(CONFIG_FILE);
         config = await configResponse.json();
       } catch (e) {}
       const themePromises = config?.themes?.map((themePath) => {
@@ -484,6 +533,17 @@ function useStandalone(
           Promise.all(componentPromises || []),
           Promise.all(themePromises || []),
         ]);
+
+      // --- Collect the elements of the standalone app (and potential errors)
+      const errorComponents: ComponentDef[] = [];
+
+      // --- Check if the main component has errors
+      if (loadedEntryPoint.hasError) {
+        errorComponents.push(loadedEntryPoint!.component as ComponentDef);
+      }
+      if (loadedEntryPointCodeBehind?.hasError) {
+        errorComponents.push(loadedEntryPointCodeBehind.component as ComponentDef);
+      }
 
       const sources: Record<string, string> = {};
       const codeBehinds: any = {};
@@ -580,21 +640,36 @@ function useStandalone(
         );
       }
 
+      // --- Let's check for errors to display
+      const errorComponent: ComponentDef | null =
+        errorComponents.length > 0
+          ? {
+              type: "VStack",
+              props: { gap: 0, padding: 0 },
+              children: errorComponents,
+            }
+          : null;
+      console.log("errorComponent", errorComponent);
+
       setStandaloneApp({
         ...config,
         themes,
         sources,
         components: componentsWithCodeBehinds,
-        entryPoint: entryPointWithCodeBehind,
+        entryPoint: errorComponent || entryPointWithCodeBehind,
       });
     })();
   }, [runtime, standaloneAppDef]);
   return standaloneApp;
 }
 
-function collectMissingComponents(entryPoint, components, componentsFailedToLoad = new Set()) {
+function collectMissingComponents(
+  entryPoint: ComponentDef | CompoundComponentDef,
+  components: any[],
+  componentsFailedToLoad = new Set(),
+) {
   const componentRegistry = new ComponentRegistry({ compoundComponents: components });
-  const result = checkXmlUiMarkup(entryPoint, components, {
+  const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
     getComponentProps: (componentName) => {
       return componentRegistry.lookupComponentRenderer(componentName)?.descriptor?.props;
     },
@@ -632,6 +707,14 @@ function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
 
 let contentRoot: Root | null = null;
 
+/**
+ * This function injects the StandaloneApp component into a React app. It looks
+ * up a component with the "root" id as the host of the standalone app. If such
+ * an element does not exist, it creates a `<div id="root">` element.
+ * @param runtime The app's runtime representation
+ * @param components The related component's runtime representation
+ * @returns The content's root element
+ */
 export function startApp(runtime?: any, components?: ComponentRendererDef[]) {
   let rootElement: HTMLElement | null = document.getElementById("root");
   if (!rootElement) {
