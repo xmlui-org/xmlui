@@ -142,7 +142,6 @@ type ParsedResponse = {
   hasError?: boolean;
 };
 
-// <<<<<<< HEAD
 // --- Parses the response of a component markup file
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
   const code = await response.text();
@@ -272,7 +271,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
 
     // --- Collect the components and their code behinds
     if (matchesFolder(key, "components")) {
-      if (key.endsWith(codeBehindFileExtension)) {
+      if (key.endsWith(`.${codeBehindFileExtension}`)) {
         // --- "default" contains the functions and variables declared in the
         // --- component's code behind file.
         codeBehindsByFileName[key] = value.default;
@@ -313,9 +312,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     // --- Use the components collected from the runtime files; merge the components
     // --- with their code behinds
     Object.entries(componentsByFileName).forEach(([key, compound]) => {
-      const fileParts = key.split(".");
-      const codeBehindFile = `${fileParts[0]}.${codeBehindFileExtension}`;
-      const componentCodeBehind = codeBehindsByFileName[codeBehindFile];
+      const componentCodeBehind = codeBehindsByFileName[`${key}.xs`]
       const componentWithCodeBehind = {
         ...compound,
         component: {
@@ -415,6 +412,7 @@ function useStandalone(
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
 
+
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
       if (
@@ -471,7 +469,7 @@ function useStandalone(
         }
       }) as any;
 
-      // --- Fethc the configuration file (we do not check whether the content is semantically valid)
+      // --- Fetch the configuration file (we do not check whether the content is semantically valid)
       let config: StandaloneJsonConfig = undefined;
       try {
         const configResponse = await fetchWithoutCache(CONFIG_FILE);
