@@ -80,7 +80,6 @@ export function Theme({
 
   const { themeCssVars, getResourceUrl, fontLinks, allThemeVarsWithResolvedHierarchicalVars, getThemeVar } =
     useCompiledTheme(currentTheme, themeTone, themes, resources, resourceMap);
-
   const { css, className, rangeClassName, fromClass, toClass } = useMemo(() => {
     const vars = { ...themeCssVars, "color-scheme": themeTone };
     // const vars = themeCssVars;

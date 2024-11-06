@@ -29,7 +29,6 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
     ...generateRbgChannelsForTone("color-surface", {...resolvedTheme, ...colorTones}),
     ...generateRbgChannelsForTone("color-primary", {...resolvedTheme, ...colorTones})
   };
-  
 }
 
 export function generateBaseSpacings(theme: Record<string, string> | undefined) {
@@ -205,64 +204,69 @@ function getRgbChannelsString(colorStr?: string) {
 }
 
 function generateBaseTonesForColor(varName: string, theme: Record<string, string>, options = {distributeEven: false}) {
-  const {distributeEven} = options;
-  const color = theme[varName];
-  if (!color || typeof color !== "string") {
-    return {};
-  }
-  const baseColor = Color(color);
-  let color50;
-  let color100;
-  let color200;
-  let color300;
-  let color400;
-  let color500;
-  let color600;
-  let color700;
-  let color800;
-  let color900;
-  let color950;
-  if(distributeEven){
-    color50 = baseColor.lightness(98);
-    color100 = baseColor.lightness(95);
-    color200 = baseColor.lightness(83);
-    color300 = baseColor.lightness(75);
-    color400 = baseColor.lightness(63);
-    color500 = baseColor.lightness(52);
-    color600 = baseColor.lightness(40);
-    color700 = baseColor.lightness(32);
-    color800 = baseColor.lightness(27);
-    color900 = baseColor.lightness(16);
-    color950 = baseColor.lightness(13);
-  } else {
-    const baseL = baseColor.hsl().l();
-    const darkStep = baseL / 5;
-    const lightStep = (100 - baseL) / 5;
-    color50 = baseColor.lightness(baseL + lightStep * 4.5);
-    color100 = baseColor.lightness(baseL + lightStep * 4);
-    color200 = baseColor.lightness(baseL + lightStep * 3);
-    color300 = baseColor.lightness(baseL + lightStep * 2);
-    color400 = baseColor.lightness(baseL + lightStep * 1);
-    color500 = baseColor;
-    color600 = baseColor.lightness(baseL - darkStep * 1);
-    color700 = baseColor.lightness(baseL - darkStep * 2);
-    color800 = baseColor.lightness(baseL - darkStep * 3);
-    color900 = baseColor.lightness(baseL - darkStep * 4);
-    color950 = baseColor.lightness(baseL - darkStep * 4.5);
-  }
+  try {
+    const {distributeEven} = options;
+    const color = theme[varName];
+    if (!color || typeof color !== "string") {
+      return {};
+    }
+    const baseColor = Color(color);
+    let color50;
+    let color100;
+    let color200;
+    let color300;
+    let color400;
+    let color500;
+    let color600;
+    let color700;
+    let color800;
+    let color900;
+    let color950;
+    if (distributeEven) {
+      color50 = baseColor.lightness(98);
+      color100 = baseColor.lightness(95);
+      color200 = baseColor.lightness(83);
+      color300 = baseColor.lightness(75);
+      color400 = baseColor.lightness(63);
+      color500 = baseColor.lightness(52);
+      color600 = baseColor.lightness(40);
+      color700 = baseColor.lightness(32);
+      color800 = baseColor.lightness(27);
+      color900 = baseColor.lightness(16);
+      color950 = baseColor.lightness(13);
+    } else {
+      const baseL = baseColor.hsl().l();
+      const darkStep = baseL / 5;
+      const lightStep = (100 - baseL) / 5;
+      color50 = baseColor.lightness(baseL + lightStep * 4.5);
+      color100 = baseColor.lightness(baseL + lightStep * 4);
+      color200 = baseColor.lightness(baseL + lightStep * 3);
+      color300 = baseColor.lightness(baseL + lightStep * 2);
+      color400 = baseColor.lightness(baseL + lightStep * 1);
+      color500 = baseColor;
+      color600 = baseColor.lightness(baseL - darkStep * 1);
+      color700 = baseColor.lightness(baseL - darkStep * 2);
+      color800 = baseColor.lightness(baseL - darkStep * 3);
+      color900 = baseColor.lightness(baseL - darkStep * 4);
+      color950 = baseColor.lightness(baseL - darkStep * 4.5);
+    }
 
-  return {
-    [`${varName}-50`]: color50.toString(),
-    [`${varName}-100`]: color100.toString(),
-    [`${varName}-200`]: color200.toString(),
-    [`${varName}-300`]: color300.toString(),
-    [`${varName}-400`]: color400.toString(),
-    [`${varName}-500`]: color500.toString(),
-    [`${varName}-600`]: color600.toString(),
-    [`${varName}-700`]: color700.toString(),
-    [`${varName}-800`]: color800.toString(),
-    [`${varName}-900`]: color900.toString(),
-    [`${varName}-950`]: color950.toString(),
+    return {
+      [`${varName}-50`]: color50.toString(),
+      [`${varName}-100`]: color100.toString(),
+      [`${varName}-200`]: color200.toString(),
+      [`${varName}-300`]: color300.toString(),
+      [`${varName}-400`]: color400.toString(),
+      [`${varName}-500`]: color500.toString(),
+      [`${varName}-600`]: color600.toString(),
+      [`${varName}-700`]: color700.toString(),
+      [`${varName}-800`]: color800.toString(),
+      [`${varName}-900`]: color900.toString(),
+      [`${varName}-950`]: color950.toString(),
+    }
+  } catch (e) {
+    console.error("Error generating base tones for color:", varName);
+    return {};
   }
 }
 

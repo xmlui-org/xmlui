@@ -303,7 +303,14 @@ function collect(source: string, modules: Record<string, string> = {}): Collecte
   const codeBehind = collectCodeBehindFromSource(
     ROOT_MODULE,
     source,
-    (_: string, moduleName: string) => modules[moduleName] ?? null);
+    (parentModule: string, moduleName: string) => {
+      if (moduleName === ROOT_MODULE) {
+        return source;
+      }
+      return modules[moduleName] ?? null;
+    },
+    (a) => a);
+
   removeCodeBehindTokensFromTree(codeBehind);
   return codeBehind;
 }

@@ -554,6 +554,84 @@ describe("Modules - Parse", () => {
     expect(result.importedModules.some((mod) => mod.name === "module1")).toBe(true);
   });
 
+  it("Imported module imports function", async () => {
+    // --- Arrange
+    const source = `
+    import { a } from "module1";
+    `;
+
+    const modules: Record<string, string> = {
+      module1: `
+        import {b} from "module2";
+        export function a(){ b() }`,
+      module2: `export function b(){ console.log("from module2"); }`,
+    };
+
+    // --- Act
+    const result = parseModule(source, modules) as ScriptModule;
+
+    const m1 = result.importedModules[0];
+    const m1b = m1.imports["module2"]["b"];
+    const m2 = m1.importedModules[0];
+    const m2b = m2.exports.get("b");
+
+    // --- Assert
+    expect(isModuleErrors(result)).toBe(false);
+    expect(result.name).toBe(ROOT_MODULE);
+    expect(result.importedModules.length).toBe(1);
+
+    expect(m1.name).toBe("module1");
+    expect(m1.importedModules.length).toBe(1);
+
+    expect(m1b.name).toBe("b");
+    expect(m1b.type).toBe("FuncD");
+
+    expect(m2.name).toBe("module2");
+    expect(m2b.name).toBe("b");
+    expect(m2b.type).toBe("FuncD");
+  });
+
+  it("Cyclic imports", async () => {
+    // --- Arrange
+    const source = `
+    import { a } from "module1";
+    `;
+
+    const modules: Record<string, string> = {
+      module1: `
+        import {b} from "module2";
+        export function a(){ b() }
+        export function a2(){ }`,
+      module2: `
+        import {a2} from "module1";
+        export function b(){ console.log("from module2"); }`,
+    };
+
+    // --- Act
+    const result = parseModule(source, modules) as ScriptModule;
+
+    const m1 = result.importedModules[0];
+    const m1b = m1.imports["module2"]["b"];
+    const m2 = m1.importedModules[0];
+    const m2b = m2.exports.get("b");
+
+    // --- Assert
+    expect(isModuleErrors(result)).toBe(false);
+    expect(result.name).toBe(ROOT_MODULE);
+    expect(result.importedModules.length).toBe(1);
+
+    expect(m1.name).toBe("module1");
+    expect(m1.importedModules.length).toBe(1);
+
+    expect(m1b.name).toBe("b");
+    expect(m1b.type).toBe("FuncD");
+
+    expect(m2.name).toBe("module2");
+    expect(m2.importedModules.length).toBe(1);
+    expect(m2b.name).toBe("b");
+    expect(m2b.type).toBe("FuncD");
+  });
+
   it("Import module fails with var", async () => {
     // --- Arrange
     const source = `
@@ -577,6 +655,6 @@ function parseModule(source: string, modules: Record<string, string> = {}) {
   return parseScriptModule(
     ROOT_MODULE,
     source,
-    (parentModule: string, moduleName: string) => modules[moduleName] ?? null
+    (parentModule: string, moduleName: string) => modules[moduleName] ?? null,
   );
 }

@@ -15,7 +15,10 @@ import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { LogicalThread } from "@abstractions/scripting/LogicalThread";
 
-import { evalBinding, executeArrowExpressionSync } from "@components-core/script-runner/eval-tree-sync";
+import {
+  evalBinding,
+  executeArrowExpressionSync,
+} from "@components-core/script-runner/eval-tree-sync";
 import {
   innermostBlockScope,
   innermostLoopScope,
@@ -41,7 +44,7 @@ const SYNC_EVAL_TIMEOUT = 1000;
 export function processStatementQueue(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThread
+  thread?: LogicalThread,
 ): QueueInfo {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -71,7 +74,10 @@ export function processStatementQueue(
   // --- Consume the queue
   while (queue.length > 0) {
     // --- Check sync timeout
-    if (evalContext.startTick !== undefined && new Date().valueOf() - evalContext.startTick > SYNC_EVAL_TIMEOUT) {
+    if (
+      evalContext.startTick !== undefined &&
+      new Date().valueOf() - evalContext.startTick > SYNC_EVAL_TIMEOUT
+    ) {
       throw new Error(`Sync evaluation timeout exceeded ${SYNC_EVAL_TIMEOUT} milliseconds`);
     }
 
@@ -100,7 +106,10 @@ export function processStatementQueue(
         if (err instanceof ThrowStatementError) {
           reportEngineError(err);
         } else {
-          reportEngineError(new StatementExecutionError(err as any, queueItem!.statement?.source), err);
+          reportEngineError(
+            new StatementExecutionError(err as any, queueItem!.statement?.source),
+            err,
+          );
         }
       }
     }
@@ -145,7 +154,7 @@ export function processStatementQueue(
 function processStatement(
   statement: Statement,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThread
+  thread: LogicalThread,
 ): ProcessOutcome {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -178,12 +187,14 @@ function processStatement(
       // --- Import the module's exported variables into the parent module
       const topVars = evalContext.mainThread!.blocks![0].vars!;
       const topConst = evalContext.mainThread!.blocks![0].constVars!;
-      for (const key of Object.keys(statement.imports)) {
-        if (key in topVars) {
-          throw new Error(`Import ${key} already exists`);
+      for (const modImports of Object.values(statement.imports)) {
+        for (const key of Object.keys(modImports)) {
+          if (key in topVars) {
+            throw new Error(`Import ${key} already exists`);
+          }
+          topVars[key] = statement.module!.exports.get(modImports[key]);
+          topConst.add(key);
         }
-        topVars[key] = statement.module!.exports.get(statement.imports[key]);
-        topConst.add(key);
       }
       break;
 
@@ -230,7 +241,7 @@ function processStatement(
         statement.expression,
         evalContext,
         thread,
-        ...(evalContext.eventArgs ?? [])
+        ...(evalContext.eventArgs ?? []),
       );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = arrowFuncValue;
@@ -275,7 +286,9 @@ function processStatement(
       }
 
       // --- Store the return value
-      thread.returnValue = statement.expression ? evalBinding(statement.expression, evalContext, thread) : undefined;
+      thread.returnValue = statement.expression
+        ? evalBinding(statement.expression, evalContext, thread)
+        : undefined;
 
       // --- Check for try blocks
       if ((thread.tryBlocks ?? []).length > 0) {
@@ -350,7 +363,10 @@ function processStatement(
         throw new Error("Missing loop scope");
       }
 
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "continue"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "continue";
@@ -379,7 +395,10 @@ function processStatement(
       }
 
       // --- Break is in a loop construct
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "break"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "break";
@@ -783,7 +802,7 @@ export function processDeclarations(
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,
-  baseValue: any = undefined
+  baseValue: any = undefined,
 ): void {
   for (let i = 0; i < declarations.length; i++) {
     let value: any;
@@ -798,7 +817,12 @@ export function processDeclarations(
   }
 
   // --- Visit a variable
-  function visitDeclaration(block: BlockScope, decl: VarDeclaration, baseValue: any, addConst: boolean): void {
+  function visitDeclaration(
+    block: BlockScope,
+    decl: VarDeclaration,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     // --- Process each declaration
     if (decl.id) {
       visitIdDeclaration(block, decl.id, baseValue, addConst);
@@ -812,7 +836,12 @@ export function processDeclarations(
   }
 
   // --- Visits a single ID declaration
-  function visitIdDeclaration(block: BlockScope, id: string, baseValue: any, addConst: boolean): void {
+  function visitIdDeclaration(
+    block: BlockScope,
+    id: string,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     if (block.vars[id]) {
       throw new Error(`Variable ${id} is already declared in the current scope.`);
     }
@@ -824,7 +853,12 @@ export function processDeclarations(
   }
 
   // --- Visits an array destructure declaration
-  function visitArrayDestruct(block: BlockScope, arrayD: ArrayDestructure[], baseValue: any, addConst: boolean): void {
+  function visitArrayDestruct(
+    block: BlockScope,
+    arrayD: ArrayDestructure[],
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     for (let i = 0; i < arrayD.length; i++) {
       const arrDecl = arrayD[i];
       const value = baseValue?.[i];
@@ -843,7 +877,7 @@ export function processDeclarations(
     block: BlockScope,
     objectD: ObjectDestructure[],
     baseValue: any,
-    addConst: boolean
+    addConst: boolean,
   ): void {
     for (let i = 0; i < objectD.length; i++) {
       const objDecl = objectD[i];

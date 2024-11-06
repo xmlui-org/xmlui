@@ -4,6 +4,7 @@ import type {
   CollectedDeclarations,
   Expression,
   FunctionDeclaration,
+  ScriptModule,
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { VisitorState } from "./tree-visitor";
@@ -18,7 +19,8 @@ export const PARSED_MARK_PROP = "__PARSED__";
 export function collectCodeBehindFromSource(
   moduleName: string,
   source: string,
-  moduleResolver: ModuleResolver
+  moduleResolver: ModuleResolver,
+  moduleNameResolver: (moduleName: string) => string,
 ): CollectedDeclarations {
   const result: CollectedDeclarations = {
     vars: {},
@@ -26,21 +28,18 @@ export function collectCodeBehindFromSource(
     functions: {},
   };
 
+  const collectedFunctions: Record<
+    string,
+    { collectedImportsFrom: boolean; functions?: Record<string, CodeDeclaration> }
+  > = {};
+
   // --- Parse the module (recursively, including imported modules) in restrictive mode
   const parsedModule = parseScriptModule(moduleName, source, moduleResolver, true);
   if (isModuleErrors(parsedModule)) {
     return { ...result, moduleErrors: parsedModule };
   }
 
-  // --- Collect imported functions
-  if (parsedModule.imports) {
-    Object.keys(parsedModule.imports).forEach((key) => {
-      const obj = parsedModule.imports[key];
-      if (obj.type === "FuncD") {
-        addFunctionDeclaration(obj);
-      }
-    });
-  }
+  const mainModuleResolvedName = moduleNameResolver(parsedModule.name);
 
   // --- Collect statements from the module
   parsedModule.statements.forEach((stmt) => {
@@ -58,7 +57,7 @@ export function collectCodeBehindFromSource(
         });
         break;
       case "FuncD":
-        addFunctionDeclaration(stmt);
+        addFunctionDeclaration(mainModuleResolvedName, stmt);
         break;
       case "ImportD":
         // --- Do nothing
@@ -67,10 +66,41 @@ export function collectCodeBehindFromSource(
         throw new Error(`'${stmt.type}' is not allowed in a code-behind module.`);
     }
   });
+  collectFuncs(parsedModule);
+
   return result;
 
+  /** TODO: this exposes all the functions that were imported by any imported module
+   * to the root module. Has the effect of imported functions beeing global to the root of the import tree.*/
+  function collectFuncs(currentModule: ScriptModule) {
+    const resolvedModuleName = moduleNameResolver(currentModule.name);
+    if (collectedFunctions?.[resolvedModuleName]?.collectedImportsFrom) {
+      return;
+    }
+    for (const modName in currentModule.imports) {
+      const resolvedImportedModuleName = moduleNameResolver(modName);
+      // if (mainModuleResolvedName === resolvedImportedModuleName) {
+      //   continue;
+      // }
+      const mod = currentModule.imports[modName];
+      for (const obj of Object.values(mod)) {
+        if (obj.type === "FuncD") {
+          addFunctionDeclaration(resolvedImportedModuleName, obj);
+        }
+      }
+    }
+    collectedFunctions[resolvedModuleName] ??= { collectedImportsFrom: true };
+    collectedFunctions[resolvedModuleName].collectedImportsFrom = true;
+    for (let nextModule of currentModule.importedModules) {
+      collectFuncs(nextModule);
+    }
+  }
+
   // --- Collect function declaration data
-  function addFunctionDeclaration(stmt: FunctionDeclaration): void {
+  function addFunctionDeclaration(resolvedModuleName: string, stmt: FunctionDeclaration): void {
+    if (collectedFunctions?.[resolvedModuleName]?.functions?.[stmt.name] !== undefined) {
+      return;
+    }
     if (stmt.name in result.functions) {
       throw new Error(`Duplicated function declaration: '${stmt.name}'`);
     }
@@ -86,7 +116,7 @@ export function collectCodeBehindFromSource(
         childThreads: [],
         blocks: [{ vars: {} }],
         loops: [],
-        breakLabelValue: -1
+        breakLabelValue: -1,
       }),
     } as ArrowExpression;
 
@@ -96,6 +126,14 @@ export function collectCodeBehindFromSource(
       delete functionSelf.closureContext;
     }
 
+    collectedFunctions[resolvedModuleName] ??= { functions: {}, collectedImportsFrom: false };
+    collectedFunctions[resolvedModuleName].functions ??= {};
+
+    collectedFunctions[resolvedModuleName].functions[stmt.name] = {
+      [PARSED_MARK_PROP]: true,
+      source: funcSource,
+      tree: arrow,
+    };
     result.functions[stmt.name] = {
       [PARSED_MARK_PROP]: true,
       source: funcSource,

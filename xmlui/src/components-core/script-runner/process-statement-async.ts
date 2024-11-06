@@ -185,12 +185,14 @@ async function processStatementAsync(
       // --- Import the module's exported variables into the parent module
       const topVars = evalContext.mainThread!.blocks![0].vars!;
       const topConst = evalContext.mainThread!.blocks![0].constVars!;
-      for (const key of Object.keys(statement.imports)) {
-        if (key in topVars) {
-          throw new Error(`Import ${key} already exists`);
+      for (const modImports of Object.values(statement.imports)) {
+        for (const key of Object.keys(modImports)) {
+          if (key in topVars) {
+            throw new Error(`Import ${key} already exists`);
+          }
+          topVars[key] = statement.module!.exports.get(modImports[key]);
+          topConst.add(key);
         }
-        topVars[key] = statement.module!.exports.get(statement.imports[key]);
-        topConst.add(key);
       }
       break;
 

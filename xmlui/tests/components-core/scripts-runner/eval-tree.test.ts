@@ -912,7 +912,6 @@ describe("Evaluate binding expression tree", () => {
     expect(context.localContext.a).equal(0);
   })
 
-
   it(`Evals template literals`, () => {
     // --- Arrange
     const wParser = new Parser("`\\u0058\\x59a${2+3}b${var1}d${undef}${NaN}${null}\\${1+2}`");

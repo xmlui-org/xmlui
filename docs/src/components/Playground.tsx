@@ -63,7 +63,7 @@ export const Playground = ({
             resources,
             themes,
             defaultTone,
-            defaultTheme,
+            defaultTheme
           },
           components,
           app,
@@ -88,7 +88,9 @@ export const Playground = ({
 
   useEffect(() => {
     const nextraTone = theme === "system" ? systemTheme : theme;
-    dispatch(toneChanged(nextraTone!));
+    if (!defaultTone) {
+      dispatch(toneChanged(nextraTone!));
+    }
   }, [theme, systemTheme]);
 
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
