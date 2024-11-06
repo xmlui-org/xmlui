@@ -10,6 +10,7 @@ const CORE_FILE = "xmlui-standalone.umd.js";
 const CORE_PATH_IN_SAMPLES = "xmlui"
 const CORE_PATH = path.join(__dirname, "../../xmlui/dist", CORE_FILE);
 const SAMPLES_BASE = path.join(__dirname, "../samples");
+const PUBLIC_CORE_FOLDER = path.join(__dirname, "../public/resources/files/for-download");
 const ZIP_TARGET_FOLDER = path.join(__dirname, "../public/resources/files/getting-started");
 const GETTING_STARTED_SAMPLE = path.join(SAMPLES_BASE, "getting-started");
 const CL_TUTORIAL_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial");
@@ -19,6 +20,11 @@ const CL_TUTORIAL4_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial4");
 const CL_TUTORIAL5_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial5");
 const CL_TUTORIAL6_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial6");
 const CL_TUTORIAL_FINAL_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial-final");
+
+// --- Public core file
+console.log("Refreshing the public core file...");
+await copyCoreTo(PUBLIC_CORE_FOLDER);
+console.log("Done.");
 
 // --- Getting started sample
 console.log("Refreshing the Getting Started sample...");
