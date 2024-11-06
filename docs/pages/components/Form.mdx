@@ -150,7 +150,7 @@ The following sample demonstrates enabling a field according to another's curren
 <Form
   data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
   <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{data.isEnabled}" label="Name" bindTo="name" />
+  <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
 </Form>
 ```
 
@@ -161,7 +161,7 @@ The following sample demonstrates enabling a field according to another's curren
     <Form
       data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
       <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{data.isEnabled}" label="Name" bindTo="name" />
+      <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
     </Form>
   `}
 />

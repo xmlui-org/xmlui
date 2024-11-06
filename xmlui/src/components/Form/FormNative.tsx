@@ -458,7 +458,7 @@ export function FormWithContextVar({
     return {
       type: "Fragment",
       vars: {
-        data: formState.subject,
+        $data: formState.subject,
       },
       children: node.children,
     };
