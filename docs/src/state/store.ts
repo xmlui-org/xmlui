@@ -17,6 +17,7 @@ type Options = {
   activeTheme?: string;
   activeTone?: string;
   language: "ueml" | "json";
+  emulatedApi?: string;
 };
 
 type AppDescription = {

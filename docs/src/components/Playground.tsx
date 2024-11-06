@@ -31,6 +31,7 @@ type PlaygroundProps = {
   horizontal?: boolean;
   previewMode?: boolean;
   allowStandalone?: boolean;
+  emulatedApi: string;
 };
 
 export const Playground = ({
@@ -48,6 +49,7 @@ export const Playground = ({
   swapped = false,
   horizontal = false,
   allowStandalone = true,
+  emulatedApi,
 }: PlaygroundProps) => {
   const { theme, systemTheme } = useTheme();
 
@@ -63,12 +65,13 @@ export const Playground = ({
             resources,
             themes,
             defaultTone,
-            defaultTheme
+            defaultTheme,
           },
           components,
           app,
         }),
       );
+
       dispatch(
         optionsInitialized({
           orientation: horizontal ? "horizontal" : "vertical",
@@ -83,6 +86,7 @@ export const Playground = ({
         }),
       );
     }
+
     //TODO illesg, review (dep array?)!!!
   }, []);
 

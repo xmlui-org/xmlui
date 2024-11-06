@@ -12,11 +12,10 @@ import { usePlayground } from "@/src/hooks/usePlayground";
 import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 import { Box } from "@/src/components/Box";
 import {ToneSwitcher} from "@/src/components/ToneSwitcher";
 import {ThemeSwitcher} from "@/src/components/ThemeSwitcher";
+import {handleDownloadZip} from "@/src/utils/helpers";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -51,32 +50,9 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
     ],
   );
 
-  const handleDownloadZip = async () => {
-    const zip = new JSZip();
-
-    zip.file("Main.xmlui", appDescription.app);
-    zip.file("config.json", JSON.stringify(appDescription.config, null, 2));
-
-    if (appDescription.components.length > 0) {
-      const components = zip.folder("components");
-      appDescription.components.forEach((component) => {
-        components.file(`${component.name}.xmlui`, component.component);
-      });
-    }
-    if (appDescription.config.themes.length > 0) {
-      const components = zip.folder("themes");
-      appDescription.config.themes.forEach((theme) => {
-        components.file(`${theme.id}.json`, JSON.stringify(theme, null, 2));
-      });
-    }
-    try {
-      const content = await zip.generateAsync({ type: "blob" });
-
-      saveAs(content, `${appDescription.config.name.trim()}.zip`);
-    } catch (error) {
-      console.error("An error occurred while generating the ZIP:", error);
-    }
-  };
+  const download = useCallback(() => {
+    handleDownloadZip(appDescription);
+  }, [appDescription]);
 
   return (
     <div
@@ -152,7 +128,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
         />
         <Tooltip
           trigger={
-            <button className={styles.button} onClick={() => handleDownloadZip()}>
+            <button className={styles.button} onClick={() => download()}>
               <RxDownload />
             </button>
           }
