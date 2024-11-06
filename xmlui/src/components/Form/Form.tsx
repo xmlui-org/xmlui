@@ -53,7 +53,7 @@ export const FormMd = createMetadata({
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
   contextVars: {
-    data: d(
+    $data: d(
       `This property represents the value of the form data. You can access the fields of the form ` +
         `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances.`,
     ),
