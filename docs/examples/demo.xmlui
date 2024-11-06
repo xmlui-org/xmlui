@@ -266,7 +266,7 @@
             <Combobox placeholder="Disabled Combobox" enabled="{false}"/>
             <Combobox placeholder="Empty Combobox"/>
 
-            <Form subject="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
+            <Form data="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem label="Authentication Type" bindTo="asd" type="combobox">
                     <property name="validation">
                         <field name="minLength" value="2"/>
@@ -288,7 +288,7 @@
             <MultiCombobox placeholder="Disabled MultiCombobox" enabled="{false}"/>
             <MultiCombobox placeholder="Empty MultiCombobox"/>
 
-            <Form subject="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
+            <Form data="{{ asd: '0' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem label="Authentication Type" bindTo="asd" type="multiCombobox">
                     <property name="validation">
                         <field name="minLength" value="2"/>
@@ -333,7 +333,7 @@
             <MultiSelect placeholder="Disabled MultiSelect" enabled="{false}"/>
             <MultiSelect placeholder="Empty MultiSelect"/>
 
-            <Form subject="{{ asd: 'opt1' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
+            <Form data="{{ asd: 'opt1' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem label="Form item" bindTo="asd" type="multiSelect">
                     <Option value="opt1" label="first"/>
                     <Option value="opt2" label="second"/>
@@ -344,7 +344,7 @@
 
         <!--
         <ComponentSection heading="DatePicker">
-            <Form subject="{{ date: '2024-02-21' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
+            <Form data="{{ date: '2024-02-21' }}" onSubmit="(eventArgs) => console.log(eventArgs)">
                 <FormItem width="100%" label="DatePicker" bindTo="date" required="true" type="datePicker"/>
             </Form>
 
@@ -430,11 +430,11 @@
 
         <ComponentSection heading="Form">
             <Form id="form"
-                  subject="{{ text: 'some value here', integer: 123, number: 123.4, file: '', radio: '0', switcher: true, checkbox: true, select: '1' }}">
+                  data="{{ text: 'some value here', integer: 123, number: 123.4, file: '', radio: '0', switcher: true, checkbox: true, select: '1' }}">
                 <event name="save">
                     <APICall url="/form-test"
                                 method="post"
-                                body="{subject}"/>
+                                body="{data}"/>
                 </event>
                 <FlowLayout gap="1rem">
                     <FormItem width="50%" label="TextBox" bindTo="text" required="true"/>

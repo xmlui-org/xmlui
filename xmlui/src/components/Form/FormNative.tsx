@@ -1,4 +1,12 @@
-import {CSSProperties, Dispatch, FormEvent, ForwardedRef, ReactNode, useImperativeHandle, useRef} from "react";
+import {
+  type CSSProperties,
+  type Dispatch,
+  type FormEvent,
+  type ForwardedRef,
+  type ReactNode,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import styles from "./Form.module.scss";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
@@ -12,7 +20,7 @@ import type { GenericBackendError } from "@components-core/EngineError";
 import { ValidationSummary } from "@components/ValidationSummary/ValidationSummary";
 import { useEvent } from "@components-core/utils/misc";
 import { groupInvalidValidationResultsBySeverity } from "@components/FormItem/Validations";
-import {FormAction, formReset} from "@components/Form/formActions";
+import { type FormAction, formReset } from "@components/Form/formActions";
 import {
   backendValidationArrived,
   FormActionKind,
@@ -29,8 +37,8 @@ import type {
   RegisterComponentApiFn,
   ValueExtractor,
 } from "@abstractions/RendererDefs";
-import { FormMd } from "./Form";
-import {useModalFormClose} from "@components/ModalDialog/ModalVisibilityContext";
+import type { FormMd } from "./Form";
+import { useModalFormClose } from "@components/ModalDialog/ModalVisibilityContext";
 
 const setByPath = (obj: any, path: string, val: any) => {
   const keys = path.split(".");
@@ -450,7 +458,7 @@ export function FormWithContextVar({
     return {
       type: "Fragment",
       vars: {
-        $subject: formState.subject,
+        $data: formState.subject,
       },
       children: node.children,
     };
@@ -472,7 +480,7 @@ export function FormWithContextVar({
       onSubmit={lookupEventHandler("submit")}
       onCancel={lookupEventHandler("cancel")}
       onReset={lookupEventHandler("reset")}
-      initialValue={extractValue(node.props.subject)}
+      initialValue={extractValue(node.props.data)}
       buttonRow={renderChild(node.props.buttonRowTemplate)}
       registerComponentApi={registerComponentApi}
     >

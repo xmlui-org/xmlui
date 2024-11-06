@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useReducer } from "react";
+import React, { useEffect, useId, useMemo, useReducer } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import { useToast } from "@/src/hooks/useToast";
 import {
-  appDescriptionInitialized, contentChanged,
+  appDescriptionInitialized,
+  contentChanged,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
@@ -16,6 +17,7 @@ import styles from "./StandalonePlayground.module.scss";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
+  const id = useId();
 
   const queryParams = useMemo(() => {
     if (typeof window !== "undefined") {
@@ -25,10 +27,10 @@ export const StandalonePlayground = () => {
   }, []);
 
   useEffect(() => {
-    document.documentElement.style.scrollbarGutter = 'auto';
+    document.documentElement.style.scrollbarGutter = "auto";
 
     return () => {
-      document.documentElement.style.scrollbarGutter = '';
+      document.documentElement.style.scrollbarGutter = "";
     };
   }, []);
 
@@ -38,7 +40,7 @@ export const StandalonePlayground = () => {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         dispatch(appDescriptionInitialized(data.standalone));
         dispatch(optionsInitialized({ ...playgroundState.options, ...data.options }));
-        dispatch(contentChanged(data.options.content))
+        dispatch(contentChanged(data.options.content));
       } catch (e) {
         showToast({
           type: "error",
@@ -62,13 +64,15 @@ export const StandalonePlayground = () => {
       originalAppDescription: playgroundState.originalAppDescription,
       appDescription: playgroundState.appDescription,
       dispatch,
+      playgroundId: id,
     };
   }, [
     playgroundState.status,
     playgroundState.options,
     playgroundState.text,
-    playgroundState.appDescription,
     playgroundState.originalAppDescription,
+    playgroundState.appDescription,
+    id,
   ]);
 
   return (
@@ -76,7 +80,7 @@ export const StandalonePlayground = () => {
       <PlaygroundContext.Provider value={playgroundContextValue}>
         <ErrorBoundary>
           <div className={styles.standalonePlayground}>
-            {!playgroundState.options.previewMode && <Header standalone={true}/>}
+            {!playgroundState.options.previewMode && <Header standalone={true} />}
             <div style={{ flexGrow: 1, overflow: "auto" }}>
               <PlaygroundContent standalone={true} />
             </div>

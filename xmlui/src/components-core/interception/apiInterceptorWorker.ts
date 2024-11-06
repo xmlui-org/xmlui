@@ -1,4 +1,4 @@
-import { setupWorker } from "msw/browser";
+import { SetupWorker, setupWorker } from "msw/browser";
 import { isArray } from "lodash-es";
 import { RequestHandler, http } from "msw";
 
@@ -17,9 +17,12 @@ function createHandlers(api: ApiInterceptor): RequestHandler[] {
     }
     urls.forEach((operationUrl) => {
       handlers.push(
-        http[operation.method](`${api.getApiUrl()}${operationUrl}`, async ({ request, cookies, params }) => {
-          return await api.executeOperation(operationId, request, cookies, params);
-        })
+        http[operation.method](
+          `${api.getApiUrl()}${operationUrl}`,
+          async ({ request, cookies, params }) => {
+            return await api.executeOperation(operationId, request, cookies, params);
+          },
+        ),
       );
     });
   });
@@ -27,9 +30,17 @@ function createHandlers(api: ApiInterceptor): RequestHandler[] {
 }
 
 // Create the worker for the ApiInterceptorProvider
-export const createApiInterceptorWorker = async (apiInterceptorDefinition: ApiInterceptorDefinition) => {
+export const createApiInterceptorWorker = async (
+  apiInterceptorDefinition: ApiInterceptorDefinition,
+  apiWorker: SetupWorker | null,
+) => {
   const apiInstance = new ApiInterceptor(apiInterceptorDefinition);
   await apiInstance.initialize();
   const handlers = createHandlers(apiInstance);
-  return setupWorker(...handlers);
+  let worker = apiWorker;
+  if (!worker) {
+    worker = setupWorker();
+  }
+  worker.use(...handlers);
+  return worker;
 };

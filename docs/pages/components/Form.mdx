@@ -18,7 +18,7 @@ The following example demonstrates using it:
 
 ```ueml copy {9-18}
 <Form id="searchForm" padding="0.5rem"
-  subject="{{ search: 'Seattle', caseSensitive: false }}"
+  data="{{ search: 'Seattle', caseSensitive: false }}"
   onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
   saveLabel="Search"
   var.isSearching="{false}">
@@ -44,7 +44,7 @@ This example mimics a one-second search and turns off the submit button during t
   name="Example: buttonRowTemplate"
   app={`
     <Form id="searchForm" padding="0.5rem"
-      subject="{{ search: 'Seattle', caseSensitive: false }}"
+      data="{{ search: 'Seattle', caseSensitive: false }}"
       onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
       saveLabel="Search"
       var.isSearching="{false}">
@@ -69,6 +69,10 @@ This example mimics a one-second search and turns off the submit button during t
 
 This property defines the label of the Cancel button, by default, "Cancel".
 
+### `data`
+
+This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
+
 ### `itemLabelBreak`
 
 This boolean value indicates if form item labels can be split into multiple lines if it would overflow the available label width. Individual `FormItem` instances can override this property.
@@ -89,10 +93,6 @@ This property defines the label of the Save button to display during the form da
 
 This property defines the label of the Save button, by default, "Save".
 
-### `subject`
-
-This property sets the initial value of the form's data structure. The form infrastructure uses this value to set the initial state of form items within the form.
-
 ### `swapCancelAndSave`
 
 By default, the Cancel button is to the left of the Save button. Set this property to `true` to swap them or `false` to keep their original location.
@@ -109,11 +109,11 @@ The form infrastructure fires this event when the form is reset.
 
 ### `submit`
 
-The form infrastructure fires this event when the form is submitted. The event argument is the current `subject` value to save.
+The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save.
 
 ```ueml copy {3}
 <Form padding="0.5rem"
-  subject="{{ name: 'Joe', age: 43 }}"
+  data="{{ name: 'Joe', age: 43 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout columnGap="12px" paddingBottom="6px">
     <FormItem bindTo="name" label="Customer name" width="50%" />
@@ -127,7 +127,7 @@ The form infrastructure fires this event when the form is submitted. The event a
   name="Example: submit"
   app={`
     <Form padding="0.5rem"
-      subject="{{ name: 'Joe', age: 43 }}"
+      data="{{ name: 'Joe', age: 43 }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout columnGap="12px" paddingBottom="6px">
         <FormItem bindTo="name" label="Customer name" width="50%" />
@@ -140,7 +140,7 @@ The form infrastructure fires this event when the form is submitted. The event a
 
 ## Context Values
 
-### `$subject`
+### `$data`
 
 This property represents the value of the form data. You can access the fields of the form using the IDs in the `bindTo` property of nested `FormItem` instances.
 
@@ -148,9 +148,9 @@ The following sample demonstrates enabling a field according to another's curren
 
 ```ueml copy {4}
 <Form
-  subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+  data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
   <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+  <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
 </Form>
 ```
 
@@ -159,9 +159,9 @@ The following sample demonstrates enabling a field according to another's curren
   height={250}
   app={`
     <Form
-      subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+      data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
       <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+      <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
     </Form>
   `}
 />

@@ -83,6 +83,7 @@ module.exports = {
         // 'react/display-name': 'off',
         // '@typescript-eslint/no-non-null-assertion': 'off',
         'react/prop-types': 'off',
+        'prefer-const': 'off'
       }
     },
 

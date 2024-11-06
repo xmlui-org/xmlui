@@ -29,7 +29,7 @@ export const FormMd = createMetadata({
         `lines if it would overflow the available label width. Individual \`FormItem\` ` +
         `instances can override this property.`,
     ),
-    subject: d(
+    data: d(
       `This property sets the initial value of the form's data structure. The form infrastructure ` +
         `uses this value to set the initial state of form items within the form.`,
     ),
@@ -47,13 +47,13 @@ export const FormMd = createMetadata({
   events: {
     submit: d(
       `The form infrastructure fires this event when the form is submitted. The event argument ` +
-        `is the current \`subject\` value to save.`,
+        `is the current \`data\` value to save.`,
     ),
     cancel: d(`The form infrastructure fires this event when the form is canceled.`),
     reset: d(`The form infrastructure fires this event when the form is reset.`),
   },
   contextVars: {
-    $subject: d(
+    $data: d(
       `This property represents the value of the form data. You can access the fields of the form ` +
         `using the IDs in the \`bindTo\` property of nested \`FormItem\` instances.`,
     ),

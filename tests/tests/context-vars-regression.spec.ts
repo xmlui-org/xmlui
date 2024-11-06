@@ -98,7 +98,7 @@ test("context vars in formItems", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
     <Fragment>
-      <Form subject="{{ customText: 'hello {1 + 2}' }}">
+      <Form data="{{ customText: 'hello {1 + 2}' }}">
           <FormItem bindTo="customText">
             <TextBox initialValue="{$value}" testId="textBox"/>
           </FormItem>

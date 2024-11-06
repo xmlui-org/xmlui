@@ -4,7 +4,7 @@
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
       id="contactForm" 
-      subject="{initialData}">
+      data="{initialData}">
       <event name="submit">
         <APICall
           url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"

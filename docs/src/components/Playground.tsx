@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useReducer } from "react";
+import React, { useEffect, useId, useMemo, useReducer } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import {
@@ -14,11 +14,13 @@ import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
 import { Header } from "@/src/components/Header";
+import { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
 type PlaygroundProps = {
   name: string;
   description?: string;
   app: string;
+  api?: ApiInterceptorDefinition;
   themes?: ThemeDefinition[];
   defaultTheme?: string;
   defaultTone?: string;
@@ -34,24 +36,29 @@ type PlaygroundProps = {
   emulatedApi: string;
 };
 
+const EMPTY_ARRAY = [];
+const EMPTY_OBJECT = {};
+
 export const Playground = ({
   name,
   description,
   app,
-  themes = [],
+  themes = EMPTY_ARRAY,
   defaultTheme,
   defaultTone,
-  resources = {},
+  resources = EMPTY_OBJECT,
   previewOnly = false,
-  components = [],
+  components = EMPTY_ARRAY,
   height,
   initialEditorHeight = "50%",
   swapped = false,
   horizontal = false,
   allowStandalone = true,
+  api,
   emulatedApi,
 }: PlaygroundProps) => {
   const { theme, systemTheme } = useTheme();
+  const id = useId();
 
   useEffect(() => {
     if (app) {
@@ -69,6 +76,7 @@ export const Playground = ({
           },
           components,
           app,
+          api,
         }),
       );
 
@@ -95,12 +103,13 @@ export const Playground = ({
     if (!defaultTone) {
       dispatch(toneChanged(nextraTone!));
     }
-  }, [theme, systemTheme]);
+  }, [theme, systemTheme, defaultTone]);
 
   const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
 
   const playgroundContextValue = useMemo(() => {
     return {
+      playgroundId: id,
       status: playgroundState.status,
       options: playgroundState.options,
       text: playgroundState.text,
@@ -109,11 +118,12 @@ export const Playground = ({
       dispatch,
     };
   }, [
+    id,
     playgroundState.status,
     playgroundState.options,
     playgroundState.text,
-    playgroundState.appDescription,
     playgroundState.originalAppDescription,
+    playgroundState.appDescription,
   ]);
 
   return (

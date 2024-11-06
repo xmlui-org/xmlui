@@ -222,7 +222,7 @@ Add the highlighted elements to `ContactForm`:
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
       id="contactForm" 
-      subject="{{}}"
+      data="{{}}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
       <FormItem
         label="Full name" 
@@ -254,8 +254,8 @@ Add the highlighted elements to `ContactForm`:
 ```
 
 The `Form` component is responsible for editing the nested data items.
-Its `subject` property describes the data to edit.
-Each `FormItem` acts as an input field that is associated with an attribute of the original `subject` via the `bindTo` property.
+Its `data` property describes the data to edit.
+Each `FormItem` acts as an input field that is associated with an attribute of the original `data` via the `bindTo` property.
 
 <Callout type="info" emoji="📔">
   The `FormItem` bound to the `categoryId` property is more complex.
@@ -292,7 +292,7 @@ The current implementation of `ContactForm` starts with empty data, so you shoul
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
       id="contactForm" 
-      subject="{initialData}"
+      data="{initialData}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
       <!-- Unchanged -->
     </Form>
@@ -304,7 +304,7 @@ The current implementation of `ContactForm` starts with empty data, so you shoul
 ```
 
 The `initialData` variable will contain the data for editing.
-The form will use this data as the `subject`.
+The form will use this data as the `data`.
 The form's `open` method used to receive only the mode (add or edit) as its argument;
 the modified implementation now receives the initial data to use as well.
 
@@ -380,7 +380,7 @@ Change the `submit` event handler in the `ContactForm` component by removing the
     title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
     <Form 
       id="contactForm" 
-      subject="{initialData}">
+      data="{initialData}">
       <event name="submit">
         <APICall
           url="/api/contacts"
