@@ -126,6 +126,7 @@ export function useCompiledTheme(
       mergedThemeVars = {
         ...mergedThemeVars,
         ...theme.themeVars,
+        ...(theme.themeVars?.[activeTone] as unknown as Record<string, string>),
         ...theme.tones?.[activeTone]?.themeVars,
       };
     });
@@ -135,6 +136,7 @@ export function useCompiledTheme(
       ...themeDefChain
         .map((themeDef) => ({
           ...themeDef.themeVars,
+          ...(themeDef.themeVars?.[activeTone] as unknown as Record<string, string>),
           ...themeDef.tones?.[activeTone]?.themeVars,
         }))
         .slice(0, themeDefChain.length - 1),
@@ -147,6 +149,7 @@ export function useCompiledTheme(
       {
         ...expandTheme({
           ...themeDefChain[themeDefChain.length - 1].themeVars,
+          ...themeDefChain[themeDefChain.length - 1].themeVars?.[activeTone] as unknown as Record<string, string>,
           ...themeDefChain[themeDefChain.length - 1].tones?.[activeTone]
             ?.themeVars,
         }),
