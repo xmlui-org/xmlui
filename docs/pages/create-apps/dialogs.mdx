@@ -148,8 +148,7 @@ The declarative approach allows you to provide deep links to open modal dialogs.
 ```ueml copy {2-8} /onClick="dialog.open()"/
 <App>
   <ModalDialog id="dialog">
-    <Form
-      subject="{{ name: 'Leslie', age: 32 }}">
+    <Form data="{{ name: 'Leslie', age: 32 }}">
       <FormItem bindTo="name" label="User Name" />
       <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
     </Form>
@@ -178,8 +177,7 @@ The following code contains only a `dialog.open` action, which displays the dial
   app={`
   <App>
     <ModalDialog id="dialog">
-      <Form
-        subject="{{ name: 'Leslie', age: 32 }}">
+      <Form data="{{ name: 'Leslie', age: 32 }}">
         <FormItem bindTo="name" label="User Name" />
         <FormItem bindTo="age" label="Age" type="integer" zeroOrPositive="true" />
       </Form>
