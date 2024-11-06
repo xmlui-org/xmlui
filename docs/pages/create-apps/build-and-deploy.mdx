@@ -19,15 +19,46 @@ The simple structure of XMLUI apps contains a few folders and files, as this tab
 | --- | --- |
 | **`index.html`** | The default webpage to display |
 | **`Main.xmlui`** | The XMLUI app's entry point |
-| **`Main.xmlui.xs`** | Optional code-behind file for the app's entry point |
-| **`components`** | The folder with the app's XMLUI components (empty) |
-| **`resources`** | The folder with static app resources like images, logos, icons, etc. |
-| **`themes`** | The folder theme files. |
+| **`Main.xmlui.xs`** | (*Optional*) Code-behind file for the app's entry point |
+| **`components`** | (*Optional*) The folder with the app's XMLUI components (empty) |
+| **`resources`** | (*Optional*) The folder with static app resources like images, logos, icons, etc. |
+| **`themes`** | (*Optional*) The folder theme files. |
 | **`xmlui`** | The folder with XMLUI core framework, optional features, and third-party components |
-| **`start.bat`** | The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
-| **`start.sh`** | The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
+| **`config.json`** | (*Optional*) The app configuration file |
+| **`emulatedApi.js`** | (*Optional*) The API for the emulated backend |
+| **`emulatedApiWorker.js`** | (*Optional*) The service worker for emulated backend |
+| **`start.bat`** | (*Optional*) The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
+| **`start.sh`** | (*Optional*) The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
 
 All folders except `xmlui` are optional as your app may not contain resources, app-specific components, or themes.
+
+### Emulated API
+
+XMLUI provides API emulation, which allows you to create apps that communicate with browser-injected emulated endpoints instead of an actual remote backend. You do not need to change the source code of XMLUI apps to use this technology. Only plug in the API emulation; your app will use the emulated endpoints.
+
+<Callout type="info" emoji="📔">
+This technology is still under development. We use it in the tutorials and documentation samples, and we may make it available for XMLUI app developers in the future.
+</Callout>
+
+Two files, `emulatedApi.js` and `emulatedApiWorker.js`, are present only in backend emulation apps.
+
+If you have an emulated backend, the `emulatedApi.js` file should be loaded in `index.html` (before the XMLUI framework):
+
+```html copy filename="index.html" {6} /emulatedApi.js/
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="./emulatedApi.js"></script>
+  <script src="./xmlui/xmlui-standalone.umd.js"></script>
+</head>
+<body>
+</body>
+</html>
+```
+
+The framework will automatically load the `emulatedApiWorker.js` file (if present and needed) while initializing.
 
 ### Component files
 
