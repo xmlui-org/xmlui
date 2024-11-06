@@ -77,6 +77,7 @@ export const Playground = ({
           api,
         }),
       );
+
       dispatch(
         optionsInitialized({
           orientation: horizontal ? "horizontal" : "vertical",
@@ -91,6 +92,7 @@ export const Playground = ({
         }),
       );
     }
+
     //TODO illesg, review (dep array?)!!!
   }, []);
 
