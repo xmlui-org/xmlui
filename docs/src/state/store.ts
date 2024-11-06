@@ -4,6 +4,7 @@ import produce from "immer";
 import { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { builtInThemes } from "@components-core/theming/ThemeProvider";
 import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -32,6 +33,7 @@ type AppDescription = {
   components: any[];
   app: any;
   availableThemes?: Array<ThemeDefinition>;
+  api?: ApiInterceptorDefinition;
 };
 
 export interface IPlaygroundContext {
@@ -41,6 +43,7 @@ export interface IPlaygroundContext {
   dispatch: Dispatch<PlaygroundAction>;
   text: string;
   options: Options;
+  playgroundId: string;
 }
 
 export const PlaygroundContext = createContext<IPlaygroundContext>(
@@ -193,6 +196,7 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
         state.appDescription.components = compoundComponents;
         state.appDescription.app = action.payload.appDescription.app;
         state.appDescription.config = action.payload.appDescription.config;
+        state.appDescription.api = action.payload.appDescription.api;
         state.text = action.payload.appDescription.app;
         const themes = action.payload.appDescription.config.themes || [];
         state.appDescription.availableThemes = [...themes, ...builtInThemes];
@@ -236,14 +240,14 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
         state.text = JSON.stringify(state.originalAppDescription.config, null, 2);
       } else if (
         state.appDescription.components
-            .map((c) => c.name.toLowerCase())
-            .includes(state.options.content?.toLowerCase())
-    ) {
-      state.text =
+          .map((c) => c.name.toLowerCase())
+          .includes(state.options.content?.toLowerCase())
+      ) {
+        state.text =
           state.originalAppDescription.components.find(
-              (component: CompoundComponentDef) => component.name === state.options.content,
+            (component: CompoundComponentDef) => component.name === state.options.content,
           )?.component || "";
-    }
+      }
       break;
     }
     case PlaygroundActionKind.CONTENT_CHANGED: {
@@ -264,9 +268,11 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
             (component: CompoundComponentDef) => component.name === state.options.content,
           )?.component || "";
         state.options.language = "ueml";
-      } else if (state.appDescription.config.themes
-        .map((t) => t.id.toLowerCase())
-        .includes(state.options.content?.toLowerCase())) {
+      } else if (
+        state.appDescription.config.themes
+          .map((t) => t.id.toLowerCase())
+          .includes(state.options.content?.toLowerCase())
+      ) {
         state.text = JSON.stringify(
           state.appDescription.config.themes.find(
             (theme: ThemeDefinition) => theme.id === state.options.content,
@@ -275,7 +281,6 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
           2,
         );
         state.options.language = "json";
-
       }
       break;
     }
@@ -290,15 +295,13 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
         state.text = action.payload.text || "";
         if (state.options.content === "app") {
           state.appDescription.app = state.text;
-        }
-        else if (state.options.content === "config") {
+        } else if (state.options.content === "config") {
           try {
             state.appDescription.config = JSON.parse(state.text || "");
           } catch (e) {
             console.log(e);
           }
-        }
-        else if (
+        } else if (
           state.appDescription.components?.some(
             (component: CompoundComponentDef) => component.name === state.options.content,
           )
@@ -314,20 +317,19 @@ export const playgroundReducer = produce((state: PlaygroundState, action: Playgr
               return component;
             },
           );
-        }
-        else if (
+        } else if (
           state.appDescription.config.themes?.some(
             (theme: ThemeDefinition) => theme.id === state.options.content,
           )
         ) {
           try {
             state.appDescription.config.themes = state.appDescription.config.themes.map(
-                (theme: ThemeDefinition) => {
-                  if (theme.id === state.options.content) {
-                    return JSON.parse(state.text || "");
-                  }
-                  return theme;
-                },
+              (theme: ThemeDefinition) => {
+                if (theme.id === state.options.content) {
+                  return JSON.parse(state.text || "");
+                }
+                return theme;
+              },
             );
           } catch (e) {
             console.log(e);

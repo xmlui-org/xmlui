@@ -13,15 +13,16 @@ export class DataLoaderQueryKeyGenerator {
   private readonly queryParams?: UrlQueryParamsPart;
   private key?: DataLoaderQueryKey;
 
-  constructor (url: UrlKeyPart, queryParams?: UrlQueryParamsPart) {
+  constructor (url: UrlKeyPart, queryParams: UrlQueryParamsPart | undefined, apiUrl: string | undefined) {
     this.url = url;
     this.queryParams = queryParams;
+    this.key = [url];
     if(queryParams){
-      this.key = [url, queryParams];
-    } else {
-      this.key = [url];
+      this.key.push(queryParams);
     }
-    
+    if(apiUrl){
+      this.key.push(apiUrl);
+    }
   }
 
   asKey () {

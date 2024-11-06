@@ -10,9 +10,11 @@ import { IApiInterceptorContext } from "@abstractions/AppContextDefs";
 export function ApiInterceptorProvider({
   interceptor,
   children,
+  apiWorker,
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
+  apiWorker?: SetupWorker;
 }) {
   const [initialized, setInitialized] = useState(!interceptor);
 
@@ -28,24 +30,29 @@ export function ApiInterceptorProvider({
         if (process.env.VITE_MOCK_ENABLED) {
           const { createApiInterceptorWorker } = await import("./apiInterceptorWorker");
           if (interceptor) {
-            interceptorWorker = await createApiInterceptorWorker(interceptor);
-            interceptorWorker.start({
-              onUnhandledRequest: "bypass",
-              waitUntilReady: true,
-              quiet: true,
-              serviceWorker: {
-                url: process.env.VITE_MOCK_WORKER_LOCATION || "/mockServiceWorker.js",
-              }
-            });
+            interceptorWorker = await createApiInterceptorWorker(interceptor, apiWorker);
+            // if the apiWorker comes from the outside, we don't handle the lifecycle here
+            if (!apiWorker) {
+              await interceptorWorker.start({
+                onUnhandledRequest: "bypass",
+                quiet: true,
+                serviceWorker: {
+                  url: process.env.VITE_MOCK_WORKER_LOCATION || "/mockServiceWorker.js",
+                },
+              });
+            }
           }
         }
         setInitialized(true);
       })();
       return () => {
-        interceptorWorker?.stop();
+        // if the apiWorker comes from the outside, we don't handle the lifecycle here
+        if (!apiWorker) {
+          interceptorWorker?.stop();
+        }
       };
     }
-  }, [interceptor]);
+  }, [apiWorker, interceptor]);
 
   const contextValue: IApiInterceptorContext = useMemo(() => {
     return {
