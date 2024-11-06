@@ -1,5 +1,5 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createPropHolderComponentNew } from "@components-core/renderers";
+import { createPropHolderComponent } from "@components-core/renderers";
 
 const COMP = "Slot";
 
@@ -15,4 +15,4 @@ export const SlotMd = createMetadata({
   opaque: true
 });
 
-export const SlotHolder = createPropHolderComponentNew(COMP, SlotMd);
+export const SlotHolder = createPropHolderComponent(COMP, SlotMd);
