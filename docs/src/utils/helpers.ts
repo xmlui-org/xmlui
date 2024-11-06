@@ -69,7 +69,7 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
 
 export const handleDownloadZip = async (appDescription: any) => {
   const zip = new JSZip();
-  const emulatedApi = appDescription.options?.emulatedApi;
+  const emulatedApi = appDescription.api;
 
   if (emulatedApi) {
     const indexWithApiHtml = await fetch("/resources/files/for-download/index-with-api.html").then(
