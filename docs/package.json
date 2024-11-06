@@ -7,7 +7,8 @@
     "build": "next build",
     "postbuild": "rm -rf .next/cache",
     "start": "next start",
-    "release-ci": "npm run build && xmlui zip-dist"
+    "release-ci": "npm run build && xmlui zip-dist",
+    "refresh-samples": "node scripts/refresh-samples.mjs"
   },
   "dependencies": {
     "@monaco-editor/react": "4.5.2",
@@ -43,6 +44,7 @@
     "@types/node": "20.7.0",
     "@types/react": "18.2.23",
     "@types/react-dom": "18.2.8",
+    "adm-zip": "^0.5.16",
     "babel-loader": "9.1.3",
     "next-transpile-modules": "10.0.1",
     "raw-loader": "4.0.2",

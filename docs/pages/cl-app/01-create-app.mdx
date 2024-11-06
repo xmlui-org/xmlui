@@ -13,9 +13,9 @@ The unzipped content has the following folders and files:
 | `Main.xmlui` | The XMLUI app's entry point |
 | `components` | The folder with the app's XMLUI components (empty) |
 | `resources` | The folder with static app resources like images, logos, icons, etc. |
-| `xmlui‑standalone.umd.js` | The XMLUI framework's runtime |
-| `mockServiceWorker.js` | The mock service worker for emulated backend |
-| `mock.js` | The API for the emulated backend |
+| `xmlui` | The folder with the XMLUI framework's runtime |
+| `emulatedApiWorker.js` | The service worker for emulated backend |
+| `emulatedApi.js` | The API for the emulated backend |
 | `start.bat` | The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
 | `start.sh` | The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
 
@@ -23,6 +23,8 @@ The unzipped content has the following folders and files:
 Remember, you need a local web server to run the XMLUI app. Install the LTS version of Node.js on your machine (https://nodejs.org/en), for you will use the **http-server** Node package to host the tutorial.
 
 In your command prompt, select the downloaded sample's unzipped folder (with the cd command), and run `start.bat` on Windows or `start.sh` on Mac or Linux, which will start the web server and open your browser with the app.
+
+Alternatively, you can start the webserver directly by issuing the `npx -y http-server -o` command.
 </Callout>
 
 This is how the sample app should appear:

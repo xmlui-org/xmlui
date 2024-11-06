@@ -1,0 +1,27 @@
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>  
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="Contacts" to="/contacts" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">Dashboard</Page>
+    <Page url="/contacts">
+      <DataSource id="categories" url="/api/categories" />
+      <List data="/api/contacts">
+        <ContactRow item="{$item}" categories="{categories.value}" />
+      </List>
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>

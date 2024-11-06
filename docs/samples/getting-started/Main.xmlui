@@ -1,0 +1,22 @@
+<App 
+  name="Tutorial"
+  logo="resources/xmlui-logo.svg"
+  logo-dark="resources/xmlui-logo-dark.svg">
+<NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavLink label="SpaceX List" to="/spacexlist" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      <Home />
+    </Page>
+    <Page url="/spacexlist">
+      <List data="https://api.spacexdata.com/v3/history">
+        <Card title="{$item.title}" subTitle="{$item.details}" />
+      </List>
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>

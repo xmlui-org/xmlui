@@ -1,0 +1,41 @@
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>  
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <NavPanel>
+    <NavLink label="Dashboard" to="/" />
+    <NavLink label="All Contacts ({contactCounts.value.all})" to="/contacts/all" />
+    <NavLink label="Overdue Reviews ({contactCounts.value.overdue})" to="/contacts/overdue"/>
+    <NavLink label="Today's Reviews ({contactCounts.value.today})" to="/contacts/today"/>
+    <NavLink label="Upcoming Reviews ({contactCounts.value.upcoming})" to="/contacts/upcoming"/>
+    <NavLink label="Completed Reviews ({contactCounts.value.completed})" to="/contacts/completed"/>
+  </NavPanel>
+  <Pages>
+    <Page url="/">Dashboard</Page>
+    <Page url="/contacts/all">
+      <Contacts filter="" />
+    </Page>
+    <Page url="/contacts/overdue">
+      <Contacts filter="overdue" />
+    </Page>
+    <Page url="/contacts/today">
+      <Contacts filter="today" />
+    </Page>
+    <Page url="/contacts/upcoming">
+      <Contacts filter="upcoming" />
+    </Page>
+    <Page url="/contacts/completed">
+      <Contacts filter="completed" />
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>
