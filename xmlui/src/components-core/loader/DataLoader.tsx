@@ -1,11 +1,12 @@
-import {useCallback, useMemo, useRef} from "react";
+import { useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
-  LoaderLoadedFn, TransformResultFn,
+  LoaderLoadedFn,
+  TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
 import type { ContainerState } from "@components-core/container/ContainerComponentDef";
 import type { LoaderDirections } from "@components-core/loader/PageableLoader";
@@ -41,7 +42,7 @@ function DataLoader({
   loaderInProgressChanged,
   loaderLoaded,
   loaderError,
-  transformResult
+  transformResult,
 }: LoaderProps) {
   const appContext = useAppContext();
   const url = extractParam(state, loader.props.url, appContext);
@@ -69,21 +70,28 @@ function DataLoader({
     return new RestApiProxy(appContext);
   }, [appContext]);
 
-  const doLoad = useCallback(async (abortSignal?: AbortSignal, pageParams?: any) => {
-    return await api.execute({
-      abortSignal,
-      operation: loader.props as any,
-      params: {
-        ...state,
-        $pageParams: pageParams,
-      },
-      resolveBindingExpressions: true,
-    });
-  }, [api, loader.props, state]);
+  const doLoad = useCallback(
+    async (abortSignal?: AbortSignal, pageParams?: any) => {
+      return await api.execute({
+        abortSignal,
+        operation: loader.props as any,
+        params: {
+          ...state,
+          $pageParams: pageParams,
+        },
+        resolveBindingExpressions: true,
+      });
+    },
+    [api, loader.props, state],
+  );
 
   const queryId = useMemo(() => {
-    return new DataLoaderQueryKeyGenerator(url, queryParams).asKey();
-  }, [queryParams, url]);
+    return new DataLoaderQueryKeyGenerator(
+      url,
+      queryParams,
+      appContext?.globals.apiUrl,
+    ).asKey();
+  }, [appContext?.globals.apiUrl, queryParams, url]);
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };
@@ -95,7 +103,7 @@ function DataLoader({
       const inProgressMessage = extractParam(
         stateRef.current.state,
         loader.props.inProgressNotificationMessage,
-        stateRef.current.appContext
+        stateRef.current.appContext,
       );
       if (isInProgress && inProgressMessage) {
         if (loadingToastIdRef.current) {
@@ -108,7 +116,7 @@ function DataLoader({
         }
       }
     },
-    [loader.props.inProgressNotificationMessage, loaderInProgressChanged]
+    [loader.props.inProgressNotificationMessage, loaderInProgressChanged],
   );
 
   const loaded: LoaderLoadedFn = useCallback(
@@ -120,7 +128,7 @@ function DataLoader({
           $result: data,
         },
         loader.props.completedNotificationMessage,
-        stateRef.current.appContext
+        stateRef.current.appContext,
       );
       if (completedMessage) {
         toast.success(completedMessage, {
@@ -132,15 +140,15 @@ function DataLoader({
         }
       }
     },
-    [loader.props.completedNotificationMessage, loaderLoaded]
+    [loader.props.completedNotificationMessage, loaderLoaded],
   );
 
   const error: LoaderErrorFn = useCallback(
     async (error) => {
       loaderError(error);
-      if(onError){
+      if (onError) {
         const result = await onError(error);
-        if(result === false) {
+        if (result === false) {
           if (loadingToastIdRef.current) {
             toast.dismiss(loadingToastIdRef.current);
           }
@@ -153,7 +161,7 @@ function DataLoader({
           $error: error,
         },
         loader.props.errorNotificationMessage,
-        stateRef.current.appContext
+        stateRef.current.appContext,
       );
       if (errorMessage) {
         toast.error(errorMessage, {
@@ -168,9 +176,8 @@ function DataLoader({
         appContext.signError(error as Error);
       }
     },
-    [appContext, loader.props.errorNotificationMessage, loaderError, onError]
+    [appContext, loader.props.errorNotificationMessage, loaderError, onError],
   );
-
 
   const pollIntervalInSeconds = extractParam(state, loader.props.pollIntervalInSeconds, appContext);
   return hasPaging ? (
@@ -234,7 +241,16 @@ type DataLoaderDef = ComponentDef<typeof DataLoaderMd>;
 
 export const dataLoaderRenderer = createLoaderRenderer(
   "DataLoader",
-  ({ loader, state, loaderLoaded, loaderInProgressChanged, loaderError, registerComponentApi, lookupAction, lookupSyncCallback }) => {
+  ({
+    loader,
+    state,
+    loaderLoaded,
+    loaderInProgressChanged,
+    loaderError,
+    registerComponentApi,
+    lookupAction,
+    lookupSyncCallback,
+  }) => {
     return (
       <DataLoader
         loader={loader}
@@ -249,5 +265,5 @@ export const dataLoaderRenderer = createLoaderRenderer(
       />
     );
   },
-  DataLoaderMd
+  DataLoaderMd,
 );
