@@ -53,13 +53,15 @@ function isAxiosResponse(response: AxiosResponse | Response): response is AxiosR
 }
 
 async function parseResponseJson(response: AxiosResponse | Response) {
-  let resp;
+  let resp: any;
   if (isAxiosResponse(response)) {
     resp = response.data;
   } else {
     try {
       resp = await response.clone().json();
-    } catch (e) {}
+    } catch (e: any) {
+      console.error("Failed to parse response as JSON", response.body);
+    }
   }
   return resp;
 }
