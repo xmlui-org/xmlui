@@ -8,7 +8,7 @@ You can learn more about this component in the [Using Forms](../learning/using-c
 
 ```ueml copy /autoFocus="true"/
 <Form padding="0.5rem"
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
@@ -19,7 +19,7 @@ You can learn more about this component in the [Using Forms](../learning/using-c
 <Playground
   name="Example: autoFocus"
   app={`<Form padding="0.5rem"
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
@@ -31,11 +31,11 @@ You can learn more about this component in the [Using Forms](../learning/using-c
 
 %-PROP-START bindTo
 
-Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `subject`.
+Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `data`.
 
 ```ueml copy /bindTo="firstname"/
 <Form padding="0.5rem"
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" />
@@ -46,7 +46,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 <Playground
   name="Example: bindTo"
   app={`<Form padding="0.5rem"
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
 >
   <FormItem label="Firstname" bindTo="firstname" />
@@ -80,7 +80,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
 ```ueml copy {3} /initialValue/
 <Form
   padding="0.5rem"
-  subject="{{ firstname: 'Michael', lastname: undefined }}"
+  data="{{ firstname: 'Michael', lastname: undefined }}"
 >
   <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
   <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
@@ -91,7 +91,7 @@ Try to enter some kind of text in the input field labelled `Lastname` and submit
   name="Example: initialValue"
   app={`<Form
   padding="0.5rem"
-  subject="{{ firstname: 'Michael', lastname: undefined }}"
+  data="{{ firstname: 'Michael', lastname: undefined }}"
 >
   <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
   <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
@@ -148,7 +148,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 ```ueml copy /lengthInvalidMessage="Name is too long!"/
 <Form
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -160,7 +160,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 <Playground
   name="Example: lengthInvalidMessage"
   app={`<Form
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -180,7 +180,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 
 ```ueml copy /lengthInvalidSeverity="warning"/
 <Form
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -192,7 +192,7 @@ In the app, type a name longer than four characters in both fields, then leave t
 <Playground
   name="Example: lengthInvalidSeverity"
   app={`<Form
-  subject="{{ firstname: 'James', lastname: 'Clewell' }}"
+  data="{{ firstname: 'James', lastname: 'Clewell' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -212,7 +212,7 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 
 ```ueml copy /maxLength="4"/
 <Form
-  subject="{{ firstname: 'James' }}"
+  data="{{ firstname: 'James' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -223,7 +223,7 @@ In the demo below, try to enter an input longer than 4 characters or submit the 
 <Playground
   name="Example: maxLength"
   app={`<Form
-  subject="{{ firstname: 'James' }}"
+  data="{{ firstname: 'James' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -239,7 +239,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 
 ```ueml copy /minLength="4"/
 <Form
-  subject="{{ firstname: '' }}"
+  data="{{ firstname: '' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -250,7 +250,7 @@ In the demo below, enter an input shorter than 4 characters or just submit the f
 <Playground
   name="Example: minLength"
   app={`<Form
-  subject="{{ firstname: '' }}"
+  data="{{ firstname: '' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -269,7 +269,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 
 ```ueml copy /maxValue="99"/
 <Form
-  subject="{{ age: 100 }}"
+  data="{{ age: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -280,7 +280,7 @@ In the demo below, enter an input greater than 99 or just submit the form as is.
 <Playground
   name="Example: maxValue"
   app={`<Form
-  subject="{{ age: 100 }}"
+  data="{{ age: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -299,7 +299,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 
 ```ueml copy /minValue="18"/
 <Form
-  subject="{{ age: 0 }}"
+  data="{{ age: 0 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -310,7 +310,7 @@ In the demo below, enter an input smaller than 18 or just submit the form as is.
 <Playground
   name="Example: minValue"
   app={`<Form
-  subject="{{ age: 0 }}"
+  data="{{ age: 0 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -334,7 +334,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 
 ```ueml copy /pattern="email"/
 <Form
-  subject="{{ userEmail: 'mailto' }}"
+  data="{{ userEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -345,7 +345,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 <Playground
   name="Example: regex"
   app={`<Form
-  subject="{{ userEmail: 'mailto' }}"
+  data="{{ userEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -361,7 +361,7 @@ In the demo below, enter anything that does not look like an email and click out
 
 ```ueml copy /patternInvalidMessage="This does not look like an email"/
 <Form
-  subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -373,7 +373,7 @@ In the demo below, enter anything that does not look like an email and click out
 <Playground
   name="Example: patternInvalidMessage"
   app={`<Form
-  subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -393,7 +393,7 @@ In the demo below, enter a string of characters that does not look like an email
 
 ```ueml copy /patternInvalidSeverity="warning"/
 <Form
-  subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -405,7 +405,7 @@ In the demo below, enter a string of characters that does not look like an email
 <Playground
   name="Example: patternInvalidSeverity"
   app={`<Form
-  subject="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -423,7 +423,7 @@ Just submitting the form as is also produces the same error.
 
 ```ueml copy /rangeInvalidMessage="Out of range!"/
 <Form
-  subject="{{ age: 100, customAge: 100 }}"
+  data="{{ age: 100, customAge: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -435,7 +435,7 @@ Just submitting the form as is also produces the same error.
 <Playground
   name="Example: rangeInvalidMessage"
   app={`<Form
-  subject="{{ age: 100, customAge: 100 }}"
+  data="{{ age: 100, customAge: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -456,7 +456,7 @@ Just submitting the form as is also produces the same error.
 
 ```ueml copy /rangeInvalidSeverity="warning"/
 <Form
-  subject="{{ age: 100, customAge: 100 }}"
+  data="{{ age: 100, customAge: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -468,7 +468,7 @@ Just submitting the form as is also produces the same error.
 <Playground
   name="Example: rangeInvalidSeverity"
   app={`<Form
-  subject="{{ age: 100, customAge: 100 }}"
+  data="{{ age: 100, customAge: 100 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -485,7 +485,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 
 ```ueml copy /regex="^[a-z]+$"/
 <Form
-  subject="{{ password: 'PASSWORD123' }}"
+  data="{{ password: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -496,7 +496,7 @@ In the demo below, enter an input that is not solely one lowercase string or jus
 <Playground
   name="Example: regex"
   app={`<Form
-  subject="{{ password: 'PASSWORD123' }}"
+  data="{{ password: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -512,7 +512,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 
 ```ueml copy /regexInvalidMessage="Password must be all lowercase"/
 <Form
-  subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -524,7 +524,7 @@ In the demo below, enter a password that is not a lowercase string and click out
 <Playground
   name="Example: regexInvalidMessage"
   app={`<Form
-  subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -545,7 +545,7 @@ Just submitting the form as is also produces the same error.
 
 ```ueml copy /regexInvalidSeverity="warning"/
 <Form
-  subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -557,7 +557,7 @@ Just submitting the form as is also produces the same error.
 <Playground
   name="Example: regexInvalidSeverity"
   app={`<Form
-  subject="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -572,7 +572,7 @@ Just submitting the form as is also produces the same error.
 
 ```ueml copy /required="true"/
 <Form
-  subject="{{ name: undefined }}"
+  data="{{ name: undefined }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -583,7 +583,7 @@ Just submitting the form as is also produces the same error.
 <Playground
   name="Example: required"
   app={`<Form
-  subject="{{ name: undefined }}"
+  data="{{ name: undefined }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -598,7 +598,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 
 ```ueml copy /requiredInvalidMessage="Lastname is required!"/
 <Form
-  subject="{{ firstname: undefined, lastname: undefined }}"
+  data="{{ firstname: undefined, lastname: undefined }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -610,7 +610,7 @@ In the demo below, leave the field empty and click outside to see the regular an
 <Playground
   name="Example: requiredInvalidMessage"
   app={`<Form
-  subject="{{ firstname: undefined, lastname: undefined }}"
+  data="{{ firstname: undefined, lastname: undefined }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -664,7 +664,7 @@ Note how changing the input in the demo below will result in a slight delay of i
 ```ueml copy /customValidationsDebounce="3000"/
 <Form
   var.validations="Validations: "
-  subject="{{ name: 'Joe' }}"
+  data="{{ name: 'Joe' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -681,7 +681,7 @@ Note how changing the input in the demo below will result in a slight delay of i
   name="Example: customValidationsDebounce"
   app={`<Form
   var.validations="Validations: "
-  subject="{{ name: 'Joe' }}"
+  data="{{ name: 'Joe' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -710,7 +710,7 @@ In the demo below, leave the field as is and submit the form or enter an input t
 
 ```ueml copy {8}
 <Form
-  subject="{{ name: 'James' }}"
+  data="{{ name: 'James' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >
@@ -724,7 +724,7 @@ In the demo below, leave the field as is and submit the form or enter an input t
 <Playground
   name="Example: validate"
   app={`<Form
-  subject="{{ name: 'James' }}"
+  data="{{ name: 'James' }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
   padding="0.5rem"
 >

@@ -4,15 +4,15 @@ You can learn more about this component in the [Using Forms](/learning/using-com
 
 %-DESC-END
 
-%-CONTEXT_VAR-START $subject
+%-CONTEXT_VAR-START data
 
 The following sample demonstrates enabling a field according to another's current value.
 
 ```ueml copy {4}
 <Form
-  subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+  data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
   <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+  <FormItem enabled="{data.isEnabled}" label="Name" bindTo="name" />
 </Form>
 ```
 
@@ -21,9 +21,9 @@ The following sample demonstrates enabling a field according to another's curren
   height={250}
   app={`
     <Form
-      subject="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+      data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
       <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{$subject.isEnabled}" label="Name" bindTo="name" />
+      <FormItem enabled="{data.isEnabled}" label="Name" bindTo="name" />
     </Form>
   `}
 />
@@ -36,7 +36,7 @@ The following example demonstrates using it:
 
 ```ueml copy {9-18}
 <Form id="searchForm" padding="0.5rem"
-  subject="{{ search: 'Seattle', caseSensitive: false }}"
+  data="{{ search: 'Seattle', caseSensitive: false }}"
   onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
   saveLabel="Search"
   var.isSearching="{false}">
@@ -62,7 +62,7 @@ This example mimics a one-second search and turns off the submit button during t
   name="Example: buttonRowTemplate"
   app={`
     <Form id="searchForm" padding="0.5rem"
-      subject="{{ search: 'Seattle', caseSensitive: false }}"
+      data="{{ search: 'Seattle', caseSensitive: false }}"
       onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
       saveLabel="Search"
       var.isSearching="{false}">
@@ -89,7 +89,7 @@ This example mimics a one-second search and turns off the submit button during t
 
 ```ueml copy {3}
 <Form padding="0.5rem"
-  subject="{{ name: 'Joe', age: 43 }}"
+  data="{{ name: 'Joe', age: 43 }}"
   onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
   <FlowLayout columnGap="12px" paddingBottom="6px">
     <FormItem bindTo="name" label="Customer name" width="50%" />
@@ -103,7 +103,7 @@ This example mimics a one-second search and turns off the submit button during t
   name="Example: submit"
   app={`
     <Form padding="0.5rem"
-      subject="{{ name: 'Joe', age: 43 }}"
+      data="{{ name: 'Joe', age: 43 }}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
       <FlowLayout columnGap="12px" paddingBottom="6px">
         <FormItem bindTo="name" label="Customer name" width="50%" />

@@ -101,7 +101,7 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
-    <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}"
+    <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}"
       onCancel="dialog.close()"
       onSubmit="dialog.close()">
       <FormItem bindTo="firstName" required="true" />
@@ -118,7 +118,7 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
   <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" title="Example Dialog">
-      <Form subject="{{ firstName: 'Billy', lastName: 'Bob' }}"
+      <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}"
         onCancel="dialog.close()"
         onSubmit="dialog.close()">
         <FormItem bindTo="firstName" required="true" />

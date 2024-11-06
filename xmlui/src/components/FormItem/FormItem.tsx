@@ -25,8 +25,8 @@ export const FormItemMd = createMetadata({
   props: {
     bindTo: d(
       `This property binds a particular input field to one of the attributes of the \`Form\` data. ` +
-        `It names the property of the form's \`subject\` data to get the input's initial value. When ` +
-        `the field is saved, its value will be stored in the \`subject\` property with this name.`,
+        `It names the property of the form's \`data\` data to get the input's initial value.` +
+        `When the field is saved, its value will be stored in the \`data\` property with this name.`,
     ),
     autoFocus: dAutoFocus(),
     label: dLabel(),
