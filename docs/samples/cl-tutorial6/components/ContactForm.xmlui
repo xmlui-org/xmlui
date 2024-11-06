@@ -1,0 +1,42 @@
+<Component name="ContactForm" var.mode="" var.initialData="">
+  <ModalDialog 
+    id="dialog" 
+    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
+    <Form 
+      id="contactForm" 
+      subject="{initialData}">
+      <event name="submit">
+        <APICall
+          url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
+          method="{mode === 'add' ? 'post' : 'put'}"
+          body="{$eventArgs}" />
+      </event>
+      <FormItem
+        label="Full name" 
+        placeholder="Specify the contact name" 
+        bindTo="fullName" autoFocus="true"
+        maxLength="64" 
+        required="true" />
+      <FormItem label="Review due date" bindTo="reviewDueDate" type="datePicker" />
+      <FormItem
+        label="Comments" 
+        placeholder="Add comments here"
+        bindTo="comments"
+        type="textarea" 
+        maxLength="256" />
+      <DataSource id="categories" method="get" url="/api/categories"/>
+      <FormItem 
+        placeholder="Select a category" 
+        bindTo="categoryId"
+        initialValue="{$props.contact.categoryId}"
+        type="select">
+        <Items items="{categories.value}">
+          <Option label="{$item.name}" value="{$item.id}"/>
+        </Items>
+      </FormItem>
+    </Form>
+  </ModalDialog>
+  <method 
+    name="open" 
+    value="(m, d) => { mode = m; initialData = d; dialog.open(); }" />
+</Component>

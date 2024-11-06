@@ -1,0 +1,33 @@
+<Component name="Contacts">
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
+  <ContactForm id="contactForm" />
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus" onClick="contactForm.open('add', {})">New Contact</Button>
+    </HStack>  
+    <List 
+        items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+        defaultSections="{!$props.filter
+            ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+        sectionBy="section">    
+        <ContactRow 
+            item="{$item}" 
+            onEditClicked="(selected) => contactForm.open('edit', selected)" />
+        <property name="sectionTemplate">
+        <HStack 
+            horizontalPadding="$space-normal" 
+            verticalPadding="$space-tight"
+            verticalAlignment="center"
+            onClick="() => $context.toggle()">
+            <Text 
+                variant="subtitle" 
+                value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
+            <SpaceFiller />
+            <Icon 
+            name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
+            size="md" />  
+        </HStack>
+        </property>
+    </List>
+  </VStack>  
+</Component>

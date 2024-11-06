@@ -26,21 +26,7 @@ export function createComponentRenderer<TMd extends ComponentMetadata>(
  * @param type Component type
  * @param metadata Component metadata
  */
-export function createPropHolderComponent<T extends ComponentDef>(
-  type: T["type"],
-  metadata?: ComponentMetadata,
-) {
-  return createComponentRenderer(type, metadata, () => {
-    throw new Error("Prop holder component, shouldn't render");
-  });
-}
-
-/**
- * Create a non-visual component used for encapsulating property values
- * @param type Component type
- * @param metadata Component metadata
- */
-export function createPropHolderComponentNew<TMd extends ComponentMetadata>(
+export function createPropHolderComponent<TMd extends ComponentMetadata>(
   type: string,
   metadata?: TMd,
 ) {

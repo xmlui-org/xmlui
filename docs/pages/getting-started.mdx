@@ -52,7 +52,10 @@ In the following sections, you will change and extend the app. During these slig
 The sample's root folder contains a `Main.xmlui` file, which is the app's entry point. Open this file in your code editor. Scroll down to the bottom of this file and modify the `<Footer>` element's content by changing the "Powered by XMLUI" text to something else:
 
 ```ueml copy /I modified it!!!/ filename="Main.xmlui"
-<App>
+<App 
+  name="Tutorial"
+  logo="resources/xmlui-logo.svg"
+  logo-dark="resources/xmlui-logo-dark.svg">
   <AppHeader>
     <!-- ... -->
   </AppHeader>
@@ -90,8 +93,11 @@ The SpaceX API endpoint in this sample retrieves other data fields, including li
 
 This functionality is a cooperation of a couple of components within `App`: `NavLink`, and `Page`:
 
-```ueml filename="Main.xmlui" {3,7-11} /NavLink/ /Page/
-<App>
+```ueml filename="Main.xmlui" {6,10-14} /NavLink/ /Page/
+<App 
+  name="Tutorial"
+  logo="resources/xmlui-logo.svg"
+  logo-dark="resources/xmlui-logo-dark.svg">
   <NavPanel>
     <NavLink label="SpaceX List" to="/spacexlist" />
     <!-- Other menu items omitted -->

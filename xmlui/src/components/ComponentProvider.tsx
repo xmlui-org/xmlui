@@ -132,7 +132,7 @@ import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
 import {carouselComponentRenderer} from "@components/Carousel/Carousel";
 import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
-import {createPropHolderComponentNew} from "@components-core/renderers";
+import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 
@@ -145,8 +145,9 @@ type ComponentProviderProps = {
   contributes: ContributesDefinition;
 };
 
-const textNodePropHolder = createPropHolderComponentNew("TextNode");
-const textNodeCDataPropHolder = createPropHolderComponentNew("TextNodeCData");
+const dataSourcePropHolder = createPropHolderComponent("DataSource");
+const textNodePropHolder = createPropHolderComponent("TextNode");
+const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 
 
 
@@ -168,6 +169,7 @@ export class ComponentRegistry {
     }
 
     this.registerComponentRenderer(SlotHolder);
+    this.registerComponentRenderer(dataSourcePropHolder);
     this.registerComponentRenderer(textNodePropHolder);
     this.registerComponentRenderer(textNodeCDataPropHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {

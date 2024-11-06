@@ -1,0 +1,4 @@
+<Component name="CategoryBadge">
+  <DataSource id="categories" url="/api/categories" />
+  <Badge when="{category.id}" value="{category.name}" colorMap="{categoriesColorMap}"/>
+</Component>

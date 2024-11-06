@@ -1,0 +1,26 @@
+<Component name="Contacts">
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
+  <List 
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+    defaultSections="{!$props.filter
+        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+    sectionBy="section">    
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="sectionTemplate">
+      <HStack 
+        horizontalPadding="$space-normal" 
+        verticalPadding="$space-tight"
+        verticalAlignment="center"
+        onClick="() => $context.toggle()">
+          <Text 
+            variant="subtitle" 
+            value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
+        <SpaceFiller />
+        <Icon 
+          name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
+          size="md" />  
+      </HStack>
+    </property>
+  </List>
+</Component>

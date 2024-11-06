@@ -1,0 +1,22 @@
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>  
+  <NavPanel>
+    <NavLink label="Home" to="/" />
+  </NavPanel>
+  <Pages>
+    <Page url="/">
+      Home
+    </Page>
+  </Pages>
+  <Footer>
+    Powered by XMLUI
+  </Footer>
+</App>
