@@ -303,7 +303,7 @@ export const RootThemeDefinition: ThemeDefinition = {
 
         // --- Input is an abstract component, so we define its default theme variables here
         "color-bg-Input-default": "white",
-        "color-border-Input-default": $colorSurface400,
+        "color-border-Input-default": $colorSurface200,
         "color-border-Input-default--hover": $colorSurface600,
         "color-border-Input-default--focus": $colorSurface600,
         "color-border-Input-default--success": $colorSuccess600,
@@ -346,13 +346,9 @@ export const RootThemeDefinition: ThemeDefinition = {
         "color-text--disabled": $colorSurface500,
 
         // --- Input is an abstract component, so we define its default theme variables here
-        "color-bg-Input-default": $colorSurface950,
-        "color-bg-Input-warning": $colorSurface950,
-        "color-bg-Input-error": $colorSurface950,
-        "color-bg-Input-success": $colorSurface950,
-        "color-border-Input-default": $colorSurface400,
-        "color-border-Input-default--hover": $colorSurface200,
-        "color-border-Input-default--focus": $colorSurface200,
+        "color-border-Input-default": $colorSurface800,
+        "color-border-Input-default--hover": $colorSurface500,
+        "color-border-Input-default--focus": $colorSurface500,
         "color-border-Input-default--success": $colorSuccess600,
         "color-border-Input-default--warning": $colorWarn700,
         "color-border-Input-default--error": $colorDanger500,
