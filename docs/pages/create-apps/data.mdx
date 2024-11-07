@@ -145,48 +145,177 @@ Though using the `data` property is extremely easy, there are situations when yo
   The `DataSource` component provides **more control of the fetch operation** with its methods and state information.
 </Callout>
 
+<Callout type="info" emoji="📔">
+This samples in this section use XMLUI's emulated API feature.
+</Callout>
+
 ### Accessing the Data
 
-You can use `DataSource` with any component that does not handle data natively. The `value` property represents retrieved data when the fetch is complete.
+You can use `DataSource` with any component (even if that one does not handle data natively). When the fetch is complete, the `value` property represents retrieved data.
+
+In the following example, you use the `value` property to set the contents of `H3`:
+
+```ueml copy /fruits.value/
+<App>
+  <DataSource id='fruits' url='/api/fruits'/>
+  <HStack verticalAlignment="center">
+  <H3>These are the {fruits.value.length} fruits:</H3>
+  <Items data="{fruits}">
+    <Badge value="{$item}" />
+  </Items>
+  </HStack>
+</App>
+```
 
 <Playground
-    name="Example: Hello, World!"
-    api={{
-        initialize: `
-          $state.message = 'Hello, World from XMLUI!';
+  name="Example: Use data from a DataSource"
+  api={{
+    initialize: `
+      $state.fruits = ['apple', 'banana', 'cherry', 'pear'];
+    `,
+    operations: {
+      'get-fruits': {
+        method: 'get',
+        url: '/api/fruits',
+        handler: `
+          return $state.fruits;
         `,
-        operations: {
-            'something': {
-                method: 'get',
-                url: '/api/something',
-                handler: `
-                  return $state.message;
-                `,
-            },
-        }
-    }}
-    app={`
+      },
+    }
+  }}
+  app={`
     <App>
-      Hello, World from XMLUI!
-      <DataSource id='something' url='/api/something'/>
-      <Text value="{something}"/>
+      <DataSource id='fruits' url='/api/fruits'/>
+      <HStack verticalAlignment="center">
+      <H3>These are the {fruits.value.length} fruits:</H3>
+      <Items data="{fruits}">
+        <Badge value="{$item}" />
+      </Items>
+      </HStack>
     </App>
   `}
-    height={100}
+  height={100}
 />
-_TBD_
 
 ### Refreshing the data
 
 `DataSource` exposes a method, `refetch`, which you can use imperatively to re-query the data. The following markup demonstrates using it:
 
-_TBD_ 
+```ueml copy /coords.refetch()/
+<App>
+  <DataSource id='coords' url='/api/coords'/>
+  <Button label="Refresh" onClick="coords.refetch()" />
+  <Text>Satelite position: x={coords.value.x}, y={coords.value.y}</Text>
+</App>
+```
+
+<Playground
+  name="Example: Refreshing data"
+  api={{
+    initialize: `
+      $state.click = 0;
+    `,
+    operations: {
+      'get-coords': {
+        method: 'get',
+        url: '/api/coords',
+        handler: `
+          const coords = { x: ($state.click * 1.523).toFixed(4), y: ($state.click * 2.421).toFixed(4) };
+          $state.click++;
+          return coords;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='coords' url='/api/coords'/>
+      <Button label="Refresh" onClick="coords.refetch()" />
+      <Text>Satelite position: x={coords.value.x}, y={coords.value.y}</Text>
+    </App>
+  `}
+  height={140}
+/>
+
+### Periodic Polling
+
+`DataSource` allows you to periodically poll the backend for data. Use the `pollIntervalInSeconds` property to set this period, as the following example shows:
+
+```ueml copy /pollIntervalInSeconds="3"/
+<App var.pollCount="{0}">
+  <DataSource 
+    id='rand' 
+    url='/api/random' 
+    pollIntervalInSeconds="3" 
+    onLoaded="pollCount++"/>
+  <H3>Poll temperature in every 3 seconds (#{pollCount})</H3>
+  <Text>Current random temperature: {rand.value}</Text>
+</App>
+```
+
+Besides getting the data, this app uses the `loaded` event of `DataSource` to count the number of polls.
+
+<Playground
+  name="Example: Automatic polling"
+  api={{
+    initialize: `
+      $state.click = 0;
+    `,
+    operations: {
+      'get-coords-2': {
+        method: 'get',
+        url: '/api/random',
+        handler: `
+          return (Math.random() * 40 + 40).toFixed(4);
+        `,
+      },
+    }
+  }}
+  app={`
+    <App var.pollCount="{0}">
+      <DataSource 
+        id='rand' 
+        url='/api/random' 
+        pollIntervalInSeconds="3" 
+        onLoaded="pollCount++"/>
+      <H3>Poll temperature in every 3 seconds (#{pollCount})</H3>
+      <Text>Current random temperature: {rand.value}</Text>
+    </App>
+  `}
+  height={120}
+/>
 
 ### In-Progress State
 
 You can quickly determine if a data fetch operation is in progress. `DataSource` offers a property, `inProgress,` which indicates whether the data is currently being fetched. The following sample shows using this property:
 
-_TBD_
+<Playground
+  name="Example: Automatic polling"
+  api={{
+    initialize: `
+      $state.click = 0;
+    `,
+    operations: {
+      'get-total': {
+        method: 'get',
+        url: '/api/monthly-total',
+        handler: `
+          delay(2000);
+          return Math.random() * 12000 + 800;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App var.pollCount="{0}">
+      <DataSource id='orders' url='/api/monthly-total' />
+      <Button onClick="orders.refetch()">Query #of total orders</Button>
+      <Text when="{orders.inProgress}">Calculating...</Text>
+      <H2 when="{!orders.inProgress}">Total Orders: {orders.value}</H2>
+    </App>
+  `}
+  height={140}
+/>
 
 ### Binding Component Properties to DataSource
 
