@@ -153,84 +153,19 @@ Though using the `data` property is extremely easy, there are situations when yo
 
 You can use `DataSource` with any component that does not handle data natively. The `value` property represents retrieved data when the fetch is complete.
 
-For example, the following component uses a public API to query and show registered brewery information for Los Angeles:
-
-```ueml copy /breweries.value.length/
-<App>
-  <DataSource id="breweries" url="https://api.openbrewerydb.org/breweries?by_city=Los%20Angeles" />
-  <H2>Number of registered open breweries in Los Angeles: {breweries.value.length}</H2>
-</App>  
-```
-
-This data query retrieves an array; thus, `breweries.value.length` represents the number of entries in the response.
-
-<Playground
-  previewOnly
-  name="Example: Using value"
-  app={`
-    <App>
-      <DataSource id="breweries" url="https://api.openbrewerydb.org/breweries?by_city=Los%20Angeles" />
-      <H2>Number of registered open breweries in Los Angeles: {breweries.value.length}</H2>
-    </App>  
-  `}
-  height={100}
-/>
+_TBD_
 
 ### Refreshing the data
 
 `DataSource` exposes a method, `refetch`, which you can use imperatively to re-query the data. The following markup demonstrates using it:
 
-```ueml copy /issData.refetch/
-<App>
-  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-  <DataSource id="quoteData" url="https://api.quotable.io/random" />
-  <H2>{quoteData.value.content}</H2>
-</App>  
-```
-
-This app uses a public API to obtain a random quote. Here, `quoteData.value` represents the data retrieved from the URL; the text displays the `content` field.
-
-<Playground
-  previewOnly
-  name="Example: Using refetch()"
-  app={`
-    <App>
-      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-      <DataSource id="quoteData" url="https://api.quotable.io/random" />
-      <H2>{quoteData.value.content}</H2>
-    </App>  
-  `}
-  height={180}
-/>
+_TBD_ 
 
 ### In-Progress State
 
 You can quickly determine if a data fetch operation is in progress. `DataSource` offers a property, `inProgress,` which indicates whether the data is currently being fetched. The following sample shows using this property:
 
-```ueml copy /when="{!issData.inProgress}"/ /when="{issData.inProgress}"/
-<App>
-  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-  <DataSource id="quoteData" url="https://api.quotable.io/random" />
-  <Text when="{quoteData.inProgress}">Loading...</Text>
-  <H2 when="{!quoteData.inProgress}">{quoteData.value.content}</H2>
-</App>  
-```
-
-The app displays a "Loading..." message during the fetch. When the data is obtained, the app displays the ISS coordinates. Check how the markup leverages components' `when` attributes to hide and show them.
-
-<Playground
-  previewOnly
-  name="Example: Testing whether data fetch is in progress"
-  app={`
-    <App>
-      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-      <DataSource id="quoteData" url="https://api.quotable.io/random" />
-      <Text when="{quoteData.inProgress}">Loading...</Text>
-      <H2 when="{!quoteData.inProgress}">{quoteData.value.content}</H2>
-    </App>  
-  `}
-  height={180}
-/>
+_TBD_
 
 ### Binding Component Properties to DataSource
 
@@ -238,30 +173,7 @@ When you bind a `DataSource` component instance to a property, XMLUI starts the 
 
 The following sample demonstrates this scenario:
 
-```ueml copy /quoteData/
-<App>
-  <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-  <DataSource id="quoteData" url="https://api.quotable.io/random" 
-  resultSelector="content"/>
-  <H2 value="{quoteData}" />
-</App>  
-```
-
-Here, the `value` property of `H2` is set to the data retrieved by the `quoteData` data source.
-
-<Playground
-  previewOnly
-  name="Example: Testing whether data fetch is in progress"
-  app={`
-    <App>
-      <Button label="Ask for a new quote" onClick="quoteData.refetch()" />
-      <DataSource id="quoteData" url="https://api.quotable.io/random" 
-      resultSelector="content"/>
-      <H2 value="{quoteData}" />
-    </App>  
-  `}
-  height={200}
-/>
+_TBD_
 
 ## Persisting Data
 
