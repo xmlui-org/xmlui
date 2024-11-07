@@ -368,7 +368,7 @@ function RootContentComponent({
       navigate,
       confirm,
       signError: handleError,
-      toast: toast,
+      toast,
       loggedInUser: localLoggedInUser,
       setLoggedInUser: setLocalLoggedInUser,
       queryClient,
@@ -480,7 +480,7 @@ const RootComponent = ({
     HelmetProvider.canUseDOM = false;
   }
 
-  const siteName = (globalProps?.name || "XMLUI app");
+  const siteName = globalProps?.name || "XMLUI app";
 
   const dynamicChildren = (
     <HelmetProvider>

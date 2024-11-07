@@ -7,6 +7,7 @@ const TOASTER_CONTAINER_STYLE: CSSProperties = {
   bottom: 40,
   left: 40,
   position: "absolute",
+  overflowY: "hidden",
 };
 
 type NotificationToastProps = {
