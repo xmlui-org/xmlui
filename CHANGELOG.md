@@ -1,5 +1,13 @@
 # xmlui Changelog
 
+## v0.6.3
+
+### Breaking changes:
+
+- Renaming in `Form`: 
+  - `subject` property is now `data`.
+  - `$subject` context value is now `$data`
+
 ## v0.6.1
 
 ### Breaking changes:
