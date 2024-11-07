@@ -33,6 +33,7 @@ export type ApiInterceptorDefinition = {
   initialData?: Record<string, any[]> | (() => Promise<Record<string, any[]>>);
 
   helpers?: Record<string, any>;
+  initialize?: string;
 
   // Available operations
   operations?: Record<string, InterceptorOperationDef>;
@@ -82,6 +83,7 @@ export interface IDatabase {
   deleteItems(collectionName: string, predicate: (item: any) => Promise<boolean>): Promise<void>;
   insertItem(collectionName: string, item: any): Promise<any>;
   updateItem(collectionName: string, item: any): Promise<any>;
+  updateItem(collectionName: string, item: any): Promise<any>;
 }
 
 // Represents the request parameters the backed translates to operations
@@ -103,6 +105,7 @@ export type RequestParams = {
 // Represents the definition of a particular backed
 export type BackendDefinition = {
   initialData?: Record<string, any[]>;
+  initialize?: string;
   helpers?: Record<string, any>;
   operations: Record<string, string>;
 };

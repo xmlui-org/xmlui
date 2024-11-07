@@ -20,6 +20,7 @@ export function Preview() {
     () =>
       appDescription.api
         ? {
+            type: "in-memory",
             ...appDescription.api,
             apiUrl: apiUrl + (appDescription.api?.apiUrl || ""),
           }
