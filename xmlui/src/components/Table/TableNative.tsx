@@ -532,7 +532,7 @@ export const Table = forwardRef(
             <div className={styles.noRows}>No data available</div>
           ))}
         {hasData && (
-          <table className={styles.table} ref={tableRef}>
+          <table className={styles.table} ref={tableRef} style={{borderRight: "1px solid transparent"}}>
             {!hideHeader && (
               <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
                 {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
