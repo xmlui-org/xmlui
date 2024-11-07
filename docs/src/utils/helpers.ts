@@ -122,3 +122,36 @@ export const handleDownloadZip = async (appDescription: any) => {
     console.error("An error occurred while generating the ZIP:", error);
   }
 };
+
+export function preprocessCode(code: string): string {
+  // Split code by newlines
+  const lines = code.split("\n");
+
+  // Remove whitespace-only lines from the beginning and end
+  let start = 0;
+  while (start < lines.length && lines[start].trim() === "") {
+    start++;
+  }
+
+  let end = lines.length - 1;
+  while (end >= 0 && lines[end].trim() === "") {
+    end--;
+  }
+
+  const trimmedLines = lines.slice(start, end + 1);
+
+  // Calculate the minimum indentation
+  const minIndent = Math.min(
+      ...trimmedLines
+          .filter(line => line.trim() !== "") // Ignore empty lines for indentation
+          .map(line => line.match(/^\s*/)[0].length) // Count leading spaces
+  );
+
+  // Remove minIndent spaces from the beginning of each line
+  const result = trimmedLines.map(line =>
+      line.startsWith(" ".repeat(minIndent)) ? line.slice(minIndent) : line
+  );
+
+  // Join lines back into a single string
+  return result.join("\n");
+}
