@@ -1,5 +1,5 @@
 import { textChanged } from "@/src/state/store";
-import React, {useEffect, useMemo} from "react";
+import React, { useEffect, useMemo } from "react";
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { UEMLGrammar } from "@/syntax/monaco/grammar.monacoLanguage";
@@ -7,6 +7,7 @@ import { XmluiScripGrammar } from "@/syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../../syntax/monaco/xmlui-light";
 import xmluiDark from "../../syntax/monaco/xmlui-dark";
 import { useTheme } from "nextra-theme-docs";
+import { preprocessCode } from "@/src/utils/helpers";
 
 export const Editor = () => {
   const { text, dispatch, options } = usePlayground();
@@ -14,7 +15,7 @@ export const Editor = () => {
   const { theme, systemTheme } = useTheme();
 
   const isDark = useMemo(() => {
-    return theme === "dark" || (theme === "system" && systemTheme === "dark")
+    return theme === "dark" || (theme === "system" && systemTheme === "dark");
   }, [theme, systemTheme]);
 
   useEffect(() => {
@@ -26,7 +27,7 @@ export const Editor = () => {
       monaco.editor.defineTheme("ueml-light", xmluiLight);
       monaco.editor.defineTheme("ueml-dark", xmluiDark);
       if (options.language === "ueml") {
-        monaco.editor.setTheme(isDark ? "ueml-dark" : "ueml-light")
+        monaco.editor.setTheme(isDark ? "ueml-dark" : "ueml-light");
       }
       //xmluiscript
       monaco.languages.register({ id: XmluiScripGrammar.id });
@@ -34,6 +35,8 @@ export const Editor = () => {
       monaco.languages.setLanguageConfiguration(XmluiScripGrammar.id, XmluiScripGrammar.config);
     }
   }, [monaco, isDark, options.language]);
+
+  const preprocessedCode = useMemo(() => preprocessCode(text), [text]);
 
   return (
     <MonacoEditor
@@ -49,7 +52,7 @@ export const Editor = () => {
         overviewRulerLanes: 0,
         hideCursorInOverviewRuler: true,
       }}
-      value={text}
+      value={preprocessedCode}
     />
   );
 };
