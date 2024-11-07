@@ -103,10 +103,12 @@ function StandaloneApp({
 
   const mockedApi =
     // @ts-ignore
-    typeof window !== "undefined"  && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
+    typeof window !== "undefined" && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
 
-  // @ts-ignore
-  const shouldDecorateWithTestId = decorateComponentsWithTestId || typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false;
+  const shouldDecorateWithTestId =
+    decorateComponentsWithTestId ||
+      // @ts-ignore
+    (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
 
   return (
     <ApiInterceptorProvider interceptor={mockedApi}>
