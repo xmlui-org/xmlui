@@ -103,13 +103,16 @@ function StandaloneApp({
 
   const mockedApi =
     // @ts-ignore
-    apiInterceptor || (typeof window !== "undefined" ? window.XMLUI_MOCK_API : undefined);
+    typeof window !== "undefined"  && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
+
+  // @ts-ignore
+  const shouldDecorateWithTestId = decorateComponentsWithTestId || typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false;
 
   return (
     <ApiInterceptorProvider interceptor={mockedApi}>
       <RootComponent
         servedFromSingleFile={servedFromSingleFile}
-        decorateComponentsWithTestId={decorateComponentsWithTestId}
+        decorateComponentsWithTestId={shouldDecorateWithTestId}
         node={entryPoint!}
         standalone={true}
         debugEnabled={debugEnabled}
@@ -180,9 +183,14 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     }
   }
 
-  const codeBehind = collectCodeBehindFromSource("Main", code, () => {
-    return "";
-    }, a => a);
+  const codeBehind = collectCodeBehindFromSource(
+    "Main",
+    code,
+    () => {
+      return "";
+    },
+    (a) => a,
+  );
   if (Object.keys(codeBehind.moduleErrors ?? {}).length > 0) {
     return {
       component: errReportModuleErrors(codeBehind.moduleErrors, response.url),
@@ -312,7 +320,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
     // --- Use the components collected from the runtime files; merge the components
     // --- with their code behinds
     Object.entries(componentsByFileName).forEach(([key, compound]) => {
-      const componentCodeBehind = codeBehindsByFileName[`${key}.xs`]
+      const componentCodeBehind = codeBehindsByFileName[`${key}.xs`];
       const componentWithCodeBehind = {
         ...compound,
         component: {
@@ -411,7 +419,6 @@ function useStandalone(
     (async function () {
       const resolvedRuntime = resolveRuntime(runtime);
       const appDef = mergeAppDefWithRuntime(resolvedRuntime, standaloneAppDef);
-
 
       // --- In dev mode or when the app is inlined (provided we do not use the standalone mode),
       // --- we must have the app definition available.
