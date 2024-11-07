@@ -23,6 +23,7 @@ export const COMPONENT_COLUMN = "/components/Column";
 export const COMPONENT_COMBOBOX = "/components/Combobox";
 export const COMPONENT_CONTENTSEPARATOR = "/components/ContentSeparator";
 export const COMPONENT_CVSTACK = "/components/CVStack";
+export const COMPONENT_DATASOURCE = "/components/DataSource";
 export const COMPONENT_DATEPICKER = "/components/DatePicker";
 export const COMPONENT_DROPDOWNMENU = "/components/DropdownMenu";
 export const COMPONENT_EMOJISELECTOR = "/components/EmojiSelector";

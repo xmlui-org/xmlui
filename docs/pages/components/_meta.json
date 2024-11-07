@@ -16,6 +16,7 @@
   "Column": "Column",
   "Combobox": "Combobox",
   "ContentSeparator": "ContentSeparator",
+  "DataSource": "DataSource",
   "DatePicker": "DatePicker",
   "DropdownMenu": "DropdownMenu",
   "EmojiSelector": "EmojiSelector",

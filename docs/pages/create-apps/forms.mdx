@@ -269,7 +269,7 @@ Set each item's width to "50%" to create a two-column layout:
           jobTitle: 'janitor', 
           experience: 'broom' 
         }}" 
-        onSubmit="(toSave) => toast.success(.stringify(toSave))">
+        onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
         <FlowLayout>
           <HStack>
             <FormItem label="Title" bindTo="title" width="100px" />

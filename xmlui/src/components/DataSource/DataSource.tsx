@@ -3,7 +3,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 const COMP = "DataSource";
 
 export const DataSourceMd = createMetadata({
-  status: "in progress",
+  status: "stable",
   description:
     `The \`${COMP}\` component manages fetching data from a web API endpoint. This component ` +
     `automatically manages the complexity of the fetch operation and caching. To manipulate data ` +
