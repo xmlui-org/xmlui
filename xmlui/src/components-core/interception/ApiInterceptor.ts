@@ -2,12 +2,19 @@ import { delay, HttpResponse } from "msw";
 import type { PathParams, StrictRequest } from "msw";
 import { isObject } from "lodash-es";
 
-import type { ApiInterceptorDefinition, AuthDefinition, InterceptorOperationDef, RequestParams } from "./abstractions";
+import type {
+  ApiInterceptorDefinition,
+  AuthDefinition,
+  IDatabase,
+  InterceptorOperationDef,
+  RequestParams
+} from "./abstractions";
 import { Backend, CookieService, HeaderService } from "@components-core/interception/Backend";
 import { IndexedDb } from "@components-core/interception/IndexedDb";
 import { convertRequestParamPart } from "@components-core/utils/request-params";
 import { HttpError, HttpStatusCode } from "@components-core/interception/Errors";
 import { ThrowStatementError } from "@components-core/EngineError";
+import {InMemoryDb} from "@components-core/interception/InMemoryDb";
 
 function mergeHeaders(...sources: HeadersInit[]) {
   const result: Record<string, string> = {};
@@ -63,6 +70,17 @@ export class AuthService {
   }
 }
 
+async function initDb(apiDef: ApiInterceptorDefinition){
+  switch (apiDef.type) {
+    case "in-memory":
+      return new InMemoryDb(apiDef.schemaDescriptor?.tables, apiDef.initialData, apiDef.config);
+    default:
+      const indexedDb = new IndexedDb(apiDef.schemaDescriptor?.tables, apiDef.initialData, apiDef.config);
+      await indexedDb.initialize();
+      return indexedDb;
+  }
+}
+
 // An API interceptor implementation
 export class ApiInterceptor {
   private backend: Backend | null = null;
@@ -75,17 +93,14 @@ export class ApiInterceptor {
     Object.entries(this.apiDef.operations || {}).forEach(([key, value]) => {
       backendOperations[key] = value.handler;
     });
-    // TODO: In the future use the `type` property of ApiInterceptorDefinition to instantiate a backend
-    // Now we use the IndexedDbBackend
+    const db: IDatabase = await initDb(this.apiDef);
     const authService = new AuthService(this.apiDef.auth);
-    const indexedDb = new IndexedDb(this.apiDef.schemaDescriptor?.tables, this.apiDef.initialData, this.apiDef.config);
-    await indexedDb.initialize();
-
     const definition = {
       operations: backendOperations,
+      initialize: this.apiDef.initialize,
       helpers: this.apiDef.helpers,
     };
-    this.backend = new Backend(definition, indexedDb, authService);
+    this.backend = new Backend(definition, db, authService);
   }
 
   public getOperations() {

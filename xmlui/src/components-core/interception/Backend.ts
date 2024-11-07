@@ -84,6 +84,9 @@ export class Backend {
       }
       return helper;
     });
+    if(definition.initialize){
+      this.runFn(definition.initialize);
+    }
   }
 
   async executeOperation(operationId: string, requestParams: RequestParams, cookieService: CookieService, headerService: HeaderService) {
