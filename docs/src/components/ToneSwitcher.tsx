@@ -2,8 +2,9 @@ import { usePlayground } from "@/src/hooks/usePlayground";
 import { toneChanged } from "@/src/state/store";
 import styles from "@/src/components/Header.module.scss";
 import { LuMoon, LuSun } from "react-icons/lu";
+import { forwardRef } from "react";
 
-export function ToneSwitcher() {
+export const ToneSwitcher = forwardRef(() => {
   const { appDescription, options, dispatch } = usePlayground();
   const tone = options.activeTone || appDescription.config.defaultTone || "light";
 
@@ -17,4 +18,4 @@ export function ToneSwitcher() {
       {tone === "light" ? <LuMoon /> : <LuSun />}
     </button>
   );
-}
+});
