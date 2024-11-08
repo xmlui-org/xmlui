@@ -17,24 +17,28 @@ This property sets the label of the component.
 Default value: `false`.
 
 ```ueml copy /autoFocus="true"/
-<Form padding="0.5rem"
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
->
-  <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-  <FormItem label="Lastname" bindTo="lastname" />
-</Form>
+<App>
+  <Form 
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
+    <FormItem label="Lastname" bindTo="lastname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: autoFocus"
-  app={`<Form padding="0.5rem"
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
->
-  <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-  <FormItem label="Lastname" bindTo="lastname" />
-</Form>`}
+  app={`
+    <App>
+      <Form 
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
+        <FormItem label="Lastname" bindTo="lastname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `bindTo`
@@ -44,24 +48,28 @@ This property binds a particular input field to one of the attributes of the `Fo
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `data`.
 
 ```ueml copy /bindTo="firstname"/
-<Form padding="0.5rem"
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
->
-  <FormItem label="Firstname" bindTo="firstname" />
-  <FormItem label="Lastname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem label="Firstname" bindTo="firstname" />
+    <FormItem label="Lastname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: bindTo"
-  app={`<Form padding="0.5rem"
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
->
-  <FormItem label="Firstname" bindTo="firstname" />
-  <FormItem label="Lastname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem label="Firstname" bindTo="firstname" />
+        <FormItem label="Lastname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `customValidationsDebounce`
@@ -73,36 +81,36 @@ The default value is `0`.
 Note how changing the input in the demo below will result in a slight delay of input checks noted by the appearance of a new "I" character.
 
 ```ueml copy /customValidationsDebounce="3000"/
-<Form
-  var.validations="Validations: "
-  data="{{ name: 'Joe' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem
-    customValidationsDebounce="3000"
-    onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
-    bindTo="name"
-  />
-  <Text value="{validations}" />
-</Form>
+<App>
+  <Form
+    var.validations="Validations: "
+    data="{{ name: 'Joe' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem
+      customValidationsDebounce="3000"
+      onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
+      bindTo="name" />
+    <Text value="{validations}" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: customValidationsDebounce"
-  app={`<Form
-  var.validations="Validations: "
-  data="{{ name: 'Joe' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem
-    customValidationsDebounce="3000"
-    onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
-    bindTo="name"
-  />
-  <Text value="{validations}" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        var.validations="Validations: "
+        data="{{ name: 'Joe' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem
+          customValidationsDebounce="3000"
+          onValidate="(value) => { validations += '| '; return value === value.toUpperCase(); }"
+          bindTo="name" />
+        <Text value="{validations}" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `enabled`
@@ -111,19 +119,25 @@ This boolean property value indicates whether the component responds to user eve
 
 Default value: `true`.
 
-```ueml copy {2-3}
-<Form padding="0.5rem">
-  <FormItem label="Firstname" enabled="true" />
-  <FormItem label="Lastname" enabled="false" />
-</Form>
+```ueml copy {3-4}
+<App>
+  <Form>
+    <FormItem label="Firstname" enabled="true" />
+    <FormItem label="Lastname" enabled="false" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  app={`<Form padding="0.5rem">
-  <FormItem label="Firstname" enabled="true" />
-  <FormItem label="Lastname" enabled="false" />
-</Form>`}
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Firstname" enabled="true" />
+        <FormItem label="Lastname" enabled="false" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `initialValue`
@@ -131,24 +145,24 @@ Default value: `true`.
 This property sets the component's initial value.
 
 ```ueml copy {3} /initialValue/
-<Form
-  padding="0.5rem"
-  data="{{ firstname: 'Michael', lastname: undefined }}"
->
-  <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
-  <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
-</Form>
+<App>
+  <Form data="{{ firstname: 'Michael', lastname: undefined }}">
+    <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
+    <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
-  app={`<Form
-  padding="0.5rem"
-  data="{{ firstname: 'Michael', lastname: undefined }}"
->
-  <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
-  <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
-</Form>`}
+  app={`
+    <App>
+      <Form data="{{ firstname: 'Michael', lastname: undefined }}">
+        <FormItem label="Firstname" bindTo="firstname" initialValue="James" />
+        <FormItem label="Lastname" bindTo="lastname" initialValue="Jordan" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `label`
@@ -156,16 +170,22 @@ This property sets the component's initial value.
 This property sets the label of the component.
 
 ```ueml copy /label="Firstname"/
-<Form>
-  <FormItem label="Firstname" />
-</Form>
+<App>
+  <Form>
+    <FormItem label="Firstname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: label"
-  app={`<Form padding="0.5rem">
-  <FormItem label="Firstname" />
-</Form>`}
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Firstname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `labelBreak`
@@ -182,22 +202,28 @@ Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
 
 ```ueml copy /label="Firstname"/
-<Form>
-  <FormItem label="Left Label" labelPosition="left" />
-  <FormItem label="Top Label" labelPosition="top" />
-  <FormItem label="Right Label" labelPosition="right" />
-  <FormItem label="Bottom Label" labelPosition="bottom" />
-</Form>
+<App>
+  <Form>
+    <FormItem label="Left Label" labelPosition="left" />
+    <FormItem label="Top Label" labelPosition="top" />
+    <FormItem label="Right Label" labelPosition="right" />
+    <FormItem label="Bottom Label" labelPosition="bottom" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: labelPosition"
-  app={`<Form padding="0.5rem">
-  <FormItem label="Left Label" labelPosition="left" />
-  <FormItem label="Top Label" labelPosition="top" />
-  <FormItem label="Right Label" labelPosition="right" />
-  <FormItem label="Bottom Label" labelPosition="bottom" />
-</Form>`}
+  app={`
+    <App>
+      <Form>
+        <FormItem label="Left Label" labelPosition="left" />
+        <FormItem label="Top Label" labelPosition="top" />
+        <FormItem label="Right Label" labelPosition="right" />
+        <FormItem label="Bottom Label" labelPosition="bottom" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `labelWidth`
@@ -211,26 +237,28 @@ This optional string property is used to customize the message that is displayed
 In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses the customized one.
 
 ```ueml copy /lengthInvalidMessage="Name is too long!"/
-<Form
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-  <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+    <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: lengthInvalidMessage"
-  app={`<Form
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-  <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+        <FormItem lengthInvalidMessage="Name is too long!" maxLength="4" bindTo="lastname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `lengthInvalidSeverity`
@@ -243,26 +271,28 @@ The default severity level is `error`.
 In the app, type a name longer than four characters in both fields, then leave the edited field. The two fields will display different error messages; the second uses a warning instead of an error.
 
 ```ueml copy /lengthInvalidSeverity="warning"/
-<Form
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-  <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: 'James', lastname: 'Clewell' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+    <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: lengthInvalidSeverity"
-  app={`<Form
-  data="{{ firstname: 'James', lastname: 'Clewell' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-  <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James', lastname: 'Clewell' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+        <FormItem lengthInvalidSeverity="warning" maxLength="4" bindTo="lastname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `maxLength`
@@ -275,24 +305,26 @@ but setting such a value programmatically still results in a validation check.
 In the demo below, try to enter an input longer than 4 characters or submit the form as is.
 
 ```ueml copy /maxLength="4"/
-<Form
-  data="{{ firstname: 'James' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: 'James' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem maxLength="4" bindTo="firstname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: maxLength"
-  app={`<Form
-  data="{{ firstname: 'James' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxLength="4" bindTo="firstname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: 'James' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem maxLength="4" bindTo="firstname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `maxTextLength`
@@ -309,24 +341,26 @@ but setting such a value programmatically still results in a validation check.
 In the demo below, enter an input greater than 99 or just submit the form as is.
 
 ```ueml copy /maxValue="99"/
-<Form
-  data="{{ age: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxValue="99" bindTo="age" type="integer" />
-</Form>
+<App>
+  <Form
+    data="{{ age: 100 }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem maxValue="99" bindTo="age" type="integer" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: maxValue"
-  app={`<Form
-  data="{{ age: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem maxValue="99" bindTo="age" type="integer" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100 }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem maxValue="99" bindTo="age" type="integer" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `minLength`
@@ -336,24 +370,26 @@ Checks whether the input has a minimum length of a specified value.
 In the demo below, enter an input shorter than 4 characters or just submit the form as is.
 
 ```ueml copy /minLength="4"/
-<Form
-  data="{{ firstname: '' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minLength="4" bindTo="firstname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: '' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem minLength="4" bindTo="firstname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: minLength"
-  app={`<Form
-  data="{{ firstname: '' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minLength="4" bindTo="firstname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: '' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem minLength="4" bindTo="firstname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `minValue`
@@ -366,24 +402,26 @@ but setting such a value programmatically still results in a validation check.
 In the demo below, enter an input smaller than 18 or just submit the form as is.
 
 ```ueml copy /minValue="18"/
-<Form
-  data="{{ age: 0 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="18" bindTo="age" type="integer" />
-</Form>
+<App>
+  <Form
+    data="{{ age: 0 }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem minValue="18" bindTo="age" type="integer" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: minValue"
-  app={`<Form
-  data="{{ age: 0 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="18" bindTo="age" type="integer" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ age: 0 }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem minValue="18" bindTo="age" type="integer" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `pattern`
@@ -401,24 +439,26 @@ Checks whether the input fits a predefined regular expression.
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
 ```ueml copy /pattern="email"/
-<Form
-  data="{{ userEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" userEmail="mailto" />
-</Form>
+<App>
+  <Form
+    data="{{ userEmail: 'mailto' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="userEmail" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: regex"
-  app={`<Form
-  data="{{ userEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" bindTo="userEmail" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ userEmail: 'mailto' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="userEmail" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `patternInvalidMessage`
@@ -428,26 +468,32 @@ This optional string property is used to customize the message that is displayed
 In the demo below, enter anything that does not look like an email and click outside to see the regular and custom message.
 
 ```ueml copy /patternInvalidMessage="This does not look like an email"/
-<Form
-  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" bindTo="oldEmail" />
-  <FormItem patternInvalidMessage="This does not look like an email" pattern="email" bindTo="newEmail" />
-</Form>
+<App>
+  <Form
+    data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="oldEmail" />
+    <FormItem 
+      patternInvalidMessage="This does not look like an email" 
+      pattern="email" bindTo="newEmail" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: patternInvalidMessage"
-  app={`<Form
-  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" bindTo="oldEmail" />
-  <FormItem patternInvalidMessage="This does not look like an email" pattern="email" bindTo="newEmail" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="oldEmail" />
+        <FormItem 
+          patternInvalidMessage="This does not look like an email" 
+          pattern="email" bindTo="newEmail" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `patternInvalidSeverity`
@@ -460,26 +506,28 @@ The default severity is `error`.
 In the demo below, enter a string of characters that does not look like an email to see the difference in feedback.
 
 ```ueml copy /patternInvalidSeverity="warning"/
-<Form
-  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" bindTo="oldEmail" />
-  <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
-</Form>
+<App>
+  <Form
+    data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem pattern="email" bindTo="oldEmail" />
+    <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: patternInvalidSeverity"
-  app={`<Form
-  data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem pattern="email" bindTo="oldEmail" />
-  <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem pattern="email" bindTo="oldEmail" />
+        <FormItem patternInvalidSeverity="warning" pattern="email" bindTo="newEmail" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `rangeInvalidMessage`
@@ -490,26 +538,38 @@ In the demo below, enter any value that is out of range in the input fields and 
 Just submitting the form as is also produces the same error.
 
 ```ueml copy /rangeInvalidMessage="Out of range!"/
-<Form
-  data="{{ age: 100, customAge: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-  <FormItem minValue="0" maxValue="99" rangeInvalidMessage="Out of range!" bindTo="customAge" type="integer" />
-</Form>
+<App>
+  <Form
+    data="{{ age: 100, customAge: 100 }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+    <FormItem 
+      minValue="0" 
+      maxValue="99" 
+      rangeInvalidMessage="Out of range!" 
+      bindTo="customAge" 
+      type="integer" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: rangeInvalidMessage"
-  app={`<Form
-  data="{{ age: 100, customAge: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-  <FormItem minValue="0" maxValue="99" rangeInvalidMessage="Out of range!" bindTo="customAge" type="integer" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100, customAge: 100 }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+        <FormItem 
+          minValue="0" 
+          maxValue="99" 
+          rangeInvalidMessage="Out of range!" 
+          bindTo="customAge" 
+          type="integer" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `rangeInvalidSeverity`
@@ -523,26 +583,37 @@ In the demo below, enter any value that is out of range in the input fields and 
 Just submitting the form as is also produces the same error.
 
 ```ueml copy /rangeInvalidSeverity="warning"/
-<Form
-  data="{{ age: 100, customAge: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-  <FormItem minValue="0" maxValue="99" rangeInvalidSeverity="warning" bindTo="customAge" type="integer" />
-</Form>
+<App>
+  <Form
+    data="{{ age: 100, customAge: 100 }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+    <FormItem 
+      minValue="0" maxValue="99" 
+      rangeInvalidSeverity="warning" 
+      bindTo="customAge" 
+      type="integer" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: rangeInvalidSeverity"
-  app={`<Form
-  data="{{ age: 100, customAge: 100 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-  <FormItem minValue="0" maxValue="99" rangeInvalidSeverity="warning" bindTo="customAge" type="integer" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ age: 100, customAge: 100 }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
+        <FormItem 
+          minValue="0" 
+          maxValue="99" 
+          rangeInvalidSeverity="warning" 
+          bindTo="customAge" 
+          type="integer" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `regex`
@@ -552,24 +623,26 @@ Checks whether the input fits the provided regular expression.
 In the demo below, enter an input that is not solely one lowercase string or just submit the form as is.
 
 ```ueml copy /regex="^[a-z]+$"/
-<Form
-  data="{{ password: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="password" />
-</Form>
+<App>
+  <Form
+    data="{{ password: 'PASSWORD123' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="password" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: regex"
-  app={`<Form
-  data="{{ password: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="password" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ password: 'PASSWORD123' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="password" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `regexInvalidMessage`
@@ -579,26 +652,32 @@ This optional string property is used to customize the message that is displayed
 In the demo below, enter a password that is not a lowercase string and click outside to see the regular and custom message.
 
 ```ueml copy /regexInvalidMessage="Password must be all lowercase"/
-<Form
-  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-  <FormItem regexInvalidMessage="Password must be all lowercase" regex="^[a-z]+$" bindTo="newPassword" />
-</Form>
+<App>
+  <Form
+    data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+    <FormItem 
+      regexInvalidMessage="Password must be all lowercase" 
+      regex="^[a-z]+$" bindTo="newPassword" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: regexInvalidMessage"
-  app={`<Form
-  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-  <FormItem regexInvalidMessage="Password must be all lowercase" regex="^[a-z]+$" bindTo="newPassword" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+        <FormItem 
+          regexInvalidMessage="Password must be all lowercase" 
+          regex="^[a-z]+$" bindTo="newPassword" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `regexInvalidSeverity`
@@ -612,26 +691,28 @@ In the demo below, enter a password that is not a lowercase string and click out
 Just submitting the form as is also produces the same error.
 
 ```ueml copy /regexInvalidSeverity="warning"/
-<Form
-  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-  <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
-</Form>
+<App>
+  <Form
+    data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+    <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: regexInvalidSeverity"
-  app={`<Form
-  data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-  <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
+        <FormItem regexInvalidSeverity="warning" regex="^[a-z]+$" bindTo="newPassword" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `required`
@@ -639,24 +720,26 @@ Just submitting the form as is also produces the same error.
 Set this property to `true` to indicate it must have a value before submitting the containing form.
 
 ```ueml copy /required="true"/
-<Form
-  data="{{ name: undefined }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem required="true" label="Name" bindTo="name" />
-</Form>
+<App>
+  <Form
+    data="{{ name: undefined }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem required="true" label="Name" bindTo="name" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: required"
-  app={`<Form
-  data="{{ name: undefined }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem required="true" label="Name" bindTo="name" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ name: undefined }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem required="true" label="Name" bindTo="name" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `requiredInvalidMessage`
@@ -666,26 +749,36 @@ This optional string property is used to customize the message that is displayed
 In the demo below, leave the field empty and click outside to see the regular and custom message.
 
 ```ueml copy /requiredInvalidMessage="Lastname is required!"/
-<Form
-  data="{{ firstname: undefined, lastname: undefined }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem required="true" label="Firstname" bindTo="firstname" />
-  <FormItem requiredInvalidMessage="Lastname is required!" required="true" label="Lastname" bindTo="lastname" />
-</Form>
+<App>
+  <Form
+    data="{{ firstname: undefined, lastname: undefined }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem required="true" label="First Name" bindTo="firstname" />
+    <FormItem 
+      requiredInvalidMessage="Last Name is required!" 
+      required="true" 
+      label="Last Name" 
+      bindTo="lastname" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: requiredInvalidMessage"
-  app={`<Form
-  data="{{ firstname: undefined, lastname: undefined }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem required="true" label="First Name" bindTo="firstname" />
-  <FormItem requiredInvalidMessage="Last Name is required!" required="true" label="Last Name" bindTo="lastname" />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ firstname: undefined, lastname: undefined }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem required="true" label="First Name" bindTo="firstname" />
+        <FormItem 
+          requiredInvalidMessage="Last Name is required!" 
+          required="true" 
+          label="Last Name" 
+          bindTo="lastname" />
+      </Form>
+    </App>
+  `}
 />
 
 ### `syncToValidation`
@@ -717,8 +810,10 @@ This property is used to determine the specific input control the FormItem will 
 | `text`          | **(default)** TextBox                      |
 | `textarea`      | Textarea                                   |
 
-> **Note:** For custom controls, there is no need to explicitly set the `type` to `custom`.
-> Omitting the type and providing child components implicitly sets it to custom.
+<Callout type="info" emoji="📔">
+For custom controls, there is no need to explicitly set the `type` to `custom`.
+Omitting the type and providing child components implicitly sets it to custom.
+</Callout>
 
 ### `validationMode`
 
@@ -738,31 +833,31 @@ This event is used to define a custom validation function.
 
 In the demo below, leave the field as is and submit the form or enter an input that is not all capital letters.
 
-```ueml copy {8}
-<Form
-  data="{{ name: 'James' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem
-    bindTo="name"
-    onValidate="(value) => value === value.toUpperCase()"
-  />
-</Form>
+```ueml copy {7}
+<App>
+  <Form
+    data="{{ name: 'James' }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FormItem
+      bindTo="name"
+      onValidate="(value) => value === value.toUpperCase()" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: validate"
-  app={`<Form
-  data="{{ name: 'James' }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))"
-  padding="0.5rem"
->
-  <FormItem
-    bindTo="name"
-    onValidate="(value) => value === value.toUpperCase()"
-  />
-</Form>`}
+  app={`
+    <App>
+      <Form
+        data="{{ name: 'James' }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FormItem
+          bindTo="name"
+          onValidate="(value) => value === value.toUpperCase()" />
+      </Form>
+    </App>
+  `}
 />
 
 ## Context Values
