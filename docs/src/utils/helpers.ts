@@ -68,6 +68,19 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   },
 };
 
+function removeWhitespace(obj) {
+  if (typeof obj === 'string') {
+    return obj.replace(/\s+/g, ' ').trim(); // Remove extra whitespaces and newlines
+  } else if (typeof obj === 'object' && obj !== null) {
+    const newObj = Array.isArray(obj) ? [] : {};
+    for (const key in obj) {
+      newObj[key] = removeWhitespace(obj[key]);
+    }
+    return newObj;
+  }
+  return obj; // Return the value as is if not a string or object
+}
+
 export const handleDownloadZip = async (appDescription: any) => {
   const zip = new JSZip();
   const emulatedApi = appDescription.api;
@@ -77,7 +90,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       (res) => res.blob(),
     );
     zip.file("index.html", indexWithApiHtml);
-    zip.file("emulatedApi.js", JSON.stringify(emulatedApi, null, 2));
+    zip.file("emulatedApi.js", (JSON.stringify(removeWhitespace(emulatedApi), null, 2)));
     const emulatedApiWorker = await fetch(
       "/resources/files/for-download/emulatedApiWorker.js",
     ).then((res) => res.blob());
