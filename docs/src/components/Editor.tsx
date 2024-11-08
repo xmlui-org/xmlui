@@ -1,5 +1,5 @@
-import { textChanged } from "@/src/state/store";
-import React, { useEffect, useMemo } from "react";
+import { editorStatusChanged, textChanged } from "@/src/state/store";
+import React, { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { UEMLGrammar } from "@/syntax/monaco/grammar.monacoLanguage";
@@ -7,10 +7,10 @@ import { XmluiScripGrammar } from "@/syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../../syntax/monaco/xmlui-light";
 import xmluiDark from "../../syntax/monaco/xmlui-dark";
 import { useTheme } from "nextra-theme-docs";
-import { preprocessCode } from "@/src/utils/helpers";
 
 export const Editor = () => {
   const { text, dispatch, options } = usePlayground();
+  const [value, setValue] = useState(text);
   const monaco = useMonaco();
   const { theme, systemTheme } = useTheme();
 
@@ -36,23 +36,40 @@ export const Editor = () => {
     }
   }, [monaco, isDark, options.language]);
 
-  const preprocessedCode = useMemo(() => preprocessCode(text), [text]);
+  useEffect(() => {
+    setValue(text);
+  }, [text]);
+
+  const updateValue = useCallback(
+    (value) => {
+      setValue(value);
+      startTransition(() => {
+        dispatch(textChanged(value));
+      });
+    },
+    [dispatch],
+  );
+
+  useEffect(() => {
+    dispatch(editorStatusChanged("loading"));
+  }, [dispatch]);
 
   return (
     <MonacoEditor
       saveViewState={true}
       key={"app"}
-      onChange={(val: string | undefined) => {
-        dispatch(textChanged(val || ""));
-      }}
+      onChange={updateValue}
       language={options.language}
+      onMount={() => {
+        dispatch(editorStatusChanged("loaded"));
+      }}
       options={{
         scrollBeyondLastLine: false,
         minimap: { enabled: false },
         overviewRulerLanes: 0,
         hideCursorInOverviewRuler: true,
       }}
-      value={preprocessedCode}
+      value={value}
     />
   );
 };

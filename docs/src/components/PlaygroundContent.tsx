@@ -4,7 +4,7 @@ import { Splitter } from "@components/Splitter/SplitterNative";
 import styles from "@/src/components/PlaygroundContent.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import classnames from "classnames";
-import React from "react";
+import React, {useEffect} from "react";
 
 type PlaygroundContentProps = {
   height?: number | string;
@@ -18,7 +18,7 @@ export const PlaygroundContent = ({
   initialPrimarySize,
   standalone,
 }: PlaygroundContentProps) => {
-  const { options, status } = usePlayground();
+  const { options, status, editorStatus } = usePlayground();
 
   return (
     <div
@@ -38,8 +38,8 @@ export const PlaygroundContent = ({
               initialPrimarySize={initialPrimarySize}
             >
               <Editor />
-              <div style={{ height: "100%", overflow: "hidden" }}>
-                <Preview />
+              <div style={{ height: "100%", width: "100%", overflow: "hidden" }}>
+                {editorStatus === "loaded" && <Preview />}
               </div>
             </Splitter>
           )

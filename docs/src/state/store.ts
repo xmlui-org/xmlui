@@ -1,10 +1,11 @@
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import { createContext, Dispatch } from "react";
+import type { Dispatch } from "react";
+import { createContext } from "react";
 import produce from "immer";
-import { CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { builtInThemes } from "@components-core/theming/ThemeProvider";
 import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
+import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
 type Orientation = "horizontal" | "vertical";
 
@@ -40,6 +41,7 @@ type AppDescription = {
 
 export interface IPlaygroundContext {
   status: "loading" | "loaded" | "idle";
+  editorStatus?: "loading" | "loaded" | "idle";
   appDescription: AppDescription;
   originalAppDescription: AppDescription;
   dispatch: Dispatch<PlaygroundAction>;
@@ -60,6 +62,7 @@ enum PlaygroundActionKind {
   APP_SWAPPED = "PlaygroundActionKind:APP_SWAPPED",
   ORIENTATION_CHANGED = "PlaygroundActionKind:ORIENTATION_CHANGED",
   APP_DESCRIPTION_INITIALIZED = "PlaygroundActionKind:APP_DESCRIPTION_INITIALIZED",
+  EDITOR_STATUS_CHANGED = "PlaygroundActionKind:EDITOR_STATUS_CHANGED",
   OPTIONS_INITIALIZED = "PlaygroundActionKind:OPTIONS_INITIALIZED",
   ACTIVE_THEME_CHANGED = "PlaygroundActionKind:ACTIVE_THEME_CHANGED",
   TONE_CHANGED = "PlaygroundActionKind:TONE_CHANGED",
@@ -76,10 +79,12 @@ type PlaygroundAction = {
     content?: string;
     themes?: ThemeDefinition[];
     previewMode?: boolean;
+    editorStatus?: "loading" | "loaded";
   };
 };
 
 export interface PlaygroundState {
+  editorStatus: "loading" | "loaded" | "idle";
   status: "loading" | "loaded" | "idle";
   text: string;
   appDescription: AppDescription;
@@ -171,8 +176,22 @@ export function activeThemeChanged(activeTheme: string) {
   };
 }
 
+export function editorStatusChanged(editorStatus: "loading" | "loaded") {
+  console.log("editorStatusChanged", editorStatus);
+  return {
+    type: PlaygroundActionKind.EDITOR_STATUS_CHANGED,
+    payload: {
+      editorStatus,
+    },
+  };
+}
+
 export const playgroundReducer = produce((state: PlaygroundState, action: PlaygroundAction) => {
   switch (action.type) {
+    case PlaygroundActionKind.EDITOR_STATUS_CHANGED: {
+        state.editorStatus = action.payload.editorStatus || "idle";
+        break;
+    }
     case PlaygroundActionKind.APP_DESCRIPTION_INITIALIZED: {
       state.status = "loading";
       if (action.payload.appDescription) {

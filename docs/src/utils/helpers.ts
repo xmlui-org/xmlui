@@ -35,6 +35,7 @@ export const builtInThemes: Array<ThemeDefinition> = [
 ];
 
 export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
+  editorStatus: "idle",
   status: "idle",
   options: {
     orientation: "horizontal",
