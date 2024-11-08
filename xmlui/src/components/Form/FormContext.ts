@@ -19,6 +19,7 @@ interface IFormContext {
   validationResults: Record<string, ValidationResult>;
   interactionFlags: Record<string, InteractionFlags>;
   dispatch: Dispatch<ContainerAction | FormAction>;
+  enabled?: boolean;
   itemLabelWidth?: string;
   itemLabelBreak?: boolean;
   itemLabelPosition?: string | LabelPosition;

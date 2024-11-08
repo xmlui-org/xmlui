@@ -23,6 +23,8 @@ export type LookupActionOptions = {
    * this function. Use true on one-off handlers, like the ones in Actions (e.g., `MutateAction`).
    */
   ephemeral?: boolean;
+
+  defaultHandler?: string;
 };
 
 /**

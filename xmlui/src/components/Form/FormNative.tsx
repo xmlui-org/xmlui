@@ -172,11 +172,11 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.RESET: {
-      const {originalSubject} = action.payload;
+      const { originalSubject } = action.payload;
       return {
         ...initialState,
         subject: originalSubject,
-      }
+      };
       break;
     }
     default:
@@ -254,6 +254,8 @@ const Form = forwardRef(function (
   const [confirmSubmitModalVisible, setConfirmSubmitModalVisible] = useState(false);
   const requestModalFormClose = useModalFormClose();
 
+  const isEnabled = enabled && !formState.submitInProgress;
+
   const formContextValue = useMemo(() => {
     return {
       itemLabelBreak,
@@ -264,6 +266,7 @@ const Form = forwardRef(function (
       validationResults: formState.validationResults,
       interactionFlags: formState.interactionFlags,
       dispatch,
+      enabled: isEnabled,
     };
   }, [
     dispatch,
@@ -271,19 +274,20 @@ const Form = forwardRef(function (
     formState.subject,
     formState.validationResults,
     initialValue,
+    isEnabled,
     itemLabelBreak,
     itemLabelPosition,
     itemLabelWidth,
   ]);
 
-  const doCancel = useEvent(()=>{
+  const doCancel = useEvent(() => {
     onCancel?.();
     requestModalFormClose();
   });
 
   const doSubmit = useEvent(async (event?: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
-    if (!enabled) {
+    if (!isEnabled) {
       return;
     }
     setConfirmSubmitModalVisible(false);
@@ -306,7 +310,7 @@ const Form = forwardRef(function (
       dispatch(formSubmitted());
       requestModalFormClose();
       // we only reset the form automatically if the initial value is empty ()
-      if(initialValue === EMPTY_OBJECT){
+      if (initialValue === EMPTY_OBJECT) {
         doReset();
       }
     } catch (e: any) {
@@ -368,11 +372,11 @@ const Form = forwardRef(function (
   );
   const submitButton = useMemo(
     () => (
-      <Button key="submit" type={"submit"} disabled={formState.submitInProgress}>
+      <Button key="submit" type={"submit"} disabled={!isEnabled}>
         {formState.submitInProgress ? saveInProgressLabel : saveLabel}
       </Button>
     ),
-    [formState.submitInProgress, saveLabel, saveInProgressLabel],
+    [isEnabled, formState.submitInProgress, saveInProgressLabel, saveLabel],
   );
 
   useEffect(() => {
@@ -464,6 +468,11 @@ export function FormWithContextVar({
     };
   }, [formState.subject, node.children]);
 
+  const initialValue = extractValue(node.props.data);
+  const submitMethod =
+    extractValue.asOptionalString(node.props.submitMethod) || (initialValue ? "put" : "post");
+  const submitUrl = extractValue.asOptionalString(node.props.submitUrl);
+
   return (
     <Form
       itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
@@ -477,12 +486,17 @@ export function FormWithContextVar({
       saveLabel={extractValue(node.props.saveLabel)}
       saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}
       swapCancelAndSave={extractValue.asOptionalBoolean(node.props.swapCancelAndSave, false)}
-      onSubmit={lookupEventHandler("submit")}
+      onSubmit={lookupEventHandler("submit", {
+        defaultHandler: submitUrl
+          ? `(eventArgs)=> Actions.callApi({ url: "${submitUrl}", method: "${submitMethod}", body: eventArgs })`
+          : undefined,
+      })}
       onCancel={lookupEventHandler("cancel")}
       onReset={lookupEventHandler("reset")}
-      initialValue={extractValue(node.props.data)}
+      initialValue={initialValue}
       buttonRow={renderChild(node.props.buttonRowTemplate)}
       registerComponentApi={registerComponentApi}
+      enabled={extractValue.asOptionalBoolean(node.props.enabled, true) && !extractValue.asOptionalBoolean((node.props as any).loading, false)} //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
     >
       {renderChild(nodeWithItem)}
     </Form>

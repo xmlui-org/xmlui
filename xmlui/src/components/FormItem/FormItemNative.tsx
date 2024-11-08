@@ -113,6 +113,9 @@ export const FormItem = memo(function FormItem({
   const value = useFormContextPart<any>((value) => getByPath(value.subject, bindTo));
   const validationResult = useFormContextPart((value) => value.validationResults[bindTo]);
   const dispatch = useFormContextPart((value) => value.dispatch);
+  const formEnabled = useFormContextPart((value) => value.enabled);
+
+  const isEnabled = enabled && formEnabled;
 
   useEffect(() => {
     dispatch(fieldInitialized(bindTo, initialValue));
@@ -142,7 +145,7 @@ export const FormItem = memo(function FormItem({
           {...rest}
           value={value}
           updateState={onStateChange}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           registerComponentApi={registerComponentApi}
         >
@@ -158,7 +161,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
         >
           {children}
@@ -173,7 +176,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
         >
           {children}
@@ -188,7 +191,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
         >
           {children}
@@ -203,7 +206,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           // registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
         />
       );
@@ -216,7 +219,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           // registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
         >
           {children}
@@ -232,7 +235,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           integersOnly={type === "integer"}
           validationStatus={validationStatus}
           min={syncToValidation ? validations.minValue : undefined}
@@ -250,7 +253,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           // registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           variant={type}
         />
@@ -264,7 +267,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           multiple={asOptionalBoolean((rest as any).multiple, false)} //TODO come up with something for this
         />
@@ -278,7 +281,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
         />
@@ -293,7 +296,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
         />
@@ -307,7 +310,7 @@ export const FormItem = memo(function FormItem({
           value={value}
           updateState={onStateChange}
           registerComponentApi={registerComponentApi}
-          enabled={enabled}
+          enabled={isEnabled}
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
         />
@@ -341,7 +344,7 @@ export const FormItem = memo(function FormItem({
         label={label}
         labelWidth={labelWidthValue}
         labelBreak={labelBreakValue}
-        enabled={enabled}
+        enabled={isEnabled}
         required={validations.required}
         validationInProgress={validationResult?.partial}
         onFocus={onFocus}

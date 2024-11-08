@@ -161,7 +161,7 @@ const Component = forwardRef(function Component(
   // --- Memoizes event handler resolution by event name
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
-      const action = safeNode.events?.[eventName];
+      const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
       return lookupAction(action, uid, { eventName, ...actionOptions });
     },
     [lookupAction, safeNode.events, uid],
