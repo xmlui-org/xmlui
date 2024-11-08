@@ -9,10 +9,12 @@ See also: <SmartLink href="/components/VSplitter">VSplitter</SmartLink>
 `HSplitter` is a specialized, shorthand version for the regular `Splitter` component with a vertical orientation.
 
 ```ueml copy
-<HSplitter height="100%">
-  <Stack backgroundColor="lightblue" height="100%" />
-  <Stack backgroundColor="darksalmon" height="100%" />
-</HSplitter>
+<App height="100%">
+  <HSplitter height="100%">
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </HSplitter>
+</App>
 ```
 
 ## Examples
@@ -21,13 +23,17 @@ See also: <SmartLink href="/components/VSplitter">VSplitter</SmartLink>
   name="Example: HSplitter"
   height={150}
   app={`
-  <HSplitter height="100%">
-    <Stack backgroundColor="lightblue" height="100%" />
-    <Stack backgroundColor="darksalmon" height="100%" />
-  </HSplitter>
+    <App height="100%">
+      <HSplitter height="100%">
+        <Stack backgroundColor="lightblue" height="100%" />
+        <Stack backgroundColor="darksalmon" height="100%" />
+      </HSplitter>
+    </App>
   `}
 />
 
-> **Note**: You cannot change the orientation of `HSplitter` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `HSplitter` from vertical to horizontal by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>
 
 
