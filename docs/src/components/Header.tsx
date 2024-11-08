@@ -31,6 +31,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       const data = {
         standalone: appDescription,
         options: {
+          fixedTheme: options.fixedTheme,
           swapped: options.swapped,
           previewMode: previewMode,
           orientation: options.orientation,

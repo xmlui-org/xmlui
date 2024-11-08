@@ -42,7 +42,7 @@ export const StandalonePlayground = () => {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         setLoading(false);
         dispatch(appDescriptionInitialized(data.standalone));
-        dispatch(optionsInitialized({ ...playgroundState.options, ...data.options }));
+        dispatch(optionsInitialized({ ...playgroundState.options, ...data.options, orientation: "horizontal" }));
         dispatch(contentChanged(data.options.content));
       } catch (e) {
         showToast({
