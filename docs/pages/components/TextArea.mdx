@@ -164,7 +164,7 @@ This optional number property maximizes the number of lines the `TextArea` can g
 
 <Playground
   name="Example: maxRows"
-  height={100}
+  height={160}
   app={`
   <App>
     <TextArea
@@ -316,31 +316,24 @@ Available values:
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
-| Value     | Description                                           |
-| :-------- | :---------------------------------------------------- |
-| `valid`   | Visual indicator for an input that is accepted        |
-| `warning` | Visual indicator for an input that produced a warning |
-| `error`   | Visual indicator for an input that produced an error  |
-
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <TextArea />
   <TextArea validationStatus="valid" />
   <TextArea validationStatus="warning" />
   <TextArea validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={300}
   app={`
-  <VStack gap="0.5rem">
+  <App>
     <TextArea />
     <TextArea validationStatus="valid" />
     <TextArea validationStatus="warning" />
     <TextArea validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -352,21 +345,21 @@ This event is triggered when value of TextArea has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+```ueml copy {3}
+<App var.field="">
   <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
-  <Text initialValue="{field}" />
-</VStack>
+  <Text value="{field}" />
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={100}
+  height={160}
   app={`
-  <VStack gap="0.5rem" var.field="">
+  <App var.field="">
     <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
     <Text value="{field}" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -377,25 +370,26 @@ This event is triggered when the TextArea has received the focus.
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {3-4}
-<TextArea
-  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={100}
-  app={`
+```ueml copy {4-5}
+<App>
   <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
-    var.focused="{false}"
-  />
+    var.focused="{false}" />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+  <App>
+    <TextArea
+      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+      onGotFocus="focused = true"
+      onLostFocus="focused = false"
+      var.focused="{false}" />
+  </App>
   `}
 />
 
@@ -414,20 +408,19 @@ This component does not have any context values.
 This method sets the focus on the TextArea.
 
 ```ueml copy {2-3}
-<VStack gap="$space-0_5">
+<App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: focus"
-  height={120}
   app={`
-  <VStack gap="$space-0_5">
+  <App>
     <Button label="Trigger Focus" onClick="inputComponent.focus()" />
     <TextArea id="inputComponent" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -435,40 +428,36 @@ This method sets the focus on the TextArea.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {10}
-<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+```ueml copy {9}
+<App var.changes="">
   <TextArea
     id="inputField"
     readOnly="true"
-    onDidChange="changes++"
-  />
-  <HStack gap="$space-1">
+    onDidChange="changes++" />
+  <HStack>
     <Button
       label="Check"
-      onClick="inputField.setValue('example ')"
-    />
+      onClick="inputField.setValue('example ')" />
     <Text value="Number of changes: {changes}" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: setValue"
   app={`
-  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <App var.changes="">
     <TextArea
       id="inputField"
       readOnly="true"
-      onDidChange="changes++"
-    />
-    <HStack gap="$space-1">
+      onDidChange="changes++" />
+    <HStack>
       <Button
         label="Check"
-        onClick="inputField.setValue('example ')"
-      />
+        onClick="inputField.setValue('example ')" />
       <Text value="Number of changes: {changes}" />
     </HStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -479,20 +468,19 @@ You can query the component's value. If no value is set, it will retrieve `undef
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
 ```ueml copy {2-3}
-<HStack gap="$space-0_5">
+<App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />
-</HStack>
+</App>
 ```
 
 <Playground
   name="Example: value"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
+  <App>
     <Text value="TextArea content length: {inputComponent.value.length}" />
     <TextArea id="inputComponent" />
-  </HStack>
+  </App>
   `}
 />
 
@@ -549,7 +537,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -561,7 +548,11 @@ These variables set the `disabled` state:
       },
     },
   ]}
-  app={`<TextArea placeholder="I am a placeholder" />`}
+  app={`
+  <App>
+    <TextArea placeholder="I am a placeholder" />
+  </App>
+  `}
 />
 
 To style all input controls not just this component, replace the `TextArea` segment with `Input`:

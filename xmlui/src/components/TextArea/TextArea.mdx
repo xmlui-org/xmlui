@@ -294,19 +294,20 @@ This prop is used to visually indicate status changes reacting to form field val
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
+```ueml copy {3}
 <App var.field="">
-  <Text initialValue="{field}" />
   <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+  <Text value="{field}" />
 </App>
 ```
 
 <Playground
   name="Example: didChange"
+  height={160}
   app={`
   <App var.field="">
-    <Text initialValue="{field}" />
     <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+    <Text value="{field}" />
   </App>
   `}
 />
@@ -477,7 +478,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -489,7 +489,11 @@ These variables set the `disabled` state:
       },
     },
   ]}
-  app={`<TextArea placeholder="I am a placeholder" />`}
+  app={`
+  <App>
+    <TextArea placeholder="I am a placeholder" />
+  </App>
+  `}
 />
 
 To style all input controls not just this component, replace the `TextArea` segment with `Input`:
