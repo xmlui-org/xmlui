@@ -1,11 +1,11 @@
-import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { XmlUiHelper } from "@src/parsers/xmlui-parser/xmlui-serializer";
 import { decompress } from "@/src/components/utils";
-import { ThemeDefinition } from "@components-core/theming/abstractions";
-import { PlaygroundState } from "@/src/state/store";
+import type { ThemeDefinition } from "@components-core/theming/abstractions";
+import type { PlaygroundState } from "@/src/state/store";
 import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
 import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
-import { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
+import type { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
 
@@ -77,7 +77,7 @@ export const handleDownloadZip = async (appDescription: any) => {
       (res) => res.blob(),
     );
     zip.file("index.html", indexWithApiHtml);
-    zip.file("emulatedApi.js", emulatedApi);
+    zip.file("emulatedApi.js", JSON.stringify(emulatedApi, null, 2));
     const emulatedApiWorker = await fetch(
       "/resources/files/for-download/emulatedApiWorker.js",
     ).then((res) => res.blob());
