@@ -1,13 +1,19 @@
 %-PROP-START name
 
 ```ueml copy
-<Avatar name="John, Doe" />
+<App>
+  <Avatar name="John, Doe" />
+</App>
 ```
 
 <Playground
-  height={88}
+  height={120}
   name="Example: name"
-  app={`<VStack padding="$space-2"><Avatar name="John, Doe" /></VStack>`}
+  app={`
+    <App>
+      <Avatar name="John, Doe" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -15,26 +21,30 @@
 %-PROP-START size
 
 ```ueml copy
-<HStack gap="1rem" >
-  <Avatar name="Dorothy Ellen Fuller" />
-  <Avatar name="Xavier Schiller" size="xs" />
-  <Avatar name="Sebastien Moore" size="sm" />
-  <Avatar name="Molly Dough" size="md" />
-  <Avatar name="Lynn Gilbert" size="lg" />
-</HStack>
+<App>
+  <HStack>
+    <Avatar name="Dorothy Ellen Fuller" />
+    <Avatar name="Xavier Schiller" size="xs" />
+    <Avatar name="Sebastien Moore" size="sm" />
+    <Avatar name="Molly Dough" size="md" />
+    <Avatar name="Lynn Gilbert" size="lg" />
+  </HStack>
+</App>
 ```
 
 <Playground
-  height={136}
+  height={160}
   name="Example: size"
   app={`
-    <HStack gap="1rem" padding="$space-2">
-      <Avatar name="Dorothy Ellen Fuller" />
-      <Avatar name="Xavier Schiller" size="xs" />
-      <Avatar name="Sebastien Moore" size="sm" />
-      <Avatar name="Molly Dough" size="md" />
-      <Avatar name="Lynn Gilbert" size="lg" />
-    </HStack>
+    <App>
+      <HStack>
+        <Avatar name="Dorothy Ellen Fuller" />
+        <Avatar name="Xavier Schiller" size="xs" />
+        <Avatar name="Sebastien Moore" size="sm" />
+        <Avatar name="Molly Dough" size="md" />
+        <Avatar name="Lynn Gilbert" size="lg" />
+      </HStack>
+    </App>
   `}
 />
 
@@ -42,10 +52,20 @@
 
 %-PROP-START url
 
+```ueml copy
+<App>
+  <Avatar url="https://i.pravatar.cc/100" size="md" />
+</App>
+```
+
 <Playground
-  height={108}
+  height={130}
   name="Example: url"
-  app={`<VStack padding="$space-2"><Avatar url="https://i.pravatar.cc/100" size="md" /></VStack>`}
+  app={`
+    <App>
+      <Avatar url="https://i.pravatar.cc/100" size="md" />
+    </App>
+  `}
 />
 
 %-PROP-END

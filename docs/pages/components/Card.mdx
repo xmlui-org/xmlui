@@ -10,21 +10,22 @@ The `Card` component is a container for cohesive elements, often rendered visual
 You can nest the card's content into the `<Card>` tag:
 
 ```ueml copy
-<Stack padding="1rem">
-  <Card maxWidth="300px">
+<App>
+  <Card maxWidth="200px">
     <HStack verticalAlignment="center" gap="0.5rem">
       <Icon name="info" />
       <Text value="Information" variant="strong" />
     </HStack>
     <Text value="This is an example text" />
   </Card>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: using Card"
+  height="160"
   app={`
-    <Stack padding="1rem">
+    <App>
       <Card maxWidth="200px">
         <HStack verticalAlignment="center" gap="0.5rem">
           <Icon name="info" />
@@ -32,7 +33,7 @@ You can nest the card's content into the `<Card>` tag:
         </HStack>
         <Text value="This is an example text" />
       </Card>
-    </Stack>
+    </App>
   `}
 />
 

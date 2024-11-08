@@ -10,11 +10,13 @@ import verticalFullHeader from  "../../component-samples/App/vertical-full-heade
 
 # App [#component-app]
 
-<Callout type="info" emoji="ℹ️">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
 
 The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout.
 
-> **Note**: You can learn more details about using this component [here](../learning/using-components/app-component).
+<Callout type="info" emoji="📔">
+You can learn more details about using this component [here](../learning/using-components/app-component).
+</Callout>
 
 ## Properties
 
@@ -131,7 +133,7 @@ Currently, there is no restriction on what the user data must look like.
 ```
 
 <Playground
-  height={150}
+  height={180}
   name="Example: loggedInUser"
   horizontal
   app={`
@@ -192,10 +194,12 @@ The default value is `true`.
   <Pages defaultRoute="/">
     <Page url="/">
       <Text>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-        Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-        Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor 
+        incididunt ut labore et dolore magna aliqua.  Ut enim ad minim veniam, quis 
+        nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore 
+        eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt 
+        in culpa qui officia deserunt mollit anim id est laborum.
       </Text>
     </Page>
   </Pages>
@@ -242,7 +246,7 @@ Use it as `onReady` when inlining it on the component.
 ```
 
 <Playground
-  height={150}
+  height={100}
   name="Example: ready"
   horizontal
   app={`

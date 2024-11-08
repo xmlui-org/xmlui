@@ -554,7 +554,7 @@ function addComponentStatusDisclaimer(status) {
       disclaimer = "";
   }
 
-  return disclaimer !== "" ? `<Callout type="info" emoji="ℹ️">${disclaimer}</Callout>\n\n` : "";
+  return disclaimer !== "" ? `<Callout type="warning" emoji="📔">${disclaimer}</Callout>\n\n` : "";
 }
 
 function appendArticleId(articleId) {

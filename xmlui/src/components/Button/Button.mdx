@@ -11,28 +11,28 @@ Use the `Button` component to trigger various actions.
 %-PROP-START contentPosition
 
 ```ueml copy
-<Stack gap="1rem">
+<App>
   <Button width="200px" icon="drive" label="Button" contentPosition="center" />
   <Button width="200px" icon="drive" label="Button" contentPosition="start" />
   <Button width="200px" icon="drive" label="Button" contentPosition="end" />
   <Button width="200px" contentPosition="end">
     This is a nested text
   </Button>
-</Stack>
+</App>
 ```
 
 <Playground
-  height={230}
+  height={270}
   name="Example: content position"
   app={`
-    <Stack gap="1rem">
+    <App>
       <Button width="200px" icon="drive" label="Button" contentPosition="center" />
       <Button width="200px" icon="drive" label="Button" contentPosition="start" />
       <Button width="200px" icon="drive" label="Button" contentPosition="end" />
       <Button width="200px" contentPosition="end">
         This is a nested text
       </Button>
-    </Stack>
+    </App>
   `}
 />
 
@@ -41,22 +41,26 @@ Use the `Button` component to trigger various actions.
 %-PROP-START icon
 
 ```ueml
-<HStack gap="1rem" >
-  <Button icon="drive" label="Let there be drive" />
-  <Button icon="drive" />
-</HStack>
+  <App>
+    <HStack>
+      <Button icon="drive" label="Let there be drive" />
+      <Button icon="drive" />
+    </HStack>
+  </App>
 ```
 
 <Playground
   name="Example: icon"
   app={`
-    <HStack gap="1rem" >
-      <Button icon="drive" label="Let there be drive" />
-      <Button icon="drive" />
-    </HStack>
+    <App>
+      <HStack>
+        <Button icon="drive" label="Let there be drive" />
+        <Button icon="drive" />
+      </HStack>
+    </App>
   `}
   horizontal={true}
-  height={60}
+  height={100}
 />
 
 %-PROP-END
@@ -64,42 +68,42 @@ Use the `Button` component to trigger various actions.
 %-PROP-START iconPosition
 
 ```ueml
-<VStack gap="1rem">
-  <HStack gap="1rem">
+<App>
+  <HStack>
     <Button icon="drive" label="Left" />
     <Button icon="drive" label="Right" iconPosition="right" />
   </HStack>
-  <HStack gap="1rem">
+  <HStack>
     <Button icon="drive" label="Start" iconPosition="start" />
     <Button icon="drive" label="End" iconPosition="end" />
   </HStack>
-  <HStack gap="1rem">
+  <HStack>
     <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
     <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: iconPosition"
   app={`
-    <VStack gap="1rem">
-      <HStack gap="1rem">
+    <App>
+      <HStack>
         <Button icon="drive" label="Left" />
         <Button icon="drive" label="Right" iconPosition="right" />
       </HStack>
-      <HStack gap="1rem">
+      <HStack>
         <Button icon="drive" label="Start" iconPosition="start" />
         <Button icon="drive" label="End" iconPosition="end" />
       </HStack>
-      <HStack gap="1rem">
+      <HStack>
         <Button icon="drive" label="Start (right-to-left)" iconPosition="start" direction="rtl" />
         <Button icon="drive" label="End (right-to-left)" iconPosition="end" direction="rtl" />
       </HStack>
-    </VStack>
+    </App>
   `}
   horizontal={true}
-  height={180}
+  height={220}
 />
 
 %-PROP-END
@@ -107,30 +111,30 @@ Use the `Button` component to trigger various actions.
 %-PROP-START label
 
 ```ueml copy
-<VStack gap="1rem" >
+<App>
   <Button label="I am the button label" />
   <Button />
   <Button label="I am the button label">
     <Icon name="trash" />
     I am a text nested into Button
   </Button>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Button label"
   app={`
-    <VStack gap="1rem" >
+    <App>
       <Button label="I am the button label" />
       <Button />
       <Button label="I am the button label">
         <Icon name="trash" />
         I am a text nested into Button
       </Button>
-    </VStack>
+    </App>
   `}
   horizontal={true}
-  height={148}
+  height={200}
 />
 
 %-PROP-END
@@ -138,24 +142,28 @@ Use the `Button` component to trigger various actions.
 %-PROP-START variant
 
 ```ueml copy
-<HStack gap="1rem">
-  <Button label="default (solid)" />
-  <Button label="solid" variant="solid" />
-  <Button label="outlined" variant="outlined" />
-  <Button label="ghost" variant="ghost" />
-</HStack>
-```
-
-<Playground
-  height={60}
-  name="Example: variant"
-  app={`
-  <HStack gap="1rem">
+<App>
+  <HStack>
     <Button label="default (solid)" />
     <Button label="solid" variant="solid" />
     <Button label="outlined" variant="outlined" />
     <Button label="ghost" variant="ghost" />
   </HStack>
+</App>
+```
+
+<Playground
+  height={100}
+  name="Example: variant"
+  app={`
+  <App>
+    <HStack>
+      <Button label="default (solid)" />
+      <Button label="solid" variant="solid" />
+      <Button label="outlined" variant="outlined" />
+      <Button label="ghost" variant="ghost" />
+    </HStack>
+  </App>
   `}
 />
 
@@ -164,22 +172,27 @@ Use the `Button` component to trigger various actions.
 %-PROP-START themeColor
 
 ```ueml copy
-<Stack orientation="horizontal" gap="10px">
-  <Button label="Button" themeColor="primary" />
-  <Button label="Button" themeColor="secondary" />
-  <Button label="Button" themeColor="attention" />
-</Stack>
+<App>
+  <HStack>
+    <Button label="Button" themeColor="primary" />
+    <Button label="Button" themeColor="secondary" />
+    <Button label="Button" themeColor="attention" />
+  </HStack>
+</App>  
 ```
 
 <Playground
-    name="Example: theme colors"
-    app={`
-    <Stack orientation="horizontal" gap="10px">
-      <Button label="Button" themeColor="primary" />
-      <Button label="Button" themeColor="secondary" />
-      <Button label="Button" themeColor="attention" />
-    </Stack>`}
-    height={48}
+  name="Example: theme colors"
+  app={`
+    <App>
+      <HStack>
+        <Button label="Button" themeColor="primary" />
+        <Button label="Button" themeColor="secondary" />
+        <Button label="Button" themeColor="attention" />
+      </HStack>
+    </App>  
+  `}
+  height={100}
 />
 
 %-PROP-END
@@ -187,24 +200,28 @@ Use the `Button` component to trigger various actions.
 %-PROP-START enabled
 
 ```ueml copy
-<HStack gap="1rem" >
-  <Button label="I am enabled (by default)" />
-  <Button label="I am enabled explicitly" enabled="true" />
-  <Button label="I am not enabled" enabled="false" />
-</HStack>
+<App>
+  <HStack>
+    <Button label="I am enabled (by default)" />
+    <Button label="I am enabled explicitly" enabled="true" />
+    <Button label="I am not enabled" enabled="false" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: enabled"
   app={`
-    <HStack gap="1rem" >
-      <Button label="I am enabled (by default)" />
-      <Button label="I am enabled explicitly" enabled="true" />
-      <Button label="I am not enabled" enabled="false" />
-    </HStack>
+    <App>
+      <HStack>
+        <Button label="I am enabled (by default)" />
+        <Button label="I am enabled explicitly" enabled="true" />
+        <Button label="I am not enabled" enabled="false" />
+      </HStack>
+    </App>
   `}
   horizontal={true}
-  height={60}
+  height={100}
 />
 
 %-PROP-END
@@ -212,41 +229,45 @@ Use the `Button` component to trigger various actions.
 %-PROP-START size
 
 ```ueml copy
-<Stack gap="4px">
-  <Stack orientation="horizontal" gap="10px">
-    <Button icon="drive" label="Button" size="xs" />
-    <Button icon="drive" label="Button" size="sm" />
-    <Button icon="drive" label="Button" size="md" />
-    <Button icon="drive" label="Button" size="lg" />
-  </Stack>
-  <Stack orientation="horizontal" gap="10px">
-    <Button label="Button" size="xs" />
-    <Button label="Button" size="sm" />
-    <Button label="Button" size="md" />
-    <Button label="Button" size="lg" />
-  </Stack>
-</Stack>
-```
-
-<Playground
-  height={140}
-  name="Example: size"
-  app={`<Stack gap="4px">
-  <Stack orientation="horizontal" gap="10px">
+<App>
+  <HStack>
     <Button icon="drive" label="default" />
     <Button icon="drive" label="extra-small" size="xs" />
     <Button icon="drive" label="small" size="sm" />
     <Button icon="drive" label="medium" size="md" />
     <Button icon="drive" label="large" size="lg" />
-  </Stack>
-  <Stack orientation="horizontal" gap="10px">
+  </HStack>
+  <HStack>
     <Button label="default" />
     <Button label="extra-small" size="xs" />
     <Button label="small" size="sm" />
     <Button label="medium" size="md" />
     <Button label="large" size="lg" />
-  </Stack>
-</Stack>`}
+  </HStack>
+</App>
+```
+
+<Playground
+  height={200}
+  name="Example: size"
+  app={`
+    <App>
+      <HStack>
+        <Button icon="drive" label="default" />
+        <Button icon="drive" label="extra-small" size="xs" />
+        <Button icon="drive" label="small" size="sm" />
+        <Button icon="drive" label="medium" size="md" />
+        <Button icon="drive" label="large" size="lg" />
+      </HStack>
+      <HStack>
+        <Button label="default" />
+        <Button label="extra-small" size="xs" />
+        <Button label="small" size="sm" />
+        <Button label="medium" size="md" />
+        <Button label="large" size="lg" />
+      </HStack>
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -254,15 +275,19 @@ Use the `Button` component to trigger various actions.
 %-EVENT-START click
 
 ```ueml copy
-<Button label="Click me!" onClick="window.alert('Button clicked')" />
+<App>
+  <Button label="Click me!" onClick="window.alert('Button clicked')" />
+</App>
 ```
 
 <Playground
   name="Example: click"
   app={`
-    <Button label="Click me!" onClick="window.alert('Button clicked')" />
+    <App>
+      <Button label="Click me!" onClick="window.alert('Button clicked')" />
+    </App>
   `}
-  height={60}
+  height={100}
 />
 
 %-EVENT-END
@@ -270,29 +295,29 @@ Use the `Button` component to trigger various actions.
 %-EVENT-START gotFocus
 
 ```ueml copy
-<VStack gap="1rem" var.text="No event" >
-  <HStack gap="1rem" verticalAlignment="center" >
-    <Button label="First, click me!"
-      onGotFocus="text = 'Focus received'"
+<App var.text="No event" >
+  <HStack verticalAlignment="center" >
+    <Button label="First, click me!" 
+      onGotFocus="text = 'Focus received'" 
       onLostFocus="text = 'Focus lost'" />
     <Text value="Then, me!"/>
   </HStack>
   <Text value="{text}" />
-</VStack>
+</App>
 ```
 
 <Playground
     name="Example: gotFocus/lostFocus"
     app={`
-    <VStack gap="1rem" var.text="No event" >
-      <HStack gap="1rem" verticalAlignment="center" >
+    <App var.text="No event" >
+      <HStack verticalAlignment="center" >
         <Button label="First, click me!" onGotFocus="text = 'Focus received'" onLostFocus="text = 'Focus lost'" />
         <Text value="Then, me!"/>
       </HStack>
       <Text value="{text}" />
-    </VStack>
+    </App>
   `}
-    height={100}
+    height={140}
 />
 
 %-EVENT-END
@@ -371,7 +396,9 @@ The `Button` component handles these visual states:
 - `--focus`
 - `--hover`
 
-> **Note**: Using these states is restricted to color properties.
+<Callout type="info" emoji="📔">
+Using these states is restricted to color properties.
+</Callout>
 
 ### Fixed width and height
 
@@ -382,31 +409,35 @@ Using a set of buttons with a fixed width or height is often helpful. So `Button
 Avoid setting the `width-Button` and `height-Button` styles in the theme definition. Instead, wrap the affected button group into a `Theme` component as in the following example:
 
 ```ueml copy
-<HStack gap="1rem">
-  <Theme width-Button="120px">
-    <Button label="Short" />
-    <Button label="Longer" />
-    <Button label="Longest" />
-    <Button label="Disabled" enabled="false" />
-    <Button label="Outlined" variant="outlined" />
-  </Theme>
-</HStack>
+<App>
+  <HStack>
+    <Theme width-Button="120px">
+      <Button label="Short" />
+      <Button label="Longer" />
+      <Button label="Longest" />
+      <Button label="Disabled" enabled="false" />
+      <Button label="Outlined" variant="outlined" />
+    </Theme>
+  </HStack>
+</App>
 ```
 
 <Playground
-    name="Example: Buttons with fixed width"
-    app={`
-    <HStack gap="1rem" padding="1rem">
-      <Theme width-Button="120px">
-        <Button label="Short" />
-        <Button label="Longer" />
-        <Button label="Longest" />
-        <Button label="Disabled" enabled="false" />
-        <Button label="Outlined" variant="outlined" />
-      </Theme>
-    </HStack>
+  name="Example: Buttons with fixed width"
+  app={`
+    <App>
+      <HStack>
+        <Theme width-Button="120px">
+          <Button label="Short" />
+          <Button label="Longer" />
+          <Button label="Longest" />
+          <Button label="Disabled" enabled="false" />
+          <Button label="Outlined" variant="outlined" />
+        </Theme>
+      </HStack>
+    </App>
   `}
-    height={80}
+  height={100}
 />
 
 %-STYLE-END
