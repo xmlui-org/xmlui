@@ -9,22 +9,26 @@ See also: <SmartLink href="/components/HSplitter">HSplitter</SmartLink>
 `VSplitter` is a specialized, shorthand version for the regular `Splitter` component with a vertical orientation.
 
 ```ueml copy
-<VSplitter height="100%">
-  <Stack backgroundColor="lightblue" height="100%" />
-  <Stack backgroundColor="darksalmon" height="100%" />
-</VSplitter>
+<App height="100%">
+  <VSplitter>
+    <Stack backgroundColor="lightblue" height="100%" />
+    <Stack backgroundColor="darksalmon" height="100%" />
+  </VSplitter>
+</App>
 ```
 
 ## Examples
 
 <Playground
   name="Example: VSplitter"
-  height={150}
+  height={160}
   app={`
-  <VSplitter height="100%">
-    <Stack backgroundColor="lightblue" height="100%" />
-    <Stack backgroundColor="darksalmon" height="100%" />
-  </VSplitter>
+  <App height="100%">
+    <VSplitter>
+      <Stack backgroundColor="lightblue" height="100%" />
+      <Stack backgroundColor="darksalmon" height="100%" />
+    </VSplitter>
+  </App>
   `}
 />
 

@@ -19,13 +19,18 @@ This property sets the label of the component.
 Default value: `false`.
 
 ```ueml copy
-<TextArea autoFocus="true" />
+<App>
+  <TextArea autoFocus="true" />
+</App>
 ```
 
 <Playground
   name="Example: autoFocus"
-  height={80}
-  app={`<TextArea autoFocus="true" />`}
+  app={`
+  <App>
+    <TextArea autoFocus="true" />
+  </App>
+  `}
 />
 
 ### `autoSize`
@@ -39,13 +44,18 @@ Default value: `false`.
 Write multiple lines in the `TextArea` in the demo below to see how it resizes automatically.
 
 ```ueml copy
-<TextArea autoSize="true" />
+<App>
+  <TextArea autoSize="true" />
+</App>
 ```
 
 <Playground
   name="Example: autoSize"
-  height={100}
-  app={`<TextArea autoSize="true" />`}
+  app={`
+  <App>
+    <TextArea autoSize="true" />
+  </App>
+  `}
 />
 
 ### `enabled`
@@ -55,13 +65,18 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy
-<TextArea enabled="false" />
+<App>
+  <TextArea enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  app={`<TextArea enabled="false" />`}
-  height={80}
+  app={`
+  <App>
+    <TextArea enabled="false" />
+  </App>
+  `}
 />
 
 ### `enterSubmits`
@@ -72,24 +87,28 @@ Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
 
 ```ueml copy
-<Form onSubmit="window.alert(address.value)">
+<App>
+  <Form onSubmit="toast.success(JSON.stringify(address.value))">
     <TextArea
       id="address"
       enterSubmits="true"
-      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234"
-    />
-</Form>
+      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: enterSubmits"
-  app={`<Form onSubmit="window.alert(address.value)">
-    <TextArea
-      id="address"
-      enterSubmits="true"
-      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234"
-    />
-</Form>`}
+  app={`
+  <App>
+    <Form onSubmit="toast.success(JSON.stringify(address.value))">
+      <TextArea
+        id="address"
+        enterSubmits="true"
+        initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234" />
+    </Form>
+  </App>
+  `}
 />
 
 ### `escResets`
@@ -103,13 +122,18 @@ This property sets the component's initial value.
 The initial value displayed in the input field.
 
 ```ueml copy
-<TextArea initialValue="Example text" />
+<App>
+  <TextArea initialValue="Example text" />
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
-  height={80}
-  app={`<TextArea initialValue="Example text" />`}
+  app={`
+  <App>
+    <TextArea initialValue="Example text" />
+  </App>
+  `}
 />
 
 ### `labelId`
@@ -126,28 +150,32 @@ This optional number property maximizes the number of lines the `TextArea` can g
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy
-<TextArea
-  maxRows="3"
-  initialValue="Lorem ipsum dolor sit amet,
-  consectetur adipiscing elit,
-  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-  Ut enim ad minim veniam,
-  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-/>
+```ueml copy {3}
+<App>
+  <TextArea
+    maxRows="3"
+    initialValue="Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit,
+    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
+</App>
 ```
 
 <Playground
   name="Example: maxRows"
-  app={`<TextArea
-  maxRows="3"
-  initialValue="Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-/>`}
-  height={100}
+  height={160}
+  app={`
+  <App>
+    <TextArea
+      maxRows="3"
+      initialValue="Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
+  </App>
+  `}
 />
 
 ### `minRows`
@@ -156,14 +184,20 @@ This optional number property indicates the minimum number of lines the `TextAre
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy
-<TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+```ueml copy /minRows="3"/
+<App>
+  <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+</App>
 ```
 
 <Playground
   name="Example: minRows"
-  app={`<TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />`}
-  height={100}
+  height={200}
+  app={`
+  <App>
+    <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+  </App>
+  `}
 />
 
 ### `placeholder`
@@ -171,13 +205,18 @@ This optional number property indicates the minimum number of lines the `TextAre
 A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy
-<TextArea placeholder="This is a placeholder" />
+<App>
+  <TextArea placeholder="This is a placeholder" />
+</App>
 ```
 
 <Playground
   name="Example: placeholder"
-  height={80}
-  app={`<TextArea placeholder="This is a placeholder" />`}
+  app={`
+  <App>
+    <TextArea placeholder="This is a placeholder" />
+  </App>
+  `}
 />
 
 ### `readOnly`
@@ -185,13 +224,18 @@ A placeholder text that is visible in the input field when its empty.
 Set this property to `true` to disallow changing the component value.
 
 ```ueml copy /readOnly="{true}"/
-<TextArea initialValue="Example text" readOnly="{true}" />
+<App>
+  <TextArea initialValue="Example text" readOnly="{true}" />
+</App>
 ```
 
 <Playground
   name="Example: readOnly"
-  height={80}
-  app={`<TextArea initialValue="Example text" readOnly="{true}" />`}
+  app={`
+  <App>
+    <TextArea initialValue="Example text" readOnly="{true}" />
+  </App>
+  `}
 />
 
 ### `required`
@@ -212,33 +256,28 @@ Available values:
 | `both` | Can resize in both dimensions |
 
 
-| Value        | Description                   |
-| :----------- | :---------------------------- |
-|  undefined   | No resizing                   |
-| `horizontal` | Can only resize horizontally  |
-| `vertical`   | Can only resize vertically    |
-| `both`       | Can resize in both dimensions |
-
 If you allow resizing, the `TextArea` turns off automatic sizing.
 
 When you allow vertical resizing, you can limit the sizable range according to `minRows` and `maxRows`.
 
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
-```ueml copy
-<VStack gap="0.5rem">
-    <TextArea resize="vertical" minRows="1" maxRows="8" />
-    <TextArea resize="both" />
-</VStack>
+```ueml copy /resize/
+<App>
+  <TextArea resize="vertical" minRows="1" maxRows="8" />
+  <TextArea resize="both" />
+</App>
 ```
 
 <Playground
   name="Example: resize"
-  app={`<VStack gap="0.5rem">
+  height={300}
+  app={`
+  <App>
     <TextArea resize="vertical" minRows="1" maxRows="8" />
     <TextArea resize="both" />
-</VStack>`}
-  height={300}
+  </App>
+  `}
 />
 
 ### `rows`
@@ -248,13 +287,18 @@ Specifies the number of lines or rows (and thus, its size) the component has.
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
 ```ueml copy
-<TextArea rows="10" />
+<App>
+  <TextArea rows="10" />
+</App>
 ```
 
 <Playground
   name="Example: rows"
-  app={`<TextArea rows="10" />`}
-  height={300}
+  app={`
+  <App>
+    <TextArea rows="10" />
+  </App>
+  `}
 />
 
 ### `validationStatus`
@@ -272,31 +316,24 @@ Available values:
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
-| Value     | Description                                           |
-| :-------- | :---------------------------------------------------- |
-| `valid`   | Visual indicator for an input that is accepted        |
-| `warning` | Visual indicator for an input that produced a warning |
-| `error`   | Visual indicator for an input that produced an error  |
-
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <TextArea />
   <TextArea validationStatus="valid" />
   <TextArea validationStatus="warning" />
   <TextArea validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={300}
   app={`
-  <VStack gap="0.5rem">
+  <App>
     <TextArea />
     <TextArea validationStatus="valid" />
     <TextArea validationStatus="warning" />
     <TextArea validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -308,21 +345,21 @@ This event is triggered when value of TextArea has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+```ueml copy {3}
+<App var.field="">
   <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
-  <Text initialValue="{field}" />
-</VStack>
+  <Text value="{field}" />
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={100}
+  height={160}
   app={`
-  <VStack gap="0.5rem" var.field="">
+  <App var.field="">
     <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
     <Text value="{field}" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -333,25 +370,26 @@ This event is triggered when the TextArea has received the focus.
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {3-4}
-<TextArea
-  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={100}
-  app={`
+```ueml copy {4-5}
+<App>
   <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
-    var.focused="{false}"
-  />
+    var.focused="{false}" />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+  <App>
+    <TextArea
+      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+      onGotFocus="focused = true"
+      onLostFocus="focused = false"
+      var.focused="{false}" />
+  </App>
   `}
 />
 
@@ -370,20 +408,19 @@ This component does not have any context values.
 This method sets the focus on the TextArea.
 
 ```ueml copy {2-3}
-<VStack gap="$space-0_5">
+<App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: focus"
-  height={120}
   app={`
-  <VStack gap="$space-0_5">
+  <App>
     <Button label="Trigger Focus" onClick="inputComponent.focus()" />
     <TextArea id="inputComponent" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -391,40 +428,36 @@ This method sets the focus on the TextArea.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {10}
-<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+```ueml copy {9}
+<App var.changes="">
   <TextArea
     id="inputField"
     readOnly="true"
-    onDidChange="changes++"
-  />
-  <HStack gap="$space-1">
+    onDidChange="changes++" />
+  <HStack>
     <Button
       label="Check"
-      onClick="inputField.setValue('example ')"
-    />
+      onClick="inputField.setValue('example ')" />
     <Text value="Number of changes: {changes}" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: setValue"
   app={`
-  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <App var.changes="">
     <TextArea
       id="inputField"
       readOnly="true"
-      onDidChange="changes++"
-    />
-    <HStack gap="$space-1">
+      onDidChange="changes++" />
+    <HStack>
       <Button
         label="Check"
-        onClick="inputField.setValue('example ')"
-      />
+        onClick="inputField.setValue('example ')" />
       <Text value="Number of changes: {changes}" />
     </HStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -435,20 +468,19 @@ You can query the component's value. If no value is set, it will retrieve `undef
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
 ```ueml copy {2-3}
-<HStack gap="$space-0_5">
+<App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />
-</HStack>
+</App>
 ```
 
 <Playground
   name="Example: value"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
+  <App>
     <Text value="TextArea content length: {inputComponent.value.length}" />
     <TextArea id="inputComponent" />
-  </HStack>
+  </App>
   `}
 />
 
@@ -505,7 +537,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -517,7 +548,11 @@ These variables set the `disabled` state:
       },
     },
   ]}
-  app={`<TextArea placeholder="I am a placeholder" />`}
+  app={`
+  <App>
+    <TextArea placeholder="I am a placeholder" />
+  </App>
+  `}
 />
 
 To style all input controls not just this component, replace the `TextArea` segment with `Input`:
