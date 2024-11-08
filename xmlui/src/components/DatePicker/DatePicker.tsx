@@ -7,11 +7,13 @@ import {
   dAutoFocus,
   dDidChange,
   dEnabled,
+  dFocus,
   dGotFocus,
   dInitialValue,
   dLostFocus,
   dPlaceholder,
   dReadonly,
+  dSetValueApi,
   dValidationStatus,
 } from "@components/metadata-helpers";
 
@@ -39,6 +41,13 @@ export const DatePickerMd = createMetadata({
     didChange: dDidChange(COMP),
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
+  },
+  apis: {
+    focus: dFocus(COMP),
+    value: d(
+      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+    ),
+    setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

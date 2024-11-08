@@ -35,13 +35,19 @@ The table below shows the available date formats:
 | MMddyyyy   | 05252024   |
 
 ```ueml copy /dateFormat="dd-MM-yyyy"/
-<DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+<App>
+  <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: dateFormat"
-  app={`<DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+    </App>
+  `}
 />
 
 ### `disabledDates`
@@ -49,13 +55,19 @@ The table below shows the available date formats:
 An array of dates that are disabled
 
 ```ueml copy
-<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+<App>
+  <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: disabledDates"
-  app={`<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+    </App>  
+  `}
 />
 
 ### `enabled`
@@ -65,13 +77,19 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy
-<DatePicker enabled="false" />
+<App>
+  <DatePicker enabled="false" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: enabled"
-  app={`<DatePicker enabled="false" />`}
+  app={`
+    <App>
+      <DatePicker enabled="false" />
+    </App>  
+  `}
 />
 
 ### `fromDate`
@@ -79,13 +97,19 @@ Default value: `true`.
 The start date of the range of selectable dates
 
 ```ueml copy
-<DatePicker fromDate="05/24/2024" />
+<App>
+  <DatePicker fromDate="05/24/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: fromDate"
-  app={`<DatePicker fromDate="05/24/2024" />`}
+  app={`
+    <App>
+      <DatePicker fromDate="05/24/2024" />
+    </App>
+  `}
 />
 
 ### `initialValue`
@@ -93,13 +117,19 @@ The start date of the range of selectable dates
 This property sets the component's initial value.
 
 ```ueml copy
-<DatePicker initialValue="05/25/2024" />
+<App>
+  <DatePicker initialValue="05/25/2024" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: initialValue"
-  app={`<DatePicker initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker initialValue="05/25/2024" />
+    </App>  
+  `}
 />
 
 ### `mode`
@@ -107,20 +137,21 @@ This property sets the component's initial value.
 The mode of the datepicker (single or range)
 
 ```ueml copy {2-3}
-<VStack>
+<App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={120}
+  height={240}
   name="Example: mode"
   app={`
-  <VStack>
+  <App>
     <DatePicker mode="single" />
     <DatePicker mode="range" />
-  </VStack>`}
+  </App>
+  `}
 />
 
 ### `placeholder`
@@ -128,13 +159,19 @@ The mode of the datepicker (single or range)
 A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy
-<DatePicker placeholder="This is a placeholder" />
+<App>
+  <DatePicker placeholder="This is a placeholder" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: placeholder"
-  app={`<DatePicker placeholder="This is a placeholder" />`}
+  app={`
+    <App>
+      <DatePicker placeholder="This is a placeholder" />
+    </App>  
+  `}
 />
 
 ### `readOnly`
@@ -146,13 +183,19 @@ Set this property to `true` to disallow changing the component value.
 Whether to show the week number in the calendar
 
 ```ueml copy
-<DatePicker showWeekNumber="true" />
+<App>
+  <DatePicker showWeekNumber="true" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: showWeekNumber"
-  app={`<DatePicker showWeekNumber="true" />`}
+  app={`
+    <App>
+      <DatePicker showWeekNumber="true" />
+    </App>
+  `}
 />
 
 ### `toDate`
@@ -160,13 +203,19 @@ Whether to show the week number in the calendar
 The end date of the range of selectable dates
 
 ```ueml copy
-<DatePicker toDate="05/26/2024" />
+<App>
+  <DatePicker toDate="05/26/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: toDate"
-  app={`<DatePicker toDate="05/26/2024" />`}
+  app={`
+    <App>
+      <DatePicker toDate="05/26/2024" />
+    </App>
+  `}
 />
 
 ### `validationStatus`
@@ -189,24 +238,25 @@ Available values:
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
   <DatePicker validationStatus="warning" />
   <DatePicker validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={200}
+  height={300}
   app={`
-  <VStack gap="0.5rem">
-    <DatePicker />
-    <DatePicker validationStatus="valid" />
-    <DatePicker validationStatus="warning" />
-    <DatePicker validationStatus="error" />
-  </VStack>`}
+    <App>
+      <DatePicker />
+      <DatePicker validationStatus="valid" />
+      <DatePicker validationStatus="warning" />
+      <DatePicker validationStatus="error" />
+    </App>
+  `}
 />
 
 ### `weekStartsOn`
@@ -224,13 +274,19 @@ The first day of the week. 0 is Sunday, 1 is Monday, etc.
 | Saturday  | 6      |
 
 ```ueml copy
-<DatePicker weekStartsOn="1" />
+<App>
+  <DatePicker weekStartsOn="1" />
+</App>
 ```
 
 <Playground
   name="Example: weekStartsOn"
-  height={60}
-  app={`<DatePicker weekStartsOn="1" />`}
+  height={120}
+  app={`
+    <App>
+      <DatePicker weekStartsOn="1" />
+    </App>
+  `}
 />
 
 ## Events
@@ -242,20 +298,21 @@ This event is triggered when value of DatePicker has changed.
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+<App var.field="">
   <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
-</VStack>
+</App>
 ```
 
 <Playground
   height={120}
   name="Example: didChange"
   app={`
-  <VStack gap="0.5rem" var.field="">
-    <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text value="{field}" />
-  </VStack>`}
+    <App var.field="">
+      <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
+      <Text value="{field}" />
+    </App>
+  `}
 />
 
 ### `gotFocus`
@@ -266,26 +323,27 @@ Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {4-5}
-<VStack gap="0.5rem" var.isFocused="false">
+<App var.isFocused="false">
   <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
   <DatePicker
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false"
   />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={120}
+  height={160}
   name="Example: gotFocus/lostFocus"
   app={`
-  <VStack gap="0.5rem" var.isFocused="false">
-    <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
-    <DatePicker
-      onGotFocus="isFocused = true"
-      onLostFocus="isFocused = false"
-    />
-  </VStack>`}
+    <App var.isFocused="false">
+      <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
+      <DatePicker
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false"
+      />
+    </App>
+  `}
 />
 
 ### `lostFocus`
@@ -298,7 +356,54 @@ This component does not have any context values.
 
 ## Exposed Members
 
-This component does not expose any members.
+### `focus`
+
+This method sets the focus on the DatePicker.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+```ueml copy {3, 9, 12}
+<App>
+  <DatePicker
+    id="picker"
+    readOnly="true"
+  />
+  <HStack gap="0.5rem">
+    <Button
+      label="Add Text"
+      onClick="picker.setValue('05/25/2024')" />
+    <Button
+      label="Remove Text"
+      onClick="picker.setValue('')" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: value and setValue"
+  app={`
+    <App>
+      <DatePicker
+        id="picker"
+        readOnly="true"
+      />
+      <HStack gap="0.5rem">
+        <Button
+          label="Add Text"
+          onClick="picker.setValue('05/25/2024')" />
+        <Button
+          label="Remove Text"
+          onClick="picker.setValue('')" />
+      </HStack>
+    </App>
+  `}
+/>
+
+### `value`
+
+You can query the component's value. If no value is set, it will retrieve `undefined`.
 
 ## Styling
 
@@ -336,7 +441,7 @@ The `DatePicker` component provides these theme variables to customize its appea
 
 <Playground
   name="Example: styling"
-  height={60}
+  height={120}
   defaultTheme="custom"
   themes={[
     {
@@ -351,7 +456,11 @@ The `DatePicker` component provides these theme variables to customize its appea
       },
     },
   ]}
-  app={`<DatePicker />`}
+  app={`
+    <App>
+      <DatePicker />
+    </App>  
+  `}
 />
 
 To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:
