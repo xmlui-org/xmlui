@@ -369,13 +369,88 @@ This component does not have any context values.
 
 This method sets the focus on the TextArea.
 
+```ueml copy {2-3}
+<VStack gap="$space-0_5">
+  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+  <TextArea id="inputComponent" />
+</VStack>
+```
+
+<Playground
+  name="Example: focus"
+  height={120}
+  app={`
+  <VStack gap="$space-0_5">
+    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+    <TextArea id="inputComponent" />
+  </VStack>
+  `}
+/>
+
 ### `setValue`
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
+```ueml copy {10}
+<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <TextArea
+    id="inputField"
+    readOnly="true"
+    onDidChange="changes++"
+  />
+  <HStack gap="$space-1">
+    <Button
+      label="Check"
+      onClick="inputField.setValue('example ')"
+    />
+    <Text value="Number of changes: {changes}" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  name="Example: setValue"
+  app={`
+  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+    <TextArea
+      id="inputField"
+      readOnly="true"
+      onDidChange="changes++"
+    />
+    <HStack gap="$space-1">
+      <Button
+        label="Check"
+        onClick="inputField.setValue('example ')"
+      />
+      <Text value="Number of changes: {changes}" />
+    </HStack>
+  </VStack>
+  `}
+/>
+
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
+
+```ueml copy {2-3}
+<HStack gap="$space-0_5">
+  <Text value="TextArea content length: {inputComponent.value.length}" />
+  <TextArea id="inputComponent" />
+</HStack>
+```
+
+<Playground
+  name="Example: value"
+  height={60}
+  app={`
+  <HStack gap="$space-0_5">
+    <Text value="TextArea content length: {inputComponent.value.length}" />
+    <TextArea id="inputComponent" />
+  </HStack>
+  `}
+/>
 
 ## Styling
 

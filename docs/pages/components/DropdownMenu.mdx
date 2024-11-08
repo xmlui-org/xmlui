@@ -240,6 +240,28 @@ This component does not have any context values.
 
 This method command closes the dropdown.
 
+```ueml copy {3}
+<DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+  <EmojiSelector
+    onSelect="(reaction) => { emojiDropDown.close(); }"
+    autoFocus="true"
+  />
+</DropdownMenu>
+```
+
+<Playground
+  name="Example: close"
+  height={200}
+  app={`
+  <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+    <EmojiSelector
+      onSelect="(reaction) => { emojiDropDown.close(); }"
+      autoFocus="true"
+    />
+  </DropdownMenu>
+  `}
+/>
+
 ## Styling
 
 The `DropdownMenu` component uses these theme variables to customize its appearance:

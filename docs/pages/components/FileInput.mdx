@@ -320,9 +320,45 @@ This component does not have any context values.
 
 This method sets the focus on the FileInput.
 
+```ueml copy {2-3}
+<HStack gap="$space-0_5">
+  <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+  <FileInput id="fileInputComponent" />
+</HStack>
+```
+
+<Playground
+  name="Example: focus"
+  height={60}
+  app={`
+  <HStack gap="$space-0_5">
+    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+  `}
+/>
+
 ### `open`
 
 This API command triggers the file browsing dialog to open.
+
+```ueml copy {3-4}
+<HStack gap="$space-0_5">
+  <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+  <FileInput id="fileInputComponent" />
+</HStack>
+```
+
+<Playground
+  name="Example: open"
+  height={60}
+  app={`
+  <HStack gap="$space-0_5">
+    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+  `}
+/>
 
 ### `setValue`
 
@@ -331,6 +367,27 @@ This API command triggers the file browsing dialog to open.
 ### `value`
 
 By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined.
+
+In the example below, select a file using the file browser of the `FileInput` component
+and note how the `Text` component displays the selected file's name:
+
+```ueml copy {2-3}
+<HStack gap="$space-0_5">
+  <Text value="Selected file name: {fileInputComponent.value}" />
+  <FileInput id="fileInputComponent" />
+</HStack>
+```
+
+<Playground
+  name="Example: value"
+  height={60}
+  app={`
+  <HStack gap="$space-0_5">
+    <Text value="Selected file name: {fileInputComponent.value}" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+  `}
+/>
 
 ## Styling
 
