@@ -33,6 +33,7 @@ type PlaygroundProps = {
   horizontal?: boolean;
   previewMode?: boolean;
   allowStandalone?: boolean;
+  fixedTheme?: boolean;
 };
 
 const EMPTY_ARRAY = [];
@@ -54,6 +55,7 @@ export const Playground = ({
   horizontal = false,
   allowStandalone = true,
   api,
+  fixedTheme = false,
 }: PlaygroundProps) => {
   const { theme, systemTheme } = useTheme();
   const id = useId();
@@ -89,6 +91,7 @@ export const Playground = ({
           allowStandalone,
           id: 0,
           language: "ueml",
+          fixedTheme,
         }),
       );
     }
