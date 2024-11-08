@@ -13,9 +13,9 @@ import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import { Box } from "@/src/components/Box";
-import {ToneSwitcher} from "@/src/components/ToneSwitcher";
-import {ThemeSwitcher} from "@/src/components/ThemeSwitcher";
-import {handleDownloadZip} from "@/src/utils/helpers";
+import { ToneSwitcher } from "@/src/components/ToneSwitcher";
+import { ThemeSwitcher } from "@/src/components/ThemeSwitcher";
+import { handleDownloadZip } from "@/src/utils/helpers";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -66,10 +66,12 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && standalone && <CodeSelector />}
         </Box>
         <SpaceFiller />
-        <Tooltip trigger={<ToneSwitcher />} label="Change tone" />
-        {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
+        {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
+        {!options.fixedTheme &&
+          appDescription.availableThemes &&
+          appDescription.availableThemes.length > 1 && (
             <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
-        )}
+          )}
         {!options.previewMode && show && (
           <>
             {!standalone && (
