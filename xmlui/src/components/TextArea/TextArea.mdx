@@ -9,13 +9,18 @@ To add new lines to the input field press `Shift` + `Enter`.
 %-PROP-START autoFocus
 
 ```ueml copy
-<TextArea autoFocus="true" />
+<App>
+  <TextArea autoFocus="true" />
+</App>
 ```
 
 <Playground
   name="Example: autoFocus"
-  height={80}
-  app={`<TextArea autoFocus="true" />`}
+  app={`
+  <App>
+    <TextArea autoFocus="true" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -27,13 +32,18 @@ To add new lines to the input field press `Shift` + `Enter`.
 Write multiple lines in the `TextArea` in the demo below to see how it resizes automatically.
 
 ```ueml copy
-<TextArea autoSize="true" />
+<App>
+  <TextArea autoSize="true" />
+</App>
 ```
 
 <Playground
   name="Example: autoSize"
-  height={100}
-  app={`<TextArea autoSize="true" />`}
+  app={`
+  <App>
+    <TextArea autoSize="true" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -41,13 +51,18 @@ Write multiple lines in the `TextArea` in the demo below to see how it resizes a
 %-PROP-START enabled
 
 ```ueml copy
-<TextArea enabled="false" />
+<App>
+  <TextArea enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  app={`<TextArea enabled="false" />`}
-  height={80}
+  app={`
+  <App>
+    <TextArea enabled="false" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -58,24 +73,28 @@ Press `Enter` after writing something in the `TextArea` in the demo below.
 See [Using Forms](../learning/forms.mdx) for details.
 
 ```ueml copy
-<Form onSubmit="window.alert(address.value)">
+<App>
+  <Form onSubmit="toast.success(JSON.stringify(address.value))">
     <TextArea
       id="address"
       enterSubmits="true"
-      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234"
-    />
-</Form>
+      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: enterSubmits"
-  app={`<Form onSubmit="window.alert(address.value)">
-    <TextArea
-      id="address"
-      enterSubmits="true"
-      initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234"
-    />
-</Form>`}
+  app={`
+  <App>
+    <Form onSubmit="toast.success(JSON.stringify(address.value))">
+      <TextArea
+        id="address"
+        enterSubmits="true"
+        initialValue="Suzy Queue, 4455 Landing Lange, APT 4, Louisville, KY 40018-1234" />
+    </Form>
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -85,13 +104,18 @@ See [Using Forms](../learning/forms.mdx) for details.
 The initial value displayed in the input field.
 
 ```ueml copy
-<TextArea initialValue="Example text" />
+<App>
+  <TextArea initialValue="Example text" />
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
-  height={80}
-  app={`<TextArea initialValue="Example text" />`}
+  app={`
+  <App>
+    <TextArea initialValue="Example text" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -100,28 +124,32 @@ The initial value displayed in the input field.
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy
-<TextArea
-  maxRows="3"
-  initialValue="Lorem ipsum dolor sit amet,
-  consectetur adipiscing elit,
-  sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-  Ut enim ad minim veniam,
-  quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-/>
+```ueml copy {3}
+<App>
+  <TextArea
+    maxRows="3"
+    initialValue="Lorem ipsum dolor sit amet,
+    consectetur adipiscing elit,
+    sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
+</App>
 ```
 
 <Playground
   name="Example: maxRows"
-  app={`<TextArea
-  maxRows="3"
-  initialValue="Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-Ut enim ad minim veniam,
-quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-/>`}
-  height={100}
+  height={160}
+  app={`
+  <App>
+    <TextArea
+      maxRows="3"
+      initialValue="Lorem ipsum dolor sit amet,
+      consectetur adipiscing elit,
+      sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      Ut enim ad minim veniam,
+      quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -130,14 +158,20 @@ quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa
 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
-```ueml copy
-<TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+```ueml copy /minRows="3"/
+<App>
+  <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+</App>
 ```
 
 <Playground
   name="Example: minRows"
-  app={`<TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />`}
-  height={100}
+  height={200}
+  app={`
+  <App>
+    <TextArea minRows="3" initialValue="Lorem ipsum dolor sit amet..." />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -145,13 +179,18 @@ quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa
 %-PROP-START placeholder
 
 ```ueml copy
-<TextArea placeholder="This is a placeholder" />
+<App>
+  <TextArea placeholder="This is a placeholder" />
+</App>
 ```
 
 <Playground
   name="Example: placeholder"
-  height={80}
-  app={`<TextArea placeholder="This is a placeholder" />`}
+  app={`
+  <App>
+    <TextArea placeholder="This is a placeholder" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -159,25 +198,23 @@ quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequa
 %-PROP-START readOnly
 
 ```ueml copy /readOnly="{true}"/
-<TextArea initialValue="Example text" readOnly="{true}" />
+<App>
+  <TextArea initialValue="Example text" readOnly="{true}" />
+</App>
 ```
 
 <Playground
   name="Example: readOnly"
-  height={80}
-  app={`<TextArea initialValue="Example text" readOnly="{true}" />`}
+  app={`
+  <App>
+    <TextArea initialValue="Example text" readOnly="{true}" />
+  </App>
+  `}
 />
 
 %-PROP-END
 
 %-PROP-START resize
-
-| Value        | Description                   |
-| :----------- | :---------------------------- |
-|  undefined   | No resizing                   |
-| `horizontal` | Can only resize horizontally  |
-| `vertical`   | Can only resize vertically    |
-| `both`       | Can resize in both dimensions |
 
 If you allow resizing, the `TextArea` turns off automatic sizing.
 
@@ -185,20 +222,22 @@ When you allow vertical resizing, you can limit the sizable range according to `
 
 Drag the small resize indicators at the bottom right on each of the controls in the demo.
 
-```ueml copy
-<VStack gap="0.5rem">
-    <TextArea resize="vertical" minRows="1" maxRows="8" />
-    <TextArea resize="both" />
-</VStack>
+```ueml copy /resize/
+<App>
+  <TextArea resize="vertical" minRows="1" maxRows="8" />
+  <TextArea resize="both" />
+</App>
 ```
 
 <Playground
   name="Example: resize"
-  app={`<VStack gap="0.5rem">
+  height={300}
+  app={`
+  <App>
     <TextArea resize="vertical" minRows="1" maxRows="8" />
     <TextArea resize="both" />
-</VStack>`}
-  height={300}
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -208,13 +247,18 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 > **Note**: If either `autoSize`, `maxRows` or `minRows` is set, the `rows` prop has no effect.
 
 ```ueml copy
-<TextArea rows="10" />
+<App>
+  <TextArea rows="10" />
+</App>
 ```
 
 <Playground
   name="Example: rows"
-  app={`<TextArea rows="10" />`}
-  height={300}
+  app={`
+  <App>
+    <TextArea rows="10" />
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -223,31 +267,24 @@ Drag the small resize indicators at the bottom right on each of the controls in 
 
 This prop is used to visually indicate status changes reacting to form field validation.
 
-| Value     | Description                                           |
-| :-------- | :---------------------------------------------------- |
-| `valid`   | Visual indicator for an input that is accepted        |
-| `warning` | Visual indicator for an input that produced a warning |
-| `error`   | Visual indicator for an input that produced an error  |
-
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <TextArea />
   <TextArea validationStatus="valid" />
   <TextArea validationStatus="warning" />
   <TextArea validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={300}
   app={`
-  <VStack gap="0.5rem">
+  <App>
     <TextArea />
     <TextArea validationStatus="valid" />
     <TextArea validationStatus="warning" />
     <TextArea validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -258,20 +295,19 @@ This prop is used to visually indicate status changes reacting to form field val
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
-  <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+<App var.field="">
   <Text initialValue="{field}" />
-</VStack>
+  <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={100}
   app={`
-  <VStack gap="0.5rem" var.field="">
+  <App var.field="">
+    <Text initialValue="{field}" />
     <TextArea initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text value="{field}" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -282,25 +318,26 @@ Write in the input field and see how the `Text` underneath it is updated in para
 Clicking on the `TextArea` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
-```ueml copy {3-4}
-<TextArea
-  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={100}
-  app={`
+```ueml copy {4-5}
+<App>
   <TextArea
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
-    var.focused="{false}"
-  />
+    var.focused="{false}" />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+  <App>
+    <TextArea
+      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+      onGotFocus="focused = true"
+      onLostFocus="focused = false"
+      var.focused="{false}" />
+  </App>
   `}
 />
 
@@ -309,20 +346,19 @@ Note how clicking elsewhere resets the text to the original.
 %-API-START focus
 
 ```ueml copy {2-3}
-<VStack gap="$space-0_5">
+<App>
   <Button label="Trigger Focus" onClick="inputComponent.focus()" />
   <TextArea id="inputComponent" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: focus"
-  height={120}
   app={`
-  <VStack gap="$space-0_5">
+  <App>
     <Button label="Trigger Focus" onClick="inputComponent.focus()" />
     <TextArea id="inputComponent" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -333,20 +369,19 @@ Note how clicking elsewhere resets the text to the original.
 In the example below, typing in the `TextArea` will also display the length of the text typed into it above the field:
 
 ```ueml copy {2-3}
-<HStack gap="$space-0_5">
+<App>
   <Text value="TextArea content length: {inputComponent.value.length}" />
   <TextArea id="inputComponent" />
-</HStack>
+</App>
 ```
 
 <Playground
   name="Example: value"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
+  <App>
     <Text value="TextArea content length: {inputComponent.value.length}" />
     <TextArea id="inputComponent" />
-  </HStack>
+  </App>
   `}
 />
 
@@ -354,40 +389,36 @@ In the example below, typing in the `TextArea` will also display the length of t
 
 %-API-START setValue
 
-```ueml copy {10}
-<VStack margin="$space-1" gap="$space-0_5" var.changes="">
+```ueml copy {9}
+<App var.changes="">
   <TextArea
     id="inputField"
     readOnly="true"
-    onDidChange="changes++"
-  />
-  <HStack gap="$space-1">
+    onDidChange="changes++" />
+  <HStack>
     <Button
       label="Check"
-      onClick="inputField.setValue('example ')"
-    />
+      onClick="inputField.setValue('example ')" />
     <Text value="Number of changes: {changes}" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: setValue"
   app={`
-  <VStack margin="$space-1" gap="$space-0_5" var.changes="">
+  <App var.changes="">
     <TextArea
       id="inputField"
       readOnly="true"
-      onDidChange="changes++"
-    />
-    <HStack gap="$space-1">
+      onDidChange="changes++" />
+    <HStack>
       <Button
         label="Check"
-        onClick="inputField.setValue('example ')"
-      />
+        onClick="inputField.setValue('example ')" />
       <Text value="Number of changes: {changes}" />
     </HStack>
-  </VStack>
+  </App>
   `}
 />
 
