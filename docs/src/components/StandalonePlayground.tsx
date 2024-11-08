@@ -1,4 +1,4 @@
-import React, {useEffect, useId, useMemo, useReducer, useState} from "react";
+import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import { useToast } from "@/src/hooks/useToast";
@@ -14,7 +14,7 @@ import { ToastProvider } from "@radix-ui/react-toast";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { Header } from "@/src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
-import {Spinner} from "@components/Spinner/SopinnerNative";
+import { Spinner } from "@components/Spinner/SopinnerNative";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
@@ -42,7 +42,13 @@ export const StandalonePlayground = () => {
         const data = JSON.parse(await decompressData(queryParams.app as string));
         setLoading(false);
         dispatch(appDescriptionInitialized(data.standalone));
-        dispatch(optionsInitialized({ ...playgroundState.options, ...data.options, orientation: "horizontal" }));
+        dispatch(
+          optionsInitialized({
+            ...playgroundState.options,
+            ...data.options,
+            orientation: "horizontal",
+          }),
+        );
         dispatch(contentChanged(data.options.content));
       } catch (e) {
         showToast({
@@ -61,6 +67,7 @@ export const StandalonePlayground = () => {
 
   const playgroundContextValue = useMemo(() => {
     return {
+      editorStatus: playgroundState.editorStatus,
       status: playgroundState.status,
       options: playgroundState.options,
       text: playgroundState.text,
@@ -70,6 +77,7 @@ export const StandalonePlayground = () => {
       playgroundId: id,
     };
   }, [
+    playgroundState.editorStatus,
     playgroundState.status,
     playgroundState.options,
     playgroundState.text,
@@ -84,12 +92,12 @@ export const StandalonePlayground = () => {
         <ErrorBoundary>
           {loading && <Spinner />}
           {!loading && (
-              <div className={styles.standalonePlayground}>
-                {!playgroundState.options.previewMode && <Header standalone={true} />}
-                <div style={{ flexGrow: 1, overflow: "auto" }}>
-                  <PlaygroundContent standalone={true} />
-                </div>
+            <div className={styles.standalonePlayground}>
+              {!playgroundState.options.previewMode && <Header standalone={true} />}
+              <div style={{ flexGrow: 1, overflow: "auto" }}>
+                <PlaygroundContent standalone={true} />
               </div>
+            </div>
           )}
         </ErrorBoundary>
       </PlaygroundContext.Provider>

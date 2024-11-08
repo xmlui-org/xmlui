@@ -1,4 +1,4 @@
-import { textChanged } from "@/src/state/store";
+import { editorStatusChanged, textChanged } from "@/src/state/store";
 import React, { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
 import { usePlayground } from "@/src/hooks/usePlayground";
@@ -50,12 +50,19 @@ export const Editor = () => {
     [dispatch],
   );
 
+  useEffect(() => {
+    dispatch(editorStatusChanged("loading"));
+  }, [dispatch]);
+
   return (
     <MonacoEditor
       saveViewState={true}
       key={"app"}
       onChange={updateValue}
       language={options.language}
+      onMount={() => {
+        dispatch(editorStatusChanged("loaded"));
+      }}
       options={{
         scrollBeyondLastLine: false,
         minimap: { enabled: false },
