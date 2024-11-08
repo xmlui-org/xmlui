@@ -64,7 +64,7 @@ const metadata = Object.entries(collectedComponentMetadata)
       [
         "props",
         "events",
-        "api",
+        "apis",
         "contextVars",
       ],
     );

@@ -414,6 +414,32 @@ This context variable acts as a template for an item in the list.
 
 This method sets the focus on the MultiSelect.
 
+```ueml copy /onClick="inputControl.focus()"/
+<VStack padding="$space-1" gap="$space-0_5">
+  <Button label="Focus Input" onClick="inputControl.focus()" />
+  <MultiSelect id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </MultiSelect>
+</VStack>
+```
+
+<Playground
+  name="Example: focus()"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <Button label="Focus Input" onClick="inputControl.focus()" />
+    <MultiSelect id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </MultiSelect>
+  </VStack>
+  `}
+/>
+
 ## Styling
 
 The `MultiSelect` component uses these theme variables:
