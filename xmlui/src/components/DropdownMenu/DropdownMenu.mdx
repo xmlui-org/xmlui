@@ -3,15 +3,17 @@
 You can nest `MenuItem`, `MenuSeparator`, and `SubMenuItem` components into `DropdownMenu` to define a menu hierarchy. The component provides a trigger to display the menu items:
 
 ```ueml copy
-<DropdownMenu label="DropdownMenu">
-  <MenuItem>Item 1</MenuItem>
-  <MenuItem>Item 2</MenuItem>
-  <MenuSeparator />
-  <SubMenuItem label="Submenu">
-    <MenuItem>Submenu Item 1</MenuItem>
-    <MenuItem>Submenu Item 2</MenuItem>
-  </SubMenuItem>
-</DropdownMenu>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuSeparator />
+    <SubMenuItem label="Submenu">
+      <MenuItem>Submenu Item 1</MenuItem>
+      <MenuItem>Submenu Item 2</MenuItem>
+    </SubMenuItem>
+  </DropdownMenu>
+</App>
 ```
 
 Try this dropdown menu:
@@ -20,7 +22,7 @@ Try this dropdown menu:
   name="Example: Using DropdownMenu"
   height={240}
   app={`
-    <VStack padding="1rem">
+    <App>
       <DropdownMenu label="DropdownMenu">
         <MenuItem>Item 1</MenuItem>
         <MenuItem>Item 2</MenuItem>
@@ -30,7 +32,7 @@ Try this dropdown menu:
           <MenuItem>Submenu Item 2</MenuItem>
         </SubMenuItem>
       </DropdownMenu>
-    </VStack>
+    </App>
   `}
 />
 
@@ -42,39 +44,41 @@ Available values are:
 - `start`: Menu items are aligned to the start of the trigger component (default).
 - `end`: Menu items are aligned to the end of the trigger component.
 
-```ueml copy {9}
-<HStack padding="1rem" gap="2rem">
-  <DropdownMenu label="Start-aligned menu">
-    <MenuItem>Item 1</MenuItem>
-    <MenuItem>Item 2</MenuItem>
-    <MenuItem>Item 3</MenuItem>
-  </DropdownMenu>
-  <DropdownMenu
-    label="End-aligned menu"
-    alignment="end">
-    <MenuItem>Item 1</MenuItem>
-    <MenuItem>Item 2</MenuItem>
-    <MenuItem>Item 3</MenuItem>
-  </DropdownMenu>
-</HStack>
+```ueml copy {8}
+<App>
+  <HStack>
+    <DropdownMenu label="Start-aligned menu">
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+    <DropdownMenu label="End-aligned menu" alignment="end">
+      <MenuItem>Item 1</MenuItem>
+      <MenuItem>Item 2</MenuItem>
+      <MenuItem>Item 3</MenuItem>
+    </DropdownMenu>
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: alignment"
-  height={200}
+  height={240}
   app={`
-    <HStack padding="1rem" gap="2rem">
-      <DropdownMenu label="Start-aligned menu">
-        <MenuItem>Item 1</MenuItem>
-        <MenuItem>Item 2</MenuItem>
-        <MenuItem>Item 3</MenuItem>
-      </DropdownMenu>
-      <DropdownMenu label="End-aligned menu" alignment="end">
-        <MenuItem>Item 1</MenuItem>
-        <MenuItem>Item 2</MenuItem>
-        <MenuItem>Item 3</MenuItem>
-      </DropdownMenu>
-    </HStack>
+    <App>
+      <HStack>
+        <DropdownMenu label="Start-aligned menu">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuItem>Item 3</MenuItem>
+        </DropdownMenu>
+        <DropdownMenu label="End-aligned menu" alignment="end">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuItem>Item 3</MenuItem>
+        </DropdownMenu>
+      </HStack>
+    </App>
   `}
 />
 
@@ -82,31 +86,33 @@ Available values are:
 
 %-PROP-START triggerTemplate
 
-```ueml copy {2-4}
-<DropdownMenu label="(ignored)">
-  <property name="triggerTemplate">
-    <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
-  </property>
-  <MenuItem>Item 1</MenuItem>
-  <MenuItem>Item 2</MenuItem>
-  <MenuItem>Item 3</MenuItem>
-</DropdownMenu>
+```ueml copy {3-5}
+<App>
+  <DropdownMenu label="(ignored)">
+    <property name="triggerTemplate">
+      <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+    </property>
+    <MenuItem>Item 1</MenuItem>
+    <MenuItem>Item 2</MenuItem>
+    <MenuItem>Item 3</MenuItem>
+  </DropdownMenu>
+</App>
 ```
 
 <Playground
   name="Example: triggerTemplate"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="1rem">
-    <DropdownMenu label="(ignored)">
-      <property name="triggerTemplate">
-        <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
-      </property>
-      <MenuItem>Item 1</MenuItem>
-      <MenuItem>Item 2</MenuItem>
-      <MenuItem>Item 3</MenuItem>
-    </DropdownMenu>
-  </VStack>
+    <App>
+      <DropdownMenu label="(ignored)">
+        <property name="triggerTemplate">
+          <Button label="Custom trigger" icon="chevrondown" iconPosition="right"/>
+        </property>
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+    </App>
   `}
 />
 
@@ -114,49 +120,49 @@ Available values are:
 
 %-PROP-START enabled
 
-```ueml copy {3, 11}
-<HStack padding="1rem" gap="2rem">
-  <DropdownMenu
-    enabled="true"
-    label="Enabled Dropdown"
-  >
-    <MenuItem>Item 1</MenuItem>
-    <MenuItem>Item 2</MenuItem>
-    <MenuItem>Item 3</MenuItem>
-  </DropdownMenu>
-  <DropdownMenu
-    enabled="false"
-    label="Disabled Dropdown"
-  >
-    <MenuItem>Item 1</MenuItem>
-    <MenuItem>Item 2</MenuItem>
-    <MenuItem>Item 3</MenuItem>
-  </DropdownMenu>
-</HStack>
-```
-
-<Playground
-  name="Example: enabled"
-  height={200}
-  app={`
-  <HStack padding="1rem" gap="2rem">
+```ueml copy {4, 11}
+<App>
+  <HStack>
     <DropdownMenu
       enabled="true"
-      label="Enabled Dropdown"
-    >
+      label="Enabled Dropdown">
       <MenuItem>Item 1</MenuItem>
       <MenuItem>Item 2</MenuItem>
       <MenuItem>Item 3</MenuItem>
     </DropdownMenu>
     <DropdownMenu
       enabled="false"
-      label="Disabled Dropdown"
-    >
+      label="Disabled Dropdown">
       <MenuItem>Item 1</MenuItem>
       <MenuItem>Item 2</MenuItem>
       <MenuItem>Item 3</MenuItem>
     </DropdownMenu>
   </HStack>
+</App>
+```
+
+<Playground
+  name="Example: enabled"
+  height={240}
+  app={`
+    <App>
+      <HStack>
+        <DropdownMenu
+          enabled="true"
+          label="Enabled Dropdown">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuItem>Item 3</MenuItem>
+        </DropdownMenu>
+        <DropdownMenu
+          enabled="false"
+          label="Disabled Dropdown">
+          <MenuItem>Item 1</MenuItem>
+          <MenuItem>Item 2</MenuItem>
+          <MenuItem>Item 3</MenuItem>
+        </DropdownMenu>
+      </HStack>
+    </App>
   `}
 />
 
@@ -167,36 +173,34 @@ Available values are:
 %-EVENT-START willOpen
 
 ```ueml copy {6}
-<VStack padding="1rem" gap="2rem">
+<App>
   <var name="counter" value="{0}" />
   <Text value="Number of times the dropdown was opened: {counter}" />
   <DropdownMenu
     label="Dropdown"
-    onWillOpen="counter += 1"
-  >
+    onWillOpen="counter += 1">
     <MenuItem>Item 1</MenuItem>
     <MenuItem>Item 2</MenuItem>
     <MenuItem>Item 3</MenuItem>
   </DropdownMenu>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: willOpen"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="1rem" gap="2rem">
-    <var name="counter" value="{0}" />
-    <Text value="Number of times the dropdown was opened: {counter}" />
-    <DropdownMenu
-      label="Dropdown"
-      onWillOpen="counter += 1"
-    >
-      <MenuItem>Item 1</MenuItem>
-      <MenuItem>Item 2</MenuItem>
-      <MenuItem>Item 3</MenuItem>
-    </DropdownMenu>
-  </VStack>
+    <App>
+      <var name="counter" value="{0}" />
+      <Text value="Number of times the dropdown was opened: {counter}" />
+      <DropdownMenu
+        label="Dropdown"
+        onWillOpen="counter += 1">
+        <MenuItem>Item 1</MenuItem>
+        <MenuItem>Item 2</MenuItem>
+        <MenuItem>Item 3</MenuItem>
+      </DropdownMenu>
+    </App>
   `}
 />
 
@@ -204,25 +208,29 @@ Available values are:
 
 %-API-START close
 
-```ueml copy {3}
-<DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
-  <EmojiSelector
-    onSelect="(reaction) => { emojiDropDown.close(); }"
-    autoFocus="true"
-  />
-</DropdownMenu>
-```
-
-<Playground
-  name="Example: close"
-  height={200}
-  app={`
+```ueml copy {4}
+<App>
   <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
     <EmojiSelector
       onSelect="(reaction) => { emojiDropDown.close(); }"
       autoFocus="true"
     />
   </DropdownMenu>
+</App>
+```
+
+<Playground
+  name="Example: close"
+  height={240}
+  app={`
+    <App>
+      <DropdownMenu id="emojiDropDown" label="Emoji Dropdown">
+        <EmojiSelector
+          onSelect="(reaction) => { emojiDropDown.close(); }"
+          autoFocus="true"
+        />
+      </DropdownMenu>
+    </App>
   `}
 />
 

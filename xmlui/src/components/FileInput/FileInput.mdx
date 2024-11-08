@@ -11,13 +11,18 @@ The text box of the input field is read only.
 %-PROP-START enabled
 
 ```ueml copy
-<FileInput enabled="false" />
+<App>
+  <FileInput enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={60}
-  app={`<FileInput enabled="false" />`}
+  app={`
+    <App>
+      <FileInput enabled="false" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -31,23 +36,24 @@ The text box of the input field is read only.
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <FileInput />
   <FileInput validationStatus="valid" />
   <FileInput validationStatus="warning" />
   <FileInput validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={220}
-  app={`<VStack gap="0.5rem">
-  <FileInput />
-  <FileInput validationStatus="valid" />
-  <FileInput validationStatus="warning" />
-  <FileInput validationStatus="error" />
-</VStack>`}
+  app={`
+    <App>
+      <FileInput />
+      <FileInput validationStatus="valid" />
+      <FileInput validationStatus="warning" />
+      <FileInput validationStatus="error" />
+    </App>
+`}
 />
 
 %-PROP-END
@@ -58,19 +64,19 @@ If no label is specified and an icon is set, the button will modify its styling 
 By default the label reads `Browse`.
 
 ```ueml copy
-<VStack gap="1rem" >
+<App >
   <FileInput />
-  <FileInput label="I am the button label" />
-</VStack>
+  <FileInput buttonLabel="I am the button label" />
+</App>
 ```
 
 <Playground
   name="Example: label"
-  height={120}
-  app={`<VStack gap="1rem" >
-  <FileInput />
-  <FileInput buttonLabel="I am the button label" />
-</VStack>
+  app={`
+    <App >
+      <FileInput />
+      <FileInput buttonLabel="I am the button label" />
+    </App>
   `}
 />
 
@@ -79,19 +85,20 @@ By default the label reads `Browse`.
 %-PROP-START buttonIcon
 
 ```ueml
-<VStack gap="0.5rem" >
+<App>
   <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
   <FileInput buttonIcon="drive" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={110}
   name="Example: buttonIcon"
-  app={`<VStack gap="0.5rem" >
-  <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
-  <FileInput buttonIcon="drive" />
-</VStack>`}
+  app={`
+    <App>
+      <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
+      <FileInput buttonIcon="drive" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -99,8 +106,19 @@ By default the label reads `Browse`.
 %-PROP-START buttonIconPosition
 
 ```ueml
-<FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+<App>
+  <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonIconPosition"
+  app={`
+    <App>
+      <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+    </App>
+  `}
+/>
 
 Details on different icon positions can be found in the [`Button` icon positions section](./Button.mdx#iconposition).
 
@@ -108,39 +126,39 @@ Details on different icon positions can be found in the [`Button` icon positions
 
 %-PROP-START acceptsFileType
 
-**NOTE:** Does not seem to work.
-
 ```ueml
-<FileInput acceptsFileType="{['.txt', '.jpg']}" />
+<App>
+  <FileInput acceptsFileType="{['.txt', '.jpg']}" />
+</App>  
 ```
 
 <Playground
-  height={60}
   name="Example: acceptsFileType"
-  app={`<FileInput acceptsFileType="{['.txt', '.jpg']}" />`}
+  app={`
+    <App>
+      <FileInput acceptsFileType="{['.txt', '.jpg']}" />
+    </App>  
+  `}
 />
 
 %-PROP-END
 
 %-PROP-START multiple
 
-**NOTE**: This is pretty faulty
-
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <FileInput multiple="false" />
   <FileInput multiple="true" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={110}
   name="Example: multiple"
   app={`
-  <VStack gap="0.5rem">
-    <FileInput multiple="false" />
-    <FileInput multiple="true" />
-  </VStack>
+    <App>
+      <FileInput multiple="false" />
+      <FileInput multiple="true" />
+    </App>
   `}
 />
 
@@ -149,8 +167,19 @@ Details on different icon positions can be found in the [`Button` icon positions
 %-PROP-START buttonSize
 
 ```ueml copy
-<FileInput buttonSize="lg" />
+<App>
+  <FileInput buttonSize="lg" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonSize"
+  app={`
+    <App>
+      <FileInput buttonSize="lg" />
+    </App>
+  `}
+/>
 
 Details on different sizes can be found in the [`Button` sizes section](./Button.mdx#size).
 
@@ -159,8 +188,19 @@ Details on different sizes can be found in the [`Button` sizes section](./Button
 %-PROP-START buttonThemeColor
 
 ```ueml copy
-<FileInput buttonThemeColor="secondary" />
+<App>
+  <FileInput buttonThemeColor="secondary" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonThemeColor"
+  app={`
+    <App>
+      <FileInput buttonThemeColor="secondary" />
+    </App>
+  `}
+/>
 
 Details on different theme colors can be found in the [`Button` theme colors section](./Button.mdx#themecolor).
 
@@ -169,8 +209,20 @@ Details on different theme colors can be found in the [`Button` theme colors sec
 %-PROP-START buttonVariant
 
 ```ueml copy
-<FileInput buttonLabel="outlined" variant="outlined" />
+<App>
+  <FileInput buttonLabel="outlined" buttonVariant="outlined" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonVariant"
+  app={`
+    <App>
+      <FileInput buttonLabel="outlined" buttonVariant="outlined" />
+    </App>
+  `}
+/>
+
 
 Details on different button variants can be found in the [`Button` variants section](./Button.mdx#variant).
 
@@ -179,13 +231,18 @@ Details on different button variants can be found in the [`Button` variants sect
 %-PROP-START directory
 
 ```ueml copy
-<FileInput directory="true" />
+<App>
+  <FileInput directory="true" />
+</App>  
 ```
 
 <Playground
-  height={60}
   name="Example: directory"
-  app={`<FileInput directory="true" />`}
+  app={`
+    <App>
+      <FileInput directory="true" />
+    </App>  
+  `}
 />
 
 %-PROP-END
@@ -195,20 +252,19 @@ Details on different button variants can be found in the [`Button` variants sect
 Write in the input field and see how the `Text` underneath it is updated in accordingly.
 
 ```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+<App var.field="">
   <FileInput onDidChange="(file) => field = file[0]?.name" />
   <Text value="{field}" />
-</VStack>`
+</App>`
 ```
 
 <Playground
   name="Example: didChange"
-  height={80}
   app={`
-  <VStack gap="0.5rem" var.field="">
-    <FileInput onDidChange="(file) => field = file[0]?.name" />
-    <Text value="{field}" />
-  </VStack>`
+    <App var.field="">
+      <FileInput onDidChange="(file) => field = file[0]?.name" />
+      <Text value="{field}" />
+    </App>`
   }
 />
 
@@ -220,24 +276,27 @@ Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {3-4}
-<FileInput
-  buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={72}
-  app={`
+<App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
     var.focused="{false}"
   />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+    <App>
+      <FileInput
+        buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+        onGotFocus="focused = true"
+        onLostFocus="focused = false"
+        var.focused="{false}"
+      />
+    </App>
   `}
 />
 
@@ -255,20 +314,23 @@ In the example below, select a file using the file browser of the `FileInput` co
 and note how the `Text` component displays the selected file's name:
 
 ```ueml copy {2-3}
-<HStack gap="$space-0_5">
-  <Text value="Selected file name: {fileInputComponent.value}" />
-  <FileInput id="fileInputComponent" />
-</HStack>
+<App>
+  <HStack>
+    <Text value="Selected file name: {fileInputComponent.value}" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: value"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
-    <Text value="Selected file name: {fileInputComponent.value}" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+    <App>
+      <HStack>
+        <Text value="Selected file name: {fileInputComponent.value}" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>
   `}
 />
 
@@ -277,20 +339,23 @@ and note how the `Text` component displays the selected file's name:
 %-API-START focus
 
 ```ueml copy {2-3}
-<HStack gap="$space-0_5">
-  <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
-  <FileInput id="fileInputComponent" />
-</HStack>
+<App>
+  <HStack>
+    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>  
 ```
 
 <Playground
   name="Example: focus"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
-    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+    <App>
+      <HStack>
+        <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>  
   `}
 />
 
@@ -299,20 +364,23 @@ and note how the `Text` component displays the selected file's name:
 %-API-START open
 
 ```ueml copy {3-4}
-<HStack gap="$space-0_5">
-  <Button label="Open FileInput" onClick="fileInputComponent.open()" />
-  <FileInput id="fileInputComponent" />
-</HStack>
+<App>
+  <HStack>
+    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: open"
-  height={60}
   app={`
-  <HStack gap="$space-0_5">
-    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
-    <FileInput id="fileInputComponent" />
-  </HStack>
+    <App>
+      <HStack>
+        <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>
   `}
 />
 

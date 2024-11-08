@@ -278,14 +278,14 @@ You can use this method to set the component's current value programmatically (`
 
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
 
-```ueml copy {9,12,14}
-<VStack margin="1rem" gap="0.5rem" var.changes="">
+```ueml copy {10,13,15}
+<App var.changes="">
   <Checkbox
     id="checkbox"
     readOnly="true"
     label="This checkbox can be set only programmatically"
     onDidChange="changes += '+'" />
-  <HStack gap="0.5rem">
+  <HStack>
     <Button
       label="Check"
       onClick="checkbox.setValue(true)" />
@@ -295,20 +295,19 @@ You can use this method to set the checkbox's current value programmatically (`t
   </HStack>
   <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
   <Text value="Changes: {changes}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: value and setValue"
-  height={170}
   app={`
-    <VStack margin="1rem" gap="0.5rem" var.changes="">
+    <App var.changes="">
       <Checkbox
         id="checkbox"
         readOnly="true"
         label="This checkbox can be set only programmatically"
         onDidChange="changes += '+'" />
-      <HStack gap="0.5rem">
+      <HStack>
         <Button
           label="Check"
           onClick="checkbox.setValue(true)" />
@@ -318,7 +317,7 @@ You can use this method to set the checkbox's current value programmatically (`t
       </HStack>
       <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
       <Text value="Changes: {changes}" />
-    </VStack>
+    </App>
   `}
 />
 

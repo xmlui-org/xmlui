@@ -20,7 +20,8 @@ The `columnGap` property specifies the space between items in a single row; it o
 The `columnGap` property specifies the space between items in a single row; it overrides the `gap` value.
 
 ```ueml copy
-<FlowLayout columnGap="1rem">
+<App>
+  <FlowLayout columnGap="$space-8">
   <Stack width="25%" height="32" backgroundColor="red" />
   <Stack width="25%" height="32" backgroundColor="blue" />
   <Stack width="25%" height="32" backgroundColor="green" />
@@ -29,23 +30,27 @@ The `columnGap` property specifies the space between items in a single row; it o
   <Stack width="25%" height="32" backgroundColor="teal" />
   <Stack width="25%" height="32" backgroundColor="seagreen" />
   <Stack width="25%" height="32" backgroundColor="olive" />
-</FlowLayout>
+  </FlowLayout>
+</App>
 ```
 You can observe no gap between the rows of the `FlowLayout`, as `columnGap` keeps the space between rows intact:
 
 <Playground
   name="Example: columnGap"
-  height={80}
-  app={`<FlowLayout columnGap="1rem">
-    <Stack width="25%" height="32" backgroundColor="red" />
-    <Stack width="25%" height="32" backgroundColor="blue" />
-    <Stack width="25%" height="32" backgroundColor="green" />
-    <Stack width="25%" height="32" backgroundColor="yellow" />
-    <Stack width="25%" height="32" backgroundColor="maroon" />
-    <Stack width="25%" height="32" backgroundColor="teal" />
-    <Stack width="25%" height="32" backgroundColor="seagreen" />
-    <Stack width="25%" height="32" backgroundColor="olive" />
-</FlowLayout>`}
+  app={`
+    <App>
+      <FlowLayout columnGap="$space-8">
+      <Stack width="25%" height="32" backgroundColor="red" />
+      <Stack width="25%" height="32" backgroundColor="blue" />
+      <Stack width="25%" height="32" backgroundColor="green" />
+      <Stack width="25%" height="32" backgroundColor="yellow" />
+      <Stack width="25%" height="32" backgroundColor="maroon" />
+      <Stack width="25%" height="32" backgroundColor="teal" />
+      <Stack width="25%" height="32" backgroundColor="seagreen" />
+      <Stack width="25%" height="32" backgroundColor="olive" />
+      </FlowLayout>
+    </App>
+  `}
 />
 
 ### `gap`
@@ -55,48 +60,51 @@ This property defines the gap between items in the same row and between rows. Th
 The `gap` property defines the gap between items in the same row and between rows. The `FlowLayout` component creates a new row when an item is about to overflow the current row.
 
 ```ueml copy
-<FlowLayout gap="1rem">
-  <Stack width="25%" height="32" backgroundColor="red" />
-  <Stack width="25%" height="32" backgroundColor="blue" />
-  <Stack width="25%" height="32" backgroundColor="green" />
-  <Stack width="25%" height="32" backgroundColor="yellow" />
-  <Stack width="25%" height="32" backgroundColor="maroon" />
-  <Stack width="25%" height="32" backgroundColor="teal" />
-  <Stack width="25%" height="32" backgroundColor="seagreen" />
-  <Stack width="25%" height="32" backgroundColor="olive" />
-</FlowLayout>
+<App>
+  <FlowLayout gap="$space-12">
+    <Stack width="25%" height="32" backgroundColor="red" />
+    <Stack width="25%" height="32" backgroundColor="blue" />
+    <Stack width="25%" height="32" backgroundColor="green" />
+    <Stack width="25%" height="32" backgroundColor="yellow" />
+    <Stack width="25%" height="32" backgroundColor="maroon" />
+    <Stack width="25%" height="32" backgroundColor="teal" />
+    <Stack width="25%" height="32" backgroundColor="seagreen" />
+    <Stack width="25%" height="32" backgroundColor="olive" />
+  </FlowLayout>
+</App>
 ```
 
 In this markup, only four items fit in a single row. The `gap` property sets the same gaps within and between rows.
 
 <Playground
   name="Example: gap"
-  height={80}
   app={`
-    <FlowLayout gap="1rem">
-      <Stack width="25%" height="32" backgroundColor="red" />
-      <Stack width="25%" height="32" backgroundColor="blue" />
-      <Stack width="25%" height="32" backgroundColor="green" />
-      <Stack width="25%" height="32" backgroundColor="yellow" />
-      <Stack width="25%" height="32" backgroundColor="maroon" />
-      <Stack width="25%" height="32" backgroundColor="teal" />
-      <Stack width="25%" height="32" backgroundColor="seagreen" />
-      <Stack width="25%" height="32" backgroundColor="olive" />
-    </FlowLayout>
+    <App>
+      <FlowLayout gap="$space-12">
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+        <Stack width="25%" height="32" backgroundColor="maroon" />
+        <Stack width="25%" height="32" backgroundColor="teal" />
+        <Stack width="25%" height="32" backgroundColor="seagreen" />
+        <Stack width="25%" height="32" backgroundColor="olive" />
+      </FlowLayout>
+    </App>
   `}
 />
 
 This markup demonstrates different `gap` values:
 
 ```ueml copy
-<Stack gap="1rem">
+<App>
   <FlowLayout>
     <Stack width="25%" height="32" backgroundColor="red" />
     <Stack width="25%" height="32" backgroundColor="blue" />
     <Stack width="25%" height="32" backgroundColor="green" />
     <Stack width="25%" height="32" backgroundColor="yellow" />
-    </FlowLayout>
-  <FlowLayout gap="12">
+  </FlowLayout>
+  <FlowLayout gap="10">
     <Stack width="25%" height="32" backgroundColor="red" />
     <Stack width="25%" height="32" backgroundColor="blue" />
     <Stack width="25%" height="32" backgroundColor="green" />
@@ -114,40 +122,41 @@ This markup demonstrates different `gap` values:
     <Stack width="25%" height="32" backgroundColor="green" />
     <Stack width="25%" height="32" backgroundColor="yellow" />
   </FlowLayout>
-</Stack>
+</App>
 ```
 
 All items within a `FlowLayout` instance fit in a single row, so `gap` affects only the space between items. The space between rows comes from the outermost `Stack`.
 
 <Playground
   name="Example: different size units"
-  height={170}
-  app={`<Stack gap="0.4rem">
-    <FlowLayout>
-      <Stack width="25%" height="32" backgroundColor="red" />
-      <Stack width="25%" height="32" backgroundColor="blue" />
-      <Stack width="25%" height="32" backgroundColor="green" />
-      <Stack width="25%" height="32" backgroundColor="yellow" />
-    </FlowLayout>
-    <FlowLayout gap="10">
-      <Stack width="25%" height="32" backgroundColor="red" />
-      <Stack width="25%" height="32" backgroundColor="blue" />
-      <Stack width="25%" height="32" backgroundColor="green" />
-      <Stack width="25%" height="32" backgroundColor="yellow" />
-    </FlowLayout>
-    <FlowLayout gap="1rem">
-      <Stack width="25%" height="32" backgroundColor="red" />
-      <Stack width="25%" height="32" backgroundColor="blue" />
-      <Stack width="25%" height="32" backgroundColor="green" />
-      <Stack width="25%" height="32" backgroundColor="yellow" />
-    </FlowLayout>
-    <FlowLayout gap="4ch">
-      <Stack width="25%" height="32" backgroundColor="red" />
-      <Stack width="25%" height="32" backgroundColor="blue" />
-      <Stack width="25%" height="32" backgroundColor="green" />
-      <Stack width="25%" height="32" backgroundColor="yellow" />
-    </FlowLayout>
-</Stack>`}
+  app={`
+    <App>
+      <FlowLayout>
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+      </FlowLayout>
+      <FlowLayout gap="10">
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+      </FlowLayout>
+      <FlowLayout gap="1rem">
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+      </FlowLayout>
+      <FlowLayout gap="4ch">
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+      </FlowLayout>
+    </App>
+  `}
 />
 
 ### `rowGap`
@@ -157,24 +166,8 @@ The `rowGap` property specifies the space between the FlowLayout rows; it overri
 The `rowGap` property specifies the space between the `FlowLayout` rows; it overrides the `gap` value.
 
 ```ueml copy
-<FlowLayout rowGap="1rem">
-  <Stack width="25%" height="32" backgroundColor="red" />
-  <Stack width="25%" height="32" backgroundColor="blue" />
-  <Stack width="25%" height="32" backgroundColor="green" />
-  <Stack width="25%" height="32" backgroundColor="yellow" />
-  <Stack width="25%" height="32" backgroundColor="maroon" />
-  <Stack width="25%" height="32" backgroundColor="teal" />
-  <Stack width="25%" height="32" backgroundColor="seagreen" />
-  <Stack width="25%" height="32" backgroundColor="olive" />
-</FlowLayout>
-```
-
-You can observe no gap between the items in a single row of the `FlowLayout`, as `rowGap` keeps the gap within a row  intact:
-
-<Playground
-  name="Example: rowGap"
-  height={80}
-  app={`<FlowLayout rowGap="1rem">
+<App>
+  <FlowLayout rowGap="2px">
     <Stack width="25%" height="32" backgroundColor="red" />
     <Stack width="25%" height="32" backgroundColor="blue" />
     <Stack width="25%" height="32" backgroundColor="green" />
@@ -183,7 +176,28 @@ You can observe no gap between the items in a single row of the `FlowLayout`, as
     <Stack width="25%" height="32" backgroundColor="teal" />
     <Stack width="25%" height="32" backgroundColor="seagreen" />
     <Stack width="25%" height="32" backgroundColor="olive" />
-</FlowLayout>`}
+  </FlowLayout>
+</App>
+```
+
+You can observe no gap between the items in a single row of the `FlowLayout`, as `rowGap` keeps the gap within a row  intact:
+
+<Playground
+  name="Example: rowGap"
+  app={`
+    <App>
+      <FlowLayout rowGap="2px">
+        <Stack width="25%" height="32" backgroundColor="red" />
+        <Stack width="25%" height="32" backgroundColor="blue" />
+        <Stack width="25%" height="32" backgroundColor="green" />
+        <Stack width="25%" height="32" backgroundColor="yellow" />
+        <Stack width="25%" height="32" backgroundColor="maroon" />
+        <Stack width="25%" height="32" backgroundColor="teal" />
+        <Stack width="25%" height="32" backgroundColor="seagreen" />
+        <Stack width="25%" height="32" backgroundColor="olive" />
+      </FlowLayout>
+    </App>
+  `}
 />
 
 ### `shadow`
