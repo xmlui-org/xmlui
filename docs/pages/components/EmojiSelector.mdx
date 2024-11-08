@@ -15,18 +15,18 @@ This property sets the label of the component.
 Default value: `false`.
 
 ```ueml copy
-<HStack padding="0.5rem">
+<App>
   <EmojiSelector autoFocus="true" />
-</HStack>
+</App>
 ```
 
 <Playground
   name="Example: autoFocus"
-  height={380}
+  height={420}
   app={`
-  <HStack padding="0.5rem">
+  <App>
     <EmojiSelector autoFocus="true" />
-  </HStack>
+  </App>
   `}
 />
 
@@ -37,20 +37,24 @@ Default value: `false`.
 This event is fired when the user selects an emoticon from this component.
 
 ```ueml copy /onSelect="(emoji) => { selected = emoji }"/
-<HStack var.selected="" gap="1rem">
-  <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
-  <Text value="Selected emoji: {selected}" />
-</HStack>
+<App>
+  <HStack var.selected="">
+    <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+    <Text value="Selected emoji: {selected}" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: select"
-  height={380}
+  height={420}
   app={`
-  <HStack var.selected="" gap="0.5rem">
-    <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
-    <Text value="Selected emoji: {selected}" />
-  </HStack>
+    <App>
+      <HStack var.selected="">
+        <EmojiSelector onSelect="(emoji) => { selected = emoji }" />
+        <Text value="Selected emoji: {selected}" />
+      </HStack>
+    </App>
   `}
 />
 
