@@ -8,7 +8,7 @@ import { Footer } from "./FooterNative";
 const COMP = "Footer";
 
 export const FooterMd = createMetadata({
-  description: `The \`${COMP}\` is a component that acts as the footer within \`App\`.`,
+  description: `The \`${COMP}\` is a component that acts as a placeholder within \`App\`.`,
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-${COMP}`]: "$color-bg-AppHeader",
