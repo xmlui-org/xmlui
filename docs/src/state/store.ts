@@ -1,10 +1,11 @@
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import { createContext, Dispatch } from "react";
+import type { Dispatch } from "react";
+import { createContext } from "react";
 import produce from "immer";
-import { CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { builtInThemes } from "@components-core/theming/ThemeProvider";
 import { errReportComponent, xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
+import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
 type Orientation = "horizontal" | "vertical";
 

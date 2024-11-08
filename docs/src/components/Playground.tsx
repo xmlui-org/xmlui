@@ -9,7 +9,7 @@ import {
   toneChanged,
 } from "@/src/state/store";
 import { ThemeDefinition } from "@components-core/theming/abstractions";
-import { INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
+import {INITIAL_PLAYGROUND_STATE, preprocessCode} from "@/src/utils/helpers";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
@@ -74,8 +74,8 @@ export const Playground = ({
             defaultTone,
             defaultTheme,
           },
-          components,
-          app,
+          components: components.map((c) => preprocessCode(c)),
+          app: preprocessCode(app),
           api,
         }),
       );
