@@ -289,8 +289,18 @@ Besides getting the data, this app uses the `loaded` event of `DataSource` to co
 
 You can quickly determine if a data fetch operation is in progress. `DataSource` offers a property, `inProgress,` which indicates whether the data is currently being fetched. The following sample shows using this property:
 
+
+```ueml copy /orders.inProgress/
+<App var.pollCount="{0}">
+  <DataSource id='orders' url='/api/monthly-total' />
+  <Button onClick="orders.refetch()">Query #of total orders</Button>
+  <Text when="{orders.inProgress}">Calculating...</Text>
+  <H2 when="{!orders.inProgress}">Total Orders: {orders.value}</H2>
+</App>
+```
+
 <Playground
-  name="Example: Automatic polling"
+  name="Example: Checking in-progress state"
   api={{
     initialize: `
       $state.click = 0;
@@ -323,7 +333,79 @@ When you bind a `DataSource` component instance to a property, XMLUI starts the 
 
 The following sample demonstrates this scenario:
 
-_TBD_
+```ueml copy /orders.value.title/ /orders.value.author/
+<App>
+  <DataSource id='orders' url='/api/title-info' />
+  <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
+</App>
+```
+
+<Playground
+  name="Example: Binding component properties to DataSource"
+  api={{
+    initialize: `
+      $state.click = 0;
+    `,
+    operations: {
+      'get-titles': {
+        method: 'get',
+        url: '/api/title-info',
+        handler: `
+          return {author: "Douglas Adams", title: "Hichhiker's Guide to the Galaxy"};
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='orders' url='/api/title-info' />
+      <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
+    </App>
+  `}
+/>
+
+### Adding Header information
+
+Some API endpoints may ask for a particular header. You can send it with the request using the `headers` property of `DataSource`.
+
+In the following example, the backend requires a header named `x-api-key` with the value of `1111` to accept the request.
+
+```ueml copy /headers="{{ 'x-api-key': '1111' }}/
+<App>
+  <DataSource id='orders' url='/api/title-info-header' headers="{{ 'x-api-key': '1111' }}" />
+  <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
+</App>
+```
+
+Pop out this example in the playground and check what happens when you change or remove the `headers` property.
+
+<Playground
+  name="Example: Using Headers"
+  api={{
+    initialize: `
+      $state.click = 0;
+    `,
+    operations: {
+      'get-title-with-header': {
+        method: 'get',
+        url: '/api/title-info-header',
+        handler: `
+        const token = $requestHeaders['x-api-key'];
+        if (token === "1111") {
+          return {author: "Cixin Liu", title: "The Three-Body Problem"};
+        }
+        throw Errors.HttpError(400, { message: "No valid API key provided in header!" });
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='orders' url='/api/title-info-header' headers="{{ 'x-api-key': '1111' }}" />
+      <Card title="{orders.value.title}" subtitle="{orders.value.author}" />
+    </App>
+  `}
+/>
 
 ## Persisting Data
 
@@ -344,7 +426,164 @@ Besides managing the request-response protocol, `APICall` provides a few UI serv
 - Other components may ask the APICall whether it is in progress.
 - You can define event handlers for handling successful/failed operations.
 
-_TODO: Add examples of APICall usage when API interceptor can be used with the documentation platform._
+### Using APICall to Persist Data
+
+The following sample demonstrates how to use `APICall` to send a request with a particular body. The sample allows you to add a new fruit to a list; you send the new fruit's name in the request body.
+
+```ueml copy  {6-12}
+<App>
+  <DataSource id='myFruits' url='/api/my-fruits' />
+  <HStack>
+    <TextBox id="newFruit" placeholder="Enter a new fruit" width="50%" />
+    <Button enabled="{newFruit.value.trim()}" label="Add">
+      <event name="click">
+        <APICall 
+          method="post" 
+          url="/api/my-fruits" 
+          body="{newFruit.value}" 
+          onSuccess="newFruit.setValue('')" />
+      </event> 
+    </Button>
+  </HStack>
+  <HStack wrapContent="true">
+    <Items data="{myFruits}">
+      <Badge value="{$item.name}"/>
+    </Items>
+  </HStack>
+</App>
+```
+
+Observe the `onSuccess` event handler: the code deletes the textbox after completing the API call.
+
+<Playground
+  name="Example: Persisting data"
+  height={240}
+  api={{
+    initialize: `
+      $state.fruits = [{id: 1, name: 'apple'}, {id: 2, name: 'banana'}, {id: 3, name: 'cherry'}];
+    `,
+    operations: {
+      'get-fruits-with-persist': {
+        method: 'get',
+        url: '/api/my-fruits',
+        handler: `
+          return $state.fruits;
+        `,
+      },
+      'post-fruit': {
+        method: 'post',
+        url: '/api/my-fruits',
+        handler: `
+          $state.fruits.push({id: $state.fruits.length + 1, name: $requestBody});
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='myFruits' url='/api/my-fruits' />
+      <HStack>
+        <TextBox id="newFruit" placeholder="Enter a new fruit" width="50%" />
+        <Button enabled="{newFruit.value.trim()}" label="Add">
+          <event name="click">
+            <APICall 
+              method="post" 
+              url="/api/my-fruits" 
+              body="{newFruit.value}" 
+              onSuccess="newFruit.setValue('')" />
+          </event> 
+        </Button>
+      </HStack>
+      <HStack wrapContent="true">
+        <Items data="{myFruits}">
+          <Badge value="{$item.name}"/>
+        </Items>
+      </HStack>
+    </App>
+  `}
+/>
+
+### Confirming and Notifications
+
+`APICall` allows you to request user confirmation before issuing a particular call. The operation continues if the answer is affirmative; otherwise, it will not be sent. You can also display a notification message when the operation is completed.
+
+The following example demonstrates these features:
+
+```ueml copy {10, 12} /confirmTitle/ /confirmMessage/ /completedNotificationMessage/
+<App>
+  <List data="/api/components">
+    <HStack padding="$padding-tight" verticalAlignment="center">
+      <H3 width="20%">{$item.name}</H3>
+      <Button label="Delete" size="xs">
+        <event name="click">
+          <APICall 
+            url="/api/components/{$item.id}" 
+            method="delete" 
+            confirmTitle="Delete a Component"
+            confirmMessage="Are you sure you want to remove '{$item.name}' from your list?" 
+            completedNotificationMessage="{$item.name} component deleted." />
+        </event>
+      </Button>
+    </HStack>        
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: Confirmation"
+  height={320}
+  api={{
+    initialize: `
+      $state.components = [
+        {id: 1, name: 'Button'}, 
+        {id: 2, name: 'Checkbox'}, 
+        {id: 3, name: 'Switch'},
+        {id: 4, name: 'TextBox'},
+        {id: 5, name: 'RadioButton'},
+        {id: 6, name: 'Slider'},
+      ];
+    `,
+    operations: {
+      'get-components': {
+        method: 'get',
+        url: '/api/components',
+        handler: `
+          return $state.components;
+        `,
+      },
+      'post-fruit': {
+        method: 'delete',
+        url: '/api/components/:id',
+        pathParamTypes: {
+          id: "integer",
+        },
+        handler: `
+          $state.components = $state.components.filter(c => c.id !== $pathParams.id);
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <List data="/api/components">
+        <HStack padding="$padding-tight" verticalAlignment="center">
+          <H3 width="20%">{$item.name}</H3>
+          <Button label="Delete" size="xs">
+            <event name="click">
+              <APICall 
+                url="/api/components/{$item.id}" 
+                method="delete" 
+                confirmTitle="Delete a Component"
+                confirmMessage="Are you sure you want to remove '{$item.name}' from your list?" 
+                completedNotificationMessage="{$item.name} component deleted." />
+            </event>
+          </Button>
+        </HStack>        
+      </List>
+    </App>
+  `}
+/>
+
 
 ## Data-Aware Components
 
