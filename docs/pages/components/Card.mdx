@@ -12,7 +12,7 @@ You can nest the card's content into the `<Card>` tag:
 ```ueml copy
 <App>
   <Card maxWidth="200px">
-    <HStack verticalAlignment="center" gap="0.5rem">
+    <HStack verticalAlignment="center">
       <Icon name="info" />
       <Text value="Information" variant="strong" />
     </HStack>
@@ -27,7 +27,7 @@ You can nest the card's content into the `<Card>` tag:
   app={`
     <App>
       <Card maxWidth="200px">
-        <HStack verticalAlignment="center" gap="0.5rem">
+        <HStack verticalAlignment="center">
           <Icon name="info" />
           <Text value="Information" variant="strong" />
         </HStack>
@@ -41,37 +41,35 @@ There are also prestyled properties one can make use of, detailed in the [Proper
 Prestyled elements always appear above other children.
 
 ```ueml copy
-<Stack padding="1rem">
+<App>
   <Card
     avatarUrl="https://i.pravatar.cc/100"
     title="Example Title"
     subtitle="Predefined subtitle"
-    maxWidth="300px"
-  >
-    <HStack gap="1rem" verticalAlignment="center">
+    maxWidth="300px">
+    <HStack verticalAlignment="center">
       <Icon name="info"/>
       This is a card
     </HStack>
   </Card>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: using Card with prestyled elements"
   app={`
-    <Stack padding="1rem">
+    <App>
       <Card
         avatarUrl="https://i.pravatar.cc/100"
         title="Example Title"
         subtitle="Predefined subtitle"
-        maxWidth="300px"
-      >
-        <HStack gap="1rem" verticalAlignment="center">
+        maxWidth="300px">
+        <HStack verticalAlignment="center">
           <Icon name="info"/>
           This is a card
         </HStack>
       </Card>
-    </Stack>
+    </App>
   `}
 />
 
@@ -92,21 +90,22 @@ Indicates whether the Card should be displayed
 Note that in the demo below if the `avatarUrl` is specified, `showAvatar` is automatically set to true but can still be hidden.
 
 ```ueml copy /showAvatar="true"/
-<Stack padding="1rem" gap="1rem">
+<App>
   <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
   <Card maxWidth="300px" showAvatar="true" title="Example Card" />
   <Card maxWidth="300px" showAvatar="true" />
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: showAvatar"
+  height="200"
   app={`
-    <Stack padding="1rem" gap="1rem">
+    <App>
       <Card maxWidth="300px" avatarUrl="https://i.pravatar.cc/100" />
       <Card maxWidth="300px" showAvatar="true" title="Example Card" />
       <Card maxWidth="300px" showAvatar="true" />
-    </Stack>
+    </App>
   `}
 />
 
@@ -117,17 +116,17 @@ This prop sets the prestyled subtitle.
 This prop sets the prestyled subtitle.
 
 ```ueml copy /subtitle="Example Subtitle"/
-<Stack padding="1rem">
+<App>
   <Card maxWidth="300px" subtitle="Example Subtitle" />
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: subtitle"
   app={`
-    <Stack padding="1rem">
+    <App>
       <Card maxWidth="300px" subtitle="Example Subtitle" />
-    </Stack>
+    </App>
   `}
 />
 
@@ -138,17 +137,17 @@ This prop sets the prestyled title.
 This prop sets the prestyled title.
 
 ```ueml copy
-<Stack padding="1rem">
+<App>
   <Card maxWidth="300px" title="Example Title" />
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: title"
   app={`
-    <Stack padding="1rem">
+    <App>
       <Card maxWidth="300px" title="Example Title" />
-    </Stack>
+    </App>
   `}
 />
 
@@ -161,29 +160,29 @@ This event is triggered when the Card is clicked.
 This event is triggered when the `Card` is clicked.
 
 ```ueml copy
-<Stack padding="1rem">
-  <Card maxWidth="300px" onClick="window.alert('Clicked!')">
-    <HStack verticalAlignment="center" gap="0.5rem">
+<App>
+  <Card maxWidth="300px" onClick="toast('Clicked!')">
+    <HStack verticalAlignment="center">
       <Icon name="info" />
       <Text value="Information" variant="strong" />
     </HStack>
     <Text value="This is an example text" />
   </Card>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: click"
   app={`
-    <Stack padding="1rem">
-      <Card maxWidth="300px" onClick="window.alert('Clicked!')">
-        <HStack verticalAlignment="center" gap="0.5rem">
+    <App>
+      <Card maxWidth="300px" onClick="toast('Clicked!')">
+        <HStack verticalAlignment="center">
           <Icon name="info" />
           <Text value="Information" variant="strong" />
         </HStack>
         <Text value="This is an example text" />
       </Card>
-    </Stack>
+    </App>
   `}
 />
 
@@ -241,15 +240,15 @@ The following theme definition changes the visual appearance of the card:
     }
   }]}
   app={`
-    <Stack padding="1rem">
+    <App>
       <Card maxWidth="240px">
-        <HStack verticalAlignment="center" gap="0.5rem">
+        <HStack verticalAlignment="center">
           <Icon name="info" />
           <Text value="Information" variant="strong" />
         </HStack>
         <Text value="This is an example text" />
       </Card>
-    </Stack>
+    </App>
   `}
 />
 
