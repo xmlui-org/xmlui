@@ -35,13 +35,19 @@ Note how the `List` infers the given data and provides a simple layout for it.
 To tweak what data and how it is displayed, see the [`itemTemplate` section](#itemtemplate).
 
 ```ueml copy
-<List data="{[...]}" />
+<App>
+  <List data='{[...]}' />
+</App>
 ```
 
 <Playground
   name="Example: data"
   height={400}
-  app={`<List data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 You can also provide the `List` with data directly from an API via this property.
@@ -87,38 +93,42 @@ This property adds default sections for the `List` and displays the section head
 
 Note the `meat` section header before all the others in the list below:
 
-> **Note:** For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
-> and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+<Callout type="info" emoji="📔">
+For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
+and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+</Callout>
 
-```ueml copy {3}
-<List
-  data='{${JSON.stringify(data)}}'
-  defaultSections="{['meat']}"
-  sectionBy="category"
->
-  <property name="sectionTemplate">
-    <Stack padding="$space-2">
-      <Text variant="subtitle" value="{$item.sectionKey}" />
-    </Stack>
-  </property>
-</List>
+```ueml copy {4}
+<App>
+  <List
+    data='{[...]}'
+    defaultSections="{['meat']}"
+    sectionBy="category" >
+    <property name="sectionTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </VStack>
+    </property>
+  </List>
+</App>
 ```
 
 <Playground
   name="Example: defaultSections"
   height={400}
   app={`
-  <List
-    data='{${JSON.stringify(data)}}'
-    defaultSections="{['meat']}"
-    sectionBy="category"
-  >
-    <property name="sectionTemplate">
-      <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </Stack>
-    </property>
-  </List>
+    <App>
+      <List
+        data='{${JSON.stringify(data, null, 2)}}'
+        defaultSections="{['meat']}"
+        sectionBy="category">
+        <property name="sectionTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$item.sectionKey}" />
+          </VStack>
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -127,26 +137,30 @@ Note the `meat` section header before all the others in the list below:
 This property defines the template to display when the list is empty.
 
 ```ueml copy
-<List>
-  <property name="emptyListTemplate">
-    <Stack width="100%" horizontalAlignment="center">
-      <Text variant="strong" value="Empty..." />
-    </Stack>
-  </property>
-</List>
+<App>
+  <List>
+    <property name="emptyListTemplate">
+      <VStack horizontalAlignment="center">
+        <Text variant="strong" value="Empty..." />
+      </VStack>
+    </property>
+  </List>
+</App>
 ```
 
 <Playground
   name="Example: emptyListTemplate"
-  height={100}
+  height={140}
   app={`
-  <List>
-    <property name="emptyListTemplate">
-      <Stack width="100%" horizontalAlignment="center">
-        <Text variant="strong" value="Empty..." />
-      </Stack>
-    </property>
-  </List>
+    <App>
+      <List>
+        <property name="emptyListTemplate">
+          <VStack horizontalAlignment="center">
+            <Text variant="strong" value="Empty..." />
+          </VStack>
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -155,13 +169,19 @@ This property defines the template to display when the list is empty.
 Denotes which attribute of an item acts as the ID or key of the item. Default is `"id"`.
 
 ```ueml /idKey="key"/
-<List idKey="key" data="{[...]}" />
+<App>
+  <List idKey="key" data='{[...]}' />
+</App>
 ```
 
 <Playground
   name="Example: idKey"
   height={400}
-  app={`<List idKey="key" data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List idKey="key" data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 ### `itemTemplate`
@@ -171,27 +191,8 @@ This property allows the customization of mapping data items to components. You 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
 
 ```ueml copy {2-12}
-<List data="{[...]}">
-  <property name="itemTemplate">
-    <Card>
-      <HStack verticalAlignment="center" gap="0.5rem">
-        <Icon name="info" />
-        <Text value="{$item.name}" variant="strong" />
-      </HStack>
-      <HStack gap="0.5rem">
-        <Text value="{$item.quantity}" />
-        <Text value="{$item.unit}" variant="em" />
-      </HStack>
-    </Card>
-  </property>
-</List>
-```
-
-<Playground
-  name="Example: itemTemplate"
-  height={400}
-  app={`
-  <List data='{${JSON.stringify(data)}}'>
+<App>
+  <List data='{[...]}'>
     <property name="itemTemplate">
       <Card>
         <HStack verticalAlignment="center" gap="0.5rem">
@@ -205,6 +206,29 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
       </Card>
     </property>
   </List>
+</App>
+```
+
+<Playground
+  name="Example: itemTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}'>
+        <property name="itemTemplate">
+          <Card>
+            <HStack verticalAlignment="center" gap="0.5rem">
+              <Icon name="info" />
+              <Text value="{$item.name}" variant="strong" />
+            </HStack>
+            <HStack gap="0.5rem">
+              <Text value="{$item.quantity}" />
+              <Text value="{$item.unit}" variant="em" />
+            </HStack>
+          </Card>
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -217,13 +241,19 @@ You can use `items` as an alias for the `data` property. When you bind the list 
 This property limits the number of items displayed in the `List`.
 
 ```ueml /limit="4"/
-<List limit="4" data="{[...]}" />
+<App>
+  <List limit="4" data='{[...]}' />
+</App>
 ```
 
 <Playground
   name="Example: limit"
   height={400}
-  app={`<List limit="4" data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List limit="4" data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 ### `loading`
@@ -231,13 +261,19 @@ This property limits the number of items displayed in the `List`.
 This property delays the rendering of children until it is set to `false`, or the component receives usable list items via the [`data`](#data) property.
 
 ```ueml copy
-<List loading="true" />
+<App>
+  <List loading="true" />
+</App>
 ```
 
 <Playground
   name="Example: loading"
-  height={60}
-  app={`<List loading="true" />`}
+  height={120}
+  app={`
+    <App>
+      <List loading="true" />
+    </App>
+  `}
 />
 
 ### `orderBy`
@@ -245,13 +281,21 @@ This property delays the rendering of children until it is set to `false`, or th
 This property enables the ordering of list items by specifying an attribute in the data.
 
 ```ueml /orderBy="{{ field: 'quantity', direction: 'desc' }}"/
-<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data="{[...]}" />
+<App>
+  <List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{[...]}' />
+</App>
 ```
 
 <Playground
   name="Example: orderBy"
   height={400}
-  app={`<List orderBy="{{ field: 'quantity', direction: 'desc' }}" data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List 
+        orderBy="{{ field: 'quantity', direction: 'desc' }}" 
+        data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 ### `pageInfo`
@@ -272,51 +316,61 @@ It contains the following boolean attributes:
 This property pins the scroll position to either the `top` or the `bottom` of the list.
 
 ```ueml /scrollAnchor="bottom"/
-<List scrollAnchor="bottom" data="{[...]}" />
+<App>
+  <List scrollAnchor="bottom" data='{${JSON.stringify(data, null, 2)}}' />
+</App>
 ```
 
 <Playground
   name="Example: scrollAnchor"
   height={400}
-  app={`<List scrollAnchor="bottom" data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List scrollAnchor="bottom" data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 ### `sectionBy`
 
 This property set which attribute of the data is used to group or section the list items. If the attribute does not appear in the data items, it will be ignored.
 
-> **Note:** For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
-> or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+<Callout type="info" emoji="📔">
+For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
+or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+</Callout>
 
 ```ueml copy {3}
-<List
-  data='{${JSON.stringify(data)}}'
-  defaultSections="{['meat']}"
-  sectionBy="category"
->
-  <property name="sectionTemplate">
-    <Stack padding="$space-2">
-      <Text variant="subtitle" value="{$item.sectionKey}" />
-    </Stack>
-  </property>
-</List>
+<App>
+  <List
+    data='{[...]}'
+    defaultSections="{['meat']}"
+    sectionBy="category">
+    <property name="sectionTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </VStack>
+    </property>
+  </List>
+</App>
 ```
 
 <Playground
   name="Example: sectionBy"
   height={400}
   app={`
-  <List
-    data='{${JSON.stringify(data)}}'
-    defaultSections="{['meat']}"
-    sectionBy="category"
-  >
-    <property name="sectionTemplate">
-      <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </Stack>
-    </property>
-  </List>
+    <App>
+      <List
+        data='{${JSON.stringify(data, null, 2)}}'
+        defaultSections="{['meat']}"
+        sectionBy="category">
+        <property name="sectionTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$item.sectionKey}" />
+          </VStack>
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -333,33 +387,37 @@ An `$item` here looks like the following:
 | sectionItems | The items filtered from the original data list that fall into this section.                                   |
 | sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
 
-```ueml copy {7-9}
-<List data='{${JSON.stringify(data)}}' sectionBy="category">
-  <property name="sectionTemplate">
-    <Stack padding="$space-2">
-      <Text variant="subtitle" value="{$item.sectionKey}" />
-    </Stack>
-  </property>
-  <property name="sectionFooterTemplate">
-    <ContentSeparator />
-  </property>
-</List>
+```ueml copy {8-10}
+<App>
+  <List data='{[...]}' sectionBy="category">
+    <property name="sectionTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$item.sectionKey}" />
+      </VStack>
+    </property>
+    <property name="sectionFooterTemplate">
+      <ContentSeparator />
+    </property>
+  </List>
+</App>
 ```
 
 <Playground
   name="Example: sectionFooterTemplate"
   height={400}
   app={`
-  <List data='{${JSON.stringify(data)}}' sectionBy="category">
-    <property name="sectionTemplate">
-      <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </Stack>
-    </property>
-    <property name="sectionFooterTemplate">
-      <ContentSeparator />
-    </property>
-  </List>
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
+        <property name="sectionTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$item.sectionKey}" />
+          </VStack>
+        </property>
+        <property name="sectionFooterTemplate">
+          <ContentSeparator />
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -377,26 +435,30 @@ An `$item` here looks like the following:
 | sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
 
 ```ueml copy {2-6}
-<List data='{${JSON.stringify(data)}}' sectionBy="category">
-  <property name="sectionTemplate">
-    <Stack padding="$space-2">
-      <Text variant="subtitle" value="{$item.sectionKey}" />
-    </Stack>
-  </property>
-</List>
-```
-
-<Playground
-  name="Example: sectionTemplate"
-  height={400}
-  app={`
-  <List data='{${JSON.stringify(data)}}' sectionBy="category">
+<App>
+  <List data='{[...]}' sectionBy="category">
     <property name="sectionTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
     </property>
   </List>
+</App>
+```
+
+<Playground
+  name="Example: sectionTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
+        <property name="sectionTemplate">
+          <Stack padding="$space-2">
+            <Text variant="subtitle" value="{$item.sectionKey}" />
+          </Stack>
+        </property>
+      </List>
+    </App>
   `}
 />
 
@@ -409,13 +471,19 @@ This Boolean property defines whether the list sections are initially expanded.
 This property scrolls to a specific item indicated by its index.
 
 ```ueml /selectedIndex="5"/
-<List selectedIndex="5" data="{[...]}" />
+<App>
+  <List selectedIndex="5" data='{[...]}' />
+</App>
 ```
 
 <Playground
   name="Example: selectedIndex"
   height={400}
-  app={`<List selectedIndex="5" data='{${JSON.stringify(data)}}' />`}
+  app={`
+    <App>
+      <List selectedIndex="5" data='{${JSON.stringify(data, null, 2)}}' />
+    </App>
+  `}
 />
 
 ## Events
@@ -424,19 +492,13 @@ This property scrolls to a specific item indicated by its index.
 
 Obsolete.
 
-**Note:** Not used in code.
-
 ### `requestFetchPrevPage`
 
 Obsolete.
 
-**Note:** Not used in code.
-
 ### `resetSelectedIndex`
 
 Obsolete.
-
-**Note:** Not used in code.
 
 ## Context Values
 

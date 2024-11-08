@@ -11,24 +11,27 @@ A `Link` component represents a navigation target within the app or a reference 
 You can use the `label` and `icon` properties of a `Link` to set its text and icon to display. If you want a custom appearance, you can nest your visual representation into `Link`:
 
 ```ueml copy {1,6}
-<Link to="https://ncrm.azurewebsites.net/" target="_blank">
-  <HStack gap="0.5rem" verticalAlignment="center">
-    <Stack width="16px" height="16px" backgroundColor="purple" />
-    XMLUI introduction
-  </HStack>
-</Link>
+<App>
+  <Link to="https://ncrm.azurewebsites.net/" target="_blank">
+    <HStackverticalAlignment="center">
+      <Stack width="16px" height="16px" backgroundColor="purple" />
+      XMLUI introduction
+    </HStack>
+  </Link>
+</App>
 ```
 
 <Playground
   name="Example: custom Link content"
-  height={60}
   app={`
-    <Link to="https://ncrm.azurewebsites.net/" target="_blank">
-      <HStack gap="0.5rem" verticalAlignment="center">
-        <Stack width="16px" height="16px" backgroundColor="purple" />
-        XMLUI introduction
-      </HStack>
-    </Link>
+    <App>
+      <Link to="https://ncrm.azurewebsites.net/" target="_blank">
+        <HStack verticalAlignment="center">
+          <Stack width="16px" height="16px" backgroundColor="purple" />
+          XMLUI introduction
+        </HStack>
+      </Link>
+    </App>
   `}
 />
 
@@ -41,22 +44,21 @@ Indicates whether this link is active or not. If so, it will have a distinct vis
 Default value: `false`.
 
 ```ueml copy /active="true"/ /active="false"/
-<VStack>
+<App>
   <Link>I'm an inactive link (by default)</Link>
   <Link active="true">I'm an active link</Link>
   <Link active="false">I'm an inactive link (explicit setting)</Link>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: active"
-  height={140}
   app={`
-    <VStack>
+    <App>
       <Link>I'm an inactive link (by default)</Link>
       <Link active="true">I'm an active link</Link>
       <Link active="false">I'm an inactive link (explicit setting)</Link>
-    </VStack>
+    </App>
   `}
 />
 
@@ -67,22 +69,21 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy /enabled="true"/ /enabled="false"/
-<VStack>
+<App>
   <Link>I'm an enabled link (by default)</Link>
   <Link enabled="false">I'm a disabled link</Link>
   <Link enabled="true">I'm an enabled link (explicit setting)</Link>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: active"
-  height={140}
   app={`
-    <VStack>
+    <App>
       <Link>I'm an enabled link (by default)</Link>
       <Link enabled="false">I'm a disabled link</Link>
       <Link enabled="true">I'm an enabled link (explicit setting)</Link>
-    </VStack>
+    </App>
   `}
 />
 
@@ -91,20 +92,19 @@ Default value: `true`.
 This property allows you to add an icon (specify the icon's name) to the link.
 
 ```ueml copy
-<VStack>
+<App>
   <Link icon="home" label="Home" />
   <Link icon="drive">Drives</Link>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: icon"
-  height={100}
   app={`
-    <VStack>
+    <App>
       <Link icon="home" label="Home" />
       <Link icon="drive">Drives</Link>
-    </VStack>
+    </App>
   `}
 />
 
@@ -134,13 +134,22 @@ Available values:
 
 The following sample opens its link in a new tab:
 
+```ueml copy
+<App>
+  <Link to="https://docs.xmlui.com/" target="_blank">
+    Open XMLUI overview in a new tab
+  </Link>
+</App>
+```
+
 <Playground
   name="Example: target"
-  height={60}
   app={`
-    <Link to="https://docs.xmlui.com/" target="_blank">
-      Open XMLUI overview in a new tab
-    </Link>
+    <App>
+      <Link to="https://docs.xmlui.com/" target="_blank">
+        Open XMLUI overview in a new tab
+      </Link>
+    </App>
   `}
 />
 
@@ -204,7 +213,9 @@ The following sample theme sets a few visual properties of `Link`:
     },
   ]}
   app={`
-    <Link>I have a fancy style when you hover me!</Link>
+    <App>
+      <Link>I have a fancy style when you hover me!</Link>
+    </App>
   `}
 />
 

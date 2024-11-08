@@ -76,11 +76,6 @@ export const ListMd = createMetadata({
         `even if no items fall into a particular section.`,
     ),
   },
-  events: {
-    resetSelectedIndex: d(`Obsolete.`),
-    requestFetchNextPage: d(`Obsolete.`),
-    requestFetchPrevPage: d(`Obsolete.`),
-  },
   contextVars: {
     $item: d(`This property represents the value of an item in the data list.`),
   },
