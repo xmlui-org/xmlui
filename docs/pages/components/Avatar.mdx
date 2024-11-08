@@ -11,13 +11,19 @@ The `Avatar` component represents a user, group (or other entity's) avatar with 
 This property sets the name value the Avatar uses to display initials.
 
 ```ueml copy
-<Avatar name="John, Doe" />
+<App>
+  <Avatar name="John, Doe" />
+</App>
 ```
 
 <Playground
-  height={88}
+  height={120}
   name="Example: name"
-  app={`<VStack padding="$space-2"><Avatar name="John, Doe" /></VStack>`}
+  app={`
+    <App>
+      <Avatar name="John, Doe" />
+    </App>
+  `}
 />
 
 ### `size`
@@ -37,26 +43,30 @@ Available values:
 
 
 ```ueml copy
-<HStack gap="1rem" >
-  <Avatar name="Dorothy Ellen Fuller" />
-  <Avatar name="Xavier Schiller" size="xs" />
-  <Avatar name="Sebastien Moore" size="sm" />
-  <Avatar name="Molly Dough" size="md" />
-  <Avatar name="Lynn Gilbert" size="lg" />
-</HStack>
+<App>
+  <HStack>
+    <Avatar name="Dorothy Ellen Fuller" />
+    <Avatar name="Xavier Schiller" size="xs" />
+    <Avatar name="Sebastien Moore" size="sm" />
+    <Avatar name="Molly Dough" size="md" />
+    <Avatar name="Lynn Gilbert" size="lg" />
+  </HStack>
+</App>
 ```
 
 <Playground
-  height={136}
+  height={160}
   name="Example: size"
   app={`
-    <HStack gap="1rem" padding="$space-2">
-      <Avatar name="Dorothy Ellen Fuller" />
-      <Avatar name="Xavier Schiller" size="xs" />
-      <Avatar name="Sebastien Moore" size="sm" />
-      <Avatar name="Molly Dough" size="md" />
-      <Avatar name="Lynn Gilbert" size="lg" />
-    </HStack>
+    <App>
+      <HStack>
+        <Avatar name="Dorothy Ellen Fuller" />
+        <Avatar name="Xavier Schiller" size="xs" />
+        <Avatar name="Sebastien Moore" size="sm" />
+        <Avatar name="Molly Dough" size="md" />
+        <Avatar name="Lynn Gilbert" size="lg" />
+      </HStack>
+    </App>
   `}
 />
 
@@ -64,10 +74,20 @@ Available values:
 
 This property specifies the URL of the image to display in the Avatar.
 
+```ueml copy
+<App>
+  <Avatar url="https://i.pravatar.cc/100" size="md" />
+</App>
+```
+
 <Playground
-  height={108}
+  height={130}
   name="Example: url"
-  app={`<VStack padding="$space-2"><Avatar url="https://i.pravatar.cc/100" size="md" /></VStack>`}
+  app={`
+    <App>
+      <Avatar url="https://i.pravatar.cc/100" size="md" />
+    </App>
+  `}
 />
 
 ## Events

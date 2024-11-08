@@ -1,28 +1,39 @@
 %-PROP-START value
 
 ```ueml copy
-<Badge value="Example badge" />
+<App>
+  <Badge value="Example badge" />
+</App>  
 ```
 
-<Playground height={40} name="Example: value" app={`<Badge value="Example badge" />`} />
+<Playground 
+  height={88} 
+  name="Example: value" 
+  app={`
+    <App>
+      <Badge value="Example badge" />
+    </App>  
+  `} />
 
 %-PROP-END
 
 %-PROP-START variant
 
 ```ueml copy
-<Badge value="Example badge" variant="badge" />
-<Badge value="Example pill" variant="pill" />
+<App>
+  <Badge value="Example badge" variant="badge" />
+  <Badge value="Example pill" variant="pill" />
+</App>
 ```
 
 <Playground
-  height={90}
+  height={140}
   name="Example: variant"
   app={`
-  <Stack gap="1rem">
+  <App>
     <Badge value="Example badge" variant="badge" />
     <Badge value="Example pill" variant="pill" />
-  </Stack>
+  </App>
   `}
 />
 
@@ -33,50 +44,48 @@
 1. Only change the background color
 
 ```ueml copy {2}
-<Stack>
-  <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+<App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
-</Stack>
+</App>
 ```
 
 <Playground
-  height={40}
+  height={88}
   name="Example: only background color"
-  app={`<Stack var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
-    <Badge value="important" colorMap="{simpleColorMap}" />
-</Stack>
+  app={`
+    <App var.simpleColorMap="{{ important: 'red', regular: 'blue', unimportant: 'black' }}">
+      <Badge value="important" colorMap="{simpleColorMap}" />
+    </App>
 `}
 />
 
 2. Change the background and label color
 
-```ueml copy {4-7}
-<Stack>
-  <var name="simpleColorMap"
-    value="{
-      {
-        important: { label: 'red', background: 'pink' },
-        unimportant: { label: 'black', background: 'gray' }
-      }
-    }"
-  />
+```ueml copy {2-5}
+<App 
+  var.simpleColorMap="{{ 
+    important: { label: 'red', background: 'pink' }, 
+    unimportant: { label: 'black', background: 'gray' }
+  }}">
   <Badge value="important" colorMap="{simpleColorMap}" />
   <Badge value="unimportant" colorMap="{simpleColorMap}" />
   <Badge value="other" colorMap="{simpleColorMap}" />
-</Stack>
+</App>
 ```
 
 <Playground
-  height={120}
+  height={180}
   name="Example: background and label color"
   app={`
-  <Stack gap="0.5rem">
-    <var name="simpleColorMap"
-    value="{ { important: { label: 'red', background: 'pink' }, unimportant: { label: 'black', background: 'gray' } } }" />
+  <App 
+    var.simpleColorMap="{{ 
+      important: { label: 'red', background: 'pink' }, 
+      unimportant: { label: 'black', background: 'gray' }
+    }}">
     <Badge value="important" colorMap="{simpleColorMap}" />
     <Badge value="unimportant" colorMap="{simpleColorMap}" />
     <Badge value="other" colorMap="{simpleColorMap}" />
-  </Stack>
+  </App>
   `}
 />
 

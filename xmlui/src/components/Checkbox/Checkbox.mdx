@@ -7,36 +7,35 @@ To bind data to a \`Checkbox\`, use the XMLUI [Forms infrastructure](../learning
 %-PROP-START enabled
 
 ```ueml copy {4-5, 9-10}
-<VStack margin="1rem" gap="0.8rem">
+<App>
   Enabled checkboxes:
-  <HStack gap="0.5rem">
+  <HStack>
     <Checkbox initialValue="true" enabled="true" />
     <Checkbox initialValue="false" enabled="true" />
   </HStack>
   Disabled checkboxes:
-  <HStack gap="0.5rem">
+  <HStack>
     <Checkbox initialValue="true" enabled="false" />
     <Checkbox initilaValue="false" enabled="false" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={160}
   app={`
-    <VStack margin="1rem" gap="0.8rem">
+    <App>
       Enabled checkboxes:
-      <HStack gap="0.5rem">
+      <HStack>
         <Checkbox initialValue="true" enabled="true" />
         <Checkbox initialValue="false" enabled="true" />
       </HStack>
       Disabled checkboxes:
-      <HStack gap="0.5rem">
+      <HStack>
         <Checkbox initialValue="true" enabled="false" />
         <Checkbox initilaValue="false" enabled="false" />
       </HStack>
-    </VStack>
+    </App>
   `}
 />
 
@@ -49,7 +48,7 @@ This prop is commonly used if there are several other checkboxes linked to one c
 The following sample binds the state of two checkboxes to one and updates the state of the top checkbox accordingly. When the states of the bound checkboxes are different, the top checkbox is set to indeterminate:
 
 ```ueml copy {4}
-<VStack margin="1rem" gap="0.8rem" var.indeterminate="{false}">
+<App var.indeterminate="{false}">
   <Checkbox
     label="Indeterminate Checkbox"
     indeterminate="{indeterminate}"
@@ -59,20 +58,19 @@ The following sample binds the state of two checkboxes to one and updates the st
     listenTo="{ { v1: cb1.value, v2: cb2.value } }"
     onDidChange="indeterminate = cb1.value !== cb2.value" />
   Group of checkboxes:
-  <HStack gap="0.5rem">
+  <HStack>
     <Checkbox label="Checkbox #1" id="cb1" initialValue="true" />
     <Checkbox label="Checkbox #2" id="cb2" initialValue="false" />
   </HStack>
-</VStack>
+</App>
 ```
 
 Try this sample by clicking the bottom group of checkboxes.
 
 <Playground
   name="Example: indeterminate"
-  height={140}
   app={`
-    <VStack margin="1rem" gap="0.8rem" var.indeterminate="{false}">
+    <App var.indeterminate="{false}">
       <Checkbox
         label="Indeterminate Checkbox"
         indeterminate="{indeterminate}"
@@ -82,11 +80,11 @@ Try this sample by clicking the bottom group of checkboxes.
         listenTo="{ { v1: cb1.value, v2: cb2.value } }"
         onDidChange="indeterminate = cb1.value !== cb2.value" />
       Group of checkboxes:
-      <HStack gap="0.5rem">
+      <HStack>
         <Checkbox label="Checkbox #1" id="cb1" initialValue="true" />
         <Checkbox label="Checkbox #2" id="cb2" initialValue="false" />
       </HStack>
-    </VStack>
+    </App>
   `}
 />
 
@@ -95,20 +93,19 @@ Try this sample by clicking the bottom group of checkboxes.
 %-PROP-START label
 
 ```ueml copy
-<VStack margin="1rem" gap="0.5rem">
+<App>
   <Checkbox label="Example label" initialValue="true" />
   <Checkbox label="Another label" intialValue="false" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: label"
-  height={90}
   app={`
-    <VStack margin="1rem" gap="0.5rem">
+    <App>
       <Checkbox label="Example label" initialValue="true" />
       <Checkbox label="Another label" intialValue="false" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -117,24 +114,23 @@ Try this sample by clicking the bottom group of checkboxes.
 %-PROP-START labelPosition
 
 ```ueml copy
-<VStack margin="1rem" gap="0.8rem">
+<App>
   <Checkbox label="Top label" labelPosition="top" initialValue="true" />
   <Checkbox label="Right label" labelPosition="right" initialValue="true" />
   <Checkbox label="Bottom label" labelPosition="bottom" initialValue="true" />
   <Checkbox label="Left label" labelPosition="left" initialValue="true" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: labelPosition"
-  height={200}
   app={`
-    <VStack margin="1rem" gap="0.8rem">
+    <App>
       <Checkbox label="Top label" labelPosition="top" initialValue="true" />
       <Checkbox label="Right label" labelPosition="right" initialValue="true" />
       <Checkbox label="Bottom label" labelPosition="bottom" initialValue="true" />
       <Checkbox label="Left label" labelPosition="left" initialValue="true" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -143,22 +139,23 @@ Try this sample by clicking the bottom group of checkboxes.
 %-PROP-START readOnly
 
 ```ueml copy {3}
-<VStack margin="1rem" gap="0.5rem">
+<App>
   <Checkbox readOnly="true" label="Checked" initialValue="true" />
   <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: readOnly"
-  height={90}
   app={`
-    <VStack margin="1rem" gap="0.5rem">
+    <App>
       <Checkbox readOnly="true" label="Checked" initialValue="true" />
       <Checkbox readOnly="true" label="Unchecked" intialValue="false" />
-    </VStack>
+    </App>
   `}
 />
+
+%-PROP-END
 
 ## API
 
@@ -175,13 +172,13 @@ See an example in the `setValue` API method.
 You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
 
 ```ueml copy {9,12,14}
-<VStack margin="1rem" gap="0.5rem" var.changes="">
+<App var.changes="">
   <Checkbox
     id="checkbox"
     readOnly="true"
     label="This checkbox can be set only programmatically"
     onDidChange="changes += '+'" />
-  <HStack gap="0.5rem">
+  <HStack>
     <Button
       label="Check"
       onClick="checkbox.setValue(true)" />
@@ -191,20 +188,20 @@ You can use this method to set the checkbox's current value programmatically (`t
   </HStack>
   <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
   <Text value="Changes: {changes}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: value and setValue"
   height={170}
   app={`
-    <VStack margin="1rem" gap="0.5rem" var.changes="">
+    <App var.changes="">
       <Checkbox
         id="checkbox"
         readOnly="true"
         label="This checkbox can be set only programmatically"
         onDidChange="changes += '+'" />
-      <HStack gap="0.5rem">
+      <HStack>
         <Button
           label="Check"
           onClick="checkbox.setValue(true)" />
@@ -214,7 +211,7 @@ You can use this method to set the checkbox's current value programmatically (`t
       </HStack>
       <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
       <Text value="Changes: {changes}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -223,22 +220,21 @@ You can use this method to set the checkbox's current value programmatically (`t
 %-EVENT-START didChange
 
 ```ueml copy
-<VStack margin="0.75rem" gap="0.5rem" verticalAlignment="center" var.changes="">
+<App verticalAlignment="center" var.changes="">
   <Checkbox label="Changeable" onDidChange="changes += '+'" />
   <Checkbox label="Readonly" readOnly="true" onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={110}
   app={`
-    <VStack margin="0.75rem" gap="0.5rem" verticalAlignment="center" var.changes="">
+    <App verticalAlignment="center" var.changes="">
       <Checkbox label="Changeable" onDidChange="changes += '+'" />
       <Checkbox label="Readonly" readOnly="true" onDidChange="changes += '-'" />
       <Text value="Changes: {changes}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -249,28 +245,27 @@ You can use this method to set the checkbox's current value programmatically (`t
 Click the `Checkbox` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {4,5}
-<VStack var.focused="{false}" margin="0.75rem" gap="0.5rem" verticalAlignment="center">
+<App var.focused="{false}" verticalAlignment="center">
   <Checkbox
     value="true"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
   />
   <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: gotFocus/lostFocus"
-  height={72}
   app={`
-    <VStack var.focused="{false}" margin="0.75rem" gap="0.5rem" verticalAlignment="center">
+    <App var.focused="{false}" verticalAlignment="center">
       <Checkbox
         value="true"
         onGotFocus="focused = true"
         onLostFocus="focused = false"
       />
       <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -299,13 +294,15 @@ The `Checkbox` component uses these theme variables to customize its appearance:
 - `color-border-checked-Checkbox-warning`
 - `color-border-checked-Checkbox-error`
 
-> **Note**: some generic styling options are not available for this component.
-> Namely using any `padding` features like the following:
->
-> ```
-> <Checkbox padding="1rem" />
-> ```
->
-> If you need to add space around the component, use `margins` instead of `paddings`.
+<Callout type="info" emoji="📔">
+Some generic styling options are not available for this component.
+Namely using any `padding` features like the following:
+
+```
+<Checkbox padding="1rem" />
+```
+If you need to add space around the component, use `margins` instead of `paddings`.
+</Callout>
+
 
 %-STYLE-END
