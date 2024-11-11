@@ -9,7 +9,7 @@ import { MdSwapHoriz, MdSwapVert } from "react-icons/md";
 import { PiSquareSplitHorizontalLight, PiSquareSplitVerticalLight } from "react-icons/pi";
 import { RxOpenInNewWindow, RxReset, RxDownload, RxCode } from "react-icons/rx";
 import { usePlayground } from "@/src/hooks/usePlayground";
-import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
+import { resetApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import { Box } from "@/src/components/Box";
@@ -67,12 +67,17 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && standalone && <CodeSelector />}
         </Box>
         <SpaceFiller />
-        {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
-        {!options.fixedTheme &&
-          appDescription.availableThemes &&
-          appDescription.availableThemes.length > 1 && (
-            <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
-          )}
+        {standalone && (
+          <>
+            {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
+            {!options.fixedTheme &&
+              appDescription.availableThemes &&
+              appDescription.availableThemes.length > 1 && (
+                <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+              )}
+          </>
+
+        )}
         {!options.previewMode && show && (
           <>
             {!standalone && (
@@ -85,7 +90,15 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 label="Edit code in new window"
               />
             )}
-            {standalone && (
+            <Tooltip
+                trigger={
+                  <button className={styles.button} onClick={() => dispatch(resetApp())}>
+                    <RxReset />
+                  </button>
+                }
+                label="Reset the app"
+            />
+            {/*            {standalone && (
               <>
                 <Tooltip
                   trigger={
@@ -108,35 +121,29 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                   label="Toggle orientation"
                 />
               </>
-            )}
+            )}*/}
           </>
         )}
-        {options.allowStandalone && (
-          <Tooltip
-            trigger={
-              <button className={styles.button} onClick={() => openStandaloneApp()}>
-                <RxOpenInNewWindow />
-              </button>
-            }
-            label="Open in new window"
-          />
+        {standalone && (
+          <>
+            <Tooltip
+              trigger={
+                <button className={styles.button} onClick={() => openStandaloneApp()}>
+                  <RxOpenInNewWindow />
+                </button>
+              }
+              label="Open in new window"
+            />
+            <Tooltip
+              trigger={
+                <button className={styles.button} onClick={() => download()}>
+                  <RxDownload />
+                </button>
+              }
+              label="Download app"
+            />
+          </>
         )}
-        <Tooltip
-          trigger={
-            <button className={styles.button} onClick={() => dispatch(resetApp())}>
-              <RxReset />
-            </button>
-          }
-          label="Reset the app"
-        />
-        <Tooltip
-          trigger={
-            <button className={styles.button} onClick={() => download()}>
-              <RxDownload />
-            </button>
-          }
-          label="Download app"
-        />
       </Box>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>
