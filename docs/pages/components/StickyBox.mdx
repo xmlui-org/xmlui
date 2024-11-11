@@ -13,28 +13,28 @@ The `StickyBox` is a component that "sticks" or remains fixed at the top or bott
 This property determines whether the StickyBox should be anchored to the `top` or `bottom`.
 
 ```ueml copy
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <StickyBox to="top">
     This part of the UI sticks to the top
   </StickyBox>
   <Stack backgroundColor="red" height="80px" width="100%" />
   <Stack backgroundColor="green" height="80px" width="100%" />
   <Stack backgroundColor="blue" height="80px" width="100%" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: to"
-  height={100}
+  height={200}
   app={`
-  <VStack padding="$space-4" gap="$space-4">
+  <App>
     <StickyBox to="top">
       This part of the UI sticks to the top
     </StickyBox>
     <Stack backgroundColor="red" height="80px" width="100%" />
     <Stack backgroundColor="green" height="80px" width="100%" />
     <Stack backgroundColor="blue" height="80px" width="100%" />
-  </VStack>
+  </App>
   `}
 />
 

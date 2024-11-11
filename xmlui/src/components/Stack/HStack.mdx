@@ -1,23 +1,28 @@
 `HStack` is a specialized, shorthand version for the regular `Stack` component with a horizontal orientation.
 
 ```ueml copy
-<HStack gap="1rem">
-  <Stack height="32px" width="32px" backgroundColor="red" />
-  <Stack height="32px" width="32px" backgroundColor="blue" />
-  <Stack height="32px" width="32px" backgroundColor="green" />
-</HStack>
+<App>
+  <HStack>
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: HStack"
-  height={50}
   app={`
-    <HStack gap="1rem">
-      <Stack height="32px" width="32px" backgroundColor="red" />
-      <Stack height="32px" width="32px" backgroundColor="blue" />
-      <Stack height="32px" width="32px" backgroundColor="green" />
-    </HStack>
+    <App>
+      <HStack>
+        <Stack height="32px" width="32px" backgroundColor="red" />
+        <Stack height="32px" width="32px" backgroundColor="blue" />
+        <Stack height="32px" width="32px" backgroundColor="green" />
+      </HStack>
+    </App>
  `}
 />
 
-> **Note**: You cannot change the orientation of `HStack` from horizontal to vertical by setting the `orientation` prop, as the engine ignores that setting.
+<Callout type="info" emoji="📔">
+You cannot change the orientation of `HStack` from horizontal to vertical by setting the `orientation` prop, as the engine ignores that setting.
+</Callout>

@@ -4,36 +4,35 @@ This boolean property indicates whether the checkbox responds to user events (i.
 it is `true` by default.
 
 ```ueml copy {4-5, 9-10}
-<VStack margin="1rem" gap="0.8rem">
+<App>
   Enabled switches:
-  <HStack gap="0.5rem">
+  <HStack>
     <Switch initialValue="true" enabled="true" />
     <Switch initialValue="false" enabled="true" />
   </HStack>
   Disabled switches:
-  <HStack gap="0.5rem">
+  <HStack>
     <Switch initialValue="true" enabled="false" />
     <Switch initilaValue="false" enabled="false" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={160}
   app={`
-    <VStack margin="1rem" gap="0.8rem">
+    <App>
       Enabled switches:
-      <HStack gap="0.5rem">
+      <HStack>
         <Switch initialValue="true" enabled="true" />
         <Switch initialValue="false" enabled="true" />
       </HStack>
       Disabled switches:
-      <HStack gap="0.5rem">
+      <HStack>
         <Switch initialValue="true" enabled="false" />
         <Switch initilaValue="false" enabled="false" />
       </HStack>
-    </VStack>
+    </App>
   `}
 />
 
@@ -44,20 +43,19 @@ it is `true` by default.
 This property sets the label of the component.
 
 ```ueml copy
-<VStack margin="1rem" gap="0.5rem">
+<App>
   <Switch label="Example label" initialValue="true" />
   <Switch label="Another label" intialValue="false" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: label"
-  height={90}
   app={`
-    <VStack margin="1rem" gap="0.5rem">
+    <App>
       <Switch label="Example label" initialValue="true" />
       <Switch label="Another label" intialValue="false" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -66,24 +64,23 @@ This property sets the label of the component.
 %-PROP-START labelPosition
 
 ```ueml copy
-<VStack margin="1rem" gap="0.8rem">
+<App>
   <Switch label="Top label" labelPosition="top" initialValue="true" />
   <Switch label="Right label" labelPosition="right" initialValue="true" />
   <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
   <Switch label="Left label" labelPosition="left" initialValue="true" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: labelPosition"
-  height={210}
   app={`
-    <VStack margin="1rem" gap="0.8rem">
+    <App>
       <Switch label="Top label" labelPosition="top" initialValue="true" />
       <Switch label="Right label" labelPosition="right" initialValue="true" />
       <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
       <Switch label="Left label" labelPosition="left" initialValue="true" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -94,20 +91,19 @@ This property sets the label of the component.
 If true, the value of the component cannot be modified.
 
 ```ueml copy
-<VStack margin="1rem" gap="0.5rem">
+<App>
   <Switch readOnly="true" label="Checked" initialValue="true" />
   <Switch readOnly="true" label="Unchecked" intialValue="false" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: readOnly"
-  height={90}
   app={`
-    <VStack margin="1rem" gap="0.5rem">
+    <App>
       <Switch readOnly="true" label="Checked" initialValue="true" />
       <Switch readOnly="true" label="Unchecked" intialValue="false" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -116,13 +112,13 @@ If true, the value of the component cannot be modified.
 %-API-START setValue
 
 ```ueml copy {9,12,14}
-<VStack margin="1rem" gap="0.5rem" var.changes="">
+<App var.changes="">
   <Switch
     id="mySwitch"
     readOnly="true"
     label="This switch can be set only programmatically"
     onDidChange="changes += '+'" />
-  <HStack gap="0.5rem">
+  <HStack>
     <Button
       label="Check"
       onClick="mySwitch.setValue(true)" />
@@ -132,20 +128,19 @@ If true, the value of the component cannot be modified.
   </HStack>
   <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
   <Text value="Changes: {changes}" />
-</VStack>
+</App>
 ```
 
 <Playground
-    name="Example: value and setValue"
-    height={170}
-    app={`
-    <VStack margin="1rem" gap="0.5rem" var.changes="">
+  name="Example: value and setValue"
+  app={`
+    <App var.changes="">
       <Switch
         id="mySwitch"
         readOnly="true"
         label="This switch can be set only programmatically"
         onDidChange="changes += '+'" />
-      <HStack gap="0.5rem">
+      <HStack>
         <Button
           label="Check"
           onClick="mySwitch.setValue(true)" />
@@ -155,7 +150,7 @@ If true, the value of the component cannot be modified.
       </HStack>
       <Text>The switch is {checkbox.value ? "checked" : "unchecked"}</Text>
       <Text value="Changes: {changes}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -167,22 +162,21 @@ This event is triggered when the `Switch` is toggled due to user interaction.
 A read-only switch never fires this event, and it won't fire if the switch's value is set programmatically.
 
 ```ueml copy
-<VStack margin="0.75rem" gap="0.5rem" verticalAlignment="center" var.changes="">
+<App verticalAlignment="center" var.changes="">
   <Switch label="Changeable" onDidChange="changes += '+'" />
   <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
   <Text value="Changes: {changes}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={110}
   app={`
-    <VStack margin="0.75rem" gap="0.5rem" verticalAlignment="center" var.changes="">
+    <App verticalAlignment="center" var.changes="">
       <Switch label="Changeable" onDidChange="changes += '+'" />
       <Switch label="Readonly" readOnly="true" onDidChange="changes += '-'" />
       <Text value="Changes: {changes}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -195,28 +189,27 @@ This event is triggered when the `Switch` receives focus.
 Click the `Switch` in the example demo to change the label text. Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {4,5}
-<HStack var.focused="{false}" margin="0.75rem" gap="0.5rem" verticalAlignment="center">
-    <Switch
-      value="{true}"
-      onGotFocus="focused = true"
-      onLostFocus="focused = false"
-    />
-    <Text value="{focused === true ? 'I got focused!' : 'I lost focus...'}" />
-</HStack>
+<App var.focused="{false}" verticalAlignment="center">
+  <Switch
+    value="true"
+    onGotFocus="focused = true"
+    onLostFocus="focused = false"
+  />
+  <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
+</App>
 ```
 
 <Playground
   name="Example: gotFocus/lostFocus"
-  height={80}
   app={`
-    <VStack var.focused="{false}" margin="0.75rem" gap="0.5rem" verticalAlignment="center">
+    <App var.focused="{false}" verticalAlignment="center">
       <Switch
         value="true"
         onGotFocus="focused = true"
         onLostFocus="focused = false"
       />
       <Text value="{focused === true ? 'I am focused!' : 'I have lost the focus!'}" />
-    </VStack>
+    </App>
   `}
 />
 
@@ -243,13 +236,15 @@ The `Switch` component uses these theme variables to customize its appearance:
 - `color-border-checked-Switch-success`
 - `color-border-checked-Switch-error`
 
-> **Note**: some generic styling options are not available for this component.
-> Namely using any `padding` features like the following:
->
-> ```
-> <Switch padding="1rem" />
-> ```
->
-> If you need to add space around the component, use `margins` instead of `paddings`.
+<Callout type="info" emoji="📔">
+some generic styling options are not available for this component.
+Namely using any `padding` features like the following:
+
+```
+<Switch padding="1rem" />
+```
+
+If you need to add space around the component, use `margins` instead of `paddings`.
+</Callout>
 
 %-STYLE-END

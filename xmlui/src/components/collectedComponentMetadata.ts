@@ -69,7 +69,6 @@ import { AccordionMd } from "./Accordion/Accordion";
 import { AlertMd } from "./Alert/Alert";
 import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "@components-core/Fragment";
-import { SlotMd } from "@components-core/Slot";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
 import { BarChartMd } from "./BarChart/BarChart";
@@ -166,7 +165,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Redirect: RedirectMd,
   Select: SelectMd,
   SelectionStore: SelectionStoreMd,
-  Slot: SlotMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
   Splitter: SplitterMd,

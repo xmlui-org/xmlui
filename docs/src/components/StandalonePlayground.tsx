@@ -14,7 +14,7 @@ import { ToastProvider } from "@radix-ui/react-toast";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
 import { Header } from "@/src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
-import { Spinner } from "@components/Spinner/SopinnerNative";
+import { Spinner } from "@components/Spinner/SpinnerNative";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();
