@@ -7,24 +7,26 @@ See the [`DropdownMenu` component](./DropdownMenu) for using this component in m
 %-PROP-START icon
 
 ```ueml copy {2-4}
-<DropdownMenu label="DropdownMenu">
-  <MenuItem icon="drive">Item 1</MenuItem>
-  <MenuItem icon="trash">Item 2</MenuItem>
-  <MenuItem icon="email">Item 3</MenuItem>
-</DropdownMenu>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem icon="drive">Item 1</MenuItem>
+    <MenuItem icon="trash">Item 2</MenuItem>
+    <MenuItem icon="email">Item 3</MenuItem>
+  </DropdownMenu>
+</App>
 ```
 
 <Playground
   name="Example: icon"
   height={200}
   app={`
-    <VStack padding="1rem">
+    <App>
       <DropdownMenu label="DropdownMenu">
         <MenuItem icon="drive">Item 1</MenuItem>
         <MenuItem icon="trash">Item 2</MenuItem>
         <MenuItem icon="email">Item 3</MenuItem>
       </DropdownMenu>
-    </VStack>
+    </App>
   `}
 />
 
@@ -41,24 +43,26 @@ Avaliable values are:
 
 
 ```ueml copy {2-4}
-<DropdownMenu label="DropdownMenu">
-  <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
-  <MenuItem icon="trash" iconPosition="end">Item 2</MenuItem>
-  <MenuItem icon="email">Item 3</MenuItem>
-</DropdownMenu>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
+    <MenuItem icon="trash" iconPosition="end">Item 2</MenuItem>
+    <MenuItem icon="email">Item 3</MenuItem>
+  </DropdownMenu>
+</App>
 ```
 
 <Playground
   name="Example: iconPosition"
   height={200}
   app={`
-    <VStack padding="1rem">
-      <DropdownMenu label="DropdownMenu">
-        <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
-        <MenuItem icon="trash" iconPosition="end">Item 2</MenuItem>
-        <MenuItem icon="email">Item 3</MenuItem>
-      </DropdownMenu>
-    </VStack>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem icon="drive" iconPosition="start">Item 1</MenuItem>
+    <MenuItem icon="trash" iconPosition="end">Item 2</MenuItem>
+    <MenuItem icon="email">Item 3</MenuItem>
+  </DropdownMenu>
+</App>
   `}
 />
 
@@ -67,24 +71,26 @@ Avaliable values are:
 %-PROP-START active
 
 ```ueml copy /active="true"/
-<DropdownMenu label="DropdownMenu">
-  <MenuItem icon="drive" active="true">Item 1</MenuItem>
-  <MenuItem icon="trash">Item 2</MenuItem>
-  <MenuItem icon="email">Item 3</MenuItem>
-</DropdownMenu>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem icon="drive" active="true">Item 1</MenuItem>
+    <MenuItem icon="trash">Item 2</MenuItem>
+    <MenuItem icon="email">Item 3</MenuItem>
+  </DropdownMenu>
+</App>
 ```
 
 <Playground
   name="Example: icon"
   height={200}
   app={`
-    <VStack padding="1rem">
+    <App>
       <DropdownMenu label="DropdownMenu">
         <MenuItem icon="drive" active="true">Item 1</MenuItem>
         <MenuItem icon="trash">Item 2</MenuItem>
         <MenuItem icon="email">Item 3</MenuItem>
       </DropdownMenu>
-    </VStack>
+    </App>
   `}
 />
 
@@ -110,13 +116,13 @@ If both properties are defined, `click` takes precedence.
   name="Example: iconPosition"
   height={200}
   app={`
-    <VStack padding="1rem">
-      <DropdownMenu label="DropdownMenu">
-        <MenuItem onClick="window.alert('Item 1 clicked')">Item 1</MenuItem>
-        <MenuItem onClick="window.alert('Item 2 clicked')">Item 2</MenuItem>
-        <MenuItem onClick="window.alert('Item 3 clicked')">Item 3</MenuItem>
-      </DropdownMenu>
-    </VStack>
+<App>
+  <DropdownMenu label="DropdownMenu">
+    <MenuItem onClick="window.alert('Item 1 clicked')">Item 1</MenuItem>
+    <MenuItem onClick="window.alert('Item 2 clicked')">Item 2</MenuItem>
+    <MenuItem onClick="window.alert('Item 3 clicked')">Item 3</MenuItem>
+  </DropdownMenu>
+</App>
   `}
 />
 
