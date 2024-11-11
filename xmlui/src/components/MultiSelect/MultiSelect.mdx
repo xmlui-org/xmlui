@@ -7,22 +7,26 @@ The component provides two ways to add a list of options to the dropdown:
 The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
-<MultiSelect padding="$space-1">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: using Option"
-  height={160}
-  app={`
+<App>
   <MultiSelect padding="$space-1">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
+</App>
+```
+
+<Playground
+  name="Example: using Option"
+  height={200}
+  app={`
+    <App>
+      <MultiSelect padding="$space-1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -32,22 +36,8 @@ In cases where you do not wish to maunally create each item of a datalist
 you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
 
 ```ueml copy
-<MultiSelect padding="$space-1">
-  <Items items="{[
-    { name: 'Joe', id: 0 },
-    { name: 'Jane', id: 1 },
-    { name: 'Carl', id: 2 }
-  ]}">
-    <Option value="{$item.id}" label="{$item.name}" />
-  </Items>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: using Items"
-  height={160}
-  app={`
-  <MultiSelect padding="$space-1">
+<App>
+  <MultiSelect>
     <Items items="{[
       { name: 'Joe', id: 0 },
       { name: 'Jane', id: 1 },
@@ -56,54 +46,52 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
       <Option value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiSelect>
+</App>
+```
+
+<Playground
+  name="Example: using Items"
+  height={200}
+  app={`
+    <App>
+      <MultiSelect>
+        <Items items="{[
+          { name: 'Joe', id: 0 },
+          { name: 'Jane', id: 1 },
+          { name: 'Carl', id: 2 }
+        ]}">
+          <Option value="{$item.id}" label="{$item.name}" />
+        </Items>
+      </MultiSelect>
+    </App>
   `}
 />
 
 %-DESC-END
 
-%-PROP-START autoFocus
-
-```ueml copy /autoFocus="true"/
-<MultiSelect autoFocus="true" padding="$space-1">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: autoFocus"
-  height={160}
-  app={`
-  <MultiSelect autoFocus="true" padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </MultiSelect>
-  `}
-/>
-
-%-PROP-END
-
 %-PROP-START enabled
 
 ```ueml copy /enabled="false"/
-<MultiSelect enabled="false" padding="$space-1">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: enabled"
-  height={160}
-  app={`
+<App>
   <MultiSelect enabled="false" padding="$space-1">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
+</App>
+```
+
+<Playground
+  name="Example: enabled"
+  height={200}
+  app={`
+    <App>
+      <MultiSelect enabled="false" padding="$space-1">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -118,24 +106,24 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack padding="$space-1" gap="$space-1">
+<App>
   <MultiSelect />
   <MultiSelect validationStatus="valid" />
   <MultiSelect validationStatus="warning" />
   <MultiSelect validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={220}
+  height={280}
   app={`
-  <VStack padding="$space-1" gap="$space-1">
+  <App>
     <MultiSelect />
     <MultiSelect validationStatus="valid" />
     <MultiSelect validationStatus="warning" />
     <MultiSelect validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -144,22 +132,26 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 %-PROP-START placeholder
 
 ```ueml copy /placeholder="Select any number of options"/
-<MultiSelect placeholder="Select any number of options" padding="$space-1">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: placeholder"
-  height={160}
-  app={`
-  <MultiSelect placeholder="Select any number of options" padding="$space-1">
+<App>
+  <MultiSelect placeholder="Select any number of options">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
+</App>
+```
+
+<Playground
+  name="Example: placeholder"
+  height={240}
+  app={`
+    <App>
+      <MultiSelect placeholder="Select any number of options">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -168,7 +160,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 %-PROP-START initialValue
 
 ```ueml copy /initialValue="['second', 'third']"/
-<MultiSelect initialValue="['second', 'third']" padding="$space-1">
+<MultiSelect initialValue="['second', 'third']">
   <Option value="opt1" label="first"/>
   <Option value="opt2" label="second"/>
   <Option value="opt3" label="third"/>
@@ -177,13 +169,15 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 
 <Playground
   name="Example: initialValue"
-  height={160}
+  height={200}
   app={`
-  <MultiSelect initialValue="['second', 'third']" padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
-  </MultiSelect>
+    <App>
+      <MultiSelect initialValue="['second', 'third']">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -192,26 +186,10 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 %-PROP-START optionTemplate
 
 ```ueml copy
-<MultiSelect>
-  <property name="optionTemplate">
-    <HStack verticalAlignment="center" gap="$space-1">
-      <Icon name="info" />
-      <Text value="{$item.label}" variant="strong" />
-    </HStack>
-  </property>
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiSelect>
-```
-
-<Playground
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+<App>
   <MultiSelect>
     <property name="optionTemplate">
-      <HStack verticalAlignment="center" gap="$space-1">
+      <HStack verticalAlignment="center">
         <Icon name="info" />
         <Text value="{$item.label}" variant="strong" />
       </HStack>
@@ -220,6 +198,26 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
+</App>
+```
+
+<Playground
+  name="Example: optionTemplate"
+  height={240}
+  app={`
+    <App>
+      <MultiSelect>
+        <property name="optionTemplate">
+          <HStack verticalAlignment="center">
+            <Icon name="info" />
+            <Text value="{$item.label}" variant="strong" />
+          </HStack>
+        </property>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -230,12 +228,12 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 Click on the second field to see the custom empty list indicator.
 
 ```ueml copy {9-11}
-<VStack padding="$space-1" gap="$space-1">
-  <VStack gap="$space-0_5">
+<App>
+  <VStack>
     <Text value="Default:" />
     <MultiSelect />
   </VStack>
-  <VStack gap="$space-0_5">
+  <VStack>
     <Text value="Custom:" />
     <MultiSelect>
       <property name="emptyListTemplate">
@@ -243,19 +241,19 @@ Click on the second field to see the custom empty list indicator.
       </property>
     </MultiSelect>
   </VStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: emptyListTemplate"
-  height={220}
+  height={260}
   app={`
-  <VStack padding="$space-1" gap="$space-1">
-    <VStack gap="$space-0_5">
+  <App>
+    <VStack>
       <Text value="Default:" />
       <MultiSelect />
     </VStack>
-    <VStack gap="$space-0_5">
+    <VStack>
       <Text value="Custom:" />
       <MultiSelect>
         <property name="emptyListTemplate">
@@ -263,7 +261,7 @@ Click on the second field to see the custom empty list indicator.
         </property>
       </MultiSelect>
     </VStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -272,7 +270,7 @@ Click on the second field to see the custom empty list indicator.
 %-EVENT-START didChange
 
 ```ueml copy /onDidChange="(newItems) => newValues = newItems"/
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="newValues" value="{[]}" />
   <Items items="{newValues}">
     <Text value="{$item}" />
@@ -282,14 +280,14 @@ Click on the second field to see the custom empty list indicator.
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
+  <App>
     <var name="newValues" value="{[]}" />
     <Items items="{newValues}">
       <Text value="{$item}" />
@@ -299,7 +297,7 @@ Click on the second field to see the custom empty list indicator.
       <Option value="opt2" label="second"/>
       <Option value="opt3" label="third"/>
     </MultiSelect>
-  </VStack>
+  </App>
   `}
 />
 
@@ -308,36 +306,34 @@ Click on the second field to see the custom empty list indicator.
 %-EVENT-START gotFocus
 
 ```ueml copy {5-6}
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
   <MultiSelect
     onGotFocus="isFocused = true"
-    onLostFocus="isFocused = false"
-  >
+    onLostFocus="isFocused = false">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: gotFocus/lostFocus"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <var name="isFocused" value="{false}" />
-    <Text value="Input control is focused: {isFocused}" />
-    <MultiSelect
-      onGotFocus="isFocused = true"
-      onLostFocus="isFocused = false"
-    >
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </MultiSelect>
-  </VStack>
+    <App>
+      <var name="isFocused" value="{false}" />
+      <Text value="Input control is focused: {isFocused}" />
+      <MultiSelect
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -352,28 +348,28 @@ See the example in [gotFocus event section](#gotfocus).
 %-API-START focus
 
 ```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <MultiSelect id="inputControl">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiSelect>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: focus()"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <MultiSelect id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </MultiSelect>
-  </VStack>
+    <App>
+      <Button label="Focus Input" onClick="inputControl.focus()" />
+      <MultiSelect id="inputControl">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiSelect>
+    </App>
   `}
 />
 
@@ -436,8 +432,20 @@ Theme variables to set the styles of an unselected item:
 ### Example
 
 ```json copy
-"radius-MultiSelect": "30px",
-"color-placeholder-MultiSelect-default": "blue"
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "radius-MultiSelect": "30px",
+    "color-placeholder-MultiSelect-default": "blue"
+  }
+}
+```
+
+```ueml copy
+<App>
+  <MultiSelect placeholder="I am a placeholder" />
+</App>
 ```
 
 <Playground
@@ -454,7 +462,11 @@ Theme variables to set the styles of an unselected item:
       },
     },
   ]}
-  app={`<MultiSelect placeholder="I am a placeholder" />`}
+  app={`
+    <App>
+      <MultiSelect placeholder="I am a placeholder" />
+    </App>
+  `}
 />
 
 To style all input controls not just this component, replace the `MultiSelect` segment with `Input`:

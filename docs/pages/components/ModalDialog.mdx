@@ -6,6 +6,10 @@ The `ModalDialog` component defines a modal dialog UI element that can be displa
 
 ## Using the Component
 
+<Callout type="info" emoji="📔">
+When using the examples in this article, pop them out to the full screen to check how they work.
+</Callout>
+
 Opening and closing the modal dialog can be done in two ways depending on circumstances.
 
 ### With Imperative API
@@ -19,28 +23,30 @@ Note the `id` property of the `ModalDialog` in the example below and how it is u
 operations of the component in the `onClick` event handlers.
 
 ```ueml copy
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
-    <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog">
-      <Button label="Close Dialog" onClick="dialog.close()" />
-    </ModalDialog>
-  </Stack>
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <Button label="Open Dialog" onClick="dialog.open()" />
+  <ModalDialog id="dialog" title="Example Dialog">
+    <Button label="Close Dialog" onClick="dialog.close()" />
+  </ModalDialog>
+</App>
 ```
 
 <Playground
   name="Example: imperative API"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" title="Example Dialog">
       <Button label="Close Dialog" onClick="dialog.close()" />
     </ModalDialog>
-  </Stack>
+  </App>
   `}
 />
 
-> **Note**: The imperative approach is perhaps the most intuitive way to display and hide modal dialogs.
+<Callout type="info" emoji="📔">
+The imperative approach is perhaps the most intuitive way to display and hide modal dialogs.
+</Callout>
 
 ### With `when`
 
@@ -50,11 +56,11 @@ Using the `when` property in a `ModalDialog` dialog component is commonly used w
 showing the modal in conjunction with an updated URL so that the opened state of the modal dialog is referable.
 
 ```ueml copy /when="{isDialogShown}"/
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <var name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
   <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
-</Stack>
+</App>
 ```
 
 Click on the button in the demo below to open the modal dialog. Click anywhere outside the opened dialog or the close button to close it.
@@ -63,71 +69,51 @@ Click on the button in the demo below to open the modal dialog. Click anywhere o
   name="Example: when"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <var name="isDialogShown" value="{false}"/>
     <Button label="Open Dialog" onClick="isDialogShown = true" />
     <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
-  </Stack>
+  </App>
   `}
 />
 
 Setting the `when` property is the most straightforward way for deep-linked modals. If you use deep links with query parameters to show a particular dialog, you can set the `when` property to show or hide the dialog according to parameter values.
 
-### As Request Confirmation
-
-The `ModalDialog` is also used for confirming certain actions such as API requests.
-
-The example below shows that the `ApiBinding` component has a number of confirmation dialog related properties.
-Setting one of these properties (highlighted in example) enable the `ModalDialog` to appear if the `Button` is clicked.
-
-```ueml copy {6-8}
-<Button>Delete
-  <event name="click">
-    <ApiBinding
-      url="/drives/{$driveId}"
-      method="delete"
-      confirmationMessageTitle="Remove Drive"
-      confirmationMessage="Are you sure you want to remove this drive and all of its information?"
-      actionButtonLabel="Remove" />
-  </event>
-</Button>
-```
-
 ### The `ModalDialog` as a Container
 
 The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx), that it also accepts child components.
 
-```ueml copy {4-9}
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+```ueml copy {3-8}
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" title="Example Dialog">
-    <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}"
-      onCancel="dialog.close()"
-      onSubmit="dialog.close()">
+    <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
       <FormItem bindTo="firstName" required="true" />
       <FormItem bindTo="lastName" required="true" />
     </Form>
   </ModalDialog>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: children"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" title="Example Dialog">
-      <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}"
-        onCancel="dialog.close()"
-        onSubmit="dialog.close()">
+      <Form data="{{ firstName: 'Billy', lastName: 'Bob' }}">
         <FormItem bindTo="firstName" required="true" />
         <FormItem bindTo="lastName" required="true" />
       </Form>
     </ModalDialog>
-  </Stack>
+  </App>
   `}
 />
+
+<Callout type="info" emoji="📔">
+When a form is nested into a modal dialog, closing the form (canceling it or completing its submit action) automatically closes the dialog.
+</Callout>
 
 ## Properties
 
@@ -136,10 +122,10 @@ The `ModalDialog` component is also a container such as the [`Card`](./Card.mdx)
 Shows (`true`) or hides (`false`) the visibility of the close button on the dialog.
 
 ```ueml copy /closeButtonVisible="false"/
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
-</Stack>
+</App>
 ```
 
 Click outside the dialog to close it.
@@ -148,10 +134,10 @@ Click outside the dialog to close it.
   name="Example: closeButtonVisible"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" closeButtonVisible="false" title="Example Dialog" />
-  </Stack>
+  </App>
   `}
 />
 
@@ -160,10 +146,10 @@ Click outside the dialog to close it.
 Toggles whether the dialog encompasses the whole UI (`true`) or not and has a minimum width and height (`false`).
 
 ```ueml copy /fullScreen="true"/
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
   <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
-</Stack>
+</App>
 ```
 
 Click the button to display a full-screen dialog. The icon at the top-right corner of the dialog allows you to close it.
@@ -172,10 +158,10 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
   name="Example: fullScreen"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
     <ModalDialog id="dialog" fullScreen="true" title="Example Dialog" />
-  </Stack>
+  </App>
   `}
 />
 
@@ -183,36 +169,25 @@ Click the button to display a full-screen dialog. The icon at the top-right corn
 
 This property sets whether the modal dialog appears open (`true`) or not (`false`) when the page is it is defined on is rendered.
 
-```ueml copy {4}
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
-  <Button label="Open Dialog" onClick="dialog.open()" />
-  <ModalDialog
-    isInitiallyOpen="true"
-    id="dialog"
-    title="Example Dialog"
-  />
-</Stack>
-```
-
 ### `title`
 
 Provides a prestyled heading to display the intent of the dialog.
 
-```ueml copy /title="Example Dialog"/
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+```ueml copy {3}
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="dialog.open()" />
-  <ModalDialog id="dialog" title="Example Dialog" />
-</Stack>
+  <ModalDialog id="dialog" title="Example Title" />
+</App>
 ```
 
 <Playground
   name="Example: title"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="dialog.open()" />
-    <ModalDialog id="dialog" title="Example Dialog" />
-  </Stack>
+    <ModalDialog id="dialog" title="Example Title" />
+  </App>
   `}
 />
 
@@ -222,12 +197,10 @@ Provides a prestyled heading to display the intent of the dialog.
 
 This event is fired when the close button is pressed or the user clicks outside the `ModalDialog`.
 
-> For the API method of the same name, see `close` under the `Api` section.
-
 In this example, the `close` event counts how many times you closed the dialog:
 
 ```ueml copy {6-8}
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"
@@ -236,7 +209,7 @@ In this example, the `close` event counts how many times you closed the dialog:
     onClose="counter++">
     <Text value="Dialog closed {counter} number of times." />
   </ModalDialog>
-</Stack>
+</App>
 ```
 
 Open and close the dialog several times to test that it changes the counter.
@@ -245,7 +218,7 @@ Open and close the dialog several times to test that it changes the counter.
   name="Example: open/close events"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="myDialog.open()" />
     <ModalDialog
       id="myDialog"
@@ -254,7 +227,7 @@ Open and close the dialog several times to test that it changes the counter.
       onClose="counter++">
       <Text value="Dialog closed {counter} number of times." />
     </ModalDialog>
-  </Stack>
+  </App>
   `}
 />
 
@@ -262,12 +235,10 @@ Open and close the dialog several times to test that it changes the counter.
 
 This event is fired when the `ModalDialog` is opened either via a `when` or an imperative API call (`open()`).
 
-> For the API method of the same name, see `open` under the `Api` section.
-
 In this example, the `open` event counts how many times you opened the dialog:
 
 ```ueml copy {6-8}
-<Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+<App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <Button label="Open Dialog" onClick="myDialog.open()" />
   <ModalDialog
     id="myDialog"
@@ -276,7 +247,7 @@ In this example, the `open` event counts how many times you opened the dialog:
     onOpen="counter++">
     <Text value="Dialog opened {counter} number of times." />
   </ModalDialog>
-</Stack>
+</App>
 ```
 
 Open and close the dialog several times to test that it changes the counter.
@@ -285,7 +256,7 @@ Open and close the dialog several times to test that it changes the counter.
   name="Example: open/close events"
   height={120}
   app={`
-  <Stack height="100%" verticalAlignment="center" horizontalAlignment="center">
+  <App height="100%" verticalAlignment="center" horizontalAlignment="center">
     <Button label="Open Dialog" onClick="myDialog.open()" />
     <ModalDialog
       id="myDialog"
@@ -294,7 +265,7 @@ Open and close the dialog several times to test that it changes the counter.
       onOpen="counter++">
       <Text value="Dialog opened {counter} number of times." />
     </ModalDialog>
-  </Stack>
+  </App>
   `}
 />
 
@@ -310,13 +281,9 @@ This method is used to close the `ModalDialog`. Invoke it using `modalId.close()
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
-> For the event of the same name, see \`close\` under the \`Event\` section.
-
 ### `open`
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
-
-> For the event of the same name, see \`open\` under the \`Event\` section.
 
 ## Styling
 
