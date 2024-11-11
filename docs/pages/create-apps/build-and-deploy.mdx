@@ -23,10 +23,9 @@ The simple structure of XMLUI apps contains a few folders and files, as this tab
 | **`components`** | (*Optional*) The folder with the app's XMLUI components (empty) |
 | **`resources`** | (*Optional*) The folder with static app resources like images, logos, icons, etc. |
 | **`themes`** | (*Optional*) The folder theme files. |
-| **`xmlui`** | The folder with XMLUI core framework, optional features, and third-party components |
+| **`xmlui`** | The folder with XMLUI core framework, optional features, emulated APIs, and third-party components |
 | **`config.json`** | (*Optional*) The app configuration file |
-| **`emulatedApi.js`** | (*Optional*) The API for the emulated backend |
-| **`emulatedApiWorker.js`** | (*Optional*) The service worker for emulated backend |
+| **`mockApi.js`** | (*Optional*) The service worker for emulated backend |
 | **`start.bat`** | (*Optional*) The batch file to start the `http-server` utility (assumes Node.js is installed) on Windows |
 | **`start.sh`** | (*Optional*) The bash script file to start the `http-server` utility (assumes Node.js is installed) on Mac and Linux |
 
@@ -40,9 +39,9 @@ XMLUI provides API emulation, which allows you to create apps that communicate w
 This technology is still under development. We use it in the tutorials and documentation samples, and we may make it available for XMLUI app developers in the future.
 </Callout>
 
-Two files, `emulatedApi.js` and `emulatedApiWorker.js`, are present only in backend emulation apps.
+Two files, `xmlui/mockApiDef.js` and `mockApi.js`, are present only in backend emulation apps.
 
-If you have an emulated backend, the `emulatedApi.js` file should be loaded in `index.html` (before the XMLUI framework):
+If you have an emulated backend, the `mockApiDef.js` file should be loaded in `index.html` (before the XMLUI framework):
 
 ```html copy filename="index.html" {6} /emulatedApi.js/
 <!DOCTYPE html>
@@ -50,7 +49,7 @@ If you have an emulated backend, the `emulatedApi.js` file should be loaded in `
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="./emulatedApi.js"></script>
+  <script src="./xmlui/mockApiDef.js"></script>
   <script src="./xmlui/xmlui-standalone.umd.js"></script>
 </head>
 <body>
@@ -58,7 +57,7 @@ If you have an emulated backend, the `emulatedApi.js` file should be loaded in `
 </html>
 ```
 
-The framework will automatically load the `emulatedApiWorker.js` file (if present and needed) while initializing.
+The framework will automatically load the `mockApi.js` file (if present and needed) while initializing.
 
 ### Component files
 
