@@ -1,6 +1,6 @@
 import { ButtonMd } from "@components/Button/Button";
 import { CHStackMd, CVStackMd, HStackMd, StackMd, VStackMd } from "@components/Stack/Stack";
-import { TextBoxMd } from "@components/TextBox/TextBox";
+import { PasswordMd, TextBoxMd } from "@components/TextBox/TextBox";
 import { ThemeMd } from "@components/Theme/Theme";
 import { AppMd } from "@components/App/App";
 import { AppHeaderMd } from "@components/AppHeader/AppHeader";
@@ -187,7 +187,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Text: TextMd,
   TextArea: TextAreaMd,
   TextBox: TextBoxMd,
-  PasswordInput: TextBoxMd,
+  PasswordInput: PasswordMd,
   Toolbar: ToolbarMd,
   ToolbarButton: ToolbarButtonMd,
   TrendLabel: TrendLabelMd,

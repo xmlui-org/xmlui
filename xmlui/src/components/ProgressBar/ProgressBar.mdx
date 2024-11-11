@@ -3,26 +3,25 @@
 The following example demonstrates using it:
 
 ```ueml copy {2-6}
-<VStack padding="1rem" gap="1rem">
+<App>
   <ProgressBar value="0"/>
   <ProgressBar value="0.2"/>
   <ProgressBar value="0.6"/>
   <ProgressBar value="1"/>
   <ProgressBar value="1.2"/>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: value"
-  height={140}
   app={`
-    <VStack padding="1rem" gap="1rem">
+    <App>
       <ProgressBar value="0"/>
       <ProgressBar value="0.2"/>
       <ProgressBar value="0.6"/>
       <ProgressBar value="1"/>
       <ProgressBar value="1.2"/>
-    </VStack>
+    </App>
   `}
 />
 
@@ -47,19 +46,18 @@ This sample shows how you can style `ProgressBar`:
   thickness-ProgressBar="12px"
   radius-indicator-ProgressBar="12px"
   radius-Progressbar="4px">
-  <VStack padding="1rem" gap="1rem">
+  <App>
     <ProgressBar value="0"/>
     <ProgressBar value="0.2"/>
     <ProgressBar value="0.6"/>
     <ProgressBar value="1"/>
     <ProgressBar value="1.2"/>
-  </VStack>
+  </App>
 </Theme>
 ```
 
 <Playground
   name="Example: styling ProgressBar"
-  height={160}
   app={`
     <Theme
       color-bg-ProgressBar="cyan"
@@ -67,13 +65,13 @@ This sample shows how you can style `ProgressBar`:
       thickness-ProgressBar="12px"
       radius-indicator-ProgressBar="12px"
       radius-Progressbar="4px">
-      <VStack padding="1rem" gap="1rem">
+      <App>
         <ProgressBar value="0"/>
         <ProgressBar value="0.2"/>
         <ProgressBar value="0.6"/>
         <ProgressBar value="1"/>
         <ProgressBar value="1.2"/>
-      </VStack>
+      </App>
     </Theme>
   `}
 />
