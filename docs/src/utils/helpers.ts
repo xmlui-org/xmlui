@@ -86,36 +86,6 @@ export const handleDownloadZip = async (appDescription: any) => {
   const operatingSystem = getOperatingSystem();
 
   const zip = new JSZip();
-  const emulatedApi = appDescription.api;
-
-  if (emulatedApi) {
-    const indexWithApiHtml = await fetch("/resources/files/for-download/index-with-api.html").then(
-      (res) => res.blob(),
-    );
-    zip.file("index.html", indexWithApiHtml);
-    zip.file("emulatedApi.js", (JSON.stringify(removeWhitespace(emulatedApi), null, 2)));
-    const emulatedApiWorker = await fetch(
-      "/resources/files/for-download/emulatedApiWorker.js",
-    ).then((res) => res.blob());
-    zip.file("emulatedApiWorker.js", emulatedApiWorker);
-  } else {
-    const indexHtml = await fetch("/resources/files/for-download/index.html").then((res) =>
-      res.blob(),
-    );
-    zip.file("index.html", indexHtml);
-  }
-
-  const startBat = await fetch("/resources/files/for-download/start.bat").then((res) => res.blob());
-  const startSh = await fetch("/resources/files/for-download/start.sh").then((res) => res.blob());
-
-  if (operatingSystem === "Windows") {
-    zip.file("start.bat", startBat);
-  } else {
-    zip.file("start.sh", startSh, {
-      unixPermissions: "777"
-    });
-
-  }
 
   const xmluiFolder = zip.folder("xmlui");
   const xmluiStandalone = await fetch(
@@ -138,6 +108,37 @@ export const handleDownloadZip = async (appDescription: any) => {
       themes.file(`${theme.id}.json`, JSON.stringify(theme, null, 2));
     });
   }
+
+  const emulatedApi = appDescription.api;
+  if (emulatedApi) {
+    const indexWithApiHtml = await fetch("/resources/files/for-download/index-with-api.html").then(
+        (res) => res.blob(),
+    );
+    zip.file("index.html", indexWithApiHtml);
+    xmluiFolder.file("mockApiDef.js", `window.XMLUI_MOCK_API = ${JSON.stringify(removeWhitespace(emulatedApi), null, 2)};`);
+
+    const emulatedApiWorker = await fetch(
+        "/resources/files/for-download/mockApi.js",
+    ).then((res) => res.blob());
+    zip.file("mockApi.js", emulatedApiWorker);
+  } else {
+    const indexHtml = await fetch("/resources/files/for-download/index.html").then((res) =>
+        res.blob(),
+    );
+    zip.file("index.html", indexHtml);
+  }
+
+  const startBat = await fetch("/resources/files/for-download/start.bat").then((res) => res.blob());
+  const startSh = await fetch("/resources/files/for-download/start.sh").then((res) => res.blob());
+
+  if (operatingSystem === "Windows") {
+    zip.file("start.bat", startBat);
+  } else {
+    zip.file("start.sh", startSh, {
+      unixPermissions: "777"
+    });
+  }
+
   try {
     const content = await zip.generateAsync({ type: "blob", platform: operatingSystem === "Windows" ? "DOS" : "UNIX" });
 

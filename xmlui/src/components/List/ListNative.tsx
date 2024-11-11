@@ -226,6 +226,8 @@ type DynamicHeightListProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
+
+// TODO check this out: https://github.com/TanStack/virtual/discussions/195#discussioncomment-11170421
 export const DynamicHeightList = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,

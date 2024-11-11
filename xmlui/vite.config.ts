@@ -24,7 +24,7 @@ export default ({ mode }) => {
         "process.env": {
           NODE_ENV: env.NODE_ENV,
           VITE_MOCK_ENABLED: true,
-          VITE_MOCK_WORKER_LOCATION: "/emulatedApiWorker.js",
+          VITE_MOCK_WORKER_LOCATION: "/mockApi.js",
           VITE_USED_COMPONENTS_Pdf: "false",
           VITE_USED_COMPONENTS_Chart: "false",
           VITE_USER_COMPONENTS_XmluiCodeHightlighter: "false",
