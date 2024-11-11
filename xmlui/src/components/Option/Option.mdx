@@ -5,56 +5,56 @@
 ### With `Combobox`
 
 ```ueml copy {4-6}
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <Text value="Selected ID: {myCombo.value}"/>
   <Combobox id="myCombo">
     <Option label="John, Smith" value="john" />
-    <Option label="Jane, Clint" value="jane" />
+    <Option label="Jane, Clint" value="jane" disabled="true" />
     <Option label="Herbert, Frank" value="herbert" />
   </Combobox>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: Option in a Combobox"
   height={260}
   app={`
-    <VStack padding="$space-4" gap="$space-4">
+    <App>
       <Text value="Selected ID: {myCombo.value}"/>
       <Combobox id="myCombo">
         <Option label="John, Smith" value="john" />
         <Option label="Jane, Clint" value="jane" disabled="true" />
         <Option label="Herbert, Frank" value="herbert" />
       </Combobox>
-    </VStack>
+    </App>
   `}
 />
 
 ### With `Select`
 
 ```ueml copy {4-6}
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
     <Option label="John, Smith" value="john" />
     <Option label="Jane, Clint" value="jane" />
     <Option label="Herbert, Frank" value="herbert" />
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: Option in a Select"
   height={260}
   app={`
-    <VStack padding="$space-4" gap="$space-4">
+    <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
         <Option label="John, Smith" value="john" />
         <Option label="Jane, Clint" value="jane" />
         <Option label="Herbert, Frank" value="herbert" />
       </Select>
-    </VStack>
+    </App>
   `}
 />
 
@@ -63,28 +63,28 @@
 %-PROP-START disabled
 
 ```ueml copy /disabled="true"/
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" disabled="true" />
     <Option label="Pistachio" value="pistachio" />
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: Option in a Select"
   height={260}
   app={`
-    <VStack padding="$space-4" gap="$space-4">
+    <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
         <Option label="Vanilla" value="vanilla" />
         <Option label="Chocolate" value="chocolate" disabled="true" />
         <Option label="Pistachio" value="pistachio" />
       </Select>
-    </VStack>
+    </App>
   `}
 />
 
@@ -92,10 +92,12 @@
 
 %-PROP-START label
 
-> **Note**: If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+<Callout type="info" emoji="📔">
+If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
 
 ```ueml copy
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
     <Option />
@@ -103,14 +105,14 @@
     <Option label="Chocolate" value="choc" />
     <Option value="pist" />
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: Using label"
   height={260}
   app={`
-    <VStack padding="$space-4" gap="$space-4">
+    <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
         <Option />
@@ -118,7 +120,7 @@
         <Option label="Chocolate" value="choc" />
         <Option value="pist" />
       </Select>
-    </VStack>
+    </App>
   `}
 />
 
@@ -126,10 +128,12 @@
 
 %-PROP-START value
 
-> **Note**: If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+<Callout type="info" emoji="📔">
+If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
 
 ```ueml copy
-<VStack padding="$space-4" gap="$space-4">
+<App>
   <Text value="Selected ID: {mySelect.value}"/>
   <Select id="mySelect">
     <Option />
@@ -137,14 +141,14 @@
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: Option in a Select"
   height={260}
   app={`
-    <VStack padding="$space-4" gap="$space-4">
+    <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
         <Option />
@@ -152,7 +156,7 @@
         <Option label="Chocolate" value="chocolate" />
         <Option label="Pistachio" value="pistachio" />
       </Select>
-    </VStack>
+    </App>
   `}
 />
 

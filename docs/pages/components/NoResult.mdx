@@ -11,19 +11,23 @@ import { Callout } from "nextra/components";
 This boolean property indicates if the icon should be hidden.
 
 ```ueml copy
-<HStack height="100%">
-    <NoResult hideIcon="{true}" width="50%" />
-    <NoResult hideIcon="{false}" width="50%" />
-</HStack>
+<App>
+  <FlowLayout>
+    <NoResult hideIcon="true" width="50%" />
+    <NoResult hideIcon="false" width="50%" />
+  </FlowLayout>
+</App>
 ```
 
 <Playground
-  height={80}
   name="Example: hideIcon"
-  app={`<HStack height="100%">
-    <NoResult hideIcon="{true}" width="50%" />
-    <NoResult hideIcon="{false}" width="50%" />
-</HStack>
+  app={`
+    <App>
+      <FlowLayout>
+        <NoResult hideIcon="true" width="50%" />
+        <NoResult hideIcon="false" width="50%" />
+      </FlowLayout>
+    </App>
 `}
 />
 
@@ -34,13 +38,18 @@ This property defines the icon to display with the component.
 This property defines the icon to display with the component. For a list of of available icons consult [`Icon` documentation](./Icon.mdx).
 
 ```ueml copy
-<NoResult icon="error" height="100%" />
+<App>
+  <NoResult icon="error" height="100%" />
+</App>
 ```
 
 <Playground
-  height={80}
   name="Example: icon"
-  app={`<NoResult icon="error" height="100%" />`}
+  app={`
+    <App>
+      <NoResult icon="error" height="100%" />
+    </App>
+  `}
 />
 
 ### `label`
@@ -50,13 +59,18 @@ This property sets the label of the component.
 Customize the displayed text using this property. Leave empty to omit it.
 
 ```ueml copy
-<NoResult label="Sorry, found nothing!" height="100%" />
+<App>
+  <NoResult label="Sorry, found nothing!" height="100%" />
+</App>
 ```
 
 <Playground
-  height={80}
   name="Example: label"
-  app={`<NoResult label="Sorry, found nothing!" height="100%" />`}
+  app={`
+    <App>
+      <NoResult label="Sorry, found nothing!" height="100%" />
+    </App>
+  `}
 />
 
 ## Events
