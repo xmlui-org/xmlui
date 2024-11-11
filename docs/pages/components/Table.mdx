@@ -40,73 +40,62 @@ This property sets the label of the component.
 
 Default value: `false`.
 
-If this boolean prop is set to true, the `Table` will be focused when appearing on the UI.
-
-```ueml copy /autoFocus="true"/
-<Table data='{[...]}' autoFocus="true">
-  ...
-</Table>
-```
-
-<Playground
-  name="Example: autoFocus"
-  height={300}
-  app={`
-    <Table data='{${JSON.stringify(data)}}' autoFocus="true">
-      <Column bindTo="name"/>
-      <Column bindTo="quantity"/>
-      <Column bindTo="unit"/>
-    </Table>
-  `}
-/>
-
 ### `data`
 
 The component receives data via this property. The `data` property is a list of items that the `Table` can display.
 
 ```ueml copy /data='{[...]}'/
-<Table data='{[...]}'>
-  ...
-</Table>
+<App>
+  <Table data='{[...]}'>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: data"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}'>
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 You can also provide the `Table` with data directly from an API via this property.
 Here, the component displays rocket information coming from the official SpaceX API.
 
 ```ueml copy /data='https://api.spacexdata.com/v3/rockets'/
-<Table data='https://api.spacexdata.com/v3/rockets'>
-  <Column header="Image" size="140px">
-    <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
-  </Column>
-  <Column canSort="true" bindTo="country"/>
-  <Column canSort="true" bindTo="company"/>
-</Table>
-```
-
-<Playground
-  name="Example: data API Call"
-  height={400}
-  app={`
+<App>
   <Table data='https://api.spacexdata.com/v3/rockets'>
     <Column header="Image" size="140px">
       <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Column>
     <Column canSort="true" bindTo="country"/>
     <Column canSort="true" bindTo="company"/>
-  </Table>`
-  }
+  </Table>
+</App>
+```
+
+<Playground
+  name="Example: data API Call"
+  height={400}
+  app={`
+    <App>
+      <Table data='https://api.spacexdata.com/v3/rockets'>
+        <Column header="Image" size="140px">
+          <Image height="100px" fit="cover" src="{$item.flickr_images[0]}"/>
+        </Column>
+        <Column canSort="true" bindTo="country"/>
+        <Column canSort="true" bindTo="company"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `enableMultiRowSelection`
@@ -119,29 +108,39 @@ Setting it to `false` limits selection to a single row.
 
 By default, the value of this property is `true`.
 
-> **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
-> It is merely for cosmetic reasons.
+<Callout type="info" emoji="📔">
+A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes. It is merely for cosmetic reasons.
+</Callout>
 
 ```ueml copy /enableMultiRowSelection="false"/
-<SelectionStore>
-  <Table data='{[...]}' rowsSelectable="true" enableMultiRowSelection="false">
-    ...
-  </Table>
-</SelectionStore>
-```
-
-<Playground
-  name="Example: rowsSelectable"
-  height={300}
-  app={`
+<App>
   <SelectionStore id="tableData">
-    <Table data='{${JSON.stringify(data)}}' rowsSelectable="true" enableMultiRowSelection="false">
+    <Table data='{[...]}' 
+      rowsSelectable="true" 
+      enableMultiRowSelection="false">
       <Column bindTo="name"/>
       <Column bindTo="quantity"/>
       <Column bindTo="unit"/>
     </Table>
-  </SelectionStore>`
-  }
+  </SelectionStore>
+</App>
+```
+
+<Playground
+  name="Example: rowsSelectable"
+  app={`
+    <App>
+      <SelectionStore id="tableData">
+        <Table data='{${JSON.stringify(data, null, 2)}}' 
+          rowsSelectable="true" 
+          enableMultiRowSelection="false">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+          <Column bindTo="unit"/>
+        </Table>
+      </SelectionStore>
+    </App>
+  `}
 />
 
 ### `headerHeight`
@@ -151,21 +150,26 @@ This optional property is used to specify the height of the table header.
 It accepts common [size values](./appearance/common-units.mdx#size-values).
 
 ```ueml copy /headerHeight="60px"/
-<Table data='{[...]}' headerHeight="60px">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' headerHeight="60px">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: headerHeight"
-  height={320}
   app={`
-  <Table data='{${JSON.stringify(data)}}' headerHeight="60px">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' headerHeight="60px">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `hideHeader`
@@ -176,21 +180,27 @@ Set the header visibility using this property. Set it to `true` to hide the head
 The default value is `false`.
 
 ```ueml copy /hideHeader="true"/
-<Table data='{[...]}' hideHeader="true">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' hideHeader="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: hideHeader"
   height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' hideHeader="true">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' hideHeader="true">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `iconNoSort`
@@ -201,21 +211,26 @@ Allows the customization of the icon displayed in a Table column header when whe
 and sorting is not done according to the column. Use the "-" (dash) value to sign that you do not want to display an icon when a table column is not sorted.
 
 ```ueml copy /iconNoSort="close"/
-<Table data='{[...]}' sortBy="quantity" iconNoSort="close">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' sortBy="quantity" iconNoSort="close">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: iconNoSort"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconNoSort="close">
-    <Column bindTo="name" canSort="true" />
-    <Column bindTo="quantity" canSort="true" />
-    <Column bindTo="unit" canSort="true" />
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconNoSort="close">
+        <Column bindTo="name" canSort="true" />
+        <Column bindTo="quantity" canSort="true" />
+        <Column bindTo="unit" canSort="true" />
+      </Table>
+    </App>
+  `}
 />
 
 ### `iconSortAsc`
@@ -226,21 +241,26 @@ Allows the customization of the icon displayed in a Table column header when sor
 sorting is done according to the column, and the column is sorted in ascending order.
 
 ```ueml copy /iconSortAsc="chevronup"/
-<Table data='{[...]}' sortBy="quantity" iconSortAsc="chevronup">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' sortBy="quantity" iconSortAsc="chevronup">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: iconSortAsc"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconSortAsc="chevronup">
-    <Column bindTo="name" canSort="true" />
-    <Column bindTo="quantity" canSort="true" />
-    <Column bindTo="unit" canSort="true" />
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconSortAsc="chevronup">
+        <Column bindTo="name" canSort="true" />
+        <Column bindTo="quantity" canSort="true" />
+        <Column bindTo="unit" canSort="true" />
+      </Table>
+    </App>
+  `}
 />
 
 ### `iconSortDesc`
@@ -251,23 +271,28 @@ Allows the customization of the icon displayed in a Table column header when sor
 sorting is done according to the column, and the column is sorted in descending order.
 
 ```ueml copy /iconSortDesc="chevrondown"/
-<Table data='{[...]}' sortBy="quantity" iconSortDesc="chevrondown">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' sortBy="quantity" iconSortDesc="chevrondown">
+    <Column bindTo="name" canSort="true" />
+    <Column bindTo="quantity" canSort="true" />
+    <Column bindTo="unit" canSort="true" />
+  </Table>
+</App>
 ```
 
 Select a column header and set it to descending ordering.
 
 <Playground
   name="Example: iconSortDesc"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' sortBy="quantity" iconSortDesc="chevrondown">
-    <Column bindTo="name" canSort="true" />
-    <Column bindTo="quantity" canSort="true" />
-    <Column bindTo="unit" canSort="true" />
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" iconSortDesc="chevrondown">
+        <Column bindTo="name" canSort="true" />
+        <Column bindTo="quantity" canSort="true" />
+        <Column bindTo="unit" canSort="true" />
+      </Table>
+    </App>
+  `}
 />
 
 ### `isPaginated`
@@ -275,21 +300,26 @@ Select a column header and set it to descending ordering.
 This property adds pagination controls to the `Table`.
 
 ```ueml copy /isPaginated="true"/
-<Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: isPaginated"
-  height={240}
   app={`
-  <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `items`
@@ -304,37 +334,46 @@ This boolean property indicates if the component is fetching (or processing) dat
 This property is useful when data is loaded conditionally or receiving it takes some time.
 
 ```ueml copy
-<Table loading="true" />
+<App>
+  <Table loading="true" />
+</App>
 ```
 
 <Playground
   name="Example: loading"
-  height={60}
-  app={`<Table loading="true" />`}
+  app={`
+    <App>
+      <Table loading="true" />
+    </App>
+  `}
 />
 
 ### `noDataTemplate`
 
 A property to customize what to display if the table does not contain any data.
 
-```ueml copy {2-4}
-<Table>
-  <property name="noDataTemplate">
-    <Text value="No data loaded" variant="strong" padding="1rem" />
-  </property>
-</Table>
-```
-
-<Playground
-  name="Example: noDataTemplate"
-  height={60}
-  app={`
+```ueml copy {3-5}
+<App>
   <Table>
     <property name="noDataTemplate">
       <Text value="No data loaded" variant="strong" padding="1rem" />
     </property>
-  </Table>`
-  }
+  </Table>
+</App>
+```
+
+<Playground
+  name="Example: noDataTemplate"
+  height={140}
+  app={`
+    <App>
+      <Table>
+        <property name="noDataTemplate">
+          <Text value="No data loaded" variant="strong" />
+        </property>
+      </Table>
+    </App>
+  `}
 />
 
 ### `pageSizes`
@@ -346,21 +385,26 @@ Page sizes are only accepted in an array, even if the array contains one item.
 Note that this property only works if the [`isPaginated`](#ispaginated) property is set to `true`.
 
 ```ueml copy /pageSizes="{[3, 6, 12]}"/
-<Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: pageSizes"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' isPaginated="true" pageSizes="{[3, 6, 12]}">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `rowDisabledPredicate`
@@ -369,27 +413,32 @@ This property defines a predicate function with a return value that determines i
 
 The following example disables all table rows where the item's quantity exceeds 6:
 
-```ueml copy {2}
-<Table data='{[...]}' rowDisabledPredicate="true">
-  rowDisabledPredicate="{(item) => item.quantity > 6}">
-  <Column bindTo="name"/>
-  <Column bindTo="quantity"/>
-  <Column bindTo="unit"/>
-</Table>
+```ueml copy {3}
+<App>
+  <Table data='{[...]}'
+    rowDisabledPredicate="{(item) => item.quantity > 6}">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
-> **Note:** Disabled items are rendered with a different color.
+<Callout type="info" emoji="📔">
+Disabled items are rendered with a different color.
+</Callout>
 
 <Playground
   name="Example: rowDisabledPredicate"
-  height={300}
   app={`
-    <Table data='{${JSON.stringify(data)}}'
-      rowDisabledPredicate="{(item) => item.quantity > 6}">
-      <Column bindTo="name"/>
-      <Column bindTo="quantity"/>
-      <Column bindTo="unit"/>
-    </Table>
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}'
+        rowDisabledPredicate="{(item) => item.quantity > 6}">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
   `}
 />
 
@@ -399,29 +448,35 @@ Indicates whether the rows are selectable (`true`) or not (`false`).
 
 The default value is `false`.
 
-> **Note:** A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes.
-> It is merely for cosmetic reasons.
+<Callout type="info" emoji="📔">
+A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes. It is merely for cosmetic reasons.
+</Callout>
 
 ```ueml copy /rowsSelectable="true"/
-<SelectionStore>
-  <Table data='{[...]}' rowsSelectable="true">
-    ...
-  </Table>
-</SelectionStore>
-```
-
-<Playground
-  name="Example: rowsSelectable"
-  height={300}
-  app={`
+<App>
   <SelectionStore id="tableData">
-    <Table data='{${JSON.stringify(data)}}' rowsSelectable="true">
+    <Table data='{[...]}' rowsSelectable="true">
       <Column bindTo="name"/>
       <Column bindTo="quantity"/>
       <Column bindTo="unit"/>
     </Table>
-  </SelectionStore>`
-  }
+  </SelectionStore>
+</App>
+```
+
+<Playground
+  name="Example: rowsSelectable"
+  app={`
+    <App>
+      <SelectionStore id="tableData">
+        <Table data='{${JSON.stringify(data, null, 2)}}' rowsSelectable="true">
+          <Column bindTo="name"/>
+          <Column bindTo="quantity"/>
+          <Column bindTo="unit"/>
+        </Table>
+      </SelectionStore>
+    </App>
+  `}
 />
 
 ### `sortBy`
@@ -429,21 +484,26 @@ The default value is `false`.
 This property is used to determine which data attributes to sort by.
 
 ```ueml copy /sortBy="quantity"/
-<Table data='{[...]}' sortBy="quantity">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' sortBy="quantity">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: sortBy"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' sortBy="quantity">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### `sortDirection`
@@ -451,21 +511,26 @@ This property is used to determine which data attributes to sort by.
 This property determines the sort order to be `ascending` or `descending`. This property only works if the [`sortBy`](#sortby) property is also set.
 
 ```ueml copy /sortDirection="descending"/
-<Table data='{[...]}' sortBy="quantity" sortDirection="descending">
-  ...
-</Table>
+<App>
+  <Table data='{[...]}' sortBy="quantity" sortDirection="descending">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
 ```
 
 <Playground
   name="Example: sortDirection"
-  height={300}
   app={`
-  <Table data='{${JSON.stringify(data)}}' sortBy="quantity" sortDirection="descending">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}' sortBy="quantity" sortDirection="descending">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ## Events
@@ -477,32 +542,31 @@ This event is fired when the table data sorting has changed. It has two argument
 Note the [`canSort`](./TableColumnDef.mdx#cansort) properties on the `TableColumnDef` components which enable custom ordering.
 
 ```ueml copy {4}
-<Stack var.sortedBy="" gap="1rem">
-  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="0.5rem" />
+<App var.sortedBy="">
+  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
   <Table data='{[...]}'
     onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
     <Column bindTo="name" canSort="true"/>
     <Column bindTo="quantity" canSort="true"/>
     <Column bindTo="unit" canSort="true"/>
   </Table>
-</Stack>
+</App>
 ```
 
 Click on any of the column headers to trigger a new sorting:
 
 <Playground
   name="Example: sortingDidChange"
-  height={360}
   app={`
-    <Stack var.sortedBy="" gap="1rem">
+    <App var.sortedBy="">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data)}}'
+      <Table data='{${JSON.stringify(data, null, 2)}}'
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
         <Column bindTo="quantity" canSort="true"/>
         <Column bindTo="unit" canSort="true"/>
       </Table>
-    </Stack>
+    </App>
   `}
 />
 
@@ -513,8 +577,8 @@ This event is fired before the table data is sorted. It has two arguments: the c
 The following example uses the `willSort` event to refuse sorting by name:
 
 ```ueml copy {4}
-<Stack var.sortedBy="" gap="1rem">
-  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="0.5rem" />
+<App var.sortedBy="">
+  <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
   <Table data='{[...]}'
     onWillSort="(by, dir) => by !== 'name'"
     onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
@@ -522,7 +586,7 @@ The following example uses the `willSort` event to refuse sorting by name:
     <Column bindTo="quantity" canSort="true"/>
     <Column bindTo="unit" canSort="true"/>
   </Table>
-</Stack>
+</App>
 ```
 
 Click on any of the column headers to trigger the event.
@@ -531,18 +595,17 @@ clicking that column header still does not sort because `willSort` prevents it:
 
 <Playground
   name="Example: willSort"
-  height={360}
   app={`
-    <Stack var.sortedBy="" gap="1rem">
+    <App var.sortedBy="">
       <Heading level="h4" value="Table is sorted by: {sortedBy || ''}" paddingLeft="1rem"/>
-      <Table data='{${JSON.stringify(data)}}'
+      <Table data='{${JSON.stringify(data, null, 2)}}'
         onWillSort="(by, dir) => by !== 'name'"
         onSortingDidChange="(by, dir) => sortedBy = (by && dir) ? by + ' | ' + dir : '' " >
         <Column bindTo="name" canSort="true"/>
         <Column bindTo="quantity" canSort="true"/>
         <Column bindTo="unit" canSort="true"/>
       </Table>
-    </Stack>
+    </App>
   `}
 />
 
@@ -605,16 +668,21 @@ Heading theme variables:
 ### Example
 
 ```json copy
-"color-bg-heading-Table": "#dbdbdb",
-"color-bg-Table": "#ededed",
-"padding-vertical-heading-Table": "1rem",
-"color-text-Table": "black",
-"color-text-heading-Table": "black"
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-bg-heading-Table": "#c4c4c4",
+    "color-bg-Table": "#ededed",
+    "padding-vertical-heading-Table": "1rem",
+    "color-text-Table": "black",
+    "color-text-heading-Table": "black"
+  }
+}
 ```
 
 <Playground
   name="Example: styling"
-  height={340}
   defaultTheme="custom"
   themes={[
     {
@@ -630,12 +698,14 @@ Heading theme variables:
     },
   ]}
   app={`
-  <Table data='{${JSON.stringify(data)}}'>
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>`
-  }
+    <App>
+      <Table data='{${JSON.stringify(data, null, 2)}}'>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+    </App>
+  `}
 />
 
 ### Theme Variables

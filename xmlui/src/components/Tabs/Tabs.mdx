@@ -7,22 +7,7 @@ The `TabItem` component has a `label` prop to define the tab button label text.
 Content is provided to a tab via placing child components under the `TabItem`.
 
 ```ueml copy
-<Tabs>
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: using Tabs"
-  app={`
+<App>
   <Tabs>
     <TabItem label="Account">
       <Text>Account</Text>
@@ -34,8 +19,27 @@ Content is provided to a tab via placing child components under the `TabItem`.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: using Tabs"
+  app={`
+    <App>
+      <Tabs>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 %-DESC-END
@@ -43,22 +47,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 %-PROP-START activeTab
 
 ```ueml copy /activeTab="2"/
-<Tabs activeTab="2">
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: activeTab"
-  app={`
+<App>
   <Tabs activeTab="2">
     <TabItem label="Account">
       <Text>Account</Text>
@@ -70,8 +59,27 @@ Content is provided to a tab via placing child components under the `TabItem`.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: activeTab"
+  app={`
+    <App>
+      <Tabs activeTab="2">
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 %-PROP-END
@@ -79,22 +87,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 %-PROP-START orientation
 
 ```ueml copy /orientation="horizontal"/
-<Tabs orientation="horizontal">
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: orientation"
-  app={`
+<App>
   <Tabs orientation="horizontal">
     <TabItem label="Account">
       <Text>Account</Text>
@@ -106,8 +99,27 @@ Content is provided to a tab via placing child components under the `TabItem`.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: orientation"
+  app={`
+    <App>
+      <Tabs orientation="horizontal">
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={160}
+  height={200}
 />
 
 %-PROP-END
@@ -115,25 +127,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 %-PROP-START tabTemplate
 
 ```ueml copy {2-4}
-<Tabs>
-  <property name="tabTemplate">
-    <Button variant="outlined" label="{$item.label}" />
-  </property>
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: tabTemplate"
-  app={`
+<App>
   <Tabs>
     <property name="tabTemplate">
       <Button variant="outlined" label="{$item.label}" />
@@ -148,8 +142,30 @@ Content is provided to a tab via placing child components under the `TabItem`.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: tabTemplate"
+  app={`
+    <App>
+      <Tabs>
+        <property name="tabTemplate">
+          <Button variant="outlined" label="{$item.label}" />
+        </property>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 %-PROP-END
@@ -166,14 +182,20 @@ The `Tabs` component uses these theme variables to customize its appearance:
 - `color-bg-trigger-Tabs--hover`
 
 ```json copy
-"color-bg-Tabs": "green",
-"thickness-border-Tabs": "6px",
-"color-border-Tabs": "gold"
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-bg-Tabs": "green",
+    "thickness-border-Tabs": "6px",
+    "color-border-Tabs": "gold"
+  }
+}
 ```
 
 <Playground
   name="Example: styling"
-  height={80}
+  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -187,17 +209,19 @@ The `Tabs` component uses these theme variables to customize its appearance:
     },
   ]}
   app={`
-  <Tabs>
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
+    <App>
+      <Tabs>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
 />
 

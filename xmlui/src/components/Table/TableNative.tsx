@@ -19,7 +19,7 @@ import {
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
 import { Button } from "@components/Button/ButtonNative";
-import { Spinner } from "@components/Spinner/SopinnerNative";
+import { Spinner } from "@components/Spinner/SpinnerNative";
 import classnames from "@components-core/utils/classnames";
 import useRowSelection from "./useRowSelection";
 import { Toggle } from "@components/Toggle/Toggle";

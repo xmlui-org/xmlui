@@ -9,46 +9,52 @@ The `SpaceFiller` is a component that works well in layout containers to fill th
 In a `Stack`, `SpaceFiller` pushes the children following it to the other end of the container:
 
 ```ueml copy {3}
-<HStack>
-  <Stack width="36" height="36" backgroundColor="red" />
-  <SpaceFiller />
-  <Stack width="36" height="36" backgroundColor="blue" />
-</HStack>
-```
-
-<Playground
-  name="SpaceFiller in an HStack"
-  height={80}
-  app={`
+<App>
   <HStack>
     <Stack width="36" height="36" backgroundColor="red" />
     <SpaceFiller />
     <Stack width="36" height="36" backgroundColor="blue" />
   </HStack>
+</App>
+```
+
+<Playground
+  name="SpaceFiller in an HStack"
+  app={`
+    <App>
+      <HStack>
+        <Stack width="36" height="36" backgroundColor="red" />
+        <SpaceFiller />
+        <Stack width="36" height="36" backgroundColor="blue" />
+      </HStack>
+    </App>
   `}
 />
 
 In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children following the `SpaceFiller` enters a new line.
 
 ```ueml copy {3}
-<FlowLayout>
-  <Stack width="20%" height="36" backgroundColor="red" />
-  <SpaceFiller />
-  <Stack width="20%" height="36" backgroundColor="green" />
-  <Stack width="20%" height="36" backgroundColor="blue" />
-</FlowLayout>
-```
-
-<Playground
-  name="Example: in a FlowLayout"
-  height={120}
-  app={`
+<App>
   <FlowLayout>
     <Stack width="20%" height="36" backgroundColor="red" />
     <SpaceFiller />
     <Stack width="20%" height="36" backgroundColor="green" />
     <Stack width="20%" height="36" backgroundColor="blue" />
   </FlowLayout>
+</App>
+```
+
+<Playground
+  name="Example: in a FlowLayout"
+  app={`
+    <App>
+      <FlowLayout>
+        <Stack width="20%" height="36" backgroundColor="red" />
+        <SpaceFiller />
+        <Stack width="20%" height="36" backgroundColor="green" />
+        <Stack width="20%" height="36" backgroundColor="blue" />
+      </FlowLayout>
+    </App>
   `}
 />
 

@@ -20,7 +20,7 @@ import { ScrollContext } from "@components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { Card } from "@components/Card/CardNative";
 import { Text } from "@components/Text/TextNative";
-import { Spinner } from "@components/Spinner/SopinnerNative";
+import { Spinner } from "@components/Spinner/SpinnerNative";
 import { usePrevious, useResizeObserver } from "@components-core/utils/hooks";
 import { MemoizedItem } from "@components/container-helpers";
 import type { ComponentDef } from "@abstractions/ComponentDefs";

@@ -4,7 +4,9 @@ The Stack component is the primary and most versatile building block for laying 
 
 See also: [HStack](./HStack), [VStack](./VStack), [CHStack](./CHStack), [CVStack](./CVStack).
 
-> **Note**: You can learn about the semantics and usage of layout container, including `Stack`, [here](/learning/layout-components).
+<Callout type="info" emoji="📔">
+You can learn about the semantics and usage of layout container, including `Stack`, [here](/learning/layout-components).
+</Callout>
 
 %-DESC-END
 
@@ -12,31 +14,29 @@ See also: [HStack](./HStack), [VStack](./VStack), [CHStack](./CHStack), [CVStack
 
 In the following example we use pixels, characters (shorthand `ch`), and the `em` CSS unit size which is a relative size to the font-size of the element (See size values).
 
-```ueml copy {3, 11, 19}
-<Stack orientation="vertical">
+```ueml copy {3, 10}
+<App>
   <Stack orientation="horizontal" backgroundColor="cyan"
-         gap="80px">
+      gap="80px">
     <Stack height="40px" width="40px" backgroundColor="red" />
     <Stack height="40px" width="40px" backgroundColor="green" />
     <Stack height="40px" width="40px" backgroundColor="blue" />
     <Stack height="40px" width="40px" backgroundColor="yellow" />
   </Stack>
-
   <Stack orientation="horizontal" backgroundColor="cyan"
-         gap="12ch">
+          gap="12ch">
     <Stack height="40px" width="40px" backgroundColor="red" />
     <Stack height="40px" width="40px" backgroundColor="green" />
     <Stack height="40px" width="40px" backgroundColor="blue" />
     <Stack height="40px" width="40px" backgroundColor="yellow" />
   </Stack>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: gap"
-  height={100}
   app={`
-    <Stack orientation="vertical">
+    <App>
       <Stack orientation="horizontal" backgroundColor="cyan"
          gap="80px">
         <Stack height="40px" width="40px" backgroundColor="red" />
@@ -44,7 +44,6 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
         <Stack height="40px" width="40px" backgroundColor="blue" />
         <Stack height="40px" width="40px" backgroundColor="yellow" />
       </Stack>
-
       <Stack orientation="horizontal" backgroundColor="cyan"
              gap="12ch">
         <Stack height="40px" width="40px" backgroundColor="red" />
@@ -52,7 +51,7 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
         <Stack height="40px" width="40px" backgroundColor="blue" />
         <Stack height="40px" width="40px" backgroundColor="yellow" />
       </Stack>
-    </Stack>
+    </App>
   `}
 />
 
@@ -60,23 +59,27 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 
 %-PROP-START horizontalAlignment
 
-> **Note**: The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
+<Callout type="info" emoji="📔">
+The `start` and `end` values can be affected by i18n if the layout is in a right-to-left writing style.
+</Callout>
 
-```ueml copy {2}
-<Stack width="100%" backgroundColor="cyan"
-  horizontalAlignment="center">
-  <Stack width="36px" height="36px" backgroundColor="red" />
-</Stack>
+```ueml copy {3}
+<App>
+  <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
+    <Stack width="36px" height="36px" backgroundColor="red" />
+  </Stack>
+</App>
 ```
 
 <Playground
   name="Example: horizontalAlignment"
   app={`
-    <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
-      <Stack width="36px" height="36px" backgroundColor="red" />
-    </Stack>
-`}
-  height={60}
+    <App>
+      <Stack width="100%" horizontalAlignment="center" backgroundColor="cyan">
+        <Stack width="36px" height="36px" backgroundColor="red" />
+      </Stack>
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -85,37 +88,41 @@ In the following example we use pixels, characters (shorthand `ch`), and the `em
 
 Default is **false**, which indicates a left-to-right layout.
 
-```ueml copy {7}
-<Stack gap="10px" backgroundColor="cyan">
-  <Stack gap="10px" orientation="horizontal">
-    <Stack height="40px" width="40px" backgroundColor="red" />
-    <Stack height="40px" width="40px" backgroundColor="green" />
-    <Stack height="40px" width="40px" backgroundColor="blue" />
+```ueml copy /reverse="true"/
+<App>
+  <Stack backgroundColor="cyan">
+    <Stack gap="10px" orientation="horizontal">
+      <Stack height="40px" width="40px" backgroundColor="red" />
+      <Stack height="40px" width="40px" backgroundColor="green" />
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+    </Stack>
+    <Stack reverse="true" orientation="horizontal">
+      <Stack height="40px" width="40px" backgroundColor="red" />
+      <Stack height="40px" width="40px" backgroundColor="green" />
+      <Stack height="40px" width="40px" backgroundColor="blue" />
+    </Stack>
   </Stack>
-  <Stack reverse="true" gap="10px" orientation="horizontal">
-    <Stack height="40px" width="40px" backgroundColor="red" />
-    <Stack height="40px" width="40px" backgroundColor="green" />
-    <Stack height="40px" width="40px" backgroundColor="blue" />
-  </Stack>
-</Stack>
+</App>
 ```
 
 <Playground
   name="Example: reverse"
-  height={100}
   app={`
-    <Stack gap="10px" backgroundColor="cyan">
-      <Stack gap="10px" orientation="horizontal">
-        <Stack height="40px" width="40px" backgroundColor="red" />
-        <Stack height="40px" width="40px" backgroundColor="green" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
+    <App>
+      <Stack backgroundColor="cyan">
+        <Stack gap="10px" orientation="horizontal">
+          <Stack height="40px" width="40px" backgroundColor="red" />
+          <Stack height="40px" width="40px" backgroundColor="green" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+        </Stack>
+        <Stack reverse="true" orientation="horizontal">
+          <Stack height="40px" width="40px" backgroundColor="red" />
+          <Stack height="40px" width="40px" backgroundColor="green" />
+          <Stack height="40px" width="40px" backgroundColor="blue" />
+        </Stack>
       </Stack>
-      <Stack reverse="true" gap="10px" orientation="horizontal">
-        <Stack height="40px" width="40px" backgroundColor="red" />
-        <Stack height="40px" width="40px" backgroundColor="green" />
-        <Stack height="40px" width="40px" backgroundColor="blue" />
-      </Stack>
-    </Stack>`}
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -123,20 +130,22 @@ Default is **false**, which indicates a left-to-right layout.
 %-PROP-START verticalAlignment
 
 ```ueml copy {2}
-<Stack height="100px" backgroundColor="cyan"
-  verticalAlignment="end">
-  <Stack width="36px" height="36px" backgroundColor="red" />
-</Stack>
+<App>
+  <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
+    <Stack width="36px" height="36px" backgroundColor="red" />
+  </Stack>
+</App>
 ```
 
 <Playground
   name="Example: verticalAlignment"
   app={`
-    <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
-      <Stack width="36px" height="36px" backgroundColor="red" />
-    </Stack>
+    <App>
+      <Stack height="100px" verticalAlignment="end" backgroundColor="cyan">
+        <Stack width="36px" height="36px" backgroundColor="red" />
+      </Stack>
+    </App>
   `}
-  height={120}
 />
 
 %-PROP-END
@@ -145,24 +154,28 @@ Default is **false**, which indicates a left-to-right layout.
 
 Optional boolean which wraps the content if set to true and the available space is not big enough. Works in all orientations.
 
-```ueml copy
-<Stack wrapContent="true" width="140px" gap="10px" orientation="horizontal" backgroundColor="cyan">
-  <Stack height="40px" width="40px" backgroundColor="blue" />
-  <Stack height="40px" width="40px" backgroundColor="blue" />
-  <Stack height="40px" width="40px" backgroundColor="blue" />
-  <Stack height="40px" width="40px" backgroundColor="blue" />
-</Stack>
+```ueml copy /wrapContent="true"/
+<App>
+  <Stack wrapContent="true" width="140px" orientation="horizontal" backgroundColor="cyan">
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+    <Stack height="40px" width="40px" backgroundColor="blue" />
+  </Stack>
+</App>
 ```
 
 <Playground
-  name="Example: wrap"
+  name="Example: wrapContent"
   app={`
-    <Stack wrapContent="true" width="140px" gap="10px" orientation="horizontal" backgroundColor="cyan">
-      <Stack height="40px" width="40px" backgroundColor="blue" />
-      <Stack height="40px" width="40px" backgroundColor="blue" />
-      <Stack height="40px" width="40px" backgroundColor="blue" />
-      <Stack height="40px" width="40px" backgroundColor="blue" />
-    </Stack>
+    <App>
+      <Stack wrapContent="true" width="140px" orientation="horizontal" backgroundColor="cyan">
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+        <Stack height="40px" width="40px" backgroundColor="blue" />
+      </Stack>
+    </App>
   `}
 />
 
@@ -173,20 +186,23 @@ Optional boolean which wraps the content if set to true and the available space 
 Describes the logic that fires when the component is clicked.
 
 ```ueml copy {4}
-<Stack gap="10px" orientation="horizontal" var.shown="{false}">
-  <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
-  <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
-</Stack>
+<App>
+  <HStack var.shown="{false}">
+    <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
+    <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: click"
-  height={80}
   app={`
-    <Stack gap="10px" orientation="horizontal" var.shown="{false}">
-      <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
-      <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
-    </Stack>
+    <App>
+      <HStack var.shown="{false}">
+        <Stack height="40px" width="40px" backgroundColor="red" onClick="shown = !shown" />
+        <Stack when="{shown}" height="40px" width="40px" backgroundColor="blue" />
+      </HStack>
+    </App>
   `}
 />
 

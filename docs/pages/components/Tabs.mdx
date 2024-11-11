@@ -13,22 +13,7 @@ The `TabItem` component has a `label` prop to define the tab button label text.
 Content is provided to a tab via placing child components under the `TabItem`.
 
 ```ueml copy
-<Tabs>
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: using Tabs"
-  app={`
+<App>
   <Tabs>
     <TabItem label="Account">
       <Text>Account</Text>
@@ -40,8 +25,27 @@ Content is provided to a tab via placing child components under the `TabItem`.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: using Tabs"
+  app={`
+    <App>
+      <Tabs>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 ## Properties
@@ -51,22 +55,7 @@ Content is provided to a tab via placing child components under the `TabItem`.
 This property indicates the index of the active tab. The indexing starts from 0, representing the starting (leftmost) tab.
 
 ```ueml copy /activeTab="2"/
-<Tabs activeTab="2">
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: activeTab"
-  app={`
+<App>
   <Tabs activeTab="2">
     <TabItem label="Account">
       <Text>Account</Text>
@@ -78,8 +67,27 @@ This property indicates the index of the active tab. The indexing starts from 0,
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: activeTab"
+  app={`
+    <App>
+      <Tabs activeTab="2">
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 ### `orientation`
@@ -87,22 +95,7 @@ This property indicates the index of the active tab. The indexing starts from 0,
 This property indicates the orientation of the component. In horizontal orientation, the tab sections are laid out on the left side of the content panel, while in vertical orientation, the buttons are at the top.
 
 ```ueml copy /orientation="horizontal"/
-<Tabs orientation="horizontal">
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: orientation"
-  app={`
+<App>
   <Tabs orientation="horizontal">
     <TabItem label="Account">
       <Text>Account</Text>
@@ -114,8 +107,27 @@ This property indicates the orientation of the component. In horizontal orientat
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: orientation"
+  app={`
+    <App>
+      <Tabs orientation="horizontal">
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={160}
+  height={200}
 />
 
 ### `tabTemplate`
@@ -123,25 +135,7 @@ This property indicates the orientation of the component. In horizontal orientat
 This property declares the template for the clickable tab area.
 
 ```ueml copy {2-4}
-<Tabs>
-  <property name="tabTemplate">
-    <Button variant="outlined" label="{$item.label}" />
-  </property>
-  <TabItem label="Account">
-    <Text>Account</Text>
-  </TabItem>
-  <TabItem label="Stream">
-    <Text>Stream</Text>
-  </TabItem>
-  <TabItem label="Support">
-    <Text>Support</Text>
-  </TabItem>
-</Tabs>
-```
-
-<Playground
-  name="Example: tabTemplate"
-  app={`
+<App>
   <Tabs>
     <property name="tabTemplate">
       <Button variant="outlined" label="{$item.label}" />
@@ -156,8 +150,30 @@ This property declares the template for the clickable tab area.
       <Text>Support</Text>
     </TabItem>
   </Tabs>
+</App>
+```
+
+<Playground
+  name="Example: tabTemplate"
+  app={`
+    <App>
+      <Tabs>
+        <property name="tabTemplate">
+          <Button variant="outlined" label="{$item.label}" />
+        </property>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
-  height={80}
+  height={200}
 />
 
 ## Events
@@ -184,14 +200,20 @@ The `Tabs` component uses these theme variables to customize its appearance:
 - `color-bg-trigger-Tabs--hover`
 
 ```json copy
-"color-bg-Tabs": "green",
-"thickness-border-Tabs": "6px",
-"color-border-Tabs": "gold"
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "color-bg-Tabs": "green",
+    "thickness-border-Tabs": "6px",
+    "color-border-Tabs": "gold"
+  }
+}
 ```
 
 <Playground
   name="Example: styling"
-  height={80}
+  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -205,17 +227,19 @@ The `Tabs` component uses these theme variables to customize its appearance:
     },
   ]}
   app={`
-  <Tabs>
-    <TabItem label="Account">
-      <Text>Account</Text>
-    </TabItem>
-    <TabItem label="Stream">
-      <Text>Stream</Text>
-    </TabItem>
-    <TabItem label="Support">
-      <Text>Support</Text>
-    </TabItem>
-  </Tabs>
+    <App>
+      <Tabs>
+        <TabItem label="Account">
+          <Text>Account</Text>
+        </TabItem>
+        <TabItem label="Stream">
+          <Text>Stream</Text>
+        </TabItem>
+        <TabItem label="Support">
+          <Text>Support</Text>
+        </TabItem>
+      </Tabs>
+    </App>
   `}
 />
 
