@@ -6,7 +6,7 @@ import { Text } from "@components/Text/TextNative";
 import { CodeSelector } from "@/src/components/CodeSelector";
 import { Tooltip } from "@/src/components/Tooltip";
 import { RxOpenInNewWindow, RxDownload, RxCode } from "react-icons/rx";
-import { LiaUndoAltSolid} from "react-icons/lia";
+import { LiaUndoAltSolid } from "react-icons/lia";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { resetApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
@@ -15,10 +15,12 @@ import { Box } from "@/src/components/Box";
 import { ToneSwitcher } from "@/src/components/ToneSwitcher";
 import { ThemeSwitcher } from "@/src/components/ThemeSwitcher";
 import { handleDownloadZip } from "@/src/utils/helpers";
+import ConfirmationDialog from "@/src/components/ConfirmationDialog";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
   const { appDescription, options, dispatch } = usePlayground();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const [show, setShow] = useState(false);
   useEffect(() => {
@@ -75,7 +77,6 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
               )}
           </>
-
         )}
         {!options.previewMode && show && (
           <>
@@ -89,13 +90,34 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 label="Edit code in new window"
               />
             )}
+            <ConfirmationDialog
+              open={dialogOpen}
+              onOpenChange={setDialogOpen}
+              title="Confirm Reset"
+              description="Are you sure you want to reset the app? This action cannot be undone and will reset all code to its initial state."
+              onConfirm={() => {
+                dispatch(resetApp());
+                setDialogOpen(false);
+              }}
+              confirmText="Confirm"
+              cancelText="Cancel"
+            />
             <Tooltip
-                trigger={
-                  <button className={styles.button} onClick={() => dispatch(resetApp())}>
-                    <LiaUndoAltSolid />
-                  </button>
-                }
-                label="Reset the app"
+              trigger={
+                <button
+                  className={styles.button}
+                  onClick={() => {
+                    if (standalone) {
+                      setDialogOpen(true);
+                    } else {
+                      dispatch(resetApp());
+                    }
+                  }}
+                >
+                  <LiaUndoAltSolid />
+                </button>
+              }
+              label="Reset the app"
             />
             {/*            {standalone && (
               <>
