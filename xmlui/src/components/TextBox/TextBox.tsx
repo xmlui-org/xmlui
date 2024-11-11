@@ -154,6 +154,13 @@ export const textBoxComponentRenderer = createComponentRenderer(
   },
 );
 
+export const PasswordMd = createMetadata({
+  ...TextBoxMd,
+  description:
+    "The \`Password\` component is a specialized version of the \`TextBox\` component that " + 
+    "allows users to input and edit passwords.",
+});
+
 export const passwordInputComponentRenderer = createComponentRenderer(
   "PasswordInput",
   TextBoxMd,

@@ -23,26 +23,29 @@ Default value: `true`.
 This property indicates whether the input accepts user actions (`true`) or not (`false`). The default value is `true`.
 
 ```ueml copy /enabled="false"/
-<RadioGroup initialValue="first" enabled="false">
-  <HStack gap="1rem" padding="1rem">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-    <RadioGroupOption label="Third Item" value="third"/>
-  </HStack>
-</RadioGroup>
+<App>
+  <RadioGroup initialValue="first" enabled="false">
+    <HStack gap="1rem" padding="1rem">
+      <RadioGroupOption label="First Item" value="first"/>
+      <RadioGroupOption label="Second Item" value="second"/>
+      <RadioGroupOption label="Third Item" value="third"/>
+    </HStack>
+  </RadioGroup>
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={54}
   app={`
-    <RadioGroup initialValue="first" enabled="false">
-      <HStack gap="1rem" padding="1rem">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
-        <RadioGroupOption label="Third Item" value="third"/>
-      </HStack>
-    </RadioGroup>
+    <App>
+      <RadioGroup initialValue="first" enabled="false">
+        <HStack gap="1rem" padding="1rem">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+          <RadioGroupOption label="Third Item" value="third"/>
+        </HStack>
+      </RadioGroup>
+    </App>
   `}
 />
 
@@ -53,19 +56,7 @@ This property sets the component's initial value.
 This property defines the initial value of the selected option within the group.
 
 ```ueml copy /initialValue="first"/
-<RadioGroup initialValue="first">
-  <HStack gap="1rem" padding="1rem">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-    <RadioGroupOption label="Third Item" value="third"/>
-  </HStack>
-</RadioGroup>
-```
-
-<Playground
-  name="Example: initialValue"
-  height={54}
-  app={`
+<App>
   <RadioGroup initialValue="first">
     <HStack gap="1rem" padding="1rem">
       <RadioGroupOption label="First Item" value="first"/>
@@ -73,6 +64,21 @@ This property defines the initial value of the selected option within the group.
       <RadioGroupOption label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
+</App>
+```
+
+<Playground
+  name="Example: initialValue"
+  app={`
+    <App>
+      <RadioGroup initialValue="first">
+        <HStack gap="1rem" padding="1rem">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+          <RadioGroupOption label="Third Item" value="third"/>
+        </HStack>
+      </RadioGroup>
+    </App>
   `}
 />
 
@@ -114,40 +120,43 @@ This prop is used to visually indicate status changes reacting to form field val
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<HStack gap="1rem" padding="1rem">
-  <RadioGroup initialValue="first" validationStatus="error">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-  </RadioGroup>
-  <RadioGroup initialValue="first" validationStatus="warning">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-  </RadioGroup>
-  <RadioGroup initialValue="first" validationStatus="valid">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
-  </RadioGroup>
-</HStack>
+<App>
+  <HStack>
+    <RadioGroup initialValue="first" validationStatus="error">
+      <RadioGroupOption label="First Item" value="first"/>
+      <RadioGroupOption label="Second Item" value="second"/>
+    </RadioGroup>
+    <RadioGroup initialValue="first" validationStatus="warning">
+      <RadioGroupOption label="First Item" value="first"/>
+      <RadioGroupOption label="Second Item" value="second"/>
+    </RadioGroup>
+    <RadioGroup initialValue="first" validationStatus="valid">
+      <RadioGroupOption label="First Item" value="first"/>
+      <RadioGroupOption label="Second Item" value="second"/>
+    </RadioGroup>
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={88}
   app={`
-    <HStack gap="1rem" padding="1rem">
-      <RadioGroup initialValue="first" validationStatus="error">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
-      </RadioGroup>
-      <RadioGroup initialValue="first" validationStatus="warning">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
-      </RadioGroup>
-      <RadioGroup initialValue="first" validationStatus="valid">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
-      </RadioGroup>
-    </HStack>
+    <App>
+      <HStack>
+        <RadioGroup initialValue="first" validationStatus="error">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+        </RadioGroup>
+        <RadioGroup initialValue="first" validationStatus="warning">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+        </RadioGroup>
+        <RadioGroup initialValue="first" validationStatus="valid">
+          <RadioGroupOption label="First Item" value="first"/>
+          <RadioGroupOption label="Second Item" value="second"/>
+        </RadioGroup>
+      </HStack>
+    </App>
   `}
 />
 
@@ -160,28 +169,27 @@ This event is triggered when value of RadioGroup has changed.
 This event is triggered after the user has changed the field value. The following example uses this event to display the selected option's value:
 
 ```ueml copy /onDidChange="(val) => field = val"/
-<VStack var.field="" gap="0.5rem" padding="1rem">
+<App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
     <RadioGroupOption label="First Item" value="first"/>
     <RadioGroupOption label="Second Item" value="second"/>
   </RadioGroup>
   <Text value="{field}" />
-</VStack>
+</App>
 ```
 
 Select one of the available options and see how the `Text` underneath it is updated in parallel:
 
 <Playground
   name="Example: didChange"
-  height={110}
   app={`
-    <VStack var.field="" gap="0.5rem" padding="1rem">
+    <App var.field="">
       <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
         <RadioGroupOption label="First Item" value="first"/>
         <RadioGroupOption label="Second Item" value="second"/>
       </RadioGroup>
       <Text value="{field}" />
-    </VStack>
+    </App>
   `}
 />
 

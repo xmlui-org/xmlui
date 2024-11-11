@@ -11,22 +11,26 @@ The component accepts `Option` components as children defining a particular opti
 If the `label` is not specified `value` is shown.
 
 ```ueml copy
-<Select>
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</Select>
+<App>
+  <Select>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
 ```
 
 <Playground
   name="Example: using Select"
-  height={170}
+  height={200}
   app={`
-    <Select>
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
+    <App>
+      <Select>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -45,12 +49,12 @@ This optional property provides the ability to customize what is displayed when 
 Click on the second field to see the custom empty list indicator.
 
 ```ueml copy {9-11}
-<VStack gap="$space-1">
-  <VStack gap="$space-0_5">
+<App>
+  <VStack>
     <Text value="Default:" />
     <Select />
   </VStack>
-  <VStack gap="$space-0_5">
+  <VStack>
     <Text value="Custom:" />
     <Select>
       <property name="emptyListTemplate">
@@ -58,19 +62,19 @@ Click on the second field to see the custom empty list indicator.
       </property>
     </Select>
   </VStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: emptyListTemplate"
-  height={220}
+  height={260}
   app={`
-    <VStack gap="$space-1">
-      <VStack gap="$space-0_5rem">
+    <App>
+      <VStack>
         <Text value="Default:" />
         <Select />
       </VStack>
-      <VStack gap="$space-0_5rem">
+      <VStack>
         <Text value="Custom:" />
         <Select>
           <property name="emptyListTemplate">
@@ -78,7 +82,7 @@ Click on the second field to see the custom empty list indicator.
           </property>
         </Select>
       </VStack>
-    </VStack>
+    </App>
   `}
 />
 
@@ -89,14 +93,17 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy
-<Select enabled="false" />
+<App>
+  <Select enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={60}
   app={`
-    <Select enabled="false" />
+    <App>
+      <Select enabled="false" />
+    </App>
   `}
 />
 
@@ -105,22 +112,26 @@ Default value: `true`.
 This property sets the component's initial value.
 
 ```ueml copy
-<Select initialValue="opt3">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</Select>
+<App>
+  <Select initialValue="opt3">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
-  height={170}
+  height={200}
   app={`
-    <Select initialValue="opt3">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
+    <App>
+      <Select initialValue="opt3">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -137,34 +148,38 @@ This property sets the maximum length of the input it accepts.
 This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
 
 ```ueml copy
-<Select>
-  <property name="optionTemplate">
-    <HStack verticalAlignment="center" gap="$space-0_5">
-      <Icon name="info" />
-      <Text value="{$item.label}" variant="strong" />
-    </HStack>
-  </property>
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</Select>
+<App>
+  <Select>
+    <property name="optionTemplate">
+      <HStack verticalAlignment="center" gap="$space-0_5">
+        <Icon name="info" />
+        <Text value="{$item.label}" variant="strong" />
+      </HStack>
+    </property>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
 ```
 
 <Playground
   name="Example: optionTemplate"
-  height={170}
+  height={200}
   app={`
-    <Select>
-      <property name="optionTemplate">
-        <HStack verticalAlignment="center" gap="$space-0_5">
-          <Icon name="info" />
-          <Text value="{$item.label}" variant="strong" />
-        </HStack>
-      </property>
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
+    <App>
+      <Select>
+        <property name="optionTemplate">
+          <HStack verticalAlignment="center" gap="$space-0_5">
+            <Icon name="info" />
+            <Text value="{$item.label}" variant="strong" />
+          </HStack>
+        </property>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -173,22 +188,26 @@ This property enables the customization of list items. To access the attributes 
 A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy
-<Select placeholder="Please select an item">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</Select>
+<App>
+  <Select placeholder="Please select an item">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
 ```
 
 <Playground
   name="Example: placeholder"
-  height={170}
+  height={200}
   app={`
-    <Select placeholder="Please select an item">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
+    <App>
+      <Select placeholder="Please select an item">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -214,23 +233,24 @@ Available values:
 
 
 ```ueml copy
-<VStack gap="$space-0_5rem">
+<App>
   <Select />
   <Select validationStatus="valid" />
   <Select validationStatus="warning" />
   <Select validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={200}
-  app={`<VStack gap="$space-0_5">
-  <Select />
-  <Select validationStatus="valid" />
-  <Select validationStatus="warning" />
-  <Select validationStatus="error" />
-</VStack>`}
+  app={`
+    <App>
+      <Select />
+      <Select validationStatus="valid" />
+      <Select validationStatus="warning" />
+      <Select validationStatus="error" />
+    </App>
+  `}
 />
 
 ## Events
@@ -240,7 +260,7 @@ Available values:
 This event is triggered when value of Select has changed.
 
 ```ueml copy /onDidChange="(newItem) => newValue = newItem"/
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="newValue" value="" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
@@ -248,22 +268,22 @@ This event is triggered when value of Select has changed.
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
   height={200}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <var name="newValue" value="" />
-    <Text value="{newValue}" />
-    <Select onDidChange="(newItem) => newValue = newItem">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-  </VStack>
+    <App>
+      <var name="newValue" value="" />
+      <Text value="{newValue}" />
+      <Select onDidChange="(newItem) => newValue = newItem">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -272,36 +292,34 @@ This event is triggered when value of Select has changed.
 This event is triggered when the Select has received the focus.
 
 ```ueml copy {5-6}
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
   <Select
     onGotFocus="isFocused = true"
-    onLostFocus="isFocused = false"
-  >
+    onLostFocus="isFocused = false">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: gotFocus/lostFocus"
   height={200}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <var name="isFocused" value="{false}" />
-    <Text value="Input control is focused: {isFocused}" />
-    <Select
-      onGotFocus="isFocused = true"
-      onLostFocus="isFocused = false"
-    >
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-  </VStack>
+    <App>
+      <var name="isFocused" value="{false}" />
+      <Text value="Input control is focused: {isFocused}" />
+      <Select
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -326,28 +344,28 @@ For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\
 This method sets the focus on the Select.
 
 ```ueml copy /onClick="inputControl.focus()"/
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </Select>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: focus()"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
-    <Button label="Focus Input" onClick="inputControl.focus()" />
-    <Select id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-  </VStack>
+    <App>
+      <Button label="Focus Input" onClick="inputControl.focus()" />
+      <Select id="inputControl">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
   `}
 />
 
@@ -356,13 +374,13 @@ This method sets the focus on the Select.
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
 ```ueml copy
-<VStack gap="$space-0_5">
+<App>
   <Select id="inputControl">
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </Select>
-  <HStack gap="$space-0_5">
+  <HStack>
     <Button
       label="Select 2nd Item"
       onClick="inputControl.setValue('opt2')" />
@@ -370,28 +388,27 @@ You can use this method to set the component's current value programmatically (`
       label="Remove Selection"
       onClick="inputControl.setValue('')" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
-  height={110}
   name="Example: value() and setValue()"
   app={`
-  <VStack gap="$space-0_5">
-    <Select id="inputControl">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
-    </Select>
-    <HStack gap="$space-0_5">
-      <Button
-        label="Select 2nd Item"
-        onClick="inputControl.setValue('opt2')" />
-      <Button
-        label="Remove Selection"
-        onClick="inputControl.setValue('')" />
-    </HStack>
-  </VStack>
+    <App>
+      <Select id="inputControl">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+      <HStack>
+        <Button
+          label="Select 2nd Item"
+          onClick="inputControl.setValue('opt2')" />
+        <Button
+          label="Remove Selection"
+          onClick="inputControl.setValue('')" />
+      </HStack>
+    </App>
   `}
 />
 
@@ -453,14 +470,20 @@ Theme variables to set the styles of an unselected item:
 ### Example
 
 ```json copy
-"radius-Select": "30px",
-"color-placeholder-Select": "red",
-"thickness-border-Select": "4px"
+{
+  "id": "custom",
+  "name": "Custom Theme",
+  "themeVars": {
+    "radius-Select": "30px",
+    "color-placeholder-Select": "red",
+    "thickness-border-Select": "4px"
+  }
+}
 ```
 
 <Playground
   name="Example: styling"
-  height={90}
+  height={260}
   defaultTheme="custom"
   themes={[
     {
@@ -473,7 +496,11 @@ Theme variables to set the styles of an unselected item:
       },
     },
   ]}
-  app={`<Select placeholder="Please select an option" />`}
+  app={`
+    <App>
+      <Select placeholder="Please select an option" />
+    </App>
+  `}
 />
 
 To style all input controls not just this component, use `Input` instead of the `Select` segment:
