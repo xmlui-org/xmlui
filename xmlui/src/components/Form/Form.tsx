@@ -43,6 +43,13 @@ export const FormMd = createMetadata({
       `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
     ),
+    submitUrl: d(
+        `URL to submit the form data.`
+    ),
+    submitMethod: d(
+        `HTTP method to use when submitting the form data.`,
+    ),
+    enabled: d(`Whether the form is enabled or not. The default value is \`true\`.`),
   },
   events: {
     submit: d(

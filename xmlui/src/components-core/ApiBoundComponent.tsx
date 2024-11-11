@@ -168,7 +168,7 @@ export function ApiBoundComponent({
           loaderEvents[eventName] = value;
         }
       });
-      if(key === "data"){
+      if (key === "data") {
         props.__DATA_RESOLVED = true;
       }
       if (!isDatasourceRef) {
@@ -183,9 +183,13 @@ export function ApiBoundComponent({
         api[`addItem_${key}`] = `(element, index) => {  ${loaderUid}.addItem(element, index); }`;
         api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
         api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
+        if (key === "data") {
+          props.submitUrl = props.submitUrl || operation.url;
+          props.submitMethod = props.submitMethod || 'put';
+        }
       }
       props[key] = `{ ${loaderUid}.value }`;
-      props.loading = `{${loaderUid}.inProgress}`;
+      props.loading = `{${loaderUid}.inProgress === undefined ? true : ${loaderUid}.inProgress}`;
       props.pageInfo = `{${loaderUid}.pageInfo}`;
       events.requestFetchPrevPage = `${loaderUid}.fetchPrevPage()`;
       events.requestFetchNextPage = `${loaderUid}.fetchNextPage()`;

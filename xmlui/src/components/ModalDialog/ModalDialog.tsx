@@ -80,7 +80,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
               node={node.children}
               renderChild={renderChild}
               layoutContext={{ type: "Stack" }}
-              context={modalContext}
+              contextVars={{ $modalContext: modalContext }}
             />
           );
         }}
