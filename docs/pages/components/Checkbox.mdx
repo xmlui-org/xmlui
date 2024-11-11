@@ -276,9 +276,58 @@ This component does not have any context values.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
+You can use this method to set the checkbox's current value programmatically (`true`: checked, `false`: unchecked).
+
+```ueml copy {10,13,15}
+<App var.changes="">
+  <Checkbox
+    id="checkbox"
+    readOnly="true"
+    label="This checkbox can be set only programmatically"
+    onDidChange="changes += '+'" />
+  <HStack>
+    <Button
+      label="Check"
+      onClick="checkbox.setValue(true)" />
+    <Button
+      label="Uncheck"
+      onClick="checkbox.setValue(false)" />
+  </HStack>
+  <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
+  <Text value="Changes: {changes}" />
+</App>
+```
+
+<Playground
+  name="Example: value and setValue"
+  app={`
+    <App var.changes="">
+      <Checkbox
+        id="checkbox"
+        readOnly="true"
+        label="This checkbox can be set only programmatically"
+        onDidChange="changes += '+'" />
+      <HStack>
+        <Button
+          label="Check"
+          onClick="checkbox.setValue(true)" />
+        <Button
+          label="Uncheck"
+          onClick="checkbox.setValue(false)" />
+      </HStack>
+      <Text>The checkbox is {checkbox.value ? "checked" : "unchecked"}</Text>
+      <Text value="Changes: {changes}" />
+    </App>
+  `}
+/>
+
 ### `value`
 
 You can query this read-only API property to query the component's current value (`true`: checked, `false`: unchecked).
+
+You can query this read-only API property to query the checkbox's current value (`true`: checked, `false`: unchecked).
+
+See an example in the `setValue` API method.
 
 ## Styling
 

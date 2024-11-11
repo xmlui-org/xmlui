@@ -16,26 +16,28 @@ This property allows defining a custom component to display the buttons at the b
 
 The following example demonstrates using it:
 
-```ueml copy {9-18}
-<Form id="searchForm" padding="0.5rem"
-  data="{{ search: 'Seattle', caseSensitive: false }}"
-  onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
-  saveLabel="Search"
-  var.isSearching="{false}">
-    <Text>Please specify the name to include in the search:</Text>
-    <FormItem bindTo="search" width="280px" />
-    <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
-    <property name="buttonRowTemplate">
-      <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
-        <Button label="Test Search Server" type="button"
-          themeColor="secondary" variant="outlined"
-          onClick="window.alert('Search server is ok.')"/>
-        <SpaceFiller/>
-        <Button type="submit" enabled="{!isSearching}" icon="search"
-          label="{isSearching ? 'Searching...' : 'Search'}"/>
-      </HStack>
-    </property>
-</Form>
+```ueml copy {10-19}
+<App>
+  <Form id="searchForm" padding="0.5rem"
+    data="{{ search: 'Seattle', caseSensitive: false }}"
+    onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
+    saveLabel="Search"
+    var.isSearching="{false}">
+      <Text>Please specify the name to include in the search:</Text>
+      <FormItem bindTo="search" width="280px" />
+      <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
+      <property name="buttonRowTemplate">
+        <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
+          <Button label="Test Search Server" type="button"
+            themeColor="secondary" variant="outlined"
+            onClick="window.alert('Search server is ok.')"/>
+          <SpaceFiller/>
+          <Button type="submit" enabled="{!isSearching}" icon="search"
+            label="{isSearching ? 'Searching...' : 'Search'}"/>
+        </HStack>
+      </property>
+  </Form>
+</App>  
 ```
 
 This example mimics a one-second search and turns off the submit button during the operation. Also, it adds a Test Search Server button:
@@ -43,25 +45,27 @@ This example mimics a one-second search and turns off the submit button during t
 <Playground
   name="Example: buttonRowTemplate"
   app={`
-    <Form id="searchForm" padding="0.5rem"
-      data="{{ search: 'Seattle', caseSensitive: false }}"
-      onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
-      saveLabel="Search"
-      var.isSearching="{false}">
-        <Text>Please specify the name to include in the search:</Text>
-        <FormItem bindTo="search" width="280px" />
-        <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
-        <property name="buttonRowTemplate">
-          <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
-            <Button label="Test Search Server" type="button"
-              themeColor="secondary" variant="outlined"
-              onClick="window.alert('Search server is ok.')"/>
-            <SpaceFiller/>
-            <Button type="submit" enabled="{!isSearching}" icon="search"
-              label="{isSearching ? 'Searching...' : 'Search'}"/>
-          </HStack>
-        </property>
-    </Form>
+    <App>
+      <Form id="searchForm" padding="0.5rem"
+        data="{{ search: 'Seattle', caseSensitive: false }}"
+        onSubmit="() => {isSearching = true; delay(1000); isSearching = false; }"
+        saveLabel="Search"
+        var.isSearching="{false}">
+          <Text>Please specify the name to include in the search:</Text>
+          <FormItem bindTo="search" width="280px" />
+          <FormItem type="checkbox" label="Case sensitive?" bindTo="caseSensitive" />
+          <property name="buttonRowTemplate">
+            <HStack gap="0.5rem" borderTop="1px solid #ddd" verticalPadding="1rem">
+              <Button label="Test Search Server" type="button"
+                themeColor="secondary" variant="outlined"
+                onClick="window.alert('Search server is ok.')"/>
+              <SpaceFiller/>
+              <Button type="submit" enabled="{!isSearching}" icon="search"
+                label="{isSearching ? 'Searching...' : 'Search'}"/>
+            </HStack>
+          </property>
+      </Form>
+    </App>  
   `}
 />
 
@@ -111,30 +115,34 @@ The form infrastructure fires this event when the form is reset.
 
 The form infrastructure fires this event when the form is submitted. The event argument is the current `data` value to save.
 
-```ueml copy {3}
-<Form padding="0.5rem"
-  data="{{ name: 'Joe', age: 43 }}"
-  onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-  <FlowLayout columnGap="12px" paddingBottom="6px">
-    <FormItem bindTo="name" label="Customer name" width="50%" />
-    <FormItem bindTo="age" label="Age" type="integer" width="50%"
-      zeroOrPositive="true" />
-  </FlowLayout>
-</Form>
+```ueml copy {4}
+<App>
+  <Form padding="0.5rem"
+    data="{{ name: 'Joe', age: 43 }}"
+    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+    <FlowLayout columnGap="12px" paddingBottom="6px">
+      <FormItem bindTo="name" label="Customer name" width="50%" />
+      <FormItem bindTo="age" label="Age" type="integer" width="50%"
+        zeroOrPositive="true" />
+    </FlowLayout>
+  </Form>
+</App>  
 ```
 
 <Playground
   name="Example: submit"
   app={`
-    <Form padding="0.5rem"
-      data="{{ name: 'Joe', age: 43 }}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-      <FlowLayout columnGap="12px" paddingBottom="6px">
-        <FormItem bindTo="name" label="Customer name" width="50%" />
-        <FormItem bindTo="age" label="Age" type="integer" width="50%"
-          zeroOrPositive="true" />
-      </FlowLayout>
-    </Form>
+    <App>
+      <Form padding="0.5rem"
+        data="{{ name: 'Joe', age: 43 }}"
+        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
+        <FlowLayout columnGap="12px" paddingBottom="6px">
+          <FormItem bindTo="name" label="Customer name" width="50%" />
+          <FormItem bindTo="age" label="Age" type="integer" width="50%"
+            zeroOrPositive="true" />
+        </FlowLayout>
+      </Form>
+    </App>  
   `}
 />
 
@@ -146,23 +154,26 @@ This property represents the value of the form data. You can access the fields o
 
 The following sample demonstrates enabling a field according to another's current value.
 
-```ueml copy {4}
-<Form
-  data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
-  <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-  <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
-</Form>
+```ueml copy {5}
+<App>
+  <Form
+    data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+    <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+    <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
+  </Form>
+</App>
 ```
 
 <Playground
   name="Example: referencing field values"
-  height={250}
   app={`
-    <Form
-      data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
-      <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
-      <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
-    </Form>
+    <App>
+      <Form
+        data="{{ isEnabled: true, name: 'Joe' }}" horizontalPadding="1rem">
+        <FormItem label="Enable name" bindTo="isEnabled" type="switch" />
+        <FormItem enabled="{$data.isEnabled}" label="Name" bindTo="name" />
+      </Form>
+    </App>
   `}
 />
 

@@ -5,17 +5,16 @@ import { useTheme } from "nextra-theme-docs";
 import { Text } from "@components/Text/TextNative";
 import { CodeSelector } from "@/src/components/CodeSelector";
 import { Tooltip } from "@/src/components/Tooltip";
-import { MdSwapHoriz, MdSwapVert } from "react-icons/md";
-import { PiSquareSplitHorizontalLight, PiSquareSplitVerticalLight } from "react-icons/pi";
-import { RxOpenInNewWindow, RxReset, RxDownload, RxCode } from "react-icons/rx";
+import { RxOpenInNewWindow, RxDownload, RxCode } from "react-icons/rx";
+import { LiaUndoAltSolid} from "react-icons/lia";
 import { usePlayground } from "@/src/hooks/usePlayground";
-import { changeOrientation, resetApp, swapApp } from "@/src/state/store";
+import { resetApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import { Box } from "@/src/components/Box";
-import {ToneSwitcher} from "@/src/components/ToneSwitcher";
-import {ThemeSwitcher} from "@/src/components/ThemeSwitcher";
-import {handleDownloadZip} from "@/src/utils/helpers";
+import { ToneSwitcher } from "@/src/components/ToneSwitcher";
+import { ThemeSwitcher } from "@/src/components/ThemeSwitcher";
+import { handleDownloadZip } from "@/src/utils/helpers";
 
 export const Header = ({ standalone = false }: { standalone?: boolean }) => {
   const { theme, systemTheme } = useTheme();
@@ -31,6 +30,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
       const data = {
         standalone: appDescription,
         options: {
+          fixedTheme: options.fixedTheme,
           swapped: options.swapped,
           previewMode: previewMode,
           orientation: options.orientation,
@@ -66,9 +66,16 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
           {!options.previewMode && standalone && <CodeSelector />}
         </Box>
         <SpaceFiller />
-        <Tooltip trigger={<ToneSwitcher />} label="Change tone" />
-        {appDescription.availableThemes && appDescription.availableThemes.length > 1 && (
-            <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+        {standalone && (
+          <>
+            {!options.fixedTheme && <Tooltip trigger={<ToneSwitcher />} label="Change tone" />}
+            {!options.fixedTheme &&
+              appDescription.availableThemes &&
+              appDescription.availableThemes.length > 1 && (
+                <Tooltip trigger={<ThemeSwitcher />} label="Change theme" />
+              )}
+          </>
+
         )}
         {!options.previewMode && show && (
           <>
@@ -82,7 +89,15 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                 label="Edit code in new window"
               />
             )}
-            {standalone && (
+            <Tooltip
+                trigger={
+                  <button className={styles.button} onClick={() => dispatch(resetApp())}>
+                    <LiaUndoAltSolid />
+                  </button>
+                }
+                label="Reset the app"
+            />
+            {/*            {standalone && (
               <>
                 <Tooltip
                   trigger={
@@ -105,35 +120,29 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                   label="Toggle orientation"
                 />
               </>
-            )}
+            )}*/}
           </>
         )}
-        {options.allowStandalone && (
-          <Tooltip
-            trigger={
-              <button className={styles.button} onClick={() => openStandaloneApp()}>
-                <RxOpenInNewWindow />
-              </button>
-            }
-            label="Open in new window"
-          />
+        {standalone && (
+          <>
+            <Tooltip
+              trigger={
+                <button className={styles.button} onClick={() => openStandaloneApp()}>
+                  <RxOpenInNewWindow />
+                </button>
+              }
+              label="Preview in fullscreen"
+            />
+            <Tooltip
+              trigger={
+                <button className={styles.button} onClick={() => download()}>
+                  <RxDownload />
+                </button>
+              }
+              label="Download app"
+            />
+          </>
         )}
-        <Tooltip
-          trigger={
-            <button className={styles.button} onClick={() => dispatch(resetApp())}>
-              <RxReset />
-            </button>
-          }
-          label="Reset the app"
-        />
-        <Tooltip
-          trigger={
-            <button className={styles.button} onClick={() => download()}>
-              <RxDownload />
-            </button>
-          }
-          label="Download app"
-        />
       </Box>
       {appDescription.config?.description && (
         <div className={styles.description}>{appDescription.config?.description}</div>

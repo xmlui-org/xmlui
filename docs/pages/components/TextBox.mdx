@@ -21,13 +21,18 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy
-<TextBox enabled="false" />
+<App>
+  <TextBox enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={60}
-  app={`<TextBox enabled="false" />`}
+  app={`
+  <App>
+    <TextBox enabled="false" />
+  </App>
+  `}
 />
 
 ### `endIcon`
@@ -35,25 +40,35 @@ Default value: `true`.
 This property sets an icon to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```ueml copy
-<TextBox endIcon="email" />
+<App>
+  <TextBox endIcon="email" />
+</App>
 ```
 
 <Playground
   name="Example: endIcon"
-  height={60}
-  app={`<TextBox endIcon="email" />`}
+  app={`
+  <App>
+    <TextBox endIcon="email" />
+  </App>
+  `}
 />
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
 ```ueml copy
-<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+<App>
+  <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+</App>
 ```
 
 <Playground
   name="Example: all adornments"
-  height={60}
-  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+  app={`
+  <App>
+    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+  </App>
+  `}
 />
 
 ### `endText`
@@ -61,25 +76,35 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 This property sets a text to appear on the end (right side when the left-to-right direction is set) of the input.
 
 ```ueml copy
-<TextBox endText=".com" />
+<App>
+  <TextBox endText=".com" />
+</App>
 ```
 
 <Playground
   name="Example: endText"
-  height={60}
-  app={`<TextBox endText=".com" />`}
+  app={`
+  <App>
+    <TextBox endText=".com" />
+  </App>
+  `}
 />
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`startText`](#starttext).
 
 ```ueml copy
-<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+<App>
+  <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+</App>
 ```
 
 <Playground
   name="Example: all adornments"
-  height={60}
-  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+  app={`
+  <App>
+    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+  </App>
+  `}
 />
 
 ### `initialValue`
@@ -87,13 +112,18 @@ It is possible to set the other adornments as well: [`endIcon`](#endicon), [`sta
 This property sets the component's initial value.
 
 ```ueml copy
-<TextBox initialValue="Example text" />
+<App>
+  <TextBox initialValue="Example text" />
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
-  height={60}
-  app={`<TextBox initialValue="Example text" />`}
+  app={`
+  <App>
+    <TextBox initialValue="Example text" />
+  </App>
+  `}
 />
 
 ### `labelId`
@@ -107,13 +137,18 @@ This property sets the maximum length of the input it accepts.
 Try to enter a longer value into the input field below.
 
 ```ueml copy
-<TextBox maxLength="16" />
+<App>
+  <TextBox maxLength="16" />
+</App>
 ```
 
 <Playground
   name="Example: maxLength"
-  height={60}
-  app={`<TextBox maxLength="16" />`}
+  app={`
+  <App>
+    <TextBox maxLength="16" />
+  </App>
+  `}
 />
 
 ### `placeholder`
@@ -121,13 +156,18 @@ Try to enter a longer value into the input field below.
 A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy
-<TextBox placeholder="This is a placeholder" />
+<App>
+  <TextBox placeholder="This is a placeholder" />
+</App>
 ```
 
 <Playground
   name="Example: placeholder"
-  height={60}
-  app={`<TextBox placeholder="This is a placeholder" />`}
+  app={`
+  <App>
+    <TextBox placeholder="This is a placeholder" />
+  </App>
+  `}
 />
 
 ### `readOnly`
@@ -135,13 +175,18 @@ A placeholder text that is visible in the input field when its empty.
 Set this property to `true` to disallow changing the component value.
 
 ```ueml copy
-<TextBox initialValue="Example text" readOnly="true" />
+<App>
+  <TextBox initialValue="Example text" readOnly="true" />
+</App>
 ```
 
 <Playground
   name="Example: readOnly"
-  height={60}
-  app={`<TextBox initialValue="Example text" readOnly="true" />`}
+  app={`
+  <App>
+    <TextBox initialValue="Example text" readOnly="true" />
+  </App>
+  `}
 />
 
 ### `required`
@@ -153,25 +198,35 @@ Set this property to `true` to indicate it must have a value before submitting t
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy
-<TextBox startIcon="hyperlink" />
+<App>
+  <TextBox startIcon="hyperlink" />
+</App>
 ```
 
 <Playground
   name="Example: startIcon"
-  height={60}
-  app={`<TextBox startIcon="hyperlink" />`}
+  app={`
+  <App>
+    <TextBox startIcon="hyperlink" />
+  </App>
+  `}
 />
 
 It is possible to set the other adornments as well: [`endText`](#endtext), [`startIcon`](#starticon) and [`startText`](#starttext).
 
 ```ueml copy
-<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+<App>
+  <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+</App>
 ```
 
 <Playground
   name="Example: all adornments"
-  height={60}
-  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+  app={`
+  <App>
+    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+  </App>
+  `}
 />
 
 ### `startText`
@@ -179,25 +234,35 @@ It is possible to set the other adornments as well: [`endText`](#endtext), [`sta
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy
-<TextBox startText="www." />
+<App>
+  <TextBox startText="www." />
+</App>
 ```
 
 <Playground
   name="Example: startText"
-  height={60}
-  app={`<TextBox startText="www." />`}
+  app={`
+  <App>
+    <TextBox startText="www." />
+  </App>
+  `}
 />
 
 It is possible to set the other adornments as well: [`endIcon`](#endicon), [`startIcon`](#starticon) and [`endText`](#endtext).
 
 ```ueml copy
-<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+<App>
+  <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+</App>
 ```
 
 <Playground
   name="Example: all adornments"
-  height={60}
-  app={`<TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />`}
+  app={`
+  <App>
+    <TextBox startIcon="hyperlink" startText="www." endIcon="email" endText=".com" />
+  </App>
+  `}
 />
 
 ### `validationStatus`
@@ -214,24 +279,23 @@ Available values:
 
 
 ```ueml copy
-<VStack gap="$space-0_5">
+<App>
   <TextBox />
   <TextBox validationStatus="valid" />
   <TextBox validationStatus="warning" />
   <TextBox validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={200}
   app={`
-  <VStack gap="$space-0_5">
+  <App>
     <TextBox />
     <TextBox validationStatus="valid" />
     <TextBox validationStatus="warning" />
     <TextBox validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -243,21 +307,21 @@ This event is triggered when value of TextBox has changed.
 
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
-```ueml copy {2}
-<VStack gap="$space-0_5" var.field="">
+```ueml copy {3}
+<App var.field="">
   <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={100}
+  height={160}
   app={`
-  <VStack gap="$space-0_5" var.field="">
+  <App var.field="">
     <TextBox initialValue="{field}" onDidChange="(val) => field = val" />
     <Text value="{field}" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -268,25 +332,28 @@ This event is triggered when the TextBox has received the focus.
 Clicking on the `TextBox` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to its original.
 
-```ueml copy {3-4}
-<TextBox
-  initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={72}
-  app={`
+```ueml copy {4-5}
+<App>
   <TextBox
     initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
     var.focused="{false}"
   />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+  <App>
+    <TextBox
+      initialValue="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+      onGotFocus="focused = true"
+      onLostFocus="focused = false"
+      var.focused="{false}"
+    />
+  </App>
   `}
 />
 
@@ -304,13 +371,86 @@ This component does not have any context values.
 
 This method sets the focus on the TextBox.
 
+```ueml copy {2-3}
+<App>
+  <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+  <TextBox id="inputComponent" />
+</App>
+```
+
+<Playground
+  name="Example: focus"
+  app={`
+  <App>
+    <Button label="Trigger Focus" onClick="inputComponent.focus()" />
+    <TextBox id="inputComponent" />
+  </App>
+  `}
+/>
+
 ### `setValue`
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
+```ueml copy {10}
+<App var.changes="">
+  <TextBox
+    id="inputField"
+    readOnly="true"
+    onDidChange="changes++"
+  />
+  <HStack>
+    <Button
+      label="Check"
+      onClick="inputField.setValue('example ')"
+    />
+    <Text value="Number of changes: {changes}" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: setValue"
+  app={`
+  <App var.changes="">
+    <TextBox
+      id="inputField"
+      readOnly="true"
+      onDidChange="changes++"
+    />
+    <HStack>
+      <Button
+        label="Check"
+        onClick="inputField.setValue('example ')"
+      />
+      <Text value="Number of changes: {changes}" />
+    </HStack>
+  </App>
+  `}
+/>
+
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+In the example below, typing in the `TextBox` will also display the length of the text typed into it above the field:
+
+```ueml copy {2-3}
+<App>
+  <Text value="TextBox content length: {inputComponent.value.length}" />
+  <TextBox id="inputComponent" />
+</App>
+```
+
+<Playground
+  name="Example: value"
+  app={`
+  <App>
+    <Text value="TextBox content length: {inputComponent.value.length}" />
+    <TextBox id="inputComponent" />
+  </App>
+  `}
+/>
 
 ## Styling
 
@@ -365,7 +505,6 @@ These variables set the `disabled` state:
 
 <Playground
   name="Example: styling"
-  height={200}
   defaultTheme="custom"
   themes={[
     {
@@ -377,7 +516,11 @@ These variables set the `disabled` state:
       },
     },
   ]}
-  app={`<TextBox placeholder="I am a placeholder" />`}
+  app={`
+  <App>
+    <TextBox placeholder="I am a placeholder" />
+  </App>
+  `}
 />
 
 To style all input controls not just this component, replace the `TextBox` segment with `Input`:

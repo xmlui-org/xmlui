@@ -5,13 +5,19 @@ This is useful in two cases:
 2. The text is also displayed when the image can't be loaded for some reason (network errors, content blocking, etc.).
 
 ```ueml copy
-<Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
+<App>
+  <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
+</App>
 ```
 
 <Playground
   name="Example: alt"
-  height={60}
-  app={`<Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />`}
+  height={100}
+  app={`
+    <App>
+      <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -24,20 +30,23 @@ This is useful in two cases:
 | `cover`   | The image is sized to maintain its aspect ratio while filling the element's entire content box. If the image's aspect ratio does not match the aspect ratio of its container, then the image will be clipped to fit. |
 
 ```ueml copy /fit/
-<HStack padding="1rem" height="280px" gap="1rem">
-  <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
-  <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
-</HStack>
-```
-
-<Playground
-  name="Example: fit"
-  height={300}
-  app={`
+<App>
   <HStack padding="1rem" height="280px" gap="1rem">
     <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
     <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
   </HStack>
+</App>
+```
+
+<Playground
+  name="Example: fit"
+  app={`
+    <App>
+      <HStack padding="1rem" height="280px" gap="1rem">
+        <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
+        <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
+      </HStack>
+    </App>
   `}
 />
 
@@ -53,13 +62,19 @@ The default value is eager (\`false\`).
 %-PROP-START aspectRatio
 
 ```ueml copy
-<Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="1420 / 934" />
+<App>
+  <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" />
+</App>
 ```
 
 <Playground
   name="Example: aspectRatio"
   height={300}
-  app={` <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" /> `}
+  app={`
+    <App>
+      <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -69,26 +84,29 @@ The default value is eager (\`false\`).
 This event is triggered when the image is clicked.
 
 ```ueml copy {5}
-<Stack padding="1rem" height="280px" width="400px">
-  <Image
-    src="/resources/images/components/image/breakfast.jpg"
-    fit="cover"
-    onClick="window.alert('Image clicked')"
-  />
-</Stack>
-```
-
-<Playground
-  name="Example: click"
-  height={300}
-  app={`
-  <Stack padding="1rem" height="280px" width="400px">
+<App>
+  <Stack height="280px" width="400px">
     <Image
       src="/resources/images/components/image/breakfast.jpg"
       fit="cover"
       onClick="window.alert('Image clicked')"
     />
   </Stack>
+</App>
+```
+
+<Playground
+  name="Example: click"
+  app={`
+    <App>
+      <Stack height="280px" width="400px">
+        <Image
+          src="/resources/images/components/image/breakfast.jpg"
+          fit="cover"
+          onClick="toast('Image clicked')"
+        />
+      </Stack>
+    </App>
   `}
 />
 
@@ -101,14 +119,15 @@ Nonetheless, you can use layout properties and theme variables.
 The following markup uses the `radius` layout property to set rounded borders:
 
 ```ueml copy {6}
-<Stack padding="1rem" height="280px" width="400px" >
-  <Image
-    src="/resources/images/components/image/breakfast.jpg"
-    fit="cover"
-    radius="400px"
-    border="$border-MyImage"
-  />
-</Stack>
+<App>
+  <Stack height="280px" width="400px" >
+    <Image 
+      src="/resources/images/components/image/breakfast.jpg" 
+      fit="cover" 
+      radius="400px" 
+      border="$border-MyImage" />
+  </Stack>
+</App>
 ```
 
 The `border` layout property refers to a theme variable, `$border-MyImage`,
@@ -123,7 +142,6 @@ This example shows the result:
 <Playground
   name="Example: styling with layout properties"
   defaultTheme="custom"
-  height={300}
   themes={[
     {
       id: "custom",
@@ -134,9 +152,15 @@ This example shows the result:
     },
   ]}
   app={`
-  <Stack padding="1rem" height="280px" width="400px" >
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" radius="400px" border="$border-MyImage" />
-  </Stack>
+    <App>
+      <Stack height="280px" width="400px" >
+        <Image 
+          src="/resources/images/components/image/breakfast.jpg" 
+          fit="cover" 
+          radius="400px" 
+          border="$border-MyImage" />
+      </Stack>
+    </App>
   `}
 />
 

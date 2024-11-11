@@ -1,7 +1,7 @@
 %-API-START setValue
 
 ```ueml copy {3, 9, 12}
-<VStack gap="0.5rem">
+<App>
   <DatePicker
     id="picker"
     readOnly="true"
@@ -14,26 +14,27 @@
       label="Remove Text"
       onClick="picker.setValue('')" />
   </HStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: value and setValue"
   app={`
-  <VStack gap="0.5rem">
-    <DatePicker
-      id="picker"
-      readOnly="true"
-    />
-    <HStack gap="0.5rem">
-      <Button
-        label="Add Text"
-        onClick="picker.setValue('05/25/2024')" />
-      <Button
-        label="Remove Text"
-        onClick="picker.setValue('')" />
-    </HStack>
-  </VStack>`}
+    <App>
+      <DatePicker
+        id="picker"
+        readOnly="true"
+      />
+      <HStack gap="0.5rem">
+        <Button
+          label="Add Text"
+          onClick="picker.setValue('05/25/2024')" />
+        <Button
+          label="Remove Text"
+          onClick="picker.setValue('')" />
+      </HStack>
+    </App>
+  `}
 />
 
 %-API-END
@@ -41,13 +42,19 @@
 %-PROP-START initialValue
 
 ```ueml copy
-<DatePicker initialValue="05/25/2024" />
+<App>
+  <DatePicker initialValue="05/25/2024" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: initialValue"
-  app={`<DatePicker initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker initialValue="05/25/2024" />
+    </App>  
+  `}
 />
 
 %-PROP-END
@@ -55,13 +62,19 @@
 %-PROP-START placeholder
 
 ```ueml copy
-<DatePicker placeholder="This is a placeholder" />
+<App>
+  <DatePicker placeholder="This is a placeholder" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: placeholder"
-  app={`<DatePicker placeholder="This is a placeholder" />`}
+  app={`
+    <App>
+      <DatePicker placeholder="This is a placeholder" />
+    </App>  
+  `}
 />
 
 %-PROP-END
@@ -69,13 +82,19 @@
 %-PROP-START enabled
 
 ```ueml copy
-<DatePicker enabled="false" />
+<App>
+  <DatePicker enabled="false" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: enabled"
-  app={`<DatePicker enabled="false" />`}
+  app={`
+    <App>
+      <DatePicker enabled="false" />
+    </App>  
+  `}
 />
 
 %-PROP-END
@@ -89,24 +108,25 @@
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <DatePicker />
   <DatePicker validationStatus="valid" />
   <DatePicker validationStatus="warning" />
   <DatePicker validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={200}
+  height={300}
   app={`
-  <VStack gap="0.5rem">
-    <DatePicker />
-    <DatePicker validationStatus="valid" />
-    <DatePicker validationStatus="warning" />
-    <DatePicker validationStatus="error" />
-  </VStack>`}
+    <App>
+      <DatePicker />
+      <DatePicker validationStatus="valid" />
+      <DatePicker validationStatus="warning" />
+      <DatePicker validationStatus="error" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -114,20 +134,21 @@
 %-PROP-START mode
 
 ```ueml copy {2-3}
-<VStack>
+<App>
   <DatePicker mode="single" />
   <DatePicker mode="range" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={120}
+  height={240}
   name="Example: mode"
   app={`
-  <VStack>
+  <App>
     <DatePicker mode="single" />
     <DatePicker mode="range" />
-  </VStack>`}
+  </App>
+  `}
 />
 
 %-PROP-END
@@ -151,13 +172,19 @@ The table below shows the available date formats:
 | MMddyyyy   | 05252024   |
 
 ```ueml copy /dateFormat="dd-MM-yyyy"/
-<DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+<App>
+  <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: dateFormat"
-  app={`<DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker dateFormat="dd-MM-yyyy" initialValue="05/25/2024" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -165,13 +192,19 @@ The table below shows the available date formats:
 %-PROP-START showWeekNumber
 
 ```ueml copy
-<DatePicker showWeekNumber="true" />
+<App>
+  <DatePicker showWeekNumber="true" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: showWeekNumber"
-  app={`<DatePicker showWeekNumber="true" />`}
+  app={`
+    <App>
+      <DatePicker showWeekNumber="true" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -189,13 +222,19 @@ The table below shows the available date formats:
 | Saturday  | 6      |
 
 ```ueml copy
-<DatePicker weekStartsOn="1" />
+<App>
+  <DatePicker weekStartsOn="1" />
+</App>
 ```
 
 <Playground
   name="Example: weekStartsOn"
-  height={60}
-  app={`<DatePicker weekStartsOn="1" />`}
+  height={120}
+  app={`
+    <App>
+      <DatePicker weekStartsOn="1" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -203,13 +242,19 @@ The table below shows the available date formats:
 %-PROP-START fromDate
 
 ```ueml copy
-<DatePicker fromDate="05/24/2024" />
+<App>
+  <DatePicker fromDate="05/24/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: fromDate"
-  app={`<DatePicker fromDate="05/24/2024" />`}
+  app={`
+    <App>
+      <DatePicker fromDate="05/24/2024" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -217,13 +262,19 @@ The table below shows the available date formats:
 %-PROP-START toDate
 
 ```ueml copy
-<DatePicker toDate="05/26/2024" />
+<App>
+  <DatePicker toDate="05/26/2024" />
+</App>
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: toDate"
-  app={`<DatePicker toDate="05/26/2024" />`}
+  app={`
+    <App>
+      <DatePicker toDate="05/26/2024" />
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -231,13 +282,19 @@ The table below shows the available date formats:
 %-PROP-START disabledDates
 
 ```ueml copy
-<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+<App>
+  <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+</App>  
 ```
 
 <Playground
-  height={60}
+  height={120}
   name="Example: disabledDates"
-  app={`<DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />`}
+  app={`
+    <App>
+      <DatePicker disabledDates="{['05/26/2024', '05/27/2024']}" initialValue="05/25/2024" />
+    </App>  
+  `}
 />
 
 %-PROP-END
@@ -247,20 +304,21 @@ The table below shows the available date formats:
 Write in the input field and see how the `Text` underneath it is updated in parallel.
 
 ```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+<App var.field="">
   <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
   <Text value="{field}" />
-</VStack>
+</App>
 ```
 
 <Playground
   height={120}
   name="Example: didChange"
   app={`
-  <VStack gap="0.5rem" var.field="">
-    <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
-    <Text value="{field}" />
-  </VStack>`}
+    <App var.field="">
+      <DatePicker initialValue="{field}" onDidChange="(val) => field = val" />
+      <Text value="{field}" />
+    </App>
+  `}
 />
 
 %-EVENT-END
@@ -271,26 +329,27 @@ Clicking on the `DatePicker` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {4-5}
-<VStack gap="0.5rem" var.isFocused="false">
+<App var.isFocused="false">
   <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
   <DatePicker
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false"
   />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={120}
+  height={160}
   name="Example: gotFocus/lostFocus"
   app={`
-  <VStack gap="0.5rem" var.isFocused="false">
-    <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
-    <DatePicker
-      onGotFocus="isFocused = true"
-      onLostFocus="isFocused = false"
-    />
-  </VStack>`}
+    <App var.isFocused="false">
+      <Text value="{isFocused === true ? 'DatePicker focused' : 'DatePicker lost focus'}" />
+      <DatePicker
+        onGotFocus="isFocused = true"
+        onLostFocus="isFocused = false"
+      />
+    </App>
+  `}
 />
 
 %-EVENT-END
@@ -331,7 +390,7 @@ The `DatePicker` component provides these theme variables to customize its appea
 
 <Playground
   name="Example: styling"
-  height={60}
+  height={120}
   defaultTheme="custom"
   themes={[
     {
@@ -346,7 +405,11 @@ The `DatePicker` component provides these theme variables to customize its appea
       },
     },
   ]}
-  app={`<DatePicker />`}
+  app={`
+    <App>
+      <DatePicker />
+    </App>  
+  `}
 />
 
 To style all input controls not just this component, use `Input` instead of the `DatePicker` segment:

@@ -456,9 +456,51 @@ This method sets the focus on the NumberBox.
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
 
+You can use this method to set the component's current value programmatically.
+
+```ueml copy {3, 9, 12}
+<VStack gap="0.5rem">
+  <NumberBox
+    id="numberbox"
+    readOnly="true"
+  />
+  <HStack gap="0.5rem">
+    <Button
+      label="Set to 100"
+      onClick="numberbox.setValue(100)" />
+    <Button
+      label="Set to 0"
+      onClick="numberbox.setValue(0)" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  name="Example: value and setValue"
+  height={120}
+  app={`<VStack gap="0.5rem">
+  <NumberBox
+    id="numberbox"
+    readOnly="true"
+  />
+  <HStack gap="0.5rem">
+    <Button
+      label="Set to 100"
+      onClick="numberbox.setValue(100)" />
+    <Button
+      label="Set to 0"
+      onClick="numberbox.setValue(0)" />
+  </HStack>
+</VStack>`}
+/>
+
 ### `value`
 
 You can query the component's value. If no value is set, it will retrieve `undefined`.
+
+You can query this read-only API property to get the input component's current value.
+
+See an example in the `setValue` API method.
 
 ## Styling
 

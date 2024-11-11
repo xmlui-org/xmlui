@@ -36,6 +36,7 @@ Each theme has an identifier. To apply a particular theme, change the "defaultTh
 The following sample uses the default theme (its ID is "xmlui") with the default light tone:
 
 <Playground
+    fixedTheme={true}
     name="Theme: xmlui (light)"
     app={`
     <Theme tone="light" themeId="xmlui">
@@ -58,6 +59,7 @@ Change the following properties in the configuration file:
 Now, you see the purple-shaded XMLUI theme with a dark tone.
 
 <Playground
+    fixedTheme={true}
     name="Theme: xmlui (light)"
     app={`
     <Theme tone="dark" themeId="xmlui-purple">
@@ -147,6 +149,7 @@ The following markup displays the first button's panel with the default theme an
 ```
 
 <Playground
+    fixedTheme={true}
     name="Theme component with a new theme"
     app={`
     <App>
@@ -175,6 +178,7 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
 ```
 
 <Playground
+    fixedTheme={true}
     name="Theme component with a new tone"
     app={`
     <App>
@@ -203,6 +207,7 @@ In addition to theme IDs and tones, you can modify particular theme variables, a
 ```
 
 <Playground
+    fixedTheme={true}
     name="Theme component with modified theme variables"
     app={`
     <App>
@@ -242,6 +247,7 @@ Let's assume you run this app with the default theme:
 ```
 
 <Playground
+    fixedTheme={true}
     name="Simple app with the default theme"
     height={180}
     horizontal
@@ -288,6 +294,7 @@ Set this new theme as the default in your app's configuration file:
 Now, your new theme displays the app in a light tone like this:
 
 <Playground
+    fixedTheme={true}
     name="Simple app with the default theme"
     height={240}
     horizontal
@@ -323,6 +330,7 @@ Now, your new theme displays the app in a light tone like this:
 It also handles the dark tone:
 
 <Playground
+    fixedTheme={true}
     name="Simple app with the default theme"
     height={240}
     horizontal
@@ -492,6 +500,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     components using the default theme (light):
 
     <Playground
+        fixedTheme={true}
         name="Gallery with the default theme"
         height={400}
         app={gallery}/>
@@ -508,6 +517,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     color property set to `primary` and `Badge` leverage the primary color) immediately change their appearance:
 
     <Playground
+        fixedTheme={true}
         name="Changing 'color-primary'"
         height={400}
         app={gallery}
@@ -552,22 +562,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     </Callout>
 
     <Playground
-
-    name="Changing 'color-Button'"
-    height={400}
-    horizontal={true}
-    app={gallery}
-    defaultTheme="sample"
-    themes={[
-        {
-            name: "Sample",
-            id: "sample",
-            tone: "light",
-            themeVars: {
-                "color-Button": "orangered",
+        fixedTheme={true}
+        name="Changing 'color-Button'"
+        height={400}
+        horizontal={true}
+        app={gallery}
+        defaultTheme="sample"
+        themes={[
+            {
+                name: "Sample",
+                id: "sample",
+                tone: "light",
+                themeVars: {
+                    "color-Button": "orangered",
+                },
             },
-        },
-    ]}
+        ]}
     />
 
     ### More Specific Variable Changes
@@ -587,22 +597,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     intact.
 
     <Playground
-
-    name="Changing 'color-Button-primary-solid'"
-    height={400}
-    horizontal={true}
-    app={gallery}
-    defaultTheme="sample"
-    themes={[
-        {
-            name: "Sample",
-            id: "sample",
-            tone: "light",
-            themeVars: {
-                "color-Button-primary-solid": "orangered",
+        fixedTheme={true}
+        name="Changing 'color-Button-primary-solid'"
+        height={400}
+        horizontal={true}
+        app={gallery}
+        defaultTheme="sample"
+        themes={[
+            {
+                name: "Sample",
+                id: "sample",
+                tone: "light",
+                themeVars: {
+                    "color-Button-primary-solid": "orangered",
+                },
             },
-        },
-    ]}
+        ]}
     />
 
     Sometimes, you want to override a single visual property of a component, like the background color of the button
@@ -617,22 +627,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     This theme variable works as you expect! Move the mouse over any button to test the hover effect:
 
     <Playground
-
-    name="Changing 'color-bg-Button--hover'"
-    height={400}
-    horizontal={true}
-    app={gallery}
-    defaultTheme="sample"
-    themes={[
-        {
-            name: "Sample",
-            id: "sample",
-            tone: "light",
-            themeVars: {
-                "color-bg-Button--hover": "orangered",
+        fixedTheme={true}
+        name="Changing 'color-bg-Button--hover'"
+        height={400}
+        horizontal={true}
+        app={gallery}
+        defaultTheme="sample"
+        themes={[
+            {
+                name: "Sample",
+                id: "sample",
+                tone: "light",
+                themeVars: {
+                    "color-bg-Button--hover": "orangered",
+                },
             },
-        },
-    ]}
+        ]}
     />
 
     Following this pattern, you can tighten the theme variable to affect only a single button type's hover color, like
@@ -648,22 +658,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     the solid variant):
 
     <Playground
-
-    name="Changing 'color-bg-Button-primary-solid--hover'"
-    height={400}
-    horizontal={true}
-    app={gallery}
-    defaultTheme="sample"
-    themes={[
-        {
-            name: "Sample",
-            id: "sample",
-            tone: "light",
-            themeVars: {
-                "color-bg-Button-primary-solid--hover": "orangered",
+        fixedTheme={true}
+        name="Changing 'color-bg-Button-primary-solid--hover'"
+        height={400}
+        horizontal={true}
+        app={gallery}
+        defaultTheme="sample"
+        themes={[
+            {
+                name: "Sample",
+                id: "sample",
+                tone: "light",
+                themeVars: {
+                    "color-bg-Button-primary-solid--hover": "orangered",
+                },
             },
-        },
-    ]}
+        ]}
     />
 
     ### Component Theme Classes
@@ -680,7 +690,7 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 </Form>
     ```
 
-    <Playground name="Input components" height={200} horizontal={true} app={inputs}/>
+    <Playground fixedTheme={true} name="Input components" height={200} horizontal={true} app={inputs}/>
 
     If you want to change their border rounding while keeping other components, such as the buttons intact, you could
     create a derived theme like this:
@@ -699,22 +709,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     The new theme works as you expect:
 
     <Playground
-
-    name="Input components with theme #1"
-    height={200}
-    horizontal={true}
-    app={inputs}
-    defaultTheme="rounded"
-    themes={[
-    {
-        name: "Rounded",
-        id: "rounded",
-        themeVars: {
-            "radius-TextBox": "160px",
-            "radius-NumberBox": "160px",
-        },
-    },
-]}
+        fixedTheme={true}
+        name="Input components with theme #1"
+        height={200}
+        horizontal={true}
+        app={inputs}
+        defaultTheme="rounded"
+        themes={[
+            {
+                name: "Rounded",
+                id: "rounded",
+                themeVars: {
+                    "radius-TextBox": "160px",
+                    "radius-NumberBox": "160px",
+                },
+            },
+        ]}
     />
 
     Many components function as inputs. When you change some of their more generic visual attributes, such as the
@@ -741,22 +751,22 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     This theme changes the rounding and the background color of **all** input components:
 
     <Playground
-
-    name="Input components with theme #2"
-    height={200}
-    horizontal={true}
-    app={inputs}
-    defaultTheme="rounded"
-    themes={[
-        {
-            name: "Rounded",
-            id: "rounded",
-            themeVars: {
-                "radius-Input": "160px",
-                "color-bg-Input": "papayawhip",
+        fixedTheme={true}
+        name="Input components with theme #2"
+        height={200}
+        horizontal={true}
+        app={inputs}
+        defaultTheme="rounded"
+        themes={[
+            {
+                name: "Rounded",
+                id: "rounded",
+                themeVars: {
+                    "radius-Input": "160px",
+                    "color-bg-Input": "papayawhip",
+                },
             },
-        },
-    ]}
+        ]}
     />
 
     The key to this behavior is the `Input` component name within the `radius-Input` and `color-bg-Input` variable

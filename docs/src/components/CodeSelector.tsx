@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
 import selectStyles from "./Select.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
-import { ThemeDefinition } from "@components-core/theming/abstractions";
+import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { contentChanged } from "@/src/state/store";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
@@ -32,7 +32,7 @@ export const CodeSelector = () => {
       content = `${options.content}.json`;
     } else if (
       appDescription.components?.some(
-        (component: CompoundComponentDef) => component.name === options.content,
+        (component: CompoundComponentDef) => component.name.toLowerCase() === options.content.toLowerCase(),
       )
     ) {
       content = `${options.content}.xmlui`;

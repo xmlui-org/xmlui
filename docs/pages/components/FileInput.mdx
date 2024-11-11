@@ -18,16 +18,19 @@ The text box of the input field is read only.
 
 A list of file types the input controls accepts provided as a string array.
 
-**NOTE:** Does not seem to work.
-
 ```ueml
-<FileInput acceptsFileType="{['.txt', '.jpg']}" />
+<App>
+  <FileInput acceptsFileType="{['.txt', '.jpg']}" />
+</App>  
 ```
 
 <Playground
-  height={60}
   name="Example: acceptsFileType"
-  app={`<FileInput acceptsFileType="{['.txt', '.jpg']}" />`}
+  app={`
+    <App>
+      <FileInput acceptsFileType="{['.txt', '.jpg']}" />
+    </App>  
+  `}
 />
 
 ### `autoFocus`
@@ -41,19 +44,20 @@ Default value: `false`.
 The ID of the icon to display in the button
 
 ```ueml
-<VStack gap="0.5rem" >
+<App>
   <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
   <FileInput buttonIcon="drive" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={110}
   name="Example: buttonIcon"
-  app={`<VStack gap="0.5rem" >
-  <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
-  <FileInput buttonIcon="drive" />
-</VStack>`}
+  app={`
+    <App>
+      <FileInput buttonIcon="drive" buttonLabel="Let there be drive" />
+      <FileInput buttonIcon="drive" />
+    </App>
+  `}
 />
 
 ### `buttonIconPosition`
@@ -63,8 +67,19 @@ This optional string determines the location of the button icon.
 Available values: `left`, `right`, `start`, `end`
 
 ```ueml
-<FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+<App>
+  <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonIconPosition"
+  app={`
+    <App>
+      <FileInput buttonIcon="drive" buttonLabel="End" buttonIconPosition="end" />
+    </App>
+  `}
+/>
 
 Details on different icon positions can be found in the [`Button` icon positions section](./Button.mdx#iconposition).
 
@@ -76,19 +91,19 @@ If no label is specified and an icon is set, the button will modify its styling 
 By default the label reads `Browse`.
 
 ```ueml copy
-<VStack gap="1rem" >
+<App >
   <FileInput />
-  <FileInput label="I am the button label" />
-</VStack>
+  <FileInput buttonLabel="I am the button label" />
+</App>
 ```
 
 <Playground
   name="Example: label"
-  height={120}
-  app={`<VStack gap="1rem" >
-  <FileInput />
-  <FileInput buttonLabel="I am the button label" />
-</VStack>
+  app={`
+    <App >
+      <FileInput />
+      <FileInput buttonLabel="I am the button label" />
+    </App>
   `}
 />
 
@@ -107,8 +122,19 @@ Available values:
 
 
 ```ueml copy
-<FileInput buttonSize="lg" />
+<App>
+  <FileInput buttonSize="lg" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonSize"
+  app={`
+    <App>
+      <FileInput buttonSize="lg" />
+    </App>
+  `}
+/>
 
 Details on different sizes can be found in the [`Button` sizes section](./Button.mdx#size).
 
@@ -119,8 +145,19 @@ The button color scheme (primary, secondary, attention)
 Available values: `attention`, `primary`, `secondary`
 
 ```ueml copy
-<FileInput buttonThemeColor="secondary" />
+<App>
+  <FileInput buttonThemeColor="secondary" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonThemeColor"
+  app={`
+    <App>
+      <FileInput buttonThemeColor="secondary" />
+    </App>
+  `}
+/>
 
 Details on different theme colors can be found in the [`Button` theme colors section](./Button.mdx#themecolor).
 
@@ -131,8 +168,20 @@ The button variant to use
 Available values: `solid`, `outlined`, `ghost`
 
 ```ueml copy
-<FileInput buttonLabel="outlined" variant="outlined" />
+<App>
+  <FileInput buttonLabel="outlined" buttonVariant="outlined" />
+</App>
 ```
+
+<Playground
+  name="Example: buttonVariant"
+  app={`
+    <App>
+      <FileInput buttonLabel="outlined" buttonVariant="outlined" />
+    </App>
+  `}
+/>
+
 
 Details on different button variants can be found in the [`Button` variants section](./Button.mdx#variant).
 
@@ -143,13 +192,18 @@ This boolean property indicates whether the component allows selecting directori
 Default value: `false`.
 
 ```ueml copy
-<FileInput directory="true" />
+<App>
+  <FileInput directory="true" />
+</App>  
 ```
 
 <Playground
-  height={60}
   name="Example: directory"
-  app={`<FileInput directory="true" />`}
+  app={`
+    <App>
+      <FileInput directory="true" />
+    </App>  
+  `}
 />
 
 ### `enabled`
@@ -159,13 +213,18 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy
-<FileInput enabled="false" />
+<App>
+  <FileInput enabled="false" />
+</App>
 ```
 
 <Playground
   name="Example: enabled"
-  height={60}
-  app={`<FileInput enabled="false" />`}
+  app={`
+    <App>
+      <FileInput enabled="false" />
+    </App>
+  `}
 />
 
 ### `initialValue`
@@ -178,23 +237,20 @@ This boolean property enables to add not just one (`false`), but multiple files 
 
 Default value: `false`.
 
-**NOTE**: This is pretty faulty
-
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <FileInput multiple="false" />
   <FileInput multiple="true" />
-</VStack>
+</App>
 ```
 
 <Playground
-  height={110}
   name="Example: multiple"
   app={`
-  <VStack gap="0.5rem">
-    <FileInput multiple="false" />
-    <FileInput multiple="true" />
-  </VStack>
+    <App>
+      <FileInput multiple="false" />
+      <FileInput multiple="true" />
+    </App>
   `}
 />
 
@@ -230,23 +286,24 @@ Available values:
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack gap="0.5rem">
+<App>
   <FileInput />
   <FileInput validationStatus="valid" />
   <FileInput validationStatus="warning" />
   <FileInput validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={220}
-  app={`<VStack gap="0.5rem">
-  <FileInput />
-  <FileInput validationStatus="valid" />
-  <FileInput validationStatus="warning" />
-  <FileInput validationStatus="error" />
-</VStack>`}
+  app={`
+    <App>
+      <FileInput />
+      <FileInput validationStatus="valid" />
+      <FileInput validationStatus="warning" />
+      <FileInput validationStatus="error" />
+    </App>
+`}
 />
 
 ## Events
@@ -258,20 +315,19 @@ This event is triggered when value of FileInput has changed.
 Write in the input field and see how the `Text` underneath it is updated in accordingly.
 
 ```ueml copy {2}
-<VStack gap="0.5rem" var.field="">
+<App var.field="">
   <FileInput onDidChange="(file) => field = file[0]?.name" />
   <Text value="{field}" />
-</VStack>`
+</App>`
 ```
 
 <Playground
   name="Example: didChange"
-  height={80}
   app={`
-  <VStack gap="0.5rem" var.field="">
-    <FileInput onDidChange="(file) => field = file[0]?.name" />
-    <Text value="{field}" />
-  </VStack>`
+    <App var.field="">
+      <FileInput onDidChange="(file) => field = file[0]?.name" />
+      <Text value="{field}" />
+    </App>`
   }
 />
 
@@ -283,24 +339,27 @@ Clicking on the `FileInput` in the example demo changes the label text.
 Note how clicking elsewhere resets the text to the original.
 
 ```ueml copy {3-4}
-<FileInput
-  buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
-  onGotFocus="focused = true"
-  onLostFocus="focused = false"
-  var.focused="{false}"
-/>
-```
-
-<Playground
-  name="Example: gotFocus/lostFocus"
-  height={72}
-  app={`
+<App>
   <FileInput
     buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
     onGotFocus="focused = true"
     onLostFocus="focused = false"
     var.focused="{false}"
   />
+</App>
+```
+
+<Playground
+  name="Example: gotFocus/lostFocus"
+  app={`
+    <App>
+      <FileInput
+        buttonLabel="{focused === true ? 'I got focused!' : 'I lost focus...'}"
+        onGotFocus="focused = true"
+        onLostFocus="focused = false"
+        var.focused="{false}"
+      />
+    </App>
   `}
 />
 
@@ -320,9 +379,51 @@ This component does not have any context values.
 
 This method sets the focus on the FileInput.
 
+```ueml copy {2-3}
+<App>
+  <HStack>
+    <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>  
+```
+
+<Playground
+  name="Example: focus"
+  app={`
+    <App>
+      <HStack>
+        <Button label="Focus FileInput" onClick="fileInputComponent.focus()" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>  
+  `}
+/>
+
 ### `open`
 
 This API command triggers the file browsing dialog to open.
+
+```ueml copy {3-4}
+<App>
+  <HStack>
+    <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: open"
+  app={`
+    <App>
+      <HStack>
+        <Button label="Open FileInput" onClick="fileInputComponent.open()" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>
+  `}
+/>
 
 ### `setValue`
 
@@ -331,6 +432,30 @@ This API command triggers the file browsing dialog to open.
 ### `value`
 
 By setting an ID for the component, you can refer to the value of the field if set. If no value is set, the value will be undefined.
+
+In the example below, select a file using the file browser of the `FileInput` component
+and note how the `Text` component displays the selected file's name:
+
+```ueml copy {2-3}
+<App>
+  <HStack>
+    <Text value="Selected file name: {fileInputComponent.value}" />
+    <FileInput id="fileInputComponent" />
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: value"
+  app={`
+    <App>
+      <HStack>
+        <Text value="Selected file name: {fileInputComponent.value}" />
+        <FileInput id="fileInputComponent" />
+      </HStack>
+    </App>
+  `}
+/>
 
 ## Styling
 

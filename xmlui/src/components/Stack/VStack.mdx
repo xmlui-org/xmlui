@@ -2,24 +2,27 @@
 See also: [HStack](./HStack.mdx), [CHStack](./CHStack.mdx), [CVStack](./CVStack.mdx).
 
 ```ueml copy
-<VStack gap="1rem">
-  <Stack height="32px" width="32px" backgroundColor="red" />
-  <Stack height="32px" width="32px" backgroundColor="blue" />
-  <Stack height="32px" width="32px" backgroundColor="green" />
-</VStack>
+<App>
+  <VStack>
+    <Stack height="32px" width="32px" backgroundColor="red" />
+    <Stack height="32px" width="32px" backgroundColor="blue" />
+    <Stack height="32px" width="32px" backgroundColor="green" />
+  </VStack>
+</App>
 ```
 
 ## Examples
 
 <Playground
   name="Example: VStack"
-  height={150}
   app={`
-    <VStack gap="1rem">
+  <App>
+    <VStack>
       <Stack height="32px" width="32px" backgroundColor="red" />
       <Stack height="32px" width="32px" backgroundColor="blue" />
       <Stack height="32px" width="32px" backgroundColor="green" />
     </VStack>
+  </App>
   `}
 />
 

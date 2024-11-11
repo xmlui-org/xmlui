@@ -4,28 +4,29 @@ import { Callout } from "nextra/components";
 
 Represents a heading text
 
-> **Note**: `Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+<Callout type="info" emoji="📔">
+`Heading` follows the basic rules of the HTML heading elements (`<h1>`, ..., `<h6>`).
+</Callout>
 
 For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3](./H3), [H4](./H4), [H5](./H5), [H6](./H6).
 
 <Playground
   name="Example: Headings with levels"
-  height={400}
   app={`
-  <VStack>
-    <Heading level="h1" value="Heading Level 1" />
-    <Text>Text following H1</Text>
-    <Heading level="h2" value="Heading Level 2" />
-    <Text>Text following H2</Text>
-    <Heading level="h3" value="Heading Level 3" />
-    <Text>Text following H3</Text>
-    <Heading level="h4" value="Heading Level 4" />
-    <Text>Text following H4</Text>
-    <Heading level="h5" value="Heading Level 5" />
-    <Text>Text following H5</Text>
-    <Heading level="h6" value="Heading Level 6" />
-    <Text>Text following H6</Text>
-  </VStack>
+    <App>
+      <Heading level="h1" value="Heading Level 1" />
+      <Text>Text following H1</Text>
+      <Heading level="h2" value="Heading Level 2" />
+      <Text>Text following H2</Text>
+      <Heading level="h3" value="Heading Level 3" />
+      <Text>Text following H3</Text>
+      <Heading level="h4" value="Heading Level 4" />
+      <Text>Text following H4</Text>
+      <Heading level="h5" value="Heading Level 5" />
+      <Text>Text following H5</Text>
+      <Heading level="h6" value="Heading Level 6" />
+      <Text>Text following H6</Text>
+    </App>
   `}
 />
 
@@ -36,26 +37,7 @@ For the shorthand versions see their reference page: [H1](./H1), [H2](./H2), [H3
 This property indicates whether ellipses should be displayed (`true`) when the heading text is cropped or not (`false`).
 
 ```ueml copy {4}
-<VStack width="200" gap="0.5rem">
-  <H3
-    backgroundColor="blue"
-    maxLines="1"
-    ellipses="false">
-    Though this long text does is about to crop!
-  </H3>
-  <H3
-    backgroundColor="blue"
-    maxLines="1">
-    Though this long text does is about to crop!
-  </H3>
-</VStack>
-```
-
-<Playground
-  name="Example: ellipses"
-  height={100}
-  horizontal
-  app={`
+<App>
   <VStack width="200" gap="0.5rem">
     <H3
       backgroundColor="blue"
@@ -69,6 +51,29 @@ This property indicates whether ellipses should be displayed (`true`) when the h
       Though this long text does is about to crop!
     </H3>
   </VStack>
+</App>
+```
+
+<Playground
+  name="Example: ellipses"
+  height={100}
+  horizontal
+  app={`
+    <App>
+      <VStack width="200" gap="0.5rem">
+        <H3
+          backgroundColor="blue"
+          maxLines="1"
+          ellipses="false">
+          Though this long text does is about to crop!
+        </H3>
+        <H3
+          backgroundColor="blue"
+          maxLines="1">
+          Though this long text does is about to crop!
+        </H3>
+      </VStack>
+    </App>
   `}
 />
 
@@ -92,20 +97,23 @@ For a visual example, see the component description.
 This property determines the maximum number of lines the component can wrap to. If there is not enough space for all of the text, the component wraps the text up to as many lines as specified.
 
 ```ueml copy
-<H2
-  maxWidth="160"
-  backgroundColor="blue"
-  value="A long heading text that will likely overflow" maxLines="2" />
-```
-
-<Playground
-  name="Example: maxLines"
-  height={90}
-  app={`
+<App>
   <H2
     maxWidth="160"
     backgroundColor="blue"
     value="A long heading text that will likely overflow" maxLines="2" />
+</App>
+```
+
+<Playground
+  name="Example: maxLines"
+  app={`
+    <App>
+      <H2
+        maxWidth="160"
+        backgroundColor="blue"
+        value="A long heading text that will likely overflow" maxLines="2" />
+    </App>
   `}
 />
 
@@ -114,30 +122,8 @@ This property determines the maximum number of lines the component can wrap to. 
 This property indicates whether linebreaks should be preserved when displaying text.
 
 ```ueml copy {5}
-<HStack gap="1rem">
-  <H3
-    width="200"
-    backgroundColor="blue"
-    preserveLinebreaks="true"
-    value="(preserve) This long text
-with several line breaks
-        does not fit into a viewport with a 200-pixel width." />
-  <H3
-    width="200"
-    backgroundColor="blue"
-    value="(do not preserve) This long text
-with several line breaks
-        does not fit into a viewport with a 200-pixel width." />
-  </HStack>
-```
-You can observe the effect of using `preserveLinebreaks`:
-
-<Playground
-  name="Example: preserveLinebreaks"
-  height={160}
-  horizontal
-  app={`
-  <HStack gap="1rem">
+<App>
+  <HStack>
     <H3
       width="200"
       backgroundColor="blue"
@@ -152,33 +138,59 @@ You can observe the effect of using `preserveLinebreaks`:
   with several line breaks
           does not fit into a viewport with a 200-pixel width." />
   </HStack>
+</App>
+```
+You can observe the effect of using `preserveLinebreaks`:
+
+<Playground
+  name="Example: preserveLinebreaks"
+  horizontal
+  app={`
+    <App>
+      <HStack>
+        <H3
+          width="200"
+          backgroundColor="blue"
+          preserveLinebreaks="true"
+          value="(preserve) This long text
+      with several line breaks
+              does not fit into a viewport with a 200-pixel width." />
+        <H3
+          width="200"
+          backgroundColor="blue"
+          value="(do not preserve) This long text
+      with several line breaks
+              does not fit into a viewport with a 200-pixel width." />
+      </HStack>
+    </App>
   `}
 />
 
-> **Note**: Remember to use the `value` property of `Heading`.
-> Linebreaks are converted to spaces when nesting the text in the `Heading` component.
+<Callout type="info" emoji="📔">
+Remember to use the `value` property of `Heading`.
+Linebreaks are converted to spaces when nesting the text in the `Heading` component.
+</Callout>
 
 ### `value`
 
 This property determines the text displayed in the heading. `Heading` also accepts nested text instead of specifying the `value`. If both `value` and a nested text are used, the `value` will be displayed.
 
 ```ueml copy
-<VStack>
+<App>
   <Heading value="This is level 3 (value)" level="h3" />
   <Heading level="h3">This is level 3 (child)</Heading>
   <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
-</VStack>
+</App>
 ```
 
 <Playground
-  height={140}
   name="Example: value"
   app={`
-  <VStack>
-    <Heading value="This is level 3 (value)" level="h3" />
-    <Heading level="h3">This is level 3 (child)</Heading>
-    <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
-  </VStack>
+    <App>
+      <Heading value="This is level 3 (value)" level="h3" />
+      <Heading level="h3">This is level 3 (child)</Heading>
+      <Heading value="Value" level="h3"><Icon name="trash" /></Heading>
+    </App>
   `}
 />
 

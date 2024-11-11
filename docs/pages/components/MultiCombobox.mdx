@@ -13,22 +13,26 @@ The component provides two ways to add a list of options to the dropdown:
 The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
-<MultiCombobox padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: using Option"
-  height={160}
-  app={`
-  <MultiCombobox padding="$space-1">
+<App>
+  <MultiCombobox>
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: using Option"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox>
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -38,22 +42,8 @@ In cases where you do not wish to maunally create each item of a datalist
 you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
 
 ```ueml copy
-<MultiCombobox padding="$space-1">
-  <Items items="{[
-    { name: 'Joe', id: 0 },
-    { name: 'Jane', id: 1 },
-    { name: 'Carl', id: 2 }
-  ]}">
-    <Option value="{$item.id}" label="{$item.name}" />
-  </Items>
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: using Items"
-  height={160}
-  app={`
-  <MultiCombobox padding="$space-1">
+<App>
+  <MultiCombobox>
     <Items items="{[
       { name: 'Joe', id: 0 },
       { name: 'Jane', id: 1 },
@@ -62,6 +52,24 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
       <Option value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: using Items"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox>
+        <Items items="{[
+          { name: 'Joe', id: 0 },
+          { name: 'Jane', id: 1 },
+          { name: 'Carl', id: 2 }
+        ]}">
+          <Option value="{$item.id}" label="{$item.name}" />
+        </Items>
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -73,26 +81,6 @@ This property sets the label of the component.
 
 Default value: `false`.
 
-```ueml copy /autoFocus="true"/
-<MultiCombobox autoFocus="true" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: autoFocus"
-  height={160}
-  app={`
-  <MultiCombobox autoFocus="true" padding="$space-1">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
-  </MultiCombobox>
-  `}
-/>
-
 ### `emptyListTemplate`
 
 With this property, you can define the template to display when the search list (after filtering) contains no element.
@@ -100,12 +88,12 @@ With this property, you can define the template to display when the search list 
 Click on the second field to see the custom empty list indicator.
 
 ```ueml copy {9-11}
-<VStack padding="$space-1" gap="$space-1">
-  <VStack gap="$space-0_5">
+<App>
+  <VStack>
     <Text value="Default:" />
     <MultiCombobox />
   </VStack>
-  <VStack gap="$space-0_5">
+  <VStack>
     <Text value="Custom:" />
     <MultiCombobox>
       <property name="emptyListTemplate">
@@ -113,19 +101,19 @@ Click on the second field to see the custom empty list indicator.
       </property>
     </MultiCombobox>
   </VStack>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: emptyListTemplate"
-  height={220}
+  height={300}
   app={`
-  <VStack padding="$space-1" gap="$space-1">
-    <VStack gap="$space-0_5">
+  <App>
+    <VStack>
       <Text value="Default:" />
       <MultiCombobox />
     </VStack>
-    <VStack gap="$space-0_5">
+    <VStack>
       <Text value="Custom:" />
       <MultiCombobox>
         <property name="emptyListTemplate">
@@ -133,7 +121,7 @@ Click on the second field to see the custom empty list indicator.
         </property>
       </MultiCombobox>
     </VStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -144,22 +132,26 @@ This boolean property value indicates whether the component responds to user eve
 Default value: `true`.
 
 ```ueml copy /enabled="false"/
-<MultiCombobox enabled="false" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: enabled"
-  height={160}
-  app={`
-  <MultiCombobox enabled="false" padding="$space-1">
+<App>
+  <MultiCombobox enabled="false">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: enabled"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox enabled="false">
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -176,22 +168,26 @@ This property sets a text to appear on the end (right side when the left-to-righ
 This property sets the component's initial value.
 
 ```ueml copy /initialValue="['chocolate', 'pistachio']"/
-<MultiCombobox initialValue="['chocolate', 'pistachio']" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
+<App>
+  <MultiCombobox initialValue="['chocolate', 'pistachio']">
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
+  </MultiCombobox>
+</App>
 ```
 
 <Playground
   name="Example: initialValue"
   height={160}
   app={`
-  <MultiCombobox initialValue="['chocolate', 'pistachio']" padding="$space-1">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
-  </MultiCombobox>
+    <App>
+      <MultiCombobox initialValue="['chocolate', 'pistachio']">
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -208,26 +204,10 @@ This property sets the maximum length of the input it accepts.
 You can define a template for the option items of the `Combobox`.
 
 ```ueml copy
-<MultiCombobox>
-  <property name="optionTemplate">
-    <HStack verticalAlignment="center" gap="$space-1">
-      <Icon name="info" />
-      <Text value="{$item.label}" variant="strong" />
-    </HStack>
-  </property>
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+<App>
   <MultiCombobox>
     <property name="optionTemplate">
-      <HStack verticalAlignment="center" gap="$space-1">
+      <HStack verticalAlignment="center">
         <Icon name="info" />
         <Text value="{$item.label}" variant="strong" />
       </HStack>
@@ -236,6 +216,26 @@ You can define a template for the option items of the `Combobox`.
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: optionTemplate"
+  height={240}
+  app={`
+    <App>
+      <MultiCombobox>
+        <property name="optionTemplate">
+          <HStack verticalAlignment="center">
+            <Icon name="info" />
+            <Text value="{$item.label}" variant="strong" />
+          </HStack>
+        </property>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -244,22 +244,26 @@ You can define a template for the option items of the `Combobox`.
 A placeholder text that is visible in the input field when its empty.
 
 ```ueml copy /placeholder="Select any number of options"/
-<MultiCombobox placeholder="Select any number of options" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: placeholder"
-  height={160}
-  app={`
-  <MultiCombobox placeholder="Select any number of options" padding="$space-1">
+<App>
+  <MultiCombobox placeholder="Select any number of options">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: placeholder"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox placeholder="Select any number of options">
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -276,22 +280,26 @@ Set this property to `true` to indicate it must have a value before submitting t
 This property sets an icon to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy /startIcon="email"/
-<MultiCombobox startIcon="email" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: startIcon"
-  height={160}
-  app={`
-  <MultiCombobox startIcon="email" padding="$space-1">
+<App>
+  <MultiCombobox startIcon="email">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: startIcon"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox startIcon="email">
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -300,22 +308,26 @@ This property sets an icon to appear at the start (left side when the left-to-ri
 This property sets a text to appear at the start (left side when the left-to-right direction is set) of the input.
 
 ```ueml copy /startText="Badges:"/
-<MultiCombobox startText="Badges:" padding="$space-1">
-  <Option label="Vanilla" value="vanilla" />
-  <Option label="Chocolate" value="chocolate" />
-  <Option label="Pistachio" value="pistachio" />
-</MultiCombobox>
-```
-
-<Playground
-  name="Example: startText"
-  height={160}
-  app={`
-  <MultiCombobox startText="Badges:" padding="$space-1">
+<App>
+  <MultiCombobox startText="Badges:">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
+</App>
+```
+
+<Playground
+  name="Example: startText"
+  height={200}
+  app={`
+    <App>
+      <MultiCombobox startText="Badges:">
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </MultiCombobox>
+    </App>
   `}
 />
 
@@ -339,24 +351,24 @@ Available values:
 | `error`   | Visual indicator for an input that produced an error  |
 
 ```ueml copy
-<VStack padding="$space-1" gap="$space-1">
+<App>
   <MultiCombobox />
   <MultiCombobox validationStatus="valid" />
   <MultiCombobox validationStatus="warning" />
   <MultiCombobox validationStatus="error" />
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: validationStatus"
-  height={220}
+  height={260}
   app={`
-  <VStack padding="$space-1" gap="$space-1">
+  <App>
     <MultiCombobox />
     <MultiCombobox validationStatus="valid" />
     <MultiCombobox validationStatus="warning" />
     <MultiCombobox validationStatus="error" />
-  </VStack>
+  </App>
   `}
 />
 
@@ -367,7 +379,7 @@ Available values:
 This event is triggered when value of Combobox has changed.
 
 ```ueml copy /onDidChange="(newItems) => newValues = newItems"/
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="newValues" value="{[]}" />
   <Items items="{newValues}">
     <Text value="{$item}" />
@@ -377,14 +389,14 @@ This event is triggered when value of Combobox has changed.
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: didChange"
-  height={200}
+  height={240}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
+  <App>
     <var name="newValues" value="{[]}" />
     <Items items="{newValues}">
       <Text value="{$item}" />
@@ -394,7 +406,7 @@ This event is triggered when value of Combobox has changed.
       <Option label="Chocolate" value="chocolate" />
       <Option label="Pistachio" value="pistachio" />
     </MultiCombobox>
-  </VStack>
+  </App>
   `}
 />
 
@@ -403,36 +415,34 @@ This event is triggered when value of Combobox has changed.
 This event is triggered when the Combobox has received the focus.
 
 ```ueml copy {5-6}
-<VStack padding="$space-1" gap="$space-0_5">
+<App>
   <var name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
   <MultiCombobox
     onGotFocus="isFocused = true"
-    onLostFocus="isFocused = false"
-  >
+    onLostFocus="isFocused = false">
     <Option label="Vanilla" value="vanilla" />
     <Option label="Chocolate" value="chocolate" />
     <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
-</VStack>
+</App>
 ```
 
 <Playground
   name="Example: gotFocus/lostFocus"
   height={200}
   app={`
-  <VStack padding="$space-1" gap="$space-0_5">
+  <App>
     <var name="isFocused" value="{false}" />
     <Text value="Input control is focused: {isFocused}" />
     <MultiCombobox
       onGotFocus="isFocused = true"
-      onLostFocus="isFocused = false"
-    >
+      onLostFocus="isFocused = false">
       <Option label="Vanilla" value="vanilla" />
       <Option label="Chocolate" value="chocolate" />
       <Option label="Pistachio" value="pistachio" />
     </MultiCombobox>
-  </VStack>
+  </App>
   `}
 />
 

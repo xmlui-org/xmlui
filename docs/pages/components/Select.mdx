@@ -325,9 +325,75 @@ For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\
 
 This method sets the focus on the Select.
 
+```ueml copy /onClick="inputControl.focus()"/
+<VStack padding="$space-1" gap="$space-0_5">
+  <Button label="Focus Input" onClick="inputControl.focus()" />
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</VStack>
+```
+
+<Playground
+  name="Example: focus()"
+  height={200}
+  app={`
+  <VStack padding="$space-1" gap="$space-0_5">
+    <Button label="Focus Input" onClick="inputControl.focus()" />
+    <Select id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+  </VStack>
+  `}
+/>
+
 ### `setValue`
 
 You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+```ueml copy
+<VStack gap="$space-0_5">
+  <Select id="inputControl">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+  <HStack gap="$space-0_5">
+    <Button
+      label="Select 2nd Item"
+      onClick="inputControl.setValue('opt2')" />
+    <Button
+      label="Remove Selection"
+      onClick="inputControl.setValue('')" />
+  </HStack>
+</VStack>
+```
+
+<Playground
+  height={110}
+  name="Example: value() and setValue()"
+  app={`
+  <VStack gap="$space-0_5">
+    <Select id="inputControl">
+      <Option value="opt1" label="first"/>
+      <Option value="opt2" label="second"/>
+      <Option value="opt3" label="third"/>
+    </Select>
+    <HStack gap="$space-0_5">
+      <Button
+        label="Select 2nd Item"
+        onClick="inputControl.setValue('opt2')" />
+      <Button
+        label="Remove Selection"
+        onClick="inputControl.setValue('')" />
+    </HStack>
+  </VStack>
+  `}
+/>
 
 ## Styling
 

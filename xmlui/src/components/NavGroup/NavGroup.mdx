@@ -6,27 +6,27 @@ The primary use of a `NavGroup` is to create an application menu with submenus, 
 
 ```ueml copy {4,6,10,13}
 <App layout="condensed">
-<NavPanel>
-  <NavLink label="Home" to="/" icon="home"/>
-  <NavGroup label="Pages">
-    <NavLink label="Page 1" to="/page/1"/>
-    <NavGroup label="Page 2-4">
-      <NavLink label="Page 2" to="/page/2"/>
-      <NavLink label="Page 3" to="/page/3"/>
-      <NavLink label="Page 4" to="/page/4"/>
+  <NavPanel>
+    <NavLink label="Home" to="/" icon="home"/>
+    <NavGroup label="Pages">
+      <NavLink label="Page 1" to="/page/1"/>
+      <NavGroup label="Page 2-4">
+        <NavLink label="Page 2" to="/page/2"/>
+        <NavLink label="Page 3" to="/page/3"/>
+        <NavLink label="Page 4" to="/page/4"/>
+      </NavGroup>
+      <NavLink label="Page 5" to="/page/5"/>
+      <NavLink label="Page Other" to="/page/Other"/>
     </NavGroup>
-    <NavLink label="Page 5" to="/page/5"/>
-    <NavLink label="Page Other" to="/page/Other"/>
-  </NavGroup>
-</NavPanel>
-<Pages defaultRoute="/">
-  <Page url="/">
-    Home
-  </Page>
-  <Page url="/page/:id">
-    <Text value="Page {$routeParams.id}" />
-  </Page>
-</Pages>
+  </NavPanel>
+  <Pages defaultRoute="/">
+    <Page url="/">
+      Home
+    </Page>
+    <Page url="/page/:id">
+      <Text value="Page {$routeParams.id}" />
+    </Page>
+  </Pages>
 </App>
 ```
 
@@ -37,66 +37,70 @@ Here, the highlighted `NavGroup` element nests other `NavLink` and `NavGroup` el
   height={200}
   app={`
     <App layout="condensed">
-    <NavPanel>
-      <NavLink label="Home" to="/" icon="home"/>
-      <NavGroup label="Pages">
-        <NavLink label="Page 1" to="/page/1"/>
-        <NavGroup label="Page 2-4">
-          <NavLink label="Page 2" to="/page/2"/>
-          <NavLink label="Page 3" to="/page/3"/>
-          <NavLink label="Page 4" to="/page/4"/>
+      <NavPanel>
+        <NavLink label="Home" to="/" icon="home"/>
+        <NavGroup label="Pages">
+          <NavLink label="Page 1" to="/page/1"/>
+          <NavGroup label="Page 2-4">
+            <NavLink label="Page 2" to="/page/2"/>
+            <NavLink label="Page 3" to="/page/3"/>
+            <NavLink label="Page 4" to="/page/4"/>
+          </NavGroup>
+          <NavLink label="Page 5" to="/page/5"/>
+          <NavLink label="Page Other" to="/page/Other"/>
         </NavGroup>
-        <NavLink label="Page 5" to="/page/5"/>
-        <NavLink label="Page Other" to="/page/Other"/>
-      </NavGroup>
-    </NavPanel>
-    <Pages defaultRoute="/">
-      <Page url="/">
-        Home
-      </Page>
-      <Page url="/page/:id">
-        <Text value="Page {$routeParams.id}" />
-      </Page>
-    </Pages>
-  </App>
+      </NavPanel>
+      <Pages defaultRoute="/">
+        <Page url="/">
+          Home
+        </Page>
+        <Page url="/page/:id">
+          <Text value="Page {$routeParams.id}" />
+        </Page>
+      </Pages>
+    </App>
 `}
 />
 
-You do not have to use `NavGroup` with `App`; you can nest it into other components to represent a menu, like in the following example:
+You do not have to use `NavGroup` within `NavPanel`; you can nest it into other components to represent a menu, like in the following example:
 
 ```ueml copy
-<HStack padding="0.5rem" verticalAlignment="center">
-  <Text>Use this menu:</Text>
-  <NavGroup label="Pages">
-    <NavLink label="Page 1" />
-    <NavGroup label="Page 2-4">
-      <NavLink label="Page 2" />
-      <NavLink label="Page 3" />
-      <NavLink label="Page 4" />
+<App>
+  <HStack verticalAlignment="center">
+    <Text>Use this menu:</Text>
+    <NavGroup label="Pages">
+      <NavLink label="Page 1" />
+      <NavGroup label="Page 2-4">
+        <NavLink label="Page 2" />
+        <NavLink label="Page 3" />
+        <NavLink label="Page 4" />
+      </NavGroup>
+      <NavLink label="Page 5" />
+      <NavLink label="Page Other" />
     </NavGroup>
-    <NavLink label="Page 5" />
-    <NavLink label="Page Other" />
-  </NavGroup>
-</HStack>
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: NavGroup in a Stack"
   height={220}
   app={`
-    <HStack padding="0.5rem" verticalAlignment="center">
-      <Text>Use this menu:</Text>
-      <NavGroup label="Pages">
-        <NavLink label="Page 1" />
-        <NavGroup label="Page 2-4">
-          <NavLink label="Page 2" />
-          <NavLink label="Page 3" />
-          <NavLink label="Page 4" />
+    <App>
+      <HStack verticalAlignment="center">
+        <Text>Use this menu:</Text>
+        <NavGroup label="Pages">
+          <NavLink label="Page 1" />
+          <NavGroup label="Page 2-4">
+            <NavLink label="Page 2" />
+            <NavLink label="Page 3" />
+            <NavLink label="Page 4" />
+          </NavGroup>
+          <NavLink label="Page 5" />
+          <NavLink label="Page Other" />
         </NavGroup>
-        <NavLink label="Page 5" />
-        <NavLink label="Page Other" />
-      </NavGroup>
-    </HStack>
+      </HStack>
+    </App>
 `}
 />
 
@@ -108,36 +112,40 @@ This property defines an optional icon to display along with the `NavGroup` labe
 
 Look at this example:
 
-```ueml copy {2, 4}
-<HStack padding="0.5rem" verticalAlignment="center">
-  <NavGroup icon="email" label="Send To" >
-    <NavLink icon="arrowup" label="Boss" />
-    <NavGroup icon="users" label="Team">
-      <NavLink label="Jane" />
-      <NavLink label="Will" />
-      <NavLink label="Sandra" />
+```ueml copy {3, 5}
+<App>
+  <HStack verticalAlignment="center">
+    <NavGroup icon="email" label="Send To" >
+      <NavLink icon="arrowup" label="Boss" />
+      <NavGroup icon="users" label="Team">
+        <NavLink label="Jane" />
+        <NavLink label="Will" />
+        <NavLink label="Sandra" />
+      </NavGroup>
+      <NavLink icon="cube" label="Support" />
     </NavGroup>
-    <NavLink icon="cube" label="Support" />
-  </NavGroup>
-</HStack>
+  </HStack>
+</App>
 ```
 
 <Playground
-    name="Example: label and icon"
-    height={220}
-    app={`
-    <HStack padding="0.5rem" verticalAlignment="center">
-      <NavGroup icon="email" label="Send To" >
-        <NavLink icon="arrowup" label="Boss" />
-        <NavGroup icon="users" label="Team">
-          <NavLink label="Jane" />
-          <NavLink label="Will" />
-          <NavLink label="Sandra" />
+  name="Example: label and icon"
+  height={220}
+  app={`
+    <App>
+      <HStack verticalAlignment="center">
+        <NavGroup icon="email" label="Send To" >
+          <NavLink icon="arrowup" label="Boss" />
+          <NavGroup icon="users" label="Team">
+            <NavLink label="Jane" />
+            <NavLink label="Will" />
+            <NavLink label="Sandra" />
+          </NavGroup>
+          <NavLink icon="cube" label="Support" />
         </NavGroup>
-        <NavLink icon="cube" label="Support" />
-      </NavGroup>
-    </HStack>
-`}
+      </HStack>
+    </App>
+  `}
 />
 
 %-PROP-END
@@ -161,33 +169,12 @@ You can use these properties to change the styling of the `NavGroup` component:
 The following sample demonstrates using these theme variables and the `Theme` component:
 
 ```ueml copy
-<Theme
-  color-bg-dropdown-NavGroup="cyan"
-  shadow-dropdown-NavGroup="$shadow-xxl"
-  radius-dropdown-NavGroup="4px">
-  <HStack padding="0.5rem" verticalAlignment="center">
-    <NavGroup icon="email" label="Send To" >
-      <NavLink icon="arrowup" label="Boss" />
-      <NavGroup icon="users" label="Team">
-        <NavLink label="Jane" />
-        <NavLink label="Will" />
-        <NavLink label="Sandra" />
-      </NavGroup>
-      <NavLink icon="cube" label="Support" />
-    </NavGroup>
-  </HStack>
-</Theme>
-```
-
-<Playground
-  name="Example: styling"
-  height={220}
-  app={`
+<App>
   <Theme
     color-bg-dropdown-NavGroup="cyan"
     shadow-dropdown-NavGroup="$shadow-xxl"
     radius-dropdown-NavGroup="4px">
-    <HStack padding="0.5rem" verticalAlignment="center">
+    <HStack verticalAlignment="center">
       <NavGroup icon="email" label="Send To" >
         <NavLink icon="arrowup" label="Boss" />
         <NavGroup icon="users" label="Team">
@@ -199,6 +186,31 @@ The following sample demonstrates using these theme variables and the `Theme` co
       </NavGroup>
     </HStack>
   </Theme>
+</App>
+```
+
+<Playground
+  name="Example: styling"
+  height={220}
+  app={`
+    <App>
+      <Theme
+        color-bg-dropdown-NavGroup="cyan"
+        shadow-dropdown-NavGroup="$shadow-xxl"
+        radius-dropdown-NavGroup="4px">
+        <HStack verticalAlignment="center">
+          <NavGroup icon="email" label="Send To" >
+            <NavLink icon="arrowup" label="Boss" />
+            <NavGroup icon="users" label="Team">
+              <NavLink label="Jane" />
+              <NavLink label="Will" />
+              <NavLink label="Sandra" />
+            </NavGroup>
+            <NavLink icon="cube" label="Support" />
+          </NavGroup>
+        </HStack>
+      </Theme>
+    </App>
   `}
 />
 
