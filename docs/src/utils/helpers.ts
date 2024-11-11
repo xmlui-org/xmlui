@@ -82,6 +82,9 @@ function removeWhitespace(obj) {
 }
 
 export const handleDownloadZip = async (appDescription: any) => {
+
+  const operatingSystem = getOperatingSystem();
+
   const zip = new JSZip();
   const emulatedApi = appDescription.api;
 
@@ -104,8 +107,15 @@ export const handleDownloadZip = async (appDescription: any) => {
 
   const startBat = await fetch("/resources/files/for-download/start.bat").then((res) => res.blob());
   const startSh = await fetch("/resources/files/for-download/start.sh").then((res) => res.blob());
-  zip.file("start.bat", startBat);
-  zip.file("start.sh", startSh);
+
+  if (operatingSystem === "Windows") {
+    zip.file("start.bat", startBat);
+  } else {
+    zip.file("start.sh", startSh, {
+      unixPermissions: "777"
+    });
+
+  }
 
   const xmluiFolder = zip.folder("xmlui");
   const xmluiStandalone = await fetch(
@@ -129,7 +139,7 @@ export const handleDownloadZip = async (appDescription: any) => {
     });
   }
   try {
-    const content = await zip.generateAsync({ type: "blob" });
+    const content = await zip.generateAsync({ type: "blob", platform: operatingSystem === "Windows" ? "DOS" : "UNIX" });
 
     saveAs(content, `${appDescription.config.name.trim()}.zip`);
   } catch (error) {
@@ -169,3 +179,26 @@ export function preprocessCode(code: string): string {
   // Join lines back into a single string
   return result.join("\n");
 }
+
+function getOperatingSystem() {
+  const userAgent = window.navigator.userAgent;
+  const platform = window.navigator.platform;
+
+  if (/Win/.test(platform)) {
+    return "Windows";
+  }
+  if (/Mac/.test(platform)) {
+    return "MacOS";
+  }
+  if (/Linux/.test(platform)) {
+    return "Linux";
+  }
+  if (/Android/.test(userAgent)) {
+    return "Android";
+  }
+  if (/iPhone|iPad|iPod/.test(userAgent)) {
+    return "iOS";
+  }
+  return "Unknown OS";
+}
+
