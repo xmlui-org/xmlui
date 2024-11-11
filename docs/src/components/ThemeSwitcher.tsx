@@ -7,14 +7,15 @@ import classnames from "classnames";
 import * as RadixMenu from "@radix-ui/react-dropdown-menu";
 import { FiCheck } from "react-icons/fi";
 import { activeThemeChanged } from "@/src/state/store";
+import { forwardRef } from "react";
 
-export const ThemeSwitcher = React.forwardRef(() => {
+export const ThemeSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
   const { theme, systemTheme } = useTheme();
   const { appDescription, options, dispatch } = usePlayground();
 
   return (
     <RadixMenu.Root modal={false}>
-      <RadixMenu.Trigger className={styles.button}>
+      <RadixMenu.Trigger className={styles.button} ref={ref} {...props}>
         <MdOutlinePalette />
       </RadixMenu.Trigger>
       <RadixMenu.Portal>
@@ -29,9 +30,14 @@ export const ThemeSwitcher = React.forwardRef(() => {
             value={options.activeTheme}
             onValueChange={(value: string) => dispatch(activeThemeChanged(value))}
           >
-            {appDescription.availableThemes && appDescription.availableThemes.length > 0 &&
+            {appDescription.availableThemes &&
+              appDescription.availableThemes.length > 0 &&
               appDescription.availableThemes.map((theme, index) => (
-                <RadixMenu.RadioItem className={styles.RadixMenuRadioItem} value={theme.id} key={index}>
+                <RadixMenu.RadioItem
+                  className={styles.RadixMenuRadioItem}
+                  value={theme.id}
+                  key={index}
+                >
                   {theme.id}
                   <RadixMenu.ItemIndicator className={styles.RadixMenuItemIndicator}>
                     <FiCheck />
@@ -44,3 +50,5 @@ export const ThemeSwitcher = React.forwardRef(() => {
     </RadixMenu.Root>
   );
 });
+
+ThemeSwitcher.displayName = "ThemeSwitcher";
