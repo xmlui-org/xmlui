@@ -5,9 +5,8 @@ import { useTheme } from "nextra-theme-docs";
 import { Text } from "@components/Text/TextNative";
 import { CodeSelector } from "@/src/components/CodeSelector";
 import { Tooltip } from "@/src/components/Tooltip";
-import { MdSwapHoriz, MdSwapVert } from "react-icons/md";
-import { PiSquareSplitHorizontalLight, PiSquareSplitVerticalLight } from "react-icons/pi";
-import { RxOpenInNewWindow, RxReset, RxDownload, RxCode } from "react-icons/rx";
+import { RxOpenInNewWindow, RxDownload, RxCode } from "react-icons/rx";
+import { LiaUndoAltSolid} from "react-icons/lia";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import { resetApp } from "@/src/state/store";
 import { createQueryString } from "@/src/components/utils";
@@ -93,7 +92,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
             <Tooltip
                 trigger={
                   <button className={styles.button} onClick={() => dispatch(resetApp())}>
-                    <RxReset />
+                    <LiaUndoAltSolid />
                   </button>
                 }
                 label="Reset the app"
@@ -132,7 +131,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
                   <RxOpenInNewWindow />
                 </button>
               }
-              label="Open in new window"
+              label="Preview in fullscreen"
             />
             <Tooltip
               trigger={

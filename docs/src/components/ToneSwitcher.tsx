@@ -10,6 +10,7 @@ export const ToneSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {
 
   return (
     <button
+      {...props}
       ref={ref}
       className={styles.button}
       onClick={() => {
