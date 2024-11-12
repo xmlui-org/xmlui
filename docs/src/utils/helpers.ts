@@ -8,6 +8,15 @@ import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
 import type { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
+import {normalizePath} from "@components-core/utils/misc";
+
+async function fetchWithoutCache(url: string) {
+  return fetch(normalizePath(url), {
+    headers: {
+      "Cache-Control": "no-cache, no-store",
+    },
+  });
+}
 
 export function serialize(component: ComponentDef | CompoundComponentDef): string {
   if (component) {
@@ -88,7 +97,7 @@ export const handleDownloadZip = async (appDescription: any) => {
   const zip = new JSZip();
 
   const xmluiFolder = zip.folder("xmlui");
-  const xmluiStandalone = await fetch(
+  const xmluiStandalone = await fetchWithoutCache(
     "/resources/files/for-download/xmlui/xmlui-standalone.umd.js",
   ).then((res) => res.blob());
   xmluiFolder.file("xmlui-standalone.umd.js", xmluiStandalone);
@@ -111,29 +120,30 @@ export const handleDownloadZip = async (appDescription: any) => {
 
   const emulatedApi = appDescription.api;
   if (emulatedApi) {
-    const indexWithApiHtml = await fetch("/resources/files/for-download/index-with-api.html").then(
+    const indexWithApiHtml = await fetchWithoutCache("/resources/files/for-download/index-with-api.html").then(
         (res) => res.blob(),
     );
     zip.file("index.html", indexWithApiHtml);
     xmluiFolder.file("mockApiDef.js", `window.XMLUI_MOCK_API = ${JSON.stringify(removeWhitespace(emulatedApi), null, 2)};`);
 
-    const emulatedApiWorker = await fetch(
+    const emulatedApiWorker = await fetchWithoutCache(
         "/resources/files/for-download/mockApi.js",
     ).then((res) => res.blob());
     zip.file("mockApi.js", emulatedApiWorker);
   } else {
-    const indexHtml = await fetch("/resources/files/for-download/index.html").then((res) =>
+    const indexHtml = await fetchWithoutCache("/resources/files/for-download/index.html").then((res) =>
         res.blob(),
     );
     zip.file("index.html", indexHtml);
   }
 
-  const startBat = await fetch("/resources/files/for-download/start.bat").then((res) => res.blob());
-  const startSh = await fetch("/resources/files/for-download/start.sh").then((res) => res.blob());
+  const startBat = await fetchWithoutCache("/resources/files/for-download/start.bat").then((res) => res.blob());
 
   if (operatingSystem === "Windows") {
     zip.file("start.bat", startBat);
   } else {
+    let fileName = operatingSystem === "Linux" ? "start-linux.sh" : "start-darwin.sh";
+    const startSh = await fetchWithoutCache(`/resources/files/for-download/${fileName}`).then((res) => res.blob());
     zip.file("start.sh", startSh, {
       unixPermissions: "777"
     });
@@ -141,7 +151,6 @@ export const handleDownloadZip = async (appDescription: any) => {
 
   try {
     const content = await zip.generateAsync({ type: "blob", platform: operatingSystem === "Windows" ? "DOS" : "UNIX" });
-
     saveAs(content, `${appDescription.config.name.trim()}.zip`);
   } catch (error) {
     console.error("An error occurred while generating the ZIP:", error);
