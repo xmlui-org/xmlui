@@ -24,6 +24,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
+import {Combobox2} from "@components/Combobox/ComboboxNative2";
 
 const COMP = "Combobox";
 
@@ -94,7 +95,7 @@ export const comboboxComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     return (
-      <Combobox
+      <Combobox2
         layout={layoutCss}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}
@@ -122,7 +123,7 @@ export const comboboxComponentRenderer = createComponentRenderer(
         }}
       >
         {renderChild(node.children)}
-      </Combobox>
+      </Combobox2>
     );
   },
 );

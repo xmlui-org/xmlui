@@ -166,7 +166,8 @@ export function Select({
             {...getToggleButtonProps()}
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
-            value={selectedItem?.label || placeholder}
+            placeholder={placeholder}
+            value={selectedItem?.label}
           />
           <span aria-label="toggle menu" className={styles.indicator}>
             {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
