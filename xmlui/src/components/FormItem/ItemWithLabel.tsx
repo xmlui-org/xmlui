@@ -90,7 +90,7 @@ export function ItemWithLabel({
           )}
         </label>
       )}
-      <div style={{display: 'flex', flexDirection: 'column', width: labelPosition === "right" ? 'auto' : '100%' }}>
+      <div style={{display: 'flex', flexDirection: 'column' }}>
         {Children.only(<Slot id={inputId}>{children}</Slot>)}
         {validationResult}
       </div>
