@@ -1,13 +1,18 @@
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import AdmZip from "adm-zip";
+import os from "os";
+import JSZip from "jszip";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
+const filePermissions = {
+  "start.sh": "777",
+};
+
 const CORE_FILE = "xmlui-standalone.umd.js";
-const CORE_PATH_IN_SAMPLES = "xmlui"
+const CORE_PATH_IN_SAMPLES = "xmlui";
 const CORE_PATH = path.join(__dirname, "../../xmlui/dist", CORE_FILE);
 const SAMPLES_BASE = path.join(__dirname, "../samples");
 const PUBLIC_CORE_FOLDER = path.join(__dirname, "../public/resources/files/for-download");
@@ -84,8 +89,28 @@ async function copyCoreTo(dest) {
 }
 
 async function compressFolder(sourceDir, targetFile) {
+  const zip = new JSZip();
+
+  async function addFolderToZip(folderPath, zipFolder) {
+    const items = await fs.promises.readdir(folderPath, { withFileTypes: true });
+    for (const item of items) {
+      const fullPath = path.join(folderPath, item.name);
+      if (item.isDirectory()) {
+        const newZipFolder = zipFolder.folder(item.name);
+        await addFolderToZip(fullPath, newZipFolder);
+      } else {
+        const fileData = await fs.promises.readFile(fullPath);
+        const permissions = filePermissions[item.name]
+          ? { unixPermissions: filePermissions[item.name] }
+          : undefined;
+        zipFolder.file(item.name, fileData, permissions);
+      }
+    }
+  }
+
+  await addFolderToZip(sourceDir, zip);
+  const content = await zip.generateAsync({ type: "nodebuffer", platform: os.platform() === "win32" ? "DOS" : "UNIX" });
   const targetPath = path.join(ZIP_TARGET_FOLDER, targetFile);
-  const zip = new AdmZip();
-  zip.addLocalFolder(sourceDir);
-  zip.writeZip(targetPath);
+  await fs.promises.writeFile(targetPath, content);
+  console.log(`Compressed file ${targetPath} created successfully.`);
 }
