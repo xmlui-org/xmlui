@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
 import * as RTabs from "@radix-ui/react-tabs";
 import styles from "./Tabs.module.scss";
 import { TabContext, useTabContextValue } from "@components/Tabs/TabContext";
@@ -19,9 +19,14 @@ export const Tabs = ({
   children,
 }: Props) => {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const _activeTab =
-    activeTab <= 0 ? 0 : activeTab > tabItems.length - 1 ? tabItems.length - 1 : activeTab;
-  const [currentTab, setCurrentTab] = useState(`${_activeTab}`);
+  const [currentTab, setCurrentTab] = useState(`${activeTab}`);
+
+  useEffect(() => {
+    const _activeTab = activeTab - 1;
+    const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
+    const _newActiveTab = _activeTab < 0 ? 0 : _activeTab > maxIndex ? maxIndex : _activeTab;
+    setCurrentTab(`${_newActiveTab}`);
+  }, [tabItems, activeTab]);
 
   return (
     <TabContext.Provider value={tabContextValue}>
