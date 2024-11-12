@@ -271,7 +271,9 @@ Open and close the dialog several times to test that it changes the counter.
 
 ## Context Values
 
-This component does not have any context values.
+### `$modalContext`
+
+This value represents the information passed to the modal dialog when opening it.
 
 ## Exposed Members
 
@@ -282,6 +284,8 @@ This method is used to close the `ModalDialog`. Invoke it using `modalId.close()
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
 ### `open`
+
+This method imperatively opens the modal dialog. If you pass parameters,the first can be accessed in the `$modalContext` context value.
 
 See the [\`With Imperative API\`](#with-imperative-api) subsection for an example.
 
