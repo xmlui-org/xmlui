@@ -78,7 +78,7 @@ export const Combobox = ({
   const items = useMemo(() => {
     return filterOptions(
       searchValue,
-      options.filter((option) => !value.includes(option.value)),
+      options.filter((option) => !value?.toString().includes(option.value)),
     );
   }, [options, searchValue]);
 
