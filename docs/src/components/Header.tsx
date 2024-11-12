@@ -84,7 +84,7 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
               <Tooltip
                 trigger={
                   <button className={styles.button} onClick={() => openStandaloneApp(false)}>
-                    <RxCode />
+                    <RxOpenInNewWindow />
                   </button>
                 }
                 label="Edit code in new window"

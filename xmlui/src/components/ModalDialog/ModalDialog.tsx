@@ -41,7 +41,15 @@ export const ModalDialogMd = createMetadata({
       `This method is used to close the \`${COMP}\`. Invoke it using \`modalId.close()\` ` +
         `where \`modalId\` refers to a \`ModalDialog\` component.`,
     ),
-    open: d(``),
+    open: d(
+      "This method imperatively opens the modal dialog. If you pass parameters," +
+        "the first can be accessed in the `$modalContext` context value.",
+    ),
+  },
+  contextVars: {
+    $modalContext: d(
+      "This value represents the information passed to the modal dialog when opening it.",
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
