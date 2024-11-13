@@ -10,7 +10,7 @@ import { App } from "./AppNative";
 const COMP = "App";
 
 export const AppMd = createMetadata({
-  status: "experimental",
+  status: "stable",
   description:
     `The \`${COMP}\` component provides a UI frame for XMLUI apps. According to predefined (and ` +
     `run-time configurable) structure templates, \`${COMP}\` allows you to display your ` +
@@ -41,6 +41,13 @@ export const AppMd = createMetadata({
       "boolean",
       false,
     ),
+    defaultTone: d(
+      'This property sets the app\'s default tone ("light" or "dark").',
+      null,
+      "string",
+      "light",
+    ),
+    defaultTheme: d("This property sets the app's default theme.", null, "string", "xmlui"),
   },
   events: {
     ready: d(`This event fires when the \`${COMP}\` component finishes rendering on the page.`),
@@ -100,6 +107,8 @@ export const appRenderer = createComponentRenderer(
         logo={extractValue(node.props.logo)}
         logoDark={extractValue(node.props["logo-dark"])}
         logoLight={extractValue(node.props["logo-light"])}
+        defaultTone={extractValue(node.props.defaultTone)}
+        defaultTheme={extractValue(node.props.defaultTheme)}
       >
         {renderChild(restChildren)}
       </App>
