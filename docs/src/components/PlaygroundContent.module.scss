@@ -4,13 +4,9 @@
   padding: 0 16px 16px 16px;
   background-color: #E0EDF9;
 
-  &:focus{
+  &:focus-within{
     z-index: 999;
   }
-}
-
-.playgroundContent:focus-within {
-  z-index: 2;
 }
 
 .standaloneMode {
