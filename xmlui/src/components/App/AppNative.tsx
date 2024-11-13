@@ -1,6 +1,6 @@
 import React, { CSSProperties, ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { d, type ComponentDef } from "@abstractions/ComponentDefs";
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { useLocation } from "@remix-run/react";
@@ -12,7 +12,7 @@ import { useAppContext } from "@components-core/AppContext";
 import { Sheet, SheetContent } from "@components/App/Sheet";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { useResizeObserver } from "@components-core/utils/hooks";
-import { useTheme } from "@components-core/theming/ThemeContext";
+import { useTheme, useThemes } from "@components-core/theming/ThemeContext";
 import type { JSX } from "react/jsx-runtime";
 import { AppContextAwareAppHeader } from "@components/AppHeader/AppHeaderNative";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
@@ -39,6 +39,8 @@ type Props = {
   logo?: string;
   logoDark?: string;
   logoLight?: string;
+  defaultTone?: string;
+  defaultTheme?: string;
 };
 
 export function App({
@@ -57,10 +59,16 @@ export function App({
   logo,
   logoDark,
   logoLight,
+  defaultTone,
+  defaultTheme,
   renderChild,
   name,
 }: Props) {
   const { getThemeVar } = useTheme();
+  const { setActiveThemeTone, setActiveThemeId } = useThemes();
+
+  const mounted = useRef(false);
+
   const layoutWithDefaultValue = layout || getThemeVar("layout-App") || "condensed-sticky";
   const safeLayout = layoutWithDefaultValue
     ?.trim()
@@ -83,6 +91,21 @@ export function App({
   useEffect(() => {
     setLoggedInUser(loggedInUser);
   }, [loggedInUser, setLoggedInUser]);
+
+  useEffect(() => {
+    if (mounted.current) return;
+    mounted.current = true;
+    if (defaultTone === "dark" || defaultTone === "light") {
+      setActiveThemeTone(defaultTone as any);
+    }
+    if (defaultTheme) {
+      setActiveThemeId(defaultTheme);
+    }
+
+    return () => {
+      mounted.current = false;
+    }
+  }, [defaultTone, defaultTheme, setActiveThemeTone, setActiveThemeId]);
 
   useEffect(() => {
     onReady();
