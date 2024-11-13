@@ -213,6 +213,10 @@ export type ComponentPropertyMetadata = {
 
   // The function that tests if the current property value is valid
   isValid?: IsValidFunction<any>;
+
+  // Indicates that a particular property is internal and should not be exposed in the
+  // documentation
+  isInternal?: boolean;
 };
 
 export type ComponentMetadata<

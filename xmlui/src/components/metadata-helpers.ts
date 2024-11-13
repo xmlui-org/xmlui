@@ -1,6 +1,13 @@
 import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
 import { orientationOptionMd, validationStatusMd } from "./abstractions";
 
+export function dInternal(description?: string): ComponentPropertyMetadata {
+  return {
+    description: description ?? `This property is for internal use only.`,
+    isInternal: true,
+  };
+}
+
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {
     description: `This event is triggered when the ${comp} is clicked.`,

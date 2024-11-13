@@ -2,6 +2,7 @@ import {type ComponentDef, createMetadata, d} from "@abstractions/ComponentDefs"
 import { createComponentRenderer } from "@components-core/renderers";
 import { APICallNative } from "./APICallNative";
 import type {ApiOperationDef} from "@components-core/RestApiProxy";
+import { dInternal } from "@components/metadata-helpers";
 
 const COMP = "APICall";
 
@@ -81,11 +82,11 @@ export const APICallMd = createMetadata({
       `This property defines the message to display automatically when the operation has ` +
         `been completed.`,
     ),
-    payloadType: d(""),
-    invalidates: d(""),
-    updates: d(""),
-    optimisticValue: d(""),
-    getOptimisticValue: d(""),
+    payloadType: dInternal(),
+    invalidates: dInternal(),
+    updates: dInternal(),
+    optimisticValue: dInternal(),
+    getOptimisticValue: dInternal(),
   },
   events: {
     beforeRequest: d(
@@ -98,7 +99,7 @@ export const APICallMd = createMetadata({
      * @descriptionRef
      */
     error: d(`This event fires when a request results in an error.`),
-    progress: d(``),
+    progress: dInternal(),
   },
 });
 
