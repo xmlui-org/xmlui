@@ -1,7 +1,12 @@
 .playgroundContent {
   flex-grow: 1;
+  position: relative;
   padding: 0 16px 16px 16px;
   background-color: #E0EDF9;
+
+  &:focus{
+    z-index: 999;
+  }
 }
 
 .playgroundContent:focus-within {
