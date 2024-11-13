@@ -28,7 +28,7 @@ export const themeComponentRenderer = createComponentRenderer(
   ThemeMd,
   ({ node, extractValue, renderChild, layoutContext, appContext }) => {
     const { tone, ...restProps } = node.props;
-    const toastDuration = appContext?.globals?.notifications?.duration;
+    const toastDuration = appContext?.appGlobals?.notifications?.duration;
     let themeTone = extractValue.asOptionalString(tone);
     if (themeTone && themeTone !== "dark") {
       themeTone = "light";

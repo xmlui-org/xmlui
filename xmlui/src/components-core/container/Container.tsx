@@ -268,8 +268,8 @@ const MemoizedContainer = memo(
           },
           options: {
             defaultToOptionalMemberAccess:
-              typeof appContext.globals?.defaultToOptionalMemberAccess === "boolean"
-                ? appContext.globals.defaultToOptionalMemberAccess
+              typeof appContext.appGlobals?.defaultToOptionalMemberAccess === "boolean"
+                ? appContext.appGlobals.defaultToOptionalMemberAccess
                 : true,
           },
         };

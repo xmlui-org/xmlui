@@ -19,7 +19,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local`, override: true });
 
 type StandaloneJsonConfig = {
   name: string;
-  globals?: Record<string, any>;
+  appGlobals?: Record<string, any>;
   entryPoint?: string;
   components?: string[];
   themes?: string[];

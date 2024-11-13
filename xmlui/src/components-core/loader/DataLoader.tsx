@@ -89,9 +89,9 @@ function DataLoader({
     return new DataLoaderQueryKeyGenerator(
       url,
       queryParams,
-      appContext?.globals.apiUrl,
+      appContext?.appGlobals.apiUrl,
     ).asKey();
-  }, [appContext?.globals.apiUrl, queryParams, url]);
+  }, [appContext?.appGlobals.apiUrl, queryParams, url]);
 
   const stateRef = useRef({ state, appContext });
   stateRef.current = { state, appContext };

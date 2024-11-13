@@ -12,6 +12,14 @@ get activeThemeId: string;
 
 This property returns the ID of the currently active theme.
 
+### `appGlobals`
+
+```ts
+get appGlobals: any;
+```
+
+This property returns a hash object containing all application-global settings defined in the app's configuration file.
+
 ### `availableThemeIds`
 
 ```ts
@@ -40,14 +48,6 @@ get environment: {
 ```
 
 Returns an object with some properties of the current environment.
-
-### `globals`
-
-```ts
-get globals: any;
-```
-
-A hash object containing all global settings defined in the app's configuration file.
 
 ### `mediaSize`
 
