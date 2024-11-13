@@ -16,7 +16,7 @@ export async function invalidateQueries(
     }
     arrayToInvalidate.forEach((invalidate) => {
       appContext.queryClient?.invalidateQueries(
-        new DataLoaderQueryKeyGenerator(extractParam(state, invalidate, appContext), undefined, appContext?.globals.apiUrl).asPredicate()
+        new DataLoaderQueryKeyGenerator(extractParam(state, invalidate, appContext), undefined, appContext?.appGlobals.apiUrl).asPredicate()
       );
     });
   } else {

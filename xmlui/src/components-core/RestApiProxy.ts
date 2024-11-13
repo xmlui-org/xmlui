@@ -101,14 +101,14 @@ export default class RestApiProxy {
   private appContext?: AppContextObject;
 
   constructor(appContext?: AppContextObject) {
-    const conf = appContext?.globals || { apiUrl: "" };
+    const conf = appContext?.appGlobals || { apiUrl: "" };
     const { apiUrl, errorResponseTransform } = conf;
     this.appContext = appContext;
     this.config = {
       apiUrl,
       errorResponseTransform,
       headers: {
-        ...appContext?.globals?.headers,
+        ...appContext?.appGlobals?.headers,
       }
     };
   }

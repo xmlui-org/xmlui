@@ -41,7 +41,7 @@ async function download(
 
   if (
     (operation.method && (operation.method as string).toLowerCase() !== "get") ||
-    Object.keys(appContext.globals?.headers || {}).length !== 0 || //if we have any headers for the api, we can't use the iframe trick
+    Object.keys(appContext.appGlobals?.headers || {}).length !== 0 || //if we have any headers for the api, we can't use the iframe trick
     appContext.apiInterceptorContext.isMocked(_url) //if we mock this url, the mock can't work in an iframe, so we must fall back to download it with the restApiProxy
   ) {
     const file: File = await api.execute({

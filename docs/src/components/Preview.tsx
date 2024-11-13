@@ -53,7 +53,7 @@ export function Preview() {
 
     let globalProps = {
       name: appDescription.config?.name,
-      ...(appDescription.config?.globals || {}),
+      ...(appDescription.config?.appGlobals || {}),
       apiUrl: apiUrl,
     };
 
@@ -85,7 +85,7 @@ export function Preview() {
     appDescription.config,
     appDescription.config?.themes,
     appDescription.config?.name,
-    appDescription.config?.globals,
+    appDescription.config?.appGlobals,
     appDescription.config?.resources,
     appDescription.config?.defaultTheme,
     appDescription.config?.defaultTone,

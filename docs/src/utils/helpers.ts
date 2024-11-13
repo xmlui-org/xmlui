@@ -58,7 +58,7 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   appDescription: {
     config: {
       name: "",
-      globals: {},
+      appGlobals: {},
       resources: {},
       themes: [],
     },
@@ -68,7 +68,7 @@ export const INITIAL_PLAYGROUND_STATE: PlaygroundState = {
   originalAppDescription: {
     config: {
       name: "",
-      globals: {},
+      appGlobals: {},
       resources: {},
       themes: [],
     },

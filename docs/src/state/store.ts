@@ -27,7 +27,7 @@ type AppDescription = {
   config: {
     name: string;
     description?: string;
-    globals: any;
+    appGlobals: any;
     resources: any;
     themes: ThemeDefinition[];
     defaultTheme?: string;

@@ -90,7 +90,7 @@ function StandaloneApp({
   const {
     apiInterceptor,
     name,
-    globals,
+    appGlobals,
     defaultTheme,
     defaultTone,
     resources,
@@ -122,7 +122,7 @@ function StandaloneApp({
         baseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={{
           name: name,
-          ...(globals || {}),
+          ...(appGlobals || {}),
         }}
         defaultTheme={defaultTheme}
         defaultTone={defaultTone as ThemeTone}
@@ -453,7 +453,7 @@ function useStandalone(
         setStandaloneApp({
           ...appDef,
           name: config.name,
-          globals: config.globals,
+          appGlobals: config.appGlobals,
           defaultTheme: config.defaultTheme,
           resources: config.resources,
           resourceMap: config.resourceMap,
