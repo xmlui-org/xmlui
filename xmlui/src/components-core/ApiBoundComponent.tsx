@@ -5,7 +5,7 @@ import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentD
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import type { UploadActionComponent } from "@components-core/action/FileUploadAction";
 import type { DownloadActionComponent } from "@components-core/action/FileDownloadAction";
-import type { ApiActionComponent } from "@components-core/action/APICall";
+import type { ApiActionComponent } from "@components/APICall/APICall";
 
 type ApiBoundComponentProps = {
   uid: symbol;
@@ -138,7 +138,7 @@ export function ApiBoundComponent({
               params: { '$eventArgs': eventArgs }, 
               onError: ${JSON.stringify(error)}, 
               onProgress: ${JSON.stringify(progress)}, 
-              beforeRequest: ${JSON.stringify(beforeRequest)}, 
+              onBeforeRequest: ${JSON.stringify(beforeRequest)}, 
               onSuccess: ${JSON.stringify(success)}, 
               updates: ${JSON.stringify(updates)}, 
               optimisticValue: ${JSON.stringify(optimisticValue)}, 
@@ -185,7 +185,7 @@ export function ApiBoundComponent({
         api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
         if (key === "data") {
           props.submitUrl = props.submitUrl || operation.url;
-          props.submitMethod = props.submitMethod || 'put';
+          props.submitMethod = props.submitMethod || "put";
         }
       }
       props[key] = `{ ${loaderUid}.value }`;

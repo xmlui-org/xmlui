@@ -1,4 +1,4 @@
-import type { ValueExtractor } from "@abstractions/RendererDefs";
+import type {RegisterComponentApiFn, ValueExtractor} from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TextBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -102,7 +102,7 @@ function renderTextBox(
     eventName: keyof NonNullable<TextBoxComponentDef["events"]>,
     actionOptions?: LookupActionOptions,
   ) => AsyncFunction | undefined,
-  registerComponentApi: (apiFn: Record<string, (...args: any[]) => void>) => void,
+  registerComponentApi: RegisterComponentApiFn,
   type: "text" | "password" = "text",
 ) {
   return (
