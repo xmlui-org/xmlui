@@ -3,6 +3,7 @@ import type {
   ArrowExpressionStatement,
   BlockStatement,
   EmptyStatement,
+  Expression,
   ExpressionStatement,
   FunctionInvocationExpression,
   Identifier,
@@ -36,7 +37,11 @@ export function parseHandlerCode(source: string): Statement[] {
     if (wParser.errors.length > 0) {
       const err = wParser.errors[0];
       reportEngineError(
-        new ScriptParseError(`${err.code}(${err.line}, ${err.column}): ${wParser.errors[0].text}`, source, err.position)
+        new ScriptParseError(
+          `${err.code}(${err.line}, ${err.column}): ${wParser.errors[0].text}`,
+          source,
+          err.position,
+        ),
       );
     } else {
       throw err;
@@ -46,7 +51,9 @@ export function parseHandlerCode(source: string): Statement[] {
   // --- Check for the completeness of source code parsing
   if (!wParser.isEof) {
     const tail = wParser.getTail();
-    reportEngineError(new ScriptParseError(`Invalid tail found`, source, source.length - tail.length + 1));
+    reportEngineError(
+      new ScriptParseError(`Invalid tail found`, source, source.length - tail.length + 1),
+    );
   }
 
   // --- Done
@@ -60,7 +67,7 @@ export function parseHandlerCode(source: string): Statement[] {
  */
 export function prepareHandlerStatements(
   statements: Statement[],
-  evalContext?: BindingTreeEvaluationContext
+  evalContext?: BindingTreeEvaluationContext,
 ): Statement[] {
   const stmtLength = statements?.length ?? 0;
   if (stmtLength === 0) {
@@ -81,61 +88,35 @@ export function prepareHandlerStatements(
 
   if (stmtLength === 1) {
     const stmt = statements[0];
-    if (evalContext && stmt.type === "ExprS" && stmt.expression.type === "IdE") {
-      // --- A single identifier, it is supposed to be an arrow function
-      // --- Create formal arguments
-      const formalArgs = evalContext.eventArgs
-        ? evalContext.eventArgs.map(
-            (_, idx) =>
-              ({
-                type: "IdE",
-                name: `__arg@@#__${idx}__`,
-              } as Identifier)
-          )
-        : [];
 
-      // --- Add formal argument with current values
-      if (evalContext.eventArgs) {
-        evalContext.eventArgs.forEach((val, idx) => {
-          evalContext.localContext[`__arg@@#__${idx}__`] = val;
-        });
+    if (stmt.type === "ExprS") {
+      // --- Handle single expression statements
+      if (evalContext) {
+        // --- We have a context in which the event handler is executed
+        if (stmt.expression.type === "IdE") {
+          // --- A single identifier, it is supposed to be an arrow function
+          // --- Use this arrow expression
+          return [convertExpressionToFunctionInvocation(stmt.expression)];
+        }
+
+        if (isMemberExpressionChain(stmt.expression)) {
+          // --- A single member expression chain, it is supposed to be an arrow function
+          // --- Use this arrow expression
+          return [convertExpressionToFunctionInvocation(stmt.expression)];
+        }
       }
 
-      // --- Create the arrow expression
-      const arrowExpr: ArrowExpression = {
-        type: "ArrowE",
-        args: formalArgs,
-        statement: {
-          type: "ExprS",
-          expression: {
-            type: "InvokeE",
-            object: stmt.expression,
-            arguments: [...formalArgs],
-          } as unknown as FunctionInvocationExpression,
-        } as ExpressionStatement,
-      } as ArrowExpression;
+      if (stmt.expression.type === "ArrowE") {
+        // --- A single arrow expression
+        return [
+          {
+            type: "ArrowS",
+            expression: stmt.expression,
+          } as ArrowExpressionStatement,
+        ];
+      }
 
-      // --- Use this arrow expression
-      return [
-        {
-          type: "ArrowS",
-          expression: arrowExpr,
-        } as ArrowExpressionStatement,
-      ];
-    }
-
-    if (stmt.type === "ExprS" && stmt.expression.type === "ArrowE") {
-      // --- A single arrow expression
-      return [
-        {
-          type: "ArrowS",
-          expression: stmt.expression,
-        } as ArrowExpressionStatement,
-      ];
-    }
-
-    if (stmt.type === "ExprS" && stmt.expression.type !== "ArrowE") {
-      // --- A single arrow expression
+      // --- A single statement, turn into an arrow expression
       return [
         {
           type: "ArrowS",
@@ -210,6 +191,54 @@ export function prepareHandlerStatements(
 
   // --- Nothing to transform
   return statements;
+
+  function isMemberExpressionChain(expr: Expression): boolean {
+    return (
+      (expr.type === "MembE" || (expr.type === "CMembE" && expr.member.type === "LitE")) &&
+      (isMemberExpressionChain(expr.object) || expr.object.type === "IdE")
+    );
+  }
+
+  function convertExpressionToFunctionInvocation(expr: Expression): ArrowExpressionStatement {
+    // --- A single identifier, it is supposed to be an arrow function
+    // --- Create formal arguments
+    const formalArgs = evalContext.eventArgs
+      ? evalContext.eventArgs.map(
+          (_, idx) =>
+            ({
+              type: "IdE",
+              name: `__arg@@#__${idx}__`,
+            }) as Identifier,
+        )
+      : [];
+
+    // --- Add formal argument with current values
+    if (evalContext.eventArgs) {
+      evalContext.eventArgs.forEach((val, idx) => {
+        evalContext.localContext[`__arg@@#__${idx}__`] = val;
+      });
+    }
+
+    // --- Create the arrow expression
+    const arrowExpr: ArrowExpression = {
+      type: "ArrowE",
+      args: formalArgs,
+      statement: {
+        type: "ExprS",
+        expression: {
+          type: "InvokeE",
+          object: expr,
+          arguments: [...formalArgs],
+        } as unknown as FunctionInvocationExpression,
+      } as ExpressionStatement,
+    } as ArrowExpression;
+
+    // --- Use this arrow expression
+    return {
+      type: "ArrowS",
+      expression: arrowExpr,
+    } as ArrowExpressionStatement;
+  }
 }
 
 /**
@@ -223,7 +252,7 @@ export async function runEventHandlerCode(
   source: string,
   evalContext: BindingTreeEvaluationContext,
   thread?: LogicalThread,
-  onStatementCompleted?: OnStatementCompletedCallback
+  onStatementCompleted?: OnStatementCompletedCallback,
 ): Promise<QueueInfo> {
   const statements = prepareHandlerStatements(parseHandlerCode(source));
   return await processStatementQueueAsync(statements, evalContext, thread, onStatementCompleted);
