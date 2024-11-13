@@ -64,7 +64,13 @@ export function processDocfiles(metadata, importsToInject, relativeComponentFold
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath);
+    componentNames = processMdx(
+      component,
+      componentNames,
+      metadata,
+      importsToInject,
+      relativeComponentFolderPath,
+    );
   });
 
   // Write the _meta.json file
@@ -76,7 +82,13 @@ export function processDocfiles(metadata, importsToInject, relativeComponentFold
   }
 }
 
-function processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath) {
+function processMdx(
+  component,
+  componentNames,
+  metadata,
+  importsToInject,
+  relativeComponentFolderPath,
+) {
   let result = "";
   let fileData = "";
 
@@ -765,4 +777,5 @@ const themeKeywordLinks = {
   "line-height": "[line‑height](../styles-and-themes/common-units/#size-values)",
   radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
   shadow: "[shadow](../styles-and-themes/common-units/#color-values)",
+  gap: "[gap](../styles-and-themes/common-units/#size-values)",
 };
