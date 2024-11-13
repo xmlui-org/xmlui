@@ -262,6 +262,7 @@ function addContextVarsSection(data, component) {
   Object.entries(component.contextVars)
     .sort()
     .forEach(([contextVarName, contextVar]) => {
+      if (contextVar.isInternal) return;
       buffer += `### \`${contextVarName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, contextVar, CONTEXT_VARS);
       buffer += "\n\n";
@@ -282,6 +283,7 @@ function addPropsSection(data, component) {
   Object.entries(component.props)
     .sort()
     .forEach(([propName, prop]) => {
+      if (prop.isInternal) return;
       buffer += `### \`${propName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, prop, PROPS);
       buffer += "\n\n";
@@ -302,6 +304,7 @@ function addApisSection(data, component) {
   Object.entries(component.apis)
     .sort()
     .forEach(([apiName, api]) => {
+      if (api.isInternal) return;
       buffer += `### \`${apiName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, api, API);
       buffer += "\n\n";
@@ -322,6 +325,7 @@ function addEventsSection(data, component) {
   Object.entries(component.events)
     .sort()
     .forEach(([eventName, event]) => {
+      if (event.isInternal) return;
       buffer += `### \`${eventName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, event, EVENTS);
       buffer += "\n\n";
