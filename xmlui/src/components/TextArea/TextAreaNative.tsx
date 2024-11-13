@@ -16,7 +16,8 @@ import TextAreaResizable from "./TextAreaResizable";
 import TextareaAutosize from "react-textarea-autosize";
 import { isNil } from "lodash-es";
 import { useEvent } from "@components-core/utils/misc";
-  
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];
 
@@ -52,6 +53,10 @@ type Props = {
   maxLength?: number;
   rows?: number;
   enabled?: boolean;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
 };
 
 export const TextArea = ({
@@ -80,6 +85,10 @@ export const TextArea = ({
   maxLength,
   rows = 2,
   enabled = true,
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
 }: Props) => {
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -91,14 +100,14 @@ export const TextArea = ({
       updateState({ value: value });
       onDidChange(value);
     },
-    [onDidChange, updateState]
+    [onDidChange, updateState],
   );
 
   const onInputChange: ChangeEventHandler<HTMLTextAreaElement> = useCallback(
     (event) => {
       updateValue(event.target.value);
     },
-    [updateValue]
+    [updateValue],
   );
 
   useEffect(() => {
@@ -146,7 +155,7 @@ export const TextArea = ({
         setCursorPosition(start + text.length);
       }
     },
-    [inputRef, onInputChange]
+    [inputRef, onInputChange],
   );
 
   const setValue = useEvent((val: string) => {
@@ -184,10 +193,11 @@ export const TextArea = ({
         e.currentTarget.form?.reset();
       }
     },
-    [enterSubmits, escResets]
+    [enterSubmits, escResets],
   );
 
-  const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> & React.RefAttributes<HTMLTextAreaElement> = {
+  const textareaProps: TextareaHTMLAttributes<HTMLTextAreaElement> &
+    React.RefAttributes<HTMLTextAreaElement> = {
     className: classnames(styles.textarea, resize ? resizeMap[resize] : "", {
       [styles.focused]: focused,
       [styles.disabled]: !enabled,
@@ -218,13 +228,64 @@ export const TextArea = ({
 
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
-      <TextAreaResizable {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />
+      <ItemWithLabel
+        labelPosition={labelPosition as any}
+        label={label}
+        labelWidth={labelWidth}
+        labelBreak={labelBreak}
+        required={required}
+        enabled={enabled}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+      >
+        <TextAreaResizable
+          {...textareaProps}
+          style={style as any}
+          maxRows={maxRows}
+          minRows={minRows}
+          rows={rows}
+        />
+      </ItemWithLabel>
     );
   }
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
-    return <TextareaAutosize {...textareaProps} style={style as any} maxRows={maxRows} minRows={minRows} rows={rows} />;
+    return (
+      <ItemWithLabel
+        labelPosition={labelPosition as any}
+        label={label}
+        labelWidth={labelWidth}
+        labelBreak={labelBreak}
+        required={required}
+        enabled={enabled}
+        onFocus={onFocus}
+        onBlur={onBlur}
+        style={style}
+      >
+        <TextareaAutosize
+          {...textareaProps}
+          style={style as any}
+          maxRows={maxRows}
+          minRows={minRows}
+          rows={rows}
+        />
+      </ItemWithLabel>
+    );
   }
 
-  return <textarea {...textareaProps} rows={rows} />;
+  return (
+    <ItemWithLabel
+      labelPosition={labelPosition as any}
+      label={label}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      style={style}
+    >
+      <textarea {...textareaProps} rows={rows} />
+    </ItemWithLabel>
+  );
 };
-  

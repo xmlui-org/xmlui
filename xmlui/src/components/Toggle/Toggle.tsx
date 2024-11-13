@@ -26,6 +26,9 @@ type ToggleProps = {
   className?: string;
   label?: string;
   labelPosition?: LabelPosition;
+  labelWidth?: string;
+  labelBreak?: boolean;
+  required?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
@@ -46,6 +49,9 @@ export const Toggle = forwardRef(function Toggle ({
   className,
   label,
   labelPosition = "right",
+  labelWidth,
+  labelBreak,
+  required,
   registerComponentApi
 }: ToggleProps, forwardedRef) {
   const innerRef = React.useRef<HTMLInputElement | null>(null);
@@ -107,6 +113,9 @@ export const Toggle = forwardRef(function Toggle ({
       label={label}
       style={style}
       labelPosition={labelPosition}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
       enabled={enabled}
       shrinkToLabel={true}
       labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}

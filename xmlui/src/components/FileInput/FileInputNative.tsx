@@ -1,5 +1,5 @@
 import type React from "react";
-import { useCallback, useEffect, useRef } from "react";
+import { CSSProperties, useCallback, useEffect, useRef } from "react";
 import styles from "./FileInput.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { Button } from "@components/Button/ButtonNative";
@@ -16,6 +16,7 @@ import type {
   ComponentSize,
   IconPosition,
 } from "@components/abstractions";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -27,6 +28,7 @@ type Props = {
   // General
   id?: string;
   enabled?: boolean;
+  style?: CSSProperties;
   // Button styles
   buttonLabel?: string;
   variant?: ButtonVariant;
@@ -48,11 +50,17 @@ type Props = {
   acceptsFileType?: string | string[];
   multiple?: boolean;
   directory?: boolean;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
+  required?: boolean;
 };
 
 export const FileInput = ({
   id,
   enabled = true,
+  style,
 
   buttonLabel = "Browse",
   buttonIcon,
@@ -73,6 +81,11 @@ export const FileInput = ({
   acceptsFileType,
   multiple = false,
   directory = false,
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
+  required,
 }: Props) => {
   // Don't accept any (initial) value if it is not a File array explicitly
   const _initialValue: File[] | undefined = isFileArray(initialValue) ? initialValue : undefined;
@@ -141,6 +154,17 @@ export const FileInput = ({
 
   // Solution source: https://stackoverflow.com/questions/1084925/input-type-file-show-only-button
   return (
+    <ItemWithLabel
+      labelPosition={labelPosition as any}
+      label={label}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      style={style}
+    >
     <div className={styles.container}>
       <button
         {...getRootProps({
@@ -187,6 +211,7 @@ export const FileInput = ({
         {buttonLabel}
       </Button>
     </div>
+    </ItemWithLabel>
   );
 };
 
