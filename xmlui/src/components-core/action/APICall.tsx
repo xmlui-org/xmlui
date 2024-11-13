@@ -1,13 +1,11 @@
 import toast from "react-hot-toast";
 
 import type { ApiActionOptions, ApiOperationDef } from "@components-core/RestApiProxy";
+import RestApiProxy from "@components-core/RestApiProxy";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { AsyncFunction } from "@abstractions/FunctionDefs";
 import type { ActionExecutionContext, LookupAsyncFnInner } from "@abstractions/ActionDefs";
-
-import RestApiProxy from "@components-core/RestApiProxy";
 import { invalidateQueries } from "@components-core/utils/actionUtils";
 import { extractParam, shouldKeep } from "@components-core/utils/extractParam";
 import { createDraft, finishDraft } from "immer";
@@ -52,7 +50,7 @@ async function prepareOptimisticValuesForQueries(
   clientTxId: string,
   stateContext: any,
   resolvedOptimisticValue?: any,
-  optimisticValueGetter?: AsyncFunction
+  optimisticValueGetter?: AsyncFunction,
 ) {
   const ret: Map<QueryKey, any> = new Map();
 
@@ -66,18 +64,23 @@ async function prepareOptimisticValuesForQueries(
         return;
       }
       const currentData = queryClient.getQueryData(queryKey) as any;
-      const flatData = currentData?.pages ? currentData.pages.flatMap((page: any) => page) : currentData;
+      const flatData = currentData?.pages
+        ? currentData.pages.flatMap((page: any) => page)
+        : currentData;
       const optimisticValue = await optimisticValueGetter(flatData, stateContext["$eventArgs"]);
       if (optimisticValue) {
         ret.set(queryKey, prepareOptimisticValue(optimisticValue, clientTxId));
       }
-    })
+    }),
   );
 
   return ret;
 }
 
-async function doOptimisticUpdate(optimisticValuesByQueryKeys: Map<QueryKey, any>, queryClient: QueryClient) {
+async function doOptimisticUpdate(
+  optimisticValuesByQueryKeys: Map<QueryKey, any>,
+  queryClient: QueryClient,
+) {
   if (!optimisticValuesByQueryKeys.size) {
     return;
   }
@@ -123,7 +126,7 @@ function updateQueriesWithResult(
   optimisticValuesByQueryKeys: Map<QueryKey, any>,
   clientTxId: string,
   queryClient: QueryClient,
-  result: any
+  result: any,
 ) {
   if (!queryKeysToUpdate.length) {
     return;
@@ -135,8 +138,11 @@ function updateQueriesWithResult(
     if (draft.pages) {
       //pageable loader
       if (optimisticValue) {
-        draft.pages[draft.pages.length - 1] = draft.pages[draft.pages.length - 1].map((item: any) =>
-          item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId ? result : item
+        draft.pages[draft.pages.length - 1] = draft.pages[draft.pages.length - 1].map(
+          (item: any) =>
+            item.id === optimisticValue.id && item._initiatorClientTxId === clientTxId
+              ? result
+              : item,
         );
       } else {
         let updated = false;
@@ -198,14 +204,17 @@ async function updateQueriesWithOptimisticValue({
   getOptimisticValue?: string;
   uid: symbol;
 }) {
-  const queryKeysToUpdate = findQueryKeysToUpdate(extractParam(stateContext, updates, appContext), queryClient);
+  const queryKeysToUpdate = findQueryKeysToUpdate(
+    extractParam(stateContext, updates, appContext),
+    queryClient,
+  );
   const optimisticValuesByQueryKeys = await prepareOptimisticValuesForQueries(
     queryKeysToUpdate,
     queryClient,
     clientTxId,
     stateContext,
     extractParam(stateContext, optimisticValue, appContext),
-    lookupAction(getOptimisticValue, uid)
+    lookupAction(getOptimisticValue, uid),
   );
 
   await doOptimisticUpdate(optimisticValuesByQueryKeys, queryClient);
@@ -218,51 +227,31 @@ type APICall = {
   confirmTitle?: string;
   confirmMessage?: string;
   confirmButtonLabel?: string;
-  beforeRequest?: string;
-  onSuccess?: string;
-  onProgress?: string;
-  onError?: string;
-  params: any;
+  params?: any;
   payloadType?: string;
-  optimisticValue: any;
-  when: string;
-  getOptimisticValue: string;
+  optimisticValue?: any;
+  getOptimisticValue?: string;
   inProgressNotificationMessage?: string;
   completedNotificationMessage?: string;
   errorNotificationMessage?: string;
-  uid?: string;
+
+  uid?: string | symbol;
+  when?: string;
+
+  onBeforeRequest?: string;
+  onSuccess?: string;
+  onProgress?: string;
+  onError?: string;
 } & ApiOperationDef;
 
-export interface ApiActionComponent extends ComponentDef {
-  props: {
-    payloadType?: string;
-    invalidates?: string | string[];
-    updates?: string | string[];
-    confirmTitle?: string;
-    confirmMessage?: string;
-    confirmButtonLabel?: string;
-    optimisticValue: any;
-    getOptimisticValue: string;
-    inProgressNotificationMessage?: string;
-    errorNotificationMessage?: string;
-    completedNotificationMessage?: string;
-  } & ApiOperationDef;
-  events: {
-    success: string;
-    progress: string;
-    error: string;
-    beforeRequest: string;
-  };
-}
-
-async function callApi(
+export async function callApi(
   { state, appContext, lookupAction, uid: containerUid }: ActionExecutionContext,
   {
     confirmTitle,
     confirmMessage,
     confirmButtonLabel,
     params = {},
-    beforeRequest,
+    onBeforeRequest,
     onSuccess,
     onError,
     invalidates,
@@ -285,9 +274,9 @@ async function callApi(
     method,
     body,
   }: APICall,
-  { resolveBindingExpressions }: ApiActionOptions = {}
+  { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
-  const uid = Symbol(actionUid);
+  const uid = typeof actionUid === "symbol" ? actionUid : Symbol(actionUid);
   const stateContext = { ...params, ...state };
   if (!shouldKeep(when, stateContext, appContext)) {
     return;
@@ -306,23 +295,25 @@ async function callApi(
   const resolvedInvalidates = extractParam(stateContext, invalidates, appContext);
 
   const clientTxId = randomUUID();
-  const beforeRequestFn = lookupAction(beforeRequest, uid);
+  const beforeRequestFn = lookupAction(onBeforeRequest, uid);
   const beforeRequestResult = await beforeRequestFn?.();
   if (typeof beforeRequestResult === "boolean" && beforeRequestResult === false) {
     return;
   }
 
-  const { queryKeysToUpdate, optimisticValuesByQueryKeys } = await updateQueriesWithOptimisticValue({
-    stateContext,
-    updates,
-    appContext,
-    queryClient: appContext.queryClient!,
-    clientTxId,
-    optimisticValue,
-    lookupAction,
-    getOptimisticValue,
-    uid,
-  });
+  const { queryKeysToUpdate, optimisticValuesByQueryKeys } = await updateQueriesWithOptimisticValue(
+    {
+      stateContext,
+      updates,
+      appContext,
+      queryClient: appContext.queryClient!,
+      clientTxId,
+      optimisticValue,
+      lookupAction,
+      getOptimisticValue,
+      uid,
+    },
+  );
 
   const inProgressMessage = extractParam(stateContext, inProgressNotificationMessage, appContext);
 
@@ -338,17 +329,17 @@ async function callApi(
       rawBody,
       method,
       body,
-      payloadType
+      payloadType,
     };
     const _onProgress = lookupAction(onProgress, uid, {
-      eventName: "progress"
+      eventName: "progress",
     });
     const result = await new RestApiProxy(appContext).execute({
       operation,
       params: stateContext,
       transactionId: clientTxId,
       resolveBindingExpressions,
-      onProgress: _onProgress
+      onProgress: _onProgress,
     });
 
     const onSuccessFn = lookupAction(onSuccess, uid, {
@@ -361,13 +352,17 @@ async function callApi(
       optimisticValuesByQueryKeys,
       clientTxId,
       appContext.queryClient!,
-      result
+      result,
     );
 
     if (resolvedInvalidates || !updates) {
       await invalidateQueries(resolvedInvalidates, appContext, state);
     }
-    const completedMessage = extractParam({ ...stateContext, $result: result }, completedNotificationMessage, appContext);
+    const completedMessage = extractParam(
+      { ...stateContext, $result: result },
+      completedNotificationMessage,
+      appContext,
+    );
     if (completedMessage) {
       toast.success(completedMessage, {
         id: loadingToastId,
@@ -381,19 +376,24 @@ async function callApi(
       await appContext.queryClient!.invalidateQueries();
     }
     const onErrorFn = lookupAction(onError, uid, {
-      eventName: "error"
+      eventName: "error",
     });
     const result = await onErrorFn?.(e, stateContext["$eventArgs"]);
-    const errorMessage = extractParam({ ...stateContext, $error: e }, errorNotificationMessage, appContext);
-    if(errorMessage){
+    const errorMessage = extractParam(
+      { ...stateContext, $error: e },
+      errorNotificationMessage,
+      appContext,
+    );
+    if (errorMessage) {
       toast.error(errorMessage, {
-        id: loadingToastId
+        id: loadingToastId,
       });
     } else {
       if (loadingToastId) {
         toast.dismiss(loadingToastId);
       }
-      if (result !== false) {   //stop the error propagation, if the error handler returns false
+      if (result !== false) {
+        //stop the error propagation, if the error handler returns false
         throw e;
       }
     }

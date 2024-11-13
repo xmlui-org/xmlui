@@ -1,12 +1,62 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import {type ComponentDef, createMetadata, d} from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "@components-core/renderers";
+import { APICallNative } from "./APICallNative";
+import type {ApiOperationDef} from "@components-core/RestApiProxy";
 
 const COMP = "APICall";
+
+export interface ApiActionComponent extends ComponentDef {
+  props?: ApiOperationDef & {
+    invalidates?: string | string[];
+    updates?: string | string[];
+    confirmTitle?: string;
+    confirmMessage?: string;
+    confirmButtonLabel?: string;
+    optimisticValue: any;
+    getOptimisticValue: string;
+    inProgressNotificationMessage?: string;
+    errorNotificationMessage?: string;
+    completedNotificationMessage?: string;
+  };
+  events?: {
+    success: string;
+    progress: string;
+    error: string;
+    beforeRequest: string;
+  };
+}
 
 export const APICallMd = createMetadata({
   description:
     `\`${COMP}\` is used to mutate (create, update or delete) some data on the backend. It ` +
     `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
   props: {
+    method: d(
+        `The method of data manipulation can be done via setting this property. The following ` +
+        `HTTP methods are available: \`post\`, \`put\`, and \`delete\`.`,
+    ),
+    url: d(`Use this property to set the URL to send data to.`),
+    rawBody: d(
+        `This property sets the request body to the value provided here without any conversion. ` +
+        `Use the * \`body\` property if you want the object sent in JSON. When you define ` +
+        `\`body\` and \`rawBody\`, the latest one prevails.`,
+    ),
+    body: d(
+        `This property sets the request body. The object you pass here will be serialized to ` +
+        `JSON when sending the request. Use the \`rawBody\` property to send another request ` +
+        `body using its native format. When you define \`body\` and \`rawBody\`, the latest ` +
+        `one prevails.`,
+    ),
+    queryParams: d(
+        `This property sets the query parameters for the request. The object you pass here will ` +
+        `be serialized to a query string and appended to the request URL. You can specify key ` +
+        `and value pairs where the key is the name of a particular query parameter and the value ` +
+        `is that parameter's value.`,
+    ),
+    headers: d(
+        `You can define request header values as key and value pairs, where the key is the ID of ` +
+        `the particular header and the value is that header's value.`,
+    ),
     confirmTitle: d(
       `This optional string sets the title in the confirmation dialog that is displayed before ` +
         `the \`${COMP}\` is executed.`,
@@ -31,37 +81,16 @@ export const APICallMd = createMetadata({
       `This property defines the message to display automatically when the operation has ` +
         `been completed.`,
     ),
-    method: d(
-      `The method of data manipulation can be done via setting this property. The following ` +
-        `HTTP methods are available: \`post\`, \`put\`, and \`delete\`.`,
-    ),
-    url: d(`Use this property to set the URL to send data to.`),
-    rawBody: d(
-      `This property sets the request body to the value provided here without any conversion. ` +
-        `Use the * \`body\` property if you want the object sent in JSON. When you define ` +
-        `\`body\` and \`rawBody\`, the latest one prevails.`,
-    ),
-    body: d(
-      `This property sets the request body. The object you pass here will be serialized to ` +
-        `JSON when sending the request. Use the \`rawBody\` property to send another request ` +
-        `body using its native format. When you define \`body\` and \`rawBody\`, the latest ` +
-        `one prevails.`,
-    ),
-    queryParams: d(
-      `This property sets the query parameters for the request. The object you pass here will ` +
-        `be serialized to a query string and appended to the request URL. You can specify key ` +
-        `and value pairs where the key is the name of a particular query parameter and the value ` +
-        `is that parameter's value.`,
-    ),
-    headers: d(
-      `You can define request header values as key and value pairs, where the key is the ID of ` +
-        `the particular header and the value is that header's value.`,
-    ),
+    payloadType: d(""),
+    invalidates: d(""),
+    updates: d(""),
+    optimisticValue: d(""),
+    getOptimisticValue: d(""),
   },
   events: {
     beforeRequest: d(
       `This event fires before the request is sent. Returning an explicit boolean` +
-      `'false' value will prevent the request from being sent.`
+        `'false' value will prevent the request from being sent.`,
     ),
     success: d(`This event fires when a request results in a success.`),
     /**
@@ -69,5 +98,17 @@ export const APICallMd = createMetadata({
      * @descriptionRef
      */
     error: d(`This event fires when a request results in an error.`),
+    progress: d(``),
   },
 });
+
+export const apiCallRenderer = createComponentRenderer(
+  COMP,
+  APICallMd,
+  ({ node, registerComponentApi, uid, extractValue }) => {
+    return <APICallNative registerComponentApi={registerComponentApi}
+                          node={node}
+                          uid={uid}
+    />;
+  },
+);

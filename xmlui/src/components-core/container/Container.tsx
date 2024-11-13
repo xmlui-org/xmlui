@@ -298,7 +298,7 @@ const MemoizedContainer = memo(
             return;
           }
           if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerStarted(componentUid.description!, options?.eventName!));
+            dispatch(eventHandlerStarted(componentUid.description, options.eventName));
           }
           let mainThreadBlockingRuns = 0;
           await processStatementQueueAsync(
@@ -1571,7 +1571,7 @@ export const containerReducer = produce((state: ContainerState, action: Containe
             // in vars, and wasn't updated yet. In the first update, it's value is undefined, and because the key is
             // a number (an id in our case), lodash thinks it has to create an array after this 'set'. This way we
             // can force it, because in the target we have the target object value (given by the proxy change),so if
-            // it's an object, it should be an object. Otherwise we let lodash decide)
+            // it's an object, it should be an object. Otherwise, we let lodash decide)
             return Object(nsValue);
           }
         });

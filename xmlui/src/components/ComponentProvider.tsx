@@ -135,6 +135,7 @@ import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
 import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
+import {apiCallRenderer} from "@components/APICall/APICall";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -354,6 +355,7 @@ export class ComponentRegistry {
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
+    this.registerComponentRenderer(apiCallRenderer);
 
     // --- Added after tabler-clone review
     this.registerCompoundComponentRenderer(pageHeaderRenderer);
@@ -421,6 +423,10 @@ export class ComponentRegistry {
 
   public lookupComponentRenderer(viewComponentType: string): ComponentRegistryEntry | undefined {
     return this.pool.get(viewComponentType);
+  }
+
+  public lookupAction(actionType: string): ActionFunction | undefined {
+    return this.actionFns.get(actionType);
   }
 
   /**
