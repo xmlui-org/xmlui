@@ -7,6 +7,7 @@ import styles from "./TextBox.module.scss";
 import { noop } from "@components-core/constants";
 import { Adornment } from "@components/Input/InputAdornment";
 import { useEvent } from "@components-core/utils/misc";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 
 type Props = {
   id?: string;
@@ -30,6 +31,11 @@ type Props = {
   autoFocus?: boolean;
   readOnly?: boolean;
   tabIndex?: number;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
+  required?: boolean;
 };
 
 export const TextBox = ({
@@ -54,6 +60,11 @@ export const TextBox = ({
   autoFocus,
   readOnly,
   tabIndex,
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
+  required
 }: Props) => {
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -119,38 +130,50 @@ export const TextBox = ({
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <div
-      className={classnames(styles.inputRoot, {
-        [styles.disabled]: !enabled,
-        [styles.readOnly]: readOnly,
-        [styles.error]: validationStatus === "error",
-        [styles.warning]: validationStatus === "warning",
-        [styles.valid]: validationStatus === "valid",
-      })}
-      tabIndex={-1}
-      onFocus={() => {
-        inputRef.current?.focus();
-      }}
+    <ItemWithLabel
+      labelPosition={labelPosition as any}
+      label={label}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      onFocus={onFocus}
+      onBlur={onBlur}
       style={style}
     >
-      <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-      <input
-        id={id}
-        type={type}
-        className={classnames(styles.input, { [styles.readOnly]: readOnly })}
-        disabled={!enabled}
-        value={localValue}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        onChange={onInputChange}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        ref={inputRef}
-        readOnly={readOnly}
-        autoFocus={autoFocus}
-        tabIndex={tabIndex}
-      />
-      <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-    </div>
+      <div
+        className={classnames(styles.inputRoot, {
+          [styles.disabled]: !enabled,
+          [styles.readOnly]: readOnly,
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        tabIndex={-1}
+        onFocus={() => {
+          inputRef.current?.focus();
+        }}
+        style={style}
+      >
+        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <input
+          id={id}
+          type={type}
+          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          disabled={!enabled}
+          value={localValue}
+          maxLength={maxLength}
+          placeholder={placeholder}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          ref={inputRef}
+          readOnly={readOnly}
+          autoFocus={autoFocus}
+          tabIndex={tabIndex}
+        />
+        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+      </div>
+    </ItemWithLabel>
   );
 };

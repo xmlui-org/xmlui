@@ -12,10 +12,13 @@ import {
   dIndeterminate,
   dInitialValue,
   dLabel,
+  dLabelBreak,
   dLabelId,
   dLabelPosition,
+  dLabelWidth,
   dLostFocus,
   dReadonly,
+  dRequired,
   dSetValueApi,
   dValidationStatus,
   dValueApi,
@@ -32,6 +35,9 @@ export const SwitchMd = createMetadata({
     indeterminate: dIndeterminate(),
     label: dLabel(),
     labelPosition: dLabelPosition("right"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
+    required: dRequired(),
     initialValue: dInitialValue(false),
     labelId: dLabelId(),
     autoFocus: dAutoFocus(),
@@ -106,6 +112,9 @@ export const switchComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         label={extractValue(node.props.label)}
         labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
         variant="switch"
         registerComponentApi={registerComponentApi}
       />

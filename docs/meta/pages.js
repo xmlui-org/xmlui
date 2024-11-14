@@ -75,7 +75,6 @@ export const COMPONENT_RADIOGROUPOPTION = "/components/RadioGroupOption";
 export const COMPONENT_REALTIMEADAPTER = "/components/RealTimeAdapter";
 export const COMPONENT_REDIRECT = "/components/Redirect";
 export const COMPONENT_SELECT = "/components/Select";
-export const COMPONENT_SELECTIONSTORE = "/components/SelectionStore";
 export const COMPONENT_SPACEFILLER = "/components/SpaceFiller";
 export const COMPONENT_SPINNER = "/components/Spinner";
 export const COMPONENT_SPLITTER = "/components/Splitter";

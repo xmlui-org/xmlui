@@ -12,7 +12,11 @@ import {
   dFocus,
   dGotFocus,
   dInitialValue,
+  dLabel,
+  dLabelBreak,
   dLabelId,
+  dLabelPosition,
+  dLabelWidth,
   dLostFocus,
   dMaxLength,
   dPlaceholder,
@@ -35,6 +39,10 @@ export const NumberBoxMd = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     labelId: dLabelId(),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -128,6 +136,11 @@ export const numberBoxComponentRenderer = createComponentRenderer(
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
         maxLength={extractValue(node.props.maxLength)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
       />
     );
   },

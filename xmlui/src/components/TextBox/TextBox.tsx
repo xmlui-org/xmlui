@@ -1,4 +1,4 @@
-import type { ValueExtractor } from "@abstractions/RendererDefs";
+import type {RegisterComponentApiFn, ValueExtractor} from "@abstractions/RendererDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./TextBox.module.scss";
 import { parseScssVar } from "@components-core/theming/themeVars";
@@ -14,7 +14,11 @@ import {
   dFocus,
   dGotFocus,
   dInitialValue,
+  dLabel,
+  dLabelBreak,
   dLabelId,
+  dLabelPosition,
+  dLabelWidth,
   dLostFocus,
   dMaxLength,
   dPlaceholder,
@@ -36,6 +40,10 @@ export const TextBoxMd = createMetadata({
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
     labelId: dLabelId(),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
@@ -102,7 +110,7 @@ function renderTextBox(
     eventName: keyof NonNullable<TextBoxComponentDef["events"]>,
     actionOptions?: LookupActionOptions,
   ) => AsyncFunction | undefined,
-  registerComponentApi: (apiFn: Record<string, (...args: any[]) => void>) => void,
+  registerComponentApi: RegisterComponentApiFn,
   type: "text" | "password" = "text",
 ) {
   return (
@@ -126,6 +134,11 @@ function renderTextBox(
       endIcon={extractValue.asOptionalString(node.props.endIcon)}
       autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
       readOnly={extractValue.asOptionalBoolean(node.props.readOnly)}
+      label={extractValue.asOptionalString(node.props.label)}
+      labelPosition={extractValue(node.props.labelPosition)}
+      labelWidth={extractValue.asOptionalString(node.props.labelWidth)}
+      labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+      required={extractValue.asOptionalBoolean(node.props.required)}
     />
   );
 }

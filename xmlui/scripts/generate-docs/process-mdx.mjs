@@ -64,7 +64,13 @@ export function processDocfiles(metadata, importsToInject, relativeComponentFold
   let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
   metadata.forEach((component) => {
-    componentNames = processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath);
+    componentNames = processMdx(
+      component,
+      componentNames,
+      metadata,
+      importsToInject,
+      relativeComponentFolderPath,
+    );
   });
 
   // Write the _meta.json file
@@ -76,7 +82,13 @@ export function processDocfiles(metadata, importsToInject, relativeComponentFold
   }
 }
 
-function processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath) {
+function processMdx(
+  component,
+  componentNames,
+  metadata,
+  importsToInject,
+  relativeComponentFolderPath,
+) {
   let result = "";
   let fileData = "";
 
@@ -250,6 +262,7 @@ function addContextVarsSection(data, component) {
   Object.entries(component.contextVars)
     .sort()
     .forEach(([contextVarName, contextVar]) => {
+      if (contextVar.isInternal) return;
       buffer += `### \`${contextVarName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, contextVar, CONTEXT_VARS);
       buffer += "\n\n";
@@ -270,6 +283,7 @@ function addPropsSection(data, component) {
   Object.entries(component.props)
     .sort()
     .forEach(([propName, prop]) => {
+      if (prop.isInternal) return;
       buffer += `### \`${propName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, prop, PROPS);
       buffer += "\n\n";
@@ -290,6 +304,7 @@ function addApisSection(data, component) {
   Object.entries(component.apis)
     .sort()
     .forEach(([apiName, api]) => {
+      if (api.isInternal) return;
       buffer += `### \`${apiName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, api, API);
       buffer += "\n\n";
@@ -310,6 +325,7 @@ function addEventsSection(data, component) {
   Object.entries(component.events)
     .sort()
     .forEach(([eventName, event]) => {
+      if (event.isInternal) return;
       buffer += `### \`${eventName}\`\n\n`;
       buffer += combineDescriptionAndDescriptionRef(data, event, EVENTS);
       buffer += "\n\n";
@@ -765,4 +781,5 @@ const themeKeywordLinks = {
   "line-height": "[line‑height](../styles-and-themes/common-units/#size-values)",
   radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
   shadow: "[shadow](../styles-and-themes/common-units/#color-values)",
+  gap: "[gap](../styles-and-themes/common-units/#size-values)",
 };

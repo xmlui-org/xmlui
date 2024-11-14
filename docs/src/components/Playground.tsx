@@ -68,7 +68,7 @@ export const Playground = ({
             name,
             description,
             logo: null,
-            globals: {},
+            appGlobals: {},
             resources,
             themes,
             defaultTone,

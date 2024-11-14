@@ -113,7 +113,7 @@ export type AppContextObject = {
   readonly activeThemeId: string;
   readonly availableThemeIds: string[];
   readonly setTheme: (newTheme: string) => void;
-  readonly globals?: Record<string, any>;
+  readonly appGlobals?: Record<string, any>;
   readonly resources?: Record<string, string>;
 
   readonly apiInterceptorContext: IApiInterceptorContext;

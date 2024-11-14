@@ -7,7 +7,7 @@ This section contains reference information about the components shipped with th
 | Num | Component | Description | Status |
 | :---: | :---: | --- | :---: |
 | 1 | [APICall](./components/APICall.mdx) | `APICall` is used to mutate (create, update or delete) some data on the backend. It is similar in nature to the `DataSource` component which retrieves data from the backend. | stable |
-| 2 | [App](./components/App.mdx) | The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout. | experimental |
+| 2 | [App](./components/App.mdx) | The `App` component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout. | stable |
 | 3 | [AppHeader](./components/AppHeader.mdx) | `AppHeader` is a placeholder within `App` to define a custom application header. | experimental |
 | 4 | [AppState](./components/AppState.mdx) | AppState is a functional component (without a visible user interface) that helps store and manage the app's state. | stable |
 | 5 | [Avatar](./components/Avatar.mdx) | The `Avatar` component represents a user, group (or other entity's) avatar with a small image or initials. | stable |
@@ -75,27 +75,26 @@ This section contains reference information about the components shipped with th
 | 67 | [RealTimeAdapter](./components/RealTimeAdapter.mdx) | `RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling. | experimental |
 | 68 | [Redirect](./components/Redirect.mdx) | `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app. | stable |
 | 69 | [Select](./components/Select.mdx) | Provides a dropdown with a list of options to choose from. | stable |
-| 70 | [SelectionStore](./components/SelectionStore.mdx) | The `SelectionStore` is a non-visual component that may wrap components (items) and manage their selection state to accommodate the usage of other actions. | stable |
-| 71 | [SpaceFiller](./components/SpaceFiller.mdx) | The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. | stable |
-| 72 | [Spinner](./components/Spinner.mdx) | The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value. | stable |
-| 73 | [Splitter](./components/Splitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
-| 74 | [Stack](./components/Stack.mdx) | `Stack` is a layout container displaying children in a horizontal or vertical stack. | stable |
-| 75 | [StickyBox](./components/StickyBox.mdx) | The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls. | experimental |
-| 76 | [SubMenuItem](./components/SubMenuItem.mdx) | This component represents a nested menu item within another menu or menu item. | stable |
-| 77 | [Switch](./components/Switch.mdx) | The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state. | stable |
-| 78 | [TabItem](./components/TabItem.mdx) | `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select. | stable |
-| 79 | [Table](./components/Table.mdx) | `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells. | stable |
-| 80 | [TableHeader](./components/TableHeader.mdx) | The `TableHeader` component can be used within a `Table` to define a particular table column's visual properties and data bindings. | experimental |
-| 81 | [TableOfContents](./components/TableOfContents.mdx) | The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position. | experimental |
-| 82 | [Tabs](./components/Tabs.mdx) | The `Tabs` component provides a tabbed layout where each tab has a clickable label and content. | experimental |
-| 83 | [Text](./components/Text.mdx) | The `Text` component displays textual information in a number of optional styles and variants. | stable |
-| 84 | [TextArea](./components/TextArea.mdx) | `TextArea` is a component that provides a multiline text input area. | experimental |
-| 85 | [TextBox](./components/TextBox.mdx) | The `TextBox` is an input component that allows users to input and edit textual data. | experimental |
-| 86 | [Theme](./components/Theme.mdx) | The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context. | stable |
-| 87 | [ThemeChangerButton](./components/ThemeChangerButton.mdx) | The `ThemeChangerButton` component is a component that allows the user to change the theme of the app. | experimental |
-| 88 | [ToneChangerButton](./components/ToneChangerButton.mdx) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. | experimental |
-| 89 | [Toolbar](./components/Toolbar.mdx) | This component is a container for a toolbar. | experimental |
-| 90 | [ToolbarButton](./components/ToolbarButton.mdx) | This component is a button that is used in a toolbar. | experimental |
-| 91 | [TrendLabel](./components/TrendLabel.mdx) | This component displays a trend label. | experimental |
-| 92 | [VSplitter](./components/VSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
-| 93 | [VStack](./components/VStack.mdx) | This component represents a stack rendering its contents vertically. | stable |
+| 70 | [SpaceFiller](./components/SpaceFiller.mdx) | The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. | stable |
+| 71 | [Spinner](./components/Spinner.mdx) | The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value. | stable |
+| 72 | [Splitter](./components/Splitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
+| 73 | [Stack](./components/Stack.mdx) | `Stack` is a layout container displaying children in a horizontal or vertical stack. | stable |
+| 74 | [StickyBox](./components/StickyBox.mdx) | The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls. | experimental |
+| 75 | [SubMenuItem](./components/SubMenuItem.mdx) | This component represents a nested menu item within another menu or menu item. | stable |
+| 76 | [Switch](./components/Switch.mdx) | The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state. | stable |
+| 77 | [TabItem](./components/TabItem.mdx) | `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select. | stable |
+| 78 | [Table](./components/Table.mdx) | `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells. | stable |
+| 79 | [TableHeader](./components/TableHeader.mdx) | The `TableHeader` component can be used within a `Table` to define a particular table column's visual properties and data bindings. | experimental |
+| 80 | [TableOfContents](./components/TableOfContents.mdx) | The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position. | experimental |
+| 81 | [Tabs](./components/Tabs.mdx) | The `Tabs` component provides a tabbed layout where each tab has a clickable label and content. | experimental |
+| 82 | [Text](./components/Text.mdx) | The `Text` component displays textual information in a number of optional styles and variants. | stable |
+| 83 | [TextArea](./components/TextArea.mdx) | `TextArea` is a component that provides a multiline text input area. | experimental |
+| 84 | [TextBox](./components/TextBox.mdx) | The `TextBox` is an input component that allows users to input and edit textual data. | experimental |
+| 85 | [Theme](./components/Theme.mdx) | The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context. | stable |
+| 86 | [ThemeChangerButton](./components/ThemeChangerButton.mdx) | The `ThemeChangerButton` component is a component that allows the user to change the theme of the app. | experimental |
+| 87 | [ToneChangerButton](./components/ToneChangerButton.mdx) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. | experimental |
+| 88 | [Toolbar](./components/Toolbar.mdx) | This component is a container for a toolbar. | experimental |
+| 89 | [ToolbarButton](./components/ToolbarButton.mdx) | This component is a button that is used in a toolbar. | experimental |
+| 90 | [TrendLabel](./components/TrendLabel.mdx) | This component displays a trend label. | experimental |
+| 91 | [VSplitter](./components/VSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
+| 92 | [VStack](./components/VStack.mdx) | This component represents a stack rendering its contents vertically. | stable |

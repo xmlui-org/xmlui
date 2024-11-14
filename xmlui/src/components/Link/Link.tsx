@@ -47,6 +47,8 @@ export const LinkMd = createMetadata({
     [`style-outline-${COMP}--focus`]: "$style-outline--focus",
     [`offset-outline-${COMP}--focus`]: "$offset-outline--focus",
     [`font-size-${COMP}`]: "$font-size",
+    [`gap-icon-${COMP}`]: "$gap-tight",
+    [`padding-icon-${COMP}`]: "$space-0_5",
 
     light: {
       [`color-text-${COMP}`]: "$color-primary-500",

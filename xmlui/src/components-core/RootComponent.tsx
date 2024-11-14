@@ -357,7 +357,7 @@ function RootContentComponent({
     vpSizeIndex,
   ]);
 
-  const globals = useMemo(() => {
+  const appGlobals = useMemo(() => {
     return globalProps ? { ...globalProps } : EMPTY_OBJECT;
   }, [globalProps]);
 
@@ -379,7 +379,7 @@ function RootContentComponent({
       activeThemeId: activeThemeId,
       activeThemeTone: activeThemeTone,
       availableThemeIds: availableThemeIds,
-      globals,
+      appGlobals: appGlobals,
       delay,
       Actions,
       Transforms,
@@ -405,7 +405,7 @@ function RootContentComponent({
     decorateComponentsWithTestId,
     embed,
     environment,
-    globals,
+    appGlobals,
     localLoggedInUser,
     mediaSize,
     navigate,

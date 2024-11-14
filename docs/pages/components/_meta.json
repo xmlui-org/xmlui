@@ -68,7 +68,6 @@
   "RealTimeAdapter": "RealTimeAdapter",
   "Redirect": "Redirect",
   "Select": "Select",
-  "SelectionStore": "SelectionStore",
   "SpaceFiller": "SpaceFiller",
   "Spinner": "Spinner",
   "Splitter": "Splitter",

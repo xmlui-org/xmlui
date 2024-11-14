@@ -13,14 +13,14 @@ export type StandaloneAppDescription = {
   defaultTone?: string;
   resources?: Record<string, string>;
   resourceMap?: Record<string, string>;
-  globals?: Record<string, any>;
+  appGlobals?: Record<string, any>;
   apiInterceptor?: ApiInterceptorDefinition;
   sources?: Record<string, string>;
 };
 
 export type StandaloneJsonConfig = {
   name?: string;
-  globals?: Record<string, any>;
+  appGlobals?: Record<string, any>;
   entryPoint?: string;
   components?: string[];
   themes?: string[];

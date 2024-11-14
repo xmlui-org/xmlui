@@ -19,7 +19,7 @@ export type ContainerState = Record<string | symbol, any>;
  * Components can provide an API that other components can invoke (using the host component ID). This
  * type defines the shape of a hash object that stores the API endpoints.
  */
-export type ComponentApi = Record<string, (args?: any[]) => any>;
+export type ComponentApi = Record<string, ((...args: any[]) => any) | boolean>;
 
 // Function signature to register a component API
 

@@ -8,6 +8,7 @@ import { Icon } from "@components/Icon/IconNative";
 import { Adornment } from "@components/Input/InputAdornment";
 import { Button } from "@components/Button/ButtonNative";
 import { useEvent } from "@components-core/utils/misc";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 
 // =====================================================================================================================
 // React NumberBox component definition
@@ -42,6 +43,11 @@ type Props = {
   endIcon?: string;
   autoFocus?: boolean;
   readOnly?: boolean;
+  required?: boolean;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
 };
 
 export const NumberBox = ({
@@ -70,6 +76,11 @@ export const NumberBox = ({
   endIcon,
   autoFocus,
   readOnly,
+  required,
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
 }: Props) => {
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
   min = Math.max(zeroOrPositive ? 0 : -MAX_VALUE, min);
@@ -305,69 +316,81 @@ export const NumberBox = ({
   }, [focus, registerComponentApi, setValue]);
 
   return (
-    <div
-      className={classnames(styles.inputRoot, {
-        [styles.readOnly]: readOnly,
-        [styles.disabled]: !enabled,
-        [styles.noSpinBox]: !hasSpinBox,
-        [styles.error]: validationStatus === "error",
-        [styles.warning]: validationStatus === "warning",
-        [styles.valid]: validationStatus === "valid",
-      })}
-      tabIndex={-1}
+    <ItemWithLabel
+      labelPosition={labelPosition as any}
+      label={label}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      onFocus={onFocus}
+      onBlur={onBlur}
       style={style}
-      onFocus={() => {
-        inputRef.current?.focus();
-      }}
     >
-      <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-      <input
-        id={id}
-        type="text"
-        inputMode="numeric"
-        className={classnames(styles.input, { [styles.readOnly]: readOnly })}
-        disabled={!enabled}
-        value={valueStrRep}
-        step={step}
-        placeholder={placeholder}
-        onChange={onInputChange}
-        onFocus={handleOnFocus}
-        onBlur={handleOnBlur}
-        onBeforeInput={handleOnBeforeInput}
-        onKeyDown={handleOnKey}
-        readOnly={readOnly}
-        ref={inputRef}
-        autoFocus={autoFocus}
-        maxLength={maxLength}
-      />
-      <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-      {hasSpinBox && (
-        <div className={styles.spinnerBox}>
-          <Button
-            type="button"
-            variant={"ghost"}
-            themeColor={"secondary"}
-            tabIndex={-1}
-            className={styles.spinnerButton}
-            disabled={!enabled}
-            ref={upButton}
-          >
-            <Icon name="chevronup" size="sm" />
-          </Button>
-          <Button
-            type="button"
-            tabIndex={-1}
-            variant={"ghost"}
-            themeColor={"secondary"}
-            className={styles.spinnerButton}
-            disabled={!enabled}
-            ref={downButton}
-          >
-            <Icon name="chevrondown" size="sm" />
-          </Button>
-        </div>
-      )}
-    </div>
+      <div
+        className={classnames(styles.inputRoot, {
+          [styles.readOnly]: readOnly,
+          [styles.disabled]: !enabled,
+          [styles.noSpinBox]: !hasSpinBox,
+          [styles.error]: validationStatus === "error",
+          [styles.warning]: validationStatus === "warning",
+          [styles.valid]: validationStatus === "valid",
+        })}
+        tabIndex={-1}
+        style={style}
+        onFocus={() => {
+          inputRef.current?.focus();
+        }}
+      >
+        <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
+        <input
+          id={id}
+          type="text"
+          inputMode="numeric"
+          className={classnames(styles.input, { [styles.readOnly]: readOnly })}
+          disabled={!enabled}
+          value={valueStrRep}
+          step={step}
+          placeholder={placeholder}
+          onChange={onInputChange}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          onBeforeInput={handleOnBeforeInput}
+          onKeyDown={handleOnKey}
+          readOnly={readOnly}
+          ref={inputRef}
+          autoFocus={autoFocus}
+          maxLength={maxLength}
+        />
+        <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
+        {hasSpinBox && (
+          <div className={styles.spinnerBox}>
+            <Button
+              type="button"
+              variant={"ghost"}
+              themeColor={"secondary"}
+              tabIndex={-1}
+              className={styles.spinnerButton}
+              disabled={!enabled}
+              ref={upButton}
+            >
+              <Icon name="chevronup" size="sm" />
+            </Button>
+            <Button
+              type="button"
+              tabIndex={-1}
+              variant={"ghost"}
+              themeColor={"secondary"}
+              className={styles.spinnerButton}
+              disabled={!enabled}
+              ref={downButton}
+            >
+              <Icon name="chevrondown" size="sm" />
+            </Button>
+          </div>
+        )}
+      </div>
+    </ItemWithLabel>
   );
 };
 

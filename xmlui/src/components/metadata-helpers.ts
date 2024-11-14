@@ -1,6 +1,13 @@
 import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
 import { orientationOptionMd, validationStatusMd } from "./abstractions";
 
+export function dInternal(description?: string): ComponentPropertyMetadata {
+  return {
+    description: description ?? `This property is for internal use only.`,
+    isInternal: true,
+  };
+}
+
 export function dClick(comp: string): ComponentPropertyMetadata {
   return {
     description: `This event is triggered when the ${comp} is clicked.`,
@@ -55,6 +62,22 @@ export function dLabelPosition(def?: any): ComponentPropertyMetadata {
   };
 }
 
+export function dLabelWidth(comp: string): ComponentPropertyMetadata {
+  return {
+    description: `This property sets the width of the \`${comp}\`.`,
+  };
+}
+
+export function dLabelBreak(comp: string): ComponentPropertyMetadata {
+  return {
+    description:
+      `This boolean value indicates if the \`${comp}\` labels can be split into multiple ` +
+      `lines if it would overflow the available label width.`,
+    valueType: "boolean",
+    defaultValue: false,
+  };
+}
+
 export function dAutoFocus(): ComponentPropertyMetadata {
   return {
     description: `This property sets the label of the component.`,
@@ -78,8 +101,7 @@ export function dReadonly(): ComponentPropertyMetadata {
 
 export function dEnabled(): ComponentPropertyMetadata {
   return {
-    description:
-      `This boolean property value indicates whether the component responds to user events (\`true\`) or not (\`false\`).`,
+    description: `This boolean property value indicates whether the component responds to user events (\`true\`) or not (\`false\`).`,
     valueType: "boolean",
     defaultValue: true,
   };
@@ -87,8 +109,7 @@ export function dEnabled(): ComponentPropertyMetadata {
 
 export function dValidationStatus(): ComponentPropertyMetadata {
   return {
-    description:
-      `This property allows you to set the validation status of the input component.`,
+    description: `This property allows you to set the validation status of the input component.`,
     availableValues: validationStatusMd,
   };
 }
@@ -229,8 +250,7 @@ export function dTriggerTemplate(comp: string): ComponentPropertyMetadata {
 
 export function dOrientation(defaultValue: string): ComponentPropertyMetadata {
   return {
-    description:
-      `This property sets the main axis along which the nested components are rendered.`,
+    description: `This property sets the main axis along which the nested components are rendered.`,
     availableValues: orientationOptionMd,
     valueType: "string",
     defaultValue,

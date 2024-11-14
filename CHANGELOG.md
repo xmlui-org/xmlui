@@ -1,5 +1,11 @@
 # xmlui Changelog
 
+## v0.6.5
+
+### Breaking changes:
+
+- The `globals` property of app configuration renamed to `appGlobals`
+
 ## v0.6.3
 
 ### Breaking changes:

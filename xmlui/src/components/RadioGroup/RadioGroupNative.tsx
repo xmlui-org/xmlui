@@ -14,6 +14,7 @@ import { noop } from "@components-core/constants";
 import type { ValidationStatus } from "@components/abstractions";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { useEvent } from "@components-core/utils/misc";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 
 const RadioGroupValidationStatusContext = createContext<{
   value?: string;
@@ -29,6 +30,11 @@ type RadioGroupProps = {
   enabled?: boolean;
   layout?: CSSProperties;
   validationStatus?: ValidationStatus;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
+  required?: boolean;
   updateState?: UpdateStateFn;
   onDidChange?: (newValue: string) => void;
   onFocus?: () => void;
@@ -43,6 +49,11 @@ export const RadioGroup = ({
   initialValue = "",
   enabled = true,
   validationStatus = "none",
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
+  required = false,
   updateState = noop,
   onDidChange = noop,
   onFocus = noop,
@@ -101,22 +112,33 @@ export const RadioGroup = ({
   }, [value, validationStatus]);
 
   return (
-    <RadioGroupValidationStatusContext.Provider value={contextValue}>
-      <InnerRadioGroup.Root
-        id={id}
-        onBlur={handleOnBlur}
-        onFocus={handleOnFocus}
-        onValueChange={onInputChange}
-        value={value}
-        disabled={!enabled}
-        className={classnames(styles.radioGroupContainer, {
-          [styles.focused]: focused,
-          [styles.disabled]: !enabled,
-        })}
-      >
-        {children}
-      </InnerRadioGroup.Root>
-    </RadioGroupValidationStatusContext.Provider>
+    <ItemWithLabel
+      labelPosition={labelPosition as any}
+      label={label}
+      labelWidth={labelWidth}
+      labelBreak={labelBreak}
+      required={required}
+      enabled={enabled}
+      onFocus={onFocus}
+      onBlur={onBlur}
+    >
+      <RadioGroupValidationStatusContext.Provider value={contextValue}>
+        <InnerRadioGroup.Root
+          id={id}
+          onBlur={handleOnBlur}
+          onFocus={handleOnFocus}
+          onValueChange={onInputChange}
+          value={value}
+          disabled={!enabled}
+          className={classnames(styles.radioGroupContainer, {
+            [styles.focused]: focused,
+            [styles.disabled]: !enabled,
+          })}
+        >
+          {children}
+        </InnerRadioGroup.Root>
+      </RadioGroupValidationStatusContext.Provider>
+    </ItemWithLabel>
   );
 };
 
