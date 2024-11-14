@@ -1,5 +1,6 @@
 import { COMMON_VISUAL_PROPERTY_UNITS_BORDER_STYLE, COMMON_VISUAL_PROPERTY_UNITS_COLOR, COMMON_VISUAL_PROPERTY_UNITS_SIZE } from "../../meta/pages";
 import colorValues from "./samples/color-values.xmlui";
+import { Callout } from "nextra/components";
 
 # Common Visual Property Units
 
@@ -15,54 +16,61 @@ Position a child component within its parent to the start according to the curre
 |center|Position child component in the center|
 |end|Position child component at the end|
 
-```ueml copy {3, 7, 11, 16, 17}
-<VStack gap=".2rem">
-  <HStack width="300" backgroundColor="cyan"
-    horizontalAlignment="start">
-    <Text>This is a text aligned to left</Text>
-  </HStack>
-  <HStack width="300" backgroundColor="cyan"
-    horizontalAlignment="center">
-    <Text>This is a text aligned to left</Text>
-  </HStack>
-  <HStack width="300" backgroundColor="cyan"
-    horizontalAlignment="end">
-    <Text>This is a text aligned to left</Text>
-  </HStack>
-  <VStack height="100"
-    backgroundColor="cyan"
-    verticalAlignment="end"
-    horizontalAlignment="center">
-    <Stack width="36" height="36" backgroundColor="red" />
+```ueml copy /horizontalAlignment/ /verticalAlignment/
+<App>
+  <VStack>
+    <HStack width="300" backgroundColor="cyan"
+      horizontalAlignment="start">
+      <Text>This is a text aligned to the start</Text>
+    </HStack>
+    <HStack width="300" backgroundColor="cyan"
+      horizontalAlignment="center">
+      <Text>This is a text aligned to the center</Text>
+    </HStack>
+    <HStack width="300" backgroundColor="cyan"
+      horizontalAlignment="end">
+      <Text>This is a text aligned to the end</Text>
+    </HStack>
+    <VStack height="100"
+      backgroundColor="cyan"
+      verticalAlignment="end"
+      horizontalAlignment="center">
+      <Text>
+        This text is aligned vertically to the bottom, horizontally to the center
+      </Text>
+    </VStack>
   </VStack>
-</VStack>
+</App>
 ```
 
 <Playground
     name="Alignment values"
     app={`
-    <VStack gap=".2rem">
-      <HStack width="300" backgroundColor="cyan"
-        horizontalAlignment="start">
-        <Text>This is a text aligned to left</Text>
-      </HStack>
-      <HStack width="300" backgroundColor="cyan"
-        horizontalAlignment="center">
-        <Text>This is a text aligned to left</Text>
-      </HStack>
-      <HStack width="300" backgroundColor="cyan"
-        horizontalAlignment="end">
-        <Text>This is a text aligned to left</Text>
-      </HStack>
-      <VStack height="100"
-        backgroundColor="cyan"
-        verticalAlignment="end"
-        horizontalAlignment="center">
-        <Stack width="36" height="36" backgroundColor="red" />
+    <App>
+      <VStack>
+        <HStack width="300" backgroundColor="cyan"
+          horizontalAlignment="start">
+          <Text>This is a text aligned to the start</Text>
+        </HStack>
+        <HStack width="300" backgroundColor="cyan"
+          horizontalAlignment="center">
+          <Text>This is a text aligned to the center</Text>
+        </HStack>
+        <HStack width="300" backgroundColor="cyan"
+          horizontalAlignment="end">
+          <Text>This is a text aligned to the end</Text>
+        </HStack>
+        <VStack height="100"
+          backgroundColor="cyan"
+          verticalAlignment="end"
+          horizontalAlignment="center">
+          <Text>
+            This text is aligned vertically to the bottom, horizontally to the center
+          </Text>
+        </VStack>
       </VStack>
-    </VStack>
+    </App>
   `}
-    height={200}
 />
 
 ## Boolean Values [#boolean]
@@ -97,16 +105,17 @@ You can define border rounding values to round the corners of a component's oute
 When you specify multiple radii, the first value determines the horizontal rounding, and the second the vertical rounding.
 
 <Playground
-    name="Border styles"
-    app={`
+  name="Border styles"
+  app={`
+    <App>
     <FlowLayout gap="8" padding="8">
       <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px"><Text value="20px" /></CVStack>
       <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px 40px"><Text value="20px 40px" /></CVStack>
       <CVStack width="25%" height="64" border="solid 4px #202020" radius="25% 20px"><Text value="25% 20px" /></CVStack>
       <CVStack width="25%" height="64" border="solid 4px #202020" radius="50%"><Text value="50%" /></CVStack>
     </FlowLayout>
+    </App>
   `}
-    height={80}
 />
 
 ## Border Style Values [#border-style]
@@ -125,20 +134,21 @@ The engine supports these border style values:
 | `solid` | Displays a single, straight, solid line. |
 
 <Playground
-    name="Border styles"
-    app={`
-    <FlowLayout padding="8" gap="8">
-      <CVStack width="25%" height="64" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
-      <CVStack width="25%" height="64" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
-      <CVStack width="25%" height="64" border="double 8px #202020"><Text value="double" /></CVStack>
-      <CVStack width="25%" height="64" border="groove 8px #202020"><Text value="groove" /></CVStack>
-      <CVStack width="25%" height="64" border="inset 8px #202020"><Text value="inset" /></CVStack>
-      <CVStack width="25%" height="64" border="outset 8px #202020"><Text value="outset" /></CVStack>
-      <CVStack width="25%" height="64" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
-      <CVStack width="25%" height="64" border="solid 8px #202020"><Text value="solid" /></CVStack>
-    </FlowLayout>
+  name="Border styles"
+  app={`
+    <App>
+      <FlowLayout>
+        <CVStack width="25%" height="64" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
+        <CVStack width="25%" height="64" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
+        <CVStack width="25%" height="64" border="double 8px #202020"><Text value="double" /></CVStack>
+        <CVStack width="25%" height="64" border="groove 8px #202020"><Text value="groove" /></CVStack>
+        <CVStack width="25%" height="64" border="inset 8px #202020"><Text value="inset" /></CVStack>
+        <CVStack width="25%" height="64" border="outset 8px #202020"><Text value="outset" /></CVStack>
+        <CVStack width="25%" height="64" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
+        <CVStack width="25%" height="64" border="solid 8px #202020"><Text value="solid" /></CVStack>
+      </FlowLayout>
+    </App>
   `}
-    height={164}
 />
 
 ## Color Values [#color]
@@ -154,7 +164,6 @@ The engine accepts several color value types:
 <Playground
     name="Color values"
     app={colorValues}
-    height={550}
 />
 
 ## Cursor Values [#cursor]
@@ -222,26 +231,26 @@ Move the mouse over the rectangles in the following example to check what the cu
 <Playground
     name="Cursor values"
     app={`
-    <VStack gap="8">
-      <FlowLayout padding="8" gap="8">
+    <App>
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="auto" border="solid 1 #202020">auto</CVStack>
         <CVStack width="20%" height="36" cursor="default" border="solid 1 #202020">default</CVStack>
         <CVStack width="20%" height="36" cursor="none" border="solid 1 #202020">none</CVStack>
       </FlowLayout>
-      <FlowLayout padding="8" gap="8">
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="context-menu" border="solid 1 #202020">context-menu</CVStack>
         <CVStack width="20%" height="36" cursor="help" border="solid 1 #202020">help</CVStack>
         <CVStack width="20%" height="36" cursor="pointer" border="solid 1 #202020">pointer</CVStack>
         <CVStack width="20%" height="36" cursor="progress" border="solid 1 #202020">progress</CVStack>
         <CVStack width="20%" height="36" cursor="wait" border="solid 1 #202020">wait</CVStack>
       </FlowLayout>
-      <FlowLayout padding="8" gap="8">
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="cell" border="solid 1 #202020">cell</CVStack>
         <CVStack width="20%" height="36" cursor="crosshair" border="solid 1 #202020">crosshair</CVStack>
         <CVStack width="20%" height="36" cursor="text" border="solid 1 #202020">text</CVStack>
         <CVStack width="20%" height="36" cursor="vertical-text" border="solid 1 #202020">vertical-text</CVStack>
       </FlowLayout>
-      <FlowLayout padding="8" gap="8">
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="alias" border="solid 1 #202020">alias</CVStack>
         <CVStack width="20%" height="36" cursor="copy" border="solid 1 #202020">copy</CVStack>
         <CVStack width="20%" height="36" cursor="move" border="solid 1 #202020">move</CVStack>
@@ -250,7 +259,7 @@ Move the mouse over the rectangles in the following example to check what the cu
         <CVStack width="20%" height="36" cursor="grab" border="solid 1 #202020">grab</CVStack>
         <CVStack width="20%" height="36" cursor="grabbing" border="solid 1 #202020">grabbing</CVStack>
       </FlowLayout>
-      <FlowLayout padding="8" gap="8">
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="alt-scroll" border="solid 1 #202020">all-scroll</CVStack>
         <CVStack width="20%" height="36" cursor="col-resize" border="solid 1 #202020">col-resize</CVStack>
         <CVStack width="20%" height="36" cursor="row-resize" border="solid 1 #202020">row-resize</CVStack>
@@ -267,13 +276,12 @@ Move the mouse over the rectangles in the following example to check what the cu
         <CVStack width="20%" height="36" cursor="nesw-resize" border="solid 1 #202020">nesw-resize</CVStack>
         <CVStack width="20%" height="36" cursor="nwse-resize" border="solid 1 #202020">nwse-resize</CVStack>
       </FlowLayout>
-      <FlowLayout padding="8" gap="8">
+      <FlowLayout>
         <CVStack width="20%" height="36" cursor="zoom-in" border="solid 1 #202020">zoom-in</CVStack>
         <CVStack width="20%" height="36" cursor="zoom-out" border="solid 1 #202020">zoom-out</CVStack>
       </FlowLayout>
-    </VStack>
+    </App>
   `}
-    height={500}
 />
 
 ## Font Family Values [#font-family]
@@ -284,21 +292,22 @@ These are the generic family names:
 |Name|Description|
 |-|-|
 |`serif`| Glyphs have finishing strokes, flared or tapering ends, or have actual serifed endings. |
-|`sans-serif`| Glyphs have stroke endings that are plain. |
+|`sans‑serif`| Glyphs have stroke endings that are plain. |
 |`monospace`| All glyphs have the same fixed width. |
 |`cursive`| Glyphs in cursive fonts generally have either joining strokes or other cursive characteristics beyond those of italic typefaces. The glyphs are partially or completely connected, and the result looks more like handwritten pen or brush writing than printed letter work. |
 |`fantasy`| fantasy fonts are primarily decorative fonts that contain playful representations of characters. |
-|`system-ui`| Glyphs are taken from the default user interface font on a given platform. Because typographic traditions vary widely across the world, this generic is provided for typefaces that don't map cleanly into the other generics. |
-|`ui-serif`| The default user interface serif font. |
-|`ui-sans-serif`| The default user interface sans-serif font. |
-|`ui-monospace`| The default user interface monospace font. |
-|`ui-rounded`| The default user interface font that has rounded features. |
+|`system‑ui`| Glyphs are taken from the default user interface font on a given platform. Because typographic traditions vary widely across the world, this generic is provided for typefaces that don't map cleanly into the other generics. |
+|`ui‑serif`| The default user interface serif font. |
+|`ui‑sans‑serif`| The default user interface sans-serif font. |
+|`ui‑monospace`| The default user interface monospace font. |
+|`ui‑rounded`| The default user interface font that has rounded features. |
 |`math`| This is for the particular stylistic concerns of representing mathematics: superscript and subscript, brackets that cross several lines, nesting expressions, and double struck glyphs with distinct meanings. |
 |`emoji`| Fonts that are specifically designed to render emoji. |
 |`fangsong`| A particular style of Chinese characters that are between serif-style Song and cursive-style Kai forms. This style is often used for government documents. |
 
-
-> **Note**: A generic font family should be the last item in the list of font family names.
+<Callout type="info" emoji="📔">
+A generic font family should be the last item in the list of font family names.
+</Callout>
 
 Examples:
 
@@ -320,6 +329,16 @@ Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..
 |`bold`| Bold font weight. Same as `700`. |
 |`lighter`| One relative font weight lighter than the parent element. |
 |`bolder`| One relative font weight heavier than the parent element. |
+
+## Font Stretch Values [#font-stretch]
+
+This property selects a regular, condensed, or expanded face from a font. Its value can be specified as a percentage value or as one of the following:
+
+|Value|Description|
+|-|-|
+|`normal`| Specifies a normal font face. |
+|`semi‑condensed`, `condensed`, `extra‑condensed`, `ultra‑condensed`| Specifies a more condensed font face than normal, with `ultra‑condensed` as the most condensed. |
+|`semi‑expanded`, `expanded`, `extra‑expanded`, `ultra‑expanded`| Specifies a more expanded font face than normal, with `ultra‑expanded` as the most expanded. |
 
 ## Orientation [#orientation]
 
@@ -347,7 +366,6 @@ Describes the orientation a particular component renders its content (child comp
           <Stack height="40px" width="40px" backgroundColor="blue" />
         </HStack>
       </HStack>`}
-    height={200}
 />
 
 ## Overflow Values [#overflow]
