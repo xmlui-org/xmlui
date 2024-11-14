@@ -44,7 +44,7 @@ test("api call as an extracted component get called", async ({ page }) => {
 });
 
 
-test.fixme("api call as an extracted component get called (function reference + default body)", async ({ page }) => {
+test("api call as an extracted component get called (function reference + default body)", async ({ page }) => {
   await initApp(page, {
     entryPoint: `
     <Fragment>

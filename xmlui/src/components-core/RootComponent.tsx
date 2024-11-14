@@ -24,7 +24,7 @@ import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 import { ErrorBoundary } from "./ErrorBoundary";
 import ThemeProvider from "@components-core//theming/ThemeProvider";
 import { renderRoot } from "./container/Container";
-import { delay } from "@components-core/utils/misc";
+import { delay, formatFileSizeInBytes, getFileExtension } from "@components-core/utils/misc";
 import { unPackTree } from "./utils/treeUtils";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { IconProvider } from "@components/IconProvider";
@@ -159,7 +159,7 @@ const DateUtils = {
   },
 };
 
-function handleError(error: Error | string) {
+function signError(error: Error | string) {
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
 }
 
@@ -182,7 +182,7 @@ function RootContentComponent({
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
 }) {
-  const [localLoggedInUser, setLocalLoggedInUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(null);
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
@@ -363,35 +363,56 @@ function RootContentComponent({
 
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
-      ...dateFunctions,
-      ...miscellaneousUtils,
-      navigate,
-      confirm,
-      signError: handleError,
-      toast,
-      loggedInUser: localLoggedInUser,
-      setLoggedInUser: setLocalLoggedInUser,
-      queryClient,
-      routerBaseName,
-      standalone,
-      decorateComponentsWithTestId,
-      debugEnabled,
-      activeThemeId: activeThemeId,
-      activeThemeTone: activeThemeTone,
-      availableThemeIds: availableThemeIds,
-      appGlobals: appGlobals,
-      delay,
+      // --- Actions namespace
       Actions,
-      Transforms,
-      DateUtils,
-      embed,
+      
+      // --- App-specific
+      appGlobals,
+      debugEnabled,
+      decorateComponentsWithTestId,
       environment,
       mediaSize,
-      apiInterceptorContext,
+      queryClient,
+      standalone,
+
+
+      // --- Date-related
+      ...dateFunctions,
+
+      // --- File Utilities
+      formatFileSizeInBytes,
+      getFileExtension,
+
+      // --- Navigation-related
+      navigate,
+      routerBaseName,
+
+      // --- Notifications and dialogs
+      confirm,
+      signError,
+      toast,
+
+      // --- Theme-related
+      activeThemeId,
+      activeThemeTone,
+      availableThemeIds,
       setTheme: setActiveThemeId,
       setThemeTone: setActiveThemeTone,
       toggleThemeTone,
+
+      // --- User-related
+      loggedInUser,
+      setLoggedInUser,
+
+      delay,
+      Transforms,
+      DateUtils,
+      embed,
+      apiInterceptorContext,
       getPropertyByPath: get,
+
+      // --- Various utils
+      ...miscellaneousUtils,
     };
     return ret;
   }, [
@@ -406,7 +427,7 @@ function RootContentComponent({
     embed,
     environment,
     appGlobals,
-    localLoggedInUser,
+    loggedInUser,
     mediaSize,
     navigate,
     routerBaseName,

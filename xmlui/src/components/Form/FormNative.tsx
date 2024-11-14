@@ -471,7 +471,9 @@ export function FormWithContextVar({
   const initialValue = extractValue(node.props.data);
   const submitMethod =
     extractValue.asOptionalString(node.props.submitMethod) || (initialValue ? "put" : "post");
-  const submitUrl = extractValue.asOptionalString(node.props.submitUrl);
+  const submitUrl =
+    extractValue.asOptionalString(node.props.submitUrl) ||
+    extractValue.asOptionalString(node.props._data_url);
 
   return (
     <Form
@@ -496,7 +498,10 @@ export function FormWithContextVar({
       initialValue={initialValue}
       buttonRow={renderChild(node.props.buttonRowTemplate)}
       registerComponentApi={registerComponentApi}
-      enabled={extractValue.asOptionalBoolean(node.props.enabled, true) && !extractValue.asOptionalBoolean((node.props as any).loading, false)} //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
+      enabled={
+        extractValue.asOptionalBoolean(node.props.enabled, true) &&
+        !extractValue.asOptionalBoolean((node.props as any).loading, false)
+      } //the as any is there to not include this property in the docs (temporary, we disable the form until it's data is loaded)
     >
       {renderChild(nodeWithItem)}
     </Form>
