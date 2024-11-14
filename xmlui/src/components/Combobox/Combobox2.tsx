@@ -4,7 +4,6 @@ import { type ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Combobox } from "./ComboboxNative";
 import {
   dAutoFocus,
   dComponent,
@@ -24,9 +23,9 @@ import {
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
-import {Combobox2} from "@components/Combobox/ComboboxNative2";
+import { Combobox2 } from "@components/Combobox/ComboboxNative2";
 
-const COMP = "Combobox";
+const COMP = "Combobox2";
 
 const defaultOptionRenderer = {
   type: "Text",
@@ -81,8 +80,8 @@ export const ComboboxMd = createMetadata({
   },
 });
 
-export const comboboxComponentRenderer = createComponentRenderer(
-  "Combobox",
+export const combobox2ComponentRenderer = createComponentRenderer(
+  "Combobox2",
   ComboboxMd,
   ({
     node,
@@ -95,7 +94,7 @@ export const comboboxComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     return (
-      <Combobox
+      <Combobox2
         layout={layoutCss}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}
@@ -108,10 +107,6 @@ export const comboboxComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
@@ -123,7 +118,7 @@ export const comboboxComponentRenderer = createComponentRenderer(
         }}
       >
         {renderChild(node.children)}
-      </Combobox>
+      </Combobox2>
     );
   },
 );
