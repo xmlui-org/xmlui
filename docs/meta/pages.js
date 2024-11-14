@@ -152,6 +152,7 @@ export const COMMON_VISUAL_PROPERTY_UNITS_COLOR = "/styles-and-themes/common-uni
 export const COMMON_VISUAL_PROPERTY_UNITS_CURSOR = "/styles-and-themes/common-units#cursor";
 export const COMMON_VISUAL_PROPERTY_UNITS_FONT_FAMILY = "/styles-and-themes/common-units#font-family";
 export const COMMON_VISUAL_PROPERTY_UNITS_FONT_WEIGHT = "/styles-and-themes/common-units#font-weight";
+export const COMMON_VISUAL_PROPERTY_UNITS_FONT_STRETCH = "/styles-and-themes/common-units#font-stretch";
 export const COMMON_VISUAL_PROPERTY_UNITS_ORIENTATION = "/styles-and-themes/common-units#orientation";
 export const COMMON_VISUAL_PROPERTY_UNITS_OVERFLOW = "/styles-and-themes/common-units#overflow";
 export const COMMON_VISUAL_PROPERTY_UNITS_SHADOW = "/styles-and-themes/common-units#shadow";
