@@ -2,27 +2,18 @@
 
 import * as React from "react";
 
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./Command";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from "./Command";
 import classnames from "classnames";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import { Button } from "@components/Button/ButtonNative";
 import Icon from "@components/Icon/IconNative";
-import { CheckIcon } from "@components/Icon/CheckIcon";
-import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
 import styles from "./Combobox2.module.scss";
 import type { CSSProperties, ReactNode } from "react";
 import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
 import type { UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import type { Option } from "@components/abstractions";
+import { SelectContext2 } from "@components/Select/SelectContext2";
 
 type Combobox2Props = {
   id?: string;
@@ -35,13 +26,13 @@ type Combobox2Props = {
   onDidChange?: (newValue: string) => void;
   layout?: CSSProperties;
   emptyListTemplate?: ReactNode;
-  optionRenderer?: (item: Option) => ReactNode;
+  optionRenderer?: (label: string) => ReactNode;
   onFocus?: () => void;
   onBlur?: () => void;
 };
 
-function defaultRenderer(item: Option) {
-  return <div>{item.label}</div>;
+function defaultRenderer(label: string) {
+  return <div>{label}</div>;
 }
 
 export function Combobox2({
@@ -59,7 +50,6 @@ export function Combobox2({
   optionRenderer = defaultRenderer,
   emptyListTemplate,
 }: Combobox2Props) {
-  const { options, selectContextValue } = useSelectContextValue();
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = useState(0);
@@ -99,8 +89,13 @@ export function Combobox2({
   }, [onBlur]);
 
   return (
-    <SelectContext.Provider value={selectContextValue}>
-      {children}
+    <SelectContext2.Provider
+      value={{
+        value,
+        onChange: onInputChange,
+        optionRenderer,
+      }}
+    >
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           asChild
@@ -117,9 +112,7 @@ export function Combobox2({
               [styles.disabled]: !enabled,
             })}
           >
-            {value
-              ? options.find((framework) => framework.value === value)?.label
-              : placeholder || ""}
+            {value ? value : placeholder || ""}
             <Icon name="chevrondown" />
           </Button>
         </PopoverTrigger>
@@ -135,31 +128,11 @@ export function Combobox2({
                   </span>
                 )}
               </CommandEmpty>
-              <CommandGroup className={styles.commandGroup}>
-                {options.map((option) => (
-                  <CommandItem
-                    key={option.value}
-                    value={option.value}
-                    className={styles.commandItem}
-                    onSelect={(currentValue) => {
-                      onInputChange(currentValue === value ? "" : currentValue);
-                      setOpen(false);
-                    }}
-                  >
-                    {optionRenderer(option)}
-                    <CheckIcon
-                      className={classnames(
-                        styles.checkIcon,
-                        value === option.value && styles.checkIconVisible,
-                      )}
-                    />
-                  </CommandItem>
-                ))}
-              </CommandGroup>
+              <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
-    </SelectContext.Provider>
+    </SelectContext2.Provider>
   );
 }

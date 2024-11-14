@@ -136,6 +136,8 @@ import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 import {apiCallRenderer} from "@components/APICall/APICall";
+import {option2ComponentRenderer} from "@components/Option/Option2";
+import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -278,6 +280,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_Option2 !== "false") {
+      this.registerComponentRenderer(option2ComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
     }
@@ -348,6 +353,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuSeparatorRenderer);
       this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
+      this.registerComponentRenderer(combobox2ComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
