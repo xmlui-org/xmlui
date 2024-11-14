@@ -40,6 +40,7 @@ export const option2ComponentRenderer = createComponentRenderer(
     } else if (label == undefined && value != undefined) {
       label = value;
     }
+
     return (
       <Option2Component
         value={value}

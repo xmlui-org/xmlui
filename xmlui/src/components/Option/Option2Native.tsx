@@ -1,4 +1,4 @@
-import { useId } from "react";
+import { useEffect, useId } from "react";
 
 import { CommandItem } from "@components/Combobox/Command";
 import styles from "@components/Combobox/Combobox2.module.scss";
@@ -20,14 +20,17 @@ export function Option2Component({ value, label, disabled }: OptionComponentProp
   return (
     <CommandItem
       id={id}
-      key={value}
-      value={value}
+      key={id}
+      value={`${value}`}
       className={styles.commandItem}
-      onSelect={(currentValue) => {
-        onChange(currentValue);
+      onSelect={() => {
+        onChange({
+          label,
+          value,
+        });
       }}
     >
-      {label}
+      {optionRenderer({ label, value })}
       <CheckIcon
         className={classnames(styles.checkIcon, selectedValue === value && styles.checkIconVisible)}
       />

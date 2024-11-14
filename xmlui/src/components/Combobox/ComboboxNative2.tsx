@@ -8,12 +8,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover
 import { Button } from "@components/Button/ButtonNative";
 import Icon from "@components/Icon/IconNative";
 import styles from "./Combobox2.module.scss";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode} from "react";
+import { useMemo } from "react";
 import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
 import type { UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
 import { SelectContext2 } from "@components/Select/SelectContext2";
+import type { Option } from "@components/abstractions";
 
 type Combobox2Props = {
   id?: string;
@@ -26,13 +28,13 @@ type Combobox2Props = {
   onDidChange?: (newValue: string) => void;
   layout?: CSSProperties;
   emptyListTemplate?: ReactNode;
-  optionRenderer?: (label: string) => ReactNode;
+  optionRenderer?: (option: Option) => ReactNode;
   onFocus?: () => void;
   onBlur?: () => void;
 };
 
-function defaultRenderer(label: string) {
-  return <div>{label}</div>;
+function defaultRenderer(option: Option) {
+  return <div>{option.label}</div>;
 }
 
 export function Combobox2({
@@ -60,9 +62,10 @@ export function Combobox2({
   }, [initialValue, updateState]);
 
   const onInputChange = useCallback(
-    (selectedValue: string) => {
-      updateState({ value: selectedValue });
-      onDidChange(selectedValue);
+    (selectedOption: Option) => {
+      setOpen(false);
+      updateState({ value: selectedOption.value });
+      onDidChange(selectedOption.value);
     },
     [onDidChange, updateState],
   );
@@ -88,14 +91,17 @@ export function Combobox2({
     onBlur?.();
   }, [onBlur]);
 
+  const contextValue = useMemo(
+    () => ({
+      value,
+      onChange: onInputChange,
+      optionRenderer,
+    }),
+    [onInputChange, optionRenderer, value],
+  );
+
   return (
-    <SelectContext2.Provider
-      value={{
-        value,
-        onChange: onInputChange,
-        optionRenderer,
-      }}
-    >
+    <SelectContext2.Provider value={contextValue}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           asChild
