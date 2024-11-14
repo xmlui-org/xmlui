@@ -3,7 +3,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { FormWithContextVar } from "./FormNative";
-import { dComponent } from "@components/metadata-helpers";
+import { dComponent, dInternal } from "@components/metadata-helpers";
 
 const COMP = "Form";
 
@@ -43,13 +43,10 @@ export const FormMd = createMetadata({
       `By default, the Cancel button is to the left of the Save button. Set this property to ` +
         `\`true\` to swap them or \`false\` to keep their original location.`,
     ),
-    submitUrl: d(
-        `URL to submit the form data.`
-    ),
-    submitMethod: d(
-        `HTTP method to use when submitting the form data.`,
-    ),
+    submitUrl: d(`URL to submit the form data.`),
+    submitMethod: d(`HTTP method to use when submitting the form data.`),
     enabled: d(`Whether the form is enabled or not. The default value is \`true\`.`),
+    _data_url: dInternal("when we have an api bound data prop, we inject the url here"),
   },
   events: {
     submit: d(

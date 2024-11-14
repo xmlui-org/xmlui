@@ -184,8 +184,7 @@ export function ApiBoundComponent({
         api[`getItems_${key}`] = `() => { return ${loaderUid}.getItems(); }`;
         api[`deleteItem_${key}`] = `(element) => { ${loaderUid}.deleteItem(element); }`;
         if (key === "data") {
-          props.submitUrl = props.submitUrl || operation.url;
-          props.submitMethod = props.submitMethod || "put";
+          props._data_url = operation.url;
         }
       }
       props[key] = `{ ${loaderUid}.value }`;
