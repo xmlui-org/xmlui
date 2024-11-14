@@ -8,14 +8,14 @@ import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover
 import { Button } from "@components/Button/ButtonNative";
 import Icon from "@components/Icon/IconNative";
 import styles from "./Combobox2.module.scss";
-import type { CSSProperties, ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
-import type { UpdateStateFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
 import { SelectContext2 } from "@components/Select/SelectContext2";
-import type { Option } from "@components/abstractions";
+import type { Option, ValidationStatus } from "@components/abstractions";
 
 type Combobox2Props = {
   id?: string;
@@ -29,8 +29,10 @@ type Combobox2Props = {
   layout?: CSSProperties;
   emptyListTemplate?: ReactNode;
   optionRenderer?: (option: Option) => ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
   onFocus?: () => void;
   onBlur?: () => void;
+  validationStatus?: ValidationStatus;
 };
 
 function defaultRenderer(option: Option) {
@@ -49,7 +51,9 @@ export function Combobox2({
   onDidChange = noop,
   onFocus = noop,
   onBlur = noop,
+  validationStatus = "none",
   optionRenderer = defaultRenderer,
+  registerComponentApi,
   emptyListTemplate,
 }: Combobox2Props) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
@@ -91,6 +95,16 @@ export function Combobox2({
     onBlur?.();
   }, [onBlur]);
 
+  const focus = useCallback(() => {
+    referenceElement?.focus();
+  }, [referenceElement]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+    });
+  }, [focus, registerComponentApi]);
+
   const contextValue = useMemo(
     () => ({
       value,
@@ -114,7 +128,7 @@ export function Combobox2({
           <Button
             variant="outlined"
             aria-expanded={open}
-            className={classnames(styles.comboboxButton, {
+            className={classnames(styles.comboboxButton, styles[validationStatus], {
               [styles.disabled]: !enabled,
             })}
           >

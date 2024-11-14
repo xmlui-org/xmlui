@@ -107,10 +107,6 @@ export const combobox2ComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
