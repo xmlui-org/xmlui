@@ -2,276 +2,6 @@
 
 XMLUI offers dozens of global functions and properties for use in XMLScript code. This document provides a detailed description of them.
 
-## App-Specific Globals
-
-### `activeThemeId`
-
-```ts
-get activeThemeId: string;
-```
-
-This property returns the ID of the currently active theme.
-
-### `appGlobals`
-
-```ts
-get appGlobals: any;
-```
-
-This property returns a hash object containing all application-global settings defined in the app's configuration file.
-
-### `availableThemeIds`
-
-```ts
-get availableThemeIds: string[];
-```
-
-This property returns an array of all available theme IDs.
-
-
-### `activeThemeTone`
-
-```ts
-get activeThemeTone: string;
-```
-
-This property returns the tone of the currently active theme ("light" or "dark").
-
-This property returns an object with some properties of the current API interceptor context.
-
-### `environment`
-
-```ts
-get environment: {
-  isWindowFocused: boolean;
-};
-```
-
-Returns an object with some properties of the current environment.
-
-### `mediaSize`
-
-```ts
-get mediaSize: {
-  phone: boolean;
-  landscapePhone: boolean;
-  tablet: boolean;
-  desktop: boolean;
-  largeDesktop: boolean;
-  xlDesktop: boolean;
-  smallScreen: boolean;
-  largeScreen: boolean;
-  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
-};
-```
-
-This property returns an object with information about the current media size. The `phone`, `landscapePhone`, `tablet`, `desktop`, `largeDesktop`, and `xlDesktop` flogs indicate the current app window's viewport size. Only one of these flags is `true`; the others are `false`.
-`smallScreen` is set to `true` if the current size is less than `desktop`. `largeScreen` is set to `true` if the current size is `desktop` or bigger.
-
-### `setTheme`
-
-```ts
-function setTheme(themeId: string): void;
-```
-
-This function sets the active theme to the specified theme ID.
-
-### `setThemeTone`
-
-```ts
-function setThemeTone(tone: string): void;
-```
-
-This function sets the active theme tone to the specified value ("light" or "dark").
-
-### `toggleThemeTone`
-
-```ts
-function toggleThemeTone(): void;
-```
-
-This function toggles the active theme tone between "light" and "dark."
-
-### `standalone`
-
-```ts
-get standalone: boolean;
-```
-
-This property returns `true` if the app is a standalone XMLUI app; otherwise (for example, as part of a website), it returns `false`.
-
-## Date Utilities
-
-### `formatDate`
-
-```ts
-function formatDate(date: string | Date): string;
-```
-
-Format the specified value's date part into a local date string (according to the machine's local settings).
-
-### `formatDateTime`
-
-```ts
-function formatDateTime(date: string | Date): string;
-```
-
-Format the specified value part into a local date and time string (according to the machine's local settings).
-
-### `formatDateWithoutYear`
-
-```ts
-function formatDateWithoutYear(date: string | Date): string;
-```
-
-Format the specified value's date part (without year) into a local date string (according to the machine's local settings).
-
-### `formatTime`
-
-```ts
-function formatTime(date: string | Date): string;
-```
-
-Format the specified value's time part into a local date string (according to the machine's local settings).
-
-### `formatTimeWithoutSeconds`
-
-```ts
-function formatTimeWithoutSeconds(date: string | Date): string;
-```
-
-Format the specified value's time part (without seconds) into a local date string (according to the machine's local settings).
-
-### `getDate`
-
-```ts
-function function getDate(date?: string | number | Date): Date;
-```
-
-Create a date from the specified input value. If no input is provided, return the current date and time.
-
-### `getDateUntilNow`
-
-```ts
-function function getDateUntilNow(date?: string | number | Date): string;
-```
-
-Calculates the difference between the current date and the provided one and returns it in a human-readable form, such as "1 month", "2 weeks", etc.
-
-### `isoDateString`
-
-```ts
-function isoDateString(date?: string): string;
-```
-
-This function converts the input string into a date value and returns the ISO 8601 string representation of the date. It can pass dates between the UI and backend APIs in a standard format.
-
-### `isToday`
-
-```ts
-function isToday(date?: string | number | Date): boolean;
-```
-
-This function checks if the specified date is today.
-
-### `isTomorrow`
-
-```ts
-function isTomorrow(date?: string | number | Date): boolean;
-```
-
-This function checks if the specified date is tomorrow.
-
-### `isYesterday`
-
-```ts
-function isYesterday(date?: string | number | Date): boolean;
-```
-
-This function checks if the specified date is yesterday.
-
-### `smartFormatDate`
-
-```ts
-function function smartFormatDateTime(date?: string | number | Date): string;
-```
-
-This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDate` would. Special values returned:
-- No date value provided: "-"
-- The date is today: returns only the date value with `formatDate`
-- The date is this week: return the relative time difference, such as "last Monday"
-
-### `smartFormatDateTime`
-
-```ts
-function function smartFormatDateTime(date?: string | number | Date): string;
-```
-
-This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDateTime` would. Special values returned:
-- No date value provided: "-"
-- The date is today: returns only the time value with `formatTime`
-- The date is this week: return the relative time difference, such as "last Monday at 2:00 AM"
-
-## File Utilities
-
-### `formatFileSizeInBytes`
-
-```ts
-function formatFileSizeInBytes(size?: number): string;
-```
-
-Returns the specified file size in a compact form, such as "112 B", "2.0 KiB", "23.4 KiB", "2.3 MiB", etc.
-
-### `getFileExtension`
-
-```ts
-function getFileExtension(filename: string, mimetype?: string): string;
-```
-
-Returns the type of the specified file. 
-- If only `filename` is specified, return the extension inferred from the file name. 
-- If only `mime-type` is specified, it returns the type inferred from the type name.
-- If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
-- Otherwise, it returns undefined.
-
-## Navigation Utilities
-
-### `navigate`
-
-```ts
-function navigate(url: string): void;
-```
-
-Navigate to the specified URL.
-
-### `routerBaseName`
-
-```ts
-get routerBaseName: string;
-```
-
-Returns the base name of the current router.
-
-## Users
-
-XMLUI does not constrain what user information may contain; it may be a single identifier or a set of user-specific properties. The app is responsible for processing and displaying this information.
-
-### `loggedInUser`
-
-```ts
-get loggedInUser: any;
-```
-
-This property queries the information about the current user.
-
-### `setLoggedInUser`
-
-```ts 
-function setLoggedInUser(user: any): void;
-```
-
-This app sets the currently logged-in user's information (usually after login). 
-
 ## Actions Namespace
 
 XMLUI provides an `Actions` namespace to collect frequently used application actions you can invoke from scripts. When calling them, use the `Actions` namespace like in the following example:
@@ -311,7 +41,7 @@ function Actions.callApi(options: {
 }): Promise<any>;
 ```
 
-Invokes an API endpoint with the specified options.
+This function invokes an API endpoint with the specified options.
 
 ### `Actions.download`
 
@@ -329,7 +59,7 @@ function Actions.download(options: {
 }): Promise<any>;
 ```
 
-Downloads a file from the specified URL.
+This function downloads a file from the specified URL.
 
 ### `Actions.upload`
 
@@ -353,6 +83,354 @@ function Actions.upload(options: {
 }): Promise<any>;
 ```
 
+This function uploads a file to the specified URL.
+
+## App-Specific Globals
+
+### `appGlobals`
+
+```ts
+get appGlobals: Record<string, any>;
+```
+
+This property returns a hash object containing all application-global settings defined in the app's configuration file.
+
+### `environment`
+
+```ts
+get environment: {
+  isWindowFocused: boolean;
+};
+```
+
+Returns an object with some properties of the current environment.
+
+### `mediaSize`
+
+```ts
+get mediaSize: {
+  phone: boolean;
+  landscapePhone: boolean;
+  tablet: boolean;
+  desktop: boolean;
+  largeDesktop: boolean;
+  xlDesktop: boolean;
+  smallScreen: boolean;
+  largeScreen: boolean;
+  size: "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
+};
+```
+
+This property returns an object with information about the current media size. The `phone`, `landscapePhone`, `tablet`, `desktop`, `largeDesktop`, and `xlDesktop` flogs indicate the current app window's viewport size. Only one of these flags is `true`; the others are `false`.
+`smallScreen` is set to `true` if the current size is less than `desktop`. `largeScreen` is set to `true` if the current size is `desktop` or bigger.
+
+### `standalone`
+
+```ts
+get standalone: boolean;
+```
+
+This property returns `true` if the app is a standalone XMLUI app; otherwise (for example, as part of a website), it returns `false`.
+
+## Date Utilities
+
+### `formatDate`
+
+```ts
+function formatDate(date: string | Date): string;
+```
+
+This function formats the specified value's date part into a local date string (according to the machine's local settings).
+
+### `formatDateTime`
+
+```ts
+function formatDateTime(date: string | Date): string;
+```
+
+This function formats the specified value into a local date and time string (according to the machine's local settings).
+
+### `formatDateWithoutYear`
+
+```ts
+function formatDateWithoutYear(date: string | Date): string;
+```
+
+This function formats the specified value's date part (without year) into a local date string (according to the machine's local settings).
+
+### `formatTime`
+
+```ts
+function formatTime(date: string | Date): string;
+```
+
+This function formats the specified value's time part into a local date string (according to the machine's local settings).
+
+### `formatTimeWithoutSeconds`
+
+```ts
+function formatTimeWithoutSeconds(date: string | Date): string;
+```
+
+Format the specified value's time part (without seconds) into a local date string (according to the machine's local settings).
+
+### `getDate`
+
+```ts
+function function getDate(date?: string | number | Date): Date;
+```
+
+This function creates a date from the specified input value. If no input is provided, it returns the current date and time.
+
+### `getDateUntilNow`
+
+```ts
+function function getDateUntilNow(date?: string | number | Date): string;
+```
+
+This function calculates the difference between the current date and the provided one and returns it in a human-readable form, such as "1 month", "2 weeks", etc.
+
+### `isoDateString`
+
+```ts
+function isoDateString(date?: string): string;
+```
+
+This function converts the input string into a date value and returns the ISO 8601 string representation of the date. It can pass dates between the UI and backend APIs in a standard format.
+
+### `isToday`
+
+```ts
+function isToday(date?: string | Date): boolean;
+```
+
+This function checks if the specified date is today.
+
+### `isTomorrow`
+
+```ts
+function isTomorrow(date?: string | Date): boolean;
+```
+
+This function checks if the specified date is tomorrow.
+
+### `isYesterday`
+
+```ts
+function isYesterday(date?: string | number | Date): boolean;
+```
+
+This function checks if the specified date is yesterday.
+
+### `smartFormatDate`
+
+```ts
+function function smartFormatDate(date?: string | number | Date): string;
+```
+
+This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDate` would. Special values returned:
+- No date value provided: "-"
+- The date is today: returns only the date value with `formatDate`
+- The date is this week: return the relative time difference, such as "last Monday"
+
+### `smartFormatDateTime`
+
+```ts
+function function smartFormatDateTime(date?: string | number | Date): string;
+```
+
+This function checks the date value provided for some particular values and returns accordingly. Otherwise, returns it as `formatDateTime` would. Special values returned:
+- No date value provided: "-"
+- The date is today: returns only the time value with `formatTime`
+- The date is this week: return the relative time difference, such as "last Monday at 2:00 AM"
+
+## File Utilities
+
+### `formatFileSizeInBytes`
+
+```ts
+function formatFileSizeInBytes(size?: number): string;
+```
+
+This function returns the specified file size in a compact form, such as "112 B", "2.0 KiB", "23.4 KiB", "2.3 MiB", etc.
+
+### `getFileExtension`
+
+```ts
+function getFileExtension(filename: string, mimetype?: string): string;
+```
+
+This function returns the type of the specified file.  
+- If only `filename` is specified, return the extension inferred from the file name. 
+- If only `mime-type` is specified, it returns the type inferred from the type name.
+- If both are specified, and the inferred file extension equals the inferred mime type, that value is returned.
+- Otherwise, it returns undefined.
+
+## Navigation Utilities
+
+### `navigate`
+
+```ts
+function navigate(url: string): void;
+```
+
+This function navigates to the specified `url`.
+
+### `routerBaseName`
+
+```ts
+get routerBaseName: string;
+```
+
+This property gets the base name used for the router. 
+
+## Notifications and Dialogs
+
+### `confirm`
+
+```ts
+function confirm: (title: string, message?: string, actionLabel?: string): boolean
+```
+
+Instructs the browser to display a dialog with a confirmation message, and to wait until the user either confirms or cancels the dialog. It returns a boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
+
+- `title`: The title of the dialog
+- `message`: The message to display
+- `actionLabel`: The label of the action button
+
+### `signError`
+
+```ts
+function signError(error: Error | string): void;
+```
+
+This method displays the specified `error` (error message) on the UI.
+
+### `toast`
+
+```ts
+function toast(message: string, options: ToastOptions): void;
+```
+
+This function displays a neutral toast with the specified `message`.
+
+All toast methods allow the using an option object (`ToastOptions`) with these properties:
+- `id` (string): an optional ID. This identifier can be used to remove the toast programmatically.
+- `duration` (number): The timeout of the notification (in milliseconds). After this timeout, the notification is removed from the screen.
+- `position` (string): The notification's position; one of these values: `top-left`, `top-center`, `top-right`,  `bottom-left`, `bottom-center`, or `bottom-right`.
+
+Examples:
+```js
+// --- Message for 2 seconds
+toast("Hello, world!", { duration: 2000 });
+
+// --- Message at the top-left corner
+toast("Hello, world!", { position: "top-left" });
+```
+
+### `toast.error`
+
+```ts
+function toast.error(message: string, options: ToastOptions): void;
+```
+
+This function displays a toast with the specified error notification `message`.
+
+### `toast.loading`
+
+```ts
+function toast.loading(message: string, options: ToastOptions): void;
+```
+
+This function displays a toast with the specified notification `message` indicating an operation's in-progress state.
+
+### `toast.remove`
+
+```ts
+function toast.remove(id: string): void;
+```
+
+This function removes the toast with the specified `id`.
+
+### `toast.success`
+
+```ts
+function toast.success(message: string, options: ToastOptions): void;
+```
+
+This function displays a toast with the specified success notification `message`.
+
+## Theme-Related
+
+### `activeThemeId`
+
+```ts
+get activeThemeId: string;
+```
+
+This property returns the ID of the currently active theme.
+
+### `activeThemeTone`
+
+```ts
+get activeThemeTone: string;
+```
+
+This property returns the tone of the currently active theme ("light" or "dark").
+
+### `availableThemeIds`
+
+```ts
+get availableThemeIds: string[];
+```
+
+This property returns an array of all available theme IDs.
+
+### `setTheme`
+
+```ts
+setTheme: (themId: string): void;
+```
+
+This function sets the current theme to the one with the specified `themeId`.
+
+### `setThemeTone`
+
+```ts
+setThemeTone: (tone: string): void;
+```
+
+This function sets the current theme tone to the specified `tone` value ("light" or "dark").
+
+### `toggleThemeTone`
+
+```ts
+toggleThemeTone: (): void;
+```
+
+This function toggles the current theme tone from "light" to "dark" or vice versa.
+
+## Users
+
+XMLUI does not constrain what user information may contain; it may be a single identifier or a set of user-specific properties. The app is responsible for processing and displaying this information.
+
+### `loggedInUser`
+
+```ts
+get loggedInUser: any | null;
+```
+
+This property gets the information about the logged-in user. If `null`, no user is logged in.
+
+
+### `setLoggedInUser`
+
+```ts
+setLoggedInUser: (loggedInUser: any): void;
+```
+
+This function sets the information about the logged-in user.
+
 ## Various Functions
 
 ### `capitalize`
@@ -362,14 +440,6 @@ function capitalize(input?: string): string;
 ```
 
 Converts the first character of string to upper case and the remaining to lower case.
-
-### `confirm`
-
-```ts
-function confirm(message: string): boolean;
-```
-
-Instructs the browser to display a dialog with an optional message, and to wait until the user either confirms or cancels the dialog. It returns a boolean indicating whether OK (`true`) or Cancel (`false`) was selected.
 
 ### `defaultTo`
 
@@ -395,14 +465,6 @@ function getPropertyByPath(obj: any, path: string): any;
 
 Gets the property of `obj` at the specified `path`. `path` is a string with the chained property names separated by dots.
 
-### `handleError`
-
-```ts
-function handleError(errorObj: any): void;
-```
-
-Displays an error toast with a message. If the provided `errorObj` is a string, it uses it as a message; otherwise, it displays "Something went wrong."
-
 ### `pluralize`
 
 ```ts
@@ -410,20 +472,6 @@ function pluralize(value: number, singular: string, plural: string): string;
 ```
 
 When the value is equal to one, returns `singular`; otherwise, `plural.`
-
-### `signError`
-
-```ts
-function signError(message: string): void;
-```
-
-### `toast`
-
-```ts
-function toast(message: string): void;
-```
-
-Displays a toast with the specified message.
 
 ### `toHashObject`
 
