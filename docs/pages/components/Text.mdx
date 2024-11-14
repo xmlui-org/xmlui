@@ -14,26 +14,7 @@ This property indicates whether ellipses should be displayed when the text is cr
 
 ```ueml copy /ellipses="false"/
 <App>
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1"
-    ellipses="false">
-    Though this long text does is about to crop!
-  </Text>
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1">
-    Though this long text does is about to crop!
-  </Text>
-</App>
-```
-
-<Playground
-  name="Example: ellipses"
-  app={`
-  <App>
+  <VStack width="120">
     <Text
       backgroundColor="cyan"
       color="black"
@@ -47,6 +28,29 @@ This property indicates whether ellipses should be displayed when the text is cr
       maxLines="1">
       Though this long text does is about to crop!
     </Text>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: ellipses"
+  app={`
+  <App>
+    <VStack width="120">
+      <Text
+        backgroundColor="cyan"
+        color="black"
+        maxLines="1"
+        ellipses="false">
+        Though this long text does is about to crop!
+      </Text>
+      <Text
+        backgroundColor="cyan"
+        color="black"
+        maxLines="1">
+        Though this long text does is about to crop!
+      </Text>
+    </VStack>
   </App>
   `}
 />
@@ -75,7 +79,7 @@ This property determines the maximum number of lines the component can wrap to. 
       backgroundColor="cyan"
       color="black"
       value="A long text that will likely overflow"
-      maxLines="2" />
+      maxLines="1" />
   </App>
   `}
 />
@@ -112,7 +116,7 @@ This property indicates if linebreaks should be preserved when displaying text.
   <App>
     <HStack>
       <Text
-        width="200"
+        width="250"
         backgroundColor="cyan"
         color="black"
         preserveLinebreaks="true"
@@ -120,10 +124,10 @@ This property indicates if linebreaks should be preserved when displaying text.
         with several line breaks
                 does not fit into a viewport with a 200-pixel width." />
       <Text
-        width="200"
+        width="250"
         backgroundColor="cyan"
         color="black"
-        value="(do not preserve) This long text
+        value="(don't preserve) This long text
         with several line breaks
                 does not fit into a viewport with a 200-pixel width." />
     </HStack>
@@ -440,163 +444,163 @@ with the following theme variables:
 
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
-| align-vertical-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-sub | sub | sub |
-| align-vertical-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-sup | super | super |
-| align-vertical-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| align-vertical-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text | $radius | $radius |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| border-[radius](../styles-and-themes/common-units/#border-rounding)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text | $color-text-primary | $color-text-primary |
-| [color](../styles-and-themes/common-units/#color-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-codefence | $color-surface-900 | $color-surface-200 |
-| [color](../styles-and-themes/common-units/#color-values)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-placeholder | $color-surface-500 | $color-surface-500 |
-| [color](../styles-and-themes/common-units/#color-values)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-secondary | $color-text-secondary | $color-text-secondary |
-| [color](../styles-and-themes/common-units/#color-values)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-subheading | $color-text-secondary | $color-text-secondary |
-| [color](../styles-and-themes/common-units/#color-values)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-code | $color-surface-100 | $color-surface-800 |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-codefence | $color-primary-100 | $color-primary-800 |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-keyboard | $color-surface-200 | $color-surface-800 |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-marked | yellow | orange |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-code | $color-surface-200 | $color-surface-700 |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-keyboard | $color-surface-300 | $color-surface-700 |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-decoration](../styles-and-themes/common-units/#color-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text | $font-family | $font-family |
-| font-family-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-code | $font-family-monospace | $font-family-monospace |
-| font-family-Text-codefence | $font-family-monospace | $font-family-monospace |
-| font-family-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-keyboard | $font-family-monospace | $font-family-monospace |
-| font-family-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-mono | $font-family-monospace | $font-family-monospace |
-| font-family-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-sample | $font-family-monospace | $font-family-monospace |
-| font-family-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-family-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-sub | sub | sub |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-sup | super | super |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [align-vertical](../styles-and-themes/common-units/#alignment)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text | $radius | $radius |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [border-radius](../styles-and-themes/common-units/#border-rounding)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text | $color-text-primary | $color-text-primary |
+| [color](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-codefence | $color-surface-900 | $color-surface-200 |
+| [color](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-placeholder | $color-surface-500 | $color-surface-500 |
+| [color](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-secondary | $color-text-secondary | $color-text-secondary |
+| [color](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-subheading | $color-text-secondary | $color-text-secondary |
+| [color](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-code | $color-surface-100 | $color-surface-800 |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-codefence | $color-primary-100 | $color-primary-800 |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-200 | $color-surface-800 |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-marked | yellow | orange |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-code | $color-surface-200 | $color-surface-700 |
+| [color-border](../styles-and-themes/common-units/#color)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-keyboard | $color-surface-300 | $color-surface-700 |
+| [color-border](../styles-and-themes/common-units/#color)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-decoration](../styles-and-themes/common-units/#color)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text | $font-family | $font-family |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-code | $font-family-monospace | $font-family-monospace |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-codefence | $font-family-monospace | $font-family-monospace |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-keyboard | $font-family-monospace | $font-family-monospace |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-mono | $font-family-monospace | $font-family-monospace |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-sample | $font-family-monospace | $font-family-monospace |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-family](../styles-and-themes/common-units/#font-family)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size-values)-Text | $font-size-small | $font-size-small |
 | [font-size](../styles-and-themes/common-units/#size-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -620,28 +624,28 @@ with the following theme variables:
 | [font-size](../styles-and-themes/common-units/#size-values)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size-values)-Text-title | $font-size-large | $font-size-large |
 | [font-size](../styles-and-themes/common-units/#size-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| font-stretch-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-subheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-stretch](../styles-and-themes/common-units/#font-stretch)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | font-style-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | font-style-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | font-style-Text-cite | italic | italic |
@@ -687,28 +691,28 @@ with the following theme variables:
 | [font-weight](../styles-and-themes/common-units/#font-weight-values)-Text-tableheading | $font-weight-bold | $font-weight-bold |
 | [font-weight](../styles-and-themes/common-units/#font-weight-values)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-weight](../styles-and-themes/common-units/#font-weight-values)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-caption | 0.05rem | 0.05rem |
-| letter-spacing-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-subheading | 0.04em | 0.04em |
-| letter-spacing-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| letter-spacing-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-caption | 0.05rem | 0.05rem |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-code | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-codefence | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-deleted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-inserted | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-keyboard | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-marked | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-mono | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-paragraph | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-placeholder | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-sample | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-secondary | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-small | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-sub | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-subheading | 0.04em | 0.04em |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-subtitle | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-sup | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-tableheading | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-title | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [letter-spacing](../styles-and-themes/common-units/#size)-Text-var | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-decoration](../styles-and-themes/common-units/#text-decoration-values)-Text-abbr | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-decoration](../styles-and-themes/common-units/#text-decoration-values)-Text-caption | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [style-decoration](../styles-and-themes/common-units/#text-decoration-values)-Text-cite | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

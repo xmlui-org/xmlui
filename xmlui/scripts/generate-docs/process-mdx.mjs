@@ -721,19 +721,19 @@ function listThemeVars(component) {
 
 // Use this object/map to replace the occurrences of the keys and have them be replaced by links
 const themeKeywordLinks = {
-  color: "[color](../styles-and-themes/common-units/#color-values)",
-  "color-border": "[color-border](../styles-and-themes/common-units/#color-values)",
-  "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color-values)",
-  "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color-values)",
+  color: "[color](../styles-and-themes/common-units/#color)",
+  "color-border": "[color-border](../styles-and-themes/common-units/#color)",
+  "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color)",
+  "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color)",
   "color-border-horizontal":
-    "[color-border-horizontal](../styles-and-themes/common-units/#color-values)",
+    "[color-border-horizontal](../styles-and-themes/common-units/#color)",
   "color-border-vertical":
-    "[color-border-vertical](../styles-and-themes/common-units/#color-values)",
-  "color-border-right": "[color-text](../styles-and-themes/common-units/#color-values)",
-  "color-border-left": "[color-text](../styles-and-themes/common-units/#color-values)",
-  "color-bg": "[color-bg](../styles-and-themes/common-units/#color-values)",
-  "color-decoration": "[color-decoration](../styles-and-themes/common-units/#color-values)",
-  "color-text": "[color-text](../styles-and-themes/common-units/#color-values)",
+    "[color-border-vertical](../styles-and-themes/common-units/#color)",
+  "color-border-right": "[color-text](../styles-and-themes/common-units/#color)",
+  "color-border-left": "[color-text](../styles-and-themes/common-units/#color)",
+  "color-bg": "[color-bg](../styles-and-themes/common-units/#color)",
+  "color-decoration": "[color-decoration](../styles-and-themes/common-units/#color)",
+  "color-text": "[color-text](../styles-and-themes/common-units/#color)",
   "font-weight": "[font-weight](../styles-and-themes/common-units/#font-weight-values)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
   "style-border": "[style-border](../styles-and-themes/common-units/#border-style-values)",
@@ -780,6 +780,11 @@ const themeKeywordLinks = {
     "[style-decoration](../styles-and-themes/common-units/#text-decoration-values)",
   "line-height": "[line‑height](../styles-and-themes/common-units/#size-values)",
   radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
+  "border-radius": "[border-radius](../styles-and-themes/common-units/#border-rounding)",
   shadow: "[shadow](../styles-and-themes/common-units/#color-values)",
   gap: "[gap](../styles-and-themes/common-units/#size-values)",
+  "align-vertical": "[align-vertical](../styles-and-themes/common-units/#alignment)",
+  "font-family": "[font-family](../styles-and-themes/common-units/#font-family)",
+  "font-stretch": "[font-stretch](../styles-and-themes/common-units/#font-stretch)",
+  "letter-spacing": "[letter-spacing](../styles-and-themes/common-units/#size)",
 };

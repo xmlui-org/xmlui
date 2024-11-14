@@ -26,7 +26,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
       backgroundColor="cyan"
       color="black"
       value="A long text that will likely overflow"
-      maxLines="2" />
+      maxLines="1" />
   </App>
   `}
 />
@@ -37,26 +37,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
 
 ```ueml copy /ellipses="false"/
 <App>
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1"
-    ellipses="false">
-    Though this long text does is about to crop!
-  </Text>
-  <Text
-    backgroundColor="cyan"
-    color="black"
-    maxLines="1">
-    Though this long text does is about to crop!
-  </Text>
-</App>
-```
-
-<Playground
-  name="Example: ellipses"
-  app={`
-  <App>
+  <VStack width="120">
     <Text
       backgroundColor="cyan"
       color="black"
@@ -70,6 +51,29 @@ You can learn more about this component in the [Working with Text](/learning/usi
       maxLines="1">
       Though this long text does is about to crop!
     </Text>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: ellipses"
+  app={`
+  <App>
+    <VStack width="120">
+      <Text
+        backgroundColor="cyan"
+        color="black"
+        maxLines="1"
+        ellipses="false">
+        Though this long text does is about to crop!
+      </Text>
+      <Text
+        backgroundColor="cyan"
+        color="black"
+        maxLines="1">
+        Though this long text does is about to crop!
+      </Text>
+    </VStack>
   </App>
   `}
 />
@@ -106,7 +110,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
   <App>
     <HStack>
       <Text
-        width="200"
+        width="250"
         backgroundColor="cyan"
         color="black"
         preserveLinebreaks="true"
@@ -114,10 +118,10 @@ You can learn more about this component in the [Working with Text](/learning/usi
         with several line breaks
                 does not fit into a viewport with a 200-pixel width." />
       <Text
-        width="200"
+        width="250"
         backgroundColor="cyan"
         color="black"
-        value="(do not preserve) This long text
+        value="(don't preserve) This long text
         with several line breaks
                 does not fit into a viewport with a 200-pixel width." />
     </HStack>
