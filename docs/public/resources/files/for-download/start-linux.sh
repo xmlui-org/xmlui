@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env bash
 
 # Check if npx is available
 if command -v npx > /dev/null 2>&1; then
