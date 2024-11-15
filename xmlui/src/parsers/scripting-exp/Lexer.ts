@@ -24,6 +24,7 @@ enum LexerPhase {
 
   // Multi-char tokens
   Slash,
+  Dollar,
   Or,
   Asterisk,
   Ampersand,
@@ -50,6 +51,8 @@ enum LexerPhase {
   RealExponent,
   RealExponentSign,
   RealExponentTail,
+  StringTemplateLiteralBackSlash,
+  StringTemplateLiteral,
   String,
   StringBackSlash,
   StringHexa1,
@@ -102,6 +105,7 @@ export class Lexer {
   // --- input position at the beginning of last fetch
   private _lastFetchPosition = 0;
 
+  private _phaseExternallySet: null | LexerPhase = null;
   /**
    * Initializes the tokenizer with the input stream
    * @param input Input source code stream
@@ -175,6 +179,14 @@ export class Lexer {
       : this.input.getTail(this._lastFetchPosition);
   }
 
+  /** Parsing template literals requires a context sensitive lexer.
+   * This method has to be called by the parser when the lexer needs to scan a string inside a template literal.
+   * Call this after the first opening backing and after the parser is done with parsing a placeholder, after the right brace.
+   */
+  setStartingPhaseToTemplateLiteral() {
+    this._phaseExternallySet = LexerPhase.StringTemplateLiteral;
+  }
+
   /**
    * Fetches the next character from the input stream
    */
@@ -209,7 +221,7 @@ export class Lexer {
     let useResolver = false;
 
     // --- Start from the beginning
-    let phase: LexerPhase = LexerPhase.Start;
+    let phase: LexerPhase = this.getStartingPhaseThenReset();
 
     // --- Process all token characters
     while (true) {
@@ -227,7 +239,7 @@ export class Lexer {
       }
 
       // --- Follow the lexer state machine
-      switch (phase) {
+      phaseSwitch: switch (phase) {
         // ====================================================================
         // Process the first character
         case LexerPhase.Start:
@@ -245,6 +257,11 @@ export class Lexer {
             case "/":
               phase = LexerPhase.Slash;
               tokenType = TokenType.Divide;
+              break;
+
+            case "$":
+              phase = LexerPhase.Dollar;
+              tokenType = TokenType.Identifier;
               break;
 
             case "*":
@@ -307,6 +324,9 @@ export class Lexer {
               phase = LexerPhase.Colon;
               tokenType = TokenType.Colon;
               break;
+
+            case "`":
+              return completeToken(TokenType.Backtick);
 
             case "[":
               return completeToken(TokenType.LSquare);
@@ -709,6 +729,54 @@ export class Lexer {
           }
           break;
 
+        // A dollar sign is also a valid variable name. When it isn't a dollar left brace, we continue as if it was an identifier
+        case LexerPhase.Dollar:
+          if (ch === "{") {
+            return completeToken(TokenType.DollarLBrace);
+          }
+          phase = LexerPhase.IdTail;
+          useResolver = true;
+          tokenType = TokenType.Identifier;
+          if (!isIdContinuation(ch)) {
+            makeToken();
+          }
+          break;
+
+        case LexerPhase.StringTemplateLiteralBackSlash: {
+          phase = LexerPhase.StringTemplateLiteral;
+          const charAhead1 = this.input.ahead(0);
+          const charAhead2 = this.input.ahead(1);
+
+          if (charAhead1 === "`" || (charAhead1 === "$" && charAhead2 === "{")) {
+            return completeToken(TokenType.StringLiteral);
+          }
+          break;
+        }
+
+        case LexerPhase.StringTemplateLiteral:
+          switch (ch) {
+            case "\\":
+              phase = LexerPhase.StringTemplateLiteralBackSlash;
+              tokenType = TokenType.Unknown;
+              break phaseSwitch;
+            case "`":
+              return completeToken(TokenType.Backtick);
+            case "$":
+              const charAhead = this.input.ahead(0);
+              if (charAhead === "{") {
+                appendTokenChar();
+                this.fetchNextChar();
+                return completeToken(TokenType.DollarLBrace);
+              }
+          }
+          const charAhead1 = this.input.ahead(0);
+          const charAhead2 = this.input.ahead(1);
+
+          if (charAhead1 === "`" || (charAhead1 === "$" && charAhead2 === "{")) {
+            return completeToken(TokenType.StringLiteral);
+          }
+          break;
+
         case LexerPhase.String:
           if (ch === stringState) {
             return completeToken(TokenType.StringLiteral);
@@ -938,7 +1006,14 @@ export class Lexer {
       return makeToken();
     }
   }
-
+  getStartingPhaseThenReset(): LexerPhase {
+    if (this._phaseExternallySet !== null) {
+      const phase = this._phaseExternallySet;
+      this._phaseExternallySet = null;
+      return phase;
+    }
+    return LexerPhase.Start;
+  }
   /**
    * Fetches the next RegEx token from the input stream
    */

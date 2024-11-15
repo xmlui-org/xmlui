@@ -69,6 +69,8 @@ export enum TokenType {
   Dot,
   Spread,
   Global,
+  Backtick,
+  DollarLBrace,
   Arrow,
 
   DecimalLiteral,

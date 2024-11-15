@@ -227,6 +227,7 @@ export type Expression =
   | MemberAccessExpression
   | CalculatedMemberAccessExpression
   | Identifier
+  | TemplateLiteralExpression
   | Literal
   | ArrayLiteral
   | ObjectLiteral
@@ -351,6 +352,11 @@ export interface Identifier extends ExpressionBase {
 export interface Literal extends ExpressionBase {
   type: "LitE";
   value: any;
+}
+
+export interface TemplateLiteralExpression extends ExpressionBase {
+  type: "TempLitE";
+  segments: (Literal | Expression)[];
 }
 
 export interface ArrayLiteral extends ExpressionBase {
