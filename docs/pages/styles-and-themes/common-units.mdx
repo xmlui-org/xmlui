@@ -330,6 +330,18 @@ Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..
 |`lighter`| One relative font weight lighter than the parent element. |
 |`bolder`| One relative font weight heavier than the parent element. |
 
+## Font Style Values [#font-style]
+
+This property determines whether a font should be styled with a normal, italic, or oblique face from its font family.
+
+Weight values can be numbers between 1 and 1000. The hundreds (100, 200, 300, ..., 900) are conventionally used. You can use a few identifiers to specify the font weights:
+
+|Value|Description|
+|-|-|
+|`normal`| Selects a font that is classified as normal within a font-family. |
+|`italic`| Selects a font that is classified as italic. If no italic version of the face is available, one classified as oblique is used instead. If neither is available, the style is artificially simulated. |
+|`oblique`| Selects a font that is classified as oblique. If no oblique version of the face is available, one classified as italic is used instead. If neither is available, the style is artificially simulated. |
+
 ## Font Stretch Values [#font-stretch]
 
 This property selects a regular, condensed, or expanded face from a font. Its value can be specified as a percentage value or as one of the following:
@@ -339,6 +351,12 @@ This property selects a regular, condensed, or expanded face from a font. Its va
 |`normal`| Specifies a normal font face. |
 |`semi‑condensed`, `condensed`, `extra‑condensed`, `ultra‑condensed`| Specifies a more condensed font face than normal, with `ultra‑condensed` as the most condensed. |
 |`semi‑expanded`, `expanded`, `extra‑expanded`, `ultra‑expanded`| Specifies a more expanded font face than normal, with `ultra‑expanded` as the most expanded. |
+
+## Opacity [#opacity]
+
+This property sets an element's opacity. Opacity is the degree to which the content behind an element is hidden, and it is the opposite of transparency. 
+
+The property value is a number in the range of 0.0 to 1.0, inclusive, or a percentage in the range of 0% to 100%, inclusive, representing the opacity of the channel (that is, the value of its alpha channel). Any value outside the interval, though valid, is clamped to the nearest limit in the range.
 
 ## Orientation [#orientation]
 

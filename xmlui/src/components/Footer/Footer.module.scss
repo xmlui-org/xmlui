@@ -19,7 +19,7 @@ $height-Footer: createThemeVar("height-#{$component}");
 $padding-horizontal-Footer: createThemeVar("padding-horizontal-#{$component}");
 $padding-vertical-Footer: createThemeVar("padding-vertical-#{$component}");
 $font-size-Footer: createThemeVar("font-size-#{$component}");
-$vertical-alignment-Footer: createThemeVar("vertical-alignment-#{$component}");
+$align-vertical-Footer: createThemeVar("align-vertical-#{$component}");
 $max-content-width-Footer: createThemeVar("max-content-width-#{$component}");
 
 .outerWrapper{
@@ -39,7 +39,7 @@ $max-content-width-Footer: createThemeVar("max-content-width-#{$component}");
   padding-top: $padding-vertical-Footer;
   padding-bottom: $padding-vertical-Footer;
   font-size: $font-size-Footer;
-  align-items: $vertical-alignment-Footer;
+  align-items: $align-vertical-Footer;
   max-width: $max-content-width-Footer;
   color: $color-text-Footer;
   margin: 0 auto;
