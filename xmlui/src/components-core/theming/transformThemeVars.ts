@@ -2,10 +2,20 @@ import Color from "color";
 
 import { HVar, parseHVar } from "@components-core/theming/hvar";
 
-export function resolveThemeVar(varName: string, theme: Record<string, string> = {}): string {
-  const value = theme[varName];
-  if (typeof value === "string" && value.startsWith("$")) {
-    return resolveThemeVar(value.substring(1), theme);
+
+export function isThemeVarName(varName: any){
+  return typeof varName === 'string' && varName?.startsWith("$");
+
+}
+
+export function resolveThemeVar(varName: string | undefined, theme: Record<string, string> = {}): string {
+  let safeVarName = varName;
+  if(isThemeVarName(varName)){
+    safeVarName = varName.substring(1);
+  }
+  const value = theme[safeVarName];
+  if (typeof value === "string" && isThemeVarName(value)) {
+    return resolveThemeVar(value, theme);
   }
   return value;
 }

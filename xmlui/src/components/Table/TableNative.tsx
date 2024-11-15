@@ -34,6 +34,8 @@ import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
 import { useIsomorphicLayoutEffect, useResizeObserver } from "@components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import { useTheme } from "@components-core/theming/ThemeContext";
+import { isThemeVarName } from "@components-core/theming/transformThemeVars";
 
 // =====================================================================================================================
 // Helper types
@@ -155,6 +157,7 @@ export const Table = forwardRef(
     }: TableProps,
     forwardedRef,
   ) => {
+    const {getThemeVar} = useTheme();
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -279,22 +282,23 @@ export const Table = forwardRef(
         ): { width?: number; starSizedWidth?: string } {
           let starSizedWidth;
           let width;
-          if (typeof colWidth === "number") {
-            width = colWidth;
-          } else if (typeof colWidth === "string") {
-            const oneStarSizedWidthMatch = colWidth.match(/^\s*\*\s*$/);
+          const resolvedWidth= isThemeVarName(colWidth) ? getThemeVar(colWidth) : colWidth;
+          if (typeof resolvedWidth === "number") {
+            width = resolvedWidth;
+          } else if (typeof resolvedWidth === "string") {
+            const oneStarSizedWidthMatch = resolvedWidth.match(/^\s*\*\s*$/);
             if (allowStarSize && oneStarSizedWidthMatch) {
               starSizedWidth = "1*";
             } else {
-              const starSizedWidthMatch = colWidth.match(/^\s*(\d+)\s*\*\s*$/);
+              const starSizedWidthMatch = resolvedWidth.match(/^\s*(\d+)\s*\*\s*$/);
               if (allowStarSize && starSizedWidthMatch) {
                 starSizedWidth = starSizedWidthMatch[1] + "*";
               } else {
-                const pixelWidthMatch = colWidth.match(/^\s*(\d+)\s*(px)?\s*$/);
+                const pixelWidthMatch = resolvedWidth.match(/^\s*(\d+)\s*(px)?\s*$/);
                 if (pixelWidthMatch) {
                   width = Number(pixelWidthMatch[1]);
                 } else {
-                  throw new Error(`Invalid TableColumnDef '${propName}' value`);
+                  throw new Error(`Invalid TableColumnDef '${propName}' value: ${resolvedWidth}`);
                 }
               }
             }
@@ -305,7 +309,7 @@ export const Table = forwardRef(
           return { width, starSizedWidth };
         }
       });
-    }, [safeColumns]);
+    }, [getThemeVar, safeColumns]);
 
     // --- Prepare column renderers according to columns defined in the table supporting optional row selection
     const columnsWithSelectColumn: ColumnDef<any>[] = useMemo(() => {
