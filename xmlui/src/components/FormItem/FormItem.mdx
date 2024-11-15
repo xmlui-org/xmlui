@@ -4,35 +4,6 @@ You can learn more about this component in the [Using Forms](../learning/using-c
 
 %-DESC-END
 
-%-PROP-START autoFocus
-
-```ueml copy /autoFocus="true"/
-<App>
-  <Form 
-    data="{{ firstname: 'James', lastname: 'Clewell' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-    <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-    <FormItem label="Lastname" bindTo="lastname" />
-  </Form>
-</App>
-```
-
-<Playground
-  name="Example: autoFocus"
-  app={`
-    <App>
-      <Form 
-        data="{{ firstname: 'James', lastname: 'Clewell' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-        <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-        <FormItem label="Lastname" bindTo="lastname" />
-      </Form>
-    </App>
-  `}
-/>
-
-%-PROP-END
-
 %-PROP-START bindTo
 
 Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `data`.

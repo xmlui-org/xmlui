@@ -176,7 +176,7 @@ export const PasswordMd = createMetadata({
 
 export const passwordInputComponentRenderer = createComponentRenderer(
   "PasswordInput",
-  TextBoxMd,
+  PasswordMd,
   ({
     node,
     state,

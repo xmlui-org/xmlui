@@ -16,31 +16,6 @@ This property sets the label of the component.
 
 Default value: `false`.
 
-```ueml copy /autoFocus="true"/
-<App>
-  <Form 
-    data="{{ firstname: 'James', lastname: 'Clewell' }}"
-    onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-    <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-    <FormItem label="Lastname" bindTo="lastname" />
-  </Form>
-</App>
-```
-
-<Playground
-  name="Example: autoFocus"
-  app={`
-    <App>
-      <Form 
-        data="{{ firstname: 'James', lastname: 'Clewell' }}"
-        onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
-        <FormItem label="Firstname" bindTo="firstname" autoFocus="true" />
-        <FormItem label="Lastname" bindTo="lastname" />
-      </Form>
-    </App>
-  `}
-/>
-
 ### `bindTo`
 
 This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
@@ -909,6 +884,6 @@ This component displays other input components and binds them with the form's lo
 | [font-style](../styles-and-themes/common-units/#font-style)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-weight](../styles-and-themes/common-units/#font-weight)-FormItemLabel | $font-weight-medium | $font-weight-medium |
 | [font-weight](../styles-and-themes/common-units/#font-weight)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| text-[transform](../styles-and-themes/common-units/#text-transform)-FormItemLabel | none | none |
-| text-[transform](../styles-and-themes/common-units/#text-transform)-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [transform](../styles-and-themes/common-units/#text-transform)-text-FormItemLabel | none | none |
+| [transform](../styles-and-themes/common-units/#text-transform)-text-FormItemLabel-required | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 

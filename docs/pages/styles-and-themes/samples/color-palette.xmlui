@@ -1,5 +1,5 @@
 <Component name="Palette">
-  <FlowLayout padding="1rem" gap="0.5rem">
+  <FlowLayout>
       <Swatch width="25%" color="$color-{$props.name || 'surface'}-50" textColor="$color-surface-950" />
       <Swatch width="25%" color="$color-{$props.name || 'surface'}-100" textColor="$color-surface-950" />
       <Swatch width="25%" color="$color-{$props.name || 'surface'}-200" textColor="$color-surface-950" />

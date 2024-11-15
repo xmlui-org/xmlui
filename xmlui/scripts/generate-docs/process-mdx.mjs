@@ -653,10 +653,9 @@ function listThemeVars(component) {
       // --- Sort by removing the optional base component prefix
       const partsA = a.split(":");
       const partsB = b.split(":");
-      if (partsA.length > 1 && partsB.length > 1) {
-        return partsA[1].localeCompare(partsB[1]);
-      }
-      return a.localeCompare(b);
+      const partAValue = partsA.length > 1 ? partsA[1] : partsA[0];
+      const partBValue = partsB.length > 1 ? partsB[1] : partsB[0];
+      return partAValue.localeCompare(partBValue);
     })
     // --- Only list theme vars that contain the component name
     .filter((themeVar) => themeVar.indexOf(component.displayName) !== -1)
@@ -667,12 +666,12 @@ function listThemeVars(component) {
       }
 
       const defaultLightVar =
-        component.defaultThemeVars?.["light"]?.[themeVar] ??
-        component.defaultThemeVars?.[themeVar] ??
+        component.defaultThemeVars?.["light"]?.[themeVar] ||
+        component.defaultThemeVars?.[themeVar] ||
         "<GrayText>none</GrayText>";
       const defaultDarkVar =
-        component.defaultThemeVars?.["dark"]?.[themeVar] ??
-        component.defaultThemeVars?.[themeVar] ??
+        component.defaultThemeVars?.["dark"]?.[themeVar] ||
+        component.defaultThemeVars?.[themeVar] ||
         "<GrayText>none</GrayText>";
 
       return [provideLinkForThemeVar(themeVar), defaultLightVar, defaultDarkVar];
@@ -733,10 +732,8 @@ const themeKeywordLinks = {
   "color-border": "[color-border](../styles-and-themes/common-units/#color)",
   "color-border-bottom": "[color-border-bottom](../styles-and-themes/common-units/#color)",
   "color-border-top": "[color-border-top](../styles-and-themes/common-units/#color)",
-  "color-border-horizontal":
-    "[color-border-horizontal](../styles-and-themes/common-units/#color)",
-  "color-border-vertical":
-    "[color-border-vertical](../styles-and-themes/common-units/#color)",
+  "color-border-horizontal": "[color-border-horizontal](../styles-and-themes/common-units/#color)",
+  "color-border-vertical": "[color-border-vertical](../styles-and-themes/common-units/#color)",
   "color-border-right": "[color-text](../styles-and-themes/common-units/#color)",
   "color-border-left": "[color-text](../styles-and-themes/common-units/#color)",
   "color-bg": "[color-bg](../styles-and-themes/common-units/#color)",
@@ -745,17 +742,14 @@ const themeKeywordLinks = {
   "font-weight": "[font-weight](../styles-and-themes/common-units/#font-weight)",
   rounding: "[rounding](../styles-and-themes/common-units/#border-rounding)",
   "style-border": "[style-border](../styles-and-themes/common-units/#border-style)",
-  "style-border-bottom":
-    "[style-border-bottom](../styles-and-themes/common-units/#border-style)",
+  "style-border-bottom": "[style-border-bottom](../styles-and-themes/common-units/#border-style)",
   "style-border-top": "[style-border-top](../styles-and-themes/common-units/#border-style)",
   "style-border-horizontal":
     "[style-border-horizontal](../styles-and-themes/common-units/#border-style)",
   "style-border-vertical":
     "[style-border-vertical](../styles-and-themes/common-units/#border-style)",
-  "style-border-right":
-    "[style-border-right](../styles-and-themes/common-units/#border-style)",
-  "style-border-left":
-    "[style-border-left](../styles-and-themes/common-units/#border-style)",
+  "style-border-right": "[style-border-right](../styles-and-themes/common-units/#border-style)",
+  "style-border-left": "[style-border-left](../styles-and-themes/common-units/#border-style)",
   size: "[size](../styles-and-themes/common-units/#size)",
   "font-size": "[font-size](../styles-and-themes/common-units/#size)",
   height: "[height](../styles-and-themes/common-units/#size)",
@@ -767,17 +761,14 @@ const themeKeywordLinks = {
   distance: "[distance](../styles-and-themes/common-units/#size)",
   thickness: "[thickness](../styles-and-themes/common-units/#size)",
   "thickness-border": "[thickness-border](../styles-and-themes/common-units/#size)",
-  "thickness-border-bottom":
-    "[thickness-border-bottom](../styles-and-themes/common-units/#size)",
+  "thickness-border-bottom": "[thickness-border-bottom](../styles-and-themes/common-units/#size)",
   "thickness-border-top": "[thickness-border-top](../styles-and-themes/common-units/#size)",
   "thickness-border-horizontal":
     "[thickness-border-horizontal](../styles-and-themes/common-units/#size)",
   "thickness-border-vertical":
     "[thickness-border-vertical](../styles-and-themes/common-units/#size)",
-  "thickness-border-right":
-    "[thickness-border-right](../styles-and-themes/common-units/#size)",
-  "thickness-border-left":
-    "[thickness-border-left](../styles-and-themes/common-units/#size)",
+  "thickness-border-right": "[thickness-border-right](../styles-and-themes/common-units/#size)",
+  "thickness-border-left": "[thickness-border-left](../styles-and-themes/common-units/#size)",
   "thickness‑decoration": "[thickness‑decoration](../styles-and-themes/common-units/#size)",
   offset: "[offset](../styles-and-themes/common-units/#size)",
   padding: "[padding](../styles-and-themes/common-units/#size)",
@@ -792,8 +783,7 @@ const themeKeywordLinks = {
   "margin-bottom": "[margin-bottom](../styles-and-themes/common-units/#size)",
   "margin-left": "[margin-left](../styles-and-themes/common-units/#size)",
   "margin-right": "[margin-right](../styles-and-themes/common-units/#size)",
-  "line-decoration":
-    "[line-decoration](../styles-and-themes/common-units/#text-decoration)",
+  "line-decoration": "[line-decoration](../styles-and-themes/common-units/#text-decoration)",
   "line-height": "[line‑height](../styles-and-themes/common-units/#size)",
   radius: "[radius](../styles-and-themes/common-units/#border-rounding)",
   "border-radius": "[border-radius](../styles-and-themes/common-units/#border-rounding)",
@@ -809,16 +799,15 @@ const themeKeywordLinks = {
   "font-stretch": "[font-stretch](../styles-and-themes/common-units/#font-stretch)",
   "font-style": "[font-style](../styles-and-themes/common-units/#font-style)",
   "letter-spacing": "[letter-spacing](../styles-and-themes/common-units/#size)",
-  "style-decoration":
-    "[style-decoration](../styles-and-themes/common-units/#text-decoration)",
+  "style-decoration": "[style-decoration](../styles-and-themes/common-units/#text-decoration)",
   "thickness-decoration":
     "[thickness-decoration](../styles-and-themes/common-units/#text-decoration)",
-  "transform":
-    "[transform](../styles-and-themes/common-units/#text-transform)",
+  transform: "[transform](../styles-and-themes/common-units/#text-transform)",
   "max-content-width": "[max-content-width](../styles-and-themes/common-units/#size)",
   "style-outline": "[style-outline](../styles-and-themes/common-units/#border)",
   "thickness-outline": "[thickness-outline](../styles-and-themes/common-units/#size)",
   "color-outline": "[color-outline](../styles-and-themes/common-units/#color)",
   "offset-outline": "[offset-outline](../styles-and-themes/common-units/#size)",
-  "opacity": "[opacity](../styles-and-themes/common-units/#opacity)",
-  };
+  opacity: "[opacity](../styles-and-themes/common-units/#opacity)",
+  cursor: "[cursor](../styles-and-themes/common-units/#cursor)",
+};

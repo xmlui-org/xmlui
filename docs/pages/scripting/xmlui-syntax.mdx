@@ -25,7 +25,9 @@ const sqrNums = nums.map(n => n * n); // Create the squares of numbers
 
 XMLUIScript provides several statements to express programming logic. Most of these statements have the same semantics as their counterpart in JavaScript.
 
-> **Note**: The statements can be optionally closed with a semicolon. There are a few contexts where the closing semicolons are required to avoid ambiguity. It is a suggested practice to conclude statements with a semicolon always.
+<Callout type="info" emoji="📔">
+The statements can be optionally closed with a semicolon. There are a few contexts where the closing semicolons are required to avoid ambiguity. It is a suggested practice to conclude statements with a semicolon always.
+</Callout>
 
 ### Variable declarations
 
@@ -84,7 +86,7 @@ Example:
 ```js
 // This for loop has no iteration body
 for (let i = 0; i < 10; i++); // The closing ";" indicates the empty statement
-````
+```
 
 ### Block Statement
 
@@ -109,7 +111,9 @@ let myNumber = 1234;
 console.log(myNumber);
 ```
 
-> **Note**: You do not need to put a closing semicolon after a block statement.
+<Callout type="info" emoji="📔">
+You do not need to put a closing semicolon after a block statement.
+</Callout>
 
 ### Expression Statement
 
@@ -124,13 +128,17 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-> **Note**: Though there is no use in evaluating the value of `123 + 456` expression statement, the engine does that (in every iteration) and omits the result.
+<Callout type="info" emoji="📔">
+Though there is no use in evaluating the value of `123 + 456` expression statement, the engine does that (in every iteration) and omits the result.
+</Callout>
 
 ### The `if...else` Statement
 
 The `if...else` statement executes a statement if a specified condition is *truthy*. If the condition is *falsy*, another statement in the optional else clause will be executed.
 
-> **Note**: A *truthy* value is a value that is considered `true` when encountered in a Boolean context: All values are *truthy* unless they are defined as *falsy*. That is, all values are *truthy* except `false`, `0`, `-0`, `""`, `null`, `undefined`, and `NaN`.
+<Callout type="info" emoji="📔">
+A *truthy* value is a value that is considered `true` when encountered in a Boolean context: All values are *truthy* unless they are defined as *falsy*. That is, all values are *truthy* except `false`, `0`, `-0`, `""`, `null`, `undefined`, and `NaN`.
+</Callout>
 
 Here are a few examples:
 
@@ -149,7 +157,9 @@ if (a > 3) {
 else doThat();
 ```
 
-> **Note**: Example #2 shows that you need a closing semicolon before `else`, as the consequent ("then") branch of the `if...else` statement is a single (non-block) statement.
+<Callout type="info" emoji="📔">
+Example #2 shows that you need a closing semicolon before `else`, as the consequent ("then") branch of the `if...else` statement is a single (non-block) statement.
+</Callout>
 
 ### The `while` Statement
 
@@ -536,7 +546,7 @@ The engine considers the empty code (whitespaces only) a no-op declaration and t
 
 ```js
 () => {}
-````
+```
 
 ### Identifiers
 
@@ -544,9 +554,34 @@ The engine considers the identifiers to be arrow function names. It transforms t
 
 ```js
 (arg1, arg2, /* ... */, argN) => idUsed(arg1, arg2, /* ... */, argN)
-````
+```
 
-> **Note**: Here, `idUsed` is the identifier used as the event handler, and `arg1`,  `arg2`, and `argN` are the event arguments.
+<Callout type="info" emoji="📔">
+Here, `idUsed` is the identifier used as the event handler, and `arg1`,  `arg2`, and `argN` are the event arguments.
+</Callout>
+
+### Member Access Chain
+
+The engine considers the member access chains to be evaluated to arrow function expressions. It transforms them into arrow functions with as many arguments as the corresponding event. Provided an event has *N* arguments (*N* can be zero), the engine applies this transform:
+
+```js
+(arg1, arg2, /* ... */, argN) => memberAccessChain(arg1, arg2, /* ... */, argN)
+```
+
+The engine takes identifiers chained together with the member access (`.`) operator or the calculated member access operator (`[<literal>]`) as a member access chain. Here are a few examples:
+
+```js
+action.execute
+operation[0].handler.fire
+operation["do-it"].handler.fire
+```
+
+However, the calculated member access operator with expressions (and not literals) breaks this chain. For example, these expressions do not turn the member access expression chain into an arrow function:
+
+```js
+operation[index + 3].handler.fire
+operation["do" + "it"].handler.fire
+```
 
 ### Expressions
 
@@ -649,4 +684,6 @@ Transformed event handler:
 }
 ```
 
-> **Note**: Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
+<Callout type="info" emoji="📔">
+Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
+</Callout>

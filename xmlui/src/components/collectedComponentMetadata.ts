@@ -86,6 +86,7 @@ import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
+import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -141,7 +142,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
-  MultiCombobox: ComboboxMd,
+  MultiCombobox: MultiComboboxMd,
   MultiSelect: MultiSelectMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,

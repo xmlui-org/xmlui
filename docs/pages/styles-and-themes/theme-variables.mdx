@@ -114,9 +114,11 @@ For example, when you set the the `color-primary` variable to `#008000`, XMLUI c
   name="Custom primary color shades"
   components={[swatch, palette]}
   app={`
-    <Theme color-primary="#008000">
-      <Palette name="primary" />
-    </Theme>
+    <App>
+      <Theme color-primary="#008000">
+        <Palette name="primary" />
+      </Theme>
+    </App>
   `}
 />
 
@@ -125,9 +127,11 @@ When selecting the primary color, choose one representing the middle shade (500)
   name="Unuseful primary color shades"
   components={[swatch, palette]}
   app={`
-    <Theme color-primary="#001000">
-      <Palette name="primary" />
-    </Theme>
+    <App>
+      <Theme color-primary="#001000">
+        <Palette name="primary" />
+      </Theme>
+    </App>
   `}
 />
 
@@ -140,7 +144,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Surface Colors"
   components={[swatch, palette]}
-  app={`<Palette name="surface" />`}
+  app={`
+    <App>
+      <Palette name="surface" />
+    </App>
+  `}
 />
 
 #### Primary
@@ -148,7 +156,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Primary Colors"
   components={[swatch, palette]}
-  app={`<Palette name="primary" />`}
+  app={`
+    <App>
+      <Palette name="primary" />
+    </App>
+  `}
 />
 
 #### Secondary
@@ -156,7 +168,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Secondary Colors"
   components={[swatch, palette]}
-  app={`<Palette name="secondary" />`}
+  app={`
+    <App>
+      <Palette name="secondary" />
+    </App>
+  `}
 />
 
 #### Warn
@@ -164,7 +180,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Warn Colors"
   components={[swatch, palette]}
-  app={`<Palette name="warn" />`}
+  app={`
+    <App>
+      <Palette name="warn" />
+    </App>
+  `}
 />
 
 #### Danger
@@ -172,7 +192,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Danger Colors"
   components={[swatch, palette]}
-  app={`<Palette name="danger" />`}
+  app={`
+    <App>
+      <Palette name="danger" />
+    </App>
+  `}
 />
 
 #### Success
@@ -180,7 +204,11 @@ XMLUI declares these default color shade sets:
 <Playground
   name="Success Colors"
   components={[swatch, palette]}
-  app={`<Palette name="success" />`}
+  app={`
+    <App>
+      <Palette name="success" />
+    </App>
+  `}
 />
 
 #### Default Text Colors
@@ -195,32 +223,32 @@ XMLUI declares these default color shade sets:
   name="Default Text Colors"
   components={[swatch]}
   app={`
-  <VStack padding="1rem" gap="0.5rem">
-    <HStack gap="0.5rem">
+  <App>
+    <HStack>
       <Text width="180px" variant="strong">color-text-primary:</Text>
       <Text color="$color-text-primary">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="180px" variant="strong">color-text-secondary:</Text>
       <Text color="$color-text-secondary">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="180px" variant="strong">color-text-attention:</Text>
       <Text color="$color-text-attention">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="180px" variant="strong">color-text-subtitle:</Text>
       <Text color="$color-text-subtitle">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="180px" variant="strong">color-text--disabled:</Text>
       <Text color="$color-text--disabled">This is an example text</Text>
     </HStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -240,17 +268,19 @@ XMLUI declares these default color shade sets:
   name="Default Background Colors"
   components={[swatch]}
   app={`
-  <FlowLayout padding="1rem" gap="0.5rem">
-      <Swatch color="$color-bg" width="25%" />
-      <Swatch color="$color-bg-primary" width="25%" />
-      <Swatch color="$color-bg-secondary" width="25%" />
-      <Swatch color="$color-bg-attention" width="25%" />
-      <Swatch color="$color-bg--disabled" width="25%" />
-      <Swatch color="$color-bg--selected" width="25%" />
-      <Swatch color="$color-bg-overlay" width="25%" />
-      <Swatch color="$color-bg-dropdown-item--hover" width="50%" />
-      <Swatch color="$color-bg-dropdown-item--active" width="50%" />
-  </FlowLayout>
+    <App>
+      <FlowLayout>
+          <Swatch color="$color-bg" width="25%" />
+          <Swatch color="$color-bg-primary" width="25%" />
+          <Swatch color="$color-bg-secondary" width="25%" />
+          <Swatch color="$color-bg-attention" width="25%" />
+          <Swatch color="$color-bg--disabled" width="25%" />
+          <Swatch color="$color-bg--selected" width="25%" />
+          <Swatch color="$color-bg-overlay" width="25%" />
+          <Swatch color="$color-bg-dropdown-item--hover" width="50%" />
+          <Swatch color="$color-bg-dropdown-item--active" width="50%" />
+      </FlowLayout>
+    </App>
   `}
 />
 
@@ -266,12 +296,14 @@ These colors represent validation states:
   name="Validation Colors"
   components={[swatch]}
   app={`
-  <FlowLayout padding="1rem" gap="0.5rem">
-    <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
-    <Swatch color="$color-valid" width="25%" textColor="$color-surface-50" />
-    <Swatch color="$color-warning" width="25%" textColor="$color-surface-50" />
-    <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
-  </FlowLayout>
+    <App>
+      <FlowLayout>
+        <Swatch color="$color-info" width="25%" textColor="$color-surface-50" />
+        <Swatch color="$color-valid" width="25%" textColor="$color-surface-50" />
+        <Swatch color="$color-warning" width="25%" textColor="$color-surface-50" />
+        <Swatch color="$color-error" width="25%" textColor="$color-surface-50" />
+      </FlowLayout>
+    </App>
   `}
 />
 
@@ -287,22 +319,22 @@ These theme variables set the default font styles:
 <Playground
   name="Font Family"
   app={`
-  <VStack padding="1rem" gap="0.5rem">
-    <HStack gap="0.5rem">
+  <App>
+    <HStack>
       <Text width="200px" variant="strong">Default font family:</Text>
       <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="200px" variant="strong">Sans serif font family:</Text>
       <Text fontFamily="$font-family-sans-serif">This is an example text</Text>
     </HStack>
 
-    <HStack gap="0.5rem">
+    <HStack>
       <Text width="200px" variant="strong">Monospace font family:</Text>
       <Text fontFamily="$font-family-monospace">This is an example text</Text>
     </HStack>
-  </VStack>
+  </App>
   `}
 />
 
@@ -313,37 +345,37 @@ These theme variables define a set of line heights:
 <Playground
   name="Line Height"
   app={`
-  <VStack padding="1rem" gap="0.5rem">
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-none:</Text>
-      <Text lineHeight="$line-height-none" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
+    <App>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-none:</Text>
+        <Text lineHeight="$line-height-none" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-tight:</Text>
-      <Text lineHeight="$line-height-tight" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-tight:</Text>
+        <Text lineHeight="$line-height-tight" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-snug:</Text>
-      <Text lineHeight="$line-height-snug" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-snug:</Text>
+        <Text lineHeight="$line-height-snug" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-normal:</Text>
-      <Text lineHeight="$line-height-normal" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-normal:</Text>
+        <Text lineHeight="$line-height-normal" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-relaxed:</Text>
-      <Text lineHeight="$line-height-relaxed" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-relaxed:</Text>
+        <Text lineHeight="$line-height-relaxed" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="180px" variant="strong">line-height-loose:</Text>
-      <Text lineHeight="$line-height-loose" backgroundColor="$color-surface-300">This is an example text</Text>
-    </HStack>
-  </VStack>
+      <HStack verticalAlignment="center">
+        <Text width="180px" variant="strong">line-height-loose:</Text>
+        <Text lineHeight="$line-height-loose" backgroundColor="$color-surface-300">This is an example text</Text>
+      </HStack>
+    </App>
   `}
 />
 
@@ -354,42 +386,42 @@ The `font-size` theme variables allow you to set your themes' normal font size (
 <Playground
   name="Font Size"
   app={`
-  <VStack padding="1rem" gap="0.5rem">
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-tiny:</Text>
-      <Text fontSize="$font-size-tiny">This is an example text</Text>
-    </HStack>
+    <App>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-tiny:</Text>
+        <Text fontSize="$font-size-tiny">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-smaller:</Text>
-      <Text fontSize="$font-size-smaller">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-smaller:</Text>
+        <Text fontSize="$font-size-smaller">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-small:</Text>
-      <Text fontSize="$font-size-small">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-small:</Text>
+        <Text fontSize="$font-size-small">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-normal:</Text>
-      <Text fontSize="$font-size-normal">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-normal:</Text>
+        <Text fontSize="$font-size-normal">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-medium:</Text>
-      <Text fontSize="$font-size-medium">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-medium:</Text>
+        <Text fontSize="$font-size-medium">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-large:</Text>
-      <Text fontSize="$font-size-large">This is an example text</Text>
-    </HStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-large:</Text>
+        <Text fontSize="$font-size-large">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem" verticalAlignment="center">
-      <Text width="160px" variant="strong">font-size-gigantic:</Text>
-      <Text fontSize="$font-size-gigantic">This is an example text</Text>
-    </HStack>
-  </VStack>
+      <HStack verticalAlignment="center">
+        <Text width="160px" variant="strong">font-size-gigantic:</Text>
+        <Text fontSize="$font-size-gigantic">This is an example text</Text>
+      </HStack>
+    </App>
   `}
 />
 
@@ -400,47 +432,38 @@ The `font-weight` theme variables allow you to set your themes' normal font weig
 <Playground
   name="Font Weight"
   app={`
-  <VStack padding="1rem" gap="0.5rem">
-    <HStack gap="0.5rem">
-      <Text width="200px" variant="strong">font-weight-light:</Text>
-      <Text fontWeight="$font-weight-light">This is an example text</Text>
-    </HStack>
+    <App>
+      <HStack>
+        <Text width="200px" variant="strong">font-weight-light:</Text>
+        <Text fontWeight="$font-weight-light">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem">
-      <Text width="200px" variant="strong">font-weight-normal:</Text>
-      <Text fontWeight="$font-weight-normal">This is an example text</Text>
-    </HStack>
+      <HStack>
+        <Text width="200px" variant="strong">font-weight-normal:</Text>
+        <Text fontWeight="$font-weight-normal">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem">
-      <Text width="200px" variant="strong">font-weight-medium:</Text>
-      <Text fontWeight="$font-weight-medium">This is an example text</Text>
-    </HStack>
+      <HStack>
+        <Text width="200px" variant="strong">font-weight-medium:</Text>
+        <Text fontWeight="$font-weight-medium">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem">
-      <Text width="200px" variant="strong">font-weight-bold:</Text>
-      <Text fontWeight="$font-weight-bold">This is an example text</Text>
-    </HStack>
+      <HStack>
+        <Text width="200px" variant="strong">font-weight-bold:</Text>
+        <Text fontWeight="$font-weight-bold">This is an example text</Text>
+      </HStack>
 
-    <HStack gap="0.5rem">
-      <Text width="200px" variant="strong">font-weight-extra-bold:</Text>
-      <Text fontWeight="$font-weight-extra-bold">This is an example text</Text>
-    </HStack>
-  </VStack>
+      <HStack>
+        <Text width="200px" variant="strong">font-weight-extra-bold:</Text>
+        <Text fontWeight="$font-weight-extra-bold">This is an example text</Text>
+      </HStack>
+    </App>
   `}
 />
 
 ### Shadows
 
 XMLUI defines a few stock shadow resources:
-
-```ueml /shadow="$shadow-xxl"/
-<Card shadow="$shadow-xxl">
-  <HStack verticalAlignment="center" gap="0.5rem">
-    <Icon name="info" />
-    <Text value="Information" variant="strong" />
-  </HStack>
-</Card>
-```
 
 <Playground
   name="Shadows"
