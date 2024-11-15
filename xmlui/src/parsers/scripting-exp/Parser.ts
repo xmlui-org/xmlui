@@ -49,6 +49,7 @@ import type {
   VarStatement,
   WhileStatement,
   ImportedItem,
+  TemplateLiteralExpression,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { Lexer } from "./Lexer";
@@ -547,7 +548,7 @@ export class Parser {
           this.reportError("W031");
           return null;
         }
-  
+
         endToken = nextToken;
         nextToken = this._lexer.get();
       } else if (nextToken.type === TokenType.LSquare) {
@@ -2249,6 +2250,9 @@ export class Parser {
           idToken
         );
       }
+      case TokenType.Backtick:
+        return this.parseTemplateLiteral();
+
       case TokenType.False:
       case TokenType.True:
         this._lexer.get();
@@ -2338,6 +2342,39 @@ export class Parser {
     return null;
   }
 
+  private parseTemplateLiteral(): TemplateLiteralExpression {
+    const startToken = this._lexer.get()
+    this._lexer.setStartingPhaseToTemplateLiteral();
+    const segments: (Literal | Expression)[] = [];
+    loop: while (true) {
+      let nextToken = this._lexer.peek();
+      switch (nextToken.type) {
+        case TokenType.StringLiteral:
+          this._lexer.get();
+          const str = this.parseStringLiteral(nextToken, false);
+          segments.push(str);
+          break;
+        case TokenType.DollarLBrace:
+          this._lexer.get();
+          const innerExpr = this.parseExpr();
+          segments.push(innerExpr);
+          this.expectToken(TokenType.RBrace, "W004");
+          this._lexer.setStartingPhaseToTemplateLiteral()
+          break;
+        case TokenType.Backtick:
+          break loop;
+        default:
+          this.reportError("W004");
+      }
+    }
+    const endToken = this._lexer.get()
+    return this.createExpressionNode<TemplateLiteralExpression>(
+      "TempLitE",
+      { segments },
+      startToken,
+      endToken,
+    );
+  }
   /**
    * Parses an array literal
    */
@@ -2740,8 +2777,8 @@ export class Parser {
    * Converts a string token to intrinsic string
    * @param token Literal token
    */
-  private parseStringLiteral(token: Token): Literal {
-    const input = token.text.length < 2 ? "" : token.text.substring(1, token.text.length - 1);
+  private parseStringLiteral(token: Token, quoteSurrounded: boolean = true): Literal {
+       const input = token.text.length < 2 || !quoteSurrounded ? token.text : token.text.substring(1, token.text.length - 1);
     let result = "";
     let state: StrParseState = StrParseState.Normal;
     let collect = 0;

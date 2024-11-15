@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { ArrayLiteral, Expression, Identifier, Literal, ObjectLiteral } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { ArrayLiteral, Expression, Identifier, Literal, ObjectLiteral, BinaryExpression, TemplateLiteralExpression} from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { tokenTraits } from "@parsers/scripting-exp/TokenTrait";
 import { TokenType } from "@parsers/scripting-exp/TokenType";
 
@@ -259,6 +259,134 @@ describe("Parser - literals", () => {
       expect(literal.value).equal(c.exp);
     });
   });
+  it("template string, no placeholder", () => {
+    // --- Arrange
+    const wParser = new Parser("`hi\\n\\x41`");
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    expect(expr.type).equal("TempLitE");
+    const literal = expr as TemplateLiteralExpression;
+    expect(literal.segments).toHaveLength(1);
+    expect(literal.segments[0].type).equal("LitE");
+    expect((literal.segments[0] as Literal).value).equal("hi\nA");
+  });
+
+  it("template string, expr placeholder", () => {
+    // --- Arrange
+    const wParser = new Parser("`hi ${ 1 + 2 } there`");
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    expect(expr.type).equal("TempLitE");
+    const literal = expr as TemplateLiteralExpression;
+
+    expect(literal.segments).toHaveLength(3);
+    expect(literal.segments[0].type).equal("LitE");
+    expect((literal.segments[0] as Literal).value).equal("hi ");
+
+    const binary = literal.segments[1] as BinaryExpression;
+    expect(binary.type).equal("BinaryE");
+    expect(binary.op).equal("+");
+    expect(binary.left.type).equal("LitE");
+    expect((binary.left as Literal).value).equal(1);
+    expect(binary.right.type).equal("LitE");
+    expect((binary.right as Literal).value).equal(2);
+
+    expect(literal.segments[2].type).equal("LitE");
+    expect((literal.segments[2] as Literal).value).equal(" there");
+  });
+
+  it("template string, no str before placeholder", () => {
+    // --- Arrange
+    const wParser = new Parser("`${ 1 + 2 } there`");
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    expect(expr.type).equal("TempLitE");
+    const literal = expr as TemplateLiteralExpression;
+
+    expect(literal.segments).toHaveLength(2);
+
+    const binary = literal.segments[0] as BinaryExpression;
+    expect(binary.type).equal("BinaryE");
+    expect(binary.op).equal("+");
+    expect(binary.left.type).equal("LitE");
+    expect((binary.left as Literal).value).equal(1);
+    expect(binary.right.type).equal("LitE");
+    expect((binary.right as Literal).value).equal(2);
+
+    expect(literal.segments[1].type).equal("LitE");
+    expect((literal.segments[1] as Literal).value).equal(" there");
+  });
+
+  it("template string, no str after placeholder", () => {
+    // --- Arrange
+    const wParser = new Parser("`hi ${ 1 + 2 }`");
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    expect(expr.type).equal("TempLitE");
+    const literal = expr as TemplateLiteralExpression;
+
+    expect(literal.segments).toHaveLength(2);
+    expect(literal.segments[0].type).equal("LitE");
+    expect((literal.segments[0] as Literal).value).equal("hi ");
+
+    const binary = literal.segments[1] as BinaryExpression;
+    expect(binary.type).equal("BinaryE");
+    expect(binary.op).equal("+");
+    expect(binary.left.type).equal("LitE");
+    expect((binary.left as Literal).value).equal(1);
+    expect(binary.right.type).equal("LitE");
+    expect((binary.right as Literal).value).equal(2);
+  });
+  it("template string, nested template string placeholder", () => {
+    // --- Arrange
+    const wParser = new Parser("`hi ${ `all ${2} people` } there`");
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    expect(expr.type).equal("TempLitE");
+    const literal = expr as TemplateLiteralExpression;
+
+    expect(literal.segments).toHaveLength(3);
+    expect(literal.segments[0].type).equal("LitE");
+    expect((literal.segments[0] as Literal).value).equal("hi ");
+
+    {
+      const literalNested = literal.segments[1] as TemplateLiteralExpression;
+      expect(literalNested.type).equal("TempLitE");
+
+      expect(literalNested.segments).toHaveLength(3);
+      expect(literalNested.segments[0].type).equal("LitE");
+      expect((literalNested.segments[0] as Literal).value).equal("all ");
+
+      expect(literalNested.segments[1].type).equal("LitE");
+      expect((literalNested.segments[1] as Literal).value).equal(2);
+
+      expect(literalNested.segments[2].type).equal("LitE");
+      expect((literalNested.segments[2] as Literal).value).equal(" people");
+    }
+
+    expect(literal.segments[2].type).equal("LitE");
+    expect((literal.segments[2] as Literal).value).equal(" there");
+  });
 
   const arrayCases = [
     { src: "[]", len: 0, idx: -1, exp: null },
@@ -349,4 +477,7 @@ describe("Parser - literals", () => {
       expect(literal.value).equal(123);
     });
   });
+
+
+
 });
