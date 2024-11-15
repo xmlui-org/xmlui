@@ -433,8 +433,8 @@ function RootContentComponent({
     routerBaseName,
     setActiveThemeId,
     setActiveThemeTone,
-    standalone,
-    get,
+    toggleThemeTone,
+    standalone
   ]);
 
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);

@@ -5,6 +5,8 @@
 }
 
 .baseRootComponent {
+  container-type: size;
+  container-name: app-container;
   width: 100%;
   position: relative;
   height: inherit;

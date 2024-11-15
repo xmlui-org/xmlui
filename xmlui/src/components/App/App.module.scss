@@ -80,17 +80,17 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
     height: 100%;
     overflow: auto;
     scroll-padding-top: var(--header-height);
+    --containerHeight: 100vh;
     //padding-bottom: var(--footer-height);
     .navPanelWrapper {
       width: $width-navPanel-App;
       position: sticky;
-      height: calc(100vh - var(--footer-height) - var(--header-height));
+      height: calc(var(--containerHeight) - var(--footer-height) - var(--header-height));
       top: var(--header-height);
     }
-
     .PagesWrapper {
       overflow: initial;
-      min-height: calc(100vh - var(--header-height) - var(--footer-height));
+      min-height: calc(var(--containerHeight) - var(--header-height) - var(--footer-height));
       height: 100%;
     }
 
@@ -106,6 +106,10 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
       left: 0;
       right: 0;
       bottom: 0;
+    }
+
+    @container app-container (height > 0) {
+      --containerHeight: 100cqh;
     }
   }
 
@@ -251,6 +255,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
   //bottom:  calc(-1 * var(--footer-height));
   //margin-bottom: calc(-1 * var(--footer-height));
 }
+
 
 // --- We export the theme variables to add them to the component renderer
 :export {
