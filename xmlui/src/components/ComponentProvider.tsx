@@ -138,6 +138,8 @@ import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneC
 import {apiCallRenderer} from "@components/APICall/APICall";
 import {option2ComponentRenderer} from "@components/Option/Option2";
 import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
+import {select2ComponentRenderer} from "@components/Select/Select2";
+import {selectOptionComponentRenderer} from "@components/Select/SelectOption";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -283,6 +285,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Option2 !== "false") {
       this.registerComponentRenderer(option2ComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
+      this.registerComponentRenderer(selectOptionComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
     }
@@ -354,6 +359,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
       this.registerComponentRenderer(combobox2ComponentRenderer);
+      this.registerComponentRenderer(select2ComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
