@@ -1,9 +1,9 @@
-import * as Select from "@radix-ui/react-select";
+import * as SelectPrimitive from "@radix-ui/react-select";
 import React from "react";
 import Icon from "@components/Icon/IconNative";
-import classnames from "classnames";
+import styles from "./SelectOption.module.scss";
 
-type SelectItemProps = React.ComponentProps<typeof Select.Item>;
+type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 
 type SelectOptionProps = SelectItemProps & {
   label: string;
@@ -11,17 +11,19 @@ type SelectOptionProps = SelectItemProps & {
 };
 
 export const SelectOption = React.forwardRef<
-  React.ElementRef<typeof Select.Item>,
+  React.ElementRef<typeof SelectPrimitive.Item>,
   SelectOptionProps
->(({ className, value, label }, forwardedRef) => {
+>(({ value, label }, ref) => {
   return (
-    <Select.Item className={classnames("SelectItem", className)} value={value} ref={forwardedRef}>
-      <Select.ItemText>{label}</Select.ItemText>
-      <Select.ItemIndicator className="SelectItemIndicator">
-        <Icon name="check" />
-      </Select.ItemIndicator>
-    </Select.Item>
+    <SelectPrimitive.Item ref={ref} className={styles.selectItem} value={value}>
+      <span className={styles.selectItemIndicator}>
+        <SelectPrimitive.ItemIndicator>
+          <Icon name="check" />
+        </SelectPrimitive.ItemIndicator>
+      </span>
+      <SelectPrimitive.ItemText>{label}</SelectPrimitive.ItemText>
+    </SelectPrimitive.Item>
   );
 });
 
-SelectOption.displayName = "SelectItem";
+SelectOption.displayName = "SelectOption";
