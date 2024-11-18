@@ -6,6 +6,11 @@ import { Callout } from "nextra/components";
 
 The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order.
 
+The component provides context values with which you can access some internal properties:
+
+- `$completedItems`: A list containing the queue items that have been completed (fully processed).
+
+
 ## Using Queue
 
 As its name suggests, the `Queue` component keeps a queue of items to process. You can add items to the queue with the `enqueueItem` (or `enqueueItems`) method. Once the queue has some items to process, the engine reads them one by one (in FIFO order) and processes an item with the `process` event handler.
@@ -374,13 +379,7 @@ Click the button several times and see how the number of skipped items increment
   `}
 />
 
-## Context Values
-
-### `$completedItems`
-
-A list containing the queue items that have been completed (fully processed).
-
-## Exposed Members
+## Exposed Methods
 
 ### `enqueueItem`
 
