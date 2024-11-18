@@ -140,15 +140,18 @@ export function Combobox2({
           <Command>
             <CommandInput placeholder="Search..." className={styles.commandInput} />
             <CommandList className={styles.commandList}>
-              <CommandEmpty className={styles.commandEmpty}>
-                {emptyListTemplate ?? (
-                  <span className={styles.empty}>
-                    <Icon name={"noresult"} />
-                    List is empty
-                  </span>
-                )}
-              </CommandEmpty>
-              <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+              {React.Children.toArray(children).length > 0 ? (
+                <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+              ) : (
+                <CommandEmpty className={styles.commandEmpty}>
+                  {emptyListTemplate ?? (
+                    <div className={styles.empty}>
+                      <Icon name={"noresult"} />
+                      <span>List is empty</span>
+                    </div>
+                  )}
+                </CommandEmpty>
+              )}
             </CommandList>
           </Command>
         </PopoverContent>

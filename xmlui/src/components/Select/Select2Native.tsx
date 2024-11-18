@@ -1,4 +1,5 @@
-import { CSSProperties, ReactNode, useEffect } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
@@ -54,7 +55,7 @@ export function Select2({
   layout,
   children,
 }: SelectProps) {
-  const [open, setOpen] = React.useState(false);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
   useEffect(() => {
     updateState({ value: initialValue });
@@ -62,12 +63,30 @@ export function Select2({
 
   const onInputChange = useCallback(
     (selectedOption: Option) => {
-      setOpen(false);
       updateState({ value: selectedOption.value });
       onDidChange(selectedOption.value);
     },
     [onDidChange, updateState],
   );
+
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
+
+  const handleOnBlur = useCallback(() => {
+    onBlur?.();
+  }, [onBlur]);
+
+  const focus = useCallback(() => {
+    referenceElement?.focus();
+  }, [referenceElement]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+    });
+  }, [focus, registerComponentApi]);
 
   const contextValue = useMemo(
     () => ({
@@ -78,13 +97,24 @@ export function Select2({
     [onInputChange, optionRenderer, value],
   );
 
+  useEffect(() => {
+    console.log(React.Children.toArray(children));
+  }, [children]);
+
   return (
     <SelectContext2.Provider value={contextValue}>
       <Select>
-        <SelectTrigger id={id} enabled={enabled}>
+        <SelectTrigger
+          id={id}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          enabled={enabled}
+          validationStatus={validationStatus}
+          ref={setReferenceElement}
+        >
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
-        <SelectContent>{children}</SelectContent>
+        <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
       </Select>
     </SelectContext2.Provider>
   );
@@ -92,11 +122,14 @@ export function Select2({
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & { enabled: boolean }
->(({ className, children, enabled, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    enabled?: boolean;
+    validationStatus?: ValidationStatus;
+  }
+>(({ className, children, enabled, validationStatus, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
-    className={styles.selectTrigger}
+    className={classnames(styles.selectTrigger, styles[validationStatus])}
     {...props}
     disabled={!enabled}
   >
@@ -133,24 +166,27 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
->(({ className, children, position = "popper", ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { emptyListTemplate?: ReactNode }
+>(({ className, children, emptyListTemplate, ...props }, ref) => (
   <SelectPrimitive.Portal>
     <SelectPrimitive.Content
       ref={ref}
-      className={classnames(styles.selectContent, {
-        [styles.popper]: position === "popper",
-      })}
-      position={position}
+      className={styles.selectContent}
+      position="popper"
       {...props}
     >
       <SelectScrollUpButton />
-      <SelectPrimitive.Viewport
-        className={classnames(styles.selectViewport, {
-          [styles.popper]: position === "popper",
-        })}
-      >
-        {children}
+      <SelectPrimitive.Viewport className={classnames(styles.selectViewport, {})}>
+        {React.Children.toArray(children).length > 0 ? (
+          <>{children}</>
+        ) : (
+          emptyListTemplate ?? (
+            <div className={styles.selectEmpty}>
+              <Icon name={"noresult"} />
+              <span>List is empty</span>
+            </div>
+          )
+        )}
       </SelectPrimitive.Viewport>
       <SelectScrollDownButton />
     </SelectPrimitive.Content>
