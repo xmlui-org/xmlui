@@ -145,10 +145,10 @@ export function Combobox2({
               ) : (
                 <CommandEmpty className={styles.commandEmpty}>
                   {emptyListTemplate ?? (
-                    <div className={styles.empty}>
+                    <>
                       <Icon name={"noresult"} />
                       <span>List is empty</span>
-                    </div>
+                    </>
                   )}
                 </CommandEmpty>
               )}

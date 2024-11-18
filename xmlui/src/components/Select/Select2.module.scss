@@ -106,7 +106,6 @@
 }
 
 .selectViewport {
-  padding: 0.25rem;
   height: var(--radix-select-trigger-height);
   width: 100%;
   min-width: var(--radix-select-trigger-width);
@@ -115,7 +114,7 @@
 .selectEmpty {
   display: flex;
   gap: .2rem;
-  padding: 14px 0;
+  padding: 10px 0;
   justify-content: center;
   align-items: center;
   font-size: 14px;

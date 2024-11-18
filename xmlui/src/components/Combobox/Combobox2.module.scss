@@ -129,10 +129,13 @@ $componentName: "Combobox";
 }
 
 .commandEmpty {
-  padding: 0.5rem 1rem;
-  color: #6b7280;
-  text-align: center;
+  padding: 10px 0;
   font-size: 0.875rem;
+  display: flex;
+  gap: 0.5rem;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
 }
 
 .checkIcon {
@@ -143,14 +146,6 @@ $componentName: "Combobox";
 
 .checkIconVisible {
   opacity: 1;
-}
-
-.empty {
-  display: flex;
-  gap: 0.5rem;
-  width: 100%;
-  align-items: center;
-  justify-content: center;
 }
 
 // --- We export the theme variables to add them to the component renderer
