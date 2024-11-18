@@ -52,7 +52,6 @@ import { RadioGroupMd } from "@components/RadioGroup/RadioGroup";
 import { RealTimeAdapterMd } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "@components/Redirect/Redirect";
 import { SelectMd } from "@components/Select/Select";
-import { Select2Md } from "@components/Select2/Select2";
 import { SelectionStoreMd } from "@components/SelectionStore/SelectionStore";
 import { SpaceFillerMd } from "@components/SpaceFiller/SpaceFiller";
 import { SpinnerMd } from "@components/Spinner/Spinner";
@@ -128,7 +127,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,
-  Select2: Select2Md,
   SelectionStore: SelectionStoreMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,

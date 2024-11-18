@@ -27,28 +27,26 @@ $componentName: "Select";
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
-  &:focus-visible {
+  &:focus {
     outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
     outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
     outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
     outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
   }
 
-  .placeholder {
+  &::placeholder {
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
 }
 
-.selectContainer {
+.selectTrigger {
   display: flex;
   padding: t.$space-2;
   width: 100%;
-  border-style: solid;
-  border-width: 1px;
-  outline: #00B248;
-  transition: background-color ease-in 0.1s;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
   overflow: hidden;
-  position: relative;
 
   @include variant("default");
 
@@ -63,106 +61,178 @@ $componentName: "Select";
   &.valid {
     @include variant("success");
   }
-
-  &.disabled {
-    cursor: not-allowed;
-    background-color: createThemeVar("Input:color-bg-Select--disabled");
-    color: createThemeVar("Input:color-text-Select--disabled");
-    border-color: createThemeVar("Input:color-border-Select--disabled");
-
-    .inputRoot {
-      .indicator, .input {
-        cursor: not-allowed;
-      }
-    }
-  }
-
-  .inputRoot {
-    position: relative;
-    width: 100%;
-  }
-
-  .indicator {
-    font-size: inherit;
-    color: createThemeVar("Input:color-text-indicator-Select");
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: transparent;
-    cursor: pointer;
-    border: 0;
-    margin: 0;
-    pointer-events: none;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-  }
 }
 
-.input {
-  font-size: inherit;
-  color: inherit;
-  text-align: left;
-  border: 0;
-  outline: none;
-  background-color: transparent;
-  width: 100%;
-  padding: 0;
-  cursor: pointer;
+.selectTrigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
+  color: createThemeVar("Input:color-text-#{$componentName}--disabled");
+  border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
 }
 
-.selectMenu {
-  padding: 0;
-  overflow-y: auto;
-  list-style: none;
-  transition: height 0.2s ease;
-  height: fit-content;
-  box-shadow: createThemeVar("Input:shadow-menu-Select");
-  max-height: 200px;
-  background-color: createThemeVar("Input:color-bg-menu-Select");
+.selectTrigger > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.selectScrollUpButton {
+  display: flex;
+  cursor: default;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.selectScrollDownButton {
+  display: flex;
+  cursor: default;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.selectContent {
+  position: relative;
+  z-index: 50;
+  max-height: 24rem;
+  min-width: 8rem;
+  overflow: hidden;
+  //background-color: createThemeVar("Input:color-bg-menu-Select");
+  background-color: #fff;
   border-radius: createThemeVar("Input:radius-menu-Select");
+  box-shadow: createThemeVar("Input:shadow-menu-Select");
 
-  &:focus,
-  &:focus-visible {
-    outline: none;
+  &[data-state='open'] {
+    animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
   }
 
-  .item {
-    display: flex;
-    padding-top: .5em;
-    padding-bottom: .5em;
-    padding-inline: 1em;
-    font-size: createThemeVar("Input:font-size-Select");
-    align-items: center;
-    user-select: none;
+  &[data-state='closed'] {
+    animation: fadeOut 0.3s ease-in-out, zoomOut 0.3s ease-in-out;
+  }
 
-    .empty {
-      display: flex;
-      gap: 0.5rem;
-      width: 100%;
-      align-items: center;
-      justify-content: center;
-    }
+  &[data-side='bottom'] {
+    animation: slideInFromTop 0.08s ease-in-out;
+  }
 
-    &.selectable {
-      user-select: initial;
-      cursor: pointer;
+  &[data-side='left'] {
+    animation: slideInFromRight 0.3s ease-in-out;
+  }
 
-      &.itemActive, &[data-highlighted], &:hover:not(.itemDisabled) {
-        background-color: createThemeVar("Input:color-bg-item-Select--hover");
-      }
+  &[data-side='right'] {
+    animation: slideInFromLeft 0.3s ease-in-out;
+  }
 
-      &.itemSelected {
-        background-color: createThemeVar("Input:color-bg-item-Select--active");
-      }
+  &[data-side='top'] {
+    animation: slideInFromBottom 0.3s ease-in-out;
+  }
 
-      &.itemDisabled {
-        cursor: not-allowed;
-        color: createThemeVar("Input:color-text-item-Select--disabled");
-        font-style: italic;
-      }
-    }
+  &[data-side='bottom'] {
+    transform: translateY(0.25rem);
+  }
+
+  &[data-side='left'] {
+    transform: translateX(-0.25rem);
+  }
+
+  &[data-side='right'] {
+    transform: translateX(0.25rem);
+  }
+
+  &[data-side='top'] {
+    transform: translateY(-0.25rem);
+  }
+}
+
+.selectViewport {
+  height: var(--radix-select-trigger-height);
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+}
+
+.selectEmpty {
+  display: flex;
+  gap: .2rem;
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-0.75rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(0.75rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
   }
 }
 
@@ -170,3 +240,4 @@ $componentName: "Select";
 :export {
   themeVars: t.json-stringify($themeVars);
 }
+

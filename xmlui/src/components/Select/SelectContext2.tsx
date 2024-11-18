@@ -4,7 +4,7 @@ import type { Option } from "@components/abstractions";
 
 type SelectContextValue = {
   value: string;
-  onChange: (selectedOption: Option) => void;
+  onChange?: (selectedOption: Option) => void;
   optionRenderer: (option: Option) => ReactNode;
 };
 

@@ -138,7 +138,6 @@ import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneC
 import {apiCallRenderer} from "@components/APICall/APICall";
 import {option2ComponentRenderer} from "@components/Option2/Option2";
 import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
-import {select2ComponentRenderer} from "@components/Select2/Select2";
 import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
 
 // Properties used by the ComponentProvider
@@ -359,7 +358,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
       this.registerComponentRenderer(combobox2ComponentRenderer);
-      this.registerComponentRenderer(select2ComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);

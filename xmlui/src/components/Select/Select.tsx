@@ -1,10 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "@components/Select/Select.module.scss";
-
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Select } from "./SelectNative";
 import {
   dPlaceholder,
   dInitialValue,
@@ -22,6 +20,7 @@ import {
   dFocus,
   dSetValueApi,
 } from "@components/metadata-helpers";
+import { Select } from "@components/Select/SelectNative";
 
 const COMP = "Select";
 
@@ -72,6 +71,7 @@ export const SelectMd = createMetadata({
     [`radius-menu-${COMP}`]: "$radius",
     [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
     [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
+    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
     [`min-height-Input`]: "39px",
     light: {
       [`color-text-item-${COMP}--disabled`]: "$color-surface-200",

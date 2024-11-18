@@ -13,7 +13,7 @@ import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import { SelectContext2 } from "@components/Select2/SelectContext2";
+import { SelectContext2 } from "@components/Select/SelectContext2";
 import type { Option, ValidationStatus } from "@components/abstractions";
 
 type Combobox2Props = {

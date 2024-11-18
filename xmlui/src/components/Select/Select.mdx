@@ -9,22 +9,22 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: using Select"
-  height={200}
-  app={`
+    name="Example: using Select"
+    height={200}
+    app={`
     <App>
       <Select>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -37,22 +37,22 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select initialValue="opt3">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: initialValue"
-  height={200}
-  app={`
+    name="Example: initialValue"
+    height={200}
+    app={`
     <App>
       <Select initialValue="opt3">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -71,17 +71,17 @@ If the `label` is not specified `value` is shown.
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+    name="Example: optionTemplate"
+    height={200}
+    app={`
     <App>
       <Select>
         <property name="optionTemplate">
@@ -90,9 +90,9 @@ If the `label` is not specified `value` is shown.
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -105,22 +105,22 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select placeholder="Please select an item">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: placeholder"
-  height={200}
-  app={`
+    name="Example: placeholder"
+    height={200}
+    app={`
     <App>
       <Select placeholder="Please select an item">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -140,8 +140,8 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: validationStatus"
-  app={`
+    name="Example: validationStatus"
+    app={`
     <App>
       <Select />
       <Select validationStatus="valid" />
@@ -162,8 +162,8 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: enabled"
-  app={`
+    name="Example: enabled"
+    app={`
     <App>
       <Select enabled="false" />
     </App>
@@ -194,9 +194,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: emptyListTemplate"
-  height={260}
-  app={`
+    name="Example: emptyListTemplate"
+    height={260}
+    app={`
     <App>
       <VStack>
         <Text value="Default:" />
@@ -223,24 +223,24 @@ Click on the second field to see the custom empty list indicator.
   <var name="newValue" value="" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: didChange"
-  height={200}
-  app={`
+    name="Example: didChange"
+    height={200}
+    app={`
     <App>
       <var name="newValue" value="" />
       <Text value="{newValue}" />
       <Select onDidChange="(newItem) => newValue = newItem">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -257,26 +257,26 @@ Click on the second field to see the custom empty list indicator.
   <Select
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: gotFocus/lostFocus"
-  height={200}
-  app={`
+    name="Example: gotFocus/lostFocus"
+    height={200}
+    app={`
     <App>
       <var name="isFocused" value="{false}" />
       <Text value="Input control is focused: {isFocused}" />
       <Select
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -290,23 +290,23 @@ Click on the second field to see the custom empty list indicator.
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
 </App>
 ```
 
 <Playground
-  name="Example: focus()"
-  height={240}
-  app={`
+    name="Example: focus()"
+    height={240}
+    app={`
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <Select id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -319,9 +319,9 @@ Click on the second field to see the custom empty list indicator.
 ```ueml copy
 <App>
   <Select id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <SelectOption value="opt1" label="first"/>
+    <SelectOption value="opt2" label="second"/>
+    <SelectOption value="opt3" label="third"/>
   </Select>
   <HStack>
     <Button
@@ -335,13 +335,13 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: value() and setValue()"
-  app={`
+    name="Example: value() and setValue()"
+    app={`
     <App>
       <Select id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <SelectOption value="opt1" label="first"/>
+        <SelectOption value="opt2" label="second"/>
+        <SelectOption value="opt3" label="third"/>
       </Select>
       <HStack>
         <Button
@@ -435,21 +435,21 @@ Theme variables to set the styles of an unselected item:
 ```
 
 <Playground
-  name="Example: styling"
-  height={260}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "radius-Select": "30px",
-        "color-placeholder-Select": "red",
-        "thickness-border-Select": "4px",
-      },
-    },
-  ]}
-  app={`
+    name="Example: styling"
+    height={260}
+    defaultTheme="custom"
+    themes={[
+        {
+            id: "custom",
+            name: "Custom Theme",
+            themeVars: {
+                "radius-Select": "30px",
+                "color-placeholder-Select": "red",
+                "thickness-border-Select": "4px",
+            },
+        },
+    ]}
+    app={`
     <App>
       <Select placeholder="Please select an option" />
     </App>

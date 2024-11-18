@@ -1,21 +1,17 @@
-import { useSelect } from "downshift";
 import type { CSSProperties, ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { useEvent } from "@components-core/utils/misc";
-import styles from "@components/Select/Select.module.scss";
-import { Icon } from "@components/Icon/IconNative";
-
-import classnames from "@components-core/utils/classnames";
-import { usePopper } from "react-popper";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { createPortal } from "react-dom";
 import type { ValidationStatus } from "@components/abstractions";
-import { SelectContext, useSelectContextValue } from "./SelectContext";
-import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
-import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
+import * as SelectPrimitive from "@radix-ui/react-select";
+import Icon from "@components/Icon/IconNative";
+import * as React from "react";
+import { SelectContext2 } from "@components/Select/SelectContext2";
+import styles from "./Select.module.scss";
+import classnames from "classnames";
+import { useEvent } from "@components-core/utils/misc";
 
 type SelectProps = {
   id?: string;
@@ -39,6 +35,8 @@ function defaultRenderer(item: Option) {
   return <div>{item.label}</div>;
 }
 
+const SelectValue = SelectPrimitive.Value;
+
 export function Select({
   id,
   initialValue = "",
@@ -56,53 +54,11 @@ export function Select({
   layout,
   children,
 }: SelectProps) {
-  const { options, selectContextValue } = useSelectContextValue();
-  const [referenceElement, setReferenceElement] = useState<HTMLDivElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLUListElement | null>(null);
-  const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: "bottom-start",
-  });
-  const { root } = useTheme();
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
-  const {
-    isOpen,
-    selectedItem,
-    getToggleButtonProps,
-    getMenuProps,
-    highlightedIndex,
-    getItemProps,
-  } = useSelect({
-    //labelId: id,
-    toggleButtonId: id,
-    items: options,
-    itemToString(item: Option | null) {
-      return item ? item.value + "" : "";
-    },
-    onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
-      if (newSelectedItem) onInputChange(newSelectedItem);
-    },
-    initialSelectedItem: options.find((item) => item.value === value) || null,
-    selectedItem: options.find((item) => item.value === value) || null,
-    isItemDisabled: (item) => item.disabled!,
-  });
-
-  // --- Initialize the related field with the input's initial value
   useEffect(() => {
     updateState({ value: initialValue });
   }, [initialValue, updateState]);
-
-  const updateValue = useCallback(
-    (value: string) => {
-      updateState({ value });
-      onDidChange(value);
-    },
-    [onDidChange, updateState],
-  );
-
-  const onInputChange = useCallback(
-    (selectedOption: Option) => updateValue(selectedOption.value),
-    [updateValue],
-  );
 
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(() => {
@@ -117,6 +73,14 @@ export function Select({
     referenceElement?.focus();
   }, [referenceElement]);
 
+  const updateValue = useCallback(
+    (value: string) => {
+      updateState({ value });
+      onDidChange(value);
+    },
+    [onDidChange, updateState],
+  );
+
   const setValue = useEvent((newValue: string) => {
     updateValue(newValue);
   });
@@ -128,93 +92,115 @@ export function Select({
     });
   }, [focus, registerComponentApi, setValue]);
 
-  // Sizing the dropdown list width to the reference button size
-  const [width, setWidth] = useState(0);
-  const observer = useRef<ResizeObserver>();
-
-  useEffect(() => {
-    const current = referenceElement;
-    // --- We are already observing old element
-    if (observer?.current && current) {
-      observer.current.unobserve(current);
-    }
-    observer.current = new ResizeObserver(
-      () => referenceElement && setWidth(referenceElement.clientWidth),
-    );
-    if (current && observer.current) {
-      observer.current.observe(referenceElement);
-    }
-  }, [referenceElement]);
+  const contextValue = useMemo(
+    () => ({
+      value,
+      optionRenderer,
+    }),
+    [optionRenderer, value],
+  );
 
   return (
-    <SelectContext.Provider value={selectContextValue}>
-      {children}
-      <div
-        style={layout}
-        ref={(el: HTMLDivElement) => setReferenceElement(el)}
-        className={classnames(styles.selectContainer, styles[validationStatus], {
-          [styles.disabled]: !enabled,
-        })}
-      >
-        <div className={styles.inputRoot}>
-          <input
-            type="button"
-            disabled={!enabled}
-            className={classnames(styles.input, {
-              [styles.placeholder]: placeholder && !selectedItem,
-            })}
-            {...getToggleButtonProps()}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-            placeholder={placeholder}
-            value={selectedItem?.label}
-          />
-          <span aria-label="toggle menu" className={styles.indicator}>
-            {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          </span>
-        </div>
-        <div {...getMenuProps()}>
-          {isOpen &&
-            root &&
-            createPortal(
-              <ul
-                className={styles.selectMenu}
-                ref={(el: HTMLUListElement) => setPopperElement(el)}
-                style={{ ...popperStyles.popper, width }}
-                {...attributes.popper}
-              >
-                {options.length > 0 ? (
-                  options.map((item, index) => {
-                    const props = getItemProps({ item, index });
-                    return (
-                      <li
-                        {...props}
-                        key={index}
-                        className={classnames(styles.item, styles.selectable, {
-                          [styles.itemActive]: highlightedIndex === index,
-                          [styles.itemSelected]: selectedItem?.value === item.value,
-                          [styles.itemDisabled]: item.disabled,
-                        })}
-                      >
-                        {optionRenderer(item)}
-                      </li>
-                    );
-                  })
-                ) : (
-                  <li className={styles.item}>
-                    {emptyListTemplate ?? (
-                      <span className={styles.empty}>
-                        <Icon name={"noresult"} />
-                        List is empty
-                      </span>
-                    )}
-                  </li>
-                )}
-              </ul>,
-              root,
-            )}
-        </div>
-      </div>
-    </SelectContext.Provider>
+    <SelectContext2.Provider value={contextValue}>
+      <SelectPrimitive.Root value={value} onValueChange={updateValue}>
+        <SelectTrigger
+          id={id}
+          style={layout}
+          className={styles.selectTrigger}
+          onFocus={handleOnFocus}
+          onBlur={handleOnBlur}
+          enabled={enabled}
+          validationStatus={validationStatus}
+          ref={setReferenceElement}
+        >
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
+      </SelectPrimitive.Root>
+    </SelectContext2.Provider>
   );
 }
+
+const SelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    enabled?: boolean;
+    validationStatus?: ValidationStatus;
+  }
+>(({ className, children, enabled, validationStatus, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    className={classnames(styles.selectTrigger, styles[validationStatus])}
+    {...props}
+    disabled={!enabled}
+  >
+    {children}
+    <SelectPrimitive.Icon asChild>
+      <Icon name="chevrondown" />
+    </SelectPrimitive.Icon>
+  </SelectPrimitive.Trigger>
+));
+
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
+const SelectScrollUpButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollUpButton ref={ref} className={styles.selectScrollUpButton} {...props}>
+    <Icon name="chevronup" />
+  </SelectPrimitive.ScrollUpButton>
+));
+
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
+
+const SelectScrollDownButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollDownButton ref={ref} className={styles.selectScrollDownButton} {...props}>
+    <Icon name="chevrondown" />
+  </SelectPrimitive.ScrollDownButton>
+));
+
+SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
+
+const SelectContent = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { emptyListTemplate?: ReactNode }
+>(({ className, children, emptyListTemplate, ...props }, ref) => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      ref={ref}
+      className={styles.selectContent}
+      position="popper"
+      {...props}
+    >
+      <SelectScrollUpButton />
+      <SelectPrimitive.Viewport className={classnames(styles.selectViewport, {})}>
+        {React.Children.toArray(children).length > 0 ? (
+          <>{children}</>
+        ) : (
+          emptyListTemplate ?? (
+            <div className={styles.selectEmpty}>
+              <Icon name={"noresult"} />
+              <span>List is empty</span>
+            </div>
+          )
+        )}
+      </SelectPrimitive.Viewport>
+      <SelectScrollDownButton />
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+));
+
+SelectContent.displayName = SelectPrimitive.Content.displayName;
+
+const SelectLabel = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Label>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.Label ref={ref} className={styles.selectLabel} {...props} />
+));
+
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
