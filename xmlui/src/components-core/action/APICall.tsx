@@ -67,7 +67,7 @@ async function prepareOptimisticValuesForQueries(
       const flatData = currentData?.pages
         ? currentData.pages.flatMap((page: any) => page)
         : currentData;
-      const optimisticValue = await optimisticValueGetter(flatData, stateContext["$eventArgs"]);
+      const optimisticValue = await optimisticValueGetter(flatData, stateContext["$param"]);
       if (optimisticValue) {
         ret.set(queryKey, prepareOptimisticValue(optimisticValue, clientTxId));
       }
@@ -345,7 +345,7 @@ export async function callApi(
     const onSuccessFn = lookupAction(onSuccess, uid, {
       eventName: "success",
     });
-    await onSuccessFn?.(result, stateContext["$eventArgs"]);
+    await onSuccessFn?.(result, stateContext["$param"]);
 
     updateQueriesWithResult(
       queryKeysToUpdate,
@@ -378,7 +378,7 @@ export async function callApi(
     const onErrorFn = lookupAction(onError, uid, {
       eventName: "error",
     });
-    const result = await onErrorFn?.(e, stateContext["$eventArgs"]);
+    const result = await onErrorFn?.(e, stateContext["$param"]);
     const errorMessage = extractParam(
       { ...stateContext, $error: e },
       errorNotificationMessage,

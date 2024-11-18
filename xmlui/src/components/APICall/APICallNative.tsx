@@ -13,14 +13,15 @@ interface Props {
 
 export function APICallNative({ registerComponentApi, node, uid }: Props) {
   const execute = useEvent(
-    async (executionContext: ActionExecutionContext, eventArgs: any, options: any) => {
+    async (executionContext: ActionExecutionContext, ...eventArgs: any[]) => {
+      const options = eventArgs[1];
       return await callApi(
         executionContext,
         {
           ...node.props,
-          body: node.props.body || (options?.passAsDefaultBody ? eventArgs : undefined),
+          body: node.props.body || (options?.passAsDefaultBody ? eventArgs[0] : undefined),
           uid: uid,
-          params: { $eventArgs: eventArgs },
+          params: { $param: eventArgs[0], $params: eventArgs },
           onError: node.events?.error,
           onProgress: node.events?.progress,
           onBeforeRequest: node.events?.beforeRequest,

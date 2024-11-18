@@ -4,8 +4,16 @@ import { Callout } from "nextra/components";
 
 The `Items` component maps sequential data items into component instances, representing each data item as a particular component.
 
+The component provides context values with which you can access some internal properties:
+
+- `$isFirst`: This boolean value indicates if the component renders its first item.
+- `$isLast`: This boolean value indicates if the component renders its last item.
+- `$item`: This value represents the current iteration item while the component renders its children.
+- `$itemIndex`: This integer value represents the current iteration index (zero-based) while rendering children.
+
+
 <Callout type="info" emoji="📔">
-`Items` is not a container! It does not wrap its items into a container; it merely renders the its children.
+`Items` is not a container! It does not wrap its items into a container; it merely renders its children.
 </Callout>
 
 The `Items` component does not use virtualization; it maps each data item into a component.
@@ -139,13 +147,9 @@ This property reverses the order in which data is mapped to template components.
 
 This component does not have any events.
 
-## Context Values
+## Exposed Methods
 
-This component does not have any context values.
-
-## Exposed Members
-
-This component does not expose any members.
+This component does not expose any methods.
 
 ## Styling
 

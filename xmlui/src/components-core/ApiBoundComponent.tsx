@@ -67,7 +67,7 @@ export function ApiBoundComponent({
               headers: ${JSON.stringify(headers)}, 
               method: ${JSON.stringify(method)}, 
               file: ${JSON.stringify(file)}, 
-              params: { '$eventArgs': eventArgs }, 
+              params: { '$param': eventArgs }, 
               onError: ${JSON.stringify(error)}, 
               onSuccess: ${JSON.stringify(success)}, 
               onProgress: eventArgs.onProgress, 
@@ -90,7 +90,7 @@ export function ApiBoundComponent({
               headers: ${JSON.stringify(headers)}, 
               method: ${JSON.stringify(method)}, 
               fileName: ${JSON.stringify(fileName)}, 
-              params: { '$eventArgs': eventArgs },
+              params: { '$param': eventArgs },
             }, { resolveBindingExpressions: true });
           }`;
           break;
@@ -135,7 +135,7 @@ export function ApiBoundComponent({
               inProgressNotificationMessage: ${JSON.stringify(inProgressNotificationMessage)}, 
               completedNotificationMessage: ${JSON.stringify(completedNotificationMessage)}, 
               errorNotificationMessage: ${JSON.stringify(errorNotificationMessage)}, 
-              params: { '$eventArgs': eventArgs }, 
+              params: { '$param': eventArgs }, 
               onError: ${JSON.stringify(error)}, 
               onProgress: ${JSON.stringify(progress)}, 
               onBeforeRequest: ${JSON.stringify(beforeRequest)}, 

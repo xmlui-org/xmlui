@@ -54,7 +54,7 @@ const sectionNames = {
   props: "Properties",
   events: "Events",
   styles: "Styling",
-  api: "Exposed Members",
+  api: "Exposed Methods",
   contextVars: "Context Values",
 };
 
@@ -153,9 +153,6 @@ function processMdx(
     result += addEventsSection(fileData, component);
     result += "\n\n";
 
-    result += addContextVarsSection(fileData, component);
-    result += "\n\n";
-
     result += addApisSection(fileData, component);
     result += "\n\n";
 
@@ -252,27 +249,6 @@ function addImportsSection(data, component) {
   }
 }
 
-function addContextVarsSection(data, component) {
-  logger.info(`Processing ${component.displayName} context variables`);
-  let buffer = `## ${sectionNames.contextVars}\n\n`;
-
-  if (!component.contextVars || Object.keys(component.contextVars ?? {}).length === 0) {
-    return buffer + "This component does not have any context values.";
-  }
-  Object.entries(component.contextVars)
-    .sort()
-    .forEach(([contextVarName, contextVar]) => {
-      if (contextVar.isInternal) return;
-      buffer += `### \`${contextVarName}\`\n\n`;
-      buffer += combineDescriptionAndDescriptionRef(data, contextVar, CONTEXT_VARS);
-      buffer += "\n\n";
-    });
-
-  // Remove last newline
-  buffer = buffer.slice(0, -2);
-  return buffer;
-}
-
 function addPropsSection(data, component) {
   logger.info(`Processing ${component.displayName} props`);
   let buffer = `## ${sectionNames.props}\n\n`;
@@ -299,7 +275,7 @@ function addApisSection(data, component) {
   let buffer = `## ${sectionNames.api}\n\n`;
 
   if (!component.apis || Object.keys(component.apis ?? {}).length === 0) {
-    return buffer + "This component does not expose any members.";
+    return buffer + "This component does not expose any methods.";
   }
   Object.entries(component.apis)
     .sort()
@@ -370,6 +346,21 @@ function combineDescriptionAndDescriptionRef(
 
   if (component[SECTION_DESCRIPTION]) {
     descriptionBuffer = component[SECTION_DESCRIPTION];
+  }
+
+  if (sectionId === DESCRIPTION) {
+    if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
+      descriptionBuffer += "\n\nThe component provides context values with which you can access some internal properties:";
+      descriptionBuffer += "\n\n"
+      Object.entries(component.contextVars)
+        .sort()
+        .forEach(([contextVarName, contextVar]) => {
+          if (contextVar.isInternal || !contextVar.description) return;
+          descriptionBuffer += `- \`${contextVarName}\`: ${contextVar.description}\n`;
+        });
+    } else {
+      descriptionBuffer += "\n\n";
+    }
   }
 
   if (sectionId === PROPS) {

@@ -107,10 +107,6 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
       right: 0;
       bottom: 0;
     }
-
-    @container app-container (height > 0) {
-      --containerHeight: 100cqh;
-    }
   }
 
   &.scrollWholePage {

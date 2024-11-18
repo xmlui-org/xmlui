@@ -82,13 +82,13 @@ export const modalViewComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
       >
-        {(modalContext) => {
+        {(...params) => {
           return (
             <MemoizedItem
               node={node.children}
               renderChild={renderChild}
               layoutContext={{ type: "Stack" }}
-              contextVars={{ $modalContext: modalContext }}
+              contextVars={{ $param: params?.[0], $params: params }}
             />
           );
         }}

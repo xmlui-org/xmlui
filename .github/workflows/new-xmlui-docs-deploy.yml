@@ -1,6 +1,7 @@
 name: XMLUI Documentation CI/CD
 
 on:
+  workflow_dispatch:
   push:
     paths:
       - docs/**
