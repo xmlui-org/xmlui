@@ -93,7 +93,7 @@ test("regression: data url through modal context", async ({ page }) => {
       <Fragment>
         <Button testId="openModalButton" onClick="modal.open({data: '/entities/10'})"/>
         <ModalDialog id="modal">
-          <Form data="{$modalContext.data}" submitUrl="{$modalContext.submitUrl}">
+          <Form data="{$param.data}" submitUrl="{$param.submitUrl}">
              <FormItem bindTo="name" testId="nameInput"/>
           </Form>
         </ModalDialog>
