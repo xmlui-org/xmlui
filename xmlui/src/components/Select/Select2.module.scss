@@ -52,10 +52,6 @@
   padding-bottom: 0.25rem;
 }
 
-.selectViewport {
-  padding: 0.25rem;
-}
-
 .selectContent {
   position: relative;
   z-index: 50;
@@ -67,46 +63,46 @@
   background-color: #ffffff;
   color: #1f2937;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
 
-.selectContent[data-state='open'] {
-  animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
-}
+  &[data-state='open'] {
+    animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
+  }
 
-.selectContent[data-state='closed'] {
-  animation: fadeOut 0.3s ease-in-out, zoomOut 0.3s ease-in-out;
-}
+  &[data-state='closed'] {
+    animation: fadeOut 0.3s ease-in-out, zoomOut 0.3s ease-in-out;
+  }
 
-.selectContent[data-side='bottom'] {
-  animation: slideInFromTop 0.3s ease-in-out;
-}
+  &[data-side='bottom'] {
+    animation: slideInFromTop 0.01s ease-in-out;
+  }
 
-.selectContent[data-side='left'] {
-  animation: slideInFromRight 0.3s ease-in-out;
-}
+  &[data-side='left'] {
+    animation: slideInFromRight 0.3s ease-in-out;
+  }
 
-.selectContent[data-side='right'] {
-  animation: slideInFromLeft 0.3s ease-in-out;
-}
+  &[data-side='right'] {
+    animation: slideInFromLeft 0.3s ease-in-out;
+  }
 
-.selectContent[data-side='top'] {
-  animation: slideInFromBottom 0.3s ease-in-out;
-}
+  &[data-side='top'] {
+    animation: slideInFromBottom 0.3s ease-in-out;
+  }
 
-.selectContent.popper[data-side='bottom'] {
-  transform: translateY(0.25rem);
-}
+  &.popper[data-side='bottom'] {
+    transform: translateY(0.25rem);
+  }
 
-.selectContent.popper[data-side='left'] {
-  transform: translateX(-0.25rem);
-}
+  &.popper[data-side='left'] {
+    transform: translateX(-0.25rem);
+  }
 
-.selectContent.popper[data-side='right'] {
-  transform: translateX(0.25rem);
-}
+  &.popper[data-side='right'] {
+    transform: translateX(0.25rem);
+  }
 
-.selectContent.popper[data-side='top'] {
-  transform: translateY(-0.25rem);
+  &.popper[data-side='top'] {
+    transform: translateY(-0.25rem);
+  }
 }
 
 .selectViewport {
@@ -145,8 +141,8 @@
 }
 
 .selectItem:focus {
-  background-color: #e2e8f0; /* Replace with your focus:bg-accent */
-  color: #1a202c; /* Replace with your focus:text-accent-foreground */
+  background-color: #e2e8f0;
+  color: #1a202c;
 }
 
 .selectItem[data-disabled] {
@@ -202,7 +198,7 @@
 
 @keyframes slideInFromTop {
   from {
-    transform: translateY(-100%);
+    transform: translateY(-0.75rem);
   }
   to {
     transform: translateY(0);
@@ -211,7 +207,7 @@
 
 @keyframes slideInFromBottom {
   from {
-    transform: translateY(100%);
+    transform: translateY(0.75rem);
   }
   to {
     transform: translateY(0);
