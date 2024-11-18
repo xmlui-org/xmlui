@@ -385,13 +385,13 @@ Change the `submit` event handler in the `ContactForm` component by removing the
         <APICall
           url="/api/contacts"
           method="post"
-          body="{$eventArgs}" />
+          body="{$param}" />
       </event>
       <!-- Unchanged -->
 </Component>
 ```
-The `$eventArgs` context value within an event handler represents the arguments passed to the handler.
-The `submit` event uses the data to save as its `$eventArgs`; we send it in the request body.
+The `$param` context value within an event handler represents the arguments passed to the handler.
+The `submit` event uses the data to save as its `$param`; we send it in the request body.
 When the `APICall` has been completed, the code executes the `success` event handler and closes the dialog.
 
 The following figure shows that a new contact with its date set to the current calendar day will appear in the "Today" list after saving it:
@@ -410,7 +410,7 @@ Let's fix this by modifying the performed action:
 <APICall
   url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
   method="{mode === 'add' ? 'post' : 'put'}"
-  body="{$eventArgs}" />
+  body="{$param}" />
 ```
 
 This code uses the proper API endpoint depending on the operation mode (add or edit).
