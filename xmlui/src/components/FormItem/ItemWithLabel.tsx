@@ -62,38 +62,42 @@ export function ItemWithLabel({
     // });
   }
   return (
-    <div
-      className={classnames(styles.container, {
-        [styles.top]: labelPosition === "top",
-        [styles.bottom]: labelPosition === "bottom",
-        [styles.left]: labelPosition === "left",
-        [styles.right]: labelPosition === "right",
-        [styles.shrinkToLabel]: shrinkToLabel,
-      })}
-      style={style}
-      onFocus={onFocus}
-      onBlur={onBlur}
-    >
-      {label && (
-        <label
-          htmlFor={inputId}
-          style={{ ...labelStyle, width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth }}
-          className={classnames(styles.inputLabel, {
-            [styles.required]: required,
-            [styles.disabled]: !enabled,
-            [styles.labelBreak]: labelBreak,
-          })}
-        >
-          {label} {required && <span className={styles.requiredMark}>*</span>}
-          {validationInProgress && (
-            <Spinner style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }} />
-          )}
-        </label>
-      )}
-      <div style={{display: 'flex', flexDirection: 'column', width: labelPosition === "right" ? 'auto' : '100%' }}>
+    <div style={style}>
+      <div
+        className={classnames(styles.container, {
+          [styles.top]: labelPosition === "top",
+          [styles.bottom]: labelPosition === "bottom",
+          [styles.left]: labelPosition === "left",
+          [styles.right]: labelPosition === "right",
+          [styles.shrinkToLabel]: shrinkToLabel,
+        })}
+        onFocus={onFocus}
+        onBlur={onBlur}
+      >
+        {label && (
+          <label
+            htmlFor={inputId}
+            style={{
+              ...labelStyle,
+              width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+            }}
+            className={classnames(styles.inputLabel, {
+              [styles.required]: required,
+              [styles.disabled]: !enabled,
+              [styles.labelBreak]: labelBreak,
+            })}
+          >
+            {label} {required && <span className={styles.requiredMark}>*</span>}
+            {validationInProgress && (
+              <Spinner
+                style={{ height: "1em", width: "1em", marginLeft: "1em", alignSelf: "center" }}
+              />
+            )}
+          </label>
+        )}
         {Children.only(<Slot id={inputId}>{children}</Slot>)}
-        {validationResult}
       </div>
+      {validationResult}
     </div>
   );
 }
