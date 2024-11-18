@@ -96,22 +96,10 @@ Later, you will learn about how you can use scripts in the code-behind files.
 ### Component IDs
 
 <Callout type="info" emoji="💡">
-    The nested tags in the XMLUI markup form a natural hierarchy of components. Parent components have children
-    (directly or through their children or children's children, and so on).
+    With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to refer to that particular component in code (expressions). Component IDs are visible only **in the scope of their markup (and associated code-behind) file**.
 </Callout>
 
-When rendering an app, the engine uses this hierarchy as a declarative binding, rendering children within their parent.
-
-However, sometimes, you want to establish cooperation between two (or more) components that are not in a parent-child relationship. They may be siblings (having the same parent component) or can be in totally different branches of the markup.
-
-<Callout type="info" emoji="💡">
-    With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to
-    refer to that particular component in code (expressions).
-</Callout>
-
-<Callout>
-    Component IDs are visible only in the scope of their markup (and associated code-behind) file.
-</Callout>
+You can access the exposed methods and properties of the particular component through its component ID. The following section shows a sample.
 
 ### Expressions
 

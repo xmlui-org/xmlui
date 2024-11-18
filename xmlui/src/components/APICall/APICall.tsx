@@ -1,7 +1,7 @@
-import {type ComponentDef, createMetadata, d} from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { APICallNative } from "./APICallNative";
-import type {ApiOperationDef} from "@components-core/RestApiProxy";
+import type { ApiOperationDef } from "@components-core/RestApiProxy";
 import { dInternal } from "@components/metadata-helpers";
 
 const COMP = "APICall";
@@ -33,29 +33,29 @@ export const APICallMd = createMetadata({
     `is similar in nature to the \`DataSource\` component which retrieves data from the backend.`,
   props: {
     method: d(
-        `The method of data manipulation can be done via setting this property. The following ` +
+      `The method of data manipulation can be done via setting this property. The following ` +
         `HTTP methods are available: \`post\`, \`put\`, and \`delete\`.`,
     ),
     url: d(`Use this property to set the URL to send data to.`),
     rawBody: d(
-        `This property sets the request body to the value provided here without any conversion. ` +
+      `This property sets the request body to the value provided here without any conversion. ` +
         `Use the * \`body\` property if you want the object sent in JSON. When you define ` +
         `\`body\` and \`rawBody\`, the latest one prevails.`,
     ),
     body: d(
-        `This property sets the request body. The object you pass here will be serialized to ` +
+      `This property sets the request body. The object you pass here will be serialized to ` +
         `JSON when sending the request. Use the \`rawBody\` property to send another request ` +
         `body using its native format. When you define \`body\` and \`rawBody\`, the latest ` +
         `one prevails.`,
     ),
     queryParams: d(
-        `This property sets the query parameters for the request. The object you pass here will ` +
+      `This property sets the query parameters for the request. The object you pass here will ` +
         `be serialized to a query string and appended to the request URL. You can specify key ` +
         `and value pairs where the key is the name of a particular query parameter and the value ` +
         `is that parameter's value.`,
     ),
     headers: d(
-        `You can define request header values as key and value pairs, where the key is the ID of ` +
+      `You can define request header values as key and value pairs, where the key is the ID of ` +
         `the particular header and the value is that header's value.`,
     ),
     confirmTitle: d(
@@ -101,15 +101,30 @@ export const APICallMd = createMetadata({
     error: d(`This event fires when a request results in an error.`),
     progress: dInternal(),
   },
+  contextVars: {
+    $param: d(
+      "This value represents the first parameters passed to the \`execute()\` method to " +
+        "display the modal dialog.",
+    ),
+    $params: d(
+      "This value represents the array of parameters passed to the \`execute()\` method. " +
+        "You can use \`$params[0]\` to access the first and \`$params[1]\` to access the " +
+        "second (and so on) parameters. \`$param\` is the same as \`$params[0]\`.",
+    ),
+  },
+  apis: {
+    execute: d(
+      "This method triggers the invocation of the API. You can pass an arbitrary " +
+        "number of parameters to the method. In the \`APICall\` instance, you can " +
+        "access those with the \`$param\` and \`$params\` context values.",
+    ),
+  },
 });
 
 export const apiCallRenderer = createComponentRenderer(
   COMP,
   APICallMd,
   ({ node, registerComponentApi, uid, extractValue }) => {
-    return <APICallNative registerComponentApi={registerComponentApi}
-                          node={node}
-                          uid={uid}
-    />;
+    return <APICallNative registerComponentApi={registerComponentApi} node={node} uid={uid} />;
   },
 );
