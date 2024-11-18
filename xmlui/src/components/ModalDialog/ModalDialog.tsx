@@ -42,13 +42,20 @@ export const ModalDialogMd = createMetadata({
         `where \`modalId\` refers to a \`ModalDialog\` component.`,
     ),
     open: d(
-      "This method imperatively opens the modal dialog. If you pass parameters," +
-        "the first can be accessed in the `$modalContext` context value.",
+      "This method imperatively opens the modal dialog. You can pass an arbitrary number " + 
+      "of parameters to the method. In the \`ModalDialog\` instance, you can access those " + 
+      "with the \`$paramq` and \`$params\` context values.",
     ),
   },
   contextVars: {
-    $modalContext: d(
-      "This value represents the information passed to the modal dialog when opening it.",
+    $param: d(
+      "This value represents the first parameters passed to the \`open()\` method to " +
+        "display the modal dialog.",
+    ),
+    $params: d(
+      "This value represents the array of parameters passed to the \`open()\` method. " +
+        "You can use \`$params[0]\` to access the first and \`$params[1]\` to access the " +
+        "second (and so on) parameters. \`$param\` is the same as \`$params[0]\`.",
     ),
   },
   themeVars: parseScssVar(styles.themeVars),
