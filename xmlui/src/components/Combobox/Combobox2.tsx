@@ -1,4 +1,4 @@
-import styles from "@components/Combobox/Combobox.module.scss";
+import styles from "@components/Combobox/Combobox2.module.scss";
 
 import { type ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";

@@ -1,8 +1,10 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Option2Component } from "@components/Option/Option2Native";
+import { SelectOption } from "./SelectOptionNative";
+import { parseScssVar } from "@components-core/theming/themeVars";
+import styles from "@components/SelectOption/SelectOption.module.scss";
 
-const COMP = "Option2";
+const COMP = "SelectOption";
 
 export const OptionMd = createMetadata({
   description:
@@ -23,13 +25,26 @@ export const OptionMd = createMetadata({
         `in its parent component.`,
     ),
   },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
+    [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
+    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
+    [`min-height-Input`]: "39px",
+    light: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-200",
+    },
+    dark: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-800",
+    },
+  },
 });
 
-export const option2ComponentRenderer = createComponentRenderer(
+export const selectOptionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
   (rendererContext) => {
-    const { node, renderChild, extractValue } = rendererContext;
+    const { node, extractValue } = rendererContext;
     let label = extractValue(node.props.label);
     let value = extractValue(node.props.value);
     if (label == undefined && value == undefined) {
@@ -40,9 +55,8 @@ export const option2ComponentRenderer = createComponentRenderer(
     } else if (label == undefined && value != undefined) {
       label = value;
     }
-
     return (
-      <Option2Component
+      <SelectOption
         value={value}
         label={label}
         disabled={extractValue.asOptionalBoolean(node.props.disabled)}

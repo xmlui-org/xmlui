@@ -1,0 +1,242 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "Select2";
+
+// --- CSS properties of a particular Select variant
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+  font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+  background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+  color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+    color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus {
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+  }
+
+  &::placeholder {
+    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+  }
+}
+
+.selectTrigger {
+  display: flex;
+  padding: t.$space-2;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  outline: none;
+  overflow: hidden;
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+
+  &.warning {
+    @include variant("warning");
+  }
+
+  &.valid {
+    @include variant("success");
+  }
+}
+
+.selectTrigger:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
+  color: createThemeVar("Input:color-text-#{$componentName}--disabled");
+  border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+}
+
+.selectTrigger > span {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
+}
+
+.selectScrollUpButton {
+  display: flex;
+  cursor: default;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.selectScrollDownButton {
+  display: flex;
+  cursor: default;
+  align-items: center;
+  justify-content: center;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.selectContent {
+  position: relative;
+  z-index: 50;
+  max-height: 24rem;
+  min-width: 8rem;
+  overflow: hidden;
+  background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
+  border-radius: createThemeVar("Input:radius-menu-#{$componentName}");
+  box-shadow: createThemeVar("Input:shadow-menu-#{$componentName}");
+
+  &[data-state='open'] {
+    animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
+  }
+
+  &[data-state='closed'] {
+    animation: fadeOut 0.3s ease-in-out, zoomOut 0.3s ease-in-out;
+  }
+
+  &[data-side='bottom'] {
+    animation: slideInFromTop 0.08s ease-in-out;
+  }
+
+  &[data-side='left'] {
+    animation: slideInFromRight 0.3s ease-in-out;
+  }
+
+  &[data-side='right'] {
+    animation: slideInFromLeft 0.3s ease-in-out;
+  }
+
+  &[data-side='top'] {
+    animation: slideInFromBottom 0.3s ease-in-out;
+  }
+
+  &[data-side='bottom'] {
+    transform: translateY(0.25rem);
+  }
+
+  &[data-side='left'] {
+    transform: translateX(-0.25rem);
+  }
+
+  &[data-side='right'] {
+    transform: translateX(0.25rem);
+  }
+
+  &[data-side='top'] {
+    transform: translateY(-0.25rem);
+  }
+}
+
+.selectViewport {
+  height: var(--radix-select-trigger-height);
+  width: 100%;
+  min-width: var(--radix-select-trigger-width);
+}
+
+.selectEmpty {
+  display: flex;
+  gap: .2rem;
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  width: 100%;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.95);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes zoomOut {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(0.95);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    transform: translateY(-0.75rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    transform: translateY(0.75rem);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+

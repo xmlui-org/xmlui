@@ -87,6 +87,7 @@ import { CarouselMd } from "./Carousel/Carousel";
 import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
+import {Select2Md} from "@components/Select2/Select2";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -165,6 +166,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,
+  Select2: Select2Md,
   SelectionStore: SelectionStoreMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,

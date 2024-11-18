@@ -5,7 +5,7 @@ import styles from "@components/Combobox/Combobox2.module.scss";
 import { CheckIcon } from "@components/Icon/CheckIcon";
 import * as React from "react";
 import classnames from "classnames";
-import { useSelect } from "@components/Select/SelectContext2";
+import { useSelect } from "@components/Select2/SelectContext2";
 
 type OptionComponentProps = {
   value: string;

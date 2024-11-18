@@ -8,7 +8,7 @@ import type { ValidationStatus } from "@components/abstractions";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import * as React from "react";
-import { SelectContext2 } from "@components/Select/SelectContext2";
+import { SelectContext2 } from "@components/Select2/SelectContext2";
 import styles from "./Select2.module.scss";
 import classnames from "classnames";
 
@@ -97,15 +97,13 @@ export function Select2({
     [onInputChange, optionRenderer, value],
   );
 
-  useEffect(() => {
-    console.log(React.Children.toArray(children));
-  }, [children]);
-
   return (
     <SelectContext2.Provider value={contextValue}>
       <Select>
         <SelectTrigger
           id={id}
+          style={layout}
+          className={styles.selectTrigger}
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
           enabled={enabled}

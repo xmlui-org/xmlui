@@ -1,8 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { SelectOption } from "./SelectOptionNative";
+import { Option2Component } from "@components/Option2/Option2Native";
 
-const COMP = "SelectOption";
+const COMP = "Option2";
 
 export const OptionMd = createMetadata({
   description:
@@ -25,11 +25,11 @@ export const OptionMd = createMetadata({
   },
 });
 
-export const selectOptionComponentRenderer = createComponentRenderer(
+export const option2ComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
   (rendererContext) => {
-    const { node, extractValue } = rendererContext;
+    const { node, renderChild, extractValue } = rendererContext;
     let label = extractValue(node.props.label);
     let value = extractValue(node.props.value);
     if (label == undefined && value == undefined) {
@@ -40,8 +40,9 @@ export const selectOptionComponentRenderer = createComponentRenderer(
     } else if (label == undefined && value != undefined) {
       label = value;
     }
+
     return (
-      <SelectOption
+      <Option2Component
         value={value}
         label={label}
         disabled={extractValue.asOptionalBoolean(node.props.disabled)}

@@ -136,10 +136,10 @@ import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 import {apiCallRenderer} from "@components/APICall/APICall";
-import {option2ComponentRenderer} from "@components/Option/Option2";
+import {option2ComponentRenderer} from "@components/Option2/Option2";
 import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
-import {select2ComponentRenderer} from "@components/Select/Select2";
-import {selectOptionComponentRenderer} from "@components/Select/SelectOption";
+import {select2ComponentRenderer} from "@components/Select2/Select2";
+import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
