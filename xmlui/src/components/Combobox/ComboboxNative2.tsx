@@ -125,16 +125,15 @@ export function Combobox2({
           onFocus={handleOnFocus}
           onBlur={handleOnBlur}
         >
-          <Button
-            variant="outlined"
+          <button
             aria-expanded={open}
             className={classnames(styles.comboboxButton, styles[validationStatus], {
               [styles.disabled]: !enabled,
             })}
           >
-            {value ? value : placeholder || ""}
+            <span>{value ? value : placeholder || ""}</span>
             <Icon name="chevrondown" />
-          </Button>
+          </button>
         </PopoverTrigger>
         <PopoverContent className={styles.popoverContent} style={{ width }}>
           <Command>
