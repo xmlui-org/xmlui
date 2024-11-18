@@ -6,7 +6,7 @@ import styles from "@components/SelectOption/SelectOption.module.scss";
 
 const COMP = "SelectOption";
 
-export const OptionMd = createMetadata({
+export const SelectOptionMd = createMetadata({
   description:
     `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
     `(such as \`Select\`, \`Combobox\`, and others) may use nested \`Option\` instances ` +
@@ -42,7 +42,7 @@ export const OptionMd = createMetadata({
 
 export const selectOptionComponentRenderer = createComponentRenderer(
   COMP,
-  OptionMd,
+  SelectOptionMd,
   (rendererContext) => {
     const { node, extractValue } = rendererContext;
     let label = extractValue(node.props.label);

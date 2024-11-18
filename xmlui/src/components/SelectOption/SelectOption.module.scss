@@ -22,33 +22,35 @@ $componentName: "SelectOption";
   padding-inline: 1em;
   outline: none;
   font-size: createThemeVar("font-size-SelectOption");
-}
 
-.selectItem[data-state="checked"] {
-  background-color: createThemeVar("Input:color-bg-item-#{$componentName}--active");
-}
+  &[data-highlighted] {
+    background-color: blue;
+    //background-color: createThemeVar("color-bg-item-SelectOption--hover");
+  }
 
-.selectItem[data-highlighted] {
-  background-color: createThemeVar("Input:color-bg-item-#{$componentName}--hover");
+  &[data-state=checked] {
+    //background-color: createThemeVar("color-bg-item-SelectOption--active");
+    background-color: red;
+  }
 }
 
 .selectItem[data-disabled] {
   pointer-events: none;
   opacity: 0.5;
   cursor: not-allowed;
-  color: createThemeVar("Input:color-text-item-#{$componentName}--disabled");
+  color: createThemeVar("color-text-item-#{$componentName}--disabled");
   font-style: italic;
 }
 
 .selectItemIndicator {
   position: absolute;
-  left: 0.5rem;
+  right: 0.5rem;
   display: flex;
   height: 0.875rem;
   width: 0.875rem;
   align-items: center;
   justify-content: center;
-  color: createThemeVar("Input:color-text-indicator-#{$componentName}");
+  color: createThemeVar("color-text-indicator-#{$componentName}");
 }
 
 
