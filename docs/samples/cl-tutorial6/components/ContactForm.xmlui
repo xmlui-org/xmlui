@@ -9,7 +9,7 @@
         <APICall
           url="{mode === 'add' ? '/api/contacts': '/api/contacts/' + initialData.id}"
           method="{mode === 'add' ? 'post' : 'put'}"
-          body="{$eventArgs}" />
+          body="{$param}" />
       </event>
       <FormItem
         label="Full name" 

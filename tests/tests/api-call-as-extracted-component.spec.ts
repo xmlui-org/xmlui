@@ -9,7 +9,7 @@ test("api call as an extracted component get called", async ({ page }) => {
            id="apiCall"
            url="/postUrl"
            method="post"
-           body="{$eventArgs}"
+           body="{$param}"
         />
         <Form onSubmit="(body)=>apiCall.execute(body)">
             <FormItem bindTo="name" testId="nameInput"/>
