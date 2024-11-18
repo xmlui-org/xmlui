@@ -632,7 +632,7 @@ This app displays the data stored in the `launchpadData` variable, initialized t
 
 You can pass parameters to an `APICall` component and use that parameter to prepare the request. The following sample passes an identifier (of a rocket) in the `execute` methods. The `APICall` accesses that through its `$param` context value:
 
-```ueml copy /5e9d0d95eda69955f709d1eb/ /$param/
+```ueml copy {3} /5e9d0d95eda69955f709d1eb/ /$param/
 <App 
   var.rocketData="">
   <APICall id="rocket" url="https://api.spacexdata.com/v4/rockets/{$param}" method="get" />
@@ -666,6 +666,36 @@ You can pass parameters to an `APICall` component and use that parameter to prep
 
 ### Passing Multiple Parameters
 
+As the following sample demonstrates, you can pass multiple parameters to `APICall` when invoking the execute method.
+
+```ueml copy {4-8} /$params[0]/ /$params[1]/ /execute/
+<App>
+  <DataSource id='myNames' url='/api/my-names' />
+  <HStack>
+    <APICall 
+      id="addNameApi"
+      url="/api/my-names/{$params[0]}"
+      body="{$params[1]}"
+      method="post" />
+    <TextBox id="newName" placeholder="Enter a new name" width="50%" />
+    <Button 
+      enabled="{newName.value.trim()}" 
+      label="Add"
+      onClick="
+        addNameApi.execute(myNames.value.length + 1, newName.value.trim());
+        newName.setValue('');
+      "/>
+  </HStack>
+  <HStack wrapContent="true">
+    <Items data="{myNames}">
+      <Badge value="{$item.name}"/>
+    </Items>
+  </HStack>
+</App>
+```
+
+When the `APICall` receives multiple parameters, you can access only the first parameter with the `$param` context value. Other parameters can be accessed with indexing through the `$params` value, such as `$params[1]` for the second, `$params[2]` for the third (and so on) parameters. `$params[0]` is the same as `$param`.
+
 <Playground
   name="Example: Passing multiple parameters to APICall"
   height={240}
@@ -683,12 +713,12 @@ You can pass parameters to an `APICall` component and use that parameter to prep
       },
       'post-fruit': {
         method: 'post',
-        url: '/api/my-names/:id/:name',
+        url: '/api/my-names/:id',
         pathParamTypes: {
           id: "integer",
         },
         handler: `
-          $state.names.push({id: $pathParams.id, name: $pathParams.name});
+          $state.names.push({id: $pathParams.id, name: $requestBody});
         `,
       },
     }
@@ -699,7 +729,8 @@ You can pass parameters to an `APICall` component and use that parameter to prep
       <HStack>
         <APICall 
           id="addNameApi"
-          url="/api/my-names/{$params[0]}/{$params[1]}" 
+          url="/api/my-names/{$params[0]}"
+          body="{$params[1]}"
           method="post" />
         <TextBox id="newName" placeholder="Enter a new name" width="50%" />
         <Button 
