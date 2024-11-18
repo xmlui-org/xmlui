@@ -4,6 +4,11 @@ import { Callout } from "nextra/components";
 
 Provides a dropdown with a list of options to choose from.
 
+The component provides context values with which you can access some internal properties:
+
+- `$item`: This context variable acts as a template for an item in the list.
+
+
 ## Using `Select`
 
 The component accepts `Option` components as children defining a particular option's label-value pair.
@@ -327,17 +332,7 @@ This event is triggered when the Select has received the focus.
 
 This event is triggered when the Select has lost the focus.
 
-## Context Values
-
-### `$item`
-
-This context variable acts as a template for an item in the list.
-
-Access attributes of the item using the dot notation.
-
-For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`didChange\`](#didchange) event.
-
-## Exposed Members
+## Exposed Methods
 
 ### `focus`
 

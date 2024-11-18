@@ -4,6 +4,11 @@ import { Callout } from "nextra/components";
 
 The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action.
 
+The component provides context values with which you can access some internal properties:
+
+- `$modalContext`: This value represents the information passed to the modal dialog when opening it.
+
+
 ## Using the Component
 
 <Callout type="info" emoji="📔">
@@ -269,13 +274,7 @@ Open and close the dialog several times to test that it changes the counter.
   `}
 />
 
-## Context Values
-
-### `$modalContext`
-
-This value represents the information passed to the modal dialog when opening it.
-
-## Exposed Members
+## Exposed Methods
 
 ### `close`
 

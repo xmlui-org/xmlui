@@ -6,6 +6,11 @@ import { Callout } from "nextra/components";
 
 The `MultiCombobox` component is essentially a [`ComboBox`](./ComboBox.mdx) that enables the selection of multiple elements from a list either by typing in the field or by clicking list elements in the dropdown. These elements are then displayed in the field and can be removed as necessary.
 
+The component provides context values with which you can access some internal properties:
+
+- `$item`: This context variable acts as a template for an item in the list.
+
+
 The component provides two ways to add a list of options to the dropdown:
 
 ### Using the `Option` component
@@ -452,13 +457,7 @@ This event is triggered when the MultiCombobox has lost the focus.
 
 See the example in [gotFocus event section](#gotfocus).
 
-## Context Values
-
-### `$item`
-
-This context variable acts as a template for an item in the list.
-
-## Exposed Members
+## Exposed Methods
 
 ### `focus`
 
