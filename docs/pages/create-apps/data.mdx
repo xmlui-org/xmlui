@@ -584,6 +584,140 @@ The following example demonstrates these features:
   `}
 />
 
+## Using APICall Imperatively
+
+Besides using `APICall` in event handlers, you can use this component imperatively through its component identifier. This section shows you a few scenarios of this imperative usage.
+
+### Fetching Data with APICall
+
+Though you primarily use `DataSource` to fetch data, you can also use `APICall`. The following example demonstrates how to do this.
+
+```ueml copy {2}
+<App var.launchpadData="{[]}">
+  <APICall id="launchpads" url="https://api.spacexdata.com/v4/launchpads" method="get" />
+  <Button 
+    id="fetchButton"
+    enabled="{!fetchButton.clickInProgress}" 
+    onClick="launchpadData = launchpads.execute()">
+    Fetch Launchpads
+  </Button>
+  <List data="{launchpadData}">
+    <Card subtitle="{$item.full_name}" />
+  </List>
+</App>  
+```
+
+This app displays the data stored in the `launchpadData` variable, initialized to an empty array. When you click the button, it triggers the fetch (get) operation defined by the `APICall` invoking the `execute()` method through the `APICall`'s identifier, `launchpads`. The execute method retrieves the fetched data and displays it by assigning it to `launchpadData`.
+
+<Playground
+  name="Example: Fetching data with APICall"
+  app={`
+    <App var.launchpadData="{[]}">
+      <APICall id="launchpads" url="https://api.spacexdata.com/v4/launchpads" method="get" />
+      <Button 
+        id="fetchButton"
+        enabled="{!fetchButton.clickInProgress}" 
+        onClick="launchpadData = launchpads.execute()">
+        Fetch Launchpads
+      </Button>
+      <List data="{launchpadData}">
+        <Card subtitle="{$item.full_name}" />
+      </List>
+    </App>  
+  `}
+  height={300}
+/>
+
+### Passing a Parameter to APICall
+
+You can pass parameters to an `APICall` component and use that parameter to prepare the request. The following sample passes an identifier (of a rocket) in the `execute` methods. The `APICall` accesses that through its `$param` context value:
+
+```ueml copy /5e9d0d95eda69955f709d1eb/ /$param/
+<App 
+  var.rocketData="">
+  <APICall id="rocket" url="https://api.spacexdata.com/v4/rockets/{$param}" method="get" />
+  <Button 
+    id="fetchButton"
+    enabled="{!fetchButton.clickInProgress}" 
+    onClick="rocketData = rocket.execute('5e9d0d95eda69955f709d1eb')">
+    Fetch Falcon 1
+  </Button>
+  <Card when="{rocketData}" title="{rocketData.name}" subtitle="{rocketData.description}" />
+</App>  
+```
+
+<Playground
+  name="Example: Fetching data with APICall"
+  app={`
+    <App 
+      var.rocketData="">
+      <APICall id="rocket" url="https://api.spacexdata.com/v4/rockets/{$param}" method="get" />
+      <Button 
+        id="fetchButton"
+        enabled="{!fetchButton.clickInProgress}" 
+        onClick="rocketData = rocket.execute('5e9d0d95eda69955f709d1eb')">
+        Fetch Falcon 1
+      </Button>
+      <Card when="{rocketData}" title="{rocketData.name}" subtitle="{rocketData.description}" />
+    </App>  
+  `}
+  height={300}
+/>
+
+### Passing Multiple Parameters
+
+<Playground
+  name="Example: Passing multiple parameters to APICall"
+  height={240}
+  api={{
+    initialize: `
+      $state.names = [{id: 1, name: 'Albert'}, {id: 2, name: 'Benny'}, {id: 3, name: 'Clotilde'}];
+    `,
+    operations: {
+      'get-names-with-persist': {
+        method: 'get',
+        url: '/api/my-names',
+        handler: `
+          return $state.names;
+        `,
+      },
+      'post-fruit': {
+        method: 'post',
+        url: '/api/my-names/:id/:name',
+        pathParamTypes: {
+          id: "integer",
+        },
+        handler: `
+          $state.names.push({id: $pathParams.id, name: $pathParams.name});
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='myNames' url='/api/my-names' />
+      <HStack>
+        <APICall 
+          id="addNameApi"
+          url="/api/my-names/{$params[0]}/{$params[1]}" 
+          method="post" />
+        <TextBox id="newName" placeholder="Enter a new name" width="50%" />
+        <Button 
+          enabled="{newName.value.trim()}" 
+          label="Add"
+          onClick="
+            addNameApi.execute(myNames.value.length + 1, newName.value.trim());
+            newName.setValue('');
+          "/>
+      </HStack>
+      <HStack wrapContent="true">
+        <Items data="{myNames}">
+          <Badge value="{$item.name}"/>
+        </Items>
+      </HStack>
+    </App>
+  `}
+/>
 
 ## Data-Aware Components
 
