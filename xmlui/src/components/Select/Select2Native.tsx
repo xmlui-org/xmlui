@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode, useEffect } from "react";
 import { useCallback, useMemo } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
@@ -56,6 +56,10 @@ export function Select2({
 }: SelectProps) {
   const [open, setOpen] = React.useState(false);
 
+  useEffect(() => {
+    updateState({ value: initialValue });
+  }, [initialValue, updateState]);
+
   const onInputChange = useCallback(
     (selectedOption: Option) => {
       setOpen(false);
@@ -77,7 +81,7 @@ export function Select2({
   return (
     <SelectContext2.Provider value={contextValue}>
       <Select>
-        <SelectTrigger>
+        <SelectTrigger id={id} enabled={enabled}>
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>{children}</SelectContent>
@@ -88,9 +92,14 @@ export function Select2({
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
-  <SelectPrimitive.Trigger ref={ref} className={styles.selectTrigger} {...props}>
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & { enabled: boolean }
+>(({ className, children, enabled, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    className={styles.selectTrigger}
+    {...props}
+    disabled={!enabled}
+  >
     {children}
     <SelectPrimitive.Icon asChild>
       <Icon name="chevrondown" />
