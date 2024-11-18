@@ -100,21 +100,15 @@ Setting it to `false` limits selection to a single row.
 
 By default, the value of this property is `true`.
 
-<Callout type="info" emoji="📔">
-A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes. It is merely for cosmetic reasons.
-</Callout>
-
 ```ueml copy /enableMultiRowSelection="false"/
 <App>
-  <SelectionStore id="tableData">
-    <Table data='{[...]}' 
-      rowsSelectable="true" 
-      enableMultiRowSelection="false">
-      <Column bindTo="name"/>
-      <Column bindTo="quantity"/>
-      <Column bindTo="unit"/>
-    </Table>
-  </SelectionStore>
+  <Table data='{[...]}' 
+    rowsSelectable="true" 
+    enableMultiRowSelection="false">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
 </App>
 ```
 
@@ -122,15 +116,13 @@ A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide tog
   name="Example: rowsSelectable"
   app={`
     <App>
-      <SelectionStore id="tableData">
-        <Table data='{${JSON.stringify(data, null, 2)}}' 
-          rowsSelectable="true" 
-          enableMultiRowSelection="false">
-          <Column bindTo="name"/>
-          <Column bindTo="quantity"/>
-          <Column bindTo="unit"/>
-        </Table>
-      </SelectionStore>
+      <Table data='{${JSON.stringify(data, null, 2)}}' 
+        rowsSelectable="true" 
+        enableMultiRowSelection="false">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
     </App>
   `}
 />
@@ -344,19 +336,13 @@ Disabled items are rendered with a different color.
 
 The default value is `false`.
 
-<Callout type="info" emoji="📔">
-A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide toggle functionality to the checkboxes. It is merely for cosmetic reasons.
-</Callout>
-
 ```ueml copy /rowsSelectable="true"/
 <App>
-  <SelectionStore id="tableData">
-    <Table data='{[...]}' rowsSelectable="true">
-      <Column bindTo="name"/>
-      <Column bindTo="quantity"/>
-      <Column bindTo="unit"/>
-    </Table>
-  </SelectionStore>
+  <Table data='{[...]}' rowsSelectable="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
 </App>
 ```
 
@@ -364,13 +350,11 @@ A [`SelectionStore`](./SelectionStore.mdx) component is also used to provide tog
   name="Example: rowsSelectable"
   app={`
     <App>
-      <SelectionStore id="tableData">
-        <Table data='{${JSON.stringify(data, null, 2)}}' rowsSelectable="true">
-          <Column bindTo="name"/>
-          <Column bindTo="quantity"/>
-          <Column bindTo="unit"/>
-        </Table>
-      </SelectionStore>
+      <Table data='{${JSON.stringify(data, null, 2)}}' rowsSelectable="true">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
     </App>
   `}
 />
