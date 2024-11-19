@@ -12,6 +12,7 @@ import { SelectContext2 } from "@components/Select/SelectContext2";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
+import { useTheme } from "@components-core/theming/ThemeContext";
 
 type SelectProps = {
   id?: string;
@@ -168,31 +169,34 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { emptyListTemplate?: ReactNode }
->(({ className, children, emptyListTemplate, ...props }, ref) => (
-  <SelectPrimitive.Portal>
-    <SelectPrimitive.Content
-      ref={ref}
-      className={styles.selectContent}
-      position="popper"
-      {...props}
-    >
-      <SelectScrollUpButton />
-      <SelectPrimitive.Viewport className={classnames(styles.selectViewport, {})}>
-        {React.Children.toArray(children).length > 0 ? (
-          <>{children}</>
-        ) : (
-          emptyListTemplate ?? (
-            <div className={styles.selectEmpty}>
-              <Icon name={"noresult"} />
-              <span>List is empty</span>
-            </div>
-          )
-        )}
-      </SelectPrimitive.Viewport>
-      <SelectScrollDownButton />
-    </SelectPrimitive.Content>
-  </SelectPrimitive.Portal>
-));
+>(({ className, children, emptyListTemplate, ...props }, ref) => {
+  const { root } = useTheme();
+  return (
+    <SelectPrimitive.Portal container={root}>
+      <SelectPrimitive.Content
+        ref={ref}
+        className={styles.selectContent}
+        position="popper"
+        {...props}
+      >
+        <SelectScrollUpButton />
+        <SelectPrimitive.Viewport className={classnames(styles.selectViewport, {})}>
+          {React.Children.toArray(children).length > 0 ? (
+            <>{children}</>
+          ) : (
+            emptyListTemplate ?? (
+              <div className={styles.selectEmpty}>
+                <Icon name={"noresult"} />
+                <span>List is empty</span>
+              </div>
+            )
+          )}
+        </SelectPrimitive.Viewport>
+        <SelectScrollDownButton />
+      </SelectPrimitive.Content>
+    </SelectPrimitive.Portal>
+  );
+});
 
 SelectContent.displayName = SelectPrimitive.Content.displayName;
 

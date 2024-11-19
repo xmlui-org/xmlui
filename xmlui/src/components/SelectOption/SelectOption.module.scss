@@ -24,13 +24,11 @@ $componentName: "SelectOption";
   font-size: createThemeVar("font-size-SelectOption");
 
   &[data-highlighted] {
-    background-color: blue;
-    //background-color: createThemeVar("color-bg-item-SelectOption--hover");
+    background-color: createThemeVar("color-bg-item-SelectOption--hover");
   }
 
   &[data-state=checked] {
-    //background-color: createThemeVar("color-bg-item-SelectOption--active");
-    background-color: red;
+    background-color: createThemeVar("color-bg-item-SelectOption--active");
   }
 }
 
