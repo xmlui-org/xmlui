@@ -562,7 +562,7 @@ export class Parser {
           this.reportError("W031");
           return null;
         }
-  
+
         endToken = nextToken;
         nextToken = this._lexer.get();
       } else if (nextToken.type === TokenType.LSquare) {
@@ -898,7 +898,7 @@ export class Parser {
         this.reportError("W031");
         return null;
       }
-      
+
       // --- Skip variable binding type
       this._lexer.get();
     }
@@ -1191,8 +1191,14 @@ export class Parser {
         break;
       case "SeqE":
         isValid = exprList.parenthesized === 1;
+        let spreadFound = false;
         if (isValid) {
           for (const expr of exprList.expressions) {
+            // --- Spread operator can be used only in the last position
+            if (spreadFound) {
+              isValid = false;
+              break;
+            }
             switch (expr.type) {
               case "IdE":
                 isValid = !expr.parenthesized;
@@ -1212,6 +1218,15 @@ export class Parser {
                   const des = this.convertToArrayDestructure(expr);
                   if (des) args.push(des);
                 }
+                break;
+              }
+              case "SpreadE": {
+                spreadFound = true;
+                if (expr.operand.type !== "IdE") {
+                  isValid = false;
+                  break;
+                }
+                args.push(expr);
                 break;
               }
               default:
@@ -1234,6 +1249,14 @@ export class Parser {
           const des = this.convertToArrayDestructure(exprList);
           if (des) args.push(des);
         }
+        break;
+      case "SpreadE":
+        if (exprList.operand.type !== "IdE") {
+          isValid = false;
+          break;
+        }
+        isValid = true;
+        args.push(exprList);
         break;
       default:
         isValid = false;
@@ -1543,8 +1566,13 @@ export class Parser {
         break;
       case "SeqE":
         isValid = left.parenthesized === 1;
+        let spreadFound = false;
         if (isValid) {
           for (const expr of left.expressions) {
+            if (spreadFound) {
+              isValid = false;
+              break;
+            }
             switch (expr.type) {
               case "IdE":
                 isValid = !expr.parenthesized;
@@ -1566,6 +1594,15 @@ export class Parser {
                 }
                 break;
               }
+              case "SpreadE": {
+                spreadFound = true;
+                if (expr.operand.type !== "IdE") {
+                  isValid = false;
+                  break;
+                }
+                args.push(expr);
+                break;
+              }
               default:
                 isValid = false;
                 break;
@@ -1585,6 +1622,12 @@ export class Parser {
         if (isValid) {
           const des = this.convertToArrayDestructure(left);
           if (des) args.push(des);
+        }
+        break;
+      case "SpreadE":
+        isValid = left.operand.type === "IdE";
+        if (isValid) {
+          args.push(left);
         }
         break;
       default:
@@ -2375,7 +2418,7 @@ export class Parser {
   }
 
   private parseTemplateLiteral(): TemplateLiteralExpression {
-    const startToken = this._lexer.get()
+    const startToken = this._lexer.get();
     this._lexer.setStartingPhaseToTemplateLiteral();
     const segments: (Literal | Expression)[] = [];
     loop: while (true) {
@@ -2391,7 +2434,7 @@ export class Parser {
           const innerExpr = this.parseExpr();
           segments.push(innerExpr);
           this.expectToken(TokenType.RBrace, "W004");
-          this._lexer.setStartingPhaseToTemplateLiteral()
+          this._lexer.setStartingPhaseToTemplateLiteral();
           break;
         case TokenType.Backtick:
           break loop;
@@ -2399,7 +2442,7 @@ export class Parser {
           this.reportError("W004");
       }
     }
-    const endToken = this._lexer.get()
+    const endToken = this._lexer.get();
     return this.createExpressionNode<TemplateLiteralExpression>(
       "TempLitE",
       { segments },
@@ -3313,4 +3356,4 @@ export class Parser {
     return tokenTraits[token.type]?.expressionStart ?? false;
   }
 }
-"TypeError: Cannot read properties of undefined (reading 'canBeUnary')\n    at Parser.parseUnaryOrPrefixExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:2041:38)\n    at Parser.parseExponentialExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1985:25)\n    at Parser.parseMultExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1951:25)\n    at Parser.parseAddExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1917:25)\n    at Par…nExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1835:25)\n    at Parser.parseEquExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1793:25)\n    at Parser.parseBitwiseAndExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1760:25)\n    at Parser.parseBitwiseXorExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1727:25)\n    at Parser.parseBitwiseOrExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1694:25)"
+("TypeError: Cannot read properties of undefined (reading 'canBeUnary')\n    at Parser.parseUnaryOrPrefixExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:2041:38)\n    at Parser.parseExponentialExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1985:25)\n    at Parser.parseMultExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1951:25)\n    at Parser.parseAddExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1917:25)\n    at Par…nExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1835:25)\n    at Parser.parseEquExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1793:25)\n    at Parser.parseBitwiseAndExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1760:25)\n    at Parser.parseBitwiseXorExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1727:25)\n    at Parser.parseBitwiseOrExpr (/home/ez/code/work/xmlui/xmlui/src/parsers/scripting/Parser.ts:1694:25)");

@@ -183,6 +183,8 @@ Strings allow the same characters as JavaScript, including inline Unicode and th
 - `\u{hHHHHH}`: Unicode code point between `U+0000` and `U+10FFFF` (here `hHHHHH` represents one to six hexadecimal
 digits).
 
+XMLUI supports [template strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals); however, it does not allow using [tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates).
+
 ### Operators
 
 You can use most of the JavaScript operators in XMLUI scripts. Here, you can read the list of them; the operators are grouped according to their precedence, starting with the highest one:
@@ -294,7 +296,7 @@ You can use most of the JavaScript operators in XMLUI scripts. Here, you can rea
 > Note that you cannot use these JavaScript operators with binding expressions: `new`, `void`, `await`, `instanceof`, assigment operators (none
 of them), `yield`, and `yield*`.
 
-### Arrow Functions
+### Arrow Functions [#arrow-functions]
 
 The XMLUI allows you to define arrow functions. Though you can define arrow functions in attribute or property values, the only place where it is useful is in a variable declaration as the initial variable value.
 
@@ -336,4 +338,12 @@ Assuming you assigned the arrow function to the `myCalc` variable, this is how y
 const coords = { x: 12, y: -23 };
 // ...
 myCalc(coords);
+```
+
+Arrow functions also support the rest parameter syntax:
+
+```js
+const mySum = (...args) => args.reduce((acc, val) => acc + val, 0);
+
+console.log(mySum(1, 2, 3, 4, 5)); // It will display 15
 ```

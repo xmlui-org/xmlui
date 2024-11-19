@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components';
-import { XMLUI_EXPRESSIONS } from "../../meta/pages";
+import { XMLUI_EXPRESSIONS, XMLUI_EXPRESSIONS_ARROW_FUNCTIONS } from "../../meta/pages";
 
 # Script Syntax
 
@@ -86,6 +86,45 @@ Example:
 ```js
 // This for loop has no iteration body
 for (let i = 0; i < 10; i++); // The closing ";" indicates the empty statement
+```
+
+### Function Declarations
+
+XMLUI supports function declarations within event handlers and code behind files. When you declare functions, identifiers, destructuring constructs, and rest parameters can be used just like for <SmartLink href={XMLUI_EXPRESSIONS_ARROW_FUNCTIONS}>arrow expressions</SmartLink>.
+
+
+Here are a few samples:
+
+```js
+function signError() {
+  console.error("An error occurred");
+}
+
+function sum(a, b) {
+  return a + b;
+}
+
+function distance({x1, y1}, {x2, y2}) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
+functtions sumAll(...values) {
+  return values.reduce((a, b) => a + b);
+}
+```
+
+Just like in JavaScript, xmlui uses function hoisting: it does not matter where you declare a function; it will be moved to the top of its declaration scope. So, you can refer to a function (invoke it) before its declaration.
+
+XMLUI support functions nested in other functions, so this declaration is valid:
+
+```js
+function outer() {
+  greet("World");
+
+  function greet(name) {
+    console.log(`Hello, ${name}`);
+  }
+}
 ```
 
 ### Block Statement
