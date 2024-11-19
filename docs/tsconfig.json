@@ -41,6 +41,9 @@
       ],
       "@components/*": [
         "../xmlui/src/components/*"
+      ],
+      "@parsers/*": [
+        "../xmlui/src/components/parsers/*"
       ]
     },
     "incremental": true

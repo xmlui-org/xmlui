@@ -12,6 +12,7 @@ import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 import { getIdentifierScope } from "./eval-tree-common";
+import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 /**
  * Collects the name of local context variables the specified program depends on
@@ -222,6 +223,7 @@ export function collectVariableDependencies(
           thread.blocks!.push({ vars: {} });
           const block = innermostBlockScope(thread);
           const argSpecs = program.args;
+          let restFound = false;
           for (let i = 0; i < argSpecs.length; i++) {
             // --- Turn argument specification into processable variable declarations
             const argSpec = argSpecs[i];
@@ -240,6 +242,14 @@ export function collectVariableDependencies(
                   id: argSpec.id,
                   arrayDestruct: argSpec.arrayDestruct,
                   objectDestruct: argSpec.objectDestruct,
+                } as VarDeclaration;
+                break;
+              }
+              case "SpreadE": {
+                restFound = true;
+                decl = {
+                  type: "VarD",
+                  id: (argSpec.operand as unknown as Identifier).name,
                 } as VarDeclaration;
                 break;
               }

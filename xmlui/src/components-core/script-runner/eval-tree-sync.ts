@@ -40,6 +40,8 @@ import { Parser } from "../../parsers/scripting/Parser";
 import { ensureMainThread } from "./process-statement-common";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { isBannedFunction } from "./bannedFunctions";
+import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { rest } from "lodash-es";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -556,6 +558,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
     workingThread.blocks ??= [];
     workingThread.blocks.push(arrowBlock);
     const argSpecs = args[0] as Expression[];
+    let restFound = false;
     for (let i = 0; i < argSpecs.length; i++) {
       // --- Turn argument specification into processable variable declarations
       const argSpec = argSpecs[i];
@@ -577,24 +580,55 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
           } as VarDeclaration;
           break;
         }
+        case "SpreadE": {
+          restFound = true;
+          decl = {
+            type: "VarD",
+            id: (argSpec.operand as unknown as Identifier).name,
+          } as VarDeclaration;
+          break;
+        }
         default:
+          console.log(argSpec);
           throw new Error("Unexpected arrow argument specification");
       }
       if (decl) {
-        // --- Get the actual value to work with
-        let argVal = args[i + 3];
-        if (argVal?._EXPRESSION_) {
-          argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
+        if (restFound) {
+          // --- Get the rest of the arguments
+          const restArgs = args.slice(i + 3);
+          let argVals: any[] = [];
+          for (const arg of restArgs) {
+            if (arg?._EXPRESSION_) {
+              argVals.push(evaluator([], arg, runTimeEvalContext, runtimeThread));
+            } else {
+              argVals.push(arg);
+            }
+          }
+          processDeclarations(
+            arrowBlock,
+            runTimeEvalContext,
+            runtimeThread,
+            [decl],
+            false,
+            true,
+            argVals,
+          );
+        } else {
+          // --- Get the actual value to work with
+          let argVal = args[i + 3];
+          if (argVal?._EXPRESSION_) {
+            argVal = evaluator([], argVal, runTimeEvalContext, runtimeThread);
+          }
+          processDeclarations(
+            arrowBlock,
+            runTimeEvalContext,
+            runtimeThread,
+            [decl],
+            false,
+            true,
+            argVal,
+          );
         }
-        processDeclarations(
-          arrowBlock,
-          runTimeEvalContext,
-          runtimeThread,
-          [decl],
-          false,
-          true,
-          argVal,
-        );
       }
     }
 
