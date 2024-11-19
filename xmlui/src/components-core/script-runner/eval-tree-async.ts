@@ -1,4 +1,4 @@
-import { isPlainObject } from "lodash-es"
+import { isPlainObject } from "lodash-es";
 
 import type {
   ArrayLiteral,
@@ -739,6 +739,7 @@ async function createArrowFunctionAsync(
     workingThread.blocks ??= [];
     workingThread.blocks.push(arrowBlock);
     const argSpecs = args[0] as Expression[];
+    let restFound = false;
     for (let i = 0; i < argSpecs.length; i++) {
       // --- Turn argument specification into processable variable declarations
       const argSpec = argSpecs[i];
@@ -760,31 +761,70 @@ async function createArrowFunctionAsync(
           } as VarDeclaration;
           break;
         }
+        case "SpreadE": {
+          restFound = true;
+          decl = {
+            type: "VarD",
+            id: (argSpec.operand as unknown as Identifier).name,
+          } as VarDeclaration;
+          break;
+        }
         default:
           throw new Error("Unexpected arrow argument specification");
       }
       if (decl) {
-        // --- Get the actual value to work with
-        let argVal = args[i + 4];
-        if (argVal?._EXPRESSION_) {
-          argVal = await evaluator(
-            [],
-            argVal,
+        if (restFound) {
+          // --- Get the rest of the arguments
+          const restArgs = args.slice(i + 4);
+          let argVals: any[] = [];
+          for (const arg of restArgs) {
+            if (arg?._EXPRESSION_) {
+              argVals.push(
+                await evaluator(
+                  [],
+                  arg,
+                  runTimeEvalContext,
+                  runtimeThread,
+                  runTimeOnStatementCompleted,
+                ),
+              );
+            } else {
+              argVals.push(arg);
+            }
+          }
+          await processDeclarationsAsync(
+            arrowBlock,
             runTimeEvalContext,
             runtimeThread,
             runTimeOnStatementCompleted,
+            [decl],
+            false,
+            true,
+            argVals,
+          );
+        } else {
+          // --- Get the actual value to work with
+          let argVal = args[i + 4];
+          if (argVal?._EXPRESSION_) {
+            argVal = await evaluator(
+              [],
+              argVal,
+              runTimeEvalContext,
+              runtimeThread,
+              runTimeOnStatementCompleted,
+            );
+          }
+          await processDeclarationsAsync(
+            arrowBlock,
+            runTimeEvalContext,
+            runtimeThread,
+            runTimeOnStatementCompleted,
+            [decl],
+            false,
+            true,
+            argVal,
           );
         }
-        await processDeclarationsAsync(
-          arrowBlock,
-          runTimeEvalContext,
-          runtimeThread,
-          runTimeOnStatementCompleted,
-          [decl],
-          false,
-          true,
-          argVal,
-        );
       }
     }
 
