@@ -18,7 +18,7 @@ $thickness-border-Card: createThemeVar("thickness-border-Card");
 $style-border-Card: createThemeVar("style-border-Card");
 $border-Card: createThemeVar("border-Card");
 
-.wrapper{
+.wrapper {
   padding: $padding-Card;
   box-shadow: $shadow-Card;
   background-color: $color-bg-Card;
@@ -27,6 +27,15 @@ $border-Card: createThemeVar("border-Card");
   display: flex;
   flex-direction: column;
   gap: var(--stack-gap-default);
+
+  &.horizontal {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  &.vertical {  
+    flex-direction: column;
+  }
 
   &.isClickable {
     cursor: pointer;
