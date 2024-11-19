@@ -2,8 +2,9 @@ import styles from "./Card.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Card } from "./CardNative";
+import { Card, DEFAULT_ORIENTATION } from "./CardNative";
 import { dClick } from "@components/metadata-helpers";
+import { orientationOptionMd } from "@components/abstractions";
 
 const COMP = "Card";
 
@@ -19,6 +20,15 @@ export const CardMd = createMetadata({
     subtitle: d(`This prop sets the prestyled subtitle.`),
     linkTo: d(
       `This property wraps the title in a \`Link\` component that is clickable to navigate.`,
+    ),
+    orientation: d(
+      `An optional property that governs the ${COMP}'s orientation ` +
+        `(whether the ${COMP} lays out its children in a row or a column). ` +
+        `If the orientation is set to \`horizontal\`, the ${COMP} will display `+
+        `its children in a row, except for its [\`title\`](#title) and [\`subtitle\`](#subtitle).`,
+      orientationOptionMd,
+      "string",
+      DEFAULT_ORIENTATION,
     ),
   },
   events: {
@@ -56,6 +66,7 @@ export const cardComponentRenderer = createComponentRenderer(
         subtitle={extractValue.asOptionalString(node.props.subtitle)}
         avatarUrl={extractValue.asOptionalString(node.props.avatarUrl)}
         showAvatar={extractValue.asOptionalBoolean(node.props.showAvatar)}
+        orientation={extractValue.asOptionalString(node.props.orientation)}
       >
         {renderChild(node.children, {
           type: "Stack",

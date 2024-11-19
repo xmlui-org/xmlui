@@ -359,7 +359,7 @@ const Form = forwardRef(function (
     onReset?.();
   });
 
-  const cancelButton = (
+  const cancelButton = cancelLabel === "" ? null : (
     <Button
       key="cancel"
       type="button"

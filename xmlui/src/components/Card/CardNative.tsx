@@ -9,6 +9,8 @@ import { Heading } from "@components/Heading/HeadingNative";
 import { Stack } from "@components/Stack/StackNative";
 import { Text } from "@components/Text/TextNative";
 
+export const DEFAULT_ORIENTATION = "vertical";
+
 type Props = {
   style?: CSSProperties;
   children?: ReactNode;
@@ -17,12 +19,14 @@ type Props = {
   linkTo?: string;
   avatarUrl?: string;
   showAvatar?: boolean;
+  orientation?: string;
   onClick?: any;
 };
 
 export const Card = forwardRef(function Card(
   {
     children,
+    orientation = DEFAULT_ORIENTATION,
     style,
     title,
     subtitle,
@@ -42,6 +46,8 @@ export const Card = forwardRef(function Card(
       ref={ref as any}
       className={classnames(styles.wrapper, {
         [styles.isClickable]: !!onClick,
+        [styles.vertical]: orientation === "vertical",
+        [styles.horizontal]: orientation === "horizontal",
       })}
       style={style}
       onClick={onClick}

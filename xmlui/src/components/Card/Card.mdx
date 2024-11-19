@@ -139,6 +139,35 @@ This prop sets the prestyled title.
 
 %-PROP-END
 
+%-PROP-START orientation
+
+```ueml copy /orientation="horizontal"/
+<App>
+  <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
+    <SpaceFiller />
+    <Text>Text child #1</Text>
+    <Text>Text child #2</Text>
+    <Button label="Button Child" />
+  </Card>
+</App>
+```
+
+<Playground
+  name="Example: orientation"
+  app={`
+  <App>
+    <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
+      <SpaceFiller />
+      <Text>Text child #1</Text>
+      <Text>Text child #2</Text>
+      <Button label="Button Child" />
+    </Card>
+  </App>
+  `}
+/>
+
+%-PROP-END
+
 %-EVENT-START click
 
 This event is triggered when the `Card` is clicked.
@@ -198,7 +227,8 @@ The following theme definition changes the visual appearance of the card:
     "radius-Card": "4px",
     "color-border-Card": "$color-surface-600",
     "thickness-border-Card": "2px",
-    "padding-horizontal-Card": "2rem"
+    "padding-horizontal-Card": "2rem",
+    "color": "black"
   }
 }
 ```
@@ -214,7 +244,8 @@ The following theme definition changes the visual appearance of the card:
       "radius-Card": "4px",
       "color-border-Card": "$color-surface-600",
       "thickness-border-Card": "2px",
-      "padding-horizontal-Card": "2rem"
+      "padding-horizontal-Card": "2rem",
+      "color": "black"
     }
   }]}
   app={`
