@@ -2,6 +2,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import React from "react";
 import Icon from "@components/Icon/IconNative";
 import styles from "./SelectOption.module.scss";
+import {useSelect} from "@components/Select/SelectContext2";
 
 type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 
@@ -14,9 +15,12 @@ export const SelectOption = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Item>,
   SelectOptionProps
 >(({ value, label }, ref) => {
+  const {optionRenderer} = useSelect();
   return (
     <SelectPrimitive.Item ref={ref} className={styles.selectItem} value={value}>
-      <SelectPrimitive.ItemText>{label}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemText>{
+          optionRenderer ? optionRenderer({label, value}) : label
+      }</SelectPrimitive.ItemText>
       <span className={styles.selectItemIndicator}>
         <SelectPrimitive.ItemIndicator>
           <Icon name="checkmark" />
