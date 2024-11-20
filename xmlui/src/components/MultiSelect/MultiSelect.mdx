@@ -2,29 +2,29 @@
 
 The component provides two ways to add a list of options to the dropdown:
 
-### Using the `Option` component
+### Using the `MultiSelectOption` component
 
-The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
+The [`MultiSelectOption`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
 <App>
   <MultiSelect padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
 
 <Playground
-  name="Example: using Option"
+  name="Example: using MultiSelectOption"
   height={200}
   app={`
     <App>
       <MultiSelect padding="$space-1">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -33,7 +33,7 @@ The [`Option`](./Option.mdx) component can be used in situations where you need 
 ### Using the `Items` component
 
 In cases where you do not wish to maunally create each item of a datalist
-you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
+you can map the data to an [`Items`](./Items.mdx) component and place `MultiSelectOption` components in it.
 
 ```ueml copy
 <App>
@@ -43,7 +43,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
       { name: 'Jane', id: 1 },
       { name: 'Carl', id: 2 }
     ]}">
-      <Option value="{$item.id}" label="{$item.name}" />
+      <MultiSelectOption value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiSelect>
 </App>
@@ -60,7 +60,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
           { name: 'Jane', id: 1 },
           { name: 'Carl', id: 2 }
         ]}">
-          <Option value="{$item.id}" label="{$item.name}" />
+          <MultiSelectOption value="{$item.id}" label="{$item.name}" />
         </Items>
       </MultiSelect>
     </App>
@@ -74,9 +74,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 ```ueml copy /enabled="false"/
 <App>
   <MultiSelect enabled="false" padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -87,8 +87,8 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
   app={`
     <App>
       <MultiSelect enabled="false" padding="$space-1">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
         <Option value="opt3" label="third"/>
       </MultiSelect>
     </App>
@@ -134,9 +134,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 ```ueml copy /placeholder="Select any number of options"/
 <App>
   <MultiSelect placeholder="Select any number of options">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -147,9 +147,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
   app={`
     <App>
       <MultiSelect placeholder="Select any number of options">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -161,9 +161,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
 
 ```ueml copy /initialValue="['second', 'third']"/
 <MultiSelect initialValue="['second', 'third']">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
+  <MultiSelectOption value="opt1" label="first"/>
+  <MultiSelectOption value="opt2" label="second"/>
+  <MultiSelectOption value="opt3" label="third"/>
 </MultiSelect>
 ```
 
@@ -173,9 +173,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
   app={`
     <App>
       <MultiSelect initialValue="['opt1', 'opt3']">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -194,9 +194,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -213,9 +213,9 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -276,9 +276,9 @@ Click on the second field to see the custom empty list indicator.
     <Text value="{$item}" />
   </Items>
   <MultiSelect onDidChange="(newItems) => newValues = newItems">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -293,9 +293,9 @@ Click on the second field to see the custom empty list indicator.
       <Text value="{$item}" />
     </Items>
     <MultiSelect onDidChange="(newItems) => newValues = newItems">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
+      <MultiSelectOption value="opt1" label="first"/>
+      <MultiSelectOption value="opt2" label="second"/>
+      <MultiSelectOption value="opt3" label="third"/>
     </MultiSelect>
   </App>
   `}
@@ -312,9 +312,9 @@ Click on the second field to see the custom empty list indicator.
   <MultiSelect
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -329,9 +329,9 @@ Click on the second field to see the custom empty list indicator.
       <MultiSelect
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -351,9 +351,9 @@ See the example in [gotFocus event section](#gotfocus).
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <MultiSelect id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -365,9 +365,9 @@ See the example in [gotFocus event section](#gotfocus).
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <MultiSelect id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}

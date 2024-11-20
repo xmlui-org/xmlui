@@ -13,29 +13,29 @@ The component provides context values with which you can access some internal pr
 
 The component provides two ways to add a list of options to the dropdown:
 
-### Using the `Option` component
+### Using the `MultiSelectOption` component
 
-The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
+The [`MultiSelectOption`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
 <App>
   <MultiSelect padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
 
 <Playground
-  name="Example: using Option"
+  name="Example: using MultiSelectOption"
   height={200}
   app={`
     <App>
       <MultiSelect padding="$space-1">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -44,7 +44,7 @@ The [`Option`](./Option.mdx) component can be used in situations where you need 
 ### Using the `Items` component
 
 In cases where you do not wish to maunally create each item of a datalist
-you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
+you can map the data to an [`Items`](./Items.mdx) component and place `MultiSelectOption` components in it.
 
 ```ueml copy
 <App>
@@ -54,7 +54,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
       { name: 'Jane', id: 1 },
       { name: 'Carl', id: 2 }
     ]}">
-      <Option value="{$item.id}" label="{$item.name}" />
+      <MultiSelectOption value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiSelect>
 </App>
@@ -71,7 +71,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
           { name: 'Jane', id: 1 },
           { name: 'Carl', id: 2 }
         ]}">
-          <Option value="{$item.id}" label="{$item.name}" />
+          <MultiSelectOption value="{$item.id}" label="{$item.name}" />
         </Items>
       </MultiSelect>
     </App>
@@ -139,9 +139,9 @@ Default value: `true`.
 ```ueml copy /enabled="false"/
 <App>
   <MultiSelect enabled="false" padding="$space-1">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -152,8 +152,8 @@ Default value: `true`.
   app={`
     <App>
       <MultiSelect enabled="false" padding="$space-1">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
         <Option value="opt3" label="third"/>
       </MultiSelect>
     </App>
@@ -174,9 +174,9 @@ This property sets the component's initial value.
 
 ```ueml copy /initialValue="['second', 'third']"/
 <MultiSelect initialValue="['second', 'third']">
-  <Option value="opt1" label="first"/>
-  <Option value="opt2" label="second"/>
-  <Option value="opt3" label="third"/>
+  <MultiSelectOption value="opt1" label="first"/>
+  <MultiSelectOption value="opt2" label="second"/>
+  <MultiSelectOption value="opt3" label="third"/>
 </MultiSelect>
 ```
 
@@ -186,9 +186,9 @@ This property sets the component's initial value.
   app={`
     <App>
       <MultiSelect initialValue="['opt1', 'opt3']">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -211,9 +211,9 @@ This property sets the placeholder text displayed in the input field if no value
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -230,9 +230,9 @@ This property sets the placeholder text displayed in the input field if no value
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -249,9 +249,9 @@ A placeholder text that is visible in the input field when its empty.
 ```ueml copy /placeholder="Select any number of options"/
 <App>
   <MultiSelect placeholder="Select any number of options">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -262,9 +262,9 @@ A placeholder text that is visible in the input field when its empty.
   app={`
     <App>
       <MultiSelect placeholder="Select any number of options">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -340,9 +340,9 @@ This event is triggered when value of MultiSelect has changed.
     <Text value="{$item}" />
   </Items>
   <MultiSelect onDidChange="(newItems) => newValues = newItems">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -357,9 +357,9 @@ This event is triggered when value of MultiSelect has changed.
       <Text value="{$item}" />
     </Items>
     <MultiSelect onDidChange="(newItems) => newValues = newItems">
-      <Option value="opt1" label="first"/>
-      <Option value="opt2" label="second"/>
-      <Option value="opt3" label="third"/>
+      <MultiSelectOption value="opt1" label="first"/>
+      <MultiSelectOption value="opt2" label="second"/>
+      <MultiSelectOption value="opt3" label="third"/>
     </MultiSelect>
   </App>
   `}
@@ -376,9 +376,9 @@ This event is triggered when the MultiSelect has received the focus.
   <MultiSelect
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -393,9 +393,9 @@ This event is triggered when the MultiSelect has received the focus.
       <MultiSelect
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -417,9 +417,9 @@ This method sets the focus on the MultiSelect.
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <MultiSelect id="inputControl">
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiSelectOption value="opt1" label="first"/>
+    <MultiSelectOption value="opt2" label="second"/>
+    <MultiSelectOption value="opt3" label="third"/>
   </MultiSelect>
 </App>
 ```
@@ -431,9 +431,9 @@ This method sets the focus on the MultiSelect.
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <MultiSelect id="inputControl">
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiSelectOption value="opt1" label="first"/>
+        <MultiSelectOption value="opt2" label="second"/>
+        <MultiSelectOption value="opt3" label="third"/>
       </MultiSelect>
     </App>
   `}
@@ -551,94 +551,3 @@ color-border-Input: "#0033FF"
 - [`MultiCombobox`](./MultiCombobox.mdx)
 
 See [custom themes](../learning/themes/overview.mdx) for styling details.
-
-### Theme Variables
-
-| Variable | Default Value (Light) | Default Value (Dark) |
-| --- | --- | --- |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect | $color-bg-dropdown-item | $color-bg-dropdown-item |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-MultiSelect | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-menu-MultiSelect | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-bg-primary | $color-bg-primary |
-| [color-bg](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-bg-primary | $color-bg-primary |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-indicator-MultiSelect | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-item-MultiSelect--disabled | $color-surface-200 | $color-surface-800 |
-| [color-text](../styles-and-themes/common-units/#color)-item-MultiSelect--disabled | $color-surface-200 | $color-surface-800 |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-text-primary | $color-text-primary |
-| [color-text](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-text-primary | $color-text-primary |
-| [font-size](../styles-and-themes/common-units/#size)-MultiSelect | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-menu-MultiSelect | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-menu-MultiSelect | $radius | $radius |
-| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-menu-MultiSelect | $shadow-md | $shadow-md |
-| [shadow](../styles-and-themes/common-units/#color)-menu-MultiSelect | $shadow-md | $shadow-md |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-

@@ -18,12 +18,20 @@ $componentName: "MultiSelectOption";
   transition: background-color 0.2s ease;
   background-color: createThemeVar("color-bg-item-#{$componentName}");
 
-  &[data-selected="true"] {
+  &[data-selected=true] {
     background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
   }
 
   &[data-state=checked] {
     background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+  }
+
+  &[data-disabled=true] {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: createThemeVar("color-text-item-#{$componentName}--disabled");
+    font-style: italic;
   }
 }
 

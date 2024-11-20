@@ -1,9 +1,9 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import styles from "./MultiSelect.module.scss";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { MultiSelect } from "./MultiSelectNative";
+import styles from "@components/MultiSelect/MultiSelect.module.scss";
+
 import {
   dAutoFocus,
   dComponent,
@@ -23,7 +23,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
-import {MultiSelect2} from "@components/MultiSelect/MultiSelect2Native";
+import {MultiSelect} from "@components/MultiSelect/MultiSelectNative";
 
 const COMP = "MultiSelect";
 
@@ -98,7 +98,7 @@ export const multiSelectComponentRenderer = createComponentRenderer(
   MultiSelectMd,
   ({ node, state, updateState, extractValue, renderChild, lookupEventHandler }) => {
     return (
-      <MultiSelect2
+      <MultiSelect
         placeholder={extractValue(node.props.placeholder)}
         updateState={updateState}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
@@ -120,7 +120,7 @@ export const multiSelectComponentRenderer = createComponentRenderer(
         }}
       >
         {renderChild(node.children)}
-      </MultiSelect2>
+      </MultiSelect>
     );
   },
 );

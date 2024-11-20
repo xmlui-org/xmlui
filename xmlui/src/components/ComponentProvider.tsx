@@ -60,7 +60,6 @@ import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/Re
 import { formComponentRenderer } from "@components/Form/Form";
 import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "@components/NumberBox/NumberBox";
-import { multiSelectComponentRenderer } from "@components/MultiSelect/MultiSelect";
 import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
 import { appRenderer } from "@components/App/App";
 import { navPanelRenderer } from "@components/NavPanel/NavPanel";
@@ -140,6 +139,7 @@ import {option2ComponentRenderer} from "@components/Option2/Option2";
 import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
 import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
 import {multiSelectOptionComponentRenderer} from "@components/MultiSelect/MultiSelectOption";
+import {multiSelectComponentRenderer} from "@components/MultiSelect/MultiSelect";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -291,6 +291,9 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_MultiSelectOption !== "false") {
       this.registerComponentRenderer(multiSelectOptionComponentRenderer);
     }
+    if (process.env.VITE_USED_COMPONENTS_MultiSelect !== "false") {
+      this.registerComponentRenderer(multiSelectComponentRenderer);
+    }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
     }
@@ -343,7 +346,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(passwordInputComponentRenderer);
       this.registerComponentRenderer(emojiSelectorRenderer);
       this.registerComponentRenderer(numberBoxComponentRenderer);
-      this.registerComponentRenderer(multiSelectComponentRenderer);
       this.registerComponentRenderer(hoverCardComponentRenderer);
       this.registerComponentRenderer(radioGroupRenderer);
       this.registerComponentRenderer(radioGroupOptionRenderer);
