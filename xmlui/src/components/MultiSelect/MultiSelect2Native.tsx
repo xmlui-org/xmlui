@@ -33,7 +33,7 @@ interface MultiSelectProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
   placeholder?: string;
   children: ReactNode;
   updateState?: UpdateStateFn;
-  onDidChange?: (newValue: string) => void;
+  onDidChange?: (newValue: string[]) => void;
   layout?: CSSProperties;
   emptyListTemplate?: ReactNode;
   optionRenderer?: (option: Option) => ReactNode;
@@ -47,207 +47,202 @@ function defaultRenderer(option: Option) {
   return <div>{option.label}</div>;
 }
 
-export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps>(
-  (
-    {
-      id,
-      value,
-      initialValue,
-      placeholder,
-      children,
-      layout,
-      enabled = true,
-      updateState,
-      onDidChange = noop,
-      onFocus = noop,
-      onBlur = noop,
-      validationStatus = "none",
-      optionRenderer = defaultRenderer,
-      registerComponentApi,
-      emptyListTemplate,
-    },
-    ref,
-  ) => {
-    const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
-    const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
-    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
-    const [width, setWidth] = useState(0);
-    const observer = useRef<ResizeObserver>();
+export const MultiSelect2 = ({
+  id,
+  value,
+  initialValue,
+  placeholder,
+  children,
+  layout,
+  enabled = true,
+  updateState,
+  onDidChange = noop,
+  onFocus = noop,
+  onBlur = noop,
+  validationStatus = "none",
+  optionRenderer = defaultRenderer,
+  registerComponentApi,
+  emptyListTemplate,
+}: MultiSelectProps) => {
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
+  const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [width, setWidth] = useState(0);
+  const observer = useRef<ResizeObserver>();
 
-    const { root } = useTheme();
+  const { root } = useTheme();
 
-    useEffect(() => {
-      setInitValue((prevState) => {
-        if (isEqual(prevState, initialValue)) {
-          return prevState;
-        }
-        return initialValue;
-      });
-    }, [initialValue]);
-
-    useEffect(() => {
-      updateState({ value: initValue });
-    }, [initValue, updateState]);
-
-    // --- Manage obtaining and losing the focus
-    const handleOnFocus = useCallback(() => {
-      onFocus?.();
-    }, [onFocus]);
-
-    const handleOnBlur = useCallback(() => {
-      onBlur?.();
-    }, [onBlur]);
-
-    const focus = useCallback(() => {
-      referenceElement?.focus();
-    }, [referenceElement]);
-
-    const setValue = useEvent((newValue: string) => {
-      updateState({ value: newValue });
-      onDidChange(newValue);
+  useEffect(() => {
+    setInitValue((prevState) => {
+      if (isEqual(prevState, initialValue)) {
+        return prevState;
+      }
+      return initialValue;
     });
+  }, [initialValue]);
 
-    useEffect(() => {
-      registerComponentApi?.({
-        focus,
-        setValue,
-      });
-    }, [focus, registerComponentApi, setValue]);
+  useEffect(() => {
+    updateState({ value: initValue });
+  }, [initValue, updateState]);
 
-    const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === "Enter") {
-        setIsPopoverOpen(true);
-      } else if (event.key === "Backspace" && !event.currentTarget.value) {
-        const newSelectedValues = [...value];
-        newSelectedValues.pop();
-        updateState({ value: newSelectedValues });
-        onDidChange(newSelectedValues);
-      }
-    };
+  // --- Manage obtaining and losing the focus
+  const handleOnFocus = useCallback(() => {
+    onFocus?.();
+  }, [onFocus]);
 
-    const toggleOption = useCallback(
-      (selecteValue: string) => {
-        const newSelectedValues = value.includes(selecteValue)
-          ? value.filter((value) => value !== selecteValue)
-          : [...value, selecteValue];
-        updateState({ value: newSelectedValues });
-        onDidChange(newSelectedValues);
-      },
-      [onDidChange, updateState, value],
-    );
+  const handleOnBlur = useCallback(() => {
+    onBlur?.();
+  }, [onBlur]);
 
-    const handleClear = () => {
-      updateState({ value: [] });
-      onDidChange([]);
-    };
+  const focus = useCallback(() => {
+    referenceElement?.focus();
+  }, [referenceElement]);
 
-    const handleTogglePopover = () => {
-      setIsPopoverOpen((prev) => !prev);
-    };
+  const setValue = useEvent((newValue: string[]) => {
+    updateState({ value: newValue });
+    onDidChange(newValue);
+  });
 
-    useEffect(() => {
-      const current = referenceElement as any;
-      // --- We are already observing old element
-      if (observer?.current && current) {
-        observer.current.unobserve(current);
-      }
-      observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
-      if (current && observer.current) {
-        observer.current.observe(referenceElement as any);
-      }
-    }, [referenceElement]);
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
 
-    const multiSelectContextValue = useMemo(
-      () => ({
-        value,
-        onChange: toggleOption,
-        optionRenderer,
-      }),
-      [optionRenderer, toggleOption, value],
-    );
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      setIsPopoverOpen(true);
+    } else if (event.key === "Backspace" && !event.currentTarget.value) {
+      const newSelectedValues = [...value];
+      newSelectedValues.pop();
+      updateState({ value: newSelectedValues });
+      onDidChange(newSelectedValues);
+    }
+  };
 
-    return (
-      <MultiSelectContext.Provider value={multiSelectContextValue}>
-        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
-          <PopoverTrigger asChild>
-            <button
-              ref={setReferenceElement}
-              id={id}
-              style={layout}
-              onFocus={handleOnFocus}
-              onBlur={handleOnBlur}
-              disabled={!enabled}
-              onClick={handleTogglePopover}
-              className={classnames(styles.multiSelectButton, styles[validationStatus])}
-            >
-              {value?.length > 0 ? (
-                <div className={styles.badgeListContainer}>
-                  <div className={styles.badgeList}>
-                    {value.map((v) => {
-                      return (
-                        <SelectBadge key={v}>
-                          {v}
-                          <Icon
-                            name="close"
-                            size="sm"
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              toggleOption(v);
-                            }}
-                          />
-                        </SelectBadge>
-                      );
-                    })}
-                  </div>
-                  <div className={styles.actions}>
-                    <Icon
-                      name="close"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        handleClear();
-                      }}
-                    />
-                    <Icon name="chevrondown" />
-                  </div>
+  const toggleOption = useCallback(
+    (selecteValue: string) => {
+      const newSelectedValues = value.includes(selecteValue)
+        ? value.filter((value) => value !== selecteValue)
+        : [...value, selecteValue];
+      updateState({ value: newSelectedValues });
+      onDidChange(newSelectedValues);
+    },
+    [onDidChange, updateState, value],
+  );
+
+  const handleClear = () => {
+    updateState({ value: [] });
+    onDidChange([]);
+  };
+
+  const handleTogglePopover = () => {
+    setIsPopoverOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const current = referenceElement as any;
+    // --- We are already observing old element
+    if (observer?.current && current) {
+      observer.current.unobserve(current);
+    }
+    observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
+    if (current && observer.current) {
+      observer.current.observe(referenceElement as any);
+    }
+  }, [referenceElement]);
+
+  const multiSelectContextValue = useMemo(
+    () => ({
+      value,
+      onChange: toggleOption,
+      optionRenderer,
+    }),
+    [optionRenderer, toggleOption, value],
+  );
+
+  return (
+    <MultiSelectContext.Provider value={multiSelectContextValue}>
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
+        <PopoverTrigger asChild>
+          <button
+            ref={setReferenceElement}
+            id={id}
+            style={layout}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            disabled={!enabled}
+            onClick={handleTogglePopover}
+            className={classnames(styles.multiSelectButton, styles[validationStatus])}
+          >
+            {value?.length > 0 ? (
+              <div className={styles.badgeListContainer}>
+                <div className={styles.badgeList}>
+                  {value.map((v) => {
+                    return (
+                      <SelectBadge key={v}>
+                        {v}
+                        <Icon
+                          name="close"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleOption(v);
+                          }}
+                        />
+                      </SelectBadge>
+                    );
+                  })}
                 </div>
-              ) : (
-                <div className={styles.emptySelect}>
-                  <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
-                  <Icon name="chevrondown" size="sm" />
+                <div className={styles.actions}>
+                  <Icon
+                    name="close"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleClear();
+                    }}
+                  />
+                  <Icon name="chevrondown" />
                 </div>
-              )}
-            </button>
-          </PopoverTrigger>
-          <Portal container={root}>
-            <PopoverContent
-              align="start"
-              onEscapeKeyDown={() => setIsPopoverOpen(false)}
-              style={{ width }}
-            >
-              <Command className={styles.multiSelectMenu}>
-                <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
-                <CommandList>
-                  {React.Children.toArray(children).length > 0 ? (
-                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                  ) : (
-                    <CommandEmpty className={styles.commandEmpty}>
-                      {emptyListTemplate ?? (
-                        <>
-                          <Icon name={"noresult"} />
-                          <span>List is empty</span>
-                        </>
-                      )}
-                    </CommandEmpty>
-                  )}
-                </CommandList>
-              </Command>
-            </PopoverContent>
-          </Portal>
-        </Popover>
-      </MultiSelectContext.Provider>
-    );
-  },
-);
+              </div>
+            ) : (
+              <div className={styles.emptySelect}>
+                <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
+                <Icon name="chevrondown" size="sm" />
+              </div>
+            )}
+          </button>
+        </PopoverTrigger>
+        <Portal container={root}>
+          <PopoverContent
+            align="start"
+            onEscapeKeyDown={() => setIsPopoverOpen(false)}
+            style={{ width }}
+          >
+            <Command className={styles.multiSelectMenu}>
+              <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
+              <CommandList>
+                {React.Children.toArray(children).length > 0 ? (
+                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                ) : (
+                  <CommandEmpty className={styles.commandEmpty}>
+                    {emptyListTemplate ?? (
+                      <>
+                        <Icon name={"noresult"} />
+                        <span>List is empty</span>
+                      </>
+                    )}
+                  </CommandEmpty>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Portal>
+      </Popover>
+    </MultiSelectContext.Provider>
+  );
+};
 
 MultiSelect2.displayName = "MultiSelect2";
 
