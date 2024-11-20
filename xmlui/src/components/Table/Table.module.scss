@@ -126,7 +126,12 @@ $transform-text-heading-Table: createThemeVar("transform-text-heading-Table");
     .checkBoxWrapper {
       font-size: 1rem;
       visibility: hidden;
+
+      &.showInHeader {
+        visibility: visible;
+      }
     }
+
 
     &:hover,
     &.selected,

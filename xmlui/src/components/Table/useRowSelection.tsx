@@ -24,8 +24,7 @@ type ToggleOptions = {
   shiftKey?: boolean;
   metaKey?: boolean;
   ctrlKey?: boolean;
-  // TODO: Consider removing this unused property
-  [x: string | number | symbol]: any;
+  singleItem?: boolean;
 };
 
 /**
@@ -113,11 +112,14 @@ export default function useRowSelection(items: Item[] = EMPTY_ARRAY): RowSelecti
     // options: key event options
     (targetIndex: number, options: ToggleOptions = {}) => {
       const targetId = walkableList[targetIndex];
-      const { shiftKey, metaKey, ctrlKey } = options;
+      const { shiftKey, metaKey, ctrlKey, singleItem } = options;
 
       // --- This variable will hold the newest selection interval
       let newSelectionInterval: SelectionInterval;
-      let newSelectedRowsIdsInOrder = [...(selectedItems.map(item => item[idKey]))];
+      console.log("selectedItems", selectedItems);
+      let newSelectedRowsIdsInOrder = singleItem
+        ? [...(selectedItems.filter(item => item[idKey] === targetId).map(item => item[idKey]))]
+        : [...(selectedItems.map(item => item[idKey]))];
 
       if (shiftKey) {
         // --- SHIFT is pressed, extend the current selection
