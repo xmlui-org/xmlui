@@ -73,9 +73,20 @@ export const TableMd = createMetadata({
         `to \`false\` limits selection to a single row.`,
     ),
     singleSelectOnRowClick: d(
-      "This property influences how clicking on a row works. If this property is set to true, " + 
-      "a click clears all other selected rows and toggles the selection of the clicked row. " + 
-      "Otherwise, it keeps the selection state of other rows.",
+      "This property influences how clicking on a row works. If this property is set to true, " +
+        "a click clears all other selected rows and toggles the selection of the clicked row. " +
+        "Otherwise, it keeps the selection state of other rows.",
+      null,
+      "boolean",
+      false,
+    ),
+    alwaysShowSelectionHeader: d(
+      "This property indicates when the row selection header is displayed. When the value is " +
+        "`true,` the selection header is always visible. Otherwise, it is displayed only " +
+        "when hovered.",
+      null,
+      "boolean",
+      false,
     ),
   },
   events: {
@@ -241,6 +252,9 @@ const TableWithColumns = ({
         hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
         enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
         singleSelectOnRowClick={extractValue.asOptionalBoolean(node.props.singleSelectOnRowClick)}
+        alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
+          node.props.alwaysShowSelectionHeader,
+        )}
       />
     </>
   );

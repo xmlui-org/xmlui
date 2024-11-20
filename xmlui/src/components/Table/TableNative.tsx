@@ -97,6 +97,7 @@ type TableProps = {
   autoFocus?: boolean;
   hideHeader?: boolean;
   singleSelectOnRowClick?: boolean;
+  alwaysShowSelectionHeader?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -155,6 +156,7 @@ export const Table = forwardRef(
       autoFocus = false,
       hideHeader = false,
       singleSelectOnRowClick = false,
+      alwaysShowSelectionHeader = false,
       // cols
     }: TableProps,
     forwardedRef,
@@ -328,7 +330,9 @@ export const Table = forwardRef(
           enableMultiRowSelection ? (
             <Toggle
               {...{
-                className: classnames(styles.checkBoxWrapper),
+                className: classnames(styles.checkBoxWrapper, {
+                  [styles.showInHeader]: alwaysShowSelectionHeader,
+                }),
                 value: table.getIsAllRowsSelected(),
                 indeterminate: table.getIsSomeRowsSelected(),
                 onDidChange: (checked: any) => {
