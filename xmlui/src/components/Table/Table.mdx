@@ -113,7 +113,7 @@ By default, the value of this property is `true`.
 ```
 
 <Playground
-  name="Example: rowsSelectable"
+  name="Example: enableMultiRowSelection"
   app={`
     <App>
       <Table data='{${JSON.stringify(data, null, 2)}}' 
@@ -360,6 +360,44 @@ The default value is `false`.
 />
 
 %-PROP-END
+
+%-PROP-START singleSelectOnRowClick
+
+The following sample turns on this property. Try how it works when you click on a row or directly to the selection checkbox.
+
+```ueml copy /singleSelectOnRowClick="true"/
+<App>
+  <Table 
+    data='{${JSON.stringify(data, null, 2)}}' 
+    rowsSelectable="true"
+    singleSelectOnRowClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+<Playground
+  name="Example: singleSelectOnRowClick"
+  app={`
+    <App>
+      <SelectionStore>
+      <Table 
+        data='{${JSON.stringify(data, null, 2)}}' 
+        rowsSelectable="true"
+        singleSelectOnRowClick="true">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+      </SelectionStore>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
 
 %-PROP-START sortBy
 

@@ -10,12 +10,12 @@ export type BadgeColors = {
 };
 
 type Props = {
-  value: string;
+  children?: React.ReactNode;
   variant?: BadgeVariant;
   color?: string | BadgeColors;
 };
 
-export const Badge = ({ value, color, variant = "badge" }: Props) => {
+export const Badge = ({ children, color, variant = "badge" }: Props) => {
   return (
     <div
       className={classnames({ [styles.badge]: variant === "badge", [styles.pill]: variant === "pill" })}
@@ -27,7 +27,7 @@ export const Badge = ({ value, color, variant = "badge" }: Props) => {
           : undefined
       }
     >
-      {value}
+      {children}
     </div>
   );
 };

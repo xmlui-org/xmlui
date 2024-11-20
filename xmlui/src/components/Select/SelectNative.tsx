@@ -13,6 +13,13 @@ import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
+import { createPortal } from "react-dom";
+import type { ValidationStatus } from "@components/abstractions";
+import { SelectContext, useSelectContextValue } from "./SelectContext";
+import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
+import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { OptionComponent } from "@components/Option/OptionNative";
 
 type SelectProps = {
   id?: string;
@@ -103,7 +110,10 @@ export function Select({
 
   return (
     <SelectContext2.Provider value={contextValue}>
-      <SelectPrimitive.Root value={value} onValueChange={updateValue}>
+        <OptionTypeProvider Component={OptionComponent}>
+            {children}
+        </OptionTypeProvider>
+        <SelectPrimitive.Root value={value} onValueChange={updateValue}>
         <SelectTrigger
           id={id}
           style={layout}

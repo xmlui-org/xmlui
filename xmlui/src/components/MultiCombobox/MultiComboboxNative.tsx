@@ -17,6 +17,8 @@ import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
 import Icon from "@components/Icon/IconNative";
 import { isEqual } from "lodash-es";
+import { OptionComponent } from "@components/Option/OptionNative";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 
 type MultiComboboxProps = {
   id?: string;
@@ -126,7 +128,7 @@ export const MultiCombobox = ({
     itemToString(item: Option | null) {
       return item ? item.label : "";
     },
-    isItemDisabled: (item) => item.disabled!,
+    isItemDisabled: (item) => item.enabled === false,
     inputValue,
     stateReducer(state, actionAndChanges) {
       const { changes, type } = actionAndChanges;
@@ -225,7 +227,9 @@ export const MultiCombobox = ({
 
   return (
     <SelectContext.Provider value={selectContextValue}>
-      {children}
+      <OptionTypeProvider Component={OptionComponent}>
+        {children}
+      </OptionTypeProvider>
       <div className={styles.comboboxContainer} style={layout}>
         <div
           className={classnames(styles.comboboxToggleButton, styles[validationStatus], {
