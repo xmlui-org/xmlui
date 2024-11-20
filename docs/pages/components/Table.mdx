@@ -123,7 +123,7 @@ By default, the value of this property is `true`.
 ```
 
 <Playground
-  name="Example: rowsSelectable"
+  name="Example: enableMultiRowSelection"
   app={`
     <App>
       <Table data='{${JSON.stringify(data, null, 2)}}' 
@@ -461,6 +461,43 @@ The default value is `false`.
         <Column bindTo="quantity"/>
         <Column bindTo="unit"/>
       </Table>
+    </App>
+  `}
+/>
+
+### `singleSelectOnRowClick`
+
+This property influences how clicking on a row works. If this property is set to true, a click clears all other selected rows and toggles the selection of the clicked row. Otherwise, it keeps the selection state of other rows.
+
+The following sample turns on this property. Try how it works when you click on a row or directly to the selection checkbox.
+
+```ueml copy /singleSelectOnRowClick="true"/
+<App>
+  <Table 
+    data='{${JSON.stringify(data, null, 2)}}' 
+    rowsSelectable="true"
+    singleSelectOnRowClick="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+    <Column bindTo="unit"/>
+  </Table>
+</App>
+```
+
+<Playground
+  name="Example: singleSelectOnRowClick"
+  app={`
+    <App>
+      <SelectionStore>
+      <Table 
+        data='{${JSON.stringify(data, null, 2)}}' 
+        rowsSelectable="true"
+        singleSelectOnRowClick="true">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+        <Column bindTo="unit"/>
+      </Table>
+      </SelectionStore>
     </App>
   `}
 />

@@ -96,6 +96,7 @@ type TableProps = {
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
   hideHeader?: boolean;
+  singleSelectOnRowClick?: boolean;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -153,11 +154,12 @@ export const Table = forwardRef(
       noDataRenderer,
       autoFocus = false,
       hideHeader = false,
+      singleSelectOnRowClick = false,
       // cols
     }: TableProps,
     forwardedRef,
   ) => {
-    const {getThemeVar} = useTheme();
+    const { getThemeVar } = useTheme();
     const safeData = Array.isArray(data) ? data : EMPTY_ARRAY;
     const wrapperRef = useRef<HTMLDivElement>(null);
     const ref = forwardedRef ? composeRefs(wrapperRef, forwardedRef) : wrapperRef;
@@ -282,7 +284,7 @@ export const Table = forwardRef(
         ): { width?: number; starSizedWidth?: string } {
           let starSizedWidth;
           let width;
-          const resolvedWidth= isThemeVarName(colWidth) ? getThemeVar(colWidth) : colWidth;
+          const resolvedWidth = isThemeVarName(colWidth) ? getThemeVar(colWidth) : colWidth;
           if (typeof resolvedWidth === "number") {
             width = resolvedWidth;
           } else if (typeof resolvedWidth === "string") {
@@ -536,7 +538,11 @@ export const Table = forwardRef(
             <div className={styles.noRows}>No data available</div>
           ))}
         {hasData && (
-          <table className={styles.table} ref={tableRef} style={{borderRight: "1px solid transparent"}}>
+          <table
+            className={styles.table}
+            ref={tableRef}
+            style={{ borderRight: "1px solid transparent" }}
+          >
             {!hideHeader && (
               <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
                 {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
@@ -649,10 +655,15 @@ export const Table = forwardRef(
                       if (event.defaultPrevented) {
                         return;
                       }
+                      const target = event.target as HTMLElement;
+                      if (target.tagName.toLowerCase() === "input") {
+                        return;
+                      }
                       toggleRow(row.original, {
                         ...event,
                         metaKey: enableMultiRowSelection,
                         shiftKey: enableMultiRowSelection ? event.shiftKey : false,
+                        singleItem: singleSelectOnRowClick,
                       });
                     }}
                   >

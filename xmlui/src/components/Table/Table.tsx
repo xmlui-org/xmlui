@@ -20,9 +20,9 @@ export const TableMd = createMetadata({
   props: {
     items: d(
       `You can use \`items\` as an alias for the \`data\` property. ` +
-      `When you bind the table to a data source (e.g. an API endpoint), ` +
-      `the \`data\` acts as the property that accepts a URL to fetch information from an API. ` +
-      `When both \`items\` and \`data\` are used, \`items\` has priority.`,
+        `When you bind the table to a data source (e.g. an API endpoint), ` +
+        `the \`data\` acts as the property that accepts a URL to fetch information from an API. ` +
+        `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
     data: d(
       `The component receives data via this property. The \`data\` property is a list of items ` +
@@ -71,6 +71,11 @@ export const TableMd = createMetadata({
       `This boolean property indicates whether you can select multiple rows in the table. ` +
         `This property only has an effect when the rowsSelectable property is set. Setting it ` +
         `to \`false\` limits selection to a single row.`,
+    ),
+    singleSelectOnRowClick: d(
+      "This property influences how clicking on a row works. If this property is set to true, " + 
+      "a click clears all other selected rows and toggles the selection of the clicked row. " + 
+      "Otherwise, it keeps the selection state of other rows.",
     ),
   },
   events: {
@@ -235,6 +240,7 @@ const TableWithColumns = ({
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
         enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
+        singleSelectOnRowClick={extractValue.asOptionalBoolean(node.props.singleSelectOnRowClick)}
       />
     </>
   );
