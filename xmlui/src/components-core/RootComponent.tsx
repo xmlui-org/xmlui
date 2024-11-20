@@ -234,14 +234,13 @@ function RootContentComponent({
   const observer = useRef<ResizeObserver>();
   useIsomorphicLayoutEffect(()=>{
     if(trackContainerHeight){
-      if(root !== document.body){
+      if(root && root !== document.body){
         // --- We are already observing old element
         if (observer?.current) {
           observer.current.unobserve(root);
         }
         observer.current = new ResizeObserver((entries)=>{
-          console.log(entries[0].contentRect.height);
-          root?.style.setProperty('--containerHeight', entries[0].contentRect.height + "px");
+          root.style.setProperty('--containerHeight', entries[0].contentRect.height + "px");
         });
         if (observer.current) {
           observer.current.observe(root);
