@@ -13,8 +13,10 @@ import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import { SelectContext } from "@components/Select/SelectContext";
 import type { Option, ValidationStatus } from "@components/abstractions";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { ComboboxOption } from "@components/Combobox/ComboboxtOptionNative";
+import { ComboboxContext } from "@components/Combobox/ComboboxContext";
 
 type ComboboxProps = {
   id?: string;
@@ -65,10 +67,10 @@ export function Combobox({
   }, [initialValue, updateState]);
 
   const onInputChange = useCallback(
-    (selectedOption: Option) => {
+    (selectedValue: string) => {
       setOpen(false);
-      updateState({ value: selectedOption.value });
-      onDidChange(selectedOption.value);
+      updateState({ value: selectedValue });
+      onDidChange(selectedValue);
     },
     [onDidChange, updateState],
   );
@@ -114,33 +116,30 @@ export function Combobox({
   );
 
   return (
-    <SelectContext.Provider value={contextValue}>
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger
-          asChild
-          style={layout}
-          ref={setReferenceElement}
-          id={id}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-        >
-          <button
-            aria-expanded={open}
-            className={classnames(styles.comboboxButton, styles[validationStatus], {
-              [styles.disabled]: !enabled,
-            })}
-          >
-            <span>{value ? value : placeholder || ""}</span>
-            <Icon name="chevrondown" />
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className={styles.popoverContent} style={{ width }}>
-          <Command>
-            <CommandInput placeholder="Search..." className={styles.commandInput} />
-            <CommandList className={styles.commandList}>
-              {React.Children.toArray(children).length > 0 ? (
+    <ComboboxContext.Provider value={contextValue}>
+      <OptionTypeProvider Component={ComboboxOption}>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <button
+              style={layout}
+              ref={setReferenceElement}
+              id={id}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              aria-expanded={open}
+              className={classnames(styles.comboboxButton, styles[validationStatus], {
+                [styles.disabled]: !enabled,
+              })}
+            >
+              <span>{value ? value : placeholder || ""}</span>
+              <Icon name="chevrondown" />
+            </button>
+          </PopoverTrigger>
+          <PopoverContent className={styles.popoverContent} style={{ width }}>
+            <Command>
+              <CommandInput placeholder="Search..." className={styles.commandInput} />
+              <CommandList className={styles.commandList}>
                 <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-              ) : (
                 <CommandEmpty className={styles.commandEmpty}>
                   {emptyListTemplate ?? (
                     <>
@@ -149,11 +148,11 @@ export function Combobox({
                     </>
                   )}
                 </CommandEmpty>
-              )}
-            </CommandList>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </SelectContext.Provider>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </OptionTypeProvider>
+    </ComboboxContext.Provider>
   );
 }

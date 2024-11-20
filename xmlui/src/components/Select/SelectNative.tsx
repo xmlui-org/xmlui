@@ -14,7 +14,7 @@ import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { OptionComponent } from "@components/Option/OptionNative";
+import { SelectOption } from "@components/Select/SelectOptionNative";
 
 type SelectProps = {
   id?: string;
@@ -107,23 +107,24 @@ export function Select({
 
   return (
     <SelectContext.Provider value={contextValue}>
-      {/*<OptionTypeProvider Component={OptionComponent}>{children}</OptionTypeProvider>*/}
-      <SelectPrimitive.Root value={value} onValueChange={updateValue}>
-        <SelectTrigger
-          autoFocus={autoFocus}
-          id={id}
-          style={layout}
-          className={styles.selectTrigger}
-          onFocus={handleOnFocus}
-          onBlur={handleOnBlur}
-          enabled={enabled}
-          validationStatus={validationStatus}
-          ref={setReferenceElement}
-        >
-          <SelectValue placeholder={placeholder} aria-multiselectable={true} />
-        </SelectTrigger>
-        <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
-      </SelectPrimitive.Root>
+      <OptionTypeProvider Component={SelectOption}>
+        <SelectPrimitive.Root value={value} onValueChange={updateValue}>
+          <SelectTrigger
+            autoFocus={autoFocus}
+            id={id}
+            style={layout}
+            className={styles.selectTrigger}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            enabled={enabled}
+            validationStatus={validationStatus}
+            ref={setReferenceElement}
+          >
+            <SelectValue placeholder={placeholder} aria-multiselectable={true} />
+          </SelectTrigger>
+          <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
+        </SelectPrimitive.Root>
+      </OptionTypeProvider>
     </SelectContext.Provider>
   );
 }

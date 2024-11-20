@@ -2,7 +2,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { SelectOption } from "./SelectOptionNative";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import styles from "@components/SelectOption/SelectOption.module.scss";
+import styles from "@components/Select/SelectOption.module.scss";
 
 const COMP = "SelectOption";
 

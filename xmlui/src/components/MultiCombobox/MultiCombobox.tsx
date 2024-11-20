@@ -111,10 +111,6 @@ export const multiComboboxComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem

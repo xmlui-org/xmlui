@@ -9,9 +9,9 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select>
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -22,9 +22,9 @@ If the `label` is not specified `value` is shown.
     app={`
     <App>
       <Select>
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -37,9 +37,9 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select initialValue="opt3">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -50,9 +50,9 @@ If the `label` is not specified `value` is shown.
     app={`
     <App>
       <Select initialValue="opt3">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -71,9 +71,9 @@ If the `label` is not specified `value` is shown.
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -90,9 +90,9 @@ If the `label` is not specified `value` is shown.
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -105,9 +105,9 @@ If the `label` is not specified `value` is shown.
 ```ueml copy
 <App>
   <Select placeholder="Please select an item">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -118,9 +118,9 @@ If the `label` is not specified `value` is shown.
     app={`
     <App>
       <Select placeholder="Please select an item">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -223,9 +223,9 @@ Click on the second field to see the custom empty list indicator.
   <var name="newValue" value="" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -238,9 +238,9 @@ Click on the second field to see the custom empty list indicator.
       <var name="newValue" value="" />
       <Text value="{newValue}" />
       <Select onDidChange="(newItem) => newValue = newItem">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -257,9 +257,9 @@ Click on the second field to see the custom empty list indicator.
   <Select
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -274,9 +274,9 @@ Click on the second field to see the custom empty list indicator.
       <Select
         onGotFocus="isFocused = true"
         onLostFocus="isFocused = false">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -290,9 +290,9 @@ Click on the second field to see the custom empty list indicator.
 <App>
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <Select id="inputControl">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
 </App>
 ```
@@ -304,9 +304,9 @@ Click on the second field to see the custom empty list indicator.
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <Select id="inputControl">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
     </App>
   `}
@@ -319,9 +319,9 @@ Click on the second field to see the custom empty list indicator.
 ```ueml copy
 <App>
   <Select id="inputControl">
-    <SelectOption value="opt1" label="first"/>
-    <SelectOption value="opt2" label="second"/>
-    <SelectOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </Select>
   <HStack>
     <Button
@@ -339,9 +339,9 @@ Click on the second field to see the custom empty list indicator.
     app={`
     <App>
       <Select id="inputControl">
-        <SelectOption value="opt1" label="first"/>
-        <SelectOption value="opt2" label="second"/>
-        <SelectOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </Select>
       <HStack>
         <Button

@@ -3,28 +3,28 @@ import { useId } from "react";
 import { CommandItem } from "@components/Combobox/Command";
 import styles from "@components/MultiSelect/MultiOption.module.scss";
 import * as React from "react";
-import { useSelect } from "@components/MultiSelect/MultiSelectContext";
 import Icon from "@components/Icon/IconNative";
+import { useCombobox } from "@components/Combobox/ComboboxContext";
 import classnames from "classnames";
 
 type OptionComponentProps = {
   value: string;
   label: string;
-  disabled?: boolean;
+  enabled?: boolean;
 };
 
-export function MultiOption({ value, label, disabled }: OptionComponentProps) {
+export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
   const id = useId();
-  const { value: selectedValues, onChange, optionRenderer } = useSelect();
+  const { value: selectedValue, onChange, optionRenderer } = useCombobox();
+  const selected = selectedValue === value;
 
-  const selected = selectedValues.includes(value);
   return (
     <CommandItem
       id={id}
       key={id}
+      disabled={!enabled}
       value={`${value}`}
-      disabled={disabled}
-      className={styles.multiOption}
+      className={classnames(styles.multiOption)}
       onSelect={() => {
         onChange(value);
       }}

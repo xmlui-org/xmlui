@@ -134,7 +134,7 @@ import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 import {apiCallRenderer} from "@components/APICall/APICall";
-import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
+import {selectOptionComponentRenderer} from "@components/Select/SelectOption";
 import {multiOptionComponentRenderer} from "@components/MultiSelect/MultiOption";
 import {multiSelectComponentRenderer} from "@components/MultiSelect/MultiSelect";
 import {optionComponentRenderer} from "@components/Option/Option";
@@ -279,6 +279,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
+      this.registerComponentRenderer(selectOptionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_MultiOption !== "false") {
       this.registerComponentRenderer(multiOptionComponentRenderer);

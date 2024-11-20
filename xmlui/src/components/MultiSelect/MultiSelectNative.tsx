@@ -22,7 +22,7 @@ import { isEqual } from "lodash-es";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { OptionComponent } from "@components/Option/OptionNative";
+import { MultiOption } from "@components/MultiSelect/MultiOptionNative";
 
 /**
  * Props for MultiSelect component
@@ -169,86 +169,87 @@ export const MultiSelect = ({
 
   return (
     <MultiSelectContext.Provider value={multiSelectContextValue}>
-      {/*      <OptionTypeProvider Component={OptionComponent}>{children}</OptionTypeProvider>*/}
-      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
-        <PopoverTrigger asChild>
-          <button
-            id={id}
-            style={layout}
-            ref={setReferenceElement}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-            disabled={!enabled}
-            onClick={handleTogglePopover}
-            className={classnames(styles.multiSelectButton, styles[validationStatus], {
-              [styles.disabled]: !enabled,
-            })}
-            autoFocus={autoFocus}
-          >
-            {value?.length > 0 ? (
-              <div className={styles.badgeListContainer}>
-                <div className={styles.badgeList}>
-                  {value.map((v) => {
-                    return (
-                      <SelectBadge key={v}>
-                        {v}
-                        <Icon
-                          name="close"
-                          size="sm"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            toggleOption(v);
-                          }}
-                        />
-                      </SelectBadge>
-                    );
-                  })}
+      <OptionTypeProvider Component={MultiOption}>
+        <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
+          <PopoverTrigger asChild>
+            <button
+              id={id}
+              style={layout}
+              ref={setReferenceElement}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              disabled={!enabled}
+              onClick={handleTogglePopover}
+              className={classnames(styles.multiSelectButton, styles[validationStatus], {
+                [styles.disabled]: !enabled,
+              })}
+              autoFocus={autoFocus}
+            >
+              {value?.length > 0 ? (
+                <div className={styles.badgeListContainer}>
+                  <div className={styles.badgeList}>
+                    {value.map((v) => {
+                      return (
+                        <SelectBadge key={v}>
+                          {v}
+                          <Icon
+                            name="close"
+                            size="sm"
+                            onClick={(event) => {
+                              event.stopPropagation();
+                              toggleOption(v);
+                            }}
+                          />
+                        </SelectBadge>
+                      );
+                    })}
+                  </div>
+                  <div className={styles.actions}>
+                    <Icon
+                      name="close"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleClear();
+                      }}
+                    />
+                    <Icon name="chevrondown" />
+                  </div>
                 </div>
-                <div className={styles.actions}>
-                  <Icon
-                    name="close"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      handleClear();
-                    }}
-                  />
-                  <Icon name="chevrondown" />
+              ) : (
+                <div className={styles.emptySelect}>
+                  <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
+                  <Icon name="chevrondown" size="sm" />
                 </div>
-              </div>
-            ) : (
-              <div className={styles.emptySelect}>
-                <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
-                <Icon name="chevrondown" size="sm" />
-              </div>
-            )}
-          </button>
-        </PopoverTrigger>
-        <Portal container={root}>
-          <PopoverContent
-            align="start"
-            onEscapeKeyDown={() => setIsPopoverOpen(false)}
-            style={{ width }}
-          >
-            <Command className={styles.multiSelectMenu}>
-              <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
-              <CommandList>
-                {React.Children.toArray(children).length > 0 ? (
-                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                ) : (
-                  <CommandEmpty className={styles.commandEmpty}>
-                    {emptyListTemplate ?? (
-                      <>
-                        <Icon name={"noresult"} />
-                        <span>List is empty</span>
-                      </>
-                    )}
-                  </CommandEmpty>
-                )}
-              </CommandList>
-            </Command>
-          </PopoverContent>
-        </Portal>
-      </Popover>
+              )}
+            </button>
+          </PopoverTrigger>
+          <Portal container={root}>
+            <PopoverContent
+              align="start"
+              onEscapeKeyDown={() => setIsPopoverOpen(false)}
+              style={{ width }}
+            >
+              <Command className={styles.multiSelectMenu}>
+                <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
+                <CommandList>
+                  {React.Children.toArray(children).length > 0 ? (
+                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                  ) : (
+                    <CommandEmpty className={styles.commandEmpty}>
+                      {emptyListTemplate ?? (
+                        <>
+                          <Icon name={"noresult"} />
+                          <span>List is empty</span>
+                        </>
+                      )}
+                    </CommandEmpty>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Portal>
+        </Popover>
+      </OptionTypeProvider>
     </MultiSelectContext.Provider>
   );
 };

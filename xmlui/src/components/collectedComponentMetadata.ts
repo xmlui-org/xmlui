@@ -86,6 +86,7 @@ import { CarouselMd } from "./Carousel/Carousel";
 import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
+import {OptionMd} from "@components/Option/Option";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -149,6 +150,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   NoResult: NoResultMd,
   NumberBox: NumberBoxMd,
   OffCanvas: OffCanvasMd,
+  Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
   PageHeader: PageHeaderMd,
