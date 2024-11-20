@@ -246,9 +246,8 @@ export const MultiSelect2 = ({
 
 MultiSelect2.displayName = "MultiSelect2";
 
-const SelectBadge = React.forwardRef<
-  React.ElementRef<typeof SelectBadge>,
-  React.ComponentPropsWithoutRef<typeof SelectBadge>
->(({ ...props }, ref) => <div className={styles.selectBadge} {...props} />);
+const SelectBadge = ({ children }: { children: ReactNode }) => (
+  <div className={styles.selectBadge}>{children}</div>
+);
 
 SelectBadge.displayName = "SelectBadge";
