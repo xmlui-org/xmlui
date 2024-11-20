@@ -1,179 +1,86 @@
-import { useCombobox, useMultipleSelection } from "downshift";
-import type { CSSProperties, ReactNode } from "react";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Option } from "../abstractions";
-import { EMPTY_ARRAY, noop } from "@components-core/constants";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import styles from "./MultiCombobox.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { createPortal } from "react-dom";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { usePopper } from "react-popper";
-import type { ValidationStatus } from "@components/abstractions";
-import { SelectContext, useSelectContextValue } from "@components/Select/SelectContext";
-import { Adornment } from "@components/Input/InputAdornment";
-import { filterOptions } from "../component-utils";
-import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
-import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
+import * as React from "react";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import classnames from "classnames";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+} from "@components/Combobox/Command";
 import Icon from "@components/Icon/IconNative";
+import styles from "@components/MultiSelect/MultiSelect.module.scss";
+import { EMPTY_ARRAY, noop } from "@components-core/constants";
+import type { CSSProperties, ReactNode } from "react";
+import { useRef } from "react";
+import { useEffect, useState } from "react";
+import { useCallback, useMemo } from "react";
+import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import type { Option, ValidationStatus } from "@components/abstractions";
 import { isEqual } from "lodash-es";
-import { OptionComponent } from "@components/Option/OptionNative";
+import { useTheme } from "@components-core/theming/ThemeContext";
+import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { OptionComponent } from "@components/Option/OptionNative";
+import {MultiSelectContext} from "@components/MultiSelect/MultiSelectContext";
 
-type MultiComboboxProps = {
+/**
+ * Props for MultiCombobox component
+ */
+interface MultiComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   id?: string;
-  initialValue?: string[];
   value?: string[];
+  initialValue?: string[];
   enabled?: boolean;
   placeholder?: string;
+  children: ReactNode;
   updateState?: UpdateStateFn;
-  layout?: CSSProperties;
   onDidChange?: (newValue: string[]) => void;
+  layout?: CSSProperties;
+  emptyListTemplate?: ReactNode;
+  optionRenderer?: (option: Option) => ReactNode;
+  registerComponentApi?: RegisterComponentApiFn;
   onFocus?: () => void;
   onBlur?: () => void;
-  validationStatus?: ValidationStatus;
-  registerComponentApi?: RegisterComponentApiFn;
-  optionRenderer?: (item: Option) => ReactNode;
-  emptyListTemplate?: ReactNode;
-  children?: ReactNode;
   autoFocus?: boolean;
-  startIcon?: string;
-  startText?: string;
-  endIcon?: string;
-  endText?: string;
-};
+  validationStatus?: ValidationStatus;
+}
 
-function defaultRenderer(item: Option) {
-  return <div>{item.label}</div>;
+function defaultRenderer(option: Option) {
+  return <div>{option.label}</div>;
 }
 
 export const MultiCombobox = ({
   id,
-  initialValue = EMPTY_ARRAY,
   value = EMPTY_ARRAY,
-  enabled = true,
+  initialValue = EMPTY_ARRAY,
   placeholder,
-  updateState = noop,
-  validationStatus = "none",
+  children,
+  layout,
+  enabled = true,
+  updateState,
   onDidChange = noop,
   onFocus = noop,
   onBlur = noop,
+  validationStatus = "none",
+  optionRenderer = defaultRenderer,
   registerComponentApi,
   emptyListTemplate,
-  optionRenderer = defaultRenderer,
-  layout,
-  children,
-  autoFocus,
-  startIcon,
-  startText,
-  endIcon,
-  endText,
+  autoFocus = false,
 }: MultiComboboxProps) => {
+  const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
-  const { options, selectContextValue } = useSelectContextValue();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
-  const [popperElement, setPopperElement] = useState<HTMLUListElement | null>(null);
-  const { styles: popperStyles, attributes } = usePopper(referenceElement, popperElement, {
-    placement: "bottom-start",
-  });
+  const [width, setWidth] = useState(0);
+  const observer = useRef<ResizeObserver>();
+
   const { root } = useTheme();
-  const [inputValue, setInputValue] = React.useState("");
-
-  useEffect(() => {
-    if (autoFocus) {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-    }
-  }, [autoFocus]);
-
-  const items = useMemo(() => {
-    return filterOptions(
-      inputValue,
-      options.filter((option) => !value.includes(option.value)),
-    );
-  }, [inputValue, options, value]);
-
-  const { getSelectedItemProps, getDropdownProps } = useMultipleSelection({
-    onStateChange({ selectedItems, type }) {
-      switch (type) {
-        case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownBackspace:
-        case useMultipleSelection.stateChangeTypes.SelectedItemKeyDownDelete:
-        case useMultipleSelection.stateChangeTypes.DropdownKeyDownBackspace:
-        case useMultipleSelection.stateChangeTypes.FunctionRemoveSelectedItem:
-          if (selectedItems) {
-            onInputChange(selectedItems.map((item: any) => item.value).concat(value));
-          }
-          break;
-        default:
-          break;
-      }
-    },
-  });
-  const {
-    isOpen,
-    selectedItem,
-    closeMenu,
-    getToggleButtonProps,
-    getMenuProps,
-    getInputProps,
-    highlightedIndex,
-    getItemProps,
-  } = useCombobox({
-    //labelId: id,
-    // toggleButtonId: id,
-    defaultHighlightedIndex: 0,
-    items,
-    itemToString(item: Option | null) {
-      return item ? item.label : "";
-    },
-    isItemDisabled: (item) => item.enabled === false,
-    inputValue,
-    stateReducer(state, actionAndChanges) {
-      const { changes, type } = actionAndChanges;
-      switch (type) {
-        case useCombobox.stateChangeTypes.InputKeyDownEnter:
-        case useCombobox.stateChangeTypes.ItemClick:
-          return {
-            ...changes,
-            isOpen: true, // keep the menu open after selection.
-            highlightedIndex: 0,
-          };
-        default:
-          return changes;
-      }
-    },
-    onStateChange({ inputValue: newInputValue, type, selectedItem }) {
-      switch (type) {
-        case useCombobox.stateChangeTypes.InputKeyDownEnter:
-        case useCombobox.stateChangeTypes.ItemClick:
-        case useCombobox.stateChangeTypes.InputBlur:
-          handleOnBlur();
-          if (selectedItem) {
-            onInputChange([...value, selectedItem.value]);
-            setInputValue("");
-            closeMenu();
-          }
-          break;
-        case useCombobox.stateChangeTypes.InputKeyDownArrowDown:
-        case useCombobox.stateChangeTypes.InputClick:
-        case useCombobox.stateChangeTypes.InputChange:
-          handleOnFocus();
-          setInputValue(newInputValue || "");
-          break;
-        default:
-          break;
-      }
-    },
-  });
 
   useEffect(() => {
     setInitValue((prevState) => {
       if (isEqual(prevState, initialValue)) {
         return prevState;
       }
-      console.log("Setting initial value", initialValue);
       return initialValue;
     });
   }, [initialValue]);
@@ -181,14 +88,6 @@ export const MultiCombobox = ({
   useEffect(() => {
     updateState({ value: initValue });
   }, [initValue, updateState]);
-
-  const onInputChange = useCallback(
-    (newValue: string[]) => {
-      updateState({ value: newValue });
-      onDidChange(newValue);
-    },
-    [onDidChange, updateState],
-  );
 
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(() => {
@@ -203,16 +102,49 @@ export const MultiCombobox = ({
     referenceElement?.focus();
   }, [referenceElement]);
 
+  const setValue = useEvent((newValue: string[]) => {
+    updateState({ value: newValue });
+    onDidChange(newValue);
+  });
+
   useEffect(() => {
     registerComponentApi?.({
       focus,
+      setValue,
     });
-  }, [focus, registerComponentApi]);
+  }, [focus, registerComponentApi, setValue]);
 
-  // Sizing the dropdown list width to the reference button size
+  const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      setIsPopoverOpen(true);
+    } else if (event.key === "Backspace" && !event.currentTarget.value) {
+      const newSelectedValues = [...value];
+      newSelectedValues.pop();
+      updateState({ value: newSelectedValues });
+      onDidChange(newSelectedValues);
+    }
+  };
 
-  const [width, setWidth] = useState(0);
-  const observer = useRef<ResizeObserver>();
+  const toggleOption = useCallback(
+    (selecteValue: string) => {
+      const newSelectedValues = value.includes(selecteValue)
+        ? value.filter((value) => value !== selecteValue)
+        : [...value, selecteValue];
+      updateState({ value: newSelectedValues });
+      onDidChange(newSelectedValues);
+    },
+    [onDidChange, updateState, value],
+  );
+
+  const handleClear = () => {
+    updateState({ value: [] });
+    onDidChange([]);
+  };
+
+  const handleTogglePopover = () => {
+    setIsPopoverOpen((prev) => !prev);
+  };
+
   useEffect(() => {
     const current = referenceElement as any;
     // --- We are already observing old element
@@ -225,121 +157,106 @@ export const MultiCombobox = ({
     }
   }, [referenceElement]);
 
+  const multiSelectContextValue = useMemo(
+    () => ({
+      value,
+      onChange: toggleOption,
+      optionRenderer,
+    }),
+
+    [optionRenderer, toggleOption, value],
+  );
+
   return (
-    <SelectContext.Provider value={selectContextValue}>
-      <OptionTypeProvider Component={OptionComponent}>
-        {children}
-      </OptionTypeProvider>
-      <div className={styles.comboboxContainer} style={layout}>
-        <div
-          className={classnames(styles.comboboxToggleButton, styles[validationStatus], {
-            [styles.disabled]: !enabled,
-          })}
-          ref={setReferenceElement}
-        >
-          <div className={styles.selectedOptions}>
-            <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
-            {options
-              .filter((option) => value.includes(option.value))
-              .map(function renderSelectedItem(selectedItemForRender, index) {
-                return (
-                  <div
-                    data-multi-value-container={true}
-                    className={styles.multiValue}
-                    key={`selected-item-${index}`}
-                    {...getSelectedItemProps({
-                      selectedItem: selectedItemForRender,
-                      index,
-                      disabled: !enabled,
-                    })}
-                  >
-                    <div className={styles.multiValueLabel}>{selectedItemForRender.label}</div>
-                    <div
-                      role="button"
-                      className={classnames(styles.multiValueRemove, {
-                        [styles.disabled]: !enabled,
-                      })}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        if (enabled) {
-                          onInputChange(value.filter((v) => v !== selectedItemForRender.value));
-                        }
-                      }}
-                    >
-                      &#10005;
-                    </div>
-                  </div>
-                );
-              })}
-            <div className={styles.comboboxInputContainer}>
-              <input
-                {...getInputProps(
-                  getDropdownProps({
-                    preventKeyAction: isOpen,
-                    id: id,
-                    ref: inputRef,
-                    placeholder: placeholder,
-                    disabled: !enabled,
-                    className: styles.comboboxInput,
-                  }),
-                )}
-              />
-            </div>
-          </div>
-          <div style={{ display: "flex" }}>
-            <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
-            <button
-              aria-label="toggle-menu"
-              className={styles.indicator}
-              type="button"
-              {...getToggleButtonProps({ disabled: !enabled })}
-            >
-              {isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-            </button>
-          </div>
-        </div>
-        <div {...getMenuProps()}>
-          {isOpen &&
-            root &&
-            createPortal(
-              <ul
-                className={styles.multiComboboxMenu}
-                ref={(el: HTMLUListElement) => setPopperElement(el)}
-                style={{ ...popperStyles.popper, width }}
-                {...attributes.popper}
-              >
-                {items.length > 0 ? (
-                  items.map((item, index) => {
-                    const props = getItemProps({ item, index, "aria-disabled": item.disabled });
+    <MultiSelectContext.Provider value={multiSelectContextValue}>
+      {/*      <OptionTypeProvider Component={OptionComponent}>{children}</OptionTypeProvider>*/}
+      <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
+        <PopoverTrigger asChild>
+          <button
+            id={id}
+            style={layout}
+            ref={setReferenceElement}
+            onFocus={handleOnFocus}
+            onBlur={handleOnBlur}
+            disabled={!enabled}
+            onClick={handleTogglePopover}
+            className={classnames(styles.multiSelectButton, styles[validationStatus], {
+              [styles.disabled]: !enabled,
+            })}
+            autoFocus={autoFocus}
+          >
+            {value?.length > 0 ? (
+              <div className={styles.badgeListContainer}>
+                <div className={styles.badgeList}>
+                  {value.map((v) => {
                     return (
-                      <li
-                        {...props}
-                        key={index}
-                        className={classnames(styles.item, styles.selectable, {
-                          [styles.itemActive]: highlightedIndex === index,
-                          [styles.itemSelected]: selectedItem === item,
-                          [styles.itemDisabled]: item.disabled,
-                        })}
-                      >
-                        {item.renderer ? item.renderer(item) : optionRenderer(item)}
-                      </li>
+                      <SelectBadge key={v}>
+                        {v}
+                        <Icon
+                          name="close"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleOption(v);
+                          }}
+                        />
+                      </SelectBadge>
                     );
-                  })
-                ) : (
-                  <li className={styles.item}>
-                    {emptyListTemplate ?? (
-                      <span className={styles.empty}>
-                        <Icon name={"noresult"} />
-                        List is empty
-                      </span>
-                    )}
-                  </li>
-                )}
-              </ul>,
-              root,
+                  })}
+                </div>
+                <div className={styles.actions}>
+                  <Icon
+                    name="close"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleClear();
+                    }}
+                  />
+                  <Icon name="chevrondown" />
+                </div>
+              </div>
+            ) : (
+              <div className={styles.emptySelect}>
+                <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
+                <Icon name="chevrondown" size="sm" />
+              </div>
             )}
-        </div>
-      </div>
-    </SelectContext.Provider>
+          </button>
+        </PopoverTrigger>
+        <Portal container={root}>
+          <PopoverContent
+            align="start"
+            onEscapeKeyDown={() => setIsPopoverOpen(false)}
+            style={{ width }}
+          >
+            <Command className={styles.multiSelectMenu}>
+              <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
+              <CommandList>
+                {React.Children.toArray(children).length > 0 ? (
+                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                ) : (
+                  <CommandEmpty className={styles.commandEmpty}>
+                    {emptyListTemplate ?? (
+                      <>
+                        <Icon name={"noresult"} />
+                        <span>List is empty</span>
+                      </>
+                    )}
+                  </CommandEmpty>
+                )}
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Portal>
+      </Popover>
+    </MultiSelectContext.Provider>
   );
 };
+
+MultiCombobox.displayName = "MultiCombobox";
+
+const SelectBadge = ({ children }: { children: ReactNode }) => (
+  <div className={styles.selectBadge}>{children}</div>
+);
+
+SelectBadge.displayName = "SelectBadge";

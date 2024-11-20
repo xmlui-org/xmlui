@@ -4,7 +4,6 @@ import { type ComponentDef, createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Combobox } from "./ComboboxNative";
 import {
   dAutoFocus,
   dComponent,
@@ -24,7 +23,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
-import {Combobox2} from "@components/Combobox/ComboboxNative2";
+import { Combobox } from "@components/Combobox/ComboboxNative";
 
 const COMP = "Combobox";
 
@@ -108,10 +107,6 @@ export const comboboxComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem

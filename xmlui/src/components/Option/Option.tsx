@@ -1,9 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { useOptionType } from "@components/Option/OptionTypeProvider";
-import type { Option } from "@components/abstractions";
-import { memo } from "react";
-import { dEnabled } from "@components/metadata-helpers";
+import { OptionComponent } from "@components/Option/OptionNative";
 
 const COMP = "Option";
 
@@ -21,29 +18,34 @@ export const OptionMd = createMetadata({
       `This property defines the value of the option. If \`value\` is not defined, ` +
         `\`Option\` will use the \`label\` as the value.`,
     ),
-    enabled: dEnabled(),
+    disabled: d(
+      `If this property is set to \`true\`, the option is disabled and cannot be selected ` +
+        `in its parent component.`,
+    ),
   },
 });
-
-const OptionNative = memo((props: Option) => {
-  const OptionType = useOptionType();
-  if (!OptionType) {
-    return null;
-  }
-  return <OptionType {...props} />;
-});
-OptionNative.displayName = "OptionNative";
 
 export const optionComponentRenderer = createComponentRenderer(
   COMP,
   OptionMd,
-  ({ node, extractValue, layoutCss }) => {
+  (rendererContext) => {
+    const { node, renderChild, extractValue } = rendererContext;
+    let label = extractValue(node.props.label);
+    let value = extractValue(node.props.value);
+    if (label == undefined && value == undefined) {
+      return null;
+    }
+    if (label != undefined && value == undefined) {
+      value = label;
+    } else if (label == undefined && value != undefined) {
+      label = value;
+    }
+
     return (
-      <OptionNative
-        value={extractValue.asString(node.props.value)}
-        label={extractValue.asOptionalString(node.props.label)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        style={layoutCss}
+      <OptionComponent
+        value={value}
+        label={label}
+        disabled={extractValue.asOptionalBoolean(node.props.disabled)}
       />
     );
   },

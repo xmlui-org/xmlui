@@ -439,6 +439,10 @@ This method sets the focus on the MultiSelect.
   `}
 />
 
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
 ## Styling
 
 The `MultiSelect` component uses these theme variables:
@@ -551,3 +555,91 @@ color-border-Input: "#0033FF"
 - [`MultiCombobox`](./MultiCombobox.mdx)
 
 See [custom themes](../learning/themes/overview.mdx) for styling details.
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect | $color-bg-dropdown-item | $color-bg-dropdown-item |
+| [color-bg](../styles-and-themes/common-units/#color)-item-MultiSelect--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-MultiSelect | $color-bg-primary | $color-bg-primary |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-MultiSelect | $color-bg-primary | $color-bg-primary |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-bg-primary | $color-bg-primary |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-item-MultiSelect--disabled | $color-surface-200 | $color-surface-800 |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-value-MultiSelect | $color-text-primary | $color-text-primary |
+| [font-size](../styles-and-themes/common-units/#size)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [offset-outline](../styles-and-themes/common-units/#size)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-MultiSelect | $radius | $radius |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-MultiSelect | $radius | $radius |
+| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-menu-MultiSelect | $shadow-md | $shadow-md |
+| [shadow](../styles-and-themes/common-units/#color)-menu-MultiSelect | $shadow-md | $shadow-md |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-MultiSelect-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-MultiSelect-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-outline](../styles-and-themes/common-units/#size)-MultiSelect-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+

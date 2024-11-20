@@ -1,10 +1,12 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import { Option2Component } from "@components/Option2/Option2Native";
+import { MultiOption } from "@components/MultiSelect/MultiOptionNative";
+import { parseScssVar } from "@components-core/theming/themeVars";
+import styles from "@components/MultiSelect/MultiOption.module.scss";
 
-const COMP = "Option2";
+const COMP = "MultiOption";
 
-export const OptionMd = createMetadata({
+export const MultiOptionMd = createMetadata({
   description:
     `\`${COMP}\` is a non-visual component describing a selection option. Other components ` +
     `(such as \`Select\`, \`Combobox\`, and others) may use nested \`Option\` instances ` +
@@ -23,11 +25,24 @@ export const OptionMd = createMetadata({
         `in its parent component.`,
     ),
   },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
+    [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
+    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
+    [`min-height-Input`]: "39px",
+    light: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-200",
+    },
+    dark: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-800",
+    },
+  },
 });
 
-export const option2ComponentRenderer = createComponentRenderer(
+export const multiOptionComponentRenderer = createComponentRenderer(
   COMP,
-  OptionMd,
+  MultiOptionMd,
   (rendererContext) => {
     const { node, renderChild, extractValue } = rendererContext;
     let label = extractValue(node.props.label);
@@ -42,7 +57,7 @@ export const option2ComponentRenderer = createComponentRenderer(
     }
 
     return (
-      <Option2Component
+      <MultiOption
         value={value}
         label={label}
         disabled={extractValue.asOptionalBoolean(node.props.disabled)}

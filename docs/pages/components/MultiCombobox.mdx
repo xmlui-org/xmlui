@@ -13,29 +13,29 @@ The component provides context values with which you can access some internal pr
 
 The component provides two ways to add a list of options to the dropdown:
 
-### Using the `Option` component
+### Using the `MultiOption` component
 
-The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
+The [`MultiOption`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
 <App>
   <MultiCombobox>
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
 
 <Playground
-  name="Example: using Option"
+  name="Example: using MultiOption"
   height={200}
   app={`
     <App>
       <MultiCombobox>
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -44,7 +44,7 @@ The [`Option`](./Option.mdx) component can be used in situations where you need 
 ### Using the `Items` component
 
 In cases where you do not wish to maunally create each item of a datalist
-you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
+you can map the data to an [`Items`](./Items.mdx) component and place `MultiOption` components in it.
 
 ```ueml copy
 <App>
@@ -54,7 +54,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
       { name: 'Jane', id: 1 },
       { name: 'Carl', id: 2 }
     ]}">
-      <Option value="{$item.id}" label="{$item.name}" />
+      <MultiOption value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiCombobox>
 </App>
@@ -71,7 +71,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `Option` c
           { name: 'Jane', id: 1 },
           { name: 'Carl', id: 2 }
         ]}">
-          <Option value="{$item.id}" label="{$item.name}" />
+          <MultiOption value="{$item.id}" label="{$item.name}" />
         </Items>
       </MultiCombobox>
     </App>
@@ -139,9 +139,9 @@ Default value: `true`.
 ```ueml copy /enabled="false"/
 <App>
   <MultiCombobox enabled="false">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -152,9 +152,9 @@ Default value: `true`.
   app={`
     <App>
       <MultiCombobox enabled="false">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -175,9 +175,9 @@ This property sets the component's initial value.
 ```ueml copy /initialValue="['chocolate', 'pistachio']"/
 <App>
   <MultiCombobox initialValue="['chocolate', 'pistachio']">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -188,9 +188,9 @@ This property sets the component's initial value.
   app={`
     <App>
       <MultiCombobox initialValue="['chocolate', 'pistachio']">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -213,9 +213,9 @@ This property defines the template to display a particular option.
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <Option value="opt1" label="first"/>
-    <Option value="opt2" label="second"/>
-    <Option value="opt3" label="third"/>
+    <MultiOption value="opt1" label="first"/>
+    <MultiOption value="opt2" label="second"/>
+    <MultiOption value="opt3" label="third"/>
   </MultiCombobox>
 </App>
 ```
@@ -232,9 +232,9 @@ This property defines the template to display a particular option.
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
-        <Option value="opt3" label="third"/>
+        <MultiOption value="opt1" label="first"/>
+        <MultiOption value="opt2" label="second"/>
+        <MultiOption value="opt3" label="third"/>
       </MultiCombobox>
     </App>
   `}
@@ -251,9 +251,9 @@ A placeholder text that is visible in the input field when its empty.
 ```ueml copy /placeholder="Select any number of options"/
 <App>
   <MultiCombobox placeholder="Select any number of options">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -264,9 +264,9 @@ A placeholder text that is visible in the input field when its empty.
   app={`
     <App>
       <MultiCombobox placeholder="Select any number of options">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -287,9 +287,9 @@ This property sets an icon to appear at the start (left side when the left-to-ri
 ```ueml copy /startIcon="email"/
 <App>
   <MultiCombobox startIcon="email">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -300,9 +300,9 @@ This property sets an icon to appear at the start (left side when the left-to-ri
   app={`
     <App>
       <MultiCombobox startIcon="email">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -315,9 +315,9 @@ This property sets a text to appear at the start (left side when the left-to-rig
 ```ueml copy /startText="Badges:"/
 <App>
   <MultiCombobox startText="Badges:">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -328,9 +328,9 @@ This property sets a text to appear at the start (left side when the left-to-rig
   app={`
     <App>
       <MultiCombobox startText="Badges:">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" />
-        <Option label="Pistachio" value="pistachio" />
+        <MultiOption label="Vanilla" value="vanilla" />
+        <MultiOption label="Chocolate" value="chocolate" />
+        <MultiOption label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -390,9 +390,9 @@ This event is triggered when value of MultiCombobox has changed.
     <Text value="{$item}" />
   </Items>
   <MultiCombobox onDidChange="(newItems) => newValues = newItems">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -407,9 +407,9 @@ This event is triggered when value of MultiCombobox has changed.
       <Text value="{$item}" />
     </Items>
     <MultiCombobox onDidChange="(newItems) => newValues = newItems">
-      <Option label="Vanilla" value="vanilla" />
-      <Option label="Chocolate" value="chocolate" />
-      <Option label="Pistachio" value="pistachio" />
+      <MultiOption label="Vanilla" value="vanilla" />
+      <MultiOption label="Chocolate" value="chocolate" />
+      <MultiOption label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </App>
   `}
@@ -426,9 +426,9 @@ This event is triggered when the MultiCombobox has received the focus.
   <MultiCombobox
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -443,9 +443,9 @@ This event is triggered when the MultiCombobox has received the focus.
     <MultiCombobox
       onGotFocus="isFocused = true"
       onLostFocus="isFocused = false">
-      <Option label="Vanilla" value="vanilla" />
-      <Option label="Chocolate" value="chocolate" />
-      <Option label="Pistachio" value="pistachio" />
+      <MultiOption label="Vanilla" value="vanilla" />
+      <MultiOption label="Chocolate" value="chocolate" />
+      <MultiOption label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </App>
   `}
@@ -463,15 +463,15 @@ See the example in [gotFocus event section](#gotfocus).
 
 This method sets the focus on the MultiCombobox.
 
-Access attributes of the item using the dot notation. For an example, see the [\`optionTemplate\`](#optiontemplate) property or the [\`change\`](#change) event.
+Access attributes of the item using the dot notation. For an example, see the [\`optionTemplate\`](#MultiOptiontemplate) property or the [\`change\`](#change) event.
 
 ```ueml copy /onClick="inputControl.focus()"/
 <VStack padding="$space-1" gap="$space-0_5">
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <MultiCombobox id="inputControl">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" />
-    <Option label="Pistachio" value="pistachio" />
+    <MultiOption label="Vanilla" value="vanilla" />
+    <MultiOption label="Chocolate" value="chocolate" />
+    <MultiOption label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </VStack>
 ```
@@ -483,9 +483,9 @@ Access attributes of the item using the dot notation. For an example, see the [\
   <VStack padding="$space-1" gap="$space-0_5">
     <Button label="Focus Input" onClick="inputControl.focus()" />
     <MultiCombobox id="inputControl">
-      <Option label="Vanilla" value="vanilla" />
-      <Option label="Chocolate" value="chocolate" />
-      <Option label="Pistachio" value="pistachio" />
+      <MultiOption label="Vanilla" value="vanilla" />
+      <MultiOption label="Chocolate" value="chocolate" />
+      <MultiOption label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </VStack>
   `}

@@ -1,21 +1,39 @@
-import { useEffect, useId } from "react";
+import { useId } from "react";
 
-import type { Option } from "@components/abstractions";
-import { useSelectContext } from "@components/Select/SelectContext";
+import { CommandItem } from "@components/Combobox/Command";
+import styles from "@components/Combobox/Combobox.module.scss";
+import { CheckIcon } from "@components/Icon/CheckIcon";
+import * as React from "react";
+import classnames from "classnames";
+import { useSelect } from "@components/Select/SelectContext";
 
-export function OptionComponent(props: Option) {
+type OptionComponentProps = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+};
+
+export function OptionComponent({ value, label, disabled }: OptionComponentProps) {
   const id = useId();
-  const { register, unRegister } = useSelectContext();
-  useEffect(() => {
-    register({
-      ...props,
-      id,
-    });
-  }, [id, props, register]);
-  useEffect(() => {
-    return () => {
-      unRegister(id);
-    };
-  }, [id, unRegister]);
-  return null;
+  const { value: selectedValue, onChange, optionRenderer } = useSelect();
+
+  return (
+    <CommandItem
+      id={id}
+      key={id}
+      value={`${value}`}
+      className={styles.commandItem}
+      onSelect={() => {
+        onChange({
+          label,
+          value,
+        });
+      }}
+    >
+      {optionRenderer({ label, value })}
+      <CheckIcon
+        className={classnames(styles.checkIcon, selectedValue === value && styles.checkIconVisible)}
+      />
+    </CommandItem>
+  );
 }

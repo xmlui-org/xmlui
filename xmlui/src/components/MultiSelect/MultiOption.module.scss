@@ -7,9 +7,9 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "MultiSelectOption";
+$componentName: "MultiOption";
 
-.multiSelectOption {
+.multiOption {
   padding: 0.5rem 1rem;
   display: flex;
   gap: 1rem;

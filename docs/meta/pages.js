@@ -62,7 +62,6 @@ export const COMPONENT_NAVLINK = "/components/NavLink";
 export const COMPONENT_NAVPANEL = "/components/NavPanel";
 export const COMPONENT_NORESULT = "/components/NoResult";
 export const COMPONENT_NUMBERBOX = "/components/NumberBox";
-export const COMPONENT_OPTION = "/components/Option";
 export const COMPONENT_PAGE = "/components/Page";
 export const COMPONENT_PAGEHEADER = "/components/PageHeader";
 export const COMPONENT_PAGEMETATITLE = "/components/PageMetaTitle";

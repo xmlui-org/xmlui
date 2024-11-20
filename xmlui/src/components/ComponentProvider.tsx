@@ -92,7 +92,6 @@ import { merge, range } from "lodash-es";
 import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
 import { columnComponentRenderer } from "@components/Column/Column";
-import { optionComponentRenderer } from "@components/Option/Option";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/APICall";
 import { downloadAction } from "@components-core/action/FileDownloadAction";
@@ -135,11 +134,10 @@ import {createPropHolderComponent} from "@components-core/renderers";
 import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
 import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
 import {apiCallRenderer} from "@components/APICall/APICall";
-import {option2ComponentRenderer} from "@components/Option2/Option2";
-import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
 import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
-import {multiSelectOptionComponentRenderer} from "@components/MultiSelect/MultiSelectOption";
+import {multiOptionComponentRenderer} from "@components/MultiSelect/MultiOption";
 import {multiSelectComponentRenderer} from "@components/MultiSelect/MultiSelect";
+import {optionComponentRenderer} from "@components/Option/Option";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -282,14 +280,8 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Option2 !== "false") {
-      this.registerComponentRenderer(option2ComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
-      this.registerComponentRenderer(selectOptionComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_MultiSelectOption !== "false") {
-      this.registerComponentRenderer(multiSelectOptionComponentRenderer);
+    if (process.env.VITE_USED_COMPONENTS_MultiOption !== "false") {
+      this.registerComponentRenderer(multiOptionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_MultiSelect !== "false") {
       this.registerComponentRenderer(multiSelectComponentRenderer);
@@ -363,7 +355,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuSeparatorRenderer);
       this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
-      this.registerComponentRenderer(combobox2ComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);

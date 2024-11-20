@@ -39,7 +39,6 @@ import { NavPanelMd } from "@components/NavPanel/NavPanel";
 import { NoResultMd } from "@components/NoResult/NoResult";
 import { NumberBoxMd } from "@components/NumberBox/NumberBox";
 import { OffCanvasMd } from "@components/OffCanvas/OffCanvas";
-import { OptionMd } from "@components/Option/Option";
 import { PageMetaTitleMd } from "@components/PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "@components/Pages/Pages";
 import { PdfMd } from "@components/Pdf/LazyPdf";
@@ -150,7 +149,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   NoResult: NoResultMd,
   NumberBox: NumberBoxMd,
   OffCanvas: OffCanvasMd,
-  Option: OptionMd,
   PageMetaTitle: PageMetaTitleMd,
   Page: PageMd,
   PageHeader: PageHeaderMd,
