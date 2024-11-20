@@ -13,7 +13,7 @@ import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import { SelectContext2 } from "@components/Select/SelectContext2";
+import { SelectContext } from "@components/Select/SelectContext";
 import type { Option, ValidationStatus } from "@components/abstractions";
 
 type Combobox2Props = {
@@ -114,7 +114,7 @@ export function Combobox2({
   );
 
   return (
-    <SelectContext2.Provider value={contextValue}>
+    <SelectContext.Provider value={contextValue}>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger
           asChild
@@ -154,6 +154,6 @@ export function Combobox2({
           </Command>
         </PopoverContent>
       </Popover>
-    </SelectContext2.Provider>
+    </SelectContext.Provider>
   );
 }

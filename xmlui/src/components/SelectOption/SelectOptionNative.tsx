@@ -2,7 +2,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import React from "react";
 import Icon from "@components/Icon/IconNative";
 import styles from "./SelectOption.module.scss";
-import {useSelect} from "@components/Select/SelectContext2";
+import {useSelect} from "@components/Select/SelectContext";
 
 type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 

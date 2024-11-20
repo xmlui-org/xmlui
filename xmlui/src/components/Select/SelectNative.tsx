@@ -8,7 +8,7 @@ import type { ValidationStatus } from "@components/abstractions";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import * as React from "react";
-import { SelectContext2 } from "@components/Select/SelectContext2";
+import { SelectContext } from "@components/Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
@@ -104,7 +104,7 @@ export function Select({
   );
 
   return (
-    <SelectContext2.Provider value={contextValue}>
+    <SelectContext.Provider value={contextValue}>
       {/*<OptionTypeProvider Component={OptionComponent}>{children}</OptionTypeProvider>*/}
       <SelectPrimitive.Root value={value} onValueChange={updateValue}>
         <SelectTrigger
@@ -121,7 +121,7 @@ export function Select({
         </SelectTrigger>
         <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
       </SelectPrimitive.Root>
-    </SelectContext2.Provider>
+    </SelectContext.Provider>
   );
 }
 
