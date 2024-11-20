@@ -80,17 +80,16 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
     height: 100%;
     overflow: auto;
     scroll-padding-top: var(--header-height);
-    --containerHeight: 100vh;
     //padding-bottom: var(--footer-height);
     .navPanelWrapper {
       width: $width-navPanel-App;
       position: sticky;
-      height: calc(var(--containerHeight) - var(--footer-height) - var(--header-height));
+      height: calc(var(--containerHeight, 100vh) - var(--footer-height) - var(--header-height));
       top: var(--header-height);
     }
     .PagesWrapper {
       overflow: initial;
-      min-height: calc(var(--containerHeight) - var(--header-height) - var(--footer-height));
+      min-height: calc(var(--containerHeight, 100vh) - var(--header-height) - var(--footer-height));
       height: 100%;
     }
 

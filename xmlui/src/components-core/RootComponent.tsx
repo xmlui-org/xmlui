@@ -92,6 +92,7 @@ export type RootComponentProps = {
    * Indicates that the root component represents a standalone application
    */
   standalone?: boolean;
+  trackContainerHeight?: boolean;
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
 
@@ -172,6 +173,7 @@ function RootContentComponent({
   routerBaseName,
   globalProps,
   standalone,
+  trackContainerHeight,
   decorateComponentsWithTestId,
   debugEnabled,
 }: {
@@ -179,6 +181,7 @@ function RootContentComponent({
   routerBaseName: string;
   globalProps?: GlobalProps;
   standalone?: boolean;
+  trackContainerHeight?: boolean;
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
 }) {
@@ -227,6 +230,29 @@ function RootContentComponent({
     const match = dimension.match(/^(\d+)px$/);
     return match ? `${parseInt(match[1]) - 0.02}px` : "0";
   };
+
+  const observer = useRef<ResizeObserver>();
+  useIsomorphicLayoutEffect(()=>{
+    if(trackContainerHeight){
+      if(root && root !== document.body){
+        // --- We are already observing old element
+        if (observer?.current) {
+          observer.current.unobserve(root);
+        }
+        observer.current = new ResizeObserver((entries)=>{
+          root.style.setProperty('--containerHeight', entries[0].contentRect.height + "px");
+        });
+        if (observer.current) {
+          observer.current.observe(root);
+        }
+      }
+    }
+    return ()=>{
+      if (observer?.current) {
+        observer.current.unobserve(root);
+      }
+    }
+  }, [root]);
 
   // we sync with the theme variable value (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
@@ -434,7 +460,7 @@ function RootContentComponent({
     setActiveThemeId,
     setActiveThemeTone,
     toggleThemeTone,
-    standalone
+    standalone,
   ]);
 
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
@@ -488,6 +514,7 @@ const RootComponent = ({
   contributes = EMPTY_OBJECT,
   globalProps,
   standalone,
+  trackContainerHeight,
   decorateComponentsWithTestId,
   debugEnabled,
   defaultTheme,
@@ -521,6 +548,7 @@ const RootComponent = ({
                 routerBaseName={baseName}
                 globalProps={globalProps}
                 standalone={standalone}
+                trackContainerHeight={trackContainerHeight}
                 decorateComponentsWithTestId={decorateComponentsWithTestId}
                 debugEnabled={debugEnabled}
               />
@@ -563,6 +591,7 @@ function AppRoot({
   resources,
   globalProps,
   standalone,
+  trackContainerHeight,
   baseName,
   previewMode,
   servedFromSingleFile,
@@ -610,6 +639,7 @@ function AppRoot({
         defaultTone={defaultTone}
         globalProps={globalProps}
         standalone={standalone}
+        trackContainerHeight={trackContainerHeight}
         previewMode={previewMode}
         servedFromSingleFile={servedFromSingleFile}
         sources={sources}
