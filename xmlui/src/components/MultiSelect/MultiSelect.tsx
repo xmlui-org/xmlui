@@ -23,6 +23,7 @@ import {
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
+import {MultiSelect2} from "@components/MultiSelect/MultiSelect2Native";
 
 const COMP = "MultiSelect";
 
@@ -97,7 +98,7 @@ export const multiSelectComponentRenderer = createComponentRenderer(
   MultiSelectMd,
   ({ node, state, updateState, extractValue, renderChild, lookupEventHandler }) => {
     return (
-      <MultiSelect
+      <MultiSelect2
         placeholder={extractValue(node.props.placeholder)}
         updateState={updateState}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
@@ -108,10 +109,6 @@ export const multiSelectComponentRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-        startText={extractValue.asOptionalString(node.props.startText)}
-        startIcon={extractValue.asOptionalString(node.props.startIcon)}
-        endText={extractValue.asOptionalString(node.props.endText)}
-        endIcon={extractValue.asOptionalString(node.props.endIcon)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
@@ -123,7 +120,7 @@ export const multiSelectComponentRenderer = createComponentRenderer(
         }}
       >
         {renderChild(node.children)}
-      </MultiSelect>
+      </MultiSelect2>
     );
   },
 );

@@ -139,6 +139,7 @@ import {apiCallRenderer} from "@components/APICall/APICall";
 import {option2ComponentRenderer} from "@components/Option2/Option2";
 import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
 import {selectOptionComponentRenderer} from "@components/SelectOption/SelectOption";
+import {multiSelectOptionComponentRenderer} from "@components/MultiSelect/MultiSelectOption";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -286,6 +287,9 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
       this.registerComponentRenderer(selectOptionComponentRenderer);
+    }
+    if (process.env.VITE_USED_COMPONENTS_MultiSelectOption !== "false") {
+      this.registerComponentRenderer(multiSelectOptionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
