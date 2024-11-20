@@ -16,6 +16,7 @@ export function MultiSelectOption({ value, label, disabled }: OptionComponentPro
   const id = useId();
   const { value: selectedValues, onChange, optionRenderer } = useSelect();
 
+  const selected = selectedValues.includes(value);
   return (
     <CommandItem
       id={id}
@@ -25,9 +26,10 @@ export function MultiSelectOption({ value, label, disabled }: OptionComponentPro
       onSelect={() => {
         onChange(value);
       }}
+      data-state={selected ? "checked" : undefined}
     >
       {optionRenderer({ label, value })}
-      {selectedValues.includes(value) && <Icon name="checkmark" />}
+      {selected && <Icon name="checkmark" />}
     </CommandItem>
   );
 }

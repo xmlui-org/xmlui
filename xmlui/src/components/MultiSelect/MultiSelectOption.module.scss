@@ -21,6 +21,10 @@ $componentName: "MultiSelectOption";
   &[data-selected="true"] {
     background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
   }
+
+  &[data-state=checked] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
