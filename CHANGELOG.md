@@ -1,5 +1,11 @@
 # xmlui Changelog
 
+## v0.6.6
+
+### Breaking changes:
+
+- The `$eventArgs` property of event handlers renamed to `$params`
+
 ## v0.6.5
 
 ### Breaking changes:
