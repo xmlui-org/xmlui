@@ -218,7 +218,9 @@ export const formItemComponentRenderer = createComponentRenderer(
             bindTo={extractValue.asString(bindTo)}
           />
         ) : (
-          renderChild(node.children)
+          renderChild(node.children, {
+            type: formItemType
+          })
         )}
       </FormItem>
     );

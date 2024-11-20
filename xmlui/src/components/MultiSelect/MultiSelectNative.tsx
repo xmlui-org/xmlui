@@ -16,6 +16,8 @@ import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
 import Icon from "@components/Icon/IconNative";
 import { isEqual } from "lodash-es";
 import { Adornment } from "@components/Input/InputAdornment";
+import { OptionComponent } from "@components/Option/OptionNative";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 
 type MultiSelectProps = {
   id?: string;
@@ -107,7 +109,7 @@ export function MultiSelect({
     itemToString(item: Option | null) {
       return item ? item.label : "";
     },
-    isItemDisabled: (item) => item.disabled!,
+    isItemDisabled: (item) => item.enabled === false,
     stateReducer: (state, actionAndChanges) => {
       const { changes, type } = actionAndChanges;
       switch (type) {
@@ -195,7 +197,9 @@ export function MultiSelect({
 
   return (
     <SelectContext.Provider value={selectContextValue}>
-      {children}
+      <OptionTypeProvider Component={OptionComponent}>
+        {children}
+      </OptionTypeProvider>
       <div className={styles.multiSelectContainer}>
         <button
           type="button"

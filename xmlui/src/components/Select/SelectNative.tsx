@@ -16,6 +16,8 @@ import type { ValidationStatus } from "@components/abstractions";
 import { SelectContext, useSelectContextValue } from "./SelectContext";
 import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { OptionComponent } from "@components/Option/OptionNative";
 
 type SelectProps = {
   id?: string;
@@ -83,7 +85,7 @@ export function Select({
     },
     initialSelectedItem: options.find((item) => item.value === value) || null,
     selectedItem: options.find((item) => item.value === value) || null,
-    isItemDisabled: (item) => item.disabled!,
+    isItemDisabled: (item) => item.enabled === false,
   });
 
   // --- Initialize the related field with the input's initial value
@@ -148,7 +150,9 @@ export function Select({
 
   return (
     <SelectContext.Provider value={selectContextValue}>
-      {children}
+      <OptionTypeProvider Component={OptionComponent}>
+        {children}
+      </OptionTypeProvider>
       <div
         style={layout}
         ref={(el: HTMLDivElement) => setReferenceElement(el)}

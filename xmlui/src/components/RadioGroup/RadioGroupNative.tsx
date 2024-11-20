@@ -11,10 +11,11 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./RadioGroup.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
-import type { ValidationStatus } from "@components/abstractions";
+import type { Option, ValidationStatus } from "@components/abstractions";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { useEvent } from "@components-core/utils/misc";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 
 const RadioGroupValidationStatusContext = createContext<{
   value?: string;
@@ -122,33 +123,29 @@ export const RadioGroup = ({
       onFocus={onFocus}
       onBlur={onBlur}
     >
-      <RadioGroupValidationStatusContext.Provider value={contextValue}>
-        <InnerRadioGroup.Root
-          id={id}
-          onBlur={handleOnBlur}
-          onFocus={handleOnFocus}
-          onValueChange={onInputChange}
-          value={value}
-          disabled={!enabled}
-          className={classnames(styles.radioGroupContainer, {
-            [styles.focused]: focused,
-            [styles.disabled]: !enabled,
-          })}
-        >
-          {children}
-        </InnerRadioGroup.Root>
-      </RadioGroupValidationStatusContext.Provider>
+      <OptionTypeProvider Component={RadioGroupOption}>
+        <RadioGroupValidationStatusContext.Provider value={contextValue}>
+          <InnerRadioGroup.Root
+            id={id}
+            onBlur={handleOnBlur}
+            onFocus={handleOnFocus}
+            onValueChange={onInputChange}
+            value={value}
+            disabled={!enabled}
+            className={classnames(styles.radioGroupContainer, {
+              [styles.focused]: focused,
+              [styles.disabled]: !enabled,
+            })}
+          >
+            {children}
+          </InnerRadioGroup.Root>
+        </RadioGroupValidationStatusContext.Provider>
+      </OptionTypeProvider>
     </ItemWithLabel>
   );
 };
 
-type RadioGroupOptionProps = {
-  value: string;
-  label?: string;
-  enabled?: boolean;
-};
-
-export const RadioGroupOption = ({ value, label, enabled = true }: RadioGroupOptionProps) => {
+export const RadioGroupOption = ({ value, label, enabled = true }: Option) => {
   const id = useId();
   const validationContext = useContext(RadioGroupValidationStatusContext);
 
