@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, assert, it } from "vitest";
 
 import { Parser } from "@parsers/scripting/Parser";
-import { Destructure, FunctionDeclaration, Identifier } from "@abstractions/scripting/ScriptingSourceTree";
+import { Destructure, FunctionDeclaration, Identifier, SpreadExpression } from "@abstractions/scripting/ScriptingSourceTree";
 
-describe("Parser - arrow expressions", () => {
+describe("Parser - function declarations", () => {
   it("No param", () => {
     // --- Arrange
     const source = "function myFunc() { return 2*v; }";
@@ -224,4 +224,79 @@ describe("Parser - arrow expressions", () => {
     expect((stmt.args[2] as Identifier).name).toEqual("e");
     expect(stmt.statement.type).toEqual("BlockS");
   });
+
+  it("Single rest param", () => {
+    // --- Arrange
+    const source = "function myFunc(...v) { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    const stmts = wParser.parseStatements()!;
+
+    // --- Assert
+    expect(stmts.length).toEqual(1);
+    const stmt = stmts[0] as FunctionDeclaration;
+    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.name).toEqual("myFunc");
+    expect(stmt.args.length).toEqual(1);
+    expect(stmt.args[0].type).toEqual("SpreadE");
+    const spread = stmt.args[0] as SpreadExpression;
+    expect((spread.operand as Identifier).name).toEqual("v");
+    expect(stmt.statement.type).toEqual("BlockS");
+  });
+
+  it("Multiple params with rest", () => {
+    // --- Arrange
+    const source = "function myFunc(v, ...w) { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    const stmts = wParser.parseStatements()!;
+
+    // --- Assert
+    expect(stmts.length).toEqual(1);
+    const stmt = stmts[0] as FunctionDeclaration;
+    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.name).toEqual("myFunc");
+    expect(stmt.args.length).toEqual(2);
+    expect(stmt.args[0].type).toEqual("IdE");
+    expect((stmt.args[0] as Identifier).name).toEqual("v");
+    expect(stmt.args[1].type).toEqual("SpreadE");
+    const spread = stmt.args[1] as SpreadExpression;
+    expect((spread.operand as Identifier).name).toEqual("w");
+    expect(stmt.statement.type).toEqual("BlockS");
+  });
+
+  it("Fails with rest params #1", () => {
+    // --- Arrange
+    const source = "function myFunc(...a, b) { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      // --- Assert
+      expect(err.toString().includes("argument")).toBe(true);
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
+  it("Fails with rest params #2", () => {
+    // --- Arrange
+    const source = "function myFunc(...(a+b)) { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      // --- Assert
+      expect(err.toString().includes("argument")).toBe(true);
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
 });

@@ -138,6 +138,7 @@ export const INTRODUCTION = "/index";
 export const USING_JAVASCRIPT_LIBRARIES = "/js-library-devs";
 export const XMLUI_EXTENSIBILITY_OVERVIEW = "/overview-devs";
 export const XMLUI_EXPRESSIONS = "/scripting/expressions";
+export const XMLUI_EXPRESSIONS_ARROW_FUNCTIONS = "/scripting/expressions#arrow-functions";
 export const GLOBAL_FUNCTIONS_AND_VARIABLES = "/scripting/globals";
 export const SCRIPT_SYNTAX = "/scripting/xmlui-syntax";
 export const SCRIPT_SYNTAX_EVENT_HANDLERS = "/scripting/xmlui-syntax#event-handlers";

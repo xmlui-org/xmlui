@@ -217,7 +217,9 @@ export class Parser {
         case TokenType.Import:
           return this.parseImport();
         default:
-          return this.isExpressionStart(startToken) ? this.parseExpressionStatement(allowSequence) : null;
+          return this.isExpressionStart(startToken)
+            ? this.parseExpressionStatement(allowSequence)
+            : null;
       }
     } finally {
       this._statementLevel--;
@@ -253,7 +255,7 @@ export class Parser {
             expr,
           },
           startToken,
-          expr.endToken
+          expr.endToken,
         )
       : null;
   }
@@ -319,7 +321,9 @@ export class Parser {
       }
 
       // --- New declaration reached
-      decls.push(this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken));
+      decls.push(
+        this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken),
+      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -333,7 +337,7 @@ export class Parser {
         decls,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -390,7 +394,9 @@ export class Parser {
       endToken = expr.endToken;
 
       // --- New declaration reached
-      decls.push(this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken));
+      decls.push(
+        this.createExpressionNode<VarDeclaration>("VarD", declarationProps, declStart, endToken),
+      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -404,7 +410,7 @@ export class Parser {
         decls,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -448,7 +454,14 @@ export class Parser {
       declarationProps.expr = expr;
       endToken = expr.endToken;
       // --- New declaration reached
-      decls.push(this.createExpressionNode<ReactiveVarDeclaration>("RVarD", declarationProps, declStart, endToken));
+      decls.push(
+        this.createExpressionNode<ReactiveVarDeclaration>(
+          "RVarD",
+          declarationProps,
+          declStart,
+          endToken,
+        ),
+      );
 
       // --- Check for more declarations
       if (this._lexer.peek().type !== TokenType.Comma) break;
@@ -462,7 +475,7 @@ export class Parser {
         decls,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -514,7 +527,12 @@ export class Parser {
       nextToken = this._lexer.peek();
       if (nextToken.type === TokenType.Comma || nextToken.type === TokenType.RBrace) {
         result.push(
-          this.createExpressionNode<ObjectDestructure>("ODestr", { id, alias, aDestr, oDestr }, startToken, endToken)
+          this.createExpressionNode<ObjectDestructure>(
+            "ODestr",
+            { id, alias, aDestr, oDestr },
+            startToken,
+            endToken,
+          ),
         );
 
         if (nextToken.type === TokenType.Comma) {
@@ -565,14 +583,24 @@ export class Parser {
       if (nextToken.type === TokenType.Comma) {
         // --- Store the segment
         result.push(
-          this.createExpressionNode<ArrayDestructure>("ADestr", { id, aDestr, oDestr }, startToken, endToken)
+          this.createExpressionNode<ArrayDestructure>(
+            "ADestr",
+            { id, aDestr, oDestr },
+            startToken,
+            endToken,
+          ),
         );
         this._lexer.get();
       } else if (nextToken.type === TokenType.RSquare) {
         if (id || aDestr || oDestr) {
           // --- Store a non-empty the segment
           result.push(
-            this.createExpressionNode<ArrayDestructure>("ADestr", { id, aDestr, oDestr }, startToken, endToken)
+            this.createExpressionNode<ArrayDestructure>(
+              "ADestr",
+              { id, aDestr, oDestr },
+              startToken,
+              endToken,
+            ),
           );
         }
         break;
@@ -650,7 +678,7 @@ export class Parser {
         elseB,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -677,7 +705,7 @@ export class Parser {
         body,
       },
       startToken,
-      body.endToken
+      body.endToken,
     );
   }
 
@@ -709,7 +737,7 @@ export class Parser {
         body,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -735,7 +763,7 @@ export class Parser {
         expr,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -848,7 +876,7 @@ export class Parser {
         body,
       },
       startToken,
-      body.endToken
+      body.endToken,
     );
   }
 
@@ -867,7 +895,7 @@ export class Parser {
     startToken: Token,
     varB: ForVarBinding,
     idToken: Token,
-    type: string
+    type: string,
   ): ForInStatement | ForOfStatement | null {
     if (varB !== "none") {
       // --- Skip variable binding type
@@ -907,7 +935,7 @@ export class Parser {
             body,
           },
           startToken,
-          body.endToken
+          body.endToken,
         )
       : this.createStatementNode<ForOfStatement>(
           "ForOfS",
@@ -923,7 +951,7 @@ export class Parser {
             body,
           },
           startToken,
-          body.endToken
+          body.endToken,
         );
   }
 
@@ -946,7 +974,7 @@ export class Parser {
         expr,
       },
       startToken,
-      expr.endToken
+      expr.endToken,
     );
   }
 
@@ -1026,7 +1054,7 @@ export class Parser {
         finallyB,
       },
       startToken,
-      endToken
+      endToken,
     );
 
     function getBlock(): BlockStatement | null {
@@ -1121,8 +1149,8 @@ export class Parser {
             caseE,
             stmts,
           },
-          startToken
-        )
+          startToken,
+        ),
       );
     }
 
@@ -1136,7 +1164,7 @@ export class Parser {
         cases,
       },
       startToken,
-      endToken
+      endToken,
     );
   }
 
@@ -1181,8 +1209,14 @@ export class Parser {
         break;
       case "SeqE":
         isValid = exprList.parenthesized === 1;
+        let spreadFound = false;
         if (isValid) {
           for (const expr of exprList.exprs) {
+            // --- Spread operator can be used only in the last position
+            if (spreadFound) {
+              isValid = false;
+              break;
+            }
             switch (expr.type) {
               case "IdE":
                 isValid = !expr.parenthesized;
@@ -1202,6 +1236,15 @@ export class Parser {
                   const des = this.convertToArrayDestructure(expr);
                   if (des) args.push(des);
                 }
+                break;
+              }
+              case "SpreadE": {
+                spreadFound = true;
+                if (expr.expr.type !== "IdE") {
+                  isValid = false;
+                  break;
+                }
+                args.push(expr);
                 break;
               }
               default:
@@ -1224,6 +1267,14 @@ export class Parser {
           const des = this.convertToArrayDestructure(exprList);
           if (des) args.push(des);
         }
+        break;
+      case "SpreadE":
+        if (exprList.expr.type !== "IdE") {
+          isValid = false;
+          break;
+        }
+        isValid = true;
+        args.push(exprList);
         break;
       default:
         isValid = false;
@@ -1251,7 +1302,7 @@ export class Parser {
         stmt,
       },
       startToken,
-      stmt.endToken
+      stmt.endToken,
     );
   }
 
@@ -1357,7 +1408,7 @@ export class Parser {
         moduleFile: literal.value,
       },
       startToken,
-      moduleToken
+      moduleToken,
     );
   }
 
@@ -1372,7 +1423,9 @@ export class Parser {
    *   ;
    */
   parseExpr(allowSequence = true): Expression | null {
-    return deepFreeze(allowSequence ? this.parseSequenceExpression() : this.parseCondOrSpreadOrAsgnOrArrowExpr());
+    return deepFreeze(
+      allowSequence ? this.parseSequenceExpression() : this.parseCondOrSpreadOrAsgnOrArrowExpr(),
+    );
   }
 
   /**
@@ -1421,7 +1474,7 @@ export class Parser {
         loose,
       },
       start,
-      endToken
+      endToken,
     );
 
     // --- Check for "loose" sequence expression
@@ -1453,7 +1506,7 @@ export class Parser {
               expr: spreadOperand,
             },
             startToken,
-            spreadOperand.endToken
+            spreadOperand.endToken,
           )
         : null;
     }
@@ -1484,7 +1537,7 @@ export class Parser {
           elseE: falseExpr,
         },
         startToken,
-        falseExpr!.endToken
+        falseExpr!.endToken,
       );
     }
 
@@ -1501,7 +1554,7 @@ export class Parser {
               expr,
             },
             startToken,
-            expr.endToken
+            expr.endToken,
           )
         : null;
     }
@@ -1528,8 +1581,13 @@ export class Parser {
         break;
       case "SeqE":
         isValid = left.parenthesized === 1;
+        let spreadFound = false;
         if (isValid) {
           for (const expr of left.exprs) {
+            if (spreadFound) {
+              isValid = false;
+              break;
+            }
             switch (expr.type) {
               case "IdE":
                 isValid = !expr.parenthesized;
@@ -1549,6 +1607,15 @@ export class Parser {
                   const des = this.convertToArrayDestructure(expr);
                   if (des) args.push(des);
                 }
+                break;
+              }
+              case "SpreadE": {
+                spreadFound = true;
+                if (expr.expr.type !== "IdE") {
+                  isValid = false;
+                  break;
+                }
+                args.push(expr);
                 break;
               }
               default:
@@ -1572,6 +1639,12 @@ export class Parser {
           if (des) args.push(des);
         }
         break;
+      case "SpreadE":
+        isValid = left.expr.type === "IdE";
+        if (isValid) {
+          args.push(left);
+        }
+        break;
       default:
         isValid = false;
     }
@@ -1593,7 +1666,7 @@ export class Parser {
             statement,
           },
           start,
-          statement.endToken
+          statement.endToken,
         )
       : null;
   }
@@ -1624,7 +1697,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1657,7 +1730,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1690,7 +1763,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1723,7 +1796,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1756,7 +1829,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1789,7 +1862,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1809,7 +1882,12 @@ export class Parser {
 
     let opType: Token | null;
     while (
-      (opType = this.skipTokens(TokenType.Equal, TokenType.StrictEqual, TokenType.NotEqual, TokenType.StrictNotEqual))
+      (opType = this.skipTokens(
+        TokenType.Equal,
+        TokenType.StrictEqual,
+        TokenType.NotEqual,
+        TokenType.StrictNotEqual,
+      ))
     ) {
       const rightExpr = this.parseRelOrInExpr();
       if (!rightExpr) {
@@ -1826,7 +1904,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1851,7 +1929,7 @@ export class Parser {
         TokenType.LessThanOrEqual,
         TokenType.GreaterThan,
         TokenType.GreaterThanOrEqual,
-        TokenType.In
+        TokenType.In,
       ))
     ) {
       const rightExpr = this.parseShiftExpr();
@@ -1868,7 +1946,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1887,7 +1965,13 @@ export class Parser {
     }
 
     let opType: Token | null;
-    while ((opType = this.skipTokens(TokenType.ShiftLeft, TokenType.ShiftRight, TokenType.SignedShiftRight))) {
+    while (
+      (opType = this.skipTokens(
+        TokenType.ShiftLeft,
+        TokenType.ShiftRight,
+        TokenType.SignedShiftRight,
+      ))
+    ) {
       const rightExpr = this.parseAddExpr();
       if (!rightExpr) {
         this.reportError("W001");
@@ -1902,7 +1986,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1936,7 +2020,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -1970,7 +2054,7 @@ export class Parser {
           right: rightExpr,
         },
         startToken,
-        endToken
+        endToken,
       );
     }
     return leftExpr;
@@ -2006,7 +2090,7 @@ export class Parser {
             right: rightExpr,
           },
           startToken,
-          endToken
+          endToken,
         );
       } else {
         const prevLeft = leftExpr as BinaryExpression;
@@ -2023,7 +2107,7 @@ export class Parser {
             },
           },
           startToken,
-          endToken
+          endToken,
         );
       }
       count++;
@@ -2052,7 +2136,7 @@ export class Parser {
           expr: unaryOperand,
         },
         startToken,
-        unaryOperand.endToken
+        unaryOperand.endToken,
       );
     }
 
@@ -2069,7 +2153,7 @@ export class Parser {
           expr: prefixOperand,
         },
         startToken,
-        prefixOperand.endToken
+        prefixOperand.endToken,
       );
     }
 
@@ -2117,7 +2201,7 @@ export class Parser {
               arguments: args,
             },
             startToken,
-            endToken
+            endToken,
           );
           break;
         }
@@ -2139,7 +2223,7 @@ export class Parser {
               opt: currentStart.type === TokenType.OptionalChaining,
             },
             startToken,
-            member
+            member,
           );
           break;
 
@@ -2158,7 +2242,7 @@ export class Parser {
               member: memberExpr,
             },
             startToken,
-            endToken
+            endToken,
           );
           break;
 
@@ -2179,7 +2263,7 @@ export class Parser {
           expr: primary,
         },
         startToken,
-        nextToken
+        nextToken,
       );
     }
 
@@ -2229,7 +2313,7 @@ export class Parser {
             name: idToken.text,
           },
           idToken,
-          idToken
+          idToken,
         );
       }
 
@@ -2247,7 +2331,7 @@ export class Parser {
             isGlobal: true,
           },
           idToken,
-          idToken
+          idToken,
         );
       }
       case TokenType.Backtick:
@@ -2262,7 +2346,7 @@ export class Parser {
             value: start.type === TokenType.True,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.BinaryLiteral:
@@ -2293,7 +2377,7 @@ export class Parser {
             value: Infinity,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.NaN:
@@ -2304,7 +2388,7 @@ export class Parser {
             value: NaN,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.Null:
@@ -2315,7 +2399,7 @@ export class Parser {
             value: null,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.Undefined:
@@ -2326,7 +2410,7 @@ export class Parser {
             value: undefined,
           },
           start,
-          start
+          start,
         );
 
       case TokenType.LSquare:
@@ -2343,7 +2427,7 @@ export class Parser {
   }
 
   private parseTemplateLiteral(): TemplateLiteralExpression {
-    const startToken = this._lexer.get()
+    const startToken = this._lexer.get();
     this._lexer.setStartingPhaseToTemplateLiteral();
     const segments: (Literal | Expression)[] = [];
     loop: while (true) {
@@ -2359,7 +2443,7 @@ export class Parser {
           const innerExpr = this.parseExpr();
           segments.push(innerExpr);
           this.expectToken(TokenType.RBrace, "W004");
-          this._lexer.setStartingPhaseToTemplateLiteral()
+          this._lexer.setStartingPhaseToTemplateLiteral();
           break;
         case TokenType.Backtick:
           break loop;
@@ -2367,7 +2451,7 @@ export class Parser {
           this.reportError("W004");
       }
     }
-    const endToken = this._lexer.get()
+    const endToken = this._lexer.get();
     return this.createExpressionNode<TemplateLiteralExpression>(
       "TempLitE",
       { segments },
@@ -2395,7 +2479,7 @@ export class Parser {
         items: expressions,
       },
       start,
-      endToken
+      endToken,
     );
   }
 
@@ -2426,14 +2510,18 @@ export class Parser {
               {
                 exprs: [nameExpr],
               },
-              start
+              start,
             );
           } else if (traits.isPropLiteral) {
             nameExpr = this.getExpression(false);
             if (!nameExpr) {
               return null;
             }
-            if (nameExpr.type !== "IdE" && nameExpr.type !== "LitE" && nameExpr.type !== "SpreadE") {
+            if (
+              nameExpr.type !== "IdE" &&
+              nameExpr.type !== "LitE" &&
+              nameExpr.type !== "SpreadE"
+            ) {
               this.reportError("W007");
               return null;
             }
@@ -2475,7 +2563,10 @@ export class Parser {
 
           if (nameType === "IdE") {
             const nameFollowerToken = this._lexer.peek();
-            if (nameFollowerToken.type === TokenType.Comma || nameFollowerToken.type === TokenType.RBrace) {
+            if (
+              nameFollowerToken.type === TokenType.Comma ||
+              nameFollowerToken.type === TokenType.RBrace
+            ) {
               valueExpr = { ...nameExpr };
             }
           }
@@ -2512,7 +2603,7 @@ export class Parser {
         props,
       },
       start,
-      endToken
+      endToken,
     );
   }
 
@@ -2526,7 +2617,7 @@ export class Parser {
           value: new RegExp(result.pattern!, result.flags),
         },
         startToken,
-        this._lexer.peek()
+        this._lexer.peek(),
       );
     }
     this.reportError("W002", startToken, result.pattern ?? "");
@@ -2601,7 +2692,9 @@ export class Parser {
   private reportError(errorCode: ErrorCodes, token?: Token, ...options: any[]): void {
     let errorText: string = errorMessages[errorCode] ?? "Unkonwn error";
     if (options) {
-      options.forEach((o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())));
+      options.forEach(
+        (o, idx) => (errorText = replace(errorText, `{${idx}}`, options[idx].toString())),
+      );
     }
     if (!token) {
       token = this._lexer.peek();
@@ -2632,7 +2725,7 @@ export class Parser {
     type: ScripNodeBase["type"],
     stump: any,
     startToken: Token,
-    endToken?: Token
+    endToken?: Token,
   ): T {
     if (!endToken) {
       endToken = this._lexer.peek();
@@ -2656,7 +2749,7 @@ export class Parser {
     type: Expression["type"],
     stump: any = {},
     startToken?: Token,
-    endToken?: Token
+    endToken?: Token,
   ): T {
     if (!endToken) {
       endToken = this._lexer.peek();
@@ -2682,7 +2775,7 @@ export class Parser {
     type: Statement["type"],
     stump: any,
     startToken?: Token,
-    endToken?: Token
+    endToken?: Token,
   ): T {
     return Object.assign({}, stump, {
       type,
@@ -2709,7 +2802,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2731,7 +2824,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2753,7 +2846,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2769,7 +2862,7 @@ export class Parser {
         value,
       },
       token,
-      token
+      token,
     );
   }
 
@@ -2778,7 +2871,10 @@ export class Parser {
    * @param token Literal token
    */
   private parseStringLiteral(token: Token, quoteSurrounded: boolean = true): Literal {
-       const input = token.text.length < 2 || !quoteSurrounded ? token.text : token.text.substring(1, token.text.length - 1);
+    const input =
+      token.text.length < 2 || !quoteSurrounded
+        ? token.text
+        : token.text.substring(1, token.text.length - 1);
     let result = "";
     let state: StrParseState = StrParseState.Normal;
     let collect = 0;
@@ -3005,7 +3101,7 @@ export class Parser {
         value: result,
       },
       token,
-      token
+      token,
     );
 
     function isHexaDecimal(ch: string): boolean {
@@ -3015,21 +3111,31 @@ export class Parser {
 
   private convertToArrayDestructure(seq: SequenceExpression | ArrayLiteral): Destructure | null {
     const items = seq.type === "SeqE" ? seq.exprs : seq.items;
-    const result = this.createExpressionNode<Destructure>("Destr", { aDestr: [] }, seq.startToken, seq.endToken);
+    const result = this.createExpressionNode<Destructure>(
+      "Destr",
+      { aDestr: [] },
+      seq.startToken,
+      seq.endToken,
+    );
 
     // --- Convert all items
     for (const item of items) {
       let arrayD: ArrayDestructure | undefined;
       switch (item.type) {
         case "NoArgE":
-          arrayD = this.createExpressionNode<ArrayDestructure>("ADestr", {}, item.startToken, item.endToken);
+          arrayD = this.createExpressionNode<ArrayDestructure>(
+            "ADestr",
+            {},
+            item.startToken,
+            item.endToken,
+          );
           break;
         case "IdE":
           arrayD = this.createExpressionNode<ArrayDestructure>(
             "ADestr",
             { id: item.name },
             item.startToken,
-            item.endToken
+            item.endToken,
           );
           break;
         case "Destr":
@@ -3047,7 +3153,7 @@ export class Parser {
                 aDestr: destructure.aDestr,
               },
               item.startToken,
-              item.endToken
+              item.endToken,
             );
           }
           break;
@@ -3059,7 +3165,7 @@ export class Parser {
               oDestr: item,
             },
             item.startToken,
-            item.endToken
+            item.endToken,
           );
           break;
         case "OLitE": {
@@ -3071,7 +3177,7 @@ export class Parser {
                 oDestr: destructure.oDestr,
               },
               item.startToken,
-              item.endToken
+              item.endToken,
             );
           }
           break;
@@ -3089,7 +3195,12 @@ export class Parser {
   }
 
   private convertToObjectDestructure(objLit: ObjectLiteral): Destructure | null {
-    const result = this.createExpressionNode<Destructure>("Destr", { oDestr: [] }, objLit.startToken, objLit.endToken);
+    const result = this.createExpressionNode<Destructure>(
+      "Destr",
+      { oDestr: [] },
+      objLit.startToken,
+      objLit.endToken,
+    );
 
     // --- Convert all items
     for (const prop of objLit.props) {
@@ -3113,7 +3224,7 @@ export class Parser {
               "ODestr",
               { id: propKey.name },
               propValue.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           } else {
             objD = this.createExpressionNode<ObjectDestructure>(
@@ -3123,7 +3234,7 @@ export class Parser {
                 alias: propValue.name,
               },
               propValue.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;
@@ -3135,7 +3246,7 @@ export class Parser {
               aDestr: propValue,
             },
             propKey.startToken,
-            propValue.endToken
+            propValue.endToken,
           );
           break;
         }
@@ -3149,7 +3260,7 @@ export class Parser {
                 aDestr: destructure.aDestr,
               },
               propKey.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;
@@ -3167,7 +3278,7 @@ export class Parser {
                 oDestr: destructure.oDestr,
               },
               propKey.startToken,
-              propValue.endToken
+              propValue.endToken,
             );
           }
           break;

@@ -85,6 +85,45 @@ Show the avatar (`true`) or not (`false`). If not specified, the Card will show 
 
 This property wraps the title in a `Link` component that is clickable to navigate.
 
+### `orientation`
+
+An optional property that governs the Card's orientation (whether the Card lays out its children in a row or a column). If the orientation is set to `horizontal`, the Card will display its children in a row, except for its [`title`](#title) and [`subtitle`](#subtitle).
+
+Default value: `"vertical"`.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `horizontal` | The component will fill the available space horizontally |
+| `vertical` | The component will fill the available space vertically **(default)** |
+
+
+```ueml copy /orientation="horizontal"/
+<App>
+  <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
+    <SpaceFiller />
+    <Text>Text child #1</Text>
+    <Text>Text child #2</Text>
+    <Button label="Button Child" />
+  </Card>
+</App>
+```
+
+<Playground
+  name="Example: orientation"
+  app={`
+  <App>
+    <Card title="Example Title" subtitle="Example Subtitle" orientation="horizontal">
+      <SpaceFiller />
+      <Text>Text child #1</Text>
+      <Text>Text child #2</Text>
+      <Button label="Button Child" />
+    </Card>
+  </App>
+  `}
+/>
+
 ### `showAvatar`
 
 Indicates whether the Card should be displayed
@@ -218,7 +257,8 @@ The following theme definition changes the visual appearance of the card:
     "radius-Card": "4px",
     "color-border-Card": "$color-surface-600",
     "thickness-border-Card": "2px",
-    "padding-horizontal-Card": "2rem"
+    "padding-horizontal-Card": "2rem",
+    "color": "black"
   }
 }
 ```
@@ -234,7 +274,8 @@ The following theme definition changes the visual appearance of the card:
       "radius-Card": "4px",
       "color-border-Card": "$color-surface-600",
       "thickness-border-Card": "2px",
-      "padding-horizontal-Card": "2rem"
+      "padding-horizontal-Card": "2rem",
+      "color": "black"
     }
   }]}
   app={`

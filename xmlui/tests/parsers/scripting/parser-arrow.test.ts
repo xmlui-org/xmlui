@@ -7,6 +7,7 @@ import {
   Destructure,
   FunctionInvocationExpression,
   Identifier,
+  SpreadExpression,
 } from "@abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - arrow expressions", () => {
@@ -66,8 +67,15 @@ describe("Parser - arrow expressions", () => {
     expect(arrowExpr.source).equal(source);
   });
 
-  const invalidLeftCases = ["2 => 2*v", "a+2 => 2*v", "(a, a+2) => 2*v", "(a+2) => 2*v", "(!a) => 2*v", "((a)) => 2*v"];
-  invalidLeftCases.forEach(c => {
+  const invalidLeftCases = [
+    "2 => 2*v",
+    "a+2 => 2*v",
+    "(a, a+2) => 2*v",
+    "(a+2) => 2*v",
+    "(!a) => 2*v",
+    "((a)) => 2*v",
+  ];
+  invalidLeftCases.forEach((c) => {
     it(`Invalid param: '${c}' `, () => {
       // --- Arrange
       const wParser = new Parser(c);
@@ -170,16 +178,17 @@ describe("Parser - arrow expressions", () => {
 
   it("Block statement #4", () => {
     // --- Arrange
-    const source = "(item) => { \n" +
-        "  Actions.DeleteEntityAction({\n" +
-        "    entityId: \"apiFile\",\n" +
-        "    entityDisplayName: item,\n" +
-        "    params: {\n" +
-        "      nodeId: $props.nodeId,\n" +
-        "      id: item\n" +
-        "    }\n" +
-        "  })\n" +
-        "}";
+    const source =
+      "(item) => { \n" +
+      "  Actions.DeleteEntityAction({\n" +
+      '    entityId: "apiFile",\n' +
+      "    entityDisplayName: item,\n" +
+      "    params: {\n" +
+      "      nodeId: $props.nodeId,\n" +
+      "      id: item\n" +
+      "    }\n" +
+      "  })\n" +
+      "}";
     const wParser = new Parser(source);
 
     // --- Act
@@ -194,7 +203,6 @@ describe("Parser - arrow expressions", () => {
     expect(arrowExpr.statement.type).equal("BlockS");
     expect(arrowExpr.source).equal(source);
   });
-
 
   it("Arrow function invocation #1", () => {
     // --- Arrange
@@ -269,7 +277,7 @@ describe("Parser - arrow expressions", () => {
     expect(arrowExpr.statement.type).equal("ExprS");
     expect(arrowExpr.source).equal(source);
   });
-  
+
   it("Single object destructure #2", () => {
     // --- Arrange
     const source = "({x, y:q}) => x + q";
@@ -401,4 +409,75 @@ describe("Parser - arrow expressions", () => {
     expect(arrowExpr.source).equal(source);
   });
 
+  it("Single rest param", () => {
+    // --- Arrange
+    const source = "(...v) => 2*v";
+    const wParser = new Parser(source);
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    expect(expr.type).equal("ArrowE");
+    const arrowExpr = expr as ArrowExpression;
+    expect(arrowExpr.args.length).equal(1);
+    const spread = arrowExpr.args[0] as SpreadExpression;
+    expect((spread.operand as Identifier).name).equal("v");
+    expect(arrowExpr.statement.type).equal("ExprS");
+  });
+
+  it("Multiple rest param", () => {
+    // --- Arrange
+    const source = "(v, ...w) => 2*v";
+    const wParser = new Parser(source);
+
+    // --- Act
+    const expr = wParser.parseExpr();
+
+    // --- Assert
+    expect(expr).not.equal(null);
+    if (!expr) return;
+    expect(expr.type).equal("ArrowE");
+    const arrowExpr = expr as ArrowExpression;
+    expect(arrowExpr.args.length).equal(2);
+    const id = arrowExpr.args[0] as Identifier;
+    expect(id.name).equal("v");
+    const spread = arrowExpr.args[1] as SpreadExpression;
+    expect((spread.operand as Identifier).name).equal("w");
+    expect(arrowExpr.statement.type).equal("ExprS");
+  });
+
+  it("Fails with rest params #1", () => {
+    // --- Arrange
+    const source = "(...a, b) => { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      // --- Assert
+      expect(err.toString().includes("argument")).toBe(true);
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
+  it("Fails with rest params #2", () => {
+    // --- Arrange
+    const source = "(...(a+b)) => { return 2*v; }";
+    const wParser = new Parser(source);
+
+    // --- Act
+    try {
+      wParser.parseStatements()!;
+    } catch (err) {
+      // --- Assert
+      expect(err.toString().includes("argument")).toBe(true);
+      return;
+    }
+    assert.fail("Exception expected");
+  });
 });
