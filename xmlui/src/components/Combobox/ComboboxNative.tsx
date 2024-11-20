@@ -16,6 +16,8 @@ import { ChevronDownIcon } from "@components/Icon/ChevronDownIcon";
 import { ChevronUpIcon } from "@components/Icon/ChevronUpIcon";
 import Icon from "@components/Icon/IconNative";
 import { Adornment } from "@components/Input/InputAdornment";
+import { OptionComponent } from "@components/Option/OptionNative";
+import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 
 // =====================================================================================================================
 // React Combobox component implementation
@@ -183,7 +185,9 @@ export const Combobox = ({
 
   return (
     <SelectContext.Provider value={selectContextValue}>
-      {children}
+      <OptionTypeProvider Component={OptionComponent}>
+        {children}
+      </OptionTypeProvider>
       <div
         className={classnames(styles.comboboxToggleButton, styles[validationStatus], {
           //TODO expand styles[validationStatus]
