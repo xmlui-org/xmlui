@@ -12,14 +12,15 @@ import Icon from "@components/Icon/IconNative";
 import styles from "@components/MultiSelect/MultiSelect2.module.scss";
 import { noop } from "@components-core/constants";
 import type { CSSProperties, ReactNode } from "react";
+import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import type { Option, ValidationStatus } from "@components/abstractions";
-import { Button } from "@components/Button/ButtonNative";
 import { MultiSelectContext } from "@components/MultiSelect/MultiSelectContext";
 import { isEqual } from "lodash-es";
 import { useTheme } from "@components-core/theming/ThemeContext";
+import { useEvent } from "@components-core/utils/misc";
 
 /**
  * Props for MultiSelect component
@@ -69,6 +70,9 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
   ) => {
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
+    const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+    const [width, setWidth] = useState(0);
+    const observer = useRef<ResizeObserver>();
 
     const { root } = useTheme();
 
@@ -84,6 +88,31 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
     useEffect(() => {
       updateState({ value: initValue });
     }, [initValue, updateState]);
+
+    // --- Manage obtaining and losing the focus
+    const handleOnFocus = useCallback(() => {
+      onFocus?.();
+    }, [onFocus]);
+
+    const handleOnBlur = useCallback(() => {
+      onBlur?.();
+    }, [onBlur]);
+
+    const focus = useCallback(() => {
+      referenceElement?.focus();
+    }, [referenceElement]);
+
+    const setValue = useEvent((newValue: string) => {
+      updateState({ value: newValue });
+      onDidChange(newValue);
+    });
+
+    useEffect(() => {
+      registerComponentApi?.({
+        focus,
+        setValue,
+      });
+    }, [focus, registerComponentApi, setValue]);
 
     const handleInputKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
       if (event.key === "Enter") {
@@ -116,6 +145,18 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
       setIsPopoverOpen((prev) => !prev);
     };
 
+    useEffect(() => {
+      const current = referenceElement as any;
+      // --- We are already observing old element
+      if (observer?.current && current) {
+        observer.current.unobserve(current);
+      }
+      observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
+      if (current && observer.current) {
+        observer.current.observe(referenceElement as any);
+      }
+    }, [referenceElement]);
+
     const multiSelectContextValue = useMemo(
       () => ({
         value,
@@ -130,9 +171,14 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
           <PopoverTrigger asChild>
             <button
-              ref={ref}
+              ref={setReferenceElement}
+              id={id}
+              style={layout}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              disabled={!enabled}
               onClick={handleTogglePopover}
-              className={classnames(styles.multiSelectButton)}
+              className={classnames(styles.multiSelectButton, styles[validationStatus])}
             >
               {value?.length > 0 ? (
                 <div className={styles.badgeListContainer}>
@@ -156,13 +202,11 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
                   <div className={styles.actions}>
                     <Icon
                       name="close"
-                      size="sm"
                       onClick={(event) => {
                         event.stopPropagation();
                         handleClear();
                       }}
                     />
-                    {/* <Separator orientation="vertical" className="flex min-h-6 h-full" />*/}
                     <Icon name="chevrondown" />
                   </div>
                 </div>
@@ -175,7 +219,11 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
             </button>
           </PopoverTrigger>
           <Portal container={root}>
-            <PopoverContent align="start" onEscapeKeyDown={() => setIsPopoverOpen(false)}>
+            <PopoverContent
+              align="start"
+              onEscapeKeyDown={() => setIsPopoverOpen(false)}
+              style={{ width }}
+            >
               <Command className={styles.multiSelectMenu}>
                 <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
                 <CommandList>
