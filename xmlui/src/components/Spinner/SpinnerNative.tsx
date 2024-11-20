@@ -23,14 +23,12 @@ export function Spinner({ delay = 400, fullScreen = false, style }: SpinnerProps
 
   const spinner = (
     <>
-      <div style={style}>
-        <div className={styles["lds-ring"]}>
+        <div className={styles["lds-ring"]} style={style}>
           <div></div>
           <div></div>
           <div></div>
           <div></div>
         </div>
-      </div>
     </>
   );
 
