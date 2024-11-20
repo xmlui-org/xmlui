@@ -42,6 +42,7 @@ interface MultiSelectProps extends React.ButtonHTMLAttributes<HTMLButtonElement>
   registerComponentApi?: RegisterComponentApiFn;
   onFocus?: () => void;
   onBlur?: () => void;
+  autoFocus?: boolean;
   validationStatus?: ValidationStatus;
 }
 
@@ -65,6 +66,7 @@ export const MultiSelect = ({
   optionRenderer = defaultRenderer,
   registerComponentApi,
   emptyListTemplate,
+  autoFocus = false,
 }: MultiSelectProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
@@ -171,14 +173,17 @@ export const MultiSelect = ({
       <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
         <PopoverTrigger asChild>
           <button
-            ref={setReferenceElement}
             id={id}
             style={layout}
+            ref={setReferenceElement}
             onFocus={handleOnFocus}
             onBlur={handleOnBlur}
             disabled={!enabled}
             onClick={handleTogglePopover}
-            className={classnames(styles.multiSelectButton, styles[validationStatus])}
+            className={classnames(styles.multiSelectButton, styles[validationStatus], {
+              [styles.disabled]: !enabled,
+            })}
+            autoFocus={autoFocus}
           >
             {value?.length > 0 ? (
               <div className={styles.badgeListContainer}>

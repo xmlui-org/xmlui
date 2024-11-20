@@ -101,6 +101,7 @@ export const selectComponentRenderer = createComponentRenderer(
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
         validationStatus={extractValue(node.props.validationStatus)}

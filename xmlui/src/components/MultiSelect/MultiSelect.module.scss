@@ -61,6 +61,14 @@ $componentName: "MultiSelect";
   &.valid {
     @include variant("success");
   }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+    background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
+    color: createThemeVar("Input:color-text-#{$componentName}--disabled");
+    border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+  }
 }
 
 .badgeListContainer {

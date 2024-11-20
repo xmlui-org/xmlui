@@ -32,6 +32,7 @@ type SelectProps = {
   onBlur?: () => void;
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
+  autoFocus?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -56,6 +57,7 @@ export function Select({
   emptyListTemplate,
   layout,
   children,
+  autoFocus = false,
 }: SelectProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
@@ -108,6 +110,7 @@ export function Select({
       {/*<OptionTypeProvider Component={OptionComponent}>{children}</OptionTypeProvider>*/}
       <SelectPrimitive.Root value={value} onValueChange={updateValue}>
         <SelectTrigger
+          autoFocus={autoFocus}
           id={id}
           style={layout}
           className={styles.selectTrigger}

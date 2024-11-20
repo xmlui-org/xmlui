@@ -19,11 +19,12 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
+  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
 } from "@components/metadata-helpers";
-import {MultiSelect} from "@components/MultiSelect/MultiSelectNative";
+import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 
 const COMP = "MultiSelect";
 
@@ -71,6 +72,7 @@ export const MultiSelectMd = createMetadata({
   },
   apis: {
     focus: dFocus(COMP),
+    setValue: dSetValueApi(),
   },
   contextVars: {
     $item: d(`This context variable acts as a template for an item in the list.`),
@@ -96,7 +98,15 @@ export const MultiSelectMd = createMetadata({
 export const multiSelectComponentRenderer = createComponentRenderer(
   COMP,
   MultiSelectMd,
-  ({ node, state, updateState, extractValue, renderChild, lookupEventHandler }) => {
+  ({
+    node,
+    state,
+    updateState,
+    extractValue,
+    renderChild,
+    lookupEventHandler,
+    registerComponentApi,
+  }) => {
     return (
       <MultiSelect
         placeholder={extractValue(node.props.placeholder)}
@@ -109,6 +119,8 @@ export const multiSelectComponentRenderer = createComponentRenderer(
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+        registerComponentApi={registerComponentApi}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem

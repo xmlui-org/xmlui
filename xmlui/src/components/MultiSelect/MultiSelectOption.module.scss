@@ -12,8 +12,9 @@ $componentName: "MultiSelectOption";
 .multiSelectOption {
   padding: 0.5rem 1rem;
   display: flex;
-  justify-content: space-between;
+  gap: 1rem;
   align-items: center;
+  justify-content: space-between;
   cursor: pointer;
   transition: background-color 0.2s ease;
   background-color: createThemeVar("color-bg-item-#{$componentName}");
@@ -22,9 +23,9 @@ $componentName: "MultiSelectOption";
     background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
   }
 
-  &[data-state=checked] {
+/*  &[data-state=checked] {
     background-color: createThemeVar("color-bg-item-#{$componentName}--active");
-  }
+  }*/
 
   &[data-disabled=true] {
     pointer-events: none;
