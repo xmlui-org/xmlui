@@ -1,11 +1,10 @@
 import { useId } from "react";
 
 import { CommandItem } from "@components/Combobox/Command";
-import styles from "@components/Combobox/Combobox2.module.scss";
-import { CheckIcon } from "@components/Icon/CheckIcon";
+import styles from "@components/MultiSelect/MultiSelectOption.module.scss";
 import * as React from "react";
-import classnames from "classnames";
 import { useSelect } from "@components/MultiSelect/MultiSelectContext";
+import Icon from "@components/Icon/IconNative";
 
 type OptionComponentProps = {
   value: string;
@@ -22,18 +21,13 @@ export function MultiSelectOption({ value, label, disabled }: OptionComponentPro
       id={id}
       key={id}
       value={`${value}`}
-      className={styles.commandItem}
+      className={styles.multiSelectOption}
       onSelect={() => {
         onChange(value);
       }}
     >
       {optionRenderer({ label, value })}
-      <CheckIcon
-        className={classnames(
-          styles.checkIcon,
-          selectedValues.includes(value) && styles.checkIconVisible,
-        )}
-      />
+      {selectedValues.includes(value) && <Icon name="checkmark" />}
     </CommandItem>
   );
 }

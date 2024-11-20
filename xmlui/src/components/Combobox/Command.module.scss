@@ -76,38 +76,4 @@
     letter-spacing: 0.05em;
     color: #6b7280;
   }
-
-
-  .commandItem {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 8px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: default;
-    outline: none;
-
-
-    &:hover {
-      background-color: #e2e8f0 !important;
-      color: #1a202c !important;
-    }
-
-    &[data-disabled="true"] {
-      pointer-events: none;
-      opacity: 0.5;
-    }
-
-    &[data-selected="true"] {
-      background-color: #3b82f6;
-      color: #ffffff;
-    }
-
-    & svg {
-      pointer-events: none;
-      flex-shrink: 0;
-    }
-  }
-
 }

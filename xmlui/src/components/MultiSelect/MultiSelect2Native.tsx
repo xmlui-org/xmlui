@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
 import {
   Command,
@@ -11,7 +11,7 @@ import {
 import Icon from "@components/Icon/IconNative";
 import styles from "@components/MultiSelect/MultiSelect2.module.scss";
 import { noop } from "@components-core/constants";
-import type { CSSProperties, ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
@@ -19,6 +19,7 @@ import type { Option, ValidationStatus } from "@components/abstractions";
 import { Button } from "@components/Button/ButtonNative";
 import { MultiSelectContext } from "@components/MultiSelect/MultiSelectContext";
 import { isEqual } from "lodash-es";
+import { useTheme } from "@components-core/theming/ThemeContext";
 
 /**
  * Props for MultiSelect component
@@ -68,6 +69,8 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
   ) => {
     const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
     const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
+
+    const { root } = useTheme();
 
     useEffect(() => {
       setInitValue((prevState) => {
@@ -132,14 +135,15 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
               className={classnames(styles.multiSelectButton)}
             >
               {value?.length > 0 ? (
-                <div className="flex justify-between items-center w-full">
-                  <div className="flex flex-wrap items-center">
+                <div className={styles.badgeListContainer}>
+                  <div className={styles.badgeList}>
                     {value.map((v) => {
                       return (
                         <SelectBadge key={v}>
                           {v}
-                          <Button
-                            icon="close"
+                          <Icon
+                            name="close"
+                            size="sm"
                             onClick={(event) => {
                               event.stopPropagation();
                               toggleOption(v);
@@ -149,49 +153,48 @@ export const MultiSelect2 = React.forwardRef<HTMLButtonElement, MultiSelectProps
                       );
                     })}
                   </div>
-                  <div className="flex items-center justify-between">
-                    <Button
-                      icon="close"
-                      className="h-4 mx-2 cursor-pointer text-muted-foreground"
+                  <div className={styles.actions}>
+                    <Icon
+                      name="close"
+                      size="sm"
                       onClick={(event) => {
                         event.stopPropagation();
                         handleClear();
                       }}
                     />
                     {/* <Separator orientation="vertical" className="flex min-h-6 h-full" />*/}
-                    {/*<Icon name="chevrondown" />*/}
+                    <Icon name="chevrondown" />
                   </div>
                 </div>
               ) : (
-                <div className="flex items-center justify-between w-full mx-auto">
+                <div className={styles.emptySelect}>
                   <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
+                  <Icon name="chevrondown" size="sm" />
                 </div>
               )}
             </button>
           </PopoverTrigger>
-          <PopoverContent
-            className="w-auto p-0"
-            align="start"
-            onEscapeKeyDown={() => setIsPopoverOpen(false)}
-          >
-            <Command>
-              <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
-              <CommandList>
-                {React.Children.toArray(children).length > 0 ? (
-                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                ) : (
-                  <CommandEmpty className={styles.commandEmpty}>
-                    {emptyListTemplate ?? (
-                      <>
-                        <Icon name={"noresult"} />
-                        <span>List is empty</span>
-                      </>
-                    )}
-                  </CommandEmpty>
-                )}
-              </CommandList>
-            </Command>
-          </PopoverContent>
+          <Portal container={root}>
+            <PopoverContent align="start" onEscapeKeyDown={() => setIsPopoverOpen(false)}>
+              <Command className={styles.multiSelectMenu}>
+                <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
+                <CommandList>
+                  {React.Children.toArray(children).length > 0 ? (
+                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                  ) : (
+                    <CommandEmpty className={styles.commandEmpty}>
+                      {emptyListTemplate ?? (
+                        <>
+                          <Icon name={"noresult"} />
+                          <span>List is empty</span>
+                        </>
+                      )}
+                    </CommandEmpty>
+                  )}
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Portal>
         </Popover>
       </MultiSelectContext.Provider>
     );

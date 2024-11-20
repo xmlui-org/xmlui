@@ -91,11 +91,7 @@ const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={classnames(styles.commandItem, className)}
-    {...props}
-  />
+  <CommandPrimitive.Item ref={ref} className={classnames(className)} {...props} />
 ));
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;

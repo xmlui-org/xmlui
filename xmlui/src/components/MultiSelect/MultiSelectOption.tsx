@@ -1,6 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { MultiSelectOption } from "@components/MultiSelect/MultiSelectOptionNative";
+import { parseScssVar } from "@components-core/theming/themeVars";
+import styles from "@components/MultiSelect/MultiSelectOption.module.scss";
 
 const COMP = "MultiSelectOption";
 
@@ -22,6 +24,19 @@ export const MultiSelectOptionMd = createMetadata({
       `If this property is set to \`true\`, the option is disabled and cannot be selected ` +
         `in its parent component.`,
     ),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
+    [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
+    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
+    [`min-height-Input`]: "39px",
+    light: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-200",
+    },
+    dark: {
+      [`color-text-item-${COMP}--disabled`]: "$color-surface-800",
+    },
   },
 });
 
