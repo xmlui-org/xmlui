@@ -16,9 +16,9 @@ export function XmluiCodeHighlighter({ value }: { value: string }) {
         const { createHighlighterCore } = await import("shiki/core");
         highlighter = await createHighlighterCore({
           // @ts-ignore
-          themes: [import("../../../docs/syntax/textMate/xmlui.json")],
+          themes: [import("../syntax/textMate/xmlui.json")],
           // @ts-ignore
-          langs: [import("../../../docs/syntax/grammar.tmLanguage.json")],
+          langs: [import("../syntax/grammar.tmLanguage.json")],
           loadWasm: import("shiki/wasm"),
         });
       }

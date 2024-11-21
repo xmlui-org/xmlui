@@ -2,7 +2,7 @@ const withTM = require("next-transpile-modules")(["react-icons"]);
 const withSvgr = require("next-plugin-svgr");
 const shiki = require("shiki");
 const fs = require("fs");
-const theme = require("./syntax/textMate/xmlui.json");
+const theme = require("../xmlui/src/syntax/textMate/xmlui.json");
 
 const withNextra = require("nextra")({
   theme: "nextra-theme-docs",
@@ -11,7 +11,7 @@ const withNextra = require("nextra")({
   mdxOptions: {
     rehypePrettyCodeOptions: {
       getHighlighter: async (options) => {
-        const myLanguageGrammar = JSON.parse(fs.readFileSync("./syntax/grammar.tmLanguage.json"));
+        const myLanguageGrammar = JSON.parse(fs.readFileSync("../xmlui/src/syntax/grammar.tmLanguage.json"));
 
         const uemlLanguage = {
           id: "xmlui",
