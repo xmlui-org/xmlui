@@ -189,7 +189,7 @@ export const MultiCombobox = ({
               {value?.length > 0 ? (
                 <div className={styles.badgeListContainer}>
                   <div className={styles.badgeList}>
-                    {value.map((v) => {
+                    {value?.map((v) => {
                       return (
                         <ComboboxBadge key={v}>
                           {v}
