@@ -80,6 +80,7 @@ export function ItemWithLabel({
             style={{
               ...labelStyle,
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
+              flexShrink: (labelWidth !== undefined) ? 0 : undefined,
             }}
             className={classnames(styles.inputLabel, {
               [styles.required]: required,
