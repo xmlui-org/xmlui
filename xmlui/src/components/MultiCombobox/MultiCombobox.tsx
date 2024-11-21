@@ -20,6 +20,7 @@ import {
   dPlaceholder,
   dReadonly,
   dRequired,
+  dSetValueApi,
   dStartIcon,
   dStartText,
   dValidationStatus,
@@ -69,6 +70,7 @@ export const MultiComboboxMd = createMetadata({
   },
   apis: {
     focus: dFocus(COMP),
+    setValue: dSetValueApi(),
   },
   contextVars: {
     $item: d(`This context variable acts as a template for an item in the list.`),
@@ -96,7 +98,16 @@ export const MultiComboboxMd = createMetadata({
 export const multiComboboxComponentRenderer = createComponentRenderer(
   COMP,
   MultiComboboxMd,
-  ({ node, state, updateState, extractValue, renderChild, layoutCss, lookupEventHandler }) => {
+  ({
+    node,
+    state,
+    updateState,
+    extractValue,
+    renderChild,
+    layoutCss,
+    lookupEventHandler,
+    registerComponentApi,
+  }) => {
     return (
       <MultiCombobox
         layout={layoutCss}
@@ -111,6 +122,7 @@ export const multiComboboxComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+        registerComponentApi={registerComponentApi}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
