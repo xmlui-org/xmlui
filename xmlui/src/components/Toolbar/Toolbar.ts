@@ -1,5 +1,9 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { CompoundComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import componentSource from "./Toolbar.xmlui?raw";
+
+const COMP = "Toolbar";
 
 export const ToolbarMd = createMetadata({
   status: "experimental",
@@ -12,22 +16,12 @@ export const ToolbarMd = createMetadata({
   },
 });
 
+const compoundComponentDef = xmlUiMarkupToComponent(componentSource).component as CompoundComponentDef;
+if (!compoundComponentDef) {
+  throw new Error(`Failed to parse ${COMP} component definition during build.`);
+}
+
 export const toolbarRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef: {
-    name: "Toolbar",
-    component: {
-      type: "HStack",
-      props: {
-        gap: "$gap-Toolbar",
-        verticalAlignment: "center",
-        horizontalAligmnent: "{$props.alignment ?? 'end' }",
-      },
-      children: [
-        {
-          type: "Slot",
-        },
-      ],
-    },
-  },
+  compoundComponentDef,
   hints: ToolbarMd,
 };
