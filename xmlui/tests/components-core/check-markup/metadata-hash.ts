@@ -33,7 +33,6 @@ import { LogoMd } from "@components/Logo/Logo";
 import Markdown from "react-markdown";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
-import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
 import { NavGroupMd } from "@components/NavGroup/NavGroup";
 import { NavLinkMd } from "@components/NavLink/NavLink";
 import { NavPanelMd } from "@components/NavPanel/NavPanel";
@@ -108,7 +107,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   MenuItem: MenuItemMd,
   ModalDialog: ModalDialogMd,
   MultiCombobox: ComboboxMd,
-  MultiSelect: MultiSelectMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,

@@ -33,13 +33,10 @@ $componentName: "MultiCombobox";
     outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
     outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
   }
-
-  &::placeholder {
-    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
-  }
 }
 
 .multiComboboxButton {
+  min-height: 2.5rem;
   display: flex;
   padding: t.$space-2;
   width: 100%;
@@ -47,6 +44,7 @@ $componentName: "MultiCombobox";
   justify-content: space-between;
   outline: none;
   overflow: hidden;
+  line-height: 1.25rem;
 
   @include variant("default");
 
@@ -85,17 +83,19 @@ $componentName: "MultiCombobox";
   align-items: center;
 }
 
-.selectBadge {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  border-radius: 9999px;
-  border: 1px solid #e5e7eb;
-  padding: 0.125rem 0.625rem;
-  font-size: 0.75rem;
-  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
-  outline: none;
+.placeholder {
+  margin: 3px 0;
+  display: block;
+  color: createThemeVar("Input:color-placeholder-#{$componentName}");
+
+  &:empty::before {
+    content: "\00a0"; /* Nem törhető szóköz */
+    display: inline-block;
+  }
 }
+
+
+
 
 .actions {
   display: flex;

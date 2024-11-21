@@ -24,6 +24,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { MultiComboboxContext, useSelect } from "@components/MultiCombobox/MultiComboboxContext";
+import {Button} from "@components/Button/ButtonNative";
 
 /**
  * Props for MultiCombobox component
@@ -191,7 +192,7 @@ export const MultiCombobox = ({
                   <div className={styles.badgeList}>
                     {value?.map((v) => {
                       return (
-                        <ComboboxBadge key={v}>
+                        <Button size="xs" key={v} variant="solid" themeColor="primary">
                           {v}
                           <Icon
                             name="close"
@@ -201,24 +202,25 @@ export const MultiCombobox = ({
                               toggleOption(v);
                             }}
                           />
-                        </ComboboxBadge>
+                        </Button>
                       );
                     })}
                   </div>
                   <div className={styles.actions}>
                     <Icon
                       name="close"
+                      size="sm"
                       onClick={(event) => {
                         event.stopPropagation();
                         handleClear();
                       }}
                     />
-                    <Icon name="chevrondown" />
+                    <Icon name="chevrondown" size="sm" />
                   </div>
                 </div>
               ) : (
                 <div className={styles.emptySelect}>
-                  <span className="text-sm text-muted-foreground mx-3">{placeholder}</span>
+                  <span className={styles.placeholder}>{placeholder}</span>
                   <Icon name="chevrondown" size="sm" />
                 </div>
               )}
@@ -257,12 +259,6 @@ export const MultiCombobox = ({
 
 MultiCombobox.displayName = "MultiCombobox";
 
-const ComboboxBadge = ({ children }: { children: ReactNode }) => (
-  <div className={styles.selectBadge}>{children}</div>
-);
-
-ComboboxBadge.displayName = "ComboboxBadge";
-
 type OptionComponentProps = {
   value: string;
   label: string;
@@ -287,7 +283,7 @@ export function ComboboxOption({ value, label, disabled }: OptionComponentProps)
       data-state={selected ? "checked" : undefined}
     >
       {optionRenderer({ label, value })}
-      {selected && <Icon name="checkmark" />}
+      {selected && <Icon name="checkmark" size="sm"/>}
     </CommandItem>
   );
 }
