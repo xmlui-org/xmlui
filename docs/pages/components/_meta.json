@@ -64,7 +64,6 @@
   "ProgressBar": "ProgressBar",
   "Queue": "Queue",
   "RadioGroup": "RadioGroup",
-  "RadioGroupOption": "RadioGroupOption",
   "RealTimeAdapter": "RealTimeAdapter",
   "Redirect": "Redirect",
   "Select": "Select",

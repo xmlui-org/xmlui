@@ -66,35 +66,11 @@ import { Callout } from "nextra/components";
 
 ## Properties
 
-### `disabled`
+### `enabled`
 
-If this property is set to `true`, the option is disabled and cannot be selected in its parent component.
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-```ueml copy /disabled="true"/
-<App>
-  <Text value="Selected ID: {mySelect.value}"/>
-  <Select id="mySelect">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" disabled="true" />
-    <Option label="Pistachio" value="pistachio" />
-  </Select>
-</App>
-```
-
-<Playground
-  name="Example: Option in a Select"
-  height={260}
-  app={`
-    <App>
-      <Text value="Selected ID: {mySelect.value}"/>
-      <Select id="mySelect">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" disabled="true" />
-        <Option label="Pistachio" value="pistachio" />
-      </Select>
-    </App>
-  `}
-/>
+Default value: `true`.
 
 ### `label`
 

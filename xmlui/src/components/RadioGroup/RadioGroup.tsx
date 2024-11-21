@@ -20,16 +20,6 @@ import {
   dValidationStatus,
 } from "@components/metadata-helpers";
 
-export const RadioGroupOptionMd = createMetadata({
-  status: "stable",
-  description: "A single radio button within a radio button group",
-  props: {
-    enabled: dEnabled(),
-    value: d("The value of the option"),
-    label: d("The option's label"),
-  },
-});
-
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;
 
