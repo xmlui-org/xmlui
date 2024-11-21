@@ -153,7 +153,6 @@ export const TextBox = ({
         onFocus={() => {
           inputRef.current?.focus();
         }}
-        style={style}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input
