@@ -2,7 +2,7 @@ import styles from "./RadioGroup.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { RadioGroup, RadioGroupOption } from "./RadioGroupNative";
+import { RadioGroup } from "./RadioGroupNative";
 import {
   dAutoFocus,
   dDidChange,
@@ -20,59 +20,8 @@ import {
   dValidationStatus,
 } from "@components/metadata-helpers";
 
-const RGOption = "RadioGroupOption";
-
-export const RadioGroupOptionMd = createMetadata({
-  status: "stable",
-  description: "A single radio button within a radio button group",
-  props: {
-    enabled: dEnabled(),
-    value: d("The value of the option"),
-    label: d("The option's label"),
-  },
-  themeVars: parseScssVar(styles.themeVars),
-  defaultThemeVars: {
-    [`gap-${RGOption}`]: "$space-1_5",
-    [`thickness-border-${RGOption}`]: "2px",
-    [`color-bg-checked-${RGOption}--disabled]`]: `$color-border-${RGOption}--disabled`,
-    [`color-bg-checked-${RGOption}-error`]: `$color-border-${RGOption}-error`,
-    [`color-bg-checked-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
-    [`color-bg-checked-${RGOption}-success`]: `$color-border-${RGOption}-success`,
-    [`font-size-${RGOption}`]: "$font-size-small",
-    [`font-weight-${RGOption}`]: "$font-weight-bold",
-    [`color-text-${RGOption}-error`]: `$color-border-${RGOption}-error`,
-    [`color-text-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
-    [`color-text-${RGOption}-success`]: `$color-border-${RGOption}-success`,
-    light: {
-      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
-      [`color-border-${RGOption}-default`]: "$color-surface-500",
-      [`color-border-${RGOption}-default--hover`]: "$color-surface-700",
-      [`color-border-${RGOption}-default--active`]: "$color-primary-500",
-    },
-    dark: {
-      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
-      [`color-border-${RGOption}-default`]: "$color-surface-500",
-      [`color-border-${RGOption}-default--hover`]: "$color-surface-300",
-      [`color-border-${RGOption}-default--active`]: "$color-primary-400",
-    },
-  },
-});
-
-export const radioGroupOptionRenderer = createComponentRenderer(
-  RGOption,
-  RadioGroupOptionMd,
-  ({ node, extractValue }) => {
-    return (
-      <RadioGroupOption
-        value={extractValue.asString(node.props.value)}
-        label={extractValue.asOptionalString(node.props.label)}
-        enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-      />
-    );
-  },
-);
-
 const COMP = "RadioGroup";
+const RGOption = `RadioGroupOption`;
 
 export const RadioGroupMd = createMetadata({
   description:
@@ -101,6 +50,32 @@ export const RadioGroupMd = createMetadata({
     gotFocus: dGotFocus(COMP),
     lostFocus: dLostFocus(COMP),
     didChange: dDidChange(COMP),
+  },
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    [`gap-${RGOption}`]: "$space-1_5",
+    [`thickness-border-${RGOption}`]: "2px",
+    [`color-bg-checked-${RGOption}--disabled]`]: `$color-border-${RGOption}--disabled`,
+    [`color-bg-checked-${RGOption}-error`]: `$color-border-${RGOption}-error`,
+    [`color-bg-checked-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
+    [`color-bg-checked-${RGOption}-success`]: `$color-border-${RGOption}-success`,
+    [`font-size-${RGOption}`]: "$font-size-small",
+    [`font-weight-${RGOption}`]: "$font-weight-bold",
+    [`color-text-${RGOption}-error`]: `$color-border-${RGOption}-error`,
+    [`color-text-${RGOption}-warning`]: `$color-border-${RGOption}-warning`,
+    [`color-text-${RGOption}-success`]: `$color-border-${RGOption}-success`,
+    light: {
+      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
+      [`color-border-${RGOption}-default`]: "$color-surface-500",
+      [`color-border-${RGOption}-default--hover`]: "$color-surface-700",
+      [`color-border-${RGOption}-default--active`]: "$color-primary-500",
+    },
+    dark: {
+      [`color-bg-checked-${RGOption}-default`]: "$color-primary-500",
+      [`color-border-${RGOption}-default`]: "$color-surface-500",
+      [`color-border-${RGOption}-default--hover`]: "$color-surface-300",
+      [`color-border-${RGOption}-default--active`]: "$color-primary-400",
+    },
   },
 });
 

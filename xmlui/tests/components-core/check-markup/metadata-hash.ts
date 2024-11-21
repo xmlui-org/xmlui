@@ -47,7 +47,6 @@ import { PieChartMd } from "@components/PieChart/PieChart";
 import { PositionedContainerMd } from "@components/PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "@components/ProgressBar/ProgressBar";
 import { QueueMd } from "@components/Queue/Queue";
-import { RadioGroupMd } from "@components/RadioGroup/RadioGroup";
 import { RealTimeAdapterMd } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "@components/Redirect/Redirect";
 import { SelectMd } from "@components/Select/Select";
@@ -121,7 +120,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
-  RadioGroup: RadioGroupMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,

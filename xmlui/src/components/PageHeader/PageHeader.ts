@@ -1,7 +1,11 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+// --- We cannot use this with nextra
+// import componentSource from "./PageHeader.xmlui?raw";
 
 const COMP = "PageHeader";
+
 export const PageHeaderMd = createMetadata({
   status: "experimental",
   description:
@@ -16,47 +20,20 @@ export const PageHeaderMd = createMetadata({
   },
 });
 
+const componentSource = `
+<Component name="PageHeader">
+  <HStack gap="$gap-PageHeader" verticalAlignment="center">
+    <VStack gap="$space-tight">
+      <Text when="{$props.preTitle !== undefined}" variant="subheading" value="{$props.preTitle}" />
+      <H2 value="{$props.title}" />
+    </VStack>
+    <SpaceFiller />
+    <Slot />
+  </HStack>
+</Component>
+`;
+
 export const pageHeaderRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef: {
-    name: "PageHeader",
-    component: {
-      type: "HStack",
-      props: {
-        gap: "$gap-PageHeader",
-        verticalAlignment: "center",
-      },
-      children: [
-        {
-          type: "VStack",
-          props: {
-            gap: 0,
-          },
-          children: [
-            {
-              type: "Text",
-              props: {
-                variant: "subheading",
-                when: "{$props.preTitle !== undefined}",
-                value: "{$props.preTitle}",
-              },
-            },
-            {
-              type: "H2",
-              props: {
-                value: "{$props.title}",
-                margin: "0",
-              },
-            },
-          ],
-        },
-        {
-          type: "SpaceFiller",
-        },
-        {
-          type: "Slot",
-        },
-      ],
-    },
-  },
+  compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
   hints: PageHeaderMd,
 };

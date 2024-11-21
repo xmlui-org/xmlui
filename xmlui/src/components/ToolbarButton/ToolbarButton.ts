@@ -1,5 +1,10 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+// --- We cannot use this with nextra
+// import componentSource from "./ToolbarButton.xmlui?raw";
+
+const COMP = "ToolbarButton";
 
 export const ToolbarButtonMd = createMetadata({
   status: "experimental",
@@ -14,28 +19,22 @@ export const ToolbarButtonMd = createMetadata({
   },
 });
 
+const componentSource = `
+<Component name="ToolbarButton">
+  <Button
+    variant="ghost"
+    themeColor="secondary"
+    horizontalPadding="$padding-horizontal-ToolbarButton"
+    verticalPadding="$padding-vertical-ToolbarButton"
+    icon="{$props.icon}"
+    label="{$props.label}"
+    onClick="e => emitEvent('click', e)">
+    <Slot />
+  </Button>
+</Component>
+`;
+
 export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef: {
-    name: "ToolbarButton",
-    component: {
-      type: "Button",
-      props: {
-        variant: "ghost",
-        themeColor: "secondary",
-        horizontalPadding: "$padding-horizontal-ToolbarButton",
-        verticalPadding: "$padding-vertical-ToolbarButton",
-        icon: "{$props.icon}",
-        label: "{$props.label}",
-      },
-      events: {
-        click: "e => emitEvent('click', e)",
-      },
-      children: [
-        {
-          type: "Slot",
-        },
-      ],
-    },
-  },
+  compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
   hints: ToolbarButtonMd,
 };

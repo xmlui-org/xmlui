@@ -28,9 +28,9 @@ This property indicates whether the input accepts user actions (`true`) or not (
 <App>
   <RadioGroup initialValue="first" enabled="false">
     <HStack gap="1rem" padding="1rem">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
-      <RadioGroupOption label="Third Item" value="third"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
+      <Option label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
 </App>
@@ -42,9 +42,9 @@ This property indicates whether the input accepts user actions (`true`) or not (
     <App>
       <RadioGroup initialValue="first" enabled="false">
         <HStack gap="1rem" padding="1rem">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
-          <RadioGroupOption label="Third Item" value="third"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
+          <Option label="Third Item" value="third"/>
         </HStack>
       </RadioGroup>
     </App>
@@ -61,9 +61,9 @@ This property defines the initial value of the selected option within the group.
 <App>
   <RadioGroup initialValue="first">
     <HStack gap="1rem" padding="1rem">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
-      <RadioGroupOption label="Third Item" value="third"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
+      <Option label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
 </App>
@@ -75,9 +75,9 @@ This property defines the initial value of the selected option within the group.
     <App>
       <RadioGroup initialValue="first">
         <HStack gap="1rem" padding="1rem">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
-          <RadioGroupOption label="Third Item" value="third"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
+          <Option label="Third Item" value="third"/>
         </HStack>
       </RadioGroup>
     </App>
@@ -147,16 +147,16 @@ This prop is used to visually indicate status changes reacting to form field val
 <App>
   <HStack>
     <RadioGroup initialValue="first" validationStatus="error">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
     <RadioGroup initialValue="first" validationStatus="warning">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
     <RadioGroup initialValue="first" validationStatus="valid">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
   </HStack>
 </App>
@@ -168,16 +168,16 @@ This prop is used to visually indicate status changes reacting to form field val
     <App>
       <HStack>
         <RadioGroup initialValue="first" validationStatus="error">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
         <RadioGroup initialValue="first" validationStatus="warning">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
         <RadioGroup initialValue="first" validationStatus="valid">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
       </HStack>
     </App>
@@ -195,8 +195,8 @@ This event is triggered after the user has changed the field value. The followin
 ```ueml copy /onDidChange="(val) => field = val"/
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
+    <Option label="First Item" value="first"/>
+    <Option label="Second Item" value="second"/>
   </RadioGroup>
   <Text value="{field}" />
 </App>
@@ -209,8 +209,8 @@ Select one of the available options and see how the `Text` underneath it is upda
   app={`
     <App var.field="">
       <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
+        <Option label="First Item" value="first"/>
+        <Option label="Second Item" value="second"/>
       </RadioGroup>
       <Text value="{field}" />
     </App>
@@ -231,4 +231,45 @@ This component does not expose any methods.
 
 ## Styling
 
-`RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within a group.
+`RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within the group. When you set the theme variables for the group's options, use the `RadioGroupOption` name.
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption--disabled] | $color-border-RadioGroupOption--disabled | $color-border-RadioGroupOption--disabled |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-default | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-error | $color-border-RadioGroupOption-error | $color-border-RadioGroupOption-error |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-success | $color-border-RadioGroupOption-success | $color-border-RadioGroupOption-success |
+| [color-bg](../styles-and-themes/common-units/#color)-checked-RadioGroupOption-warning | $color-border-RadioGroupOption-warning | $color-border-RadioGroupOption-warning |
+| [color-bg](../styles-and-themes/common-units/#color)-RadioGroupOption-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default | $color-surface-500 | $color-surface-500 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-400 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default--active | $color-primary-500 | $color-primary-400 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-300 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-default--hover | $color-surface-700 | $color-surface-300 |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $color-border-RadioGroupOption-error | $color-border-RadioGroupOption-error |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-error | $color-border-RadioGroupOption-error | $color-border-RadioGroupOption-error |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $color-border-RadioGroupOption-success | $color-border-RadioGroupOption-success |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-success | $color-border-RadioGroupOption-success | $color-border-RadioGroupOption-success |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $color-border-RadioGroupOption-warning | $color-border-RadioGroupOption-warning |
+| [color-text](../styles-and-themes/common-units/#color)-RadioGroupOption-warning | $color-border-RadioGroupOption-warning | $color-border-RadioGroupOption-warning |
+| [font-size](../styles-and-themes/common-units/#size)-RadioGroupOption | $font-size-small | $font-size-small |
+| [font-size](../styles-and-themes/common-units/#size)-RadioGroupOption | $font-size-small | $font-size-small |
+| [font-weight](../styles-and-themes/common-units/#font-weight)-RadioGroupOption | $font-weight-bold | $font-weight-bold |
+| [font-weight](../styles-and-themes/common-units/#font-weight)-RadioGroupOption | $font-weight-bold | $font-weight-bold |
+| [gap](../styles-and-themes/common-units/#size)-RadioGroupOption | $space-1_5 | $space-1_5 |
+| [offset-outline](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-RadioGroupOption | 2px | 2px |
+| [thickness-outline](../styles-and-themes/common-units/#size)-RadioGroupOption--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+

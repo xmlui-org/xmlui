@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.6.6",
+  "version": "0.6.7",
   "sideEffects": false,
   "scripts": {
     "build:bin": "tsc -p tsconfig.bin.json",

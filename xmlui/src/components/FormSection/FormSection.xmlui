@@ -1,0 +1,21 @@
+<Component name="FormSection">
+  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0">
+    <Heading 
+      when="{!!$props.heading}"
+      marginBottom="$space-tight"
+      level="{$props.headingLevel ?? 'h3'}"
+      fontWeight="{$props.headingWeight ?? 'bold'}"
+      value="{$props.heading}" />
+    <Text
+      when="{!!$props.info}"
+      fontSize="{$props.infoFontSize ?? '0.8rem'}"
+      paddingBottom="$space-normal"
+      value="{$props.info}" />
+    <FlowLayout 
+      paddingTop="{$props.paddingTop ?? '$space-normal'}"
+      columnGap="{$props.columnGap ?? '3rem'}"
+      rowGap="{$props.rowGap ?? '$space-normal'}" >
+      <Slot />
+    </FlowLayout>
+  </VStack>
+</Component>

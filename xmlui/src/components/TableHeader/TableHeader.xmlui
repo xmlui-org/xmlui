@@ -1,0 +1,8 @@
+<Component name="TableHeader">
+  <VStack 
+    verticalAlignment="center"
+    verticalPadding="$padding-vertical-TableHeader"
+    horizontalPadding="$padding-horizontal-TableHeader">
+    <Text variant="strong" value="{$props.title}"/>
+  </VStack>
+</Component>

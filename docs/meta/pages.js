@@ -70,7 +70,6 @@ export const COMPONENT_PASSWORDINPUT = "/components/PasswordInput";
 export const COMPONENT_PROGRESSBAR = "/components/ProgressBar";
 export const COMPONENT_QUEUE = "/components/Queue";
 export const COMPONENT_RADIOGROUP = "/components/RadioGroup";
-export const COMPONENT_RADIOGROUPOPTION = "/components/RadioGroupOption";
 export const COMPONENT_REALTIMEADAPTER = "/components/RealTimeAdapter";
 export const COMPONENT_REDIRECT = "/components/Redirect";
 export const COMPONENT_SELECT = "/components/Select";

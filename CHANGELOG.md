@@ -1,5 +1,11 @@
 # xmlui Changelog
 
+## v0.6.7
+
+### Breaking changes:
+
+- `RadioGroupOption` has been removed; `RadioGroup` uses `Option` instead of `RadioGroupOption`.
+
 ## v0.6.6
 
 ### Breaking changes:
