@@ -11,7 +11,7 @@ import {
   CommandList,
 } from "./Command";
 import classnames from "classnames";
-import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import Icon from "@components/Icon/IconNative";
 import styles from "./Combobox.module.scss";
 import type { CSSProperties, ReactNode } from "react";
@@ -24,6 +24,7 @@ import { noop } from "@components-core/constants";
 import type { Option, ValidationStatus } from "@components/abstractions";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { ComboboxContext, useCombobox } from "@components/Combobox/ComboboxContext";
+import { useTheme } from "@components-core/theming/ThemeContext";
 
 type ComboboxProps = {
   id?: string;
@@ -68,6 +69,8 @@ export function Combobox({
   const [open, setOpen] = React.useState(false);
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
+
+  const { root } = useTheme();
 
   useEffect(() => {
     updateState({ value: initialValue });
@@ -125,7 +128,7 @@ export function Combobox({
   return (
     <ComboboxContext.Provider value={contextValue}>
       <OptionTypeProvider Component={ComboboxOption}>
-        <Popover open={open} onOpenChange={setOpen}>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
           <PopoverTrigger asChild>
             <button
               style={layout}
@@ -142,22 +145,24 @@ export function Combobox({
               <Icon name="chevrondown" />
             </button>
           </PopoverTrigger>
-          <PopoverContent className={styles.popoverContent} style={{ width }}>
-            <Command>
-              <CommandInput placeholder="Search..." className={styles.commandInput} />
-              <CommandList className={styles.commandList}>
-                <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                <CommandEmpty className={styles.commandEmpty}>
-                  {emptyListTemplate ?? (
-                    <>
-                      <Icon name={"noresult"} />
-                      <span>List is empty</span>
-                    </>
-                  )}
-                </CommandEmpty>
-              </CommandList>
-            </Command>
-          </PopoverContent>
+          <Portal container={root}>
+            <PopoverContent className={styles.popoverContent} style={{ width }}>
+              <Command>
+                <CommandInput placeholder="Search..." className={styles.commandInput} />
+                <CommandList className={styles.commandList}>
+                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                  <CommandEmpty className={styles.commandEmpty}>
+                    {emptyListTemplate ?? (
+                      <>
+                        <Icon name={"noresult"} />
+                        <span>List is empty</span>
+                      </>
+                    )}
+                  </CommandEmpty>
+                </CommandList>
+              </Command>
+            </PopoverContent>
+          </Portal>
         </Popover>
       </OptionTypeProvider>
     </ComboboxContext.Provider>
@@ -181,7 +186,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
       key={id}
       disabled={!enabled}
       value={`${value}`}
-      className={classnames(styles.multiOption)}
+      className={styles.multiComboboxOption}
       onSelect={() => {
         onChange(value);
       }}

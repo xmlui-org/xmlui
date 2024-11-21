@@ -127,10 +127,10 @@ export const MultiCombobox = ({
   };
 
   const toggleOption = useCallback(
-    (selecteValue: string) => {
-      const newSelectedValues = value.includes(selecteValue)
-        ? value.filter((value) => value !== selecteValue)
-        : [...value, selecteValue];
+    (selectedValue: string) => {
+      const newSelectedValues = value.includes(selectedValue)
+        ? value.filter((value) => value !== selectedValue)
+        : [...value, selectedValue];
       updateState({ value: newSelectedValues });
       onDidChange(newSelectedValues);
     },
@@ -181,7 +181,7 @@ export const MultiCombobox = ({
               onBlur={handleOnBlur}
               disabled={!enabled}
               onClick={handleTogglePopover}
-              className={classnames(styles.multiSelectButton, styles[validationStatus], {
+              className={classnames(styles.multiComboboxButton, styles[validationStatus], {
                 [styles.disabled]: !enabled,
               })}
               autoFocus={autoFocus}
@@ -191,7 +191,7 @@ export const MultiCombobox = ({
                   <div className={styles.badgeList}>
                     {value.map((v) => {
                       return (
-                        <SelectBadge key={v}>
+                        <ComboboxBadge key={v}>
                           {v}
                           <Icon
                             name="close"
@@ -201,7 +201,7 @@ export const MultiCombobox = ({
                               toggleOption(v);
                             }}
                           />
-                        </SelectBadge>
+                        </ComboboxBadge>
                       );
                     })}
                   </div>
@@ -257,11 +257,11 @@ export const MultiCombobox = ({
 
 MultiCombobox.displayName = "MultiCombobox";
 
-const SelectBadge = ({ children }: { children: ReactNode }) => (
+const ComboboxBadge = ({ children }: { children: ReactNode }) => (
   <div className={styles.selectBadge}>{children}</div>
 );
 
-SelectBadge.displayName = "SelectBadge";
+ComboboxBadge.displayName = "ComboboxBadge";
 
 type OptionComponentProps = {
   value: string;
