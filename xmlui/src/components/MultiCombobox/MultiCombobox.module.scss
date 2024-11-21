@@ -103,7 +103,17 @@ $componentName: "MultiCombobox";
   justify-content: space-between;
 }
 
-.emptySelect {
+.emptyList {
+  display: flex;
+  gap: .2rem;
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  width: 100%;
+}
+
+.empty {
   display: flex;
   align-items: center;
   justify-content: space-between;

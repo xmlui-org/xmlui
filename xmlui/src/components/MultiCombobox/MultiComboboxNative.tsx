@@ -24,7 +24,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { MultiComboboxContext, useSelect } from "@components/MultiCombobox/MultiComboboxContext";
-import {Button} from "@components/Button/ButtonNative";
+import { Button } from "@components/Button/ButtonNative";
 
 /**
  * Props for MultiCombobox component
@@ -219,7 +219,7 @@ export const MultiCombobox = ({
                   </div>
                 </div>
               ) : (
-                <div className={styles.emptySelect}>
+                <div className={styles.empty}>
                   <span className={styles.placeholder}>{placeholder}</span>
                   <Icon name="chevrondown" size="sm" />
                 </div>
@@ -235,18 +235,15 @@ export const MultiCombobox = ({
               <Command className={styles.multiSelectMenu}>
                 <CommandInput placeholder="Search..." onKeyDown={handleInputKeyDown} />
                 <CommandList>
-                  {React.Children.toArray(children).length > 0 ? (
-                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                  ) : (
-                    <CommandEmpty className={styles.commandEmpty}>
-                      {emptyListTemplate ?? (
-                        <>
-                          <Icon name={"noresult"} />
-                          <span>List is empty</span>
-                        </>
-                      )}
-                    </CommandEmpty>
-                  )}
+                  <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                  <CommandEmpty className={styles.commandEmpty}>
+                    {emptyListTemplate ?? (
+                      <div className={styles.emptyList}>
+                        <Icon name={"noresult"} />
+                        <span>List is empty</span>
+                      </div>
+                    )}
+                  </CommandEmpty>
                 </CommandList>
               </Command>
             </PopoverContent>
@@ -283,7 +280,7 @@ export function ComboboxOption({ value, label, disabled }: OptionComponentProps)
       data-state={selected ? "checked" : undefined}
     >
       {optionRenderer({ label, value })}
-      {selected && <Icon name="checkmark" size="sm"/>}
+      {selected && <Icon name="checkmark" size="sm" />}
     </CommandItem>
   );
 }
