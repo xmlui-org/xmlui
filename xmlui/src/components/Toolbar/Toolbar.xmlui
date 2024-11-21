@@ -1,0 +1,8 @@
+<Component name="Toolbar">
+  <HStack 
+    gap="$gap-Toolbar" 
+    verticalAlignment="center"
+    horizontalAlignment="{$props.alignment ?? 'end' }">
+    <Slot />
+  </HStack>
+</Component>
