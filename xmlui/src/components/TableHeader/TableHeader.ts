@@ -1,5 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+// --- We cannot use this with nextra
+//import componentSource from "./TableHeader.xmlui?raw";
 
 const COMP = "TableHeader";
 
@@ -17,26 +20,18 @@ export const TableHeaderMd = createMetadata({
   },
 });
 
+const componentSource = `
+<Component name="TableHeader">
+  <VStack 
+    verticalAlignment="center"
+    verticalPadding="$padding-vertical-TableHeader"
+    horizontalPadding="$padding-horizontal-TableHeader">
+    <Text variant="strong" value="{$props.title}"/>
+  </VStack>
+</Component>
+`;
+
 export const tableHeaderRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef: {
-    name: COMP,
-    component: {
-      type: "VStack",
-      props: {
-        verticalAlignment: "center",
-        verticalPadding: "$padding-vertical-TableHeader",
-        horizontalPadding: "$padding-horizontal-TableHeader",
-      },
-      children: [
-        {
-          type: "Text",
-          props: {
-            variant: "strong",
-            value: "{$props.title}",
-          },
-        },
-      ],
-    },
-  },
+  compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
   hints: TableHeaderMd,
 };

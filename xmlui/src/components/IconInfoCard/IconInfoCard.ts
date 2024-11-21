@@ -1,5 +1,11 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+
+// --- We cannot use this with nextra
+// import componentSource from "./IconInfoCard.xmlui?raw";
+
+const COMP = "IconInfoCard";
 
 export const IconInfoCardMd = createMetadata({
   status: "experimental",
@@ -11,56 +17,26 @@ export const IconInfoCardMd = createMetadata({
   },
 });
 
+const componentSource = `
+<Component name="IconInfoCard">
+  <Card height="{$props.height}" width="{$props.width}">
+    <HStack verticalAlignment="center">
+      <CHStack 
+        backgroundColor="{$props.iconBackgroundColor}"
+        width="$space-10"
+        height="$space-10"
+        radius="$radius">
+        <Icon name="{$props.iconName}" size="$space-6" />
+      </CHStack>
+      <VStack gap="0">
+        <Slot />
+      </VStack>
+    </HStack>
+  </Card>
+</Component>
+`;
+
 export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef: {
-    name: "IconInfoCard",
-    component: {
-      type: "Card",
-      props: {
-        height: "{$props.height}",
-      },
-      children: [
-        {
-          type: "HStack",
-          props: {
-            gap: "$space-4",
-            verticalAlignment: "center",
-          },
-          children: [
-            {
-              type: "CHStack",
-              props: {
-                backgroundColor: "{$props.iconBackgroundColor}",
-                color: "white",
-                width: "$space-10",
-                height: "$space-10",
-                radius: "$radius",
-              },
-              children: [
-                {
-                  type: "Icon",
-                  props: {
-                    name: "{$props.iconName}",
-                    size: "$space-6",
-                  },
-                },
-              ],
-            },
-            {
-              type: "VStack",
-              props: {
-                gap: 0,
-              },
-              children: [
-                {
-                  type: "Slot",
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  },
+  compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
   hints: IconInfoCardMd,
 };

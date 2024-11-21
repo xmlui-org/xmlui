@@ -1,7 +1,8 @@
-import { CompoundComponentDef, createMetadata } from "@abstractions/ComponentDefs";
+import { createMetadata } from "@abstractions/ComponentDefs";
 import { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
-import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import componentSource from "./FormSection.xmlui?raw";
+import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+// --- We cannot use this with nextra
+// import componentSource from "./FormSection.xmlui?raw";
 
 const COMP = "FormSection";
 
@@ -13,14 +14,31 @@ export const FormSectionMd = createMetadata({
     `are placed in a [\`FlowLayout\`](./FlowLayout.mdx) component.`,
 });
 
-
-console.log('componentSource', componentSource);
-const compoundComponentDef = xmlUiMarkupToComponent(componentSource).component as CompoundComponentDef;
-if (!compoundComponentDef) {
-  throw new Error(`Failed to parse ${COMP} component definition during build.`);
-}
+const componentSource = `
+<Component name="FormSection">
+  <VStack paddingBottom="{$props.paddingBottom ?? '1rem'}" gap="0">
+    <Heading 
+      when="{!!$props.heading}"
+      marginBottom="$space-tight"
+      level="{$props.headingLevel ?? 'h3'}"
+      fontWeight="{$props.headingWeight ?? 'bold'}"
+      value="{$props.heading}" />
+    <Text
+      when="{!!$props.info}"
+      fontSize="{$props.infoFontSize ?? '0.8rem'}"
+      paddingBottom="$space-normal"
+      value="{$props.info}" />
+    <FlowLayout 
+      paddingTop="{$props.paddingTop ?? '$space-normal'}"
+      columnGap="{$props.columnGap ?? '3rem'}"
+      rowGap="{$props.rowGap ?? '$space-normal'}" >
+      <Slot />
+    </FlowLayout>
+  </VStack>
+</Component>
+`;
 
 export const formSectionRenderer: CompoundComponentRendererInfo = {
-  compoundComponentDef,
+  compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
   hints: FormSectionMd,
 };
