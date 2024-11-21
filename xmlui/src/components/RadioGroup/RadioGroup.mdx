@@ -12,9 +12,9 @@ This property defines the initial value of the selected option within the group.
 <App>
   <RadioGroup initialValue="first">
     <HStack gap="1rem" padding="1rem">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
-      <RadioGroupOption label="Third Item" value="third"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
+      <Option label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
 </App>
@@ -26,9 +26,9 @@ This property defines the initial value of the selected option within the group.
     <App>
       <RadioGroup initialValue="first">
         <HStack gap="1rem" padding="1rem">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
-          <RadioGroupOption label="Third Item" value="third"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
+          <Option label="Third Item" value="third"/>
         </HStack>
       </RadioGroup>
     </App>
@@ -45,9 +45,9 @@ This property indicates whether the input accepts user actions (`true`) or not (
 <App>
   <RadioGroup initialValue="first" enabled="false">
     <HStack gap="1rem" padding="1rem">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
-      <RadioGroupOption label="Third Item" value="third"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
+      <Option label="Third Item" value="third"/>
     </HStack>
   </RadioGroup>
 </App>
@@ -59,9 +59,9 @@ This property indicates whether the input accepts user actions (`true`) or not (
     <App>
       <RadioGroup initialValue="first" enabled="false">
         <HStack gap="1rem" padding="1rem">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
-          <RadioGroupOption label="Third Item" value="third"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
+          <Option label="Third Item" value="third"/>
         </HStack>
       </RadioGroup>
     </App>
@@ -84,16 +84,16 @@ This prop is used to visually indicate status changes reacting to form field val
 <App>
   <HStack>
     <RadioGroup initialValue="first" validationStatus="error">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
     <RadioGroup initialValue="first" validationStatus="warning">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
     <RadioGroup initialValue="first" validationStatus="valid">
-      <RadioGroupOption label="First Item" value="first"/>
-      <RadioGroupOption label="Second Item" value="second"/>
+      <Option label="First Item" value="first"/>
+      <Option label="Second Item" value="second"/>
     </RadioGroup>
   </HStack>
 </App>
@@ -105,16 +105,16 @@ This prop is used to visually indicate status changes reacting to form field val
     <App>
       <HStack>
         <RadioGroup initialValue="first" validationStatus="error">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
         <RadioGroup initialValue="first" validationStatus="warning">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
         <RadioGroup initialValue="first" validationStatus="valid">
-          <RadioGroupOption label="First Item" value="first"/>
-          <RadioGroupOption label="Second Item" value="second"/>
+          <Option label="First Item" value="first"/>
+          <Option label="Second Item" value="second"/>
         </RadioGroup>
       </HStack>
     </App>
@@ -130,8 +130,8 @@ You can use this method to set the component's current value programmatically.
 ```ueml copy {2, 7-8}
 <App>
   <RadioGroup id="radio">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
+    <Option label="First Item" value="first"/>
+    <Option label="Second Item" value="second"/>
   </RadioGroup>
   <HStack>
     <Button label="Set First" onClick="radio.setValue('first')" />
@@ -145,8 +145,8 @@ You can use this method to set the component's current value programmatically.
   app={`
     <App>
       <RadioGroup id="radio">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
+        <Option label="First Item" value="first"/>
+        <Option label="Second Item" value="second"/>
       </RadioGroup>
       <HStack>
         <Button label="Set First" onClick="radio.setValue('first')" />
@@ -165,8 +165,8 @@ This event is triggered after the user has changed the field value. The followin
 ```ueml copy /onDidChange="(val) => field = val"/
 <App var.field="">
   <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-    <RadioGroupOption label="First Item" value="first"/>
-    <RadioGroupOption label="Second Item" value="second"/>
+    <Option label="First Item" value="first"/>
+    <Option label="Second Item" value="second"/>
   </RadioGroup>
   <Text value="{field}" />
 </App>
@@ -179,8 +179,8 @@ Select one of the available options and see how the `Text` underneath it is upda
   app={`
     <App var.field="">
       <RadioGroup initialValue="{field}" onDidChange="(val) => field = val">
-        <RadioGroupOption label="First Item" value="first"/>
-        <RadioGroupOption label="Second Item" value="second"/>
+        <Option label="First Item" value="first"/>
+        <Option label="Second Item" value="second"/>
       </RadioGroup>
       <Text value="{field}" />
     </App>
@@ -191,6 +191,6 @@ Select one of the available options and see how the `Text` underneath it is upda
 
 %-STYLE-START
 
-`RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within a group.
+`RadioGroup` is a component that governs its children and stores the selected value. It does not support styling; however, you can style the options within the group. When you set the theme variables for the group's options, use the `RadioGroupOption` name.
 
 %-STYLE-END

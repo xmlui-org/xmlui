@@ -47,7 +47,7 @@ import { PieChartMd } from "@components/PieChart/PieChart";
 import { PositionedContainerMd } from "@components/PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "@components/ProgressBar/ProgressBar";
 import { QueueMd } from "@components/Queue/Queue";
-import { RadioGroupMd, RadioGroupOptionMd } from "@components/RadioGroup/RadioGroup";
+import { RadioGroupMd } from "@components/RadioGroup/RadioGroup";
 import { RealTimeAdapterMd } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { RedirectMd } from "@components/Redirect/Redirect";
 import { SelectMd } from "@components/Select/Select";
@@ -161,7 +161,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
-  RadioGroupOption: RadioGroupOptionMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,
