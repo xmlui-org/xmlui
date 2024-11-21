@@ -14,7 +14,12 @@ import { CheckboxMd } from "@components/Checkbox/Checkbox";
 import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import {
+  DropdownMenuMd,
+  MenuItemMd,
+  MenuSeparatorMd,
+  SubMenuItemMd,
+} from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -32,7 +37,6 @@ import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
-import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
 import { NavGroupMd } from "@components/NavGroup/NavGroup";
 import { NavLinkMd } from "@components/NavLink/NavLink";
 import { NavPanelMd } from "@components/NavPanel/NavPanel";
@@ -86,7 +90,7 @@ import { CarouselMd } from "./Carousel/Carousel";
 import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
-import {OptionMd} from "@components/Option/Option";
+import { OptionMd } from "@components/Option/Option";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -143,7 +147,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
   MultiCombobox: MultiComboboxMd,
-  MultiSelect: MultiSelectMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,

@@ -6,12 +6,14 @@ import {
   CommandEmpty,
   CommandGroup,
   CommandInput,
+  CommandItem,
   CommandList,
 } from "@components/Combobox/Command";
 import Icon from "@components/Icon/IconNative";
-import styles from "@components/MultiSelect/MultiSelect.module.scss";
+import styles from "@components/MultiCombobox/MultiCombobox.module.scss";
 import { EMPTY_ARRAY, noop } from "@components-core/constants";
 import type { CSSProperties, ReactNode } from "react";
+import { useId } from "react";
 import { useRef } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
@@ -21,9 +23,7 @@ import { isEqual } from "lodash-es";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { MultiSelectContext } from "@components/MultiSelect/MultiSelectContext";
-import { OptionComponent } from "@components/Combobox/ComboboxtOptionNative";
-import { MultiOption } from "@components/MultiSelect/MultiOptionNative";
+import { MultiComboboxContext, useSelect } from "@components/MultiCombobox/MultiComboboxContext";
 
 /**
  * Props for MultiCombobox component
@@ -169,8 +169,8 @@ export const MultiCombobox = ({
   );
 
   return (
-    <MultiSelectContext.Provider value={multiSelectContextValue}>
-      <OptionTypeProvider Component={MultiOption}>
+    <MultiComboboxContext.Provider value={multiSelectContextValue}>
+      <OptionTypeProvider Component={ComboboxOption}>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
           <PopoverTrigger asChild>
             <button
@@ -251,7 +251,7 @@ export const MultiCombobox = ({
           </Portal>
         </Popover>
       </OptionTypeProvider>
-    </MultiSelectContext.Provider>
+    </MultiComboboxContext.Provider>
   );
 };
 
@@ -262,3 +262,32 @@ const SelectBadge = ({ children }: { children: ReactNode }) => (
 );
 
 SelectBadge.displayName = "SelectBadge";
+
+type OptionComponentProps = {
+  value: string;
+  label: string;
+  disabled?: boolean;
+};
+
+export function ComboboxOption({ value, label, disabled }: OptionComponentProps) {
+  const id = useId();
+  const { value: selectedValues, onChange, optionRenderer } = useSelect();
+
+  const selected = selectedValues.includes(value);
+  return (
+    <CommandItem
+      id={id}
+      key={id}
+      value={`${value}`}
+      disabled={disabled}
+      className={styles.multiComboboxOption}
+      onSelect={() => {
+        onChange(value);
+      }}
+      data-state={selected ? "checked" : undefined}
+    >
+      {optionRenderer({ label, value })}
+      {selected && <Icon name="checkmark" />}
+    </CommandItem>
+  );
+}

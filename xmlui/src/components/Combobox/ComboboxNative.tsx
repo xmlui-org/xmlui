@@ -2,12 +2,20 @@
 
 import * as React from "react";
 
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from "./Command";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./Command";
 import classnames from "classnames";
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover";
 import Icon from "@components/Icon/IconNative";
 import styles from "./Combobox.module.scss";
 import type { CSSProperties, ReactNode } from "react";
+import { useId } from "react";
 import { useMemo } from "react";
 import { useRef, useState } from "react";
 import { useCallback, useEffect } from "react";
@@ -15,8 +23,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/Render
 import { noop } from "@components-core/constants";
 import type { Option, ValidationStatus } from "@components/abstractions";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { ComboboxOption } from "@components/Combobox/ComboboxtOptionNative";
-import { ComboboxContext } from "@components/Combobox/ComboboxContext";
+import { ComboboxContext, useCombobox } from "@components/Combobox/ComboboxContext";
 
 type ComboboxProps = {
   id?: string;
@@ -154,5 +161,34 @@ export function Combobox({
         </Popover>
       </OptionTypeProvider>
     </ComboboxContext.Provider>
+  );
+}
+
+type OptionComponentProps = {
+  value: string;
+  label: string;
+  enabled?: boolean;
+};
+
+export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
+  const id = useId();
+  const { value: selectedValue, onChange, optionRenderer } = useCombobox();
+  const selected = selectedValue === value;
+
+  return (
+    <CommandItem
+      id={id}
+      key={id}
+      disabled={!enabled}
+      value={`${value}`}
+      className={classnames(styles.multiOption)}
+      onSelect={() => {
+        onChange(value);
+      }}
+      data-state={selected ? "checked" : undefined}
+    >
+      {optionRenderer({ label, value })}
+      {selected && <Icon name="checkmark" />}
+    </CommandItem>
   );
 }

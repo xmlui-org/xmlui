@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import type { ComponentRendererDef, CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import type {
+  ComponentRendererDef,
+  CompoundComponentRendererInfo,
+} from "@abstractions/RendererDefs";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
@@ -55,7 +58,10 @@ import { dynamicHeightListComponentRenderer } from "@components/List/List";
 import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "@components/FormItem/FormItem";
-import { passwordInputComponentRenderer, textBoxComponentRenderer } from "@components/TextBox/TextBox";
+import {
+  passwordInputComponentRenderer,
+  textBoxComponentRenderer,
+} from "@components/TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "@components/Form/Form";
 import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
@@ -98,7 +104,10 @@ import { downloadAction } from "@components-core/action/FileDownloadAction";
 import { uploadAction } from "@components-core/action/FileUploadAction";
 import { navigateAction } from "@components-core/action/NavigateAction";
 import { timedAction } from "@components-core/action/TimedAction";
-import type { LoaderRenderer, LoaderRendererDef } from "@components-core/abstractions/LoaderRenderer";
+import type {
+  LoaderRenderer,
+  LoaderRendererDef,
+} from "@components-core/abstractions/LoaderRenderer";
 import { apiLoaderRenderer } from "@components-core/loader/ApiLoader";
 import { externalDataLoaderRenderer } from "@components-core/loader/ExternalDataLoader";
 import { mockLoaderRenderer } from "@components-core/loader/MockLoaderRenderer";
@@ -123,21 +132,19 @@ import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
-import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
+import { tabItemComponentRenderer } from "@components/Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
-import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
+import { accordionItemComponentRenderer } from "@components/Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
-import {carouselComponentRenderer} from "@components/Carousel/Carousel";
-import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
-import {createPropHolderComponent} from "@components-core/renderers";
-import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
-import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
-import {apiCallRenderer} from "@components/APICall/APICall";
-import {selectOptionComponentRenderer} from "@components/Select/SelectOption";
-import {multiOptionComponentRenderer} from "@components/MultiSelect/MultiOption";
-import {multiSelectComponentRenderer} from "@components/MultiSelect/MultiSelect";
-import {optionComponentRenderer} from "@components/Option/Option";
+import { carouselComponentRenderer } from "@components/Carousel/Carousel";
+import { carouselItemComponentRenderer } from "@components/Carousel/CarouselItem";
+import { createPropHolderComponent } from "@components-core/renderers";
+import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
+import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
+import { apiCallRenderer } from "@components/APICall/APICall";
+import { selectOptionComponentRenderer } from "@components/Select/SelectOption";
+import { optionComponentRenderer } from "@components/Option/Option";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -151,8 +158,6 @@ type ComponentProviderProps = {
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
-
-
 
 export class ComponentRegistry {
   private pool = new Map<string, ComponentRegistryEntry>();
@@ -283,12 +288,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
       this.registerComponentRenderer(selectOptionComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_MultiOption !== "false") {
-      this.registerComponentRenderer(multiOptionComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_MultiSelect !== "false") {
-      this.registerComponentRenderer(multiSelectComponentRenderer);
-    }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
     }
@@ -322,7 +321,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(codeComponentRenderer);
     }
 
-    if(process.env.VITE_USER_COMPONENTS_Markdown !== "false"){
+    if (process.env.VITE_USER_COMPONENTS_Markdown !== "false") {
       this.registerComponentRenderer(markdownComponentRenderer);
     }
 
@@ -383,7 +382,6 @@ export class ComponentRegistry {
     this.registerComponentRenderer(rangeComponentRenderer);
     this.registerComponentRenderer(sliderComponentRenderer);
     this.registerComponentRenderer(buttonGroupComponentRenderer);
-
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
@@ -448,6 +446,14 @@ export class ComponentRegistry {
     return this.loaders.get(type);
   }
 
+  hasComponent(componentName: string) {
+    return (
+      this.pool.get(componentName) !== undefined ||
+      this.loaders.get(componentName) !== undefined ||
+      this.actionFns.get(componentName) !== undefined
+    );
+  }
+
   private registerComponentRenderer({ type, renderer, metadata: hints }: ComponentRendererDef) {
     this.pool.set(type, { renderer, descriptor: hints });
     if (hints?.themeVars) {
@@ -458,7 +464,10 @@ export class ComponentRegistry {
     }
   }
 
-  private registerCompoundComponentRenderer({ compoundComponentDef, hints }: CompoundComponentRendererInfo) {
+  private registerCompoundComponentRenderer({
+    compoundComponentDef,
+    hints,
+  }: CompoundComponentRendererInfo) {
     this.pool.set(compoundComponentDef.name, {
       renderer: (rendererContext: any) => {
         return (
@@ -492,23 +501,23 @@ export class ComponentRegistry {
   private registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
   }
-
-  hasComponent(componentName: string) {
-    return this.pool.get(componentName) !== undefined || this.loaders.get(componentName) !== undefined || this.actionFns.get(componentName) !== undefined;
-  }
 }
 
 // This React component provides a context in which components can access the component registry. The
 // component takes care that child component are rendered only when the component registry is initialized
 // (filled with the definition of available components).
 export function ComponentProvider({ children, contributes }: ComponentProviderProps) {
-  const [componentRegistry, setComponentRegistry] = useState(() => new ComponentRegistry(contributes));
+  const [componentRegistry, setComponentRegistry] = useState(
+    () => new ComponentRegistry(contributes),
+  );
   //sync up the changed contributes (HMR)
   useEffect(() => {
     setComponentRegistry(new ComponentRegistry(contributes));
   }, [contributes]);
 
   return (
-    <ViewComponentRegistryContext.Provider value={componentRegistry}>{children}</ViewComponentRegistryContext.Provider>
+    <ViewComponentRegistryContext.Provider value={componentRegistry}>
+      {children}
+    </ViewComponentRegistryContext.Provider>
   );
 }

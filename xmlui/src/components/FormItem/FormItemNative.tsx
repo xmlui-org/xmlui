@@ -27,7 +27,6 @@ import {
 } from "@components/Form/formActions";
 import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
-import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 import type { LabelPosition } from "./ItemWithLabel";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
@@ -181,21 +180,6 @@ export const FormItem = memo(function FormItem({
         >
           {children}
         </Select>
-      );
-      break;
-    }
-    case "multiSelect": {
-      formControl = (
-        <MultiSelect
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </MultiSelect>
       );
       break;
     }
