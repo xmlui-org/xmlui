@@ -56,7 +56,6 @@ export const COMPONENT_MENUITEM = "/components/MenuItem";
 export const COMPONENT_MENUSEPARATOR = "/components/MenuSeparator";
 export const COMPONENT_MODALDIALOG = "/components/ModalDialog";
 export const COMPONENT_MULTICOMBOBOX = "/components/MultiCombobox";
-export const COMPONENT_MULTISELECT = "/components/MultiSelect";
 export const COMPONENT_NAVGROUP = "/components/NavGroup";
 export const COMPONENT_NAVLINK = "/components/NavLink";
 export const COMPONENT_NAVPANEL = "/components/NavPanel";

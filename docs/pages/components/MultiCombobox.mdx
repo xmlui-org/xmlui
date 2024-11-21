@@ -13,29 +13,29 @@ The component provides context values with which you can access some internal pr
 
 The component provides two ways to add a list of options to the dropdown:
 
-### Using the `MultiOption` component
+### Using the `Option` component
 
-The [`MultiOption`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
+The [`Option`](./Option.mdx) component can be used in situations where you need more control over how the list items are displayed.
 
 ```ueml copy
 <App>
   <MultiCombobox>
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
 
 <Playground
-  name="Example: using MultiOption"
+  name="Example: using Option"
   height={200}
   app={`
     <App>
       <MultiCombobox>
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -44,7 +44,7 @@ The [`MultiOption`](./Option.mdx) component can be used in situations where you 
 ### Using the `Items` component
 
 In cases where you do not wish to maunally create each item of a datalist
-you can map the data to an [`Items`](./Items.mdx) component and place `MultiOption` components in it.
+you can map the data to an [`Items`](./Items.mdx) component and place `Option` components in it.
 
 ```ueml copy
 <App>
@@ -54,7 +54,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `MultiOpti
       { name: 'Jane', id: 1 },
       { name: 'Carl', id: 2 }
     ]}">
-      <MultiOption value="{$item.id}" label="{$item.name}" />
+      <Option value="{$item.id}" label="{$item.name}" />
     </Items>
   </MultiCombobox>
 </App>
@@ -71,7 +71,7 @@ you can map the data to an [`Items`](./Items.mdx) component and place `MultiOpti
           { name: 'Jane', id: 1 },
           { name: 'Carl', id: 2 }
         ]}">
-          <MultiOption value="{$item.id}" label="{$item.name}" />
+          <Option value="{$item.id}" label="{$item.name}" />
         </Items>
       </MultiCombobox>
     </App>
@@ -139,9 +139,9 @@ Default value: `true`.
 ```ueml copy /enabled="false"/
 <App>
   <MultiCombobox enabled="false">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -152,9 +152,9 @@ Default value: `true`.
   app={`
     <App>
       <MultiCombobox enabled="false">
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -175,9 +175,9 @@ This property sets the component's initial value.
 ```ueml copy /initialValue="['chocolate', 'pistachio']"/
 <App>
   <MultiCombobox initialValue="['chocolate', 'pistachio']">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -188,9 +188,9 @@ This property sets the component's initial value.
   app={`
     <App>
       <MultiCombobox initialValue="['chocolate', 'pistachio']">
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -213,9 +213,9 @@ This property defines the template to display a particular option.
         <Text value="{$item.label}" variant="strong" />
       </HStack>
     </property>
-    <MultiOption value="opt1" label="first"/>
-    <MultiOption value="opt2" label="second"/>
-    <MultiOption value="opt3" label="third"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
   </MultiCombobox>
 </App>
 ```
@@ -232,9 +232,9 @@ This property defines the template to display a particular option.
             <Text value="{$item.label}" variant="strong" />
           </HStack>
         </property>
-        <MultiOption value="opt1" label="first"/>
-        <MultiOption value="opt2" label="second"/>
-        <MultiOption value="opt3" label="third"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
       </MultiCombobox>
     </App>
   `}
@@ -251,9 +251,9 @@ A placeholder text that is visible in the input field when its empty.
 ```ueml copy /placeholder="Select any number of options"/
 <App>
   <MultiCombobox placeholder="Select any number of options">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -264,9 +264,9 @@ A placeholder text that is visible in the input field when its empty.
   app={`
     <App>
       <MultiCombobox placeholder="Select any number of options">
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -287,9 +287,9 @@ This property sets an icon to appear at the start (left side when the left-to-ri
 ```ueml copy /startIcon="email"/
 <App>
   <MultiCombobox startIcon="email">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -300,9 +300,9 @@ This property sets an icon to appear at the start (left side when the left-to-ri
   app={`
     <App>
       <MultiCombobox startIcon="email">
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -315,9 +315,9 @@ This property sets a text to appear at the start (left side when the left-to-rig
 ```ueml copy /startText="Badges:"/
 <App>
   <MultiCombobox startText="Badges:">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -328,9 +328,9 @@ This property sets a text to appear at the start (left side when the left-to-rig
   app={`
     <App>
       <MultiCombobox startText="Badges:">
-        <MultiOption label="Vanilla" value="vanilla" />
-        <MultiOption label="Chocolate" value="chocolate" />
-        <MultiOption label="Pistachio" value="pistachio" />
+        <Option label="Vanilla" value="vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
       </MultiCombobox>
     </App>
   `}
@@ -390,9 +390,9 @@ This event is triggered when value of MultiCombobox has changed.
     <Text value="{$item}" />
   </Items>
   <MultiCombobox onDidChange="(newItems) => newValues = newItems">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -407,9 +407,9 @@ This event is triggered when value of MultiCombobox has changed.
       <Text value="{$item}" />
     </Items>
     <MultiCombobox onDidChange="(newItems) => newValues = newItems">
-      <MultiOption label="Vanilla" value="vanilla" />
-      <MultiOption label="Chocolate" value="chocolate" />
-      <MultiOption label="Pistachio" value="pistachio" />
+      <Option label="Vanilla" value="vanilla" />
+      <Option label="Chocolate" value="chocolate" />
+      <Option label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </App>
   `}
@@ -426,9 +426,9 @@ This event is triggered when the MultiCombobox has received the focus.
   <MultiCombobox
     onGotFocus="isFocused = true"
     onLostFocus="isFocused = false">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </App>
 ```
@@ -443,9 +443,9 @@ This event is triggered when the MultiCombobox has received the focus.
     <MultiCombobox
       onGotFocus="isFocused = true"
       onLostFocus="isFocused = false">
-      <MultiOption label="Vanilla" value="vanilla" />
-      <MultiOption label="Chocolate" value="chocolate" />
-      <MultiOption label="Pistachio" value="pistachio" />
+      <Option label="Vanilla" value="vanilla" />
+      <Option label="Chocolate" value="chocolate" />
+      <Option label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </App>
   `}
@@ -463,15 +463,15 @@ See the example in [gotFocus event section](#gotfocus).
 
 This method sets the focus on the MultiCombobox.
 
-Access attributes of the item using the dot notation. For an example, see the [\`optionTemplate\`](#MultiOptiontemplate) property or the [\`change\`](#change) event.
+Access attributes of the item using the dot notation. For an example, see the [\`optionTemplate\`](#Optiontemplate) property or the [\`change\`](#change) event.
 
 ```ueml copy /onClick="inputControl.focus()"/
 <VStack padding="$space-1" gap="$space-0_5">
   <Button label="Focus Input" onClick="inputControl.focus()" />
   <MultiCombobox id="inputControl">
-    <MultiOption label="Vanilla" value="vanilla" />
-    <MultiOption label="Chocolate" value="chocolate" />
-    <MultiOption label="Pistachio" value="pistachio" />
+    <Option label="Vanilla" value="vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
   </MultiCombobox>
 </VStack>
 ```
@@ -483,9 +483,9 @@ Access attributes of the item using the dot notation. For an example, see the [\
   <VStack padding="$space-1" gap="$space-0_5">
     <Button label="Focus Input" onClick="inputControl.focus()" />
     <MultiCombobox id="inputControl">
-      <MultiOption label="Vanilla" value="vanilla" />
-      <MultiOption label="Chocolate" value="chocolate" />
-      <MultiOption label="Pistachio" value="pistachio" />
+      <Option label="Vanilla" value="vanilla" />
+      <Option label="Chocolate" value="chocolate" />
+      <Option label="Pistachio" value="pistachio" />
     </MultiCombobox>
   </VStack>
   `}
@@ -596,8 +596,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [color-bg](../styles-and-themes/common-units/#color)-item-MultiCombobox | $color-bg-dropdown-item | $color-bg-dropdown-item |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiCombobox--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-MultiCombobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
 | [color-bg](../styles-and-themes/common-units/#color)-item-MultiCombobox--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
 | [color-bg](../styles-and-themes/common-units/#color)-menu-MultiCombobox | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-menu-MultiCombobox | $color-bg-primary | $color-bg-primary |
@@ -610,7 +608,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-MultiCombobox-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-MultiCombobox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-MultiCombobox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-value-MultiCombobox | $color-bg-secondary | $color-bg-secondary |
 | [color-bg](../styles-and-themes/common-units/#color)-value-MultiCombobox | $color-bg-secondary | $color-bg-secondary |
 | [color-border](../styles-and-themes/common-units/#color)-MultiCombobox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-border](../styles-and-themes/common-units/#color)-MultiCombobox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -625,13 +622,10 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-outline](../styles-and-themes/common-units/#color)-MultiCombobox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-outline](../styles-and-themes/common-units/#color)-MultiCombobox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-outline](../styles-and-themes/common-units/#color)-MultiCombobox-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color](../styles-and-themes/common-units/#color)-placeholder-MultiCombobox | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-MultiCombobox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-MultiCombobox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-MultiCombobox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-MultiCombobox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-indicator-MultiCombobox | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-item-MultiCombobox--disabled | $color-surface-200 | $color-surface-800 |
 | [color-text](../styles-and-themes/common-units/#color)-item-MultiCombobox--disabled | $color-surface-200 | $color-surface-800 |
 | [color-text](../styles-and-themes/common-units/#color)-MultiCombobox--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-MultiCombobox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -643,12 +637,10 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-text](../styles-and-themes/common-units/#color)-MultiCombobox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-MultiCombobox-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-value-MultiCombobox | $color-text-primary | $color-text-primary |
-| [color-text](../styles-and-themes/common-units/#color)-value-MultiCombobox | $color-text-primary | $color-text-primary |
 | [font-size](../styles-and-themes/common-units/#size)-MultiCombobox-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-MultiCombobox-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-MultiCombobox-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-MultiCombobox-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [min-height](../styles-and-themes/common-units/#size)-MultiCombobox | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-MultiCombobox-default--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-MultiCombobox-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-MultiCombobox-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
