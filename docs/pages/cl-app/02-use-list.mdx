@@ -11,11 +11,15 @@ You can continue working with the code you completed in the previous tutorial se
 
 ## Fetching Data from API
 
+<Callout type="info" emoji="💡">
 With XMLUI, fetching data from a REST API is straightforward.
-The `data` property, which accepts local data, also handles data fetching if the value provided looks like a URL string.
-Components manage all aspects of the data fetching operation.
+</Callout>
 
-Replace the `Page` tag with the `/contacts` URL to use the following contents:
+The markup in the previous articles fetched a message with the `DataSource` component. Often, you use only a URL to access data in a backend.
+
+When using the **`data` property** (with any component), the framework infers from its value that it must fetch data (invoking a GET request with the particular URL).
+
+To see how it works, replace the `Page` tag with the `/contacts` URL to use the following contents:
 
 ```ueml copy {3} filename="Main.xmlui"
 <!-- Omitted -->
@@ -25,7 +29,9 @@ Replace the `Page` tag with the `/contacts` URL to use the following contents:
 <!-- Omitted -->
 ```
 
-If the app is not running yet, start it on your web server and visit the app's page in your browser. The code snipped you have just added displays some contact data when you click the Contacts menu:
+`List` is a component that works with an array of items.  The framework fetches the data from the `/api/contacts` URL and injects it into the `List`, which displays each item.
+
+If the app is not running yet, start it on your web server and visit the app's page in your browser. The code snippet you have just added displays some contact data when you click the Contacts menu:
 
 <br/>
 <Image alt="Default task list" src="/resources/images/get-started/default-contact-list.png" />
@@ -36,7 +42,7 @@ The default layout is good for quick prototyping, but in this case, you need a b
 
 ## Customizing the List
 
-The list component is versatile and provides several services, making it easy to customize the layout. In this section, you will change the outlook of list items. A contact record has these fields (columns):
+The `List` component is versatile and provides several services, making it easy to customize the layout. In this section, you will change the outlook of list items. A contact record has these fields (columns):
 
 | Field | Type | Description |
 | --- | --- | --- |
@@ -57,10 +63,12 @@ The default display of the list uses the `fullName` and then `categoryId` fields
 <!-- Omitted -->
 ```
 
+The nested markup defines the UI for a single item in the list. The code snippet uses a `Card` component for a list item. `Card` is a simple container for displaying cohesive data, such as record fields. This component has a predefined layout we can leverage through the `title` and `subtitle` fields. 
+
+When processing the data, `List` uses a special property, `$item`, to refer to the current iteration item. In the expressions above, `$item.fullName` and `$item.comments` are the fields of the current iteration item, of a contact record.
+
 <br/>
 <Image alt="Template with Card" src="/resources/images/get-started/template-with-card.png" />
-
-The code utilizes the `Card` component, a simple container to display cohesive data, such as record fields. This component has a predefined layout we can leverage through the `title` and `subtitle` fields. Take note of the `$item` context value; it represents the current item the template should display. So `$item.fullName` and `$item.comments` are the fields of the current contact record.
 
 ## Adding and Formatting Fields
 
@@ -85,13 +93,13 @@ Let's change the layout of the items to something more attractive and helpful. M
 <!-- Omitted -->
 ```
 
-Here, you add a checkbox indicating the completeness of a particular item. You align the item's title and description in a column with two rows and display the `reviewDueDate` field aligned right in the item's row:
+Here, you add a checkbox indicating the completeness of a particular item. With the help of `VStack` and `HStack` **layout components**, you align the item's title and description in a column with two rows and display the `reviewDueDate` field aligned right in the item's row. Observe the `smartFormatDate($item.reviewDueDate)` expression, which smartly transforms a `reviewDueDate` field, for example, recognizing that a particular date is `Yesterday`.
 
 <br/>
 <Image alt="Test API" src="/resources/images/get-started/detailed-template.png" />
 
 <Callout type="info" emoji="📔">
-  The code leverages several `HStack` (horizontal stack) and `VStack` (vertical stack) component instances to establish the layout.
+It might occur to you that rendering hundreds or thousands of data items would consume a lot of resources. The `List` component is a **virtualized container** that ensures that only data items visible in the current viewport (and a few near the edges) are rendered.
 </Callout>
 
 ## Extracting a Reusable component
@@ -127,7 +135,7 @@ It is the best time to extract the item template of the list into a separate com
 </Component>
 ```
 
-4. The `$item` context value you used with the list's item template has no meaning within a reusable component's definition. Reusable components use the `$props` context value to refer to the properties passed in their markup instances. Thus, you need to replace the `$item` occurrences with `$props.item` to ensure the new extracted component works:
+4. The `$item` value you used with the list's item template has no meaning within a reusable component's definition. Reusable components use the `$props` context value to refer to the properties passed in their markup instances. Thus, you need to replace the `$item` occurrences with `$props.item` to ensure the new extracted component works:
 
 ```ueml copy {2-13} filename="ContactRow.xmlui" /$props.item/
 <Component name="ContactRow">
@@ -170,25 +178,25 @@ In the app's database, each contact can be assigned a category. The available ca
 
 XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Badge`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
 
-1. Navigate to the `Main.xmlui` file and add a `DataSource` component before the `List` with the `categories` identifier. You can refer to the fetched value with `categories.value`; pass it to `ContactRow` in the `categoryList` property. This `DataSource` component will fetch all category data from the backend. Update the `ContactRow` component by setting the `categories` property:
+1. Navigate to the freshly created `ContactRow.xmlui` file and add a `DataSource` component before the `Card` with the `categories` identifier. This `DataSource` component will fetch all category data from the backend.
 
-```ueml copy {2, 4} filename="Main.xmlui"
-<Page url="/contacts">
+```ueml copy {2} filename="ContactRow.xmlui"
+<Component name="ContactRow">
   <DataSource id="categories" url="/api/categories" />
-  <List data="/api/contacts">
-    <ContactRow item="{$item}" categories="{categories.value}" />
-  </List>
-</Page>
+  <Card>
+    <!-- Omitted -->
+  </Card>
+</Component>
 ```
 
 2. Create a new `ContactRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `ContactRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `ContactRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
 
 ```javascript copy filename="ContactRow.xmlui.xs"
 // Category record of the item
-var category = $props.categories.find(t => t.id === $props.item.categoryId);
+var category = categories.value.find(t => t.id === $props.item.categoryId);
  
 // Create a color map for all categories
-var categoriesColorMap = toHashObject($props.categories, "name", "color");
+var categoriesColorMap = toHashObject(categories.value, "name", "color");
 ```
 
 The `category` variable contains the category record associated with the item. If the item does not have a topic, the variable has an undefined value. The `categoriesColorMap` variable converts the list of topic records into a hash object with the topic name and color value pairs.

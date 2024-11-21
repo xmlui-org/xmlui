@@ -15,8 +15,8 @@
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts">
-      <DataSource id="categories" url="/api/categories" />
-      <Text variant="codefence">{JSON.stringify(categories.value, null, 2)}</Text>
+      <DataSource id="message" url="/api/test" />
+      <Text>{message.value}</Text>
     </Page>
   </Pages>
   <Footer>

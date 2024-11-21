@@ -154,17 +154,21 @@ Test the emulated backend by adding code that triggers invoking an endpoint. Rep
 ```ueml copy {3-4} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <Text variant="codefence">{JSON.stringify(categories.value, null, 2)}</Text>
+  <DataSource id="message" url="/api/test" />
+  <Text>{message.value}</Text>
 </Page>
 <!-- Omitted -->
 ```
+
+The framework considers text wrapped between curly braces an **expression**. Instead of displaying the literal value, it replaces them with their evaluated value.
+
+`DataSource` is a powerful component responsible for fetching data. The code above uses the `/api/test` endpoint, which retrieves a string. This component has an identifier, `message`, which allows accessing its exposed properties and methods. 
+
+The `Text` element displays a `message.value` expression. The engine recognizes that it must fetch data from the URL specified in the component identified with `message` (it is the `DataSource`). When the fetch has been completed, `message.value` represents the returned string, and the UI refreshes to display that string. 
 
 Turn to the app running in the browser and refresh. Click the "Contact List" menu item; it will trigger fetching the "category" data from the backend and display it on the screen in JSON:
 
 <br/>
 <Image alt="Test API" src="/resources/images/get-started/test-emulated-api.png" />
-
-The highlighted markup lines access the `/categories` API endpoint, which retrieves a list of contact categories. The `Text` component converts the list to JSON and displays it.
 
 In the following article, you will learn how the `DataSource` component works together with others to fetch and leverage data from a backend.
