@@ -69,7 +69,7 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { footerRenderer } from "@components/Footer/Footer";
 import { navGroupComponentRenderer } from "@components/NavGroup/NavGroup";
 import { logoComponentRenderer } from "@components/Logo/Logo";
-import { radioGroupOptionRenderer, radioGroupRenderer } from "@components/RadioGroup/RadioGroup";
+import { radioGroupRenderer } from "@components/RadioGroup/RadioGroup";
 import { SlotHolder } from "@components-core/Slot";
 import { fileInputRenderer } from "@components/FileInput/FileInput";
 import { chartRenderer } from "@components/Chart/Chart";
@@ -338,7 +338,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(multiSelectComponentRenderer);
       this.registerComponentRenderer(hoverCardComponentRenderer);
       this.registerComponentRenderer(radioGroupRenderer);
-      this.registerComponentRenderer(radioGroupOptionRenderer);
       this.registerComponentRenderer(fileInputRenderer);
       this.registerComponentRenderer(datePickerComponentRenderer);
       this.registerComponentRenderer(spinnerComponentRenderer);
