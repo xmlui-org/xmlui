@@ -298,9 +298,11 @@ export type AppContextObject = {
   // ==============================================================================================
   // Various Utilities
 
-  readonly capitalize: (s?: string) => string;
-  readonly pluralize: (number: number, singular: string, plural: string) => string;
-  readonly delay: (timeInMs: number, callback?: any) => Promise<void>;
+  capitalize: (s?: string) => string;
+  pluralize: (number: number, singular: string, plural: string) => string;
+  delay: (timeInMs: number, callback?: any) => Promise<void>;
+  toHashObject: (arr: any[], keyProp: string, valueProp: string) => any;
+  findByField: (arr: any[], field: string, value: any) => any;
   readonly Transforms: Record<string, any>;
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
