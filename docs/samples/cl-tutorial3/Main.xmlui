@@ -15,9 +15,8 @@
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts">
-      <DataSource id="categories" url="/api/categories" />
       <List data="/api/contacts">
-        <ContactRow item="{$item}" categories="{categories.value}" />
+        <ContactRow item="{$item}" />
       </List>
     </Page>
   </Pages>

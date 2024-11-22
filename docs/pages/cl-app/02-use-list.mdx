@@ -193,16 +193,18 @@ XMLUI has a `Badge` component that can use a color map (name and color pairs). W
 
 ```javascript copy filename="ContactRow.xmlui.xs"
 // Category record of the item
-var category = categories.value.find(t => t.id === $props.item.categoryId);
+var category = findByField(categories.value, "id", $props.item.categoryId);
  
 // Create a color map for all categories
 var categoriesColorMap = toHashObject(categories.value, "name", "color");
 ```
 
-The `category` variable contains the category record associated with the item. If the item does not have a topic, the variable has an undefined value. The `categoriesColorMap` variable converts the list of topic records into a hash object with the topic name and color value pairs.
+The `category` variable contains the category record associated with the item. The `findByField` function searches the first category item with the id the current contact row refers to (in its `categoryId` field). The variable has an `undefined` value if the item does not have a topic. 
+
+The `categoriesColorMap` variable converts the list of topic records into a hash object with the topic name and color value pairs.
 
 <Callout type="info" emoji="📔">
-This transformation with the `reduce` JavaScript function converts category records from this format
+This transformation with the `toHashObject` JavaScript function converts category records from this format
 
 ```json
 [
@@ -252,6 +254,21 @@ Now, running the app will display the topics of task items:
 
 <br/>
 <Image alt="Badges" src="/resources/images/get-started/items-and-badges.png" />
+
+<Callout type="info" emoji="📔">
+You may have noticed that the definition of `ContactRow` includes a `DataSource` that fetches the contact categories:
+
+```ueml copy {2} filename="ContactRow.xmlui"
+<Component name="ContactRow">
+  <DataSource id="categories" url="/api/categories" />
+  <Card>
+    <!-- Omitted -->
+  </Card>
+</Component>
+```
+
+The engine is smart enough to recognize that it should not fetch this endpoint every time a contact row is displayed. It will fetch the data only when the first visible row in the list is to be rendered and will use the cached set of categories for the subsequent rows.
+</Callout>
 
 In the following article, you will learn to display filtered data.
 

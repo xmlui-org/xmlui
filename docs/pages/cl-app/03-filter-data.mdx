@@ -45,9 +45,8 @@ Add a few new menu items with their corresponding pages to the app definition in
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts/all">
-      <DataSource id="categories" url="/api/categories" />
       <List data="/api/contacts">
-        <ContactRow item="{$item}" categories="{categories.value}" />
+        <ContactRow item="{$item}" />
       </List>
     </Page>
     <Page url="/contacts/overdue">Overdue</Page>
@@ -70,8 +69,38 @@ For example, selecting the "Overdue Reviews menu" item displays the following:
 ## Filter on the Client
 
 First, let's focus on filtering the data on the client side.
-In this scenario, you will fetch all the data from the backend but filter it before assigning it to the displayed list.
-All lists use the same logic; the only difference is how they filter the contact data. 
+In this scenario, you will fetch all the data from the backend but filter it before assigning it to the displayed list. All lists use the same logic; the only difference is how they filter the contact data. 
+
+### Using a DataSource
+
+Previously, you used a URL, `/api/contacts` to display the contact data in a `List`:
+
+```ueml copy {3} filename="Main.xmlui"
+<!-- Omitted -->
+<Page url="/contacts/all">
+  <List data="/api/contacts">
+    <ContactRow item="{$item}" />
+  </List>
+</Page>
+<!-- Omitted -->
+```
+
+You will use the same URL in five pages and filter their data by different criteria. Instead of writing the same URL five times, outsource the fetch mechanism to a `DataSource` component and name it as the list's data source with these steps:
+
+1. Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
+
+```ueml copy {3} filename="Main.xmlui"
+<!-- Omitted -->
+<Page url="/contacts/all">
+  <List data="/api/contacts">
+    <ContactRow item="{$item}" />
+  </List>
+</Page>
+<!-- Omitted -->
+```
+
+
+Update the contacts page to use this `DataSource` (refer to the identifier of `DataSource`):
 
 ### A Reusable `Contacts` Component
 
