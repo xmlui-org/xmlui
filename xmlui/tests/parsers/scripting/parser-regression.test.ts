@@ -3,6 +3,8 @@ import { Lexer } from "@parsers/scripting/Lexer";
 import { InputStream } from "@parsers/common/InputStream";
 import { Parser } from "@parsers/scripting/Parser";
 import { TokenType } from "@abstractions/scripting/Token";
+import { parsePropertyValue } from "@parsers/scripting-exp/property-parsing";
+import { parseParameterString } from "@components-core/script-runner/ParameterParser";
 
 describe("Parser - regression", () => {
   it("Lexer 'toString'", () => {
@@ -25,4 +27,11 @@ describe("Parser - regression", () => {
     // --- Assert
     expect(expr.type).equal("OLitE");
   });
+
+  it("Function invocation", () => {
+    // --- Act
+    const result = parsePropertyValue("{findByField.toString()}");
+
+  });
+
 });

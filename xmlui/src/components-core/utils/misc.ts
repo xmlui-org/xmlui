@@ -470,6 +470,10 @@ export function toHashObject(arr: any[], keyProp: string, valueProp: string): an
   }, {});
 }
 
+export function findByField(arr: any[], field: string, value: any): any{
+  return (arr ?? []).find(item => item[field || ""] === value);
+}
+
 // from here: https://github.com/lodash/lodash/issues/4815
 /**
  * Throttles an async function in a way that can be awaited.
