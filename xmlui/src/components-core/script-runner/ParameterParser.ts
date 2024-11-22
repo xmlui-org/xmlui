@@ -66,7 +66,7 @@ export function parseParameterString (source: string): (StringLiteralSection | E
         const tail = parser.getTail();
         if (!tail || tail.trim().length < 1 || tail.trim()[0] !== "}") {
           // --- Unclosed expression, back to its beginning
-          throw new Error(`Unclosed expression: '${exprSource}'`);
+          throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
           // --- Successfully parsed expression
           result.push({

@@ -72,7 +72,7 @@ export function parsePropertyValue(source: any): PropertyValue | undefined | nul
         const tail = parser.getTail();
         if (!tail || tail.trim().length < 1 || tail.trim()[0] !== "}") {
           // --- Unclosed expression, back to its beginning
-          throw new Error(`Unclosed expression: '${exprSource}'`);
+          throw new Error(`Unclosed expression: '${source}'\n'${exprSource}'`);
         } else {
           // --- Successfully parsed expression
           parts.push(expr!);
