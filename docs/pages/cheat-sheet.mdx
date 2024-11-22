@@ -1,0 +1,60 @@
+import { Callout } from 'nextra/components'
+import { XMLUI_EMPTY, XMLUI_STARTER } from "../meta/downloads";
+
+# XMLUI Cheat Sheet
+
+## Create a New XMLUI App
+
+1. Unless already installed, set up Node.js on your machine (https://nodejs.org/en).
+2. Download the <DownloadLink href={XMLUI_STARTER}>XMLUI starter app</DownloadLink>.
+3. Unzip the downloaded zip file.
+4. Start a command prompt and select the unzipped folder as the current working directory
+5. Execute `start.bat` (Windows), or `./start.sh` (MacOs, Linux), or run `npx -y http-server -o` (any platform)
+
+For example, if your unzipped folder is in `C:\Users\Mary\work\xmlui-starter` (Windows), use these commands:
+
+```bat
+cd C:\Users\Mary\work\xmlui-starter
+start.bat
+```
+
+The XMLUI starter app creates a small app. In step 2, download the <DownloadLink href={XMLUI_EMPTY}>empty XMLUI app</DownloadLink> to create an empty app.
+
+<Callout type="info" emoji="📔">
+The empty app will display some text to let you be sure that the app works.
+</Callout>
+
+## XMLUI Markup
+
+As the name suggests, XMLUI uses the same markup as XML/XHTML (with a few extensions).
+
+### The Application Root
+
+An XMLUI app must start with one and only one component tag.
+
+```ueml copy
+<App>
+  Though not exciting, this is a valid XMLUI app.
+</App>
+```
+
+The following markup does not start with a component tag, so it is invalid:
+
+```ueml copy
+Not only is it not exciting, but this is an invalid XMLUI app.
+```
+
+This markup contains multiple root tags, so it is invalid:
+
+```ueml copy
+<H2>
+  This H2 heading alone would be a valid app.
+</H2>
+<Text>
+  This Text component makes the markup invalid (multiple root tags).
+</Text>
+```
+
+### Fragment
+
+You can use the `Fragment` component to merge multiple component tags into a single node.
