@@ -1,7 +1,70 @@
-import { expect as baseExpect, mergeExpects } from "@playwright/test";
+import type { Page } from "@playwright/test";
+import { expect as baseExpect, mergeExpects, test as base } from "@playwright/test";
+import { initApp } from "./component-test-helpers";
 
-export { test } from "@playwright/test";
+export type baseComponentFixtures = {
+  initComponent: (entryPoint: string) => Promise<void>;
+  initComponentWithEventWrapper: (entryPoint: string) => Promise<TestBed>;
+};
 
+export const TEST_EVENT_PLACEHOLDER = "€EVENT_TESTING_PLACEHOLDER_WILL_REPLACE_ON_INITIALIZATION€" as const;
+
+// type KeyValue = { [key: string]: any };
+// export function extendWithDriverFixture<Fixture extends KeyValue>(baseTest, driver){
+//  return baseTest.extend<Fixture>({
+//     createAvatarDriver: async ({page}, use) =>{
+//       await use((testId: string) => {
+//         const avatarLocator = page.getByTestId(testId)
+//         return new AvatarDriver(avatarLocator)
+//       });
+//     }
+//   });
+// }
+
+export const test = base.extend<baseComponentFixtures>({
+  initComponent: async ({page}, use) => {
+    await use(async (entryPoint: string) => {
+      await initApp(page, { entryPoint });
+    });
+  },
+  initComponentWithEventWrapper : async ({page}, use) => {
+      await use(async (entryPoint: string) => {
+        const eventTargetTestId = "__event_target_placeholder_testId" as const;
+        const testVarNameEventModifies = "__test_event_modifies_this_variable" as const;
+        if (!entryPoint.includes(TEST_EVENT_PLACEHOLDER)){
+          throw new Error("Tried to initialize a component with event wrapper, but no placeholder was found for the event handler.")
+        }
+        const codeWithReplacedHandler = entryPoint.replace(TEST_EVENT_PLACEHOLDER, `
+          ${testVarNameEventModifies} += 1
+          `)
+        const prefix = `<Fragment var.${testVarNameEventModifies} = "{ 0 }">`
+        const suffix =`
+          <Stack width="0" height="0">
+          <Text
+            testId="${eventTargetTestId}"
+            value="{ ${testVarNameEventModifies} }"/>
+            </Stack>
+        </Fragment>`
+
+        const code = prefix + codeWithReplacedHandler + suffix;
+        await initApp(page, { entryPoint: code });
+        return new TestBed(page, eventTargetTestId)
+      });
+    },
+});
+
+class TestBed {
+  constructor(private readonly page: Page, private readonly eventTargetTestId){ }
+
+  async expectEventToBeInvoked() {
+    await expect(this.page.getByTestId(this.eventTargetTestId)).not.toBeEmpty()
+    await expect(this.page.getByTestId(this.eventTargetTestId)).not.toHaveText("0")
+  }
+
+  async expectEventNotToBeInvoked() {
+    await expect(this.page.getByTestId(this.eventTargetTestId)).toHaveText("0")
+  }
+}
 const expectWithToEqualWithTolerance = baseExpect.extend({
   /**
    * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
@@ -87,7 +150,7 @@ const expectWithToBeShadeOf = baseExpect.extend({
     const expected = expectedStart + expectedMiddle + expectedEnd;
 
     if (matches === null) {
-      message = () => 
+      message = () =>
         this.utils.matcherHint(assertionName, providedColor, expected, { isNot: this.isNot }) +
         "\n" +
         "Wrong rgb or rgba string pattern" +

@@ -1,21 +1,18 @@
-import type { Locator } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type { ThemeTestDesc } from "./component-test-helpers";
+import type { baseComponentFixtures} from "./fixtures";
 
-import { test as base, expect } from "./fixtures";
+import { test as base, expect, TEST_EVENT_PLACEHOLDER } from "./fixtures";
 import { initApp } from "./component-test-helpers";
+import { INITIAL_THEME_TONE } from "../../xmlui/src/abstractions/ThemingDefs";
 
-type InitComponentFixtures = {
-  initComponent: (entryPoint: string) => Promise<void>;
-  createAvatarDriver: (testId: string) => AvatarDriver;
-  initComponentWithEventWrapper: (entryPoint: string) => Promise<void>;
-};
 
 class AvatarDriver {
   constructor(private readonly avatar: Locator) { }
   async expectInitials(initials: string) {
     await expect(this.avatar).toContainText(initials)
   }
-  async expectEmptyInitials(){
+  async expectNoInitials(){
     await expect(this.avatar).toBeEmpty();
   }
   async click() {
@@ -23,22 +20,14 @@ class AvatarDriver {
   }
 }
 
-export const test = base.extend<InitComponentFixtures>({
-  initComponent: async ({page}, use) => {
-    await use(async (entryPoint: string) => {
-      await initApp(page, { entryPoint });
-    });
-  },
-  initComponentWithEventWrapper : async ({page}, use) => {
-      await use(async (entryPoint: string) => {
-        await initApp(page, { entryPoint });
-      });
-    },
+type avatarFixtures = baseComponentFixtures & {
+  createAvatarDriver: (testId: string) => AvatarDriver;
+};
+export const test = base.extend<avatarFixtures>({
   createAvatarDriver: async ({page}, use) =>{
     await use((testId: string) => {
       const avatarLocator = page.getByTestId(testId)
-      const avatarDriver = new AvatarDriver(avatarLocator)
-      return avatarDriver;
+      return new AvatarDriver(avatarLocator)
     });
   }
 });
@@ -48,13 +37,13 @@ const RED = "rgb(255, 0, 0)";
 test("No initials without name", async ({ initComponent, createAvatarDriver}) => {
   await initComponent(`<Avatar testId="avatar"/>`);
   const driver = createAvatarDriver("avatar");
-  await driver.expectEmptyInitials()
+  await driver.expectNoInitials()
 });
 
 test("No initials with empty name", async ({ initComponent, createAvatarDriver }) => {
   await initComponent(`<Avatar testId="avatar" name=""/>`);
   const driver = createAvatarDriver("avatar");
-  await driver.expectEmptyInitials()
+  await driver.expectNoInitials()
 });
 
 test("Name with ascii symbols works", async ({ initComponent, createAvatarDriver }) => {
@@ -142,32 +131,30 @@ sizes.forEach((tc) => {
   });
 });
 
-test("click", async ({ page, initComponentWithEventWrapper, createAvatarDriver }) => {
+test("click works", async ({ initComponentWithEventWrapper, createAvatarDriver }) => {
+  const testBed = await initComponentWithEventWrapper(
+    `<Avatar testId="avatar" name="Molly Dough" onClick="${TEST_EVENT_PLACEHOLDER}" />`
+  );
   const driver = createAvatarDriver("avatar");
 
-  const entryPoint = `
-    <Avatar testId="avatar" name="Molly Dough" onClick="$PLACEHOLDER$" />
-  `;
-
-  const testBed = await initComponentWithEventWrapper(entryPoint)
-  // testBed.expectEventToBeInvoked()
+  testBed.expectEventNotToBeInvoked()
   await driver.click();
-  // testBed.expectEventNotToBeInvoked()
+  testBed.expectEventToBeInvoked()
 });
 
 // theme vars are more intricate, global theme vars can interact
-const THEME_TESTS: ThemeTestDesc[] = [
-  { themeVar: "color-bg-Avatar", themeVarAsCSS: "background-color", expected: RED },
-  { themeVar: "color-border-Avatar", themeVarAsCSS: "border-color", expected: RED },
-  { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
-  { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
-  { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
-  { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
-  { themeVar: "style-border-Avatar", themeVarAsCSS: "border-style", expected: "dotted" },
-  { themeVar: "thickness-border-Avatar", themeVarAsCSS: "border-width", expected: "5px"},
-];
+// const THEME_TESTS: ThemeTestDesc[] = [
+//   { themeVar: "color-bg-Avatar", themeVarAsCSS: "background-color", expected: RED },
+//   { themeVar: "color-border-Avatar", themeVarAsCSS: "border-color", expected: RED },
+//   { themeVar: "color-text-Avatar", themeVarAsCSS: "color", expected: RED },
+//   { themeVar: "font-weight-Avatar", themeVarAsCSS: "font-weight", expected: "700" },
+//   { themeVar: "radius-Avatar", themeVarAsCSS: "border-radius", expected: "15px" },
+//   { themeVar: "shadow-Avatar", themeVarAsCSS: "box-shadow", expected: RED + " 5px 10px 0px 0px" },
+//   { themeVar: "style-border-Avatar", themeVarAsCSS: "border-style", expected: "dotted" },
+//   { themeVar: "thickness-border-Avatar", themeVarAsCSS: "border-width", expected: "5px"},
+// ];
 
-THEME_TESTS.forEach((testCase) => {
-  test(testCase.themeVar, async ({ }) => {
-  });
-});
+// THEME_TESTS.forEach((testCase) => {
+//   test(testCase.themeVar, async ({ }) => {
+//   });
+// });
