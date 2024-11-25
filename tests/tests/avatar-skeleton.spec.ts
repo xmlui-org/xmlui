@@ -136,6 +136,7 @@ test("click works", async ({ initComponentWithEventWrapper, createAvatarDriver }
     `<Avatar testId="avatar" name="Molly Dough" onClick="${TEST_EVENT_PLACEHOLDER}" />`
   );
   const driver = createAvatarDriver("avatar");
+  //the driver uses the testBed inside itself
 
   testBed.expectEventNotToBeInvoked()
   await driver.click();
