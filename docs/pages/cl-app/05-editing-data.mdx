@@ -21,10 +21,8 @@ These dialogs will show up when you click a button to add a new item or select t
 Let's change the layout of the `Contact` component to add a button above the list (and wrap the button and the list into a `VStack`).
 When you click this button, it will display a dialog for adding a new contact item:
 
-```ueml copy {4-7, 11} filename="Contacts.xmlui"
+```ueml copy {2-5, 9} filename="Contacts.xmlui"
 <Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <VStack>
     <HStack horizontalAlignment="end">
       <Button icon="plus">New Contact</Button>
@@ -36,7 +34,6 @@ When you click this button, it will display a dialog for adding a new contact it
 </Component>
 ```
 
-This code provides a small gap around the list to make the layout breathe.
 The `HStack` section adds a button above the list:
 
 <br/>
@@ -47,11 +44,12 @@ The `HStack` section adds a button above the list:
 Next, you should add a context menu to each contact item.
 This menu appears on the right side of an item with the following markup in the `ContactRow` component:
 
-```ueml copy {13-19} filename="ContactRow.xmlui"
+```ueml copy {14-20} filename="ContactRow.xmlui"
 <Component name="ContactRow">
+  <DataSource id="categories" url="/api/categories" />
   <Card>
     <HStack verticalAlignment="center">
-      <Checkbox id="completedSelector" initialValue="{$props.item.reviewCompleted}" />
+      <Checkbox initialValue="{$props.item.reviewCompleted}" />
       <VStack width="*" gap="0">
         <Text variant="strong">{$props.item.fullName}</Text>
         <Text>{$props.item.comments}</Text>
@@ -83,26 +81,27 @@ You can reveal the menu by clicking the three dots to the right of a particular 
 When you add a new contact's details or edit a contact, the app displays a form in a modal dialog.
 Create a component, `ContactForm`  (`ContactForm.xmlui` within the `components` folder), to display the dialog:
   
-```ueml copy filename="ContactForm.xmlui"
+```ueml copy {5} filename="ContactForm.xmlui"
 <Component name="ContactForm">
   <ModalDialog id="dialog" title="Add a new Contact">
     <Text>Contact Form</Text>
   </ModalDialog>
-  <method name="open" value="dialog.open()" />
+  <method name="open" value="dialog.open" />
 </Component>
 ```
 
-This component embeds a `ModalDialog` component to display a modal on demand.
-`ModalDialog` exposes an `open` method that can be invoked from outside to display it.
+This component embeds a `ModalDialog` component to display a modal on demand. This dialog is only displayed if it is explicitly opened. The `ModalDialog` component is nested within the component definition, so it cannot be displayed outside of `ContactForm` without the component's cooperation. `ContactForm` exposes an `open` method that can be invoked from outside; it displays the dialog by invoking the `dialog.open` method.
+
+<Callout type="info" emoji="📔">
+Whatever parameters you pass to the exposed `open` method, xmlui conveys to the `dialog.open` method when calling it.
+</Callout>
 
 ### Showing the Form
 
 Add the code to `Contacts` to display this dialog:
 
-```ueml copy {4, 7} filename="Contacts.xmlui" /onClick="contactForm.open()"/
+```ueml copy {2, 5} filename="Contacts.xmlui" /onClick="contactForm.open()"/
 <Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <ContactForm id="contactForm" />
   <VStack>
     <HStack horizontalAlignment="end">
@@ -121,44 +120,27 @@ The dialog is not displayed unless you explicitly invoke its exposed `open` meth
 <br/>
 <Image alt="Contact dialog" src="/resources/images/get-started/contact-dialog.png" />
 
-You can reuse this dialog when editing data.
-The acton associated with triggering the editing should be found within the `ContactRow` components.
-However, you need to handle the action in the `Contacts` component, as it embeds the dialog to pop up.
+You can reuse this dialog when editing data. Modify the markup of `ContactRow`:
 
-There is a simple solution for this scenario.
-The `ContactRow` component will raise a custom event representing the edit action and the `Contacts` component will respond. 
-
-Add the following custom event to `ContactRow`:
-
-```ueml copy {6} filename="ContactRow.xmlui"
-<!-- Omitted -->
-<DropdownMenu>
-  <property name="triggerTemplate">
-    <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-  </property>
-  <MenuItem label="Edit" onClick="{() => emitEvent('editClicked')}" />
-  <MenuItem label="Delete" />
-</DropdownMenu>
-<!-- Omitted -->
+```ueml copy {3, 10} filename="ContactRow.xmlui" /onClick="contactForm.open()"/
+<Component name="ContactRow">
+  <DataSource id="categories" url="/api/categories" />
+  <ContactForm id="contactForm" />
+  <Card>
+    <!-- Omitted -->
+      <DropdownMenu>
+        <property name="triggerTemplate">
+          <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
+        </property>
+        <MenuItem label="Edit" onClick="contactForm.open()"/>
+        <MenuItem label="Delete" />
+      </DropdownMenu>
+    </HStack>
+  </Card>
+</Component>
 ```
 
-The highlighted code exposes an event, `editClicked`.
-Bind the dialog in `Contacts` to the `editClicked` event handler:
-
-```ueml copy {7} filename="Contacts.xmlui"
-<!-- Omitted -->
-<List>
-  <!-- Omitted -->
-  <ContactRow 
-    item="{$item}" 
-    categories="{categories.value}" 
-    onEditClicked="contactForm.open()" />
-  <!-- Omitted -->
-</List>
-<!-- Omitted -->
-```
-
-Now, clicking the "Edit" context menu of any contact item displays the same dialog and the "New Contact" button.
+You use the same dialog in the `ContactRow` component here. Clicking the Edit action in the dropdown opens the form imperatively, just as the New Contact button did.
 
 ### Context Sensitive Dialog
 
