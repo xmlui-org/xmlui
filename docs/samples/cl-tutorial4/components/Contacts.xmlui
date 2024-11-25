@@ -1,6 +1,5 @@
 <Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <List data="/api/contacts/{$props.filter}">
-    <ContactRow item="{$item}" categories="{categories.value}" />
+  <List items="{$props.data}">
+    <ContactRow item="{$item}" />
   </List>
 </Component>

@@ -75,135 +75,160 @@ In this scenario, you will fetch all the data from the backend but filter it bef
 
 Previously, you used a URL, `/api/contacts` to display the contact data in a `List`:
 
-```ueml copy {3} filename="Main.xmlui"
-<!-- Omitted -->
-<Page url="/contacts/all">
-  <List data="/api/contacts">
-    <ContactRow item="{$item}" />
-  </List>
-</Page>
-<!-- Omitted -->
+```ueml copy {4} filename="Main.xmlui"
+<App>
+  <!-- Omitted -->
+  <Page url="/contacts/all">
+    <List data="/api/contacts">
+      <ContactRow item="{$item}" />
+    </List>
+  </Page>
+  <!-- Omitted -->
+</App>
 ```
 
-You will use the same URL in five pages and filter their data by different criteria. Instead of writing the same URL five times, outsource the fetch mechanism to a `DataSource` component and name it as the list's data source with these steps:
+With the new app pages, you will use the same URL five times and filter the data by different criteria. Instead of writing the same URL five times, outsource the fetch mechanism to a `DataSource` component and name it as the list's data source with these steps:
 
-1. Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
+Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
 
-```ueml copy {3} filename="Main.xmlui"
-<!-- Omitted -->
-<Page url="/contacts/all">
-  <List data="/api/contacts">
-    <ContactRow item="{$item}" />
-  </List>
-</Page>
-<!-- Omitted -->
+```ueml copy {6} filename="Main.xmlui" /id="contactsDs"/
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
+  <DataSource id="contactsDs" url="/api/contacts" />
+  <!-- Omitted -->
+</App>
 ```
-
 
 Update the contacts page to use this `DataSource` (refer to the identifier of `DataSource`):
 
-### A Reusable `Contacts` Component
-
-Next, you will extract this functionality into a new component that receives a filtering function:
-
-Create a new file, `Contacts.xmlui` in the `components` folder, and add this piece of code:
-
-```ueml copy filename="Contacts.xmlui"
-<Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts" />
-  <List items="{contacts.value.filter($props.predicate)}">
-    <ContactRow item="{$item}" categories="{categories.value}" />
-  </List>
-</Component>
-```
-
-The `Contacts` component declares a new `DataSource` component to fetch all contacts from the backend.
-Previously, you used the `data` property of the `List` by pointing it to an API endpoint to fetch data.
-You cannot do so in this situation, as you have to filter the fetched data before passing it to `List`.
-Instead, filter the contacts by using a predicate function (passed in the `predicate` component property).
-
-<Callout type="info" emoji="📔">
-  A predicate function accepts a contact record and returns a boolean value to indicate whether that particular contact should be in the filtered set.
-</Callout>
-
-Update all `Page` tags in the `Main.xmlui` file to use the new `Contacts` component:
-
-```ueml copy {5, 8, 11, 14,17} filename="Main.xmlui"
-<!-- Omitted -->
-<Pages>
-  <Page url="/">Dashboard</Page>
+```ueml copy {4} filename="Main.xmlui" /contactsDs/
+<App>
+  <!-- Omitted -->
   <Page url="/contacts/all">
-    <Contacts predicate="{t => true}"/>
+    <List data="{contactsDs}">
+      <ContactRow item="{$item}" />
+    </List>
   </Page>
-  <Page url="/contacts/overdue">
-    <Contacts predicate="{t => true}"/>
-  </Page>
-  <Page url="/contacts/today">
-    <Contacts predicate="{t => true}"/>
-  </Page>
-  <Page url="/contacts/upcoming">
-    <Contacts predicate="{t => true}"/>
-  </Page>
-  <Page url="/contacts/completed">
-    <Contacts predicate="{t => true}"/>
-  </Page>
-</Pages>
-<!-- Omitted -->
+  <!-- Omitted -->
+</App>
 ```
 
-In this code, you use the same predicate, `t => true`, for each `Contacts` independently from the desired filtering. This predicate will match with every task, so using `Contacts` with the `t => true` predicate will represent all contacts retrieved from the backend.
-
-Now, when you visit any of the contact-related menu functions, the UI displays all contacts.
+When you visit the All Contacts page, the UI displays the same list as before.
 
 <br/>
 <Image alt="Contact predicates" src="/resources/images/get-started/contact-predicates.png" />
 
+Earlier, you learned that XMLUI handles the `data` property in a special way: when its value is evaluated as a string, the framework considers it a URL and fetches the data from there.
 
-Though contacts still need to be filtered, the new structure makes it easy. To implement a particular filter, you pass the appropriate predicate function to the `Contact` component.
+Here, you can learn another specialty of handling `data`. When its value is evaluated to a `DataSource` component, that data source is used to fetch the data from the backend. 
 
-### Update Predicates
+`DataSource` allows you granular control over how a web request is sent to the backend; in addition to the URL, you can configure other parameters, including headers, the request method, the body, and a few others.
 
-Let's finish the job and create the appropriate predicates! 
+So, in the `<List data="{contactsDs}">` tag, the `contactsDs` expression is evaluated to a `DataSource` instance (as `contactsDs` is the identifier of that data source). This way, the framework knows how to set the list's data to display.
 
-Create a new `Main.xmlui.xs` file in the `src` folder. As you learned earlier, this is a code-behind file for `Main.xmlui`. Add this function definition to the file:
+### A Reusable `Contacts` Component
 
-```javascript copy filename="Main.xmlui.xs"
-function getSection(contact) {
-  if (contact.reviewCompleted) return 'Completed';
-  if (!contact.reviewDueDate) return 'No Due Date';
-  if (isToday(contact.reviewDueDate)) return 'Today';
-  return (getDate(contact.reviewDueDate) < getDate()) 
-    ? 'Overdue' 
-    : 'Upcoming'
-}
+Extract a new `Contacts` component to display the contacts list with the received data. You will use several instances of this new component, one for each filtered page.
+
+<Callout type="info" emoji="📔">
+Creating this component has the benefit of changing the representation of listed contacts in the future only by altering this component. You do not have to maintain five separate `Page` instances (representing the different filtered views).
+</Callout>
+
+First, create a new file, `Contacts.xmlui` in the `components` folder, and add this piece of code:
+
+```ueml copy filename="Contacts.xmlui"
+<Component name="Contacts">
+  <List items="{$props.data}">
+    <ContactRow item="{$item}" />
+  </List>
+</Component>
 ```
 
-This function returns one of these section values of the input contact: `Completed`, `No Due Date`, `Today`, `Overdue`, or `Upcoming`.
+The `Contacts` component passes the array of contact items (received in its `data` property) to the underlying list, which displays them as before.
 
-Change the `predicate` property of all `Contacts` components in `Main.xmlui`:
+Update the Contact `Page` (the one with the `/contacts/all` URL) in `Main.xmlui` to use the new `Contacts` component:
 
-```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
+```ueml copy {5} filename="Main.xmlui" /data="{contactsDs}"/
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
   <Page url="/contacts/all">
-    <Contacts predicate="{t => true}"/>
+    <Contacts data="{contactsDs}" />
   </Page>
-  <Page url="/contacts/overdue">
-    <Contacts predicate="{t => getSection(t) === 'Overdue'}"/>
-  </Page>
-  <Page url="/contacts/today">
-    <Contacts predicate="{t => getSection(t) === 'Today'}"/>
-  </Page>
-  <Page url="/contacts/upcoming">
-    <Contacts predicate="{t => getSection(t) === 'Upcoming'}"/>
-  </Page>
-  <Page url="/contacts/completed">
-    <Contacts predicate="{t => getSection(t) === 'Completed'}"/>
-  </Page>
+  <!-- Omitted -->
 </Pages>
 <!-- Omitted -->
+```
+
+You can check that your app behaves just like before.
+
+### Define Filters
+
+The `Contacts` component displays the data it receives, so the UI logic must pass the appropriate filtered data to each `Contacts` instance. You will prepare the pages to show filtered contacts.
+
+Add a `Main.xmlui.xs` code-behind file to the root app folder (this new file must be beside the `Main.xmlui` file) with this code:
+
+```js
+function getSection(contact) {
+  if (contact.reviewCompleted) return "Completed";
+  if (!contact.reviewDueDate) return "No Due Date";
+  if (isToday(contact.reviewDueDate)) return "Today";
+  return getDate(contact.reviewDueDate) < getDate() ? "Overdue" : "Upcoming";
+}
+
+function filterBySection(contacts, section) {
+  return contacts.filter((contact) => getSection(contact) === section);
+}
+
+var allContacts = contactsDs.value;
+var overdueContacts = filterBySection(allContacts, "Overdue");
+var todayContacts = filterBySection(allContacts, "Today");
+var upcomingContacts = filterBySection(allContacts, "Upcoming");
+var completedContacts = filterBySection(allContacts, "Completed");
+```
+
+The `getSection(contact)` function returns a particular contact's section, one of these values according to the state of its review process; one of these values: `"Completed"`, `"No Due Date"`, `"Today"`, `"Overdue"`, or `"Upcoming"`.
+
+The `filterBySection(contacts, section)` function retrieves only the `contacts` in the specified `section`.
+
+<Callout type="info" emoji="📔">
+You may not understand precisely how the 
+```
+contacts.filter((contact) => getSection(contact) === section);
+``` 
+code snippet works; just accept that it does its job.
+</Callout>
+
+The `allContacts`, `overdueContacts`, `todayContacts`, `upcomingContacts`, and `completedContacts` variables store the filtered contact lists.
+
+Update all remaining contact pages in `Main.xmlui` to use `Contacts` with filtered data:
+
+```ueml copy filename="Main.xmlui" /{overdueContacts}/ /{todayContacts}/ /{upcomingContacts}/ /{completedContacts}/
+<App> 
+  <!-- Omitted -->
+  <Pages>
+    <Page url="/">Dashboard</Page>
+    <Page url="/contacts/all">
+      <Contacts data="{allContacts}" />
+    </Page>
+    <Page url="/contacts/overdue">
+      <Contacts data="{overdueContacts}" />
+    </Page>
+    <Page url="/contacts/today">
+      <Contacts data="{todayContacts}" />
+    </Page>
+    <Page url="/contacts/upcoming">
+      <Contacts data="{upcomingContacts}" />
+    </Page>
+    <Page url="/contacts/completed">
+      <Contacts data="{completedContacts}" />
+    </Page>
+  </Pages>
+  <!-- Omitted -->
+</App>
 ```
 
 Now, contact filtering works as expected. The list of today's reviews contains only contacts belonging to that category.
@@ -213,90 +238,9 @@ Now, contact filtering works as expected. The list of today's reviews contains o
 
 ### Display Contact Counts
 
-From a UX point of view, it would be good to display the number of contacts in a particular section with the menu items to indicate, for example, that today there are two reviews to be done.
+From a UX point of view, it would be good to display the number of contacts in a particular section with the menu items to indicate, for example, that there are some reviews to be done today.
 
-This feature requires a different approach: you cannot postpone getting the number of contacts in a particular section while the user selects that section in the menu; we must query it when the app starts.
-
-With the following steps, you will query all contacts when the app starts and create variables that contain the contact records for a particular section:
-
-1. Create a `DataSource` component within the main component to fetch the number of items in every section.
-2. Add variables that keep the records in a particular section.
-3. Update the `Contacts` component to use those variables in the data source.
-4. Append the contact counts to the menu item labels.
-
-#### Create a `DataSource`
-
-Navigate to the `Main.xmlui` file and add this `DataSource` declaration (after `AppHeader`):
-
-```ueml copy {2} filename="Main.xmlui"
-<!-- Insert after AppHeader -->
-<DataSource id="contacts" url="/api/contacts" />
-<NavPanel>
-  <!-- Omitted -->
-</NavPanel>
-<!-- Omitted -->
-```
-
-You can access the current data under this `DataSource` using the `contacts.value` expression (`contacts` identifies the `DataSource`, `value` represents the fetched data).
-
-#### Add Task Category Variables
-
-Append these variable definitions to the `Main.xmlui.xs` file:
-
-```javascript copy filename="Main.xmlui.xs"
-var allContacts = contacts.value.filter(t => true);
-var overdueContacts = contacts.value.filter(t => getSection(t) === "Overdue");
-var todayContacts = contacts.value.filter(t => getSection(t) === "Today");
-var upcomingContacts = contacts.value.filter(t => getSection(t) === "Upcoming");
-var completedContacts = contacts.value.filter(t => getSection(t) === "Completed");
-```
-
-Each variable represents a particular task category.
-XMLUI variables are reactive variables: whenever a dependency on the right side (after the equal sign) of the variable definition changes,
-the engine re-evaluates the variable's value and ensures that all dependent objects, including the UI, are updated.
-
-#### Update the `Contacts` Component
-
-You moved the `DataSource` component to the main component, so you no longer need it in `Contacts`.
-Pass the contacts to display in the `data` property of `Contacts` (see `$props.data`):
-
-```ueml copy filename="Contacts.xmlui"
-<Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <List items="{$props.data}">
-    <ContactRow item="{$item}" categories="{categories.value}" />
-  </List>
-</Component>
-```
-
-Update the occurrences of `Contacts` in `Main.xmlui` to pass the variables in `data`:
-
-```ueml copy {4, 7, 10, 13, 16} filename="Main.xmlui"
-<!-- Omitted -->
-<Pages>
-  <Page url="/">Dashboard</Page>
-  <Page url="/contacts/all">
-    <Contacts data="{allContacts}" />
-  </Page>
-  <Page url="/contacts/overdue">
-    <Contacts data="{overdueContacts}" />
-  </Page>
-  <Page url="/contacts/today">
-    <Contacts data="{todayContacts}" />
-  </Page>
-  <Page url="/contacts/upcoming">
-    <Contacts data="{upcomingContacts}" />
-  </Page>
-  <Page url="/contacts/completed">
-    <Contacts data="{completedContacts}" />
-  </Page>
-</Pages>
-<!-- Omitted -->
-```
-
-#### Update the Menu Item Labels
-
-One final step remains: extend the `NavItem` labels with the expressions to display the number of contact records:
+Update the `NavLabel` components in `Main.xmlui`:
 
 ```ueml copy {4-8} filename="Main.xmlui"
 <!-- Omitted -->
@@ -328,68 +272,42 @@ However, the API has other endpoints to get filtered data, as the following URLs
 
 In this section, you will change the code to get filtered contact data from the backend.
 
-### Update `Contacts`
+As you leverage five different URLs to get the data, you do not need the `DataSource` referring to the `/api/contacts` URL. Remove this `DataSource` from `Main.xmlui`. Change the `data` properties of `Contacts` instances to use the corresponding URL:
 
-Change the definition of the `Contacts` component by removing the `DataSource` querying all tasks and setting the `data` property of the `List` to accept a filter tag:
-
-```ueml copy {3} filename="Contacts.xmlui"
-<Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <List data="/api/contacts/{$props.filter}">
-    <ContactRow item="{$item}" categories="{categories.value}" />
-  </List>
-</Component>
-```
-
-<Callout>
-  At this point, the changes are not complete, the app will stop working and display error messages when you refresh the browser. Ignore them; they will go away soon.
-</Callout>
-
-The predicates you used with client-side filtering are now coming from the backend.
-When you invoke a particular `/api/contacts/<filterTag>` endpoint, the backend will apply the proper filtering.
-The `Contacts` component receives its filter tag through the `filter` property.
-
-### Update Filter Tags
-
-Remove the `DataSource` tag from `Main.xmlui`, as you no longer need to invoke the `/api/contacts` endpoint.
-
-Change the `Main.xmlui` file to use the filter tags instead of predicates:
 
 ```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"
 <!-- Omitted -->
 <Pages>
   <Page url="/">Dashboard</Page>
   <Page url="/contacts/all">
-    <Contacts filter="" />
+    <Contacts data="/api/contacts" />
   </Page>
   <Page url="/contacts/overdue">
-    <Contacts filter="overdue" />
+    <Contacts data="/api/contacts/overdue" />
   </Page>
   <Page url="/contacts/today">
-    <Contacts filter="today" />
+    <Contacts data="/api/contacts/today" />
   </Page>
   <Page url="/contacts/upcoming">
-    <Contacts filter="upcoming" />
+    <Contacts data="/api/contacts/upcoming" />
   </Page>
   <Page url="/contacts/completed">
-    <Contacts filter="completed" />
+    <Contacts data="/api/contacts/completed" />
   </Page>
 </Pages>
 <!-- Omitted -->
 ```
 
-Now, the app gets the contact filtered information from the backend.
-To make sure the pontential error messages go away (that came up due to incomplete code), refresh the app in the browser:
+When you refresh the app in the browser, you can test that data filtering still works. However, this time, it happens on the backend. Nonetheless, the item counts in the menu labels show "undefined", because the counters were calculated through the `DataSource` component you just removed.
 
 <br/>
 <Image alt="Completed tasks" src="/resources/images/get-started/filter-completed.png" />
 
-### Update Contact Counts
+<Callout type="info" emoji="📔">
+If you still see the item counters, you forgot to remove the `DataSource` component from `Main.xmlui`.
+</Callout>
 
-You can see that the menu items show "(undefined)" instead of the current contact count.
-This situation resulted from removing the `DataSource` from `Main.xmlui`, which was used to calculate contact counts.
-
-The API has an endpoint, `/api/contactcounts`,
+Let's fix this! The API has an endpoint, `/api/contactcounts`,
 retrieving the task category counts in an object with properties `all`, `overdue`, `today`, `upcoming`, and `completed`,
 each representing a particular contact section.
 
@@ -424,5 +342,6 @@ With this step, the contact counts are displayed again (refresh the browser to s
 <br/>
 <Image alt="Completed tasks" src="/resources/images/get-started/contact-counts.png" />
 
-Now that you learned how to retrieve and filter data on the client or the backend site, it is time to add a few finishing touches to the app.
-The next article will show you how.
+When you filtered the data on the client, you used a `Main.xmlui.xs` code-behind file with several helper functions and variables. Since you no longer leverage them, you can remove the `Main.xmlui.xs` file.
+
+Now that you learned how to retrieve and filter data on the client or the backend site, it is time to add a few finishing touches to the app. The next article will show you how.
