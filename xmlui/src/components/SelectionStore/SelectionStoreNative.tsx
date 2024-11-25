@@ -5,26 +5,38 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/Render
 import { EMPTY_ARRAY } from "@components-core/constants";
 
 type SelectionStoreProps = {
-  idKey: string;
+  idKey?: string;
   updateState: UpdateStateFn;
   children: ReactNode;
   selectedItems: any[];
-  registerComponentApi: RegisterComponentApiFn;
+  registerComponentApi?: RegisterComponentApiFn;
 };
+
+const EMPTY_SELECTION_STATE = {
+  value: EMPTY_ARRAY
+}
+export const StandaloneSelectionStore = ({children})=>{
+  const [selection, setSelection] = useState(EMPTY_SELECTION_STATE);
+  return <SelectionStore updateState={setSelection} selectedItems={selection.value}>{children}</SelectionStore>;
+}
 
 export const SelectionStore = ({
   updateState = noop,
   idKey = "id",
   children,
   selectedItems = EMPTY_ARRAY,
-  registerComponentApi,
+  registerComponentApi = noop,
 }: SelectionStoreProps) => {
   const [items, setItems] = useState<any[]>(selectedItems);
 
   const refreshSelection = useEvent((allItems: any[] = EMPTY_ARRAY) => {
     setItems(allItems);
+    let value = allItems.filter((item) => !!selectedItems.find((si) => si[idKey] === item[idKey]));
+    if(value.length === 0){
+      value = EMPTY_ARRAY
+    }
     updateState({
-      value: allItems.filter((item) => !!selectedItems.find((si) => si[idKey] === item[idKey])),
+      value: value,
     });
   });
 
@@ -66,12 +78,7 @@ interface SelectionState {
 }
 
 // Represents the default selection context
-const SelectionContext = React.createContext<SelectionState>({
-  selectedItems: [],
-  setSelectedRowIds: noop,
-  refreshSelection: noop,
-  idKey: "id",
-});
+const SelectionContext = React.createContext<SelectionState>(null);
 
 // This React hook takes care of retrieving the current selection context
 export function useSelectionContext() {

@@ -9,6 +9,7 @@ import type { RendererContext } from "@abstractions/RendererDefs";
 import { useEvent } from "@components-core/utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
+import { EMPTY_ARRAY } from "@components-core/constants";
 
 type CompoundComponentProps<T extends ComponentDef> = {
   // Definition of the `component` part of the compound component
@@ -60,7 +61,7 @@ export const CompoundComponent = forwardRef(
       const { loaders, vars, functions, scriptError, ...rest } = compound;
       return {
         type: "Container",
-        uses: [],
+        uses: EMPTY_ARRAY,
         api,
         scriptCollected,
         loaders: loaders,

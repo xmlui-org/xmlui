@@ -609,7 +609,7 @@ const MemoizedContainer = memo(
     const uidInfo: Record<string, string> = {};
 
     const thisUidInfoRef = useRef({});
-    const uidInfoRef = isImplicit ? parentUidInfoRef : thisUidInfoRef;
+    const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
 
     return (
       <Fragment
