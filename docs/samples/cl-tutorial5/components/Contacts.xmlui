@@ -1,12 +1,11 @@
 <Component name="Contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
-    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-    defaultSections="{!$props.filter
-        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-    sectionBy="section">    
-    <ContactRow item="{$item}" categories="{categories.value}" />
+    items="{$props.data.map(extendWithSection)}" 
+    defaultSections="{$props.showAllSections
+      ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']
+      : undefined }"
+    sectionBy="section">
+    <ContactRow item="{$item}" />
     <property name="sectionTemplate">
       <HStack 
         horizontalPadding="$space-normal" 

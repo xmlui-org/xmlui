@@ -1,4 +1,5 @@
 <Component name="ContactRow">
+  <DataSource id="categories" url="/api/categories" />
   <Card>
     <HStack verticalAlignment="center">
       <Checkbox initialValue="{$props.item.reviewCompleted}" />

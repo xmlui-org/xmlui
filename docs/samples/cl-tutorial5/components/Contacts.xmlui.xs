@@ -5,6 +5,10 @@ function getSection(contact) {
   return getDate(contact.reviewDueDate) < getDate() ? "Overdue" : "Upcoming";
 }
 
-function loading(contacts, count) {
-  return contacts.inProgress ? "loading..." : count;
+function extendWithSection(contact) {
+  return { ...contact, section: getSection(contact) };
+}
+
+function loading(contacts, message) {
+  return contacts.inProgress ? "loading..." : message;
 }

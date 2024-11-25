@@ -20,19 +20,19 @@
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts/all">
-      <Contacts filter="" />
+      <Contacts data="/api/contacts" showAllSections="yes" />
     </Page>
     <Page url="/contacts/overdue">
-      <Contacts filter="overdue" />
+      <Contacts data="/api/contacts/overdue" />
     </Page>
     <Page url="/contacts/today">
-      <Contacts filter="today" />
+      <Contacts data="/api/contacts/today" />
     </Page>
     <Page url="/contacts/upcoming">
-      <Contacts filter="upcoming" />
+      <Contacts data="/api/contacts/upcoming" />
     </Page>
     <Page url="/contacts/completed">
-      <Contacts filter="completed" />
+      <Contacts data="/api/contacts/completed" />
     </Page>
   </Pages>
   <Footer>
