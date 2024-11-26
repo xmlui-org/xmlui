@@ -22,7 +22,6 @@ import {
   dMulti,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
-import { MultiSelect } from "@components/Select/MultiSelectNative";
 
 const COMP = "Select";
 
@@ -99,39 +98,9 @@ export const selectComponentRenderer = createComponentRenderer(
     layoutCss,
     registerComponentApi,
   }) => {
-    if (extractValue(node.props.multi)) {
-      return (
-        <MultiSelect
-          searchable={extractValue.asOptionalBoolean(node.props.searchable)}
-          layout={layoutCss}
-          updateState={updateState}
-          initialValue={extractValue(node.props.initialValue)}
-          value={state?.value}
-          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-          enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-          placeholder={extractValue.asOptionalString(node.props.placeholder)}
-          validationStatus={extractValue(node.props.validationStatus)}
-          onDidChange={lookupEventHandler("didChange")}
-          onFocus={lookupEventHandler("gotFocus")}
-          onBlur={lookupEventHandler("lostFocus")}
-          registerComponentApi={registerComponentApi}
-          emptyListTemplate={renderChild(node.props.emptyListTemplate)}
-          optionRenderer={(item) => {
-            return (
-              <MemoizedItem
-                node={node.props.optionTemplate || (defaultOptionRenderer as any)}
-                item={item}
-                renderChild={renderChild}
-              />
-            );
-          }}
-        >
-          {renderChild(node.children)}
-        </MultiSelect>
-      );
-    }
     return (
       <Select
+        multi={extractValue.asOptionalBoolean(node.props.multi)}
         layout={layoutCss}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}

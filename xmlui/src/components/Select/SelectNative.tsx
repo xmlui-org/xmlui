@@ -16,22 +16,20 @@ import { useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { SelectOption } from "@components/Select/SelectOptionNative";
-import { type DialogProps, Dialog, DialogContent } from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
-
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 
 type SelectProps = {
   id?: string;
-  initialValue?: string;
-  value?: string;
+  initialValue?: string | string[];
+  value?: string | string[];
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
-  onDidChange?: (newValue: string) => void;
+  onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -39,6 +37,7 @@ type SelectProps = {
   children?: ReactNode;
   autoFocus?: boolean;
   searchable?: boolean;
+  multi?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -65,6 +64,7 @@ export function Select({
   children,
   autoFocus = false,
   searchable = false,
+  multi = false,
 }: SelectProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = React.useState(false);
@@ -101,17 +101,8 @@ export function Select({
     referenceElement?.focus();
   }, [referenceElement]);
 
-  const updateValue = useCallback(
-    (value: string) => {
-      updateState({ value });
-      onDidChange(value);
-      setOpen(false);
-    },
-    [onDidChange, updateState],
-  );
-
   const setValue = useEvent((newValue: string) => {
-    updateValue(newValue);
+    toggleOption(newValue);
   });
 
   useEffect(() => {
@@ -121,40 +112,104 @@ export function Select({
     });
   }, [focus, registerComponentApi, setValue]);
 
+  const toggleOption = useCallback(
+    (selectedValue: string) => {
+      const newSelectedValues =
+        typeof value === "object" && value.includes(selectedValue)
+          ? value.filter((value) => value !== selectedValue)
+          : [...value, selectedValue];
+      updateState({ value: newSelectedValues });
+      onDidChange(newSelectedValues);
+    },
+    [onDidChange, updateState, value],
+  );
+
   const contextValue = useMemo(
     () => ({
+      multi,
       value,
       optionRenderer,
-      onChange: updateValue,
+      onChange: toggleOption,
     }),
-    [optionRenderer, updateValue, value],
+    [multi, optionRenderer, toggleOption, value],
   );
+
+  const handleTogglePopover = () => {
+    setOpen((prev) => !prev);
+  };
+
+  const handleClear = () => {
+    updateState({ value: [] });
+    onDidChange([]);
+  };
+
+  useEffect(() => {
+    console.log("multi", multi);
+  }, [multi]);
 
   return (
     <SelectContext.Provider value={contextValue}>
-      <OptionTypeProvider Component={searchable ? ComboboxOption : SelectOption}>
-        {searchable ? (
+      <OptionTypeProvider Component={searchable || multi ? ComboboxOption : SelectOption}>
+        {searchable || multi ? (
           <Popover open={open} onOpenChange={setOpen} modal={false}>
             <PopoverTrigger asChild>
               <button
+                id={id}
                 style={layout}
                 ref={setReferenceElement}
-                id={id}
                 onFocus={handleOnFocus}
                 onBlur={handleOnBlur}
+                disabled={!enabled}
                 aria-expanded={open}
+                onClick={handleTogglePopover}
                 className={classnames(styles.selectTrigger, styles[validationStatus], {
                   [styles.disabled]: !enabled,
                 })}
+                autoFocus={autoFocus}
               >
-                <span>{value ? value : placeholder || ""}</span>
+                {multi ? (
+                  value?.length > 0 && (
+                    <div className={styles.badgeListContainer}>
+                      <div className={styles.badgeList}>
+                        {typeof value === "object" &&
+                          value?.map((v) => {
+                            return (
+                              <span key={v}>
+                                {v}
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    toggleOption(v);
+                                  }}
+                                />
+                              </span>
+                            );
+                          })}
+                      </div>
+                      <div className={styles.actions}>
+                        <Icon
+                          name="close"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            handleClear();
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )
+                ) : (
+                  <span>{value ? value : placeholder || ""}</span>
+                )}
                 <Icon name="chevrondown" />
               </button>
             </PopoverTrigger>
             <Portal container={root}>
-              <PopoverContent className={styles.selectContent} style={{ width }}>
+              <PopoverContent style={{ width }}>
                 <Command
-                  className={styles.command}
+                  className={styles.selectContent}
                   filter={(value, search, keywords) => {
                     const extendValue = `${value} ${keywords.join(" ")}`;
                     if (extendValue.includes(search)) return 1;
@@ -166,10 +221,10 @@ export function Select({
                     <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
                     <CommandEmpty className={styles.commandEmpty}>
                       {emptyListTemplate ?? (
-                        <>
+                        <div className={styles.emptyList}>
                           <Icon name={"noresult"} />
                           <span>List is empty</span>
-                        </>
+                        </div>
                       )}
                     </CommandEmpty>
                   </CommandList>
@@ -178,7 +233,10 @@ export function Select({
             </Portal>
           </Popover>
         ) : (
-          <SelectPrimitive.Root value={value} onValueChange={updateValue}>
+          <SelectPrimitive.Root
+            value={typeof value === "string" ? value : ""}
+            onValueChange={toggleOption}
+          >
             <SelectTrigger
               autoFocus={autoFocus}
               id={id}
@@ -296,7 +354,8 @@ type OptionComponentProps = {
 export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
   const id = useId();
   const { value: selectedValue, onChange, optionRenderer } = useSelect();
-  const selected = selectedValue === value;
+  const selected =
+    typeof selectedValue === "object" ? selectedValue.includes(value) : selectedValue === value;
 
   return (
     <CommandItem
@@ -324,14 +383,6 @@ export const Command = React.forwardRef<
   <CommandPrimitive ref={ref} className={classnames(styles.command, className)} {...props} />
 ));
 Command.displayName = CommandPrimitive.displayName;
-
-const CommandDialog = ({ children, ...props }: DialogProps) => (
-  <Dialog {...props}>
-    <DialogContent className={classnames(styles.commandDialogContent)}>
-      <Command>{children}</Command>
-    </DialogContent>
-  </Dialog>
-);
 
 export const CommandInput = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Input>,
@@ -384,18 +435,6 @@ export const CommandGroup = React.forwardRef<
 
 CommandGroup.displayName = CommandPrimitive.Group.displayName;
 
-export const CommandSeparator = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Separator>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive.Separator
-    ref={ref}
-    className={classnames(styles.commandSeparator, className)}
-    {...props}
-  />
-));
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName;
-
 export const CommandItem = React.forwardRef<
   React.ElementRef<typeof CommandPrimitive.Item>,
   React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
@@ -404,8 +443,3 @@ export const CommandItem = React.forwardRef<
 ));
 
 CommandItem.displayName = CommandPrimitive.Item.displayName;
-
-export const CommandShortcut = ({ className, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span className={classnames(styles.commandShortcut, className)} {...props} />
-);
-CommandShortcut.displayName = "CommandShortcut";
