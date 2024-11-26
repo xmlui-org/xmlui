@@ -248,7 +248,13 @@ export function Select({
                     return 0;
                   }}
                 >
-                  <CommandInput placeholder="Search..." className={styles.commandInput} />
+                  {searchable ? (
+                    <CommandInput placeholder="Search..." className={styles.commandInput} />
+                  ) : (
+                    // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                    <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                  )}
+
                   <CommandList className={styles.commandList}>
                     <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
                     <CommandEmpty className={styles.commandEmpty}>{emptyListNode}</CommandEmpty>
