@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { useId, useRef } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
@@ -161,6 +161,17 @@ export function Select({
     onDidChange([]);
   };
 
+  const emptyListNode = useMemo(
+    () =>
+      emptyListTemplate ?? (
+        <div className={styles.selectEmpty}>
+          <Icon name={"noresult"} />
+          <span>List is empty</span>
+        </div>
+      ),
+    [emptyListTemplate],
+  );
+
   return (
     <SelectContext.Provider value={contextValue}>
       <OptionTypeProvider Component={searchable || multi ? ComboboxOption : SelectOption}>
@@ -240,14 +251,7 @@ export function Select({
                   <CommandInput placeholder="Search..." className={styles.commandInput} />
                   <CommandList className={styles.commandList}>
                     <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                    <CommandEmpty className={styles.commandEmpty}>
-                      {emptyListTemplate ?? (
-                        <div className={styles.emptyList}>
-                          <Icon name={"noresult"} />
-                          <span>List is empty</span>
-                        </div>
-                      )}
-                    </CommandEmpty>
+                    <CommandEmpty className={styles.commandEmpty}>{emptyListNode}</CommandEmpty>
                   </CommandList>
                 </Command>
               </PopoverContent>
@@ -271,7 +275,9 @@ export function Select({
             >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
+            <SelectContent>
+              {React.Children.toArray(children).length > 0 ? <>{children}</> : emptyListNode}
+            </SelectContent>
           </SelectPrimitive.Root>
         )}
       </OptionTypeProvider>
@@ -325,8 +331,8 @@ SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayNam
 
 const SelectContent = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content> & { emptyListTemplate?: ReactNode }
->(({ className, children, emptyListTemplate, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+>(({ className, children, ...props }, ref) => {
   const { root } = useTheme();
   return (
     <SelectPrimitive.Portal container={root}>
@@ -337,17 +343,8 @@ const SelectContent = React.forwardRef<
         {...props}
       >
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport className={classnames(styles.selectViewport, {})}>
-          {React.Children.toArray(children).length > 0 ? (
-            <>{children}</>
-          ) : (
-            emptyListTemplate ?? (
-              <div className={styles.selectEmpty}>
-                <Icon name={"noresult"} />
-                <span>List is empty</span>
-              </div>
-            )
-          )}
+        <SelectPrimitive.Viewport className={classnames(styles.selectViewport, className)}>
+          {children}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>

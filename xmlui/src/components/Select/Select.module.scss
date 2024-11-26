@@ -38,6 +38,7 @@ $componentName: "Select";
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
 }
+
 .selectTrigger {
   min-height: 2.6rem;
   display: flex;
@@ -137,13 +138,14 @@ $componentName: "Select";
   }
 }
 
-.empty {
+.emptyList {
   display: flex;
+  gap: .2rem;
+  padding: 10px 0;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
+  font-size: 14px;
   width: 100%;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .selectScrollUpButton {
@@ -199,10 +201,6 @@ $componentName: "Select";
     outline: none;
     box-shadow: none;
     border: 0;
-  }
-
-  &::placeholder {
-    color: #9ca3af;
   }
 
   &:disabled {
