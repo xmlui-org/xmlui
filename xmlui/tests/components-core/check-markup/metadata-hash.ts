@@ -11,7 +11,6 @@ import { BookmarkMd } from "@components/Bookmark/Bookmark";
 import { CardMd } from "@components/Card/Card";
 import { ChangeListenerMd } from "@components/ChangeListener/ChangeListener";
 import { CheckboxMd } from "@components/Checkbox/Checkbox";
-import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
 import { DropdownMenuMd, MenuItemMd } from "@components/DropdownMenu/DropdownMenu";
@@ -77,7 +76,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   Column: ColumnMd,
-  Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
@@ -105,7 +103,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   Markdown: MarkdownMd,
   MenuItem: MenuItemMd,
   ModalDialog: ModalDialogMd,
-  MultiCombobox: ComboboxMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,

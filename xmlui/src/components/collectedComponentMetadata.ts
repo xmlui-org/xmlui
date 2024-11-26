@@ -11,7 +11,6 @@ import { BookmarkMd } from "@components/Bookmark/Bookmark";
 import { CardMd } from "@components/Card/Card";
 import { ChangeListenerMd } from "@components/ChangeListener/ChangeListener";
 import { CheckboxMd } from "@components/Checkbox/Checkbox";
-import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
 import {
@@ -110,7 +109,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Chart: ChartMd,
   Checkbox: CheckboxMd,
   Column: ColumnMd,
-  Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
