@@ -137,9 +137,89 @@ $componentName: "Select";
   max-height: 24rem;
   min-width: 8rem;
   overflow: hidden;
-  background-color: createThemeVar("Input:color-bg-menu-Select");
-  border-radius: createThemeVar("Input:radius-menu-Select");
-  box-shadow: createThemeVar("Input:shadow-menu-Select");
+  background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
+  border-radius: createThemeVar("Input:radius-menu-#{$componentName}");
+  box-shadow: createThemeVar("Input:shadow-menu-#{$componentName}");
+
+  .command {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    border-radius: 6px;
+    background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
+
+    .commandDialogContent {
+      overflow: hidden;
+      padding: 0;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .commandInputContainer {
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+    }
+
+    .commandInput {
+      flex: 1;
+      height: 44px;
+      background-color: transparent;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      border: none;
+
+      &:focus {
+        outline: none;
+        box-shadow: none;
+        border: 0;
+      }
+
+      &::placeholder {
+        color: #9ca3af;
+      }
+
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.5;
+      }
+    }
+
+    .commandList {
+      max-height: 300px;
+      overflow-y: auto;
+      overflow-x: hidden;
+
+    }
+
+    .commandGroup {
+      overflow: hidden;
+      padding: 4px;
+
+      & [cmdk-group-heading] {
+        padding: 6px 8px;
+        font-size: 12px;
+        font-weight: 500;
+        color: #6b7280;
+      }
+    }
+
+    .commandSeparator {
+      margin: 0 -4px;
+      height: 1px;
+      background-color: #e5e7eb;
+    }
+
+    .commandShortcut {
+      margin-left: auto;
+      font-size: 12px;
+      letter-spacing: 0.05em;
+      color: #6b7280;
+    }
+  }
+
 
   &[data-state='open'] {
     animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
@@ -207,8 +287,9 @@ $componentName: "Select";
     color: createThemeVar("color-text-item-#{$componentName}--disabled");
     font-style: italic;
   }
-}x0
+}
 
+x0
 .selectViewport {
   height: var(--radix-select-trigger-height);
   width: 100%;

@@ -1,14 +1,6 @@
 import * as React from "react";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import classnames from "classnames";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@components/Select/Command";
 import Icon from "@components/Icon/IconNative";
 import styles from "@components/Select/Select.module.scss";
 import { EMPTY_ARRAY, noop } from "@components-core/constants";
@@ -25,6 +17,14 @@ import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { Button } from "@components/Button/ButtonNative";
 import { MultiSelectContext, useMultiSelect } from "@components/Select/MultiSelectContext";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@components/Select/SelectNative";
 
 /**
  * Props for MultiSelect component
