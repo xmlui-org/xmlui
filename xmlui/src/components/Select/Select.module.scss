@@ -38,16 +38,15 @@ $componentName: "Select";
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
 }
-
 .selectTrigger {
+  min-height: 2.6rem;
   display: flex;
-  padding: t.$space-2;
+  padding: t.$space-1 t.$space-2;
   width: 100%;
   align-items: center;
   justify-content: space-between;
   outline: none;
   overflow: hidden;
-  line-height: 1.25rem;
 
   @include variant("default");
 
@@ -91,6 +90,40 @@ $componentName: "Select";
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+}
+
+.badge {
+  width: fit-content;
+  height: fit-content;
+  min-width: 0;
+  padding: createThemeVar("padding-vertical-#{$componentName}-badge") createThemeVar("padding-horizontal-#{$componentName}-badge");
+  transition: color 0.2s, background-color 0.2s;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  gap: t.$space-1;
+  justify-content: center;
+  align-items: center;
+  border-radius: t.$radius;
+  font-size: createThemeVar("Input:font-size-#{$componentName}-badge");
+  background-color: createThemeVar("Input:color-bg-#{$componentName}-badge");
+  color: createThemeVar("Input:color-text-#{$componentName}-badge");
+
+  &:hover {
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--hover");
+    color: createThemeVar("Input:color-text-#{$componentName}-badge--hover");
+  }
+
+  &:active {
+    background-color: createThemeVar("Input:color-bg-#{$componentName}-badge--active");
+    color: createThemeVar("Input:color-text-#{$componentName}-badge--active");
+  }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .placeholder {

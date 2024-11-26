@@ -178,6 +178,7 @@ export function Select({
                 onClick={handleTogglePopover}
                 className={classnames(styles.selectTrigger, styles[validationStatus], {
                   [styles.disabled]: !enabled,
+                  [styles.multi]: multi,
                 })}
                 autoFocus={autoFocus}
               >
@@ -188,7 +189,7 @@ export function Select({
                       <div className={styles.badgeList}>
                         {value.map((v) => {
                           return (
-                            <span key={v}>
+                            <span key={v} className={styles.badge}>
                               {v}
                               <Icon
                                 name="close"
@@ -202,24 +203,28 @@ export function Select({
                           );
                         })}
                       </div>
-                      <div className={styles.actions}>
-                        <Icon
-                          name="close"
-                          size="sm"
-                          onClick={(event) => {
-                            event.stopPropagation();
-                            handleClear();
-                          }}
-                        />
-                      </div>
                     </div>
                   ) : (
-                    <span>{placeholder || ""}</span>
+                    <span className={styles.placeholder}>{placeholder || ""}</span>
                   ))
                 ) : (
-                  <span>{value !== null && value !== undefined ? value : placeholder || ""}</span>
+                  <span className={styles.placeholder}>
+                    {value !== null && value !== undefined ? value : placeholder || ""}
+                  </span>
                 )}
-                <Icon name="chevrondown" />
+                <div className={styles.actions}>
+                  {Array.isArray(value) && value.length > 0 && (
+                    <Icon
+                      name="close"
+                      size="sm"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        handleClear();
+                      }}
+                    />
+                  )}
+                  <Icon name="chevrondown" />
+                </div>
               </button>
             </PopoverTrigger>
             <Portal container={root}>
