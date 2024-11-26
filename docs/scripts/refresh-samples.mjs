@@ -17,6 +17,8 @@ const CORE_PATH = path.join(__dirname, "../../xmlui/dist", CORE_FILE);
 const SAMPLES_BASE = path.join(__dirname, "../samples");
 const PUBLIC_CORE_FOLDER = path.join(__dirname, "../public/resources/files/for-download");
 const ZIP_TARGET_FOLDER = path.join(__dirname, "../public/resources/files/getting-started");
+const XMLUI_STARTER = path.join(SAMPLES_BASE, "xmlui-starter");
+const XMLUI_EMPTY = path.join(SAMPLES_BASE, "xmlui-empty");
 const GETTING_STARTED_SAMPLE = path.join(SAMPLES_BASE, "getting-started");
 const CL_TUTORIAL_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial");
 const CL_TUTORIAL2_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial2");
@@ -29,6 +31,18 @@ const CL_TUTORIAL_FINAL_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial-final");
 // --- Public core file
 console.log("Refreshing the public core file...");
 await copyCoreTo(PUBLIC_CORE_FOLDER);
+console.log("Done.");
+
+// --- XMLUI starter sample
+console.log("Refreshing the XMLUI Starter sample...");
+await copyCoreTo(XMLUI_STARTER);
+await compressFolder(XMLUI_STARTER, "xmlui-starter.zip");
+console.log("Done.");
+
+// --- XMLUI empty sample
+console.log("Refreshing the XMLUI Empty sample...");
+await copyCoreTo(XMLUI_EMPTY);
+await compressFolder(XMLUI_EMPTY, "xmlui-empty.zip");
 console.log("Done.");
 
 // --- Getting started sample
