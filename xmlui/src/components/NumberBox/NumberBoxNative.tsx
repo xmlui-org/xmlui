@@ -337,7 +337,6 @@ export const NumberBox = ({
           [styles.valid]: validationStatus === "valid",
         })}
         tabIndex={-1}
-        style={style}
         onFocus={() => {
           inputRef.current?.focus();
         }}

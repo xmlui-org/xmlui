@@ -4,6 +4,7 @@ import { useEvent } from "@components-core/utils/misc";
 import { union, uniq } from "lodash-es";
 import { EMPTY_ARRAY } from "@components-core/constants";
 import { useSelectionContext } from "@components/SelectionStore/SelectionStoreNative";
+import { usePrevious } from "@components-core/utils/hooks";
 
 /**
  * An interval of selected items
@@ -30,11 +31,9 @@ type ToggleOptions = {
 
 type SelectionApi = {
   getSelectedItems: () => any[];
-  getSelectedIndexes: () => number[];
   getSelectedIds: () => any[];
   clearSelection: () => void;
   selectAll: () => void;
-  selectIndex: (index: number | Array<number>) => void;
   selectId: (id: any | Array<any>) => void;
 };
 
@@ -96,7 +95,7 @@ export default function useRowSelection({
   onSelectionDidChange,
 }: {
   items: Item[];
-  visibleItems?: Item[];
+  visibleItems: Item[];
   rowsSelectable: boolean;
   enableMultiRowSelection: boolean;
   onSelectionDidChange?: (newSelection: Item[]) => Promise<void>;
@@ -112,9 +111,22 @@ export default function useRowSelection({
     return visibleItems.map((item) => item[idKey]);
   }, [idKey, visibleItems]);
 
+
+  // --- If the items change, refresh the selectable items (if the rows are selectable)
   useEffect(() => {
     refreshSelection(rowsSelectable ? items : EMPTY_ARRAY);
   }, [refreshSelection, items, rowsSelectable]);
+
+
+  // --- If the multi-row selection switches to disabled, keep only the first selected item
+  const prevEnableMultiRowSelection = usePrevious(enableMultiRowSelection);
+  useEffect(() => {
+    if(prevEnableMultiRowSelection && !enableMultiRowSelection){
+      if(selectedItems.length > 1){
+        setSelectedRowIds([selectedItems[0][idKey]]);
+      }
+    }
+  }, [enableMultiRowSelection, idKey, prevEnableMultiRowSelection, selectedItems, setSelectedRowIds]);
 
   // --- If the focused item is not available set the focus to the first item
   useEffect(() => {
@@ -267,6 +279,7 @@ export default function useRowSelection({
   });
 
   useEffect(() => {
+    // console.log("selection DID CHANGE?");
     onSelectionDidChange?.(selectedItems);
   }, [selectedItems, onSelectionDidChange]);
 
@@ -298,12 +311,6 @@ export default function useRowSelection({
     return selectedItems;
   }, [selectedItems]);
 
-  const getSelectedIndexes = useCallback(() => {
-    return selectedItems.map((item) => {
-      return walkableList.indexOf(item[idKey]);
-    });
-  }, [idKey, selectedItems, walkableList]);
-
   const getSelectedIds = useCallback(() => {
     return selectedItems.map((item) => item[idKey]);
   }, [idKey, selectedItems]);
@@ -316,29 +323,14 @@ export default function useRowSelection({
     checkAllRows(true);
   }, [checkAllRows]);
 
-  const selectIndex = useCallback(
-    (index: number | Array<number>) => {
-      if(!rowsSelectable){
-        return;
-      }
-      const indexes = Array.isArray(index) ? index : [index];
-      if (indexes.length > 1 && !enableMultiRowSelection) {
-        return;
-      }
-      const ids = indexes.map((i) => walkableList[i]);
-      setSelectedRowIds(ids);
-    },
-    [enableMultiRowSelection, rowsSelectable, setSelectedRowIds, walkableList],
-  );
-
   const selectId = useCallback(
     (id: any | Array<any>) => {
       if(!rowsSelectable){
         return;
       }
-      const ids = Array.isArray(id) ? id : [id];
+      let ids = Array.isArray(id) ? id : [id];
       if (ids.length > 1 && !enableMultiRowSelection) {
-        return;
+        ids = [ids[0]];
       }
       setSelectedRowIds(ids);
     },
@@ -348,21 +340,17 @@ export default function useRowSelection({
   const api = useMemo(() => {
     return {
       getSelectedItems,
-      getSelectedIndexes,
       getSelectedIds,
       clearSelection,
       selectAll,
-      selectIndex,
       selectId,
     };
   }, [
     clearSelection,
     getSelectedIds,
-    getSelectedIndexes,
     getSelectedItems,
     selectAll,
     selectId,
-    selectIndex,
   ]);
 
   // --- Retrieve the selection management object
