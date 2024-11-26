@@ -115,11 +115,12 @@ export function Select({
   const toggleOption = useCallback(
     (selectedValue: string) => {
       const newSelectedValues =
-        typeof value === "object" && value.includes(selectedValue)
+        typeof value === "object" ? value.includes(selectedValue)
           ? value.filter((value) => value !== selectedValue)
-          : [...value, selectedValue];
+          : [...value, selectedValue] : selectedValue;
       updateState({ value: newSelectedValues });
       onDidChange(newSelectedValues);
+      setOpen(false);
     },
     [onDidChange, updateState, value],
   );
@@ -142,10 +143,6 @@ export function Select({
     updateState({ value: [] });
     onDidChange([]);
   };
-
-  useEffect(() => {
-    console.log("multi", multi);
-  }, [multi]);
 
   return (
     <SelectContext.Provider value={contextValue}>
