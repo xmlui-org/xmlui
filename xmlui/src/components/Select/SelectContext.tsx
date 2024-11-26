@@ -4,13 +4,13 @@ import type { Option } from "@components/abstractions";
 
 type SelectContextValue = {
   value: string;
-  onChange?: (selectedOption: Option) => void;
+  onChange?: (selectedValue: string) => void;
   optionRenderer: (option: Option) => ReactNode;
 };
 
 export const SelectContext = createContext<SelectContextValue>({
   value: "",
-  onChange: (selectedOption: Option) => {},
+  onChange: (selectedValue: string) => {},
   optionRenderer: (option: Option) => <div>{option.label}</div>,
 });
 

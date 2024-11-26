@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { useId, useRef } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
 import type { Option } from "@components/abstractions";
@@ -8,13 +9,22 @@ import type { ValidationStatus } from "@components/abstractions";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import * as React from "react";
-import { SelectContext } from "@components/Select/SelectContext";
+import {SelectContext, useSelect} from "@components/Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { SelectOption } from "@components/Select/SelectOptionNative";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@components/Select/Command";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 
 type SelectProps = {
   id?: string;
@@ -33,6 +43,7 @@ type SelectProps = {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   autoFocus?: boolean;
+  searchable?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -58,12 +69,29 @@ export function Select({
   layout,
   children,
   autoFocus = false,
+  searchable = false,
 }: SelectProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [width, setWidth] = useState(0);
+  const { root } = useTheme();
+  const observer = useRef<ResizeObserver>();
 
   useEffect(() => {
     updateState({ value: initialValue });
   }, [initialValue, updateState]);
+
+  useEffect(() => {
+    const current = referenceElement as any;
+    // --- We are already observing old element
+    if (observer?.current && current) {
+      observer.current.unobserve(current);
+    }
+    observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
+    if (current && observer.current) {
+      observer.current.observe(referenceElement as any);
+    }
+  }, [referenceElement]);
 
   // --- Manage obtaining and losing the focus
   const handleOnFocus = useCallback(() => {
@@ -82,6 +110,7 @@ export function Select({
     (value: string) => {
       updateState({ value });
       onDidChange(value);
+      setOpen(false);
     },
     [onDidChange, updateState],
   );
@@ -101,29 +130,69 @@ export function Select({
     () => ({
       value,
       optionRenderer,
+      onChange: updateValue,
     }),
     [optionRenderer, value],
   );
 
   return (
     <SelectContext.Provider value={contextValue}>
-      <OptionTypeProvider Component={SelectOption}>
-        <SelectPrimitive.Root value={value} onValueChange={updateValue}>
-          <SelectTrigger
-            autoFocus={autoFocus}
-            id={id}
-            style={layout}
-            className={styles.selectTrigger}
-            onFocus={handleOnFocus}
-            onBlur={handleOnBlur}
-            enabled={enabled}
-            validationStatus={validationStatus}
-            ref={setReferenceElement}
-          >
-            <SelectValue placeholder={placeholder} />
-          </SelectTrigger>
-          <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
-        </SelectPrimitive.Root>
+      <OptionTypeProvider Component={searchable ? ComboboxOption : SelectOption}>
+        {searchable ? (
+          <Popover open={open} onOpenChange={setOpen} modal={false}>
+            <PopoverTrigger asChild>
+              <button
+                style={layout}
+                ref={setReferenceElement}
+                id={id}
+                onFocus={handleOnFocus}
+                onBlur={handleOnBlur}
+                aria-expanded={open}
+                className={classnames(styles.selectTrigger, styles[validationStatus], {
+                  [styles.disabled]: !enabled,
+                })}
+              >
+                <span>{value ? value : placeholder || ""}</span>
+                <Icon name="chevrondown" />
+              </button>
+            </PopoverTrigger>
+            <Portal container={root}>
+              <PopoverContent className={styles.popoverContent} style={{ width }}>
+                <Command>
+                  <CommandInput placeholder="Search..." className={styles.commandInput} />
+                  <CommandList className={styles.commandList}>
+                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
+                    <CommandEmpty className={styles.commandEmpty}>
+                      {emptyListTemplate ?? (
+                        <>
+                          <Icon name={"noresult"} />
+                          <span>List is empty</span>
+                        </>
+                      )}
+                    </CommandEmpty>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Portal>
+          </Popover>
+        ) : (
+          <SelectPrimitive.Root value={value} onValueChange={updateValue}>
+            <SelectTrigger
+              autoFocus={autoFocus}
+              id={id}
+              style={layout}
+              className={styles.selectTrigger}
+              onFocus={handleOnFocus}
+              onBlur={handleOnBlur}
+              enabled={enabled}
+              validationStatus={validationStatus}
+              ref={setReferenceElement}
+            >
+              <SelectValue placeholder={placeholder} />
+            </SelectTrigger>
+            <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
+          </SelectPrimitive.Root>
+        )}
       </OptionTypeProvider>
     </SelectContext.Provider>
   );
@@ -215,3 +284,33 @@ const SelectLabel = React.forwardRef<
 ));
 
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
+
+type OptionComponentProps = {
+  value: string;
+  label: string;
+  enabled?: boolean;
+};
+
+export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
+  const id = useId();
+  const { value: selectedValue, onChange, optionRenderer } = useSelect();
+  const selected = selectedValue === value;
+
+  return (
+    <CommandItem
+      id={id}
+      key={id}
+      disabled={!enabled}
+      value={`${value}`}
+      className={styles.multiComboboxOption}
+      onSelect={() => {
+        onChange(value);
+      }}
+      data-state={selected ? "checked" : undefined}
+      keywords={[value]}
+    >
+      {optionRenderer({ label, value })}
+      {selected && <Icon name="checkmark" />}
+    </CommandItem>
+  );
+}

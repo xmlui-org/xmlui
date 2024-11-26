@@ -8,9 +8,9 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@components/Combobox/Command";
+} from "@components/Select/Command";
 import Icon from "@components/Icon/IconNative";
-import styles from "@components/Select/MultiSelect.module.scss";
+import styles from "@components/Select/Select.module.scss";
 import { EMPTY_ARRAY, noop } from "@components-core/constants";
 import type { CSSProperties, ReactNode } from "react";
 import { useId } from "react";
@@ -184,7 +184,7 @@ export const MultiSelect = ({
               onBlur={handleOnBlur}
               disabled={!enabled}
               onClick={handleTogglePopover}
-              className={classnames(styles.multiComboboxButton, styles[validationStatus], {
+              className={classnames(styles.selectTrigger, styles[validationStatus], {
                 [styles.disabled]: !enabled,
               })}
               autoFocus={autoFocus}

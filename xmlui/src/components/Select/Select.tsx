@@ -134,6 +134,7 @@ export const selectComponentRenderer = createComponentRenderer(
       <Select
         layout={layoutCss}
         updateState={updateState}
+        searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}

@@ -17,7 +17,6 @@ import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { HelperText } from "@components/FormItem/HelperText";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useValidation, useValidationDisplay } from "./Validations";
-import { Combobox } from "@components/Combobox/ComboboxNative";
 import {
   fieldChanged,
   fieldFocused,
@@ -137,21 +136,6 @@ export const FormItem = memo(function FormItem({
 
   let formControl = null;
   switch (type) {
-    case "combobox": {
-      formControl = (
-        <Combobox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          registerComponentApi={registerComponentApi}
-        >
-          {children}
-        </Combobox>
-      );
-      break;
-    }
     case "select": {
       formControl = (
         <Select

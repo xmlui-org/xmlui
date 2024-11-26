@@ -37,7 +37,6 @@ import { cardComponentRenderer } from "@components/Card/Card";
 import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
 import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "@components/NoResult/NoResult";
-import { comboboxComponentRenderer } from "@components/Combobox/Combobox";
 import { fileUploadDropZoneComponentRenderer } from "@components/FileUploadDropZone/FileUploadDropZone";
 import { iconComponentRenderer } from "@components/Icon/Icon";
 import { itemsComponentRenderer } from "@components/Items/Items";
@@ -353,7 +352,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuItemRenderer);
       this.registerComponentRenderer(subMenuItemRenderer);
       this.registerComponentRenderer(menuSeparatorRenderer);
-      this.registerComponentRenderer(comboboxComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);

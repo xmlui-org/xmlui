@@ -7,7 +7,7 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-$componentName: "MultiCombobox";
+$componentName: "MultiSelect";
 
 // --- CSS properties of a particular Select variant
 @mixin variant($variantName) {
@@ -92,8 +92,6 @@ $componentName: "MultiCombobox";
     display: inline-block;
   }
 }
-
-
 
 
 .actions {

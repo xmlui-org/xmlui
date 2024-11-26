@@ -47,6 +47,7 @@ $componentName: "Select";
   justify-content: space-between;
   outline: none;
   overflow: hidden;
+  line-height: 1.25rem;
 
   @include variant("default");
 
@@ -76,6 +77,40 @@ $componentName: "Select";
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 1;
   overflow: hidden;
+}
+
+.badgeListContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.badgeList {
+  gap: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.placeholder {
+  margin: 3px 0;
+  display: block;
+  color: createThemeVar("Input:color-placeholder-#{$componentName}");
+
+  &:empty::before {
+    content: "\00a0";
+    display: inline-block;
+  }
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .selectScrollUpButton {
@@ -146,6 +181,33 @@ $componentName: "Select";
     transform: translateY(-0.25rem);
   }
 }
+
+.multiComboboxOption {
+  padding: 0.5rem 1rem;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: createThemeVar("color-bg-item-#{$componentName}");
+
+  &[data-selected=true] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+  }
+
+  /*  &[data-state=checked] {
+      background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+    }*/
+
+  &[data-disabled=true] {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: createThemeVar("color-text-item-#{$componentName}--disabled");
+    font-style: italic;
+  }
+}x0
 
 .selectViewport {
   height: var(--radix-select-trigger-height);
