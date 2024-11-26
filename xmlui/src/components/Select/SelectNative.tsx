@@ -9,7 +9,7 @@ import type { ValidationStatus } from "@components/abstractions";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import * as React from "react";
-import {SelectContext, useSelect} from "@components/Select/SelectContext";
+import { SelectContext, useSelect } from "@components/Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
@@ -132,7 +132,7 @@ export function Select({
       optionRenderer,
       onChange: updateValue,
     }),
-    [optionRenderer, value],
+    [optionRenderer, updateValue, value],
   );
 
   return (
@@ -158,7 +158,13 @@ export function Select({
             </PopoverTrigger>
             <Portal container={root}>
               <PopoverContent className={styles.popoverContent} style={{ width }}>
-                <Command>
+                <Command
+                  filter={(value, search, keywords) => {
+                    const extendValue = `${value} ${keywords.join(" ")}`;
+                    if (extendValue.includes(search)) return 1;
+                    return 0;
+                  }}
+                >
                   <CommandInput placeholder="Search..." className={styles.commandInput} />
                   <CommandList className={styles.commandList}>
                     <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
@@ -307,7 +313,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
-      keywords={[value]}
+      keywords={[label]}
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
