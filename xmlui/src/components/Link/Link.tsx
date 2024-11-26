@@ -46,7 +46,7 @@ export const LinkMd = createMetadata({
     [`thickness-outline-${COMP}--focus`]: "$thickness-outline--focus",
     [`style-outline-${COMP}--focus`]: "$style-outline--focus",
     [`offset-outline-${COMP}--focus`]: "$offset-outline--focus",
-    [`font-size-${COMP}`]: "$font-size",
+    [`font-size-${COMP}`]: "inherit",
     [`gap-icon-${COMP}`]: "$gap-tight",
     [`padding-icon-${COMP}`]: "$space-0_5",
 
