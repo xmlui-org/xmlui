@@ -18,7 +18,6 @@ import { HelperText } from "@components/FormItem/HelperText";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useValidation, useValidationDisplay } from "./Validations";
 import { Combobox } from "@components/Combobox/ComboboxNative";
-import { MultiCombobox } from "@components/MultiCombobox/MultiComboboxNative";
 import {
   fieldChanged,
   fieldFocused,
@@ -150,21 +149,6 @@ export const FormItem = memo(function FormItem({
         >
           {children}
         </Combobox>
-      );
-      break;
-    }
-    case "multiCombobox": {
-      formControl = (
-        <MultiCombobox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </MultiCombobox>
       );
       break;
     }

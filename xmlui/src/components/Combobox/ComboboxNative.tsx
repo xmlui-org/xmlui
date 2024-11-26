@@ -191,6 +191,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
+      keywords={[value]}
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}

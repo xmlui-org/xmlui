@@ -36,9 +36,8 @@ $componentName: "MultiCombobox";
 }
 
 .multiComboboxButton {
-  min-height: 2.5rem;
   display: flex;
-  padding: t.$space-2;
+  padding: t.$space-1;
   width: 100%;
   align-items: center;
   justify-content: space-between;
@@ -89,7 +88,7 @@ $componentName: "MultiCombobox";
   color: createThemeVar("Input:color-placeholder-#{$componentName}");
 
   &:empty::before {
-    content: "\00a0"; /* Nem törhető szóköz */
+    content: "\00a0";
     display: inline-block;
   }
 }

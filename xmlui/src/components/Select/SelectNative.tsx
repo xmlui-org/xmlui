@@ -120,7 +120,7 @@ export function Select({
             validationStatus={validationStatus}
             ref={setReferenceElement}
           >
-            <SelectValue placeholder={placeholder} aria-multiselectable={true} />
+            <SelectValue placeholder={placeholder} />
           </SelectTrigger>
           <SelectContent emptyListTemplate={emptyListTemplate}>{children}</SelectContent>
         </SelectPrimitive.Root>

@@ -82,7 +82,6 @@ import { spinnerComponentRenderer } from "@components/Spinner/Spinner";
 import { markdownComponentRenderer } from "@components/Markdown/Markdown";
 import { selectComponentRenderer } from "@components/Select/Select";
 import { themeChangerButtonComponentRenderer } from "@components/ThemeChanger/ThemeChanger";
-import { multiComboboxComponentRenderer } from "@components/MultiCombobox/MultiCombobox";
 import { formSectionRenderer } from "@components/FormSection/FormSection";
 import { checkboxComponentRenderer } from "@components/Checkbox/Checkbox";
 import { switchComponentRenderer } from "@components/Switch/Switch";
@@ -354,7 +353,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuItemRenderer);
       this.registerComponentRenderer(subMenuItemRenderer);
       this.registerComponentRenderer(menuSeparatorRenderer);
-      this.registerComponentRenderer(multiComboboxComponentRenderer);
       this.registerComponentRenderer(comboboxComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);

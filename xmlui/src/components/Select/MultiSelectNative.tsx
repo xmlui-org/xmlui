@@ -10,7 +10,7 @@ import {
   CommandList,
 } from "@components/Combobox/Command";
 import Icon from "@components/Icon/IconNative";
-import styles from "@components/MultiCombobox/MultiCombobox.module.scss";
+import styles from "@components/Select/MultiSelect.module.scss";
 import { EMPTY_ARRAY, noop } from "@components-core/constants";
 import type { CSSProperties, ReactNode } from "react";
 import { useId } from "react";
@@ -23,13 +23,13 @@ import { isEqual } from "lodash-es";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { useEvent } from "@components-core/utils/misc";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { MultiComboboxContext, useSelect } from "@components/MultiCombobox/MultiComboboxContext";
 import { Button } from "@components/Button/ButtonNative";
+import { MultiSelectContext, useMultiSelect } from "@components/Select/MultiSelectContext";
 
 /**
- * Props for MultiCombobox component
+ * Props for MultiSelect component
  */
-interface MultiComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface MultiSelectProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   id?: string;
   value?: string[];
   initialValue?: string[];
@@ -46,13 +46,14 @@ interface MultiComboboxProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   onBlur?: () => void;
   autoFocus?: boolean;
   validationStatus?: ValidationStatus;
+  searchable?: boolean;
 }
 
 function defaultRenderer(option: Option) {
   return <div>{option.label}</div>;
 }
 
-export const MultiCombobox = ({
+export const MultiSelect = ({
   id,
   value = EMPTY_ARRAY,
   initialValue = EMPTY_ARRAY,
@@ -69,7 +70,8 @@ export const MultiCombobox = ({
   registerComponentApi,
   emptyListTemplate,
   autoFocus = false,
-}: MultiComboboxProps) => {
+  searchable = true,
+}: MultiSelectProps) => {
   const [isPopoverOpen, setIsPopoverOpen] = React.useState(false);
   const [initValue, setInitValue] = useState<string[] | undefined>(initialValue);
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
@@ -170,7 +172,7 @@ export const MultiCombobox = ({
   );
 
   return (
-    <MultiComboboxContext.Provider value={multiSelectContextValue}>
+    <MultiSelectContext.Provider value={multiSelectContextValue}>
       <OptionTypeProvider Component={ComboboxOption}>
         <Popover open={isPopoverOpen} onOpenChange={setIsPopoverOpen} modal={false}>
           <PopoverTrigger asChild>
@@ -250,11 +252,11 @@ export const MultiCombobox = ({
           </Portal>
         </Popover>
       </OptionTypeProvider>
-    </MultiComboboxContext.Provider>
+    </MultiSelectContext.Provider>
   );
 };
 
-MultiCombobox.displayName = "MultiCombobox";
+MultiSelect.displayName = "MultiSelect";
 
 type OptionComponentProps = {
   value: string;
@@ -264,7 +266,7 @@ type OptionComponentProps = {
 
 export function ComboboxOption({ value, label, disabled }: OptionComponentProps) {
   const id = useId();
-  const { value: selectedValues, onChange, optionRenderer } = useSelect();
+  const { value: selectedValues, onChange, optionRenderer } = useMultiSelect();
 
   const selected = selectedValues.includes(value);
   return (

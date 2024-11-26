@@ -87,9 +87,7 @@ import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
-import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
-import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
 import { OptionMd } from "@components/Option/Option";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
@@ -146,7 +144,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
-  MultiCombobox: MultiComboboxMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,
