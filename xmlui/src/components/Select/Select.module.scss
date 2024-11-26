@@ -306,10 +306,6 @@ $componentName: "Select";
     background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
   }
 
-  /*  &[data-state=checked] {
-      background-color: createThemeVar("color-bg-item-#{$componentName}--active");
-    }*/
-
   &[data-disabled=true] {
     pointer-events: none;
     opacity: 0.5;
