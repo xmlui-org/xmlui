@@ -1,3 +1,4 @@
+export const XMLUI_CHEAT_SHEET = "/cheat-sheet";
 export const CREATE_THE_APP = "/cl-app/01-create-app";
 export const DISPLAY_DATA_IN_A_LIST = "/cl-app/02-use-list";
 export const FILTER_DATA = "/cl-app/03-filter-data";
@@ -137,6 +138,7 @@ export const INTRODUCTION = "/index";
 export const USING_JAVASCRIPT_LIBRARIES = "/js-library-devs";
 export const XMLUI_EXTENSIBILITY_OVERVIEW = "/overview-devs";
 export const XMLUI_EXPRESSIONS = "/scripting/expressions";
+export const XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX = "/scripting/expressions#expression-syntax";
 export const XMLUI_EXPRESSIONS_ARROW_FUNCTIONS = "/scripting/expressions#arrow-functions";
 export const GLOBAL_FUNCTIONS_AND_VARIABLES = "/scripting/globals";
 export const SCRIPT_SYNTAX = "/scripting/xmlui-syntax";
