@@ -12,13 +12,12 @@ import * as React from "react";
 import { SelectContext, useSelect } from "@components/Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
-import { useEvent } from "@components-core/utils/misc";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { SelectOption } from "@components/Select/SelectOptionNative";
 import { Command as CommandPrimitive } from "cmdk";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import { isEqual } from "lodash-es";
+import { useEvent } from "@components-core/utils/misc";
 
 type SelectProps = {
   id?: string;
@@ -68,50 +67,59 @@ export function Select({
   multi = false,
 }: SelectProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(0);
-  const { root } = useTheme();
   const observer = useRef<ResizeObserver>();
-  const [initValue, setInitValue] = useState<string | string[] | undefined>(null);
+  const { root } = useTheme();
 
+  // Set initial state based on the initialValue prop
   useEffect(() => {
-    if (multi) {
-      setInitValue((prevState) => {
-        if (isEqual(prevState, initialValue)) {
-          return prevState;
-        }
-        return initialValue ?? [];
-      });
-    } else {
-      setInitValue(initialValue ?? "");
+    if (initialValue !== undefined) {
+      updateState({ value: initialValue });
     }
-  }, [initialValue, multi, updateState]);
+  }, [initialValue, updateState]);
 
+  // Observe the size of the reference element
   useEffect(() => {
-    updateState({ value: initValue });
-  }, [initValue, updateState]);
+    const current = referenceElement;
+    observer.current?.disconnect();
 
-  useEffect(() => {
-    const current = referenceElement as any;
-    // --- We are already observing old element
-    if (observer?.current && current) {
-      observer.current.unobserve(current);
+    if (current) {
+      observer.current = new ResizeObserver(() => setWidth(current.clientWidth));
+      observer.current.observe(current);
     }
-    observer.current = new ResizeObserver(() => setWidth((referenceElement as any).clientWidth));
-    if (current && observer.current) {
-      observer.current.observe(referenceElement as any);
-    }
+
+    return () => {
+      observer.current?.disconnect();
+    };
   }, [referenceElement]);
 
-  // --- Manage obtaining and losing the focus
-  const handleOnFocus = useCallback(() => {
-    onFocus?.();
-  }, [onFocus]);
+  // Handle option selection
+  const toggleOption = useCallback(
+    (selectedValue: string) => {
+      const newSelectedValue = multi
+        ? Array.isArray(value)
+          ? value.includes(selectedValue)
+            ? value.filter((v) => v !== selectedValue)
+            : [...value, selectedValue]
+          : [selectedValue]
+        : selectedValue;
 
-  const handleOnBlur = useCallback(() => {
-    onBlur?.();
-  }, [onBlur]);
+      updateState({ value: newSelectedValue });
+      onDidChange(newSelectedValue);
+      setOpen(false);
+    },
+    [multi, value, updateState, onDidChange],
+  );
 
+  // Clear selected value
+  const clearValue = useCallback(() => {
+    const newValue = multi ? [] : "";
+    updateState({ value: newValue });
+    onDidChange(newValue);
+  }, [multi, updateState, onDidChange]);
+
+  // Register component API for external interactions
   const focus = useCallback(() => {
     referenceElement?.focus();
   }, [referenceElement]);
@@ -127,45 +135,12 @@ export function Select({
     });
   }, [focus, registerComponentApi, setValue]);
 
-  const toggleOption = useCallback(
-    (selectedValue: string) => {
-      const newSelectedValue =
-        Array.isArray(value) && multi
-          ? value.includes(selectedValue)
-            ? value.filter((value) => value !== selectedValue)
-            : [...value, selectedValue]
-          : selectedValue;
-      updateState({ value: newSelectedValue });
-      onDidChange(newSelectedValue);
-      setOpen(false);
-    },
-    [multi, onDidChange, updateState, value],
-  );
-
-  const contextValue = useMemo(
-    () => ({
-      multi,
-      value,
-      optionRenderer,
-      onChange: toggleOption,
-    }),
-    [multi, optionRenderer, toggleOption, value],
-  );
-
-  const handleTogglePopover = () => {
-    setOpen((prev) => !prev);
-  };
-
-  const handleClear = () => {
-    updateState({ value: [] });
-    onDidChange([]);
-  };
-
+  // Render the "empty list" message
   const emptyListNode = useMemo(
     () =>
       emptyListTemplate ?? (
         <div className={styles.selectEmpty}>
-          <Icon name={"noresult"} />
+          <Icon name="noresult" />
           <span>List is empty</span>
         </div>
       ),
@@ -173,7 +148,14 @@ export function Select({
   );
 
   return (
-    <SelectContext.Provider value={contextValue}>
+    <SelectContext.Provider
+      value={{
+        multi,
+        value,
+        optionRenderer,
+        onChange: toggleOption,
+      }}
+    >
       <OptionTypeProvider Component={searchable || multi ? ComboboxOption : SelectOption}>
         {searchable || multi ? (
           <Popover open={open} onOpenChange={setOpen} modal={false}>
@@ -182,11 +164,11 @@ export function Select({
                 id={id}
                 style={layout}
                 ref={setReferenceElement}
-                onFocus={handleOnFocus}
-                onBlur={handleOnBlur}
+                onFocus={onFocus}
+                onBlur={onBlur}
                 disabled={!enabled}
                 aria-expanded={open}
-                onClick={handleTogglePopover}
+                onClick={() => setOpen((prev) => !prev)}
                 className={classnames(styles.selectTrigger, styles[validationStatus], {
                   [styles.disabled]: !enabled,
                   [styles.multi]: multi,
@@ -194,43 +176,40 @@ export function Select({
                 autoFocus={autoFocus}
               >
                 {multi ? (
-                  Array.isArray(value) &&
-                  (value.length > 0 ? (
+                  Array.isArray(value) && value.length > 0 ? (
                     <div className={styles.badgeListContainer}>
                       <div className={styles.badgeList}>
-                        {value.map((v) => {
-                          return (
-                            <span key={v} className={styles.badge}>
-                              {v}
-                              <Icon
-                                name="close"
-                                size="sm"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleOption(v);
-                                }}
-                              />
-                            </span>
-                          );
-                        })}
+                        {value.map((v) => (
+                          <span key={v} className={styles.badge}>
+                            {v}
+                            <Icon
+                              name="close"
+                              size="sm"
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                toggleOption(v);
+                              }}
+                            />
+                          </span>
+                        ))}
                       </div>
                     </div>
                   ) : (
                     <span className={styles.placeholder}>{placeholder || ""}</span>
-                  ))
-                ) : value !== null && value !== undefined ? (
+                  )
+                ) : value ? (
                   <span>{value}</span>
                 ) : (
                   <span className={styles.placeholder}>{placeholder || ""}</span>
                 )}
                 <div className={styles.actions}>
-                  {Array.isArray(value) && value.length > 0 && (
+                  {multi && Array.isArray(value) && value.length > 0 && (
                     <Icon
                       name="close"
                       size="sm"
                       onClick={(event) => {
                         event.stopPropagation();
-                        handleClear();
+                        clearValue();
                       }}
                     />
                   )}
@@ -240,24 +219,16 @@ export function Select({
             </PopoverTrigger>
             <Portal container={root}>
               <PopoverContent style={{ width }}>
-                <Command
-                  className={styles.selectContent}
-                  filter={(value, search, keywords) => {
-                    const extendValue = `${value} ${keywords.join(" ")}`;
-                    if (extendValue.includes(search)) return 1;
-                    return 0;
-                  }}
-                >
+                <Command>
                   {searchable ? (
-                    <CommandInput placeholder="Search..." className={styles.commandInput} />
+                    <CommandInput placeholder="Search..." />
                   ) : (
-                    // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                      // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
                     <button autoFocus aria-hidden="true" className={styles.srOnly} />
                   )}
-
-                  <CommandList className={styles.commandList}>
-                    <CommandGroup className={styles.commandGroup}>{children}</CommandGroup>
-                    <CommandEmpty className={styles.commandEmpty}>{emptyListNode}</CommandEmpty>
+                  <CommandList>
+                    <CommandGroup>{children}</CommandGroup>
+                    <CommandEmpty>{emptyListNode}</CommandEmpty>
                   </CommandList>
                 </Command>
               </PopoverContent>
@@ -269,21 +240,18 @@ export function Select({
             onValueChange={toggleOption}
           >
             <SelectTrigger
-              autoFocus={autoFocus}
               id={id}
               style={layout}
-              className={styles.selectTrigger}
-              onFocus={handleOnFocus}
-              onBlur={handleOnBlur}
+              onFocus={onFocus}
+              onBlur={onBlur}
               enabled={enabled}
               validationStatus={validationStatus}
               ref={setReferenceElement}
+              autoFocus={autoFocus}
             >
               <SelectValue placeholder={placeholder} />
             </SelectTrigger>
-            <SelectContent>
-              {React.Children.toArray(children).length > 0 ? <>{children}</> : emptyListNode}
-            </SelectContent>
+            <SelectContent>{children || emptyListNode}</SelectContent>
           </SelectPrimitive.Root>
         )}
       </OptionTypeProvider>
