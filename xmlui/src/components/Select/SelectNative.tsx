@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ReactNode } from "react";
 import { useId, useRef } from "react";
 import { useEffect, useState } from "react";
 import { useCallback, useMemo } from "react";
@@ -18,6 +18,7 @@ import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { SelectOption } from "@components/Select/SelectOptionNative";
 import { Command as CommandPrimitive } from "cmdk";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
+import { isEqual } from "lodash-es";
 
 type SelectProps = {
   id?: string;
@@ -48,8 +49,8 @@ const SelectValue = SelectPrimitive.Value;
 
 export function Select({
   id,
-  initialValue = "",
-  value = "",
+  initialValue,
+  value,
   enabled = true,
   placeholder,
   updateState = noop,
@@ -71,10 +72,24 @@ export function Select({
   const [width, setWidth] = useState(0);
   const { root } = useTheme();
   const observer = useRef<ResizeObserver>();
+  const [initValue, setInitValue] = useState<string | string[] | undefined>(null);
 
   useEffect(() => {
-    updateState({ value: initialValue });
-  }, [initialValue, updateState]);
+    if (multi) {
+      setInitValue((prevState) => {
+        if (isEqual(prevState, initialValue)) {
+          return prevState;
+        }
+        return initialValue ?? [];
+      });
+    } else {
+      setInitValue(initialValue ?? "");
+    }
+  }, [initialValue, multi, updateState]);
+
+  useEffect(() => {
+    updateState({ value: initValue });
+  }, [initValue, updateState]);
 
   useEffect(() => {
     const current = referenceElement as any;
@@ -114,15 +129,17 @@ export function Select({
 
   const toggleOption = useCallback(
     (selectedValue: string) => {
-      const newSelectedValues =
-        typeof value === "object" ? value.includes(selectedValue)
-          ? value.filter((value) => value !== selectedValue)
-          : [...value, selectedValue] : selectedValue;
-      updateState({ value: newSelectedValues });
-      onDidChange(newSelectedValues);
+      const newSelectedValue =
+        Array.isArray(value) && multi
+          ? value.includes(selectedValue)
+            ? value.filter((value) => value !== selectedValue)
+            : [...value, selectedValue]
+          : selectedValue;
+      updateState({ value: newSelectedValue });
+      onDidChange(newSelectedValue);
       setOpen(false);
     },
-    [onDidChange, updateState, value],
+    [multi, onDidChange, updateState, value],
   );
 
   const contextValue = useMemo(
@@ -165,25 +182,25 @@ export function Select({
                 autoFocus={autoFocus}
               >
                 {multi ? (
-                  value?.length > 0 && (
+                  Array.isArray(value) &&
+                  (value.length > 0 ? (
                     <div className={styles.badgeListContainer}>
                       <div className={styles.badgeList}>
-                        {typeof value === "object" &&
-                          value?.map((v) => {
-                            return (
-                              <span key={v}>
-                                {v}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
-                                    toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            );
-                          })}
+                        {value.map((v) => {
+                          return (
+                            <span key={v}>
+                              {v}
+                              <Icon
+                                name="close"
+                                size="sm"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(v);
+                                }}
+                              />
+                            </span>
+                          );
+                        })}
                       </div>
                       <div className={styles.actions}>
                         <Icon
@@ -196,9 +213,11 @@ export function Select({
                         />
                       </div>
                     </div>
-                  )
+                  ) : (
+                    <span>{placeholder || ""}</span>
+                  ))
                 ) : (
-                  <span>{value ? value : placeholder || ""}</span>
+                  <span>{value !== null && value !== undefined ? value : placeholder || ""}</span>
                 )}
                 <Icon name="chevrondown" />
               </button>
@@ -231,7 +250,7 @@ export function Select({
           </Popover>
         ) : (
           <SelectPrimitive.Root
-            value={typeof value === "string" ? value : ""}
+            value={!Array.isArray(value) && value ? value : ""}
             onValueChange={toggleOption}
           >
             <SelectTrigger
@@ -350,9 +369,11 @@ type OptionComponentProps = {
 
 export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer } = useSelect();
+  const { value: selectedValue, onChange, optionRenderer, multi } = useSelect();
   const selected =
-    typeof selectedValue === "object" ? selectedValue.includes(value) : selectedValue === value;
+    typeof selectedValue === "object" && multi
+      ? selectedValue.includes(value)
+      : selectedValue === value;
 
   return (
     <CommandItem
