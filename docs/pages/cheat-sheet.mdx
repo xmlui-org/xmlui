@@ -1,6 +1,6 @@
 import { Callout } from 'nextra/components'
 import { XMLUI_EMPTY, XMLUI_STARTER } from "../meta/downloads";
-import { XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX } from '../meta/pages';
+import { COMPONENT_APP, THE_APP_COMPONENT, THE_APP_COMPONENT_LAYOUT_VARIANTS, XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX } from '../meta/pages';
 
 # XMLUI Cheat Sheet
 
@@ -289,7 +289,7 @@ Instead of using the `value` attribute of `<var>`, you can nest it into the elem
 
 **Variant 4: Declaration in a code-behind file**
 
-Use the var keyword in a code-behind file. You can refer to the declared variable in the corresponding markup file.
+Use the `var` keyword in a code-behind file. You can refer to the declared variable in the corresponding markup file.
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
@@ -348,20 +348,119 @@ In the following example, clicking the button will increment the `count` variabl
 </App>
 ```
 
-### Fragment
+## Event Handlers
 
-You can use the `Fragment` component to merge multiple component tags into a single node.
+When a user interaction or system event occurs, the XMLUI engine executes component event handlers. You can
+ override the default event handler with your custom event handler.
 
-<Playground
-    name="Example: Hello, World!"
-    app={`
-<App>
-  <Text var.myVar="{6 * 7}">{myVar}</Text> <!-- myVar is a number: 42 -->
-  <Text var.myVar="12345">{myVar}</Text> <!-- myVar is a string: "12345" -->
-  <Text var.myVar="See: {6 * 7}|{1 + 2 * 3}">
-    {myVar}
-  </Text> <!-- myVar is a string: "See: 42|7" -->
-</App>
-  `}
-/>
+You can declare event handlers in the markup or the code-behind file. Event handlers can be XMLUI scripts or components that may act as event handlers. Currently, XMLUI has one component, `APICall`, with this trait.
 
+**Variant 1: Markup with `on` attribute prefix**
+
+You can define an event handler for a particular component event using an attribute with the `on` prefix followed by the event name:
+
+```ueml copy
+<Button label="Click me" onClick="toast('Clicked!')" />
+```
+
+**Variant 2: Markup with the `<event>` helper tag**
+
+Alternatively, you can use the `<event>` helper tag with the `name` and `value` attributes:
+
+```ueml copy
+<Button label="Click me">
+  <event name="click" value="toast('Clicked!')" />
+</Button>
+```
+
+**Variant 3: Markup with the `<event>` helper tag and nested value**
+
+Instead of using the `value` attribute of `<event>`, you can nest it into the element:
+
+```ueml copy
+<Button label="Click me">
+  <event name="click">
+    toast('Clicked!')
+  </event>
+</Button>
+```
+
+**Variant 4: Declaration in a code-behind file**
+
+Declare a function in a code-behind file. You can assign the name of the function declared in the corresponding markup file to the event handler:
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+    <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```js copy filename="Main.xmlui.xs"
+function displayToast() {
+  toast('Clicked!');
+}
+```
+    </div>
+    <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```ueml copy filename="Main.xmlui" /{myVar}/
+<Button 
+  label="Click me" 
+  onClick="displayToast" />
+```
+    </div>
+</div>
+
+XMLUI supports auto-binding for event handlers in the code-behind file based on a particular function name convention. Your component must have an id, and the event handler function name must be `[componentId]_on[eventName]`, like in the following example:
+
+<br/>
+<div style={{display: "flex", flexDirection: "row"}}>
+    <div style={{width: "50%", paddingRight: "0.25rem"}}>
+```js copy filename="Main.xmlui.xs"
+function myButton_onClick() {
+  toast('Clicked!');
+}
+```
+    </div>
+    <div style={{width: "50%", paddingLeft: "0.25rem"}}>
+```ueml copy filename="Main.xmlui" /{myVar}/
+<Button
+  id="myButton" 
+  label="Click me" />
+```
+    </div>
+</div>
+
+<Callout type="info" emoji="📔">
+Use auto-binding of event handlers with care. Though your markup is shorter, you must look into the code-behind file to check if a component declares a particular event handler.
+</Callout>
+
+The XMLUI engine supports components that can act as event handlers. To invoke an API endpoint from an event handler can be done by declaring an `APICall` component as an event handler. This option is available only with the component markup (not in the code-behind file) using the `<event>` helper tag:
+
+```ueml copy
+<Button label="Delete Customer">
+  <event name="click">
+    <APICall 
+      url="/api/customer/12345"
+      method="delete"
+      confirmMessage="Are you sure you want to delete the customer?"
+    />
+  </event>
+</Button>
+```
+
+## Layout
+
+XMLUI makes it easy to establish an application layout with the `App` component and other layout components like `Stack`, `FlowLayout`, and others.
+
+The `App` component has a `layout` property that defines the initial layout of an app, including its header, navigation panel, main content, footer, and pages. For example, by setting the layout to `horizontal-sticky,` the navigation panel displays the items horizontally. As you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
+
+```ueml copy
+<App layout="horizontal-sticky">
+```
+
+You can learn more about the available app layouts <SmartLink href={THE_APP_COMPONENT_LAYOUT_VARIANTS}>here</SmartLink>.
+
+These are the layout components that help you establish the app's layout:
+
+|Component|Description|
+|---|---|
+|`App`|Provides the fundamental layout of the app. Learn more about using `App` <SmartLink href={THE_APP_COMPONENT}>here</SmartLink>, or check its <SmartLink href={COMPONENT_APP}>component reference</SmartLink>.|
+
+_TBC_

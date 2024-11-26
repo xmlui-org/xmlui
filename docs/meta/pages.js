@@ -100,6 +100,7 @@ export const COMPONENT_VSPLITTER = "/components/VSplitter";
 export const COMPONENT_VSTACK = "/components/VStack";
 export const COMPONENT_REFERENCE = "/components";
 export const THE_APP_COMPONENT = "/create-apps/app-component";
+export const THE_APP_COMPONENT_LAYOUT_VARIANTS = "/create-apps/app-component#layout-variants";
 export const BASIC_COMPONENTS = "/create-apps/basic-components";
 export const BUILD_AND_DEPLOY = "/create-apps/build-and-deploy";
 export const WORKING_WITH_DATA = "/create-apps/data";
