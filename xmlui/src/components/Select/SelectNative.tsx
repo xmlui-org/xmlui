@@ -218,10 +218,10 @@ export function Select({
                   ) : (
                     <span className={styles.placeholder}>{placeholder || ""}</span>
                   ))
+                ) : value !== null && value !== undefined ? (
+                  <span>{value}</span>
                 ) : (
-                  <span className={styles.placeholder}>
-                    {value !== null && value !== undefined ? value : placeholder || ""}
-                  </span>
+                  <span className={styles.placeholder}>{placeholder || ""}</span>
                 )}
                 <div className={styles.actions}>
                   {Array.isArray(value) && value.length > 0 && (
