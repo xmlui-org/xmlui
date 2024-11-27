@@ -81,12 +81,12 @@ See the [itemTemplate section](#itemtemplate).
 
 %-PROP-END
 
-%-PROP-START defaultSections
+%-PROP-START defaultGroups
 
 Note the `meat` section header before all the others in the list below:
 
 <Callout type="info" emoji="📔">
-For the `defaultSections` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
+For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
 and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 </Callout>
 
@@ -94,7 +94,7 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
 <App>
   <List
     data='{[...]}'
-    defaultSections="{['meat']}"
+    defaultGroups="{['meat']}"
     groupBy="category" >
     <property name="sectionTemplate">
       <VStack>
@@ -106,13 +106,13 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
 ```
 
 <Playground
-  name="Example: defaultSections"
+  name="Example: defaultGroups"
   height={400}
   app={`
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
+        defaultGroups="{['meat']}"
         groupBy="category">
         <property name="sectionTemplate">
           <VStack>
@@ -312,7 +312,7 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 <App>
   <List
     data='{[...]}'
-    defaultSections="{['meat']}"
+    defaultGroups="{['meat']}"
     groupBy="category">
     <property name="sectionTemplate">
       <VStack>
@@ -330,7 +330,7 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
+        defaultGroups="{['meat']}"
         groupBy="category">
         <property name="sectionTemplate">
           <VStack>

@@ -163,7 +163,7 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 ## Section Ordering
 
 The order of sections displayed above could be more helpful using a different ordering.
-With the help of the `defaultSections` property of the `List`, you can define the ordering.
+With the help of the `defaultGroups` property of the `List`, you can define the ordering.
 
 Modify the `List` accordingly:
 
@@ -171,7 +171,7 @@ Modify the `List` accordingly:
 <!-- Omitted -->
 <List 
   items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultSections="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+  defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
   groupBy="section">
   <!-- Omitted -->
 </List>
@@ -197,7 +197,7 @@ Modify the code to omit them whenever we display a filtered list:
 <!-- Omitted -->
 <List 
   items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultSections="{!$props.filter
+  defaultGroups="{!$props.filter
     ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
   groupBy="section">
   <!-- Omitted -->

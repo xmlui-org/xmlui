@@ -40,7 +40,7 @@ export const ListMd = createMetadata({
     orderBy: d(
       `This property enables the ordering of list items by specifying an attribute in the data.`,
     ),
-    availableSections: d(
+    availableGroups: d(
       `This property is an array of section names that the \`${COMP}\` will display.`,
     ),
     sectionTemplate: dComponent(
@@ -71,7 +71,7 @@ export const ListMd = createMetadata({
     sectionsInitiallyExpanded: d(
       `This Boolean property defines whether the list sections are initially expanded.`,
     ),
-    defaultSections: d(
+    defaultGroups: d(
       `This property adds default sections for the \`${COMP}\` and displays the section headers ` +
         `even if no items fall into a particular section.`,
     ),
@@ -105,7 +105,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         limit={extractValue(node.props.limit)}
         groupBy={extractValue(node.props.groupBy)}
         orderBy={extractValue(node.props.orderBy)}
-        availableSections={extractValue(node.props.availableSections)}
+        availableGroups={extractValue(node.props.availableGroups)}
         scrollAnchor={node.props.scrollAnchor as any}
         pageInfo={extractValue(node.props.pageInfo)}
         idKey={extractValue(node.props.idKey)}
@@ -117,7 +117,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         sectionsInitiallyExpanded={extractValue.asOptionalBoolean(
           node.props.sectionsInitiallyExpanded,
         )}
-        defaultSections={extractValue(node.props.defaultSections)}
+        defaultGroups={extractValue(node.props.defaultGroups)}
         itemRenderer={
           itemTemplate &&
           ((item) => {

@@ -335,7 +335,7 @@ Pass an empty record to add a new contact.
     </HStack>
     <List 
       items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-      defaultSections="{!$props.filter
+      defaultGroups="{!$props.filter
         ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
       groupBy="section">
       <property name="itemTemplate">

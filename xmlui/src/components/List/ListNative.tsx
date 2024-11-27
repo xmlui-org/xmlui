@@ -71,13 +71,13 @@ enum RowType {
 
 type ListData = {
   sectionsInitiallyExpanded?: boolean;
-  defaultSections?: Array<string>;
+  defaultGroups?: Array<string>;
   expanded?: Record<any, boolean>;
   items: any[];
   limit?: number;
   groupBy?: string;
   orderBy?: OrderBy;
-  availableSections?: string[];
+  availableGroups?: string[];
 };
 
 export function useListData({
@@ -87,8 +87,8 @@ export function useListData({
   limit,
   groupBy,
   orderBy,
-  availableSections,
-  defaultSections = EMPTY_ARRAY,
+  availableGroups,
+  defaultGroups = EMPTY_ARRAY,
 }: ListData) {
   const sortedItems = useMemo(() => {
     if (!orderBy) {
@@ -128,14 +128,14 @@ export function useListData({
     if (groupBy === undefined) {
       return EMPTY_ARRAY;
     }
-    let foundSectionKeys = uniq([...defaultSections, ...Object.keys(sectionedItems)]);
-    if (availableSections) {
+    let foundSectionKeys = uniq([...defaultGroups, ...Object.keys(sectionedItems)]);
+    if (availableGroups) {
       foundSectionKeys = sortBy(foundSectionKeys, (item) => {
-        return availableSections.indexOf(item);
+        return availableGroups.indexOf(item);
       });
     }
     return foundSectionKeys;
-  }, [groupBy, sectionedItems, defaultSections, availableSections]);
+  }, [groupBy, sectionedItems, defaultGroups, availableGroups]);
 
   const rows = useMemo(() => {
     if (groupBy === undefined) {
@@ -211,7 +211,7 @@ type DynamicHeightListProps = {
   limit?: number;
   groupBy?: string;
   orderBy?: OrderBy;
-  availableSections?: string[];
+  availableGroups?: string[];
   scrollAnchor?: "top" | "bottom";
   requestFetchPrevPage?: () => any;
   requestFetchNextPage?: () => any;
@@ -222,7 +222,7 @@ type DynamicHeightListProps = {
   style?: CSSProperties;
   emptyListPlaceholder?: ReactNode;
   sectionsInitiallyExpanded?: boolean;
-  defaultSections: Array<string>;
+  defaultGroups: Array<string>;
   registerComponentApi?: RegisterComponentApiFn;
 };
 
@@ -238,7 +238,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     limit,
     groupBy,
     orderBy,
-    availableSections,
+    availableGroups,
     scrollAnchor = "top",
     requestFetchPrevPage = noop,
     requestFetchNextPage = noop,
@@ -249,7 +249,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     style,
     emptyListPlaceholder,
     sectionsInitiallyExpanded = true,
-    defaultSections = EMPTY_ARRAY,
+    defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
   }: DynamicHeightListProps,
   ref,
@@ -276,13 +276,13 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
 
   const { rows } = useListData({
     sectionsInitiallyExpanded,
-    defaultSections,
+    defaultGroups,
     expanded,
     items,
     limit,
     groupBy,
     orderBy,
-    availableSections,
+    availableGroups,
   });
 
   const hasOutsideScroll =
