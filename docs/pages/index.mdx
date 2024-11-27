@@ -1,11 +1,11 @@
-import {Callout} from 'nextra/components'
+import { Callout } from 'nextra/components'
 import themeGallery from "./styles-and-themes/samples/theme-gallery-brief.xmlui";
 
 # Introduction
 
 <Callout type="info" emoji="💡">
-    XMLUI offers **simple concepts** to create **data-aware** apps quickly **without coping with the cumbersome
-    peculiarities of web development.**
+  XMLUI offers **simple concepts** to create **data-aware** apps quickly **without coping with the cumbersome
+  peculiarities of web development.**
 </Callout>
 
 XMLUI applications have a **simple structure** with static files ready to be hosted on a production web server.
@@ -13,8 +13,8 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ## Components
 
 <Callout type="info" emoji="💡">
-    XMLUI is an intuitive UI framework with a **declarative approach**. It uses simple markup to build apps from
-    **components**.
+  XMLUI is an intuitive UI framework with a **declarative approach**. It uses simple markup to build apps from
+  **components**.
 </Callout>
 
 ```ueml copy
@@ -24,17 +24,16 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ```
 
 <Playground
-    name="Example: Hello, World!"
-    app={`
+  name="Example: Hello, World!"
+  app={`
     <App>
       Hello, World from XMLUI!
     </App>
   `}
-    height={100}
 />
 
 <Callout type="info" emoji="💡">
-    You can **bind components to work together**.
+  You can **bind components to work together**.
 </Callout>
 
 ```ueml copy /myTextBox/ /myTextBox.value/
@@ -45,14 +44,13 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ```
 
 <Playground
-    name="Example: Bind components"
-    app={`
+  name="Example: Bind components"
+  app={`
     <App>
       <TextBox id="myTextBox" placeholder="Type something" />
       <Text variant="title">You typed: {myTextBox.value}</Text>
     </App>
   `}
-    height={160}
 />
 
 ```ueml copy /toast(myTextBox.value)/
@@ -63,18 +61,17 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ```
 
 <Callout type="info" emoji="💡">
-    Components handle user and system events. You can add your **custom event handlers** to respond to them.
+  Components handle user and system events. You can add your **custom event handlers** to respond to them.
 </Callout>
 
 <Playground
-    name="Example: Handle events"
-    app={`
+  name="Example: Handle events"
+  app={`
     <App>
       <TextBox id="myTextBox" placeholder="Type a message" />
       <Button onClick="toast(myTextBox.value)">Show the message</Button>
     </App>
   `}
-    height={160}
 />
 
 ## Data
@@ -92,15 +89,15 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 ```
 
 <Playground
-    name="Example: Fetch and display data"
-    app={`
+  name="Example: Fetch and display data"
+  app={`
     <App>
       <List data="https://api.spacexdata.com/v3/history">
         <Card title="{$item.title}" subtitle="{$item.details}"/>
       </List>
     </App>
   `}
-    height={300}
+  height={300}
 />
 
 <Callout type="info" emoji="💡">
@@ -128,8 +125,8 @@ XMLUI applications have a **simple structure** with static files ready to be hos
 The engine is smart enough to invalidate the part of the UI that may have changed due to the API invocation. For example, in this sample, the list is automatically refreshed after you add a new item through the API.
 
 <Playground
-    name="Example: Fetch, display, and change data"
-    app={`
+  name="Example: Fetch, display, and change data"
+  app={`
     <App var.fruits="{['apple', 'orange', 'banana']}" >
       <HStack verticalAlignment="center">
         <TextBox id="fruitName" placeholder="Type a fruit name" width="*"/>
@@ -144,74 +141,75 @@ The engine is smart enough to invalidate the part of the UI that may have change
       </List>
     </App>
   `}
-    height={300}
+  height={300}
 />
 
 ## Code
 
 <Callout type="info" emoji="💡">
-    With XMLUI, **you rarely need to write code.**
+  With XMLUI, **you rarely need to write code.**
 </Callout>
 
 You can use code-behind files if you have to write logic that cannot be specified with simple inline expressions.
 
 <Callout type="info" emoji="💡">
-    You can put event handlers and other functions into **code-behind** files. XMLUI **automatically binds event
-    handlers** using the component's ID and the event name. While you follow the naming convention, you do not need to
-    add event handlers to the component markup.
+  You can put event handlers and other functions into **code-behind** files. XMLUI **automatically binds event
+  handlers** using the component's ID and the event name. While you follow the naming convention, you do not need to
+  add event handlers to the component markup.
 </Callout>
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /calcButton/
-        <Button id="calcButton"
-                label="Calculate delay"/>
+```ueml copy filename="Main.xmlui (markup)" /calcButton/
+<Button 
+  id="calcButton"
+  label="Calculate delay"/>
 
-
-        ```
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /calcButton_onClick/
-        function calcButton_onClick() {
-        const delay = 500 * 2;
-        toast('Delay calculated: ' + delay);
-    }
-        ```
+```js copy filename="Main.xmlui.xs (code-behind)" /calcButton_onClick/
+function calcButton_onClick() {
+  const delay = 500 * 2;
+  toast('Delay calculated: ' + delay);
+}
+```
     </div>
 </div>
 
 <Callout type="info" emoji="💡">
-    You can declare **variables** in code-behind files with the **`var` keyword** and optionally initialize them. These
-    variables are **reactive**: whenever their dependencies change, their value is reevaluated.
+  You can declare **variables** in code-behind files with the **`var` keyword** and optionally initialize them. These
+  variables are **reactive**: whenever their dependencies change, their value is reevaluated.
 </Callout>
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
-        <Button
-            label="Click to increment!"
-            onClick="count++"/>
-        <Text>Click count = {count}</Text>
-        <Text>Click count * 3 = {countTimes3}</Text>
-        ```
+```ueml copy filename="Main.xmlui (markup)" /handleOnClick/
+<Button
+  label="Click to increment!"
+  onClick="count++"/>
+<Text>Click count = {count}</Text>
+<Text>Click count * 3 = {countTimes3}</Text>
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
-        var count = 0;
-        var countTimes3 = count * 3;
+```js copy filename="Main.xmlui.xs (code-behind)" /handleOnClick/
+var count = 0;
+var countTimes3 = count * 3;
 
 
-        ```
+
+```
     </div>
 </div>
 
 Clicking the button increments only the `count` variable. Because `countTimes` is a reactive variable that depends on `count`, incrementing `count` triggers updating `countTimes3` too.
 
 <Playground
-    name="Example: Reactive variables"
-    app={`
+  name="Example: Reactive variables"
+  app={`
     <App var.count="{0}" var.countTimes3="{3 * count}" >
       <Button
         label="Click to increment!"
@@ -220,14 +218,13 @@ Clicking the button increments only the `count` variable. Because `countTimes` i
       <Text>Click count * 3 = {countTimes3}</Text>
     </App>
   `}
-    height={180}
 />
 
 ## Component Composition
 
 <Callout type="info" emoji="💡">
-    Components may have properties that accept other component definitions (markup) as their value. We call them
-    **template properties**.
+  Components may have properties that accept other component definitions (markup) as their value. We call them
+  **template properties**.
 </Callout>
 
 ```ueml copy {3-5} /name="triggerTemplate"/
@@ -243,8 +240,8 @@ Clicking the button increments only the `count` variable. Because `countTimes` i
 ```
 
 <Playground
-    name="Example: Using a template property"
-    app={`
+  name="Example: Using a template property"
+  app={`
     <App>
       <DropdownMenu label="DropdownMenu">
         <property name="triggerTemplate">
@@ -255,48 +252,46 @@ Clicking the button increments only the `count` variable. Because `countTimes` i
       </DropdownMenu>
     </App>
   `}
-    height={180}
+  height={180}
 />
 
-
-
 <Callout type="info" emoji="💡">
-    You can extract frequently occurring markup snippets and **create reusable component definitions**. When these
-    definitions change, the instances of these components instantly update.
+  You can extract frequently occurring markup snippets and **create reusable component definitions**. When these
+  definitions change, the instances of these components instantly update.
 </Callout>
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /calcButton/
-        <App>
-            <InfoCard icon="email" label="Send email"/>
-            <InfoCard icon="phone" label="Start call"/>
-            <InfoCard icon="home" label="Back to home"/>
-        </App>
+```ueml copy filename="Main.xmlui (markup)" /calcButton/
+<App>
+    <InfoCard icon="email" label="Send email"/>
+    <InfoCard icon="phone" label="Start call"/>
+    <InfoCard icon="home" label="Back to home"/>
+</App>
 
 
-        ```
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```ueml copy filename="InfoCard.xmlui (reusable component)"
-        <Component name="InfoCard">
-            <Card>
-                <HStack>
-                    <Icon name="{$props.icon}"/>
-                    <Text>{$props.label}</Text>
-                </HStack>
-            </Card>
-        </Component>
-        ```
+```ueml copy filename="InfoCard.xmlui (reusable component)"
+<Component name="InfoCard">
+    <Card>
+        <HStack>
+            <Icon name="{$props.icon}"/>
+            <Text>{$props.label}</Text>
+        </HStack>
+    </Card>
+</Component>
+```
     </div>
 </div>
 
 `Infocard` is a resusable component.The `$props` context value exposes the current property values used with a particular `<InfoCard>` instance.
 
 <Playground
-    name="Example: Component composition"
-    components={[`
+  name="Example: Component composition"
+  components={[`
     <Component name="InfoCard">
       <Card>
         <HStack>
@@ -306,47 +301,44 @@ Clicking the button increments only the `count` variable. Because `countTimes` i
       </Card>
     </Component>
   `]}
-    app={`
+  app={`
     <App>
       <InfoCard icon="email" label="Send email" />
       <InfoCard icon="phone" label="Start call" />
       <InfoCard icon="home" label="Back to home" />
     </App>
   `}
-    height={260}
 />
 
 ## Themes
 
 <Callout type="info" emoji="💡">
-    **XMLUI supports themes** with **light** and **dark** tone variants.
+  **XMLUI supports themes** with **light** and **dark** tone variants.
 </Callout>
 
 <Playground
-    name="The default XMLUI theme (light)"
-    app={`
+  name="The default XMLUI theme (light)"
+  app={`
     <Theme tone="light" themeId="xmlui">
       <ThemeGallery />
     </Theme>
   `}
-    components={[themeGallery]}
-    height={272}
+  components={[themeGallery]}
 />
 
 <Playground
-    name="The default XMLUI theme (dark)"
-    app={`
+  name="The default XMLUI theme (dark)"
+  app={`
     <Theme tone="dark" themeId="xmlui">
       <ThemeGallery />
     </Theme>
   `}
-    components={[themeGallery]}
-    height={272}
+  components={[themeGallery]}
 />
 
 <Callout type="info" emoji="💡">
-    You can easily create custom themes by adding a new **theme file** that overrides a few **theme variables**. XMLUI
-    **automatically applies the changes to light and dark themes**; you do not have to handle them separately.
+  You can easily create custom themes by adding a new **theme file** that overrides a few **theme variables**. XMLUI
+  **automatically applies the changes to light and dark themes**; you do not have to handle them separately.
 </Callout>
 
 ```json copy {4-5} filename="themes/myCustomTheme.json"
@@ -362,58 +354,54 @@ Clicking the button increments only the `count` variable. Because `countTimes` i
 These modifications set the primary theme color to purplish and add a bigger corner radius to the input (and only to the input) components. Check the hover effect of the "outlined/primary" button in light and dark themes!
 
 <Playground
-    name="Modified theme (light)"
-    defaultTheme="myCustomTheme"
-    themes={[
-        {
-            name: "My Custom Theme",
-            id: "myCustomTheme",
-            themeVars: {
-                "color-primary": "#702F72",
-                "radius-Input": "12px",
-            },
-        },
-    ]}
-    app={`
+  name="Modified theme (light)"
+  defaultTheme="myCustomTheme"
+  themes={[
+      {
+          name: "My Custom Theme",
+          id: "myCustomTheme",
+          themeVars: {
+              "color-primary": "#702F72",
+              "radius-Input": "12px",
+          },
+      },
+  ]}
+  app={`
     <Theme tone="light" themeId="myCustomTheme">
       <ThemeGallery />
     </Theme>
   `}
-    components={[themeGallery]}
-    height={272}
+  components={[themeGallery]}
 />
 
 <Playground
-    name="Modified theme (dark)"
-    defaultTheme="myCustomTheme"
-    defaultTone="dark"
-    themes={[
-        {
-            name: "My Custom Theme",
-            id: "myCustomTheme",
-            themeVars: {
-                "color-primary": "#702F72",
-                "radius-Input": "12px",
-            },
-        },
-    ]}
-    app={`
-      <ThemeGallery />
+  name="Modified theme (dark)"
+  defaultTheme="myCustomTheme"
+  defaultTone="dark"
+  themes={[
+      {
+          name: "My Custom Theme",
+          id: "myCustomTheme",
+          themeVars: {
+              "color-primary": "#702F72",
+              "radius-Input": "12px",
+          },
+      },
+  ]}
+  app={`
+    <ThemeGallery />
   `}
-    components={[themeGallery]}
-    height={272}
+  components={[themeGallery]}
 />
 
 ## Deployment
 
 <Callout type="info" emoji="💡">
-    XMLUI applications have a **simple folder structure**. You can copy this structure into the static files folder of
-    your web server, and they are **ready to be hosted instantly** by a web server.
+  XMLUI applications have a **simple folder structure**. You can copy this structure into the static files folder of
+  your web server, and they are **ready to be hosted instantly** by a web server.
 </Callout>
 
 <Callout emoji="💡">
-    **You do not need to build an app**. However, the framework offers several build methods that **optimize the static
-    file structure for size and startup performance** if you need this feature.
+  **You do not need to build an app**. However, the framework offers several build methods that **optimize the static
+  file structure for size and startup performance** if you need this feature.
 </Callout>
-
-

@@ -1,11 +1,19 @@
-import { CSSProperties, ReactNode, useLayoutEffect } from "react";
-import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
   CellContext,
   Column,
   ColumnDef,
-  Header,
   HeaderContext,
   PaginationState,
   RowData,
@@ -32,11 +40,15 @@ import { ScrollContext } from "@components-core/ScrollContext";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
-import { useIsomorphicLayoutEffect, usePrevious, useResizeObserver } from "@components-core/utils/hooks";
+import {
+  useIsomorphicLayoutEffect,
+  usePrevious,
+  useResizeObserver,
+} from "@components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { isThemeVarName } from "@components-core/theming/transformThemeVars";
-import { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 // =====================================================================================================================
 // Helper types
@@ -99,7 +111,7 @@ type TableProps = {
   autoFocus?: boolean;
   hideHeader?: boolean;
   alwaysShowSelectionHeader?: boolean;
-  registerComponentApi: RegisterComponentApiFn
+  registerComponentApi: RegisterComponentApiFn;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -159,7 +171,7 @@ export const Table = forwardRef(
       hideHeader = false,
       alwaysShowSelectionHeader = false,
       registerComponentApi,
-      onSelectionDidChange
+      onSelectionDidChange,
       // cols
     }: TableProps,
     forwardedRef,
@@ -192,15 +204,21 @@ export const Table = forwardRef(
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
     // --- Get the operations to manage selected rows in a table
-    const { toggleRow, checkAllRows, focusedIndex, onKeyDown, selectedRowIdMap, idKey, selectionApi } =
-      useRowSelection({
-        items: safeData,
-        visibleItems,
-        rowsSelectable: rowsSelectable,
-        enableMultiRowSelection: enableMultiRowSelection,
-        onSelectionDidChange: onSelectionDidChange
-      });
-
+    const {
+      toggleRow,
+      checkAllRows,
+      focusedIndex,
+      onKeyDown,
+      selectedRowIdMap,
+      idKey,
+      selectionApi,
+    } = useRowSelection({
+      items: safeData,
+      visibleItems,
+      rowsSelectable,
+      enableMultiRowSelection,
+      onSelectionDidChange,
+    });
 
     // --- Create data with order information whenever the items in the table change
     const dataWithOrder = useMemo(() => {
@@ -365,7 +383,14 @@ export const Table = forwardRef(
         ),
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
-    }, [rowsSelectable, columnsWithCustomCell, enableMultiRowSelection, alwaysShowSelectionHeader, checkAllRows, toggleRow]);
+    }, [
+      rowsSelectable,
+      columnsWithCustomCell,
+      enableMultiRowSelection,
+      alwaysShowSelectionHeader,
+      checkAllRows,
+      toggleRow,
+    ]);
 
     // --- Set up page information (using the first page size option)
     // const [pagination, setPagination] = useState<PaginationState>();
@@ -377,7 +402,7 @@ export const Table = forwardRef(
     const prevIsPaginated = usePrevious(isPaginated);
 
     useEffect(() => {
-      if(!prevIsPaginated && isPaginated){
+      if (!prevIsPaginated && isPaginated) {
         setPagination((prev) => {
           return {
             ...prev,
@@ -385,7 +410,7 @@ export const Table = forwardRef(
           };
         });
       }
-      if(prevIsPaginated && !isPaginated){
+      if (prevIsPaginated && !isPaginated) {
         setPagination((prev) => {
           return {
             pageIndex: 0,

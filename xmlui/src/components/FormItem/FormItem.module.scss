@@ -56,6 +56,7 @@ $themeVars: ();
     user-select: none;
     cursor: pointer;
     word-break: normal;
+    white-space: nowrap;
 
     &.disabled {
       cursor: not-allowed;
@@ -63,6 +64,7 @@ $themeVars: ();
     }
 
     &.labelBreak {
+      white-space: normal;
       word-break: break-word;
     }
 
