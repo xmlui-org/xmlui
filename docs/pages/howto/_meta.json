@@ -1,6 +1,8 @@
 {
+  "create-apps": "Creating XMLUI Apps",
   "App": "Using App",
   "AppHeader": "Using AppHeader",
+  "stacks": "Using Stacks",
   "DatePicker": "Using DatePicker",
   "Footer": "Using Footer",
   "RadioGroup": "Using RadioGroup",

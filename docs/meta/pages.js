@@ -104,6 +104,7 @@ export const THE_APP_COMPONENT_LAYOUT_VARIANTS = "/create-apps/app-component#lay
 export const BASIC_COMPONENTS = "/create-apps/basic-components";
 export const BUILD_AND_DEPLOY = "/create-apps/build-and-deploy";
 export const WORKING_WITH_DATA = "/create-apps/data";
+export const WORKING_WITH_DATA_PERSISTING_DATA = "/create-apps/data#persisting-data";
 export const USING_MODAL_DIALOGS = "/create-apps/dialogs";
 export const USING_MODAL_DIALOGS_INTEROPERABILITY_WITH_FORMS = "/create-apps/dialogs#interoperability-with-forms";
 export const USING_FORMS = "/create-apps/forms";
