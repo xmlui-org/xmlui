@@ -9,21 +9,13 @@ import { INITIAL_THEME_TONE } from "../../xmlui/src/abstractions/ThemingDefs";
 import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 
 
-class AvatarDriver {
+class ComponentDriver {
   protected readonly componentLocator: Locator
   protected readonly testStateLocator: Locator
 
   constructor({ componentLocator, testStateViewLocator }) {
     this.componentLocator = componentLocator;
     this.testStateLocator = testStateViewLocator;
-  }
-
-  async expectInitials(initials: string) {
-    await expect(this.componentLocator).toContainText(initials)
-  }
-
-  async expectNoInitials(){
-    await expect(this.componentLocator).toBeEmpty();
   }
 
   async click() {
@@ -39,12 +31,22 @@ class AvatarDriver {
   }
 
   /** returns an async function that can query the test state */
-  getTestState(){
+  private getTestState(){
     return async () =>{
       const text = await this.testStateLocator.textContent();
       const testState = JSON.parse(text!);
       return testState
     }
+  }
+}
+
+class AvatarDriver extends ComponentDriver {
+  async expectInitials(initials: string) {
+    await expect(this.componentLocator).toContainText(initials)
+  }
+
+  async expectNoInitials(){
+    await expect(this.componentLocator).toBeEmpty();
   }
 }
 
@@ -70,8 +72,16 @@ export const test = base.extend<avatarFixtures>({
       if (errors.length > 0){
         throw { errors: errors };
       }
-      const componentTestId = "test-id-component";
-      (component as ComponentDef).children![0].testId = componentTestId
+      let componentTestId = "test-id-component";
+      const children =(component as ComponentDef).children
+      const child0 = children?.[0]
+      const testId = child0?.testId
+      if(testId){
+        componentTestId = testId
+      } else {
+        component.children ??= []
+        component.children[0]!.testId ??= componentTestId
+      }
 
       await initApp(page, { entryPoint: component });
       return new AvatarDriver({ componentLocator:page.getByTestId(componentTestId) , testStateViewLocator: page.getByTestId(testStateViewTestId) })
