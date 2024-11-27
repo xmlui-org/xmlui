@@ -1,5 +1,12 @@
-import type { CSSProperties, ReactNode } from "react";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  CSSProperties,
+  ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styles from "./ModalDialog.module.scss";
 import classnames from "@components-core/utils/classnames";
 import { Icon } from "@components/Icon/IconNative";
@@ -14,68 +21,34 @@ import { ModalVisibilityContext } from "./ModalVisibilityContext";
 // =====================================================================================================================
 // React component definition
 
+type OnClose = (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
+type OnOpen = (...args: any[]) => void;
 type ModalProps = {
   isInitiallyOpen?: boolean;
   style?: CSSProperties;
-  onClose?: (...args: any[]) => Promise<boolean | undefined | void> | boolean | undefined | void;
-  onOpen?: (...args: any[]) => void;
-  children?: ((modalContext: any) => ReactNode) | ReactNode;
-  portalTo?: HTMLElement;
+  onClose?: OnClose;
+  onOpen?: OnOpen;
+  children?: ReactNode;
   fullScreen?: boolean;
   title?: string;
-  registerComponentApi?: RegisterComponentApiFn;
   closeButtonVisible?: boolean;
 };
 
-export const ModalDialog = React.forwardRef(
+type ModalDialogFrameProps = {
+  isInitiallyOpen?: boolean;
+  registerComponentApi?: RegisterComponentApiFn;
+  onClose?: OnClose;
+  onOpen?: OnOpen;
+  renderDialog?: (modalContext?: any) => ReactNode;
+};
+
+export const ModalDialogFrame = React.forwardRef(
   (
-    {
-      children,
-      style,
-      isInitiallyOpen,
-      onClose,
-      onOpen,
-      fullScreen,
-      title,
-      registerComponentApi,
-      closeButtonVisible = true,
-    }: ModalProps,
+    { isInitiallyOpen, onOpen, onClose, registerComponentApi, renderDialog }: ModalDialogFrameProps,
     ref,
   ) => {
-    const [isOpen, setIsOpen] = useState(isInitiallyOpen);
-    const isClosing = useRef(false);
-    const { root } = useTheme();
-    const containerRef = useRef<HTMLDivElement>(null);
-    const modalRef = useRef<HTMLDivElement>(null);
-    const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
-    const [modalContext, setModalContext] = useState(null);
-
-    useEffect(() => {
-      if (isOpen) {
-        containerRef.current?.focus();
-      }
-    }, [isOpen]);
-
-    const doOpen = useEvent((modalContext?: any) => {
-      setModalContext(modalContext);
-      onOpen?.();
-      setIsOpen(true);
-    });
-
-    const doClose = useEvent(async () => {
-      if (!isClosing.current) {
-        try {
-          isClosing.current = true;
-          const result = await onClose?.();
-          if (result === false) {
-            return;
-          }
-        } finally {
-          isClosing.current = false;
-        }
-      }
-      setIsOpen(false);
-    });
+    const modalContextStateValue = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
+    const { doOpen, doClose, isOpen, openParams } = modalContextStateValue;
 
     useEffect(() => {
       registerComponentApi?.({
@@ -83,6 +56,86 @@ export const ModalDialog = React.forwardRef(
         close: doClose,
       });
     }, [doClose, doOpen, registerComponentApi]);
+
+    return isOpen ? (
+      <ModalStateContext.Provider value={modalContextStateValue}>
+        {renderDialog({
+          openParams,
+          ref
+        })}
+      </ModalStateContext.Provider>
+    ) : null;
+  },
+);
+
+const ModalStateContext = React.createContext(null);
+
+function useModalLocalOpenState(isInitiallyOpen: boolean, onOpen?: OnOpen, onClose?: OnClose) {
+  const [isOpen, setIsOpen] = useState(isInitiallyOpen);
+  const isClosing = useRef(false);
+  const [openParams, setOpenParams] = useState(null);
+
+  const doOpen = useEvent((...openParams: any) => {
+    setOpenParams(openParams);
+    onOpen?.();
+    setIsOpen(true);
+  });
+
+  const doClose = useEvent(async () => {
+    if (!isClosing.current) {
+      try {
+        isClosing.current = true;
+        const result = await onClose?.();
+        if (result === false) {
+          return;
+        }
+      } finally {
+        isClosing.current = false;
+      }
+    }
+    setIsOpen(false);
+  });
+
+  return useMemo(() => {
+    return {
+      isOpen,
+      doClose,
+      doOpen,
+      openParams,
+    };
+  }, [doClose, doOpen, isOpen, openParams]);
+}
+function useModalOpenState(isInitiallyOpen = true, onOpen?: OnOpen, onClose?: OnClose) {
+  const modalStateContext = useContext(ModalStateContext);
+  const modalLocalOpenState = useModalLocalOpenState(isInitiallyOpen, onOpen, onClose);
+  return modalStateContext || modalLocalOpenState;
+}
+
+export const ModalDialog = React.forwardRef(
+  (
+    {
+      children,
+      style,
+      isInitiallyOpen,
+      fullScreen,
+      title,
+      closeButtonVisible = true,
+      onOpen,
+      onClose,
+    }: ModalProps,
+    ref,
+  ) => {
+    const { root } = useTheme();
+    const modalRef = useRef<HTMLDivElement>(null);
+    const composedRef = ref ? composeRefs(ref, modalRef) : modalRef;
+
+    const { isOpen, doClose, doOpen } = useModalOpenState(isInitiallyOpen, onOpen, onClose);
+
+    useEffect(() => {
+      if (isOpen) {
+        modalRef.current?.focus();
+      }
+    }, [isOpen]);
 
     // https://github.com/radix-ui/primitives/issues/2122#issuecomment-2140827998
     useEffect(() => {
@@ -121,7 +174,10 @@ export const ModalDialog = React.forwardRef(
     }
 
     return (
-      <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
+      <Dialog.Root
+        open={isOpen}
+        onOpenChange={(open) => (open ? doOpen() : doClose())}
+      >
         <Dialog.Portal container={root}>
           {!fullScreen && <div className={styles.overlayBg} />}
           <Dialog.Overlay
@@ -141,7 +197,7 @@ export const ModalDialog = React.forwardRef(
                 }
               }}
               ref={composedRef}
-              style={{...style, gap: undefined}}
+              style={{ ...style, gap: undefined }}
             >
               {!!title && (
                 <Dialog.Title style={{ marginTop: 0 }}>
@@ -150,15 +206,14 @@ export const ModalDialog = React.forwardRef(
                   </header>
                 </Dialog.Title>
               )}
-              <div className={styles.innerContent} style={{gap: style?.gap}}>
+              <div className={styles.innerContent} style={{ gap: style?.gap }}>
                 <ModalVisibilityContext.Provider value={modalVisibilityContextValue}>
-                  {isOpen && (typeof children === "function" ? children?.(modalContext) : children)}
+                  {children}
                 </ModalVisibilityContext.Provider>
               </div>
               {closeButtonVisible && (
                 <Dialog.Close asChild={true}>
                   <Button
-                    onClick={doClose}
                     variant={"ghost"}
                     themeColor={"secondary"}
                     className={styles.closeButton}

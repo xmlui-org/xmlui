@@ -4,7 +4,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { paddingSubject } from "@components-core/theming/themes/base-utils";
 import { MemoizedItem } from "@components/container-helpers";
-import { ModalDialog } from "./ModalDialogNative";
+import { ModalDialog, ModalDialogFrame } from "./ModalDialogNative";
 
 const COMP = "ModalDialog";
 
@@ -77,28 +77,41 @@ export const ModalDialogMd = createMetadata({
 export const modalViewComponentRenderer = createComponentRenderer(
   COMP,
   ModalDialogMd,
-  ({ node, extractValue, layoutCss, renderChild, lookupEventHandler, registerComponentApi }) => {
+  ({ node, extractValue, layoutCss, renderChild, lookupEventHandler, registerComponentApi, layoutContext }) => {
+
+    // gigantic hack: If the ModalDialog is not inside a ModalDialogFrame, wrap it in one
+    //   we do this through the layout context, render it through another render loop with the extra $param context var
+    //   (note the layoutContext and node on the MemoizedItem)
+    // one solution would be to have a renderChild that can take a contextVars argument
+    if(!layoutContext?._insideModalFrame){
+      return (
+        <ModalDialogFrame
+          isInitiallyOpen={node.when !== undefined}
+          registerComponentApi={registerComponentApi}
+          onClose={lookupEventHandler("close")}
+          onOpen={lookupEventHandler("open")}
+          renderDialog={({ openParams, ref }) => {
+            return (
+              <MemoizedItem
+                node={node}
+                renderChild={renderChild}
+                layoutContext={{ _insideModalFrame: true }}
+                contextVars={{ $param: openParams?.[0], $params: openParams }}
+              />
+            );
+          }}
+        />
+      );
+    }
+    
     return (
       <ModalDialog
-        isInitiallyOpen={node.when !== undefined}
         style={layoutCss}
-        onClose={lookupEventHandler("close")}
-        onOpen={lookupEventHandler("open")}
         fullScreen={extractValue(node.props?.fullScreen)}
         title={extractValue(node.props?.title)}
-        registerComponentApi={registerComponentApi}
         closeButtonVisible={extractValue.asOptionalBoolean(node.props.closeButtonVisible)}
       >
-        {(...params) => {
-          return (
-            <MemoizedItem
-              node={node.children}
-              renderChild={renderChild}
-              layoutContext={{ type: "Stack" }}
-              contextVars={{ $param: params?.[0], $params: params }}
-            />
-          );
-        }}
+        {renderChild(node.children, { type: "Stack"})}
       </ModalDialog>
     );
   },
