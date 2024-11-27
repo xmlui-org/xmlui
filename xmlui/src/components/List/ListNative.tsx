@@ -1,6 +1,4 @@
-import type {
-  CSSProperties,
-  ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import React, {
   forwardRef,
   useCallback,
@@ -14,7 +12,15 @@ import React, {
 import type { Range } from "@tanstack/react-virtual";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import styles from "./List.module.scss";
-import { get, groupBy as groupByFunc, noop, omit, orderBy as lodashOrderBy, sortBy, uniq } from "lodash-es";
+import {
+  get,
+  groupBy as groupByFunc,
+  noop,
+  omit,
+  orderBy as lodashOrderBy,
+  sortBy,
+  uniq,
+} from "lodash-es";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -226,7 +232,6 @@ type DynamicHeightListProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-
 // TODO check this out: https://github.com/TanStack/virtual/discussions/195#discussioncomment-11170421
 export const DynamicHeightList = forwardRef(function DynamicHeightList(
   {
@@ -328,13 +333,13 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   );
 
   const scrollToBottom = useEvent(() => {
-    if(rows.length){
+    if (rows.length) {
       tryToScrollToIndex(rows.length - 1);
     }
   });
 
   const scrollToTop = useEvent(() => {
-    if(rows.length) {
+    if (rows.length) {
       tryToScrollToIndex(0);
     }
   });
@@ -576,6 +581,13 @@ export function MemoizedSection({
   }, [expanded, id, toggleExpanded]);
 
   return (
-    <MemoizedItem node={node} renderChild={renderChild} item={item} context={sectionContext} />
+    <MemoizedItem
+      node={node}
+      renderChild={renderChild}
+      item={item}
+      context={sectionContext}
+      itemKey="$group"
+      contextKey="$group"
+    />
   );
 }

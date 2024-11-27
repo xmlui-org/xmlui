@@ -94,11 +94,11 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 <App>
   <List
     data='{[...]}'
-    defaultGroups="{['meat']}"
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
     groupBy="category" >
     <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
   </List>
@@ -112,11 +112,11 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultGroups="{['meat']}"
+        defaultGroups="{['dairy', 'meat', 'vegetables']}"
         groupBy="category">
         <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
       </List>
@@ -312,11 +312,10 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 <App>
   <List
     data='{[...]}'
-    defaultGroups="{['meat']}"
     groupBy="category">
     <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
   </List>
@@ -330,11 +329,10 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultGroups="{['meat']}"
         groupBy="category">
         <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
       </List>
@@ -346,25 +344,28 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
 %-PROP-START groupFooterTemplate
 
-The structure of `$item` in a `groupFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
+The structure of `$group` in a `groupFooterTemplate` is the following:
 
 | Attribute    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
 | id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `groupBy`                                                     |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
 
-```ueml copy {8-10}
+This example displays a separator line in the groups' footer:
+
+```ueml copy {8-12}
 <App>
-  <List data='{[...]}' groupBy="category">
+  <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
     <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
     <property name="groupFooterTemplate">
-      <ContentSeparator />
+      <VStack verticalPadding="$space-normal">
+        <ContentSeparator/>
+      </VStack>
     </property>
   </List>
 </App>
@@ -378,11 +379,13 @@ An `$item` here looks like the following:
       <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
         <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
         <property name="groupFooterTemplate">
-          <ContentSeparator />
+          <VStack verticalPadding="$space-normal">
+            <ContentSeparator/>
+          </VStack>
         </property>
       </List>
     </App>
@@ -393,21 +396,20 @@ An `$item` here looks like the following:
 
 %-PROP-START groupHeaderTemplate
 
-The structure of `$item` in a `groupHeaderTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
+The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 | Attribute    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
 | id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `groupBy`                                                     |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
 
 ```ueml copy {2-6}
 <App>
   <List data='{[...]}' groupBy="category">
     <property name="groupHeaderTemplate">
       <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </Stack>
     </property>
   </List>
@@ -422,7 +424,7 @@ An `$item` here looks like the following:
       <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
         <property name="groupHeaderTemplate">
           <Stack padding="$space-2">
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </Stack>
         </property>
       </List>

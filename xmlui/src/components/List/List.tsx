@@ -72,8 +72,9 @@ export const ListMd = createMetadata({
       `This Boolean property defines whether the list groups are initially expanded.`,
     ),
     defaultGroups: d(
-      `This property adds default groups for the \`${COMP}\` and displays the group headers ` +
-        `even if no items fall into a particular section.`,
+      `This property adds default groups for the \`${COMP}\` and displays the group headers ` + 
+      `in the specified order. If a group header is declared here, that is displayed even if ` + 
+      `no items fall into a particular section.`,
     ),
   },
   contextVars: {
@@ -149,6 +150,8 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
                   node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
                   item={item}
                   renderChild={renderChild}
+                  itemKey="$group"
+                  contextKey="$group"
                 />
               )
             : undefined
