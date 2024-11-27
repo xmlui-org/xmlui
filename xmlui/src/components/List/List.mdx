@@ -81,24 +81,24 @@ See the [itemTemplate section](#itemtemplate).
 
 %-PROP-END
 
-%-PROP-START defaultSections
+%-PROP-START defaultGroups
 
 Note the `meat` section header before all the others in the list below:
 
 <Callout type="info" emoji="📔">
-For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
-and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
+and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
 ```ueml copy {4}
 <App>
   <List
     data='{[...]}'
-    defaultSections="{['meat']}"
-    sectionBy="category" >
-    <property name="sectionTemplate">
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
+    groupBy="category" >
+    <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
   </List>
@@ -106,17 +106,17 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
 ```
 
 <Playground
-  name="Example: defaultSections"
+  name="Example: defaultGroups"
   height={400}
   app={`
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
-        sectionBy="category">
-        <property name="sectionTemplate">
+        defaultGroups="{['dairy', 'meat', 'vegetables']}"
+        groupBy="category">
+        <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
       </List>
@@ -301,22 +301,21 @@ It contains the following boolean attributes:
 
 %-PROP-END
 
-%-PROP-START sectionBy
+%-PROP-START groupBy
 
 <Callout type="info" emoji="📔">
-For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
-or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
+or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
 ```ueml copy {3}
 <App>
   <List
     data='{[...]}'
-    defaultSections="{['meat']}"
-    sectionBy="category">
-    <property name="sectionTemplate">
+    groupBy="category">
+    <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
   </List>
@@ -324,17 +323,16 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 ```
 
 <Playground
-  name="Example: sectionBy"
+  name="Example: groupBy"
   height={400}
   app={`
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
-        sectionBy="category">
-        <property name="sectionTemplate">
+        groupBy="category">
+        <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
       </List>
@@ -344,45 +342,50 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
 
 %-PROP-END
 
-%-PROP-START sectionFooterTemplate
+%-PROP-START groupFooterTemplate
 
-The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
+The structure of `$group` in a `groupFooterTemplate` is the following:
 
 | Attribute    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
 
-```ueml copy {8-10}
+This example displays a separator line in the groups' footer:
+
+```ueml copy {8-12}
 <App>
-  <List data='{[...]}' sectionBy="category">
-    <property name="sectionTemplate">
+  <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+    <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
-    <property name="sectionFooterTemplate">
-      <ContentSeparator />
+    <property name="groupFooterTemplate">
+      <VStack verticalPadding="$space-normal">
+        <ContentSeparator/>
+      </VStack>
     </property>
   </List>
 </App>
 ```
 
 <Playground
-  name="Example: sectionFooterTemplate"
+  name="Example: groupFooterTemplate"
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
-        <property name="sectionTemplate">
+      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+        <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
-        <property name="sectionFooterTemplate">
-          <ContentSeparator />
+        <property name="groupFooterTemplate">
+          <VStack verticalPadding="$space-normal">
+            <ContentSeparator/>
+          </VStack>
         </property>
       </List>
     </App>
@@ -391,23 +394,22 @@ An `$item` here looks like the following:
 
 %-PROP-END
 
-%-PROP-START sectionTemplate
+%-PROP-START groupHeaderTemplate
 
-The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
+The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 | Attribute    | Description                                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
 
 ```ueml copy {2-6}
 <App>
-  <List data='{[...]}' sectionBy="category">
-    <property name="sectionTemplate">
+  <List data='{[...]}' groupBy="category">
+    <property name="groupHeaderTemplate">
       <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </Stack>
     </property>
   </List>
@@ -415,14 +417,14 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  name="Example: sectionTemplate"
+  name="Example: groupHeaderTemplate"
   height={400}
   app={`
     <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
-        <property name="sectionTemplate">
+      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+        <property name="groupHeaderTemplate">
           <Stack padding="$space-2">
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </Stack>
         </property>
       </List>

@@ -33,25 +33,25 @@ export const ListMd = createMetadata({
     scrollAnchor: d(
       `This property pins the scroll position to either the \`top\` or the \`bottom\` of the list.`,
     ),
-    sectionBy: d(
-      `This property set which attribute of the data is used to group or section the list items. ` +
+    groupBy: d(
+      `This property set which attribute of the data is used to group the list items. ` +
         `If the attribute does not appear in the data items, it will be ignored.`,
     ),
     orderBy: d(
       `This property enables the ordering of list items by specifying an attribute in the data.`,
     ),
-    availableSections: d(
-      `This property is an array of section names that the \`${COMP}\` will display.`,
+    availableGroups: d(
+      `This property is an array of group names that the \`${COMP}\` will display.`,
     ),
-    sectionTemplate: dComponent(
-      `Enables the customization of how the sections or groups are displayed, similarly to the ` +
+    groupHeaderTemplate: dComponent(
+      `Enables the customization of how the groups are displayed, similarly to the ` +
         `[\`itemTemplate\`](#itemtemplate). You can use the \`$item\` context variable to access ` +
-        `an item section and map its individual attributes.`,
+        `an item group and map its individual attributes.`,
     ),
-    sectionFooterTemplate: dComponent(
-      `Enables the customization of how the the footer of each section or group id displayed. ` +
-        `Combine with [\`sectionTemplate\`](#sectiontemplate) to customize sections. You can use ` +
-        `the \`$item\` context variable to access an item section and map its individual attributes.`,
+    groupFooterTemplate: dComponent(
+      `Enables the customization of how the the footer of each group is displayed. ` +
+        `Combine with [\`groupHeaderTemplate\`](#groupHeaderTemplate) to customize sections. You can use ` +
+        `the \`$item\` context variable to access an item group and map its individual attributes.`,
     ),
     itemTemplate: dComponent(
       `This property allows the customization of mapping data items to components. You can use ` +
@@ -68,12 +68,13 @@ export const ListMd = createMetadata({
       `Denotes which attribute of an item acts as the ID or key of the item. Default is \`"id"\`.`,
     ),
     selectedIndex: d(`This property scrolls to a specific item indicated by its index.`),
-    sectionsInitiallyExpanded: d(
-      `This Boolean property defines whether the list sections are initially expanded.`,
+    groupsInitiallyExpanded: d(
+      `This Boolean property defines whether the list groups are initially expanded.`,
     ),
-    defaultSections: d(
-      `This property adds default sections for the \`${COMP}\` and displays the section headers ` +
-        `even if no items fall into a particular section.`,
+    defaultGroups: d(
+      `This property adds default groups for the \`${COMP}\` and displays the group headers ` + 
+      `in the specified order. If a group header is declared here, that is displayed even if ` + 
+      `no items fall into a particular section.`,
     ),
   },
   contextVars: {
@@ -103,9 +104,9 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         items={extractValue(node.props.items) || extractValue(node.props.data)}
         limit={extractValue(node.props.limit)}
-        sectionBy={extractValue(node.props.sectionBy)}
+        groupBy={extractValue(node.props.groupBy)}
         orderBy={extractValue(node.props.orderBy)}
-        availableSections={extractValue(node.props.availableSections)}
+        availableGroups={extractValue(node.props.availableGroups)}
         scrollAnchor={node.props.scrollAnchor as any}
         pageInfo={extractValue(node.props.pageInfo)}
         idKey={extractValue(node.props.idKey)}
@@ -114,10 +115,10 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         selectedIndex={extractValue(node.props.selectedIndex)}
         resetSelectedIndex={lookupAction(node.events?.resetSelectedIndex)}
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
-        sectionsInitiallyExpanded={extractValue.asOptionalBoolean(
-          node.props.sectionsInitiallyExpanded,
+        groupsInitiallyExpanded={extractValue.asOptionalBoolean(
+          node.props.groupsInitiallyExpanded,
         )}
-        defaultSections={extractValue(node.props.defaultSections)}
+        defaultGroups={extractValue(node.props.defaultGroups)}
         itemRenderer={
           itemTemplate &&
           ((item) => {
@@ -132,10 +133,10 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
           })
         }
         sectionRenderer={
-          node.props.sectionBy
+          node.props.groupBy
             ? (item) => (
                 <MemoizedSection
-                  node={node.props.sectionTemplate ?? ({ type: "Fragment" } as any)}
+                  node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
                   renderChild={renderChild}
                   item={item}
                 />
@@ -143,12 +144,14 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
             : undefined
         }
         sectionFooterRenderer={
-          node.props.sectionFooterTemplate
+          node.props.groupFooterTemplate
             ? (item) => (
                 <MemoizedItem
-                  node={node.props.sectionFooterTemplate ?? ({ type: "Fragment" } as any)}
+                  node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
                   item={item}
                   renderChild={renderChild}
+                  itemKey="$group"
+                  contextKey="$group"
                 />
               )
             : undefined

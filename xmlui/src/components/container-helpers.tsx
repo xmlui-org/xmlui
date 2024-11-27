@@ -13,6 +13,8 @@ type MemoizedItemProps = {
   layoutContext?: LayoutContext;
   itemName?: string;
   contextVars?: Record<string, any>;
+  itemKey?: string;
+  contextKey?: string;
 };
 
 export const MemoizedItem = memo(
@@ -23,14 +25,26 @@ export const MemoizedItem = memo(
     renderChild,
     layoutContext,
     contextVars = EMPTY_OBJECT,
+    itemKey = "$item",
+    contextKey = "$context",
   }: MemoizedItemProps) => {
     const shallowMemoedContextVars = useShallowCompareMemoize(contextVars);
     const nodeWithItem = useMemo(() => {
+      if (itemKey === contextKey) {
+        return {
+          type: "Container",
+          contextVars: {
+            [itemKey]: {...item, ...context},
+            ...shallowMemoedContextVars,
+          },
+          children: Array.isArray(node) ? node : [node],
+        } as ContainerComponentDef;
+      }
       return {
         type: "Container",
         contextVars: {
-          $item: item,
-          $context: context,
+          [itemKey]: item,
+          [contextKey]: context,
           ...shallowMemoedContextVars,
         },
         children: Array.isArray(node) ? node : [node],

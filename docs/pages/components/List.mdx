@@ -28,9 +28,9 @@ The data is provided as JSON.
 
 ## Properties
 
-### `availableSections`
+### `availableGroups`
 
-This property is an array of section names that the `List` will display.
+This property is an array of group names that the `List` will display.
 
 ### `data`
 
@@ -92,26 +92,26 @@ See the [itemTemplate section](#itemtemplate).
   `}
 />
 
-### `defaultSections`
+### `defaultGroups`
 
-This property adds default sections for the `List` and displays the section headers even if no items fall into a particular section.
+This property adds default groups for the `List` and displays the group headers even if no items fall into a particular section.
 
 Note the `meat` section header before all the others in the list below:
 
 <Callout type="info" emoji="📔">
-For the `defaultSections` property to work, the data must be sectioned using the [`sectionBy`](#sectionby) property,
-and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
+and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
 ```ueml copy {4}
 <App>
   <List
     data='{[...]}'
-    defaultSections="{['meat']}"
-    sectionBy="category" >
-    <property name="sectionTemplate">
+    defaultGroups="{['dairy', 'meat', 'vegetables']}"
+    groupBy="category" >
+    <property name="groupHeaderTemplate">
       <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
+        <Text variant="subtitle" value="{$group.key}" />
       </VStack>
     </property>
   </List>
@@ -119,17 +119,17 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
 ```
 
 <Playground
-  name="Example: defaultSections"
+  name="Example: defaultGroups"
   height={400}
   app={`
     <App>
       <List
         data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
-        sectionBy="category">
-        <property name="sectionTemplate">
+        defaultGroups="{['dairy', 'meat', 'vegetables']}"
+        groupBy="category">
+        <property name="groupHeaderTemplate">
           <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
+            <Text variant="subtitle" value="{$group.key}" />
           </VStack>
         </property>
       </List>
@@ -168,6 +168,143 @@ This property defines the template to display when the list is empty.
     </App>
   `}
 />
+
+### `groupBy`
+
+This property set which attribute of the data is used to group the list items. If the attribute does not appear in the data items, it will be ignored.
+
+<Callout type="info" emoji="📔">
+For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
+or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
+</Callout>
+
+```ueml copy {3}
+<App>
+  <List
+    data='{[...]}'
+    groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupBy"
+  height={400}
+  app={`
+    <App>
+      <List
+        data='{${JSON.stringify(data, null, 2)}}'
+        groupBy="category">
+        <property name="groupHeaderTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </VStack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupFooterTemplate`
+
+Enables the customization of how the the footer of each group is displayed. Combine with [`groupHeaderTemplate`](#groupHeaderTemplate) to customize sections. You can use the `$item` context variable to access an item group and map its individual attributes.
+
+The structure of `$group` in a `groupFooterTemplate` is the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
+
+This example displays a separator line in the groups' footer:
+
+```ueml copy {8-12}
+<App>
+  <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+    <property name="groupHeaderTemplate">
+      <VStack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </VStack>
+    </property>
+    <property name="groupFooterTemplate">
+      <VStack verticalPadding="$space-normal">
+        <ContentSeparator/>
+      </VStack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupFooterTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+        <property name="groupHeaderTemplate">
+          <VStack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </VStack>
+        </property>
+        <property name="groupFooterTemplate">
+          <VStack verticalPadding="$space-normal">
+            <ContentSeparator/>
+          </VStack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupHeaderTemplate`
+
+Enables the customization of how the groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item group and map its individual attributes.
+
+The structure of `$group` in a `groupHeaderTemplate` is the following:
+
+| Attribute    | Description                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------------------------------------- |
+| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
+| items | The items filtered from the original data list that fall into this section.                                   |
+| key   | The attribute name to section by provided via `groupBy`                                                     |
+
+```ueml copy {2-6}
+<App>
+  <List data='{[...]}' groupBy="category">
+    <property name="groupHeaderTemplate">
+      <Stack padding="$space-2">
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>
+  </List>
+</App>
+```
+
+<Playground
+  name="Example: groupHeaderTemplate"
+  height={400}
+  app={`
+    <App>
+      <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
+        <property name="groupHeaderTemplate">
+          <Stack padding="$space-2">
+            <Text variant="subtitle" value="{$group.key}" />
+          </Stack>
+        </property>
+      </List>
+    </App>
+  `}
+/>
+
+### `groupsInitiallyExpanded`
+
+This Boolean property defines whether the list groups are initially expanded.
 
 ### `idKey`
 
@@ -335,141 +472,6 @@ This property pins the scroll position to either the `top` or the `bottom` of th
     </App>
   `}
 />
-
-### `sectionBy`
-
-This property set which attribute of the data is used to group or section the list items. If the attribute does not appear in the data items, it will be ignored.
-
-<Callout type="info" emoji="📔">
-For the `sectionBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
-or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
-</Callout>
-
-```ueml copy {3}
-<App>
-  <List
-    data='{[...]}'
-    defaultSections="{['meat']}"
-    sectionBy="category">
-    <property name="sectionTemplate">
-      <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </VStack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: sectionBy"
-  height={400}
-  app={`
-    <App>
-      <List
-        data='{${JSON.stringify(data, null, 2)}}'
-        defaultSections="{['meat']}"
-        sectionBy="category">
-        <property name="sectionTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
-          </VStack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-### `sectionFooterTemplate`
-
-Enables the customization of how the the footer of each section or group id displayed. Combine with [`sectionTemplate`](#sectiontemplate) to customize sections. You can use the `$item` context variable to access an item section and map its individual attributes.
-
-The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
-
-| Attribute    | Description                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
-
-```ueml copy {8-10}
-<App>
-  <List data='{[...]}' sectionBy="category">
-    <property name="sectionTemplate">
-      <VStack>
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </VStack>
-    </property>
-    <property name="sectionFooterTemplate">
-      <ContentSeparator />
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: sectionFooterTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
-        <property name="sectionTemplate">
-          <VStack>
-            <Text variant="subtitle" value="{$item.sectionKey}" />
-          </VStack>
-        </property>
-        <property name="sectionFooterTemplate">
-          <ContentSeparator />
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-### `sectionTemplate`
-
-Enables the customization of how the sections or groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item section and map its individual attributes.
-
-The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
-An `$item` here looks like the following:
-
-| Attribute    | Description                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `sectionBy`. |
-| sectionItems | The items filtered from the original data list that fall into this section.                                   |
-| sectionKey   | The attribute name to section by provided via `sectionBy`                                                     |
-
-```ueml copy {2-6}
-<App>
-  <List data='{[...]}' sectionBy="category">
-    <property name="sectionTemplate">
-      <Stack padding="$space-2">
-        <Text variant="subtitle" value="{$item.sectionKey}" />
-      </Stack>
-    </property>
-  </List>
-</App>
-```
-
-<Playground
-  name="Example: sectionTemplate"
-  height={400}
-  app={`
-    <App>
-      <List data='{${JSON.stringify(data, null, 2)}}' sectionBy="category">
-        <property name="sectionTemplate">
-          <Stack padding="$space-2">
-            <Text variant="subtitle" value="{$item.sectionKey}" />
-          </Stack>
-        </property>
-      </List>
-    </App>
-  `}
-/>
-
-### `sectionsInitiallyExpanded`
-
-This Boolean property defines whether the list sections are initially expanded.
 
 ### `selectedIndex`
 

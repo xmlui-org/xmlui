@@ -50,8 +50,8 @@ Now, instead of "undefined", labels display "loading...":
 ## Displaying List Sections
 
 The `List` component supports the grouping of list items according to a specified attribute.
-It has a `sectionBy` property that enables this grouping.
-The `List` identifies each unique value of the attribute given to `sectionBy` and groups the items accordingly.
+It has a `groupBy` property that enables this grouping.
+The `List` identifies each unique value of the attribute given to `groupBy` and groups the items accordingly.
 
 We have already created the `getSections` function within `Main.xmlui.xs`, which comes in handy for grouping.
 It is currently in the `Main.xmlui.xs` file, but we need it in the `Contacts` component.
@@ -92,9 +92,9 @@ To display the section information, add the `section` property to the `List` and
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-    sectionBy="section">
+    groupBy="section">
     <ContactRow item="{$item}" categories="{categories.value}" />
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle"
@@ -134,9 +134,9 @@ Update the `List` definition in `Contacts`:
   <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
   <List 
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-    sectionBy="section">
+    groupBy="section">
     <ContactRow item="{$item}" categories="{categories.value}" />
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
@@ -163,7 +163,7 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 ## Section Ordering
 
 The order of sections displayed above could be more helpful using a different ordering.
-With the help of the `defaultSections` property of the `List`, you can define the ordering.
+With the help of the `defaultGroups` property of the `List`, you can define the ordering.
 
 Modify the `List` accordingly:
 
@@ -171,8 +171,8 @@ Modify the `List` accordingly:
 <!-- Omitted -->
 <List 
   items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultSections="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
-  sectionBy="section">
+  defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+  groupBy="section">
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
@@ -197,9 +197,9 @@ Modify the code to omit them whenever we display a filtered list:
 <!-- Omitted -->
 <List 
   items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultSections="{!$props.filter
+  defaultGroups="{!$props.filter
     ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-  sectionBy="section">
+  groupBy="section">
   <!-- Omitted -->
 </List>  
 <!-- Omitted -->
