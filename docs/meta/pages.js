@@ -135,6 +135,7 @@ export const CUSTOMIZING_INPUT_FIELDS = "/howto/customize-input-fields";
 export const HOW_TO_EVENTS = "/howto/events";
 export const HOW_TO_LAYOUT = "/howto/layout";
 export const MENUS = "/howto/menus";
+export const USING_STACKS = "/howto/stacks";
 export const HOW_TO_GUIDES = "/howto";
 export const INTRODUCTION = "/index";
 export const USING_JAVASCRIPT_LIBRARIES = "/js-library-devs";
