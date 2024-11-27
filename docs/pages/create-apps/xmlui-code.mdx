@@ -11,8 +11,8 @@ import {
 # Coding with XMLUI
 
 <Callout type="info" emoji="💡">
-    When you create apps, sometimes you need to declare UI logic. The XMLUI components and the framework relieve you of
-    many aspects other web UI frameworks require you to add code to.
+  When you create apps, sometimes you need to declare UI logic. The XMLUI components and the framework relieve you of
+  many aspects other web UI frameworks require you to add code to.
 </Callout>
 
 However, there are a few occasions where you need to add code. XMLUI strives to reduce coding to using expressions instead of utilizing advanced concepts like function declarations, conditional statements, loops, etc.
@@ -24,7 +24,7 @@ This article will teach you the fundamental concepts and constructs of working w
 There are a few fundamental concepts the understanding of which help you add UI logic to your apps.
 
 <Callout type="info" emoji="💡">
-    XMLUI has a scripting language (XmlUiScript), a **subset of JavaScript** that follows its syntax and semantics.
+  XMLUI has a scripting language (XmlUiScript), a **subset of JavaScript** that follows its syntax and semantics.
 </Callout>
 
 Do not feel intimidated if you do not have experience with JavaScript. You *rarely* have to write complex code with XMLUI. In most cases, your intention can be described with short expressions.
@@ -36,7 +36,7 @@ You can learn more details about the subset of JavaScript supported by XMLUI in 
 ### Inline Code Snippets
 
 <Callout type="info" emoji="💡">
-    You can place code snippets inline into component properties, variable values, and event handlers.
+  You can place code snippets inline into component properties, variable values, and event handlers.
 </Callout>
 
 This technique works well when the code snippets are short and close to the components using them.
@@ -59,8 +59,8 @@ This technique works well when the code snippets are short and close to the comp
 ### Code-Behind Files
 
 <Callout type="info" emoji="💡">
-    You can put code (variables, functions) into **code-behind** files. Markup files (`.xmlui` extension) may have a
-    code-behind file using the markup file name but the `.xmlui.xs` extension.
+  You can put code (variables, functions) into **code-behind** files. Markup files (`.xmlui` extension) may have a
+  code-behind file using the markup file name but the `.xmlui.xs` extension.
 </Callout>
 
 XMLUI **automatically binds component markup** with code-behind files. This technique is helpful when you have long code snippets that would otherwise disturb your understanding of the markup.
@@ -68,35 +68,34 @@ XMLUI **automatically binds component markup** with code-behind files. This tech
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /showDelay/
-        <Button id="calcButton"
-                label="Show delay"
-                onClick="showDelay()"/>
-
-        ```
+```ueml copy filename="Main.xmlui (markup)" /showDelay/
+<Button 
+  id="calcButton"
+  label="Show delay"
+  onClick="showDelay()"/>
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /showDelay/
-        function showDelay() {
-        const delay = 500 * 2;
-        toast('Delay calculated: ' + delay);
-    }
-        ```
+```js copy filename="Main.xmlui.xs (code-behind)" /showDelay/
+function showDelay() {
+  const delay = 500 * 2;
+  toast('Delay calculated: ' + delay);
+}
+```
     </div>
 </div>
 
 
 <Callout type="info" emoji="📔">
-    The code you declare in a code-behind file is visible in the entire component but not outside.
+  The code you declare in a code-behind file is visible in the entire component but not outside.
 </Callout>
 
 Later, you will learn about how you can use scripts in the code-behind files.
 
-
 ### Component IDs
 
 <Callout type="info" emoji="💡">
-    With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to refer to that particular component in code (expressions). Component IDs are visible only **in the scope of their markup (and associated code-behind) file**.
+  With the **`id` attribute** of a component tag, you can assign an identifier to a component that you can use to refer to that particular component in code (expressions). Component IDs are visible only **in the scope of their markup (and associated code-behind) file**.
 </Callout>
 
 You can access the exposed methods and properties of the particular component through its component ID. The following section shows a sample.
@@ -104,7 +103,7 @@ You can access the exposed methods and properties of the particular component th
 ### Expressions
 
 <Callout type="info" emoji="💡">
-    Expressions are the primary tools for binding components to work one with the state of another.
+  Expressions are the primary tools for binding components to work one with the state of another.
 </Callout>
 
 ```ueml copy /myText/ /myText.value/
@@ -117,10 +116,9 @@ You can access the exposed methods and properties of the particular component th
 Type some text into the textbox to discover how this small example works.
 
 <Playground
-    name="Example: Binding two components with an expression"
-    height={140}
-    horizontal={true}
-    app={`
+  name="Example: Binding two components with an expression"
+  horizontal={true}
+  app={`
     <App>
       <TextBox id="myText" initialValue="Hello!" />
       <Text>You typed: {myText.value}</Text>
@@ -133,14 +131,14 @@ The `{myText.value}` part in the Text component is an **expression**. The wrappi
 The TextBox component's identifier is `myText`. You can access the TextBox's exposed values (and methods) through this ID. `myText.value` represents the current text content within the box. **So, this expression binds the TextBox's value to the Text's displayed label**.
 
 <Callout type="info" emoji="💡">
-    When the XMLUI engine observes that a dependency of an expression changes, it **re-evaluates the expression** and
-    re-renders the affected part of the UI (and only that part).
+  When the XMLUI engine observes that a dependency of an expression changes, it **re-evaluates the expression** and
+  re-renders the affected part of the UI (and only that part).
 </Callout>
 
 In the small app above, when you type something in the text box, every key you press triggers such a change.
 
 <Callout type="info" emoji="💡">
-    When you set property values, **you can mix** literal strings with expressions.
+  When you set property values, **you can mix** literal strings with expressions.
 </Callout>
 
 ```ueml copy
@@ -154,10 +152,9 @@ In the small app above, when you type something in the text box, every key you p
 Here, the first text uses a string literal, the second is a sheer expression, and the third combines string literals and expressions.
 
 <Playground
-    name="Example: mixing string literals an expressions"
-    height={140}
-    horizontal={true}
-    app={`
+  name="Example: mixing string literals an expressions"
+  horizontal={true}
+  app={`
     <App gap="$space-tight">
       <Text>I am a string literal.</Text>
       <Text>{"I am" + " an " + "expression."}</Text>
@@ -180,10 +177,9 @@ Variables are indispensable to the UI logic as they store some state. You can us
 Here, `var.myValue` is a variable declaration with a variable name (`myValue`) and an initial value (`{6 * 7}`). Before displaying the text, the engine initializes the `myValue` variable. Thus, when that is displayed, `{myValue}` is replaced with its current value, 42.
 
 <Playground
-    name="Example: Initializing a variable"
-    height={88}
-    horizontal={true}
-    app={`
+  name="Example: Initializing a variable"
+  horizontal={true}
+  app={`
     <App
       var.myValue="{6 * 7}">
       Life, universe, and everything: {myValue}
@@ -200,18 +196,18 @@ The following code has the same behavior as the previous one.
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /showDelay/
-        <App>
-            Life, universe, and everything: {myValue}
-        </App>
-        ```
+```ueml copy filename="Main.xmlui (markup)" /showDelay/
+<App>
+  Life, universe, and everything: {myValue}
+</App>
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /showDelay/
-        var myValue = 42;
+```js copy filename="Main.xmlui.xs (code-behind)" /showDelay/
+var myValue = 42;
 
 
-        ```
+```
     </div>
 </div>
 
@@ -239,11 +235,9 @@ The following sample demonstrates this concept:
 Check the variable types in the output:
 
 <Playground
-
-name = "Example: Variables values and types"
-height = {168}
-horizontal = {true}
-app = {`
+  name = "Example: Variables values and types"
+  horizontal = {true}
+  app = {`
     <App gap="$space-tight"
       var.stringValue="true"
       var.boolValue="{true}"
@@ -258,7 +252,7 @@ app = {`
 />
 
 <Callout type="info" emoji="💡">
-    XMLUI variables are **reactive**: whenever their dependencies change, their value is reevaluated.
+  XMLUI variables are **reactive**: whenever their dependencies change, their value is reevaluated.
 </Callout>
 
 ```ueml copy /var.countTimes3="{3 * count}"/ /{countTimes3}/
@@ -274,9 +268,9 @@ app = {`
 Clicking the button increments only the `count` variable. Because `countTimes3` is a reactive variable that depends on `count`, incrementing `count` triggers updating `countTimes3` too.
 
 <Playground
-    name="Example: Reactive variables"
-    horizontal={true}
-    app={`
+  name="Example: Reactive variables"
+  horizontal={true}
+  app={`
     <App var.count="{0}" var.countTimes3="{3 * count}" >
       <Button
         label="Click to increment!"
@@ -285,14 +279,13 @@ Clicking the button increments only the `count` variable. Because `countTimes3` 
       <Text>Click count * 3 = {countTimes3}</Text>
     </App>
   `}
-    height={180}
 />
 
 ### Event Handlers
 
 <Callout type="info" emoji="💡">
-    When a user interaction or system event occurs, the XMLUI engine executes component **event handlers**. You can
-    override the default event handler with your custom event handler.
+  When a user interaction or system event occurs, the XMLUI engine executes component **event handlers**. You can
+  override the default event handler with your custom event handler.
 </Callout>
 
 In an event handler, the entire attribute value is an XMLUI Script code snippet, so you do not need to wrap the code into curly braces:
@@ -308,11 +301,10 @@ In an event handler, the entire attribute value is an XMLUI Script code snippet,
 If you click the button, the engine executes the `toast('Howdy!')` code and displays a toast message.
 
 <Playground
-
-name = "Example: Declaring an event handler"
-height = {160}
-horizontal = {true}
-app = {`
+  name = "Example: Declaring an event handler"
+  horizontal = {true}
+  height={200}
+  app = {`
     <App>
       <Button
       label="Greet me!"
@@ -324,9 +316,9 @@ app = {`
 Event handlers often contain not only expressions but also **statements**.
 
 <Callout type="info" emoji="💡">
-    You can use **local variables** within expressions and function declarations. The **`let` keyword** allows using a
-    mutable variable; **`const`** declares an immutable one (following the JavaScript semantics). In contrast to `var`,
-    local variables declared with `let` and `const` **are not reactive**.
+  You can use **local variables** within expressions and function declarations. The **`let` keyword** allows using a
+  mutable variable; **`const`** declares an immutable one (following the JavaScript semantics). In contrast to `var`,
+  local variables declared with `let` and `const` **are not reactive**.
 </Callout>
 
 ```ueml copy /let sum = 0/ /let i = 1/
@@ -343,9 +335,9 @@ Event handlers often contain not only expressions but also **statements**.
 ```
 
 <Playground
-    name="Example: Local variables"
-    horizontal={true}
-    app={`
+  name="Example: Local variables"
+  horizontal={true}
+  app={`
     <App var.result="???" >
       <Button
         label="Calculate the sum of 1 to 100"
@@ -357,11 +349,10 @@ Event handlers often contain not only expressions but also **statements**.
       <Text>Result: {result}</Text>
     </App>
   `}
-    height={140}
 />
 
 <Callout type="info" emoji="💡">
-    You can move event handler declarations into code-behind files.
+  You can move event handler declarations into code-behind files.
 </Callout>
 
 The following code has the same behavior as the previous one.
@@ -369,32 +360,32 @@ The following code has the same behavior as the previous one.
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /calculate/ /result/
-        <App>
-            <Button
-                label="Calculate the sum of 1 to 100"
-                onClick="calculate()"/>
-            <Text>Result: {result}</Text>
-        </App>
+```ueml copy filename="Main.xmlui (markup)" /calculate/ /result/
+<App>
+    <Button
+        label="Calculate the sum of 1 to 100"
+        onClick="calculate()"/>
+    <Text>Result: {result}</Text>
+</App>
 
-        ```
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /calculate/ /result/
-        var result = "???";
+```js copy filename="Main.xmlui.xs (code-behind)" /calculate/ /result/
+var result = "???";
 
-        function calculate() {
-        let sum = 0;
-        for (let i = 1; i <= 100; i++) sum += i;
-        result = sum;
-    }
-        ```
+function calculate() {
+  let sum = 0;
+  for (let i = 1; i <= 100; i++) sum += i;
+  result = sum;
+  }
+```
     </div>
 </div>
 
 <Callout type="info" emoji="💡">
-    When your component has an ID, the engine **automatically binds component event handlers** with functions in the
-    code-behind file.
+  When your component has an ID, the engine **automatically binds component event handlers** with functions in the
+  code-behind file.
 </Callout>
 
 For example, in the following markup, the button has the id `calcButton`. The engine automatically binds the button's `click` event with the `calcButton_onClick` function in the code-behind file.
@@ -402,31 +393,31 @@ For example, in the following markup, the button has the id `calcButton`. The en
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
     <div style={{width: "50%", paddingRight: "0.25rem"}}>
-        ```ueml copy filename="Main.xmlui (markup)" /result/
-        <App>
-            <Button
-                id="calcButton"
-                label="Calculate the sum of 1 to 100"/>
-            <Text>Result: {result}</Text>
-        </App>
+```ueml copy filename="Main.xmlui (markup)" /result/
+<App>
+    <Button
+        id="calcButton"
+        label="Calculate the sum of 1 to 100"/>
+    <Text>Result: {result}</Text>
+</App>
 
-        ```
+```
     </div>
     <div style={{width: "50%", paddingLeft: "0.25rem"}}>
-        ```js copy filename="Main.xmlui.xs (code-behind)" /result/ /calcButton_onClick/
-        var result = "???";
+```js copy filename="Main.xmlui.xs (code-behind)" /result/ /calcButton_onClick/
+var result = "???";
 
-        function calcButton_onClick() {
-        let sum = 0;
-        for (let i = 1; i <= 100; i++) sum += i;
-        result = sum;
-    }
-        ```
+function calcButton_onClick() {
+  let sum = 0;
+  for (let i = 1; i <= 100; i++) sum += i;
+  result = sum;
+}
+```
     </div>
 </div>
 
 <Callout type="info" emoji="💡">
-    Some event handlers may have **one or more arguments**.
+  Some event handlers may have **one or more arguments**.
 </Callout>
 
 In the following example, the `didChange` event of `TextBox` has a single argument: the new value after the change.
@@ -445,10 +436,9 @@ The `(newValue) => message = newValue` expression is an arrow function (with the
 When you change the text in the TextBox, the `message` variable is updated with the new value.
 
 <Playground
-    name="Example: An event handler with argument"
-    height={140}
-    horizontal={true}
-    app={`
+  name="Example: An event handler with argument"
+  horizontal={true}
+  app={`
     <App var.message="(not changed yet)">
       <TextBox
         initialValue="Hello!"
@@ -459,16 +449,16 @@ When you change the text in the TextBox, the `message` variable is updated with 
 />
 
 <Callout type="info" emoji="📔">
-    XMLUI understands your intention when defining an event handler. In addition to the arrow function syntax, it
-    accepts several other alternatives, as here the <SmartLink href={SCRIPT_SYNTAX_EVENT_HANDLERS}>Event
-    Handlers</SmartLink> section describes.
+  XMLUI understands your intention when defining an event handler. In addition to the arrow function syntax, it
+  accepts several other alternatives, as here the <SmartLink href={SCRIPT_SYNTAX_EVENT_HANDLERS}>Event
+  Handlers</SmartLink> section describes.
 </Callout>
 
 
 ### Exposed Methods
 
 <Callout type="info" emoji="📔">
-    Reusable components can expose methods to other components.
+  Reusable components can expose methods to other components.
 </Callout>
 
 These methods can use XMLUI Script statements like event handler functions. You can learn more about them in the <SmartLink href={REUSABLE_COMPONENTS_EXPOSING_METHODS}>Reusable Components</SmartLink> article.
@@ -476,8 +466,8 @@ These methods can use XMLUI Script statements like event handler functions. You 
 ## Code-Behind Variables and Functions
 
 <Callout type="info" emoji="💡">
-    Code-behind files may contain only reactive variables (`var` keyword) and function declarations on their top-level
-    scope. Any other statement or expression declaration is forbidden.
+  Code-behind files may contain only reactive variables (`var` keyword) and function declarations on their top-level
+  scope. Any other statement or expression declaration is forbidden.
 </Callout>
 
 Thus, the following code-behind file is valid:
@@ -504,7 +494,7 @@ function selectItem(index) {
 ```
 
 <Callout type="info" emoji="💡">
-    Function declarations can be nested in other functions.
+  Function declarations can be nested in other functions.
 </Callout>
 
 In this case, markup files can see only the outermost declarations; inner functions are unavailable.
@@ -524,16 +514,16 @@ function calculateValue(n) {
 ```
 
 <Callout>
-    Currently, XMLUI does not implement the concept of imports, so you cannot create code files and import them into
-    code-behind files (for example, to share utility functions). This feature is being added to the framework in the
-    future.
+  Currently, XMLUI does not implement the concept of imports, so you cannot create code files and import them into
+  code-behind files (for example, to share utility functions). This feature is being added to the framework in the
+  future.
 </Callout>
 
 ## How XMLUI Code Runs
 
 <Callout type="info" emoji="💡">
-    The engine does not create JavaScript code to execute it in the browser; it runs **interpreted code created from the
-    compiled source script**.
+  The engine does not create JavaScript code to execute it in the browser; it runs **interpreted code created from the
+  compiled source script**.
 </Callout>
 
 These are the main reasons XMLUI prefers this technique:
@@ -545,7 +535,7 @@ These are the main reasons XMLUI prefers this technique:
 ### No Frozen UI
 
 <Callout type="info" emoji="💡">
-    You do not need to use `async`..`await` constructs.
+  You do not need to use `async`..`await` constructs.
 </Callout>
 
 These keywords are not even part of the XMLUI scripting syntax. The framework will ensure that even if you start an infinite loop in the code, the UI remains responsive:
@@ -578,10 +568,9 @@ loopRuns = true; while (loopRuns) count++;
 Now, try the code and break out of the loop by clicking the second button:
 
 <Playground
-    name="Example: No frozen UI"
-    height={140}
-    horizontal={true}
-    app={`
+  name="Example: No frozen UI"
+  horizontal={true}
+  app={`
     <App var.count="{0}" var.loopRuns="{false}">
       <HStack>
         <Button enabled="{!loopRuns}"
@@ -612,10 +601,9 @@ For example, in the following markup, using the `delay()` function would raise a
 ```
 
 <Playground
-    name="Example: Property cannot use async evaluation"
-    height={120}
-    horizontal={true}
-    app={`
+  name="Example: Property cannot use async evaluation"
+  horizontal={true}
+  app={`
     <App>
       <Text value="My value {delay(100), 123}" />
     </App>
