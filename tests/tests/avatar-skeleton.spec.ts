@@ -59,48 +59,48 @@ test("Max 3 initials", async ({ createDriver }) => {
   await avatar.expectInitials('TJS');
 });
 
-const sizes = [
-  { size: "xs", expected: ""},
-  { size: "sm", expected: ""},
-  { size: "md", expected: ""},
-  { size: "lg", expected: ""},
-]
-sizes.forEach((tc) =>{
-  test(`"${tc.size}" works with no name`, async ({}) => {
-  });
+// const sizes = [
+//   { size: "xs", expected: ""},
+//   { size: "sm", expected: ""},
+//   { size: "md", expected: ""},
+//   { size: "lg", expected: ""},
+// ]
+// sizes.forEach((tc) =>{
+//   test(`"${tc.size}" works with no name`, async ({}) => {
+//   });
 
-  test(`"${tc.size}" works with empty name`, async ({}) => {
-  });
+//   test(`"${tc.size}" works with empty name`, async ({}) => {
+//   });
 
-  test(`"${tc.size}" works with "I"`, async ({}) => {
-  });
+//   test(`"${tc.size}" works with "I"`, async ({}) => {
+//   });
 
-  test(`"${tc.size}" works with "WWW"`, async ({}) => {
-  });
-  test(`"${tc.size}" works with image`, async ({}) => {
-  });
-})
+//   test(`"${tc.size}" works with "WWW"`, async ({}) => {
+//   });
+//   test(`"${tc.size}" works with image`, async ({}) => {
+//   });
+// })
 
-test("url image status 404", async ({ }) => {
-});
+// test("url image status 404", async ({ }) => {
+// });
 
-test("url image status 400", async ({ }) => {
-});
+// test("url image status 400", async ({ }) => {
+// });
 
-test("url returns non-image", async ({ }) => {
-});
+// test("url returns non-image", async ({ }) => {
+// });
 
 
-sizes.forEach((tc) => {
-  test(`${tc.size} url image 100x100px`, async ({ }) => {
-  });
+// sizes.forEach((tc) => {
+//   test(`${tc.size} url image 100x100px`, async ({ }) => {
+//   });
 
-  test(`${tc.size} url image 100x200px`, async ({ }) => {
-  });
+//   test(`${tc.size} url image 100x200px`, async ({ }) => {
+//   });
 
-  test(`${tc.size} url image 200x100px`, async ({ }) => {
-  });
-});
+//   test(`${tc.size} url image 200x100px`, async ({ }) => {
+//   });
+// });
 
 test("click works", async ({ createDriver }) => {
   const avatar = await createDriver(`<Avatar name="Molly Dough" onClick="testState = true" />`);
