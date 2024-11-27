@@ -1,0 +1,83 @@
+import { Callout } from 'nextra/components'
+
+# Using Stacks
+
+## Use a vertical stack
+
+```ueml copy
+<VStack>
+  <Text value="First" /> <!-- Displays on top -->
+  <Text value="Second" /> <!-- Displays in the middle -->
+  <Text value="Third" /> <!-- Displays at the bottom -->
+</VStack>
+```
+
+## Use a horizontal stack
+
+```ueml copy
+<HStack>
+  <Text value="First" /> <!-- Displays on the left -->
+  <Text value="Second" /> <!-- Displays in the middle -->
+  <Text value="Third" /> <!-- Displays on the right -->
+</HStack>
+```
+
+## Use Stack orientation programmatically
+
+The orientation toggles between vertical and horizontal when you click within the stack (any child item).
+
+```ueml copy
+<Stack 
+  var.isVertical="{true}"
+  orientation="{isVertical ? 'vertical' : 'horizontal'}"
+  onClick="isVertical = !isVertical">
+  <Text value="First" />
+  <Text value="Second" />
+  <Text value="Third" />
+</Stack>
+```
+
+<Callout type="info" emoji="📔">
+Use `VStack` or `HStack` explicitly whenever possible. Use `Stack` when you need to set the orientation programmatically.
+</Callout>
+
+## Reverse the order of stack items
+
+```ueml copy /reverse="true"/
+<VStack reverse="true">
+  <Text value="First" /> <!-- Displays at the bottom -->
+  <Text value="Second" /> <!-- Displays in the middle -->
+  <Text value="Third" /> <!-- Displays on top -->
+</VStack>
+```
+
+<Callout type="info" emoji="📔">
+The `reverse` property also works with `HStack` using the same analogy.
+</Callout>
+
+## Remove the gap between items
+
+All stack components, by default, add a (non-zero) gap between adjacent items. If you want to avoid gaps, use `gap="0"`. 
+
+```ueml copy /gap="0"/
+<VStack gap="0">
+  <Text value="First" />
+  <Text value="Second" />
+  <Text value="Third" />  
+</VStack>
+```
+
+## Use `HStack` with content wrapping 
+
+The `HStack` component renders all its child items side-by-side, even if they overflow the current viewport. With content wrapping, children that would otherwise overflow will enter a new row.
+
+```ueml copy /wrapContent="true"/
+<HStack wrapContent="true">
+  <Text value="Item #1, longer than usual." />
+  <Text value="Item #2, longer than usual." />
+  <Text value="Item #3, longer than usual." />
+  <Text value="Item #4, this is a very long item, it may not fit into the current line." />
+</HStack>
+```
+
+Depending on the current browser (viewport) width, Item #4 may enter a new row (on a very narrow screen, each item may have a separate row).

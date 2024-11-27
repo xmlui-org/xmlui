@@ -1,223 +1,87 @@
 import { Callout } from 'nextra/components'
 import { XMLUI_EMPTY, XMLUI_STARTER } from "../meta/downloads";
-import { COMPONENT_APP, THE_APP_COMPONENT, THE_APP_COMPONENT_LAYOUT_VARIANTS, XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX } from '../meta/pages';
+import { COMPONENT_APP, COMPONENT_FLOWLAYOUT, COMPONENT_HSTACK, COMPONENT_SPACEFILLER, COMPONENT_SPLITTER, COMPONENT_STACK, COMPONENT_VSTACK, MARKUP, THE_APP_COMPONENT, THE_APP_COMPONENT_LAYOUT_VARIANTS, WORKING_WITH_DATA, WORKING_WITH_DATA_PERSISTING_DATA, XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX } from '../meta/pages';
 
 # XMLUI Cheat Sheet
 
-## Create a New XMLUI App
+## Properties
 
-1. Unless already installed, set up Node.js on your machine (https://nodejs.org/en).
-2. Download the <DownloadLink href={XMLUI_STARTER}>XMLUI starter app</DownloadLink>.
-3. Unzip the downloaded zip file.
-4. Start a command prompt and select the unzipped folder as the current working directory
-5. Execute `start.bat` (Windows), or `./start.sh` (MacOs, Linux), or run `npx -y http-server -o` (any platform)
+You can influence components' visual appearance (and behavior) by setting component properties.
 
-For example, if your unzipped folder is in `C:\Users\Mary\work\xmlui-starter` (Windows), use these commands:
+**Set a Simple Component Property**
 
-```bat
-cd C:\Users\Mary\work\xmlui-starter
-start.bat
+Component properties are represented with attributes in the markup. Set this attribute value with a literal string.
+
+```ueml copy /value="I'm a text!"/
+<Text value="I'm a text!" />
 ```
 
-The XMLUI starter app creates a small app. In step 2, download the <DownloadLink href={XMLUI_EMPTY}>empty XMLUI app</DownloadLink> to create an empty app.
+**Set a component property with an expression**
 
-<Callout type="info" emoji="📔">
-The empty app will display some text to let you be sure that the app works.
-</Callout>
+You can use expressions to set up a property value. Expressions are wrapped in curly braces (between `{` and `}` characters).
 
-## Application Structure
+```ueml copy /{6 * 7}/
+<!-- Displays: "Life, universe, and everything: 42" -->
+<Text value="Life, universe, and everything: {6 * 7}" />
+```
 
-XMLUI apps have a single (multi-folder) structure with static files and are ready to be served by a web server. An XMLUI app has this minimal structure:
+**Set a component property with the `<property>` helper tag and nested value**
 
-| File/Folder | Description |
-| --- | --- |
-| **`index.html`** | The default webpage to display |
-| **`Main.xmlui`** | The XMLUI app's entry point |
-| **`xmlui`** | The folder with XMLUI core framework, optional features, emulated APIs, and third-party components |
-
-An app may contain app-specific components, be harnessed with additional themes, and use some app-wide configuration settings. The structure may contain these optional folders and files:
-
-| File/Folder | Description |
-| --- | --- |
-| **`Main.xmlui.xs`** | Code-behind file for the app's entry point |
-| **`components`** | The folder with the app-specific XMLUI components |
-| **`resources`** | The folder with static app resources like images, logos, icons, etc. |
-| **`themes`** | The folder for theme files. |
-| **`config.json`** | The app configuration file |
-
-XMLUI may emulate backend API endpoints within the browser. When an app runs in such an emulated mode, an extra file, `mockApi.js`, is loaded from the app's root folder. 
-
-Files with `.xmlui` extension (`Main.xmlui` and other app-specific component files in the `components` folder) use XMLUI markup syntax. Optional code-behind files with `.xmlui.xs` extension (`Main.xmlui.xs` and other app-specific code-behind files in the `components` folder) use XMLUI script (a subset of JavaScript) syntax.
-
-An XMLUI app (in the `Main.xmlui` file) must start with one and only one root tag. This root tag can be any component, including `<App>`, `<Text>`, `<H1>`, and many others, except `<Component>`.
+This construct is helpful when you want to set a property value to a component declaration (for example, you define a template with a property).
 
 ```ueml copy
-<App>
-  Though not exciting, this is a valid XMLUI app.
-</App>
+<Items data="{[1, 2, 3]}">
+  <property name="itemTemplate">
+    <Text value="This item is: {$item}" />
+  </property>
+</Items>
 ```
 
-The following markup does not start with a tag, so it is invalid:
+**Set component presence and visibility**
+
+By setting a component's `when` attribute to `false`, you can omit it from the markup tree (as if the definition were not there).
 
 ```ueml copy
-Not only is it not exciting, but this is an invalid XMLUI app.
+<Text when="false" value="I'm omitted from the markup" />
 ```
 
-This markup contains multiple root tags, so it is invalid:
+Naturally, components omitted from the markup (`when` set to `false`) are not visible.
 
-```ueml copy
-<H1>
-  This H1 heading alone would be a valid app.
-</H1>
-<Text>
-  This Text component makes the markup invalid (multiple root tags).
-</Text>
-```
+**Access exposed component properties**
 
-An XMLUI app-specific component (a `.xmlui` file within the `components` folder) must start with a `<Component>` tag. The component tag has a single attribute, `name`, which defines the component's name. The component's name must start with an uppercase letter and match the component file's name.
+You can assign an identifier to the component with the `id` attribute and use that to access its exposed properties.
 
-```ueml copy filename="components/MyComponent.xmlui"
-<Component name="MyComponent">
-  This is a valid XMLUI component.
-</Component>
-```
-
-## XMLUI Markup
-
-As the name suggests, XMLUI uses the same markup as XML/XHTML (with a few extensions). The markup comprises comments, tags, attributes, CDATA, and text sections.
-
-Unlike in XML/XHTML, comments can be used within a tag's definition:
-
-```ueml copy
-<!-- This is a comment -->
-<Button label="Hey!" <!-- variant="ghost" --> onClick="toast('Clicked!')" />
-```
-
-Tag names follow the *identifier syntax*. An identifier starts with a letter, a dollar sign (`$`), or an underscore (`_`) and continues with these characters or digits. Tags starting with uppercase letters represent components. A tag beginning with a lowercase letter marks a helper tag.
-
-```ueml copy
-<App>
-  <event name="ready">
-    console.log('App is ready');
-  </event>
-  <H1>This is a small App</H1>
-</App>
-```
-
-Attributes within component tags represent component properties, event handlers, methods, or variable declarations. They follow the identifier syntax. Some special attributes also allow the use of the dash (`-`) and dot (`.`) characters.
-
-Tags may nest a combination of text elements and other tags.
-
-```ueml copy
-<HStack>
-  This is an 'email' icon.
-  <Icon name="email" />
-  Do you see it?
-</HStack>
-```
-
-XMLUI collapses consecutive whitespace characters in text elements into a single space and ignores leading or trailing spaces.
-
-```ueml copy
-<Text>
-  This multiline 
-     text
-  will be collapsed.
-</Text> <!-- Displays: This multiline text will be collapsed. -->
-```
-
-In text elements and attribute values, you may use the following entity references:
-
-- `&amp;` (`&`, ampersand), `&gt;` (`>`, greater than), `&lt;` (`<`, less than), `&apos;` (`'`, apostrophe), `&quot;` (`"`, double quote), and `&nbsp;` (non-breaking space).
-
-Except for `<` in text elements, you do not have to use them. Nonetheless, XMLUI will understand them.
-
-```ueml copy
-<VStack>
-  <Text>I'm here!</Text> <!-- Displays: I'm here! -->
-  <Text>You're&nbsp;&nbsp;&nbsp;there!</Text> <!-- Displays: You're   there! -->
-  <Text value="He's on vacation" /> <!-- Displays: He's on vacation -->
-  <Text>Just him & her</Text> <!-- Displays: Just him & her -->
-  <Text>Just me &amp; you</Text> <!-- Displays: Just me & you -->
-  2 is always &lt; 3 <!-- Displays: 2 is always < 3 -->
-</VStack>
-```
-
-The CDATA ensures that text value within an XMLUI tag preserves all
- characters (prevents whitespace collapsing).
-
-```ueml copy
-<App>
-  <Markdown>
-    <![CDATA[
-# The Tale of Sir Galahad
-
-Popular sentences:
-
-- "Bring out your dead!"
-- "Oh, wicked, bad, naughty, evil Zoot!"
-- "You must tie her down on a bed and spank her!"
-- "No! It is too perilous."
-    ]]>
-  </Markdown>
-</App>
-```
-
-## Components
-
-Tags in XMLUI represent components. Attributes within tags represent component properties or event handlers (attributes starting with `on` and followed by an event name starting with an uppercase letter). In the following code snippet, `<Button>` is a component tag, `label` is a property, and `onClick` is an event handler (responding to the `click` event of the button).
-
-```ueml copy
-<Button label="Click me" onClick="toast('Clicked!')" />
-```
-
-Components can be defined with a separate opening and closing tag. This declaration is equivalent with the previous one:
-
-```ueml copy
-<Button label="Click me" onClick="toast('Clicked!')">
-</Button>
-```
-
-Components may nest child components. Parent components know how to display their children.
-
-```ueml copy
-<HStack>
-  <Icon name="email" />
-  <Text>contact.me@mycompany.com</Text>
-</HStack>
-```
-
-Components have a special property, `when`, determining whether the component should be processed as part of the object hierarchy defined by the markup. If the value of `when` is falsy (zero, boolean false, empty string, `undefined`, `null`), the component is virtually omitted from the markup as if it were never there. Otherwise, or if `when` is not declared, the component is processed as part of the markup.
-
-Naturally, where `when` is falsy, the component is not displayed.
-
-```ueml copy
-<App>
-  <Text when="false">This text is not displayed.</Text>
-  <Text when="true">This text is displayed.</Text>
-</App>
-```
-
-<Callout type="info" emoji="📔">
-The value of `when` determines the component's presence, and not just its visibility. If a component is not present, it is not visible. Some XMLUI components do not display any UI. They cannot be displayed by setting their `when` property to true.
-</Callout>
-
-Components may declare an identifier (with their `id` property) that starts with a letter, a dollar sign (`$`), or an underscore (`_`) and continues with these characters or digits. Identifiers can be used as references to the particular component instance; you can use them in expressions to access the component's exposed methods and properties.
-
-In the following sample, the `TextBox` uses the `myTextBox` identifier; the `Text` component leverages it to display the value typed into that box.
-
-```ueml copy
+```ueml copy /id="myTextBox"/ /{myTextBox.value}/
 <App>
   <TextBox id="myTextBox" placeholder="Type something" />
   <Text variant="title">You typed: {myTextBox.value}</Text>
 </App>
 ```
 
-The `{myTextBox.value}` part is an *expression*.
+This way, you can bind components: changing a particular property of one will trigger changing the other.
+
+**Invoke exposed component methods**
+
+You can assign an identifier to the component with the `id` attribute and use that to invoke its exposed methods.
+
+```ueml copy /id="myTextBox"/ /{myTextBox.value}/
+<App>
+  <Checkbox 
+    id="myCheckbox" 
+    label="Use encrypted channel"
+    initialValue="false" />
+  <Button label="Turn on encryption" onClick="myCheckbox.setValue(true)"/>
+</App>
+```
 
 ## Expressions
 
-You can use expressions in any property value declaration. Expressions are wrapped between curly braces; the engine evaluates them and replaces them with their actual value.
+The expressions in XMLUI use the same syntax and semantics as JavaScript. For details on syntax, see this 
+<SmartLink href={XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX}>article</SmartLink>.
+
+**Use an expression in a property value or component text**
+
+Expressions are wrapped between curly braces; the engine evaluates them and replaces them with their actual value.
 
 ```ueml copy
 <App>
@@ -227,35 +91,31 @@ You can use expressions in any property value declaration. Expressions are wrapp
 </App>
 ```
 
-The evaluated value of an expression has a type according to the expression. For example, the three expressions above result in two numbers and a boolean value.
+**Use an expression for interpolation**
 
-You can use multiple expressions in property or text values with arbitrary text segments before, after, and between them. Expressions are still evaluated to some values with particular types. However, the property or text value they compose is converted to a string.
+You can use multiple expressions combined with literal string segments in property values or component text.
 
 ```ueml copy
 <App>
-  <Text value="{1 + 2 * 3}" /> <!-- Number -->
-  <Text>{6 * 7}</Text>         <!-- Number -->
-  <Text>See: {1 + 2 * 3}{6 * 7} is a text</Text> <!-- String -->
+  <Text value="10 times 10 is {10*10} and not {9 * 10}" />
 </App>
 ```
 
-When you want to display an opening curly brace and avoid it being interpreted as the beginning of an expression, use `\{`. You do not need to escape the closing brace.
+**Use curly braces in values**
+
+Use `\{` as an escape for the opening curly brace. You do not need to escape the closing curly brace.
 
 ```ueml copy
 <Text value="\{1 + 2 * 3}" /> <!-- Displays {1 + 2 * 3} -->
 ```
-The expressions in XMLUI use the same syntax and semantics as JavaScript. For details on syntax, see this 
-<SmartLink href={XMLUI_EXPRESSIONS_EXPRESSION_SYNTAX}>article</SmartLink>.
 
 ## Variables
 
-You can declare variables in XMLUI; they have the same role as in other programming languages: storing state. Variables have a name following the same syntax as attribute names: they start with a letter, a dollar sign (`$`), or an underscore (`_`) and continue with these characters or digits.
+Variable names start with a letter or an underscore (`_`) and continue with these characters or digits.
 
-You can declare variables in the markup or code-behind files. There are three syntax variants for variable declarations in the markup; they are equivalent.
+Variables are scoped; their name must be unique in the declaring scope. When you declare variables in markup, they are visible within the declaring component (including all direct and indirect children). When you declare them in a code-behind file, their scope is the markup within the corresponding file.
 
-**Variant 1: Markup with `var.` prefix**
-
-You can use an attribute with the `var.` prefix in a component tag:
+**Declare a variable with the `var.` prefix**
 
 ```ueml copy /var.myVar/ /{myVar}/
 <App var.myVar="Hello, World!">
@@ -263,22 +123,9 @@ You can use an attribute with the `var.` prefix in a component tag:
 </App>
 ```
 
-**Variant 2: Markup with the `<var>` helper tag**
+**Declare a variable with the `<var>` helper tag and a nested value**
 
-Alternatively, you can use the `<var>` helper tag with the `name` and `value` attributes:
-
-```ueml copy /name="myVar"/ /{myVar}/
-<App>
-  <var name="myVar" value="Hello, World!" />
-  <Text>{myVar}</Text> <!-- Displays: Hello, World! -->
-</App>
-```
-
-**Variant 3: Markup with the `<var>` helper tag and nested value**
-
-Instead of using the `value` attribute of `<var>`, you can nest it into the element:
-
-```ueml copy /name="myVar"/ /{myVar}/
+```ueml copy {2-4} /name="myVar"/ /{myVar}/
 <App>
   <var name="myVar">
     Hello, World!
@@ -287,9 +134,7 @@ Instead of using the `value` attribute of `<var>`, you can nest it into the elem
 </App>
 ```
 
-**Variant 4: Declaration in a code-behind file**
-
-Use the `var` keyword in a code-behind file. You can refer to the declared variable in the corresponding markup file.
+**Declare a variable in the code-behind file**
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
@@ -309,9 +154,9 @@ var myVar="Hello, World!";
     </div>
 </div>
 
-Variables are scoped; their name must be unique in the declaring scope. When you declare variables in markup, they are visible within the declaring component (including all direct and indirect children). When you declare them in a code-behind file, their scope is the markup within the corresponding file.
+**Reusing a variable name in a nested scope**
 
-The same variable name can be declared in nested scopes. When evaluating the variable's value, the engine starts searching for the variable from the scope where it's referenced. If the search in a particular scope fails, it continues in the outer scope until the entire file (app root or component file) is processed.
+The same variable name can be declared in nested scopes. The engine resolves the name to the variable in the closest (innermost) scope.
 
 ```ueml copy
 <App var.myVar="Hello, from App!">
@@ -322,21 +167,9 @@ The same variable name can be declared in nested scopes. When evaluating the var
 </App>
 ```
 
-In markup files, you can use literal strings, expressions, or a combination of string segments and expressions to initialize variables. Their value follows the same rules as described with expressions.
+**Leverage the reactive nature of variables**
 
-```ueml copy
-<App>
-  <Text var.myVar="{6 * 7}">{myVar}</Text> <!-- myVar is a number: 42 -->
-  <Text var.myVar="12345">{myVar}</Text> <!-- myVar is a string: "12345" -->
-  <Text var.myVar="See: {6 * 7}|{1 + 2 * 3}">
-    {myVar}
-  </Text> <!-- myVar is a string: "See: 42|7" -->
-</App>
-```
-
-XMLUI variables are reactive. If you initialize them with an expression, the engine collects the other variables and XMLUI objects on which the variable depends. The engine re-evaluates the variable whenever these dependencies change and refreshes the UI according to the new value. 
-
-In the following example, clicking the button will increment the `count` variable. As variables are reactive, any time `count` is incremented, `count3Times` follows the change and will always have the value of three times `count.`
+If you initialize them with an expression, the engine detects any changes on which the variable value depends. When a change happens, the engine refreshes the UI.
 
 ```ueml copy
 <App var.count="{0}" var.countTimes3="{3 * count}" >
@@ -347,35 +180,19 @@ In the following example, clicking the button will increment the `count` variabl
   <Text>Click count * 3 = {countTimes3}</Text>
 </App>
 ```
+Any time `count` is incremented, `count3Times` follows the change and will always have the value of three times `count.`
 
 ## Event Handlers
 
-When a user interaction or system event occurs, the XMLUI engine executes component event handlers. You can
- override the default event handler with your custom event handler.
-
-You can declare event handlers in the markup or the code-behind file. Event handlers can be XMLUI scripts or components that may act as event handlers. Currently, XMLUI has one component, `APICall`, with this trait.
-
-**Variant 1: Markup with `on` attribute prefix**
+**Declare an event handler with the `on` attribute prefix**
 
 You can define an event handler for a particular component event using an attribute with the `on` prefix followed by the event name:
 
-```ueml copy
+```ueml copy /onClick="toast('Clicked!')"/
 <Button label="Click me" onClick="toast('Clicked!')" />
 ```
 
-**Variant 2: Markup with the `<event>` helper tag**
-
-Alternatively, you can use the `<event>` helper tag with the `name` and `value` attributes:
-
-```ueml copy
-<Button label="Click me">
-  <event name="click" value="toast('Clicked!')" />
-</Button>
-```
-
-**Variant 3: Markup with the `<event>` helper tag and nested value**
-
-Instead of using the `value` attribute of `<event>`, you can nest it into the element:
+**Declare an event handler with the `<event>` helper tag and nested value**
 
 ```ueml copy
 <Button label="Click me">
@@ -385,9 +202,9 @@ Instead of using the `value` attribute of `<event>`, you can nest it into the el
 </Button>
 ```
 
-**Variant 4: Declaration in a code-behind file**
+**Declare an event handler in the code-behind file**
 
-Declare a function in a code-behind file. You can assign the name of the function declared in the corresponding markup file to the event handler:
+You can assign the function's name declared in the code-behind file to the event handler in the markup.
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
@@ -407,7 +224,9 @@ function displayToast() {
     </div>
 </div>
 
-XMLUI supports auto-binding for event handlers in the code-behind file based on a particular function name convention. Your component must have an id, and the event handler function name must be `[componentId]_on[eventName]`, like in the following example:
+**Declare a code-behind event handler with auto markup-binding**
+
+When your component must have an id, and the event handler function name follows the `[componentId]_on[eventName]` pattern, XMLUI automatically binds the event handler to the corresponding component.
 
 <br/>
 <div style={{display: "flex", flexDirection: "row"}}>
@@ -431,7 +250,9 @@ function myButton_onClick() {
 Use auto-binding of event handlers with care. Though your markup is shorter, you must look into the code-behind file to check if a component declares a particular event handler.
 </Callout>
 
-The XMLUI engine supports components that can act as event handlers. To invoke an API endpoint from an event handler can be done by declaring an `APICall` component as an event handler. This option is available only with the component markup (not in the code-behind file) using the `<event>` helper tag:
+**Use an `APICall` component as an event handler**
+
+The XMLUI engine supports using an `APICall` component definition as an event handler. This option is available only with the component markup (not in the code-behind file) using the `<event>` helper tag:
 
 ```ueml copy
 <Button label="Delete Customer">
@@ -445,22 +266,136 @@ The XMLUI engine supports components that can act as event handlers. To invoke a
 </Button>
 ```
 
+`APICall` provides valuable services (such as confirmation before the invocation and many others). Learn more in <SmartLink href={WORKING_WITH_DATA_PERSISTING_DATA}>this article</SmartLink>.
+
 ## Layout
 
-XMLUI makes it easy to establish an application layout with the `App` component and other layout components like `Stack`, `FlowLayout`, and others.
+XMLUI has a few fundamental components you can use to establish the app's layout. Their sole responsibility is to provide a viewport and organize the placement, dimensions, and other visual traits of their children.
 
-The `App` component has a `layout` property that defines the initial layout of an app, including its header, navigation panel, main content, footer, and pages. For example, by setting the layout to `horizontal-sticky,` the navigation panel displays the items horizontally. As you scroll the content, the heading and the navigation panel dock to the top, while the footer sticks to the bottom.
+| Component | Description |
+| --------- | ----------- |
+| <SmartLink href={COMPONENT_APP}>`App`</SmartLink> | This component provides a UI frame for XMLUI apps. According to predefined (and run-time configurable) structure templates, `App` allows you to display your preferred layout. |
+| <SmartLink href={COMPONENT_STACK}>`Stack`</SmartLink> | This component is a layout container displaying children in a horizontal or vertical stack. |
+| <SmartLink href={COMPONENT_VSTACK}>`VStack`</SmartLink>, <SmartLink href={COMPONENT_HSTACK}>`HStack`</SmartLink> | These components are specialized versions of `Stack` that display children in a vertical or horizontal stack, respectively. |
+| <SmartLink href={COMPONENT_FLOWLAYOUT}>`FlowLayout`</SmartLink> | This layout component is used to position content in rows with an auto wrapping feature: if the length of the items exceed the available space the layout will wrap into a new line. |
+| <SmartLink href={COMPONENT_SPACEFILLER}>`SpaceFiler`</SmartLink> | This component works in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. |
+| <SmartLink href={COMPONENT_SPLITTER}>`Splitter`</SmartLink> | This component divides a container (such as a window, panel, pane, etc.) into two resizable sections. |
+
+
+## Fetching Data
+
+**Use a URL with the GET operation (list)**
+
+Setting the `data` property of data-aware components (such as `List`, `Items`, `Table`, and others) to a string fetches the data from the specified URL (with the GET verb).
 
 ```ueml copy
-<App layout="horizontal-sticky">
+<List data="/api/products">
+  <Card title="{$item.name}" subtitle="{$item.description}"/>
+</List>
 ```
 
-You can learn more about the available app layouts <SmartLink href={THE_APP_COMPONENT_LAYOUT_VARIANTS}>here</SmartLink>.
+**Use a URL with the GET operation (filtered list)**
 
-These are the layout components that help you establish the app's layout:
+```ueml copy
+<App var.category="electronics">
+  <Button label="Use books" onClick="category = 'books'" />
+  <List data="/api/products/{category}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
 
-|Component|Description|
-|---|---|
-|`App`|Provides the fundamental layout of the app. Learn more about using `App` <SmartLink href={THE_APP_COMPONENT}>here</SmartLink>, or check its <SmartLink href={COMPONENT_APP}>component reference</SmartLink>.|
+**Bind an input value with a URL**
 
-_TBC_
+You can combine the value of a particular input with the URL.
+
+```ueml copy /{myTextBox.value}/ /myTextBox/ 
+<App>
+  <TextBox id="myTextBox" placeholder="Search value" />
+  <List data="/api/products?search={myTextBox.value}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
+
+**Use a URL with another verb**
+
+If you must use a verb other than GET, you can use a `DataSource` that provides more control over the request. The identifier of the `DataSource` is in the `data` property.
+
+```ueml copy {2} /method="post"/ /{productSource}/ /productSource/
+<App>
+  <DataSource id="productSource" url="/api/products" method="post" />
+  <List data="{productSource}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
+
+**Use a request header**
+
+You can set a request header in a `DataSource` component.
+
+```ueml copy {2-5} /headers/ /{productSource}/ /productSource/
+<App>
+  <DataSource 
+    id="productSource" 
+    url="/api/products"
+    headers="{{ 'x-api-key': 'my-secret-key' }}" />
+  <List data="{productSource}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
+
+**Select a part of the response as the result**
+
+If the data you want to use is just a part of the response, you can drill down to the response segment with your data.
+
+```ueml copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
+<App>
+  <DataSource id="productSource" url="/api/products" resultSelector="items"/>
+  <List data="{productSource}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
+
+This example assumes the response contains a `metadata` property (to ignore) and an `items` property (the actual payload for your query).
+
+**Filter or modify the fetched result**
+
+You can refer to the `value` property of a `DataSource` and use that to filter or modify the result.
+
+```ueml copy {2} /{productSource}/ /productSource/ /resultSelector="items"/
+<App>
+  <DataSource id="productSource" url="/api/products" resultSelector="items"/>
+  <List data="{productSource.value.filter(p => p.weight > 100)}" >
+    <Card title="{$item.name}" subtitle="{$item.description}" />
+  </List>
+</App>
+```
+
+The markup in this example filters the product with a weight over 100 lbs.
+
+## Calling an API
+
+_TBD_ 
+
+## Using Forms
+
+_TBD_
+
+## Dialogs
+
+_TBD_
+
+## Creating App-Specific components
+
+_TBD_
+
+## Using Themes
+
+_TBD_
+
+
+
