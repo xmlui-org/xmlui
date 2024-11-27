@@ -26,9 +26,9 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: using Select"
-  height={200}
-  app={`
+    name="Example: using Select"
+    height={200}
+    app={`
     <App>
       <Select>
         <Option value="opt1" label="first"/>
@@ -71,9 +71,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: emptyListTemplate"
-  height={260}
-  app={`
+    name="Example: emptyListTemplate"
+    height={260}
+    app={`
     <App>
       <VStack>
         <Text value="Default:" />
@@ -104,8 +104,8 @@ Default value: `true`.
 ```
 
 <Playground
-  name="Example: enabled"
-  app={`
+    name="Example: enabled"
+    app={`
     <App>
       <Select enabled="false" />
     </App>
@@ -127,9 +127,9 @@ This property sets the component's initial value.
 ```
 
 <Playground
-  name="Example: initialValue"
-  height={200}
-  app={`
+    name="Example: initialValue"
+    height={200}
+    app={`
     <App>
       <Select initialValue="opt3">
         <Option value="opt1" label="first"/>
@@ -147,6 +147,12 @@ You can specify the identifier of a component acting as its label. When you clic
 ### `maxLength`
 
 This property sets the maximum length of the input it accepts.
+
+### `multi`
+
+This property allows the user to select multiple items.
+
+Default value: `false`.
 
 ### `optionTemplate`
 
@@ -169,9 +175,9 @@ This property enables the customization of list items. To access the attributes 
 ```
 
 <Playground
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+    name="Example: optionTemplate"
+    height={200}
+    app={`
     <App>
       <Select>
         <property name="optionTemplate">
@@ -203,9 +209,9 @@ A placeholder text that is visible in the input field when its empty.
 ```
 
 <Playground
-  name="Example: placeholder"
-  height={200}
-  app={`
+    name="Example: placeholder"
+    height={200}
+    app={`
     <App>
       <Select placeholder="Please select an item">
         <Option value="opt1" label="first"/>
@@ -223,6 +229,10 @@ Set this property to `true` to disallow changing the component value.
 ### `required`
 
 Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `searchable`
+
+This property enables the search functionality in the dropdown list.
 
 ### `validationStatus`
 
@@ -247,8 +257,8 @@ Available values:
 ```
 
 <Playground
-  name="Example: validationStatus"
-  app={`
+    name="Example: validationStatus"
+    app={`
     <App>
       <Select />
       <Select validationStatus="valid" />
@@ -277,9 +287,9 @@ This event is triggered when value of Select has changed.
 ```
 
 <Playground
-  name="Example: didChange"
-  height={200}
-  app={`
+    name="Example: didChange"
+    height={200}
+    app={`
     <App>
       <var name="newValue" value="" />
       <Text value="{newValue}" />
@@ -311,9 +321,9 @@ This event is triggered when the Select has received the focus.
 ```
 
 <Playground
-  name="Example: gotFocus/lostFocus"
-  height={200}
-  app={`
+    name="Example: gotFocus/lostFocus"
+    height={200}
+    app={`
     <App>
       <var name="isFocused" value="{false}" />
       <Text value="Input control is focused: {isFocused}" />
@@ -350,9 +360,9 @@ This method sets the focus on the Select.
 ```
 
 <Playground
-  name="Example: focus()"
-  height={240}
-  app={`
+    name="Example: focus()"
+    height={240}
+    app={`
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <Select id="inputControl">
@@ -387,8 +397,8 @@ You can use this method to set the component's current value programmatically (`
 ```
 
 <Playground
-  name="Example: value() and setValue()"
-  app={`
+    name="Example: value() and setValue()"
+    app={`
     <App>
       <Select id="inputControl">
         <Option value="opt1" label="first"/>
@@ -477,21 +487,21 @@ Theme variables to set the styles of an unselected item:
 ```
 
 <Playground
-  name="Example: styling"
-  height={260}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "radius-Select": "30px",
-        "color-placeholder-Select": "red",
-        "thickness-border-Select": "4px",
-      },
-    },
-  ]}
-  app={`
+    name="Example: styling"
+    height={260}
+    defaultTheme="custom"
+    themes={[
+        {
+            id: "custom",
+            name: "Custom Theme",
+            themeVars: {
+                "radius-Select": "30px",
+                "color-placeholder-Select": "red",
+                "thickness-border-Select": "4px",
+            },
+        },
+    ]}
+    app={`
     <App>
       <Select placeholder="Please select an option" />
     </App>
@@ -522,8 +532,7 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | Variable | Default Value (Light) | Default Value (Dark) |
 | --- | --- | --- |
 | [color-bg](../styles-and-themes/common-units/#color)-item-Select | $color-bg-dropdown-item | $color-bg-dropdown-item |
-| [color-bg](../styles-and-themes/common-units/#color)-item-Select--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-bg](../styles-and-themes/common-units/#color)-item-Select--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color)-item-Select--active | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
 | [color-bg](../styles-and-themes/common-units/#color)-item-Select--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
 | [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
@@ -553,8 +562,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-indicator-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [color-text](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-800 |
 | [color-text](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-800 |
 | [color-text](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -565,7 +572,6 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-text](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
-| [font-size](../styles-and-themes/common-units/#size)-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

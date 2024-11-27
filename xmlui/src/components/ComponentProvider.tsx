@@ -1,6 +1,9 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
-import type { ComponentRendererDef, CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
+import type {
+  ComponentRendererDef,
+  CompoundComponentRendererInfo,
+} from "@abstractions/RendererDefs";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
@@ -34,7 +37,6 @@ import { cardComponentRenderer } from "@components/Card/Card";
 import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
 import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
 import { noResultComponentRenderer } from "@components/NoResult/NoResult";
-import { comboboxComponentRenderer } from "@components/Combobox/Combobox";
 import { fileUploadDropZoneComponentRenderer } from "@components/FileUploadDropZone/FileUploadDropZone";
 import { iconComponentRenderer } from "@components/Icon/Icon";
 import { itemsComponentRenderer } from "@components/Items/Items";
@@ -55,12 +57,14 @@ import { dynamicHeightListComponentRenderer } from "@components/List/List";
 import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
 import { formItemComponentRenderer } from "@components/FormItem/FormItem";
-import { passwordInputComponentRenderer, textBoxComponentRenderer } from "@components/TextBox/TextBox";
+import {
+  passwordInputComponentRenderer,
+  textBoxComponentRenderer,
+} from "@components/TextBox/TextBox";
 import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/RealTimeAdapter";
 import { formComponentRenderer } from "@components/Form/Form";
 import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
 import { numberBoxComponentRenderer } from "@components/NumberBox/NumberBox";
-import { multiSelectComponentRenderer } from "@components/MultiSelect/MultiSelect";
 import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
 import { appRenderer } from "@components/App/App";
 import { navPanelRenderer } from "@components/NavPanel/NavPanel";
@@ -77,7 +81,6 @@ import { spinnerComponentRenderer } from "@components/Spinner/Spinner";
 import { markdownComponentRenderer } from "@components/Markdown/Markdown";
 import { selectComponentRenderer } from "@components/Select/Select";
 import { themeChangerButtonComponentRenderer } from "@components/ThemeChanger/ThemeChanger";
-import { multiComboboxComponentRenderer } from "@components/MultiCombobox/MultiCombobox";
 import { formSectionRenderer } from "@components/FormSection/FormSection";
 import { checkboxComponentRenderer } from "@components/Checkbox/Checkbox";
 import { switchComponentRenderer } from "@components/Switch/Switch";
@@ -93,14 +96,16 @@ import { merge, range } from "lodash-es";
 import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
 import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
 import { columnComponentRenderer } from "@components/Column/Column";
-import { optionComponentRenderer } from "@components/Option/Option";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/APICall";
 import { downloadAction } from "@components-core/action/FileDownloadAction";
 import { uploadAction } from "@components-core/action/FileUploadAction";
 import { navigateAction } from "@components-core/action/NavigateAction";
 import { timedAction } from "@components-core/action/TimedAction";
-import type { LoaderRenderer, LoaderRendererDef } from "@components-core/abstractions/LoaderRenderer";
+import type {
+  LoaderRenderer,
+  LoaderRendererDef,
+} from "@components-core/abstractions/LoaderRenderer";
 import { apiLoaderRenderer } from "@components-core/loader/ApiLoader";
 import { externalDataLoaderRenderer } from "@components-core/loader/ExternalDataLoader";
 import { mockLoaderRenderer } from "@components-core/loader/MockLoaderRenderer";
@@ -125,19 +130,19 @@ import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
 import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
-import {tabItemComponentRenderer} from "@components/Tabs/TabItem";
+import { tabItemComponentRenderer } from "@components/Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
-import {accordionItemComponentRenderer} from "@components/Accordion/AccordionItem";
+import { accordionItemComponentRenderer } from "@components/Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
-import {carouselComponentRenderer} from "@components/Carousel/Carousel";
-import {carouselItemComponentRenderer} from "@components/Carousel/CarouselItem";
-import {createPropHolderComponent} from "@components-core/renderers";
-import {breakoutComponentRenderer} from "@components/Breakout/Breakout";
-import {toneChangerButtonComponentRenderer} from "@components/ThemeChanger/ToneChangerButton";
-import {apiCallRenderer} from "@components/APICall/APICall";
-import {option2ComponentRenderer} from "@components/Option/Option2";
-import {combobox2ComponentRenderer} from "@components/Combobox/Combobox2";
+import { carouselComponentRenderer } from "@components/Carousel/Carousel";
+import { carouselItemComponentRenderer } from "@components/Carousel/CarouselItem";
+import { createPropHolderComponent } from "@components-core/renderers";
+import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
+import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
+import { apiCallRenderer } from "@components/APICall/APICall";
+import { selectOptionComponentRenderer } from "@components/Select/SelectOption";
+import { optionComponentRenderer } from "@components/Option/Option";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -151,8 +156,6 @@ type ComponentProviderProps = {
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
-
-
 
 export class ComponentRegistry {
   private pool = new Map<string, ComponentRegistryEntry>();
@@ -280,8 +283,8 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
     }
-    if (process.env.VITE_USED_COMPONENTS_Option2 !== "false") {
-      this.registerComponentRenderer(option2ComponentRenderer);
+    if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
+      this.registerComponentRenderer(selectOptionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);
@@ -316,7 +319,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(codeComponentRenderer);
     }
 
-    if(process.env.VITE_USER_COMPONENTS_Markdown !== "false"){
+    if (process.env.VITE_USER_COMPONENTS_Markdown !== "false") {
       this.registerComponentRenderer(markdownComponentRenderer);
     }
 
@@ -335,7 +338,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(passwordInputComponentRenderer);
       this.registerComponentRenderer(emojiSelectorRenderer);
       this.registerComponentRenderer(numberBoxComponentRenderer);
-      this.registerComponentRenderer(multiSelectComponentRenderer);
       this.registerComponentRenderer(hoverCardComponentRenderer);
       this.registerComponentRenderer(radioGroupRenderer);
       this.registerComponentRenderer(fileInputRenderer);
@@ -350,9 +352,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(menuItemRenderer);
       this.registerComponentRenderer(subMenuItemRenderer);
       this.registerComponentRenderer(menuSeparatorRenderer);
-      this.registerComponentRenderer(multiComboboxComponentRenderer);
-      this.registerComponentRenderer(comboboxComponentRenderer);
-      this.registerComponentRenderer(combobox2ComponentRenderer);
       this.registerComponentRenderer(tabsComponentRenderer);
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
@@ -378,7 +377,6 @@ export class ComponentRegistry {
     this.registerComponentRenderer(rangeComponentRenderer);
     this.registerComponentRenderer(sliderComponentRenderer);
     this.registerComponentRenderer(buttonGroupComponentRenderer);
-
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
@@ -443,6 +441,14 @@ export class ComponentRegistry {
     return this.loaders.get(type);
   }
 
+  hasComponent(componentName: string) {
+    return (
+      this.pool.get(componentName) !== undefined ||
+      this.loaders.get(componentName) !== undefined ||
+      this.actionFns.get(componentName) !== undefined
+    );
+  }
+
   private registerComponentRenderer({ type, renderer, metadata: hints }: ComponentRendererDef) {
     this.pool.set(type, { renderer, descriptor: hints });
     if (hints?.themeVars) {
@@ -453,7 +459,10 @@ export class ComponentRegistry {
     }
   }
 
-  private registerCompoundComponentRenderer({ compoundComponentDef, hints }: CompoundComponentRendererInfo) {
+  private registerCompoundComponentRenderer({
+    compoundComponentDef,
+    hints,
+  }: CompoundComponentRendererInfo) {
     this.pool.set(compoundComponentDef.name, {
       renderer: (rendererContext: any) => {
         return (
@@ -487,23 +496,23 @@ export class ComponentRegistry {
   private registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
   }
-
-  hasComponent(componentName: string) {
-    return this.pool.get(componentName) !== undefined || this.loaders.get(componentName) !== undefined || this.actionFns.get(componentName) !== undefined;
-  }
 }
 
 // This React component provides a context in which components can access the component registry. The
 // component takes care that child component are rendered only when the component registry is initialized
 // (filled with the definition of available components).
 export function ComponentProvider({ children, contributes }: ComponentProviderProps) {
-  const [componentRegistry, setComponentRegistry] = useState(() => new ComponentRegistry(contributes));
+  const [componentRegistry, setComponentRegistry] = useState(
+    () => new ComponentRegistry(contributes),
+  );
   //sync up the changed contributes (HMR)
   useEffect(() => {
     setComponentRegistry(new ComponentRegistry(contributes));
   }, [contributes]);
 
   return (
-    <ViewComponentRegistryContext.Provider value={componentRegistry}>{children}</ViewComponentRegistryContext.Provider>
+    <ViewComponentRegistryContext.Provider value={componentRegistry}>
+      {children}
+    </ViewComponentRegistryContext.Provider>
   );
 }

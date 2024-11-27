@@ -11,7 +11,6 @@ import { BookmarkMd } from "@components/Bookmark/Bookmark";
 import { CardMd } from "@components/Card/Card";
 import { ChangeListenerMd } from "@components/ChangeListener/ChangeListener";
 import { CheckboxMd } from "@components/Checkbox/Checkbox";
-import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
 import { DropdownMenuMd, MenuItemMd } from "@components/DropdownMenu/DropdownMenu";
@@ -33,7 +32,6 @@ import { LogoMd } from "@components/Logo/Logo";
 import Markdown from "react-markdown";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
-import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
 import { NavGroupMd } from "@components/NavGroup/NavGroup";
 import { NavLinkMd } from "@components/NavLink/NavLink";
 import { NavPanelMd } from "@components/NavPanel/NavPanel";
@@ -64,7 +62,7 @@ import { TableOfContentsMd } from "@components/TableOfContents/TableOfContents";
 import { TabsMd } from "@components/Tabs/Tabs";
 import { TextMd } from "@components/Text/Text";
 import { TextAreaMd } from "@components/TextArea/TextArea";
-import { ComponentMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentMetadata } from "@abstractions/ComponentDefs";
 
 export const metadataHash: Record<string, ComponentMetadata> = {
   App: AppMd,
@@ -78,7 +76,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Checkbox: CheckboxMd,
   Column: ColumnMd,
-  Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
@@ -106,8 +103,6 @@ export const metadataHash: Record<string, ComponentMetadata> = {
   Markdown: MarkdownMd,
   MenuItem: MenuItemMd,
   ModalDialog: ModalDialogMd,
-  MultiCombobox: ComboboxMd,
-  MultiSelect: MultiSelectMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,

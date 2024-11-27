@@ -1,0 +1,60 @@
+@use "@components-core/theming/themes" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$componentName: "SelectOption";
+
+.selectItem {
+  position: relative;
+  display: flex;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-radius: 4px;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  padding-inline: 1em;
+  outline: none;
+  font-size: createThemeVar("font-size-SelectOption");
+
+  &[data-highlighted] {
+    background-color: createThemeVar("color-bg-item-SelectOption--hover");
+  }
+
+  &[data-state=checked] {
+    background-color: createThemeVar("color-bg-item-SelectOption--active");
+  }
+}
+
+.selectItem[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: createThemeVar("color-text-item-#{$componentName}--disabled");
+  font-style: italic;
+}
+
+.selectItemIndicator {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  height: 0.875rem;
+  width: 0.875rem;
+  align-items: center;
+  justify-content: center;
+  color: createThemeVar("color-text-indicator-#{$componentName}");
+}
+
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVars: t.json-stringify($themeVars);
+}
+
+
