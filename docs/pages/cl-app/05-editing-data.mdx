@@ -337,7 +337,7 @@ Pass an empty record to add a new contact.
       items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
       defaultSections="{!$props.filter
         ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-      sectionBy="section">
+      groupBy="section">
       <property name="itemTemplate">
         <ContactRow 
           item="{$item}" 

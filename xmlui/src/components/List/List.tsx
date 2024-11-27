@@ -33,7 +33,7 @@ export const ListMd = createMetadata({
     scrollAnchor: d(
       `This property pins the scroll position to either the \`top\` or the \`bottom\` of the list.`,
     ),
-    sectionBy: d(
+    groupBy: d(
       `This property set which attribute of the data is used to group or section the list items. ` +
         `If the attribute does not appear in the data items, it will be ignored.`,
     ),
@@ -103,7 +103,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         loading={extractValue.asOptionalBoolean(node.props.loading)}
         items={extractValue(node.props.items) || extractValue(node.props.data)}
         limit={extractValue(node.props.limit)}
-        sectionBy={extractValue(node.props.sectionBy)}
+        groupBy={extractValue(node.props.groupBy)}
         orderBy={extractValue(node.props.orderBy)}
         availableSections={extractValue(node.props.availableSections)}
         scrollAnchor={node.props.scrollAnchor as any}
@@ -132,7 +132,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
           })
         }
         sectionRenderer={
-          node.props.sectionBy
+          node.props.groupBy
             ? (item) => (
                 <MemoizedSection
                   node={node.props.sectionTemplate ?? ({ type: "Fragment" } as any)}

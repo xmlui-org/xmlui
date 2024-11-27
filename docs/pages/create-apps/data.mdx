@@ -899,10 +899,10 @@ As you expect, the list displays ships in descending order by the number of thei
 
 As the following sample demonstrates, a `List` can group its items according to a particular field. You can optionally define a section header and footer for the list.
 
-```ueml copy {10-12} /sectionBy="type"/
+```ueml copy {10-12} /groupBy="type"/
 <App>
   <List data="https://api.spacexdata.com/v4/ships"
-    sectionBy="type">
+    groupBy="type">
     <HStack padding="$padding-tight">
       <Text variant="strong" width="30%">{$item.name}</Text>
       <Text width="15%">Type: {$item.type}</Text>
@@ -921,7 +921,7 @@ As the following sample demonstrates, a `List` can group its items according to 
   app={`
     <App>
       <List data="https://api.spacexdata.com/v4/ships"
-        sectionBy="type">
+        groupBy="type">
         <HStack padding="$padding-tight">
           <Text variant="strong" width="30%">{$item.name}</Text>
           <Text width="15%">Type: {$item.type}</Text>

@@ -274,7 +274,7 @@ You can remove the highlighted lines from `Contacts.xmlui`:
         items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
         defaultSections="{$props.filter === 'all'
           ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-        sectionBy="section">
+        groupBy="section">
         <property name="itemTemplate">
           <ContactRow 
             item="{$item}" 

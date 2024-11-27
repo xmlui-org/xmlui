@@ -14,7 +14,7 @@ import React, {
 import type { Range } from "@tanstack/react-virtual";
 import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
 import styles from "./List.module.scss";
-import { get, groupBy, noop, omit, orderBy as lodashOrderBy, sortBy, uniq } from "lodash-es";
+import { get, groupBy as groupByFunc, noop, omit, orderBy as lodashOrderBy, sortBy, uniq } from "lodash-es";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import { ScrollContext } from "@components-core/ScrollContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
@@ -75,7 +75,7 @@ type ListData = {
   expanded?: Record<any, boolean>;
   items: any[];
   limit?: number;
-  sectionBy?: string;
+  groupBy?: string;
   orderBy?: OrderBy;
   availableSections?: string[];
 };
@@ -85,7 +85,7 @@ export function useListData({
   expanded = EMPTY_OBJECT,
   items,
   limit,
-  sectionBy,
+  groupBy,
   orderBy,
   availableSections,
   defaultSections = EMPTY_ARRAY,
@@ -118,14 +118,14 @@ export function useListData({
   }, [sortedItems, limit]);
 
   const sectionedItems: Record<string, any> = useMemo(() => {
-    if (sectionBy === undefined) {
+    if (groupBy === undefined) {
       return EMPTY_OBJECT;
     }
-    return groupBy(cappedItems, (item) => item[sectionBy]);
-  }, [cappedItems, sectionBy]);
+    return groupByFunc(cappedItems, (item) => item[groupBy]);
+  }, [cappedItems, groupBy]);
 
   const sections: string[] = useMemo(() => {
-    if (sectionBy === undefined) {
+    if (groupBy === undefined) {
       return EMPTY_ARRAY;
     }
     let foundSectionKeys = uniq([...defaultSections, ...Object.keys(sectionedItems)]);
@@ -135,10 +135,10 @@ export function useListData({
       });
     }
     return foundSectionKeys;
-  }, [sectionBy, sectionedItems, defaultSections, availableSections]);
+  }, [groupBy, sectionedItems, defaultSections, availableSections]);
 
   const rows = useMemo(() => {
-    if (sectionBy === undefined) {
+    if (groupBy === undefined) {
       return cappedItems;
     }
     const ret: any[] = [];
@@ -160,7 +160,7 @@ export function useListData({
       }
     });
     return ret;
-  }, [sectionBy, sections, cappedItems, expanded, sectionsInitiallyExpanded, sectionedItems]);
+  }, [groupBy, sections, cappedItems, expanded, sectionsInitiallyExpanded, sectionedItems]);
 
   return {
     rows,
@@ -209,7 +209,7 @@ type DynamicHeightListProps = {
   sectionFooterRenderer?: (group: any, id: any) => ReactNode;
   loading?: boolean;
   limit?: number;
-  sectionBy?: string;
+  groupBy?: string;
   orderBy?: OrderBy;
   availableSections?: string[];
   scrollAnchor?: "top" | "bottom";
@@ -236,7 +236,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     sectionFooterRenderer,
     loading,
     limit,
-    sectionBy,
+    groupBy,
     orderBy,
     availableSections,
     scrollAnchor = "top",
@@ -280,7 +280,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     expanded,
     items,
     limit,
-    sectionBy,
+    groupBy,
     orderBy,
     availableSections,
   });
