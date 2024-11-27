@@ -1,91 +1,129 @@
 import type { Locator, Page } from "@playwright/test";
 import type { ThemeTestDesc } from "./component-test-helpers";
 import type { baseComponentFixtures} from "./fixtures";
+import type { ComponentDef } from "../../xmlui/src/abstractions/ComponentDefs";
 
 import { test as base, expect, TEST_EVENT_PLACEHOLDER } from "./fixtures";
 import { initApp } from "./component-test-helpers";
 import { INITIAL_THEME_TONE } from "../../xmlui/src/abstractions/ThemingDefs";
+import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 
 
 class AvatarDriver {
-  constructor(private readonly avatar: Locator) { }
+  protected readonly componentLocator: Locator
+  protected readonly testStateLocator: Locator
+
+  constructor({ componentLocator, testStateViewLocator }) {
+    this.componentLocator = componentLocator;
+    this.testStateLocator = testStateViewLocator;
+  }
+
   async expectInitials(initials: string) {
-    await expect(this.avatar).toContainText(initials)
+    await expect(this.componentLocator).toContainText(initials)
   }
+
   async expectNoInitials(){
-    await expect(this.avatar).toBeEmpty();
+    await expect(this.componentLocator).toBeEmpty();
   }
+
   async click() {
-    await this.avatar.click()
+    await this.componentLocator.click()
+  }
+
+  async expectDefaultTestState(options?: {timeout?: number, intervals?: number[]}) {
+    await this.expectTestStateToEq({}, options)
+  }
+
+  async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
+    await expect.poll(this.getTestState(), options).toEqual(expected);
+  }
+
+  /** returns an async function that can query the test state */
+  getTestState(){
+    return async () =>{
+      const text = await this.testStateLocator.textContent();
+      const testState = JSON.parse(text!);
+      return testState
+    }
   }
 }
 
 type avatarFixtures = baseComponentFixtures & {
-  createAvatarDriver: (testId: string) => AvatarDriver;
+  createAvatarDriver: (source: string) => Promise<AvatarDriver>;
 };
+
 export const test = base.extend<avatarFixtures>({
   createAvatarDriver: async ({page}, use) =>{
-    await use((testId: string) => {
-      const avatarLocator = page.getByTestId(testId)
-      return new AvatarDriver(avatarLocator)
+    await use(async (source: string) => {
+      const testStateViewTestId = "test-state-view-testid"
+      // await initSingleTestComponent()
+      const prefix = `<Fragment var.testState="{{}}">`
+      const suffix =`
+        <Stack width="0" height="0">
+          <Text
+            testId="${testStateViewTestId}"
+            value="{ JSON.stringify(testState) }"/>
+        </Stack>
+      </Fragment>`
+      const code = prefix + source + suffix
+      const { errors, component } = xmlUiMarkupToComponent(code)
+      if (errors.length > 0){
+        throw { errors: errors };
+      }
+      const componentTestId = "test-id-component";
+      (component as ComponentDef).children![0].testId = componentTestId
+
+      await initApp(page, { entryPoint: component });
+      return new AvatarDriver({ componentLocator:page.getByTestId(componentTestId) , testStateViewLocator: page.getByTestId(testStateViewTestId) })
     });
   }
 });
 
 const RED = "rgb(255, 0, 0)";
 
-test("No initials without name", async ({ initComponent, createAvatarDriver}) => {
-  await initComponent(`<Avatar testId="avatar"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectNoInitials()
+test("No initials without name", async ({ createAvatarDriver}) => {
+  const avatar = await createAvatarDriver(`<Avatar />`);
+  await avatar.expectNoInitials()
 });
 
-test("No initials with empty name", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name=""/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectNoInitials()
+test("No initials with empty name", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name=""/>`);
+  await avatar.expectNoInitials()
 });
 
-test("Name with ascii symbols works", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="B 'Alan"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('B\'');
+test("Name with ascii symbols works", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="B 'Alan"/>`);
+  await avatar.expectInitials('B\'');
 });
 
-test("Name is numbers", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="123"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('1');
+test("Name is numbers", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="123"/>`);
+  await avatar.expectInitials('1');
 });
 
-test("Name is 孔丘 (Kong Qiu)", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="孔丘"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('孔');
+test("Name is 孔丘 (Kong Qiu)", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="孔丘"/>`);
+  await avatar.expectInitials('孔');
 });
 
-test("Can render 1 initial", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="Tim"/>`);
-  const driver = createAvatarDriver("avatar")
-  await driver.expectInitials('T');
+test("Can render 1 initial", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="Tim"/>`);
+  await avatar.expectInitials('T');
 });
 
-test("Can render 2 initials", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="Tim Smith"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('TS');
+test("Can render 2 initials", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="Tim Smith"/>`);
+  await avatar.expectInitials('TS');
 });
 
-test("Can render 3 initials", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="Tim John Smith"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('TJS');
+test("Can render 3 initials", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="Tim John Smith"/>`);
+  await avatar.expectInitials('TJS');
 });
 
-test("Max 3 initials", async ({ initComponent, createAvatarDriver }) => {
-  await initComponent(`<Avatar testId="avatar" name="Tim John Smith Jones"/>`);
-  const driver = createAvatarDriver("avatar");
-  await driver.expectInitials('TJS');
+test("Max 3 initials", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar testId="avatar" name="Tim John Smith Jones"/>`);
+  await avatar.expectInitials('TJS');
 });
 
 const sizes = [
@@ -131,16 +169,11 @@ sizes.forEach((tc) => {
   });
 });
 
-test("click works", async ({ initComponentWithEventWrapper, createAvatarDriver }) => {
-  const testBed = await initComponentWithEventWrapper(
-    `<Avatar testId="avatar" name="Molly Dough" onClick="${TEST_EVENT_PLACEHOLDER}" />`
-  );
-  const driver = createAvatarDriver("avatar");
-  //the driver uses the testBed inside itself
-
-  testBed.expectEventNotToBeInvoked()
-  await driver.click();
-  testBed.expectEventToBeInvoked()
+test("click works", async ({ createAvatarDriver }) => {
+  const avatar = await createAvatarDriver(`<Avatar name="Molly Dough" onClick="testState = true" />`);
+  await avatar.expectDefaultTestState();
+  await avatar.click();
+  await avatar.expectTestStateToEq(true);
 });
 
 // theme vars are more intricate, global theme vars can interact
