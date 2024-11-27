@@ -100,7 +100,7 @@ Note the `meat` section header before all the others in the list below:
 
 <Callout type="info" emoji="📔">
 For the `defaultGroups` property to work, the data must be sectioned using the [`groupBy`](#groupBy) property,
-and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
 ```ueml copy {4}
@@ -109,7 +109,7 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
     data='{[...]}'
     defaultGroups="{['meat']}"
     groupBy="category" >
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </VStack>
@@ -127,7 +127,7 @@ and either a [`sectionTemplate`](#sectiontemplate) or a [`sectionFooterTemplate`
         data='{${JSON.stringify(data, null, 2)}}'
         defaultGroups="{['meat']}"
         groupBy="category">
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <VStack>
             <Text variant="subtitle" value="{$item.sectionKey}" />
           </VStack>
@@ -341,8 +341,8 @@ This property pins the scroll position to either the `top` or the `bottom` of th
 This property set which attribute of the data is used to group or section the list items. If the attribute does not appear in the data items, it will be ignored.
 
 <Callout type="info" emoji="📔">
-For the `groupBy` property to work, either a [`sectionTemplate`](#sectiontemplate)
-or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
+For the `groupBy` property to work, either a [`groupHeaderTemplate`](#groupHeaderTemplate)
+or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 </Callout>
 
 ```ueml copy {3}
@@ -351,7 +351,7 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
     data='{[...]}'
     defaultGroups="{['meat']}"
     groupBy="category">
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </VStack>
@@ -369,7 +369,7 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
         data='{${JSON.stringify(data, null, 2)}}'
         defaultGroups="{['meat']}"
         groupBy="category">
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <VStack>
             <Text variant="subtitle" value="{$item.sectionKey}" />
           </VStack>
@@ -379,11 +379,11 @@ or a [`sectionFooterTemplate`](#sectionfootertemplate) needs to be provided.
   `}
 />
 
-### `sectionFooterTemplate`
+### `groupFooterTemplate`
 
-Enables the customization of how the the footer of each section or group id displayed. Combine with [`sectionTemplate`](#sectiontemplate) to customize sections. You can use the `$item` context variable to access an item section and map its individual attributes.
+Enables the customization of how the the footer of each section or group id displayed. Combine with [`groupHeaderTemplate`](#groupHeaderTemplate) to customize sections. You can use the `$item` context variable to access an item section and map its individual attributes.
 
-The structure of `$item` in a `sectionFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+The structure of `$item` in a `groupFooterTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
 An `$item` here looks like the following:
 
 | Attribute    | Description                                                                                                   |
@@ -395,12 +395,12 @@ An `$item` here looks like the following:
 ```ueml copy {8-10}
 <App>
   <List data='{[...]}' groupBy="category">
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <VStack>
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </VStack>
     </property>
-    <property name="sectionFooterTemplate">
+    <property name="groupFooterTemplate">
       <ContentSeparator />
     </property>
   </List>
@@ -408,17 +408,17 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  name="Example: sectionFooterTemplate"
+  name="Example: groupFooterTemplate"
   height={400}
   app={`
     <App>
       <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <VStack>
             <Text variant="subtitle" value="{$item.sectionKey}" />
           </VStack>
         </property>
-        <property name="sectionFooterTemplate">
+        <property name="groupFooterTemplate">
           <ContentSeparator />
         </property>
       </List>
@@ -426,11 +426,11 @@ An `$item` here looks like the following:
   `}
 />
 
-### `sectionTemplate`
+### `groupHeaderTemplate`
 
 Enables the customization of how the sections or groups are displayed, similarly to the [`itemTemplate`](#itemtemplate). You can use the `$item` context variable to access an item section and map its individual attributes.
 
-The structure of `$item` in a `sectionTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
+The structure of `$item` in a `groupHeaderTemplate` is different compared to the one used in [`itemTemplate`](#itemtemplate).
 An `$item` here looks like the following:
 
 | Attribute    | Description                                                                                                   |
@@ -442,7 +442,7 @@ An `$item` here looks like the following:
 ```ueml copy {2-6}
 <App>
   <List data='{[...]}' groupBy="category">
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <Stack padding="$space-2">
         <Text variant="subtitle" value="{$item.sectionKey}" />
       </Stack>
@@ -452,12 +452,12 @@ An `$item` here looks like the following:
 ```
 
 <Playground
-  name="Example: sectionTemplate"
+  name="Example: groupHeaderTemplate"
   height={400}
   app={`
     <App>
       <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category">
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <Stack padding="$space-2">
             <Text variant="subtitle" value="{$item.sectionKey}" />
           </Stack>
@@ -467,7 +467,7 @@ An `$item` here looks like the following:
   `}
 />
 
-### `sectionsInitiallyExpanded`
+### `groupsInitiallyExpanded`
 
 This Boolean property defines whether the list sections are initially expanded.
 

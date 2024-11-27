@@ -15,7 +15,7 @@
             item="{$item}" 
             categories="{categories.value}" 
             onEditClicked="(selected) => contactForm.open('edit', selected)" />
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
         <HStack 
             horizontalPadding="$space-normal" 
             verticalPadding="$space-tight"

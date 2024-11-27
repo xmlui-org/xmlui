@@ -70,7 +70,7 @@ enum RowType {
 }
 
 type ListData = {
-  sectionsInitiallyExpanded?: boolean;
+  groupsInitiallyExpanded?: boolean;
   defaultGroups?: Array<string>;
   expanded?: Record<any, boolean>;
   items: any[];
@@ -81,7 +81,7 @@ type ListData = {
 };
 
 export function useListData({
-  sectionsInitiallyExpanded = true,
+  groupsInitiallyExpanded = true,
   expanded = EMPTY_OBJECT,
   items,
   limit,
@@ -149,7 +149,7 @@ export function useListData({
         _row_type: RowType.SECTION,
         sectionKey: section,
       });
-      if (expanded[section] || (expanded[section] === undefined && sectionsInitiallyExpanded)) {
+      if (expanded[section] || (expanded[section] === undefined && groupsInitiallyExpanded)) {
         ret.push(...(sectionedItems[section] || []));
         ret.push({
           id: `${section}_footer`,
@@ -160,7 +160,7 @@ export function useListData({
       }
     });
     return ret;
-  }, [groupBy, sections, cappedItems, expanded, sectionsInitiallyExpanded, sectionedItems]);
+  }, [groupBy, sections, cappedItems, expanded, groupsInitiallyExpanded, sectionedItems]);
 
   return {
     rows,
@@ -221,7 +221,7 @@ type DynamicHeightListProps = {
   idKey?: string;
   style?: CSSProperties;
   emptyListPlaceholder?: ReactNode;
-  sectionsInitiallyExpanded?: boolean;
+  groupsInitiallyExpanded?: boolean;
   defaultGroups: Array<string>;
   registerComponentApi?: RegisterComponentApiFn;
 };
@@ -248,7 +248,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     idKey = "id",
     style,
     emptyListPlaceholder,
-    sectionsInitiallyExpanded = true,
+    groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
   }: DynamicHeightListProps,
@@ -269,13 +269,13 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
   const expandContextValue = useMemo(() => {
     return {
       isExpanded: (id: any) =>
-        expanded[id] || (expanded[id] === undefined && sectionsInitiallyExpanded),
+        expanded[id] || (expanded[id] === undefined && groupsInitiallyExpanded),
       toggleExpanded,
     };
-  }, [expanded, sectionsInitiallyExpanded, toggleExpanded]);
+  }, [expanded, groupsInitiallyExpanded, toggleExpanded]);
 
   const { rows } = useListData({
-    sectionsInitiallyExpanded,
+    groupsInitiallyExpanded,
     defaultGroups,
     expanded,
     items,

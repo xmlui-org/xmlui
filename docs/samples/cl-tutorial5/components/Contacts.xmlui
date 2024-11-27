@@ -7,7 +7,7 @@
         ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
     groupBy="section">    
     <ContactRow item="{$item}" categories="{categories.value}" />
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"

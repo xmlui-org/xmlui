@@ -909,7 +909,7 @@ As the following sample demonstrates, a `List` can group its items according to 
       <Image when="{$item.image}" height="80px" width="110px" fit="cover" src="{$item.image}"/>
       <Text when="{!$item.image}" width="*">No image available</Text>
     </HStack>
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <Card title="{$item.sectionKey}" />
     </property>
   </List>
@@ -928,7 +928,7 @@ As the following sample demonstrates, a `List` can group its items according to 
           <Image when="{$item.image}" height="80px" width="110px" fit="cover" src="{$item.image}"/>
           <Text when="{!$item.image}" width="*">No image available</Text>
         </HStack>
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <Card title="{$item.sectionKey}" />
         </property>
       </List>

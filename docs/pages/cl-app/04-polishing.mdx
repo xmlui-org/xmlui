@@ -94,7 +94,7 @@ To display the section information, add the `section` property to the `List` and
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     groupBy="section">
     <ContactRow item="{$item}" categories="{categories.value}" />
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle"
@@ -136,7 +136,7 @@ Update the `List` definition in `Contacts`:
     items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
     groupBy="section">
     <ContactRow item="{$item}" categories="{categories.value}" />
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
