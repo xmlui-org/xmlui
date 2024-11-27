@@ -196,7 +196,7 @@ export function Select({
         onChange: toggleOption,
       }}
     >
-      <OptionTypeProvider Component={searchable || multi ? MyOption : SelectOption}>
+      <OptionTypeProvider Component={searchable || multi ? HiddenOption : SelectOption}>
         {searchable || multi ? (
           <OptionContext.Provider value={optionContextValue}>
             {children}
@@ -412,7 +412,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
   );
 }
 
-function MyOption(option: Option) {
+function HiddenOption(option: Option) {
   const { onOptionRemove, onOptionAdd } = useOption();
 
   useLayoutEffect(() => {
@@ -420,7 +420,7 @@ function MyOption(option: Option) {
     return () => onOptionRemove(option);
   }, [option, onOptionAdd, onOptionRemove]);
 
-  return <span />;
+  return <span style={{ display: "none" }} />;
 }
 
 export const Command = forwardRef<
