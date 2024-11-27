@@ -1,23 +1,44 @@
 import type { CSSProperties, ReactNode } from "react";
+import { forwardRef } from "react";
+import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 import { useId, useRef } from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useCallback, useMemo } from "react";
 import type { Option } from "@components/abstractions";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import type { ValidationStatus } from "@components/abstractions";
-import * as SelectPrimitive from "@radix-ui/react-select";
+import {
+  Portal as SelectPortal,
+  Content,
+  Root,
+  ScrollDownButton,
+  ScrollUpButton,
+  Value as SelectValue,
+  Icon as SelectIcon,
+  Trigger,
+  Viewport,
+  Label,
+} from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
-import * as React from "react";
 import { SelectContext, useSelect } from "@components/Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { SelectOption } from "@components/Select/SelectOptionNative";
-import { Command as CommandPrimitive } from "cmdk";
+import {
+  Command as Cmd,
+  CommandEmpty as CmdEmpty,
+  CommandGroup as CmdGroup,
+  CommandInput as CmdInput,
+  CommandItem as CmdItem,
+  CommandList as CmdList,
+} from "cmdk";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { useEvent } from "@components-core/utils/misc";
+import { OptionContext, useOption } from "@components/Select/OptionContext";
 
 type SelectProps = {
   id?: string;
@@ -44,8 +65,6 @@ function defaultRenderer(item: Option) {
   return <div>{item.label}</div>;
 }
 
-const SelectValue = SelectPrimitive.Value;
-
 export function Select({
   id,
   initialValue,
@@ -71,6 +90,7 @@ export function Select({
   const [width, setWidth] = useState(0);
   const observer = useRef<ResizeObserver>();
   const { root } = useTheme();
+  const [options, setOptions] = useState(new Set<Option>());
 
   // Set initial state based on the initialValue prop
   useEffect(() => {
@@ -147,6 +167,26 @@ export function Select({
     [emptyListTemplate],
   );
 
+  const onOptionAdd = useCallback((option: Option) => {
+    setOptions((prev) => new Set(prev).add(option));
+  }, []);
+
+  const onOptionRemove = useCallback((option: Option) => {
+    setOptions((prev) => {
+      const optionsSet = new Set(prev);
+      optionsSet.delete(option);
+      return optionsSet;
+    });
+  }, []);
+
+  const optionContextValue = useMemo(
+    () => ({
+      onOptionAdd,
+      onOptionRemove,
+    }),
+    [onOptionAdd, onOptionRemove],
+  );
+
   return (
     <SelectContext.Provider
       value={{
@@ -156,89 +196,98 @@ export function Select({
         onChange: toggleOption,
       }}
     >
-      <OptionTypeProvider Component={searchable || multi ? ComboboxOption : SelectOption}>
+      <OptionTypeProvider Component={searchable || multi ? MyOption : SelectOption}>
         {searchable || multi ? (
-          <Popover open={open} onOpenChange={setOpen} modal={false}>
-            <PopoverTrigger asChild>
-              <button
-                id={id}
-                style={layout}
-                ref={setReferenceElement}
-                onFocus={onFocus}
-                onBlur={onBlur}
-                disabled={!enabled}
-                aria-expanded={open}
-                onClick={() => setOpen((prev) => !prev)}
-                className={classnames(styles.selectTrigger, styles[validationStatus], {
-                  [styles.disabled]: !enabled,
-                  [styles.multi]: multi,
-                })}
-                autoFocus={autoFocus}
-              >
-                {multi ? (
-                  Array.isArray(value) && value.length > 0 ? (
-                    <div className={styles.badgeListContainer}>
-                      <div className={styles.badgeList}>
-                        {value.map((v) => (
-                          <span key={v} className={styles.badge}>
-                            {v}
-                            <Icon
-                              name="close"
-                              size="sm"
-                              onClick={(event) => {
-                                event.stopPropagation();
-                                toggleOption(v);
-                              }}
-                            />
-                          </span>
-                        ))}
+          <OptionContext.Provider value={optionContextValue}>
+            {children}
+            <Popover open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger asChild>
+                <button
+                  id={id}
+                  style={layout}
+                  ref={setReferenceElement}
+                  onFocus={onFocus}
+                  onBlur={onBlur}
+                  disabled={!enabled}
+                  aria-expanded={open}
+                  onClick={() => setOpen((prev) => !prev)}
+                  className={classnames(styles.selectTrigger, styles[validationStatus], {
+                    [styles.disabled]: !enabled,
+                    [styles.multi]: multi,
+                  })}
+                  autoFocus={autoFocus}
+                >
+                  {multi ? (
+                    Array.isArray(value) && value.length > 0 ? (
+                      <div className={styles.badgeListContainer}>
+                        <div className={styles.badgeList}>
+                          {value.map((v) => (
+                            <span key={v} className={styles.badge}>
+                              {Array.from(options).find((o) => o.value === v)?.label}
+                              <Icon
+                                name="close"
+                                size="sm"
+                                onClick={(event) => {
+                                  event.stopPropagation();
+                                  toggleOption(v);
+                                }}
+                              />
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    ) : (
+                      <span className={styles.placeholder}>{placeholder || ""}</span>
+                    )
+                  ) : value ? (
+                    <span>{Array.from(options).find((o) => o.value === value)?.label}</span>
                   ) : (
                     <span className={styles.placeholder}>{placeholder || ""}</span>
-                  )
-                ) : value ? (
-                  <span>{value}</span>
-                ) : (
-                  <span className={styles.placeholder}>{placeholder || ""}</span>
-                )}
-                <div className={styles.actions}>
-                  {multi && Array.isArray(value) && value.length > 0 && (
-                    <Icon
-                      name="close"
-                      size="sm"
-                      onClick={(event) => {
-                        event.stopPropagation();
-                        clearValue();
-                      }}
-                    />
                   )}
-                  <Icon name="chevrondown" />
-                </div>
-              </button>
-            </PopoverTrigger>
-            <Portal container={root}>
-              <PopoverContent style={{ width }}>
-                <Command>
-                  {searchable ? (
-                    <CommandInput placeholder="Search..." />
-                  ) : (
+                  <div className={styles.actions}>
+                    {multi && Array.isArray(value) && value.length > 0 && (
+                      <Icon
+                        name="close"
+                        size="sm"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          clearValue();
+                        }}
+                      />
+                    )}
+                    <Icon name="chevrondown" />
+                  </div>
+                </button>
+              </PopoverTrigger>
+              <Portal container={root}>
+                <PopoverContent style={{ width }} className={styles.selectContent}>
+                  <Command>
+                    {searchable ? (
+                      <CommandInput placeholder="Search..." />
+                    ) : (
                       // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
-                    <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                  )}
-                  <CommandList>
-                    <CommandGroup>{children}</CommandGroup>
-                    <CommandEmpty>{emptyListNode}</CommandEmpty>
-                  </CommandList>
-                </Command>
-              </PopoverContent>
-            </Portal>
-          </Popover>
+                      <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                    )}
+                    <CommandList>
+                      <CommandGroup>
+                        {Array.from(options).map(({ value, label, enabled }) => (
+                          <ComboboxOption
+                            key={value}
+                            value={value}
+                            label={label}
+                            enabled={enabled}
+                          />
+                        ))}
+                      </CommandGroup>
+                      <CommandEmpty>{emptyListNode}</CommandEmpty>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Portal>
+            </Popover>
+          </OptionContext.Provider>
         ) : (
-          <SelectPrimitive.Root
-            value={!Array.isArray(value) && value ? value : ""}
-            onValueChange={toggleOption}
-          >
+          <Root value={!Array.isArray(value) && value ? value : ""} onValueChange={toggleOption}>
             <SelectTrigger
               id={id}
               style={layout}
@@ -249,93 +298,86 @@ export function Select({
               ref={setReferenceElement}
               autoFocus={autoFocus}
             >
-              <SelectValue placeholder={placeholder} />
+              <div className={styles.selectValue}>
+                <SelectValue placeholder={placeholder} />
+              </div>
             </SelectTrigger>
             <SelectContent>{children || emptyListNode}</SelectContent>
-          </SelectPrimitive.Root>
+          </Root>
         )}
       </OptionTypeProvider>
     </SelectContext.Provider>
   );
 }
 
-const SelectTrigger = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+const SelectTrigger = forwardRef<
+  React.ElementRef<typeof Trigger>,
+  React.ComponentPropsWithoutRef<typeof Trigger> & {
     enabled?: boolean;
     validationStatus?: ValidationStatus;
   }
 >(({ className, children, enabled, validationStatus, ...props }, ref) => (
-  <SelectPrimitive.Trigger
+  <Trigger
     ref={ref}
     className={classnames(styles.selectTrigger, styles[validationStatus])}
     {...props}
     disabled={!enabled}
   >
     {children}
-    <SelectPrimitive.Icon asChild>
+    <SelectIcon asChild>
       <Icon name="chevrondown" />
-    </SelectPrimitive.Icon>
-  </SelectPrimitive.Trigger>
+    </SelectIcon>
+  </Trigger>
 ));
 
-SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+SelectTrigger.displayName = Trigger.displayName;
 
-const SelectScrollUpButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+const SelectScrollUpButton = forwardRef<
+  React.ElementRef<typeof ScrollUpButton>,
+  React.ComponentPropsWithoutRef<typeof ScrollUpButton>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollUpButton ref={ref} className={styles.selectScrollUpButton} {...props}>
+  <ScrollUpButton ref={ref} className={styles.selectScrollUpButton} {...props}>
     <Icon name="chevronup" />
-  </SelectPrimitive.ScrollUpButton>
+  </ScrollUpButton>
 ));
 
-SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
+SelectScrollUpButton.displayName = ScrollUpButton.displayName;
 
-const SelectScrollDownButton = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+const SelectScrollDownButton = forwardRef<
+  React.ElementRef<typeof ScrollDownButton>,
+  React.ComponentPropsWithoutRef<typeof ScrollDownButton>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.ScrollDownButton ref={ref} className={styles.selectScrollDownButton} {...props}>
+  <ScrollDownButton ref={ref} className={styles.selectScrollDownButton} {...props}>
     <Icon name="chevrondown" />
-  </SelectPrimitive.ScrollDownButton>
+  </ScrollDownButton>
 ));
 
-SelectScrollDownButton.displayName = SelectPrimitive.ScrollDownButton.displayName;
+SelectScrollDownButton.displayName = ScrollDownButton.displayName;
 
-const SelectContent = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+const SelectContent = forwardRef<
+  React.ElementRef<typeof Content>,
+  React.ComponentPropsWithoutRef<typeof Content>
 >(({ className, children, ...props }, ref) => {
   const { root } = useTheme();
   return (
-    <SelectPrimitive.Portal container={root}>
-      <SelectPrimitive.Content
-        ref={ref}
-        className={styles.selectContent}
-        position="popper"
-        {...props}
-      >
+    <SelectPortal container={root}>
+      <Content ref={ref} className={styles.selectContent} position="popper" {...props}>
         <SelectScrollUpButton />
-        <SelectPrimitive.Viewport className={classnames(styles.selectViewport, className)}>
-          {children}
-        </SelectPrimitive.Viewport>
+        <Viewport className={classnames(styles.selectViewport, className)}>{children}</Viewport>
         <SelectScrollDownButton />
-      </SelectPrimitive.Content>
-    </SelectPrimitive.Portal>
+      </Content>
+    </SelectPortal>
   );
 });
 
-SelectContent.displayName = SelectPrimitive.Content.displayName;
+SelectContent.displayName = Content.displayName;
 
-const SelectLabel = React.forwardRef<
-  React.ElementRef<typeof SelectPrimitive.Label>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
->(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label ref={ref} className={styles.selectLabel} {...props} />
-));
+const SelectLabel = forwardRef<
+  React.ElementRef<typeof Label>,
+  React.ComponentPropsWithoutRef<typeof Label>
+>(({ className, ...props }, ref) => <Label ref={ref} className={styles.selectLabel} {...props} />);
 
-SelectLabel.displayName = SelectPrimitive.Label.displayName;
+SelectLabel.displayName = Label.displayName;
 
 type OptionComponentProps = {
   value: string;
@@ -370,70 +412,67 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
   );
 }
 
-export const Command = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
->(({ className, ...props }, ref) => (
-  <CommandPrimitive ref={ref} className={classnames(styles.command, className)} {...props} />
-));
-Command.displayName = CommandPrimitive.displayName;
+function MyOption(option: Option) {
+  const { onOptionRemove, onOptionAdd } = useOption();
 
-export const CommandInput = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Input>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input>
+  useLayoutEffect(() => {
+    onOptionAdd(option);
+    return () => onOptionRemove(option);
+  }, [option, onOptionAdd, onOptionRemove]);
+
+  return <span />;
+}
+
+export const Command = forwardRef<
+  React.ElementRef<typeof Cmd>,
+  React.ComponentPropsWithoutRef<typeof Cmd>
+>(({ className, ...props }, ref) => (
+  <Cmd ref={ref} className={classnames(styles.command, className)} {...props} />
+));
+Command.displayName = Cmd.displayName;
+
+export const CommandInput = forwardRef<
+  React.ElementRef<typeof CmdInput>,
+  React.ComponentPropsWithoutRef<typeof CmdInput>
 >(({ className, ...props }, ref) => (
   <div className={styles.commandInputContainer}>
     <Icon name="search" />
-    <CommandPrimitive.Input
-      ref={ref}
-      className={classnames(styles.commandInput, className)}
-      {...props}
-    />
+    <CmdInput ref={ref} className={classnames(styles.commandInput, className)} {...props} />
   </div>
 ));
 
-CommandInput.displayName = CommandPrimitive.Input.displayName;
+CommandInput.displayName = CmdInput.displayName;
 
-export const CommandList = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
+export const CommandList = forwardRef<
+  React.ElementRef<typeof CmdList>,
+  React.ComponentPropsWithoutRef<typeof CmdList>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.List
-    ref={ref}
-    className={classnames(styles.commandList, className)}
-    {...props}
-  />
+  <CmdList ref={ref} className={classnames(styles.commandList, className)} {...props} />
 ));
 
-CommandList.displayName = CommandPrimitive.List.displayName;
+CommandList.displayName = CmdList.displayName;
 
-export const CommandEmpty = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
->((props, ref) => (
-  <CommandPrimitive.Empty ref={ref} className={classnames(styles.commandEmpty)} {...props} />
-));
+export const CommandEmpty = forwardRef<
+  React.ElementRef<typeof CmdEmpty>,
+  React.ComponentPropsWithoutRef<typeof CmdEmpty>
+>((props, ref) => <CmdEmpty ref={ref} className={classnames(styles.commandEmpty)} {...props} />);
 
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName;
+CommandEmpty.displayName = CmdEmpty.displayName;
 
-export const CommandGroup = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
+export const CommandGroup = forwardRef<
+  React.ElementRef<typeof CmdGroup>,
+  React.ComponentPropsWithoutRef<typeof CmdGroup>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Group
-    ref={ref}
-    className={classnames(styles.commandGroup, className)}
-    {...props}
-  />
+  <CmdGroup ref={ref} className={classnames(styles.commandGroup, className)} {...props} />
 ));
 
-CommandGroup.displayName = CommandPrimitive.Group.displayName;
+CommandGroup.displayName = CmdGroup.displayName;
 
-export const CommandItem = React.forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+export const CommandItem = forwardRef<
+  React.ElementRef<typeof CmdItem>,
+  React.ComponentPropsWithoutRef<typeof CmdItem>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item ref={ref} className={classnames(className)} {...props} />
+  <CmdItem ref={ref} className={classnames(className)} {...props} />
 ));
 
-CommandItem.displayName = CommandPrimitive.Item.displayName;
+CommandItem.displayName = CmdItem.displayName;

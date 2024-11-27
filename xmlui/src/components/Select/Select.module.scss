@@ -39,6 +39,34 @@ $componentName: "Select";
   }
 }
 
+@mixin valueVariant($variantName) {
+  & > span {
+    font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+    color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
+
+    & > div {
+      color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}");
+      font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+    }
+  }
+}
+
+.selectValue {
+  @include valueVariant("default");
+
+  &.error {
+    @include valueVariant("error");
+  }
+
+  &.warning {
+    @include valueVariant("warning");
+  }
+
+  &.valid {
+    @include valueVariant("success");
+  }
+}
+
 .selectTrigger {
   min-height: 2.6rem;
   display: flex;
