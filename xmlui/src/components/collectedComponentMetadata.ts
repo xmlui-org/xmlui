@@ -11,10 +11,14 @@ import { BookmarkMd } from "@components/Bookmark/Bookmark";
 import { CardMd } from "@components/Card/Card";
 import { ChangeListenerMd } from "@components/ChangeListener/ChangeListener";
 import { CheckboxMd } from "@components/Checkbox/Checkbox";
-import { ComboboxMd } from "@components/Combobox/Combobox";
 import { ContentSeparatorMd } from "@components/ContentSeparator/ContentSeparator";
 import { DatePickerMd } from "@components/DatePicker/DatePicker";
-import { DropdownMenuMd, MenuItemMd, MenuSeparatorMd, SubMenuItemMd } from "@components/DropdownMenu/DropdownMenu";
+import {
+  DropdownMenuMd,
+  MenuItemMd,
+  MenuSeparatorMd,
+  SubMenuItemMd,
+} from "@components/DropdownMenu/DropdownMenu";
 import { EmojiSelectorMd } from "@components/EmojiSelector/EmojiSelector";
 import { FileInputMd } from "@components/FileInput/FileInput";
 import { FileUploadDropZoneMd } from "@components/FileUploadDropZone/FileUploadDropZone";
@@ -32,14 +36,12 @@ import { ListMd } from "@components/List/List";
 import { LogoMd } from "@components/Logo/Logo";
 import { MarkdownMd } from "@components/Markdown/Markdown";
 import { ModalDialogMd } from "@components/ModalDialog/ModalDialog";
-import { MultiSelectMd } from "@components/MultiSelect/MultiSelect";
 import { NavGroupMd } from "@components/NavGroup/NavGroup";
 import { NavLinkMd } from "@components/NavLink/NavLink";
 import { NavPanelMd } from "@components/NavPanel/NavPanel";
 import { NoResultMd } from "@components/NoResult/NoResult";
 import { NumberBoxMd } from "@components/NumberBox/NumberBox";
 import { OffCanvasMd } from "@components/OffCanvas/OffCanvas";
-import { OptionMd } from "@components/Option/Option";
 import { PageMetaTitleMd } from "@components/PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "@components/Pages/Pages";
 import { PdfMd } from "@components/Pdf/LazyPdf";
@@ -84,9 +86,8 @@ import { TrendLabelMd } from "./TrendLabel/TrendLabel";
 import { ButtonGroupMd } from "./ButtonGroup/ButtonGroup";
 import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
-import { CarouselItemMd } from "./Carousel/CarouselItem";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
-import { MultiComboboxMd } from "./MultiCombobox/MultiCombobox";
+import { OptionMd } from "@components/Option/Option";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -108,7 +109,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Chart: ChartMd,
   Checkbox: CheckboxMd,
   Column: ColumnMd,
-  Combobox: ComboboxMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
@@ -142,8 +142,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Markdown: MarkdownMd,
   MenuSeparator: MenuSeparatorMd,
   ModalDialog: ModalDialogMd,
-  MultiCombobox: MultiComboboxMd,
-  MultiSelect: MultiSelectMd,
   NavGroup: NavGroupMd,
   NavLink: NavLinkMd,
   NavPanel: NavPanelMd,

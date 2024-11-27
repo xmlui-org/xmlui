@@ -1,10 +1,8 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "@components/Select/Select.module.scss";
-
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Select } from "./SelectNative";
 import {
   dPlaceholder,
   dInitialValue,
@@ -21,7 +19,9 @@ import {
   dLostFocus,
   dFocus,
   dSetValueApi,
+  dMulti,
 } from "@components/metadata-helpers";
+import { Select } from "@components/Select/SelectNative";
 
 const COMP = "Select";
 
@@ -52,6 +52,8 @@ export const SelectMd = createMetadata({
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),
+    multi: dMulti(),
+    searchable: d(`This property enables the search functionality in the dropdown list.`),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -72,11 +74,22 @@ export const SelectMd = createMetadata({
     [`radius-menu-${COMP}`]: "$radius",
     [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
     [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
+    [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
     [`min-height-Input`]: "39px",
+    [`color-bg-${COMP}-badge`]: "$color-primary-500",
+    [`font-size-${COMP}-badge`]: "$font-size-small",
+    [`padding-horizontal-${COMP}-badge`]: "$space-1",
+    [`padding-vertical-${COMP}-badge`]: "$space-1",
     light: {
+      [`color-bg-${COMP}-badge--hover`]: "$color-primary-400",
+      [`color-bg-${COMP}-badge--active`]: "$color-primary-500",
       [`color-text-item-${COMP}--disabled`]: "$color-surface-200",
+      [`color-text-${COMP}-badge`]: "$color-surface-50",
     },
     dark: {
+      [`color-bg-${COMP}-badge--hover`]: "$color-primary-600",
+      [`color-bg-${COMP}-badge--active`]: "$color-primary-500",
+      [`color-text-${COMP}-badge`]: "$color-surface-50",
       [`color-text-item-${COMP}--disabled`]: "$color-surface-800",
     },
   },
@@ -97,10 +110,13 @@ export const selectComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <Select
+        multi={extractValue.asOptionalBoolean(node.props.multi)}
         layout={layoutCss}
         updateState={updateState}
+        searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
+        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
         placeholder={extractValue.asOptionalString(node.props.placeholder)}
         validationStatus={extractValue(node.props.validationStatus)}
