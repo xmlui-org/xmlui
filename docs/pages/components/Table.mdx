@@ -471,45 +471,6 @@ The default value is `false`.
   `}
 />
 
-### `singleSelectOnRowClick`
-
-This property influences how clicking on a row works. If this property is set to true, a click clears all other selected rows and toggles the selection of the clicked row. Otherwise, it keeps the selection state of other rows.
-
-Default value: `false`.
-
-The following sample turns on this property. Try how it works when you click on a row or directly to the selection checkbox.
-
-```ueml copy /singleSelectOnRowClick="true"/
-<App>
-  <Table 
-    data='{${JSON.stringify(data, null, 2)}}' 
-    rowsSelectable="true"
-    singleSelectOnRowClick="true">
-    <Column bindTo="name"/>
-    <Column bindTo="quantity"/>
-    <Column bindTo="unit"/>
-  </Table>
-</App>
-```
-
-<Playground
-  name="Example: singleSelectOnRowClick"
-  app={`
-    <App>
-      <SelectionStore>
-      <Table 
-        data='{${JSON.stringify(data, null, 2)}}' 
-        rowsSelectable="true"
-        singleSelectOnRowClick="true">
-        <Column bindTo="name"/>
-        <Column bindTo="quantity"/>
-        <Column bindTo="unit"/>
-      </Table>
-      </SelectionStore>
-    </App>
-  `}
-/>
-
 ### `sortBy`
 
 This property is used to determine which data attributes to sort by.
@@ -565,6 +526,10 @@ This property determines the sort order to be `ascending` or `descending`. This 
 />
 
 ## Events
+
+### `selectionDidChange`
+
+No description provided.
 
 ### `sortingDidChange`
 
