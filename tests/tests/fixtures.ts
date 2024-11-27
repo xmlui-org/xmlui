@@ -1,6 +1,77 @@
-import { expect as baseExpect, mergeExpects } from "@playwright/test";
+import type { Locator, Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions, TestType } from "@playwright/test";
+import type { ComponentDef } from "../../xmlui/src/abstractions/ComponentDefs";
+import { expect as baseExpect, mergeExpects, test as baseTest } from "@playwright/test";
+import { initApp } from "./component-test-helpers";
+import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 
 export { test } from "@playwright/test";
+
+export class ComponentDriver {
+  protected readonly componentLocator: Locator
+  protected readonly testStateLocator: Locator
+
+  constructor({ componentLocator, testStateViewLocator }) {
+    this.componentLocator = componentLocator;
+    this.testStateLocator = testStateViewLocator;
+  }
+
+  async click() {
+    await this.componentLocator.click()
+  }
+
+  async expectDefaultTestState(options?: {timeout?: number, intervals?: number[]}) {
+    await this.expectTestStateToEq({}, options)
+  }
+
+  async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
+    await expect.poll(this.getTestState(), options).toEqual(expected);
+  }
+
+  /** returns an async function that can query the test state */
+  private getTestState(){
+    return async () =>{
+      const text = await this.testStateLocator.textContent();
+      const testState = JSON.parse(text!);
+      return testState
+    }
+  }
+}
+
+
+export function createTestWithComponentDriverFixture<T extends new (...args: any[]) => any>(
+  DriverClass: T
+) {
+  return baseTest.extend<{
+    createDriver: (source: string) => Promise<InstanceType<T>>;
+  }>({
+    createDriver: async ({page}, use) => {
+      await use(async (source: string) => {
+        const testStateViewTestId = "test-state-view-testid"
+        const prefix = `<Fragment var.testState="{{}}">`
+        const suffix =`
+          <Stack width="0" height="0">
+            <Text
+              testId="${testStateViewTestId}"
+              value="{ JSON.stringify(testState) }"/>
+          </Stack>
+        </Fragment>`
+        const code = prefix + source + suffix
+        const { errors, component } = xmlUiMarkupToComponent(code)
+        if (errors.length > 0){
+          throw { errors: errors };
+        }
+        const componentTestId = "test-id-component";
+        (component as ComponentDef).children![0].testId = componentTestId
+
+        await initApp(page, { entryPoint: component });
+        return new DriverClass({
+          componentLocator: page.getByTestId(componentTestId),
+          testStateViewLocator: page.getByTestId(testStateViewTestId)
+        });
+      });
+    }
+  });
+}
 
 const expectWithToEqualWithTolerance = baseExpect.extend({
   /**
@@ -87,7 +158,7 @@ const expectWithToBeShadeOf = baseExpect.extend({
     const expected = expectedStart + expectedMiddle + expectedEnd;
 
     if (matches === null) {
-      message = () => 
+      message = () =>
         this.utils.matcherHint(assertionName, providedColor, expected, { isNot: this.isNot }) +
         "\n" +
         "Wrong rgb or rgba string pattern" +
