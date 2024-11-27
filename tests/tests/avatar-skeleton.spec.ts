@@ -1,62 +1,60 @@
-import { expect, ComponentDriver, createTestWithComponentDriverFixture} from "./fixtures";
+import { expect, ComponentDriver, createTestWithDriver } from "./fixtures";
+
+// --- Setup
 
 class AvatarDriver extends ComponentDriver {
-  async expectInitials(initials: string) {
-    await expect(this.componentLocator).toContainText(initials)
-  }
-
-  async expectNoInitials(){
-    await expect(this.componentLocator).toBeEmpty();
+  get avatar() {
+    return this.locator;
   }
 }
 
-const test = createTestWithComponentDriverFixture(AvatarDriver)
+const test = createTestWithDriver(AvatarDriver);
 
-const RED = "rgb(255, 0, 0)";
+// --- Testing
 
-test("No initials without name", async ({ createDriver}) => {
-  const avatar = await createDriver(`<Avatar />`);
-  await avatar.expectNoInitials()
+test("No initials without name", async ({ createDriver }) => {
+  const { avatar } = await createDriver(`<Avatar />`);
+  await expect(avatar).toBeEmpty();
 });
 
 test("No initials with empty name", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name=""/>`);
-  await avatar.expectNoInitials()
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name=""/>`);
+  await expect(avatar).toBeEmpty();
 });
 
 test("Name with ascii symbols works", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="B 'Alan"/>`);
-  await avatar.expectInitials('B\'');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="B 'Alan"/>`);
+  await expect(avatar).toContainText("B'");
 });
 
 test("Name is numbers", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="123"/>`);
-  await avatar.expectInitials('1');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="123"/>`);
+  await expect(avatar).toContainText("1");
 });
 
 test("Name is 孔丘 (Kong Qiu)", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="孔丘"/>`);
-  await avatar.expectInitials('孔');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="孔丘"/>`);
+  await expect(avatar).toContainText("孔");
 });
 
 test("Can render 1 initial", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="Tim"/>`);
-  await avatar.expectInitials('T');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="Tim"/>`);
+  await expect(avatar).toContainText("T");
 });
 
 test("Can render 2 initials", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="Tim Smith"/>`);
-  await avatar.expectInitials('TS');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="Tim Smith"/>`);
+  await expect(avatar).toContainText("TS");
 });
 
 test("Can render 3 initials", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="Tim John Smith"/>`);
-  await avatar.expectInitials('TJS');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="Tim John Smith"/>`);
+  await expect(avatar).toContainText("TJS");
 });
 
 test("Max 3 initials", async ({ createDriver }) => {
-  const avatar = await createDriver(`<Avatar testId="avatar" name="Tim John Smith Jones"/>`);
-  await avatar.expectInitials('TJS');
+  const { avatar } = await createDriver(`<Avatar testId="avatar" name="Tim John Smith Jones"/>`);
+  await expect(avatar).toContainText("TJS");
 });
 
 // const sizes = [
@@ -89,7 +87,6 @@ test("Max 3 initials", async ({ createDriver }) => {
 
 // test("url returns non-image", async ({ }) => {
 // });
-
 
 // sizes.forEach((tc) => {
 //   test(`${tc.size} url image 100x100px`, async ({ }) => {
