@@ -1,70 +1,78 @@
-import type { Page } from "@playwright/test";
-import { expect as baseExpect, mergeExpects, test as base } from "@playwright/test";
+import type { Locator, Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions, TestType } from "@playwright/test";
+import type { ComponentDef } from "../../xmlui/src/abstractions/ComponentDefs";
+import { expect as baseExpect, mergeExpects, test as baseTest } from "@playwright/test";
 import { initApp } from "./component-test-helpers";
+import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 
-export type baseComponentFixtures = {
-  initComponent: (entryPoint: string) => Promise<void>;
-  initComponentWithEventWrapper: (entryPoint: string) => Promise<TestBed>;
-};
+export { test } from "@playwright/test";
 
-export const TEST_EVENT_PLACEHOLDER = "€EVENT_TESTING_PLACEHOLDER_WILL_REPLACE_ON_INITIALIZATION€" as const;
+export class ComponentDriver {
+  protected readonly componentLocator: Locator
+  protected readonly testStateLocator: Locator
 
-// type KeyValue = { [key: string]: any };
-// export function extendWithDriverFixture<Fixture extends KeyValue>(baseTest, driver){
-//  return baseTest.extend<Fixture>({
-//     createAvatarDriver: async ({page}, use) =>{
-//       await use((testId: string) => {
-//         const avatarLocator = page.getByTestId(testId)
-//         return new AvatarDriver(avatarLocator)
-//       });
-//     }
-//   });
-// }
-
-export const test = base.extend<baseComponentFixtures>({
-  initComponent: async ({page}, use) => {
-    await use(async (entryPoint: string) => {
-      await initApp(page, { entryPoint });
-    });
-  },
-  initComponentWithEventWrapper : async ({page}, use) => {
-      await use(async (entryPoint: string) => {
-        const eventTargetTestId = "__event_target_placeholder_testId" as const;
-        const testVarNameEventModifies = "__test_event_modifies_this_variable" as const;
-        if (!entryPoint.includes(TEST_EVENT_PLACEHOLDER)){
-          throw new Error("Tried to initialize a component with event wrapper, but no placeholder was found for the event handler.")
-        }
-        const codeWithReplacedHandler = entryPoint.replace(TEST_EVENT_PLACEHOLDER, `
-          ${testVarNameEventModifies} += 1
-          `)
-        const prefix = `<Fragment var.${testVarNameEventModifies} = "{ 0 }">`
-        const suffix =`
-          <Stack width="0" height="0">
-          <Text
-            testId="${eventTargetTestId}"
-            value="{ ${testVarNameEventModifies} }"/>
-            </Stack>
-        </Fragment>`
-
-        const code = prefix + codeWithReplacedHandler + suffix;
-        await initApp(page, { entryPoint: code });
-        return new TestBed(page, eventTargetTestId)
-      });
-    },
-});
-
-class TestBed {
-  constructor(private readonly page: Page, private readonly eventTargetTestId){ }
-
-  async expectEventToBeInvoked() {
-    await expect(this.page.getByTestId(this.eventTargetTestId)).not.toBeEmpty()
-    await expect(this.page.getByTestId(this.eventTargetTestId)).not.toHaveText("0")
+  constructor({ componentLocator, testStateViewLocator }) {
+    this.componentLocator = componentLocator;
+    this.testStateLocator = testStateViewLocator;
   }
 
-  async expectEventNotToBeInvoked() {
-    await expect(this.page.getByTestId(this.eventTargetTestId)).toHaveText("0")
+  async click() {
+    await this.componentLocator.click()
+  }
+
+  async expectDefaultTestState(options?: {timeout?: number, intervals?: number[]}) {
+    await this.expectTestStateToEq({}, options)
+  }
+
+  async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
+    await expect.poll(this.getTestState(), options).toEqual(expected);
+  }
+
+  /** returns an async function that can query the test state */
+  private getTestState(){
+    return async () =>{
+      const text = await this.testStateLocator.textContent();
+      const testState = JSON.parse(text!);
+      return testState
+    }
   }
 }
+
+
+export function createTestWithComponentDriverFixture<T extends new (...args: any[]) => any>(
+  DriverClass: T
+) {
+  return baseTest.extend<{
+    createDriver: (source: string) => Promise<InstanceType<T>>;
+  }>({
+    createDriver: async ({page}, use) => {
+      await use(async (source: string) => {
+        const testStateViewTestId = "test-state-view-testid"
+        const prefix = `<Fragment var.testState="{{}}">`
+        const suffix =`
+          <Stack width="0" height="0">
+            <Text
+              testId="${testStateViewTestId}"
+              value="{ JSON.stringify(testState) }"/>
+          </Stack>
+        </Fragment>`
+        const code = prefix + source + suffix
+        const { errors, component } = xmlUiMarkupToComponent(code)
+        if (errors.length > 0){
+          throw { errors: errors };
+        }
+        const componentTestId = "test-id-component";
+        (component as ComponentDef).children![0].testId = componentTestId
+
+        await initApp(page, { entryPoint: component });
+        return new DriverClass({
+          componentLocator: page.getByTestId(componentTestId),
+          testStateViewLocator: page.getByTestId(testStateViewTestId)
+        });
+      });
+    }
+  });
+}
+
 const expectWithToEqualWithTolerance = baseExpect.extend({
   /**
    * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
