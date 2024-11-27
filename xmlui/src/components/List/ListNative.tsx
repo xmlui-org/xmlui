@@ -145,17 +145,17 @@ export function useListData({
     sections.forEach((section) => {
       ret.push({
         id: section,
-        sectionItems: sectionedItems[section],
+        items: sectionedItems[section],
         _row_type: RowType.SECTION,
-        sectionKey: section,
+        key: section,
       });
       if (expanded[section] || (expanded[section] === undefined && groupsInitiallyExpanded)) {
         ret.push(...(sectionedItems[section] || []));
         ret.push({
           id: `${section}_footer`,
-          sectionItems: sectionedItems[section],
+          items: sectionedItems[section],
           _row_type: RowType.SECTION_FOOTER,
-          sectionKey: section,
+          key: section,
         });
       }
     });
