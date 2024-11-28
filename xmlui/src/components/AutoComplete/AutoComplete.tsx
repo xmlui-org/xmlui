@@ -1,6 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
-import styles from "@components/Select/Select.module.scss";
+import styles from "@components/AutoComplete/AutoComplete.module.scss";
 import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import {
@@ -21,9 +21,9 @@ import {
   dSetValueApi,
   dMulti,
 } from "@components/metadata-helpers";
-import { Select } from "@components/Select/SelectNative";
+import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
 
-const COMP = "Select";
+const COMP = "AutoComplete";
 
 const defaultOptionRenderer = {
   type: "Text",
@@ -32,7 +32,7 @@ const defaultOptionRenderer = {
   },
 };
 
-export const SelectMd = createMetadata({
+export const AutoCompleteMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
   status: "experimental",
   props: {
@@ -53,8 +53,6 @@ export const SelectMd = createMetadata({
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),
-    multi: dMulti(),
-    searchable: d(`This property enables the search functionality in the dropdown list.`),
   },
   events: {
     gotFocus: dGotFocus(COMP),
@@ -96,9 +94,9 @@ export const SelectMd = createMetadata({
   },
 });
 
-export const selectComponentRenderer = createComponentRenderer(
+export const autoCompleteComponentRenderer = createComponentRenderer(
   COMP,
-  SelectMd,
+  AutoCompleteMd,
   ({
     node,
     state,
@@ -110,11 +108,9 @@ export const selectComponentRenderer = createComponentRenderer(
     registerComponentApi,
   }) => {
     return (
-      <Select
-        multi={extractValue.asOptionalBoolean(node.props.multi)}
+      <AutoComplete
         layout={layoutCss}
         updateState={updateState}
-        searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
@@ -137,7 +133,7 @@ export const selectComponentRenderer = createComponentRenderer(
         }}
       >
         {renderChild(node.children)}
-      </Select>
+      </AutoComplete>
     );
   },
 );
