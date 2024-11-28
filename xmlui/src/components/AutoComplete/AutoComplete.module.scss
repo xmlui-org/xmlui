@@ -122,13 +122,7 @@ $componentName: "AutoComplete";
   }
 
   &::placeholder {
-    display: block;
     color: createThemeVar("Input:color-placeholder-#{$componentName}");
-
-    &:empty::before {
-      content: "\00a0";
-      display: inline-block;
-    }
   }
 }
 
@@ -151,7 +145,7 @@ $componentName: "AutoComplete";
 .commandList {
   position: absolute;
   overflow: hidden;
-  top: 0.25rem; /* top-1 */
+  top: 0.25rem;
   z-index: 10;
   width: 100%;
   outline: none;
