@@ -53,9 +53,7 @@ The `List` component supports the grouping of list items according to a specifie
 It has a `groupBy` property that enables this grouping.
 The `List` identifies each unique value of the attribute given to `groupBy` and groups the items accordingly.
 
-In the previous section, you created a `getSections` function within `Main.xmlui.xs`. Let's use the same function in the `Contact.xmlui.xs` code-behind file.
-
-Create the `Contacts.xmlui.xs` code-behind file for `Contacts` (it in the `components` folder, beside `Contacts.xmlui`) and add the definition of `getSections` and a few other functions to it:
+In the previous section, you created a `getSections` function within `Main.xmlui.xs`. Let's use the same function in the `Contact.xmlui.xs` code-behind file; append the definition of `getSections` and a few other functions to it:
 
 ```javascript copy filename="Contacts.xmlui.xs"
 function getSection(contact) {
@@ -78,30 +76,30 @@ The `extendWithSection` function takes a particular contact and adds a new prope
 
 The `loading` function displays the "loading..." text while the data is fetched from the backend. When the data is received, it shows the `message` passed.
 
-To display the section information, add the `section` property to the `List` and define the template to display section headers:
+To display the section information, add the `groupBy` property to the `List` and define the template to display section headers:
 
-```ueml copy {2, 4-10} filename="Contacts.xmlui" /sectionBy="section"/
+```ueml copy {5-11} filename="Contacts.xmlui" /groupBy="section"/ /map(extendWithSection)/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
-  <List 
-    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+  <List data="{$props.data.map(extendWithSection)}"
     groupBy="section">
-    <ContactRow item="{$item}" categories="{categories.value}" />
     <property name="groupHeaderTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle"
-          value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
+          value="{$group.key} ({loading(contacts, $group.items.length ?? 0)})" />
       </HStack>
     </property>
+    <!-- Unchanged -->
   </List>
 </Component>
 ```
 
-In this code snippet, the `sectionBy` property of `List` names the list's property for grouping items; it is the newly calculated `section` property of a contact record.
+The list now uses the contact records extended with the `section` property (mapping the contacts with the `extendWithSection` function).
 
-The highlighted `sectionTemplate` area is the markup that represents the header of a particular section (item group). The list passes the special `$item` property to the section template. Its value is an object with `sectionKey` holding the grouping value; `sectionItems` store the items within the particular group.
+In this code snippet, the `groupBy` property of `List` names the list's property for grouping items; it is the newly calculated `section` property of a contact record.
+
+The highlighted `groupHeaderTemplate` area is the markup that represents the header of a particular item group. The list passes the special `$group` context property to the template. Its value is an object with `key` holding the grouping value; `items` store the items within the particular group.
 
 Now, When you display all contacts, you can see that items are sectioned:
 
@@ -109,40 +107,36 @@ Now, When you display all contacts, you can see that items are sectioned:
 <Image alt="Sectioned items" src="/resources/images/get-started/sectioned-items.png" />
 
 <Callout type="info" emoji="📔">
-When you do not declare a section template, the items are still grouped, but the list does not indicate the section boundaries. Besides `sectionTemplate`, `List` provides a `sectionFooterTemplate`. With this property, you can declare a markup for the footer of a section.
+When you do not declare a group template, the items are still grouped, but the list does not indicate the group boundaries. Besides `groupHeaderTemplate`, `List` provides a `groupFooterTemplate`. With this property, you can declare a markup for the footer of a section.
 </Callout>
 
 ## Expanding and Collapsing Sections
 
-The sections of a list can be expanded or collapsed.
-Unless you declare otherwise, all sections are expanded by default.
-Besides `$items`, each section receives a `$context` value, through which you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
+The sections of a list can be expanded or collapsed. Unless you declare otherwise, all sections are expanded by default. Using the `$group` context property, you can query the state of the section (`isExpanded`) and use the `toggle` function to expand or collapse the section.
 
 Update the `List` definition in `Contacts`:
 
-```ueml copy {4-18} filename="Contacts.xmlui" /$space-normal/ /$space-tight/
+```ueml copy {5-19} filename="Contacts.xmlui" /$space-normal/ /$space-tight/
 <Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
-  <List 
-    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+  <List data="{$props.data.map(extendWithSection)}"
     groupBy="section">
-    <ContactRow item="{$item}" categories="{categories.value}" />
     <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
         verticalAlignment="center"
-        onClick="() => $context.toggle()">
+        onClick="$group.toggle">
           <Text 
             variant="subtitle" 
-            value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
+            value="{$group.key} ({loading(contacts, $group.items.length ?? 0)})" />
         <SpaceFiller />
         <Icon 
-          name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
+          name="{$group.isExpanded ? 'chevrondown' : 'chevronright'}" 
           size="md" />  
       </HStack>
     </property>
+    <!-- Unchanged -->
   </List>
 </Component>
 ```
@@ -156,8 +150,7 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 
 ## Section Ordering
 
-The order of sections displayed above could be more helpful using a different ordering.
-With the help of the `defaultGroups` property of the `List`, you can define the ordering.
+The order of sections displayed above could be more helpful using a different ordering. With the help of the `defaultGroups` property of the `List`, you can define the order of sections.
 
 Modify the `List` accordingly:
 

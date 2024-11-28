@@ -23,7 +23,7 @@ In this article, you will implement the filtering functionality with both option
 
 Add a few new menu items with their corresponding pages to the app definition in the `Main.xmlui` file. Change the `/contacts` URL representing all contacts to `/contacts/all`. Set up each page to display only the related filter's name:
 
-```ueml copy {13-17, 21, 26-29} filename="Main.xmlui"
+```ueml copy {13-17, 21, 24-27} filename="Main.xmlui"
 <App 
   layout="vertical-sticky" 
   name="Contact List Tutorial" 
@@ -45,9 +45,7 @@ Add a few new menu items with their corresponding pages to the app definition in
   <Pages>
     <Page url="/">Dashboard</Page>
     <Page url="/contacts/all">
-      <List data="/api/contacts">
-        <ContactRow item="{$item}" />
-      </List>
+      <!-- Unchanged -->
     </Page>
     <Page url="/contacts/overdue">Overdue</Page>
     <Page url="/contacts/today">Today</Page>
@@ -80,24 +78,26 @@ Previously, you used a URL, `/api/contacts` to display the contact data in a `Li
   <!-- Omitted -->
   <Page url="/contacts/all">
     <List data="/api/contacts">
-      <ContactRow item="{$item}" />
+      <!-- Omitted -->
     </List>
   </Page>
   <!-- Omitted -->
 </App>
 ```
 
-With the new app pages, you will use the same URL five times and filter the data by different criteria. Instead of writing the same URL five times, outsource the fetch mechanism to a `DataSource` component and name it as the list's data source with these steps:
+With the new app pages, you will use the same URL five times and filter the data by different criteria. Instead of writing the same URL five times, outsource the fetch mechanism to a `DataSource` component. Harness it with an id (`contactsDs`), and refer to this id in the list's `data` property with the following steps:
 
 Add a `DataSource` declaration to `Main.xmlui` before the `<Pages>` tag:
 
-```ueml copy {6} filename="Main.xmlui" /id="contactsDs"/
+```ueml copy {7} filename="Main.xmlui" /id="contactsDs"/
 <App 
   layout="vertical-sticky" 
   name="Contact List Tutorial" 
   logo="resources/logo.svg" 
   logo-dark="resources/logo-dark.svg">
+  <!-- Omitted -->
   <DataSource id="contactsDs" url="/api/contacts" />
+  <Pages>
   <!-- Omitted -->
 </App>
 ```
@@ -109,7 +109,7 @@ Update the contacts page to use this `DataSource` (refer to the identifier of `D
   <!-- Omitted -->
   <Page url="/contacts/all">
     <List data="{contactsDs}">
-      <ContactRow item="{$item}" />
+      <!-- Omitted -->
     </List>
   </Page>
   <!-- Omitted -->
@@ -131,23 +131,57 @@ So, in the `<List data="{contactsDs}">` tag, the `contactsDs` expression is eval
 
 ### A Reusable `Contacts` Component
 
-Extract a new `Contacts` component to display the contacts list with the received data. You will use several instances of this new component, one for each filtered page.
+So far, you have used the markup to display the contact list only within a single `Page` definition. However, as you continue to define pages with filtered information, you will leverage the same markup in four more pages. Though the copy-and-paste approach would work, it would create a maintenance nightmare. Every modification in the list's view would require five updates in the markup.
 
-<Callout type="info" emoji="📔">
-Creating this component has the benefit of changing the representation of listed contacts in the future only by altering this component. You do not have to maintain five separate `Page` instances (representing the different filtered views).
-</Callout>
-
+It's time to create a reusable component for the contact list and use that to remove the maintenance pain.
+ 
 First, create a new file, `Contacts.xmlui` in the `components` folder, and add this piece of code:
 
 ```ueml copy filename="Contacts.xmlui"
 <Component name="Contacts">
-  <List items="{$props.data}">
-    <ContactRow item="{$item}" />
+</Component>
+```
+
+This component is empty; fill it with content! Copy the contents of the All contacts page (omit the wrapping `Page` tag):
+
+```ueml copy {2-16} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <List data="{contactsDs}">
+    <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+      <HStack verticalAlignment="center">
+        <Checkbox initialValue="{$item.reviewCompleted}" />
+        <VStack width="*" gap="0">
+          <Text variant="strong">{$item.fullName}</Text>
+          <Text>{$item.comments}</Text>
+        </VStack>
+        <HStack verticalAlignment="center" horizontalAlignment="end">
+          <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+          <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+        </HStack>
+      </HStack>
+    </Card>
   </List>
 </Component>
 ```
 
+You are almost done. However, as we filter each data list according to different criteria, the `Contacts` component should not use the data source with all contact records. It should either receive the filtered data or a filter condition.
+
+In this example, you will use the first approach (using the filtered data), as the component's responsibility is to display the list. We do not want to mix the display logic with the filtering.
+
+Change the `List` component to use the data received through a property:
+
+```ueml copy filename="Contacts.xmlui" /data="{$props.data}"/
+<Component name="Contacts">
+  <List data="{$props.data}">
+    <!-- Unchanged -->
+  </List>
+</Component>
+```
+
+
 The `Contacts` component passes the array of contact items (received in its `data` property) to the underlying list, which displays them as before.
+
+The `$props` context value represents the properties the `Contacts` component receives. Thus, `$props.data` is the `data` property passed to a `Contacts` instance.
 
 Update the Contact `Page` (the one with the `/contacts/all` URL) in `Main.xmlui` to use the new `Contacts` component:
 
@@ -163,15 +197,43 @@ Update the Contact `Page` (the one with the `/contacts/all` URL) in `Main.xmlui`
 <!-- Omitted -->
 ```
 
-You can check that your app behaves just like before.
+You can check that your app behaves just like before. **Ooops, the category badges are not displayed!**
+
+### Fix Categories
+
+We moved the contact list markup into the `Contacts` component but forgot about the UI logic, which is in the `Main.xmlui.xs` file. This logic is responsible for the category badges. Let's fix this issue!
+
+Categories use the `Datasource` with the `categories` id in `Main.xmlui` (you find it before the`<Pages>` tag). Move this `DataSource` into `Contacts.xmlui`:
+
+```ueml copy {2} filename="Contacts.xmlui"
+<Component name="Contacts">
+  <DataSource id="categories" url="/api/categories" />
+  <!-- Unchanged -->
+</Component>
+```
+
+Create a code-behind file for `Contacts.xmlui` (put it into the `components` folder and name it `Contacts.xmlui.xs`). Copy the contents of `Main.xmlui.xs` into the new `Contacts.xmlui.xs` file:
+
+```js copy filename="Contacts.xmlui.xs"
+// Create a color map for all categories
+var categoriesColorMap = toHashObject(categories.value, "name", "color");
+
+// Resolve category name by id
+function getCategoryNameById(categoryId) {
+  const category = findByField(categories.value, "id", categoryId);
+  return category ? category.name : "";
+}
+```
+
+Now, when refreshing the app in the browser, you should see the category badges again.
 
 ### Define Filters
 
 The `Contacts` component displays the data it receives, so the UI logic must pass the appropriate filtered data to each `Contacts` instance. You will prepare the pages to show filtered contacts.
 
-Add a `Main.xmlui.xs` code-behind file to the root app folder (this new file must be beside the `Main.xmlui` file) with this code:
+Change the content of `Main.xmlui.xs` code-behind file to this code (yes, you can remove the previous code entirely):
 
-```js
+```js filename="Main.xmlui.xs"
 function getSection(contact) {
   if (contact.reviewCompleted) return "Completed";
   if (!contact.reviewDueDate) return "No Due Date";
@@ -190,7 +252,7 @@ var upcomingContacts = filterBySection(allContacts, "Upcoming");
 var completedContacts = filterBySection(allContacts, "Completed");
 ```
 
-The `getSection(contact)` function returns a particular contact's section, one of these values according to the state of its review process; one of these values: `"Completed"`, `"No Due Date"`, `"Today"`, `"Overdue"`, or `"Upcoming"`.
+The `getSection(contact)` function returns a particular contact's section, one of these values according to the state of its review process: `"Completed"`, `"No Due Date"`, `"Today"`, `"Overdue"`, or `"Upcoming"`.
 
 The `filterBySection(contacts, section)` function retrieves only the `contacts` in the specified `section`.
 
@@ -272,7 +334,7 @@ However, the API has other endpoints to get filtered data, as the following URLs
 
 In this section, you will change the code to get filtered contact data from the backend.
 
-As you leverage five different URLs to get the data, you do not need the `DataSource` referring to the `/api/contacts` URL. Remove this `DataSource` from `Main.xmlui`. Change the `data` properties of `Contacts` instances to use the corresponding URL:
+As you leverage five different URLs to get the data, you do not need the `DataSource` referring to the `/api/contacts` URL (its id is `contactsDs`). Remove this `DataSource` from `Main.xmlui`. Change the `data` properties of `Contacts` instances to use the corresponding URLs:
 
 
 ```ueml copy {5, 8, 11, 14, 17} filename="Main.xmlui"

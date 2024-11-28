@@ -21,7 +21,7 @@ When using the **`data` property** (with any component), the framework infers fr
 
 To see how it works, replace the `Page` tag with the `/contacts` URL to use the following contents:
 
-```ueml copy {3} filename="Main.xmlui"
+```ueml copy {2-4} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
   <List data="/api/contacts" />
@@ -55,7 +55,7 @@ The `List` component is versatile and provides several services, making it easy 
 
 The default display of the list uses the `fullName` and then `categoryId` fields. If you want to change the default view of an item, you can modify the template used to show a particular item. Modify the `List` component's definition to use a different template:
 
-```ueml copy {3} filename="Main.xmlui"
+```ueml copy {2-4} filename="Main.xmlui"
 <!-- Omitted -->
 <List data="/api/contacts">
   <Card title="{$item.fullName}" subtitle="{$item.comments}" />
@@ -102,70 +102,6 @@ Here, you add a checkbox indicating the completeness of a particular item. With 
 It might occur to you that rendering hundreds or thousands of data items would consume a lot of resources. The `List` component is a **virtualized container** that ensures that only data items visible in the current viewport (and a few near the edges) are rendered.
 </Callout>
 
-## Extracting a Reusable component
-
-The item template of a contact row is getting bigger and bigger. In the future, you will extend this template by displaying other task properties and adding a context menu to initiate task-related actions. The template is within the `Main.xmlui` file, and as it will involve more functionality, that file will be crowded and lose its easy-to-read nature.
-
-It is the best time to extract the item template of the list into a separate component. With the following steps, you will refactor the app:
-
-1. Create a new file, `ContactRow.xmlui`, in the `components` folder. By convention, custom components created within the app go into the `components` folder.
-2. Type this code into `ContactRow.xmlui` to declare a reusable component:
-
-```ueml copy filename="ContactRow.xmlui"
-<Component name="ContactRow">
-</Component>
-```
-
-3. Move the item template from the `Main.xmlui` file to the `ContactRow.xmlui` file:
-
-```ueml copy {2-13} filename="ContactRow.xmlui"
-<Component name="ContactRow">
-  <Card>
-    <HStack verticalAlignment="center">
-      <Checkbox initialValue="{$item.reviewCompleted}" />
-      <VStack width="*" gap="0">
-        <Text variant="strong">{$item.fullName}</Text>
-        <Text>{$item.comments}</Text>
-      </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end">
-        <Text>{smartFormatDate($item.reviewDueDate)}</Text>
-      </HStack>
-    </HStack>
-  </Card>
-</Component>
-```
-
-4. The `$item` value you used with the list's item template has no meaning within a reusable component's definition. Reusable components use the `$props` context value to refer to the properties passed in their markup instances. Thus, you need to replace the `$item` occurrences with `$props.item` to ensure the new extracted component works:
-
-```ueml copy {2-13} filename="ContactRow.xmlui" /$props.item/
-<Component name="ContactRow">
-  <Card>
-    <HStack verticalAlignment="center">
-      <Checkbox initialValue="{$props.item.reviewCompleted}" />
-      <VStack width="*" gap="0">
-        <Text variant="strong">{$props.item.fullName}</Text>
-        <Text>{$props.item.comments}</Text>
-      </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end">
-        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
-      </HStack>
-    </HStack>
-  </Card>
-</Component>
-```
-
-5. Go back to the `Main.xmlui` file and replace the item template with the new `ContactRow` component:
-
-```ueml copy filename="Main.xmlui" {3}
-<!-- Omitted -->
-<List data="/api/contacts">
-  <ContactRow item="{$item}" />
-</List>
-<!-- Omitted -->
-```
-
-The app should work as before; however, now, it uses the extracted component.
-
 ## Categorizing Data
 
 In the app's database, each contact can be assigned a category. The available categories are stored in the database with the following structure:
@@ -178,30 +114,42 @@ In the app's database, each contact can be assigned a category. The available ca
 
 XMLUI has a `Badge` component that can use a color map (name and color pairs). When you pass a value to a `Badge`, it leverages the color map to set up the component's background according to the badge's text. In this section, you will add a `Badge` displaying the category associated with a particular contact:
 
-1. Navigate to the freshly created `ContactRow.xmlui` file and add a `DataSource` component before the `Card` with the `categories` identifier. This `DataSource` component will fetch all category data from the backend.
+1. Add a `DataSource` component to the markup before the `NavPanel` tag with the `categories` identifier. This `DataSource` component will fetch all category data from the backend.
 
-```ueml copy {2} filename="ContactRow.xmlui"
-<Component name="ContactRow">
+```ueml copy {11} filename="Main.xmlui" /id="categories"/
+<App 
+  layout="vertical-sticky" 
+  name="Contact List Tutorial" 
+  logo="resources/logo.svg" 
+  logo-dark="resources/logo-dark.svg">
+  <AppHeader>
+    <H2>Contact Management</H2>
+    <SpaceFiller />
+    <ToneChangerButton />
+  </AppHeader>
   <DataSource id="categories" url="/api/categories" />
-  <Card>
-    <!-- Omitted -->
-  </Card>
-</Component>
+  <!-- Omitted -->
+  <NavPanel>
+  <!-- Omitted -->
+</App>
 ```
 
-2. Create a new `ContactRow.xmlui.xs` file in the `components` folder. This file intentionally has the same name extended with `.xs` as the `ContactRow` component's markup file. It is a *code behind* a file containing variables and functions visible within the `ContactRow` component; they represent the states, actions, and other utility functionality. Copy this content into the new file:
+2. Create a new `Main.xmlui.xs` file in the app's root folder. This file intentionally has the same name extended with `.xs` as the `Main.xmlui` markup file. It is a **code-behind** file containing variables and functions visible within the app's main component. A code-behind file represents states, actions, and other utility functionality. In this case, it will declare variables. Copy this content into the new file:
 
-```javascript copy filename="ContactRow.xmlui.xs"
-// Category record of the item
-var category = findByField(categories.value, "id", $props.item.categoryId);
- 
+```javascript copy filename="Main.xmlui.xs"
 // Create a color map for all categories
 var categoriesColorMap = toHashObject(categories.value, "name", "color");
+
+// Resolve category name by id
+function getCategoryNameById(categoryId) {
+  const category = findByField(categories.value, "id", categoryId);
+  return category ? category.name : "";
+}
 ```
 
-The `category` variable contains the category record associated with the item. The `findByField` function searches the first category item with the id the current contact row refers to (in its `categoryId` field). The variable has an `undefined` value if the item does not have a topic. 
-
 The `categoriesColorMap` variable converts the list of topic records into a hash object with the topic name and color value pairs.
+
+The `getCategoryNameById` looks up the name of a particular category based on its id.
 
 <Callout type="info" emoji="📔">
 This transformation with the `toHashObject` JavaScript function converts category records from this format
@@ -225,50 +173,32 @@ into a hash object:
 ```
 </Callout>
 
-3. Add a `Badge` component to the `ContactRow` definition and wire it up with the current item:
+3. Change the definition of `Card` within the list:
 
-```ueml copy {10} filename="ContactRow.xmlui" /category/ /categoriesColorMap/
-<Component name="ContactRow">
-  <Card>
+```ueml copy {3,11} filename="Main.xmlui" /var.categoryName/ /categoriesColorMap/ /categoryName/
+<!-- Omitted -->
+<List data="/api/contacts">
+  <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
     <HStack verticalAlignment="center">
-      <Checkbox initialValue="{$props.item.reviewCompleted}" />
+      <Checkbox initialValue="{$item.reviewCompleted}" />
       <VStack width="*" gap="0">
-        <Text variant="strong">{$props.item.fullName}</Text>
-        <Text>{$props.item.comments}</Text>
+        <Text variant="strong">{$item.fullName}</Text>
+        <Text>{$item.comments}</Text>
       </VStack>
       <HStack verticalAlignment="center" horizontalAlignment="end">
-        <Badge when="{category}" value="{category.name}" colorMap="{categoriesColorMap}"/>
-        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
+        <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+        <Text>{smartFormatDate($item.reviewDueDate)}</Text>
       </HStack>
     </HStack>
   </Card>
-</Component>
+</List>
+<!-- Omitted -->
 ```
-
-The markup leverages these the `Badge` properties:
-- `when` is a Boolean property influencing when the component should be rendered (and displayed). If there is no category associated with a particular contact, the badge is not displayed.
-- `value` means the text to display in the badge; it is set to the category name.
-- `colorMap` declares the mapping of values to background colors.
+This code snippet adds a `categoryName` variable to the `Card` (this variable's scope is `Card` and its children). The markup uses this variable as its value will be used in multiple properties within `Badge`; the variable caches the value. The `Badge` component uses the `categoryName` variable's value to display its text with the associated `categoriesColorMap` (maps each category name to a particular color). Observe the `when` attribute: if there is no name for the particular contact category, the `when` value will be false, and the `Badge` component will not be rendered.
 
 Now, running the app will display the topics of task items:
 
 <br/>
 <Image alt="Badges" src="/resources/images/get-started/items-and-badges.png" />
 
-<Callout type="info" emoji="📔">
-You may have noticed that the definition of `ContactRow` includes a `DataSource` that fetches the contact categories:
-
-```ueml copy {2} filename="ContactRow.xmlui"
-<Component name="ContactRow">
-  <DataSource id="categories" url="/api/categories" />
-  <Card>
-    <!-- Omitted -->
-  </Card>
-</Component>
-```
-
-The engine is smart enough to recognize that it should not fetch this endpoint every time a contact row is displayed. It will fetch the data only when the first visible row in the list is to be rendered and will use the cached set of categories for the subsequent rows.
-</Callout>
-
 In the following article, you will learn to display filtered data.
-

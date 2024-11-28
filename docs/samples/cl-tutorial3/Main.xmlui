@@ -7,7 +7,8 @@
     <H2>Contact Management</H2>
     <SpaceFiller />
     <ToneChangerButton />
-  </AppHeader>  
+  </AppHeader>
+  <DataSource id="categories" url="/api/categories" />
   <NavPanel>
     <NavLink label="Dashboard" to="/" />
     <NavLink label="Contacts" to="/contacts" />
@@ -16,7 +17,19 @@
     <Page url="/">Dashboard</Page>
     <Page url="/contacts">
       <List data="/api/contacts">
-        <ContactRow item="{$item}" />
+        <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+          <HStack verticalAlignment="center">
+            <Checkbox initialValue="{$item.reviewCompleted}" />
+            <VStack width="*" gap="0">
+              <Text variant="strong">{$item.fullName}</Text>
+              <Text>{$item.comments}</Text>
+            </VStack>
+            <HStack verticalAlignment="center" horizontalAlignment="end">
+              <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+              <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+            </HStack>
+          </HStack>
+        </Card>
       </List>
     </Page>
   </Pages>

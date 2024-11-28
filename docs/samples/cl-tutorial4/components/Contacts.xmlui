@@ -1,5 +1,18 @@
 <Component name="Contacts">
-  <List items="{$props.data}">
-    <ContactRow item="{$item}" />
+  <DataSource id="categories" url="/api/categories" />
+  <List data="{$props.data}">
+    <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+      <HStack verticalAlignment="center">
+        <Checkbox initialValue="{$item.reviewCompleted}" />
+        <VStack width="*" gap="0">
+          <Text variant="strong">{$item.fullName}</Text>
+          <Text>{$item.comments}</Text>
+        </VStack>
+        <HStack verticalAlignment="center" horizontalAlignment="end">
+          <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+          <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+        </HStack>
+      </HStack>
+    </Card>
   </List>
 </Component>
