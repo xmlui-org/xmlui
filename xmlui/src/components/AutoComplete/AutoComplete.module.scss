@@ -27,13 +27,6 @@ $componentName: "AutoComplete";
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
-  &:focus {
-    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
-    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
-    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
-    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
-  }
-
   &::placeholder {
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
@@ -71,6 +64,13 @@ $componentName: "AutoComplete";
     background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
     color: createThemeVar("Input:color-text-#{$componentName}--disabled");
     border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
+  }
+
+  &.focused {
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}--focus');
   }
 }
 

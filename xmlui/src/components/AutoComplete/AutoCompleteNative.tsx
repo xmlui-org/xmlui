@@ -19,6 +19,7 @@ import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { AutoCompleteContext, useAutoComplete } from "@components/AutoComplete/AutoCompleteContext";
 import { OptionContext, useOption } from "@components/Select/OptionContext";
 import classnames from "classnames";
+import { useEvent } from "@components-core/utils/misc";
 
 type AutoCompleteProps = {
   id?: string;
@@ -96,6 +97,7 @@ export function AutoComplete({
   const toggleOption = useCallback(
     (selectedValue: string) => {
       setInputValue("");
+      if (selectedValue === "") return;
       const newSelectedValue = Array.isArray(value)
         ? value.includes(selectedValue)
           ? value.filter((v) => v !== selectedValue)
@@ -165,6 +167,22 @@ export function AutoComplete({
     [emptyListTemplate],
   );
 
+  // Register component API for external interactions
+  const focus = useCallback(() => {
+    inputRef?.current?.focus();
+  }, [inputRef]);
+
+  const setValue = useEvent((newValue: string) => {
+    updateState({ value: Array.isArray(newValue) ? newValue : [newValue] });
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
   const optionContextValue = useMemo(
     () => ({
       onOptionAdd,
@@ -194,8 +212,9 @@ export function AutoComplete({
                 if (!enabled) return;
                 inputRef?.current?.focus();
               }}
-              className={classnames(styles.badgeListWrapper, {
+              className={classnames(styles.badgeListWrapper, styles[validationStatus], {
                 [styles.disabled]: !enabled,
+                [styles.focused]: document.activeElement === inputRef.current,
               })}
             >
               <div className={styles.badgeList}>
@@ -229,7 +248,7 @@ export function AutoComplete({
                     setOpen(false);
                     onBlur();
                   }}
-                  placeholder={"Search..."}
+                  placeholder={placeholder}
                   className={styles.commandInput}
                 />
               </div>
@@ -245,7 +264,7 @@ export function AutoComplete({
                   </button>
                 )}
                 <button onClick={() => setOpen(true)}>
-                  <Icon name="chevrondown" size="sm" />
+                  <Icon name="chevrondown" />
                 </button>
               </div>
             </div>
@@ -284,7 +303,7 @@ function CreatableItem() {
   const { onOptionAdd } = useOption();
   if (
     isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
-    value?.find((s) => s === inputValue)
+    (Array.isArray(value) && value?.find((s) => s === inputValue))
   ) {
     return <span style={{ display: "none" }} />;
   }
