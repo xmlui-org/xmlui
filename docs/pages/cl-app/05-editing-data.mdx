@@ -3,26 +3,23 @@ import { CL_TUTORIAL5 } from '../../meta/downloads'
 
 # Editing Data
 
-In the previous sections, you created several user interfaces that display existing contact data.
-In this article, you will learn to manipulate that data: creating, editing, and deleting.
+In the previous sections, you created several user interfaces displaying contact data. This article teaches you to manipulate data by creating, editing, and deleting contacts.
 
 <Callout type="info" emoji="📔">
 You can continue working with the code you completed in the previous tutorial section. Alternatively, you can download the code from <DownloadLink href={CL_TUTORIAL5}>here</DownloadLink> and carry on. 
 </Callout>
 
-## Setting up
+## Preparing the UI
 
-There are several ways to add data editing functionality to an app.
-In this article, you will use a modal dialog to add and edit contact items.
-These dialogs will show up when you click a button to add a new item or select the edit or delete action from a context menu belonging to an item that is listed.
+There are several ways to add data editing functionality to an app. In this article, you will use a modal dialog to add and edit contact items.
 
 ### Button for New Contacts
 
-Let's change the layout of the `Contact` component to add a button above the list (and wrap the button and the list into a `VStack`).
-When you click this button, it will display a dialog for adding a new contact item:
+Let's change the layout of the `Contacts` component to add a button above the list (and wrap the button and the list into a `VStack`). Later, when you click this button, it will display a dialog for adding a new contact item.
 
-```ueml copy {2-5, 9} filename="Contacts.xmlui"
+```ueml copy {3-6, 10} filename="Contacts.xmlui"
 <Component name="Contacts">
+  <DataSource id="categories" url="/api/categories" />
   <VStack>
     <HStack horizontalAlignment="end">
       <Button icon="plus">New Contact</Button>
@@ -41,37 +38,41 @@ The `HStack` section adds a button above the list:
 
 ### Triggers for Edit and Delete
 
-Next, you should add a context menu to each contact item.
-This menu appears on the right side of an item with the following markup in the `ContactRow` component:
+Next, you should add a context menu to each contact item. This menu appears on the right side of a list item with the following markup in the `Contacts` component:
 
-```ueml copy {14-20} filename="ContactRow.xmlui"
-<Component name="ContactRow">
+```ueml copy {18-24} filename="Contacts.xmlui"
+<Component name="Contacts">
   <DataSource id="categories" url="/api/categories" />
-  <Card>
-    <HStack verticalAlignment="center">
-      <Checkbox initialValue="{$props.item.reviewCompleted}" />
-      <VStack width="*" gap="0">
-        <Text variant="strong">{$props.item.fullName}</Text>
-        <Text>{$props.item.comments}</Text>
-      </VStack>
-      <HStack verticalAlignment="center" horizontalAlignment="end">
-        <Badge when="{category}" value="{category.name}" colorMap="{categoriesColorMap}"/>
-        <Text>{smartFormatDate($props.item.reviewDueDate)}</Text>
-      </HStack>
-      <DropdownMenu>
-        <property name="triggerTemplate">
-          <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-        </property>
-        <MenuItem label="Edit" />
-        <MenuItem label="Delete" />
-      </DropdownMenu>
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus">New Contact</Button>
     </HStack>
-  </Card>
+    <List data="{$props.data.map(extendWithSection)}"
+      defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+      groupBy="section">
+      <!-- Unchanged -->
+      <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+        <HStack verticalAlignment="center">
+          <!-- Unchanged -->
+          <HStack verticalAlignment="center" horizontalAlignment="end">
+            <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+            <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+          </HStack>
+          <DropdownMenu>
+            <property name="triggerTemplate">
+              <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
+            </property>
+            <MenuItem label="Edit" />
+            <MenuItem label="Delete" />
+          </DropdownMenu>
+        </HStack>
+      </Card>
+    </List>
+  </VStack>
 </Component>
 ```
 
-The `DropdownMenu` definition adds the context menu to the contact items.
-You can reveal the menu by clicking the three dots to the right of a particular contect item in the list:
+The `DropdownMenu` definition adds the context menu to the contact items. You can reveal the menu by clicking the three dots to the right of a particular contect item in the list:
 
 <br/>
 <Image alt="Context menu" src="/resources/images/get-started/context-menu.png" />
@@ -81,7 +82,7 @@ You can reveal the menu by clicking the three dots to the right of a particular 
 When you add a new contact's details or edit a contact, the app displays a form in a modal dialog.
 Create a component, `ContactForm`  (`ContactForm.xmlui` within the `components` folder), to display the dialog:
   
-```ueml copy {5} filename="ContactForm.xmlui"
+```ueml copy {5} filename="ContactForm.xmlui" 
 <Component name="ContactForm">
   <ModalDialog id="dialog" title="Add a new Contact">
     <Text>Contact Form</Text>
@@ -90,19 +91,20 @@ Create a component, `ContactForm`  (`ContactForm.xmlui` within the `components` 
 </Component>
 ```
 
-This component embeds a `ModalDialog` component to display a modal on demand. This dialog is only displayed if it is explicitly opened. The `ModalDialog` component is nested within the component definition, so it cannot be displayed outside of `ContactForm` without the component's cooperation. `ContactForm` exposes an `open` method that can be invoked from outside; it displays the dialog by invoking the `dialog.open` method.
+This component embeds a `ModalDialog` component to display a dialog on demand. This dialog is only displayed if it is explicitly opened. The `ModalDialog` component is nested within the component definition, so it cannot be displayed outside of `ContactForm` without the component's cooperation. `ContactForm` exposes an `open` method that can be invoked from outside; it displays the dialog by invoking the `dialog.open` method.
 
 <Callout type="info" emoji="📔">
-Whatever parameters you pass to the exposed `open` method, xmlui conveys to the `dialog.open` method when calling it.
+Whatever parameters you pass to the exposed `open` method, XMLUI conveys to the `dialog.open` method when calling it.
 </Callout>
 
 ### Showing the Form
 
-Add the code to `Contacts` to display this dialog:
+Add a `ContactForm` component to `Contacts`, and set up click event handler in the New Contact button to display this dialog:
 
-```ueml copy {2, 5} filename="Contacts.xmlui" /onClick="contactForm.open()"/
+```ueml copy {2, 6} filename="Contacts.xmlui" /onClick="contactForm.open()"/
 <Component name="Contacts">
   <ContactForm id="contactForm" />
+  <DataSource id="categories" url="/api/categories" />
   <VStack>
     <HStack horizontalAlignment="end">
       <Button icon="plus" onClick="contactForm.open()">New Contact</Button>
@@ -127,7 +129,7 @@ You can reuse this dialog when editing data. Modify the markup of `ContactRow`:
   <DataSource id="categories" url="/api/categories" />
   <ContactForm id="contactForm" />
   <Card>
-    <!-- Omitted -->
+    <!-- Unchanged -->
       <DropdownMenu>
         <property name="triggerTemplate">
           <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
@@ -144,44 +146,42 @@ You use the same dialog in the `ContactRow` component here. Clicking the Edit ac
 
 ### Context Sensitive Dialog
 
-The dialog always displays its title as "Add a new Contact" whether you invoke it with the "Add button" or the "Edit" menu command.
-Modify the dialog to accept a mode variable, which can be either "add" or "edit":
+The dialog always displays its title as "Add a new Contact" whether you invoke it with the "Add button" or the "Edit" menu command. Modify the dialog to test the parameter passed to the `open` function (you invoke it from the `Contacts` component). The `$param` value represents the first parameter passed to `open`.
 
-```ueml copy {1, 4, 7} filename="ContactForm.xmlui" /var.mode=""/
-<Component name="ContactForm" var.mode="">
+```ueml copy {1, 4, 7} filename="ContactForm.xmlui" /$param/
+<Component name="ContactForm">
   <ModalDialog 
     id="dialog" 
-    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
+    title="{$param ? 'Edit a Contact' : 'Add a new Contact'}">
     <Text>Contact Form</Text>
   </ModalDialog>
-  <method name="open" value="(m) => { mode = m; dialog.open(); }" />
+  <method name="open" value="dialog.open" />
 </Component>
 ```
 
-The component has a variable, `mode`, which stores the current operation mode.
-The code changes the `open` method to use a parameter (`m`) to pass the current mode.
-When displaying the dialog, its title is set up according to the mode specified.
+When we edit data, the dialog receives a contact item. However, when we add a new contact, the dialog does not receive any parameters.
 
-To work with the current mode, you have to change the invocations of `open` in `Contacts`:
+<Callout type="info" emoji="📔">
+You can also use the `$params` (plural form) value, an array of parameters (`open` can be invoked with multiple parameters). In this case, you can use `$params[0]`, `$params[1]`, and so on to get a particular parameter's value. `$param` is the same as `$params[0]`.
+</Callout>
 
-```ueml copy {5, 13} filename="Contacts.xmlui"
-<Component name="Contacts">
-  <!-- Unchanged -->
-  <VStack>
-    <HStack horizontalAlignment="end">
-      <Button icon="plus" onClick="contactForm.open('add')">New Contact</Button>
+Modify `Contacts` to pass the contact item to edit when opening the dialog:
+
+```ueml copy {10} filename="Contacts.xmlui" /onClick="contactForm.open($item)"/
+<Component name="ContactRow">
+  <DataSource id="categories" url="/api/categories" />
+  <ContactForm id="contactForm" />
+  <Card>
+    <!-- Unchanged -->
+      <DropdownMenu>
+        <property name="triggerTemplate">
+          <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
+        </property>
+        <MenuItem label="Edit" onClick="contactForm.open($item)"/>
+        <MenuItem label="Delete" />
+      </DropdownMenu>
     </HStack>
-    <List 
-      <!-- Unchanged -->
-      <property name="itemTemplate">
-        <ContactRow 
-          item="{$item}" 
-          categories="{categories.value}" 
-          onEditClicked="contactForm.open('edit')" />
-      </property>
-      <!-- Unchanged -->
-    </List>
-  </VStack>
+  </Card>
 </Component>
 ```
 
@@ -192,19 +192,18 @@ Now, when you display the dialog clicking on the "Edit" menu, it will display th
 
 ## Contact Data Form
 
-The current contact dialog has no functionality.
-To flesh it out, create a form that accepts data entry.
+The current contact dialog has no functionality. To flesh it out, create a form that accepts data entry. 
 
-Add the highlighted elements to `ContactForm`:
+Replace the `Text` with the highlighted `Form` in `ContactForm`:
 
 ```ueml copy {5-32} filename="ContactForm.xmlui"
-<Component name="ContactForm" var.mode="">
+<Component name="ContactForm">
   <ModalDialog 
     id="dialog" 
-    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
+    title="{$param ? 'Edit a Contact' : 'Add a new Contact'}">
     <Form 
       id="contactForm" 
-      data="{{}}"
+      data="{$param}"
       onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
       <FormItem
         label="Full name" 
@@ -231,13 +230,13 @@ Add the highlighted elements to `ContactForm`:
       </FormItem>
     </Form>
   </ModalDialog>
-  <method name="open" value="(m) => { mode = m; dialog.open(); }" />
+  <method name="open" value="dialog.open" />
 </Component>
 ```
 
-The `Form` component is responsible for editing the nested data items.
-Its `data` property describes the data to edit.
-Each `FormItem` acts as an input field that is associated with an attribute of the original `data` via the `bindTo` property.
+The `Form` component is responsible for editing the nested data items. Its `data` property describes the data to edit; we pass the first parameter (`$param`) that is passed to the `open` function to show the dialog. Remember, when we add a new contact, this data is empty. However, the dialog gets the corresponding contact record when editing a contact.
+
+Each `FormItem` is an input field associated with an attribute of the original `data` via the `bindTo` property.
 
 <Callout type="info" emoji="📔">
   The `FormItem` bound to the `categoryId` property is more complex.
@@ -247,11 +246,9 @@ Each `FormItem` acts as an input field that is associated with an attribute of t
   You will add this functionality soon.
 </Callout>
 
-The `submit` event handler of the `Form` (defined with the `onSubmit` attribute) defines the activity to execute when the form is saved.
+The `submit` event handler of the `Form` (defined with the `onSubmit` attribute) defines the activity to execute when the form is saved. So far, this event handler does not persist the data; it just displays it in JSON.
 
-### Adding Records with a Form
-
-When you run the app, adding a new contact displays an empty form:
+When you run the app, adding a new contact displays an empty form. 
 
 <br/>
 <Image alt="Add new" src="/resources/images/get-started/add-new-contact.png" />
@@ -262,87 +259,16 @@ The current submit event handler displays the JSON representation of the data to
 <br/>
 <Image alt="Submit new" src="/resources/images/get-started/submit-new-contact.png" />
 
-### Editing Records with a Form
-
-Here, you need to pass the data to the `Form` when you edit existing information.
-The current implementation of `ContactForm` starts with empty data, so you should change it:
-
-```ueml copy {1, 7, 12-14} filename="ContactForm.xmlui" /var.initialData=""/ /initialData/
-<Component name="ContactForm" var.mode="" var.initialData="">
-  <ModalDialog 
-    id="dialog" 
-    title="{mode === 'add' ? 'Add a new Contact' : 'Edit a Contact'}" >
-    <Form 
-      id="contactForm" 
-      data="{initialData}"
-      onSubmit="(toSave) => window.alert(JSON.stringify(toSave))" >
-      <!-- Unchanged -->
-    </Form>
-  </ModalDialog>
-  <method 
-    name="open" 
-    value="(m, d) => { mode = m; initialData = d; dialog.open(); }" />
-</Component>
-```
-
-The `initialData` variable will contain the data for editing.
-The form will use this data as the `data`.
-The form's `open` method used to receive only the mode (add or edit) as its argument;
-the modified implementation now receives the initial data to use as well.
-
-The `ContactRow` component should pass the details of the data being edited in its `editClicked` event
-
-Modify the component accordingly:
-
-```ueml copy {6} filename="ContactRow.xmlui"
-<!-- Omitted -->
-<DropdownMenu>
-  <property name="triggerTemplate">
-    <Button icon="dotmenu" variant="ghost" themeColor="secondary"/>
-  </property>
-  <MenuItem label="Edit" onClick="{() => emitEvent('editClicked', $props.item)}" />
-  <MenuItem label="Delete" />
-</DropdownMenu>
-<!-- Omitted -->
-```
-
-You must update the changes of the `open` method in the `ContactForm` and modify the `editClicked` event handler of `ContactRow` within the `Contacts` component.
-Pass an empty record to add a new contact.
-
-```ueml copy {4, 15} filename="Contacts.xmlui"
-<Component name="Contacts">
-  <-- Unchanged -->
-    <HStack horizontalAlignment="end">
-      <Button icon="plus" onClick="contactForm.open('add', {})">New Contact</Button>
-    </HStack>
-    <List 
-      items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-      defaultGroups="{!$props.filter
-        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-      groupBy="section">
-      <property name="itemTemplate">
-        <ContactRow 
-          item="{$item}" 
-          categories="{categories.value}" 
-          onEditClicked="(selected) => contactForm.open('edit', selected)" />
-      </property>
-      <!-- Unchanged -->
-    </List>
-  </VStack>
-</Component>
-```
-
-Now, the `open` method explicitly receives a new empty object when you add a new contact or a record from the contacts data if you edit a particular item.
-
 When you click the "Edit" context menu of a particular contact, the form displays the data of the record:
 
 <br/>
 <Image alt="Edit details" src="/resources/images/get-started/edit-contact-details.png" />
 
+If you modify and save the contact data, you will see a message with the modified contact data that is similar to adding a new one.
+
 ## Saving Data
 
-You can edit the form data, but it must still be saved to the backend.
-The backend API provides three methods for adding and editing a contact record:
+You can edit the form data, but it must still be saved to the backend. You will use methods the backend provides for adding and editing a contact record:
 
 - The `POST /api/contacts` method inserts a new data record
 - The `PUT /api/contacts/{contactId}` method updates the contact record with ID `contactId`
@@ -352,8 +278,7 @@ The first two methods accept the contact details in their request bodies; the DE
 
 ### Add a New Contact Record
 
-XMLUI has a versatile component called `APICall`, that invokes web API endpoints that can modify some data on the backend.
-Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
+XMLUI has a versatile component called `APICall`, that invokes web API endpoints that can modify some data on the backend. Change the `submit` event handler in the `ContactForm` component by removing the `onSubmit` attribute and adding the highlighted event:
 
 ```ueml copy {8-13} filename="ContactForm.xmlui"
 <Component name="ContactForm" var.mode="" var.initialData="">

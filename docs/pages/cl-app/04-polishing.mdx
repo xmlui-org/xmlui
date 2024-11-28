@@ -170,47 +170,7 @@ You can see the updated section order:
 <br/>
 <Image alt="Sections ordered" src="/resources/images/get-started/sections-ordered.png" />
 
-## Omitting Empty Sections
-
-By specifying the default sections, the filtered lists also display them.
-So when you visit a filtered list, such as "Today's Reviews", it displays empty sections:
-
-<br/>
-<Image alt="empty sections" src="/resources/images/get-started/empty-sections.png" />
-
-The source of this issue is the list's markup, which declares default sections. While those are helpful for the "All contacts" view, they result in unnecessary sections for filtered views.
-
-Use a new property in `Contacts` (name it `showAllSections`) to check if the component should display each section:
-
-```ueml copy {4-6} filename="Tasks.xmlui" /$props.showAllSections/
-<!-- Omitted -->
-<List 
-  items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-  defaultGroups="{!$props.filter
-    ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-  groupBy="section">
-  <!-- Omitted -->
-</List>  
-<!-- Omitted -->
-```
-
-When you pass any non-empty value (it can be anything), the highlighted markup sets the `defaultSection` property as if it were undefined and displays only the sections available by the data. Otherwise, it will use the listed sections in their definition order.
-
-Add the `showAllSections` property to the "All contacts" view in `Main.xmlui`:
-
-```ueml copy filename="Main.xmlui" /showAllSections="yes"/
-<!-- Omitted -->
-<Pages>
-  <Page url="/">Dashboard</Page>
-  <Page url="/contacts/all">
-    <Contacts data="/api/contacts" showAllSections="yes" />
-  </Page>
-  <!-- Omitted -->
-</Pages>
-<!-- Omitted -->
-```
-
-Now, the empty sections are no longer displayed:
+When you visit a filtered page, only the corresponding section is displayed, like in the following figure:
 
 <br/>
 <Image alt="no empty sections" src="/resources/images/get-started/no-empty-sections.png" />

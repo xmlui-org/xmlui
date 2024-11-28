@@ -1,24 +1,35 @@
 <Component name="Contacts">
-  <List 
-    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-    defaultGroups="{!$props.filter
-        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-    groupBy="section">    
-    <ContactRow item="{$item}" categories="{categories.value}" />
+  <DataSource id="categories" url="/api/categories" />
+  <List data="{$props.data.map(extendWithSection)}"
+    defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+    groupBy="section">
     <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
         verticalAlignment="center"
-        onClick="() => $context.toggle()">
+        onClick="$group.toggle">
           <Text 
             variant="subtitle" 
-            value="{$item.sectionKey} ({loading(contacts, $item.sectionItems.length ?? 0)})" />
+            value="{$group.key} ({loading(contacts, $group.items.length ?? 0)})" />
         <SpaceFiller />
         <Icon 
-          name="{$context.isExpanded ? 'chevrondown' : 'chevronright'}" 
+          name="{$group.isExpanded ? 'chevrondown' : 'chevronright'}" 
           size="md" />  
       </HStack>
     </property>
+    <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+      <HStack verticalAlignment="center">
+        <Checkbox initialValue="{$item.reviewCompleted}" />
+        <VStack width="*" gap="0">
+          <Text variant="strong">{$item.fullName}</Text>
+          <Text>{$item.comments}</Text>
+        </VStack>
+        <HStack verticalAlignment="center" horizontalAlignment="end">
+          <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
+          <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+        </HStack>
+      </HStack>
+    </Card>
   </List>
 </Component>
