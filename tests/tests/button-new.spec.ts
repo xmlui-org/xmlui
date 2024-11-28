@@ -36,13 +36,18 @@ test.skip("renders without label, icon or children", async ({ createDriver }) =>
 
 // First, see how this renders
 [
-  null, 
-  undefined, 
-  { a: 1, b: "hi" }, 
-  [1, 2, 3], 
-  () => {},
-].forEach((label) => {
-  test.skip(`does not render if label is ${typeof label}`, async ({ createDriver }) => {});  
+  { label: "null", value: null }, 
+  { label: "undefined", value: undefined },
+  { label: "empty object", value: {} }, 
+  { label: "object", value: { a: 1, b: "hi" } }, 
+  { label: "empty array", value: [] }, 
+  { label: "array", value: [] }, 
+  { label: "function", value: () => {} }, 
+].forEach((type) => {
+  test.skip(`does not render if label is ${type.label}`, async ({ createDriver }) => {
+    const { locator } = await createDriver(`<Button label="${type.value}" />`);
+    //await expect(locator).not.toBeVisible();
+  });  
 });
 
 test("ignores label if children present", async ({ createDriver }) => {
@@ -179,86 +184,3 @@ test.skip("lostFocus event fires & is not focused", async ({ createDriver }) => 
 test.skip("cannot emit lostFocus event if not focused before", async ({ createDriver }) => {});
 
 test.skip("lostFocus event does not fire if disabled", async ({ createDriver }) => {});
-
-/* 
-function addTestId(entryPoint: string) {
-  const generatedTestId = `button-${Date.now()}`;
-  let testId = "";
-  if (!entryPoint.includes("testId")) {
-    testId = generatedTestId;
-    entryPoint = entryPoint.replace("<Button", `<Button testId="${testId}"`);
-  } else {
-    // Note: does not work if testId is set like this testId='asd'
-
-    const testIdsWithTag = entryPoint.match(/testId="(.*?)"/);
-    // Just to be safe, though this branch shouldn't be possible
-    if (!testIdsWithTag) {
-      testId = generatedTestId;
-      entryPoint = entryPoint.replace("<Button", `<Button testId="${testId}"`);      
-    } else if (testIdsWithTag.length > 1) {
-      throw new Error("More than one testId found");
-    } else if (testIdsWithTag[0] === "testId=\"\"") {
-      testId = generatedTestId;
-      entryPoint = entryPoint.replace("testId=\"\"", `testId="${testId}"`);
-    } else {
-      testId = testIdsWithTag[0].substring(
-        testIdsWithTag[0].indexOf("\"") + 1, 
-        testIdsWithTag[0].lastIndexOf("\"")
-      );
-    }
-  }
-  return {code: entryPoint, testId};
-}
-
-class ButtonDriver {
-  label: string | null | undefined;
-  size: {width: number, height: number} | null | undefined;
-
-  constructor(
-    public readonly component: Locator,
-    public readonly testId?: string
-  ) {
-    this.component = component;
-    this.testId = testId;
-  }
-
-  // Get all properties that are requested async
-  async init() {
-    // Getting the label does not work - not needed right now anyway
-    this.label = await this.component.innerText();
-    this.size = await getElementSize(this.component);
-  }
-
-  async getLabel() {
-    return this.component.innerText();
-  }
-
-  async expectToBeRendered() {
-    await expect(this.component).toBeVisible();
-    expect(this.size?.width).toBeGreaterThan(0);
-    expect(this.size?.height).toBeGreaterThan(0);  
-  }
-
-  async click() {
-    await this.component.click();
-  }
-}
-
-const test = baseTest.extend<{
-  createDriver: (entryPoint: string) => Promise<ButtonDriver>;
-}>({
-  createDriver: async ({ page }, use) => {
-    await use(async (entryPoint: string) => {
-      const {code, testId} = addTestId(entryPoint);
-      await initApp(page, { entryPoint: code });
-
-      const locator = page.getByTestId(testId);
-      const driver = new ButtonDriver(locator);
-      await driver.init();
-
-      return driver;
-    });
-
-  },
-});
- */
