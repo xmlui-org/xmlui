@@ -7,13 +7,13 @@
     </HStack>  
     <List 
         items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-        defaultSections="{!$props.filter
+        defaultGroups="{!$props.filter
             ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-        sectionBy="section">    
+        groupBy="section">    
         <ContactRow 
             item="{$item}" 
             onEditClicked="(selected) => contactForm.open('edit', selected)" />
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
         <HStack 
             horizontalPadding="$space-normal" 
             verticalPadding="$space-tight"

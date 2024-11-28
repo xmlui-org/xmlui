@@ -1,4 +1,10 @@
-%-DESC-START
+import { Callout } from "nextra/components";
+
+# Option [#component-option]
+
+`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `Combobox`, and others) may use nested `Option` instances from which the user can select.
+
+
 
 ## Using `Option`
 
@@ -16,9 +22,9 @@
 ```
 
 <Playground
-  name="Example: Option in a Combobox"
-  height={260}
-  app={`
+    name="Example: Option in a Combobox"
+    height={260}
+    app={`
     <App>
       <Text value="Selected ID: {myCombo.value}"/>
       <Combobox id="myCombo">
@@ -44,9 +50,9 @@
 ```
 
 <Playground
-  name="Example: Option in a Select"
-  height={260}
-  app={`
+    name="Example: Option in a Select"
+    height={260}
+    app={`
     <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
@@ -58,42 +64,20 @@
   `}
 />
 
-%-DESC-END
+## Properties
 
-%-PROP-START disabled
+### `enabled`
 
-```ueml copy /disabled="true"/
-<App>
-  <Text value="Selected ID: {mySelect.value}"/>
-  <Select id="mySelect">
-    <Option label="Vanilla" value="vanilla" />
-    <Option label="Chocolate" value="chocolate" disabled="true" />
-    <Option label="Pistachio" value="pistachio" />
-  </Select>
-</App>
-```
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
 
-<Playground
-  name="Example: Option in a Select"
-  height={260}
-  app={`
-    <App>
-      <Text value="Selected ID: {mySelect.value}"/>
-      <Select id="mySelect">
-        <Option label="Vanilla" value="vanilla" />
-        <Option label="Chocolate" value="chocolate" disabled="true" />
-        <Option label="Pistachio" value="pistachio" />
-      </Select>
-    </App>
-  `}
-/>
+Default value: `true`.
 
-%-PROP-END
+### `label`
 
-%-PROP-START label
+This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
 
 <Callout type="info" emoji="📔">
-If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
 ```ueml copy
@@ -109,9 +93,9 @@ If `Option` does not define any of the `label` or `value` properties, the option
 ```
 
 <Playground
-  name="Example: Using label"
-  height={260}
-  app={`
+    name="Example: Using label"
+    height={260}
+    app={`
     <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
@@ -124,12 +108,12 @@ If `Option` does not define any of the `label` or `value` properties, the option
   `}
 />
 
-%-PROP-END
+### `value`
 
-%-PROP-START value
+This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
 
 <Callout type="info" emoji="📔">
-If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
 </Callout>
 
 ```ueml copy
@@ -145,9 +129,9 @@ If `Option` does not define any of the `label` or `value` properties, the option
 ```
 
 <Playground
-  name="Example: Option in a Select"
-  height={260}
-  app={`
+    name="Example: Option in a Select"
+    height={260}
+    app={`
     <App>
       <Text value="Selected ID: {mySelect.value}"/>
       <Select id="mySelect">
@@ -160,4 +144,14 @@ If `Option` does not define any of the `label` or `value` properties, the option
   `}
 />
 
-%-PROP-END
+## Events
+
+This component does not have any events.
+
+## Exposed Methods
+
+This component does not expose any methods.
+
+## Styling
+
+This component does not have any styles.

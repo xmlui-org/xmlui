@@ -1,12 +1,11 @@
 <Component name="Contacts">
   <List 
-    items="{$props.data.map(extendWithSection)}" 
-    defaultSections="{$props.showAllSections
-      ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']
-      : undefined }"
-    sectionBy="section">
-    <ContactRow item="{$item}" />
-    <property name="sectionTemplate">
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+    defaultGroups="{!$props.filter
+        ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+    groupBy="section">    
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"

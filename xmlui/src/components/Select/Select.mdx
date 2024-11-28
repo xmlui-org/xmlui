@@ -17,9 +17,9 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: using Select"
-  height={200}
-  app={`
+    name="Example: using Select"
+    height={200}
+    app={`
     <App>
       <Select>
         <Option value="opt1" label="first"/>
@@ -45,9 +45,9 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: initialValue"
-  height={200}
-  app={`
+    name="Example: initialValue"
+    height={200}
+    app={`
     <App>
       <Select initialValue="opt3">
         <Option value="opt1" label="first"/>
@@ -79,9 +79,9 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: optionTemplate"
-  height={200}
-  app={`
+    name="Example: optionTemplate"
+    height={200}
+    app={`
     <App>
       <Select>
         <property name="optionTemplate">
@@ -113,9 +113,9 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: placeholder"
-  height={200}
-  app={`
+    name="Example: placeholder"
+    height={200}
+    app={`
     <App>
       <Select placeholder="Please select an item">
         <Option value="opt1" label="first"/>
@@ -140,8 +140,8 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: validationStatus"
-  app={`
+    name="Example: validationStatus"
+    app={`
     <App>
       <Select />
       <Select validationStatus="valid" />
@@ -162,8 +162,8 @@ If the `label` is not specified `value` is shown.
 ```
 
 <Playground
-  name="Example: enabled"
-  app={`
+    name="Example: enabled"
+    app={`
     <App>
       <Select enabled="false" />
     </App>
@@ -194,9 +194,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: emptyListTemplate"
-  height={260}
-  app={`
+    name="Example: emptyListTemplate"
+    height={260}
+    app={`
     <App>
       <VStack>
         <Text value="Default:" />
@@ -231,9 +231,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: didChange"
-  height={200}
-  app={`
+    name="Example: didChange"
+    height={200}
+    app={`
     <App>
       <var name="newValue" value="" />
       <Text value="{newValue}" />
@@ -265,9 +265,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: gotFocus/lostFocus"
-  height={200}
-  app={`
+    name="Example: gotFocus/lostFocus"
+    height={200}
+    app={`
     <App>
       <var name="isFocused" value="{false}" />
       <Text value="Input control is focused: {isFocused}" />
@@ -298,9 +298,9 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: focus()"
-  height={240}
-  app={`
+    name="Example: focus()"
+    height={240}
+    app={`
     <App>
       <Button label="Focus Input" onClick="inputControl.focus()" />
       <Select id="inputControl">
@@ -335,8 +335,8 @@ Click on the second field to see the custom empty list indicator.
 ```
 
 <Playground
-  name="Example: value() and setValue()"
-  app={`
+    name="Example: value() and setValue()"
+    app={`
     <App>
       <Select id="inputControl">
         <Option value="opt1" label="first"/>
@@ -435,21 +435,21 @@ Theme variables to set the styles of an unselected item:
 ```
 
 <Playground
-  name="Example: styling"
-  height={260}
-  defaultTheme="custom"
-  themes={[
-    {
-      id: "custom",
-      name: "Custom Theme",
-      themeVars: {
-        "radius-Select": "30px",
-        "color-placeholder-Select": "red",
-        "thickness-border-Select": "4px",
-      },
-    },
-  ]}
-  app={`
+    name="Example: styling"
+    height={260}
+    defaultTheme="custom"
+    themes={[
+        {
+            id: "custom",
+            name: "Custom Theme",
+            themeVars: {
+                "radius-Select": "30px",
+                "color-placeholder-Select": "red",
+                "thickness-border-Select": "4px",
+            },
+        },
+    ]}
+    app={`
     <App>
       <Select placeholder="Please select an option" />
     </App>

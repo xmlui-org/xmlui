@@ -20,80 +20,77 @@ This section contains reference information about the components shipped with th
 | 12 | [Checkbox](./components/Checkbox.mdx) | The `Checkbox` component allows users to make binary choices, typically between checked or unchecked. It consists of a small box that can be toggled on or off by clicking on it. | stable |
 | 13 | [CHStack](./components/CHStack.mdx) | This component represents a stack that renders its contents horizontally and aligns that in the center along both axes. | stable |
 | 14 | [Column](./components/Column.mdx) | The `Column` component can be used within a `Table` to define a particular table column's visual properties and data bindings. | stable |
-| 15 | [Combobox](./components/Combobox.mdx) | A `Combobox` is a component that combines the features of a dropdown list and an input field. | experimental |
-| 16 | [ContentSeparator](./components/ContentSeparator.mdx) | A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization. | stable |
-| 17 | [CVStack](./components/CVStack.mdx) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. | stable |
-| 18 | [DataSource](./components/DataSource.mdx) | The `DataSource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component. | stable |
-| 19 | [DatePicker](./components/DatePicker.mdx) | A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display. | experimental |
-| 20 | [DropdownMenu](./components/DropdownMenu.mdx) | This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items. | stable |
-| 21 | [EmojiSelector](./components/EmojiSelector.mdx) | The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication. | experimental |
-| 22 | [FileInput](./components/FileInput.mdx) | The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise). | experimental |
-| 23 | [FileUploadDropZone](./components/FileUploadDropZone.mdx) | The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI. | stable |
-| 24 | [FlowLayout](./components/FlowLayout.mdx) | This layout component is used to position content in rows with an auto wrapping feature: if the length of the items exceed the available space the layout will wrap into a new line. | stable |
-| 25 | [Footer](./components/Footer.mdx) | The `Footer` is a component that acts as a placeholder within `App`. | stable |
-| 26 | [Form](./components/Form.mdx) | A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing. | experimental |
-| 27 | [FormItem](./components/FormItem.mdx) | A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data. | experimental |
-| 28 | [FormSection](./components/FormSection.mdx) | The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component. | experimental |
-| 29 | [Fragment](./components/Fragment.mdx) | The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed. | stable |
-| 30 | [H1](./components/H1.mdx) | Represents a heading level 1 text | stable |
-| 31 | [H2](./components/H2.mdx) | Represents a heading level 2 text | stable |
-| 32 | [H3](./components/H3.mdx) | Represents a heading level 3 text | stable |
-| 33 | [H4](./components/H4.mdx) | Represents a heading level 4 text | stable |
-| 34 | [H5](./components/H5.mdx) | Represents a heading level 5 text | stable |
-| 35 | [H6](./components/H6.mdx) | Represents a heading level 6 text | stable |
-| 36 | [Heading](./components/Heading.mdx) | Represents a heading text | stable |
-| 37 | [HSplitter](./components/HSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
-| 38 | [HStack](./components/HStack.mdx) | This component represents a stack rendering its contents horizontally. | stable |
-| 39 | [Icon](./components/Icon.mdx) | This component is the representation of an icon. | experimental |
-| 40 | [IconInfoCard](./components/IconInfoCard.mdx) | This component displays an icon and some content in a card. | experimental |
-| 41 | [Image](./components/Image.mdx) | The `Image` component represents or depicts an object, scene, idea, or other concept with a picture. | stable |
-| 42 | [Items](./components/Items.mdx) | The `Items` component maps sequential data items into component instances, representing each data item as a particular component. | stable |
-| 43 | [Link](./components/Link.mdx) | A `Link` component represents a navigation target within the app or a reference to an external web URL. | stable |
-| 44 | [List](./components/List.mdx) | The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport. | experimental |
-| 45 | [Logo](./components/Logo.mdx) | The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate). | experimental |
-| 46 | [Markdown](./components/Markdown.mdx) | `Markdown` displays plain text styled using markdown syntax. | stable |
-| 47 | [MenuItem](./components/MenuItem.mdx) | This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. | stable |
-| 48 | [MenuSeparator](./components/MenuSeparator.mdx) | This component displays a separator line between menu items. | stable |
-| 49 | [ModalDialog](./components/ModalDialog.mdx) | The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action. | stable |
-| 50 | [MultiCombobox](./components/MultiCombobox.mdx) | The `MultiCombobox` component is essentially a [`ComboBox`](./ComboBox.mdx) that enables the selection of multiple elements from a list either by typing in the field or by clicking list elements in the dropdown. These elements are then displayed in the field and can be removed as necessary. | experimental |
-| 51 | [MultiSelect](./components/MultiSelect.mdx) | The `MultiSelect` component works the same way as the [`Select`](./Select.mdx) component with the addition of the ability to select multiple elements from a list by clicking list elements in the dropdown. These elements are then displayed in the field and can be removed as necessary. | experimental |
-| 52 | [NavGroup](./components/NavGroup.mdx) | The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI. | stable |
-| 53 | [NavLink](./components/NavLink.mdx) | The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link). | stable |
-| 54 | [NavPanel](./components/NavPanel.mdx) | `NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure. | stable |
-| 55 | [NoResult](./components/NoResult.mdx) | `NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items. | stable |
-| 56 | [NumberBox](./components/NumberBox.mdx) | A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`. | experimental |
-| 57 | [Option](./components/Option.mdx) | `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `Combobox`, and others) may use nested `Option` instances from which the user can select. | stable |
-| 58 | [Page](./components/Page.mdx) | The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page. | stable |
-| 59 | [PageHeader](./components/PageHeader.mdx) | The `PageHeader` component is a component that displays a title and an optional pre-title. The pre-title is displayed above the title. | experimental |
-| 60 | [PageMetaTitle](./components/PageMetaTitle.mdx) | A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab. | stable |
-| 61 | [Pages](./components/Pages.mdx) | The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx). | stable |
-| 62 | [PasswordInput](./components/PasswordInput.mdx) | The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords. | experimental |
-| 63 | [ProgressBar](./components/ProgressBar.mdx) | A `ProgressBar` component visually represents the progress of a task or process. | stable |
-| 64 | [Queue](./components/Queue.mdx) | The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order. | stable |
-| 65 | [RadioGroup](./components/RadioGroup.mdx) | The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time. | stable |
-| 66 | [RealTimeAdapter](./components/RealTimeAdapter.mdx) | `RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling. | experimental |
-| 67 | [Redirect](./components/Redirect.mdx) | `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app. | stable |
-| 68 | [Select](./components/Select.mdx) | Provides a dropdown with a list of options to choose from. | stable |
-| 69 | [SpaceFiller](./components/SpaceFiller.mdx) | The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. | stable |
-| 70 | [Spinner](./components/Spinner.mdx) | The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value. | stable |
-| 71 | [Splitter](./components/Splitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
-| 72 | [Stack](./components/Stack.mdx) | `Stack` is a layout container displaying children in a horizontal or vertical stack. | stable |
-| 73 | [StickyBox](./components/StickyBox.mdx) | The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls. | experimental |
-| 74 | [SubMenuItem](./components/SubMenuItem.mdx) | This component represents a nested menu item within another menu or menu item. | stable |
-| 75 | [Switch](./components/Switch.mdx) | The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state. | stable |
-| 76 | [TabItem](./components/TabItem.mdx) | `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select. | stable |
-| 77 | [Table](./components/Table.mdx) | `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells. | stable |
-| 78 | [TableHeader](./components/TableHeader.mdx) | The `TableHeader` component can be used within a `Table` to define a particular table column's visual properties and data bindings. | experimental |
-| 79 | [TableOfContents](./components/TableOfContents.mdx) | The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position. | experimental |
-| 80 | [Tabs](./components/Tabs.mdx) | The `Tabs` component provides a tabbed layout where each tab has a clickable label and content. | experimental |
-| 81 | [Text](./components/Text.mdx) | The `Text` component displays textual information in a number of optional styles and variants. | stable |
-| 82 | [TextArea](./components/TextArea.mdx) | `TextArea` is a component that provides a multiline text input area. | experimental |
-| 83 | [TextBox](./components/TextBox.mdx) | The `TextBox` is an input component that allows users to input and edit textual data. | experimental |
-| 84 | [Theme](./components/Theme.mdx) | The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context. | stable |
-| 85 | [ThemeChangerButton](./components/ThemeChangerButton.mdx) | The `ThemeChangerButton` component is a component that allows the user to change the theme of the app. | experimental |
-| 86 | [ToneChangerButton](./components/ToneChangerButton.mdx) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. | experimental |
-| 87 | [Toolbar](./components/Toolbar.mdx) | This component is a container for a toolbar. | experimental |
-| 88 | [ToolbarButton](./components/ToolbarButton.mdx) | This component is a button that is used in a toolbar. | experimental |
-| 89 | [TrendLabel](./components/TrendLabel.mdx) | This component displays a trend label. | experimental |
-| 90 | [VSplitter](./components/VSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
-| 91 | [VStack](./components/VStack.mdx) | This component represents a stack rendering its contents vertically. | stable |
+| 15 | [ContentSeparator](./components/ContentSeparator.mdx) | A `ContentSeparator` is a component that divides or separates content visually within a layout. It serves as a visual cue to distinguish between different sections or groups of content, helping to improve readability and organization. | stable |
+| 16 | [CVStack](./components/CVStack.mdx) | This component represents a stack that renders its contents vertically and aligns that in the center along both axes. | stable |
+| 17 | [DataSource](./components/DataSource.mdx) | The `DataSource` component manages fetching data from a web API endpoint. This component automatically manages the complexity of the fetch operation and caching. To manipulate data on the backend, use the [`APICall`](./APICall.mdx) component. | stable |
+| 18 | [DatePicker](./components/DatePicker.mdx) | A datepicker component enables the selection of a date or a range of dates in a specified format from an interactive display. | experimental |
+| 19 | [DropdownMenu](./components/DropdownMenu.mdx) | This component represents a dropdown menu with a trigger. When the user clicks the trigger, the dropdown menu displays its items. | stable |
+| 20 | [EmojiSelector](./components/EmojiSelector.mdx) | The `EmojiSelector` component provides users with a graphical interface to browse, search and select emojis to insert into text fields, messages, or other forms of communication. | experimental |
+| 21 | [FileInput](./components/FileInput.mdx) | The `FileInput` is a user interface component that allows users to select files from their device's file system for upload (or processing its content otherwise). | experimental |
+| 22 | [FileUploadDropZone](./components/FileUploadDropZone.mdx) | The `FileUploadDropZone` component allows users to upload files to a web application by dragging and dropping files from their local file system onto a designated area within the UI. | stable |
+| 23 | [FlowLayout](./components/FlowLayout.mdx) | This layout component is used to position content in rows with an auto wrapping feature: if the length of the items exceed the available space the layout will wrap into a new line. | stable |
+| 24 | [Footer](./components/Footer.mdx) | The `Footer` is a component that acts as a placeholder within `App`. | stable |
+| 25 | [Form](./components/Form.mdx) | A `Form` is a fundamental component that displays user interfaces that allow users to input (or change) data and submit it to the app (a server) for further processing. | experimental |
+| 26 | [FormItem](./components/FormItem.mdx) | A `FormItem` component represents a single input element within a `Form`. The value within the `FormItem` may be associated with a particular property within the encapsulating `Form` component's data. | experimental |
+| 27 | [FormSection](./components/FormSection.mdx) | The `FormSection` is a component that groups cohesive elements together within a `Form`. This grouping is indicated visually: the child components of the `FormSection` are placed in a [`FlowLayout`](./FlowLayout.mdx) component. | experimental |
+| 28 | [Fragment](./components/Fragment.mdx) | The `Fragment` component encloses multiple child components into a single root component, so it can be used where only a single component definition is allowed. | stable |
+| 29 | [H1](./components/H1.mdx) | Represents a heading level 1 text | stable |
+| 30 | [H2](./components/H2.mdx) | Represents a heading level 2 text | stable |
+| 31 | [H3](./components/H3.mdx) | Represents a heading level 3 text | stable |
+| 32 | [H4](./components/H4.mdx) | Represents a heading level 4 text | stable |
+| 33 | [H5](./components/H5.mdx) | Represents a heading level 5 text | stable |
+| 34 | [H6](./components/H6.mdx) | Represents a heading level 6 text | stable |
+| 35 | [Heading](./components/Heading.mdx) | Represents a heading text | stable |
+| 36 | [HSplitter](./components/HSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
+| 37 | [HStack](./components/HStack.mdx) | This component represents a stack rendering its contents horizontally. | stable |
+| 38 | [Icon](./components/Icon.mdx) | This component is the representation of an icon. | experimental |
+| 39 | [IconInfoCard](./components/IconInfoCard.mdx) | This component displays an icon and some content in a card. | experimental |
+| 40 | [Image](./components/Image.mdx) | The `Image` component represents or depicts an object, scene, idea, or other concept with a picture. | stable |
+| 41 | [Items](./components/Items.mdx) | The `Items` component maps sequential data items into component instances, representing each data item as a particular component. | stable |
+| 42 | [Link](./components/Link.mdx) | A `Link` component represents a navigation target within the app or a reference to an external web URL. | stable |
+| 43 | [List](./components/List.mdx) | The `List` component is a robust layout container that renders associated data items as a list of components. `List` is virtualized; it renders only items that are visible in the viewport. | experimental |
+| 44 | [Logo](./components/Logo.mdx) | The `Logo` component represents a logo or a brand symbol. Usually, you use this component in the [`AppHeader`](./AppHeader.mdx#logotemplate). | experimental |
+| 45 | [Markdown](./components/Markdown.mdx) | `Markdown` displays plain text styled using markdown syntax. | stable |
+| 46 | [MenuItem](./components/MenuItem.mdx) | This property represents a leaf item in a menu hierarchy. Clicking the item triggers an action. | stable |
+| 47 | [MenuSeparator](./components/MenuSeparator.mdx) | This component displays a separator line between menu items. | stable |
+| 48 | [ModalDialog](./components/ModalDialog.mdx) | The `ModalDialog` component defines a modal dialog UI element that can be displayed over the existing UI - triggered by some action. | stable |
+| 49 | [NavGroup](./components/NavGroup.mdx) | The `NavGroup` component is a container for grouping related navigation targets (`NavLink` components). It can be displayed as a submenu in the App's UI. | stable |
+| 50 | [NavLink](./components/NavLink.mdx) | The `NavLink` component defines a navigation target (app navigation menu item) within the app; it is associated with a particular in-app navigation target (or an external link). | stable |
+| 51 | [NavPanel](./components/NavPanel.mdx) | `NavPanel` is a placeholder within `App` to define the app's navigation (menu) structure. | stable |
+| 52 | [NoResult](./components/NoResult.mdx) | `NoResult` is a component that displays a visual indication that some data query (search) resulted in no (zero) items. | stable |
+| 53 | [NumberBox](./components/NumberBox.mdx) | A `NumberBox` component allows users to input numeric values: either integer or floating point numbers. It also accepts empty values, where the stored value will be of type `null`. | experimental |
+| 54 | [Option](./components/Option.mdx) | `Option` is a non-visual component describing a selection option. Other components (such as `Select`, `Combobox`, and others) may use nested `Option` instances from which the user can select. | stable |
+| 55 | [Page](./components/Page.mdx) | The `Page` component defines what content is displayed when the user navigates to a particular URL that is associated with the page. | stable |
+| 56 | [PageHeader](./components/PageHeader.mdx) | The `PageHeader` component is a component that displays a title and an optional pre-title. The pre-title is displayed above the title. | experimental |
+| 57 | [PageMetaTitle](./components/PageMetaTitle.mdx) | A PageMetaTitle component allows setting up (or changing) the app title to display with the current browser tab. | stable |
+| 58 | [Pages](./components/Pages.mdx) | The `Pages` component is used as a container for [`Page`](./Page.mdx) components within an [`App`](./App.mdx). | stable |
+| 59 | [PasswordInput](./components/PasswordInput.mdx) | The `Password` component is a specialized version of the `TextBox` component that allows users to input and edit passwords. | experimental |
+| 60 | [ProgressBar](./components/ProgressBar.mdx) | A `ProgressBar` component visually represents the progress of a task or process. | stable |
+| 61 | [Queue](./components/Queue.mdx) | The `Queue` component provides an API to enqueue elements and defines events to process queued elements in a FIFO order. | stable |
+| 62 | [RadioGroup](./components/RadioGroup.mdx) | The `RadioGroup` input component is a group of radio buttons ([`RadioGroupOption`](./RadioGroupOption.mdx) components) that allow users to select only one option from the group at a time. | stable |
+| 63 | [RealTimeAdapter](./components/RealTimeAdapter.mdx) | `RealTimeAdapter` is a non-visual component that listens to real-time events through long-polling. | experimental |
+| 64 | [Redirect](./components/Redirect.mdx) | `Redirect` is a component that immediately redirects the browser to the URL in its `to` property when it gets visible (its `when` property gets `true`). The redirection works only within the app. | stable |
+| 65 | [Select](./components/Select.mdx) | Provides a dropdown with a list of options to choose from. | stable |
+| 66 | [SpaceFiller](./components/SpaceFiller.mdx) | The `SpaceFiller` is a component that works well in layout containers to fill the remaining (unused) space. Its behavior depends on the layout container in which it is used. | stable |
+| 67 | [Spinner](./components/Spinner.mdx) | The `Spinner` component is an animated indicator that represents a particular action in progress without a deterministic progress value. | stable |
+| 68 | [Splitter](./components/Splitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
+| 69 | [Stack](./components/Stack.mdx) | `Stack` is a layout container displaying children in a horizontal or vertical stack. | stable |
+| 70 | [StickyBox](./components/StickyBox.mdx) | The `StickyBox` is a component that "sticks" or remains fixed at the top or bottom position on the screen as the user scrolls. | experimental |
+| 71 | [SubMenuItem](./components/SubMenuItem.mdx) | This component represents a nested menu item within another menu or menu item. | stable |
+| 72 | [Switch](./components/Switch.mdx) | The `Switch` component is a user interface element that allows users to toggle between two states: on and off. It consists of a small rectangular or circular button that can be moved left or right to change its state. | stable |
+| 73 | [TabItem](./components/TabItem.mdx) | `TabItem` is a non-visual component describing a tab. Tabs component may use nested TabItem instances from which the user can select. | stable |
+| 74 | [Table](./components/Table.mdx) | `Table` is a component that displays cells organized into rows and columns. The `Table` component is virtualized so it only renders visible cells. | stable |
+| 75 | [TableHeader](./components/TableHeader.mdx) | The `TableHeader` component can be used within a `Table` to define a particular table column's visual properties and data bindings. | experimental |
+| 76 | [TableOfContents](./components/TableOfContents.mdx) | The `TableOfContents` component collects headings and bookmarks within the current page and displays them in a tree representing their hierarchy. When you select an item in this tree, the component navigates the page to the selected position. | experimental |
+| 77 | [Tabs](./components/Tabs.mdx) | The `Tabs` component provides a tabbed layout where each tab has a clickable label and content. | experimental |
+| 78 | [Text](./components/Text.mdx) | The `Text` component displays textual information in a number of optional styles and variants. | stable |
+| 79 | [TextArea](./components/TextArea.mdx) | `TextArea` is a component that provides a multiline text input area. | experimental |
+| 80 | [TextBox](./components/TextBox.mdx) | The `TextBox` is an input component that allows users to input and edit textual data. | experimental |
+| 81 | [Theme](./components/Theme.mdx) | The `Theme` component provides a way to define a particular theming context for its nested components. The XMLUI framework uses `Theme` to define the default theming context for all of its child components. Theme variables and theme settings only work in this context. | stable |
+| 82 | [ThemeChangerButton](./components/ThemeChangerButton.mdx) | The `ThemeChangerButton` component is a component that allows the user to change the theme of the app. | experimental |
+| 83 | [ToneChangerButton](./components/ToneChangerButton.mdx) | The `ToneChangerButton` component is a component that allows the user to change the tone of the app. | experimental |
+| 84 | [Toolbar](./components/Toolbar.mdx) | This component is a container for a toolbar. | experimental |
+| 85 | [ToolbarButton](./components/ToolbarButton.mdx) | This component is a button that is used in a toolbar. | experimental |
+| 86 | [TrendLabel](./components/TrendLabel.mdx) | This component displays a trend label. | experimental |
+| 87 | [VSplitter](./components/VSplitter.mdx) | The `Splitter` component divides a container (such as a window, panel, pane, etc.) into two resizable sections. | stable |
+| 88 | [VStack](./components/VStack.mdx) | This component represents a stack rendering its contents vertically. | stable |

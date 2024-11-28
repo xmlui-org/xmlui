@@ -1,11 +1,19 @@
-import { CSSProperties, ReactNode, useLayoutEffect } from "react";
-import { forwardRef, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import {
+  forwardRef,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
   CellContext,
   Column,
   ColumnDef,
-  Header,
   HeaderContext,
   PaginationState,
   RowData,
@@ -32,10 +40,15 @@ import { ScrollContext } from "@components-core/ScrollContext";
 import { type OurColumnMetadata } from "../Column/TableContext";
 import { useEvent } from "@components-core/utils/misc";
 import { flushSync } from "react-dom";
-import { useIsomorphicLayoutEffect, useResizeObserver } from "@components-core/utils/hooks";
+import {
+  useIsomorphicLayoutEffect,
+  usePrevious,
+  useResizeObserver,
+} from "@components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { isThemeVarName } from "@components-core/theming/transformThemeVars";
+import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 // =====================================================================================================================
 // Helper types
@@ -90,14 +103,15 @@ type TableProps = {
   iconSortDesc?: string;
   iconNoSort?: string;
   sortingDidChange?: AsyncFunction;
+  onSelectionDidChange?: AsyncFunction;
   willSort?: AsyncFunction;
   style?: CSSProperties;
   uid?: string;
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
   hideHeader?: boolean;
-  singleSelectOnRowClick?: boolean;
   alwaysShowSelectionHeader?: boolean;
+  registerComponentApi: RegisterComponentApiFn;
 };
 
 function defaultIsRowDisabled(_: any) {
@@ -155,8 +169,9 @@ export const Table = forwardRef(
       noDataRenderer,
       autoFocus = false,
       hideHeader = false,
-      singleSelectOnRowClick = false,
       alwaysShowSelectionHeader = false,
+      registerComponentApi,
+      onSelectionDidChange,
       // cols
     }: TableProps,
     forwardedRef,
@@ -189,8 +204,21 @@ export const Table = forwardRef(
     const [visibleItems, setVisibleItems] = useState<any[]>(EMPTY_ARRAY);
 
     // --- Get the operations to manage selected rows in a table
-    const { toggleRow, checkAllRows, focusedIndex, onKeyDown, selectedRowIdMap, idKey } =
-      useRowSelection(visibleItems);
+    const {
+      toggleRow,
+      checkAllRows,
+      focusedIndex,
+      onKeyDown,
+      selectedRowIdMap,
+      idKey,
+      selectionApi,
+    } = useRowSelection({
+      items: safeData,
+      visibleItems,
+      rowsSelectable,
+      enableMultiRowSelection,
+      onSelectionDidChange,
+    });
 
     // --- Create data with order information whenever the items in the table change
     const dataWithOrder = useMemo(() => {
@@ -348,29 +376,49 @@ export const Table = forwardRef(
               value: row.getIsSelected(),
               indeterminate: row.getIsSomeSelected(),
               onDidChange: () => {
-                toggleRow(row.original, { metaKey: enableMultiRowSelection });
+                toggleRow(row.original, { metaKey: true });
               },
             }}
           />
         ),
       };
       return rowsSelectable ? [selectColumn, ...columnsWithCustomCell] : columnsWithCustomCell;
-    }, [rowsSelectable, columnsWithCustomCell, enableMultiRowSelection, checkAllRows, toggleRow]);
+    }, [
+      rowsSelectable,
+      columnsWithCustomCell,
+      enableMultiRowSelection,
+      alwaysShowSelectionHeader,
+      checkAllRows,
+      toggleRow,
+    ]);
 
     // --- Set up page information (using the first page size option)
-    const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>({
+    // const [pagination, setPagination] = useState<PaginationState>();
+    const [pagination, setPagination] = useState<PaginationState>({
+      pageSize: isPaginated ? pageSizes[0] : Number.MAX_VALUE,
       pageIndex: 0,
-      pageSize: pageSizes[0],
     });
 
-    // --- Update pagination info whenever the pae size or page index changes
-    const pagination = useMemo(
-      () => ({
-        pageIndex,
-        pageSize,
-      }),
-      [pageIndex, pageSize],
-    );
+    const prevIsPaginated = usePrevious(isPaginated);
+
+    useEffect(() => {
+      if (!prevIsPaginated && isPaginated) {
+        setPagination((prev) => {
+          return {
+            ...prev,
+            pageSize: pageSizes[0],
+          };
+        });
+      }
+      if (prevIsPaginated && !isPaginated) {
+        setPagination((prev) => {
+          return {
+            pageIndex: 0,
+            pageSize: Number.MAX_VALUE,
+          };
+        });
+      }
+    }, [isPaginated, pageSizes, prevIsPaginated]);
 
     const [columnSizing, setColumnSizing] = useState<Record<string, number>>({});
 
@@ -521,6 +569,10 @@ export const Table = forwardRef(
       });
     }, [recalculateStarSizes, safeColumns]);
 
+    useIsomorphicLayoutEffect(() => {
+      registerComponentApi(selectionApi);
+    }, [registerComponentApi, selectionApi]);
+
     return (
       <div
         className={classnames(styles.wrapper, { [styles.noScroll]: hasOutsideScroll })}
@@ -663,12 +715,7 @@ export const Table = forwardRef(
                       if (target.tagName.toLowerCase() === "input") {
                         return;
                       }
-                      toggleRow(row.original, {
-                        ...event,
-                        metaKey: enableMultiRowSelection,
-                        shiftKey: enableMultiRowSelection ? event.shiftKey : false,
-                        singleItem: singleSelectOnRowClick,
-                      });
+                      toggleRow(row.original, event);
                     }}
                   >
                     {row.getVisibleCells().map((cell, i) => {
@@ -705,7 +752,7 @@ export const Table = forwardRef(
           </table>
         )}
 
-        {isPaginated && hasData && rows.length > 0 && (
+        {isPaginated && hasData && rows.length > 0 && pagination && (
           // --- Render the pagination controls
           <div className={styles.pagination}>
             <div style={{ flex: 1 }}>
@@ -719,7 +766,7 @@ export const Table = forwardRef(
                 <span className={styles.paginationLabel}>Rows per page</span>
                 <select
                   className={styles.paginationSelect}
-                  value={pageSize}
+                  value={pagination.pageSize}
                   onChange={(e) => {
                     table.setPageSize(Number(e.target.value));
                   }}

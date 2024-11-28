@@ -107,6 +107,14 @@ export function dEnabled(): ComponentPropertyMetadata {
   };
 }
 
+export function dMulti(): ComponentPropertyMetadata {
+  return {
+    description: `This property allows the user to select multiple items.`,
+    valueType: "boolean",
+    defaultValue: false,
+  };
+}
+
 export function dValidationStatus(): ComponentPropertyMetadata {
   return {
     description: `This property allows you to set the validation status of the input component.`,

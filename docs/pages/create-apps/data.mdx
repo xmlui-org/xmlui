@@ -407,7 +407,7 @@ Pop out this example in the playground and check what happens when you change or
   `}
 />
 
-## Persisting Data
+## Persisting Data [#persisting-data]
 
 In contrast to fetching data, where the framework can be smart about when to initiate the data fetch operation, persisting data requires an explicit user (or system) trigger to invoke a related API endpoint.
 
@@ -899,17 +899,17 @@ As you expect, the list displays ships in descending order by the number of thei
 
 As the following sample demonstrates, a `List` can group its items according to a particular field. You can optionally define a section header and footer for the list.
 
-```ueml copy {10-12} /sectionBy="type"/
+```ueml copy {10-12} /groupBy="type"/
 <App>
   <List data="https://api.spacexdata.com/v4/ships"
-    sectionBy="type">
+    groupBy="type">
     <HStack padding="$padding-tight">
       <Text variant="strong" width="30%">{$item.name}</Text>
       <Text width="15%">Type: {$item.type}</Text>
       <Image when="{$item.image}" height="80px" width="110px" fit="cover" src="{$item.image}"/>
       <Text when="{!$item.image}" width="*">No image available</Text>
     </HStack>
-    <property name="sectionTemplate">
+    <property name="groupHeaderTemplate">
       <Card title="{$item.sectionKey}" />
     </property>
   </List>
@@ -921,14 +921,14 @@ As the following sample demonstrates, a `List` can group its items according to 
   app={`
     <App>
       <List data="https://api.spacexdata.com/v4/ships"
-        sectionBy="type">
+        groupBy="type">
         <HStack padding="$padding-tight">
           <Text variant="strong" width="30%">{$item.name}</Text>
           <Text width="15%">Type: {$item.type}</Text>
           <Image when="{$item.image}" height="80px" width="110px" fit="cover" src="{$item.image}"/>
           <Text when="{!$item.image}" width="*">No image available</Text>
         </HStack>
-        <property name="sectionTemplate">
+        <property name="groupHeaderTemplate">
           <Card title="{$item.sectionKey}" />
         </property>
       </List>

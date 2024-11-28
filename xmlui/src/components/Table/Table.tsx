@@ -10,6 +10,10 @@ import type { OurColumnMetadata } from "@components/Column/TableContext";
 import { TableContext } from "@components/Column/TableContext";
 import produce from "immer";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
+import {
+  SelectionStore, StandaloneSelectionStore,
+  useSelectionContext
+} from "@components/SelectionStore/SelectionStoreNative";
 
 const COMP = "Table";
 
@@ -72,14 +76,6 @@ export const TableMd = createMetadata({
         `This property only has an effect when the rowsSelectable property is set. Setting it ` +
         `to \`false\` limits selection to a single row.`,
     ),
-    singleSelectOnRowClick: d(
-      "This property influences how clicking on a row works. If this property is set to true, " +
-        "a click clears all other selected rows and toggles the selection of the clicked row. " +
-        "Otherwise, it keeps the selection state of other rows.",
-      null,
-      "boolean",
-      false,
-    ),
     alwaysShowSelectionHeader: d(
       "This property indicates when the row selection header is displayed. When the value is " +
         "`true,` the selection header is always visible. Otherwise, it is displayed only " +
@@ -100,6 +96,9 @@ export const TableMd = createMetadata({
         `column's name and the sort direction. When the method returns a literal \`false\` ` +
         `value (and not any other falsy one), the method indicates that the sorting should be aborted.`,
     ),
+    selectionDidChange: d(
+      ``
+    )
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -152,6 +151,7 @@ const TableWithColumns = ({
   lookupEventHandler,
   lookupSyncCallback,
   layoutCss,
+  registerComponentApi,
 }) => {
   const data = extractValue(node.props.items) || extractValue(node.props.data);
 
@@ -212,58 +212,70 @@ const TableWithColumns = ({
     [columnIds, columnsByIds],
   );
 
-  return (
+  const selectionContext = useSelectionContext();
+
+  let tableContent = (
     <>
-      {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
+      <>
+        {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
             This way the order of the columns is preserved.
         */}
-      <TableContext.Provider value={tableContextValue} key={tableKey}>
-        {renderChild(node.children)}
-      </TableContext.Provider>
-      <TableContext.Provider value={columnRefresherContextValue}>
-        {renderChild(node.children)}
-      </TableContext.Provider>
-      <Table
-        data={data}
-        columns={columns}
-        pageSizes={extractValue(node.props.pageSizes)}
-        rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
-        noDataRenderer={
-          node.props.noDataTemplate &&
-          (() => {
-            return renderChild(node.props.noDataTemplate);
-          })
-        }
-        loading={extractValue.asOptionalBoolean(node.props.loading)}
-        isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
-        headerHeight={extractValue.asSize(node.props.headerHeight)}
-        rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
-        sortBy={extractValue(node.props?.sortBy)}
-        sortingDirection={extractValue(node.props?.sortDirection)}
-        iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
-        iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
-        iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
-        sortingDidChange={lookupEventHandler("sortingDidChange")}
-        willSort={lookupEventHandler("willSort")}
-        style={layoutCss}
-        uid={node.uid}
-        autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
-        hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
-        enableMultiRowSelection={extractValue.asOptionalBoolean(node.props.enableMultiRowSelection)}
-        singleSelectOnRowClick={extractValue.asOptionalBoolean(node.props.singleSelectOnRowClick)}
-        alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
-          node.props.alwaysShowSelectionHeader,
-        )}
-      />
+        <TableContext.Provider value={tableContextValue} key={tableKey}>
+          {renderChild(node.children)}
+        </TableContext.Provider>
+        <TableContext.Provider value={columnRefresherContextValue}>
+          {renderChild(node.children)}
+        </TableContext.Provider>
+        <Table
+          data={data}
+          columns={columns}
+          pageSizes={extractValue(node.props.pageSizes)}
+          rowsSelectable={extractValue.asOptionalBoolean(node.props.rowsSelectable)}
+          registerComponentApi={registerComponentApi}
+          noDataRenderer={
+            node.props.noDataTemplate &&
+            (() => {
+              return renderChild(node.props.noDataTemplate);
+            })
+          }
+          loading={extractValue.asOptionalBoolean(node.props.loading)}
+          isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
+          headerHeight={extractValue.asSize(node.props.headerHeight)}
+          rowDisabledPredicate={lookupSyncCallback(node.props.rowDisabledPredicate)}
+          sortBy={extractValue(node.props?.sortBy)}
+          sortingDirection={extractValue(node.props?.sortDirection)}
+          iconSortAsc={extractValue.asOptionalString(node.props?.iconSortAsc)}
+          iconSortDesc={extractValue.asOptionalString(node.props?.iconSortDesc)}
+          iconNoSort={extractValue.asOptionalString(node.props?.iconNoSort)}
+          sortingDidChange={lookupEventHandler("sortingDidChange")}
+          onSelectionDidChange={lookupEventHandler("selectionDidChange")}
+          willSort={lookupEventHandler("willSort")}
+          style={layoutCss}
+          uid={node.uid}
+          autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
+          hideHeader={extractValue.asOptionalBoolean(node.props.hideHeader)}
+          enableMultiRowSelection={extractValue.asOptionalBoolean(
+            node.props.enableMultiRowSelection,
+          )}
+          alwaysShowSelectionHeader={extractValue.asOptionalBoolean(
+            node.props.alwaysShowSelectionHeader,
+          )}
+        />
+      </>
     </>
   );
+
+  if (selectionContext === null) {
+    return <StandaloneSelectionStore>{tableContent}</StandaloneSelectionStore>;
+  }
+  return tableContent;
 };
 
 export const tableComponentRenderer = createComponentRenderer(
   COMP,
   TableMd,
-  ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss }) => {
+  ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss, registerComponentApi }) => {
     return (
       <TableWithColumns
         node={node}
@@ -272,6 +284,7 @@ export const tableComponentRenderer = createComponentRenderer(
         lookupSyncCallback={lookupSyncCallback}
         layoutCss={layoutCss}
         renderChild={renderChild}
+        registerComponentApi={registerComponentApi}
       />
     );
   },

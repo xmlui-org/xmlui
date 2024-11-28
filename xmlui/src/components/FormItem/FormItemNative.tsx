@@ -17,8 +17,6 @@ import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { HelperText } from "@components/FormItem/HelperText";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useValidation, useValidationDisplay } from "./Validations";
-import { Combobox } from "@components/Combobox/ComboboxNative";
-import { MultiCombobox } from "@components/MultiCombobox/MultiComboboxNative";
 import {
   fieldChanged,
   fieldFocused,
@@ -27,7 +25,6 @@ import {
 } from "@components/Form/formActions";
 import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
-import { MultiSelect } from "@components/MultiSelect/MultiSelectNative";
 import type { LabelPosition } from "./ItemWithLabel";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
@@ -139,36 +136,6 @@ export const FormItem = memo(function FormItem({
 
   let formControl = null;
   switch (type) {
-    case "combobox": {
-      formControl = (
-        <Combobox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-          registerComponentApi={registerComponentApi}
-        >
-          {children}
-        </Combobox>
-      );
-      break;
-    }
-    case "multiCombobox": {
-      formControl = (
-        <MultiCombobox
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </MultiCombobox>
-      );
-      break;
-    }
     case "select": {
       formControl = (
         <Select
@@ -181,21 +148,6 @@ export const FormItem = memo(function FormItem({
         >
           {children}
         </Select>
-      );
-      break;
-    }
-    case "multiSelect": {
-      formControl = (
-        <MultiSelect
-          {...rest}
-          value={value}
-          updateState={onStateChange}
-          registerComponentApi={registerComponentApi}
-          enabled={isEnabled}
-          validationStatus={validationStatus}
-        >
-          {children}
-        </MultiSelect>
       );
       break;
     }

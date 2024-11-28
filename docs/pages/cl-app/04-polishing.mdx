@@ -50,8 +50,8 @@ Now, instead of "undefined", labels display "loading...":
 ## Displaying List Sections
 
 The `List` component supports the grouping of list items according to a specified attribute.
-It has a `sectionBy` property that enables this grouping.
-The `List` identifies each unique value of the attribute given to `sectionBy` and groups the items accordingly.
+It has a `groupBy` property that enables this grouping.
+The `List` identifies each unique value of the attribute given to `groupBy` and groups the items accordingly.
 
 In the previous section, you created a `getSections` function within `Main.xmlui.xs`. Let's use the same function in the `Contact.xmlui.xs` code-behind file.
 
@@ -82,9 +82,13 @@ To display the section information, add the `section` property to the `List` and
 
 ```ueml copy {2, 4-10} filename="Contacts.xmlui" /sectionBy="section"/
 <Component name="Contacts">
-  <List items="{$props.data.map(extendWithSection)}" sectionBy="section">
-    <ContactRow item="{$item}" />
-    <property name="sectionTemplate">
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
+  <List 
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+    groupBy="section">
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="groupHeaderTemplate">
       <HStack horizontalPadding="$space-normal" verticalPadding="$space-tight">
         <Text 
           variant="subtitle"
@@ -118,9 +122,13 @@ Update the `List` definition in `Contacts`:
 
 ```ueml copy {4-18} filename="Contacts.xmlui" /$space-normal/ /$space-tight/
 <Component name="Contacts">
-  <List items="{$props.data.map(extendWithSection)}" sectionBy="section">
-    <ContactRow item="{$item}" />
-    <property name="sectionTemplate">
+  <DataSource id="categories" url="/api/categories" />
+  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
+  <List 
+    items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+    groupBy="section">
+    <ContactRow item="{$item}" categories="{categories.value}" />
+    <property name="groupHeaderTemplate">
       <HStack 
         horizontalPadding="$space-normal" 
         verticalPadding="$space-tight"
@@ -149,16 +157,16 @@ Now, you can expand or collapse sections by clicking them. The following figure 
 ## Section Ordering
 
 The order of sections displayed above could be more helpful using a different ordering.
-With the help of the `defaultSections` property of the `List`, you can define the ordering.
+With the help of the `defaultGroups` property of the `List`, you can define the ordering.
 
 Modify the `List` accordingly:
 
 ```ueml copy {4} filename="Contacts.xmlui"
 <!-- Omitted -->
 <List 
-  items="{$props.data.map(extendWithSection)}" 
-  defaultSections="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
-  sectionBy="section">
+  items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+  defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+  groupBy="section">
   <!-- Omitted -->
 </List>
 <!-- Omitted -->
@@ -184,11 +192,10 @@ Use a new property in `Contacts` (name it `showAllSections`) to check if the com
 ```ueml copy {4-6} filename="Tasks.xmlui" /$props.showAllSections/
 <!-- Omitted -->
 <List 
-  items="{$props.data.map(extendWithSection)}" 
-  defaultSections="{$props.showAllSections
-    ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']
-    : undefined }"
-  sectionBy="section">
+  items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
+  defaultGroups="{!$props.filter
+    ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
+  groupBy="section">
   <!-- Omitted -->
 </List>  
 <!-- Omitted -->

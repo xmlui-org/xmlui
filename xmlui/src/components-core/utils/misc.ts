@@ -85,9 +85,16 @@ interface useEventOverload {
   <TF extends callbackType>(callback: TF): any;
 }
 
-//changed to useInsertionEffect, (from useLayoutEffect): https://stackoverflow.com/a/76514983
-// as for now, it's going to be called 'useEffectEvent'
-// more here: https://react.dev/reference/react/experimental_useEffectEvent
+
+// from here: https://github.com/bluesky-social/social-app/blob/587c0c625752964d8ce64faf1d329dce3c834a5c/src/lib/hooks/useNonReactiveCallback.ts
+// This should be used sparingly. It erases reactivity, i.e. when the inputs
+// change, the function itself will remain the same. This means that if you
+// use this at a higher level of your tree, and then some state you read in it
+// changes, there is no mechanism for anything below in the tree to "react"
+// to this change (e.g. by knowing to call your function again).
+//
+// Also, you should avoid calling the returned function during rendering
+// since the values captured by it are going to lag behind.
 export const useEvent: useEventOverload = (callback) => {
   const callbackRef = useRef(callback);
 
@@ -96,8 +103,9 @@ export const useEvent: useEventOverload = (callback) => {
   }, [callback]);
 
   return useCallback((...args: any) => {
-    return callbackRef.current(...args);
-  }, []);
+    const latestFn = callbackRef.current
+    return latestFn(...args);
+  }, [callbackRef]);
 };
 
 /**
