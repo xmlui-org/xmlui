@@ -34,6 +34,7 @@ const defaultOptionRenderer = {
 
 export const AutoCompleteMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
+  status: "experimental",
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
