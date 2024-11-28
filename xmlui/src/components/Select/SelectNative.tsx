@@ -412,7 +412,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
   );
 }
 
-function HiddenOption(option: Option) {
+export function HiddenOption(option: Option) {
   const { onOptionRemove, onOptionAdd } = useOption();
 
   useLayoutEffect(() => {

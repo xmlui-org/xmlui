@@ -143,6 +143,7 @@ import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/Ton
 import { apiCallRenderer } from "@components/APICall/APICall";
 import { selectOptionComponentRenderer } from "@components/Select/SelectOption";
 import { optionComponentRenderer } from "@components/Option/Option";
+import {autoCompleteComponentRenderer} from "@components/AutoComplete/AutoComplete";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -344,6 +345,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(datePickerComponentRenderer);
       this.registerComponentRenderer(spinnerComponentRenderer);
       this.registerComponentRenderer(selectComponentRenderer);
+      this.registerComponentRenderer(autoCompleteComponentRenderer);
       this.registerComponentRenderer(dropdownMenuComponentRenderer);
       this.registerComponentRenderer(themeChangerButtonComponentRenderer);
       this.registerComponentRenderer(toneChangerButtonComponentRenderer);
