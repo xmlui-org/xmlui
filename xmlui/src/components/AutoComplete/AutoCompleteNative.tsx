@@ -14,7 +14,7 @@ import {
 } from "cmdk";
 import styles from "@components/AutoComplete/AutoComplete.module.scss";
 import Icon from "@components/Icon/IconNative";
-import { CommandItem, HiddenOption } from "@components/Select/SelectNative";
+import { HiddenOption } from "@components/Select/SelectNative";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
 import { AutoCompleteContext, useAutoComplete } from "@components/AutoComplete/AutoCompleteContext";
 import { OptionContext, useOption } from "@components/Select/OptionContext";
@@ -153,6 +153,18 @@ export function AutoComplete({
     };
   }, [open]);
 
+  // Render the "empty list" message
+  const emptyListNode = useMemo(
+    () =>
+      emptyListTemplate ?? (
+        <div className={styles.autoCompleteEmpty}>
+          <Icon name="noresult" />
+          <span>List is empty</span>
+        </div>
+      ),
+    [emptyListTemplate],
+  );
+
   const optionContextValue = useMemo(
     () => ({
       onOptionAdd,
@@ -245,6 +257,7 @@ export function AutoComplete({
                     inputRef?.current?.focus();
                   }}
                 >
+                  <CmdEmpty>{emptyListNode}</CmdEmpty>
                   <CreatableItem />
                   <CmdGroup>
                     {Array.from(options).map(({ value, label, enabled }) => (
@@ -277,7 +290,7 @@ function CreatableItem() {
   }
 
   const Item = (
-    <CommandItem
+    <CmdItem
       value={inputValue}
       className={styles.autoCompleteOption}
       onMouseDown={(e) => {
@@ -291,7 +304,7 @@ function CreatableItem() {
       }}
     >
       {`Create "${inputValue}"`}
-    </CommandItem>
+    </CmdItem>
   );
 
   // For normal creatable
@@ -308,7 +321,7 @@ function AutoCompleteOption({ value, label, enabled = true }: Option) {
   const selected = selectedValue?.includes(value);
 
   return (
-    <CommandItem
+    <CmdItem
       id={id}
       key={id}
       disabled={!enabled}
@@ -326,6 +339,6 @@ function AutoCompleteOption({ value, label, enabled = true }: Option) {
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
-    </CommandItem>
+    </CmdItem>
   );
 }

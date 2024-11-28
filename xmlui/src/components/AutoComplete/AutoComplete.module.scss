@@ -138,6 +138,16 @@ $componentName: "AutoComplete";
   justify-content: space-between;
 }
 
+.autoCompleteEmpty {
+  display: flex;
+  gap: .2rem;
+  padding: 10px 0;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  width: 100%;
+}
+
 .commandList {
   position: absolute;
   overflow: hidden;

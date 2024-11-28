@@ -1,5 +1,4 @@
 import type { CSSProperties, ReactNode } from "react";
-import { forwardRef } from "react";
 import { useEffect } from "react";
 import { useLayoutEffect } from "react";
 import { useId, useRef } from "react";
@@ -11,15 +10,14 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/Render
 import type { ValidationStatus } from "@components/abstractions";
 import {
   Portal as SelectPortal,
-  Content,
-  Root,
+  Content as SelectContent,
+  Root as SelectRoot,
   ScrollDownButton,
   ScrollUpButton,
   Value as SelectValue,
   Icon as SelectIcon,
-  Trigger,
-  Viewport,
-  Label,
+  Trigger as SelectTrigger,
+  Viewport as SelectViewport,
 } from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import { SelectContext, useSelect } from "@components/Select/SelectContext";
@@ -31,7 +29,6 @@ import { SelectOption } from "@components/Select/SelectOptionNative";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
-  CommandGroup as CmdGroup,
   CommandInput as CmdInput,
   CommandItem as CmdItem,
   CommandList as CmdList,
@@ -261,131 +258,73 @@ export function Select({
               </PopoverTrigger>
               <Portal container={root}>
                 <PopoverContent style={{ width }} className={styles.selectContent}>
-                  <Command>
+                  <Cmd className={styles.command}>
                     {searchable ? (
-                      <CommandInput placeholder="Search..." />
+                      <div className={styles.commandInputContainer}>
+                        <Icon name="search" />
+                        <CmdInput
+                          className={classnames(styles.commandInput)}
+                          placeholder="Search..."
+                        />
+                      </div>
                     ) : (
                       // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
                       <button autoFocus aria-hidden="true" className={styles.srOnly} />
                     )}
-                    <CommandList>
-                      <CommandGroup>
-                        {Array.from(options).map(({ value, label, enabled }) => (
-                          <ComboboxOption
-                            key={value}
-                            value={value}
-                            label={label}
-                            enabled={enabled}
-                          />
-                        ))}
-                      </CommandGroup>
-                      <CommandEmpty>{emptyListNode}</CommandEmpty>
-                    </CommandList>
-                  </Command>
+                    <CmdList className={styles.commandList}>
+                      {Array.from(options).map(({ value, label, enabled }) => (
+                        <ComboboxOption key={value} value={value} label={label} enabled={enabled} />
+                      ))}
+                      <CmdEmpty>{emptyListNode}</CmdEmpty>
+                    </CmdList>
+                  </Cmd>
                 </PopoverContent>
               </Portal>
             </Popover>
           </OptionContext.Provider>
         ) : (
-          <Root value={!Array.isArray(value) && value ? value : ""} onValueChange={toggleOption}>
+          <SelectRoot
+            value={!Array.isArray(value) && value ? value : ""}
+            onValueChange={toggleOption}
+          >
             <SelectTrigger
               id={id}
               style={layout}
               onFocus={onFocus}
               onBlur={onBlur}
-              enabled={enabled}
-              validationStatus={validationStatus}
+              disabled={!enabled}
+              className={classnames(styles.selectTrigger, styles[validationStatus])}
               ref={setReferenceElement}
               autoFocus={autoFocus}
             >
               <div className={styles.selectValue}>
                 <SelectValue placeholder={placeholder} />
               </div>
+              <SelectIcon asChild>
+                <Icon name="chevrondown" />
+              </SelectIcon>
             </SelectTrigger>
-            <SelectContent>{children || emptyListNode}</SelectContent>
-          </Root>
+            <SelectPortal container={root}>
+              <SelectContent className={styles.selectContent} position="popper">
+                <ScrollUpButton className={styles.selectScrollUpButton}>
+                  <Icon name="chevronup" />
+                </ScrollUpButton>
+                <SelectViewport className={classnames(styles.selectViewport)}>
+                  {children || emptyListNode}
+                </SelectViewport>
+                <ScrollDownButton className={styles.selectScrollDownButton}>
+                  <Icon name="chevrondown" />
+                </ScrollDownButton>
+              </SelectContent>
+            </SelectPortal>
+          </SelectRoot>
         )}
       </OptionTypeProvider>
     </SelectContext.Provider>
   );
 }
 
-const SelectTrigger = forwardRef<
-  React.ElementRef<typeof Trigger>,
-  React.ComponentPropsWithoutRef<typeof Trigger> & {
-    enabled?: boolean;
-    validationStatus?: ValidationStatus;
-  }
->(({ className, children, enabled, validationStatus, ...props }, ref) => (
-  <Trigger
-    ref={ref}
-    className={classnames(styles.selectTrigger, styles[validationStatus])}
-    {...props}
-    disabled={!enabled}
-  >
-    {children}
-    <SelectIcon asChild>
-      <Icon name="chevrondown" />
-    </SelectIcon>
-  </Trigger>
-));
-
-SelectTrigger.displayName = Trigger.displayName;
-
-const SelectScrollUpButton = forwardRef<
-  React.ElementRef<typeof ScrollUpButton>,
-  React.ComponentPropsWithoutRef<typeof ScrollUpButton>
->(({ className, ...props }, ref) => (
-  <ScrollUpButton ref={ref} className={styles.selectScrollUpButton} {...props}>
-    <Icon name="chevronup" />
-  </ScrollUpButton>
-));
-
-SelectScrollUpButton.displayName = ScrollUpButton.displayName;
-
-const SelectScrollDownButton = forwardRef<
-  React.ElementRef<typeof ScrollDownButton>,
-  React.ComponentPropsWithoutRef<typeof ScrollDownButton>
->(({ className, ...props }, ref) => (
-  <ScrollDownButton ref={ref} className={styles.selectScrollDownButton} {...props}>
-    <Icon name="chevrondown" />
-  </ScrollDownButton>
-));
-
-SelectScrollDownButton.displayName = ScrollDownButton.displayName;
-
-const SelectContent = forwardRef<
-  React.ElementRef<typeof Content>,
-  React.ComponentPropsWithoutRef<typeof Content>
->(({ className, children, ...props }, ref) => {
-  const { root } = useTheme();
-  return (
-    <SelectPortal container={root}>
-      <Content ref={ref} className={styles.selectContent} position="popper" {...props}>
-        <SelectScrollUpButton />
-        <Viewport className={classnames(styles.selectViewport, className)}>{children}</Viewport>
-        <SelectScrollDownButton />
-      </Content>
-    </SelectPortal>
-  );
-});
-
-SelectContent.displayName = Content.displayName;
-
-const SelectLabel = forwardRef<
-  React.ElementRef<typeof Label>,
-  React.ComponentPropsWithoutRef<typeof Label>
->(({ className, ...props }, ref) => <Label ref={ref} className={styles.selectLabel} {...props} />);
-
-SelectLabel.displayName = Label.displayName;
-
-type OptionComponentProps = {
-  value: string;
-  label: string;
-  enabled?: boolean;
-};
-
-export function ComboboxOption({ value, label, enabled = true }: OptionComponentProps) {
+export function ComboboxOption({ value, label, enabled = true }: Option) {
   const id = useId();
   const { value: selectedValue, onChange, optionRenderer, multi } = useSelect();
   const selected =
@@ -394,7 +333,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
       : selectedValue === value;
 
   return (
-    <CommandItem
+    <CmdItem
       id={id}
       key={id}
       disabled={!enabled}
@@ -408,7 +347,7 @@ export function ComboboxOption({ value, label, enabled = true }: OptionComponent
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
-    </CommandItem>
+    </CmdItem>
   );
 }
 
@@ -422,57 +361,3 @@ export function HiddenOption(option: Option) {
 
   return <span style={{ display: "none" }} />;
 }
-
-export const Command = forwardRef<
-  React.ElementRef<typeof Cmd>,
-  React.ComponentPropsWithoutRef<typeof Cmd>
->(({ className, ...props }, ref) => (
-  <Cmd ref={ref} className={classnames(styles.command, className)} {...props} />
-));
-Command.displayName = Cmd.displayName;
-
-export const CommandInput = forwardRef<
-  React.ElementRef<typeof CmdInput>,
-  React.ComponentPropsWithoutRef<typeof CmdInput>
->(({ className, ...props }, ref) => (
-  <div className={styles.commandInputContainer}>
-    <Icon name="search" />
-    <CmdInput ref={ref} className={classnames(styles.commandInput, className)} {...props} />
-  </div>
-));
-
-CommandInput.displayName = CmdInput.displayName;
-
-export const CommandList = forwardRef<
-  React.ElementRef<typeof CmdList>,
-  React.ComponentPropsWithoutRef<typeof CmdList>
->(({ className, ...props }, ref) => (
-  <CmdList ref={ref} className={classnames(styles.commandList, className)} {...props} />
-));
-
-CommandList.displayName = CmdList.displayName;
-
-export const CommandEmpty = forwardRef<
-  React.ElementRef<typeof CmdEmpty>,
-  React.ComponentPropsWithoutRef<typeof CmdEmpty>
->((props, ref) => <CmdEmpty ref={ref} className={classnames(styles.commandEmpty)} {...props} />);
-
-CommandEmpty.displayName = CmdEmpty.displayName;
-
-export const CommandGroup = forwardRef<
-  React.ElementRef<typeof CmdGroup>,
-  React.ComponentPropsWithoutRef<typeof CmdGroup>
->(({ className, ...props }, ref) => (
-  <CmdGroup ref={ref} className={classnames(styles.commandGroup, className)} {...props} />
-));
-
-CommandGroup.displayName = CmdGroup.displayName;
-
-export const CommandItem = forwardRef<
-  React.ElementRef<typeof CmdItem>,
-  React.ComponentPropsWithoutRef<typeof CmdItem>
->(({ className, ...props }, ref) => (
-  <CmdItem ref={ref} className={classnames(className)} {...props} />
-));
-
-CommandItem.displayName = CmdItem.displayName;
