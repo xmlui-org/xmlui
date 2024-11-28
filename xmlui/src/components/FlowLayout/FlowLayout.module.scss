@@ -13,10 +13,8 @@ $themeVars: ();
 
   &.horizontal {
     flex-direction: row;
-    height: 100%;
 
     .flowItem {
-      height: 100%;
       flex-shrink: 0;
 
       & > * {

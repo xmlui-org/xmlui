@@ -92,10 +92,8 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, .
   }
   return (
     <>
-      <div style={outerWrapperStyle} ref={ref}>
-        <div style={{ paddingRight: _columnGap }} className={styles.flowItem}>
-          {children}
-        </div>
+      <div style={{ ...outerWrapperStyle, paddingRight: _columnGap }} className={styles.flowItem} ref={ref}>
+        {children}
       </div>
       {isStarSizing && <div className={styles.break} />}
     </>
@@ -118,10 +116,6 @@ export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowL
   const _rowGap = getSizeString(rowGap);
   const _columnGap = getSizeString(safeColumnGap);
 
-  const outerStyle: CSSProperties = {
-    overflow: "auto",
-    ...style,
-  };
   const innerStyle = {
     // We put a negative margin on the container to fill the space for the row's last columnGap
     marginRight: `calc(-1 * ${_columnGap})`,
@@ -136,11 +130,9 @@ export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowL
   }, [_columnGap, _rowGap]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
-      <div style={outerStyle}>
-        <div style={{ overflow: "hidden" }}>
-          <div className={classnames(styles.flowContainer, styles.horizontal)} style={innerStyle}>
-            {children}
-          </div>
+      <div style={{ ...style, display: "flex", flexDirection: "column", flexShrink: 0 }}>
+        <div className={classnames(styles.flowContainer, styles.horizontal)} style={innerStyle}>
+          {children}
         </div>
       </div>
     </FlowLayoutContext.Provider>
