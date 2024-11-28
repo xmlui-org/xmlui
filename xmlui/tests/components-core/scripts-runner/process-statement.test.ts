@@ -2000,6 +2000,27 @@ describe("Process statements", () => {
     }
     assert.fail("Exception expected");
   });
+
+  it("template literal regression", async () => {
+    // --- Arrange
+
+    const source = `
+    return \`f\${ obj.map(item => item) }\`;
+    `;
+    
+    const evalContext = createEvalContext({
+      localContext: {
+        obj: [1, 2, 3]
+      }
+    });
+    const statements = parseStatements(source);
+
+    // --- Act/Assert
+    await processStatementQueueAsync(statements, evalContext);
+    const thread = evalContext.mainThread!;
+    //expect(thread.blocks!.length).equal(1);
+    expect(thread.returnValue).equal("f1,2,3");
+  });
 });
 
 function getComponentStateClone(orig: any): any {

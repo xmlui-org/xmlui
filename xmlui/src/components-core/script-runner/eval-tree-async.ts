@@ -960,11 +960,11 @@ async function evalTemplateLiteralAsync(
   thread: LogicalThread,
   onStatementCompleted: OnStatementCompletedCallback,
 ): Promise<any> {
-  const segmentValuePromises = expr.segments.map(async (s) => {
-    const evaledValue = await evaluator(thisStack, s, evalContext, thread, onStatementCompleted);
+  const segmentValues = new Array(expr.segments.length);
+  for (let i = 0; i <  expr.segments.length; ++i){
+    const evaledValue = await evaluator(thisStack, expr.segments[i], evalContext, thread, onStatementCompleted);
     thisStack.pop();
-    return evaledValue;
-  });
-  const segmentValues = await Promise.all(segmentValuePromises);
+    segmentValues[i] = (evaledValue);
+  }
   return evalTemplateLiteralCore(segmentValues);
 }
