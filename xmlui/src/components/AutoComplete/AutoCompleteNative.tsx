@@ -84,7 +84,6 @@ export function AutoComplete({
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Added this
   const [options, setOptions] = useState(new Set<Option>());
-  const [onScrollbar, setOnScrollbar] = useState(false);
   const [inputValue, setInputValue] = useState("");
 
   // Set initial state based on the initialValue prop
@@ -212,6 +211,7 @@ export function AutoComplete({
                 if (!enabled) return;
                 inputRef?.current?.focus();
               }}
+              style={layout}
               className={classnames(styles.badgeListWrapper, styles[validationStatus], {
                 [styles.disabled]: !enabled,
                 [styles.focused]: document.activeElement === inputRef.current,
@@ -233,6 +233,8 @@ export function AutoComplete({
                     </span>
                   ))}
                 <CmdInput
+                  id={id}
+                  autoFocus={autoFocus}
                   ref={inputRef}
                   value={inputValue}
                   disabled={!enabled}
@@ -260,7 +262,7 @@ export function AutoComplete({
                       clearValue();
                     }}
                   >
-                    <Icon name="close" size="sm" />
+                    <Icon name="close"/>
                   </button>
                 )}
                 <button onClick={() => setOpen(true)}>

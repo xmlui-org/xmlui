@@ -245,7 +245,6 @@ export function Select({
                     {multi && Array.isArray(value) && value.length > 0 && (
                       <Icon
                         name="close"
-                        size="sm"
                         onClick={(event) => {
                           event.stopPropagation();
                           clearValue();
