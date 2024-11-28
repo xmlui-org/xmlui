@@ -34,7 +34,6 @@ export class ComponentDriver {
  
   // Not working yet
   async getSize() {
-    console.log()
     return { width: 0, height: 0 };
   }
 
@@ -42,6 +41,7 @@ export class ComponentDriver {
     await this.expectTestStateToEq({}, options)
   }
 
+  // Too obscure
   async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
     await expect.poll(this.getTestState(), options).toEqual(expected);
   }

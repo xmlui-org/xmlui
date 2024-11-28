@@ -2,11 +2,7 @@ import { expect, ComponentDriver, createTestWithDriver } from "./fixtures";
 
 // --- Setup
 
-class ButtonDriver extends ComponentDriver {
-  get button() {
-    return this.locator;
-  }
-}
+class ButtonDriver extends ComponentDriver {}
 
 const test = createTestWithDriver(ButtonDriver);
 
@@ -15,23 +11,23 @@ const test = createTestWithDriver(ButtonDriver);
 // --- --- label
 
 test("renders ASCII text in label", async ({ createDriver }) => {
-  const { button } = await createDriver(`<Button label="hello" />`);
-  await expect(button).toBeVisible();
-  await expect(button).toHaveText("hello");
+  const { locator } = await createDriver(`<Button label="hello" />`);
+  await expect(locator).toBeVisible();
+  await expect(locator).toHaveText("hello");
 });
 
 test("renders Unicode text in label", async ({ createDriver }) => {
-  const { button } = await createDriver(`<Button label="😀" />`);
-  await expect(button).toBeVisible();
-  await expect(button).toHaveText("😀");
+  const { locator } = await createDriver(`<Button label="😀" />`);
+  await expect(locator).toBeVisible();
+  await expect(locator).toHaveText("😀");
 });
 
 test.skip("renders without label, icon or children", async ({ createDriver }) => {
-  const { button, getSize } = await createDriver(`<Button />`);
+  const { locator, getSize } = await createDriver(`<Button />`);
   const { width, height } = await getSize();
-  console.log(button, { width, height });
+  console.log(locator, { width, height });
 
-  await expect(button).toBeVisible();
+  await expect(locator).toBeVisible();
   expect(height).not.toBeFalsy();
   expect(height).toBeGreaterThan(0);
   expect(width).not.toBeFalsy();
@@ -50,8 +46,8 @@ test.skip("renders without label, icon or children", async ({ createDriver }) =>
 });
 
 test("ignores label if children present", async ({ createDriver }) => {
-  const { button } = await createDriver(`<Button label="hello">world</Button>`);
-  await expect(button).toHaveText("world");
+  const { locator } = await createDriver(`<Button label="hello">world</Button>`);
+  await expect(locator).toHaveText("world");
 });
 
 test.skip("renders XMLUI component in children", async ({ createDriver }) => {});
