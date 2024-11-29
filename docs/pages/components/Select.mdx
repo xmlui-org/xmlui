@@ -2,6 +2,8 @@ import { Callout } from "nextra/components";
 
 # Select [#component-select]
 
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
 Provides a dropdown with a list of options to choose from.
 
 The component provides context values with which you can access some internal properties:
@@ -537,6 +539,12 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-menu-Select | $color-bg-primary | $color-bg-primary |
 | [color-bg](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--active | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
+| [color-bg](../styles-and-themes/common-units/#color)-Select-badge--hover | $color-primary-400 | $color-primary-600 |
 | [color-bg](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-bg](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -558,12 +566,17 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-outline](../styles-and-themes/common-units/#color)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-outline](../styles-and-themes/common-units/#color)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-outline](../styles-and-themes/common-units/#color)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-Select | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color](../styles-and-themes/common-units/#color)-placeholder-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-item-Select--disabled | $color-surface-200 | $color-surface-800 |
 | [color-text](../styles-and-themes/common-units/#color)-Select--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [color-text](../styles-and-themes/common-units/#color)-Select-badge | $color-surface-50 | $color-surface-50 |
+| [color-text](../styles-and-themes/common-units/#color)-Select-badge--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-Select-badge--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -572,6 +585,8 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [color-text](../styles-and-themes/common-units/#color)-Select-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [color-text](../styles-and-themes/common-units/#color)-Select-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-Select-badge | $font-size-small | $font-size-small |
+| [font-size](../styles-and-themes/common-units/#size)-Select-badge | $font-size-small | $font-size-small |
 | [font-size](../styles-and-themes/common-units/#size)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [font-size](../styles-and-themes/common-units/#size)-Select-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
@@ -580,6 +595,8 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-horizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
+| [padding-vertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $radius | $radius |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $radius | $radius |
 | [radius](../styles-and-themes/common-units/#border-rounding)-Select-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |

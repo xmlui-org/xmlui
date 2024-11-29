@@ -40,7 +40,7 @@ export const optionComponentRenderer = createComponentRenderer(
     ({ node, extractValue, layoutCss }) => {
         return (
             <OptionNative
-                value={extractValue.asString(node.props.value)}
+                value={extractValue(node.props.value)}
                 label={extractValue.asOptionalString(node.props.label)}
                 enabled={extractValue.asOptionalBoolean(node.props.enabled)}
                 style={layoutCss}

@@ -1,4 +1,4 @@
-import type { Locator, Page, PlaywrightTestArgs, PlaywrightTestOptions, PlaywrightWorkerArgs, PlaywrightWorkerOptions, TestType } from "@playwright/test";
+import type { Locator } from "@playwright/test";
 import type { ComponentDef } from "../../xmlui/src/abstractions/ComponentDefs";
 import { expect as baseExpect, mergeExpects, test as baseTest } from "@playwright/test";
 import { initApp } from "./component-test-helpers";
@@ -6,29 +6,48 @@ import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-pa
 
 export { test } from "@playwright/test";
 
-export class ComponentDriver {
-  protected readonly componentLocator: Locator
-  protected readonly testStateLocator: Locator
+async function getElementSize(locator: Locator) {
+  const [width, height] = await locator.evaluate((element) => [
+    element.clientWidth,
+    element.clientHeight,
+  ]);
+  return {width, height} as const;
+}
 
-  constructor({ componentLocator, testStateViewLocator }) {
-    this.componentLocator = componentLocator;
-    this.testStateLocator = testStateViewLocator;
+export type ComponentDriverParams = {
+  locator: Locator;
+  testStateLocator: Locator;
+}
+
+export class ComponentDriver {
+  public readonly locator: Locator;
+  protected readonly testStateLocator: Locator;
+
+  constructor({ locator, testStateLocator }: ComponentDriverParams) {
+    this.locator = locator;
+    this.testStateLocator = testStateLocator;
   }
 
   async click() {
-    await this.componentLocator.click()
+    await this.locator.click();
+  }
+ 
+  // Not working yet
+  async getSize() {
+    return { width: 0, height: 0 };
   }
 
   async expectDefaultTestState(options?: {timeout?: number, intervals?: number[]}) {
     await this.expectTestStateToEq({}, options)
   }
 
+  // Too obscure
   async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
     await expect.poll(this.getTestState(), options).toEqual(expected);
   }
 
   /** returns an async function that can query the test state */
-  private getTestState(){
+  private getTestState() {
     return async () =>{
       const text = await this.testStateLocator.textContent();
       const testState = JSON.parse(text!);
@@ -38,7 +57,7 @@ export class ComponentDriver {
 }
 
 
-export function createTestWithComponentDriverFixture<T extends new (...args: any[]) => any>(
+export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
   DriverClass: T
 ) {
   return baseTest.extend<{
@@ -61,17 +80,19 @@ export function createTestWithComponentDriverFixture<T extends new (...args: any
           throw { errors: errors };
         }
         const componentTestId = "test-id-component";
-        (component as ComponentDef).children![0].testId = componentTestId
+        (component as ComponentDef).children![0].testId ??= componentTestId;
 
         await initApp(page, { entryPoint: component });
         return new DriverClass({
-          componentLocator: page.getByTestId(componentTestId),
-          testStateViewLocator: page.getByTestId(testStateViewTestId)
+          locator: page.getByTestId((component as ComponentDef).children![0].testId!),
+          testStateLocator: page.getByTestId(testStateViewTestId)
         });
       });
     }
   });
 }
+
+// -----------------------------------------------------------------
 
 const expectWithToEqualWithTolerance = baseExpect.extend({
   /**

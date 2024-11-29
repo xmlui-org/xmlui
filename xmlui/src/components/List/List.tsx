@@ -21,9 +21,9 @@ export const ListMd = createMetadata({
     ),
     items: d(
       `You can use \`items\` as an alias for the \`data\` property. ` +
-      `When you bind the list to a data source (e.g. an API endpoint), ` +
-      `the \`data\` acts as the property that accepts a URL to fetch information from an API.` +
-      `When both \`items\` and \`data\` are used, \`items\` has priority.`,
+        `When you bind the list to a data source (e.g. an API endpoint), ` +
+        `the \`data\` acts as the property that accepts a URL to fetch information from an API.` +
+        `When both \`items\` and \`data\` are used, \`items\` has priority.`,
     ),
     loading: d(
       `This property delays the rendering of children until it is set to \`false\`, or the ` +
@@ -72,9 +72,16 @@ export const ListMd = createMetadata({
       `This Boolean property defines whether the list groups are initially expanded.`,
     ),
     defaultGroups: d(
-      `This property adds default groups for the \`${COMP}\` and displays the group headers ` + 
-      `in the specified order. If a group header is declared here, that is displayed even if ` + 
-      `no items fall into a particular section.`,
+      `This property adds a list of default groups for the \`${COMP}\` and displays the group ` +
+        `headers in the specified order. If the data contains group headers not in this list, ` +
+        `those headers are also displayed (after the ones in this list); however, their order ` +
+        `is indeterministic.`,
+    ),
+    hideEmptyGroups: d(
+      "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
+      null,
+      "boolean",
+      true,
     ),
   },
   contextVars: {
@@ -94,10 +101,11 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     layoutCss,
     layoutContext,
     lookupEventHandler,
-    registerComponentApi
+    registerComponentApi,
   }) => {
-      const itemTemplate = node.props.itemTemplate || node.children;
-      return (
+    const itemTemplate = node.props.itemTemplate || node.children;
+    const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
+    return (
       <DynamicHeightList
         registerComponentApi={registerComponentApi}
         style={layoutCss}
@@ -115,9 +123,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         selectedIndex={extractValue(node.props.selectedIndex)}
         resetSelectedIndex={lookupAction(node.events?.resetSelectedIndex)}
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
-        groupsInitiallyExpanded={extractValue.asOptionalBoolean(
-          node.props.groupsInitiallyExpanded,
-        )}
+        groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
         defaultGroups={extractValue(node.props.defaultGroups)}
         itemRenderer={
           itemTemplate &&
@@ -134,26 +140,28 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         }
         sectionRenderer={
           node.props.groupBy
-            ? (item) => (
-                <MemoizedSection
-                  node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
-                  renderChild={renderChild}
-                  item={item}
-                />
-              )
+            ? (item) =>
+                (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+                  <MemoizedSection
+                    node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
+                    renderChild={renderChild}
+                    item={item}
+                  />
+                ) : null
             : undefined
         }
         sectionFooterRenderer={
           node.props.groupFooterTemplate
-            ? (item) => (
-                <MemoizedItem
-                  node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
-                  item={item}
-                  renderChild={renderChild}
-                  itemKey="$group"
-                  contextKey="$group"
-                />
-              )
+            ? (item) =>
+                (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
+                  <MemoizedItem
+                    node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
+                    item={item}
+                    renderChild={renderChild}
+                    itemKey="$group"
+                    contextKey="$group"
+                  />
+                ) : null
             : undefined
         }
       />

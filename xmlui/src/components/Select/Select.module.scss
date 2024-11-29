@@ -156,14 +156,8 @@ $componentName: "Select";
 }
 
 .placeholder {
-  margin: 3px 0;
   display: block;
   color: createThemeVar("Input:color-placeholder-#{$componentName}");
-
-  &:empty::before {
-    content: "\00a0";
-    display: inline-block;
-  }
 }
 
 .emptyList {
@@ -204,12 +198,6 @@ $componentName: "Select";
   background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
 }
 
-.commandDialogContent {
-  overflow: hidden;
-  padding: 0;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .commandInputContainer {
   display: flex;
   align-items: center;
@@ -241,32 +229,6 @@ $componentName: "Select";
   max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
-
-}
-
-.commandGroup {
-  overflow: hidden;
-  padding: 4px;
-
-  & [cmdk-group-heading] {
-    padding: 6px 8px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #6b7280;
-  }
-}
-
-.commandSeparator {
-  margin: 0 -4px;
-  height: 1px;
-  background-color: #e5e7eb;
-}
-
-.commandShortcut {
-  margin-left: auto;
-  font-size: 12px;
-  letter-spacing: 0.05em;
-  color: #6b7280;
 }
 
 .selectContent {
@@ -341,6 +303,48 @@ $componentName: "Select";
     color: createThemeVar("color-text-item-#{$componentName}--disabled");
     font-style: italic;
   }
+}
+
+.selectItem {
+  position: relative;
+  display: flex;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-radius: 4px;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  padding-inline: 1em;
+  outline: none;
+  font-size: createThemeVar("font-size-#{$componentName}");
+
+  &[data-highlighted] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+  }
+
+  &[data-state=checked] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+  }
+}
+
+.selectItem[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: createThemeVar("color-text-item-#{$componentName}--disabled");
+  font-style: italic;
+}
+
+.selectItemIndicator {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  height: 0.875rem;
+  width: 0.875rem;
+  align-items: center;
+  justify-content: center;
+  color: createThemeVar("color-text-indicator-#{$componentName}");
 }
 
 .selectViewport {
