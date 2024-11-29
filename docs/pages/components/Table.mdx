@@ -529,7 +529,42 @@ This property determines the sort order to be `ascending` or `descending`. This 
 
 ### `selectionDidChange`
 
-No description provided.
+This event is triggered when the table's current selection (the rows selected) changes. Its parameter is an array of the selected table row items. 
+
+Of course, if multiple-row selection is not allowed (`enableMultipleRowSelection` is false), this array will contain zero or one item.
+
+```ueml copy {4}
+<App var.selection="">
+  <Text>Current selection (row IDs): [{selection}]</Text>
+  <Table data='{[...]}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true"
+    onSelectionDidChange="(newSel) => selection = newSel.map(item => item.id).join()" >
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
+
+Click on any of the column headers to trigger a new sorting:
+
+<Playground
+  name="Example: selectionDidChange"
+  app={`
+    <App var.selection="">
+      <Text>Current selection (row IDs): [{selection}]</Text>
+      <Table data='{${JSON.stringify(data, null, 2)}}'
+        rowsSelectable="true"
+        enableMultiRowSelection="true"
+        onSelectionDidChange="(newSel) => selection = newSel.map(item => item.id).join()" >
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
+      </Table>
+    </App>
+  `}
+/>
 
 ### `sortingDidChange`
 
@@ -607,7 +642,72 @@ clicking that column header still does not sort because `willSort` prevents it:
 
 ## Exposed Methods
 
-This component does not expose any methods.
+### `clearSelection`
+
+This method clears the list of currently selected table rows.
+
+```ueml copy /clearSelection()/ /selectId(1)/ /selectId([2, 4])/ /selectAll()/
+<App>
+  <HStack>
+    <Button label="Select all" onClick="table.selectAll()" />
+    <Button label="Clear all" onClick="table.clearSelection()" />
+    <Button label="Select 1" onClick="table.selectId(1)" />
+    <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
+  </HStack>
+  <Table id="table" data='{${JSON.stringify(data, null, 2)}}'
+    rowsSelectable="true"
+    enableMultiRowSelection="true">
+    <Column bindTo="name" canSort="true"/>
+    <Column bindTo="quantity" canSort="true"/>
+    <Column bindTo="unit" canSort="true"/>
+  </Table>
+</App>
+```
+
+<Playground
+  name="Example: selection methods"
+  app={`
+    <App>
+      <HStack>
+        <Button label="Select all" onClick="table.selectAll()" />
+        <Button label="Clear all" onClick="table.clearSelection()" />
+        <Button label="Select 1" onClick="table.selectId(1)" />
+        <Button label="Select 2, 4" onClick="table.selectId([2, 4])" />
+      </HStack>
+      <Table id="table" data='{${JSON.stringify(data, null, 2)}}'
+        rowsSelectable="true"
+        enableMultiRowSelection="true">
+        <Column bindTo="name" canSort="true"/>
+        <Column bindTo="quantity" canSort="true"/>
+        <Column bindTo="unit" canSort="true"/>
+      </Table>
+    </App>
+  `}
+/>
+
+### `getSelectedIds`
+
+This method returns the list of currently selected table rows IDs.
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+### `getSelectedItems`
+
+This method returns the list of currently selected table rows items.
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+### `selectAll`
+
+This method selects all the rows in the table. This method has no effect if the rowsSelectable property is set to `false`.
+
+(See the [example](#clearselection) at the `clearSelection` method)
+
+### `selectId`
+
+This method selects the row with the specified ID. This method has no effect if the `rowsSelectable` property is set to `false`. The method argument can be a single id or an array of them.
+
+(See the [example](#clearselection) at the `clearSelection` method)
 
 ## Styling
 
