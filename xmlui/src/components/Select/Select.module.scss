@@ -305,6 +305,48 @@ $componentName: "Select";
   }
 }
 
+.selectItem {
+  position: relative;
+  display: flex;
+  width: 100%;
+  cursor: default;
+  user-select: none;
+  align-items: center;
+  border-radius: 4px;
+  padding-top: .5em;
+  padding-bottom: .5em;
+  padding-inline: 1em;
+  outline: none;
+  font-size: createThemeVar("font-size-#{$componentName}");
+
+  &[data-highlighted] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--hover");
+  }
+
+  &[data-state=checked] {
+    background-color: createThemeVar("color-bg-item-#{$componentName}--active");
+  }
+}
+
+.selectItem[data-disabled] {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+  color: createThemeVar("color-text-item-#{$componentName}--disabled");
+  font-style: italic;
+}
+
+.selectItemIndicator {
+  position: absolute;
+  right: 0.5rem;
+  display: flex;
+  height: 0.875rem;
+  width: 0.875rem;
+  align-items: center;
+  justify-content: center;
+  color: createThemeVar("color-text-indicator-#{$componentName}");
+}
+
 .selectViewport {
   height: var(--radix-select-trigger-height);
   width: 100%;
