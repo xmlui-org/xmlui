@@ -38,10 +38,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       throw new NotAComponentDefError();
     }
 
-    // --- Only calculate column gaps if there are more than 1 child
     const columnGap = extractValue.asSize(node.props?.columnGap) || layoutCss.gap || extractValue.asSize("$space-4");
     const rowGap = extractValue.asSize(node.props?.rowGap) || layoutCss.gap || extractValue.asSize("$space-4");
-    // TODO illesg: try to do it with grid (count the children?, give it to flowLayout?);
 
     return (
       <FlowLayout style={layoutCss} columnGap={columnGap} rowGap={rowGap}>
@@ -52,11 +50,13 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             }
             // Handle SpaceFiller as a * width item
             const width = node.type === "SpaceFiller" ? "*" : extractValue((node.props as any)?.width);
+            const minWidth = extractValue((node.props as any)?.minWidth);
+            const maxWidth = extractValue((node.props as any)?.maxWidth);
             return (
               <FlowItemWrapper
                 width={width}
-                minWidth={extractValue((node.props as any)?.minWidth)}
-                maxWidth={extractValue((node.props as any)?.maxWidth)}
+                minWidth={minWidth}
+                maxWidth={maxWidth}
               >
                 {renderedChild}
               </FlowItemWrapper>
