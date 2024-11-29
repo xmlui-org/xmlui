@@ -336,7 +336,7 @@ export function ComboboxOption({ value, label, enabled = true }: Option) {
       id={id}
       key={id}
       disabled={!enabled}
-      value={`${value}`}
+      value={value}
       className={styles.multiComboboxOption}
       onSelect={() => {
         onChange(value);
