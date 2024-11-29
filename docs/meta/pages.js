@@ -22,7 +22,6 @@ export const COMPONENT_CARD = "/components/Card";
 export const COMPONENT_CHANGELISTENER = "/components/ChangeListener";
 export const COMPONENT_CHECKBOX = "/components/Checkbox";
 export const COMPONENT_COLUMN = "/components/Column";
-export const COMPONENT_COMBOBOX = "/components/Combobox";
 export const COMPONENT_CONTENTSEPARATOR = "/components/ContentSeparator";
 export const COMPONENT_DATASOURCE = "/components/DataSource";
 export const COMPONENT_DATEPICKER = "/components/DatePicker";

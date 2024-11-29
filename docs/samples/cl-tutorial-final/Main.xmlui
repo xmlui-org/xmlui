@@ -7,7 +7,7 @@
     <H2>Contact Management</H2>
     <SpaceFiller />
     <ToneChangerButton />
-  </AppHeader>  
+  </AppHeader>
   <DataSource id="contactCounts" url="/api/contactcounts" />
   <NavPanel>
     <NavLink label="Dashboard" to="/" />
@@ -19,22 +19,22 @@
   </NavPanel>
   <Pages>
     <Page url="/">
-      <Dashboard contactCountsSource="{contactCounts}"/>
+      <Dashboard />
     </Page>
     <Page url="/contacts/all">
-      <Contacts filter="" />
+      <Contacts data="/api/contacts" />
     </Page>
     <Page url="/contacts/overdue">
-      <Contacts filter="overdue" />
+      <Contacts data="/api/contacts/overdue" />
     </Page>
     <Page url="/contacts/today">
-      <Contacts filter="today" />
+      <Contacts data="/api/contacts/today" />
     </Page>
     <Page url="/contacts/upcoming">
-      <Contacts filter="upcoming" />
+      <Contacts data="/api/contacts/upcoming" />
     </Page>
     <Page url="/contacts/completed">
-      <Contacts filter="completed" />
+      <Contacts data="/api/contacts/completed" />
     </Page>
   </Pages>
   <Footer>
