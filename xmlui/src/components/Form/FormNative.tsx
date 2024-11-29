@@ -153,6 +153,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
       break;
     }
     case FormActionKind.BACKEND_VALIDATION_ARRIVED: {
+      state.submitInProgress = false;
       state.generalValidationResults = action.payload.generalValidationResults;
       Object.keys(state.validationResults).forEach((key) => {
         state.validationResults[key].validations = state.validationResults[key].validations?.filter(

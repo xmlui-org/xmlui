@@ -1,7 +1,8 @@
 <Component name="InfoCard">
-  <Card height="{$props.height}"
+  <Card 
+    height="{$props.height}"
     onClick="{Actions.navigate('/contacts/' + $props.link)}">
-    <H4 value="{$props.title}"/>
+    <Text variant="subtitle" value="{$props.title}"/>
     <CVStack width="100%">
       <H2 color="{$props.color}" fontSize="4em">
         {$props.isLoading ? "..." : $props.value}

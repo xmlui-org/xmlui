@@ -5,16 +5,16 @@ function getSection(contact) {
   return getDate(contact.reviewDueDate) < getDate() ? "Overdue" : "Upcoming";
 }
 
-var allContacts = contacts.value.filter((t) => true);
-var overdueContacts = contacts.value.filter((t) => getSection(t) === "Overdue");
-var todayContacts = contacts.value.filter((t) => getSection(t) === "Today");
-var upcomingContacts = contacts.value.filter(
-  (t) => getSection(t) === "Upcoming"
-);
-var completedContacts = contacts.value.filter(
-  (t) => getSection(t) === "Completed"
-);
+function filterBySection(contacts, section) {
+  return contacts.filter((contact) => getSection(contact) === section);
+}
 
-function countLabel(cat) {
+var allContacts = contactsDs.value;
+var overdueContacts = filterBySection(allContacts, "Overdue");
+var todayContacts = filterBySection(allContacts, "Today");
+var upcomingContacts = filterBySection(allContacts, "Upcoming");
+var completedContacts = filterBySection(allContacts, "Completed");
+
+function countLabel(cat) { 
   return contactCounts.inProgress ? "loading..." : contactCounts.value[cat];
 }

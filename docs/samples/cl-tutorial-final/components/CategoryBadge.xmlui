@@ -1,4 +1,6 @@
-<Component name="CategoryBadge">
+<Component 
+  name="CategoryBadge"
+  var.categoryName="{getCategoryNameById($props.categoryId)}">
   <DataSource id="categories" url="/api/categories" />
-  <Badge when="{category.id}" value="{category.name}" colorMap="{categoriesColorMap}"/>
+  <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
 </Component>
