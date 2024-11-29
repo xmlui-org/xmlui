@@ -4,7 +4,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
+import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
 
 const COMP = "FlowLayout";
 
@@ -38,10 +38,8 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
       throw new NotAComponentDefError();
     }
 
-    // --- Only calculate column gaps if there are more than 1 child
     const columnGap = extractValue.asSize(node.props?.columnGap) || layoutCss.gap || extractValue.asSize("$space-4");
     const rowGap = extractValue.asSize(node.props?.rowGap) || layoutCss.gap || extractValue.asSize("$space-4");
-    // TODO illesg: try to do it with grid (count the children?, give it to flowLayout?);
 
     return (
       <FlowLayout style={layoutCss} columnGap={columnGap} rowGap={rowGap}>
@@ -50,13 +48,19 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             if (hints?.opaque) {
               return renderedChild;
             }
-            // Handle SpaceFiller as a * width item
-            const width = node.type === "SpaceFiller" ? "*" : extractValue((node.props as any)?.width);
+            // Handle SpaceFiller as flow item break
+            if(node.type === "SpaceFiller"){
+              return <FlowItemBreak force={true}/>;
+            }
+            const width = extractValue((node.props as any)?.width);
+            const minWidth = extractValue((node.props as any)?.minWidth);
+            const maxWidth = extractValue((node.props as any)?.maxWidth);
             return (
               <FlowItemWrapper
                 width={width}
-                minWidth={extractValue((node.props as any)?.minWidth)}
-                maxWidth={extractValue((node.props as any)?.maxWidth)}
+                minWidth={minWidth}
+                maxWidth={maxWidth}
+                forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
               </FlowItemWrapper>

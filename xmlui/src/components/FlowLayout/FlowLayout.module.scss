@@ -7,16 +7,19 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
+
+.outer{
+  contain: layout;
+}
+
 .flowContainer {
   display: flex;
   flex-wrap: wrap;
 
   &.horizontal {
     flex-direction: row;
-    height: 100%;
 
     .flowItem {
-      height: 100%;
       flex-shrink: 0;
 
       & > * {
@@ -45,7 +48,13 @@ $themeVars: ();
   }
 }
 
-.break {
+//we use the .break class to create a new line in the flow
+// if there are multiple star-sized elements in a row, the break will be ignored between them
+.break:not(.forceBreak):has(+ .starSized) {
+  display: none;
+}
+
+.break, .forceBreak {
   flex-basis: 100%;
   height: 0;
 }
