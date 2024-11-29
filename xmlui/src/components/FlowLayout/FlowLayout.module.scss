@@ -48,6 +48,11 @@ $themeVars: ();
   }
 }
 
+//we use the .break class to create a new line in the flow
+// if there are multiple star-sized elements in a row, the break will be ignored between them
+.break:has(+ .starSized) {
+  display: none;
+}
 .break {
   flex-basis: 100%;
   height: 0;
