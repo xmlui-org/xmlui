@@ -13,36 +13,38 @@ You can continue working with the code you completed in the previous tutorial se
 ## A Rudimentary Dashboard
 
 The dashboard will display indicative numbers of significant review counts.
-These indicators will be housed in interactive cards.
-By clicking on a card, the app will navigate to the list of the corresponding contacts.
+These indicators will be housed in interactive cards. By clicking on a card, the app will navigate to the list of the corresponding contacts.
 
 Create a new file, `Dashboard.xmlui` within the `components` folder:
 
 ```ueml copy filename="Dashboard.xmlui"
-<Component name="Dashboard" var.counts="{$props.contactCountsSource.value}">
-  <H2>Overdue Reviews: {counts.overdue}</H2>
-  <H2>Today's Reviews: {counts.today}</H2>
-  <H2>Upcoming Reviews: {counts.upcoming}</H2>
-  <H2>Completed Reviews: {counts.completed}</H2>
+<Component name="Dashboard">
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <FlowLayout var.counts="{contactCounts.value}">
+    <H2>Overdue Reviews: {counts.overdue}</H2>
+    <H2>Today's Reviews: {counts.today}</H2>
+    <H2>Upcoming Reviews: {counts.upcoming}</H2>
+    <H2>Completed Reviews: {counts.completed}</H2>
+  </FlowLayout>
 </Component>
 ```
 
-The `Dashboard` component accepts a data source in its `contactsCountsSource` property and uses it to discern what numbers to display.
-Use the new component instead of the placeholder text within `Main.xmlui`:
+The `Dashboard` component uses a `DataSource` with the `/api/contactcounts` endpoint (you used it earlier) to get some counter values to display. The `counts` variable allows referencing the individual counters shorter, for example, using `counts.overdue` instead of `contactCounts.value.overdue`.
 
-```ueml copy {5} filename="Main.xmlui"
+Use this new component instead of the placeholder text within `Main.xmlui`:
+
+```ueml copy {4-6} filename="Main.xmlui"
 <App layout="vertical-full-header">
   <!-- Omitted -->
   <Pages>
     <Page url="/">
-      <Dashboard contactCountsSource="{contactCounts}"/>
+      <Dashboard />
     </Page>
     <!-- Omitted -->
 </App>
 ```
 
-Earlier, you already created a `DataSource` with the `contactCounts` ID, which retrieves several counters in an object.
-Here, you can also reuse this data source.
+Earlier, you created a `DataSource` with the `contactCounts` ID, which retrieves several counters in an object. The dashboard displays this data.
 
 When you navigate to the Dashboard page, it displays a some numeric information:
 
@@ -67,16 +69,17 @@ Start with the `InfoCard` component by adding the `InfoCard.xmlui` file to the `
   </Card>
 </Component>
 ```
-`InforCard` allows you to set its title text, color, and a number to display. 
+
+`InforCard` allows you to set its title text, color, and number to display. It also receives an `isLoading` property to display "..." while the counter data is being fetched from the backend.
 
 Change the dashboard to use the `InfoCard` component:
 
 ```ueml copy filename="Dashboard.xmlui"
-<Component 
-  name="Dashboard" 
-  var.counts="{$props.contactCountsSource.value}"
-  var.isLoading="{$props.contactCountsSource.inProgress}">
-  <FlowLayout>
+<Component name="Dashboard">
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <FlowLayout 
+    var.counts="{contactCounts.value}"
+    var.isLoading="{contactCounts.inProgress}">
     <InfoCard 
       width="25%" title="Reviews Overdue" 
       isLoading="{isLoading}" 
@@ -103,8 +106,7 @@ Change the dashboard to use the `InfoCard` component:
 </Component>
 ```
 
-Each `InfoCard` displays its associated value.
-The `FlowLayout` component and setting a width of 25% ensures items placed inside will use 25% of the available width of available space:
+Each `InfoCard` displays its associated value. The `FlowLayout` component and setting a width of 25% ensures items placed inside will use 25% of the available width of available space:
 
 <br/>
 <Image alt="Dashboard numbers" src="/resources/images/get-started/dashboard-numbers.png" />
@@ -116,11 +118,12 @@ To let the user investiage what is behind the number, you need to let them navig
 
 Prepare the `InfoCard` component to receive a `link` property and navigate to that link when it is clicked:
 
-```ueml copy {3} filename="InfoCard.xmlui"
+```ueml copy {4} filename="InfoCard.xmlui"
 <Component name="InfoCard">
-  <Card height="{$props.height}"
+  <Card 
+    height="{$props.height}"
     onClick="{Actions.navigate('/contacts/' + $props.link)}">
-    <H4 value="{$props.title}"/>
+    <Text variant="subtitle" value="{$props.title}"/>
     <CVStack width="100%">
       <H2 color="{$props.color}" fontSize="4em">
         {$props.isLoading ? "..." : $props.value}
@@ -130,17 +133,16 @@ Prepare the `InfoCard` component to receive a `link` property and navigate to th
 </Component>
 ```
 
-The `Actions.navigate` method visits the specified link.
-Remember, the `<NavPanel>` section of `Main.xmlui` contains the links in the menu; all of them start with `/contacts.`
+The `Actions.navigate` method visits the specified link. Remember, the `<NavPanel>` section of `Main.xmlui` contains the links in the menu; all of them start with `/contacts`.
 
 Set the `link` property's value for each `InfoCard` on the dashboard:
 
 ```ueml copy {10, 17, 23, 30} filename="Dashboard.xmlui"
-<Component 
-  name="Dashboard" 
-  var.counts="{$props.contactCountsSource.value}"
-  var.isLoading="{$props.contactCountsSource.inProgress}">
-  <FlowLayout>
+<Component name="Dashboard">
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <FlowLayout 
+    var.counts="{contactCounts.value}"
+    var.isLoading="{contactCounts.inProgress}">
     <InfoCard 
       width="25%" title="Reviews Overdue" 
       isLoading="{isLoading}" 
@@ -185,7 +187,7 @@ Update the `Dashboard.xmlui` file by appending a new `Card` component after the 
   name="Dashboard" 
   var.counts="{$props.contactCountsSource.value}"
   var.isLoading="{$props.contactCountsSource.inProgress}">
-      <!-- Omitted -->
+      <!-- Unchanged -->
       <Card width="50%" height="350px">
         <H4>Recent Contacts</H4>
         <Table data="/api/contacts-recent" height="*">
@@ -214,29 +216,37 @@ It would be great if the first column displayed the category's name with a color
 Create a new component, `CategoryBadge.xmlui` (within the `components` folder):
 
 ```ueml copy filename="CategoryBadge.xmlui"
-<Component name="CategoryBadge">
+<Component 
+  name="CategoryBadge"
+  var.categoryName="{getCategoryNameById($props.categoryId)}">
   <DataSource id="categories" url="/api/categories" />
-  <Badge when="{category.id}" value="{category.name}" colorMap="{categoriesColorMap}"/>
+  <Badge when="{categoryName}" value="{categoryName}" colorMap="{categoriesColorMap}"/>
 </Component>
 ```
 
 Add a code-behind file, `CategoryBadge.xmlui.xs`, to the new component using the similar technique you learned in the [Adding a Badge](./02-use-list/#categorizing-data) section:
 
 ```js copy filename="CategoryBadge.xmlui.xs"
-var category = categories.value.find(t => t.id === $props.categoryId);
- 
+// Create a color map for all categories
 var categoriesColorMap = toHashObject(categories.value, "name", "color");
+
+// Resolve category name by id
+function getCategoryNameById(categoryId) {
+  const category = findByField(categories.value, "id", categoryId);
+  return category ? category.name : "";
+}
 ```
 
 Change the `Text` element within the first `Columnn` to the new `CategoryBadge` element and update the width of the Category column:
 
-```ueml copy {9-11} filename="Dashboard.xmlui"
-<Component 
-  name="Dashboard" 
-  var.counts="{$props.contactCountsSource.value}"
-  var.isLoading="{$props.contactCountsSource.inProgress}">
-      <!-- Omitted -->
-      <Card width="50%" height="350px">
+```ueml copy {10-12} filename="Dashboard.xmlui"
+<Component name="Dashboard">
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <FlowLayout 
+    var.counts="{contactCounts.value}"
+    var.isLoading="{contactCounts.inProgress}">
+    <!-- Unchanged -->
+    <Card width="50%" height="350px">
         <H4>Recent Contacts</H4>
         <Table data="/api/contacts-recent" height="*">
           <Column header="Category" width="200">
@@ -246,51 +256,43 @@ Change the `Text` element within the first `Columnn` to the new `CategoryBadge` 
             <Text maxLines="1">{$item.fullName}</Text>
           </Column>
         </Table>
-      </Card>
-    </FlowLayout>
-  </VStack>
+      </Card>      
+  </FlowLayout>
 </Component>
 ```
 
 <br/>
 <Image alt="Table with badge" src="/resources/images/get-started/table-with-badge.png" />
 
-The new `CategoryBadge` component can replace the previous markup to display the category in `ContactRow.xmlui`.
-Change `Badge` to `CategoryBadge`:
+The new `CategoryBadge` component can replace the previous markup to display the category in `Contact.xmlui`. Change `Badge` to `CategoryBadge`:
 
-```ueml copy filename="ContactRow.xmlui"
-<CategoryBadge categoryId="{$props.item.categoryId}" />
-```
-
-You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer uses it.
-You can remove the highlighted lines from `Contacts.xmlui`:
-
-```ueml copy {2, 13} filename="Contacts.xmlui"
+```ueml copy {3, 15} filename="Contact.xmlui" /CategoryBadge/
 <Component name="Contacts">
+  <ContactForm id="contactForm" />
   <DataSource id="categories" url="/api/categories" />
-  <DataSource id="contacts" url="/api/contacts/{$props.filter}" />
-    <!-- Omitted -->
-      <List 
-        items="{contacts.value.map(t => ({...t, section: getSection(t)}))}"
-        defaultGroups="{$props.filter === 'all'
-          ? ['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed'] : undefined}"
-        groupBy="section">
-        <property name="itemTemplate">
-          <ContactRow 
-            item="{$item}" 
-            categories="{categories.value}" 
-            onEditClicked="(selected) => contactForm.open('edit', selected)" />
-        </property>
-        <!-- Omitted -->
-      </List>
-    </VStack>
-    <TaskForm id="taskForm" />
+  <VStack>
+    <HStack horizontalAlignment="end">
+      <Button icon="plus" onClick="contactForm.open()">New Contact</Button>
+    </HStack>
+    <List data="{$props.data.map(extendWithSection)}"
+      defaultGroups="{['Overdue', 'Today', 'Upcoming', 'No Due Date', 'Completed']}"
+      groupBy="section">
+      <!-- Unchanged -->
+      <Card var.categoryName="{getCategoryNameById($item.categoryId)}">
+          <!-- Unchanged -->
+          <HStack verticalAlignment="center" horizontalAlignment="end">
+            <CategoryBadge categoryId="{$item.categoryId}" />
+            <Text>{smartFormatDate($item.reviewDueDate)}</Text>
+          </HStack>
+          <!-- Unchanged -->
+      </Card>
+    </List>
+  </VStack>
 </Component>
 ```
 
-<Callout type="info" emoji="📔">
-  The contact list will work correctly even if you do not delete those lines. Nonetheless, they execute an unnecessary query.
-</Callout>
+You do not need the `categories` DataSource in `Contacts`, as `ContactRow` no longer uses it.
+You can remove it from `Contacts.xmlui`.
 
 ## Conclusion
 

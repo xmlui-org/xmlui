@@ -8,7 +8,7 @@ type SelectItemProps = React.ComponentProps<typeof SelectPrimitive.Item>;
 
 type SelectOptionProps = SelectItemProps & {
   label: string;
-  value: string;
+  value: string | number;
 };
 
 export const SelectOption = React.forwardRef<

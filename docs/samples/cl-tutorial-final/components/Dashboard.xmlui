@@ -1,8 +1,8 @@
-<Component 
-  name="Dashboard" 
-  var.counts="{$props.contactCountsSource.value}"
-  var.isLoading="{$props.contactCountsSource.inProgress}">
-  <FlowLayout>
+<Component name="Dashboard">
+  <DataSource id="contactCounts" url="/api/contactcounts" />
+  <FlowLayout 
+    var.counts="{contactCounts.value}"
+    var.isLoading="{contactCounts.inProgress}">
     <InfoCard 
       width="25%" title="Reviews Overdue" 
       isLoading="{isLoading}" 
@@ -30,15 +30,15 @@
       link="completed"
       color="$color-valid" />
     <Card width="50%" height="350px">
-      <H4>Recent Contacts</H4>
-      <Table data="/api/contacts-recent" height="*">
-        <Column header="Category" width="200">
-          <CategoryBadge categoryId="{$item.categoryId}" />
-        </Column>
-        <Column header="FullName" width="*">
-          <Text maxLines="1">{$item.fullName}</Text>
-        </Column>
-      </Table>
-    </Card>
+        <H4>Recent Contacts</H4>
+        <Table data="/api/contacts-recent" height="*">
+          <Column header="Category" width="200">
+            <CategoryBadge categoryId="{$item.categoryId}" />
+          </Column>
+          <Column header="FullName" width="*">
+            <Text maxLines="1">{$item.fullName}</Text>
+          </Column>
+        </Table>
+      </Card>      
   </FlowLayout>
 </Component>

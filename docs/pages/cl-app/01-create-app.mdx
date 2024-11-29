@@ -21,7 +21,7 @@ The unzipped content has the following folders and files:
 <Callout emoji="💡">
 Remember, you need a local web server to run the XMLUI app. Install the LTS version of Node.js on your machine (https://nodejs.org/en), for you will use the **http-server** Node package to host the tutorial.
 
-In your command prompt, select the downloaded sample's unzipped folder (with the cd command), and run `start.bat` on Windows or `start.sh` on Mac or Linux, which will start the web server and open your browser with the app. If you are using Mac or Linux, do not forget to add execution right to `start.sh` with this command line: `chmod +x start.sh`
+In your command prompt, select the downloaded sample's unzipped folder (with the cd command), and run `start.bat` on Windows or `start.sh` on Mac or Linux, which will start the web server and open your browser with the app.
 
 Alternatively, you can start the webserver directly by issuing the `npx -y http-server -o` command.
 </Callout>
@@ -154,17 +154,21 @@ Test the emulated backend by adding code that triggers invoking an endpoint. Rep
 ```ueml copy {3-4} filename="Main.xmlui"
 <!-- Omitted -->
 <Page url="/contacts">
-  <DataSource id="categories" url="/api/categories" />
-  <Text variant="codefence">{JSON.stringify(categories.value, null, 2)}</Text>
+  <DataSource id="message" url="/api/test" />
+  <Text>{message.value}</Text>
 </Page>
 <!-- Omitted -->
 ```
 
-Turn to the app running in the browser and refresh. Click the "Contact List" menu item; it will trigger fetching the "category" data from the backend and display it on the screen in JSON:
+The framework considers text wrapped between curly braces an **expression**. Instead of displaying the literal value, it replaces them with their evaluated value.
+
+`DataSource` is a powerful component responsible for fetching data. The code above uses the `/api/test` endpoint, which retrieves a string. This component has an identifier, `message`, which allows accessing its exposed properties and methods. 
+
+The `Text` element displays a `message.value` expression. The engine recognizes that it must fetch data from the URL specified in the component identified with `message` (it is the `DataSource`). When the fetch has been completed, `message.value` represents the returned string, and the UI refreshes to display that string. 
+
+Turn to the app running in the browser and refresh. Click the "Contact List" menu item; it will trigger fetching the test data (message) from the backend and display it on the screen:
 
 <br/>
 <Image alt="Test API" src="/resources/images/get-started/test-emulated-api.png" />
-
-The highlighted markup lines access the `/categories` API endpoint, which retrieves a list of contact categories. The `Text` component converts the list to JSON and displays it.
 
 In the following article, you will learn how the `DataSource` component works together with others to fetch and leverage data from a backend.
