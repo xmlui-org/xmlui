@@ -11,9 +11,10 @@ import { TableContext } from "@components/Column/TableContext";
 import produce from "immer";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import {
-  SelectionStore, StandaloneSelectionStore,
-  useSelectionContext
+  StandaloneSelectionStore,
+  useSelectionContext,
 } from "@components/SelectionStore/SelectionStoreNative";
+import { clear } from "console";
 
 const COMP = "Table";
 
@@ -97,8 +98,23 @@ export const TableMd = createMetadata({
         `value (and not any other falsy one), the method indicates that the sorting should be aborted.`,
     ),
     selectionDidChange: d(
-      ``
-    )
+      `This event is triggered when the table's current selection (the rows selected) changes. ` +
+        `Its parameter is an array of the selected table row items. `,
+    ),
+  },
+  apis: {
+    clearSelection: d("This method clears the list of currently selected table rows."),
+    getSelectedItems: d(`This method returns the list of currently selected table rows items.`),
+    getSelectedIds: d(`This method returns the list of currently selected table rows IDs.`),
+    selectAll: d(
+      `This method selects all the rows in the table. This method has no effect if the ` +
+        `rowsSelectable property is set to \`false\`.`,
+    ),
+    selectId: d(
+      `This method selects the row with the specified ID. This method has no effect if the ` +
+        `\`rowsSelectable\` property is set to \`false\`. The method argument can be a ` +
+        `single id or an array of them.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -275,7 +291,15 @@ const TableWithColumns = ({
 export const tableComponentRenderer = createComponentRenderer(
   COMP,
   TableMd,
-  ({ extractValue, node, renderChild, lookupEventHandler, lookupSyncCallback, layoutCss, registerComponentApi }) => {
+  ({
+    extractValue,
+    node,
+    renderChild,
+    lookupEventHandler,
+    lookupSyncCallback,
+    layoutCss,
+    registerComponentApi,
+  }) => {
     return (
       <TableWithColumns
         node={node}
