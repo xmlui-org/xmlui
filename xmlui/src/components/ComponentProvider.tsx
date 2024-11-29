@@ -141,7 +141,6 @@ import { createPropHolderComponent } from "@components-core/renderers";
 import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
 import { apiCallRenderer } from "@components/APICall/APICall";
-import { selectOptionComponentRenderer } from "@components/Select/SelectOption";
 import { optionComponentRenderer } from "@components/Option/Option";
 import {autoCompleteComponentRenderer} from "@components/AutoComplete/AutoComplete";
 
@@ -283,9 +282,6 @@ export class ComponentRegistry {
     }
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
       this.registerComponentRenderer(optionComponentRenderer);
-    }
-    if (process.env.VITE_USED_COMPONENTS_SelectOption !== "false") {
-      this.registerComponentRenderer(selectOptionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
       this.registerComponentRenderer(tabItemComponentRenderer);

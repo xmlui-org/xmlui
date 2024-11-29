@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import React, { CSSProperties, ReactNode } from "react";
 import { useEffect } from "react";
 import { useLayoutEffect } from "react";
 import { useId, useRef } from "react";
@@ -18,6 +18,9 @@ import {
   Icon as SelectIcon,
   Trigger as SelectTrigger,
   Viewport as SelectViewport,
+  Item as SelectItem,
+  ItemText as SelectItemText,
+  ItemIndicator as SelectItemIndicator,
 } from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import { SelectContext, useSelect } from "@components/Select/SelectContext";
@@ -25,7 +28,6 @@ import styles from "./Select.module.scss";
 import classnames from "classnames";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { SelectOption } from "@components/Select/SelectOptionNative";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -327,9 +329,7 @@ export function ComboboxOption({ value, label, enabled = true }: Option) {
   const id = useId();
   const { value: selectedValue, onChange, optionRenderer, multi } = useSelect();
   const selected =
-    typeof selectedValue === "object" && multi
-      ? selectedValue.includes(value)
-      : selectedValue === value;
+    Array.isArray(selectedValue) && multi ? selectedValue.includes(value) : selectedValue === value;
 
   return (
     <CmdItem
@@ -360,3 +360,22 @@ export function HiddenOption(option: Option) {
 
   return <span style={{ display: "none" }} />;
 }
+
+const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
+  ({ value, label }, ref) => {
+    const { optionRenderer } = useSelect();
+
+    return (
+      <SelectItem ref={ref} className={styles.selectItem} value={value}>
+        <SelectItemText>{optionRenderer ? optionRenderer({ label, value }) : label}</SelectItemText>
+        <span className={styles.selectItemIndicator}>
+          <SelectItemIndicator>
+            <Icon name="checkmark" />
+          </SelectItemIndicator>
+        </span>
+      </SelectItem>
+    );
+  },
+);
+
+SelectOption.displayName = "SelectOption";
