@@ -13,6 +13,7 @@ type FlowItemProps = {
   width?: string | number;
   minWidth?: string | number;
   maxWidth?: string | number;
+  forceBreak?: boolean;
 };
 
 const resolvedCssVars: Record<string, any> = {};
@@ -29,7 +30,9 @@ const FlowLayoutContext = createContext<IFlowLayoutContext>({
   setNumberOfChildren: noop,
 });
 
-export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, ...restProps }: FlowItemProps, ref: any) {
+export const FlowItemBreak = ({force}: {force?: boolean}) => <div className={classnames(styles.break, {[styles.forceBreak]: force})} />;
+
+export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, forceBreak, ...restProps }: FlowItemProps, ref: any) {
   const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
@@ -97,7 +100,7 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, .
       })} ref={ref}>
         {children}
       </div>
-      {isStarSizing && <div className={styles.break} />}
+      {isStarSizing && <FlowItemBreak/>}
     </>
   );
 });

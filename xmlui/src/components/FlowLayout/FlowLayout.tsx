@@ -4,7 +4,7 @@ import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
+import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
 
 const COMP = "FlowLayout";
 
@@ -48,8 +48,11 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
             if (hints?.opaque) {
               return renderedChild;
             }
-            // Handle SpaceFiller as a * width item
-            const width = node.type === "SpaceFiller" ? "*" : extractValue((node.props as any)?.width);
+            // Handle SpaceFiller as flow item break
+            if(node.type === "SpaceFiller"){
+              return <FlowItemBreak force={true}/>;
+            }
+            const width = extractValue((node.props as any)?.width);
             const minWidth = extractValue((node.props as any)?.minWidth);
             const maxWidth = extractValue((node.props as any)?.maxWidth);
             return (
@@ -57,6 +60,7 @@ export const flowLayoutComponentRenderer = createComponentRenderer(
                 width={width}
                 minWidth={minWidth}
                 maxWidth={maxWidth}
+                forceBreak={node.type === "SpaceFiller"}
               >
                 {renderedChild}
               </FlowItemWrapper>
