@@ -1,5 +1,19 @@
 # xmlui Changelog
 
+## v0.7.0
+
+### Breaking changes:
+
+- `List` properties renamed:
+  - `availableSections` --> `availableGroups`
+  - `defaultSection` --> `defaultGroups`
+  - `sectionTemplate` --> `sectionGroupTemplate`
+  - `sectionFooterTemplate` --> `sectionFooterTemplate`
+  - `sectionsInitiallyExpanded` --> `groupsInitiallyExpanded`
+  - `$item` context value in sections renamed to `group`
+    - `$item.sectionKey` --> `$group.key`
+    - `$item.sectionItems` --> `$group.items`
+
 ## v0.6.7
 
 ### Breaking changes:
