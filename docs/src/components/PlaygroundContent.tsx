@@ -4,7 +4,7 @@ import { Splitter } from "@components/Splitter/SplitterNative";
 import styles from "@/src/components/PlaygroundContent.module.scss";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import classnames from "classnames";
-import React, {useEffect} from "react";
+import React from "react";
 
 type PlaygroundContentProps = {
   height?: number | string;

@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useMemo, useReducer } from "react";
+import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import {
@@ -6,17 +6,16 @@ import {
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
-  toneChanged,
 } from "@/src/state/store";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import {INITIAL_PLAYGROUND_STATE, preprocessCode} from "@/src/utils/helpers";
+import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "@/src/utils/helpers";
+import { ToastProvider } from "@radix-ui/react-toast";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";
-import { useTheme } from "nextra-theme-docs";
-import styles from "./Playground.module.scss";
 import { Header } from "@/src/components/Header";
+import styles from "./StandalonePlayground.module.scss";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
+import type { ThemeDefinition } from "@components-core/theming/abstractions";
 
-type PlaygroundProps = {
+type DemoPlaygroundProps = {
   name: string;
   description?: string;
   app: string;
@@ -38,7 +37,7 @@ type PlaygroundProps = {
 const EMPTY_ARRAY = [];
 const EMPTY_OBJECT = {};
 
-export const Playground = ({
+export const DemoPlayground = ({
   name,
   description,
   app,
@@ -48,19 +47,19 @@ export const Playground = ({
   resources = EMPTY_OBJECT,
   previewOnly = false,
   components = EMPTY_ARRAY,
-  height,
-  initialEditorHeight = "50%",
   swapped = false,
   horizontal = false,
   allowStandalone = true,
   api,
   fixedTheme = false,
-}: PlaygroundProps) => {
-  const { theme, systemTheme } = useTheme();
+}: DemoPlaygroundProps) => {
+  const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
+
   const id = useId();
 
   useEffect(() => {
     if (app) {
+      console.log("hahaha", preprocessCode(app));
       dispatch(
         appDescriptionInitialized({
           config: {
@@ -96,19 +95,26 @@ export const Playground = ({
     }
 
     //TODO illesg, review (dep array?)!!!
-  }, []);
-
-  useEffect(() => {
-    const nextraTone = theme === "system" ? systemTheme : theme;
-    if (!defaultTone) {
-      dispatch(toneChanged(nextraTone!));
-    }
-  }, [theme, systemTheme, defaultTone]);
-
-  const [playgroundState, dispatch] = useReducer(playgroundReducer, INITIAL_PLAYGROUND_STATE);
+  }, [
+    allowStandalone,
+    api,
+    app,
+    components,
+    defaultTheme,
+    defaultTone,
+    description,
+    fixedTheme,
+    horizontal,
+    name,
+    previewOnly,
+    resources,
+    swapped,
+    themes,
+  ]);
 
   const playgroundContextValue = useMemo(() => {
     return {
+      editorStatus: playgroundState.editorStatus,
       playgroundId: id,
       status: playgroundState.status,
       options: playgroundState.options,
@@ -119,6 +125,7 @@ export const Playground = ({
     };
   }, [
     id,
+    playgroundState.editorStatus,
     playgroundState.status,
     playgroundState.options,
     playgroundState.text,
@@ -126,14 +133,26 @@ export const Playground = ({
     playgroundState.appDescription,
   ]);
 
+  useEffect(() => {
+    document.documentElement.style.scrollbarGutter = "auto";
+
+    return () => {
+      document.documentElement.style.scrollbarGutter = "";
+    };
+  }, []);
+
   return (
-    <PlaygroundContext.Provider value={playgroundContextValue}>
-      <ErrorBoundary>
-        <div className={styles.playground}>
-          <Header />
-          <PlaygroundContent height={height} initialPrimarySize={initialEditorHeight} />
-        </div>
-      </ErrorBoundary>
-    </PlaygroundContext.Provider>
+    <ToastProvider>
+      <PlaygroundContext.Provider value={playgroundContextValue}>
+        <ErrorBoundary>
+          <div className={styles.standalonePlayground}>
+            {!previewOnly && <Header standalone={true} />}
+            <div style={{ flexGrow: 1, overflow: "auto" }}>
+              <PlaygroundContent standalone={true} />
+            </div>
+          </div>
+        </ErrorBoundary>
+      </PlaygroundContext.Provider>
+    </ToastProvider>
   );
 };
