@@ -1,4 +1,5 @@
-import React, { CSSProperties, ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
+import React from "react";
 import { useEffect } from "react";
 import { useLayoutEffect } from "react";
 import { useId, useRef } from "react";
@@ -50,6 +51,7 @@ type SelectProps = {
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
   onDidChange?: (newValue: string | string[]) => void;
+  dropdownHeight?: CSSProperties["height"];
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -79,6 +81,7 @@ export function Select({
   optionRenderer = defaultRenderer,
   emptyListTemplate,
   layout,
+  dropdownHeight,
   children,
   autoFocus = false,
   searchable = false,
@@ -258,7 +261,10 @@ export function Select({
                 </button>
               </PopoverTrigger>
               <Portal container={root}>
-                <PopoverContent style={{ width }} className={styles.selectContent}>
+                <PopoverContent
+                  style={{ width, height: dropdownHeight }}
+                  className={styles.selectContent}
+                >
                   <Cmd className={styles.command}>
                     {searchable ? (
                       <div className={styles.commandInputContainer}>
