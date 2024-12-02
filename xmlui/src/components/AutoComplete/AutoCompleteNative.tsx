@@ -91,7 +91,7 @@ export function AutoComplete({
   // Set initial state based on the initialValue prop
   useEffect(() => {
     if (initialValue !== undefined) {
-      updateState({ value: initialValue });
+      updateState({ value: initialValue || [] });
     }
   }, [initialValue, updateState]);
 
