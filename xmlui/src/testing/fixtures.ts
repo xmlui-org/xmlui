@@ -67,7 +67,7 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
   DriverClass: T
 ) {
   return baseTest.extend<{
-    createDriver: (source: string, resources?: Record<string, string>) => Promise<InstanceType<T>>;
+    createDriver: (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => Promise<InstanceType<T>>;
   }>({
     createDriver: async ({page}, use) => {
       await use(async (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => {
