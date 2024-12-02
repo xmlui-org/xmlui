@@ -49,6 +49,7 @@ export const SelectMd = createMetadata({
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
+    dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
@@ -73,6 +74,8 @@ export const SelectMd = createMetadata({
     [`color-bg-menu-${COMP}`]: "$color-bg-primary",
     [`shadow-menu-${COMP}`]: "$shadow-md",
     [`radius-menu-${COMP}`]: "$radius",
+    [`thickness-border-menu-${COMP}`]: "1px",
+    [`color-border-menu-${COMP}`]: "$color-border",
     [`color-bg-item-${COMP}`]: "$color-bg-dropdown-item",
     [`color-bg-item-${COMP}--hover`]: "$color-bg-dropdown-item--active",
     [`color-bg-item-${COMP}--active`]: "$color-bg-dropdown-item--active",
@@ -126,6 +129,7 @@ export const selectComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+        dropdownHeight={extractValue(node.props.dropdownHeight)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem

@@ -193,7 +193,7 @@ $componentName: "Select";
   flex-direction: column;
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
   border-radius: 6px;
   background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
 }
@@ -202,13 +202,13 @@ $componentName: "Select";
   display: flex;
   align-items: center;
   padding: 0 12px;
+  border-bottom: 1px solid t.$color-border;
 }
 
 .commandInput {
   flex: 1;
-  height: 44px;
   background-color: transparent;
-  padding: 12px;
+  padding: 0.5rem;
   font-size: 14px;
   outline: none;
   border: none;
@@ -226,7 +226,6 @@ $componentName: "Select";
 }
 
 .commandList {
-  max-height: 300px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -234,12 +233,11 @@ $componentName: "Select";
 .selectContent {
   position: relative;
   z-index: 50;
-  max-height: 24rem;
-  min-width: 8rem;
-  overflow: hidden;
+  overflow: auto;
   background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
   border-radius: createThemeVar("Input:radius-menu-#{$componentName}");
   box-shadow: createThemeVar("Input:shadow-menu-#{$componentName}");
+  border: createThemeVar("Input:thickness-border-menu-#{$componentName}") solid createThemeVar("Input:color-border-menu-#{$componentName}");
 
   &[data-state='open'] {
     animation: fadeIn 0.3s ease-in-out, zoomIn 0.3s ease-in-out;
@@ -356,6 +354,7 @@ $componentName: "Select";
 .selectEmpty {
   display: flex;
   gap: .2rem;
+  height: 100%;
   padding: 10px 0;
   justify-content: center;
   align-items: center;

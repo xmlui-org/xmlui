@@ -45,6 +45,7 @@ export const AutoCompleteMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    dropdownHeight: d("This property sets the height of the dropdown list."),
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
@@ -122,6 +123,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         onBlur={lookupEventHandler("lostFocus")}
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
+        dropdownHeight={extractValue(node.props.dropdownHeight)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem

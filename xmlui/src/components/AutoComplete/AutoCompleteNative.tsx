@@ -38,6 +38,7 @@ type AutoCompleteProps = {
   registerComponentApi?: RegisterComponentApiFn;
   children?: ReactNode;
   autoFocus?: boolean;
+  dropdownHeight?: CSSProperties["height"];
 };
 
 function defaultRenderer(item: Option) {
@@ -79,6 +80,7 @@ export function AutoComplete({
   layout,
   children,
   autoFocus = false,
+  dropdownHeight,
 }: AutoCompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -262,7 +264,7 @@ export function AutoComplete({
                       clearValue();
                     }}
                   >
-                    <Icon name="close"/>
+                    <Icon name="close" />
                   </button>
                 )}
                 <button onClick={() => setOpen(true)}>
@@ -277,6 +279,7 @@ export function AutoComplete({
                   onMouseUp={() => {
                     inputRef?.current?.focus();
                   }}
+                  style={{ height: dropdownHeight }}
                 >
                   <CmdEmpty>{emptyListNode}</CmdEmpty>
                   <CreatableItem />
