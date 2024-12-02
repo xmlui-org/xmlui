@@ -35,8 +35,16 @@ export class ComponentDriver {
   // NOTE: methods must be created using the arrow function notation.
   // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
 
-  click = async () => {
-    await this.locator.click();
+  click = async (options?: { timeout?: number }) => {
+    await this.locator.click(options);
+  }
+
+  focus = async (options?: { timeout?: number }) => {
+    await this.locator.focus(options);
+  }
+
+  blur = async (options?: { timeout?: number }) => {
+    await this.locator.blur(options);
   }
  
   getComponentSize = async () => {
@@ -44,15 +52,15 @@ export class ComponentDriver {
   }
 
   expectTestState(options?: {timeout?: number, intervals?: number[]}) {
-    return expect.poll(this.getTestState(), options);
+    return expect.poll(this.testState, options);
   }
 
   /** returns an async function that can query the test state */
-  getTestState() {
+  get testState () {
     return async () =>{
       const text = await this.testStateLocator.textContent();
-      const testState = JSON.parse(text!);
-      return testState
+      const testState = text === "undefined" ? undefined : JSON.parse(text!);
+      return testState;
     }
   }
 }
@@ -67,12 +75,12 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
     createDriver: async ({page}, use) => {
       await use(async (source: string, resources?: Record<string, string>) => {
         const testStateViewTestId = "test-state-view-testid"
-        const prefix = `<Fragment var.testState="{undefined}">`
+        const prefix = `<Fragment var.testState="{null}">`
         const suffix =`
           <Stack width="0" height="0">
             <Text
               testId="${testStateViewTestId}"
-              value="{ JSON.stringify(testState) }"/>
+              value="{ testState === undefined ? 'undefined' : JSON.stringify(testState) }"/>
           </Stack>
         </Fragment>`
         const code = prefix + source + suffix

@@ -125,6 +125,7 @@ export const buttonTypesMd: PropertyValueDescription[] = [
   { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
   { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
 ] as const;
+export const defaultButtonType = "button";
 
 // --- Available button variants
 const buttonVariantValues = ["solid", "outlined", "ghost"] as const;
