@@ -12,7 +12,7 @@
     </Page>
     <Page url="/spacexlist">
       <List data="https://api.spacexdata.com/v3/history">
-        <Card title="{$item.title}" subTitle="{$item.details}" />
+        <Card title="{$item.title}" subtitle="{$item.details}" />
       </List>
     </Page>
   </Pages>
