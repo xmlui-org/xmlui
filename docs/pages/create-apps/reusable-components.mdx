@@ -36,23 +36,22 @@ You can immediately use the new component type, `LabeledValue`, putting it into 
 The XMLUI engine displays all `LabeledValue` component instances:
 
 <Playground
-    name="LabeledText"
-    components={[`
-      <Component name="LabeledValue">
-        <HStack>
-          <Text>Label:</Text>
-          <Text>Value</Text>
-        </HStack>
-      </Component>
-    `]}
-    app={`
+  name="LabeledText"
+  components={[`
+    <Component name="LabeledValue">
+      <HStack>
+        <Text>Label:</Text>
+        <Text>Value</Text>
+      </HStack>
+    </Component>
+  `]}
+  app={`
     <App>
       <LabeledValue />
       -- Separator text --
       <LabeledValue />
     </App>
-    `}
-    height={170}
+  `}
 />
 
 <Callout type="info" emoji="💡">
@@ -93,20 +92,19 @@ Use the same markup to pass property values to reusable components as you do for
 ```
 
 <Playground
-    name="LabeledText with properties"
-    components={[`
-      <Component name="LabeledValue">
-        <HStack><Text>{$props.label}</Text>:<Text>{$props.value}</Text></HStack>
-      </Component>
-    `]}
-    app={`
+  name="LabeledText with properties"
+  components={[`
+    <Component name="LabeledValue">
+      <HStack><Text>{$props.label}</Text>:<Text>{$props.value}</Text></HStack>
+    </Component>
+  `]}
+  app={`
     <App>
       <LabeledValue label="Firstname" value="Cameron" />
       -- Separator text --
       <LabeledValue label="Lastname" value="Smith" />
     </App>
-    `}
-    height={170}
+  `}
 />
 
 <Callout type="info" emoji="📔">
@@ -125,23 +123,22 @@ Sometimes, it is helpful to have default values for properties. XMLUI makes it s
 ```
 
 <Playground
-    name="LabeledText with default property values"
-    components={[`
-      <Component name="LabeledValue">
-        <HStack>
-          <Text>{$props.label ?? '[label]'}</Text>:
-          <Text>{$props.value ?? '[none]'}</Text>
-        </HStack>
-      </Component>
-    `]}
-    app={`
+  name="LabeledText with default property values"
+  components={[`
+    <Component name="LabeledValue">
+      <HStack>
+        <Text>{$props.label ?? '[label]'}</Text>:
+        <Text>{$props.value ?? '[none]'}</Text>
+      </HStack>
+    </Component>
+  `]}
+  app={`
     <App>
       <LabeledValue value="Cameron" />
       -- Separator text --
       <LabeledValue label="Lastname" />
     </App>
-    `}
-    height={170}
+  `}
 />
 
 ## Using Events
@@ -174,21 +171,20 @@ The following app uses the new event to append the number of clicks to a text. T
 Try using `<IncButton>` with the `incremented` event:
 
 <Playground
-    name="IncButton with an event"
-    components={[`
-      <Component name="IncButton">
-        <Button
-          label="Click to increment: {count}" var.count="{0}"
-          onClick="count++; emitEvent('incremented', count)" />
-      </Component>
-    `]}
-    app={`
+  name="IncButton with an event"
+  components={[`
+    <Component name="IncButton">
+      <Button
+        label="Click to increment: {count}" var.count="{0}"
+        onClick="count++; emitEvent('incremented', count)" />
+    </Component>
+  `]}
+  app={`
     <App var.text="">
       <IncButton onIncremented="v => text += ' ' + v" />
       <Text value="{text}" />
     </App>
-    `}
-    height={140}
+  `}
 />
 
 ## Exposing Component Methods [#exposing-methods]
@@ -233,21 +229,20 @@ The click event handler (`onClick`) of the second button uses the `myIncButton.s
 Try using this simple app:
 
 <Playground
-    name="IncButton with an exposed method"
-    components={[`
-      <Component name="IncButton" var.count="{0}" method.setValue="v => count = v">
-        <Button label="Click to increment: {count}" onClick="count++" />
-      </Component>
-`]}
-    app={`
+  name="IncButton with an exposed method"
+  components={[`
+    <Component name="IncButton" var.count="{0}" method.setValue="v => count = v">
+      <Button label="Click to increment: {count}" onClick="count++" />
+    </Component>
+  `]}
+  app={`
     <App>
       <HStack>
         <IncButton id="myIncButton" />
         <Button label="Set count to 123!" onClick="myIncButton.setValue(123)" />
       </HStack>
     </App>
-    `}
-    height={100}
+  `}
 />
 
 ## `<Slot>`
@@ -282,12 +277,9 @@ This sample injects children into `MyStack`:
 `MyStack` puts the children into the location designated by `Slot`:
 
 <Playground
-
-    name="Example: Using Slot"
-    horizontal={true}
-    height={200}
-    components={[
-        `
+  name="Example: Using Slot"
+  horizontal={true}
+  components={[`
     <Component name="MyStack">
       <H2>This is my special Stack</H2>
       <VStack padding="1rem" gap="0.2rem" backgroundColor="cyan">
@@ -296,7 +288,7 @@ This sample injects children into `MyStack`:
     </Component>
   `,
     ]}
-    app={`
+  app={`
     <App>
       <MyStack>
       These are the children injected into the
@@ -307,13 +299,11 @@ This sample injects children into `MyStack`:
   `}
 />
 
-_TODO: Now that we allow named slots for reusable components with template properties, document this feature._
-
 ## Reusable Components in Layout Containers
 
-<Callout type="info" emoji="💡">
-  When the engine renders a reusable component in a particular layout container, the rendered component **accommodates its container's layout context**.
-</Callout>
+When you use reusable components with layout containers wrapping them, displaying a particular markup is not always obvious. The reusable components may nest other layout containers. As you do not see these nested containers from the markup directly, sometimes you may not understand immediately a particular component arrangement.
+
+In this section, you will learn a few details about how reusable components are displayed within layout containers.
 
 Let's create a reusable component, `MyBoxes`, with this markup:
 
@@ -324,44 +314,61 @@ Let's create a reusable component, `MyBoxes`, with this markup:
 </Component>
 ```
 
-`MyBoxes` displays two boxes with different sizes and background color settings. This declaration does not specify how these two boxes should relate to each other; it only says the orange box follows the purple box.
+`MyBoxes` displays two boxes with different sizes and background color settings. Its declaration only tells the orange box to follow the purple box.
 
-Nest `MyBoxes` instances into an `HStack`:
+### Reusable Components in a Stack
 
-```ueml copy
+<Callout type="info" emoji="💡">
+  When you nest a reusable component into a stack, **the engine ignores all layout-related properties decorating the reusable component instance**.
+</Callout>
+
+Nest the `MyBoxes` instances into an `HStack`:
+
+```ueml copy /width="50%"/
 <App>
   <HStack>
-    <MyBoxes />
+    <MyBoxes width="50%" />
     <MyBoxes />
   </HStack>
 </App>
 ```
 
-It results in this output:
+The engine renders this markup as if your declaration was this (it ignores the `width="50%` of the first `MyBoxes`):
+
+```ueml copy
+<App>
+  <HStack>
+    <Stack width="100px" height="36px" backgroundColor="purple" />
+    <Stack width="50px" height="36px" backgroundColor="orange" />
+    <Stack width="100px" height="36px" backgroundColor="purple" />
+    <Stack width="50px" height="36px" backgroundColor="orange" />
+  </HStack> 
+</App>
+```
+
+Thus, the markup with `MyBoxes` results in this output:
 
 <Playground
-
-    name="Example: MyBoxes in a HStack"
-    horizontal={true}
-    height={100}
-    components={[`
-      <Component name="MyBoxes">
-        <Stack width="100px" height="36px" backgroundColor="purple" />
-        <Stack width="50px" height="36px" backgroundColor="orange" />
-      </Component>
-    `,
-    ]}
-    app={`
+  name="Example: MyBoxes in a HStack"
+  horizontal={true}
+  components={[`
+    <Component name="MyBoxes">
+      <Stack width="100px" height="36px" backgroundColor="purple" />
+      <Stack width="50px" height="36px" backgroundColor="orange" />
+    </Component>
+  `,
+  ]}
+  app={`
     <App>
       <HStack>
-        <MyBoxes />
+        <MyBoxes width="50%" />
         <MyBoxes />
       </HStack>
     </App>
   `}
 />
 
-Now, use a `VStack`:
+When you wrap `MyBoxes` into a `VStack`:
 
 ```ueml copy
 <App>
@@ -372,10 +379,22 @@ Now, use a `VStack`:
 </App>
 ```
 
-The previous output changes to this:
+The engine renders the markup as if it were this one:
+
+```ueml copy
+<App>
+  <VStack>
+    <Stack width="100px" height="36px" backgroundColor="purple" />
+    <Stack width="50px" height="36px" backgroundColor="orange" />
+    <Stack width="100px" height="36px" backgroundColor="purple" />
+    <Stack width="50px" height="36px" backgroundColor="orange" />
+  </VStack>
+</App>
+```
+
+Thus, the markup with `MyBoxes` in a wrapping `VStack` renders this:
 
 <Playground
-
     name="Example: MyBoxes in a VStack"
     horizontal={true}
     height={260}
@@ -396,78 +415,71 @@ The previous output changes to this:
   `}
 />
 
-Using a `FlowLayout` wrapper results in a third display:
+Because stacks use a non-zero gap by default, you see this gap between the children of `MyBoxes`.
+
+### Reusable Components in a FlowLayout
+
+While the stack components utilize the actual children of reusable components without wrapping or transforming them, **`FlowLayout` works differently**. To provide its functionality, it wraps each direct child into an internal container and removes the direct child's width settings. This internal container takes the width from the reusable component definition.
+
+Assume you use `MyBoxes` with a `FlowLayout`, like in this example:
 
 ```ueml copy
 <App>
   <FlowLayout>
-    <MyBoxes />
+    <MyBoxes width="50%" />
     <MyBoxes />
   </FlowLayout>
 </App>
 ```
 
-<Playground
+Because of the internal wrapping, the engine renders a markup like this:
 
-    name="Example: MyBoxes in FlowLayout"
-    horizontal={true}
-    height={230}
-    components={[`
-      <Component name="MyBoxes">
-        <Stack width="100px" height="36px" backgroundColor="purple" />
-        <Stack width="50px" height="36px" backgroundColor="orange" />
-      </Component>
-    `,
-    ]}
-    app={`
+```ueml copy
+<App>
+  <FlowLayout>
+    <FlowLayoutItem width="50%">
+      <Stack height="36px" backgroundColor="purple" />
+      <Stack height="36px" backgroundColor="orange" />
+    </FlowLayoutItem>
+    <FlowLayoutItem>
+      <Stack height="36px" backgroundColor="purple" />
+      <Stack height="36px" backgroundColor="orange" />
+    </FlowLayoutItem>
+  </FlowLayout>
+</App>
+```
+
+<Callout type="info" emoji="📔">
+  Note that the original `Stack` widths within `MyBoxes` are removed, and the 50% width of the first `MyBoxes` is transposed into the first virtual `FlowLayoutItem`.
+</Callout>
+
+<Playground
+  name="Example: MyBoxes in FlowLayout"
+  horizontal={true}
+  components={[`
+    <Component name="MyBoxes">
+      <Stack width="100px" height="36px" backgroundColor="purple" />
+      <Stack width="50px" height="36px" backgroundColor="orange" />
+    </Component>
+  `,
+  ]}
+  app={`
     <App>
       <FlowLayout>
-        <MyBoxes />
+        <MyBoxes width="50%" />
         <MyBoxes />
       </FlowLayout>
     </App>
   `}
 />
 
-### Component Flattening
-
-Each layout container uses its strategy to render the nested children. Though a `<Component>` tag wraps the two boxes within `MyBoxes`, that tag does not create any extra artifact. The rendering engine puts the two children of `MyBoxes` as if you put them directly in their layout components. So, when you wrap the two `MyBoxes` instances into an `HStack`, the results is as if you used this markup:
-
-```ueml copy
-<App>
-  <HStack>
-    <Stack width="100px" height="36px" backgroundColor="purple" />
-    <Stack width="50px" height="36px" backgroundColor="orange" />
-    <Stack width="100px" height="36px" backgroundColor="purple" />
-    <Stack width="50px" height="36px" backgroundColor="orange" />
-  </HStack>
-</App>
-```
-
-<Playground
-
-    name="Example: flattening MyBoxes in an HStack"
-    horizontal={true}
-    height={100}
-    app={`
-      <App>
-        <HStack>
-          <Stack width="100px" height="36px" backgroundColor="purple" />
-          <Stack width="50px" height="36px" backgroundColor="orange" />
-          <Stack width="100px" height="36px" backgroundColor="purple" />
-          <Stack width="50px" height="36px" backgroundColor="orange" />
-        </HStack>
-      </App>
-  `}
-/>
-
-The same flattening happens with a `VStack`.
-
-However, the `FlowLayout` container does not flatten the children. It keeps the two `MyBoxes` instances as separate entities.
+<Callout type="info" emoji="📔">
+  The purple and orange boxes are adjacent because the virtual `FlowLayoutItem` container does not use gaps. XMLUI does not provide a `FlowLayoutItem` component; we use this name here just for explanation.
+</Callout>
 
 ### Using Layout Containers Explicitly
 
-Use an explicit layout container within the component definition to avoid child component flattening. For example, if you want the purple and orange boxes in a particular layout (within the component), you can explicitly declare that intention:
+Use an explicit layout container within the component definition to avoid child component flattening. For example, if you want the purple and orange boxes in a horizontal layout (within the component), you can explicitly declare that intention:
 
 ```ueml copy /HStack gap="0" border="2px dotted green"/
 <Component name="MyBoxes">
@@ -479,26 +491,24 @@ Use an explicit layout container within the component definition to avoid child 
 ```
 
 <Callout type="info" emoji="📔">
-  This definition adds a border to the component to display the UI patch it fills.
+  This definition adds a dotted green border to the component to display the UI patch it fills for demonstration purposes.
 </Callout>
 
-Now, the output is different. You see this with an `HStack`:
+Wrap two `MyBoxes` instances into an `HStack`. The output differs from the one where you did not have an explicit layout container within `MyBoxes`. There is no gap between the purple and orange boxes as the `HStack` sets the gap explicitly to zero.
 
 <Playground
-
-    name="Example: MyBoxes in a HStack (explicit layout)"
-    horizontal={true}
-    height={100}
-    components={[`
-      <Component name="MyBoxes">
-        <HStack gap="0" border="2px dotted green" >
-          <Stack width="100px" height="36px" backgroundColor="purple" />
-          <Stack width="50px" height="36px" backgroundColor="orange" />
-        </HStack>
-      </Component>
-    `,
-    ]}
-    app={`
+  name="Example: MyBoxes in a HStack (explicit layout)"
+  horizontal={true}
+  components={[`
+    <Component name="MyBoxes">
+      <HStack gap="0" border="2px dotted green" >
+        <Stack width="100px" height="36px" backgroundColor="purple" />
+        <Stack width="50px" height="36px" backgroundColor="orange" />
+      </HStack>
+    </Component>
+  `,
+  ]}
+  app={`
     <App>
       <HStack>
         <MyBoxes />
@@ -508,23 +518,25 @@ Now, the output is different. You see this with an `HStack`:
   `}
 />
 
-With a `VStack`, this is the output:
+<Callout type="info" emoji="📔">
+Remember, an item's width in a horizontal stack (unless explicitly set) accommodates the content's width, which is 180 pixels here.
+</Callout>
+
+You get this output when you wrap the two `MyBoxes` instances into a `VStack`:
 
 <Playground
-
-    name="Example: MyBoxes in a VStack (explicit layout)"
-    horizontal={true}
-    height={160}
-    components={[`
-      <Component name="MyBoxes">
-        <HStack gap="0" border="2px dotted green" >
-          <Stack width="100px" height="36px" backgroundColor="purple" />
-          <Stack width="50px" height="36px" backgroundColor="orange" />
-        </HStack>
-      </Component>
-    `,
-    ]}
-    app={`
+  name="Example: MyBoxes in a VStack (explicit layout)"
+  horizontal={true}
+  components={[`
+    <Component name="MyBoxes">
+      <HStack gap="0" border="2px dotted green" >
+        <Stack width="100px" height="36px" backgroundColor="purple" />
+        <Stack width="50px" height="36px" backgroundColor="orange" />
+      </HStack>
+    </Component>
+  `,
+  ]}
+  app={`
     <App>
       <VStack>
         <MyBoxes />
@@ -534,23 +546,25 @@ With a `VStack`, this is the output:
   `}
 />
 
+<Callout type="info" emoji="📔">
+  Remember, an item's width in a vertical stack (unless explicitly set) is the entire width (100%) within the stack's parent.
+</Callout>
+
 The display with a `FlowLayout`:
 
 <Playground
-
-    name="Example: MyBoxes in a FlowLayout (explicit layout)"
-    horizontal={true}
-    height={160}
-    components={[`
-      <Component name="MyBoxes">
-        <HStack gap="0" border="2px dotted green" >
-          <Stack width="100px" height="36px" backgroundColor="purple" />
-          <Stack width="50px" height="36px" backgroundColor="orange" />
-        </HStack>
-      </Component>
-    `,
-    ]}
-    app={`
+  name="Example: MyBoxes in a FlowLayout (explicit layout)"
+  horizontal={true}
+  components={[`
+    <Component name="MyBoxes">
+      <HStack gap="0" border="2px dotted green" >
+        <Stack width="100px" height="36px" backgroundColor="purple" />
+        <Stack width="50px" height="36px" backgroundColor="orange" />
+      </HStack>
+    </Component>
+  `,
+  ]}
+  app={`
     <App>
       <FlowLayout>
         <MyBoxes />
@@ -560,9 +574,14 @@ The display with a `FlowLayout`:
   `}
 />
 
-## Using Explicit Component Width
+<Callout type="info" emoji="📔">
+  Remember, an item's width in a `FlowLayout` (unless explicitly set) is the entire width (100%) within the parent.
+</Callout>
 
-Because `MyBoxes` does not use an explicit component width, nesting them into a `VStack` or a `FlowLayout` will size them to the available width. If your intention is different, you can use an explicit width specification in the `MyBoxes` declaration:
+
+### Using Explicit Component Width
+
+When you use a layout container within a reusable component, you can assign an explicit width to that container, like in this example:
 
 ```ueml copy /width="180px"/
 <Component name="MyBoxes">
@@ -572,6 +591,21 @@ Because `MyBoxes` does not use an explicit component width, nesting them into a 
   </HStack>
 </Component>
 ```
+
+The purple and orange boxes are in a horizontal stack set to 180 pixels wide. This definition sets a dotted green border around the horizontal stack for demonstration purposes.
+
+Place two `MyBoxes` instances in an `HStack`:
+
+```ueml copy
+<App>
+  <HStack>
+    <MyBoxes />
+    <MyBoxes />
+  </HStack>
+</App>
+```
+
+The engine renders this output:
 
 <Playground
 
@@ -621,7 +655,7 @@ Because `MyBoxes` does not use an explicit component width, nesting them into a 
   `}
 />
 
-_We have a bug in FlowLayout; it should respect the "180px" width value, but it does not. TODO: Check the sample after fixing the bug._
+As you already learned, `FlowLayout` removes its direct children's explicit widths and uses the width assigned to the reusable component. So, even if you use a 180-pixel wide `HStack` within `MyBoxes`, `FlowLayout` ignores that width. Nonetheless, the two stacks within `HStack` are non-direct children, so their width is kept.
 
 <Playground
 
