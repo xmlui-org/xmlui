@@ -3,6 +3,7 @@
   "version": "0.7.0",
   "sideEffects": false,
   "scripts": {
+    "start": "cd src/testing && xmlui start",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
@@ -98,6 +99,7 @@
     "@babel/core": "7.19.6",
     "@babel/preset-env": "7.19.4",
     "@babel/preset-typescript": "7.18.6",
+    "@playwright/test": "^1.49.0",
     "@types/adm-zip": "0.5.4",
     "@types/glob": "7.2.0",
     "@types/lodash-es": "4.17.6",
@@ -121,6 +123,7 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "prettier": "^3.3.3",
     "rimraf": "6.0.1",
+    "serve": "14.2.0",
     "rollup-plugin-visualizer": "5.8.3",
     "typedoc": "^0.26.2",
     "typescript": "^5.5.4",

@@ -26,3 +26,7 @@ storybook-static
 *.sw?
 
 scripts/generate-docs/metadata.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
