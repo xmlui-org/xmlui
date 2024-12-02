@@ -1,4 +1,4 @@
-import { BrowserContext, Locator, Page } from "@playwright/test";
+import type { BrowserContext, Locator, Page } from "@playwright/test";
 import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
 import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 import type { ThemeDefinition } from "xmlui";
@@ -22,13 +22,14 @@ function parseComponent(entryPoint: ComponentDefNew<any> | string) {
   return entryPoint;
 }
 
-export async function initApp(page: Page, appDescription: UnparsedAppDescription, url: string = "/") {
+export async function initApp(page: Page, appDescription: UnparsedAppDescription, url: string = "/", resources = {}) {
   const { entryPoint, components } = appDescription;
 
   const _appDescription: StandaloneAppDescription = {
     ...appDescription,
     name: appDescription.name || "Test App",
     entryPoint: parseComponent(entryPoint),
+    resources,
     components: !components
       ? undefined
       : Array.isArray(components)

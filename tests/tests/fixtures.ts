@@ -7,11 +7,11 @@ import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-pa
 export { test } from "@playwright/test";
 
 async function getElementSize(locator: Locator) {
-  const [width, height] = await locator.evaluate((element) => [
+  const dimensions = await locator.evaluate((element) => [
     element.clientWidth,
     element.clientHeight,
   ]);
-  return {width, height} as const;
+  return { width: dimensions[0] ?? 0, height: dimensions[1] ?? 0 } as const;
 }
 
 export type ComponentDriverParams = {
@@ -20,7 +20,7 @@ export type ComponentDriverParams = {
 }
 
 export class ComponentDriver {
-  public readonly locator: Locator;
+  protected readonly locator: Locator;
   protected readonly testStateLocator: Locator;
 
   constructor({ locator, testStateLocator }: ComponentDriverParams) {
@@ -28,26 +28,27 @@ export class ComponentDriver {
     this.testStateLocator = testStateLocator;
   }
 
-  async click() {
+  get component () {
+    return this.locator;
+  }
+
+  // NOTE: methods must be created using the arrow function notation.
+  // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
+
+  click = async () => {
     await this.locator.click();
   }
  
-  // Not working yet
-  async getSize() {
-    return { width: 0, height: 0 };
+  getComponentSize = async () => {
+    return getElementSize(this.locator);
   }
 
-  async expectDefaultTestState(options?: {timeout?: number, intervals?: number[]}) {
-    await this.expectTestStateToEq({}, options)
-  }
-
-  // Too obscure
-  async expectTestStateToEq(expected: any, options?: {timeout?: number, intervals?: number[]}) {
-    await expect.poll(this.getTestState(), options).toEqual(expected);
+  expectTestState(options?: {timeout?: number, intervals?: number[]}) {
+    return expect.poll(this.getTestState(), options);
   }
 
   /** returns an async function that can query the test state */
-  private getTestState() {
+  getTestState() {
     return async () =>{
       const text = await this.testStateLocator.textContent();
       const testState = JSON.parse(text!);
@@ -61,12 +62,12 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
   DriverClass: T
 ) {
   return baseTest.extend<{
-    createDriver: (source: string) => Promise<InstanceType<T>>;
+    createDriver: (source: string, resources?: Record<string, string>) => Promise<InstanceType<T>>;
   }>({
     createDriver: async ({page}, use) => {
-      await use(async (source: string) => {
+      await use(async (source: string, resources?: Record<string, string>) => {
         const testStateViewTestId = "test-state-view-testid"
-        const prefix = `<Fragment var.testState="{{}}">`
+        const prefix = `<Fragment var.testState="{undefined}">`
         const suffix =`
           <Stack width="0" height="0">
             <Text
@@ -82,7 +83,7 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
         const componentTestId = "test-id-component";
         (component as ComponentDef).children![0].testId ??= componentTestId;
 
-        await initApp(page, { entryPoint: component });
+        await initApp(page, { entryPoint: component, resources });
         return new DriverClass({
           locator: page.getByTestId((component as ComponentDef).children![0].testId!),
           testStateLocator: page.getByTestId(testStateViewTestId)
