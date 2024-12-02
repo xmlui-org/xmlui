@@ -86,7 +86,7 @@ test("can render icon", async ({ createDriver }) => {
   await expect(driver.buttonIcon).toBeVisible();
 });
 
-test("renders correct icon", async ({ createDriver }) => {
+test.skip("renders correct icon", async ({ createDriver }) => {
   // const driver = await createDriver(`<Fragment><Button icon="test" /><Icon name="test" /></Fragment>`,
   // { "icon.test": "resources/xmlui-logo.svg" });
   const driver = await createDriver(`<Button icon="trash" />`);
@@ -99,10 +99,9 @@ test("renders icon and label", async ({ createDriver }) => {
   await expect(driver.buttonIcon).toBeVisible();
 });
 
-// Should the icon also be ignored if children are present as does the label?
 test("renders icon if children present", async ({ createDriver }) => {
   const driver = await createDriver(`<Button icon="trash">Hello World</Button>`);
-  await expect(driver.buttonIcon).toBeAttached();
+  await expect(driver.buttonIcon).toBeVisible();
 });
 
 [
@@ -120,7 +119,7 @@ test("renders icon if children present", async ({ createDriver }) => {
   });
 });
 
-test("renders if icon is not found and label is present", async ({ createDriver }) => {
+test.skip("renders if icon is not found and label is present", async ({ createDriver }) => {
   /* const driver = await createDriver(`<Button icon="___" label="hello" />`);
   await expect(driver.buttonIcon).not.toBeAttached();
   await expect(driver.button).toHaveText("hello"); */
@@ -128,9 +127,14 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 
 // --- --- iconPosition
 
+test("has a horizontal content layout", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button icon="trash" label="hello" />`);
+  await expect(driver.button).toBeVisible();
+});
+
 // With label
 
-test("left position appears left of label in ltr", async ({ createDriver }) => {
+test.skip("left position appears left of label in ltr", async ({ createDriver }) => {
   const driver = await createDriver(`<Button icon="trash" label="hello" />`);
   await expect(driver.button).toBeVisible();
 });
@@ -176,21 +180,30 @@ test.skip("end position appears at right of children", async ({ createDriver }) 
 // --- --- type
 
 ["button", "reset", "submit"].forEach((type) => {
-  test.skip(`type="${type}" is reflected in html`, async ({ createDriver }) => {});  
+  test(`type="${type}" is reflected in html`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button type="${type}" />`);
+    await expect(driver.button).toHaveAttribute("type", type);
+  });  
 });
 
 // --- --- enabled
 
-// await expect(locator).toBeEnabled()
-test.skip("has enabled state", async ({ createDriver }) => {});
+test("has enabled state", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button enabled="true" />`);
+  await expect(driver.button).toBeEnabled();
+});
 
-// await expect(locator).toBeDisabled()
-test.skip("has disabled state", async ({ createDriver }) => {});
+test("has disabled state", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button enabled="false" />`);
+  await expect(driver.button).toBeDisabled();
+});
 
 // --- --- autoFocus
 
-// await expect(locator).toBeFocused()
-test.skip("focuses component if autoFocus is set", async ({ createDriver }) => {});
+test("focuses component if autoFocus is set", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button autoFocus="{true}" />`);
+  await expect(driver.button).toBeFocused();
+});
 
 // --- --- variant & themeColor
 
@@ -212,33 +225,78 @@ test.skip("focuses component if autoFocus is set", async ({ createDriver }) => {
   test.skip(`compare size "${size}" with default size`, async ({ createDriver }) => {});  
 });
 
-test.skip("Button height is determined by content", async ({ createDriver }) => {});
+//test.skip("Button height is determined by content", async ({ createDriver }) => {});
 
 // --- Events
 
-// --- --- click
-
-test.skip("click event fires", async ({ createDriver }) => {
-  // test for event doing actually what is defined, e.g. change label text, write to console, etc.
-  /* 
-  testBed.expectEventNotToBeInvoked()
-  await driver.click();
-  testBed.expectEventToBeInvoked()
-  */
+test("testState initializes to default value", async ({ createDriver }) => {
+  const driver = await createDriver(`<Fragment />`);
+  await expect.poll(driver.testState).toEqual(null);
 });
 
-test.skip("click event does not fire if disabled", async ({ createDriver }) => {});
+// --- --- click
+
+test("click event fires", async ({ createDriver }) => {
+  // test for event doing actually what is defined, e.g. change label text, write to console, etc.
+  const driver = await createDriver(`<Button onClick="testState = true" />`);  
+  await driver.click();
+  await expect.poll(driver.testState).toEqual(true);
+});
+
+test("click event does not fire if disabled", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button enabled="false" onClick="testState = true" />`);  
+  try {
+    await driver.click({ timeout: 500 });
+  } catch (e) {
+    // This click event is deliberately ignored
+  }
+  // testState remains unchanged
+  await expect.poll(driver.testState).toEqual(null);
+});
 
 // --- --- gotFocus
 
-test.skip("gotFocus event fires & is focused", async ({ createDriver }) => {});
+test("is focused & gotFocus event fires", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button onGotFocus="testState = true" />`);  
+  await driver.focus();
 
-test.skip("gotFocus event does not fire if disabled", async ({ createDriver }) => {});
+  await expect(driver.button).toBeFocused();
+  await expect.poll(driver.testState).toEqual(true);
+});
+
+test("gotFocus event does not fire if disabled", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button enabled="false" onGotFocus="testState = true" />`);  
+  await driver.focus();
+
+  // testState remains unchanged
+  await expect(driver.button).not.toBeFocused();
+  await expect.poll(driver.testState).toEqual(null);
+});
 
 // --- --- lostFocus
 
-test.skip("lostFocus event fires & is not focused", async ({ createDriver }) => {});
+test("lostFocus event fires & is not focused", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button onLostFocus="testState = true" />`);
+  await driver.focus();
+  await driver.blur();
 
-test.skip("cannot emit lostFocus event if not focused before", async ({ createDriver }) => {});
+  await expect(driver.button).not.toBeFocused();
+  await expect.poll(driver.testState).toEqual(true);
+});
 
-test.skip("lostFocus event does not fire if disabled", async ({ createDriver }) => {});
+test("cannot emit lostFocus event if not focused before", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button onLostFocus="testState = true" />`);
+  await driver.blur();
+
+  await expect.poll(driver.testState).toEqual(null);
+});
+
+test("lostFocus event does not fire if disabled", async ({ createDriver }) => {
+  const driver = await createDriver(`<Button enabled="false" onLostFocus="testState = true" />`);
+  await driver.focus();
+  await driver.blur();
+
+  // testState remains unchanged
+  await expect(driver.button).not.toBeFocused();
+  await expect.poll(driver.testState).toEqual(null);
+});

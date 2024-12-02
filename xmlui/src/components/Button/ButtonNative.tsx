@@ -1,15 +1,16 @@
 import styles from "./Button.module.scss";
 
 import classnames from "@components-core/utils/classnames";
-import type {
-  ButtonType,
-  ButtonVariant,
-  ButtonThemeColor,
-  ComponentSize,
-  IconPosition,
-  AlignmentOptions,
-  OrientationOptions,
-  ButtonAria,
+import {
+  type ButtonType,
+  type ButtonVariant,
+  type ButtonThemeColor,
+  type ComponentSize,
+  type IconPosition,
+  type AlignmentOptions,
+  type OrientationOptions,
+  type ButtonAria,
+  defaultButtonType,
 } from "@components/abstractions";
 import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
 
@@ -45,7 +46,7 @@ type Props = {
 export const Button = React.forwardRef(function Button(
   {
     id,
-    type = "button",
+    type = defaultButtonType,
     icon,
     iconPosition = "left",
     contentPosition = "center",

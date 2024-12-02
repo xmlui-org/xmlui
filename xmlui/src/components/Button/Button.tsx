@@ -8,6 +8,7 @@ import {
   buttonVariantMd,
   buttonTypesMd,
   iconPositionMd,
+  defaultButtonType,
 } from "@components/abstractions";
 
 import { Icon } from "@components/Icon/IconNative";
@@ -52,7 +53,7 @@ export const ButtonMd = createMetadata({
         `rarely need to set this property explicitly.`,
       buttonTypesMd,
       "string",
-      "button",
+      defaultButtonType,
     ),
     enabled: d(
       `The value of this property indicates whether the button accepts actions (\`true\`) ` +
@@ -183,7 +184,7 @@ export const buttonComponentRenderer = createComponentRenderer(
     const label = extractValue.asDisplayText(node.props.label);
     return (
       <Button
-        type={node.props.type as any}
+        type={node.props.type}
         variant={extractValue(node.props.variant)}
         themeColor={extractValue(node.props.themeColor)}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus)}
@@ -191,7 +192,7 @@ export const buttonComponentRenderer = createComponentRenderer(
         icon={iconName && <Icon name={iconName} />}
         iconPosition={extractValue(node.props.iconPosition)}
         contentPosition={extractValue(node.props.contentPosition)}
-        disabled={!extractValue(node.props.enabled ?? true)}
+        disabled={!extractValue.asOptionalBoolean(node.props.enabled ?? true)}
         onClick={lookupEventHandler("click")}
         onFocus={lookupEventHandler("gotFocus")}
         onBlur={lookupEventHandler("lostFocus")}
