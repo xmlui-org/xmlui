@@ -233,7 +233,6 @@ $componentName: "Select";
 .selectContent {
   position: relative;
   z-index: 50;
-  height: 14rem;
   overflow: auto;
   background-color: createThemeVar("Input:color-bg-menu-#{$componentName}");
   border-radius: createThemeVar("Input:radius-menu-#{$componentName}");

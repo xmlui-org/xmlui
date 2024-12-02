@@ -312,7 +312,7 @@ export function Select({
               </SelectIcon>
             </SelectTrigger>
             <SelectPortal container={root}>
-              <SelectContent className={styles.selectContent} position="popper">
+              <SelectContent className={styles.selectContent} position="popper" style={{height: dropdownHeight}}>
                 <ScrollUpButton className={styles.selectScrollUpButton}>
                   <Icon name="chevronup" />
                 </ScrollUpButton>
