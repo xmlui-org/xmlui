@@ -32,6 +32,7 @@ import { getByPath } from "@components/Form/FormNative";
 import { asOptionalBoolean } from "@components-core/container/valueExtractor";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { FormItemMd } from "./FormItem";
+import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
 
 type FormControlType =
   | "text"
@@ -42,7 +43,7 @@ type FormControlType =
   | "integer"
   | "file"
   | "select"
-  | "multiSelect"
+  | "autocomplete"
   | "datePicker"
   | "radioGroup"
   | "custom"
@@ -148,6 +149,21 @@ export const FormItem = memo(function FormItem({
         >
           {children}
         </Select>
+      );
+      break;
+    }
+    case "autocomplete": {
+      formControl = (
+        <AutoComplete
+          {...rest}
+          value={value}
+          updateState={onStateChange}
+          registerComponentApi={registerComponentApi}
+          enabled={isEnabled}
+          validationStatus={validationStatus}
+        >
+          {children}
+        </AutoComplete>
       );
       break;
     }
