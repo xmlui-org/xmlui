@@ -25,7 +25,7 @@ window.XMLUI_MOCK_API = {
   type: "db",
   config: {
     database: "cl-tutorial-db",
-    version: 8,
+    version: 1,
   },
   apiUrl: "/api",
   initialData: {
@@ -379,40 +379,50 @@ window.XMLUI_MOCK_API = {
     "contact-list": {
       url: "/contacts",
       method: "get",
-      handler: `$db.$contacts.toArray();`,
+      handler: `$db.$contacts.toArray()
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-list-recent": {
       url: "/contacts-recent",
       method: "get",
-      handler: `$db.$contacts.orderBy(t => t.id, true).take(5).toArray();`,
+      handler: `$db.$contacts.orderBy(t => t.id, true)
+        .take(5).toArray()
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-list-overdue": {
       url: "/contacts/overdue",
       method: "get",
-      handler: `$db.$contacts.whereAsArray(t => getSection(t) === 'Overdue');`,
+      handler: `$db.$contacts
+        .whereAsArray(t => getSection(t) === 'Overdue')
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-list-today": {
       url: "/contacts/today",
       method: "get",
       handler: `$db.$contacts.whereAsArray(t => 
-        !t.reviewCompleted && t.reviewDueDate && 
-        $env.getDate(t.reviewDueDate).setHours(0,0,0,0) === $env.getDate().setHours(0,0,0,0)
-      );`,
+          !t.reviewCompleted && t.reviewDueDate && 
+          $env.getDate(t.reviewDueDate).setHours(0,0,0,0) === $env.getDate().setHours(0,0,0,0)
+        )
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-list-upcoming": {
       url: "/contacts/upcoming",
       method: "get",
-      handler: `$db.$contacts.whereAsArray(t => getSection(t) === 'Upcoming');`,
+      handler: `$db.$contacts
+        .whereAsArray(t => getSection(t) === 'Upcoming')
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-list-completed": {
       url: "/contacts/completed",
       method: "get",
-      handler: `$db.$contacts.whereAsArray(t => getSection(t) === 'Completed');`,
+      handler: `$db.$contacts
+        .whereAsArray(t => getSection(t) === 'Completed')
+        .map(c => ({...c, categoryId: c.categoryId.toString()}));`,
     },
 
     "contact-counts": {
@@ -456,14 +466,14 @@ window.XMLUI_MOCK_API = {
     },
 
     "contacts-edit": {
-      url: "/contacts/:taskId",
+      url: "/contacts/:contactId",
       pathParamTypes: {
-        taskId: "integer",
+        contactId: "integer",
       },
       method: "put",
       handler: `
         // --- Get task attributes
-        const taskId = $pathParams.taskId;
+        const contactId = $pathParams.contactId;
         const { 
           fullName, 
           categoryId, 
@@ -473,18 +483,18 @@ window.XMLUI_MOCK_API = {
         } = $requestBody; 
         
         // --- Update the task
-        const originalTask = Assertions.ensureContact(taskId);  
+        const originalTask = Assertions.ensureContact(contactId);  
         $db.$contacts.update({
           ...originalTask,
           fullName,
-          categoryId,
+          categoryId: categoryId ? Number(categoryId) : null,
           comments,
           reviewDueDate,
           reviewCompleted,
         });
 
         // --- Done.
-        return $db.$contacts.byId(taskId);
+        return $db.$contacts.byId(contactId);
         `,
     },
 
@@ -529,7 +539,9 @@ window.XMLUI_MOCK_API = {
     "categories-list": {
       url: "/categories",
       method: "get",
-      handler: `$db.$categories.toArray()`,
+      handler: `
+        $db.$categories.toArray().map(c => ({...c, id: c.id.toString()}));
+      `,
     },
   },
 };
