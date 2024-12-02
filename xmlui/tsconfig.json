@@ -26,7 +26,8 @@
       "@core/*": ["./src/core/*"],
       "@components-core/*": ["./src/components-core/*"],
       "@components/*": ["./src/components/*"],
-      "@parsers/*": ["./src/parsers/*"]
+      "@parsers/*": ["./src/parsers/*"],
+      "@testing/*": ["./src/testing/*"]
     }
   },
   "include": [
