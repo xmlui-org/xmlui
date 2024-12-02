@@ -75,7 +75,7 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: process.env.CI ? `npx serve dist -p ${port}` : `npm run start -- --port ${port}`,
+    command: process.env.CI ? `npx serve dist -p ${port}` : `npm run start-test-bed -- --port ${port}`,
     timeout: 10 * 1000,
     port,
     reuseExistingServer: !process.env.CI,

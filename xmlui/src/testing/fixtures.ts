@@ -52,10 +52,6 @@ export class ComponentDriver {
     return getElementSize(this.locator);
   }
 
-  expectTestState(options?: {timeout?: number, intervals?: number[]}) {
-    return expect.poll(this.testState, options);
-  }
-
   /** returns an async function that can query the test state */
   get testState () {
     return async () =>{
@@ -106,7 +102,9 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
 
 // -----------------------------------------------------------------
 
-const expectWithToEqualWithTolerance = baseExpect.extend({
+export type ColorChannelCombinations = "red" | "green" | "blue" | "grey"
+
+export const expect = baseExpect.extend({
   /**
    * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
    * Used to compare element dimensions on different platforms because of half pixel rendering.
@@ -149,11 +147,6 @@ const expectWithToEqualWithTolerance = baseExpect.extend({
       actual: undefined,
     };
   },
-});
-
-export type ColorChannelCombinations = "red" | "green" | "blue" | "grey"
-
-const expectWithToBeShadeOf = baseExpect.extend({
   /**
    * Determines whether a color has a promininent red or green or blue shade in regards to the RGB colorspace.
    * How: the red, green or blue color channel value is higher than the others and the other 2 have the same value (so the most they can do is to make the color more pale).
@@ -215,9 +208,7 @@ const expectWithToBeShadeOf = baseExpect.extend({
       actual: providedColor,
     };
   },
-});
 
-const expectWithToBeTransparent = baseExpect.extend({
   /**
    * Determines whether a color is transparent using it's alpha channel.
    * The value to check should be a valid rgba color like "rgba(255, 0, 0, 0)"
@@ -260,5 +251,3 @@ const expectWithToBeTransparent = baseExpect.extend({
     };
   },
 });
-
-export const expect: number = mergeExpects(expectWithToEqualWithTolerance, expectWithToBeShadeOf, expectWithToBeTransparent);
