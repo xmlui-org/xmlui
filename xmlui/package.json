@@ -3,7 +3,7 @@
   "version": "0.7.0",
   "sideEffects": false,
   "scripts": {
-    "start": "cd src/testing/infrastructure && xmlui start",
+    "start-test-bed": "cd src/testing/infrastructure && xmlui start",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",

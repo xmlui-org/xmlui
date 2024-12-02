@@ -14,7 +14,8 @@ import { defineConfig, devices } from '@playwright/test';
 
 const port = 3210;
 export default defineConfig({
-  testDir: './e2e',
+  testDir: './src/components',
+  testMatch: '*.spec.ts',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -38,7 +39,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], channel: 'chromium', },
     },
 
     // {
