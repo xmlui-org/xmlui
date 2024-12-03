@@ -1,5 +1,4 @@
-import type { KeyboardEventHandler } from "react";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { KeyboardEventHandler, useCallback, useEffect, useMemo, useState } from "react";
 import { useEvent } from "@components-core/utils/misc";
 import { union, uniq } from "lodash-es";
 import { EMPTY_ARRAY } from "@components-core/constants";
@@ -86,7 +85,6 @@ type RowSelectionOperations = {
   selectionApi: SelectionApi;
 };
 
-
 export default function useRowSelection({
   items = EMPTY_ARRAY,
   visibleItems = items,
@@ -111,26 +109,30 @@ export default function useRowSelection({
     return visibleItems.map((item) => item[idKey]);
   }, [idKey, visibleItems]);
 
-
   // --- If the items change, refresh the selectable items (if the rows are selectable)
   useEffect(() => {
     refreshSelection(rowsSelectable ? items : EMPTY_ARRAY);
   }, [refreshSelection, items, rowsSelectable]);
 
-
   // --- If the multi-row selection switches to disabled, keep only the first selected item
   const prevEnableMultiRowSelection = usePrevious(enableMultiRowSelection);
   useEffect(() => {
-    if(prevEnableMultiRowSelection && !enableMultiRowSelection){
-      if(selectedItems.length > 1){
+    if (prevEnableMultiRowSelection && !enableMultiRowSelection) {
+      if (selectedItems.length > 1) {
         setSelectedRowIds([selectedItems[0][idKey]]);
       }
     }
-  }, [enableMultiRowSelection, idKey, prevEnableMultiRowSelection, selectedItems, setSelectedRowIds]);
+  }, [
+    enableMultiRowSelection,
+    idKey,
+    prevEnableMultiRowSelection,
+    selectedItems,
+    setSelectedRowIds,
+  ]);
 
   // --- If the focused item is not available set the focus to the first item
   useEffect(() => {
-    if(!rowsSelectable){
+    if (!rowsSelectable) {
       return;
     }
     if (focusedIndex !== -1 && !walkableList[focusedIndex] && walkableList[0]) {
@@ -144,7 +146,7 @@ export default function useRowSelection({
     // targetIndex: the item affected by an event
     // options: key event options
     (targetIndex: number, options: ToggleOptions = {}) => {
-      if(!rowsSelectable){
+      if (!rowsSelectable) {
         return;
       }
 
@@ -236,7 +238,7 @@ export default function useRowSelection({
   // --- This function handles the user event to change the current selection according to the row ID
   // --- affected by the event
   const toggleRow = useEvent((item: any, options?: ToggleOptions) => {
-    if(!rowsSelectable){
+    if (!rowsSelectable) {
       return;
     }
     const targetIndex = walkableList.indexOf(item[idKey]);
@@ -245,7 +247,7 @@ export default function useRowSelection({
 
   // --- Handle the key events that may change the current selection
   const onKeyDown: KeyboardEventHandler = useEvent((event) => {
-    if(!rowsSelectable){
+    if (!rowsSelectable) {
       return;
     }
     if (event.key === "ArrowDown") {
@@ -287,13 +289,13 @@ export default function useRowSelection({
    * This operation checks or clears all rows
    */
   const checkAllRows = useEvent((checked: boolean) => {
-    if(!rowsSelectable){
+    if (!rowsSelectable) {
       return;
     }
     if (!enableMultiRowSelection && checked) {
       return;
     }
-    setSelectedRowIds(checked ? items.map(item => item[idKey]) : []);
+    setSelectedRowIds(checked ? items.map((item) => item[idKey]) : []);
   });
 
   /**
@@ -325,7 +327,7 @@ export default function useRowSelection({
 
   const selectId = useCallback(
     (id: any | Array<any>) => {
-      if(!rowsSelectable){
+      if (!rowsSelectable) {
         return;
       }
       let ids = Array.isArray(id) ? id : [id];
@@ -345,13 +347,7 @@ export default function useRowSelection({
       selectAll,
       selectId,
     };
-  }, [
-    clearSelection,
-    getSelectedIds,
-    getSelectedItems,
-    selectAll,
-    selectId,
-  ]);
+  }, [clearSelection, getSelectedIds, getSelectedItems, selectAll, selectId]);
 
   // --- Retrieve the selection management object
   return {
