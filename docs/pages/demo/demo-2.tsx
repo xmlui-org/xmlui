@@ -12,5 +12,6 @@ export default () => (
     themes={config.themes}
     api={api}
     defaultTone={config.defaultTone}
+    horizontal={true}
   />
 );

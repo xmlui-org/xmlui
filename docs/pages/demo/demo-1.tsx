@@ -9,6 +9,7 @@ export default () => (
     name={config.name}
     app={app}
     api={api}
+    horizontal={true}
     defaultTone={config.defaultTone}
   />
 );
