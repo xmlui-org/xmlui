@@ -3,7 +3,8 @@ import { createContext, useContext } from "react";
 import type { Option } from "@components/abstractions";
 
 type AutoCompleteContextValue = {
-  value: string[];
+  multi?: boolean;
+  value: string | string[] | null;
   onChange?: (selectedValue: string) => void;
   optionRenderer: (option: Option) => ReactNode;
   inputValue: string;
