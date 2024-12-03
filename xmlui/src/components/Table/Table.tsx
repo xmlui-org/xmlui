@@ -137,6 +137,7 @@ export const TableMd = createMetadata({
     [`transform-text-heading-${COMP}`]: "uppercase",
     [`font-size-row-${COMP}`]: "$font-size-small",
     [`color-bg-${COMP}`]: "$color-bg",
+    [`color-bg-row-${COMP}`]: "inherit",
     [`color-border-cell-${COMP}`]: "$color-border",
     [`color-bg-selected-${COMP}--hover`]: `$color-bg-row-${COMP}--hover`,
     [`color-bg-pagination-${COMP}`]: `$color-bg-${COMP}`,
