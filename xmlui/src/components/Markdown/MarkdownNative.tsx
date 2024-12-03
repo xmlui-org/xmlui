@@ -1,4 +1,4 @@
-import { memo, type ReactNode } from "react";
+import { CSSProperties, memo, type ReactNode } from "react";
 
 import styles from "./Markdown.module.scss";
 
@@ -7,21 +7,28 @@ import { Heading } from "@components/Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "@components/Link/LinkNative";
 import { Image } from "@components/Image/ImageNative";
+import { layoutOptionKeys } from "@components-core/descriptorHelper";
 
 type MarkdownProps = {
+  removeIndents?: boolean;
   children: ReactNode;
+  layout?: CSSProperties;
 };
 
-export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
+export const Markdown = memo(function Markdown({ removeIndents = false, children, layout }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
+
+  children = removeIndents ? removeTextIndents(children) : children;
+  const textLayoutToUse = {textAlign: layout?.textAlign};
+
   return (
     <ReactMarkdown
       components={{
         h1({ id, children }) {
           return (
-            <Heading uid={id} level="h1" sx={{ lineHeight: "initial" }}>
+            <Heading uid={id} layout={textLayoutToUse} level="h1" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
@@ -62,7 +69,7 @@ export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
           );
         },
         p({ id, children }) {
-          return <Text uid={id}>{children}</Text>;
+          return <Text uid={id} layout={textLayoutToUse}>{children}</Text>;
         },
         code({ id, children }) {
           return (
@@ -94,16 +101,16 @@ export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
           );
         },
         blockquote({ children }) {
-          return <Blockquote>{children}</Blockquote>;
+          return <Blockquote layout={textLayoutToUse}>{children}</Blockquote>;
         },
         ol({ children }) {
-          return <OrderedList>{children}</OrderedList>;
+          return <OrderedList layout={textLayoutToUse}>{children}</OrderedList>;
         },
         ul({ children }) {
-          return <UnorderedList>{children}</UnorderedList>;
+          return <UnorderedList layout={textLayoutToUse}>{children}</UnorderedList>;
         },
         li({ children }) {
-          return <ListItem>{children}</ListItem>;
+          return <ListItem layout={textLayoutToUse}>{children}</ListItem>;
         },
         // This needs a parser plugin for the ~ and ~~ signs that are available via react-markdown-gfm
         // or we implement our own parser?
@@ -116,47 +123,68 @@ export const Markdown = memo(function Markdown({ children }: MarkdownProps) {
         },
         img({ src, alt }) {
           return <Image src={src} alt={alt} />;
-        },
+        }
       }}
     >
-      {children}
+      {children as any}
     </ReactMarkdown>
   );
 });
 
+function removeTextIndents(input: string): string {
+  const lines = input.split("\n");
+
+  // Find the shortest starting whitespace length
+  const minIndent = lines.reduce((min, line) => {
+    const match = line.match(/^\s*/);
+    const indentLength = match ? match[0].length : 0;
+    return line.trim() ? Math.min(min, indentLength) : min;
+  }, Infinity);
+
+  // Remove the shortest starting whitespace length from each line
+  const trimmedLines = lines.map((line) =>
+    line.startsWith(" ".repeat(minIndent)) ? line.slice(minIndent) : line,
+  );
+
+  return trimmedLines.join("\n");
+}
+
 const HorizontalRule = () => {
-    return <hr className={styles.horizontalRule} />;
-  };
-  
-  type BlockquoteProps = {
-    children: React.ReactNode;
-  };
-  
-  const Blockquote = ({ children }: BlockquoteProps) => {
-    return <blockquote className={styles.blockquote}>{children}</blockquote>;
-  };
-  
-  type UnorderedListProps = {
-    children: React.ReactNode;
-  };
-  
-  const UnorderedList = ({ children }: UnorderedListProps) => {
-    return <ul className={styles.unorderedList}>{children}</ul>;
-  };
-  
-  type OrderedListProps = {
-    children: React.ReactNode;
-  };
-  
-  const OrderedList = ({ children }: OrderedListProps) => {
-    return <ol className={styles.orderedList}>{children}</ol>;
-  };
-  
-  type ListItemProps = {
-    children: React.ReactNode;
-  };
-  
-  const ListItem = ({ children }: ListItemProps) => {
-    return <li className={styles.listItem}>{children}</li>;
-  };
-  
+  return <hr className={styles.horizontalRule} />;
+};
+
+type BlockquoteProps = {
+  children: React.ReactNode;
+  layout?: CSSProperties;
+};
+
+const Blockquote = ({ children, layout }: BlockquoteProps) => {
+  return <blockquote className={styles.blockquote} style={layout} >{children}</blockquote>;
+};
+
+type UnorderedListProps = {
+  children: React.ReactNode;
+  layout?: CSSProperties;
+};
+
+const UnorderedList = ({ children, layout }: UnorderedListProps) => {
+  return <ul className={styles.unorderedList} style={layout}>{children}</ul>;
+};
+
+type OrderedListProps = {
+  children: React.ReactNode;
+  layout?: CSSProperties;
+};
+
+const OrderedList = ({ children, layout }: OrderedListProps) => {
+  return <ol className={styles.orderedList} style={layout}>{children}</ol>;
+};
+
+type ListItemProps = {
+  children: React.ReactNode;
+  layout?: CSSProperties;
+};
+
+const ListItem = ({ children, layout }: ListItemProps) => {
+  return <li className={styles.listItem} style={layout}>{children}</li>;
+};
