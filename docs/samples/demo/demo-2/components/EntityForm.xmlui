@@ -1,0 +1,13 @@
+<Component name="EntityForm" var.mode="" var.selectedId="">
+    <ModalDialog id="dialog" title="{mode === 'add' ? 'Add To Sales Funnel' : 'Edit in Funnel'}" >
+        <Form data="/entities{mode === 'add' ? '' : '/' + selectedId}" onCancel="dialog.close()">
+            <FormItem label="Name" bindTo="name" />
+            <FormItem label="Status" bindTo="status" type="select">
+                <Items data="{['Prospect', 'Lead', 'Customer', 'Opportunity']}">
+                    <Option value="{$item}" />
+                </Items>
+            </FormItem>
+        </Form>
+    </ModalDialog>
+    <method name="open" value="(obj) => { mode = obj.mode; selectedId = obj.selectedId; dialog.open(); }" />
+</Component>

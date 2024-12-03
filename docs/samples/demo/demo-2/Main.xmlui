@@ -1,0 +1,27 @@
+<App>
+    <Form submitLabel="Add New" cancelLabel="" submitUrl="/api/entities">
+        <FormItem label="Name" bindTo="name" />
+    </Form>
+    <List data="/api/entities">
+        <Card title="{$item.name}" orientation="horizontal">
+            <Badge>{$item.status}</Badge>
+            <SpaceFiller />
+            <Button label="Delete" variant="ghost" themeColor="attention">
+                <event name="click">
+                    <APICall url="/api/entities/{$item.id}" method="delete" />
+                </event>
+            </Button>
+            <Button label="Edit" onClick="editForm.open($item)" />
+        </Card>
+    </List>
+    <ModalDialog id="editForm">
+        <EntityForm title="Edit" data="{$param}" submitUrl="/api/entities/{$param.id}">
+            <FormItem label="Name" bindTo="name" />
+            <FormItem label="Status" bindTo="status" type="select">
+                <Option value="Prospect" />
+                <Option value="Lead" />
+                <Option value="Customer" />
+            </FormItem>
+        </EntityForm>
+    </ModalDialog>
+</App>
