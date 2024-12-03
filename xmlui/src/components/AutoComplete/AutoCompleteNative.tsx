@@ -47,7 +47,9 @@ function defaultRenderer(item: Option) {
 }
 
 function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
-  return newOptions.some((option) => Array.from(options).some((o) => o.value === option.value));
+  return newOptions.some((option) =>
+    Array.from(options).some((o) => o.value === option.value || o.label === option.label),
+  );
 }
 
 export function useDebounce<T>(value: T, delay?: number): T {
@@ -102,8 +104,7 @@ export function AutoComplete({
       if (multi) {
         setInputValue("");
       } else {
-        setOpen(false);
-        setInputValue(selectedValue);
+        setOpen(true);
       }
       if (selectedValue === "") return;
       const newSelectedValue = multi
@@ -118,6 +119,12 @@ export function AutoComplete({
     },
     [multi, value, updateState, onDidChange],
   );
+
+  useEffect(() => {
+    if (!multi) {
+      setInputValue(Array.from(options).find((o) => o.value === value)?.label || "");
+    }
+  }, [multi, options, value]);
 
   // Clear selected value
   const clearValue = useCallback(() => {
