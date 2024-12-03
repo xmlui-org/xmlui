@@ -62,6 +62,7 @@ export default ({ mode }) => {
         "@components-core": path.resolve(__dirname, "./src/components-core"),
         "@abstractions": path.resolve(__dirname, "./src/abstractions"),
         "@core": path.resolve(__dirname, "./src/core"),
+        "@testing": path.resolve(__dirname, "./src/testing"),
         "@parsers": path.resolve(__dirname, "./src/parsers"),
         lodash: "lodash-es",
       },
