@@ -23,15 +23,15 @@ import { useEvent } from "@components-core/utils/misc";
 
 type AutoCompleteProps = {
   id?: string;
-  initialValue?: string[];
-  value?: string[];
+  initialValue?: string | string[];
+  value?: string | string[];
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
-  onDidChange?: (newValue: string[]) => void;
+  onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -39,6 +39,7 @@ type AutoCompleteProps = {
   children?: ReactNode;
   autoFocus?: boolean;
   dropdownHeight?: CSSProperties["height"];
+  multi?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -46,7 +47,9 @@ function defaultRenderer(item: Option) {
 }
 
 function isOptionsExist(options: Set<Option>, newOptions: Option[]) {
-  return newOptions.some((option) => Array.from(options).some((o) => o.value === option.value));
+  return newOptions.some((option) =>
+    Array.from(options).some((o) => o.value === option.value || o.label === option.label),
+  );
 }
 
 export function useDebounce<T>(value: T, delay?: number): T {
@@ -81,6 +84,7 @@ export function AutoComplete({
   children,
   autoFocus = false,
   dropdownHeight,
+  multi = false,
 }: AutoCompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
@@ -97,25 +101,38 @@ export function AutoComplete({
 
   const toggleOption = useCallback(
     (selectedValue: string) => {
-      setInputValue("");
+      if (multi) {
+        setInputValue("");
+      } else {
+        setOpen(true);
+      }
       if (selectedValue === "") return;
-      const newSelectedValue = Array.isArray(value)
-        ? value.includes(selectedValue)
-          ? value.filter((v) => v !== selectedValue)
-          : [...value, selectedValue]
-        : [selectedValue];
+      const newSelectedValue = multi
+        ? Array.isArray(value)
+          ? value.includes(selectedValue)
+            ? value.filter((v) => v !== selectedValue)
+            : [...value, selectedValue]
+          : [selectedValue]
+        : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
     },
-    [value, updateState, onDidChange],
+    [multi, value, updateState, onDidChange],
   );
+
+  useEffect(() => {
+    if (!multi) {
+      setInputValue(Array.from(options).find((o) => o.value === value)?.label || "");
+    }
+  }, [multi, options, value]);
 
   // Clear selected value
   const clearValue = useCallback(() => {
-    const newValue = [];
+    const newValue = multi ? [] : "";
+    setInputValue("");
     updateState({ value: newValue });
     onDidChange(newValue);
-  }, [updateState, onDidChange]);
+  }, [multi, updateState, onDidChange]);
 
   const onOptionAdd = useCallback((option: Option) => {
     setOptions((prev) => new Set(prev).add(option));
@@ -194,13 +211,14 @@ export function AutoComplete({
 
   const autoCompleteContextValue = useMemo(() => {
     return {
+      multi,
       value,
       onChange: toggleOption,
       optionRenderer,
       options,
       inputValue,
     };
-  }, [inputValue, optionRenderer, options, toggleOption, value]);
+  }, [inputValue, multi, optionRenderer, options, toggleOption, value]);
 
   return (
     <AutoCompleteContext.Provider value={autoCompleteContextValue}>
@@ -219,21 +237,45 @@ export function AutoComplete({
                 [styles.focused]: document.activeElement === inputRef.current,
               })}
             >
-              <div className={styles.badgeList}>
-                {Array.isArray(value) &&
-                  value.map((v) => (
-                    <span key={v} className={styles.badge}>
-                      {Array.from(options).find((o) => o.value === v)?.label}
-                      <Icon
-                        name="close"
-                        size="sm"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          toggleOption(v);
-                        }}
-                      />
-                    </span>
-                  ))}
+              {multi ? (
+                <div className={styles.badgeList}>
+                  {Array.isArray(value) &&
+                    value.map((v) => (
+                      <span key={v} className={styles.badge}>
+                        {Array.from(options).find((o) => o.value === v)?.label}
+                        <Icon
+                          name="close"
+                          size="sm"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            toggleOption(v);
+                          }}
+                        />
+                      </span>
+                    ))}
+                  <CmdInput
+                    id={id}
+                    autoFocus={autoFocus}
+                    ref={inputRef}
+                    value={inputValue}
+                    disabled={!enabled}
+                    onValueChange={(value) => {
+                      setOpen(true);
+                      setInputValue(value);
+                    }}
+                    onFocus={(event) => {
+                      setOpen(true);
+                      onFocus();
+                    }}
+                    onBlur={(event) => {
+                      setOpen(false);
+                      onBlur();
+                    }}
+                    placeholder={placeholder}
+                    className={styles.commandInput}
+                  />
+                </div>
+              ) : (
                 <CmdInput
                   id={id}
                   autoFocus={autoFocus}
@@ -255,7 +297,7 @@ export function AutoComplete({
                   placeholder={placeholder}
                   className={styles.commandInput}
                 />
-              </div>
+              )}
               <div className={styles.actions}>
                 {value?.length > 0 && enabled && (
                   <button
@@ -308,7 +350,8 @@ function CreatableItem() {
   const { onOptionAdd } = useOption();
   if (
     isOptionsExist(options, [{ value: inputValue, label: inputValue }]) ||
-    (Array.isArray(value) && value?.find((s) => s === inputValue))
+    (Array.isArray(value) && value?.find((s) => s === inputValue)) ||
+    inputValue === value
   ) {
     return <span style={{ display: "none" }} />;
   }
@@ -341,8 +384,8 @@ function CreatableItem() {
 
 function AutoCompleteOption({ value, label, enabled = true }: Option) {
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer } = useAutoComplete();
-  const selected = selectedValue?.includes(value);
+  const { value: selectedValue, onChange, optionRenderer, multi } = useAutoComplete();
+  const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
 
   return (
     <CmdItem
