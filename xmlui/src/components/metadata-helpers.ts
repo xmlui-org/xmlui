@@ -80,7 +80,7 @@ export function dLabelBreak(comp: string): ComponentPropertyMetadata {
 
 export function dAutoFocus(): ComponentPropertyMetadata {
   return {
-    description: `This property sets the label of the component.`,
+    description: "If this property is set to \`true\`, the component gets the focus automatically when displayed.",
     valueType: "boolean",
     defaultValue: false,
   };
