@@ -1157,16 +1157,29 @@ export class Parser {
    *   : "function" identifier "(" [parameterList] ")" blockStatement
    *   ;
    */
-  private parseFunctionDeclaration(): FunctionDeclaration | null {
+  private parseFunctionDeclaration(allowNoName = false): FunctionDeclaration | null {
     const startToken = this._lexer.get();
 
     // --- Get the function name
+    let functionName: string | undefined;
     const funcId = this._lexer.peek();
-    if (funcId.type !== TokenType.Identifier) {
-      this.reportError("W003", funcId);
-      return null;
+    if (allowNoName) {
+      if (funcId.type !== TokenType.LParent) {
+        if (funcId.type !== TokenType.Identifier) {
+          this.reportError("W003", funcId);
+          return null;
+        }
+        functionName = funcId.text;
+        this._lexer.get();
+      }
+    } else {
+      if (funcId.type !== TokenType.Identifier) {
+        this.reportError("W003", funcId);
+        return null;
+      }
+      functionName = funcId.text;
+      this._lexer.get();
     }
-    this._lexer.get();
 
     // --- Get the parameter list;
     const nextToken = this._lexer.peek();
@@ -1279,7 +1292,7 @@ export class Parser {
     return this.createStatementNode<FunctionDeclaration>(
       "FuncD",
       {
-        name: funcId.text,
+        name: functionName,
         args,
         statement: body,
       },
@@ -1492,6 +1505,22 @@ export class Parser {
             },
             startToken,
             spreadOperand.endToken,
+          )
+        : null;
+    }
+
+    if (startToken.type === TokenType.Function) {
+      const funcDecl = this.parseFunctionDeclaration(true);
+      return funcDecl
+        ? this.createExpressionNode<ArrowExpression>(
+            "ArrowE",
+            {
+              name: funcDecl.name,
+              args: funcDecl.args,
+              statement: funcDecl.statement,
+            },
+            startToken,
+            funcDecl.endToken,
           )
         : null;
     }

@@ -557,6 +557,15 @@ function createArrowFunction(
     };
     runtimeThread.childThreads.push(workingThread);
 
+    // --- Create a block for a named arrow function
+    if (expr.name) {
+      const functionBlock: BlockScope = { vars: {} };
+      workingThread.blocks ??= [];
+      workingThread.blocks.push(functionBlock);
+      functionBlock.vars[expr.name] = expr;
+      functionBlock.constVars = new Set([expr.name]);
+    }
+    
     // --- Assign argument values to names
     const arrowBlock: BlockScope = { vars: {} };
     workingThread.blocks ??= [];
