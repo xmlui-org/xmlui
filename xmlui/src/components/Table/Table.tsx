@@ -230,8 +230,7 @@ const TableWithColumns = ({
 
   const selectionContext = useSelectionContext();
 
-  let tableContent = (
-    <>
+  const tableContent = (
       <>
         {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
@@ -279,7 +278,6 @@ const TableWithColumns = ({
           )}
         />
       </>
-    </>
   );
 
   if (selectionContext === null) {
