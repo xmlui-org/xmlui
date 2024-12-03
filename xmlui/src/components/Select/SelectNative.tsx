@@ -189,15 +189,18 @@ export function Select({
     [onOptionAdd, onOptionRemove],
   );
 
+  const selectContextValue = useMemo(
+    () => ({
+      multi,
+      value,
+      optionRenderer,
+      onChange: toggleOption,
+    }),
+    [multi, optionRenderer, toggleOption, value],
+  );
+
   return (
-    <SelectContext.Provider
-      value={{
-        multi,
-        value,
-        optionRenderer,
-        onChange: toggleOption,
-      }}
-    >
+    <SelectContext.Provider value={selectContextValue}>
       <OptionTypeProvider Component={searchable || multi ? HiddenOption : SelectOption}>
         {searchable || multi ? (
           <OptionContext.Provider value={optionContextValue}>
@@ -312,7 +315,11 @@ export function Select({
               </SelectIcon>
             </SelectTrigger>
             <SelectPortal container={root}>
-              <SelectContent className={styles.selectContent} position="popper" style={{height: dropdownHeight}}>
+              <SelectContent
+                className={styles.selectContent}
+                position="popper"
+                style={{ height: dropdownHeight }}
+              >
                 <ScrollUpButton className={styles.selectScrollUpButton}>
                   <Icon name="chevronup" />
                 </ScrollUpButton>

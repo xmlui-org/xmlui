@@ -1,8 +1,10 @@
 %-DESC-START
 
-The \`Markdown\` component does not have properties. You must provide the text to display nested between an opening and a closing tag `<Markdown>`.
+## Using Markdown
 
-## Specifying the Text
+The `Markdown` component allows you to specify its textual content in two ways:
+- You can leverage the `content` property. Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
+- You declare nested text.
 
 As whitespaces (such as spaces and line breaks) have significance in Markdown, you should wrap the text between the `<![CDATA[` and `]]>` XMLUI tags, which preserve all whitespaces.
 
@@ -16,26 +18,31 @@ Indentation is also essential in Markdown. Start the markdown text in the first 
 
 ## The Beginning
 
-In the bustling city of Markdownville, I embarked on a journey to discover the secrets of Markdown.
-My adventure started in the heart of the city, where the first rule of Markdown was inscribed in stone:
+In the bustling city of Markdownville, I embarked on a journey to discover the 
+secrets of Markdown. My adventure started in the heart of the city, where the 
+first rule of Markdown was inscribed in stone:
 
 "To create a heading, add number signs (#) in front of a word or phrase.
 The number of number signs you use should correspond to the heading level."
 
-Headings give hierarchy to text but sometimes **emphasizing something with bold is just enough**.
+Headings give hierarchy to text but sometimes **emphasizing something with bold 
+is just enough**.
 
 If not bold, then simply *italic letters give visual diversity*.
 
 ## Exploring Blockquotes
 
-As I journeyed further, I encountered blockquotes that spoke of the beauty of simplicity:
+As I journeyed further, I encountered blockquotes that spoke of the beauty of 
+simplicity:
 
-> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between the paragraphs.
+> Blockquotes can contain multiple paragraphs. Add a > on the blank lines between 
+> the paragraphs.
 > > Like so
 
 ## The Power of Lists
 
-I also discovered the power of lists, which were as versatile as the inhabitants of Markdownville:
+I also discovered the power of lists, which were as versatile as the inhabitants 
+of Markdownville:
 
 - This is the first list item.
 - Here's the second list item.
@@ -50,19 +57,22 @@ I found that I can create ordered lists as well:
 
 ## The Image
 
-Text is not the only thing I found through my journey. The power of images materialized in front of me:
+Text is not the only thing I found through my journey. The power of images 
+materialized in front of me:
 
 ![Colors image](/resources/images/components/markdown/colors.png)
 
 ## Navigating with Hyperlinks
 
-Hyperlinks, like signposts, marked other paths that branched off from the road I was treading:
+Hyperlinks, like signposts, marked other paths that branched off from the road 
+I was treading:
 - [Source of all truth](https://github.com/xmlui-com/xmlui)
 - [Back to where we started](https://ncrm.azurewebsites.net/)
 
 ## The Horizontal Rule
 
-In the quiet corners of Markdownville, I found the Horizontal Rule, a line that symbolizes the end of a section:
+In the quiet corners of Markdownville, I found the Horizontal Rule, a line that 
+symbolizes the end of a section:
 
 ***
     ]]>
@@ -500,3 +510,79 @@ Look at this example:
 
 %-STYLE-END
 
+%-PROP-START content
+
+Use this property when the text you provide is not static but a result of calculations (you assemble the text or get it from other components).
+
+```ueml copy
+<App>
+  <VStack>
+    <Items data="{[
+      {id: 123, name: 'Peter Parker'},
+      {id: 234, name: 'Clark Kent'},
+      {id: 345, name: 'Bruce Wayne'}
+    ]}">
+      <Markdown content="{'## ' + $item.id + '\\n*' + $item.name + '*' }"/>
+    </Items>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: content property"
+  app={`
+    <App>
+      <VStack>
+        <Items data="{[
+          {id: 123, name: 'Peter Parker'},
+          {id: 234, name: 'Clark Kent'},
+          {id: 345, name: 'Bruce Wayne'}
+        ]}">
+          <Markdown content="{'## ' + $item.id + '\\n*' + $item.name + '*' }"/>
+        </Items>
+      </VStack>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START removeIndents
+
+```ueml copy /removeIndents="true"/
+<App layout="horizontal-sticky" padding="1rem">
+  <Markdown removeIndents="true">
+    <![CDATA[
+      # My Adventure in Markdown Land
+
+      ## The Beginning
+
+      In the bustling city of Markdownville, I embarked on a journey to 
+      discover the secrets of Markdown. My adventure started in the heart 
+      of the city, where the first rule of Markdown was inscribed in stone.
+    ]]>
+  </Markdown>
+</App>
+```
+
+<Playground
+  horizontal={true}
+  name="Example: removeIndents property"
+  app={`
+<App layout="horizontal-sticky" padding="1rem">
+  <Markdown removeIndents="true">
+    <![CDATA[
+      # My Adventure in Markdown Land
+
+      ## The Beginning
+
+      In the bustling city of Markdownville, I embarked on a journey to discover the secrets of Markdown.
+      My adventure started in the heart of the city, where the first rule of Markdown was inscribed in stone:
+    ]]>
+  </Markdown>
+</App>
+  `}
+/>
+
+
+%-PROP-END

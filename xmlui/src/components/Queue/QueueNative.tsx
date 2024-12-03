@@ -29,9 +29,9 @@ type Props = {
   didProcessItem?: AsyncFunction;
   processItemError?: AsyncFunction;
   onComplete?: AsyncFunction;
-  progressFeedback?: React.ReactNode;
-  resultFeedback?: React.ReactNode;
-  renderResultFeedback?: (args: any) => React.ReactNode;
+  //progressFeedback?: React.ReactNode;
+  renderProgressFeedback?: (completedItems: any, queuedItems: any) => React.ReactNode;
+  renderResultFeedback?: (completedItems: any, queuedItems: any) => React.ReactNode;
   clearAfterFinish?: boolean;
 };
 
@@ -122,8 +122,8 @@ export function Queue({
   didProcessItem,
   processItemError,
   onComplete,
-  progressFeedback,
-  resultFeedback,
+  //progressFeedback,
+  renderProgressFeedback,
   renderResultFeedback,
   clearAfterFinish = true,
 }: Props) {
@@ -259,8 +259,9 @@ export function Queue({
 
   const doComplete = useCallback(() => {
     onComplete?.();
+    const queuedItems = getQueuedItems();
     const completedItems = getQueuedItems().filter((item) => item.status === "completed");
-    const resultFeedback = renderResultFeedback?.(completedItems);
+    const resultFeedback = renderResultFeedback?.(completedItems, queuedItems);
     if (resultFeedback && completedItems.length) {
       let currentToast = toastId.current;
       toast.success(<>{resultFeedback}</>, {
@@ -283,17 +284,19 @@ export function Queue({
     if (!queue.length) {
       return;
     }
-    if (progressFeedback) {
-      if (toastId.current) {
-        let anotherLoading = toast.loading(<>{progressFeedback}</>, {
+    if (renderProgressFeedback) {
+      const queuedItems = getQueuedItems();
+      const completedItems = getQueuedItems().filter((item) => item.status === "completed");
+      const progressFeedback = renderProgressFeedback?.(completedItems, queuedItems);
+      if (progressFeedback && toastId.current) {
+        toast.loading(<>{progressFeedback}</>, {
           id: toastId.current,
         });
-        // console.log("reusing toast, loading toast", toastId.current, anotherLoading);
       } else {
         toastId.current = toast.loading(<>{progressFeedback}</>);
       }
     }
-  }, [progressFeedback, queue?.length]);
+  }, [renderProgressFeedback, queue?.length]);
 
   useEffect(() => {
     if (!queue) {

@@ -9,6 +9,7 @@ The `Queue` component provides an API to enqueue elements and defines events to 
 The component provides context values with which you can access some internal properties:
 
 - `$completedItems`: A list containing the queue items that have been completed (fully processed).
+- `$queuedItems`: A list containing the items waiting in the queue, icluding the completed items.
 
 
 ## Using Queue
@@ -129,6 +130,9 @@ The following sample displays a tick mark every time the queue is emptied:
       delay(1000);
     }"
     onComplete="queueEmptied += '✅'" >
+    <property name="progressFeedback">
+      <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
+    </property>
     <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
     </property>
@@ -157,6 +161,9 @@ The following sample displays a tick mark every time the queue is emptied:
         onComplete="queueEmptied += '✅'" >
         <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
+        </property>
+        <property name="progressFeedback">
+          <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
         </property>
       </Queue>
       <Text>Items queued: {queued}</Text>

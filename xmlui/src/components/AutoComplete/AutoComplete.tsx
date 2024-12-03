@@ -46,6 +46,7 @@ export const AutoCompleteMd = createMetadata({
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
     dropdownHeight: d("This property sets the height of the dropdown list."),
+    multi: dMulti(),
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
@@ -110,6 +111,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <AutoComplete
+        multi={extractValue.asOptionalBoolean(node.props.multi)}
         layout={layoutCss}
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}

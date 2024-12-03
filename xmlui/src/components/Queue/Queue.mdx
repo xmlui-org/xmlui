@@ -237,6 +237,9 @@ The following sample displays a tick mark every time the queue is emptied:
       delay(1000);
     }"
     onComplete="queueEmptied += '✅'" >
+    <property name="progressFeedback">
+      <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
+    </property>
     <property name="resultFeedback">
       <Text value="{result.toFixed(4)}" />
     </property>
@@ -265,6 +268,9 @@ The following sample displays a tick mark every time the queue is emptied:
         onComplete="queueEmptied += '✅'" >
         <property name="resultFeedback">
           <Text value="{result.toFixed(4)}" />
+        </property>
+        <property name="progressFeedback">
+          <Text value="Completed: {$completedItems.length} of {$queuedItems.length}"/>
         </property>
       </Queue>
       <Text>Items queued: {queued}</Text>

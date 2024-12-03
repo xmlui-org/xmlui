@@ -137,6 +137,7 @@ export const TableMd = createMetadata({
     [`transform-text-heading-${COMP}`]: "uppercase",
     [`font-size-row-${COMP}`]: "$font-size-small",
     [`color-bg-${COMP}`]: "$color-bg",
+    [`color-bg-row-${COMP}`]: "inherit",
     [`color-border-cell-${COMP}`]: "$color-border",
     [`color-bg-selected-${COMP}--hover`]: `$color-bg-row-${COMP}--hover`,
     [`color-bg-pagination-${COMP}`]: `$color-bg-${COMP}`,
@@ -230,8 +231,7 @@ const TableWithColumns = ({
 
   const selectionContext = useSelectionContext();
 
-  let tableContent = (
-    <>
+  const tableContent = (
       <>
         {/* HACK: we render the column children twice, once in a context (with the key: 'tableKey') where we register the columns,
             and once in a context where we refresh the columns (by forcing the first context to re-mount, via the 'tableKey').
@@ -279,7 +279,6 @@ const TableWithColumns = ({
           )}
         />
       </>
-    </>
   );
 
   if (selectionContext === null) {
