@@ -388,6 +388,7 @@ export interface NoArgExpression extends ExpressionBase {
 
 export interface ArrowExpression extends ExpressionBase {
   type: "ArrowE";
+  name?: string;
   args: Expression[];
   statement: Statement;
 }
