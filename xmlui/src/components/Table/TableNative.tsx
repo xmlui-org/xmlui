@@ -282,7 +282,7 @@ export const Table = forwardRef(
 
     // --- Prepare column renderers according to columns defined in the table
     const columnsWithCustomCell: ColumnDef<any>[] = useMemo(() => {
-      return safeColumns.map((col) => {
+      return safeColumns.map((col, idx) => {
         // --- Obtain column width information
         const { width, starSizedWidth } = getColumnWidth(col.width, true, "width");
         const { width: minWidth } = getColumnWidth(col.minWidth, false, "minWidth");
@@ -291,6 +291,7 @@ export const Table = forwardRef(
         const customColumn = {
           ...col,
           header: col.header ?? col.accessorKey ?? " ",
+          id: 'col_' + idx,
           size: width,
           minSize: minWidth,
           maxSize: maxWidth,
