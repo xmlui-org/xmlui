@@ -1,0 +1,195 @@
+import { Callout } from "nextra/components";
+
+# AutoComplete [#component-autocomplete]
+
+<Callout type="warning" emoji="📔">This component is in an **experimental** state; you can use it in your app. However, we may modify it, and it may even have breaking changes in the future.</Callout>
+
+Provides a dropdown with a list of options to choose from.
+
+The component provides context values with which you can access some internal properties:
+
+- `$item`: This context variable acts as a template for an item in the list.
+
+
+## Using AutoComplete
+
+## Properties
+
+### `autoFocus`
+
+This property sets the label of the component.
+
+Default value: `false`.
+
+### `dropdownHeight`
+
+This property sets the height of the dropdown list.
+
+### `emptyListTemplate`
+
+This optional property provides the ability to customize what is displayed when the list of options is empty.
+
+### `enabled`
+
+This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
+
+Default value: `true`.
+
+### `initialValue`
+
+This property sets the component's initial value.
+
+### `labelId`
+
+You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
+
+### `maxLength`
+
+This property sets the maximum length of the input it accepts.
+
+### `optionTemplate`
+
+This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
+
+### `placeholder`
+
+A placeholder text that is visible in the input field when its empty.
+
+### `readOnly`
+
+Set this property to `true` to disallow changing the component value.
+
+### `required`
+
+Set this property to `true` to indicate it must have a value before submitting the containing form.
+
+### `validationStatus`
+
+This property allows you to set the validation status of the input component.
+
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `valid` | Visual indicator for an input that is accepted |
+| `warning` | Visual indicator for an input that produced a warning |
+| `error` | Visual indicator for an input that produced an error |
+
+
+## Events
+
+### `didChange`
+
+This event is triggered when value of AutoComplete has changed.
+
+### `gotFocus`
+
+This event is triggered when the AutoComplete has received the focus.
+
+### `lostFocus`
+
+This event is triggered when the AutoComplete has lost the focus.
+
+## Exposed Methods
+
+### `focus`
+
+This method sets the focus on the AutoComplete.
+
+### `setValue`
+
+You can use this method to set the component's current value programmatically (`true`: checked, `false`: unchecked).
+
+## Styling
+
+
+
+### Theme Variables
+
+| Variable | Default Value (Light) | Default Value (Dark) |
+| --- | --- | --- |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge--active | $color-primary-500 | $color-primary-500 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-600 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-badge--hover | $color-primary-400 | $color-primary-600 |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-item-AutoComplete | $color-bg-dropdown-item | $color-bg-dropdown-item |
+| [color-bg](../styles-and-themes/common-units/#color)-item-AutoComplete--active | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color)-item-AutoComplete--hover | $color-bg-dropdown-item--active | $color-bg-dropdown-item--active |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-AutoComplete | $color-bg-primary | $color-bg-primary |
+| [color-bg](../styles-and-themes/common-units/#color)-menu-AutoComplete | $color-bg-primary | $color-bg-primary |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-border](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-outline](../styles-and-themes/common-units/#color)-AutoComplete--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-AutoComplete | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color](../styles-and-themes/common-units/#color)-placeholder-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete--disabled | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-badge | $color-surface-50 | $color-surface-50 |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-badge | $color-surface-50 | $color-surface-50 |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-badge--active | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-badge--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-text](../styles-and-themes/common-units/#color)-item-AutoComplete--disabled | $color-surface-200 | $color-surface-800 |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-badge | $font-size-small | $font-size-small |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-badge | $font-size-small | $font-size-small |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [font-size](../styles-and-themes/common-units/#size)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [offset-outline](../styles-and-themes/common-units/#size)-AutoComplete--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [padding-horizontal](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
+| [padding-vertical](../styles-and-themes/common-units/#size)-AutoComplete-badge | $space-1 | $space-1 |
+| [radius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $radius | $radius |
+| [radius](../styles-and-themes/common-units/#border-rounding)-menu-AutoComplete | $radius | $radius |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-default--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-error--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-success--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-AutoComplete-warning--hover | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [shadow](../styles-and-themes/common-units/#color)-menu-AutoComplete | $shadow-md | $shadow-md |
+| [shadow](../styles-and-themes/common-units/#color)-menu-AutoComplete | $shadow-md | $shadow-md |
+| [style-border](../styles-and-themes/common-units/#border-style)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-border](../styles-and-themes/common-units/#border-style)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [style-outline](../styles-and-themes/common-units/#border)-AutoComplete--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-AutoComplete-default | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-AutoComplete-error | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-AutoComplete-success | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-border](../styles-and-themes/common-units/#size)-AutoComplete-warning | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [thickness-outline](../styles-and-themes/common-units/#size)-AutoComplete--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+
