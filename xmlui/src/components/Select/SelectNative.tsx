@@ -64,7 +64,7 @@ type SelectProps = {
   children?: ReactNode;
   autoFocus?: boolean;
   searchable?: boolean;
-  multi?: boolean;
+  multiSelect?: boolean;
   required?: boolean;
   label?: string;
   labelPosition?: string;
@@ -197,7 +197,7 @@ export function Select({
   children,
   autoFocus = false,
   searchable = false,
-  multi = false,
+  multiSelect = false,
   label,
   labelPosition,
   labelWidth,
@@ -236,7 +236,7 @@ export function Select({
   // Handle option selection
   const toggleOption = useCallback(
     (selectedValue: SingleValueType) => {
-      const newSelectedValue = multi
+      const newSelectedValue = multiSelect
         ? Array.isArray(value)
           ? value.includes(selectedValue)
             ? value.filter((v) => v !== selectedValue)
@@ -248,15 +248,15 @@ export function Select({
       onDidChange(newSelectedValue);
       setOpen(false);
     },
-    [multi, value, updateState, onDidChange],
+    [multiSelect, value, updateState, onDidChange],
   );
 
   // Clear selected value
   const clearValue = useCallback(() => {
-    const newValue = multi ? [] : "";
+    const newValue = multiSelect ? [] : "";
     updateState({ value: newValue });
     onDidChange(newValue);
-  }, [multi, updateState, onDidChange]);
+  }, [multiSelect, updateState, onDidChange]);
 
   // Register component API for external interactions
   const focus = useCallback(() => {
@@ -308,18 +308,18 @@ export function Select({
 
   const selectContextValue = useMemo(
     () => ({
-      multi,
+      multiSelect,
       value,
       optionRenderer,
       onChange: toggleOption,
     }),
-    [multi, optionRenderer, toggleOption, value],
+    [multiSelect, optionRenderer, toggleOption, value],
   );
 
   return (
     <SelectContext.Provider value={selectContextValue}>
       <OptionContext.Provider value={optionContextValue}>
-        {searchable || multi ? (
+        {searchable || multiSelect ? (
           <OptionTypeProvider Component={HiddenOption}>
             {children}
             <ItemWithLabel
@@ -345,11 +345,11 @@ export function Select({
                     onClick={() => setOpen((prev) => !prev)}
                     className={classnames(styles.selectTrigger, styles[validationStatus], {
                       [styles.disabled]: !enabled,
-                      [styles.multi]: multi,
+                      [styles.multi]: multiSelect,
                     })}
                     autoFocus={autoFocus}
                   >
-                    {multi ? (
+                    {multiSelect ? (
                       Array.isArray(value) && value.length > 0 ? (
                         <div className={styles.badgeListContainer}>
                           <div className={styles.badgeList}>
@@ -377,7 +377,7 @@ export function Select({
                       <span className={styles.placeholder}>{placeholder || ""}</span>
                     )}
                     <div className={styles.actions}>
-                      {multi && Array.isArray(value) && value.length > 0 && (
+                      {multiSelect && Array.isArray(value) && value.length > 0 && (
                         <Icon
                           name="close"
                           onClick={(event) => {
@@ -487,7 +487,7 @@ export function HiddenOption(option: Option) {
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
-    const { value, label, enabled } = option;
+    const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
 
     useLayoutEffect(() => {
