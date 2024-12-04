@@ -33,7 +33,9 @@ const defaultOptionRenderer = {
 };
 
 export const AutoCompleteMd = createMetadata({
-  description: "Provides a dropdown with a list of options to choose from.",
+  description:
+    "This component is a dropdown with a list of options. According to the " +
+    "`multi` property, the user can select one or more items.",
   status: "experimental",
   props: {
     placeholder: dPlaceholder(),
@@ -52,8 +54,7 @@ export const AutoCompleteMd = createMetadata({
         `a list item use the \`$item\` context variable.`,
     ),
     emptyListTemplate: d(
-      `This optional property provides the ability to customize what is displayed when the ` +
-        `list of options is empty.`,
+      "This property defines the template to display when the list of options is empty.",
     ),
   },
   events: {
@@ -63,10 +64,17 @@ export const AutoCompleteMd = createMetadata({
   },
   apis: {
     focus: dFocus(COMP),
+    value: d(
+      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
+    ),
     setValue: dSetValueApi(),
   },
   contextVars: {
-    $item: d(`This context variable acts as a template for an item in the list.`),
+    $item: d(
+      "This context value represents an item when you define an option item template. " +
+        "Use `$item.value` and `$item.label` to refer to the value and label of the " +
+        "particular option.",
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {

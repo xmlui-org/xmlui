@@ -88,6 +88,7 @@ import { BreakoutMd } from "./Breakout/Breakout";
 import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { OptionMd } from "@components/Option/Option";
+import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -96,6 +97,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   App: AppMd,
   AppHeader: AppHeaderMd,
   AppState: AppStateMd,
+  AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
   Badge: BadgeMd,
   BarChart: BarChartMd,

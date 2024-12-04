@@ -34,7 +34,7 @@ If the `label` is not specified `value` is shown.
     <App>
       <Select>
         <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
+        <Option value="opt2" label="second" disabled="true" />
         <Option value="opt3" label="third"/>
       </Select>
     </App>
@@ -45,7 +45,7 @@ If the `label` is not specified `value` is shown.
 
 ### `autoFocus`
 
-This property sets the label of the component.
+If this property is set to `true`, the component gets the focus automatically when displayed.
 
 Default value: `false`.
 
@@ -156,7 +156,7 @@ This property sets the maximum length of the input it accepts.
 
 ### `multi`
 
-This property allows the user to select multiple items.
+The `true` value of the property indicates if the user can select multiple items.
 
 Default value: `false`.
 
