@@ -966,8 +966,6 @@ const ComponentContainer = memo(
           node={enhancedNode as any}
           parentState={parentState}
           layoutContextRef={layoutContextRef}
-          // dynamicChildren={dynamicChildren}
-          // dynamicSlots={dynamicSlots}
           parentRenderContext={parentRenderContext}
           isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
           parentRegisterComponentApi={parentRegisterComponentApi}

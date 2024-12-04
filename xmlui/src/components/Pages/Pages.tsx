@@ -25,6 +25,7 @@ export const pageRenderer = createComponentRenderer(
       <TableOfContentsProvider>
         <RouteWrapper
           childRoute={node.children}
+          uid={node.uid}
           renderChild={renderChild}
           key={extractValue(node.props.url)}
           style={layoutCss}
