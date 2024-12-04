@@ -463,7 +463,7 @@ export function HiddenOption(option: Option) {
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
-    const { value, label } = option;
+    const { value, label, enabled } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
 
     useLayoutEffect(() => {
@@ -474,7 +474,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
     const { optionRenderer } = useSelect();
 
     return (
-      <SelectItem ref={ref} className={styles.selectItem} value={value + ""}>
+      <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
         <SelectItemText>{optionRenderer ? optionRenderer({ label, value }) : label}</SelectItemText>
         <span className={styles.selectItemIndicator}>
           <SelectItemIndicator>
