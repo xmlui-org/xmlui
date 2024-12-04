@@ -24,8 +24,10 @@ export function RouteWrapper({
   uid?: string;
 }) {
   const params = useParams();
-  //we need to wrap the child route in a container to make sure the route params are available
-  // and we do this wrapping by providing an empty object to the vars (implicit container)
+
+  //we need to wrap the child route in a container to make sure the route params are available.
+  // we do this wrapping by providing an empty object to vars.
+  // this way it becomes an 'implicit' container (vars/state inside this container is propagated to the parent)
   const wrappedWithContainer = useMemo(() => {
     if (Array.isArray(childRoute)) {
       return {
