@@ -1,23 +1,45 @@
 {
   "index": "Introduction",
   "getting-started": "Getting Started",
+  "quick-reference": {
+    "title": "Quick Reference",
+    "type": "separator"
+  },
   "cheat-sheet": "XMLUI Cheat Sheet",
+  "glossary": "Glossary of Terms",
+  "core-concepts": {
+    "title": "Core Concepts",
+    "type": "separator"
+  },
+  "xmlui-architecture": "XMLUI Architecture",
+  "components-and-themes": "Components and Themes",
+  "scripting-basics": "Scripting Basics",
+  "tutorials": {
+    "title": "Tutorials",
+    "type": "separator"
+  },
   "cl-app": "Contact List Tutorial",
   "create-apps": "Creating XMLUI Apps",
-  "howto": "How-to Guides",
+  "theme-devs": "Theme Development",
   "references": {
     "title": "References",
     "type": "separator"
   },
-  "components": "Components",
+  "components": "Components Library",
   "styles-and-themes": "Themes",
-  "scripting": "XMLUI Scripting",
+  "scripting": "Scripting and APIs",
   "extensibility": {
     "title": "Extensibility",
     "type": "separator"
   },
   "overview-devs": "Overview",
-  "theme-devs": "Theme Development",
   "component-devs": "Custom Components",
-  "js-library-devs": "Using JS Libraries"
+  "js-library-devs": "Using JS Libraries",
+  "support": {
+    "title": "Support and Community",
+    "type": "separator"
+  },
+  "faq": "FAQ",
+  "howto": "How-to Guides",
+  "contact-us": "Contact Us"
 }
