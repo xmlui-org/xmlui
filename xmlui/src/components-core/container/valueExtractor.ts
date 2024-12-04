@@ -11,7 +11,7 @@ import { isPrimitive, pickFromObject, shallowCompare } from "@components-core/ut
 import { collectVariableDependencies } from "@components-core/script-runner/visitors";
 import { extractParam } from "@components-core/utils/extractParam";
 import { StyleParser, toCssVar } from "../../parsers/style-parser/StyleParser";
-import { ValueExtractor } from "@abstractions/RendererDefs";
+import type { ValueExtractor } from "@abstractions/RendererDefs";
 
 function parseStringArray(input: string): string[] {
   const trimmedInput = input.trim();
@@ -45,12 +45,23 @@ function collectParams(expression: any) {
 
 export function asOptionalBoolean(value: any, defValue?: boolean | undefined) {
   if (value === undefined || value === null) return defValue;
+  if (typeof value === "number") {
+    return value !== 0;
+  }
   if (typeof value === "string") {
-    if (value.trim().toLowerCase() === "true") {
+
+    value = value.trim().toLowerCase();
+    if (value === "") {
+      return false;
+    }
+    if (value === "true") {
       return true;
     }
-    if (value.trim().toLowerCase() === "false") {
+    if (value === "false") {
       return false;
+    }
+    if (value !== "") {
+      return true;
     }
   }
   if (typeof value === "boolean") {
