@@ -20,6 +20,10 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
+  dLabel,
+  dLabelPosition,
+  dLabelWidth,
+  dLabelBreak,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
 
@@ -45,6 +49,10 @@ export const SelectMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
@@ -54,7 +62,7 @@ export const SelectMd = createMetadata({
       `This optional property provides the ability to customize what is displayed when the ` +
         `list of options is empty.`,
     ),
-    multi: dMulti(),
+    multiSelect: dMulti(),
     searchable: d(`This property enables the search functionality in the dropdown list.`),
   },
   events: {
@@ -84,6 +92,8 @@ export const SelectMd = createMetadata({
     [`font-size-${COMP}-badge`]: "$font-size-small",
     [`padding-horizontal-${COMP}-badge`]: "$space-1",
     [`padding-vertical-${COMP}-badge`]: "$space-1",
+    [`opacity-text-item-${COMP}--disabled`]: "0.5",
+    [`opacity-${COMP}--disabled`]: "0.5",
     light: {
       [`color-bg-${COMP}-badge--hover`]: "$color-primary-400",
       [`color-bg-${COMP}-badge--active`]: "$color-primary-500",
@@ -114,7 +124,7 @@ export const selectComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <Select
-        multi={extractValue.asOptionalBoolean(node.props.multi)}
+        multiSelect={extractValue.asOptionalBoolean(node.props.multiSelect)}
         layout={layoutCss}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}
@@ -130,6 +140,11 @@ export const selectComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
