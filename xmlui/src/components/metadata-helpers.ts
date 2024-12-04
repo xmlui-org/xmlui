@@ -80,7 +80,8 @@ export function dLabelBreak(comp: string): ComponentPropertyMetadata {
 
 export function dAutoFocus(): ComponentPropertyMetadata {
   return {
-    description: "If this property is set to \`true\`, the component gets the focus automatically when displayed.",
+    description:
+      "If this property is set to `true`, the component gets the focus automatically when displayed.",
     valueType: "boolean",
     defaultValue: false,
   };
@@ -109,7 +110,8 @@ export function dEnabled(): ComponentPropertyMetadata {
 
 export function dMulti(): ComponentPropertyMetadata {
   return {
-    description: `This property allows the user to select multiple items.`,
+    description:
+      "The `true` value of the property indicates if the user can select multiple items.",
     valueType: "boolean",
     defaultValue: false,
   };
