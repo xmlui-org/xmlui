@@ -3,7 +3,7 @@ import type { ContainerDispatcher } from "./ComponentRenderer";
 import type { ContainerState } from "../container/ContainerComponentDef";
 import type {LookupAsyncFn, LookupSyncFn} from "@abstractions/ActionDefs";
 import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";
 
 // This function renders a loader definition into a React component
 export type LoaderRenderer<TMd extends ComponentMetadata> = (
@@ -39,6 +39,7 @@ type RendererContext<TMd extends ComponentMetadata> = {
   dispatch: ContainerDispatcher;
 
   registerComponentApi: RegisterComponentApiFn;
+  extractValue: ValueExtractor;
   lookupAction: LookupAsyncFn;
   lookupSyncCallback: LookupSyncFn;
 
