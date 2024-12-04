@@ -1,6 +1,7 @@
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
+import type { ArrowExpression } from "@abstractions/scripting/ScriptingSourceTree";
 
 /**
  * This type represents the options to use for looking up actions.
@@ -53,7 +54,7 @@ export type LookupAsyncFn = (
  * This function resolves a sync action by its name (within the component node running it) and 
  * returns the action function if found. Otherwise, it returns undefined.
  */
-export type LookupSyncFnInner = (action: string | undefined, uid: symbol) => SyncFunction | undefined;
+export type LookupSyncFnInner = (action: ArrowExpression | undefined, uid: symbol) => SyncFunction | undefined;
 
 /**
  * This function resolves a sync action by its name and returns the action function if it is found. 
