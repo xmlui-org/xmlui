@@ -243,7 +243,7 @@ export function Select({
             : [...value, selectedValue]
           : [selectedValue]
         : selectedValue === value
-          ? ""
+          ? null
           : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
