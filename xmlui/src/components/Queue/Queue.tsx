@@ -74,6 +74,9 @@ export const QueueMd = createMetadata({
     $completedItems: d(
       `A list containing the queue items that have been completed (fully processed).`,
     ),
+    $queuedItems: d(
+      `A list containing the items waiting in the queue, icluding the completed items.`,
+    ),
   },
 });
 
@@ -84,16 +87,31 @@ export const queueComponentRenderer = createComponentRenderer(
     return (
       <Queue
         registerComponentApi={registerComponentApi}
-        progressFeedback={renderChild(node.props.progressFeedback)}
-        resultFeedback={renderChild(node.props.resultFeedback)}
         renderResultFeedback={
           node.props.resultFeedback
-            ? (completedItems) => {
+            ? (completedItems, queuedItems) => {
                 return (
                   <MemoizedItem
                     node={node.props.resultFeedback! as any}
                     contextVars={{
                       $completedItems: completedItems,
+                      $queuedItems: queuedItems,
+                    }}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
+        renderProgressFeedback={
+          node.props.progressFeedback
+            ? (completedItems, queuedItems) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.progressFeedback! as any}
+                    contextVars={{
+                      $completedItems: completedItems,
+                      $queuedItems: queuedItems,
                     }}
                     renderChild={renderChild}
                   />

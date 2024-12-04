@@ -4,6 +4,7 @@ import { expect as baseExpect, mergeExpects, test as baseTest } from "@playwrigh
 import { initComponent } from "./component-test-helpers";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
+import type { Page } from "playwright-core";
 
 export { test } from "@playwright/test";
 
@@ -18,15 +19,18 @@ async function getElementSize(locator: Locator) {
 export type ComponentDriverParams = {
   locator: Locator;
   testStateLocator: Locator;
+  page: Page;
 }
 
 export class ComponentDriver {
   protected readonly locator: Locator;
   protected readonly testStateLocator: Locator;
+  page: Page;
 
-  constructor({ locator, testStateLocator }: ComponentDriverParams) {
+  constructor({ locator, testStateLocator, page }: ComponentDriverParams) {
     this.locator = locator;
     this.testStateLocator = testStateLocator;
+    this.page = page;
   }
 
   get component () {
@@ -72,17 +76,16 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
     createDriver: async ({page}, use) => {
       await use(async (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => {
         const testStateViewTestId = "test-state-view-testid"
-        const prefix = `<Fragment var.testState="{null}">`
-        const suffix =`
-          <Stack width="0" height="0">
-            <Text
-              testId="${testStateViewTestId}"
-              value="{ JSON.stringify(testState) }"/>
-              value="{ testState === undefined ? 'undefined' : JSON.stringify(testState) }"/>
-          </Stack>
-        </Fragment>`
-        const code = prefix + source + suffix
-        const { errors, component } = xmlUiMarkupToComponent(code)
+        const { errors, component } = xmlUiMarkupToComponent(`
+            <Fragment var.testState="{null}">
+              ${source}
+              <Stack width="0" height="0">
+                <Text
+                  testId="${testStateViewTestId}"
+                  value="{ JSON.stringify(testState) }"/>
+              </Stack>
+            </Fragment>  
+        `)
         const entryPoint = component as ComponentDef
         if (errors.length > 0){
           throw { errors };
@@ -93,7 +96,8 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
         await initComponent(page, { ...description, entryPoint },);
         return new DriverClass({
           locator: page.getByTestId((entryPoint).children![0].testId!),
-          testStateLocator: page.getByTestId(testStateViewTestId)
+          testStateLocator: page.getByTestId(testStateViewTestId),
+          page: page
         });
       });
     }

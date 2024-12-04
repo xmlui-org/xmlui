@@ -1,5 +1,5 @@
 import React, { type ReactNode, useLayoutEffect, useMemo, useState, useContext } from "react";
-import { noop } from "lodash-es";
+import { isEqual, noop } from "lodash-es";
 import { useEvent } from "@components-core/utils/misc";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { EMPTY_ARRAY } from "@components-core/constants";
@@ -32,12 +32,11 @@ export const SelectionStore = ({
   const refreshSelection = useEvent((allItems: any[] = EMPTY_ARRAY) => {
     setItems(allItems);
     let value = allItems.filter((item) => !!selectedItems.find((si) => si[idKey] === item[idKey]));
-    if(value.length === 0){
-      value = EMPTY_ARRAY
+    if(!isEqual(selectedItems, value)){
+      updateState({
+        value: value,
+      });
     }
-    updateState({
-      value: value,
-    });
   });
 
   const setSelectedRowIds = useEvent((rowIds: any) => {

@@ -269,7 +269,7 @@ export interface SwitchCase extends BaseNode {
 
 export interface FunctionDeclaration extends StatementBase {
   type: "FuncD";
-  name: string;
+  name?: string;
   args: Expression[];
   statement: BlockStatement;
   isExported?: boolean;
@@ -460,6 +460,7 @@ export interface NoArgExpression extends ExpressionBase {
 
 export interface ArrowExpression extends ExpressionBase {
   type: "ArrowE";
+  name?: string;
   args: Expression[];
   statement: Statement;
   closureContext?: BlockScope[];

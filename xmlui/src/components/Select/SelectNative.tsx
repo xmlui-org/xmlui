@@ -1,27 +1,31 @@
-import type { CSSProperties, ReactNode } from "react";
-import React from "react";
-import { useEffect } from "react";
-import { useLayoutEffect } from "react";
-import { useId, useRef } from "react";
-import { useState } from "react";
-import { useCallback, useMemo } from "react";
-import type { Option } from "@components/abstractions";
+import type {
+  CSSProperties,
+  ReactNode} from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type { Option, ValidationStatus } from "@components/abstractions";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import type { ValidationStatus } from "@components/abstractions";
 import {
-  Portal as SelectPortal,
   Content as SelectContent,
+  Icon as SelectIcon,
+  Item as SelectItem,
+  ItemIndicator as SelectItemIndicator,
+  ItemText as SelectItemText,
+  Portal as SelectPortal,
   Root as SelectRoot,
   ScrollDownButton,
   ScrollUpButton,
-  Value as SelectValue,
-  Icon as SelectIcon,
   Trigger as SelectTrigger,
+  Value as SelectValue,
   Viewport as SelectViewport,
-  Item as SelectItem,
-  ItemText as SelectItemText,
-  ItemIndicator as SelectItemIndicator,
 } from "@radix-ui/react-select";
 import Icon from "@components/Icon/IconNative";
 import { SelectContext, useSelect } from "@components/Select/SelectContext";
@@ -40,17 +44,19 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import { useEvent } from "@components-core/utils/misc";
 import { OptionContext, useOption } from "@components/Select/OptionContext";
 
+export type SingleValueType = string | number;
+export type ValueType = SingleValueType | SingleValueType[];
 type SelectProps = {
   id?: string;
-  initialValue?: string | string[];
-  value?: string | string[];
+  initialValue?: ValueType;
+  value?: ValueType;
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
-  onDidChange?: (newValue: string | string[]) => void;
+  onDidChange?: (newValue: ValueType) => void;
   dropdownHeight?: CSSProperties["height"];
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
@@ -64,6 +70,108 @@ type SelectProps = {
 
 function defaultRenderer(item: Option) {
   return <div>{item.label}</div>;
+}
+
+function SimpleSelect(props: {
+  value: SingleValueType;
+  onValueChange: (selectedValue: SingleValueType) => void;
+  id: string;
+  style: React.CSSProperties;
+  onFocus: () => void;
+  onBlur: () => void;
+  enabled: boolean;
+  validationStatus: ValidationStatus;
+  triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
+  autoFocus: boolean;
+  placeholder: string;
+  height:
+    | "-moz-initial"
+    | "inherit"
+    | "initial"
+    | "revert"
+    | "revert-layer"
+    | "unset"
+    | "-moz-max-content"
+    | "-moz-min-content"
+    | "-webkit-fit-content"
+    | "auto"
+    | "fit-content"
+    | "max-content"
+    | "min-content"
+    | string
+    | number;
+  children: React.ReactNode;
+  options: Set<Option>;
+}) {
+  const { root } = useTheme();
+  const {
+    enabled,
+    onBlur,
+    autoFocus,
+    onValueChange,
+    validationStatus,
+    children,
+    value,
+    height,
+    style,
+    placeholder,
+    id,
+    triggerRef,
+    onFocus,
+    options,
+  } = props;
+
+  const stringValue = value + "";
+  const onValChange = useCallback(
+    (val: string) => {
+      const valueWithMatchingType = Array.from(options.values()).find(
+        (o) => o.value + "" === val,
+      )?.value;
+      onValueChange(valueWithMatchingType);
+    },
+    [onValueChange, options],
+  );
+
+  return (
+    <OptionTypeProvider Component={SelectOption}>
+      <SelectRoot value={stringValue} onValueChange={onValChange}>
+        <SelectTrigger
+          id={id}
+          style={style}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          disabled={!enabled}
+          className={classnames(styles.selectTrigger, styles[validationStatus])}
+          ref={triggerRef}
+          autoFocus={autoFocus}
+        >
+          <div className={styles.selectValue}>
+            <SelectValue placeholder={placeholder} />
+          </div>
+          <SelectIcon asChild>
+            <Icon name="chevrondown" />
+          </SelectIcon>
+        </SelectTrigger>
+        <SelectPortal container={root}>
+          <SelectContent
+            className={styles.selectContent}
+            position="popper"
+            style={{ height: height }}
+          >
+            <ScrollUpButton className={styles.selectScrollUpButton}>
+              <Icon name="chevronup" />
+            </ScrollUpButton>
+            <SelectViewport className={classnames(styles.selectViewport)}>
+              {children}
+            </SelectViewport>
+            <ScrollDownButton className={styles.selectScrollDownButton}>
+              <Icon name="chevrondown" />
+            </ScrollDownButton>
+          </SelectContent>
+        </SelectPortal>
+      </SelectRoot>
+    </OptionTypeProvider>
+  );
 }
 
 export function Select({
@@ -118,7 +226,7 @@ export function Select({
 
   // Handle option selection
   const toggleOption = useCallback(
-    (selectedValue: string) => {
+    (selectedValue: SingleValueType) => {
       const newSelectedValue = multi
         ? Array.isArray(value)
           ? value.includes(selectedValue)
@@ -181,6 +289,7 @@ export function Select({
     });
   }, []);
 
+
   const optionContextValue = useMemo(
     () => ({
       onOptionAdd,
@@ -189,18 +298,21 @@ export function Select({
     [onOptionAdd, onOptionRemove],
   );
 
+  const selectContextValue = useMemo(
+    () => ({
+      multi,
+      value,
+      optionRenderer,
+      onChange: toggleOption,
+    }),
+    [multi, optionRenderer, toggleOption, value],
+  );
+
   return (
-    <SelectContext.Provider
-      value={{
-        multi,
-        value,
-        optionRenderer,
-        onChange: toggleOption,
-      }}
-    >
-      <OptionTypeProvider Component={searchable || multi ? HiddenOption : SelectOption}>
+    <SelectContext.Provider value={selectContextValue}>
+      <OptionContext.Provider value={optionContextValue}>
         {searchable || multi ? (
-          <OptionContext.Provider value={optionContextValue}>
+          <OptionTypeProvider Component={HiddenOption}>
             {children}
             <Popover open={open} onOpenChange={setOpen} modal={false}>
               <PopoverTrigger asChild>
@@ -288,45 +400,27 @@ export function Select({
                 </PopoverContent>
               </Portal>
             </Popover>
-          </OptionContext.Provider>
+          </OptionTypeProvider>
         ) : (
-          <SelectRoot
-            value={!Array.isArray(value) && value ? value : ""}
+          <SimpleSelect
+            value={value as SingleValueType}
+            options={options}
             onValueChange={toggleOption}
+            id={id}
+            style={layout}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            enabled={enabled}
+            validationStatus={validationStatus}
+            triggerRef={setReferenceElement}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
+            height={dropdownHeight}
           >
-            <SelectTrigger
-              id={id}
-              style={layout}
-              onFocus={onFocus}
-              onBlur={onBlur}
-              disabled={!enabled}
-              className={classnames(styles.selectTrigger, styles[validationStatus])}
-              ref={setReferenceElement}
-              autoFocus={autoFocus}
-            >
-              <div className={styles.selectValue}>
-                <SelectValue placeholder={placeholder} />
-              </div>
-              <SelectIcon asChild>
-                <Icon name="chevrondown" />
-              </SelectIcon>
-            </SelectTrigger>
-            <SelectPortal container={root}>
-              <SelectContent className={styles.selectContent} position="popper" style={{height: dropdownHeight}}>
-                <ScrollUpButton className={styles.selectScrollUpButton}>
-                  <Icon name="chevronup" />
-                </ScrollUpButton>
-                <SelectViewport className={classnames(styles.selectViewport)}>
-                  {children || emptyListNode}
-                </SelectViewport>
-                <ScrollDownButton className={styles.selectScrollDownButton}>
-                  <Icon name="chevrondown" />
-                </ScrollDownButton>
-              </SelectContent>
-            </SelectPortal>
-          </SelectRoot>
+            {children || emptyListNode}
+          </SimpleSelect>
         )}
-      </OptionTypeProvider>
+      </OptionContext.Provider>
     </SelectContext.Provider>
   );
 }
@@ -368,11 +462,19 @@ export function HiddenOption(option: Option) {
 }
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
-  ({ value, label }, ref) => {
+  (option, ref) => {
+    const { value, label } = option;
+    const { onOptionRemove, onOptionAdd } = useOption();
+
+    useLayoutEffect(() => {
+      onOptionAdd(option);
+      return () => onOptionRemove(option);
+    }, [option, onOptionAdd, onOptionRemove]);
+
     const { optionRenderer } = useSelect();
 
     return (
-      <SelectItem ref={ref} className={styles.selectItem} value={value}>
+      <SelectItem ref={ref} className={styles.selectItem} value={value + ""}>
         <SelectItemText>{optionRenderer ? optionRenderer({ label, value }) : label}</SelectItemText>
         <span className={styles.selectItemIndicator}>
           <SelectItemIndicator>
