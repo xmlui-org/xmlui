@@ -113,7 +113,9 @@ export function AutoComplete({
             ? value.filter((v) => v !== selectedValue)
             : [...value, selectedValue]
           : [selectedValue]
-        : selectedValue;
+        : selectedValue === value
+          ? null
+          : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
     },
