@@ -19,7 +19,7 @@ import {
   dLostFocus,
   dFocus,
   dSetValueApi,
-  dMulti,
+  dMulti, dLabel, dLabelPosition, dLabelWidth, dLabelBreak,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
 
@@ -45,6 +45,10 @@ export const SelectMd = createMetadata({
     readOnly: dReadonly(),
     enabled: dEnabled(),
     validationStatus: dValidationStatus(),
+    label: dLabel(),
+    labelPosition: dLabelPosition("top"),
+    labelWidth: dLabelWidth(COMP),
+    labelBreak: dLabelBreak(COMP),
     optionTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
@@ -130,6 +134,11 @@ export const selectComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
+        label={extractValue(node.props.label)}
+        labelPosition={extractValue(node.props.labelPosition)}
+        labelWidth={extractValue(node.props.labelWidth)}
+        labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
+        required={extractValue.asOptionalBoolean(node.props.required)}
         optionRenderer={(item) => {
           return (
             <MemoizedItem
