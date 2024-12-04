@@ -94,7 +94,7 @@ $componentName: "Select";
 
 .selectTrigger:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: createThemeVar("opacity-#{$componentName}--disabled");
   background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
   color: createThemeVar("Input:color-text-#{$componentName}--disabled");
   border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
@@ -221,7 +221,7 @@ $componentName: "Select";
 
   &:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
+    opacity: createThemeVar("opacity-#{$componentName}--disabled");
   }
 }
 
@@ -296,9 +296,8 @@ $componentName: "Select";
 
   &[data-disabled=true] {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
     cursor: not-allowed;
-    color: createThemeVar("color-text-item-#{$componentName}--disabled");
     font-style: italic;
   }
 }
@@ -328,9 +327,8 @@ $componentName: "Select";
 
 .selectItem[data-disabled] {
   pointer-events: none;
-  opacity: 0.5;
+  opacity: createThemeVar("opacity-text-item-#{$componentName}--disabled");
   cursor: not-allowed;
-  color: createThemeVar("color-text-item-#{$componentName}--disabled");
   font-style: italic;
 }
 
