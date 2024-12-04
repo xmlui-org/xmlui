@@ -140,7 +140,7 @@ type ContainerProps = {
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
-  uidInfoRef?: RefObject<Record<string, any>>
+  uidInfoRef?: RefObject<Record<string, any>>;
 };
 
 // React component to display a view container and implement its behavior
@@ -161,7 +161,7 @@ const MemoizedContainer = memo(
       parentRenderContext,
       memoedVarsRef,
       isImplicit,
-      uidInfoRef: parentUidInfoRef
+      uidInfoRef: parentUidInfoRef,
     }: ContainerProps,
     ref,
   ) {
@@ -171,7 +171,6 @@ const MemoizedContainer = memo(
       ? parentRegisterComponentApi
       : containerRegisterComponentApi;
 
-    const { themeVars } = useTheme();
     const appContext = useAppContext();
     const { getThemeVar } = useTheme();
     const navigate = useNavigate();
@@ -179,22 +178,17 @@ const MemoizedContainer = memo(
 
     const fnsRef = useRef<Record<symbol, any>>({});
 
-    // console.log({ componentState });
-
-    // const publicComponentState = useShallowCompareMemoize(useMemo(()=>{
-    //   const ret = {};
-    //   return ret;
-    // }, []));
-
     const stateRef = useRef(componentState);
+    //generally bad practise to write ref in render (https://react.dev/learn/referencing-values-with-refs#best-practices-for-refs), but:
+    // this stateRef is only used in runCodeSync/async functions, which are memoized, so it's safe to use it here (as I know:  illesg)
+    // In case we sync up the stateRef with the componentState in the useEffect/useInsertionEffect/useLayoutEffect, the stateRef would lag behind the componentState
+
+    stateRef.current = componentState;
+
     const parsedStatementsRef = useRef<Record<string, Array<Statement> | null>>({});
     const statementPromises = useRef<Map<string, any>>(new Map());
     const [_, startTransition] = useTransition();
     const mountedRef = useRef(true);
-
-    useIsomorphicLayoutEffect(() => {
-      stateRef.current = componentState;
-    }, [componentState]);
 
     useIsomorphicLayoutEffect(() => {
       for (const resolve of statementPromises.current.values()) {
@@ -364,7 +358,7 @@ const MemoizedContainer = memo(
           );
 
           if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerCompleted(componentUid.description!, options?.eventName!));
+            dispatch(eventHandlerCompleted(componentUid.description, options.eventName));
           }
 
           if (evalContext.mainThread?.blocks?.length) {
@@ -378,36 +372,39 @@ const MemoizedContainer = memo(
             appContext.signError(e as Error);
           }
           if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerError(componentUid.description!, options?.eventName!, e));
+            dispatch(eventHandlerError(componentUid.description, options.eventName, e));
           }
           throw e;
         }
       },
     );
 
-    const runCodeSync = useEvent((arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
-      const evalContext: BindingTreeEvaluationContext = {
-        localContext: cloneDeep(stateRef.current),
-        appContext,
-        eventArgs,
-      };
-      try {
-        const arrowStmt = {
-          type: "ArrowS",
-          expression: arrowExpression,
-        } as ArrowExpressionStatement;
+    const runCodeSync = useCallback(
+      (arrowExpression: ArrowExpression, ...eventArgs: any[]) => {
+        const evalContext: BindingTreeEvaluationContext = {
+          localContext: cloneDeep(stateRef.current),
+          appContext,
+          eventArgs,
+        };
+        try {
+          const arrowStmt = {
+            type: "ArrowS",
+            expression: arrowExpression,
+          } as ArrowExpressionStatement;
 
-        processStatementQueue([arrowStmt], evalContext);
+          processStatementQueue([arrowStmt], evalContext);
 
-        if (evalContext.mainThread?.blocks?.length) {
-          return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
-            .returnValue;
+          if (evalContext.mainThread?.blocks?.length) {
+            return evalContext.mainThread.blocks[evalContext.mainThread.blocks.length - 1]
+              .returnValue;
+          }
+        } catch (e) {
+          console.error(e);
+          throw e;
         }
-      } catch (e) {
-        console.error(e);
-        throw e;
-      }
-    });
+      },
+      [appContext],
+    );
 
     const getOrCreateEventHandlerFn = useEvent(
       (src: string | ArrowExpression, uid: symbol, options?: LookupActionOptions) => {
@@ -427,40 +424,50 @@ const MemoizedContainer = memo(
       },
     );
 
-    const getOrCreateSyncCallbackFn = useEvent((arrowExpression: ArrowExpression, uid: symbol) => {
-      const fnCacheKey = `sync-callback-${arrowExpression.source}`;
-      if (!fnsRef.current[uid]?.[fnCacheKey]) {
-        fnsRef.current[uid] = fnsRef.current[uid] || {};
-        fnsRef.current[uid][fnCacheKey] = (...eventArgs: any[]) => {
-          return runCodeSync(arrowExpression, ...eventArgs);
-        };
-      }
-      return fnsRef.current[uid][fnCacheKey];
-    });
+    const getOrCreateSyncCallbackFn = useCallback(
+      (arrowExpression: ArrowExpression, uid: symbol) => {
+        const fnCacheKey = `sync-callback-${arrowExpression.source}`;
+        if (!fnsRef.current[uid]?.[fnCacheKey]) {
+          fnsRef.current[uid] = fnsRef.current[uid] || {};
+          fnsRef.current[uid][fnCacheKey] = memoizeOne((arrowExpression) => {
+            // console.log('busting sync callback cache', arrowExpression);
+            return (...eventArgs: any[]) => {
+              // console.log("calling sync callback", arrowExpression);
+              return runCodeSync(arrowExpression, ...eventArgs);
+            };
+          });
+        }
+        return fnsRef.current[uid][fnCacheKey](arrowExpression);
+      },
+      [runCodeSync],
+    );
 
-    const lookupSyncCallback: LookupSyncFnInner = useEvent((action, uid) => {
-      if (!action) {
-        return undefined;
-      }
+    const lookupSyncCallback: LookupSyncFnInner = useCallback(
+      (action, uid) => {
+        if (!action) {
+          return undefined;
+        }
 
-      if (typeof action === "function") {
-        return action;
-      }
+        if (typeof action === "function") {
+          return action;
+        }
 
-      const resolvedAction = extractParam(componentState, action, appContext, true);
-      if (!resolvedAction) {
-        return undefined;
-      }
+        // const resolvedAction = extractParam(componentState, action, appContext, true);
+        if (!action) {
+          return undefined;
+        }
 
-      if (typeof resolvedAction === "function") {
-        return resolvedAction;
-      }
+        if (typeof action === "function") {
+          return action;
+        }
 
-      if (!resolvedAction._ARROW_EXPR_) {
-        throw new Error("Only arrow expression allowed in sync callback");
-      }
-      return getOrCreateSyncCallbackFn(resolvedAction, uid);
-    });
+        if (!(action as any)._ARROW_EXPR_) {
+          throw new Error("Only arrow expression allowed in sync callback");
+        }
+        return getOrCreateSyncCallbackFn(action, uid);
+      },
+      [getOrCreateSyncCallbackFn],
+    );
 
     const lookupAction: LookupAsyncFnInner = useCallback(
       (
@@ -624,6 +631,7 @@ const MemoizedContainer = memo(
           uidInfoRef,
           loaders: node.loaders,
           componentState,
+          memoedVarsRef,
           //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
           dispatch: apiBoundContainer ? containerDispatch : dispatch,
           registerComponentApi: apiBoundContainer
@@ -696,7 +704,7 @@ type ErrorProneContainerProps = {
   parentRenderContext?: ParentRenderContext;
   isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
-  uidInfoRef?: RefObject<Record<string, any>>
+  uidInfoRef?: RefObject<Record<string, any>>;
 };
 
 // A React component that wraps a view container into an error boundary
@@ -713,7 +721,7 @@ const MemoizedErrorProneContainer = memo(
       parentRenderContext,
       isImplicit,
       parentDispatch,
-      uidInfoRef
+      uidInfoRef,
     }: ErrorProneContainerProps,
     ref,
   ) {
@@ -939,7 +947,7 @@ type ComponentContainerProps = {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
-  uidInfoRef?: RefObject<Record<string, any>>
+  uidInfoRef?: RefObject<Record<string, any>>;
 };
 
 const ComponentContainer = memo(
@@ -953,7 +961,7 @@ const ComponentContainer = memo(
       layoutContextRef,
       parentRenderContext,
       parentDispatch,
-      uidInfoRef
+      uidInfoRef,
     }: ComponentContainerProps,
     ref,
   ) {
@@ -1076,17 +1084,17 @@ function transformNodeWithChildDatasource(node: ComponentDef) {
 }
 
 function transformNodeWithDataSourceRefProp(
-    node: ComponentDef,
-    uidInfoRef: RefObject<Record<string, any>>,
+  node: ComponentDef,
+  uidInfoRef: RefObject<Record<string, any>>,
 ) {
-  if(!node.props){
+  if (!node.props) {
     return node;
   }
   let ret = { ...node };
   let resolved = false;
   Object.entries(node.props).forEach(([key, value]) => {
     let uidInfoForDatasource;
-    try{
+    try {
       uidInfoForDatasource = extractParam(uidInfoRef.current, value);
     } catch (e) {}
 
@@ -1111,13 +1119,18 @@ function transformNodeWithDataSourceRefProp(
 }
 
 function transformNodeWithDataProp(
-    node: ComponentDef,
-    resolvedDataPropIsString: boolean,
-    uidInfoRef: RefObject<Record<string, any>>
+  node: ComponentDef,
+  resolvedDataPropIsString: boolean,
+  uidInfoRef: RefObject<Record<string, any>>,
 ) {
-  if (!node.props?.__DATA_RESOLVED && node.props && "data" in node.props && resolvedDataPropIsString) {
+  if (
+    !node.props?.__DATA_RESOLVED &&
+    node.props &&
+    "data" in node.props &&
+    resolvedDataPropIsString
+  ) {
     //we skip the transformation if the data prop is a binding expression for a loader value
-    if(extractParam(uidInfoRef.current, node.props.data) === "loaderValue"){
+    if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
       return node;
     }
     return {
@@ -1136,7 +1149,7 @@ function transformNodeWithDataProp(
   return node;
 }
 
-function transformNodeWithRawDataProp(node){
+function transformNodeWithRawDataProp(node) {
   if (node.props && "raw_data" in node.props) {
     return {
       ...node,
@@ -1185,12 +1198,21 @@ const Node = memo(
     }, [node, uidInfoRef]);
 
     const resolvedDataPropIsString = useMemo(() => {
-      const resolvedDataProp = extractParam(state, nodeWithTransformedLoaders.props?.data, appContext, true);
+      const resolvedDataProp = extractParam(
+        state,
+        nodeWithTransformedLoaders.props?.data,
+        appContext,
+        true,
+      );
       return typeof resolvedDataProp === "string";
     }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
 
     const nodeWithTransformedDatasourceProp = useMemo(() => {
-      return transformNodeWithDataProp(nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef);
+      return transformNodeWithDataProp(
+        nodeWithTransformedLoaders,
+        resolvedDataPropIsString,
+        uidInfoRef,
+      );
     }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
 
     let renderedChild = null;
@@ -1592,6 +1614,7 @@ interface LoaderRenderContext {
   lookupAction: LookupAsyncFnInner;
   lookupSyncCallback: LookupSyncFnInner;
   cleanup: ComponentCleanupFn;
+  memoedVarsRef: MutableRefObject<MemoedVars>;
 }
 
 export function renderLoaders({
@@ -1605,6 +1628,7 @@ export function renderLoaders({
   lookupAction,
   lookupSyncCallback,
   cleanup,
+  memoedVarsRef,
 }: LoaderRenderContext) {
   return loaders.map((loader: ComponentDef) => {
     // --- Check for the uniqueness of UIDs
@@ -1632,6 +1656,7 @@ export function renderLoaders({
       registerComponentApi,
       lookupAction,
       lookupSyncCallback,
+      memoedVarsRef,
       cleanup,
     });
 
@@ -1653,6 +1678,7 @@ export function renderLoaders({
     lookupAction,
     lookupSyncCallback,
     cleanup,
+    memoedVarsRef,
   }: {
     loader: ComponentDef;
     componentState: ContainerState;
@@ -1662,6 +1688,7 @@ export function renderLoaders({
     lookupAction: LookupAsyncFnInner;
     lookupSyncCallback: LookupSyncFnInner;
     cleanup: ComponentCleanupFn;
+    memoedVarsRef: MutableRefObject<MemoedVars>;
   }) {
     // --- For the sake of avoiding further issues
     if (!loader) {
@@ -1684,6 +1711,8 @@ export function renderLoaders({
         registerComponentApi={registerComponentApi}
         lookupAction={lookupAction}
         lookupSyncCallback={lookupSyncCallback}
+        memoedVarsRef={memoedVarsRef}
+        appContext={appContext}
       />
     );
   }

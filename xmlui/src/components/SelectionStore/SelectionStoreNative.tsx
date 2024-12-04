@@ -1,4 +1,4 @@
-import React, { type ReactNode, useLayoutEffect, useMemo, useState, useContext } from "react";
+import React, { type ReactNode, useLayoutEffect, useMemo, useState, useContext, useRef } from "react";
 import { isEqual, noop } from "lodash-es";
 import { useEvent } from "@components-core/utils/misc";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
@@ -28,11 +28,13 @@ export const SelectionStore = ({
   registerComponentApi = noop,
 }: SelectionStoreProps) => {
   const [items, setItems] = useState<any[]>(selectedItems);
+  const valueInitializedRef = useRef(false);
 
   const refreshSelection = useEvent((allItems: any[] = EMPTY_ARRAY) => {
     setItems(allItems);
     let value = allItems.filter((item) => !!selectedItems.find((si) => si[idKey] === item[idKey]));
-    if(!isEqual(selectedItems, value)){
+    if(!isEqual(selectedItems, value) || !valueInitializedRef.current){
+      valueInitializedRef.current = true;
       updateState({
         value: value,
       });
