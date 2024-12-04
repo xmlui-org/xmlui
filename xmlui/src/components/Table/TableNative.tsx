@@ -584,11 +584,6 @@ export const Table = forwardRef(
         ref={ref}
         style={style}
       >
-        {loading && !hasData && (
-          <div className={styles.loadingWrapper}>
-            <Spinner />
-          </div>
-        )}
         <table
           className={styles.table}
           ref={tableRef}
@@ -745,6 +740,11 @@ export const Table = forwardRef(
             )}
           </tbody>}
         </table>
+        {loading && !hasData && (
+          <div className={styles.loadingWrapper}>
+            <Spinner />
+          </div>
+        )}
         {!hideNoDataView &&
           !loading &&
           !hasData &&

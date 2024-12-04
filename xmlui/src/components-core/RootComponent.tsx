@@ -617,6 +617,7 @@ function AppRoot({
           };
     return {
       type: "Container",
+      uid: "root",
       children: [themedRoot],
       uses: [],
     };
