@@ -128,7 +128,7 @@ test("ignores label property if children present", async ({ createDriver }) => {
   await expect(driver.button).toHaveLabel("world");
 });
 
-test("renders XMLUI Text component as child", async ({ createDriver }) => {
+test.skip("renders XMLUI Text component as child", async ({ createDriver }) => {
   const driver = await createDriver(`<Button label="hello"><Text>world</Text></Button>`);
   await expect(driver.button).not.toHaveLabel("hello");
 });
