@@ -242,8 +242,9 @@ export function Select({
             ? value.filter((v) => v !== selectedValue)
             : [...value, selectedValue]
           : [selectedValue]
-        : selectedValue;
-
+        : selectedValue === value
+          ? ""
+          : selectedValue;
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
       setOpen(false);
