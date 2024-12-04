@@ -1,7 +1,38 @@
 import { Callout } from 'nextra/components';
 import { XMLUI_EXPRESSIONS, XMLUI_EXPRESSIONS_ARROW_FUNCTIONS } from "../../meta/pages";
 
-# Script Syntax
+# Scripts in XMLUI
+
+XMLUI uses a scripting language, which is a subset of JavaScript. When an application runs, the framework precompiles scripts into an intermediate representation and processes (interprets) that. It uses the same expression evaluation and statement executing semantics as JavaScript.
+
+## Sync and Async Evaluation
+
+<Callout type="info" emoji="💡">
+The scripting engine is smart about using sync and async evaluation.
+</Callout>
+
+When resolving property values, the engine uses sync evaluation; event handlers are asynchronous. You do not have to know how it happens; they just get the operation result.
+
+You do not need to use `async` or `await` keywords or do anything to manage asynchronous execution. More accurately, these keywords are not part of the scripting language.
+
+When evaluating the initial value of variables or setting and changing property values, the engine expects sync evaluation. It needs the initial values instantly to render the UI. Thus, the engine raises an error message if the initial variable evaluation contains async parts.
+
+The UI remains responsive even if you create an infinite loop with an event handler.
+
+## Language Constraints
+
+The scripting language is just a subset of JavaScript. This section describes what is not implemented in XMLUI.
+
+**No `import` and `export` statements**
+
+XMLUI does not support modules, so the language does not yet include the `import` and `export` keywords.
+
+We are already working on implementing simplified module handling within the framework. So, you will be able to separate some utility code into separate files and use them similarly to JavaScript modules. Nonetheless, this feature is not available yet.
+
+
+---
+
+Old document
 
 XMLUI uses a script language (XMLUIScript, similar to JavaScript) to declare and execute application logic. The language syntax comprises *expression* and *statement* definitions.
 
