@@ -1,6 +1,4 @@
-import type {
-  CSSProperties,
-  ReactNode} from "react";
+import type { CSSProperties, ReactNode } from "react";
 import React, {
   useCallback,
   useEffect,
@@ -43,6 +41,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import { useEvent } from "@components-core/utils/misc";
 import { OptionContext, useOption } from "@components/Select/OptionContext";
+import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
@@ -66,6 +65,11 @@ type SelectProps = {
   autoFocus?: boolean;
   searchable?: boolean;
   multi?: boolean;
+  required?: boolean;
+  label?: string;
+  labelPosition?: string;
+  labelWidth?: string;
+  labelBreak?: boolean;
 };
 
 function defaultRenderer(item: Option) {
@@ -194,6 +198,11 @@ export function Select({
   autoFocus = false,
   searchable = false,
   multi = false,
+  label,
+  labelPosition,
+  labelWidth,
+  labelBreak,
+  required = false,
 }: SelectProps) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
@@ -289,7 +298,6 @@ export function Select({
     });
   }, []);
 
-
   const optionContextValue = useMemo(
     () => ({
       onOptionAdd,
@@ -314,92 +322,108 @@ export function Select({
         {searchable || multi ? (
           <OptionTypeProvider Component={HiddenOption}>
             {children}
-            <Popover open={open} onOpenChange={setOpen} modal={false}>
-              <PopoverTrigger asChild>
-                <button
-                  id={id}
-                  style={layout}
-                  ref={setReferenceElement}
-                  onFocus={onFocus}
-                  onBlur={onBlur}
-                  disabled={!enabled}
-                  aria-expanded={open}
-                  onClick={() => setOpen((prev) => !prev)}
-                  className={classnames(styles.selectTrigger, styles[validationStatus], {
-                    [styles.disabled]: !enabled,
-                    [styles.multi]: multi,
-                  })}
-                  autoFocus={autoFocus}
-                >
-                  {multi ? (
-                    Array.isArray(value) && value.length > 0 ? (
-                      <div className={styles.badgeListContainer}>
-                        <div className={styles.badgeList}>
-                          {value.map((v) => (
-                            <span key={v} className={styles.badge}>
-                              {Array.from(options).find((o) => o.value === v)?.label}
-                              <Icon
-                                name="close"
-                                size="sm"
-                                onClick={(event) => {
-                                  event.stopPropagation();
-                                  toggleOption(v);
-                                }}
-                              />
-                            </span>
-                          ))}
+            <ItemWithLabel
+              labelPosition={labelPosition as any}
+              label={label}
+              labelWidth={labelWidth}
+              labelBreak={labelBreak}
+              required={required}
+              enabled={enabled}
+              onFocus={onFocus}
+              onBlur={onBlur}
+              style={layout}
+            >
+              <Popover open={open} onOpenChange={setOpen} modal={false}>
+                <PopoverTrigger asChild>
+                  <button
+                    id={id}
+                    ref={setReferenceElement}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    disabled={!enabled}
+                    aria-expanded={open}
+                    onClick={() => setOpen((prev) => !prev)}
+                    className={classnames(styles.selectTrigger, styles[validationStatus], {
+                      [styles.disabled]: !enabled,
+                      [styles.multi]: multi,
+                    })}
+                    autoFocus={autoFocus}
+                  >
+                    {multi ? (
+                      Array.isArray(value) && value.length > 0 ? (
+                        <div className={styles.badgeListContainer}>
+                          <div className={styles.badgeList}>
+                            {value.map((v) => (
+                              <span key={v} className={styles.badge}>
+                                {Array.from(options).find((o) => o.value === v)?.label}
+                                <Icon
+                                  name="close"
+                                  size="sm"
+                                  onClick={(event) => {
+                                    event.stopPropagation();
+                                    toggleOption(v);
+                                  }}
+                                />
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <span className={styles.placeholder}>{placeholder || ""}</span>
+                      )
+                    ) : value ? (
+                      <span>{Array.from(options).find((o) => o.value === value)?.label}</span>
                     ) : (
                       <span className={styles.placeholder}>{placeholder || ""}</span>
-                    )
-                  ) : value ? (
-                    <span>{Array.from(options).find((o) => o.value === value)?.label}</span>
-                  ) : (
-                    <span className={styles.placeholder}>{placeholder || ""}</span>
-                  )}
-                  <div className={styles.actions}>
-                    {multi && Array.isArray(value) && value.length > 0 && (
-                      <Icon
-                        name="close"
-                        onClick={(event) => {
-                          event.stopPropagation();
-                          clearValue();
-                        }}
-                      />
                     )}
-                    <Icon name="chevrondown" />
-                  </div>
-                </button>
-              </PopoverTrigger>
-              <Portal container={root}>
-                <PopoverContent
-                  style={{ width, height: dropdownHeight }}
-                  className={styles.selectContent}
-                >
-                  <Cmd className={styles.command}>
-                    {searchable ? (
-                      <div className={styles.commandInputContainer}>
-                        <Icon name="search" />
-                        <CmdInput
-                          className={classnames(styles.commandInput)}
-                          placeholder="Search..."
+                    <div className={styles.actions}>
+                      {multi && Array.isArray(value) && value.length > 0 && (
+                        <Icon
+                          name="close"
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            clearValue();
+                          }}
                         />
-                      </div>
-                    ) : (
-                      // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
-                      <button autoFocus aria-hidden="true" className={styles.srOnly} />
-                    )}
-                    <CmdList className={styles.commandList}>
-                      {Array.from(options).map(({ value, label, enabled }) => (
-                        <ComboboxOption key={value} value={value} label={label} enabled={enabled} />
-                      ))}
-                      <CmdEmpty>{emptyListNode}</CmdEmpty>
-                    </CmdList>
-                  </Cmd>
-                </PopoverContent>
-              </Portal>
-            </Popover>
+                      )}
+                      <Icon name="chevrondown" />
+                    </div>
+                  </button>
+                </PopoverTrigger>
+                <Portal container={root}>
+                  <PopoverContent
+                    style={{ width, height: dropdownHeight }}
+                    className={styles.selectContent}
+                  >
+                    <Cmd className={styles.command}>
+                      {searchable ? (
+                        <div className={styles.commandInputContainer}>
+                          <Icon name="search" />
+                          <CmdInput
+                            className={classnames(styles.commandInput)}
+                            placeholder="Search..."
+                          />
+                        </div>
+                      ) : (
+                        // https://github.com/pacocoursey/cmdk/issues/322#issuecomment-2444703817
+                        <button autoFocus aria-hidden="true" className={styles.srOnly} />
+                      )}
+                      <CmdList className={styles.commandList}>
+                        {Array.from(options).map(({ value, label, enabled }) => (
+                          <ComboboxOption
+                            key={value}
+                            value={value}
+                            label={label}
+                            enabled={enabled}
+                          />
+                        ))}
+                        <CmdEmpty>{emptyListNode}</CmdEmpty>
+                      </CmdList>
+                    </Cmd>
+                  </PopoverContent>
+                </Portal>
+              </Popover>
+            </ItemWithLabel>
           </OptionTypeProvider>
         ) : (
           <SimpleSelect
