@@ -52,7 +52,7 @@ type OnStatementCompletedCallback =
 export async function processStatementQueueAsync(
   statements: Statement[],
   evalContext: BindingTreeEvaluationContext,
-  thread?: LogicalThreadExp
+  thread?: LogicalThreadExp,
 ): Promise<QueueInfo> {
   if (!thread) {
     // --- Create the main thread for the queue
@@ -94,7 +94,12 @@ export async function processStatementQueueAsync(
       await evalContext?.onStatementStarted?.(evalContext, queueItem!.statement);
 
       // --- Execute the statement
-      outcome = await processStatementAsync(queueItem!.statement, queueItem?.execInfo ?? {}, evalContext, thread);
+      outcome = await processStatementAsync(
+        queueItem!.statement,
+        queueItem?.execInfo ?? {},
+        evalContext,
+        thread,
+      );
     } catch (err) {
       if (thread.tryBlocks && thread.tryBlocks.length > 0) {
         // --- We have a try block to handle this error
@@ -114,7 +119,10 @@ export async function processStatementQueueAsync(
           reportEngineError(err);
         } else {
           // TODO: Provide source code information
-          reportEngineError(new StatementExecutionError(err as any /* queueItem!.statement?.source */), err);
+          reportEngineError(
+            new StatementExecutionError(err as any /* queueItem!.statement?.source */),
+            err,
+          );
         }
       }
     }
@@ -166,7 +174,7 @@ async function processStatementAsync(
   statement: Statement,
   execInfo: StatementRunTimeInfo,
   evalContext: BindingTreeEvaluationContext,
-  thread: LogicalThreadExp
+  thread: LogicalThreadExp,
 ): Promise<ProcessOutcome> {
   // --- These items should be put in the statement queue after return
   let toUnshift: StatementQueueItem[] = [];
@@ -213,6 +221,12 @@ async function processStatementAsync(
       // --- Function declarations are already hoisted, nothing to do
       break;
 
+    case "VarS":
+      if (thread !== evalContext.mainThread) {
+        throw new Error("'var' declarations are not allowed within functions");
+      }
+      break;
+
     case "EmptyS":
       // --- Nothing to do
       break;
@@ -250,7 +264,7 @@ async function processStatementAsync(
         statement.expr,
         evalContext,
         thread,
-        ...(evalContext.eventArgs ?? [])
+        ...(evalContext.eventArgs ?? []),
       );
       if (thread.blocks && thread.blocks.length !== 0) {
         thread.blocks[thread.blocks.length - 1].returnValue = arrowFuncValue;
@@ -295,7 +309,9 @@ async function processStatementAsync(
       }
 
       // --- Store the return value
-      thread.returnValue = statement.expr ? await evalBindingAsync(statement.expr, evalContext, thread) : undefined;
+      thread.returnValue = statement.expr
+        ? await evalBindingAsync(statement.expr, evalContext, thread)
+        : undefined;
 
       // --- Check for try blocks
       if ((thread.tryBlocks ?? []).length > 0) {
@@ -370,7 +386,10 @@ async function processStatementAsync(
         throw new Error("Missing loop scope");
       }
 
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "continue"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "continue";
@@ -399,7 +418,10 @@ async function processStatementAsync(
       }
 
       // --- Break is in a loop construct
-      if (loopScope.tryBlockDepth >= 0 && loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length) {
+      if (
+        loopScope.tryBlockDepth >= 0 &&
+        loopScope.tryBlockDepth < (thread.tryBlocks ?? []).length
+      ) {
         // --- Mark the loop's try scope to exit with "break"
         for (let i = loopScope.tryBlockDepth; i < thread.tryBlocks!.length; i++) {
           thread.tryBlocks![loopScope.tryBlockDepth]!.exitType = "break";
@@ -441,10 +463,19 @@ async function processStatementAsync(
           const loopScope = innermostLoopScope(thread);
 
           if (statement.upd) {
-            const updateStmt: StatementWithInfo = { statement: { type: "ExprS", expr: statement.upd } };
-            toUnshift = mapStatementsToQueueItems([{ statement: statement.body }, updateStmt, { statement, execInfo }]);
+            const updateStmt: StatementWithInfo = {
+              statement: { type: "ExprS", expr: statement.upd },
+            };
+            toUnshift = mapStatementsToQueueItems([
+              { statement: statement.body },
+              updateStmt,
+              { statement, execInfo },
+            ]);
           } else {
-            toUnshift = mapStatementsToQueueItems([{ statement: statement.body }, { statement, execInfo }]);
+            toUnshift = mapStatementsToQueueItems([
+              { statement: statement.body },
+              { statement, execInfo },
+            ]);
           }
           // --- The next queue label is for "break"
           loopScope.breakLabel = thread.breakLabelValue ?? -1;
@@ -524,7 +555,10 @@ async function processStatementAsync(
 
           // --- Inject the loop body
           const loopScope = innermostLoopScope(thread);
-          toUnshift = mapStatementsToQueueItems([{ statement: statement.body }, { statement, execInfo }]);
+          toUnshift = mapStatementsToQueueItems([
+            { statement: statement.body },
+            { statement, execInfo },
+          ]);
 
           // --- The next queue label is for "break"
           loopScope.breakLabel = thread.breakLabelValue ?? -1;
@@ -610,7 +644,10 @@ async function processStatementAsync(
 
         // --- Inject the loop body
         const loopScope = innermostLoopScope(thread);
-        toUnshift = mapStatementsToQueueItems([{ statement: statement.body }, { statement, execInfo }]);
+        toUnshift = mapStatementsToQueueItems([
+          { statement: statement.body },
+          { statement, execInfo },
+        ]);
 
         // --- The next queue label is for "break"
         loopScope.breakLabel = thread.breakLabelValue ?? -1;
@@ -776,7 +813,10 @@ async function processStatementAsync(
         }
 
         // --- Queue the statement flow and the guard
-        toUnshift = mapStatementsToQueueItems([...toStatementItems(statementFlow), guard(statement)]);
+        toUnshift = mapStatementsToQueueItems([
+          ...toStatementItems(statementFlow),
+          guard(statement),
+        ]);
         loopScope.breakLabel = toUnshift[toUnshift.length - 1].label;
       }
       break;
@@ -807,7 +847,7 @@ export async function processDeclarationsAsync(
   declarations: VarDeclaration[],
   addConst = false,
   useValue = false,
-  baseValue = undefined
+  baseValue = undefined,
 ): Promise<void> {
   for (let i = 0; i < declarations.length; i++) {
     let value: any;
@@ -821,7 +861,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visit a variable
-  function visitDeclaration(block: BlockScope, decl: VarDeclaration, baseValue: any, addConst: boolean): void {
+  function visitDeclaration(
+    block: BlockScope,
+    decl: VarDeclaration,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     // --- Process each declaration
     if (decl.id) {
       visitIdDeclaration(block, decl.id, baseValue, addConst);
@@ -835,7 +880,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visits a single ID declaration
-  function visitIdDeclaration(block: BlockScope, id: string, baseValue: any, addConst: boolean): void {
+  function visitIdDeclaration(
+    block: BlockScope,
+    id: string,
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     if (block.vars[id]) {
       throw new Error(`Variable ${id} is already declared in the current scope.`);
     }
@@ -847,7 +897,12 @@ export async function processDeclarationsAsync(
   }
 
   // --- Visits an array destructure declaration
-  function visitArrayDestruct(block: BlockScope, arrayD: ArrayDestructure[], baseValue: any, addConst: boolean): void {
+  function visitArrayDestruct(
+    block: BlockScope,
+    arrayD: ArrayDestructure[],
+    baseValue: any,
+    addConst: boolean,
+  ): void {
     for (let i = 0; i < arrayD.length; i++) {
       const arrDecl = arrayD[i];
       const value = baseValue?.[i];
@@ -866,7 +921,7 @@ export async function processDeclarationsAsync(
     block: BlockScope,
     objectD: ObjectDestructure[],
     baseValue: any,
-    addConst: boolean
+    addConst: boolean,
   ): void {
     for (let i = 0; i < objectD.length; i++) {
       const objDecl = objectD[i];
