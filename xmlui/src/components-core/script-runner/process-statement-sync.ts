@@ -202,6 +202,12 @@ function processStatement(
       // --- Function declarations are already hoisted, nothing to do
       break;
 
+    case "VarS":
+      if (thread !== evalContext.mainThread) {
+        throw new Error("'var' declarations are not allowed within functions");
+      }
+      break;
+
     case "EmptyS":
       // --- Nothing to do
       break;
