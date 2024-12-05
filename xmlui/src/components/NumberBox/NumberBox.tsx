@@ -26,6 +26,7 @@ import {
   dStartIcon,
   dStartText,
   dValidationStatus,
+  dValue,
 } from "@components/metadata-helpers";
 
 const COMP = "NumberBox";
@@ -90,9 +91,7 @@ export const NumberBoxMd = createMetadata({
   },
   apis: {
     focus: dFocus(COMP),
-    value: d(
-      `You can query the component's value. If no value is set, it will retrieve \`undefined\`.`,
-    ),
+    value: dValue(),
     setValue: dSetValueApi(),
   },
   themeVars: parseScssVar(styles.themeVars),
