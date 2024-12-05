@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components';
-import { XMLUI_EXPRESSIONS, XMLUI_EXPRESSIONS_ARROW_FUNCTIONS } from "../../meta/pages";
+import { GLOBAL_FUNCTIONS_AND_VARIABLES, XMLUI_EXPRESSIONS, XMLUI_EXPRESSIONS_ARROW_FUNCTIONS, XMLUI_SCRIPTING_REFERENCE } from "../../meta/pages";
 
 # Scripts in XMLUI
 
@@ -92,7 +92,7 @@ let a = 1, b = 2;
 [a, b] = [b, a];
 ```
 
-**The `new`, `void`, `yield`, and `await` operators are unavailable**
+**The `new`, `instanceof`, `void`, `yield`, and `await` operators are unavailable**
 
 You cannot instantiate objects with the `new` operator. This feature is missing for code security reasons.
 
@@ -209,39 +209,231 @@ try {
   }
 }
 ```
-## Event Handlers [#event-handlers]
 
-The engine transforms the script of event handlers into arrow functions. The compiler recognizes several patterns and helps you make the code more concise.
+## Expressions Syntax
 
-### Empty Code
-
-The engine considers the empty code (whitespaces only) a no-op declaration and turns them into a no-op arrow function:
-
-```js
-() => {}
-```
+When you declare an inline expression within a component property (markup attribute) or in a markup text element, XMLUI parses that with the *expression syntax*.
 
 ### Identifiers
 
-The engine considers the identifiers to be arrow function names. It transforms these identifiers into arrow functions with as many arguments as the corresponding event. Provided an event has *N* arguments (*N* can be zero), the engine applies this transform:
+XMLUI identifiers may start with one of these characters: `$`, `_`, or any English alphabet letters (from `a` to `z` and from `A` to `Z`). The continuation characters can be of the same set as the start character, and you can also use decimal digits (from `0` to `9`). Other characters (such as Unicode letters, symbols, or emojis) are not allowed in identifiers.
+
+Here are a few examples of valid identifiers:
 
 ```js
-(arg1, arg2, /* ... */, argN) => idUsed(arg1, arg2, /* ... */, argN)
+saveButton
+$item
+$saveCommand
+_a123
+```
+
+Identifier resolution has the same semantics as in JavaScript. Identifier search starts from the innermost scope and traverses until the global scope is reached unless the id can be resolved in one of the previous scopes.
+
+XMLUI changes this by injecting a unique scope between the global JavaScript scope and the others. This scope contains global XMLUI functions (mostly helpers) and objects. You can learn more about them <SmartLink href={GLOBAL_FUNCTIONS_AND_VARIABLES}>here</SmartLink>.
+
+### Literals
+
+You can use the same numbers (integers and floating-point numbers) as in JavaScript, and also the `NaN` value
+(not-a-number) and `Infinity` (the result coming from a divide by zero).
+
+Array and object literals also allow you the same syntax as in JavaScript. Here are a few samples:
+
+```js
+[1, 2, 3] // An array of three numbers
+["Hello", "World", 42, true] // An array of four values
+{a: 1, b: 2, c: 3} // An object with three properties
+{
+  hey: 123,
+  ho: false,
+  hi: 123.e-2,
+  what: NaN,
+  is: ["this", "object-like"],
+  thing: {
+      that: null,
+      seems: "completely",
+      stupid: "?"
+  }
+} // A compound object literal
+```
+
+Strings allow the same characters as JavaScript, including inline Unicode and the following escape characters:
+
+- `\b`: Backspace
+- `\f`: Form Feed
+- `\n`: New Line
+- `\r`: Carriage Return
+- `\t`: Horizontal Tabulator
+- `\v`: Vertical Tabulator
+- `\S`: Non-breaking Space
+- `\\`: Backslash
+- `\'`: Single quote
+- `\"`: Double quote
+- `\xhh`: Hexadecimal character (here, `hh` represents two hexadecimal digits).
+- `\uhhhh`: Unicode code point between `U+0000` and `U+FFFF` (here `hhhh` represents four hexadecimal digits).
+- `\u{hHHHHH}`: Unicode code point between `U+0000` and `U+10FFFF` (here `hHHHHH` represents one to six hexadecimal
+digits).
+
+XMLUI supports [template strings](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals); however, it does not allow using [tagged templates](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates).
+
+### Available operators
+
+The operators are grouped according to their precedence, starting with the highest one:
+
+| Operator | Notation | Examples | Group |
+| --- | --- | --- | --: |
+| **Grouping** | `( … )` | `(a + b) * c` | 1 |
+| **Member Access** | `… . …` | `object.property` | 2 |
+| **Optional Member Access** | `… ?. …` | `object?.property` | 2 |
+| **Calculated Member Access** | `… [ … ]` | `object[property]` | 2 |
+| **Function Invocation** | `… ( … )` | `function(arg1, arg2)` | 2 |
+| **Postfix Increment** | `… ++` | `a++` | 3 |
+| **Postfix Decrement** | `… --` | `a--` | 3 |
+| **Prefix Increment** | `++ …` | `++a` | 4 |
+| **Prefix Decrement** | `-- …` | `--a` | 4 |
+| **Logical NOT** | `! …` | `!a` | 4 |
+| **Bitwise NOT** | `~ …` | `~a` | 4 |
+| **Unary Plus** | `+ …` | `+a` | 4 |
+| **Unary Negation** | `- …` | `-a` | 4 |
+| **Typeof** | `typeof …` | `typeof a` | 4 |
+| **Delete** | `delete …` | `delete a` | 4 |
+| **Exponentiation** | `… ** …` | `a ** b` | 5 |
+| **Multiplication** | `… * …` | `a * b` | 6 |
+| **Division** | `… / …` | `a / b` | 6 |
+| **Remainder** | `… % …` | `a % b` | 6 |
+| **Addition** | `… + …` | `a + b` | 7 |
+| **Subtraction** | `… - …` | `a - b` | 7 |
+| **Bitwise Left Shift** | `… << …` | `a << b` | 8 |
+| **Bitwise Right Shift** | `… >> …` | `a >> b` | 8 |
+| **Bitwise Unsigned Right Shift** | `… >>> …` | `a >>> b` | 8 |
+| **Less Than** | `… < …` | `a < b` | 9 |
+| **Less Than or Equal** | `… <= …` | `a <= b` | 9 |
+| **Greater Than** | `… > …` | `a > b` | 9 |
+| **Greater Than or Equal** | `… >= …` | `a >= b` | 9 |
+| **Inclusion Test** | `… in …` | `a in b` | 9 |
+| **Equality** | `… == …` | `a == b` | 10 |
+| **Inequality** | `… != …` | `a != b` | 10 |
+| **Strict Equality** | `… === …` | `a === b` | 10 |
+| **Strict Inequality** | `… !== …` | `a !== b` | 10 |
+| **Bitwise AND** | `… & …` | `a & b` | 11 |
+| **Bitwise XOR** | `… ^ …` | `a ^ b` | 12 |
+| **Bitwise OR** | `… \| …` | `a \| b` | 13 |
+| **Logical AND** | `… && …` | `a && b` | 14 |
+| **Logical OR** | `… \|\| …` | `a \|\| b` | 15 |
+| **Nullish Coalescing** | `… ?? …` | `a ?? b` | 15 |
+| **Assignment** | `… = …` | `a = b` | 16 |
+| **Addition Assignment** | `… += …` | `a += b` | 16 |
+| **Subtraction Assignment** | `… -= …` | `a -= b` | 16 |
+| **Multiplication Assignment** | `… *= …` | `a *= b` | 16 |
+| **Division Assignment** | `… /= …` | `a /= b` | 16 |
+| **Remainder Assignment** | `… %= …` | `a %= b` | 16 |
+| **Exponentiation Assignment** | `… **= …` | `a **= b` | 16 |
+| **Bitwise Left Shift Assignment** | `… <<= …` | `a <<= b` | 16 |
+| **Bitwise Right Shift Assignment** | `… >>= …` | `a >>= b` | 16 |
+| **Bitwise Unsigned Right Shift Assignment** | `… >>>= …` | `a >>>= b` | 16 |
+| **Bitwise AND Assignment** | `… &= …` | `a &= b` | 16 |
+| **Bitwise XOR Assignment** | `… ^= …` | `a ^= b` | 16 |
+| **Bitwise OR Assignment** | `… \|= …` | `a \|= b` | 16 |
+| **Nullish Coalescing Assignment** | `… ??= …` | `a ??= b` | 16 |
+| **Conditional** | `… ? … : …` | `a ? b : c` | 17 |
+| **Arrow Function** | `() => …` | `() => a` | 18 |
+| **Comma** | `… , …` | `a, b` | 19 |
+
+### Function Declaration as Expressions
+
+You can use functions as variable values. XMLUI accepts both an arrow expression (arrow function) or a standard JavaScript function declaration as an expression. So, these variable declarations are valid in XMLUI:
+
+```ueml copy /x => x*x/ /function(x) { return x * x; }/
+<App 
+  var.mySqr="{x => x*x}"
+  var.mySqrOther="{function(x) { return x * x; }}">
+  <Text>Square of 5 is {mySqr(5)}</Text> <!-- Displays 25 -->
+  <Text>Square of 8 is {mySqrOther(8)}</Text> <!-- Displays 64 -->
+</App>
+```
+
+Function declarations support the rest parameters:
+
+```ueml copy {2, 3}
+<App 
+  var.myArgs="{(a, b, ...others) => { return others.length + 2; }}"
+  var.myArgsOther="{function(a, b, ...others) { return others.length + 2; }}">
+  <Text>Number of arguments is {myArgs(1, 2, 3, 4, 5)}</Text> <!-- Displays 5 -->
+  <Text>Number of arguments is {myArgsOther(1, 2, 3, 4)}</Text> <!-- Displays 4 -->
+</App>
+```
+
+You can use arrow expressions and function declarations with immediate invocations:
+
+```ueml copy {2, 3}
+<App>
+  <Text>5**3 is {(n => n ** 3)(5)}</Text> <!-- Displays 125 -->
+  <Text> <!-- Displays 81 -->
+    3**4 is {(function(n){ return n ** 4})(3)}
+  </Text> 
+  <Text> <!-- Displays 120 -->
+    5! is{(function fact(n) { return n &lt; 2 ? 1 : n * fact(n - 1); })(5)}
+  </Text>
+</App>
 ```
 
 <Callout type="info" emoji="📔">
-Here, `idUsed` is the identifier used as the event handler, and `arg1`,  `arg2`, and `argN` are the event arguments.
+The function name in the expression is optional. However, you must name the function if you want to refer to its name (for example, you use recursion, like above in the `fact` function).
 </Callout>
 
-### Member Access Chain
+## Statements Syntax
 
-The engine considers the member access chains to be evaluated to arrow function expressions. It transforms them into arrow functions with as many arguments as the corresponding event. Provided an event has *N* arguments (*N* can be zero), the engine applies this transform:
+While expressions are parsed using only the expression syntax (they can contain statements only within function declaration or arrow function bodies), event handlers and code-behind files can use statements.
+
+XMLUI supports these statements:
+
+| Category | Statement | Description |
+| --- | --- | --- |
+| Declaration | `var`, `let`, `const` | Variable declarations |
+| Declaration | `function` | Function declarations |
+| Control Flow | `if`, `else`, `switch`, `case`, `default`, `break`, `continue`, `return` | Conditional and switch-case statements |
+| Loops | `for`, `while`, `do..while`, `for..in`, `for..of` | Looping statements |
+| Exception Handling | `throw` `try..catch..finally` | Exception raising and handling statements |
+| Expressions | `<expression>` | Expression statement |
+| Block | `{ ... }` | Block statement |
+| Other | `;` | Empty statement |
+
+## Event Handlers [#event-handlers]
+
+Event handlers are functions that can receive and process arguments. When the engine invokes an event handler, it passes the event's parameters to the function.
+
+The engine is smart enough to create a function from your script. Even if it is not a fully declared function, after parsing the script, the engine transforms it into an invokable function.
+
+**Empty code**
+
+The engine creates a no-op function:
 
 ```js
-(arg1, arg2, /* ... */, argN) => memberAccessChain(arg1, arg2, /* ... */, argN)
+function () {}
 ```
 
-The engine takes identifiers chained together with the member access (`.`) operator or the calculated member access operator (`[<literal>]`) as a member access chain. Here are a few examples:
+**Identifier**
+
+The engine considers an identifier to be a function name. It transforms this id into arrow functions with as many arguments as the corresponding event. Provided you use the identifier `myFuncion` and the event has *N* arguments (*N* can be zero), the engine applies this transformation:
+
+```js
+function eventHandlerFunction(arg1, arg2, /* ... */, argN) {
+  myFunction(arg1, arg2, /* ... */, argN)
+}
+```
+
+**Member Access Chain**
+
+The engine considers the member access chains to refer to a function. It transforms the chain into a function declaration, similar to how it does with identifiers. 
+
+For example, if you have a member access chain, `myArr[3].method`, it is transformed the following way:
+
+```js
+function eventHandlerFunction(arg1, arg2, /* ... */, argN) {
+  myArr[3].method(arg1, arg2, /* ... */, argN)
+}
+```
+
+These member access chains can be arbitrarily long. Here are a few examples:
 
 ```js
 action.execute
@@ -249,111 +441,68 @@ operation[0].handler.fire
 operation["do-it"].handler.fire
 ```
 
-However, the calculated member access operator with expressions (and not literals) breaks this chain. For example, these expressions do not turn the member access expression chain into an arrow function:
+With the calculated member access (`[` ... `]`) operator, you can use only literals (strings or numbers); otherwise, the engine wraps considers the expression an *expression statement* and wraps it accordingly.
+
+For example, all of the following member access chains are considered expression statements because the `[` ... `]` operators contain a non-literal:
 
 ```js
 operation[index + 3].handler.fire
 operation["do" + "it"].handler.fire
 ```
 
-### Expressions
+**Expression statements**
 
-When the event handler code is an expression, the engine transforms it into an arrow expression, like in this sample:
-
-Original event handler:
+When the event handler script is an expression statement, the engine transforms it into a function returning the particular expression. For example, `count++` is transformed into this function:
 
 ```js
-count++;
+function () { return count++; }
 ```
 
-Transformed event handler:
+***Code Blocks with Single Expression***
+
+Though inline expressions are wrapped into curly braces (e.g., `{doThis()}`), event handlers are not.Nonetheless, users often forget about this fact. The engine recognizes the braces as block statement delimiters and transforms code blocks into the appropriate arrow function:
+
+For example, if the event handler is `{count++;}`, the engine transforms it into this function:
 
 ```js
-() => count++;
+function () { return count++; }
+```
+***Code Blocks with Multiple Statement***
+
+If the block statement contains a single non-expression statement or multiple statements, the engine provides a different transformation. It wraps the block into a function and separates the statements with semicolons.
+
+Let's assume the event handler script is the following:
+
+
+```js
+{ if (x) counter++; return counter + 10; }
 ```
 
-### Code Blocks with Single Expression
-
-Though binding expressions are wrapped into curly braces (e.g., `{doThis()}`), event handlers are not; nonetheless, users often forget about this fact. The engine recognizes the braces as block statement delimiters and transforms code blocks into the appropriate arrow function:
-
-Original event handler:
+The engine replaces it with this function definition:
 
 ```js
-{count++;}
-```
-
-Transformed event handler:
-
-```js
-() => count++;
-```
-
-### Code Blocks with Multiple Statement
-
-If the block statement contains a single non-expression statement or multiple statements, the engine provides a different transformation:
-
-Original event handler:
-
-```js
-{ if (x) counter++; }
-```
-
-Transformed event handler:
-
-```js
-() => { 
+function () { 
   if (x) counter++; 
+  return counter + 10;
 }
 ```
 
-Original event handler:
-
-```js
-{ doThis(); count++; }
-```
-
-Transformed event handler:
-
-```js
-() => { 
-  doThis(); 
-  count++;
-}
-```
-
-In this situation, the engine cannot infer if you intended to return the `count++` value from the event handler. You must use the `return` statement to indicate the intention explicitly:
-
-Original event handler:
-
-```js
-{ doThis(); return count++; }
-```
-
-Transformed event handler:
-
-```js
-() => { 
-  doThis(); 
-  return count++;
-}
-```
-
-### Multiple Statements
+**Multiple Statements**
 
 The engine recognizes multiple statements and transforms them similarly to the body of block statements:
 
 Original event handler:
 
 ```js
-doThis(); count++;
+if (x) counter++; return counter + 10;
 ```
 
 Transformed event handler:
 
 ```js
-() => { 
-  doThis(); 
-  count++;
+function () { 
+  if (x) counter++; 
+  return counter + 10;
 }
 ```
 
@@ -361,12 +510,11 @@ Transformed event handler:
 Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
 </Callout>
 
-
 ## Functions and Arrow Expressions
 
 _TBD_ 
 
-## How Reactiveness Works [#reactiveness]
+## Appendix: How Reactiveness Works [#reactiveness]
 
 The reactive feature works with XMLUI-managed objects such as variables and components. However, it does not work with objects managed by other entities.
 
