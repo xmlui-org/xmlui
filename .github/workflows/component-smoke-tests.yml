@@ -7,7 +7,7 @@ concurrency:  # Concurrency ensures that only a single job or workflow using the
 
 on:
   push:
-    # branches: [ main ]
+    branches: [ main ]
 jobs:
   test:
     timeout-minutes: 60
