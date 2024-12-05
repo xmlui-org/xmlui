@@ -3,7 +3,17 @@ import { XMLUI_EXPRESSIONS, XMLUI_EXPRESSIONS_ARROW_FUNCTIONS } from "../../meta
 
 # Scripts in XMLUI
 
-XMLUI uses a scripting language, which is a subset of JavaScript. When an application runs, the framework precompiles scripts into an intermediate representation and processes (interprets) that. It uses the same expression evaluation and statement executing semantics as JavaScript.
+<Callout type="info" emoji="💡">
+XMLUI uses a scripting language, which is a **subset of JavaScript**. 
+</Callout>
+
+When an application runs, the framework precompiles scripts into an intermediate representation and processes (interprets) that. It uses the same expression evaluation and statement executing semantics as JavaScript.
+
+<Callout type="info" emoji="📔">
+When we designed scripting, we opted to create the scripting language as a subset of JavaScript because of these primary reasons:
+- JavaScript is an easy language to learn at the level needed to productively use XMLUI; its language constructs are mature and proven.
+- Using JavaScript semantics allows us to leverage the entire JS runtime and utilize them with the original semantics; we do not need to create a separate runtime library.
+</Callout>
 
 ## Sync and Async Evaluation
 
@@ -27,520 +37,163 @@ The scripting language is just a subset of JavaScript. This section describes wh
 
 XMLUI does not support modules, so the language does not yet include the `import` and `export` keywords.
 
-<Callout type="info" emoji="💡">
+<Callout type="info" emoji="📔">
 We are already working on implementing simplified module handling within the framework. So, you will be able to separate some utility code into separate files and use them similarly to JavaScript modules. Nonetheless, this feature is not available yet.
 </Callout>
 
+**No labels**
 
+You cannot use labels: no label declarations; the `break` and `continue` statements do not accept labels.
 
----
+**No class declarations**
 
-Old document
+XMLUI does not allow declaring classes.
 
-XMLUI uses a script language (XMLUIScript, similar to JavaScript) to declare and execute application logic. The language syntax comprises *expression* and *statement* definitions.
+**No `debugger` statement**
 
-In the <SmartLink href={ XMLUI_EXPRESSIONS }>Expressions</SmartLink> document,
-you could learn about the expression syntax. Here, you will learn the statement syntax.
-
-## Comments
-
-XMLUIScript allows you two kinds of comments:
-- **Block comments**. Any text wrapped between `/*` and `*/` is a block comment. Note you cannot nest block comments to each other, and block comments within a string literal are not considered a comment but part of the string.
-- **End-of-line comments**. Any text following the `//` token till the end of the current line is considered a comment.
-
-Examples:
-
-```js
-const nums = [ 12, 31, 23, 117 /* , 123 */];
-const sqrNums = nums.map(n => n * n); // Create the squares of numbers
-```
-
-## Statements
-
-XMLUIScript provides several statements to express programming logic. Most of these statements have the same semantics as their counterpart in JavaScript.
+XMLUI does not support using the `debugger` statement.
 
 <Callout type="info" emoji="📔">
-The statements can be optionally closed with a semicolon. There are a few contexts where the closing semicolons are required to avoid ambiguity. It is a suggested practice to conclude statements with a semicolon always.
+When we have debugging tools for XMLUI, we may implement this statement.
+</Callout>
+
+**No default value and rest syntax with destructuring constructs**
+
+You can use destructure operators with variable declarations and function arguments with a syntax matching JavaScript. However, the current implementation does not support extracting rest values and providing default values.
+
+So, these example constructs work in XMLUI:
+
+```js
+const {a, b} = someObject;
+
+val {a, b, other: { c, d }} = someObject;
+
+let {a, b:myB} = someObject;
+
+function example ({a, b, other: { c:myC }}) {
+  // ...
+}
+```
+
+However, these constructs are not supported:
+
+```js
+const {a, b, ...rest} = someObject;
+
+let {a, b = 0} = someObject;
+```
+
+**Destructuring with left-hand value is unavailable**
+
+While destructuring works with left-hand values in JavaScript, XMLUI does not support this construct. For example, swapping two variables with this construct is available in JavaScript but not in XMLUI:
+
+```js
+let a = 1, b = 2;
+[a, b] = [b, a];
+```
+
+**The `new`, `void`, `yield`, and `await` operators are unavailable**
+
+You cannot instantiate objects with the `new` operator. This feature is missing for code security reasons.
+
+<Callout type="info" emoji="📔">
+We plan to relax this constraint in a future release, at least allowing the new operator for the core, frequently used JavaScript object types.
+</Callout>
+
+We opted to omit `the void` and `yield` operators as we guess they do not add value to the XMLUI scripting. Not only `yield` but generator functions are unavailable.
+
+As you learned earlier, XMLUI handles async execution, so there is no need for `async` or `await`. Async functions and loops are not available.
+
+**Restricted use of the optional chaining operator**
+
+XMLUI supports using the optional chaining operator(`?.`) only for member access but not for calculated member access (`?.[]`) and function invocation (`?.()`).
+
+<Callout type="info" emoji="📔">
+We plan to add these operators in a future release.
+</Callout>
+
+## Semantic differences
+
+There are a few semantic differences between JavaScript and XMLUI that you should consider when working with scripts.
+
+### Standard and optional member access operators
+
+In the current version, the member access operator `.` and its optional pair, `?.` both work with the semantics as the optional operator. 
+
+So, using the `myResult.customerName` expression, it is evaluated as if it were `myResult?.customerName`. In JavaScript, the first would give an error if `myResult` were `undefined`, while the second would result in undefined without raising an error.
+
+In XMLUI, both would retrieve `undefined`.
+
+<Callout type="info" emoji="📔">
+We decided on this implementation because we have experienced that it relaxes the syntax and makes it easier to code with `null` and `undefined` values. In the future, we will include configurable switches for the scripting engine to turn this behavior on or off. 
 </Callout>
 
 ### Variable declarations
 
-You can use the `let` and `const` statements to declare variables and optionally set their initial values. While an initial value is optional for the `let` statement, it is required for `const`. You can change the values of variables declared with `let`. However, the value of `const` variables can be set only once, at their initialization. The engine raises an error if you try to modify the value of a variable.
+Like JavaScript, XMLUI supports declaring variables with the keywords `var`, `let`, and `const`. However, XMLUI restricts their usage:
 
-Here are a few examples:
+`var` can be used only in the top code level behind files; it is not allowed within function declarations or event handlers.
+`let` and `const` can be used only within event handlers and function declarations.
+
+### Reactive Variables
+
+Variables declared with `var` are reactive. **They automatically update when their dependencies (in the expression the variable is initialized with) change, such as components or other variables they rely on**. 
+
+Look at these variable declarations:
 
 ```js
-let x; // No initial value
-let y = 0, z; // Multiple declarations
-let sum = 0; // Initialize sum to zero
-const factor = 1.5; // Factor cannot be changed later
+let count = 0;
+let countTimesThree = count * 3;
+```
+
+If you change the `count` variable, the `countTimesThree` variable will automatically update:
+
+```js
+count = 5;
+```
+
+This statement will update the `countTimesThree` variable to 15 even without explicitly assigning the value due to the reactive nature of XMLUI variables.
+
+However, the first time you assign a runtime-evaluated value to the `countTimesThree` variable, it will lose its dependency on `count`:
+
+```js
+countTimesThree = 12;
 ```
 
 <Callout type="info" emoji="📔">
-Though identifiers can start with a dollar sign (`$`), variable declarations do not allow you to start variable names with a dollar sign. `$` is reserved for context values.
+Observe that this statement is an assignment, not a variable declaration.
 </Callout>
 
-### Destructuring
-
-You can use destructure operators with variable expressions. XMLUIScript supports a similar syntax to JavaScript; however, it does not support extracting rest values and providing default values.
-
-Examples:
+After that assignment, changing the value of `counter` will never modify `counterTimesThree`; you cannot restore its reactive behavior. If you assign this value to `countTimesThree` somewhere in an event handler:
 
 ```js
-const {a, b} = someObject;
-// const a = someObject.a, b = someObject.b
-
-const {a, b, other: { c, d }} = someObject;
-// const a = someObject.a, b = someObject.b, c = someObject.other.c, d = someObject.other.d
-
-const {a, b:myB} = someObject;
-// const a = someObject.a, myB = someObject.b
-
-let {a, b, other: { c:myC }} = someObject;
-// let a = someObject.a, b = someObject.b, myC = someObject.other.c
-
-const [a, b] = someArray;
-// const a = someArray[0], b = someArray[1}
-
-const [a, b,, c] = someArray;
-// const a = someArray[0], b = someArray[1}, c = someArray[3]
-
-let [a,,, {b:myB, c}] = someArray;
-// let a = someArray[0], myB = someArray[3].b, c = someArray[3].c 
+countTimesThree = count * 3;
 ```
 
-### Empty Statement
+`countTimesThree` will have three times the current value of `count` but will no longer depend on `count`.  Any future updates to count will not update `countTimesThree` automatically.
 
-An `empty statement` is used to provide no statement, although the JavaScript syntax would expect one. XMLUIScript indicates it with a semicolon (`;`).
+This article contains a [How Reactiveness Works](#reactiveness) section where you can learn more details about this topic.
 
-> **Hint**: It is a good idea to comment on the intentional use of the empty statement, as it is not apparent to distinguish from a usual semicolon.
+### No `Error` object
 
-Example:
+XMLUI supports the `throw` statement and the `try..catch..finally` block. However, you cannot throw native JavaScript `Error` objects; you should provide your error objects (even strings, numbers, or other composite object values).
 
-```js
-// This for loop has no iteration body
-for (let i = 0; i < 10; i++); // The closing ";" indicates the empty statement
-```
+Here are a few examples:
 
-### Function Declarations
-
-XMLUI supports function declarations within event handlers and code behind files. When you declare functions, identifiers, destructuring constructs, and rest parameters can be used just like for <SmartLink href={XMLUI_EXPRESSIONS_ARROW_FUNCTIONS}>arrow expressions</SmartLink>.
-
-
-Here are a few samples:
-
-```js
-function signError() {
-  console.error("An error occurred");
-}
-
-function sum(a, b) {
-  return a + b;
-}
-
-function distance({x1, y1}, {x2, y2}) {
-  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
-}
-
-functtions sumAll(...values) {
-  return values.reduce((a, b) => a + b);
-}
-```
-
-Just like in JavaScript, xmlui uses function hoisting: it does not matter where you declare a function; it will be moved to the top of its declaration scope. So, you can refer to a function (invoke it) before its declaration.
-
-XMLUI support functions nested in other functions, so this declaration is valid:
-
-```js
-function outer() {
-  greet("World");
-
-  function greet(name) {
-    console.log(`Hello, ${name}`);
+```js copy {3}
+function sum(values) => {
+  if (values.some(function (v) {typeof v !== "number"})) {
+    throw "Can only add numbers";
   }
-}
-```
-
-### Block Statement
-
-You can group multiple statements into a single *block statement*, wrapping them between `{` and `}`. For example, you can put multiple individual statements into the body of a for-loop:
-
-```js
-let sum = 0;
-for (let i = 0; i < 10; i++) {
-  sum += i;
-  console.log("Current sum is", sum);
-}
-```
-
-Block statements have their separate identifier scope. Variables declared within them will hide external variables with the same name. For example, in the following sample, the log output will show 42 in the first line and 1234 in the second, as the declaration of `myNumber` in the block statement hides `myNumber` declared outside of the block statement:
-
-```js
-let myNumber = 1234;
-{
-  let myNumber = 42;
-  console.log(myNumber); 
-}
-console.log(myNumber);
-```
-
-<Callout type="info" emoji="📔">
-You do not need to put a closing semicolon after a block statement.
-</Callout>
-
-### Expression Statement
-
-When you write an expression in the context of other statements, XMLUIScript represents that expression as an expression statement. For example, here, the highlighted line are expression statements:
-
-```js {3,4,5}
-let sum = 0;
-for (let i = 0; i < 10; i++) {
-  sum += i;
-  console.log("Current sum is", sum);
-  123 + 456;
-}
-```
-
-<Callout type="info" emoji="📔">
-Though there is no use in evaluating the value of `123 + 456` expression statement, the engine does that (in every iteration) and omits the result.
-</Callout>
-
-### The `if...else` Statement
-
-The `if...else` statement executes a statement if a specified condition is *truthy*. If the condition is *falsy*, another statement in the optional else clause will be executed.
-
-<Callout type="info" emoji="📔">
-A *truthy* value is a value that is considered `true` when encountered in a Boolean context: All values are *truthy* unless they are defined as *falsy*. That is, all values are *truthy* except `false`, `0`, `-0`, `""`, `null`, `undefined`, and `NaN`.
-</Callout>
-
-Here are a few examples:
-
-```js
-// Example #1
-if (a > 3) doThis();
-
-// Example #2
-if (a > 3) doThis(); else doThat();
-
-// Example #3
-if (a > 3) {
-  doThisFirst();
-  andThen()
-}
-else doThat();
-```
-
-<Callout type="info" emoji="📔">
-Example #2 shows that you need a closing semicolon before `else`, as the consequent ("then") branch of the `if...else` statement is a single (non-block) statement.
-</Callout>
-
-### The `while` Statement
-
-The `while` statement creates a loop that executes a specified statement as long as the test condition evaluates to true. The condition is evaluated before executing the statement.
-
-Here are a few examples:
-
-```js
-// Example #1
-let sum = 0;
-let counter = 1;
-while (counter <= 10) sum += counter++; 
-```
-```js
-// Example #2
-let sum = 0;
-let counter = 1;
-while (counter <= 10) {
-  sum += counter;
-  counter++;
-} 
-```
-
-### The `do...while` Statement
-
-The `do...while` statement creates a loop that executes a specified statement until the test condition evaluates to false. The condition is evaluated after executing the statement, resulting in the specified statement executing at least once.
-
-```js
-// Example #1
-let sum = 0;
-let counter = 1;
-do sum += counter++; while (counter <= 10)  
-```
-```js
-// Example #2
-let sum = 0;
-let counter = 1;
-do {
-  sum += counter;
-  counter++;
-} while (counter <= 10)
-```
-
-### The `for` Statement
-
-The for statement creates a loop that consists of three optional expressions, enclosed in parentheses and separated by semicolons, followed by a statement (usually a block statement) to be executed in the loop.
-
-- **Initialization**. An expression or variable declaration that is evaluated once before the loop begins. This expression may optionally declare new variables with the `let` keyword; these variables are local to the loop.
-- **Condition**. An expression to be evaluated before each loop iteration. If this expression evaluates to true, the loop's body is executed. Otherwise, execution exits the loop and goes to the first statement after the loop construct. This conditional test is optional. If omitted, the condition always evaluates to true.
-- **Update**. An optional expression to be evaluated at the end of each iteration before the next evaluation of the condition.
-
-Examples:
-
-```js
-// Example #1
-let sum = 0;
-for (let i = 0; i < 10; i++) {
-  sum +=i;  
-}
-```
-
-```js
-// Example #2
-let sum = 0;
-let i;
-for (i = 0; i < 10; i++) {
-  sum += i;  
-}
-```
-
-You can declare multiple variables in the loop initialization and add multiple update expressions (as a sequence expression):
-
-```js
-let sum = 0;
-for (let i = 0, j = 3; i < 10; i++, j += 3) {
-  sum += i + j;  
-}
-```
-
-### The `for...in` Statement
-
-The `for...in` statement iterates over all enumerable string properties of an object including inherited enumerable properties.
-
-- **Variable**. This variable receives a string property name on each iteration. It may be either a declaration with const, or let, or a variable name. Variables declared with `const` or `let` are local to the `for...in` loop's scope.
-- **Object**. An object whose enumerable properties are iterated over.
-
-Examples:
-
-```js
-const obj = { a: 12, b: 34, c: "Hello" }
-for (const key in obj) {
-  console.log(obj[key]);
-}
-```
-
-This code snippet will display this output:
-
-```text
-12
-34
-Hello
-```
-
-### The `for...of` Statement
-
-The `for...of` statement executes a loop that operates on a sequence of values sourced from an iterable object (such as `Array`, `String`, `Map`, `Set`, and others.
-
-- **Variable**. This variable receives a value from the sequence on each iteration. It may be either a declaration with const, or let, or a variable name. Variables declared with `const` or `let` are local to the `for...in` loop's scope.
-- **Object**. An iterable object. The source of the sequence of values on which the loop operates.
-
-Examples: 
-
-```js
-const values = [1, 2, 3, 5, 8, 13, 21]
-for (const value of values) {
-  console.log(value);  
-}
-```
-
-### The `break` Statement
-
-The `break` statement terminates the current loop or switch statement and transfers program control to the statement following the terminated statement.
-
-Examples:
-
-```js
-// Sum up numbers from 1 to 10
-let sum = 0;
-let counter = 1;
-while (true) {
-  if (counter > 10) break;
-  sum += counter++;
-}
-```
-
-```js
-// Dispatch options
-switch (option) {
-  case 0:
-    doThis();
-    break;
-  case 1:
-    doThat();
-    break;
-  case 2:
-    doSpecial();
-    break;
-  default:
-    doExceptional();  
-    break;  
-}
-```
-
-### The `continue` Statement
-
-The `continue` statement terminates execution of the statements in the current iteration of the current or labeled loop, and continues execution of the loop with the next iteration.
-
-In contrast to the `break` statement, `continue` does not terminate the execution of the loop entirely, but instead:
-- In a `while` or `do...while` loop, it jumps back to the condition.
-- In a `for` loop, it jumps to the update expression.
-- In a `for...in`, or `for...of` loop, it jumps to the next iteration.
-
-Example:
-
-```js
-  
-let sum = 0;
-for (let i = 1; i <= 100; i++) {
-  if (i % 3 === 2) continue;
-  sum += i;
-  console.log("Current sum", sum);
-}
-```
-
-### The `return` Statement
-
-The `return` statement ends function execution and specifies a value to be returned to the function caller. If the value is omitted, `undefined` is returned.
-
-Examples:
-
-```js
-(n) => {
   let sum = 0;
-  for (let i = 1; i <= n; i++) sum += i;
+  for (let v of values) {
+    sum += v;
+  }  
   return sum;
 }
 ```
 
-```js
-(n) => {
-  if (n % 3 === 2) return;
-  console.log("Remainder of " + n + " is not equal to 2");
-}
-```
-
-### The `switch` Statement
-
-The `switch` statement evaluates an expression, matching the expression's value against a series of `case` clauses, and executes statements after the first case clause with a matching value until a break statement is encountered. The `default` clause of a switch statement will be executed if no case matches the expression's value.
-
-If the control flow of the executing `case` clause does not reach a `break` statement concluding the particular case, the execution continues with the subsequent `case` clause until there remains any.
-
-Examples:
-
-```js
-// Dispatch options
-switch (option) {
-  case 0:
-    doThis();
-    break;
-  case 1:
-    doThat();
-    break;
-  case 2:
-    doSpecial();
-    break;
-  default:
-    doExceptional();  
-    break;  
-}
-```
-
-```js
-// Case 0 flows to case 1
-switch (option) {
-  case 0:
-    doThis();
-  case 1:
-    doThat();
-    break;
-  case 2:
-    doSpecial();
-    break;
-}
-```
-
-```js
-// Multiple cases with the same execution
-switch (option) {
-  case 0:
-  case 3:
-  case 6:
-    doThis();
-    break;
-  case 1:
-  case 2:
-  case 5:
-    doThat();
-    break;
-  default:
-    doExceptional();  
-    break;  
-}
-```
-
-### The `throw` Statement
-
-The `throw` statement throws a user-defined error value. Execution of the current function will stop (the statements after throw won't be executed), and control will be passed to the first `catch` block in the call stack. If no `catch` block exists among caller functions, the code will terminate.
-
-The `throw` keyword can be followed by any kind of expression.
-
-Examples:
-
-```js
-(values) => {
-  if (!values.every(v => typeof v === "number")) {
-    throw "Can only add numbers";
-  }
-  return values.reduce((a, b) => a + b);
-}
-```
-
-```js
-const handler = (err, data) => {
-  if (err) {
-    throw err;
-  }
-  console.log(data);
-}
-```
-
-### The `try...catch` Statement
-
-The `try...catch` statement comprises a try block and either a `catch` block, a `finally` block, or both. The code in the `try` block is executed first, and if it throws an exception, the code in the `catch` block will be executed. The code in the `finally` block will always be executed before the control flow exits the entire construct.
-
-The `catch` block can have an optional identifier to hold the caught error for the associated `catch` block. If the `catch` block does not use the exception's value, you can omit the identifier.
-
-Examples:
-
-**Unconditional error**
-
-```js
-try {
-  throw "myError";
-} catch (e) {
-  // Log the error
-  console.log(e);
-}
-```
-
-Log:
-
-```text
-myError
-```
-
-**Testing the error condition**
-
-```js
+```js copy {3}
 try {
   readData(); // may throw three types of exceptions
 } catch (e) {
@@ -556,59 +209,6 @@ try {
   }
 }
 ```
-
-**Nested try blocks**
-
-```js
-try {
-  try {
-    throw "Something strange";
-  } catch (e) {
-    console.error("inner", e);
-    throw e;
-  } finally {
-    console.log("finally");
-  }
-} catch (e) {
-  console.error("outer", e);
-}
-```
-
-Log:
-
-```text
-inner Something strange
-finally
-outer Something strange
-```
-
-**Returning from finally**
-
-```js
-(() => {
-  try {
-    try {
-      throw "weird";
-    } catch (e) {
-      console.error("inner", e);
-      throw e;
-    } finally {
-      console.log("finally");
-      return;
-    }
-  } catch (e) {
-    console.error("outer", e);
-  }
-})();
-```
-
-Log:
-
-```text
-inner weird
-finally
-```
-
 ## Event Handlers [#event-handlers]
 
 The engine transforms the script of event handlers into arrow functions. The compiler recognizes several patterns and helps you make the code more concise.
@@ -759,4 +359,71 @@ Transformed event handler:
 
 <Callout type="info" emoji="📔">
 Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
+</Callout>
+
+
+## Functions and Arrow Expressions
+
+_TBD_ 
+
+## How Reactiveness Works [#reactiveness]
+
+The reactive feature works with XMLUI-managed objects such as variables and components. However, it does not work with objects managed by other entities.
+
+For example, the following variable declaration assigns the current timestamp to the `thisIsNow` variable:
+
+```js
+let thisIsNow = getDate();
+```
+
+The timestamp continuously changes; nonetheless, `this is now` (though it is still a reactive variable) does not have any dependencies, as the execution of the body of the `getDate()` function is managed by the JavaScript runtime and not XMLUI. 
+
+The exact time at which this automatic update occurs is indeterministic. Updating a value and all reactive variables depending on it is far from atomic. If there are more dependencies of paticular value, the order of updating them is also indeterministic.
+
+Without the exact details, this is what happens when you modify a dependency of a reactive variable:
+- After completing the execution of an operation (for example, an assignment), the engine detects the update in a dependency (or even more dependencies).
+- The engine initiates a UI refresh.
+- This UI refresh evaluates all reactive variables that depend on the updated dependency (or dependencies). The UI is displayed accordingly.
+
+You can create circular dependencies among reactive variables that could cause an infinite loop. However, the mechanism above (based on UI refresh) will settle down the value of such variables and avoid infinite updates.
+
+Because the update mechanism triggers only after executing an entire XMLUI statement, after processing all statements in an event handler, there is no more trigger, so there is no chance for an infinite loop.
+
+Look at this example, where variables `b` and `c` form a circular reference and depend on variable `a`. Clicking the button increments `a` and triggers the update mechanism:
+
+```ueml
+<App 
+  var.a="{0}" 
+  var.b="{a + (c ?? 0) * 2}" 
+  var.c="{a + (b ?? 0) * 2}">
+  <Button label="Increment 'a'" onClick="a++"/>
+  <Text>a = {a}</Text>
+  <Text>b = {b}</Text>
+  <Text>c = {c}</Text>
+</App>
+```
+
+<Playground
+  name="Example: No infinite updates"
+  app={`
+    <App 
+      var.a="{0}" 
+      var.b="{a + (c ?? 0) * 2}" 
+      var.c="{a + (b ?? 0) * 2}">
+      <Button label="Increment 'a'" onClick="a++"/>
+      <Text>a = {a}</Text>
+      <Text>b = {b}</Text>
+      <Text>c = {c}</Text>
+    </App>
+  `}
+/>
+
+The values you see are displayed after two UI updates:
+- The completion of `a++` statements in `onClick` event handler triggers a UI update.
+- The completion of the entire event handler triggers another UI update.
+
+Only the value of `a` is deterministic; it is one after a single click. The other variable values are indeterministic due to the circular reference between them and the unknown order of re-evaluating `b` and `c`. This order may be different for the two UI refreshes. 
+
+<Callout type="info" emoji="📔">
+A future release of XMLUI may display different values for `b` and `c`. However, it will not change the fact that there are now infinite update loops.
 </Callout>
