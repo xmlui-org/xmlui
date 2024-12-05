@@ -24,6 +24,7 @@ import {
   dLabelPosition,
   dLabelWidth,
   dLabelBreak,
+  dValue,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
 
@@ -73,6 +74,7 @@ export const SelectMd = createMetadata({
   apis: {
     focus: dFocus(COMP),
     setValue: dSetValueApi(),
+    value: dValue(),
   },
   contextVars: {
     $item: d(`This context variable acts as a template for an item in the list.`),
