@@ -4,6 +4,7 @@
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
+    "build:test-bed": "cd src/testing/infrastructure && xmlui build",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",
@@ -12,6 +13,7 @@
     "test": "npm run test:unit",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
+    "test:e2e-smoke": "playwright test --project smoke",
     "test:e2e-ui": "npm run test:e2e -- --ui",
     "prepublishOnly": "clean-package && npm run build",
     "postpublish": "clean-package restore",
