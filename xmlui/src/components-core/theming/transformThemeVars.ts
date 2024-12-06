@@ -37,7 +37,8 @@ export function generateBaseTones(theme: Record<string, string> | undefined) {
   return {
     ...colorTones,
     ...generateRbgChannelsForTone("color-surface", {...resolvedTheme, ...colorTones}),
-    ...generateRbgChannelsForTone("color-primary", {...resolvedTheme, ...colorTones})
+    ...generateRbgChannelsForTone("color-primary", {...resolvedTheme, ...colorTones}),
+    ...generateRbgChannelsForTone("color-secondary", {...resolvedTheme, ...colorTones})
   };
 }
 

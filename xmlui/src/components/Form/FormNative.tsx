@@ -39,6 +39,7 @@ import type {
 } from "@abstractions/RendererDefs";
 import type { FormMd } from "./Form";
 import { useModalFormClose } from "@components/ModalDialog/ModalVisibilityContext";
+import { flushSync } from "react-dom";
 
 const setByPath = (obj: any, path: string, val: any) => {
   const keys = path.split(".");
@@ -303,6 +304,7 @@ const Form = forwardRef(function (
       setConfirmSubmitModalVisible(true);
       return;
     }
+    const prevFocused = document.activeElement;
     dispatch(formSubmitting());
     try {
       await onSubmit?.(formState.subject, {
@@ -312,7 +314,12 @@ const Form = forwardRef(function (
       requestModalFormClose();
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
-        doReset();
+        flushSync(() => {
+          doReset();
+        });
+      }
+      if(prevFocused && typeof (prevFocused as HTMLElement).focus === "function"){
+        (prevFocused as HTMLElement).focus();
       }
     } catch (e: any) {
       const generalValidationResults: Array<SingleValidationResult> = [];

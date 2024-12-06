@@ -31,6 +31,7 @@ $border-Card: createThemeVar("border-Card");
   &.horizontal {
     flex-direction: row;
     align-items: center;
+    padding-block: t.$space-2;    //TODO TEMP
   }
 
   &.vertical {  
