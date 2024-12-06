@@ -4,8 +4,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./FormItem.module.scss";
 import { Spinner } from "@components/Spinner/SpinnerNative";
 import { Slot } from "@radix-ui/react-slot";
-
-export type LabelPosition = "top" | "right" | "left" | "bottom";
+import type { LabelPosition } from "@components/abstractions";
 
 type ItemWithLabelProps = {
   id?: string;

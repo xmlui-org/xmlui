@@ -207,6 +207,18 @@ export const placementMd: PropertyValueDescription[] = [
   { value: "bottom", description: "The bottom of the window" },
 ] as const;
 
+// --- Available label positions
+const labelPositionValues = ["top", "right", "left", "bottom"] as const;
+export const labelPositionNames = [...labelPositionValues];
+export type LabelPosition = (typeof labelPositionValues)[number];
+// TODO: need to add RTL to replace left and right with start and end
+export const labelPositionMd: PropertyValueDescription[] = [
+  { value: "left", description: "The left side of the input (left-to-right) or the right side of the input (right-to-left)" },
+  { value: "right", description: "The right side of the input (left-to-right) or the left side of the input (right-to-left)" },
+  { value: "top", description: "The top of the input" },
+  { value: "bottom", description: "The bottom of the input" },
+] as const;
+
 // --- Available trigger positions
 const triggerPositionValues = ["start", "end"] as const;
 export const triggerPositionNames = [...triggerPositionValues];
