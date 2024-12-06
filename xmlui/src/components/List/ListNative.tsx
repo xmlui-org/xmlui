@@ -58,6 +58,7 @@ const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
         onHeightChanged?.(divElement);
         ref.current = divElement;
       }}
+      className={styles.row}
       data-list-item-type={itemType}
       data-index={rowIndex}
     >
