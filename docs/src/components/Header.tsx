@@ -45,9 +45,10 @@ export const Header = ({ standalone = false }: { standalone?: boolean }) => {
     },
     [
       appDescription,
-      options.previewMode,
-      options.activeTheme,
+      options.fixedTheme,
+      options.swapped,
       options.orientation,
+      options.activeTheme,
       options.content,
     ],
   );

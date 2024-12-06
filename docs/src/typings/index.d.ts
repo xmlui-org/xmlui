@@ -12,3 +12,8 @@ declare module '*?url' {
     const src: string;
     export default src;
 }
+
+declare module '*.xmlui' {
+    const src: string;
+    export default src;
+}

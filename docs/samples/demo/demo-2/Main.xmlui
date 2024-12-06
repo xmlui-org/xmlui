@@ -1,0 +1,12 @@
+<App>
+    <Table data="/api/traffic-metrics">
+        <Column header="Website" width="2*">
+            <Link to="{$item.site}">{$item.site}</Link>
+        </Column>
+        <Column canSort="true" bindTo="pageViewsPerVisit" header="Views/Visit" width="120"/>
+        <Column canSort="true" bindTo="pageViews" header="Page Views" width="120"/>
+        <Column>
+            <ProgressBar value="{$item.progress}"/>
+        </Column>
+    </Table>
+</App>
