@@ -1,27 +1,14 @@
 <App>
-    <Form submitLabel="Add New" cancelLabel="" submitUrl="/api/entities">
-        <FormItem label="Name" bindTo="name" />
-    </Form>
-    <List data="/api/entities">
-        <Card title="{$item.name}" orientation="horizontal">
-            <Badge>{$item.status}</Badge>
-            <SpaceFiller />
-            <Button label="Delete" variant="ghost" themeColor="attention">
-                <event name="click">
-                    <APICall url="/api/entities/{$item.id}" method="delete" />
-                </event>
-            </Button>
-            <Button label="Edit" onClick="editForm.open($item)" />
-        </Card>
-    </List>
-    <ModalDialog id="editForm">
-        <EntityForm title="Edit" data="{$param}" submitUrl="/api/entities/{$param.id}">
-            <FormItem label="Name" bindTo="name" />
-            <FormItem label="Status" bindTo="status" type="select">
-                <Option value="Prospect" />
-                <Option value="Lead" />
-                <Option value="Customer" />
-            </FormItem>
-        </EntityForm>
-    </ModalDialog>
+    <!-- Resize columns, make Table smaller - minimal inline styling is acceptable -->
+    <H2>Table Data</H2>
+    <Table data="/api/traffic-metrics">
+        <Column header="Website" width="2*">
+            <Link to="{$item.site}">{$item.site}</Link>
+        </Column>
+        <Column canSort="true" bindTo="pageViewsPerVisit" header="Views/Visit" width="120" />
+        <Column canSort="true" bindTo="pageViews" header="Page Views" width="120" />
+        <Column width="*">
+            <ProgressBar value="{$item.progress}" />
+        </Column>
+    </Table>
 </App>

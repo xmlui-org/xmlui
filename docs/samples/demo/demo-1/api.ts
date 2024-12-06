@@ -4,114 +4,129 @@ const mock: ApiInterceptorDefinition = {
   type: "db",
   apiUrl: "/api",
   config: {
-    database: "landing-page-1",
+    database: "landing-page-2",
   },
   initialize: `
-    $state.servers = [
+    $state.entities = [
       {
         id: 0,
-        name: "Server #1",
-        description: "Main web server",
-        state: "online",
+        name: "John Doe",
+        status: "Prospect",
+        priority: "High",
+        avatarUrl: "https://i.pravatar.cc/100?u=JohnDoe-100",
       },
       {
         id: 1,
-        name: "Server #2",
-        description: "Backup web server",
-        state: "offline",
+        name: "Jane Doe",
+        status: "Lead",
+        priority: "Low",
+        avatarUrl: "https://i.pravatar.cc/100?u=JaneDoe-101",
       },
       {
         id: 2,
-        name: "Server #3",
-        description: "Database server",
-        state: "offline",
+        name: "Arnold Cartwright",
+        status: "Lead",
+        priority: "Medium",
+        avatarUrl: "https://i.pravatar.cc/100?u=104",
       },
       {
         id: 3,
-        name: "Server #4",
-        description: "Backup database server",
-        state: "offline",
+        name: "Jasmine Gold",
+        status: "Customer",
+        priority: "High",
+        avatarUrl: "https://i.pravatar.cc/100?u=102",
+      },
+      {
+        id: 4,
+        name: "Howard Jones",
+        status: "Lead",
+        priority: "Low",
+        avatarUrl: "https://i.pravatar.cc/100?u=109",
+      },
+      {
+        id: 5,
+        name: "John Doe",
+        status: "Customer",
+        priority: "Low",
+        avatarUrl: "https://i.pravatar.cc/100?u=129",
+      },
+      {
+        id: 6,
+        name: "Ellen Keys",
+        status: "Prospect",
+        priority: "High",
+        avatarUrl: "https://i.pravatar.cc/100?u=128",
+      },
+      {
+        id: 7,
+        name: "Mike Mullins",
+        status: "Customer",
+        priority: "Medium",
+        avatarUrl: "https://i.pravatar.cc/100?u=08",
       },
     ];
+    $state.lastId = 10;
   `,
   operations: {
-    "list-data": {
-      url: "/servers",
+    "entity-list": {
+      url: "/entities",
       method: "get",
-      handler: `return $state.servers;`,
+      handler: `return $state.entities`,
     },
-    "data-fetch": {
-      url: "/servers/:id",
-      method: "get",
-      pathParamTypes: {
-        id: "integer",
-      },
-      handler: `
-        const serverFound = $state.servers.find(server => server.id === $pathParams.id);
-        if (!serverFound) {
-          throw Errors.NotFound404("Server id:" + $pathParams.id + " not found");
-        };
-        return serverFound;
-      `,
-    },
-    "data-start": {
-      url: "/servers/:id/start",
-      method: "post",
-      pathParamTypes: {
-        id: "integer",
-      },
-      handler: `
-        const serverFoundIdx = $state.servers.findIndex(server => server.id === $pathParams.id);
-        if (serverFoundIdx === -1) {
-          throw Errors.NotFound404("Server id:" + $pathParams.id + " not found");
-        }; 
-
-        if ($state.servers[serverFoundIdx].state === "offline") {
-          $state.servers[serverFoundIdx] = {
-            ...$state.servers[serverFoundIdx],
-            state: "online",
-          };
-        }
-        return true;
-      `,
-    },
-    "data-stop": {
-      url: "/servers/:id/stop",
-      method: "post",
-      pathParamTypes: {
-        id: "integer",
-      },
-      handler: `
-        const serverFoundIdx = $state.servers.findIndex(server => server.id === $pathParams.id);
-        if (serverFoundIdx === -1) {
-          throw Errors.NotFound404("Server id:" + $pathParams.id + " not found");
-        }; 
-
-        if ($state.servers[serverFoundIdx].state === "online") {
-          $state.servers[serverFoundIdx] = {
-            ...$state.servers[serverFoundIdx],
-            state: "offline",
-          };
-        }
-        return true;
-      `,
-    },
-    "data-update": {
-      url: "/servers/:id",
+    "entity-update": {
+      url: "/entities/:entityId",
       method: "put",
       pathParamTypes: {
+        entityId: "integer",
+      },
+      handler: `
+        const id = $pathParams.entityId;
+        const { name, status, priority } = $requestBody;
+        
+        const foundIdx = $state.entities.findIndex(entity => entity.id === id);
+        if (foundIdx === -1) {
+          throw Errors.NotFound404("Entity id:" + id + " not found");
+        };
+
+        const updated = {
+          ...$state.entities[foundIdx],
+          name,
+          status: status || "Prospect",
+          priority: priority || "Medium",
+        };
+
+        $state.entities[foundIdx] = updated;
+        return updated;
+      `,
+    },
+    "entity-create": {
+      url: "/entities",
+      method: "post",
+      handler: `
+        const { name, status, priority } = $requestBody;
+        if(!name){
+          return;
+        }
+
+        const created = {
+          id:  $state.lastId++,
+          name,
+          status: status || "Prospect",
+          priority: priority || "Medium",
+        };
+
+        $state.entities.push(created);
+        return created;
+      `,
+    },
+    "entity-delete": {
+      url: "/entities/:id",
+      method: "delete",
+      pathParamTypes: {
         id: "integer",
       },
       handler: `
-        const serverFoundIdx = $state.servers.findIndex(server => server.id === $pathParams.id);
-        if (serverFoundIdx === -1) {
-          throw Errors.NotFound404("Server id:" + $pathParams.id + " not found");
-        }; 
-
-        return $state.servers[serverFoundIdx] = {
-          ...$state.servers[serverFoundIdx],
-          ...$requestBody,
-        };
+        $state.entities = $state.entities.filter(entity => entity.id !== $pathParams.id);
       `,
     },
   },

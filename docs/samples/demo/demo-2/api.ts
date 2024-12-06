@@ -4,119 +4,74 @@ const mock: ApiInterceptorDefinition = {
   type: "db",
   apiUrl: "/api",
   config: {
-    database: "landing-page-2",
+    database: "landing-page-5",
   },
   initialize: `
-    $state.entities = [
-      {
-        id: 0,
-        name: "John Doe",
-        status: "Prospect",
-        priority: "High",
-      },
-      {
-        id: 1,
-        name: "Jane Doe",
-        status: "Lead",
-        priority: "Low",
-      },
-      {
-        id: 2,
-        name: "Arnold Cartwright",
-        status: "Lead",
-        priority: "Medium",
-      },
-      {
-        id: 3,
-        name: "Jasmine Gold",
-        status: "Customer",
-        priority: "High",
-      },
-      {
-        id: 4,
-        name: "Howard Jones",
-        status: "Opportunity",
-        priority: "Low",
-      },
-      {
-        id: 5,
-        name: "John Doe",
-        status: "Opportunity",
-        priority: "Low",
-      },
-      {
-        id: 6,
-        name: "Ellen Keys",
-        status: "Prospect",
-        priority: "High",
-      },
-      {
-        id: 7,
-        name: "Mike Mullins",
-        status: "Customer",
-        priority: "Medium",
-      },
-    ];
+    $state.trafficMetrics = {
+      total: 3500,
+      breakdown: [
+        {
+          id: 0,
+          site: "https://www.myblog.com",
+          pageViews: 500,
+          progress: 0.5,
+          pageViewsPerVisit: 2,
+        },
+        {
+          id: 1,
+          site: "https://www.mysite.com",
+          pageViews: 100,
+          progress: 0.2,
+          pageViewsPerVisit: 3,
+        },
+        {
+          id: 2,
+          site: "https://www.myapp.io",
+          pageViews: 700,
+          progress: 0.8,
+          pageViewsPerVisit: 5,
+        },
+        {
+          id: 3,
+          site: "https://www.saas-company.com",
+          pageViews: 2000,
+          progress: 0.1,
+          pageViewsPerVisit: 6,
+        },
+        {
+          id: 4,
+          site: "https://www.myotherapp.com",
+          pageViews: 200,
+          progress: 0.2,
+          pageViewsPerVisit: 1,
+        },
+        {
+          id: 5,
+          site: "https://www.exampleapp.com",
+          pageViews: 350,
+          progress: 0.35,
+          pageViewsPerVisit: 1.5,
+        },
+        {
+          id: 6,
+          site: "https://www.newappsite.com",
+          pageViews: 120,
+          progress: 0.12,
+          pageViewsPerVisit: 0.8,
+        },
+      ]
+    };
   `,
   operations: {
-    "entity-list": {
-      url: "/entities",
+    "traffic-metrics-list": {
+      url: "/traffic-metrics",
       method: "get",
-      handler: `return $state.entities`,    
+      handler: `return $state.trafficMetrics.breakdown;`,
     },
-    "entity-update": {
-      url: "/entities/:entityId",
-      method: "put",
-      pathParamTypes: {
-        entityId: "integer",
-      },
-      handler: `
-        const id = $pathParams.entityId;
-        const { name, status, priority } = $requestBody;
-        
-        const foundIdx = $state.entities.findIndex(entity => entity.id === id);
-        if (foundIdx === -1) {
-          throw Errors.NotFound404("Entity id:" + id + " not found");
-        };
-
-        const updated = {
-          ...$state.entities[foundIdx],
-          name,
-          status: status || "Prospect",
-          priority: priority || "Medium",
-        };
-
-        $state.entities[foundIdx] = updated;
-        return updated;
-      `,
-    },
-    "entity-create": {
-      url: "/entities",
-      method: "post",
-      handler: `
-        const { name, status, priority } = $requestBody;
-
-        const created = {
-          id:  $state.entities.length + 1,
-          name,
-          status: status || "Prospect",
-          priority: priority || "Medium",
-        };
-
-        $state.entities.push(created);
-        return created;
-      `,
-    },
-    "entity-delete": {
-      url: "/entities/:id",
-      method: "delete",
-      pathParamTypes: {
-        id: "integer",
-      },
-      handler: `
-        $state.entities = $state.entities.filter(entity => entity.id !== $pathParams.id);
-        return $state.entities;
-      `,
+    "traffic-metrics-total": {
+      url: "/traffic-metrics/total",
+      method: "get",
+      handler: `return $state.trafficMetrics.total;`,
     },
   },
 };
