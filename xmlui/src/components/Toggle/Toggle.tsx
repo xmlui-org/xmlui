@@ -4,7 +4,7 @@ import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { noop } from "@components-core/constants";
 import type { ValidationStatus } from "@components/abstractions";
-import type { LabelPosition } from "@components/FormItem/ItemWithLabel";
+import type { LabelPosition } from "@components/abstractions";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 import { useEvent } from "@components-core/utils/misc";
 import {composeRefs} from "@radix-ui/react-compose-refs";
