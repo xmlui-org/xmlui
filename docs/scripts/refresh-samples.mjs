@@ -20,6 +20,7 @@ const ZIP_TARGET_FOLDER = path.join(__dirname, "../public/resources/files/gettin
 const XMLUI_STARTER = path.join(SAMPLES_BASE, "xmlui-starter");
 const XMLUI_EMPTY = path.join(SAMPLES_BASE, "xmlui-empty");
 const GETTING_STARTED_SAMPLE = path.join(SAMPLES_BASE, "getting-started");
+const HELLO_XMLUI_SAMPLE = path.join(SAMPLES_BASE, "hello-xmlui");
 const CL_TUTORIAL_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial");
 const CL_TUTORIAL2_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial2");
 const CL_TUTORIAL3_SAMPLE = path.join(SAMPLES_BASE, "cl-tutorial3");
@@ -44,6 +45,11 @@ console.log("Refreshing the XMLUI Empty sample...");
 await copyCoreTo(XMLUI_EMPTY);
 await compressFolder(XMLUI_EMPTY, "xmlui-empty.zip");
 console.log("Done.");
+
+// --- Hello XMLUI sample
+console.log("Refreshing the Hello XMLUI sample...");
+await copyCoreTo(HELLO_XMLUI_SAMPLE);
+await compressFolder(HELLO_XMLUI_SAMPLE, "hello-xmlui.zip");
 
 // --- Getting started sample
 console.log("Refreshing the Getting Started sample...");

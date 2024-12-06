@@ -510,6 +510,54 @@ function () {
 Be aware of using the `return` statement explicitly to retrieve a value from an event handler.
 </Callout>
 
+## Runtime
+
+As described earlier in this article, XMLUI entirely conceals that it runs the code asynchronously without any explicit hint from the script. The script language does not contain the `async` and `await` keywords.
+
+To implement this "magic", the scripting engine provides two mechanisms:
+It prevents some JavaScript runtime functions from calling
+Provides asynchronous replacements for some JavaScript runtime functions that support only sync operations
+
+### Banned Functions
+
+A few functions in the JavaScript runtime manage the JavaScript event loop and animation frames at a low level or may derail script management. XMLUI does not allow their use:
+
+- [`cancelAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/cancelAnimationFrame)
+- [`cancelIdleCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Window/cancelIdleCallback)
+- [`clearInterval`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearInterval)
+- [`clearImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearImmediate)
+- [`clearTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window/clearTimeout)
+- [`eval`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval)
+- [`queueMicrotask`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/queueMicrotask)
+- [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame)
+- [`requestIdleCallback`](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback)
+- [`setImmediate`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setImmediate)
+- [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setInterval)
+- [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/Window/setTimeout)
+
+When you invoke these functions, XMLUI stops with an error.
+
+<Callout type="info" emoji="📔">
+We may extend this list in the future.
+</Callout>
+
+### Async Replacements
+
+XMLUI replaces several functions with its implementation that supports async execution:
+
+- [`Array.prototype.every`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/every)
+- [`Array.prototype.filter`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/filter)
+- [`Array.prototype.find`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find)
+- [`Array.prototype.findIndex`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/findIndex)
+- [`Array.prototype.flatMap`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/flatMap)
+- [`Array.prototype.forEach`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach)
+- [`Array.prototype.map`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map)
+- [`Array.prototype.some`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/some)
+
+<Callout type="info" emoji="📔">
+We may extend this list in the future.
+</Callout>
+
 ## Appendix: How Reactiveness Works [#reactiveness]
 
 The reactive feature works with XMLUI-managed objects such as variables and components. However, it does not work with objects managed by other entities.
