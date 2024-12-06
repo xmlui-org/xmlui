@@ -25,7 +25,6 @@ import {
 } from "@components/Form/formActions";
 import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
-import type { LabelPosition } from "./ItemWithLabel";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
 import { getByPath } from "@components/Form/FormNative";
@@ -33,6 +32,7 @@ import { asOptionalBoolean } from "@components-core/container/valueExtractor";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { FormItemMd } from "./FormItem";
 import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
+import type { LabelPosition } from "@components/abstractions";
 
 type FormControlType =
   | "text"

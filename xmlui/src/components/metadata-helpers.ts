@@ -1,5 +1,5 @@
 import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
-import { orientationOptionMd, validationStatusMd } from "./abstractions";
+import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
 
 export function dInternal(description?: string): ComponentPropertyMetadata {
   return {
@@ -57,7 +57,7 @@ export function dLabel(): ComponentPropertyMetadata {
 export function dLabelPosition(def?: any): ComponentPropertyMetadata {
   return {
     description: `Places the label at the given position of the component.`,
-    availableValues: ["top", "right", "bottom", "left"],
+    availableValues: labelPositionMd,
     defaultValue: def,
   };
 }

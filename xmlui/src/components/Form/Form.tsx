@@ -4,6 +4,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { FormWithContextVar } from "./FormNative";
 import { dComponent, dInternal } from "@components/metadata-helpers";
+import { labelPositionMd } from "@components/abstractions";
 
 const COMP = "Form";
 
@@ -19,6 +20,8 @@ export const FormMd = createMetadata({
     itemLabelPosition: d(
       `This property sets the position of the item labels within the form. The default ` +
         `value is \`top\`. Individual \`FormItem\` instances can override this property.`,
+      labelPositionMd,
+      "string",
     ),
     itemLabelWidth: d(
       `This property sets the width of the item labels within the form. Individual ` +

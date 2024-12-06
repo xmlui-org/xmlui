@@ -224,7 +224,7 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
   itemLabelBreak?: boolean;
   itemLabelWidth?: string;
-  itemLabelPosition?: string;
+  itemLabelPosition?: string; // type LabelPosition
 };
 
 const Form = forwardRef(function (
