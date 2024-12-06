@@ -106,4 +106,47 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
 
 // -----------------------------------------------------------------
 
-export const expect = baseExpect.extend({});
+export const expect = baseExpect.extend({
+  /**
+   * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
+   * Used to compare element dimensions on different platforms because of half pixel rendering.
+   *
+   * **Usage**
+   *
+   * ```js
+   * const value = 8;
+   * expect(value).toEqualWithTolerance(10, 2); // true
+   * ```
+   *
+   * @param expected Expected value
+   * @param tolerance Tolerance value, **default is 1**
+   */
+  toEqualWithTolerance(provided: number, expected: number, tolerance: number = 1) {
+    const assertionName = "toEqualWithTolerance";
+    let pass = false;
+
+    if (provided >= expected - (tolerance || 0) && provided <= expected + (tolerance || 0)) {
+      pass = true;
+    }
+
+    const message = pass
+      ? () =>
+          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
+          "\n\n" +
+          `Expected: ${this.isNot ? "not" : ""}${this.utils.printExpected(expected)}\n` +
+          `Received: ${this.utils.printReceived(provided)}`
+      : () =>
+          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
+          "\n\n" +
+          `Expected: ${this.utils.printExpected(expected)}\n` +
+          `Received: ${this.utils.printReceived(provided)}`;
+
+    return {
+      message,
+      pass,
+      name: assertionName,
+      expected,
+      actual: undefined,
+    };
+  },
+});

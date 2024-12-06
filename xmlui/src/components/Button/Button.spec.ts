@@ -1,4 +1,5 @@
 import type { Locator } from "@playwright/test";
+import { getElementStyle, getFullRectangle, pixelStrToNum } from "@testing/component-test-helpers";
 import { expect as fixtureExpect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
 // --- Setup
@@ -17,15 +18,16 @@ const expect = fixtureExpect.extend({
    *
    * @param expected Expected string label
    */
-  async toHaveLabel(locator: Locator, expected: string) {
+  async toHaveExplicitLabel(locator: Locator, expected: string) {
     const assertionName = "toHaveLabel";
     let pass = false;
 
-    const label = await locator.evaluate((element) =>
-      [...element.childNodes]
-        .filter(e => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
-        .map(e => e.textContent.trim())
-        ?.[0]);
+    const label = await locator.evaluate(
+      (element) =>
+        [...element.childNodes]
+          .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
+          .map((e) => e.textContent.trim())?.[0],
+    );
 
     if (label === expected) {
       pass = true;
@@ -58,17 +60,46 @@ class ButtonDriver extends ComponentDriver {
     return this.locator;
   }
 
-  get buttonIcon() {
-    return this.locator.locator("svg").or(this.locator.locator("img"));
+  // Ensure we either get rtl or ltr strings
+  async getWritingDirection() {
+    // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir
+    const attribute = await this.locator.getAttribute("dir");
+    if (attribute && attribute !== "auto") return attribute as "rtl" | "ltr";
+    const style = await this.locator.evaluate((element) => window.getComputedStyle(element).direction);
+    // Default is ltr: https://developer.mozilla.org/en-US/docs/Web/CSS/direction#values
+    return style === "rtl" ? "rtl" : "ltr";
   }
 
-  /* islayoutHorizontal = async () => {
-    const isFlex = await this.button.evaluate(
-      (element) => element.style.display === "flex" || element.style.display === "inline-flex",
+  // NOTE: It may be prudent to target the text nodes and wrap them in a Locator-like, very basic class
+  // to better handle them and provide supporting methods such as dimensions (via getClientRects?)
+  // Source: https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects
+  async getTextNodes() {
+    return await this.locator.evaluate(
+      (element) =>
+        [...element.childNodes]
+          .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
+          .map((e) => e.textContent.trim()),
     );
-    const iconIsInline = await this.buttonIcon.evaluate((element) => (element.style.display = "inline-block"));
-    return isFlex || iconIsInline;
-  }; */
+  }
+
+  // NOTE: Accounts for the icon being passed as a child as well
+  getIcons() {
+    return this.locator.locator("> svg").or(this.locator.locator("> img"));
+  }
+
+  // NOTE: Added because we can set an icon via the icon prop as well as child
+  getFirstIcon() {
+    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(0);
+  }
+
+  // NOTE: Added because we can set an icon via the icon prop as well as child
+  getLastIcon() {
+    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(-1);
+  }
+
+  getFirstNonTextNode() {
+    return this.locator.locator("> *").nth(0);
+  }
 }
 
 const test = createTestWithDriver(ButtonDriver);
@@ -102,7 +133,8 @@ test("renders without label, icon or children", async ({ createDriver }) => {
   expect(width).toBeGreaterThan(0);
 });
 
-// First, see how this renders
+// TODO: Talk through what we should see in each case,
+// for instance, the function throws an error, the rest just don't render
 [
   { label: "null", value: null },
   { label: "undefined", value: undefined },
@@ -114,26 +146,27 @@ test("renders without label, icon or children", async ({ createDriver }) => {
 ].forEach((type) => {
   test.skip(`does not render if label is ${type.label}`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button label="${type.value}" />`);
-    //await expect(driver.button).not.toBeVisible();
+    await expect(driver.button).not.toBeAttached();
   });
 });
 
 test("text node as children are same as setting label", async ({ createDriver }) => {
   const driver = await createDriver(`<Button>hello</Button>`);
-  await expect(driver.button).toHaveLabel("hello");
+  await expect(driver.button).toHaveExplicitLabel("hello");
 });
 
 test("ignores label property if children present", async ({ createDriver }) => {
   const driver = await createDriver(`<Button label="hello">world</Button>`);
-  await expect(driver.button).toHaveLabel("world");
+  await expect(driver.button).toHaveExplicitLabel("world");
 });
 
+// TODO: Flesh out these tests by adding child targeting locators or targeting the children as a whole as a black box
 test.skip("renders XMLUI Text component as child", async ({ createDriver }) => {
   const driver = await createDriver(`<Button label="hello"><Text>world</Text></Button>`);
-  await expect(driver.button).not.toHaveLabel("hello");
+  await expect(driver.button).not.toHaveExplicitLabel("hello");
 });
 
-// Not elaborated yet - need to get the children reliably
+// TODO: See comment and test above
 test.skip("renders XMLUI Complex component as child", async ({ createDriver }) => {
   const driver = await createDriver(
     `<Button label="hello"><Card title="Button">Content</Card></Button>`,
@@ -147,7 +180,7 @@ test("can render icon", async ({ createDriver }) => {
   const driver = await createDriver(`<Button icon="test" />`, {
     resources: { "icon.test": "resources/bell.svg" },
   });
-  await expect(driver.buttonIcon).toBeVisible();
+  await expect(driver.getFirstIcon()).toBeVisible();
 });
 
 test("renders icon and label", async ({ createDriver }) => {
@@ -155,14 +188,14 @@ test("renders icon and label", async ({ createDriver }) => {
     resources: { "icon.test": "resources/bell.svg" },
   });
   await expect(driver.button).toHaveText("hello");
-  await expect(driver.buttonIcon).toBeVisible();
+  await expect(driver.getFirstIcon()).toBeVisible();
 });
 
 test("renders icon if children present", async ({ createDriver }) => {
   const driver = await createDriver(`<Button icon="test">Hello World</Button>`, {
     resources: { "icon.test": "resources/bell.svg" },
   });
-  await expect(driver.buttonIcon).toBeVisible();
+  await expect(driver.getFirstIcon()).toBeVisible();
 });
 
 [
@@ -176,68 +209,85 @@ test("renders icon if children present", async ({ createDriver }) => {
 ].forEach((type) => {
   test(`does not render icon if icon is of type ${type.label}`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="${type.value}" />`);
-    await expect(driver.buttonIcon).not.toBeAttached();
+    await expect(driver.getFirstIcon()).not.toBeAttached();
   });
 });
 
 test("renders if icon is not found and label is present", async ({ createDriver }) => {
   const driver = await createDriver(`<Button icon="_" label="hello" />`);
-  await expect(driver.buttonIcon).not.toBeAttached();
+  await expect(driver.getFirstIcon()).not.toBeAttached();
   await expect(driver.button).toHaveText("hello");
 });
 
 // --- --- iconPosition
 
-test("has a horizontal content layout", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="trash" label="hello" />`);
-  await expect(driver.button).toBeVisible();
-});
+// TODO: These test require some work: iconPosition=left/right/start/end + with label, without label, with children
+// 1. The idea of testing positioning this way can be challenged: it may be too specific
+// 2. The logic is not final since getters are used differently because async functions,
+//    the calculation may be too verbose or should be restructured
+// 3. RTL, LTR are not implemented yet, but should be incorporated in the tests without too much work
+//    (use placeholders, omit if needed, need to separate code differently)
 
 // With label
-
-test.skip("left position appears left of label in ltr", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="trash" label="hello" />`);
-  await expect(driver.button).toBeVisible();
+["left", "right"].forEach((pos) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
+      resources: { "icon.test": "resources/bell.svg" },
+    });
+    const buttonDimensions = await getFullRectangle(driver.button);
+    const contentStart = pixelStrToNum(buttonDimensions[pos] + await getElementStyle(driver.button, `padding-${pos}`));
+    const iconStart = (await getFullRectangle(driver.getFirstNonTextNode()))[pos];
+  
+    expect(contentStart).toEqualWithTolerance(iconStart);
+  });
 });
 
-test.skip("right position appears right of label in ltr", async ({ createDriver }) => {});
+["start", "end"].forEach((pos) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
+      resources: { "icon.test": "resources/bell.svg" },
+    });
+    const direction = await driver.getWritingDirection();
 
-test.skip("start position appears at left of label", async ({ createDriver }) => {});
-
-test.skip("end position appears at right of label", async ({ createDriver }) => {});
+    const buttonDimensions = await getFullRectangle(driver.button);
+    const contentLeft = pixelStrToNum(buttonDimensions.left + await getElementStyle(driver.button, "padding-left"));
+    const iconLeft = (await getFullRectangle(driver.getFirstNonTextNode())).left;
+  
+    expect(contentLeft).toEqualWithTolerance(iconLeft);  
+  });
+});
 
 // Without label
-
-test.skip("left position appears left of label in ltr (no label)", async ({ createDriver }) => {});
-
-test.skip("right position appears right of label in ltr (no label)", async ({
-  createDriver,
-}) => {});
-
-test.skip("start position appears at left of label (no label)", async ({ createDriver }) => {});
-
-test.skip("end position appears at right of label (no label)", async ({ createDriver }) => {});
+["left", "right", "start", "end"].forEach((pos) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos}`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`, {
+      resources: { "icon.test": "resources/bell.svg" },
+    });
+  
+    await expect(driver.button).toBeAttached();
+  });
+});
 
 // With children instead of label
-
-test.skip("left position appears left of children in ltr", async ({ createDriver }) => {});
-
-test.skip("right position appears right of children in ltr", async ({ createDriver }) => {});
-
-test.skip("start position appears at left of children", async ({ createDriver }) => {});
-
-test.skip("end position appears at right of children", async ({ createDriver }) => {});
+["left", "right", "start", "end"].forEach((pos) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos} of children`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
+      resources: { "icon.test": "resources/bell.svg" },
+    });
+  
+    await expect(driver.button).toBeAttached();
+  });
+});
 
 // --- --- contentPosition
 
-// Same thing as with iconPosition
-
-["center", "left", "right"].forEach((pos) => {
-  test.skip(`label is positioned to the ${pos}`, async ({ createDriver }) => {});
-  test.skip(`icon is positioned to the ${pos}`, async ({ createDriver }) => {});
-  test.skip(`children is positioned to the ${pos}`, async ({ createDriver }) => {});
-  test.skip(`label and icon is positioned to the ${pos}`, async ({ createDriver }) => {});
-  test.skip(`children and icon is positioned to the ${pos}`, async ({ createDriver }) => {});
+["center", "start", "end"].forEach((pos) => {
+  test(`label and icon is positioned to the ${pos}`, async ({ createDriver }) => {
+    const driver = await createDriver(`<Button width="100%" icon="test" label="hello" contentPosition="${pos}" />`, {
+        resources: { "icon.test": "resources/bell.svg" },
+      });
+    await expect(driver.button).toHaveCSS("justify-content", pos);
+  });
 });
 
 // --- --- type
@@ -270,6 +320,7 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
 
 // --- --- variant & themeColor
 
+// TODO: add theme variable tests - a Solid Button has specific background, border, font colors, size, etc.
 // import from abstractions: buttonVariantMd
 // import from abstractions: buttonThemeMd
 ["solid", "outlined", "ghost"].forEach((variant) => {
@@ -287,12 +338,11 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
 
 // --- --- size
 
+// TODO: add size tests
 // Relative testing is acceptable for now - basis of the test is the default size
 ["xs", "sm", "md", "lg"].forEach((size) => {
   test.skip(`compare size "${size}" with default size`, async ({ createDriver }) => {});
 });
-
-//test.skip("Button height is determined by content", async ({ createDriver }) => {});
 
 // --- Events
 
