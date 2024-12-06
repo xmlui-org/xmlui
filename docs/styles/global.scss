@@ -60,8 +60,8 @@ article {
 
   .hover\:nx-text-primary-600:hover {
     --tw-text-opacity: 1;
-    color: hsl(var(--nextra-primary-hue)var(--nextra-primary-saturation)45%/var(--tw-text-opacity));
-}
+    color: hsl(var(--nextra-primary-hue) var(--nextra-primary-saturation) 45%/var(--tw-text-opacity));
+  }
 
   ul[class^='nextra-menu'], ul[class*=' nextra-menu'] li {
     > a:hover, > button:hover {
@@ -231,11 +231,11 @@ article {
 :is(html[class~=light]) {
   article[class^='nextra-content'], article[class*=' nextra-content'] {
     thead > tr {
-      background-color: rgba(243,244,246, 1);
+      background-color: rgba(243, 244, 246, 1);
     }
 
     tr {
-      border: 1px solid rgba(209,213,219, 1);
+      border: 1px solid rgba(209, 213, 219, 1);
     }
 
     img {
@@ -247,11 +247,11 @@ article {
 :is(html[class~=dark]) {
   article[class^='nextra-content'], article[class*=' nextra-content'] {
     thead > tr {
-      background-color: rgba(75,85,99,.2);
+      background-color: rgba(75, 85, 99, .2);
     }
 
     tr {
-      border: 1px solid rgba(75,85,99, 1);
+      border: 1px solid rgba(75, 85, 99, 1);
     }
 
     img {
@@ -290,4 +290,10 @@ html {
 :is(html[class~=dark] div.nextra-nav-container nav a:first-of-type:hover),
 :is(html[class~=light] div.nextra-nav-container nav a:first-of-type:hover) {
   opacity: 1 !important;
+}
+
+
+input:focus-visible {
+  --tw-ring-offset-shadow: none;
+  --tw-ring-shadow: none;
 }
