@@ -44,7 +44,7 @@ Default value: `false`.
 
 ### `autoFocus`
 
-This property sets the label of the component.
+If this property is set to `true`, the component gets the focus automatically when displayed.
 
 Default value: `false`.
 
@@ -335,7 +335,10 @@ This property is useful when data is loaded conditionally or receiving it takes 
 
 ```ueml copy
 <App>
-  <Table loading="true" />
+  <Table loading="true">
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
+  </Table>
 </App>
 ```
 
@@ -343,7 +346,10 @@ This property is useful when data is loaded conditionally or receiving it takes 
   name="Example: loading"
   app={`
     <App>
-      <Table loading="true" />
+      <Table loading="true">
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
+      </Table>
     </App>
   `}
 />
@@ -356,21 +362,24 @@ A property to customize what to display if the table does not contain any data.
 <App>
   <Table>
     <property name="noDataTemplate">
-      <Text value="No data loaded" variant="strong" padding="1rem" />
+      <Text value="No data loaded" variant="strong" />
     </property>
+    <Column bindTo="name"/>
+    <Column bindTo="quantity"/>
   </Table>
 </App>
 ```
 
 <Playground
   name="Example: noDataTemplate"
-  height={140}
   app={`
     <App>
       <Table>
         <property name="noDataTemplate">
           <Text value="No data loaded" variant="strong" />
         </property>
+        <Column bindTo="name"/>
+        <Column bindTo="quantity"/>
       </Table>
     </App>
   `}
@@ -809,7 +818,7 @@ Heading theme variables:
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--active | $color-surface-300 | $color-surface-700 |
 | [color-bg](../styles-and-themes/common-units/#color)-heading-Table--hover | $color-surface-200 | $color-surface-800 |
 | [color-bg](../styles-and-themes/common-units/#color)-pagination-Table | $color-bg-Table | $color-bg-Table |
-| [color-bg](../styles-and-themes/common-units/#color)-row-Table | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [color-bg](../styles-and-themes/common-units/#color)-row-Table | inherit | inherit |
 | [color-bg](../styles-and-themes/common-units/#color)-row-Table--hover | $color-primary-50 | $color-primary-900 |
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table | $color-primary-100 | $color-primary-800 |
 | [color-bg](../styles-and-themes/common-units/#color)-selected-Table--hover | $color-bg-row-Table--hover | $color-bg-row-Table--hover |

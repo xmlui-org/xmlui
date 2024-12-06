@@ -1,0 +1,78 @@
+%-DESC-START
+
+## Using AutoComplete
+
+<Playground
+  height={200}
+  name="Example: Using AutoComplete"
+  app={`
+    <App>
+      <AutoComplete>
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" enabled="false" />
+        <Option value="3" label="Diana Prince" />
+      </AutoComplete>
+    </App>
+  `}
+/>
+
+%-DESC-END
+
+%-PROP-START emptyListTemplate
+
+<Playground
+  height={200}
+  name="Example: emptyListTemplate"
+  app={`
+    <App>
+      <AutoComplete>
+        <property name="emptyListTemplate">
+          <Text>No options found</Text>
+        </property>
+      </AutoComplete>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START multi
+
+<Playground
+  height={300}
+  name="Example: multi"
+  app={`
+    <App>
+      <AutoComplete multi="true">
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+        <Option value="3" label="Diana Prince" />
+        <Option value="4" label="Barry Allen" />
+        <Option value="5" label="Hal Jordan" />
+      </AutoComplete>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START optionTemplate
+
+<Playground
+  height={300}
+  name="Example: optionTemplate"
+  app={`
+    <App>
+      <AutoComplete multi="true">
+        <property name="optionTemplate">
+          <Text textAlign="center" color="purple">{console.log($item), $item.label}</Text>
+        </property>
+        <Option value="1" label="Bruce Wayne" />
+        <Option value="2" label="Clark Kent" />
+        <Option value="3" label="Diana Prince" />
+      </AutoComplete>
+    </App>
+  `}
+/>
+
+%-PROP-END

@@ -150,12 +150,20 @@ const Component = forwardRef(function Component(
     [lookupAction, uid],
   );
 
+  // --- Get the tracked APIs of the compomnent
+  const referenceTrackedApi = useReferenceTrackedApi(state);
+
+  // --- Memoizes the value extractor object
+  const valueExtractor = useMemo(() => {
+    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
+  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
+
   // --- Memoizes the lookupSyncCallback function's call
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
     (action) => {
-      return lookupSyncCallback(action, uid);
+      return lookupSyncCallback(valueExtractor(action), uid);
     },
-    [lookupSyncCallback, uid],
+    [lookupSyncCallback, uid, valueExtractor],
   );
 
   // --- Memoizes event handler resolution by event name
@@ -167,13 +175,6 @@ const Component = forwardRef(function Component(
     [lookupAction, safeNode.events, uid],
   );
 
-  // --- Get the tracked APIs of the compomnent
-  const referenceTrackedApi = useReferenceTrackedApi(state);
-
-  // --- Memoizes the value extractor object
-  const valueExtractor = useMemo(() => {
-    return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
-  }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
 
   // --- Memoizes the resource URL extraction function
   const extractResourceUrl = useCallback(

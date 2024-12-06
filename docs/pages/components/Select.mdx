@@ -34,7 +34,7 @@ If the `label` is not specified `value` is shown.
     <App>
       <Select>
         <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
+        <Option value="opt2" label="second" enabled="false" />
         <Option value="opt3" label="third"/>
       </Select>
     </App>
@@ -45,13 +45,49 @@ If the `label` is not specified `value` is shown.
 
 ### `autoFocus`
 
-This property sets the label of the component.
+If this property is set to `true`, the component gets the focus automatically when displayed.
 
 Default value: `false`.
 
 ### `dropdownHeight`
 
 This property sets the height of the dropdown list.
+
+```ueml copy /dropdownHeight="180px"/
+<App>
+  <Select dropdownHeight="180px">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: dropdownHeight"
+  height={300}
+  app={`
+    <App>
+      <Select dropdownHeight="180px">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
+    </App>
+  `}
+/>
 
 ### `emptyListTemplate`
 
@@ -146,19 +182,77 @@ This property sets the component's initial value.
   `}
 />
 
+### `label`
+
+This property sets the label of the component.
+
+### `labelBreak`
+
+This boolean value indicates if the `Select` labels can be split into multiple lines if it would overflow the available label width.
+
+Default value: `false`.
+
 ### `labelId`
 
 You can specify the identifier of a component acting as its label. When you click the label, the component behaves as you clicked it.
+
+### `labelPosition`
+
+Places the label at the given position of the component.
+
+Default value: `"top"`.
+
+Available values: `top` **(default)**, `right`, `bottom`, `left`
+
+### `labelWidth`
+
+This property sets the width of the `Select`.
 
 ### `maxLength`
 
 This property sets the maximum length of the input it accepts.
 
-### `multi`
+### `multiSelect`
 
-This property allows the user to select multiple items.
+The `true` value of the property indicates if the user can select multiple items.
 
 Default value: `false`.
+
+```ueml copy /multiSelect="true"/
+<App>
+      <Select multiSelect="true" dropdownHeight="180px" >
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: multiSelect"
+  height={300}
+  app={`
+    <App>
+      <Select multiSelect="true" dropdownHeight="180px" >
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
+    </App>
+  `}
+/>
 
 ### `optionTemplate`
 
@@ -423,6 +517,10 @@ You can use this method to set the component's current value programmatically (`
   `}
 />
 
+### `value`
+
+You can query the component's value. If no value is set, it will retrieve `undefined`.
+
 ## Styling
 
 The `Select` component uses these theme variables:
@@ -603,6 +701,8 @@ See [custom themes](../learning/themes/overview.mdx) for styling details.
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-error--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-success--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
 | [offset-outline](../styles-and-themes/common-units/#size)-Select-warning--focus | <GrayText>none</GrayText> | <GrayText>none</GrayText> |
+| [opacity](../styles-and-themes/common-units/#opacity)-Select--disabled | 0.5 | 0.5 |
+| [opacity](../styles-and-themes/common-units/#opacity)-text-item-Select--disabled | 0.5 | 0.5 |
 | [padding-horizontal](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [padding-vertical](../styles-and-themes/common-units/#size)-Select-badge | $space-1 | $space-1 |
 | [radius](../styles-and-themes/common-units/#border-rounding)-menu-Select | $radius | $radius |

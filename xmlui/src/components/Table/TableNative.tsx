@@ -110,6 +110,7 @@ type TableProps = {
   noDataRenderer?: () => ReactNode;
   autoFocus?: boolean;
   hideHeader?: boolean;
+  hideNoDataView?: boolean;
   alwaysShowSelectionHeader?: boolean;
   registerComponentApi: RegisterComponentApiFn;
 };
@@ -169,6 +170,7 @@ export const Table = forwardRef(
       noDataRenderer,
       autoFocus = false,
       hideHeader = false,
+      hideNoDataView = false,
       alwaysShowSelectionHeader = false,
       registerComponentApi,
       onSelectionDidChange,
@@ -582,176 +584,175 @@ export const Table = forwardRef(
         ref={ref}
         style={style}
       >
+        <table
+          className={styles.table}
+          ref={tableRef}
+          style={{ borderRight: "1px solid transparent" }}
+        >
+          {!hideHeader && (
+            <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
+              {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
+                <tr
+                  key={`${headerGroup.id}-${headerGroupIndex}`}
+                  className={classnames(styles.headerRow, {
+                    [styles.allSelected]: table.getIsAllRowsSelected(),
+                  })}
+                >
+                  {headerGroup.headers.map((header, headerIndex) => {
+                    const { width, ...style } = header.column.columnDef.meta?.style || {};
+                    const size = header.getSize();
+                    return (
+                      <th
+                        key={`${header.id}-${headerIndex}`}
+                        className={styles.columnCell}
+                        colSpan={header.colSpan}
+                        style={{
+                          position: "relative",
+                          width: size,
+                          ...getCommonPinningStyles(header.column),
+                        }}
+                      >
+                        <ClickableHeader
+                          hasSorting={header.column.columnDef.enableSorting}
+                          updateSorting={() =>
+                            _updateSorting(header.column.columnDef.meta?.accessorKey)
+                          }
+                        >
+                          <div className={styles.headerContent} style={style}>
+                            {
+                              flexRender(
+                                header.column.columnDef.header,
+                                header.getContext(),
+                              ) as ReactNode
+                            }
+                            <span style={{ display: "inline-flex", maxWidth: 16 }}>
+                              {header.column.columnDef.enableSorting && (
+                                <ColumnOrderingIndicator
+                                  iconSortAsc={iconSortAsc}
+                                  iconSortDesc={iconSortDesc}
+                                  iconNoSort={iconNoSort}
+                                  direction={
+                                    header.column.columnDef.meta?.accessorKey === _sortBy
+                                      ? _sortingDirection
+                                      : undefined
+                                  }
+                                />
+                              )}
+                            </span>
+                          </div>
+                        </ClickableHeader>
+                        {header.column.getCanResize() && (
+                          <div
+                            {...{
+                              onDoubleClick: () => {
+                                touchedSizesRef.current[header.column.id] = false;
+                                if (header.column.columnDef.size !== undefined) {
+                                  header.column.resetSize();
+                                } else {
+                                  recalculateStarSizes();
+                                }
+                              },
+                              onMouseDown: (event) => {
+                                columnSizeTouched(header.column.id);
+                                header.getResizeHandler()(event);
+                              },
+                              onTouchStart: (event) => {
+                                columnSizeTouched(header.column.id);
+                                header.getResizeHandler()(event);
+                              },
+                              className: classnames(styles.resizer, {
+                                [styles.isResizing]: header.column.getIsResizing(),
+                              }),
+                            }}
+                          />
+                        )}
+                      </th>
+                    );
+                  })}
+                </tr>
+              ))}
+            </thead>
+          )}
+          {hasData && <tbody className={styles.tableBody}>
+            {paddingTop > 0 && (
+              <tr>
+                <td style={{ height: `${paddingTop}px` }} />
+              </tr>
+            )}
+            {rowVirtualizer.getVirtualItems().map((virtualRow) => {
+              const rowIndex = virtualRow.index;
+              const row = rows[rowIndex];
+              return (
+                <tr
+                  data-index={rowIndex}
+                  key={`${row.id}-${rowIndex}`}
+                  className={classnames(styles.row, {
+                    [styles.selected]: row.getIsSelected(),
+                    [styles.focused]: focusedIndex === rowIndex,
+                    [styles.disabled]: rowDisabledPredicate(row.original),
+                  })}
+                  ref={(el) => {
+                    if (el && estimatedHeightRef.current === null) {
+                      estimatedHeightRef.current = Math.round(el.getBoundingClientRect().height);
+                    }
+                    rowVirtualizer.measureElement(el);
+                  }}
+                  onClick={(event) => {
+                    if (event.defaultPrevented) {
+                      return;
+                    }
+                    const target = event.target as HTMLElement;
+                    if (target.tagName.toLowerCase() === "input") {
+                      return;
+                    }
+                    toggleRow(row.original, event);
+                  }}
+                >
+                  {row.getVisibleCells().map((cell, i) => {
+                    const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
+                    const size = cell.column.getSize();
+                    return (
+                      <td
+                        className={styles.cell}
+                        key={`${cell.id}-${i}`}
+                        style={{
+                          // width: size,
+                          width: size,
+                          ...getCommonPinningStyles(cell.column),
+                        }}
+                      >
+                        {cellRenderer
+                          ? cellRenderer(cell.row.original)
+                          : (flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            ) as ReactNode)}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+            {paddingBottom > 0 && (
+              <tr>
+                <td style={{ height: `${paddingBottom}px` }} />
+              </tr>
+            )}
+          </tbody>}
+        </table>
         {loading && !hasData && (
           <div className={styles.loadingWrapper}>
             <Spinner />
           </div>
         )}
-        {!loading &&
+        {!hideNoDataView &&
+          !loading &&
           !hasData &&
           (noDataRenderer ? (
             noDataRenderer()
           ) : (
             <div className={styles.noRows}>No data available</div>
           ))}
-        {hasData && (
-          <table
-            className={styles.table}
-            ref={tableRef}
-            style={{ borderRight: "1px solid transparent" }}
-          >
-            {!hideHeader && (
-              <thead style={{ height: headerHeight }} className={styles.headerWrapper}>
-                {table.getHeaderGroups().map((headerGroup, headerGroupIndex) => (
-                  <tr
-                    key={`${headerGroup.id}-${headerGroupIndex}`}
-                    className={classnames(styles.headerRow, {
-                      [styles.allSelected]: table.getIsAllRowsSelected(),
-                    })}
-                  >
-                    {headerGroup.headers.map((header, headerIndex) => {
-                      const { width, ...style } = header.column.columnDef.meta?.style || {};
-                      const size = header.getSize();
-                      return (
-                        <th
-                          key={`${header.id}-${headerIndex}`}
-                          className={styles.columnCell}
-                          colSpan={header.colSpan}
-                          style={{
-                            position: "relative",
-                            width: size,
-                            ...getCommonPinningStyles(header.column),
-                          }}
-                        >
-                          <ClickableHeader
-                            hasSorting={header.column.columnDef.enableSorting}
-                            updateSorting={() =>
-                              _updateSorting(header.column.columnDef.meta?.accessorKey)
-                            }
-                          >
-                            <div className={styles.headerContent} style={style}>
-                              {
-                                flexRender(
-                                  header.column.columnDef.header,
-                                  header.getContext(),
-                                ) as ReactNode
-                              }
-                              <span style={{ display: "inline-flex", maxWidth: 16 }}>
-                                {header.column.columnDef.enableSorting && (
-                                  <ColumnOrderingIndicator
-                                    iconSortAsc={iconSortAsc}
-                                    iconSortDesc={iconSortDesc}
-                                    iconNoSort={iconNoSort}
-                                    direction={
-                                      header.column.columnDef.meta?.accessorKey === _sortBy
-                                        ? _sortingDirection
-                                        : undefined
-                                    }
-                                  />
-                                )}
-                              </span>
-                            </div>
-                          </ClickableHeader>
-                          {header.column.getCanResize() && (
-                            <div
-                              {...{
-                                onDoubleClick: () => {
-                                  touchedSizesRef.current[header.column.id] = false;
-                                  if (header.column.columnDef.size !== undefined) {
-                                    header.column.resetSize();
-                                  } else {
-                                    recalculateStarSizes();
-                                  }
-                                },
-                                onMouseDown: (event) => {
-                                  columnSizeTouched(header.column.id);
-                                  header.getResizeHandler()(event);
-                                },
-                                onTouchStart: (event) => {
-                                  columnSizeTouched(header.column.id);
-                                  header.getResizeHandler()(event);
-                                },
-                                className: classnames(styles.resizer, {
-                                  [styles.isResizing]: header.column.getIsResizing(),
-                                }),
-                              }}
-                            />
-                          )}
-                        </th>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </thead>
-            )}
-            <tbody className={styles.tableBody}>
-              {paddingTop > 0 && (
-                <tr>
-                  <td style={{ height: `${paddingTop}px` }} />
-                </tr>
-              )}
-              {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const rowIndex = virtualRow.index;
-                const row = rows[rowIndex];
-                return (
-                  <tr
-                    data-index={rowIndex}
-                    key={`${row.id}-${rowIndex}`}
-                    className={classnames(styles.row, {
-                      [styles.selected]: row.getIsSelected(),
-                      [styles.focused]: focusedIndex === rowIndex,
-                      [styles.disabled]: rowDisabledPredicate(row.original),
-                    })}
-                    ref={(el) => {
-                      if (el && estimatedHeightRef.current === null) {
-                        estimatedHeightRef.current = Math.round(el.getBoundingClientRect().height);
-                      }
-                      rowVirtualizer.measureElement(el);
-                    }}
-                    onClick={(event) => {
-                      if (event.defaultPrevented) {
-                        return;
-                      }
-                      const target = event.target as HTMLElement;
-                      if (target.tagName.toLowerCase() === "input") {
-                        return;
-                      }
-                      toggleRow(row.original, event);
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell, i) => {
-                      const cellRenderer = cell.column.columnDef?.meta?.cellRenderer;
-                      const size = cell.column.getSize();
-                      return (
-                        <td
-                          className={styles.cell}
-                          key={`${cell.id}-${i}`}
-                          style={{
-                            // width: size,
-                            width: size,
-                            ...getCommonPinningStyles(cell.column),
-                          }}
-                        >
-                          {cellRenderer
-                            ? cellRenderer(cell.row.original)
-                            : (flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext(),
-                              ) as ReactNode)}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-              {paddingBottom > 0 && (
-                <tr>
-                  <td style={{ height: `${paddingBottom}px` }} />
-                </tr>
-              )}
-            </tbody>
-          </table>
-        )}
 
         {isPaginated && hasData && rows.length > 0 && pagination && (
           // --- Render the pagination controls

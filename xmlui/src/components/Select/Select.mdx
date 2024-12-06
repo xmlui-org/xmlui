@@ -23,7 +23,7 @@ If the `label` is not specified `value` is shown.
     <App>
       <Select>
         <Option value="opt1" label="first"/>
-        <Option value="opt2" label="second"/>
+        <Option value="opt2" label="second" enabled="false" />
         <Option value="opt3" label="third"/>
       </Select>
     </App>
@@ -210,6 +210,86 @@ Click on the second field to see the custom empty list indicator.
           </property>
         </Select>
       </VStack>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START dropdownHeight
+
+```ueml copy /dropdownHeight="180px"/
+<App>
+  <Select dropdownHeight="180px">
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: dropdownHeight"
+  height={300}
+  app={`
+    <App>
+      <Select dropdownHeight="180px">
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START multiSelect
+
+```ueml copy /multiSelect="true"/
+<App>
+      <Select multiSelect="true" dropdownHeight="180px" >
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+    <!-- Omitted -->
+    <Option value="opt11" label="eleventh"/>
+    <Option value="opt12" label="twelfth"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: multiSelect"
+  height={300}
+  app={`
+    <App>
+      <Select multiSelect="true" dropdownHeight="180px" >
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+        <Option value="opt4" label="fourth"/>
+        <Option value="opt5" label="fifth"/>
+        <Option value="opt6" label="sixth"/>
+        <Option value="opt7" label="seventh"/>
+        <Option value="opt8" label="eighth"/>
+        <Option value="opt9" label="ninth"/>
+        <Option value="opt10" label="tenth"/>
+        <Option value="opt11" label="eleventh"/>
+        <Option value="opt12" label="twelfth"/>
+      </Select>
     </App>
   `}
 />

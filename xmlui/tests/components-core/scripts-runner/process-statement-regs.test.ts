@@ -2,14 +2,14 @@ import { describe, expect, it, assert } from "vitest";
 
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import {createEvalContext, parseExpression, parseStatements} from "./test-helpers";
+import { createEvalContext, parseExpression, parseStatements } from "./test-helpers";
 
 describe("Process statements regression", () => {
   it("while with break #2", async () => {
     // --- Arrange
     const source = "let x = 0; while (true) {x++ ; if (x > 3) break;}; x++";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -33,7 +33,7 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "((maybeUndefined)=> maybeUndefined)()";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -53,16 +53,17 @@ describe("Process statements regression", () => {
 
   it("recursive arrow regression #1", async () => {
     // --- Arrange
-    const source = "const fact = n => { if (n === 0) return 1; else return n * fact(n-1); }; x = fact(3)";
+    const source =
+      "const fact = n => { if (n === 0) return 1; else return n * fact(n-1); }; x = fact(3)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
-          x: 0
-        }
-      }
+          x: 0,
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -86,7 +87,7 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "const mapped = [1,2,3].map(id => {return {id: id} }); console.log(mapped)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -110,14 +111,14 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "let arrow = (val) => val.value++; arrow(x)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
-          x: { value: 0 }
-        }
-      }
+          x: { value: 0 },
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -134,16 +135,16 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "let arrow = (val) => val.some++; arrow(x.value)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
-          x: { 
-            value: { some: 0 }
-          }
-        }
-      }
+          x: {
+            value: { some: 0 },
+          },
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -160,14 +161,14 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "let arrow = (val) => val.value++; arrow(x)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
-          x: { value: 0 }
-        }
-      }
+          x: { value: 0 },
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -184,16 +185,16 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "let arrow = (val) => val.some++; arrow(x.value)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
           x: {
-            value: { some: 0 }
-          }
-        }
-      }
+            value: { some: 0 },
+          },
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -210,17 +211,17 @@ describe("Process statements regression", () => {
     // --- Arrange
     const source = "incrementFunc(counter.value)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     evalContext.mainThread!.blocks = [
       {
         vars: {
           counter: {
-            value: { some: 0 }
+            value: { some: 0 },
           },
-          incrementFunc: {...parseExpression("x => x.some++"), _ARROW_EXPR_: true }
-        }
-      }
+          incrementFunc: { ...parseExpression("x => x.some++"), _ARROW_EXPR_: true },
+        },
+      },
     ];
     const statements = parseStatements(source);
 
@@ -239,8 +240,8 @@ describe("Process statements regression", () => {
     const evalContext = createEvalContext({
       localContext: {
         x: 0,
-        alma: {}
-      }
+        alma: {},
+      },
     });
     const statements = parseStatements(source);
 
@@ -258,8 +259,8 @@ describe("Process statements regression", () => {
     const evalContext = createEvalContext({
       localContext: {
         x: 0,
-        alma: { a: "hello", b: "hi" }
-      }
+        alma: { a: "hello", b: "hi" },
+      },
     });
     const statements = parseStatements(source);
 
@@ -278,8 +279,8 @@ describe("Process statements regression", () => {
     const evalContext = createEvalContext({
       localContext: {
         x: 0,
-        alma: [1, 2, 3]
-      }
+        alma: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -300,7 +301,7 @@ describe("Process statements regression", () => {
     const evalContext = createEvalContext({
       localContext: {
         x: 123,
-      }
+      },
     });
     const statements = parseStatements(source);
 
@@ -311,7 +312,7 @@ describe("Process statements regression", () => {
       expect(err instanceof TypeError).equal(true);
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("disallow running banned function #1", async () => {
@@ -327,7 +328,7 @@ describe("Process statements regression", () => {
       expect(err.toString().includes("not allowed to call")).equal(true);
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("Arrow function arg regression (async) #1", async () => {
@@ -335,17 +336,16 @@ describe("Process statements regression", () => {
     const source = "val = [0,1,2,3].filter(k => k === 2 || k === 3);";
     const evalContext = createEvalContext({
       localContext: {
-        val: 0
-      }
+        val: 0,
+      },
     });
     const statements = parseStatements(source);
 
     // --- Act
     await processStatementQueueAsync(statements, evalContext);
-    
+
     // --- Assert
     expect(evalContext.localContext.val).deep.equal([2, 3]);
-
   });
 
   it("Arrow function arg regression (sync) #1", () => {
@@ -353,8 +353,8 @@ describe("Process statements regression", () => {
     const source = "val = [0,1,2,3].filter(k => k === 2 || k === 3);";
     const evalContext = createEvalContext({
       localContext: {
-        val: 0
-      }
+        val: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -381,8 +381,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -411,8 +411,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -446,8 +446,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -474,8 +474,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -504,8 +504,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -539,8 +539,8 @@ describe("Process statements regression", () => {
     `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -560,13 +560,18 @@ describe("Process statements regression", () => {
         `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
     // --- Act
-    await processStatementQueueAsync(statements, evalContext, evalContext.mainThread, async () => {});
+    await processStatementQueueAsync(
+      statements,
+      evalContext,
+      evalContext.mainThread,
+      async () => {},
+    );
 
     // --- Assert
     expect(evalContext.localContext.x).toStrictEqual([2, 4]);
@@ -581,8 +586,8 @@ describe("Process statements regression", () => {
         `;
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -592,4 +597,59 @@ describe("Process statements regression", () => {
     // --- Assert
     expect(evalContext.localContext.x).toStrictEqual([2, 4]);
   });
+
+  it("var is not allowed in function body (sync)", () => {
+    // --- Arrange
+    const source = `
+    function test() {
+      var x = 0;
+    }
+
+    var c = 3;
+    let a = test();
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    try {
+      processStatementQueue(statements, evalContext);
+    } catch (err) {
+      expect(err.toString()).toContain("'var'");
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
+  it("var is not allowed in function body (async)", async () => {
+    // --- Arrange
+    const source = `
+    function test() {
+      var x = 0;
+    }
+
+    var c = 3;
+    let a = test();
+    `;
+    const evalContext = createEvalContext({
+      localContext: {
+        x: 0,
+      },
+    });
+    const statements = parseStatements(source);
+
+    // --- Act
+    try {
+      await processStatementQueueAsync(statements, evalContext);
+    } catch (err) {
+      expect(err.toString()).toContain("'var'");
+      return;
+    }
+    assert.fail("Exception expected");
+  });
+
 });

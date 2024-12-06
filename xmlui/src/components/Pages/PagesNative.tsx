@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { EMPTY_ARRAY } from "@components-core/constants";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
@@ -15,25 +15,35 @@ export function RouteWrapper({
   renderChild,
   layoutContext,
   style,
+  uid
 }: {
   childRoute?: ComponentDef | Array<ComponentDef>;
   renderChild: RenderChildFn;
   layoutContext?: LayoutContext;
   style?: CSSProperties;
+  uid?: string;
 }) {
   const params = useParams();
+
+  //we need to wrap the child route in a container to make sure the route params are available.
+  // we do this wrapping by providing an empty object to vars.
+  // this way it becomes an 'implicit' container (vars/state inside this container is propagated to the parent)
   const wrappedWithContainer = useMemo(() => {
     if (Array.isArray(childRoute)) {
       return {
-        type: "Container",
+        type: "Fragment",
+        uid,
+        vars: EMPTY_OBJECT,
         children: childRoute,
       };
     }
     return {
-      type: "Container",
+      type: "Fragment",
+      uid,
+      vars: EMPTY_OBJECT,
       children: [childRoute],
     };
-  }, [childRoute]);
+  }, [childRoute, uid]);
 
   const wrapperStyle = useMemo(()=>{
     const {padding, paddingLeft, paddingRight, paddingTop, paddingBottom, ...rest} = style;

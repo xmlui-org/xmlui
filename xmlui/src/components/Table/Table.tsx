@@ -255,6 +255,7 @@ const TableWithColumns = ({
               return renderChild(node.props.noDataTemplate);
             })
           }
+          hideNoDataView={node.props.noDataTemplate === null || node.props.noDataTemplate === ""}
           loading={extractValue.asOptionalBoolean(node.props.loading)}
           isPaginated={extractValue.asOptionalBoolean(node.props?.isPaginated)}
           headerHeight={extractValue.asSize(node.props.headerHeight)}
