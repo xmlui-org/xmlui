@@ -44,13 +44,6 @@ const mock: ApiInterceptorDefinition = {
         avatarUrl: "https://i.pravatar.cc/100?u=109",
       },
       {
-        id: 5,
-        name: "John Doe",
-        status: "Customer",
-        priority: "Low",
-        avatarUrl: "https://i.pravatar.cc/100?u=129",
-      },
-      {
         id: 6,
         name: "Ellen Keys",
         status: "Prospect",
