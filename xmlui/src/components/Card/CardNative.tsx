@@ -39,7 +39,6 @@ export const Card = forwardRef(function Card(
 ) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
-    layout: { marginTop: 0, marginBottom: "4px" },
   };
   return (
     <div
