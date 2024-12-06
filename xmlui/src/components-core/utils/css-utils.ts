@@ -152,6 +152,9 @@ export const useScrollbarWidth = () => {
   if (didCompute.current) return widthRef.current;
 
   // Creating invisible container
+  if(typeof document === 'undefined'){
+    return 0;
+  }
   const outer = document.createElement('div');
   outer.style.visibility = 'hidden';
   outer.style.overflow = 'scroll'; // forcing scrollbar to appear
