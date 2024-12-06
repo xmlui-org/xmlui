@@ -1,8 +1,8 @@
 import { StandaloneAppDescription } from "xmlui";
 
 const App: StandaloneAppDescription = {
-  name: "Component Display",
-  globals: {
+  name: "Demo 2",
+  appGlobals: {
     apiUrl: "/api",
   },
   defaultTone: "light",

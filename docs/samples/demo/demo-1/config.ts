@@ -1,7 +1,7 @@
 import type { StandaloneAppDescription } from "xmlui";
 
 const App: StandaloneAppDescription = {
-  name: "Component Display",
+  name: "Demo 1",
   appGlobals: {
     apiUrl: "/api",
   },
