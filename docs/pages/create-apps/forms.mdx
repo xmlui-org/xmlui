@@ -1,5 +1,5 @@
 import { Callout } from 'nextra/components';
-import { 
+import {
   COMPONENT_FORMITEM,
   COMPONENT_TEXT,
   LAYOUT_DIMENSION_UNITS,
@@ -235,13 +235,13 @@ Set each item's width to "50%" to create a two-column layout:
 ```ueml copy {14-15}
 <App>
   <Form
-    data="{{ 
-      title: 'Mr.', 
-      firstname: 'Jake', 
-      lastname: 'Hard', 
-      jobTitle: 'janitor', 
-      experience: 'broom' 
-    }}" 
+    data="{{
+      title: 'Mr.',
+      firstname: 'Jake',
+      lastname: 'Hard',
+      jobTitle: 'janitor',
+      experience: 'broom'
+    }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FlowLayout>
       <HStack>
@@ -262,13 +262,13 @@ Set each item's width to "50%" to create a two-column layout:
     app={`
     <App>
       <Form
-        data="{{ 
-          title: 'Mr.', 
-          firstname: 'Jake', 
-          lastname: 'Hard', 
-          jobTitle: 'janitor', 
-          experience: 'broom' 
-        }}" 
+        data="{{
+          title: 'Mr.',
+          firstname: 'Jake',
+          lastname: 'Hard',
+          jobTitle: 'janitor',
+          experience: 'broom'
+        }}"
         onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
         <FlowLayout>
           <HStack>
@@ -330,7 +330,7 @@ The `checkbox` type represents a checkbox input component:
 
 ```ueml copy {4-6}
 <App>
-  <Form data="{{ option1: true, option2: false, option3: true }}" 
+  <Form data="{{ option1: true, option2: false, option3: true }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="checkbox" bindTo="option1" label="Option #1" />
     <FormItem type="checkbox" bindTo="option2" label="Option #2" />
@@ -344,7 +344,7 @@ The `checkbox` type represents a checkbox input component:
   previewOnly
   app={`
   <App>
-    <Form data="{{ option1: true, option2: false, option3: true }}" 
+    <Form data="{{ option1: true, option2: false, option3: true }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="checkbox" bindTo="option1" label="Option #1" />
       <FormItem type="checkbox" bindTo="option2" label="Option #2" />
@@ -401,7 +401,7 @@ The `datePicker` type represents a date picker input component:
 ```ueml copy {5}
 <App>
   <Form
-    data="{{ birthDate: '2021-04-08' }}" 
+    data="{{ birthDate: '2021-04-08' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
   </Form>
@@ -414,7 +414,7 @@ The `datePicker` type represents a date picker input component:
   app={`
   <App>
     <Form
-      data="{{ birthDate: '2021-04-08' }}" 
+      data="{{ birthDate: '2021-04-08' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="datePicker" bindTo="birthDate" label="Birthdate" />
     </Form>
@@ -428,8 +428,8 @@ The `file` type represents an input component allowing you to select one or mult
 
 ```ueml copy {5}
 <App>
-  <Form 
-    data="{{ articles: null }}" 
+  <Form
+    data="{{ articles: null }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="file" bindTo="articles" label="Articles file" />
   </Form>
@@ -441,8 +441,8 @@ The `file` type represents an input component allowing you to select one or mult
   previewOnly
   app={`
   <App>
-    <Form 
-      data="{{ articles: null }}" 
+    <Form
+      data="{{ articles: null }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="file" bindTo="articles" label="Articles file" />
     </Form>
@@ -456,8 +456,8 @@ The `integer` type represents an input component for integer values:
 
 ```ueml copy {5}
 <App>
-  <Form 
-    data="{{ age: 30 }}" 
+  <Form
+    data="{{ age: 30 }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="integer" bindTo="age" label="Age" />
   </Form>
@@ -469,8 +469,8 @@ The `integer` type represents an input component for integer values:
   previewOnly
   app={`
   <App>
-    <Form 
-      data="{{ age: 30 }}" 
+    <Form
+      data="{{ age: 30 }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="integer" bindTo="age" label="Age" />
     </Form>
@@ -486,7 +486,7 @@ You can select multiple items as well:
 ```ueml copy {5-10}
 <App>
   <Form
-    data="{{ size: 'xs' }}" 
+    data="{{ size: 'xs' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="multiCombobox" bindTo="size" label="Box size">
       <Option label="Extra small" value="xs" />
@@ -505,7 +505,7 @@ You can select multiple items as well:
   app={`
   <App>
     <Form
-      data="{{ size: 'xs' }}" 
+      data="{{ size: 'xs' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="multiCombobox" bindTo="size" label="Box size">
         <Option label="Extra small" value="xs" />
@@ -525,7 +525,7 @@ The `multiSelect` type represents a dropdown list with selectable items. You can
 ```ueml copy {5-10}
 <App>
   <Form
-    data="{{ size: 'xs' }}" 
+    data="{{ size: 'xs' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="multiSelect" bindTo="size" label="Box size">
       <Option label="Extra small" value="xs" />
@@ -544,7 +544,7 @@ The `multiSelect` type represents a dropdown list with selectable items. You can
   app={`
   <App>
     <Form
-      data="{{ size: 'xs' }}" 
+      data="{{ size: 'xs' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="multiSelect" bindTo="size" label="Box size">
         <Option label="Extra small" value="xs" />
@@ -563,8 +563,8 @@ The `number` type represents an input component for numeric values (integer or f
 
 ```ueml copy {5}
 <App>
-  <Form 
-    data="{{ distance: 192.5 }}" 
+  <Form
+    data="{{ distance: 192.5 }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="number" bindTo="distance" label="Distance in miles" />
   </Form>
@@ -576,8 +576,8 @@ The `number` type represents an input component for numeric values (integer or f
   previewOnly
   app={`
   <App>
-    <Form 
-      data="{{ distance: 192.5 }}" 
+    <Form
+      data="{{ distance: 192.5 }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="number" bindTo="distance" label="Distance in miles" />
     </Form>
@@ -592,7 +592,7 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
 ```ueml copy {5-10}
 <App>
   <Form
-    data="{{ title: 'Mr.' }}" 
+    data="{{ title: 'Mr.' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="radioGroup" bindTo="title" label="Title">
       <Option label="Mr." value="Mr." />
@@ -610,7 +610,7 @@ The `radioGroup` type represents a group of mutually exclusive radio buttons (on
   app={`
   <App>
     <Form
-      data="{{ title: 'Mr.' }}" 
+      data="{{ title: 'Mr.' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="radioGroup" bindTo="title" label="Title">
         <Option label="Mr." value="Mr." />
@@ -668,8 +668,8 @@ The `switch` type represents a switch component to toggle a boolean value:
 
 ```ueml copy {5-7}
 <App>
-  <Form 
-    data="{{ showBorder: true, showText: false, hideShadow: true }}" 
+  <Form
+    data="{{ showBorder: true, showText: false, hideShadow: true }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
     <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
@@ -683,8 +683,8 @@ The `switch` type represents a switch component to toggle a boolean value:
   previewOnly
   app={`
   <App>
-    <Form 
-      data="{{ showBorder: true, showText: false, hideShadow: true }}" 
+    <Form
+      data="{{ showBorder: true, showText: false, hideShadow: true }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="switch" bindTo="showBorder" label="Show border" labelPosition="right" />
       <FormItem type="switch" bindTo="showText" label="Show text" labelPosition="right" />
@@ -701,7 +701,7 @@ The `text` type represents a textbox to enter textual data:
 ```ueml copy {5}
 <App>
   <Form
-    data="{{ name: 'Joe' }}" 
+    data="{{ name: 'Joe' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="text" bindTo="name" label="Name" />
   </Form>
@@ -714,7 +714,7 @@ The `text` type represents a textbox to enter textual data:
   app={`
   <App>
     <Form
-      data="{{ name: 'Joe' }}" 
+      data="{{ name: 'Joe' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="text" bindTo="name" label="Name" />
     </Form>
@@ -728,8 +728,8 @@ The `textarea` type represents a multiline textbox to enter textual data:
 
 ```ueml copy {5}
 <App>
-  <Form 
-    data="{{ description: 'This is a description' }}" 
+  <Form
+    data="{{ description: 'This is a description' }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem type="textarea" bindTo="description" label="Description" />
   </Form>
@@ -741,8 +741,8 @@ The `textarea` type represents a multiline textbox to enter textual data:
   previewOnly
   app={`
   <App>
-    <Form 
-      data="{{ description: 'This is a description' }}" 
+    <Form
+      data="{{ description: 'This is a description' }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="textarea" bindTo="description" label="Description" />
     </Form>
@@ -774,8 +774,8 @@ You can nest your custom component's markup into the wrapping `FormItem` as the 
 ```
 
 Custom input fields can use a simple API to communicate with the form infrastructure.
-The `#value` identifier represents the current value of the component.
-The custom component can use the `#setValue` method to change the component value.
+The `$value` identifier represents the current value of the component.
+The custom component can use the `$setValue` method to change the component value.
 
 The following example shows a toggle button created using a regular `Button` component using the form API:
 
@@ -867,9 +867,9 @@ The `data` property can be accessed directly and you can drill down to relevant 
 <App>
   <Form
     data="{{
-      name: 'John smith', 
+      name: 'John smith',
       address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-    }}" 
+    }}"
     onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
     <FormItem bindTo="name" label="Name" />
     <FormItem bindTo="address.street" label="Street" />
@@ -886,7 +886,7 @@ The `data` property can be accessed directly and you can drill down to relevant 
       data="{{
         name: 'John smith',
         address: { street: '96th Ave N', city: 'Seattle', zip: '98005' }
-      }}" 
+      }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem bindTo="name" label="Name" />
       <FormItem bindTo="address.street" label="Street" />
@@ -1085,10 +1085,10 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
 
 ```ueml copy
 <App>
-  <Form data="{{ 
-      mobile: '+13456123456', 
-      website: 'http://www.blogsite.com', 
-      email: 'myemail@mail.com' 
+  <Form data="{{
+      mobile: '+13456123456',
+      website: 'http://www.blogsite.com',
+      email: 'myemail@mail.com'
     }}">
     <FormItem bindTo="mobile" pattern="phone" label="mobilePattern" />
     <FormItem bindTo="website" pattern="url" label="websitePattern" />
@@ -1102,10 +1102,10 @@ Evaluate predefined regex patterns. These patterns are the following: "email", "
   previewOnly
   app={`
   <App>
-    <Form data="{{ 
-      mobile: '+13456123456', 
-      website: 'http://www.blogsite.com', 
-      email: 'myemail@mail.com' 
+    <Form data="{{
+      mobile: '+13456123456',
+      website: 'http://www.blogsite.com',
+      email: 'myemail@mail.com'
     }}">
       <FormItem bindTo="mobile" pattern="phone" label="mobilePattern" />
       <FormItem bindTo="website" pattern="url" label="websitePattern" />
