@@ -179,6 +179,16 @@ export function ensureTrailingSlashForUrl(url?: string): string | undefined {
   return `${url}/`;
 }
 
+export function ensureLeadingSlashForUrl(url?: string): string | undefined {
+  if (!url) {
+    return undefined;
+  }
+  if (url.startsWith("/")) {
+    return url;
+  }
+  return `/${url}`;
+}
+
 export function humanReadableDateTimeTillNow(dateTime: number | string | Date, nowLabel?: string, time?: string) {
   // WARNING: does not handle locales, consider doing Date arithmetic instead of parsing human-readable date time
   const dateTimeStr = formatDistanceToNow(new Date(dateTime), {

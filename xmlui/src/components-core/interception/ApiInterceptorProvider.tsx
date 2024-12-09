@@ -1,20 +1,24 @@
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import type { ReactNode} from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import type { SetupWorker } from "msw/browser";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
 import { ApiInterceptorContext } from "./useApiInterceptorContext";
-import { IApiInterceptorContext } from "@abstractions/AppContextDefs";
+import type { IApiInterceptorContext } from "@abstractions/AppContextDefs";
+import { ensureLeadingSlashForUrl } from "@components-core/utils/misc";
 
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({
   interceptor,
   children,
   apiWorker,
+  useHashBasedRouting
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
   apiWorker?: SetupWorker;
+  useHashBasedRouting?: boolean
 }) {
   const [initialized, setInitialized] = useState(!interceptor);
 
@@ -33,11 +37,13 @@ export function ApiInterceptorProvider({
             interceptorWorker = await createApiInterceptorWorker(interceptor, apiWorker);
             // if the apiWorker comes from the outside, we don't handle the lifecycle here
             if (!apiWorker) {
+              const workerFileName = process.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js";
               await interceptorWorker.start({
                 onUnhandledRequest: "bypass",
                 quiet: true,
                 serviceWorker: {
-                  url: process.env.VITE_MOCK_WORKER_LOCATION || "/mockServiceWorker.js",
+                  //TODO use __PUBLIC_PATH
+                  url: !useHashBasedRouting ? ensureLeadingSlashForUrl(workerFileName) : workerFileName,
                 },
               });
             }
@@ -52,7 +58,7 @@ export function ApiInterceptorProvider({
         }
       };
     }
-  }, [apiWorker, interceptor]);
+  }, [apiWorker, interceptor, useHashBasedRouting]);
 
   const contextValue: IApiInterceptorContext = useMemo(() => {
     return {

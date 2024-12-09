@@ -110,8 +110,10 @@ function StandaloneApp({
       // @ts-ignore
     (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
 
+  const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
+
   return (
-    <ApiInterceptorProvider interceptor={mockedApi}>
+    <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
       <RootComponent
         servedFromSingleFile={servedFromSingleFile}
         decorateComponentsWithTestId={shouldDecorateWithTestId}

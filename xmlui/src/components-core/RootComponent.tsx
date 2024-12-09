@@ -529,6 +529,7 @@ const RootComponent = ({
   }
 
   const siteName = globalProps?.name || "XMLUI app";
+  const useHashBasedRouting = globalProps?.useHashBasedRouting ?? true;
 
   const dynamicChildren = (
     <HelmetProvider>
@@ -561,7 +562,7 @@ const RootComponent = ({
 
   const Router = previewMode
     ? MemoryRouter
-    : servedFromSingleFile || (globalProps?.useHashBasedRouting ?? true)
+    : servedFromSingleFile || useHashBasedRouting
       ? HashRouter
       : BrowserRouter;
 
