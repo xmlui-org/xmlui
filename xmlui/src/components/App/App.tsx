@@ -92,7 +92,8 @@ export const appRenderer = createComponentRenderer(
     return (
       <App
         scrollWholePage={extractValue.asOptionalBoolean(node.props.scrollWholePage, true)}
-        noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, false)}
+        // in case of SSR we default noScrollbarGutters to true
+        noScrollbarGutters={extractValue.asOptionalBoolean(node.props.noScrollbarGutters, typeof document === 'undefined')}
         style={layoutCss}
         layout={layoutType}
         loggedInUser={extractValue(node.props.loggedInUser)}
