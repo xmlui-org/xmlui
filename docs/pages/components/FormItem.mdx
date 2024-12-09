@@ -13,7 +13,7 @@ The component provides context values with which you can access some internal pr
 - `$value`: The context variable represents the current value of the `FormItem`. It can be used in expressions and code snippets within the `FormItem` instance.
 
 
-You can learn more about this component in the [Using Forms](../learning/using-components/forms.mdx) article.
+You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
 
 ## Properties
 
@@ -27,7 +27,7 @@ Default value: `false`.
 
 This property binds a particular input field to one of the attributes of the `Form` data. It names the property of the form's `data` data to get the input's initial value.When the field is saved, its value will be stored in the `data` property with this name.
 
-Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `data`.
+Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
 
 ```ueml copy /bindTo="firstname"/
 <App>
@@ -178,7 +178,15 @@ This boolean value indicates if the label can be split into multiple lines if it
 
 Places the label at the given position of the component.
 
-Available values: `top`, `right`, `bottom`, `left`
+Available values:
+
+| Value | Description |
+| --- | --- |
+| `left` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `right` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
+| `top` | The top of the input |
+| `bottom` | The bottom of the input |
+
 
 Different input components have different layout methods
 (i.e. `TextBox` labels are positioned at the top, `Checkbox` labels are on the right side).
@@ -455,8 +463,8 @@ In the demo below, enter anything that does not look like an email and click out
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem pattern="email" bindTo="oldEmail" />
-    <FormItem 
-      patternInvalidMessage="This does not look like an email" 
+    <FormItem
+      patternInvalidMessage="This does not look like an email"
       pattern="email" bindTo="newEmail" />
   </Form>
 </App>
@@ -470,8 +478,8 @@ In the demo below, enter anything that does not look like an email and click out
         data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem pattern="email" bindTo="oldEmail" />
-        <FormItem 
-          patternInvalidMessage="This does not look like an email" 
+        <FormItem
+          patternInvalidMessage="This does not look like an email"
           pattern="email" bindTo="newEmail" />
       </Form>
     </App>
@@ -525,11 +533,11 @@ Just submitting the form as is also produces the same error.
     data="{{ age: 100, customAge: 100 }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-    <FormItem 
-      minValue="0" 
-      maxValue="99" 
-      rangeInvalidMessage="Out of range!" 
-      bindTo="customAge" 
+    <FormItem
+      minValue="0"
+      maxValue="99"
+      rangeInvalidMessage="Out of range!"
+      bindTo="customAge"
       type="integer" />
   </Form>
 </App>
@@ -543,11 +551,11 @@ Just submitting the form as is also produces the same error.
         data="{{ age: 100, customAge: 100 }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-        <FormItem 
-          minValue="0" 
-          maxValue="99" 
-          rangeInvalidMessage="Out of range!" 
-          bindTo="customAge" 
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidMessage="Out of range!"
+          bindTo="customAge"
           type="integer" />
       </Form>
     </App>
@@ -570,10 +578,10 @@ Just submitting the form as is also produces the same error.
     data="{{ age: 100, customAge: 100 }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-    <FormItem 
-      minValue="0" maxValue="99" 
-      rangeInvalidSeverity="warning" 
-      bindTo="customAge" 
+    <FormItem
+      minValue="0" maxValue="99"
+      rangeInvalidSeverity="warning"
+      bindTo="customAge"
       type="integer" />
   </Form>
 </App>
@@ -587,11 +595,11 @@ Just submitting the form as is also produces the same error.
         data="{{ age: 100, customAge: 100 }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-        <FormItem 
-          minValue="0" 
-          maxValue="99" 
-          rangeInvalidSeverity="warning" 
-          bindTo="customAge" 
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidSeverity="warning"
+          bindTo="customAge"
           type="integer" />
       </Form>
     </App>
@@ -639,8 +647,8 @@ In the demo below, enter a password that is not a lowercase string and click out
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-    <FormItem 
-      regexInvalidMessage="Password must be all lowercase" 
+    <FormItem
+      regexInvalidMessage="Password must be all lowercase"
       regex="^[a-z]+$" bindTo="newPassword" />
   </Form>
 </App>
@@ -654,8 +662,8 @@ In the demo below, enter a password that is not a lowercase string and click out
         data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-        <FormItem 
-          regexInvalidMessage="Password must be all lowercase" 
+        <FormItem
+          regexInvalidMessage="Password must be all lowercase"
           regex="^[a-z]+$" bindTo="newPassword" />
       </Form>
     </App>
@@ -736,10 +744,10 @@ In the demo below, leave the field empty and click outside to see the regular an
     data="{{ firstname: undefined, lastname: undefined }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem required="true" label="First Name" bindTo="firstname" />
-    <FormItem 
-      requiredInvalidMessage="Last Name is required!" 
-      required="true" 
-      label="Last Name" 
+    <FormItem
+      requiredInvalidMessage="Last Name is required!"
+      required="true"
+      label="Last Name"
       bindTo="lastname" />
   </Form>
 </App>
@@ -753,10 +761,10 @@ In the demo below, leave the field empty and click outside to see the regular an
         data="{{ firstname: undefined, lastname: undefined }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem required="true" label="First Name" bindTo="firstname" />
-        <FormItem 
-          requiredInvalidMessage="Last Name is required!" 
-          required="true" 
-          label="Last Name" 
+        <FormItem
+          requiredInvalidMessage="Last Name is required!"
+          required="true"
+          label="Last Name"
           bindTo="lastname" />
       </Form>
     </App>

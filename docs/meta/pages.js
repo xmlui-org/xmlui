@@ -179,4 +179,4 @@ export const THEME_VARIABLES_VISUAL_STATES = "/styles-and-themes/theme-variables
 export const THEMES_DEFINITIONS = "/styles-and-themes/themes";
 export const THEMES_REFERENCE = "/styles-and-themes";
 export const THEME_DEVELOPMENT = "/theme-devs";
-export const UNDERSTANDING_XMLUI_ARCHITECTURE = "/xmlui-architecture";
+export const UNDERSTANDING_THE_XMLUI_ARCHITECTURE = "/xmlui-architecture";
