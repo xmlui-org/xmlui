@@ -149,6 +149,9 @@ type ParsedResponse = {
 
 // --- Parses the response of a component markup file
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
+  if(!response.ok){
+    throw new Error(`Failed to fetch ${response.url}`);
+  }
   const code = await response.text();
   const fileId = response.url;
   let { component, errors, erroneousCompoundComponentName } = xmlUiMarkupToComponent(code, fileId);
@@ -171,6 +174,9 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
 
 // --- Parses the response of a code-behind file
 async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
+  if(!response.ok){
+    throw new Error(`Failed to fetch ${response.url}`);
+  }
   const code = await response.text();
   const parser = new Parser(code);
   try {
@@ -591,7 +597,7 @@ function useStandalone(
           try {
             // --- Promises for the component markup files
             const componentPromise = fetchWithoutCache(
-              `/components/${componentPath}.${componentFileExtension}`,
+              `components/${componentPath}.${componentFileExtension}`,
             );
 
             // --- Promises for the component code-behind files
@@ -599,7 +605,7 @@ function useStandalone(
               try {
                 const codeBehindWrapper = await parseCodeBehindResponse(
                   await fetchWithoutCache(
-                    `/components/${componentPath}.${codeBehindFileExtension}`,
+                    `components/${componentPath}.${codeBehindFileExtension}`,
                   ),
                 );
                 if (codeBehindWrapper.hasError) {
