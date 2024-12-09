@@ -1,5 +1,5 @@
 import type { ValidationStatus } from "@components/abstractions";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import type { CSSProperties } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "@components-core/utils/classnames";
@@ -13,7 +13,7 @@ type Props = {
   id?: string;
   type?: "text" | "password";
   value?: string;
-  updateState?: (newState: any) => void;
+  updateState?: UpdateStateFn;
   initialValue?: string;
   style?: CSSProperties;
   maxLength?: number;
@@ -85,7 +85,7 @@ export const TextBox = ({
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    updateState({ value: initialValue });
+    updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   const updateValue = useCallback(

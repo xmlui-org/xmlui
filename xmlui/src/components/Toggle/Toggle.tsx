@@ -58,7 +58,7 @@ export const Toggle = forwardRef(function Toggle ({
   const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
 
   useEffect(() => {
-    updateState({ value: initialValue });
+    updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   const updateValue = useCallback((value: boolean) => {

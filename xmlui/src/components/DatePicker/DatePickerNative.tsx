@@ -163,7 +163,7 @@ export const DatePicker = ({
   }, [isButtonFocused, isMenuFocused, onFocus, onBlur]);
 
   useEffect(() => {
-    updateState({ value: initialValue });
+    updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   const handleSelect = useCallback(

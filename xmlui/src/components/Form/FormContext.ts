@@ -5,6 +5,7 @@ import type {FormAction} from "@components/Form/formActions";
 import type { LabelPosition } from "@components/abstractions";
 
 export type InteractionFlags = {
+  initialized: boolean;
   isDirty: boolean;
   invalidToValid: boolean;
   isValidOnFocus: boolean;

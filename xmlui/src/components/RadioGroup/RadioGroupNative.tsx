@@ -66,7 +66,7 @@ export const RadioGroup = ({
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    updateState({ value: initialValue });
+    updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   // --- Handle the value change events for this input

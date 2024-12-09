@@ -22,6 +22,7 @@ import {
   fieldFocused,
   fieldInitialized,
   fieldLostFocus,
+  fieldRemoved,
 } from "@components/Form/formActions";
 import { TextArea } from "@components/TextArea/TextAreaNative";
 import { useEvent } from "@components-core/utils/misc";
@@ -122,11 +123,20 @@ export const FormItem = memo(function FormItem({
   useValidation(validations, onValidate, value, dispatch, bindTo, customValidationsDebounce);
 
   const onStateChange = useCallback(
-    ({ value }: any) => {
-      dispatch(fieldChanged(bindTo, value));
+    ({ value }: any, options?: any) => {
+      //we already handled the initial value in the useEffect with fieldInitialized(...);
+      if (!options?.initial) {
+        dispatch(fieldChanged(bindTo, value));
+      }
     },
     [bindTo, dispatch],
   );
+
+  useEffect(() => {
+    return () => {
+      dispatch(fieldRemoved(bindTo));
+    };
+  }, [bindTo, dispatch]);
 
   const { validationStatus, isHelperTextShown } = useValidationDisplay(
     bindTo,
