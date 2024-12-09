@@ -1,12 +1,12 @@
 %-DESC-START
 
-You can learn more about this component in the [Using Forms](../learning/using-components/forms.mdx) article.
+You can learn more about this component in the [Forms](../../create-apps/forms.mdx) article.
 
 %-DESC-END
 
 %-PROP-START bindTo
 
-Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data is looks like compared to the one set in `data`.
+Try to enter some kind of text in the input field labelled `Lastname` and submit the form. Note how the submitted data looks like compared to the one set in `data`.
 
 ```ueml copy /bindTo="firstname"/
 <App>
@@ -376,8 +376,8 @@ In the demo below, enter anything that does not look like an email and click out
     data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem pattern="email" bindTo="oldEmail" />
-    <FormItem 
-      patternInvalidMessage="This does not look like an email" 
+    <FormItem
+      patternInvalidMessage="This does not look like an email"
       pattern="email" bindTo="newEmail" />
   </Form>
 </App>
@@ -391,8 +391,8 @@ In the demo below, enter anything that does not look like an email and click out
         data="{{ oldEmail: 'mailto', newEmail: 'mailto' }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem pattern="email" bindTo="oldEmail" />
-        <FormItem 
-          patternInvalidMessage="This does not look like an email" 
+        <FormItem
+          patternInvalidMessage="This does not look like an email"
           pattern="email" bindTo="newEmail" />
       </Form>
     </App>
@@ -446,11 +446,11 @@ Just submitting the form as is also produces the same error.
     data="{{ age: 100, customAge: 100 }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-    <FormItem 
-      minValue="0" 
-      maxValue="99" 
-      rangeInvalidMessage="Out of range!" 
-      bindTo="customAge" 
+    <FormItem
+      minValue="0"
+      maxValue="99"
+      rangeInvalidMessage="Out of range!"
+      bindTo="customAge"
       type="integer" />
   </Form>
 </App>
@@ -464,11 +464,11 @@ Just submitting the form as is also produces the same error.
         data="{{ age: 100, customAge: 100 }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-        <FormItem 
-          minValue="0" 
-          maxValue="99" 
-          rangeInvalidMessage="Out of range!" 
-          bindTo="customAge" 
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidMessage="Out of range!"
+          bindTo="customAge"
           type="integer" />
       </Form>
     </App>
@@ -491,10 +491,10 @@ Just submitting the form as is also produces the same error.
     data="{{ age: 100, customAge: 100 }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-    <FormItem 
-      minValue="0" maxValue="99" 
-      rangeInvalidSeverity="warning" 
-      bindTo="customAge" 
+    <FormItem
+      minValue="0" maxValue="99"
+      rangeInvalidSeverity="warning"
+      bindTo="customAge"
       type="integer" />
   </Form>
 </App>
@@ -508,11 +508,11 @@ Just submitting the form as is also produces the same error.
         data="{{ age: 100, customAge: 100 }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem minValue="0" maxValue="99" bindTo="age" type="integer" />
-        <FormItem 
-          minValue="0" 
-          maxValue="99" 
-          rangeInvalidSeverity="warning" 
-          bindTo="customAge" 
+        <FormItem
+          minValue="0"
+          maxValue="99"
+          rangeInvalidSeverity="warning"
+          bindTo="customAge"
           type="integer" />
       </Form>
     </App>
@@ -560,8 +560,8 @@ In the demo below, enter a password that is not a lowercase string and click out
     data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-    <FormItem 
-      regexInvalidMessage="Password must be all lowercase" 
+    <FormItem
+      regexInvalidMessage="Password must be all lowercase"
       regex="^[a-z]+$" bindTo="newPassword" />
   </Form>
 </App>
@@ -575,8 +575,8 @@ In the demo below, enter a password that is not a lowercase string and click out
         data="{{ oldPassword: 'PASSWORD123', newPassword: 'PASSWORD123' }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem regex="^[a-z]+$" bindTo="oldPassword" />
-        <FormItem 
-          regexInvalidMessage="Password must be all lowercase" 
+        <FormItem
+          regexInvalidMessage="Password must be all lowercase"
           regex="^[a-z]+$" bindTo="newPassword" />
       </Form>
     </App>
@@ -656,10 +656,10 @@ In the demo below, leave the field empty and click outside to see the regular an
     data="{{ firstname: undefined, lastname: undefined }}"
     onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
     <FormItem required="true" label="First Name" bindTo="firstname" />
-    <FormItem 
-      requiredInvalidMessage="Last Name is required!" 
-      required="true" 
-      label="Last Name" 
+    <FormItem
+      requiredInvalidMessage="Last Name is required!"
+      required="true"
+      label="Last Name"
       bindTo="lastname" />
   </Form>
 </App>
@@ -673,10 +673,10 @@ In the demo below, leave the field empty and click outside to see the regular an
         data="{{ firstname: undefined, lastname: undefined }}"
         onSubmit="(toSave) => window.alert(JSON.stringify(toSave))">
         <FormItem required="true" label="First Name" bindTo="firstname" />
-        <FormItem 
-          requiredInvalidMessage="Last Name is required!" 
-          required="true" 
-          label="Last Name" 
+        <FormItem
+          requiredInvalidMessage="Last Name is required!"
+          required="true"
+          label="Last Name"
           bindTo="lastname" />
       </Form>
     </App>
