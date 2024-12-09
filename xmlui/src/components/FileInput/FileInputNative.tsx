@@ -105,7 +105,7 @@ export const FileInput = ({
 
   // --- Initialize the related field with the input's initial value
   useEffect(() => {
-    updateState({ value: _initialValue });
+    updateState({ value: _initialValue }, { initial: true });
   }, [_initialValue, updateState]);
 
   const handleOnBlur = useCallback(() => {

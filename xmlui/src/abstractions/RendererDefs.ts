@@ -68,7 +68,7 @@ export interface RendererContext<TMd extends ComponentMetadata>
  * This function updates the state of a component.
  * @param componentState The new state of the component
  */
-export type UpdateStateFn = (componentState: any) => void;
+export type UpdateStateFn = (componentState: any, options?: any) => void;
 
 /**
  * This type represent the function that extracts the value from a component property

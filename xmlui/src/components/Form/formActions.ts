@@ -6,6 +6,7 @@ export enum FormActionKind {
     FIELD_FOCUSED = "FormActionKind:FIELD_FOCUSED",
     FIELD_VALIDATED = "FormActionKind:FIELD_VALIDATED",
     FIELD_INITIALIZED = "FormActionKind:FIELD_INITIALIZED",
+    FIELD_REMOVED = "FormActionKind:FIELD_REMOVED",
     TRIED_TO_SUBMIT = "FormActionKind:TRIED_TO_SUBMIT",
     BACKEND_VALIDATION_ARRIVED = "FormActionKind:BACKEND_VALIDATION_ARRIVED",
     SUBMITTING = "FormActionKind:SUBMITTING",
@@ -70,6 +71,15 @@ export function fieldValidated(uid: string, validationResult: ValidationResult) 
         payload: {
             uid,
             validationResult,
+        },
+    };
+}
+
+export function fieldRemoved(uid: string){
+    return {
+        type: FormActionKind.FIELD_REMOVED,
+        payload: {
+            uid,
         },
     };
 }

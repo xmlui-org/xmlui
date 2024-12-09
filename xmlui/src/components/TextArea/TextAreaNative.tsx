@@ -111,7 +111,7 @@ export const TextArea = ({
   );
 
   useEffect(() => {
-    updateState({ value: initialValue });
+    updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
   // --- Execute this function when the user copies the value
