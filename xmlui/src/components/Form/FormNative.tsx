@@ -70,7 +70,6 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   const { uid } = action.payload;
   if (uid !== undefined && !state.interactionFlags[uid]) {
     state.interactionFlags[uid] = {
-      initialized: false,
       isDirty: false,
       invalidToValid: false,
       isValidOnFocus: false,
@@ -81,12 +80,9 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      if(state.interactionFlags[uid].initialized){
-        break;
+      if(!state.interactionFlags[uid].isDirty){
+        setByPath(state.subject, uid, action.payload.value);
       }
-      state.interactionFlags[uid].initialized = true;
-      state.interactionFlags[uid].isDirty = false;
-      setByPath(state.subject, uid, action.payload.value);
       break;
     }
     case FormActionKind.FIELD_REMOVED: {
