@@ -16,6 +16,8 @@ import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 const MAX_VALUE = 999999999999999;
 const DECIMAL_SEPARATOR = ".";
 const EXPONENTIAL_SEPARATOR = "e";
+const INT_REGEXP = /^-?\d+$/;
+const FLOAT_REGEXP = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/;
 
 type Props = {
   id?: string;
@@ -227,6 +229,40 @@ export const NumberBox = ({
         break;
 
       default:
+        let newInput = event.data;
+        const selectionStart = event.target.selectionStart;
+
+        // --- Test for multi-character input (perhaps paste)
+        if (event.data?.length > 0) {
+          // --- Decide whether to accept the optional sign character
+          if (newInput.startsWith("-")) {
+            if (selectionStart > 0) {
+              shouldPreventDefault = true;
+              break;
+            }
+          } else if (newInput.startsWith("+")) {
+            shouldPreventDefault = true;
+            break;
+          }
+
+          // --- Replace the selection with the new input
+          const newValue =
+            currentValue.substring(0, selectionStart) +
+            newInput +
+            currentValue.substring(event.target.selectionEnd);
+
+          // --- Check for integers
+          if (integersOnly && !INT_REGEXP.test(newValue)) {
+            // --- The result is not an integer, drop the pasted input
+            shouldPreventDefault = true;
+          } else if (!FLOAT_REGEXP.test(newValue)) {
+            // --- The result is not a loat, drop the pasted input
+            shouldPreventDefault = true;
+          }
+          break;
+        }
+
+        // --- Single character input
         // --- Prevent non-digit characters
         if (event.data < "0" || event.data > "9") {
           shouldPreventDefault = true;
@@ -234,7 +270,7 @@ export const NumberBox = ({
         }
 
         // --- Prevent digits before minus sign
-        if (currentValue.startsWith("-") && event.target.selectionStart === 0) {
+        if (currentValue.startsWith("-") && selectionStart === 0) {
           shouldPreventDefault = true;
           break;
         }
