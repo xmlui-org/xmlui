@@ -1021,7 +1021,7 @@ function renderChild({
   //  </Component>
   //  and then <MyComponent>hey lorem ipsum</MyComponent>
 
-  if(node.type === "Slot" && parentRenderContext.children?.length === 1) {
+  if(node.type === "Slot" && parentRenderContext?.children?.length === 1) {
     if(parentRenderContext.children[0].type === "TextNodeCData" || parentRenderContext.children[0].type === "TextNode") {
       return parentRenderContext.renderChild(parentRenderContext.children);
     }
