@@ -6,7 +6,7 @@ import classnames from "@components-core/utils/classnames";
 import styles from "./ValidationSummary.module.scss";
 import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
 import { Button } from "@components/Button/ButtonNative";
-import { SingleValidationResult, ValidationResult, ValidationSeverity } from "@components/Form/FormContext";
+import type { SingleValidationResult, ValidationResult, ValidationSeverity } from "@components/Form/FormContext";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 

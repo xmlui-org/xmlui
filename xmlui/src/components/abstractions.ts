@@ -117,7 +117,7 @@ export const buttonThemeMd: PropertyValueDescription[] = [
 ] as const;
 
 // --- Available button types
-const buttonTypeValues = ["button", "submit", "reset"] as const;
+export const buttonTypeValues = ["button", "submit", "reset"] as const;
 export const buttonTypeNames = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
 export const buttonTypesMd: PropertyValueDescription[] = [
@@ -143,7 +143,7 @@ export const buttonAriaNames = [...buttonAriaValues];
 export type ButtonAria = (typeof buttonAriaValues)[number];
 
 // --- Available alignment options
-const alignmentOptionValues = ["start", "center", "end"] as const;
+export const alignmentOptionValues = ["start", "center", "end"] as const;
 export const alignmentOptionNames = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
 export const alignmentOptionMd: PropertyValueDescription[] = [
@@ -162,7 +162,7 @@ export const orientationOptionMd: PropertyValueDescription[] = [
 ] as const;
 
 // --- Available icon positions
-const iconPositionValues = ["left", "right", "start", "end"] as const;
+export const iconPositionValues = ["left", "right", "start", "end"] as const;
 export const iconPositionNames = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
 export const iconPositionMd: PropertyValueDescription[] = [
@@ -208,7 +208,7 @@ export const placementMd: PropertyValueDescription[] = [
 ] as const;
 
 // --- Available label positions
-const labelPositionValues = ["top", "right", "left", "bottom"] as const;
+export const labelPositionValues = ["top", "right", "left", "bottom"] as const;
 export const labelPositionNames = [...labelPositionValues];
 export type LabelPosition = (typeof labelPositionValues)[number];
 // TODO: need to add RTL to replace left and right with start and end
