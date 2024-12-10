@@ -83,6 +83,11 @@ export const ListMd = createMetadata({
       "boolean",
       true,
     ),
+    borderCollapse: d(
+      "Collapse items borders",
+      null,
+      "boolean",
+      true)
   },
   contextVars: {
     $item: d(`This property represents the value of an item in the data list.`),
@@ -125,6 +130,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
         groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
         defaultGroups={extractValue(node.props.defaultGroups)}
+        borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
         itemRenderer={
           itemTemplate &&
           ((item) => {

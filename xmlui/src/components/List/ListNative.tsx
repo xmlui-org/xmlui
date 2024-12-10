@@ -32,6 +32,7 @@ import { MemoizedItem } from "@components/container-helpers";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn, RenderChildFn } from "@abstractions/RendererDefs";
 import { useEvent } from "@components-core/utils/misc";
+import classnames from "classnames";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
@@ -58,7 +59,11 @@ const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
         onHeightChanged?.(divElement);
         ref.current = divElement;
       }}
-      className={styles.row}
+      className={classnames({
+        [styles.row]: itemType === RowType.ITEM,
+        [styles.section]: itemType === RowType.SECTION,
+        [styles.sectionFooter]: itemType === RowType.SECTION_FOOTER,
+      })}
       data-list-item-type={itemType}
       data-index={rowIndex}
     >
@@ -231,6 +236,7 @@ type DynamicHeightListProps = {
   groupsInitiallyExpanded?: boolean;
   defaultGroups: Array<string>;
   registerComponentApi?: RegisterComponentApiFn;
+  borderCollapse?: boolean;
 };
 
 // TODO check this out: https://github.com/TanStack/virtual/discussions/195#discussioncomment-11170421
@@ -257,6 +263,7 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
+    borderCollapse = true
   }: DynamicHeightListProps,
   ref,
 ) {
@@ -514,6 +521,10 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
           >
             <div
               data-list-container={true}
+              className={classnames({
+                [styles.sectioned]: groupBy !== undefined,
+                [styles.borderCollapse]: borderCollapse,
+              })}
               style={{
                 position: "absolute",
                 top: 0,
