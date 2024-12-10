@@ -1,6 +1,7 @@
 import type { Locator } from "@playwright/test";
 import { getElementStyle, getFullRectangle, pixelStrToNum } from "@testing/component-test-helpers";
 import { expect as fixtureExpect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { alignmentOptionValues, buttonTypeValues, iconPositionValues } from "@components/abstractions";
 
 // --- Setup
 
@@ -229,7 +230,9 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 //    (use placeholders, omit if needed, need to separate code differently)
 
 // With label
-["left", "right"].forEach((pos) => {
+const iconPositions = iconPositionValues.filter((pos) => pos !== "start" && pos !== "end");
+
+iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
@@ -242,7 +245,7 @@ test("renders if icon is not found and label is present", async ({ createDriver 
   });
 });
 
-["start", "end"].forEach((pos) => {
+iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
@@ -258,7 +261,7 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 });
 
 // Without label
-["left", "right", "start", "end"].forEach((pos) => {
+iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos}`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
@@ -269,7 +272,7 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 });
 
 // With children instead of label
-["left", "right", "start", "end"].forEach((pos) => {
+iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos} of children`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
@@ -281,7 +284,7 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 
 // --- --- contentPosition
 
-["center", "start", "end"].forEach((pos) => {
+alignmentOptionValues.forEach((pos) => {
   test(`label and icon is positioned to the ${pos}`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button width="100%" icon="test" label="hello" contentPosition="${pos}" />`, {
         resources: { "icon.test": "resources/bell.svg" },
@@ -292,7 +295,7 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 
 // --- --- type
 
-["button", "reset", "submit"].forEach((type) => {
+buttonTypeValues.forEach((type) => {
   test(`type="${type}" is reflected in html`, async ({ createDriver }) => {
     const driver = await createDriver(`<Button type="${type}" />`);
     await expect(driver.button).toHaveAttribute("type", type);
