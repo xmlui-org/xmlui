@@ -354,46 +354,6 @@ The `checkbox` type represents a checkbox input component:
   `}
 />
 
-### Combobox
-
-The `combobox` type represents a Combobox input component.
-It combines a textbox with a dropdown list:
-
-```ueml copy {5-10}
-<App>
-  <Form
-    data="{{ title: 'Mr.' }}"
-    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-    <FormItem type="combobox" bindTo="title" label="Title">
-      <Option label="Mr." value="Mr." />
-      <Option label="Mrs." value="Mrs." />
-      <Option label="Ms." value="Ms." />
-      <Option label="Dr." value="Dr." />
-    </FormItem>
-  </Form>
-</App>
-```
-
-<Playground
-  name="Example: Combobox"
-  height={240}
-  previewOnly
-  app={`
-  <App>
-    <Form
-      data="{{ title: 'Mr.' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="combobox" bindTo="title" label="Title">
-        <Option label="Mr." value="Mr." />
-        <Option label="Mrs." value="Mrs." />
-        <Option label="Ms." value="Ms." />
-        <Option label="Dr." value="Dr." />
-      </FormItem>
-    </Form>
-  </App>
-  `}
-/>
-
 ### DatePicker
 
 The `datePicker` type represents a date picker input component:
@@ -473,85 +433,6 @@ The `integer` type represents an input component for integer values:
       data="{{ age: 30 }}"
       onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
       <FormItem type="integer" bindTo="age" label="Age" />
-    </Form>
-  </App>
-  `}
-/>
-
-### MultiCombobox
-
-The `multiCombobox` type represents a dropdown list with selectable items which can be filtered using the input field of the input control (similarly to the [Combobox](#combobox)).
-You can select multiple items as well:
-
-```ueml copy {5-10}
-<App>
-  <Form
-    data="{{ size: 'xs' }}"
-    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-    <FormItem type="multiCombobox" bindTo="size" label="Box size">
-      <Option label="Extra small" value="xs" />
-      <Option label="Small" value="sm" />
-      <Option label="Medium" value="md" />
-      <Option label="Large" value="lg" />
-    </FormItem>
-  </Form>
-</App>
-```
-
-<Playground
-  name="Example: MultiCombobox"
-  previewOnly
-  height={240}
-  app={`
-  <App>
-    <Form
-      data="{{ size: 'xs' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="multiCombobox" bindTo="size" label="Box size">
-        <Option label="Extra small" value="xs" />
-        <Option label="Small" value="sm" />
-        <Option label="Medium" value="md" />
-        <Option label="Large" value="lg" />
-      </FormItem>
-    </Form>
-  </App>
-  `}
-/>
-
-### MultiSelect
-
-The `multiSelect` type represents a dropdown list with selectable items. You can select multiple of these items:
-
-```ueml copy {5-10}
-<App>
-  <Form
-    data="{{ size: 'xs' }}"
-    onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-    <FormItem type="multiSelect" bindTo="size" label="Box size">
-      <Option label="Extra small" value="xs" />
-      <Option label="Small" value="sm" />
-      <Option label="Medium" value="md" />
-      <Option label="Large" value="lg" />
-    </FormItem>
-  </Form>
-</App>
-```
-
-<Playground
-  name="Example: MultiSelect"
-  previewOnly
-  height={240}
-  app={`
-  <App>
-    <Form
-      data="{{ size: 'xs' }}"
-      onSubmit="(toSave) => toast.success(JSON.stringify(toSave))">
-      <FormItem type="multiSelect" bindTo="size" label="Box size">
-        <Option label="Extra small" value="xs" />
-        <Option label="Small" value="sm" />
-        <Option label="Medium" value="md" />
-        <Option label="Large" value="lg" />
-      </FormItem>
     </Form>
   </App>
   `}
