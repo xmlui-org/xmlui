@@ -61,15 +61,15 @@ class ButtonDriver extends ComponentDriver {
     return this.locator;
   }
 
-  // Ensure we either get rtl or ltr strings
-  async getWritingDirection() {
+  // Ensure we either get rtl or ltr strings - Pending approval
+  /* async getWritingDirection() {
     // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir
     const attribute = await this.locator.getAttribute("dir");
     if (attribute && attribute !== "auto") return attribute as "rtl" | "ltr";
     const style = await this.locator.evaluate((element) => window.getComputedStyle(element).direction);
     // Default is ltr: https://developer.mozilla.org/en-US/docs/Web/CSS/direction#values
     return style === "rtl" ? "rtl" : "ltr";
-  }
+  } */
 
   // NOTE: It may be prudent to target the text nodes and wrap them in a Locator-like, very basic class
   // to better handle them and provide supporting methods such as dimensions (via getClientRects?)
@@ -242,21 +242,6 @@ iconPositions.forEach((pos) => {
     const iconStart = (await getFullRectangle(driver.getFirstNonTextNode()))[pos];
   
     expect(contentStart).toEqualWithTolerance(iconStart);
-  });
-});
-
-iconPositions.forEach((pos) => {
-  test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
-      resources: { "icon.test": "resources/bell.svg" },
-    });
-    const direction = await driver.getWritingDirection();
-
-    const buttonDimensions = await getFullRectangle(driver.button);
-    const contentLeft = pixelStrToNum(buttonDimensions.left + await getElementStyle(driver.button, "padding-left"));
-    const iconLeft = (await getFullRectangle(driver.getFirstNonTextNode())).left;
-  
-    expect(contentLeft).toEqualWithTolerance(iconLeft);  
   });
 });
 
