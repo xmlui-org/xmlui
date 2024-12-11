@@ -42,7 +42,6 @@ import { iconComponentRenderer } from "@components/Icon/Icon";
 import { itemsComponentRenderer } from "@components/Items/Items";
 import { selectionStoreComponentRenderer } from "@components/SelectionStore/SelectionStore";
 import { imageComponentRenderer } from "@components/Image/Image";
-// import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import { pageMetaTitleComponentRenderer } from "@components/PageMetaTitle/PageMetaTitle";
 import { progressBarComponentRenderer } from "@components/ProgressBar/ProgressBar";
 import {
@@ -129,7 +128,6 @@ import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
-import { pdfComponentRenderer } from "@components/Pdf/LazyPdf";
 import { tabItemComponentRenderer } from "@components/Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
 import { accordionItemComponentRenderer } from "@components/Accordion/AccordionItem";
@@ -142,7 +140,8 @@ import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
 import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
 import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
-import {autoCompleteComponentRenderer} from "@components/AutoComplete/AutoComplete";
+import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
+import type StandaloneComponentManager from "../StandaloneComponentManager";
 
 // Properties used by the ComponentProvider
 type ComponentProviderProps = {
@@ -151,6 +150,8 @@ type ComponentProviderProps = {
 
   // Definition of contributors
   contributes: ContributesDefinition;
+
+  componentManager: StandaloneComponentManager;
 };
 
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
@@ -164,8 +165,13 @@ export class ComponentRegistry {
   private actionFns = new Map<string, ActionFunction>();
   // --- The pool of available loader renderers
   private loaders = new Map<string, LoaderRenderer<any>>();
+  private componentManager: StandaloneComponentManager = undefined;
 
-  constructor(contributes: ContributesDefinition = {}) {
+  constructor(
+    contributes: ContributesDefinition = {},
+    componentManager?: StandaloneComponentManager,
+  ) {
+    this.componentManager = componentManager;
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerComponentRenderer(stackComponentRenderer);
       this.registerComponentRenderer(vStackComponentRenderer);
@@ -308,10 +314,6 @@ export class ComponentRegistry {
       this.registerComponentRenderer(imageComponentRenderer);
     }
 
-    if (process.env.VITE_USED_COMPONENTS_Pdf !== "false") {
-      this.registerComponentRenderer(pdfComponentRenderer);
-    }
-
     if (process.env.VITE_USER_COMPONENTS_XmluiCodeHightlighter !== "false") {
       this.registerComponentRenderer(codeComponentRenderer);
     }
@@ -404,6 +406,8 @@ export class ComponentRegistry {
     this.registerLoaderRenderer(externalDataLoaderRenderer);
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
+
+    this.componentManager?.subscribeToRegistrations(this.registerComponentRenderer);
   }
 
   get componentThemeVars() {
@@ -447,7 +451,11 @@ export class ComponentRegistry {
     );
   }
 
-  private registerComponentRenderer({ type, renderer, metadata: hints }: ComponentRendererDef) {
+  private registerComponentRenderer = ({
+    type,
+    renderer,
+    metadata: hints,
+  }: ComponentRendererDef) => {
     this.pool.set(type, { renderer, descriptor: hints });
     if (hints?.themeVars) {
       Object.keys(hints.themeVars).forEach((key) => this.themeVars.add(key));
@@ -455,7 +463,7 @@ export class ComponentRegistry {
     if (hints?.defaultThemeVars) {
       merge(this.defaultThemeVars, hints?.defaultThemeVars);
     }
-  }
+  };
 
   private registerCompoundComponentRenderer({
     compoundComponentDef,
@@ -494,19 +502,30 @@ export class ComponentRegistry {
   private registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
   }
+
+  public destroy() {
+    this.componentManager?.unSubscribeFromRegistrations(this.registerComponentRenderer);
+  }
 }
 
 // This React component provides a context in which components can access the component registry. The
 // component takes care that child component are rendered only when the component registry is initialized
 // (filled with the definition of available components).
-export function ComponentProvider({ children, contributes }: ComponentProviderProps) {
+export function ComponentProvider({
+  children,
+  contributes,
+  componentManager,
+}: ComponentProviderProps) {
   const [componentRegistry, setComponentRegistry] = useState(
-    () => new ComponentRegistry(contributes),
+    () => new ComponentRegistry(contributes, componentManager),
   );
   //sync up the changed contributes (HMR)
   useEffect(() => {
-    setComponentRegistry(new ComponentRegistry(contributes));
-  }, [contributes]);
+    setComponentRegistry((prev) => {
+      prev.destroy();
+      return new ComponentRegistry(contributes, componentManager);
+    });
+  }, [componentManager, contributes]);
 
   return (
     <ViewComponentRegistryContext.Provider value={componentRegistry}>

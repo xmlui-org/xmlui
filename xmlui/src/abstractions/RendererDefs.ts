@@ -223,7 +223,7 @@ export type CompoundComponentRendererInfo = {
  * Components must be registered with a component registry so the engine can use them. This type
  * collects the information held by the registry.
  */
-export type ComponentRendererDef = {
+export type ComponentRendererDef<T extends ComponentDef = any> = {
   /**
    * The component's type identifier. In the markup, the component must use this name to be recognized.
    */
@@ -232,7 +232,7 @@ export type ComponentRendererDef = {
   /**
    * This function renders the component from its definition to its React representation.
    */
-  renderer: ComponentRendererFn<any>;
+  renderer: ComponentRendererFn<T>;
 
   /**
    * The metadata to use when rendering the component

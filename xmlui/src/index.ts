@@ -15,11 +15,12 @@ import { toCssVar } from "./parsers/style-parser/StyleParser";
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
-import type { RendererContext } from "@abstractions/RendererDefs";
+import type { ComponentRendererDef, RendererContext } from "@abstractions/RendererDefs";
 
 export type {
   ThemeDefinition,
-  ComponentDef as ComponentDefNew,
+  ComponentDef,
+  ComponentRendererDef,
   CompoundComponentDef,
   ComponentLike,
   StandaloneAppDescription,

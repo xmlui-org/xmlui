@@ -5,6 +5,7 @@ import { start } from "./start";
 import { preview } from "./preview";
 import { argv } from "yargs";
 import AdmZip from "adm-zip";
+import { buildLib } from "./build-lib";
 
 process.on("unhandledRejection", (err) => {
   throw err;
@@ -59,6 +60,10 @@ switch (script) {
       flatDist: getBoolArg(flatDist, prod ? true : undefined),
       withLegacyParser: getBoolArg(withLegacyParser),
     });
+    break;
+  }
+  case "build-lib": {
+    buildLib({});
     break;
   }
   case "start": {

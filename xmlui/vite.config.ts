@@ -1,3 +1,4 @@
+// @ts-ignore
 import path from "path";
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
@@ -16,7 +17,7 @@ export default ({ mode }) => {
     case "standalone": {
       lib = {
         entry: [path.resolve("src", "index-standalone.ts")],
-        name: "xmlui-standalone",
+        name: "xmlui",
         formats: ["umd"],
         fileName: (format) => `xmlui-standalone.${format}.js`,
       };
@@ -30,6 +31,7 @@ export default ({ mode }) => {
           VITE_USER_COMPONENTS_XmluiCodeHightlighter: "false",
           VITE_USED_COMPONENTS_Tree: "false",
           VITE_USER_COMPONENTS_Inspect: "false",
+          VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`
         },
       };
       break;
