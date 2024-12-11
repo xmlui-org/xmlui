@@ -18,6 +18,7 @@ const DECIMAL_SEPARATOR = ".";
 const EXPONENTIAL_SEPARATOR = "e";
 const INT_REGEXP = /^-?\d+$/;
 const FLOAT_REGEXP = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+const DEFAULT_STEP = 1;
 
 type Props = {
   id?: string;
@@ -88,7 +89,7 @@ export const NumberBox = ({
   min = Math.max(zeroOrPositive ? 0 : -MAX_VALUE, min);
 
   // Step must be an integer since floating point arithmetic needs a deeper dive.
-  const _step = toUsableNumber(step, true) || 1;
+  const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
 
   const inputRef = useRef<HTMLInputElement>(null);
   const upButton = useRef<HTMLButtonElement>(null);
@@ -506,8 +507,6 @@ function clamp(value: number, min: number, max: number) {
   return clamped;
 }
 
-type empty = null | undefined;
-
 function isEmptyLike(value: string | number | empty): value is empty {
   return typeof value === "undefined" || value === null || value === "";
 }
@@ -554,3 +553,5 @@ function useLongPress(elementRef: HTMLElement | null, action: () => void, delay:
     };
   }, [elementRef, action, delay]);
 }
+
+type empty = null | undefined;
