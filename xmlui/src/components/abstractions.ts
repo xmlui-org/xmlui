@@ -5,10 +5,11 @@ import type { CSSProperties, ReactNode } from "react";
  * Several components offer a list of options to select from. This type describes such an option.
  */
 export type Option = {
-  label: string;
+  label: string | ReactNode;
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
+  keywords?: string[];
   renderer?: (item: any) => ReactNode;
 };
 

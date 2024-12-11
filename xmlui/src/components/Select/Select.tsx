@@ -1,7 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "@components/Select/Select.module.scss";
-import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import {
   dPlaceholder,
@@ -13,7 +12,6 @@ import {
   dReadonly,
   dEnabled,
   dValidationStatus,
-  dComponent,
   dDidChange,
   dGotFocus,
   dLostFocus,
@@ -29,13 +27,6 @@ import {
 import { Select } from "@components/Select/SelectNative";
 
 const COMP = "Select";
-
-const defaultOptionRenderer = {
-  type: "Text",
-  props: {
-    value: "{$item.label}",
-  },
-};
 
 export const SelectMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
@@ -54,10 +45,6 @@ export const SelectMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-    optionTemplate: dComponent(
-      `This property enables the customization of list items. To access the attributes of ` +
-        `a list item use the \`$item\` context variable.`,
-    ),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
@@ -147,15 +134,6 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionRenderer={(item) => {
-          return (
-            <MemoizedItem
-              node={node.props.optionTemplate || (defaultOptionRenderer as any)}
-              item={item}
-              renderChild={renderChild}
-            />
-          );
-        }}
       >
         {renderChild(node.children)}
       </Select>
