@@ -226,7 +226,7 @@ export const triggerPositionNames = [...triggerPositionValues];
 export type TriggerPosition = (typeof triggerPositionValues)[number];
 
 // --- The state of a validated UI element
-const validationStatusValues = ["none", "error", "warning", "valid"] as const;
+export const validationStatusValues = ["none", "error", "warning", "valid"] as const;
 export const validationStatusNames = [...validationStatusValues];
 export type ValidationStatus = (typeof validationStatusValues)[number];
 export const validationStatusMd: PropertyValueDescription[] = [
