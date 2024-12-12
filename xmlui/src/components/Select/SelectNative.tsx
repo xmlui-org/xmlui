@@ -72,6 +72,10 @@ type SelectProps = {
   labelBreak?: boolean;
 };
 
+function defaultRenderer(item: Option) {
+  return <div>{item.label}</div>;
+}
+
 function SimpleSelect(props: {
   value: SingleValueType;
   onValueChange: (selectedValue: SingleValueType) => void;
@@ -187,6 +191,7 @@ export function Select({
   onBlur = noop,
   registerComponentApi,
   emptyListTemplate,
+  optionRenderer = defaultRenderer,
   layout,
   dropdownHeight,
   children,
@@ -306,9 +311,10 @@ export function Select({
     () => ({
       multiSelect,
       value,
+      optionRenderer,
       onChange: toggleOption,
     }),
-    [multiSelect, toggleOption, value],
+    [multiSelect, toggleOption, value, optionRenderer],
   );
 
   return (
@@ -456,7 +462,7 @@ export function Select({
 export const ComboboxOption = (option: Option) => {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
-  const { value: selectedValue, onChange, multi } = useSelect();
+  const { value: selectedValue, onChange, multi, optionRenderer } = useSelect();
   const selected =
     Array.isArray(selectedValue) && multi ? selectedValue.includes(value) : selectedValue === value;
 
@@ -473,7 +479,7 @@ export const ComboboxOption = (option: Option) => {
       data-state={selected ? "checked" : undefined}
       keywords={keywords}
     >
-      {label}
+      {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
@@ -505,6 +511,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
   (option, ref) => {
     const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
+    const { optionRenderer } = useSelect();
 
     useLayoutEffect(() => {
       onOptionAdd(option);
@@ -513,7 +520,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 
     return (
       <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
-        <SelectItemText>{label}</SelectItemText>
+        <SelectItemText>{optionRenderer({ value, label })}</SelectItemText>
         <span className={styles.selectItemIndicator}>
           <SelectItemIndicator>
             <Icon name="checkmark" />

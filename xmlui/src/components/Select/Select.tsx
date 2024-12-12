@@ -23,8 +23,10 @@ import {
   dLabelWidth,
   dLabelBreak,
   dValue,
+  dComponent,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
+import { MemoizedItem } from "@components/container-helpers";
 
 const COMP = "Select";
 
@@ -45,6 +47,10 @@ export const SelectMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
+    optionTemplate: dComponent(
+      `This property enables the customization of list items. To access the attributes of ` +
+        `a list item use the \`$item\` context variable.`,
+    ),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
@@ -134,6 +140,19 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </Select>
