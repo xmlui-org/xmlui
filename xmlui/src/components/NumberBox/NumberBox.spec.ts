@@ -138,11 +138,19 @@ test.skip("does not render spinbox if set to false", async ({ createDriver }) =>
 
 test.skip("clicking spinbox up-arrow adds default step value to input", async ({ createDriver }) => {});
 
+test.skip("pressing up arrow adds default step value to input", async ({ createDriver }) => {});
+
 test.skip("clicking spinbox down-arrow subtracts default step value from input", async ({ createDriver }) => {});
+
+test.skip("pressing down arrow adds default step value to input", async ({ createDriver }) => {});
 
 test.skip("clicking spinbox up-arrow that would overflow max value does not add value", async ({ createDriver }) => {});
 
+test.skip("pressing the up arrow that would overflow max value does not add value", async ({ createDriver }) => {});
+
 test.skip("clicking spinbox down-arrow that would underflow min value does not subtract value", async ({ createDriver }) => {});
+
+test.skip("pressing the down arrow that would underflow min value does not subtract value", async ({ createDriver }) => {});
 
 // --- --- step
 
@@ -236,3 +244,37 @@ test.skip("setValue does not update input if field is disabled", async ({ create
 
 // TODO: do an array for invalid input values?
 test.skip("setValue does not update input if value is invalid", async ({ createDriver }) => {});
+
+// --- testing for input types
+
+test.skip("field accepts empty input", async ({ createDriver }) => {
+  // value is assigned undefined or null if this is the case
+});
+
+test.skip("entering multiple 0s only results in one 0", async ({ createDriver }) => {});
+
+test.skip("copying multiple 0s only results in one 0", async ({ createDriver }) => {});
+
+test.skip("entering: no leading 0s are allowed", async ({ createDriver }) => {});
+
+test.skip("copying: no leading 0s are allowed", async ({ createDriver }) => {});
+
+test.skip("minus sign is rendered at the start of the field if prompt is at the start", async ({ createDriver }) => {});
+
+test.skip("minus sign is rendered at the start of the field if prompt is at any point in input value", async ({ createDriver }) => {});
+
+test.skip("minus sign is removed if user inputs a second minus sign", async ({ createDriver }) => {});
+
+test.skip("minus sign is removed if user copies a second minus sign", async ({ createDriver }) => {});
+
+test.skip("adding floating point to an integer results in a float", async ({ createDriver }) => {});
+
+test.skip("adding floating point to a float replaces the last point", async ({ createDriver }) => {});
+
+test.skip("adding floating point to the beginning of an integer adds a leading 0", async ({ createDriver }) => {});
+
+test.skip("adding floating point to the end of an integer adds a trailing 0", async ({ createDriver }) => {});
+
+test.skip("adding floating point to the beginning of 0 does adds a leading 0", async ({ createDriver }) => {});
+
+test.skip("adding floating point to the end of 0 adds a trailing 0", async ({ createDriver }) => {});
