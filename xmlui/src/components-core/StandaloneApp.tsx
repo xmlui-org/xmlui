@@ -60,7 +60,7 @@ type StandaloneAppProps = {
 
   // --- Custom components to be added
   components?: ComponentRendererDef[];
-  componentManager: StandaloneComponentManager;
+  componentManager?: StandaloneComponentManager;
 };
 
 /**
