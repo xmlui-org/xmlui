@@ -20,19 +20,3 @@ export function createUrlWithQueryParams(
   }
   return to;
 }
-
-/**
- * Filters the options matching with the specified query string
- * @param query Query string to filter the options
- * @param options Options to filter
- * @returns List of matching options
- */
-export function filterOptions(query: string, options: Option[]) {
-  return (
-    (query === ""
-      ? options
-      : options?.filter((option) => {
-          return option.label.toLowerCase().includes(query.toLowerCase());
-        })) || EMPTY_ARRAY
-  );
-}

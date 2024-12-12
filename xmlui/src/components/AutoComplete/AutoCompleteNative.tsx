@@ -124,7 +124,7 @@ export function AutoComplete({
 
   useEffect(() => {
     if (!multi) {
-      setInputValue(Array.from(options).find((o) => o.value === value)?.label || "");
+      setInputValue(Array.from(options).find((o) => o.value === value)?.labelText || "");
     }
   }, [multi, options, value]);
 
@@ -227,7 +227,15 @@ export function AutoComplete({
       <OptionTypeProvider Component={HiddenOption}>
         <OptionContext.Provider value={optionContextValue}>
           {children}
-          <Cmd ref={dropdownRef} className={styles.command}>
+          <Cmd
+            ref={dropdownRef}
+            className={styles.command}
+            filter={(value, search, keywords) => {
+              const extendedValue = value + " " + keywords.join(" ");
+              if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
+              return 0;
+            }}
+          >
             <div
               onClick={() => {
                 if (!enabled) return;
@@ -328,12 +336,13 @@ export function AutoComplete({
                   <CmdEmpty>{emptyListNode}</CmdEmpty>
                   <CreatableItem />
                   <CmdGroup>
-                    {Array.from(options).map(({ value, label, enabled }) => (
+                    {Array.from(options).map(({ value, label, enabled, keywords }) => (
                       <AutoCompleteOption
                         key={value}
                         value={value}
                         label={label}
                         enabled={enabled}
+                        keywords={keywords}
                       />
                     ))}
                   </CmdGroup>
@@ -384,7 +393,7 @@ function CreatableItem() {
   return <span style={{ display: "none" }} />;
 }
 
-function AutoCompleteOption({ value, label, enabled = true }: Option) {
+function AutoCompleteOption({ value, label, enabled = true, keywords }: Option) {
   const id = useId();
   const { value: selectedValue, onChange, optionRenderer, multi } = useAutoComplete();
   const selected = multi ? selectedValue?.includes(value) : selectedValue === value;
@@ -404,7 +413,7 @@ function AutoCompleteOption({ value, label, enabled = true }: Option) {
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
-      keywords={[label]}
+      keywords={keywords}
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
