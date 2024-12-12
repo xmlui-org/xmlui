@@ -1,6 +1,6 @@
 {
   "name": "xmlui",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
@@ -70,7 +70,6 @@
     "monaco-editor": "0.34.1",
     "msw": "2.0.1",
     "oidc-client-ts": "2.1.0",
-    "pdfjs-dist": "2.12.313",
     "react": "18.2.0",
     "react-apexcharts": "1.4.1",
     "react-currency-input-field": "3.6.9",
@@ -85,7 +84,6 @@
     "react-markdown": "9.0.1",
     "react-measure": "2.5.2",
     "react-oidc-context": "2.2.0",
-    "react-pdf": "5.7.2",
     "react-popper": "2.3.0",
     "react-resizable-panels": "2.0.19",
     "react-router-dom": "6.23.0",

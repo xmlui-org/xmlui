@@ -38,6 +38,7 @@ import {
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
+import StandaloneComponentManager from "../StandaloneComponentManager";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -59,6 +60,7 @@ type StandaloneAppProps = {
 
   // --- Custom components to be added
   components?: ComponentRendererDef[];
+  componentManager: StandaloneComponentManager;
 };
 
 /**
@@ -75,12 +77,13 @@ function StandaloneApp({
   debugEnabled = true,
   runtime,
   components: customComponents,
+  componentManager
 }: StandaloneAppProps) {
   const servedFromSingleFile = useMemo(() => {
     return typeof window !== "undefined" && window.location.href.startsWith("file");
   }, []);
 
-  const standaloneApp = useStandalone(appDef, runtime);
+  const standaloneApp = useStandalone(appDef, runtime, componentManager);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -131,6 +134,7 @@ function StandaloneApp({
         resources={resources}
         resourceMap={resourceMap}
         sources={sources}
+        componentManager={componentManager}
         contributes={{
           compoundComponents: components,
           components: customComponents,
@@ -403,6 +407,7 @@ async function fetchWithoutCache(url: string) {
 function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
+  componentManager?: StandaloneComponentManager
 ) {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
@@ -590,6 +595,8 @@ function useStandalone(
       let componentsToLoad = collectMissingComponents(
         entryPointWithCodeBehind,
         componentsWithCodeBehinds,
+        undefined,
+        componentManager
       );
 
       // --- Try to load the components referenced in the markup, collect those that failed
@@ -659,6 +666,7 @@ function useStandalone(
           entryPointWithCodeBehind,
           componentsWithCodeBehinds,
           componentsFailedToLoad,
+          componentManager
         );
       }
 
@@ -695,9 +703,10 @@ function collectMissingComponents(
   entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
+  componentManager?: StandaloneComponentManager
 ) {
   // --- Add the discovered compound components to the registry
-  const componentRegistry = new ComponentRegistry({ compoundComponents: components });
+  const componentRegistry = new ComponentRegistry({ compoundComponents: components }, componentManager);
 
   // --- Check the xmlui markup. This check will find all unloaded components
   const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
@@ -718,6 +727,8 @@ function collectMissingComponents(
     },
   });
 
+  componentRegistry.destroy();
+
   // --- Collect all missing components.Omit the components that failed to load
   return new Set(
     result
@@ -731,10 +742,15 @@ function collectMissingComponents(
 function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
   const logged = useRef(false);
   useEffect(() => {
-    if (standaloneApp?.name && !logged.current) {
-      console.log(`${standaloneApp.name} version: `, process.env.VITE_APP_VERSION || "dev");
-      logged.current = true;
+    if(logged.current){
+      return;
     }
+    logged.current = true;
+    let log = `XMLUI version: ${process.env.VITE_XMLUI_VERSION || 'dev'}`;
+    if (standaloneApp?.name) {
+      log += `; ${standaloneApp.name} version: ${process.env.VITE_APP_VERSION || "dev"}`;
+    }
+    console.log(log);
   }, [standaloneApp?.name]);
 }
 
@@ -748,7 +764,7 @@ let contentRoot: Root | null = null;
  * @param components The related component's runtime representation
  * @returns The content's root element
  */
-export function startApp(runtime?: any, components?: ComponentRendererDef[]) {
+export function startApp(runtime: any, components: ComponentRendererDef[] | undefined, componentManager: StandaloneComponentManager) {
   let rootElement: HTMLElement | null = document.getElementById("root");
   if (!rootElement) {
     rootElement = document.createElement("div");
@@ -758,7 +774,7 @@ export function startApp(runtime?: any, components?: ComponentRendererDef[]) {
   if (!contentRoot) {
     contentRoot = ReactDOM.createRoot(rootElement);
   }
-  contentRoot.render(<StandaloneApp runtime={runtime} components={components} />);
+  contentRoot.render(<StandaloneApp runtime={runtime} components={components} componentManager={componentManager}/>);
   return contentRoot;
 }
 

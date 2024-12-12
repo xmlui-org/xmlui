@@ -1,0 +1,43 @@
+{
+  "name": "xmlui-pdf",
+  "version": "0.1",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "build:demo": "xmlui build",
+    "preview": "xmlui preview",
+    "build": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch"
+  },
+  "dependencies": {
+    "pdfjs-dist": "^4.4.168",
+    "react-pdf": "^9.1.1"
+  },
+  "devDependencies": {
+    "@types/react": "18.2.23",
+    "@types/react-dom": "18.2.7",
+    "classnames": "^2.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-pdf.js",
+  "module": "./dist/xmlui-pdf.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-pdf.mjs",
+      "require": "./dist/xmlui-pdf.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

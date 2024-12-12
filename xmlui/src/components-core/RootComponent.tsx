@@ -52,6 +52,7 @@ import {
   useIsWindowFocused,
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
+import StandaloneComponentManager from "../StandaloneComponentManager";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -598,7 +599,8 @@ function AppRoot({
   servedFromSingleFile,
   resourceMap,
   sources,
-}: RootComponentProps) {
+  componentManager
+}: RootComponentProps & {componentManager: StandaloneComponentManager}) {
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -627,7 +629,7 @@ function AppRoot({
   resetErrors();
 
   return (
-    <ComponentProvider contributes={contributes}>
+    <ComponentProvider contributes={contributes} componentManager={componentManager}>
       <RootComponent
         resourceMap={resourceMap}
         apiInterceptor={apiInterceptor}

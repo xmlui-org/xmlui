@@ -6,6 +6,7 @@
     "./xmlui",
     "./tests",
     "./docs",
-    "./tools/create-app"
+    "./tools/create-app",
+    "./packages/*"
   ]
 }
