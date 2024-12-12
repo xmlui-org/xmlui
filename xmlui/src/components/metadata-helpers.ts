@@ -40,14 +40,6 @@ export function dIndeterminate(): ComponentPropertyMetadata {
   };
 }
 
-export function dLabelId(): ComponentPropertyMetadata {
-  return {
-    description:
-      `You can specify the identifier of a component acting as its label. When you click the label, ` +
-      `the component behaves as you clicked it.`,
-  };
-}
-
 export function dLabel(): ComponentPropertyMetadata {
   return {
     description: `This property sets the label of the component.`,
