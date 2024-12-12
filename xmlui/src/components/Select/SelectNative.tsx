@@ -491,6 +491,7 @@ export function HiddenOption(option: Option) {
   const opt: Option = useMemo(() => {
     return {
       ...option,
+      labelText: node?.textContent ?? "",
       keywords: [node?.textContent ?? ""],
     };
   }, [option, node]);

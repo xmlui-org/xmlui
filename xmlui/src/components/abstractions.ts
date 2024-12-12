@@ -6,6 +6,7 @@ import type { CSSProperties, ReactNode } from "react";
  */
 export type Option = {
   label: string | ReactNode;
+  labelText?: string;
   value: string;
   enabled?: boolean;
   style?: CSSProperties;
