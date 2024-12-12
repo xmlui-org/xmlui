@@ -101,7 +101,6 @@ export function AutoComplete({
 
   const toggleOption = useCallback(
     (selectedValue: string) => {
-      console.log("Kacsa", selectedValue);
       if (multi) {
         setInputValue("");
       } else {
@@ -118,7 +117,6 @@ export function AutoComplete({
           ? null
           : selectedValue;
 
-      console.log("hehe", newSelectedValue);
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
     },
@@ -127,7 +125,6 @@ export function AutoComplete({
 
   useEffect(() => {
     if (!multi) {
-      console.log("hahahaha", options);
       setInputValue(Array.from(options).find((o) => o.value === value)?.labelText || "");
     }
   }, [multi, options, value]);
