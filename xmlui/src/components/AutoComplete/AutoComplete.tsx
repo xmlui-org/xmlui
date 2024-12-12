@@ -6,7 +6,6 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import {
   dPlaceholder,
   dInitialValue,
-  dLabelId,
   dMaxLength,
   dAutoFocus,
   dRequired,
@@ -20,6 +19,7 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
+  dInternal,
 } from "@components/metadata-helpers";
 import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
 
@@ -33,7 +33,6 @@ export const AutoCompleteMd = createMetadata({
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
-    labelId: dLabelId(),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),

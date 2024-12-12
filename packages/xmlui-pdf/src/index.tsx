@@ -1,23 +1,21 @@
-import type { ComponentDef } from "xmlui";
+import { createComponentRenderer, createMetadata, d, parseScssVar } from "xmlui";
 import { LazyPdf } from "./LazyPdfNative";
-import type { ComponentRendererFn } from "xmlui/src/abstractions/RendererDefs";
+import styles from "./Pdf.module.scss";
 
-interface Pdf extends ComponentDef {
-  type: "Pdf";
+const COMP = "Pdf";
+const PdfMd = createMetadata({
+  description: `The \`${COMP}\` component provides a read-only preview of a pdf document's contents.`,
   props: {
-    src: string;
-  };
-  events: {
-    onClick: string;
-  };
-}
+    src: d(`This property defines the source URL of the pdf document stream to display.`),
+  },
+  status: "in progress",
+  themeVars: parseScssVar(styles.themeVars),
+  defaultThemeVars: {
+    "shadow-page-Pdf": "$shadow-md",
+    "gap-pages-Pdf": "$space-4",
+  }
+});
 
-const renderer: ComponentRendererFn<Pdf> = ({ node, extractValue }) => {
-  return <LazyPdf src={extractValue(node.props!.src)} />;
-};
-
-export default {
-  type: "Pdf",
-  renderer: renderer,
-  metadata: {},
-};
+export default createComponentRenderer(COMP, PdfMd, ({ node, extractValue }) => {
+  return <LazyPdf src={extractValue(node.props.src)} />;
+});

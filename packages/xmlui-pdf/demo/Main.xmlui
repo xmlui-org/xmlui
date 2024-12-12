@@ -1,4 +1,4 @@
 <App>
   helloka
-  <Pdf src="https://s28.q4cdn.com/392171258/files/doc_downloads/test.pdf"/>
+  <Pdf src="https://api.printnode.com/static/test/pdf/multipage.pdf"/>
 </App>

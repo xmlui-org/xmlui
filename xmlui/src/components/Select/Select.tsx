@@ -5,7 +5,6 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import {
   dPlaceholder,
   dInitialValue,
-  dLabelId,
   dMaxLength,
   dAutoFocus,
   dRequired,
@@ -36,7 +35,6 @@ export const SelectMd = createMetadata({
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
-    labelId: dLabelId(),
     maxLength: dMaxLength(),
     autoFocus: dAutoFocus(),
     required: dRequired(),

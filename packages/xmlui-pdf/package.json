@@ -1,6 +1,6 @@
 {
   "name": "xmlui-pdf",
-  "version": "0.1",
+  "version": "0.1.2",
   "sideEffects": false,
   "type": "module",
   "scripts": {
@@ -8,7 +8,8 @@
     "build:demo": "xmlui build",
     "preview": "xmlui preview",
     "build": "xmlui build-lib",
-    "build-watch": "xmlui build-lib --watch"
+    "build-watch": "xmlui build-lib --watch",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "pdfjs-dist": "^4.4.168",
