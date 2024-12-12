@@ -600,7 +600,7 @@ function AppRoot({
   resourceMap,
   sources,
   componentManager
-}: RootComponentProps & {componentManager: StandaloneComponentManager}) {
+}: RootComponentProps & {componentManager?: StandaloneComponentManager}) {
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
