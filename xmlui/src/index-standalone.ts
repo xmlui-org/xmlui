@@ -3,6 +3,7 @@ import StandaloneComponentManager from "./StandaloneComponentManager";
 import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";
+import * as all from "./index";
 
 const Xmlui = new StandaloneComponentManager();
 
@@ -20,4 +21,8 @@ window.React = React;
 // @ts-ignore
 window.jsxRuntime = jsxRuntime;
 window.ReactDOM = ReactDOM;
-export default Xmlui;
+
+export default {
+  ...all,
+  standalone: Xmlui
+}

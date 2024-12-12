@@ -1,7 +1,15 @@
-import type { StandaloneAppDescription, StandaloneJsonConfig } from "@components-core/abstractions/standalone";
+import type {
+  StandaloneAppDescription,
+  StandaloneJsonConfig,
+} from "@components-core/abstractions/standalone";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import StandaloneApp, { startApp } from "@components-core/StandaloneApp";
-import type { ComponentDef, CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
+import type {
+  ComponentDef,
+  ComponentLike,
+  CompoundComponentDef,
+} from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "@abstractions/ComponentDefs";
 import RootComponent from "@components-core/RootComponent";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { TreeNode } from "@components-core/abstractions/treeAbstractions";
@@ -16,6 +24,7 @@ import type { ThemeDefinition } from "@components-core/theming/abstractions";
 import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
 import type { ComponentRendererDef, RendererContext } from "@abstractions/RendererDefs";
+import { parseScssVar } from "@components-core/theming/themeVars";
 
 export type {
   ThemeDefinition,
@@ -33,6 +42,9 @@ export type {
 export {
   StandaloneApp,
   createComponentRenderer,
+  createMetadata,
+  d,
+  parseScssVar,
   startApp,
   useTheme, //TODO REMOVE
   RootComponent, //TODO remove, playground uses it
