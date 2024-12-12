@@ -1,9 +1,8 @@
 {
   "name": "xmlui-pdf",
-  "private": true,
+  "version": "0.1",
   "sideEffects": false,
   "type": "module",
-  "version": "0.1",
   "scripts": {
     "start": "xmlui start",
     "build:demo": "xmlui build",
