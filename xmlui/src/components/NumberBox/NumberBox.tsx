@@ -14,7 +14,6 @@ import {
   dInitialValue,
   dLabel,
   dLabelBreak,
-  dLabelId,
   dLabelPosition,
   dLabelWidth,
   dLostFocus,
@@ -39,7 +38,6 @@ export const NumberBoxMd = createMetadata({
   props: {
     placeholder: dPlaceholder(),
     initialValue: dInitialValue(),
-    labelId: dLabelId(),
     label: dLabel(),
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),

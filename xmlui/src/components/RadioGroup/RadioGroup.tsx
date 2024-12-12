@@ -11,7 +11,6 @@ import {
   dInitialValue,
   dLabel,
   dLabelBreak,
-  dLabelId,
   dLabelPosition,
   dLabelWidth,
   dLostFocus,
@@ -30,7 +29,6 @@ export const RadioGroupMd = createMetadata({
     `only one option from the group at a time.`,
   props: {
     initialValue: dInitialValue(),
-    labelId: dLabelId(),
     autoFocus: dAutoFocus(),
     required: dRequired(),
     readOnly: dReadonly(),
