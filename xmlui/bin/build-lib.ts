@@ -40,13 +40,13 @@ export const buildLib = async ({watchMode}) => {
           output: {
             footer: (chunk) => {
               if (chunk.name === "index" && chunk.fileName === umdFileName) {
-                return `if(typeof window.xmlui !== "undefined"){window.xmlui.registerComponent(window['${env.npm_package_name}']);}`;
+                return `if(typeof window.xmlui !== "undefined"){window.xmlui.standalone.registerComponent(window['${env.npm_package_name}']);}`;
               }
             },
             globals: {
               react: "React",
               "react-dom": "ReactDOM",
-              "react/jsx-runtime": "jsxRuntime",
+              "react/jsx-runtime": "jsxRuntime"
             },
           },
         },
