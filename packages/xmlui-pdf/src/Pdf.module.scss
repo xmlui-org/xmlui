@@ -1,11 +1,27 @@
-.wrapper{
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+$shadow-page-Pdf: createThemeVar("shadow-page-Pdf");
+$gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
+
+.document{
   display: flex;
   flex-direction: column;
+  gap: $gap-pages-Pdf;
   align-items: center;
-  max-height: 100%;
-  overflow: auto;
-  width: 100%;
 }
 
 .page{
+  box-shadow: $shadow-page-Pdf;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
 }

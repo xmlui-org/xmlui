@@ -23,15 +23,11 @@ const Pdf = ({ src }: Props) => {
 
 
   return (
-    <div className={styles.wrapper}>
-      <div style={{ position: "relative", minHeight: 0 }}>
-        <Document file={src} onLoadSuccess={onLoadSuccess}>
-          {Array.from(new Array(numPages), (_, index) => (
-            <Page key={index+1} pageNumber={index + 1} loading="" className={styles.page} />
-          ))}
-        </Document>
-      </div>
-    </div>
+    <Document file={src} onLoadSuccess={onLoadSuccess} className={styles.document}>
+      {Array.from(new Array(numPages), (_, index) => (
+        <Page key={index+1} pageNumber={index + 1} loading="" className={styles.page} />
+      ))}
+    </Document>
   );
 };
 
