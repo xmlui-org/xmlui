@@ -1,5 +1,5 @@
 import { labelPositionValues } from "@components/abstractions";
-import { ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
 // --- Setup
 
@@ -7,7 +7,17 @@ class FormDriver extends ComponentDriver {}
 
 const test = createTestWithDriver(FormDriver);
 
+// TODO: evaluate and add tests from 'form-smart-fetch.spec.ts' and 'conditional-field-in-form-submit.spec.ts',
+// as well as other places that may be relevant
+
+// NOTE: Most important feature of Form: submit and data handling
+
 // --- Testing
+
+test("renders component", async ({ createDriver }) => {
+  const driver = await createDriver(`<Form />`);
+  await expect(driver.component).toBeAttached();
+});
 
 // --- --- buttonRowTemplate
 
@@ -24,7 +34,7 @@ labelPositionValues.forEach((pos) => {
   test.skip(`label position ${pos} is not applied if overridden in FormItem`, async ({ createDriver }) => {});  
 });
 
-// --- --- itemLabelWidth: Should we use this? Can we re-evaluate this?
+// --- --- itemLabelWidth: Should we use this? Can we re-evaluate?
 
 // --- --- itemLabelBreak: We should talk about this
 
@@ -40,13 +50,15 @@ test.skip("Form buttons and contained FormItems are disabled", async ({ createDr
 
 // --- --- data
 
-test.skip("data accepts an object", async ({ createDriver }) => {});
+test.skip("data accepts an object", async ({ createDriver }) => {
+  const driver = await createDriver(`<Form data="{{ test: 'test' }}" />`);
+  await expect(driver.component).toBeAttached();
+});
 
 [
-  //{ label: "null", value: null },
   { label: "empty array", value: [] },
-  { label: "array", value: [] },
-  { label: "function", value: () => {} }, // ?
+  { label: "array", value: ["hi", "hello", "yay"] },
+  { label: "function", value: () => {} },
 ].forEach((type) => {
   test.skip(`data does not accept ${type.label}`, async ({ createDriver }) => {});
 });
@@ -107,7 +119,7 @@ test.skip("cancel only triggers when enabled", async ({ createDriver }) => {});
 
 // --- $data: should these be in FormItem.spec.ts?
 
-test.skip("$data is bound to form data", async ({ createDriver }) => {});
+test.skip("$data is correctly bound to form data", async ({ createDriver }) => {});
 
 test.skip("$data is correctly undefined if data is not set in props", async ({ createDriver }) => {});
 
