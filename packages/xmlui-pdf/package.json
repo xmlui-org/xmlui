@@ -8,7 +8,8 @@
     "start": "xmlui start",
     "build:demo": "xmlui build",
     "preview": "xmlui preview",
-    "build": "xmlui build-lib"
+    "build": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch"
   },
   "dependencies": {
     "pdfjs-dist": "^4.4.168",

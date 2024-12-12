@@ -63,7 +63,8 @@ switch (script) {
     break;
   }
   case "build-lib": {
-    buildLib({});
+    const { watch } = argv as any;
+    buildLib({watchMode: getBoolArg(watch, false)});
     break;
   }
   case "start": {
