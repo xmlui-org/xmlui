@@ -151,7 +151,7 @@ type ComponentProviderProps = {
   // Definition of contributors
   contributes: ContributesDefinition;
 
-  componentManager: StandaloneComponentManager;
+  componentManager?: StandaloneComponentManager;
 };
 
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
