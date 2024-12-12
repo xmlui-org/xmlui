@@ -101,6 +101,7 @@ export function AutoComplete({
 
   const toggleOption = useCallback(
     (selectedValue: string) => {
+      console.log("Kacsa", selectedValue);
       if (multi) {
         setInputValue("");
       } else {
@@ -116,6 +117,8 @@ export function AutoComplete({
         : selectedValue === value
           ? null
           : selectedValue;
+
+      console.log("hehe", newSelectedValue);
       updateState({ value: newSelectedValue });
       onDidChange(newSelectedValue);
     },
@@ -124,6 +127,7 @@ export function AutoComplete({
 
   useEffect(() => {
     if (!multi) {
+      console.log("hahahaha", options);
       setInputValue(Array.from(options).find((o) => o.value === value)?.labelText || "");
     }
   }, [multi, options, value]);
@@ -336,13 +340,14 @@ export function AutoComplete({
                   <CmdEmpty>{emptyListNode}</CmdEmpty>
                   <CreatableItem />
                   <CmdGroup>
-                    {Array.from(options).map(({ value, label, enabled, keywords }) => (
+                    {Array.from(options).map(({ value, label, enabled, keywords, labelText }) => (
                       <AutoCompleteOption
                         key={value}
                         value={value}
                         label={label}
                         enabled={enabled}
                         keywords={keywords}
+                        labelText={labelText}
                       />
                     ))}
                   </CmdGroup>
@@ -376,7 +381,7 @@ function CreatableItem() {
         e.stopPropagation();
       }}
       onSelect={(value) => {
-        const newOption = { value, label: value, enabled: true };
+        const newOption = { value, label: value, enabled: true, labelText: value };
         onOptionAdd(newOption);
         onChange(value);
       }}

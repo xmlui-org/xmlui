@@ -25,13 +25,6 @@ import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
 
 const COMP = "AutoComplete";
 
-const defaultOptionRenderer = {
-  type: "Text",
-  props: {
-    value: "{$item.label}",
-  },
-};
-
 export const AutoCompleteMd = createMetadata({
   description:
     "This component is a dropdown with a list of options. According to the " +
@@ -134,15 +127,19 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         emptyListTemplate={renderChild(node.props.emptyListTemplate)}
         dropdownHeight={extractValue(node.props.dropdownHeight)}
-        optionRenderer={(item) => {
-          return (
-            <MemoizedItem
-              node={node.props.optionTemplate || (defaultOptionRenderer as any)}
-              item={item}
-              renderChild={renderChild}
-            />
-          );
-        }}
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </AutoComplete>
