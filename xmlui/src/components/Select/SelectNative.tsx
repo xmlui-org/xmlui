@@ -190,8 +190,8 @@ export function Select({
   onFocus = noop,
   onBlur = noop,
   registerComponentApi,
-  optionRenderer = defaultRenderer,
   emptyListTemplate,
+  optionRenderer = defaultRenderer,
   layout,
   dropdownHeight,
   children,
@@ -314,7 +314,7 @@ export function Select({
       optionRenderer,
       onChange: toggleOption,
     }),
-    [multiSelect, optionRenderer, toggleOption, value],
+    [multiSelect, toggleOption, value, optionRenderer],
   );
 
   return (
@@ -372,8 +372,8 @@ export function Select({
                       ) : (
                         <span className={styles.placeholder}>{placeholder || ""}</span>
                       )
-                    ) : value ? (
-                      <span>{Array.from(options).find((o) => o.value === value)?.label}</span>
+                    ) : value !== undefined && value !== null ? (
+                      <div>{Array.from(options).find((o) => o.value === value)?.label}</div>
                     ) : (
                       <span className={styles.placeholder}>{placeholder || ""}</span>
                     )}
@@ -396,7 +396,15 @@ export function Select({
                     style={{ width, height: dropdownHeight }}
                     className={styles.selectContent}
                   >
-                    <Cmd className={styles.command}>
+                    <Cmd
+                      className={styles.command}
+                      shouldFilter={searchable}
+                      filter={(value, search, keywords) => {
+                        const extendedValue = value + " " + keywords.join(" ");
+                        if (extendedValue.toLowerCase().includes(search.toLowerCase())) return 1;
+                        return 0;
+                      }}
+                    >
                       {searchable ? (
                         <div className={styles.commandInputContainer}>
                           <Icon name="search" />
@@ -410,12 +418,13 @@ export function Select({
                         <button autoFocus aria-hidden="true" className={styles.srOnly} />
                       )}
                       <CmdList className={styles.commandList}>
-                        {Array.from(options).map(({ value, label, enabled }) => (
+                        {Array.from(options).map(({ value, label, enabled, keywords }) => (
                           <ComboboxOption
                             key={value}
                             value={value}
                             label={label}
                             enabled={enabled}
+                            keywords={keywords}
                           />
                         ))}
                         <CmdEmpty>{emptyListNode}</CmdEmpty>
@@ -450,9 +459,10 @@ export function Select({
   );
 }
 
-export function ComboboxOption({ value, label, enabled = true }: Option) {
+export const ComboboxOption = (option: Option) => {
   const id = useId();
-  const { value: selectedValue, onChange, optionRenderer, multi } = useSelect();
+  const { label, value, enabled = true, keywords } = option;
+  const { value: selectedValue, onChange, multi, optionRenderer } = useSelect();
   const selected =
     Array.isArray(selectedValue) && multi ? selectedValue.includes(value) : selectedValue === value;
 
@@ -467,40 +477,50 @@ export function ComboboxOption({ value, label, enabled = true }: Option) {
         onChange(value);
       }}
       data-state={selected ? "checked" : undefined}
-      keywords={[label]}
+      keywords={keywords}
     >
       {optionRenderer({ label, value })}
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
-}
+};
 
 export function HiddenOption(option: Option) {
   const { onOptionRemove, onOptionAdd } = useOption();
+  const [node, setNode] = useState(null);
+  const opt: Option = useMemo(() => {
+    return {
+      ...option,
+      keywords: [node?.textContent ?? ""],
+    };
+  }, [option, node]);
 
-  useLayoutEffect(() => {
-    onOptionAdd(option);
-    return () => onOptionRemove(option);
-  }, [option, onOptionAdd, onOptionRemove]);
+  useEffect(() => {
+    onOptionAdd(opt);
+    return () => onOptionRemove(opt);
+  }, [opt, onOptionAdd, onOptionRemove]);
 
-  return <span style={{ display: "none" }} />;
+  return (
+    <div ref={(el) => setNode(el)} style={{ display: "none" }}>
+      {option.label}
+    </div>
+  );
 }
 
 const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Option>(
   (option, ref) => {
     const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
+    const { optionRenderer } = useSelect();
 
     useLayoutEffect(() => {
       onOptionAdd(option);
       return () => onOptionRemove(option);
     }, [option, onOptionAdd, onOptionRemove]);
 
-    const { optionRenderer } = useSelect();
-
     return (
       <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
-        <SelectItemText>{optionRenderer ? optionRenderer({ label, value }) : label}</SelectItemText>
+        <SelectItemText>{optionRenderer({ value, label })}</SelectItemText>
         <span className={styles.selectItemIndicator}>
           <SelectItemIndicator>
             <Icon name="checkmark" />

@@ -1,7 +1,6 @@
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import styles from "@components/Select/Select.module.scss";
-import { MemoizedItem } from "@components/container-helpers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import {
   dPlaceholder,
@@ -13,7 +12,6 @@ import {
   dReadonly,
   dEnabled,
   dValidationStatus,
-  dComponent,
   dDidChange,
   dGotFocus,
   dLostFocus,
@@ -25,17 +23,12 @@ import {
   dLabelWidth,
   dLabelBreak,
   dValue,
+  dComponent,
 } from "@components/metadata-helpers";
 import { Select } from "@components/Select/SelectNative";
+import { MemoizedItem } from "@components/container-helpers";
 
 const COMP = "Select";
-
-const defaultOptionRenderer = {
-  type: "Text",
-  props: {
-    value: "{$item.label}",
-  },
-};
 
 export const SelectMd = createMetadata({
   description: "Provides a dropdown with a list of options to choose from.",
@@ -147,15 +140,19 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionRenderer={(item) => {
-          return (
-            <MemoizedItem
-              node={node.props.optionTemplate || (defaultOptionRenderer as any)}
-              item={item}
-              renderChild={renderChild}
-            />
-          );
-        }}
+        optionRenderer={
+          node.props.optionTemplate
+            ? (item) => {
+                return (
+                  <MemoizedItem
+                    node={node.props.optionTemplate}
+                    item={item}
+                    renderChild={renderChild}
+                  />
+                );
+              }
+            : undefined
+        }
       >
         {renderChild(node.children)}
       </Select>
