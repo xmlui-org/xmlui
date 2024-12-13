@@ -137,10 +137,10 @@ export const handleDownloadZip = async (appDescription: any) => {
     zip.file("index.html", indexHtml);
   }
 
-  const startBat = await fetchWithoutCache("/resources/files/for-download/start.bat").then((res) => res.blob());
+  const startBat = await fetchWithoutCache("/resources/files/for-download/startx").then((res) => res.blob());
 
   if (operatingSystem === "Windows") {
-    zip.file("start.bat", startBat);
+    zip.file("startx", startBat);
   } else {
     let fileName = operatingSystem === "Linux" ? "start-linux.sh" : "start-darwin.sh";
     const startSh = await fetchWithoutCache(`/resources/files/for-download/${fileName}`).then((res) => res.blob());
