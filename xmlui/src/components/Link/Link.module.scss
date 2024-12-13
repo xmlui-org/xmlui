@@ -72,21 +72,29 @@ $gap-icon-Link: createThemeVar("gap-icon-Link");
 }
 
 .container:not(.active) {
-    text-underline-offset: $offset-decoration-Link;
-    &:not([disabled]) {
-      &:hover {
-        text-decoration-line: $line-decoration-Link;
-        text-decoration-color: $color-decoration-Link;
-        text-decoration-style: $style-decoration-Link;
-        text-decoration-thickness: $thickness-decoration-Link;
-      }
-      &:active {
-        text-decoration-line: $line-decoration-Link;
-        text-decoration-color: $color-decoration-Link;
-        text-decoration-style: $style-decoration-Link;
-        text-decoration-thickness: $thickness-decoration-Link;
+  text-underline-offset: $offset-decoration-Link;
+  &:not([disabled]) {
+    &:hover {
+      text-decoration-line: $line-decoration-Link;
+      text-decoration-color: $color-decoration-Link;
+      text-decoration-style: $style-decoration-Link;
+      text-decoration-thickness: $thickness-decoration-Link;
+
+      &:has(> button) {
+        text-decoration-line: none;
       }
     }
+    &:active {
+      text-decoration-line: $line-decoration-Link;
+      text-decoration-color: $color-decoration-Link;
+      text-decoration-style: $style-decoration-Link;
+      text-decoration-thickness: $thickness-decoration-Link;
+
+      &:has(> button) {
+        text-decoration-line: none;
+      }
+    }
+  }
 }
 
 // --- We export the theme variables to add them to the component renderer
