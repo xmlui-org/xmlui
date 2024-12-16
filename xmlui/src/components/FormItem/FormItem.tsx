@@ -9,6 +9,7 @@ import {
   dAutoFocus,
   dEnabled,
   dInitialValue,
+  dInternal,
   dLabel,
   dLabelPosition,
   dRequired,
@@ -50,7 +51,7 @@ export const FormItemMd = createMetadata({
         `input field.`,
     ),
     initialValue: dInitialValue(),
-    syncToValidation: d(
+    syncToValidation: dInternal(
       `This boolean property indicates if the following validation properties should override the ` +
         `underlying controls' properties.`,
     ),
