@@ -6,25 +6,13 @@ concurrency: # Concurrency ensures that only a single job or workflow using the 
 
 on:
   schedule:
-    # From the github docs:
-    # "High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped. To decrease the chance of delay, schedule your workflow to run at a different time of the hour."
-    # So this is kind of a random value
-    - cron: "5 * * * *"
+    - cron: "39 1 * * *"
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
-    if: ${{ steps.check-needs-to-run.outputs.shoud-run }}
     steps:
       - uses: actions/checkout@v3
-      - name: check if job needs to run (commit is less than 23h old)
-        id: check-needs-to-run
-        run:
-          if test $(( $(date +%s) - $(git show -s --format=%ct ${{ github.sha }}) )) -le 82800; then
-          echo "::set-output name=shoud-run::true";
-          else
-          echo "::set-output name=shoud-run::false";
-          fi
       - uses: actions/setup-node@v3
         with:
           node-version: 18
