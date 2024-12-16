@@ -9,7 +9,7 @@ on:
     # From the github docs:
     # "High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped. To decrease the chance of delay, schedule your workflow to run at a different time of the hour."
     # So this is kind of a random value
-    - cron: "59 * * * *"
+    - cron: "5 * * * *"
 jobs:
   test:
     timeout-minutes: 60
