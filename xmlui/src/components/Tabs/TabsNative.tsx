@@ -34,7 +34,9 @@ export const Tabs = ({
       <RTabs.Root
         className={styles.tabs}
         value={`${currentTab}`}
-        onValueChange={setCurrentTab}
+        onValueChange={(tab) => {
+          setCurrentTab(tab);
+        }}
         orientation={orientation}
         style={style}
       >
@@ -53,7 +55,13 @@ export const Tabs = ({
           <div className={styles.filler} data-orientation={orientation} />
         </RTabs.List>
         {tabItems.map((tab, index) => (
-          <RTabs.Content key={index} value={`${index}`} className={styles.tabsContent}>
+          <RTabs.Content
+            key={index}
+            value={`${index}`}
+            className={styles.tabsContent}
+            forceMount
+            hidden={`${index}` === currentTab}
+          >
             {tab.content}
           </RTabs.Content>
         ))}
