@@ -27,6 +27,13 @@ $componentName: "DatePicker";
     color: createThemeVar("Input:color-text-#{$componentName}-#{$variantName}--hover");
   }
 
+  &:focus {
+    outline-width: createThemeVar('Input:thickness-outline-#{$componentName}-#{$variantName}--focus');
+    outline-color: createThemeVar('Input:color-outline-#{$componentName}-#{$variantName}--focus');
+    outline-style: createThemeVar('Input:style-outline-#{$componentName}-#{$variantName}--focus');
+    outline-offset: createThemeVar('Input:offset-outline-#{$componentName}-#{$variantName}--focus');
+  }
+
   .placeholder {
     color: createThemeVar("Input:color-placeholder-#{$componentName}-#{$variantName}");
   }
