@@ -52,7 +52,8 @@ type SelectProps = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
-  optionRenderer?: (item: any) => ReactNode;
+  optionRenderer?: (item: Option) => ReactNode;
+  badgeRenderer?: (item: Option) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
   onDidChange?: (newValue: ValueType) => void;
@@ -192,6 +193,7 @@ export function Select({
   registerComponentApi,
   emptyListTemplate,
   optionRenderer = defaultRenderer,
+  badgeRenderer = defaultRenderer,
   layout,
   dropdownHeight,
   children,
@@ -356,7 +358,7 @@ export function Select({
                           <div className={styles.badgeList}>
                             {value.map((v) => (
                               <span key={v} className={styles.badge}>
-                                {Array.from(options).find((o) => o.value === v)?.label}
+                                {badgeRenderer(Array.from(options).find((o) => o.value === v))}
                                 <Icon
                                   name="close"
                                   size="sm"
