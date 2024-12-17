@@ -48,8 +48,6 @@ type FormControlType =
   | "datePicker"
   | "radioGroup"
   | "custom"
-  | "combobox"
-  | "multiCombobox"
   | "switch";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {

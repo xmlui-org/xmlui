@@ -771,6 +771,14 @@ In the demo below, leave the field empty and click outside to see the regular an
   `}
 />
 
+### `syncToValidation`
+
+This boolean property indicates if the following validation properties should override the underlying controls' properties.
+
+- `maxLength` --> Set the `maxTextLength` property value of `Text` or `TextArea` if that value is not defined.
+- `minValue` --> Set the `min` property value of `NumberBox`.
+- `maxValue` --> Set the `max` property value of `NumberBox`.
+
 ### `type`
 
 This property is used to determine the specific input control the FormItem will wrap around. Note that the control names start with a lowercase letter and map to input components found in XMLUI.
