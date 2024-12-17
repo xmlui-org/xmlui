@@ -11,6 +11,7 @@ import { useTheme } from "@components-core/theming/ThemeContext";
 import { noop } from "@components-core/constants";
 import classnames from "@components-core/utils/classnames";
 import styles from "./DatePicker.module.scss";
+import { useEvent } from "@components-core/utils/misc";
 
 type Props = {
   id?: string;
@@ -97,10 +98,12 @@ export const DatePicker = ({
   fromDate,
   toDate,
   disabledDates = [],
+  registerComponentApi,
 }: Props) => {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [isButtonFocused, setIsButtonFocused] = useState(false);
   const [isMenuFocused, setIsMenuFocused] = useState(false);
+  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
 
   const selected: any = useMemo(() => {
     if (mode === "single" && typeof value === "string") {
@@ -153,6 +156,23 @@ export const DatePicker = ({
     setIsMenuFocused(false);
   };
 
+  // Register component API for external interactions
+  const focus = useCallback(() => {
+    referenceElement?.focus();
+  }, [referenceElement]);
+
+  const setValue = useEvent((newValue: string) => {
+    const parsedDate = parseDate(newValue);
+    handleSelect(parsedDate);
+  });
+
+  useEffect(() => {
+    registerComponentApi?.({
+      focus,
+      setValue,
+    });
+  }, [focus, registerComponentApi, setValue]);
+
   useEffect(() => {
     if (!isButtonFocused && !isMenuFocused) {
       onBlur?.();
@@ -196,6 +216,7 @@ export const DatePicker = ({
     <ReactDropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
       <ReactDropdownMenu.Trigger asChild>
         <button
+          ref={setReferenceElement}
           disabled={!enabled}
           id={id}
           className={classnames(styles.datePicker, {
