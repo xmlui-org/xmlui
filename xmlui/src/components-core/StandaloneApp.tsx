@@ -39,6 +39,7 @@ import {
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
 import StandaloneComponentManager from "../StandaloneComponentManager";
+import { builtInThemes } from "@components-core/theming/ThemeProvider";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -570,6 +571,16 @@ function useStandalone(
         functions: loadedEntryPointCodeBehind?.functions,
         scriptError: loadedEntryPointCodeBehind?.moduleErrors,
       };
+
+
+      const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
+      //we try to test if the default theme is not a built-in theme, nor a theme that is already loaded
+      // AND is not a binding expression. If it's all true, we try to load it from the themes folder
+      if(defaultTheme && typeof defaultTheme === 'string' && !defaultTheme.includes("{")){
+        if(!builtInThemes.find(theme=> theme.id === defaultTheme) && !themes.find(theme=> theme.id === defaultTheme)){
+          themes.push(await fetchWithoutCache(`themes/${defaultTheme}.json`).then((value) => value.json()));
+        }
+      }
 
       // --- Assemble the runtime for the components
       const componentsWithCodeBehinds = loadedComponents

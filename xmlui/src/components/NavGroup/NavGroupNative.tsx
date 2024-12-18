@@ -14,10 +14,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuPortal,
-  DropdownMenuTrigger,
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import styles from "./NavGroup.module.scss";
 import { Icon } from "@components/Icon/IconNative";
@@ -38,6 +38,7 @@ type Props = {
   style?: CSSProperties;
   label: string;
   icon?: React.ReactNode;
+  to?: string;
   node: NavGroupComponentDef;
   renderChild: RenderChildFn;
 };
@@ -47,7 +48,7 @@ const NavGroupContext = createContext({
 });
 
 export const NavGroup = forwardRef(function NavGroup(
-  { node, style, label, icon, renderChild }: Props,
+  { node, style, label, icon, renderChild, to }: Props,
   ref,
 ) {
   const { level } = useContext(NavGroupContext);
@@ -72,6 +73,7 @@ export const NavGroup = forwardRef(function NavGroup(
     <NavGroupContext.Provider value={navGroupContextValue}>
       {inline ? (
         <ExpandableNavGroup
+          to={to}
           style={style}
           label={label}
           icon={icon}
@@ -86,6 +88,7 @@ export const NavGroup = forwardRef(function NavGroup(
           node={node}
           renderChild={renderChild}
           ref={ref}
+          to={to}
         />
       )}
     </NavGroupContext.Provider>
@@ -99,12 +102,14 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
     icon,
     renderChild,
     node,
+    to,
   }: {
     style?: CSSProperties;
     label: string;
     icon: ReactNode;
     node: NavGroupComponentDef;
     renderChild: RenderChildFn;
+    to?: string;
   },
   ref,
 ) {
@@ -118,7 +123,7 @@ const ExpandableNavGroup = forwardRef(function ExpandableNavGroup(
 
   return (
     <>
-      <NavLink style={toggleStyle} onClick={() => setExpanded((prev) => !prev)} icon={icon}>
+      <NavLink style={toggleStyle} onClick={() => setExpanded((prev) => !prev)} icon={icon} to={to}>
         {label}
         <div style={{ flex: 1 }} />
         <Icon name={expanded ? "chevronup" : "chevrondown"} />
@@ -150,12 +155,14 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
     icon,
     renderChild,
     node,
+    to,
   }: {
     style?: CSSProperties;
     label: string;
     icon: ReactNode;
     node: NavGroupComponentDef;
     renderChild: RenderChildFn;
+    to?: string;
   },
   ref,
 ) {
@@ -173,7 +180,7 @@ const DropDownNavGroup = forwardRef(function DropDownNavGroup(
   return (
     <Wrapper>
       <Trigger asChild>
-        <NavLink icon={icon} style={{ flexShrink: 0 }} vertical={level >= 1}>
+        <NavLink icon={icon} style={{ flexShrink: 0 }} vertical={level >= 1} to={to}>
           <span
             className={classnames(styles.withNavGroupChevron, {
               [styles.pointRight]: level >= 1,
