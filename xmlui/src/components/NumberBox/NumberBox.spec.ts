@@ -27,7 +27,7 @@ test.skip("placeholder is hidden if input field is filled", async ({ createDrive
   { label: "empty string", value: "" },
   { label: "string that resolves to number", value: "1" },
 ].forEach(({ label, value }) => {
-  test.skip(`setting initialValue with ${label} sets value of field`, async ({ createDriver }) => {});
+  test.skip(`setting initialValue to ${label} sets value of field`, async ({ createDriver }) => {});
 });
 
 [
@@ -40,7 +40,7 @@ test.skip("placeholder is hidden if input field is filled", async ({ createDrive
   { label: "function", value: () => {} },
   { label: "NaN", value: NaN },   // <- Not sure about this one
 ].forEach(({ label, value }) => {
-  test.skip(`setting initialValue with ${label} throws error`, async ({ createDriver }) => {});
+  test.skip(`setting initialValue to ${label} throws error`, async ({ createDriver }) => {});
 })
 
 test.skip("if initialValue is too large, cap actual value to MAX_VALUE constant", async ({ createDriver }) => {
@@ -83,7 +83,7 @@ test.skip("making field required shows a visual indicator", async ({ createDrive
 
 // --- --- readOnly
 
-test.skip("readOnly disables input field", async ({ createDriver }) => {});
+test.skip("readOnly disables writing in input field", async ({ createDriver }) => {});
 
 test.skip("readOnly lets user copy from input field", async ({ createDriver }) => {});
 
@@ -242,7 +242,6 @@ test.skip("setValue updates input value", async ({ createDriver }) => {});
 
 test.skip("setValue does not update input if field is disabled", async ({ createDriver }) => {});
 
-// TODO: do an array for invalid input values?
 test.skip("setValue does not update input if value is invalid", async ({ createDriver }) => {});
 
 // --- testing for input types
