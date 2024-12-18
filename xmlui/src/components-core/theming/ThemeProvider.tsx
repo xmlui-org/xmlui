@@ -275,24 +275,11 @@ function ThemeProvider({
   });
 
   const themes: Array<ThemeDefinition> = useMemo(() => {
-    return [...builtInThemes, ...custThemes];
+    return [...custThemes, ...builtInThemes];
   }, [custThemes]);
 
   const availableThemeIds = useMemo(() => {
-    const customThemeUids = themes.map((theme) => theme.id);
-    return [
-      ...new Set([
-        ...customThemeUids,
-        "solid",
-        "xmlui",
-        "xmlui-green",
-        "xmlui-gray",
-        "xmlui-orange",
-        "xmlui-purple",
-        "xmlui-cyan",
-        "xmlui-red",
-      ]),
-    ];
+    return [...new Set(themes.map((theme) => theme.id))];
   }, [themes]);
 
   const [activeThemeId, setActiveThemeId] = useState<string>(() => {
