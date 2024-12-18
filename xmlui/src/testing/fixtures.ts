@@ -77,25 +77,28 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
       await use(async (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => {
         const testStateViewTestId = "test-state-view-testid"
         const { errors, component } = xmlUiMarkupToComponent(`
-            <Fragment var.testState="{null}">
-              ${source}
-              <Stack width="0" height="0">
-                <Text
-                  testId="${testStateViewTestId}"
-                  value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
-              </Stack>
-            </Fragment>  
-        `)
-        const entryPoint = component as ComponentDef
-        if (errors.length > 0){
+          <Fragment var.testState="{null}">
+            ${source}
+            <Stack width="0" height="0">
+              <Text
+                testId="${testStateViewTestId}"
+                value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
+            </Stack>
+          </Fragment>
+        `);
+        
+        if (errors.length > 0) {
           throw { errors };
         }
+
+        const entryPoint = component as ComponentDef;
         const componentTestId = "test-id-component";
-        (entryPoint).children![0].testId ??= componentTestId;
+        const componentToTest = (entryPoint).children![0];
+        componentToTest.testId ??= componentTestId;
 
         await initComponent(page, { ...description, entryPoint },);
         return new DriverClass({
-          locator: page.getByTestId((entryPoint).children![0].testId!),
+          locator: page.getByTestId(componentToTest.testId!),
           testStateLocator: page.getByTestId(testStateViewTestId),
           page: page
         });
