@@ -1,4 +1,4 @@
-import { CSSProperties, memo, type ReactNode } from "react";
+import { type CSSProperties, memo, type ReactNode } from "react";
 
 import styles from "./Markdown.module.scss";
 
@@ -7,7 +7,6 @@ import { Heading } from "@components/Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "@components/Link/LinkNative";
 import { Image } from "@components/Image/ImageNative";
-import { layoutOptionKeys } from "@components-core/descriptorHelper";
 
 type MarkdownProps = {
   removeIndents?: boolean;
