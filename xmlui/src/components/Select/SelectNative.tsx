@@ -53,7 +53,7 @@ type SelectProps = {
   placeholder?: string;
   updateState?: UpdateStateFn;
   optionRenderer?: (item: Option) => ReactNode;
-  badgeRenderer?: (item: Option) => ReactNode;
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
   onDidChange?: (newValue: ValueType) => void;
@@ -193,7 +193,7 @@ export function Select({
   registerComponentApi,
   emptyListTemplate,
   optionRenderer = defaultRenderer,
-  badgeRenderer = defaultRenderer,
+  valueRenderer,
   layout,
   dropdownHeight,
   children,
@@ -356,19 +356,28 @@ export function Select({
                       Array.isArray(value) && value.length > 0 ? (
                         <div className={styles.badgeListContainer}>
                           <div className={styles.badgeList}>
-                            {value.map((v) => (
-                              <span key={v} className={styles.badge}>
-                                {badgeRenderer(Array.from(options).find((o) => o.value === v))}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
+                            {value.map((v) =>
+                              valueRenderer ? (
+                                valueRenderer(
+                                  Array.from(options).find((o) => o.value === v),
+                                  () => {
                                     toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            ))}
+                                  },
+                                )
+                              ) : (
+                                <span key={v} className={styles.badge}>
+                                  {Array.from(options).find((o) => o.value === v)?.label}
+                                  <Icon
+                                    name="close"
+                                    size="sm"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      toggleOption(v);
+                                    }}
+                                  />
+                                </span>
+                              ),
+                            )}
                           </div>
                         </div>
                       ) : (

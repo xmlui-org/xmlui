@@ -49,7 +49,7 @@ export const SelectMd = createMetadata({
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
-    badgeTemplate: dComponent(`This property enables the customization of badges.`),
+    valueTemplate: dComponent(`This property enables the customization of the value.`),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
@@ -152,12 +152,15 @@ export const selectComponentRenderer = createComponentRenderer(
               }
             : undefined
         }
-        badgeRenderer={
-          node.props.badgeTemplate
-            ? (item) => {
+        valueRenderer={
+          node.props.valueTemplate
+            ? (item, removeItem) => {
                 return (
                   <MemoizedItem
-                    node={node.props.badgeTemplate}
+                    contextVars={{
+                      $context: { removeItem },
+                    }}
+                    node={node.props.valueTemplate}
                     item={item}
                     renderChild={renderChild}
                   />
