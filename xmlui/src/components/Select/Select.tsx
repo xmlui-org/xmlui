@@ -45,7 +45,7 @@ export const SelectMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-    optionTemplate: dComponent(
+    optionLabelTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
@@ -139,12 +139,12 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionRenderer={
-          node.props.optionTemplate
+        optionLabelRenderer={
+          node.props.optionLabelTemplate
             ? (item) => {
                 return (
                   <MemoizedItem
-                    node={node.props.optionTemplate}
+                    node={node.props.optionLabelTemplate}
                     item={item}
                     renderChild={renderChild}
                   />
