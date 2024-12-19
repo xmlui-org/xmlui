@@ -72,7 +72,6 @@ type Props = {
   validationMode?: ValidationMode;
   initialValue?: any;
   registerComponentApi?: RegisterComponentApiFn;
-  syncToValidation?: boolean;
   maxTextLength?: number;
 };
 
@@ -91,7 +90,6 @@ export const FormItem = memo(function FormItem({
   customValidationsDebounce,
   validationMode,
   registerComponentApi,
-  syncToValidation = true,
   maxTextLength,
   ...rest
 }: Props) {
@@ -214,9 +212,9 @@ export const FormItem = memo(function FormItem({
           enabled={isEnabled}
           integersOnly={type === "integer"}
           validationStatus={validationStatus}
-          min={syncToValidation ? validations.minValue : undefined}
-          max={syncToValidation ? validations.maxValue : undefined}
-          maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
+          min={validations.minValue}
+          max={validations.maxValue}
+          maxLength={maxTextLength ?? validations?.maxLength}
         ></NumberBox>
       );
       break;
@@ -259,7 +257,7 @@ export const FormItem = memo(function FormItem({
           registerComponentApi={registerComponentApi}
           enabled={isEnabled}
           validationStatus={validationStatus}
-          maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
+          maxLength={maxTextLength ?? validations?.maxLength}
         />
       );
       break;
@@ -274,7 +272,7 @@ export const FormItem = memo(function FormItem({
           registerComponentApi={registerComponentApi}
           enabled={isEnabled}
           validationStatus={validationStatus}
-          maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
+          maxLength={maxTextLength ?? validations?.maxLength}
         />
       );
       break;
@@ -288,7 +286,7 @@ export const FormItem = memo(function FormItem({
           registerComponentApi={registerComponentApi}
           enabled={isEnabled}
           validationStatus={validationStatus}
-          maxLength={maxTextLength ?? (syncToValidation ? validations?.maxLength : undefined)}
+          maxLength={maxTextLength ?? validations?.maxLength}
         />
       );
       break;

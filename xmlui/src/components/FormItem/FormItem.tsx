@@ -51,10 +51,6 @@ export const FormItemMd = createMetadata({
         `input field.`,
     ),
     initialValue: dInitialValue(),
-    syncToValidation: dInternal(
-      `This boolean property indicates if the following validation properties should override the ` +
-        `underlying controls' properties.`,
-    ),
     required: dRequired(),
     requiredInvalidMessage: d(
       `This optional string property is used to customize the message that is displayed if the ` +
@@ -156,7 +152,6 @@ export const formItemComponentRenderer = createComponentRenderer(
       regexInvalidSeverity,
       customValidationsDebounce,
       validationMode,
-      syncToValidation,
       maxTextLength,
       ...rest
     } = node.props;
@@ -208,7 +203,6 @@ export const formItemComponentRenderer = createComponentRenderer(
         customValidationsDebounce={extractValue.asOptionalNumber(customValidationsDebounce)}
         validationMode={extractValue.asOptionalString(validationMode)}
         registerComponentApi={registerComponentApi}
-        syncToValidation={extractValue.asOptionalBoolean(syncToValidation)}
         maxTextLength={extractValue(maxTextLength)}
         {...resolvedRestProps}
       >
