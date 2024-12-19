@@ -45,11 +45,11 @@ export const SelectMd = createMetadata({
     labelPosition: dLabelPosition("top"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
-    optionTemplate: dComponent(
+    optionLabelTemplate: dComponent(
       `This property enables the customization of list items. To access the attributes of ` +
         `a list item use the \`$item\` context variable.`,
     ),
-    badgeTemplate: dComponent(`This property enables the customization of badges.`),
+    valueTemplate: dComponent(`This property enables the customization of the value.`),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
@@ -139,12 +139,12 @@ export const selectComponentRenderer = createComponentRenderer(
         labelWidth={extractValue(node.props.labelWidth)}
         labelBreak={extractValue.asOptionalBoolean(node.props.labelBreak)}
         required={extractValue.asOptionalBoolean(node.props.required)}
-        optionRenderer={
-          node.props.optionTemplate
+        optionLabelRenderer={
+          node.props.optionLabelTemplate
             ? (item) => {
                 return (
                   <MemoizedItem
-                    node={node.props.optionTemplate}
+                    node={node.props.optionLabelTemplate}
                     item={item}
                     renderChild={renderChild}
                   />
@@ -152,12 +152,15 @@ export const selectComponentRenderer = createComponentRenderer(
               }
             : undefined
         }
-        badgeRenderer={
-          node.props.badgeTemplate
-            ? (item) => {
+        valueRenderer={
+          node.props.valueTemplate
+            ? (item, removeItem) => {
                 return (
                   <MemoizedItem
-                    node={node.props.badgeTemplate}
+                    contextVars={{
+                      $context: { removeItem },
+                    }}
+                    node={node.props.valueTemplate}
                     item={item}
                     renderChild={renderChild}
                   />

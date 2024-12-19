@@ -52,8 +52,8 @@ type SelectProps = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
-  optionRenderer?: (item: Option) => ReactNode;
-  badgeRenderer?: (item: Option) => ReactNode;
+  optionLabelRenderer?: (item: Option) => ReactNode;
+  valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
   layout?: CSSProperties;
   onDidChange?: (newValue: ValueType) => void;
@@ -72,10 +72,6 @@ type SelectProps = {
   labelWidth?: string;
   labelBreak?: boolean;
 };
-
-function defaultRenderer(item: Option) {
-  return <div>{item.label}</div>;
-}
 
 function SimpleSelect(props: {
   value: SingleValueType;
@@ -192,8 +188,8 @@ export function Select({
   onBlur = noop,
   registerComponentApi,
   emptyListTemplate,
-  optionRenderer = defaultRenderer,
-  badgeRenderer = defaultRenderer,
+  optionLabelRenderer,
+  valueRenderer,
   layout,
   dropdownHeight,
   children,
@@ -313,10 +309,10 @@ export function Select({
     () => ({
       multiSelect,
       value,
-      optionRenderer,
+      optionLabelRenderer,
       onChange: toggleOption,
     }),
-    [multiSelect, toggleOption, value, optionRenderer],
+    [multiSelect, toggleOption, value, optionLabelRenderer],
   );
 
   return (
@@ -356,19 +352,28 @@ export function Select({
                       Array.isArray(value) && value.length > 0 ? (
                         <div className={styles.badgeListContainer}>
                           <div className={styles.badgeList}>
-                            {value.map((v) => (
-                              <span key={v} className={styles.badge}>
-                                {badgeRenderer(Array.from(options).find((o) => o.value === v))}
-                                <Icon
-                                  name="close"
-                                  size="sm"
-                                  onClick={(event) => {
-                                    event.stopPropagation();
+                            {value.map((v) =>
+                              valueRenderer ? (
+                                valueRenderer(
+                                  Array.from(options).find((o) => o.value === v),
+                                  () => {
                                     toggleOption(v);
-                                  }}
-                                />
-                              </span>
-                            ))}
+                                  },
+                                )
+                              ) : (
+                                <span key={v} className={styles.badge}>
+                                  {Array.from(options).find((o) => o.value === v)?.label}
+                                  <Icon
+                                    name="close"
+                                    size="sm"
+                                    onClick={(event) => {
+                                      event.stopPropagation();
+                                      toggleOption(v);
+                                    }}
+                                  />
+                                </span>
+                              ),
+                            )}
                           </div>
                         </div>
                       ) : (
@@ -464,7 +469,7 @@ export function Select({
 export const ComboboxOption = (option: Option) => {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
-  const { value: selectedValue, onChange, multi, optionRenderer } = useSelect();
+  const { value: selectedValue, onChange, multi, optionLabelRenderer } = useSelect();
   const selected =
     Array.isArray(selectedValue) && multi ? selectedValue.includes(value) : selectedValue === value;
 
@@ -481,7 +486,7 @@ export const ComboboxOption = (option: Option) => {
       data-state={selected ? "checked" : undefined}
       keywords={keywords}
     >
-      {optionRenderer({ label, value })}
+      {optionLabelRenderer ? optionLabelRenderer({ label, value }) : label}
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
@@ -514,7 +519,7 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
   (option, ref) => {
     const { value, label, enabled = true } = option;
     const { onOptionRemove, onOptionAdd } = useOption();
-    const { optionRenderer } = useSelect();
+    const { optionLabelRenderer } = useSelect();
 
     useLayoutEffect(() => {
       onOptionAdd(option);
@@ -523,7 +528,9 @@ const SelectOption = React.forwardRef<React.ElementRef<typeof SelectItem>, Optio
 
     return (
       <SelectItem ref={ref} className={styles.selectItem} value={value + ""} disabled={!enabled}>
-        <SelectItemText>{optionRenderer({ value, label })}</SelectItemText>
+        <SelectItemText>
+          {optionLabelRenderer ? optionLabelRenderer({ value, label }) : label}
+        </SelectItemText>
         <span className={styles.selectItemIndicator}>
           <SelectItemIndicator>
             <Icon name="checkmark" />

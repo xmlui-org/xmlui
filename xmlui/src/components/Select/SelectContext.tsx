@@ -7,7 +7,7 @@ type SelectContextValue = {
   multi?: boolean;
   value: ValueType | null;
   onChange?: (selectedValue: SingleValueType) => void;
-  optionRenderer: (option: Option) => ReactNode;
+  optionLabelRenderer: (option: Option) => ReactNode;
 };
 
 export const SelectContext = createContext<SelectContextValue>(null);
