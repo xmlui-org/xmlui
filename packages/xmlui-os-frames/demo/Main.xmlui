@@ -1,0 +1,15 @@
+<App>
+  <CHStack>
+    <CVStack>
+      <WindowsAppFrame>
+        hey, windows
+      </WindowsAppFrame>
+      <MacOSAppFrame>
+        hey, mac
+      </MacOSAppFrame>
+    </CVStack>
+    <IPhoneFrame>
+      hey, iphone
+    </IPhoneFrame>
+  </CHStack>
+</App>
