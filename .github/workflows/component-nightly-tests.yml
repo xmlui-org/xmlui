@@ -5,6 +5,7 @@ concurrency: # Concurrency ensures that only a single job or workflow using the 
   cancel-in-progress: true
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: "39 1 * * *"
 jobs:
