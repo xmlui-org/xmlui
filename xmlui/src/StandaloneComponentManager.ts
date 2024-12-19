@@ -19,10 +19,16 @@ export default class StandaloneComponentManager {
     this.subscriptions.delete(cb);
   }
 
-  registerComponent(component: ComponentRendererDef) {
-    this.registeredComponents.push(component);
-    this.subscriptions.forEach((cb: ComponentRegisteredCallbackFn) => {
-      cb(component);
+  registerComponent(component: ComponentRendererDef | ComponentRendererDef[]) {
+    let comps = component as ComponentRendererDef[];
+    if(!Array.isArray(component)) {
+      comps = [component];
+    }
+    comps.forEach((component) => {
+      this.registeredComponents.push(component);
+      this.subscriptions.forEach((cb: ComponentRegisteredCallbackFn) => {
+        cb(component);
+      });
     });
   }
 }

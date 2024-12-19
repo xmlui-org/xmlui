@@ -1,0 +1,221 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+
+.device {
+  position: relative;
+  transform: scale(1);
+  z-index: 1
+}
+
+.device .deviceFrame {
+  z-index: 1
+}
+
+.device .deviceScreen {
+  background-color: t.$color-bg;
+  background-position: center center;
+  background-size: cover;
+  object-fit: cover;
+  position: relative
+}
+
+.deviceIphone14Pro {
+  height: 868px;
+  width: 428px;
+  flex-shrink: 0;
+}
+
+.deviceIphone14Pro .deviceFrame {
+  background: #010101;
+  border: 1px solid #1b1721;
+  border-radius: 68px;
+  box-shadow: inset 0 0 4px 2px #c0b7cd, inset 0 0 0 6px #342c3f;
+  height: 100%;
+  padding: 19px;
+  width: 100%;
+}
+
+.deviceIphone14Pro .deviceScreen {
+  border-radius: 49px;
+  height: 100%;
+  width: 100%;
+  padding-top: 44px;
+}
+
+.deviceIphone14Pro .deviceStripe::after, .deviceIphone14Pro .deviceStripe::before {
+  border: solid rgba(1, 1, 1, .25);
+  border-width: 0 7px;
+  content: "";
+  height: 7px;
+  left: 0;
+  position: absolute;
+  width: 100%;
+  z-index: 9;
+}
+
+.deviceIphone14Pro .deviceStripe::after {
+  top: 85px;
+}
+
+.deviceIphone14Pro .deviceStripe::before {
+  bottom: 85px;
+}
+
+.deviceIphone14Pro .deviceHeader {
+  background: #010101;
+  border-radius: 20px;
+  height: 35px;
+  left: 50%;
+  margin-left: -60px;
+  position: absolute;
+  top: 29px;
+  width: 120px;
+}
+
+.deviceIphone14Pro .deviceSensors::after, .deviceIphone14Pro .deviceSensors::before {
+  content: "";
+  position: absolute;
+}
+
+.deviceIphone14Pro .deviceSensors::after {
+  background: #010101;
+  border-radius: 17px;
+  height: 33px;
+  left: 50%;
+  margin-left: -60px;
+  top: 30px;
+  width: 74px;
+}
+
+.deviceIphone14Pro .deviceSensors::before {
+  background: radial-gradient(farthest-corner at 20% 20%, #6074bf 0, transparent 40%), radial-gradient(farthest-corner at 80% 80%, #513785 0, #24555e 20%, transparent 50%);
+  border-radius: 50%;
+  box-shadow: 0 0 1px 1px rgba(255, 255, 255, .05);
+  height: 9px;
+  left: 50%;
+  margin-left: 36px;
+  top: 42px;
+  width: 9px;
+}
+
+.deviceIphone14Pro .deviceBtns {
+  background: #1b1721;
+  border-radius: 2px;
+  height: 32px;
+  left: -2px;
+  position: absolute;
+  top: 115px;
+  width: 3px;
+}
+
+.deviceIphone14Pro .deviceBtns::after, .deviceIphone14Pro .deviceBtns::before {
+  background: #1b1721;
+  border-radius: 2px;
+  content: "";
+  height: 62px;
+  left: 0;
+  position: absolute;
+  width: 3px;
+}
+
+.deviceIphone14Pro .deviceBtns::after {
+  top: 60px;
+}
+
+.deviceIphone14Pro .deviceBtns::before {
+  top: 140px;
+}
+
+.deviceIphone14Pro .devicePower {
+  background: #1b1721;
+  border-radius: 2px;
+  height: 100px;
+  position: absolute;
+  right: -2px;
+  top: 200px;
+  width: 3px;
+}
+
+.deviceIphone14Pro .deviceHome::after, .deviceIphone14Pro .deviceHome::before {
+  border: solid rgba(1, 1, 1, .25);
+  border-width: 6px 0;
+  content: "";
+  height: 6px;
+  position: absolute;
+  width: 6px;
+  z-index: 9;
+}
+
+.deviceIphone14Pro .deviceHome::after {
+  right: 86px;
+  top: 0;
+}
+
+.deviceIphone14Pro .deviceHome::before {
+  bottom: 0;
+  left: 86px;
+}
+
+.deviceIphone14Pro.deviceSilver .deviceFrame {
+  border-color: #c8cacb;
+  box-shadow: inset 0 0 4px 2px #fff, inset 0 0 0 6px #e2e3e4;
+}
+
+.deviceIphone14Pro.deviceSilver .deviceBtns {
+  background: #c8cacb;
+}
+
+.deviceIphone14Pro.deviceSilver .deviceBtns::after, .deviceIphone14Pro.deviceSilver .deviceBtns::before {
+  background: #c8cacb;
+}
+
+.deviceIphone14Pro.deviceSilver .devicePower {
+  background: #c8cacb;
+}
+
+.deviceIphone14Pro.deviceBlack .deviceFrame {
+  border-color: #5c5956;
+  box-shadow: inset 0 0 4px 2px #fff, inset 0 0 0 6px #76726f;
+}
+
+.deviceIphone14Pro.deviceBlack .deviceBtns {
+  background: #5c5956;
+}
+
+.deviceIphone14Pro.deviceBlack .deviceBtns::after, .deviceIphone14Pro.deviceBlack .deviceBtns::before {
+  background: #5c5956;
+}
+
+.deviceIphone14Pro.deviceBlack .devicePower {
+  background: #5c5956;
+}
+
+.deviceIphone14Pro.deviceGold .deviceFrame {
+  border-color: #e7d19e;
+  box-shadow: inset 0 0 4px 2px #fff, inset 0 0 0 6px #d2ab4c;
+}
+
+.deviceIphone14Pro.deviceGold .deviceBtns {
+  background: #e7d19e;
+}
+
+.deviceIphone14Pro.deviceGold .deviceBtns::after, .deviceIphone14Pro.deviceGold .deviceBtns::before {
+  background: #e7d19e;
+}
+
+.deviceIphone14Pro.deviceGold .devicePower {
+  background: #e7d19e;
+}
+
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}

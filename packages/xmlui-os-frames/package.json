@@ -1,0 +1,42 @@
+{
+  "name": "xmlui-os-frames",
+  "version": "0.1.0",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "start": "xmlui start",
+    "build:demo": "xmlui build",
+    "preview": "xmlui preview",
+    "build": "xmlui build-lib",
+    "build-watch": "xmlui build-lib --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/react": "18.2.23",
+    "@types/react-dom": "18.2.7",
+    "classnames": "^2.5.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "xmlui": "*"
+  },
+  "main": "./dist/xmlui-os-frames.js",
+  "module": "./dist/xmlui-os-frames.mjs",
+  "exports": {
+    ".": {
+      "import": "./dist/xmlui-os-frames.mjs",
+      "require": "./dist/xmlui-os-frames.js"
+    },
+    "./*.css": {
+      "import": "./dist/*.css",
+      "require": "./dist/*.css"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

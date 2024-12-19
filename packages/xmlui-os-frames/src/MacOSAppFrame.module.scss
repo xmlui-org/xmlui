@@ -1,0 +1,115 @@
+@use "xmlui/themes.scss" as t;
+
+// --- This code snippet is required to collect the theme variables used in this module
+$themeVars: ();
+@function createThemeVar($componentVariable) {
+  $themeVars: t.appendThemeVar($themeVars, $componentVariable) !global;
+  @return t.getThemeVar($themeVars, $componentVariable);
+}
+
+.app {
+  --elevated-shadow: 0px 8.5px 10px #0000001d, 0px 68px 80px #0000003b;
+  will-change: width, height;
+  box-shadow: var(--elevated-shadow);
+  cursor: var(--system-cursor-default), auto;
+  border-radius: .75rem;
+  grid-template-rows: 1fr;
+  display: grid;
+  width: 50rem;
+  height: 30rem;
+  z-index: 14;
+  touch-action: none;
+  position: relative;
+  resize: both;
+  overflow: auto;
+}
+
+.appButtons {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  box-shadow: none !important;
+  z-index: var(--system-z-index-window-traffic-lights);
+}
+
+.appButtonsInner {
+  --button-size: .8rem;
+  grid-template-columns: repeat(3, var(--button-size));
+  align-items: center;
+  gap: .6rem;
+  height: 100%;
+  display: grid;
+
+  svg{
+    opacity: 0;
+  }
+
+  &:hover{
+    svg{
+      opacity: 1;
+    }
+  }
+}
+
+.button{
+  height: var(--button-size);
+  width: var(--button-size);
+  background-color: var(--bgcolor);
+  box-shadow: 0 0 0 .5px var(--border-color);
+  border-radius: 50%;
+  transition: transform .1s ease-in;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close{
+  --bgcolor: #ff5f56;
+  --border-color: #e0443e;
+}
+
+.minimize{
+  --bgcolor: #ffbd2e;
+  --border-color: #dea123;
+}
+
+.stretch{
+  --bgcolor: #27c93f;
+  --border-color: #1aab29;
+}
+
+
+.container {
+  background-color: t.$color-bg;
+  border-radius: inherit;
+  grid-template-rows: auto 1fr;
+  min-height: auto;
+  max-height: 100%;
+  display: grid;
+  overflow-y: hidden;
+  height: 100% !important;
+}
+
+
+.titleBar {
+  border-bottom: solid .9px hsla(var(--system-color-dark-hsl), .3);
+  justify-content: center;
+  width: 100%;
+  padding: .9rem 1rem;
+  display: flex;
+}
+
+.mainArea {
+  color: var(--system-color-light-contrast);
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  display: flex;
+  overflow-y: auto;
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export{
+  themeVars: t.json-stringify($themeVars)
+}
