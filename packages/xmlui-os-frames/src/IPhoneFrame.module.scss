@@ -29,6 +29,7 @@ $themeVars: ();
 .deviceIphone14Pro {
   height: 868px;
   width: 428px;
+  flex-shrink: 0;
 }
 
 .deviceIphone14Pro .deviceFrame {
