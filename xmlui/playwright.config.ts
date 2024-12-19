@@ -32,8 +32,8 @@ export default defineConfig({
     baseURL: `http://localhost:${port}`,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
-    serviceWorkers: 'allow',
+    trace: "on-first-retry",
+    serviceWorkers: "allow",
   },
 
   retries: process.env.CI ? 2 : 1,
@@ -53,7 +53,7 @@ export default defineConfig({
     command: process.env.CI
       ? `npx serve src/testing/infrastructure/dist -p ${port}`
       : `npm run start-test-bed -- --port ${port}`,
-    timeout: 10 * 1000,
+    timeout: 50 * 1000,
     port,
     reuseExistingServer: !process.env.CI,
   },
