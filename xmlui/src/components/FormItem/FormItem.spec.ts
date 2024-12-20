@@ -40,17 +40,17 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
 test.skip("type 'checkbox' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("checkbox");
+  //expect(driver.component).toHaveRole("checkbox");
 });
 
 test.skip("type 'datePicker' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("application");
+  //expect(driver.component).toHaveRole("application");
 });
 
 test.skip("type 'file' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("button");
+  //expect(driver.component).toHaveRole("button");
 });
 
 test.skip("type 'integer' renders right aria role", async ({ createDriver }) => {
@@ -65,27 +65,27 @@ test.skip("type 'number' renders right aria role", async ({ createDriver }) => {
 
 test.skip("type 'radioGroup' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("radiogroup");
+  //expect(driver.component).toHaveRole("radiogroup");
 });
 
 test.skip("type 'select' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("combobox");
+  //expect(driver.component).toHaveRole("combobox");
 });
 
 test.skip("type 'switch' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("switch");
+  //expect(driver.component).toHaveRole("switch");
 });
 
 test.skip("type 'text' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("textbox");
+  //expect(driver.component).toHaveRole("textbox");
 });
 
 test.skip("type 'textarea' renders right aria role", async ({ createDriver }) => {
   const driver = await createDriver(`future markup here`);
-  expect(driver.component).toHaveRole("textbox");
+  //expect(driver.component).toHaveRole("textbox");
 });
 
 types.forEach((testCase) => {
