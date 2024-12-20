@@ -1,4 +1,5 @@
 import { labelPositionValues } from "@components/abstractions";
+import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
 class FormItemDriver extends ComponentDriver {}
@@ -87,6 +88,24 @@ test.skip("type 'textarea' renders right aria role", async ({ createDriver }) =>
   const driver = await createDriver(`future markup here`);
   //expect(driver.component).toHaveRole("textbox");
 });
+
+// TODO
+test.skip("don't run other validations if field is not required",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    // Add FormItem with clientside validation: required="false" and minLength="3"
+    // Fill input field with less than 3 chars
+    // Expect no validation errors
+  });
+
+test.skip("run other validations if field is required",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    // Add FormItem with clientside validation: required="true" and minLength="3"
+    // Fill input field with less than 3 chars
+    // Expect validation error
+  });
+
 
 types.forEach((testCase) => {
   test.skip(`autofocus for type '${testCase}' works`, async ({ createDriver }) => {});
