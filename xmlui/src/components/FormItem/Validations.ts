@@ -70,13 +70,17 @@ class FormItemValidator {
   constructor (private validations: FormItemValidations, private onValidate: ValidateEventHandler, private value: any) {}
 
   preValidate = () => {
-    const validationResults = [
-      this.validateRequired(),
-      this.validateLength(),
-      this.validateRange(),
-      this.validatePattern(),
-      this.validateRegex()
-    ].filter(result => result !== undefined) as Array<SingleValidationResult>;
+    const requiredResult = this.validateRequired();
+    let validationResults: SingleValidationResult[] = [ requiredResult ];
+    if (!requiredResult || requiredResult.isValid) {
+      validationResults.push(
+        this.validateLength(),
+        this.validateRange(),
+        this.validatePattern(),
+        this.validateRegex()
+      );
+    }
+    validationResults = validationResults.filter(result => result !== undefined) as Array<SingleValidationResult>;
 
     return {
       isValid: validationResults.find(result => !result.isValid) === undefined,
@@ -85,6 +89,8 @@ class FormItemValidator {
       validations: validationResults
     } as ValidationResult;
   };
+
+
   validate = async () => {
     const preValidateResult = this.preValidate();
     const constValidationResult = (await this.validateCustom()) || [];
