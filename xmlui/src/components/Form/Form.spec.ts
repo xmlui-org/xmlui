@@ -2,6 +2,7 @@ import type { ApiInterceptorDefinition } from "@components-core/interception/abs
 import { labelPositionValues } from "@components/abstractions";
 import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
+// TODO: Copy over other tests to utilize this interceptor
 const crudInterceptor: ApiInterceptorDefinition = {
   initialize: `
     $state.items = {
@@ -58,13 +59,19 @@ class FormDriver extends ComponentDriver {
     return this.component.locator("button[type='submit']");
   }
 
+  async hasSubmitButton() {
+    return await this.getSubmitButton().count() > 0;
+  }
+
   async submitForm(trigger: SubmitTrigger = "click") {
     if (trigger === "keypress") {
-      const inputChildren = await this.locator.locator("input").all();
-      if (await this.getSubmitButton().isVisible()) {
+      if (await this.hasSubmitButton() && await this.getSubmitButton().isEnabled()) {
         await this.getSubmitButton().focus();
-      } else if (inputChildren.length > 0) {
-        await inputChildren[0].focus();
+      }
+      await this.locator.locator("input").waitFor();
+      const firstInputChild = this.locator.locator("input");
+      if (await firstInputChild.count() > 0) {
+        await firstInputChild.first().focus();
       }
       await this.page.keyboard.press("Enter");
     } else if (trigger === "click") {
@@ -100,7 +107,7 @@ class FormDriver extends ComponentDriver {
 
   // TEMP: As we expand tests, we need to rethink how the input fields are accessed
   getFormItemWithTestId(testId: string) {
-    return this.component.locator(`[data-testId="${testId}"]`).getByRole("textbox");
+    return this.component.getByTestId(testId).getByRole("textbox");
   }
 }
 
@@ -128,7 +135,7 @@ test("setting buttonRowTemplate without buttons still runs submit on Enter", asy
   const driver = await createDriver(`
     <Form onSubmit="testState = true">
       <property name="buttonRowTemplate">
-          <Fragment />
+        <Fragment />
       </property>
       <FormItem testId="name" bindTo="name" />
     </Form>`);
