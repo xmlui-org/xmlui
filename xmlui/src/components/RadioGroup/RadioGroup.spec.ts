@@ -1,4 +1,5 @@
 import { labelPositionValues, validationStatusValues } from "@components/abstractions";
+import { SKIP_REASON } from "@testing/component-test-helpers";
 import { ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
 // --- Setup
@@ -11,17 +12,17 @@ const test = createTestWithDriver(RadioGroupDriver);
 
 // --- children
 
-test.skip("Providing Option elements as children renders RadioGroup with correct children", async ({
-  createDriver,
-}) => {});
+test.skip("Providing Option elements as children renders RadioGroup with correct children",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("Providing non-Option elements as children does not render RadioGroup", async ({
-  createDriver,
-}) => {});
+test.skip("Providing non-Option elements as children does not render RadioGroup",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("Mixing Option and non-Option elements as children only renders Option elements", async ({
-  createDriver,
-}) => {});
+test.skip("Mixing Option and non-Option elements as children only renders Option elements",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- props
 
@@ -43,7 +44,9 @@ test.skip("Mixing Option and non-Option elements as children only renders Option
   { label: "undefined", value: undefined },
   { label: "null", value: null },
 ].forEach(({ label, value }) => {
-  test.skip(`setting initialValue to ${label} sets value of field`, async ({ createDriver }) => {});
+  test.skip(`setting initialValue to ${label} sets value of field`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
 });
 
 [
@@ -55,24 +58,34 @@ test.skip("Mixing Option and non-Option elements as children only renders Option
   { label: "function", value: () => {} },
   { label: "NaN", value: NaN },
 ].forEach(({ label, value }) => {
-  test.skip(`setting initialValue to ${label} throws error`, async ({ createDriver }) => {});
+  test.skip(`setting initialValue to ${label} throws error`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
 });
 
 // --- --- autoFocus
 
-test.skip("autoFocus sets focus on the first Option on page load", async ({ createDriver }) => {});
+test.skip("autoFocus sets focus on the first Option on page load",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- required
 
-test.skip("making field required shows a visual indicator", async ({ createDriver }) => {});
+test.skip("making field required shows a visual indicator",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- readOnly
 
-test.skip("readOnly disables switching between options", async ({ createDriver }) => {});
+test.skip("readOnly disables switching between options",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- enabled
 
-test.skip("disabled input field stops user interaction for field", async ({ createDriver }) => {
+test.skip("disabled input field stops user interaction for field",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
   // try to click any other Option than the one currently selected
 });
 
@@ -80,31 +93,39 @@ test.skip("disabled input field stops user interaction for field", async ({ crea
 
 const validationStatuses = validationStatusValues.filter((v) => v !== "none");
 validationStatuses.forEach((status) => {
-  test.skip(`validation status ${status} is applied correctly`, async ({ createDriver }) => {
+  test.skip(`validation status ${status} is applied correctly`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {
     // border color matches the one specified in current theme
   });
 });
 
-test.skip("only one option should have validation status 'error' or 'warning", async ({
-  createDriver,
-}) => {});
+test.skip("only one option should have validation status 'error' or 'warning",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- orientation: Not implemented yet
 
 // --- --- label
 
-test.skip("label is rendered if provided", async ({ createDriver }) => {});
+test.skip("label is rendered if provided",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("empty string label is not rendered", async ({ createDriver }) => {});
+test.skip("empty string label is not rendered",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("clicking on the label focuses input field", async ({ createDriver }) => {});
+test.skip("clicking on the label focuses input field",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- labelPosition
 
 labelPositionValues.forEach((pos) => {
-  test.skip(`label position ${pos} is applied for the input field and associated label`, async ({
-    createDriver,
-  }) => {});
+  test.skip(`label position ${pos} is applied for the input field and associated label`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
 });
 
 // --- --- labelWidth TODO?
@@ -115,38 +136,62 @@ labelPositionValues.forEach((pos) => {
 
 // --- --- onDidChange
 
-test.skip("onDidChange is called on input change", async ({ createDriver }) => {});
+test.skip("onDidChange is called on input change",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("onDidChange is not called if field is disabled", async ({ createDriver }) => {});
+test.skip("onDidChange is not called if field is disabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- onGotFocus
 
-test.skip("gotFocus event fires on focusing the field", async ({ createDriver }) => {});
+test.skip("gotFocus event fires on focusing the field",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("onFocus is not called if field is disabled", async ({ createDriver }) => {});
+test.skip("onFocus is not called if field is disabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- onLostFocus
 
-test.skip("lostFocus event fires on blurring the field", async ({ createDriver }) => {});
+test.skip("lostFocus event fires on blurring the field",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("lostFocus is not called if field is disabled", async ({ createDriver }) => {});
+test.skip("lostFocus is not called if field is disabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- api
 
 // --- --- focus
 
-test.skip("focus() focuses the first Option", async ({ createDriver }) => {});
+test.skip("focus() focuses the first Option",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("focus() does nothing if field is disabled", async ({ createDriver }) => {});
+test.skip("focus() does nothing if field is disabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- value
 
-test.skip("value returns current input value", async ({ createDriver }) => {});
+test.skip("value returns current input value",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- --- setValue
 
-test.skip("setValue updates input value", async ({ createDriver }) => {});
+test.skip("setValue updates input value", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("setValue does not update input if field is disabled", async ({ createDriver }) => {});
+test.skip("setValue does not update input if field is disabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("setValue does not update input if value is invalid", async ({ createDriver }) => {});
+test.skip("setValue does not update input if value is invalid",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});

@@ -1,5 +1,6 @@
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import { labelPositionValues } from "@components/abstractions";
+import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 
 // TODO: Copy over other tests to utilize this interceptor
@@ -113,7 +114,7 @@ class FormDriver extends ComponentDriver {
   }
 }
 
-const test = createTestWithDriver(FormDriver);
+export const test = createTestWithDriver(FormDriver);
 
 // TODO: evaluate and add tests from 'form-smart-fetch.spec.ts' and 'conditional-field-in-form-submit.spec.ts',
 // as well as other places that may be relevant
@@ -127,9 +128,9 @@ test("renders component", async ({ createDriver }) => {
 
 // --- --- buttonRowTemplate
 
-test.skip("buttonRowTemplate can render buttons", async ({ createDriver }) => {});
+test.skip("buttonRowTemplate can render buttons", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
-test.skip("buttonRowTemplate replaces built-in buttons", async ({ createDriver }) => {});
+test.skip("buttonRowTemplate replaces built-in buttons", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
 test("setting buttonRowTemplate without buttons still runs submit on Enter", async ({
   createDriver,
@@ -148,27 +149,27 @@ test("setting buttonRowTemplate without buttons still runs submit on Enter", asy
 // --- --- itemLabelPosition
 
 labelPositionValues.forEach((pos) => {
-  test.skip(`label position ${pos} is applied by default for all FormItems`, async ({
-    createDriver,
-  }) => {});
-  test.skip(`label position ${pos} is not applied if overridden in FormItem`, async ({
-    createDriver,
-  }) => {});
+  test.skip(`label position ${pos} is applied by default for all FormItems`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
+  test.skip(`label position ${pos} is not applied if overridden in FormItem`, 
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
 });
 
 // --- --- itemLabelWidth: Should we use this? Can we re-evaluate?
 
 // --- --- itemLabelBreak: We should talk about this
 
-test.skip("FormItem labels break to next line", async ({ createDriver }) => {});
+test.skip("FormItem labels break to next line", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
-test.skip("no label breaks if overriden in FormItem", async ({ createDriver }) => {});
+test.skip("no label breaks if overriden in FormItem", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
 // --- --- enabled
 
-test.skip("Form buttons and contained FormItems are enabled", async ({ createDriver }) => {});
+test.skip("Form buttons and contained FormItems are enabled", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
-test.skip("Form buttons and contained FormItems are disabled", async ({ createDriver }) => {});
+test.skip("Form buttons and contained FormItems are disabled", SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ createDriver }) => {});
 
 // --- --- data
 
@@ -194,7 +195,7 @@ test("data accepts an object", async ({ createDriver }) => {
   { label: "array", value: ["hi", "hello", "yay"] },
   { label: "function", value: () => {} },
 ].forEach((type) => {
-  test.skip(`data does not accept ${type.label}`, async ({ createDriver }) => {});
+  test.fixme(`data does not accept ${type.label}`, SKIP_REASON.UNSURE("Need to talk this through"), async ({ createDriver }) => {});
 });
 
 // Fails with CI mode, but otherwise works
@@ -221,8 +222,10 @@ test.fixme("data accepts relative URL endpoint", async ({ createDriver }) => {
   await expect(driver.getFormItemWithTestId("inputField")).toHaveValue("John");
 });
 
-// TODO: Mock's not working for some reason, can access unmocked URLs though
-test.skip("data accepts external URL endpoint", async ({ createDriver }) => {
+// TODO
+test.fixme("data accepts external URL endpoint",
+  SKIP_REASON.TEST_NOT_WORKING("Mock's not working for some reason, can access unmocked URLs though"),
+  async ({ createDriver }) => {
   // data="https://api.spacexdata.com/v3/history/1"
   const driver = await createDriver(`
     <Form data="https://example.com/test">
@@ -235,33 +238,37 @@ test.skip("data accepts external URL endpoint", async ({ createDriver }) => {
 
 // --- --- cancelLabel: In the future we need to have a test case for the hideCancel prop
 
-test.skip("cancel button uses default label if cancelLabel is not set", async ({
-  createDriver,
-}) => {});
+test.skip("cancel button uses default label if cancelLabel is not set",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 test.skip("cancel button is rendered with cancelLabel", async ({ createDriver }) => {});
 
 // saveLabel
 
-test.skip("save button is rendered with default label if saveLabel is set to empty string", async ({
-  createDriver,
-}) => {});
+test.skip("save button is rendered with default label if saveLabel is set to empty string",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("save button is rendered with saveLabel", async ({ createDriver }) => {});
+test.skip("save button is rendered with saveLabel",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // saveInProgressLabel
 
-test.skip("save in progress label shows up on submission", async ({ createDriver }) => {});
+test.skip("save in progress label shows up on submission",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("save in progress label does not get stuck after submission is done", async ({
-  createDriver,
-}) => {});
+test.skip("save in progress label does not get stuck after submission is done",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // swapCancelAndSave
 
-test.skip("built-in button row order flips if swapCancelAndSave is true", async ({
-  createDriver,
-}) => {});
+test.skip("built-in button row order flips if swapCancelAndSave is true",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- submitUrl
 
@@ -385,10 +392,11 @@ test("submit triggers when pressing Enter", async ({ createDriver }) => {
   expect(request.failure()).toBeNull();
 });
 
-// TODO: times out because the request cannot be sent - need to re-evaluate the assertion
-test.skip("submit only triggers when enabled", async ({ createDriver }) => {
-  const driver = await createDriver(
-    `
+// TODO
+test.fixme("submit only triggers when enabled",
+  SKIP_REASON.TEST_NOT_WORKING("times out because the request cannot be sent, need to re-evaluate the assertion"),
+  async ({ createDriver }) => {
+  const driver = await createDriver(`
     <Form enabled="false" data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -421,41 +429,53 @@ test("user cannot submit with clientside errors present", async ({ createDriver 
 
 // --- canceling
 
-test.skip("cancel only triggers when enabled", async ({ createDriver }) => {});
+test.skip("cancel only triggers when enabled",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- reset: TODO
 
 // --- $data: should these be in FormItem.spec.ts?
 
-test.skip("$data is correctly bound to form data", async ({ createDriver }) => {});
+test.skip("$data is correctly bound to form data", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("$data is correctly undefined if data is not set in props", async ({
-  createDriver,
-}) => {});
+test.skip("$data is correctly undefined if data is not set in props", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // --- backend validation summary
 
-test.skip("submitting with errors shows validation summary", async ({ createDriver }) => {});
+test.skip("submitting with errors shows validation summary",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("submitting without errors does not show summary", async ({ createDriver }) => {});
+test.skip("submitting without errors does not show summary",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("general error messages are rendered in the summary", async ({ createDriver }) => {});
+test.skip("general error messages are rendered in the summary",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("field-related errors are rendered at the correct FormItems", async ({
-  createDriver,
-}) => {});
+test.skip("field-related errors are rendered at the correct FormItems",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("field-related errors disappear if user updates FormItems", async ({
-  createDriver,
-}) => {});
+test.skip("field-related errors disappear if user updates FormItems",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
 // NOTE: this could be multiple tests
-test.skip("user can close all parts of the summary according to severity", async ({
-  createDriver,
-}) => {});
+test.skip("user can close all parts of the summary according to severity",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("submitting with errors 2nd time after user close shows summary again", async ({
-  createDriver,
-}) => {});
+test.skip("submitting with errors 2nd time after user close shows summary again", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
 
-test.skip("Form shows confirmation dialog if warnings are present", async ({ createDriver }) => {});
+test.skip("Form shows confirmation dialog if warnings are present", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {});
