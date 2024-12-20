@@ -60,7 +60,11 @@ async function parseResponseJson(response: AxiosResponse | Response) {
     try {
       resp = await response.clone().json();
     } catch (e: any) {
-      console.error("Failed to parse response as JSON", response.body);
+      try {
+        resp = await response.clone().text();
+      } catch (e) {
+        console.error("Failed to parse response as text or JSON", response.body);
+      }      
     }
   }
   return resp;
