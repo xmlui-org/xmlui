@@ -296,6 +296,111 @@ Click on the second field to see the custom empty list indicator.
 
 %-PROP-END
 
+%-PROP-START optionLabelTemplate
+
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
+
+```ueml copy {3-9} /optionLabelTemplate/
+<App>
+  <Select initialValue="{0}" placeholder="Select..." searchable>
+    <property name="optionLabelTemplate">
+      <HStack 
+        horizontalPadding="$padding-tight" 
+        border="2px dotted $color-primary-500">
+        <Text>{$item.label}</Text>
+      </HStack>
+    </property>
+    <Option value="{0}" label="zero"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>
+```
+
+<Playground
+  name="Example: optionLabelTemplate"
+  height={300}
+  app={`
+    <App>
+      <Select initialValue="{0}" placeholder="Select..." searchable>
+        <property name="optionLabelTemplate">
+          <HStack 
+            horizontalPadding="$padding-tight" 
+            border="2px dotted $color-primary-500">
+            <Text>{$item.label}</Text>
+          </HStack>
+        </property>
+        <Option value="{0}" label="zero"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START valueTemplate
+
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
+
+```ueml copy {3-15} /valueTemplate/
+<App>
+  <Select initialValue="{0}" placeholder="Select..." multiSelect>
+    <property name="valueTemplate">
+      <HStack 
+        paddingLeft="$padding-tight" 
+        border="2px dotted $color-primary-500"              
+        verticalAlignment="center">
+        <Text>{$item.label}</Text>
+        <Button 
+          variant="ghost"
+          icon="close" 
+          size="xs" 
+          onClick="$itemContext.removeItem()"/>
+      </HStack>
+    </property>
+    <Option value="{0}" label="zero"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: valueTemplate"
+  height={300}
+  app={`
+    <App>
+      <Select initialValue="{0}" placeholder="Select..." multiSelect>
+        <property name="valueTemplate">
+          <HStack 
+            paddingLeft="$padding-tight" 
+            border="2px dotted $color-primary-500"              
+            verticalAlignment="center">
+            <Text>{$item.label}</Text>
+            <Button 
+              variant="ghost"
+              icon="close" 
+              size="xs" 
+              onClick="$itemContext.removeItem()"/>
+          </HStack>
+        </property>
+        <Option value="{0}" label="zero"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>  
+  `}
+/>
+
+%-PROP-END
+
+
 %-EVENT-START didChange
 
 ```ueml copy /onDidChange="(newItem) => newValue = newItem"/
