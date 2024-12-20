@@ -1,5 +1,5 @@
 import type { Locator } from "@playwright/test";
-import { getElementStyle, getFullRectangle, pixelStrToNum } from "@testing/component-test-helpers";
+import { getElementStyle, getFullRectangle, pixelStrToNum, SKIP_REASON } from "@testing/component-test-helpers";
 import { expect as fixtureExpect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
 import { alignmentOptionValues, buttonTypeValues, iconPositionValues } from "@components/abstractions";
 
@@ -134,8 +134,7 @@ test("renders without label, icon or children", async ({ createDriver }) => {
   expect(width).toBeGreaterThan(0);
 });
 
-// TODO: Talk through what we should see in each case,
-// for instance, the function throws an error, the rest just don't render
+// TODO
 [
   { label: "null", value: null },
   { label: "undefined", value: undefined },
@@ -145,7 +144,9 @@ test("renders without label, icon or children", async ({ createDriver }) => {
   { label: "array", value: [] },
   { label: "function", value: () => {} },
 ].forEach((type) => {
-  test.skip(`does not render if label is ${type.label}`, async ({ createDriver }) => {
+  test.skip(`does not render if label is ${type.label}`,
+    SKIP_REASON.UNSURE("Need to talk this through, ex. the function throws an error, the rest just don't render"),
+    async ({ createDriver }) => {
     const driver = await createDriver(`<Button label="${type.value}" />`);
     await expect(driver.button).not.toBeAttached();
   });
@@ -161,14 +162,20 @@ test("ignores label property if children present", async ({ createDriver }) => {
   await expect(driver.button).toHaveExplicitLabel("world");
 });
 
-// TODO: Flesh out these tests by adding child targeting locators or targeting the children as a whole as a black box
-test.skip("renders XMLUI Text component as child", async ({ createDriver }) => {
+// TODO
+test.skip("renders XMLUI Text component as child", 
+  SKIP_REASON.TO_BE_IMPLEMENTED(
+    "Flesh out these tests by adding child targeting locators or targeting the children as a whole as a black box"
+  ),
+  async ({ createDriver }) => {
   const driver = await createDriver(`<Button label="hello"><Text>world</Text></Button>`);
   await expect(driver.button).not.toHaveExplicitLabel("hello");
 });
 
-// TODO: See comment and test above
-test.skip("renders XMLUI Complex component as child", async ({ createDriver }) => {
+// TODO
+test.skip("renders XMLUI Complex component as child",
+  SKIP_REASON.TO_BE_IMPLEMENTED("See skip reason in test above"),
+  async ({ createDriver }) => {
   const driver = await createDriver(
     `<Button label="hello"><Card title="Button">Content</Card></Button>`,
   );
@@ -233,7 +240,9 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 const iconPositions = iconPositionValues.filter((pos) => pos !== "start" && pos !== "end");
 
 iconPositions.forEach((pos) => {
-  test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos} of label`,
+    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+    async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
     });
@@ -247,7 +256,9 @@ iconPositions.forEach((pos) => {
 
 // Without label
 iconPositions.forEach((pos) => {
-  test.skip(`iconPosition=${pos} places icon on ${pos}`, async ({ createDriver }) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos}`,
+    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+    async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
     });
@@ -258,7 +269,9 @@ iconPositions.forEach((pos) => {
 
 // With children instead of label
 iconPositions.forEach((pos) => {
-  test.skip(`iconPosition=${pos} places icon on ${pos} of children`, async ({ createDriver }) => {
+  test.skip(`iconPosition=${pos} places icon on ${pos} of children`,
+    SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+    async ({ createDriver }) => {
     const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`, {
       resources: { "icon.test": "resources/bell.svg" },
     });
@@ -313,13 +326,13 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
 // import from abstractions: buttonThemeMd
 ["solid", "outlined", "ghost"].forEach((variant) => {
   ["primary", "secondary", "attention"].forEach((themeColor) => {
-    test.skip(`themeColor "${themeColor}" is applied for variant "${variant}"`, async ({
-      createDriver,
-    }) => {});
+    test.skip(`themeColor "${themeColor}" is applied for variant "${variant}"`,
+      SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+      async ({ createDriver }) => {});
     ["disabled", "hover", "active", "focused"].forEach((state) => {
-      test.skip(`${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`, async ({
-        createDriver,
-      }) => {});
+      test.skip(`${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
+        SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+        async ({ createDriver }) => {});
     });
   });
 });
@@ -329,7 +342,9 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
 // TODO: add size tests
 // Relative testing is acceptable for now - basis of the test is the default size
 ["xs", "sm", "md", "lg"].forEach((size) => {
-  test.skip(`compare size "${size}" with default size`, async ({ createDriver }) => {});
+  test.skip(`compare size "${size}" with default size`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {});
 });
 
 // --- Events

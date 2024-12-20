@@ -1,7 +1,6 @@
 import type { BrowserContext, Locator, Page } from "@playwright/test";
 // import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 // import type { Comdef } from "@abstractions/ComponentDefs";
@@ -115,3 +114,45 @@ export async function getStyle(page: Page, testId: string, style: string) {
   const locator = page.getByTestId(testId);
   return await getElementStyle(locator, style);
 }
+
+class TestSkipReason {
+  private addAnnotation(type: string, description?: string) {
+    return {
+      annotation: {
+        type,
+        description: description ?? "",
+      }
+    };
+  }
+
+  NOT_IMPLEMENTED_XMLUI(description?: string) {
+    return this.addAnnotation("not implemented in xmlui", description);
+  }
+  
+  TO_BE_IMPLEMENTED(description?: string) {
+    return this.addAnnotation("to be implemented", description);
+  }
+  
+  XMLUI_BUG(description?: string) {
+    return this.addAnnotation("xmlui bug", description);
+  }
+  
+  TEST_INFRA_BUG(description?: string) {
+    return this.addAnnotation("test infra bug", description);
+  }
+
+  TEST_NOT_WORKING(description?: string) {
+    return this.addAnnotation("test not working", description);
+  }
+
+  TEST_INFRA_NOT_IMPLEMENTED(description?: string) {
+    return this.addAnnotation("test infra not implemented", description);
+  }
+  
+  // Need to specify a reason here!
+  UNSURE(description: string) {
+    return this.addAnnotation("unsure", description);
+  }
+}
+
+export const SKIP_REASON = new TestSkipReason();
