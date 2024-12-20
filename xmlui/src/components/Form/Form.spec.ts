@@ -47,12 +47,14 @@ type MockExternalApiOptions = {
   status?: number;
   headers?: Record<string, string>;
   body?: Record<string, any>;
-}
+};
 
 class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
     const { status = 200, headers = {}, body = {} } = apiOptions;
-    await this.page.route(url, route => route.fulfill({ status, headers, body: JSON.stringify(body) }));
+    await this.page.route(url, (route) =>
+      route.fulfill({ status, headers, body: JSON.stringify(body) }),
+    );
   }
 
   getSubmitButton() {
@@ -60,17 +62,17 @@ class FormDriver extends ComponentDriver {
   }
 
   async hasSubmitButton() {
-    return await this.getSubmitButton().count() > 0;
+    return (await this.getSubmitButton().count()) > 0;
   }
 
   async submitForm(trigger: SubmitTrigger = "click") {
     if (trigger === "keypress") {
-      if (await this.hasSubmitButton() && await this.getSubmitButton().isEnabled()) {
+      if ((await this.hasSubmitButton()) && (await this.getSubmitButton().isEnabled())) {
         await this.getSubmitButton().focus();
       }
       await this.locator.locator("input").waitFor();
       const firstInputChild = this.locator.locator("input");
-      if (await firstInputChild.count() > 0) {
+      if ((await firstInputChild.count()) > 0) {
         await firstInputChild.first().focus();
       }
       await this.page.keyboard.press("Enter");
@@ -140,7 +142,7 @@ test("setting buttonRowTemplate without buttons still runs submit on Enter", asy
       <FormItem testId="name" bindTo="name" />
     </Form>`);
   await driver.submitForm("keypress");
-  expect.poll(driver.testState).toBe(true);
+  await expect.poll(driver.testState).toBe(true);
 });
 
 // --- --- itemLabelPosition
@@ -196,7 +198,8 @@ test("data accepts an object", async ({ createDriver }) => {
 });
 
 test("data accepts relative URL endpoint", async ({ createDriver }) => {
-  const driver = await createDriver(`
+  const driver = await createDriver(
+    `
     <Form data="/test">
       <FormItem testId="inputField" bindTo="name" />
     </Form>`,
@@ -261,7 +264,8 @@ test.skip("built-in button row order flips if swapCancelAndSave is true", async 
 
 test("form submits to correct url", async ({ createDriver }) => {
   const endpoint = "/test";
-  const driver = await createDriver(`
+  const driver = await createDriver(
+    `
     <Form data="{{ name: 'John' }}" submitUrl="${endpoint}" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -288,7 +292,8 @@ test("form submits to correct url", async ({ createDriver }) => {
 // TODO: GET doesn't work, are there any APIs that need to accept GET when submitting?
 [/* "get", */ "post", "put", "delete"].forEach((method) => {
   test(`submitMethod uses the ${method} REST operation`, async ({ createDriver }) => {
-    const driver = await createDriver(`
+    const driver = await createDriver(
+      `
       <Form data="{{ name: 'John' }}" submitUrl="/test" submitMethod="${method}">
         <FormItem bindTo="name" />
       </Form>`,
@@ -328,7 +333,8 @@ test("form submits to correct url", async ({ createDriver }) => {
 // --- submitting the Form
 
 test("submit triggers when clicking save/submit button", async ({ createDriver }) => {
-  const driver = await createDriver(`
+  const driver = await createDriver(
+    `
     <Form data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -350,7 +356,8 @@ test("submit triggers when clicking save/submit button", async ({ createDriver }
 });
 
 test("submit triggers when pressing Enter", async ({ createDriver }) => {
-  const driver = await createDriver(`
+  const driver = await createDriver(
+    `
     <Form data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -373,7 +380,8 @@ test("submit triggers when pressing Enter", async ({ createDriver }) => {
 
 // TODO: times out because the request cannot be sent - need to re-evaluate the assertion
 test.skip("submit only triggers when enabled", async ({ createDriver }) => {
-  const driver = await createDriver(`
+  const driver = await createDriver(
+    `
     <Form enabled="false" data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
