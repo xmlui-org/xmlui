@@ -181,18 +181,30 @@ test.skip("renders XMLUI Complex component as child", async ({ createDriver }) =
 // --- --- icon
 
 test("can render icon", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test" />`);
+  const driver = await createDriver(`<Button icon="test" />`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
   await expect(driver.getFirstIcon()).toBeVisible();
 });
 
 test("renders icon and label", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test" label="hello" />`);
+  const driver = await createDriver(`<Button icon="test" label="hello" />`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
   await expect(driver.button).toHaveText("hello");
   await expect(driver.getFirstIcon()).toBeVisible();
 });
 
 test("renders icon if children present", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test">Hello World</Button>`);
+  const driver = await createDriver(`<Button icon="test">Hello World</Button>`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
   await expect(driver.getFirstIcon()).toBeVisible();
 });
 
@@ -231,7 +243,14 @@ const iconPositions = iconPositionValues.filter((pos) => pos !== "start" && pos 
 
 iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos} of label`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`);
+    const driver = await createDriver(
+      `<Button icon="test" label="hello" iconPosition="${pos}" />`,
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
+        },
+      },
+    );
     const buttonDimensions = await getFullRectangle(driver.button);
     const contentStart = pixelStrToNum(
       buttonDimensions[pos] + (await getElementStyle(driver.button, `padding-${pos}`)),
@@ -245,7 +264,11 @@ iconPositions.forEach((pos) => {
 // Without label
 iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos}`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`);
+    const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
 
     await expect(driver.button).toBeAttached();
   });
@@ -254,7 +277,14 @@ iconPositions.forEach((pos) => {
 // With children instead of label
 iconPositions.forEach((pos) => {
   test.skip(`iconPosition=${pos} places icon on ${pos} of children`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button icon="test" label="hello" iconPosition="${pos}" />`);
+    const driver = await createDriver(
+      `<Button icon="test" label="hello" iconPosition="${pos}" />`,
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
+        },
+      },
+    );
 
     await expect(driver.button).toBeAttached();
   });
@@ -266,6 +296,11 @@ alignmentOptionValues.forEach((pos) => {
   test(`label and icon is positioned to the ${pos}`, async ({ createDriver }) => {
     const driver = await createDriver(
       `<Button width="100%" icon="test" label="hello" contentPosition="${pos}" />`,
+      {
+        resources: {
+          "icon.test": "resources/bell.svg",
+        },
+      },
     );
     await expect(driver.button).toHaveCSS("justify-content", pos);
   });

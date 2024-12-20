@@ -1,7 +1,6 @@
 import type { BrowserContext, Locator, Page } from "@playwright/test";
 // import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import testBedAppDescription from "@testing/infrastructure/src/config";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
@@ -32,7 +31,7 @@ export async function initComponent(page: Page, appDescription: UnparsedAppDescr
   const { entryPoint } = appDescription;
 
   const _appDescription: StandaloneAppDescription = {
-    ...testBedAppDescription,
+    name: "test bed app",
     ...appDescription,
     entryPoint: parseComponentIfNecessary(entryPoint),
   };
