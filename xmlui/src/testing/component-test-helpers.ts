@@ -1,6 +1,7 @@
 import type { BrowserContext, Locator, Page } from "@playwright/test";
 // import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import testBedAppDescription from "@testing/infrastructure/src/config";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
@@ -9,7 +10,7 @@ import type { ComponentDef, CompoundComponentDef } from "@abstractions/Component
 // import type { ThemeDefinition } from "@components-core";
 
 type EntryPoint = string | ComponentDef;
-  type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
+type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
   entryPoint?: EntryPoint;
 };
 
@@ -28,11 +29,11 @@ function parseComponentIfNecessary(entryPoint: ComponentDef<any> | CompoundCompo
 }
 
 export async function initComponent(page: Page, appDescription: UnparsedAppDescription) {
-  const { entryPoint, components } = appDescription;
+  const { entryPoint } = appDescription;
 
   const _appDescription: StandaloneAppDescription = {
+    ...testBedAppDescription,
     ...appDescription,
-    name: appDescription.name || "Test App",
     entryPoint: parseComponentIfNecessary(entryPoint),
   };
 
@@ -62,7 +63,12 @@ export async function getBoundingRect(locator: Locator) {
 export async function getFullRectangle(locator: Locator) {
   const boundingRect = await locator.evaluate((element) => element.getBoundingClientRect());
 
-  const margins = await getElementStyles(locator, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
+  const margins = await getElementStyles(locator, [
+    "margin-left",
+    "margin-right",
+    "margin-top",
+    "margin-bottom",
+  ]);
   const marginLeft = parseFloat(margins["margin-left"]);
   const marginRight = parseFloat(margins["margin-right"]);
   const marginTop = parseFloat(margins["margin-top"]);
@@ -94,7 +100,10 @@ export function pixelStrToNum(pixelStr: string) {
 }
 
 export async function getElementStyle(locator: Locator, style: string) {
-  return locator.evaluate((element, style) => window.getComputedStyle(element).getPropertyValue(style), style);
+  return locator.evaluate(
+    (element, style) => window.getComputedStyle(element).getPropertyValue(style),
+    style,
+  );
 }
 
 /**
@@ -105,9 +114,12 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   return locator.evaluate(
     (element, styles) =>
       Object.fromEntries(
-        styles.map((styleName) => [styleName, window.getComputedStyle(element).getPropertyValue(styleName)])
+        styles.map((styleName) => [
+          styleName,
+          window.getComputedStyle(element).getPropertyValue(styleName),
+        ]),
       ),
-    styles
+    styles,
   );
 }
 
