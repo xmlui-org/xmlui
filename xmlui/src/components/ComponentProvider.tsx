@@ -91,9 +91,9 @@ import {
   subMenuItemRenderer,
 } from "@components/DropdownMenu/DropdownMenu";
 import { themeComponentRenderer } from "@components/Theme/Theme";
-import { merge, range } from "lodash-es";
-import type { ComponentRegistryEntry } from "@components/ViewComponentRegistryContext";
-import { ViewComponentRegistryContext } from "@components/ViewComponentRegistryContext";
+import { merge } from "lodash-es";
+import type { ComponentRegistryEntry } from "@components/ComponentRegistryContext";
+import { ComponentRegistryContext } from "@components/ComponentRegistryContext";
 import { columnComponentRenderer } from "@components/Column/Column";
 import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
 import { apiAction } from "@components-core/action/APICall";
@@ -143,23 +143,32 @@ import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../StandaloneComponentManager";
 
-// Properties used by the ComponentProvider
-type ComponentProviderProps = {
-  // Child components to render
-  children: ReactNode;
-
-  // Definition of contributors
-  contributes: ContributesDefinition;
-
-  componentManager?: StandaloneComponentManager;
-};
-
+/**
+ * The framework has a specialized component concept, the "property holder 
+ * component." These components only hold property values but do not render 
+ * anything. The framework processes each of them in a particular way. 
+ * 
+ * The property holder components must be registered along with other 
+ * components, as apps may use them in their markup. The following constant 
+ * values declare renderer functions for the built-in property holders.
+ */
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
 const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 
+/**
+ * This class implements the registry that holds the components available 
+ * in xmlui. Any component in this registry can be used in the xmlui markup. 
+ * An error is raised when the markup processor does not find a particular 
+ * component within the registry.
+ * 
+ * 
+ */
 export class ComponentRegistry {
+  // --- The pool of available components
   private pool = new Map<string, ComponentRegistryEntry>();
+
+  // --- The pool of available theme variable names
   private themeVars = new Set<string>();
   private defaultThemeVars = {};
   private actionFns = new Map<string, ActionFunction>();
@@ -503,14 +512,33 @@ export class ComponentRegistry {
     this.loaders.set(type, renderer);
   }
 
-  public destroy() {
+  /**
+   * This method destroys the component registry; It unsubscribes from the component manager.
+   * This method is called when the component registry is no longer needed, e.g., when the
+   * component provider is unmounted (HMR).
+   */
+  destroy() {
     this.componentManager?.unSubscribeFromRegistrations(this.registerComponentRenderer);
   }
 }
 
-// This React component provides a context in which components can access the component registry. The
-// component takes care that child component are rendered only when the component registry is initialized
-// (filled with the definition of available components).
+// --- Properties used by the ComponentProvider
+type ComponentProviderProps = {
+  // --- Child components to render
+  children: ReactNode;
+
+  // --- Definition of contributors
+  contributes: ContributesDefinition;
+
+  // --- The component manager instance used to manage components
+  componentManager?: StandaloneComponentManager;
+};
+
+/**
+ * This React component provides a context in which components can access the 
+ * component registry. The component ensures that child components are not 
+ * rendered before the component registry is initialized.
+ */
 export function ComponentProvider({
   children,
   contributes,
@@ -519,7 +547,8 @@ export function ComponentProvider({
   const [componentRegistry, setComponentRegistry] = useState(
     () => new ComponentRegistry(contributes, componentManager),
   );
-  //sync up the changed contributes (HMR)
+  // --- Make sure the component registry is updated when the contributes or
+  // --- component manager changes (e.g., due to HMR).
   useEffect(() => {
     setComponentRegistry((prev) => {
       prev.destroy();
@@ -528,8 +557,8 @@ export function ComponentProvider({
   }, [componentManager, contributes]);
 
   return (
-    <ViewComponentRegistryContext.Provider value={componentRegistry}>
+    <ComponentRegistryContext.Provider value={componentRegistry}>
       {children}
-    </ViewComponentRegistryContext.Provider>
+    </ComponentRegistryContext.Provider>
   );
 }

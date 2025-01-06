@@ -61,16 +61,19 @@ type StandaloneAppProps = {
 
   // --- Custom components to be added
   components?: ComponentRendererDef[];
+
+  // --- The object responsible for managing the standalone components
   componentManager?: StandaloneComponentManager;
 };
 
 /**
- * This React component represents a standalone app connected with its
- * environment. It uses the XMLUI RootComponent wrapped into an ApiInterceptor.
- * The standalone application can display itself within a React app and use an
- * optional API interceptor.
- *
- * See the `startApp` function for more details
+ * This React component represents a standalone app that implements a web 
+ * application with xmlui components. A StandaloneApp instance uses a 
+ * RootComponent wrapped into an ApiInterceptor.
+ * 
+ * RootComponent is responsible for rendering the app (using an internal 
+ * representation); ApiInterceptor can emulate some backend functionality 
+ * running in the browser.
  */
 function StandaloneApp({
   appDef,

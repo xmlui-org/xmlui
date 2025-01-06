@@ -36,7 +36,7 @@ import { resetErrors } from "@components-core/reportEngineError";
 import { useThemes } from "@components-core/theming/ThemeContext";
 import { dateFunctions } from "./appContext/date-functions";
 import { miscellaneousUtils } from "./appContext/misc-utils";
-import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
+import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { ThemeToneKeys } from "@components-core/theming/abstractions";
 import { ComponentProvider } from "@components/ComponentProvider";
 import {

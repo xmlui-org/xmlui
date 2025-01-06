@@ -32,7 +32,38 @@ There are a few things to consider when using React hooks. Ignoring one of these
 - Don’t use hooks in regular JavaScript functions or classes.
 - Don’t call hooks in nested functions, loops, or conditionals.
 
-You should use the correct hook for a particular job. Later in this section, you will learn more detail.
+Here is an antipattern of using a hook:
+
+```tsx
+import React, { useState } from 'react';
+
+// ❌ ANTIPATTERN: Calls `useState` inside an if-statement
+function ConditionalStateExample({ isEnabled }: { isEnabled: boolean }) {
+  if (isEnabled) {
+    // This breaks the Rules of Hooks because 'useState' 
+    // might not run on every render (only runs when isEnabled is true).
+    const [count, setCount] = useState(0);
+    return (
+      <div>
+        <p>Count is: {count}</p>
+        <button onClick={() => setCount(count + 1)}>
+          Increment
+        </button>
+      </div>
+    );
+  } else {
+    // When this branch is taken, the 'useState' call never occurs,
+    // leading to inconsistent Hook ordering between renders.
+    return <div>Disabled</div>;
+  }
+}
+
+export default ConditionalStateExample;
+```
+
+Most hooks have an argument describing a dependency list. The hook is invoked only if any of the dependencies changes. When you define a hook, use the appropriate dependency list.
+
+You should use the correct hook for a particular job. In this section, you will learn more detail.
 
 ### `useState`
 
@@ -58,4 +89,54 @@ function Counter() {
     </div>
   );
 }
+```
+
+### `useMemo`
+
+The `useMemo` hook caches the result of a calculation between re-renders. You can use it to optimize an expensive calculation or derivation in a React component.
+
+The following scenario has an extensive list of items and filters them based on a search query. Using useMemo, you avoid performing the expensive filter operation on every render unless the input (data or search query) changes.
+
+```tsx
+import React, { useState, useMemo } from 'react';
+
+interface Item {
+  id: number;
+  name: string;
+}
+
+interface FilterableListProps {
+  data: Item[];
+}
+
+function FilterableList({ data }: FilterableListProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // useMemo to memoize filtered results
+  const filteredData = useMemo(() => {
+    // 🛠️ Simulate an expensive operation: filtering a large dataset
+    console.log('Filtering data...'); // For demonstration
+    return data.filter(item =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [data, searchQuery]);
+
+  return (
+    <div>
+      <input
+        placeholder="Search items..."
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+      />
+
+      <ul>
+        {filteredData.map(item => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default FilterableList;
 ```
