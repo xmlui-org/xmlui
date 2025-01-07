@@ -1,5 +1,5 @@
 import { startApp } from "@components-core/StandaloneApp";
-import StandaloneComponentManager from "./StandaloneComponentManager";
+import StandaloneComponentManager from "./components-core/StandaloneComponentManager";
 import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";

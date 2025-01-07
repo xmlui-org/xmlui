@@ -52,7 +52,7 @@ import {
   useIsWindowFocused,
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
-import StandaloneComponentManager from "../StandaloneComponentManager";
+import StandaloneComponentManager from "./StandaloneComponentManager";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();

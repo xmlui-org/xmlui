@@ -140,7 +140,7 @@ import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/Ton
 import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
-import type StandaloneComponentManager from "../StandaloneComponentManager";
+import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
 import { ThemeDefinition } from "@abstractions/ThemingDefs";
 
 /**
