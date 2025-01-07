@@ -1,4 +1,4 @@
-import React, { CSSProperties, ReactNode } from "react";
+import React, { CSSProperties, ReactNode, useLayoutEffect } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { d, type ComponentDef } from "@abstractions/ComponentDefs";
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
@@ -104,7 +104,7 @@ export function App({
 
     return () => {
       mounted.current = false;
-    }
+    };
   }, [defaultTone, defaultTheme, setActiveThemeTone, setActiveThemeId]);
 
   useEffect(() => {
@@ -165,6 +165,10 @@ export function App({
     setDrawerVisible((prev) => !prev);
   }, []);
 
+  useLayoutEffect(() => {
+    scrollPageContainerRef.current?.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const layoutContextValue = useMemo<IAppLayoutContext>(() => {
     return {
       hasRegisteredNavPanel,
@@ -185,7 +189,19 @@ export function App({
       navPanelDef,
       logoContentDef,
     };
-  }, [hasRegisteredNavPanel, hasRegisteredHeader, navPanelVisible, drawerVisible, safeLayout, logo, logoDark, logoLight, toggleDrawer, navPanelDef, logoContentDef]);
+  }, [
+    hasRegisteredNavPanel,
+    hasRegisteredHeader,
+    navPanelVisible,
+    drawerVisible,
+    safeLayout,
+    logo,
+    logoDark,
+    logoLight,
+    toggleDrawer,
+    navPanelDef,
+    logoContentDef,
+  ]);
 
   useEffect(() => {
     if (navPanelVisible) {
@@ -385,9 +401,7 @@ export function App({
 
   return (
     <>
-      {name !== undefined && (
-        <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} />
-      )}
+      {name !== undefined && <Helmet defaultTitle={name} titleTemplate={`%s | ${name}`} />}
       <AppLayoutContext.Provider value={layoutContextValue}>
         <Sheet open={drawerVisible} onOpenChange={(open) => setDrawerVisible(open)}>
           <SheetContent side={"left"}>{renderChild(navPanelDef, { inDrawer: true })}</SheetContent>
