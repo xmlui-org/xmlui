@@ -33,6 +33,37 @@ If your web server is not configured this way, you'll receive 404 errors for the
 If you just navigate in an XMLUI app (without manual refresh), you won't get a 404 error. However, the refresh page function may result in 404.
 </Callout>
 
+We will not discuss server configuration details, as there are many aspects to it. If you want to try a production-grade web server locally, you can download [Nginx](https://nginx.org/) and modify the configuration file in `/etc/nginx/nginx.conf` to match the snippet below. Change the path to root and it will serve your application with standard routing.
+
+``` copy {10}
+events {
+    worker_connections  1024;
+}
+
+http {
+    include       /etc/nginx/mime.types;
+    sendfile      on;
+
+    server {
+        root /path/to/your/project;
+
+        index index.html index.htm;
+
+        location ~ \.(js|css|png|jpg|jpeg|gif|ico|json|woff|woff2|ttf|eot|svg|xs|xmlui)$ {
+            add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+            expires off;
+            try_files $uri =404;
+        }
+
+        location / {
+        add_header Cache-Control "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0";
+        expires off;
+            try_files $uri $uri/ /index.html;
+        }
+    }
+}
+```
+
 ### Hash routing
 
 There are situations when you should not (or cannot) send the client-side URLs to the server. This may happen when you do not have complete control over the server. For example, you cannot set up the server to always retrieve the `index.html` file like a single-page app requires. Hash routing solves this issue.
