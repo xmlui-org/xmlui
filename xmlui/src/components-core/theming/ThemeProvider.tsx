@@ -29,7 +29,7 @@ import {
   collectThemeChainByExtends,
   expandTheme,
 } from "@components-core/theming/extendThemeUtils";
-import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
+import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import {
   XmlUiCyanThemeDefinition,
   XmlUiGrayThemeDefinition,

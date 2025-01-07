@@ -20,7 +20,7 @@ import { mergeProps } from "@components-core/utils/mergeProps";
 import ComponentDecorator from "@components-core/ComponentDecorator";
 import { createValueExtractor } from "@components-core/container/valueExtractor";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
+import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "./utils/hooks";

@@ -15,9 +15,9 @@ export type ComponentRegistryEntry = {
 };
 
 // Context object that makes the component registry available
-export const ViewComponentRegistryContext = React.createContext<ComponentRegistry | null>(null);
+export const ComponentRegistryContext = React.createContext<ComponentRegistry | null>(null);
 
 // Use this hook within a component to access the component registry
 export function useComponentRegistry() {
-  return useContext(ViewComponentRegistryContext)!;
+  return useContext(ComponentRegistryContext)!;
 }

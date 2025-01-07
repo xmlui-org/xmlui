@@ -33,5 +33,5 @@ const componentSource = `
 
 export const tableHeaderRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: TableHeaderMd,
+  metadata: TableHeaderMd,
 };

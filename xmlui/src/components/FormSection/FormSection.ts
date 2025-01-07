@@ -40,5 +40,5 @@ const componentSource = `
 
 export const formSectionRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: FormSectionMd,
+  metadata: FormSectionMd,
 };
