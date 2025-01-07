@@ -216,7 +216,7 @@ export type ComponentRendererFn<T extends ComponentDef> = (
  */
 export type CompoundComponentRendererInfo = {
   compoundComponentDef: CompoundComponentDef;
-  hints?: ComponentMetadata;
+  metadata?: ComponentMetadata;
 };
 
 /**

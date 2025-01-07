@@ -38,5 +38,5 @@ const componentSource = `
 
 export const iconInfoCardRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: IconInfoCardMd,
+  metadata: IconInfoCardMd,
 };

@@ -36,5 +36,5 @@ const componentSource = `
 
 export const toolbarButtonRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: ToolbarButtonMd,
+  metadata: ToolbarButtonMd,
 };

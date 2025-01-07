@@ -35,5 +35,5 @@ const componentSource = `
 
 export const pageHeaderRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: PageHeaderMd,
+  metadata: PageHeaderMd,
 };

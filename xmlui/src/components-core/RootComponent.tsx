@@ -38,7 +38,7 @@ import { dateFunctions } from "./appContext/date-functions";
 import { miscellaneousUtils } from "./appContext/misc-utils";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { ThemeToneKeys } from "@components-core/theming/abstractions";
-import { ComponentProvider } from "@components/ComponentProvider";
+import { ComponentProvider, ContributesDefinition } from "@components/ComponentProvider";
 import {
   ConfirmationModalContextProvider,
   useConfirm,
@@ -57,76 +57,10 @@ import StandaloneComponentManager from "../StandaloneComponentManager";
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
 
-// =====================================================================================================================
-/**
- * The properties of the root component
- */
-export type RootComponentProps = {
-  /**
-   * View component definition
-   */
-  node: ComponentLike;
+// --- This type represents an arbitrary set of global properties (name 
+// --- and value pairs).
+type GlobalProps = Record<string, any>;
 
-  /**
-   * Display the component in preview mode?
-   */
-  previewMode?: boolean;
-  servedFromSingleFile?: boolean;
-
-  /**
-   * The name used as the base name in the router definition
-   */
-  baseName?: string;
-
-  /**
-   * An object that describes how other external components extend the application with external components
-   */
-  contributes: ContributesDefinition;
-
-  /**
-   * Arbitrary set of global properties
-   */
-  globalProps?: GlobalProps;
-  resources?: Record<string, string>;
-
-  /**
-   * Indicates that the root component represents a standalone application
-   */
-  standalone?: boolean;
-  trackContainerHeight?: boolean;
-  decorateComponentsWithTestId?: boolean;
-  debugEnabled?: boolean;
-
-  apiInterceptor?: ApiInterceptorDefinition;
-
-  defaultTheme?: string;
-  defaultTone?: ThemeTone;
-  resourceMap?: Record<string, string>;
-  sources?: Record<string, string>;
-};
-
-// =====================================================================================================================
-/**
- * This type represents an arbitrary set of global properties (name and value pairs).
- */
-export type GlobalProps = Record<string, any>;
-
-// External contributions to the application (provided by a contributing package)
-export type ContributesDefinition = {
-  // Component definitions
-  components?: ComponentRendererDef[];
-
-  // Action definitions
-  actions?: ActionRendererDef[];
-
-  // Compound component definitions
-  compoundComponents?: CompoundComponentDef[];
-
-  // Themes extending the current ones
-  themes?: ThemeDefinition[];
-};
-
-// =====================================================================================================================
 /**
  * We use this object in the app context to represent the `QlientQuery` of the react-query package.
  */
@@ -502,7 +436,53 @@ function RootContentComponent({
   );
 }
 
-// =====================================================================================================================
+/**
+ * The properties of the root component
+ */
+type RootComponentProps = {
+  /**
+   * View component definition
+   */
+  node: ComponentLike;
+
+  /**
+   * Display the component in preview mode?
+   */
+  previewMode?: boolean;
+  servedFromSingleFile?: boolean;
+
+  /**
+   * The name used as the base name in the router definition
+   */
+  baseName?: string;
+
+  /**
+   * An object that describes how other external components extend the application with external components
+   */
+  contributes: ContributesDefinition;
+
+  /**
+   * Arbitrary set of global properties
+   */
+  globalProps?: GlobalProps;
+  resources?: Record<string, string>;
+
+  /**
+   * Indicates that the root component represents a standalone application
+   */
+  standalone?: boolean;
+  trackContainerHeight?: boolean;
+  decorateComponentsWithTestId?: boolean;
+  debugEnabled?: boolean;
+
+  apiInterceptor?: ApiInterceptorDefinition;
+
+  defaultTheme?: string;
+  defaultTone?: ThemeTone;
+  resourceMap?: Record<string, string>;
+  sources?: Record<string, string>;
+};
+
 /**
  * This React component is intended to be the root component in a browser window. It handles the application state
  * changes, routing, and theming, provides an error boundary, and handles a few other aspects.

@@ -51,7 +51,6 @@ import {
 } from "@components/Splitter/Splitter";
 import { queueComponentRenderer } from "@components/Queue/Queue";
 import { CompoundComponent } from "@components-core/CompoundComponent";
-import type { ContributesDefinition } from "@components-core/RootComponent";
 import { dynamicHeightListComponentRenderer } from "@components/List/List";
 import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
 import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
@@ -68,7 +67,7 @@ import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
 import { appRenderer } from "@components/App/App";
 import { navPanelRenderer } from "@components/NavPanel/NavPanel";
 import { pageRenderer, pagesRenderer } from "@components/Pages/Pages";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { footerRenderer } from "@components/Footer/Footer";
 import { navGroupComponentRenderer } from "@components/NavGroup/NavGroup";
 import { logoComponentRenderer } from "@components/Logo/Logo";
@@ -142,6 +141,7 @@ import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../StandaloneComponentManager";
+import { ThemeDefinition } from "@abstractions/ThemingDefs";
 
 /**
  * The framework has a specialized component concept, the "property holder 
@@ -157,12 +157,37 @@ const textNodePropHolder = createPropHolderComponent("TextNode");
 const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 
 /**
+ * Applications can contribute to the registry with their custom (third-party)
+ * and application-specific components and others. This type holds the 
+ * definitions of these extra artifacts.
+ */
+export type ContributesDefinition = {
+  /**
+   * Native xmlui components that come with the app.
+   */
+  components?: ComponentRendererDef[];
+
+  /**
+   * Action functions that come with the app.
+   */
+  actions?: ActionRendererDef[];
+
+  /**
+   * Application-specific compound components that come with the app.
+   */
+  compoundComponents?: CompoundComponentDef[];
+
+  /**
+   * Themes that come with the app.
+   */
+  themes?: ThemeDefinition[];
+};
+
+/**
  * This class implements the registry that holds the components available 
  * in xmlui. Any component in this registry can be used in the xmlui markup. 
  * An error is raised when the markup processor does not find a particular 
  * component within the registry.
- * 
- * 
  */
 export class ComponentRegistry {
   // --- The pool of available components
@@ -170,15 +195,28 @@ export class ComponentRegistry {
 
   // --- The pool of available theme variable names
   private themeVars = new Set<string>();
+  
+  // --- Default theme variable values collected from the registered components
   private defaultThemeVars = {};
+
+  // --- The pool of available action functions
   private actionFns = new Map<string, ActionFunction>();
+
   // --- The pool of available loader renderers
   private loaders = new Map<string, LoaderRenderer<any>>();
-  private componentManager: StandaloneComponentManager = undefined;
 
+  /**
+   * The component constructor registers all xmlui core components, so each 
+   * registry instance incorporates the framework's core. It also receives a 
+   * `contributes` argument with information about accompanying (app-specific) 
+   * components that come with a particular app using the registry.
+   * @param contributes Information about the components that come with the app
+   * @param componentManager Optional manager object that receives a notification
+   * about component registrations
+   */
   constructor(
     contributes: ContributesDefinition = {},
-    componentManager?: StandaloneComponentManager,
+    private readonly componentManager?: StandaloneComponentManager,
   ) {
     this.componentManager = componentManager;
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
@@ -419,39 +457,70 @@ export class ComponentRegistry {
     this.componentManager?.subscribeToRegistrations(this.registerComponentRenderer);
   }
 
+  /**
+   * All theme variables used by the registered components.
+   */
   get componentThemeVars() {
     return this.themeVars;
   }
 
+  /**
+   * The default values of theme variables used by the registered components.
+   */
   get componentDefaultThemeVars() {
     return this.defaultThemeVars;
   }
 
+  /**
+   * All action functions registered in the component registry.
+   */
   get actionFunctions(): Map<string, ActionFunction> {
     return this.actionFns;
   }
 
-  public getRegisteredComponentKeys() {
+  /**
+   * @returns The keys of all components registered in the component registry.
+   */
+  getRegisteredComponentKeys() {
     return Array.from(this.pool.keys());
   }
 
-  public lookupComponentRenderer(viewComponentType: string): ComponentRegistryEntry | undefined {
-    return this.pool.get(viewComponentType);
+  /**
+   * This method retrieves the registry entry of a component registered 
+   * with the specified key.
+   * @param componentName The unique ID of the component
+   * @returns The component registry entry, if found; otherwise, undefined.
+   */
+  lookupComponentRenderer(componentName: string): ComponentRegistryEntry | undefined {
+    return this.pool.get(componentName);
   }
 
-  public lookupAction(actionType: string): ActionFunction | undefined {
+  /**
+   * This method retrieves the registry entry of an action registered 
+   * with the specified key.
+   * @param actionType The unique ID of the action
+   * @returns The action registry entry, if found; otherwise, undefined.
+   */
+  lookupAction(actionType: string): ActionFunction | undefined {
     return this.actionFns.get(actionType);
   }
 
   /**
-   * This method retrieves the registry entry of a loader registered with the specified key.
+   * This method retrieves the registry entry of a loader registered with the 
+   * specified key.
    * @param type The unique ID of the loader
    * @returns The loader registry entry, if found; otherwise, undefined.
    */
-  public lookupLoaderRenderer(type: string): LoaderRenderer<any> | undefined {
+  lookupLoaderRenderer(type: string): LoaderRenderer<any> | undefined {
     return this.loaders.get(type);
   }
 
+  /**
+   * This method checks whether a component with the specified key is 
+   * registered in the component registry.
+   * @param componentName The unique ID of the component
+   * @returns True if the component is registered; otherwise, false.
+   */
   hasComponent(componentName: string) {
     return (
       this.pool.get(componentName) !== undefined ||
@@ -460,23 +529,26 @@ export class ComponentRegistry {
     );
   }
 
+  // --- Registers a renderable component using its renderer function 
+  // --- and metadata
   private registerComponentRenderer = ({
     type,
     renderer,
-    metadata: hints,
+    metadata,
   }: ComponentRendererDef) => {
-    this.pool.set(type, { renderer, descriptor: hints });
-    if (hints?.themeVars) {
-      Object.keys(hints.themeVars).forEach((key) => this.themeVars.add(key));
+    this.pool.set(type, { renderer, descriptor: metadata });
+    if (metadata?.themeVars) {
+      Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
     }
-    if (hints?.defaultThemeVars) {
-      merge(this.defaultThemeVars, hints?.defaultThemeVars);
+    if (metadata?.defaultThemeVars) {
+      merge(this.defaultThemeVars, metadata?.defaultThemeVars);
     }
   };
 
+  // --- Registers a compound component using its definition and metadata
   private registerCompoundComponentRenderer({
     compoundComponentDef,
-    hints,
+    metadata,
   }: CompoundComponentRendererInfo) {
     this.pool.set(compoundComponentDef.name, {
       renderer: (rendererContext: any) => {
@@ -491,24 +563,21 @@ export class ComponentRegistry {
       },
       isCompoundComponent: true,
     });
-    if (hints?.themeVars) {
-      Object.keys(hints.themeVars).forEach((key) => this.themeVars.add(key));
+    if (metadata?.themeVars) {
+      Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
     }
-    if (hints?.defaultThemeVars) {
-      merge(this.defaultThemeVars, hints?.defaultThemeVars);
+    if (metadata?.defaultThemeVars) {
+      merge(this.defaultThemeVars, metadata?.defaultThemeVars);
     }
   }
 
+  // --- Registers an action function using its definition
   private registerActionFn({ actionName: functionName, actionFn }: ActionRendererDef) {
     this.actionFns.set(functionName, actionFn);
   }
 
-  /**
-   * This method registers a loader in the registry through its loader renderer definition.
-   * @param type The loader's unique ID
-   * @param renderer The renderer function that creates a React node according to the loader definition
-   */
-  private registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
+  // --- Registers a loader renderer using its definition
+  registerLoaderRenderer({ type, renderer }: LoaderRendererDef) {
     this.loaders.set(type, renderer);
   }
 
