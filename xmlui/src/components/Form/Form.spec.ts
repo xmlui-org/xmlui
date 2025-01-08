@@ -1,7 +1,8 @@
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import { labelPositionValues } from "@components/abstractions";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { expect, createTestWithDriver } from "@testing/fixtures";
+import { FormDriver } from "./FormDriver";
 
 // TODO: Copy over other tests to utilize this interceptor
 const crudInterceptor: ApiInterceptorDefinition = {
@@ -42,77 +43,6 @@ const crudInterceptor: ApiInterceptorDefinition = {
 };
 
 // --- Setup
-
-type SubmitTrigger = "click" | "keypress";
-type MockExternalApiOptions = {
-  status?: number;
-  headers?: Record<string, string>;
-  body?: Record<string, any>;
-};
-
-class FormDriver extends ComponentDriver {
-  async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
-    const { status = 200, headers = {}, body = {} } = apiOptions;
-    await this.page.route(url, (route) =>
-      route.fulfill({ status, headers, body: JSON.stringify(body) }),
-    );
-  }
-
-  getSubmitButton() {
-    return this.component.locator("button[type='submit']");
-  }
-
-  async hasSubmitButton() {
-    return (await this.getSubmitButton().count()) > 0;
-  }
-
-  async submitForm(trigger: SubmitTrigger = "click") {
-    if (trigger === "keypress") {
-      if ((await this.hasSubmitButton()) && (await this.getSubmitButton().isEnabled())) {
-        await this.getSubmitButton().focus();
-      }
-      await this.locator.locator("input").waitFor();
-      const firstInputChild = this.locator.locator("input");
-      if ((await firstInputChild.count()) > 0) {
-        await firstInputChild.first().focus();
-      }
-      await this.page.keyboard.press("Enter");
-    } else if (trigger === "click") {
-      await this.getSubmitButton().click();
-    }
-  }
-
-  async getSubmitRequest(
-    endpoint = "/entities",
-    requestMethod = "POST",
-    trigger: SubmitTrigger = "click",
-    timeout = 5000,
-  ) {
-    const requestPromise = this.page.waitForRequest(
-      (request) =>
-        request.url().endsWith(endpoint) &&
-        request.method().toLowerCase() === requestMethod.toLowerCase(),
-      { timeout },
-    );
-    await this.submitForm(trigger);
-    return requestPromise;
-  }
-
-  async getSubmitResponse(
-    endpoint = "/entities",
-    requestMethod = "POST",
-    trigger: SubmitTrigger = "click",
-    timeout = 5000,
-  ) {
-    const request = await this.getSubmitRequest(endpoint, requestMethod, trigger, timeout);
-    return request.response();
-  }
-
-  // TEMP: As we expand tests, we need to rethink how the input fields are accessed
-  getFormItemWithTestId(testId: string) {
-    return this.component.getByTestId(testId).getByRole("textbox");
-  }
-}
 
 export const test = createTestWithDriver(FormDriver);
 
@@ -202,8 +132,7 @@ test("data accepts an object", async ({ createDriver }) => {
 // npm run build:test-bed;
 // CI=true npm run test:e2e
 test.fixme("data accepts relative URL endpoint", async ({ createDriver }) => {
-  const driver = await createDriver(
-    `
+  const driver = await createDriver(`
     <Form data="/test">
       <FormItem testId="inputField" bindTo="name" />
     </Form>`,
@@ -347,8 +276,7 @@ test.fixme("form submits to correct url", async ({ createDriver }) => {
 // --- submitting the Form
 
 test("submit triggers when clicking save/submit button", async ({ createDriver }) => {
-  const driver = await createDriver(
-    `
+  const driver = await createDriver(`
     <Form data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -424,6 +352,7 @@ test("user cannot submit with clientside errors present", async ({ createDriver 
       <FormItem bindTo="name" required="true" />
     </Form>`);
   // The onSubmit event should have been triggered if not for the client error of an empty required field
+  await driver.submitForm("click");
   await expect.poll(driver.testState).toEqual(null);
 });
 

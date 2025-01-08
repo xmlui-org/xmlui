@@ -1,7 +1,7 @@
-import { ValidationStatus } from "@components/abstractions";
+import type { ValidationStatus } from "@components/abstractions";
 import classnames from "@components-core/utils/classnames";
 import styles from "./HelperText.module.scss";
-import {CSSProperties} from "react";
+import type { CSSProperties } from "react";
 import { WarningIcon } from "@components/Icon/WarningIcon";
 import { ErrorIcon } from "@components/Icon/ErrorIcon";
 
