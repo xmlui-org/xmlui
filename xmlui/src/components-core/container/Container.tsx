@@ -23,11 +23,7 @@ import type {
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import type {
-  ComponentDef,
-  DynamicChildComponentDef,
-  ParentRenderContext,
-} from "@abstractions/ComponentDefs";
+import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
 import type {
   ContainerDispatcher,
   InnerRendererContext,
@@ -107,7 +103,10 @@ type StateFieldPartChangedFn = (
 
 // This function renders the entire component tree starting from the root component. As it works recursively,
 // all child components will be rendered, including the wrapping containers
-export function renderRoot(node: ComponentDef, memoedVarsRef: MutableRefObject<MemoedVars>) {
+export function renderRoot(
+  node: ComponentDef,
+  memoedVarsRef: MutableRefObject<MemoedVars>,
+): ReactNode {
   return renderChild({
     node,
     state: EMPTY_OBJECT,
@@ -1021,8 +1020,11 @@ function renderChild({
   //  </Component>
   //  and then <MyComponent>hey lorem ipsum</MyComponent>
 
-  if(node.type === "Slot" && parentRenderContext?.children?.length === 1) {
-    if(parentRenderContext.children[0].type === "TextNodeCData" || parentRenderContext.children[0].type === "TextNode") {
+  if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
+    if (
+      parentRenderContext.children[0].type === "TextNodeCData" ||
+      parentRenderContext.children[0].type === "TextNode"
+    ) {
       return parentRenderContext.renderChild(parentRenderContext.children);
     }
   }
@@ -1176,96 +1178,96 @@ function transformNodeWithRawDataProp(node) {
 
 const Node = memo(
   forwardRef(function Node(
-  {
-    node,
-    state,
-    dispatch,
-    appContext,
-    lookupAction,
-    lookupSyncCallback,
-    registerComponentApi,
-    renderChild,
-    stateFieldPartChanged,
-    layoutContext,
-    parentRenderContext,
-    memoedVarsRef,
-    resolvedKey,
-    cleanup,
-    uidInfoRef,
-    ...rest
-  }: RenderChildContext & { resolvedKey: string },
-  ref,
-) {
-  //pref, this way
-  const stableLayoutContext = useRef(layoutContext);
-  stableLayoutContext.current = layoutContext;
-
-  // console.log("uidInfoRef", uidInfoRef);
-  const nodeWithTransformedLoaders = useMemo(() => {
-    let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
-    transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
-    transformed = transformNodeWithRawDataProp(transformed);
-    return transformed;
-  }, [node, uidInfoRef]);
-
-  const resolvedDataPropIsString = useMemo(() => {
-    const resolvedDataProp = extractParam(
+    {
+      node,
       state,
-      nodeWithTransformedLoaders.props?.data,
+      dispatch,
       appContext,
-      true,
-    );
-    return typeof resolvedDataProp === "string";
-  }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
-
-  const nodeWithTransformedDatasourceProp = useMemo(() => {
-    return transformNodeWithDataProp(
-      nodeWithTransformedLoaders,
-      resolvedDataPropIsString,
+      lookupAction,
+      lookupSyncCallback,
+      registerComponentApi,
+      renderChild,
+      stateFieldPartChanged,
+      layoutContext,
+      parentRenderContext,
+      memoedVarsRef,
+      resolvedKey,
+      cleanup,
       uidInfoRef,
-    );
-  }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
+      ...rest
+    }: RenderChildContext & { resolvedKey: string },
+    ref,
+  ) {
+    //pref, this way
+    const stableLayoutContext = useRef(layoutContext);
+    stableLayoutContext.current = layoutContext;
 
-  let renderedChild = null;
-  if (isContainerLike(nodeWithTransformedDatasourceProp)) {
-    // console.log("ContainerLike", { nodeWithTransformedDatasourceProp, state });
-    renderedChild = (
-      <ComponentContainer
-        resolvedKey={resolvedKey}
-        node={nodeWithTransformedDatasourceProp as ContainerComponentDef}
-        parentState={state}
-        parentDispatch={dispatch}
-        layoutContextRef={stableLayoutContext}
-        parentRenderContext={parentRenderContext}
-        parentStateFieldPartChanged={stateFieldPartChanged}
-        parentRegisterComponentApi={registerComponentApi}
-        uidInfoRef={uidInfoRef}
-        ref={ref}
-      />
-    );
-  } else {
-    renderedChild = (
-      <Component
-        onUnmount={cleanup}
-        memoedVarsRef={memoedVarsRef}
-        node={nodeWithTransformedDatasourceProp}
-        state={state}
-        dispatch={dispatch}
-        appContext={appContext}
-        lookupAction={lookupAction}
-        lookupSyncCallback={lookupSyncCallback}
-        registerComponentApi={registerComponentApi}
-        renderChild={renderChild}
-        parentRenderContext={parentRenderContext}
-        layoutContextRef={stableLayoutContext}
-        ref={ref}
-        uidInfoRef={uidInfoRef}
-        {...rest}
-      />
-    );
-  }
+    // console.log("uidInfoRef", uidInfoRef);
+    const nodeWithTransformedLoaders = useMemo(() => {
+      let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
+      transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
+      transformed = transformNodeWithRawDataProp(transformed);
+      return transformed;
+    }, [node, uidInfoRef]);
 
-  return renderedChild;
+    const resolvedDataPropIsString = useMemo(() => {
+      const resolvedDataProp = extractParam(
+        state,
+        nodeWithTransformedLoaders.props?.data,
+        appContext,
+        true,
+      );
+      return typeof resolvedDataProp === "string";
+    }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
+
+    const nodeWithTransformedDatasourceProp = useMemo(() => {
+      return transformNodeWithDataProp(
+        nodeWithTransformedLoaders,
+        resolvedDataPropIsString,
+        uidInfoRef,
+      );
+    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
+
+    let renderedChild = null;
+    if (isContainerLike(nodeWithTransformedDatasourceProp)) {
+      // console.log("ContainerLike", { nodeWithTransformedDatasourceProp, state });
+      renderedChild = (
+        <ComponentContainer
+          resolvedKey={resolvedKey}
+          node={nodeWithTransformedDatasourceProp as ContainerComponentDef}
+          parentState={state}
+          parentDispatch={dispatch}
+          layoutContextRef={stableLayoutContext}
+          parentRenderContext={parentRenderContext}
+          parentStateFieldPartChanged={stateFieldPartChanged}
+          parentRegisterComponentApi={registerComponentApi}
+          uidInfoRef={uidInfoRef}
+          ref={ref}
+        />
+      );
+    } else {
+      renderedChild = (
+        <Component
+          onUnmount={cleanup}
+          memoedVarsRef={memoedVarsRef}
+          node={nodeWithTransformedDatasourceProp}
+          state={state}
+          dispatch={dispatch}
+          appContext={appContext}
+          lookupAction={lookupAction}
+          lookupSyncCallback={lookupSyncCallback}
+          registerComponentApi={registerComponentApi}
+          renderChild={renderChild}
+          parentRenderContext={parentRenderContext}
+          layoutContextRef={stableLayoutContext}
+          ref={ref}
+          uidInfoRef={uidInfoRef}
+          {...rest}
+        />
+      );
+    }
+
+    return renderedChild;
   }),
 );
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified

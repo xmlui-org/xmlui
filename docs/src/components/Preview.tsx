@@ -1,5 +1,5 @@
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
-import RootComponent from "@components-core/RootComponent";
+import AppRoot from "@components-core/AppRoot";
 import React, { useRef, useEffect, useMemo } from "react";
 import { usePlayground } from "@/src/hooks/usePlayground";
 import ReactDOM, { Root } from "react-dom/client";
@@ -60,7 +60,7 @@ export function Preview() {
     contentRootRef.current?.render(
       <ErrorBoundary node={component}>
         <ApiInterceptorProvider interceptor={mock} apiWorker={apiWorker}>
-          <RootComponent
+          <AppRoot
             key={`app-${options.id}`}
             previewMode={true}
             standalone={true}

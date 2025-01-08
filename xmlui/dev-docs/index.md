@@ -4,4 +4,4 @@ This article helps you understand the implementation details of xmlui so that yo
 
 - [React Fundamentals](./react-fundamentals.md)
 - [Standalone Apps](./standalone-apps.md)
-- [`RootComponent`](./root-component.md)
+- [`AppRoot`](./AppRoot.md)

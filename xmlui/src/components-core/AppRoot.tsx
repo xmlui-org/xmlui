@@ -7,25 +7,18 @@ import { Helmet, HelmetProvider } from "react-helmet-async";
 import toast from "react-hot-toast";
 import { enableMapSet } from "immer";
 
-import type {
-  ComponentDef,
-  CompoundComponentDef,
-  ComponentLike,
-} from "@abstractions/ComponentDefs";
+import type { ComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
 import type { MemoedVars } from "./abstractions/ComponentRenderer";
-import type { ActionRendererDef } from "@abstractions/ActionDefs";
 import type { ContainerComponentDef } from "./container/ContainerComponentDef";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import type { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
-import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
+import type { ThemeTone } from "@components-core/theming/abstractions";
 import type { IAppStateContext } from "@components/App/AppStateContext";
-import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 
 import { ErrorBoundary } from "./ErrorBoundary";
 import ThemeProvider from "@components-core//theming/ThemeProvider";
 import { renderRoot } from "./container/Container";
 import { delay, formatFileSizeInBytes, getFileExtension } from "@components-core/utils/misc";
-import { unPackTree } from "./utils/treeUtils";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { IconProvider } from "@components/IconProvider";
 import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
@@ -57,13 +50,12 @@ import StandaloneComponentManager from "./StandaloneComponentManager";
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
 
-// --- This type represents an arbitrary set of global properties (name 
+// --- This type represents an arbitrary set of global properties (name
 // --- and value pairs).
 type GlobalProps = Record<string, any>;
 
-/**
- * We use this object in the app context to represent the `QlientQuery` of the react-query package.
- */
+// --- We use this object in the app context to represent the `QlientQuery`
+// --- of the react-query package.
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -72,10 +64,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const Transforms = {
-  unPackTree,
-};
-
+// --- We pass these functions to the global app context
 const DateUtils = {
   differenceInMinutes: (date1: string | Date, date2: string | Date) => {
     return differenceInMinutes(new Date(date1), new Date(date2));
@@ -95,23 +84,13 @@ const DateUtils = {
   },
 };
 
+// --- We pass this funtion to the global app context
 function signError(error: Error | string) {
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
 }
 
-/**
- *  This React component implements the innermost part of the root component with access to the app and view state
- *  contexts.
- */
-function RootContentComponent({
-  rootContainer,
-  routerBaseName,
-  globalProps,
-  standalone,
-  trackContainerHeight,
-  decorateComponentsWithTestId,
-  debugEnabled,
-}: {
+// --- The properties of the AppContent component
+type AppContentProps = {
   rootContainer: ContainerComponentDef;
   routerBaseName: string;
   globalProps?: GlobalProps;
@@ -119,11 +98,33 @@ function RootContentComponent({
   trackContainerHeight?: boolean;
   decorateComponentsWithTestId?: boolean;
   debugEnabled?: boolean;
-}) {
+};
+
+/**
+ *  This component wraps the entire app into a container with these particular
+ *  responsibilities:
+ *  - Managing the application state
+ *  - Helping the app with viewport-related functionality (e.g., information
+ *    of viewport size, supporting responsive apps)
+ *  - Providing xmlui-defined methods and properties for apps, such as
+ *    `activeThemeId`, `navigate`, `toast`, and many others.
+ */
+function AppContent({
+  rootContainer,
+  routerBaseName,
+  globalProps,
+  standalone,
+  trackContainerHeight,
+  decorateComponentsWithTestId,
+  debugEnabled,
+}: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
+
+  // --- Prepare theme-related variables. We will use them to manage the selected theme
+  // --- and also pass them to the app context.
   const {
     activeThemeId,
     activeThemeTone,
@@ -134,7 +135,9 @@ function RootContentComponent({
     toggleThemeTone,
   } = useThemes();
 
+  // --- Handle special key combinations to change the theme and tone
   useDocumentKeydown((event: KeyboardEvent) => {
+    // --- Alt + Ctrl + Shift + T changes the current theme
     if (event.code === "KeyT" && event.altKey && event.ctrlKey && event.shiftKey) {
       setActiveThemeId(
         availableThemeIds[
@@ -142,6 +145,8 @@ function RootContentComponent({
         ],
       );
     }
+
+    // --- Alt + Ctrl + Shift + O changes the current theme tone
     if (event.code === "KeyO" && event.altKey && event.ctrlKey && event.shiftKey) {
       setActiveThemeTone(
         ThemeToneKeys[(ThemeToneKeys.indexOf(activeThemeTone) + 1) % ThemeToneKeys.length],
@@ -161,57 +166,61 @@ function RootContentComponent({
   const [maxWidthLargeDesktop, setMaxWidthLargeDesktop] = useState("0");
   const [maxWidthLargeDesktopLower, setMaxWidthLargeDesktopLower] = useState("0");
 
-  const createLowerDimension = (dimension: string) => {
+  // --- We create a lower dimension value for the media query using a range
+  const createLowerDimensionValue = (dimension: string) => {
     const match = dimension.match(/^(\d+)px$/);
     return match ? `${parseInt(match[1]) - 0.02}px` : "0";
   };
 
+  // --- Whenever the size of the viewport changes, we update the values 
+  // --- related to viewport size
   const observer = useRef<ResizeObserver>();
-  useIsomorphicLayoutEffect(()=>{
-    if(trackContainerHeight){
-      if(root && root !== document.body){
+  useIsomorphicLayoutEffect(() => {
+    if (trackContainerHeight) {
+      if (root && root !== document.body) {
         // --- We are already observing old element
         if (observer?.current) {
           observer.current.unobserve(root);
         }
-        observer.current = new ResizeObserver((entries)=>{
-          root.style.setProperty('--containerHeight', entries[0].contentRect.height + "px");
+        observer.current = new ResizeObserver((entries) => {
+          root.style.setProperty("--containerHeight", entries[0].contentRect.height + "px");
         });
         if (observer.current) {
           observer.current.observe(root);
         }
       }
     }
-    return ()=>{
+    return () => {
       if (observer?.current) {
         observer.current.unobserve(root);
       }
-    }
-  }, [root]);
+    };
+  }, [root, observer, trackContainerHeight]);
 
-  // we sync with the theme variable value (because we can't use css var in media queries)
+  // --- Whenever the application root DOM object or the active theme changes, we sync 
+  // --- with the theme variable values (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
     const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone"));
     setMaxWidthPhone(mwPhone);
-    setMaxWidthPhoneLower(createLowerDimension(mwPhone));
+    setMaxWidthPhoneLower(createLowerDimensionValue(mwPhone));
     const mwLandscapePhone = getComputedStyle(root!).getPropertyValue(
       getVarKey("media-max-width-landscape-phone"),
     );
     setMaxWidthLandscapePhone(mwLandscapePhone);
-    setMaxWidthLandscapePhoneLower(createLowerDimension(mwLandscapePhone));
+    setMaxWidthLandscapePhoneLower(createLowerDimensionValue(mwLandscapePhone));
     const mwTablet = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-tablet"));
     setMaxWidthTablet(mwTablet);
-    setMaxWidthTabletLower(createLowerDimension(mwTablet));
+    setMaxWidthTabletLower(createLowerDimensionValue(mwTablet));
     const mwDesktop = getComputedStyle(root!).getPropertyValue(
       getVarKey("media-max-width-desktop"),
     );
     setMaxWidthDesktop(mwDesktop);
-    setMaxWidthDesktopLower(createLowerDimension(mwDesktop));
+    setMaxWidthDesktopLower(createLowerDimensionValue(mwDesktop));
     const mwLargeDesktop = getComputedStyle(root!).getPropertyValue(
       getVarKey("media-max-width-large-desktop"),
     );
     setMaxWidthLargeDesktop(mwLargeDesktop);
-    setMaxWidthLargeDesktopLower(createLowerDimension(mwLargeDesktop));
+    setMaxWidthLargeDesktopLower(createLowerDimensionValue(mwLargeDesktop));
   }, [activeThemeId, root]);
 
   // --- Set viewport size information
@@ -248,6 +257,7 @@ function RootContentComponent({
     vpSizeIndex = 1;
   }
 
+  // --- Collect information about the current environment
   const isInIFrame = useIsInIFrame();
   const isWindowFocused = useIsWindowFocused();
   const apiInterceptorContext = useApiInterceptorContext();
@@ -272,6 +282,7 @@ function RootContentComponent({
     }
   }, [location]);
 
+  // --- We collect all the actions defined in the app and pass them to the app context
   const Actions = useMemo(() => {
     const ret: Record<string, any> = {
       _SUPPORT_IMPLICIT_CONTEXT: true,
@@ -282,18 +293,21 @@ function RootContentComponent({
     return ret;
   }, [componentRegistry.actionFunctions]);
 
+  // --- We collect information about app embedding and pass it to the app context
   const embed = useMemo(() => {
     return {
       isInIFrame: isInIFrame,
     };
   }, [isInIFrame]);
 
+  // --- We collect information about the current environment and pass it to the app context
   const environment = useMemo(() => {
     return {
       isWindowFocused,
     };
   }, [isWindowFocused]);
 
+  // --- We collect information about the current media size and pass it to the app context
   const mediaSize = useMemo(() => {
     return {
       phone: isViewportPhone,
@@ -318,15 +332,17 @@ function RootContentComponent({
     vpSizeIndex,
   ]);
 
+  // --- We extract the global properties from the app configuration and pass them to the app context
   const appGlobals = useMemo(() => {
     return globalProps ? { ...globalProps } : EMPTY_OBJECT;
   }, [globalProps]);
 
+  // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
       // --- Actions namespace
       Actions,
-      
+
       // --- App-specific
       appGlobals,
       debugEnabled,
@@ -335,7 +351,6 @@ function RootContentComponent({
       mediaSize,
       queryClient,
       standalone,
-
 
       // --- Date-related
       ...dateFunctions,
@@ -366,7 +381,6 @@ function RootContentComponent({
       setLoggedInUser,
 
       delay,
-      Transforms,
       DateUtils,
       embed,
       apiInterceptorContext,
@@ -398,6 +412,8 @@ function RootContentComponent({
     standalone,
   ]);
 
+  // --- We prepare the helper infrastructure for the `AppState` component, which manages
+  // --- app-wide state using buckets (state sections).
   const [appState, setAppState] = useState<Record<string, Record<string, any>>>(EMPTY_OBJECT);
   const registerAppState = useCallback((bucket: string, initialValue: any) => {
     setAppState((prev) => {
@@ -436,50 +452,72 @@ function RootContentComponent({
   );
 }
 
-/**
- * The properties of the root component
- */
-type RootComponentProps = {
-  /**
-   * View component definition
-   */
+type AppWrapperProps = {
+  // --- The root node of the application definition; the internal
+  // --- representation of the entire app to run
   node: ComponentLike;
 
-  /**
-   * Display the component in preview mode?
-   */
+  // --- If set to `true`, the app is displayed in preview mode (uses
+  // --- different routing and changes some aspects of browser integration).
   previewMode?: boolean;
+
+  // --- (seems obsolete) Indicates if the app is served from a single `index.html` file.
   servedFromSingleFile?: boolean;
 
-  /**
-   * The name used as the base name in the router definition
-   */
-  baseName?: string;
+  // --- The name used as the base name in the router definition
+  routerBaseName?: string;
 
-  /**
-   * An object that describes how other external components extend the application with external components
-   */
+  // --- Apps can provide their custom (third-party) components, themes,
+  // --- resources (and, in the future, other artifacts) used in the
+  // --- application code and markup. This property contains these artifacts.
   contributes: ContributesDefinition;
 
-  /**
-   * Arbitrary set of global properties
-   */
+  // --- Apps can define global configuration values (connection strings,
+  // --- titles, names, etc.) used within the app through the `appGlobals`
+  // --- property. This property contains the values to pass to `appGlobals`.
   globalProps?: GlobalProps;
+
+  // --- Apps may use external resources (images, text files, icons, etc.).
+  // --- This property contains the dictionary of these resources.
   resources?: Record<string, string>;
 
-  /**
-   * Indicates that the root component represents a standalone application
-   */
+  // --- This property indicates that the xmlui app runs in a standalone app.
+  // --- Its value can be queried in the app code via the `standalone` global
+  // --- property.
   standalone?: boolean;
+
+  // --- This property indicates whether the app should track the height of
+  // --- the app container. We created this property for the preview component
+  // --- used in the documentation platform. It has no other use.
   trackContainerHeight?: boolean;
+
+  // --- This property signs that we use the app in the end-to-end test
+  // --- environment. Components should use their IDs as test IDs added to the
+  // --- rendered DOM so that test cases can refer to the particular DOM elements.
   decorateComponentsWithTestId?: boolean;
+
+  // --- This property signs that app rendering runs in debug mode. Components
+  // --- may display additional information in the browser's console when this
+  // --- property is set.
   debugEnabled?: boolean;
 
+  // --- If the app has an emulated API, this property contains the
+  // --- corresponding API endpoint descriptions.
   apiInterceptor?: ApiInterceptorDefinition;
 
+  // --- The ID of the default theme to use when the app starts.
   defaultTheme?: string;
+
+  // --- The default tone to use when the app starts ("light" or "dark").
   defaultTone?: ThemeTone;
+
+  // --- The app can map resource names to URIs used to access a particular
+  // --- resource. This dictionary contains these mappings.
   resourceMap?: Record<string, string>;
+
+  // --- An app can display the source code for learning (and debugging)
+  // --- purposes. This property is a dictionary of filename and file content
+  // --- pairs.
   sources?: Record<string, string>;
 };
 
@@ -487,11 +525,11 @@ type RootComponentProps = {
  * This React component is intended to be the root component in a browser window. It handles the application state
  * changes, routing, and theming, provides an error boundary, and handles a few other aspects.
  */
-const RootComponent = ({
+const AppWrapper = ({
   node,
   previewMode = false,
   servedFromSingleFile = false,
-  baseName = "",
+  routerBaseName: baseName = "",
   contributes = EMPTY_OBJECT,
   globalProps,
   standalone,
@@ -503,7 +541,7 @@ const RootComponent = ({
   resources,
   resourceMap,
   sources,
-}: RootComponentProps) => {
+}: AppWrapperProps) => {
   if (previewMode) {
     //to prevent leaking the meta items to the parent document, if it lives in an iframe (e.g. docs)
     HelmetProvider.canUseDOM = false;
@@ -525,7 +563,7 @@ const RootComponent = ({
         >
           <InspectorProvider sources={sources}>
             <ConfirmationModalContextProvider>
-              <RootContentComponent
+              <AppContent
                 rootContainer={node as ContainerComponentDef}
                 routerBaseName={baseName}
                 globalProps={globalProps}
@@ -562,6 +600,11 @@ const RootComponent = ({
   );
 };
 
+/**
+ * This component runs the app in the context of the registered components
+ * (including the core xmlui components and external ones passed to this
+ * component.
+ */
 function AppRoot({
   apiInterceptor,
   contributes,
@@ -574,13 +617,13 @@ function AppRoot({
   globalProps,
   standalone,
   trackContainerHeight,
-  baseName,
+  routerBaseName,
   previewMode,
   servedFromSingleFile,
   resourceMap,
   sources,
-  componentManager
-}: RootComponentProps & {componentManager?: StandaloneComponentManager}) {
+  componentManager,
+}: AppWrapperProps & { componentManager?: StandaloneComponentManager }) {
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -610,13 +653,13 @@ function AppRoot({
 
   return (
     <ComponentProvider contributes={contributes} componentManager={componentManager}>
-      <RootComponent
+      <AppWrapper
         resourceMap={resourceMap}
         apiInterceptor={apiInterceptor}
-        node={rootNode as any}
+        node={rootNode as ComponentLike}
         contributes={contributes}
         resources={resources}
-        baseName={baseName}
+        routerBaseName={routerBaseName}
         decorateComponentsWithTestId={decorateComponentsWithTestId}
         debugEnabled={debugEnabled}
         defaultTheme={defaultTheme}

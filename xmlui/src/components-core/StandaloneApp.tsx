@@ -16,7 +16,7 @@ import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSou
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 
 import "../index.scss";
-import RootComponent from "@components-core/RootComponent";
+import AppRoot from "@components-core/AppRoot";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
@@ -70,9 +70,9 @@ type StandaloneAppProps = {
 /**
  * This React component represents a standalone app that implements a web
  * application with xmlui components. A StandaloneApp instance uses a
- * RootComponent wrapped into an ApiInterceptor.
+ * AppRoot wrapped into an ApiInterceptor.
  *
- * RootComponent is responsible for rendering the app (using an internal
+ * AppRoot is responsible for rendering the app (using an internal
  * representation); ApiInterceptor can emulate some backend functionality
  * running in the browser.
  */
@@ -131,14 +131,14 @@ function StandaloneApp({
 
   return (
     <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
-      <RootComponent
+      <AppRoot
         servedFromSingleFile={servedFromSingleFile}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
         node={entryPoint!}
         standalone={true}
         debugEnabled={debugEnabled}
         // @ts-ignore
-        baseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={{
           name: name,
           ...(appGlobals || {}),

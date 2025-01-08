@@ -303,7 +303,6 @@ export type AppContextObject = {
   delay: (timeInMs: number, callback?: any) => Promise<void>;
   toHashObject: (arr: any[], keyProp: string, valueProp: string) => any;
   findByField: (arr: any[], field: string, value: any) => any;
-  readonly Transforms: Record<string, any>;
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
 };
