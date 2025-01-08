@@ -1,10 +1,19 @@
 import { labelPositionValues } from "@components/abstractions";
+import { FormDriver } from "@components/Form/Form.spec";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { expect, ComponentDriver, createTestWithDriver, createTestWithDrivers } from "@testing/fixtures";
 
-class FormItemDriver extends ComponentDriver {}
+class FormItemDriver extends ComponentDriver {
+  // Need to check for input type
+  async fillField(value: any) {
+    await this.locator.getByRole("textbox").fill(value);
+  }
+}
 
 const test = createTestWithDriver(FormItemDriver);
+
+// TEMP: Assess whether the new testing infrastructure is sufficient
+const test2 = createTestWithDrivers();
 
 const types = [
   "checkbox",
@@ -89,23 +98,69 @@ test.skip("type 'textarea' renders right aria role", async ({ createDriver }) =>
   //expect(driver.component).toHaveRole("textbox");
 });
 
-// TODO
-test.skip("don't run other validations if field is not required",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {
-    // Add FormItem with clientside validation: required="false" and minLength="3"
-    // Fill input field with less than 3 chars
-    // Expect no validation errors
-  });
+// NOTE: Shouldn't we show validation messages for fields without a label?
+test.skip(
+  "not setting label does not show validation messages when invalid",
+  SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
+  async ({ createDriver }) => {}
+);
 
-test.skip("run other validations if field is required",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {
-    // Add FormItem with clientside validation: required="true" and minLength="3"
-    // Fill input field with less than 3 chars
-    // Expect validation error
-  });
+test.skip(
+  "validation message shows when field is invalid",
+  SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
+  async ({ createDriver }) => {}
+);
 
+test2("only run other validations if required field is filled", async ({ initTestBed, createDriver }) => {
+  await initTestBed(`
+    <Form testId="testForm" data="{{ name: '' }}" onSubmit="testState = true">
+      <FormItem
+        testId="testField"
+        label="x"
+        bindTo="name"
+        minLength="3"
+        lengthInvalidMessage="Name is too short!"
+        required="true"
+        requiredInvalidMessage="This field is required" />
+    </Form>`
+  );
+  const formDriver = await createDriver(FormDriver, "testForm");
+  const formItemDriver = await createDriver(FormItemDriver, "testField");
+
+  // Step 1: Submit form without filling in required field to trigger validation display
+  await formDriver.submitForm();
+
+  await expect(formItemDriver.component).toHaveText(/This field is required/);
+  await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
+
+  // Step 2: Fill input field with less than 3 chars to trigger minLength validation
+  await formItemDriver.fillField("Bo");
+
+  await expect(formItemDriver.component).not.toHaveText(/This field is required/);
+  await expect(formItemDriver.component).toHaveText(/Name is too short!/);
+});
+
+test2("other validations run if field is not required", async ({ initTestBed, createDriver }) => {
+  await initTestBed(`
+    <Form testId="testForm" data="{{ name: '' }}" onSubmit="testState = true">
+      <FormItem
+        testId="testField"
+        label="x"
+        bindTo="name"
+        minLength="3"
+        lengthInvalidMessage="Name is too short!"
+        required="false"
+        requiredInvalidMessage="This field is required" />
+    </Form>`
+  );
+  const formDriver = await createDriver(FormDriver, "testForm");
+  const formItemDriver = await createDriver(FormItemDriver, "testField");
+
+  await formDriver.submitForm();
+
+  await expect(formItemDriver.component).not.toHaveText(/This field is required/);
+  await expect(formItemDriver.component).toHaveText(/Name is too short!/);
+});
 
 types.forEach((testCase) => {
   test.skip(`autofocus for type '${testCase}' works`, async ({ createDriver }) => {});

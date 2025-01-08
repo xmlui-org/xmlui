@@ -20,7 +20,7 @@ export type ComponentDriverParams = {
   locator: Locator;
   testStateLocator: Locator;
   page: Page;
-}
+};
 
 export class ComponentDriver {
   protected readonly locator: Locator;
@@ -33,7 +33,7 @@ export class ComponentDriver {
     this.page = page;
   }
 
-  get component () {
+  get component() {
     return this.locator;
   }
 
@@ -42,69 +42,151 @@ export class ComponentDriver {
 
   click = async (options?: { timeout?: number }) => {
     await this.locator.click(options);
-  }
+  };
 
   focus = async (options?: { timeout?: number }) => {
     await this.locator.focus(options);
-  }
+  };
 
   blur = async (options?: { timeout?: number }) => {
     await this.locator.blur(options);
-  }
+  };
 
   getComponentSize = async () => {
     return getElementSize(this.locator);
-  }
+  };
 
   /** returns an async function that can query the test state */
-  get testState () {
-    return async () =>{
+  get testState() {
+    return async () => {
       const text = await this.testStateLocator.textContent();
       const testState = text === "undefined" ? undefined : JSON.parse(text!);
       return testState;
-    }
+    };
   }
 }
 
-
 export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
-  DriverClass: T
+  DriverClass: T,
 ) {
   return baseTest.extend<{
-    createDriver: (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => Promise<InstanceType<T>>;
+    createDriver: (
+      source: string,
+      description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+    ) => Promise<InstanceType<T>>;
   }>({
-    createDriver: async ({page}, use) => {
-      await use(async (source: string, description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">) => {
-        const testStateViewTestId = "test-state-view-testid"
-        const { errors, component } = xmlUiMarkupToComponent(`
-          <Fragment var.testState="{null}">
-            ${source}
-            <Stack width="0" height="0">
-              <Text
-                testId="${testStateViewTestId}"
-                value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
-            </Stack>
-          </Fragment>
-        `);
-        
-        if (errors.length > 0) {
-          throw { errors };
-        }
+    createDriver: async ({ page }, use) => {
+      await use(
+        async (
+          source: string,
+          description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+        ) => {
+          const testStateViewTestId = "test-state-view-testid";
+          const { errors, component } = xmlUiMarkupToComponent(`
+            <Fragment var.testState="{null}">
+              ${source}
+              <Stack width="0" height="0">
+                <Text
+                  testId="${testStateViewTestId}"
+                  value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
+              </Stack>
+            </Fragment>
+          `);
 
-        const entryPoint = component as ComponentDef;
-        const componentTestId = "test-id-component";
-        const componentToTest = (entryPoint).children![0];
-        componentToTest.testId ??= componentTestId;
+          if (errors.length > 0) {
+            throw { errors };
+          }
 
-        await initComponent(page, { ...description, entryPoint },);
-        return new DriverClass({
-          locator: page.getByTestId(componentToTest.testId!),
+          const entryPoint = component as ComponentDef;
+          const componentTestId = "test-id-component";
+          const componentToTest = entryPoint.children![0];
+          componentToTest.testId ??= componentTestId;
+
+          await initComponent(page, { ...description, entryPoint });
+
+          return new DriverClass({
+            locator: page.getByTestId(componentToTest.testId!),
+            testStateLocator: page.getByTestId(testStateViewTestId),
+            page: page,
+          });
+        },
+      );
+    },
+  });
+}
+
+type TestDriverExtenderProps = {
+  testStateViewTestId: string;
+  initTestBed: (
+    source: string,
+    description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+  ) => Promise<void>;
+  createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
+    driverClass: T,
+    testId: string,
+  ) => Promise<InstanceType<T>>;
+};
+
+export function createTestWithDrivers() {
+  // NOTE: the base Playwright test can be extended with fixture methods as well as any other language constructs we deem useful
+  return baseTest.extend<TestDriverExtenderProps>({
+    testStateViewTestId: "test-state-view-testid",
+
+    createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
+      { page, testStateViewTestId },
+      use,
+    ) => {
+      await use(async (driverClass: T, testId: string) => {
+        const locator = await getOnlyFirstLocator(page, testId);
+        return new driverClass({
+          locator,
           testStateLocator: page.getByTestId(testStateViewTestId),
-          page: page
+          page: page,
         });
       });
-    }
+    },
+
+    initTestBed: async ({ page, testStateViewTestId }, use) => {
+      await use(
+        async (
+          source: string,
+          description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+        ) => {
+          // --- Initialize XMLUI App
+          const { errors, component } = xmlUiMarkupToComponent(`
+            <Fragment var.testState="{null}">
+              ${source}
+              <Stack width="0" height="0">
+                <Text
+                  testId="${testStateViewTestId}"
+                  value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
+              </Stack>
+            </Fragment>
+          `);
+
+          if (errors.length > 0) {
+            throw { errors };
+          }
+          const entryPoint = component as ComponentDef;
+          await initComponent(page, { ...description, entryPoint });
+        },
+      );
+    },
   });
+}
+
+/**
+ * Writes an error in the console to indicate if multiple elements have the same testId
+ */
+async function getOnlyFirstLocator(page: Page, testId: string) {
+  const locators = page.getByTestId(testId);
+  if ((await locators.count()) > 1) {
+    console.error(
+      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
+    );
+    return locators.first();
+  }
+  return locators;
 }
 
 // -----------------------------------------------------------------

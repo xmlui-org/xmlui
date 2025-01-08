@@ -50,7 +50,7 @@ type MockExternalApiOptions = {
   body?: Record<string, any>;
 };
 
-class FormDriver extends ComponentDriver {
+export class FormDriver extends ComponentDriver {
   async mockExternalApi(url: string, apiOptions: MockExternalApiOptions) {
     const { status = 200, headers = {}, body = {} } = apiOptions;
     await this.page.route(url, (route) =>
@@ -202,8 +202,7 @@ test("data accepts an object", async ({ createDriver }) => {
 // npm run build:test-bed;
 // CI=true npm run test:e2e
 test.fixme("data accepts relative URL endpoint", async ({ createDriver }) => {
-  const driver = await createDriver(
-    `
+  const driver = await createDriver(`
     <Form data="/test">
       <FormItem testId="inputField" bindTo="name" />
     </Form>`,
@@ -347,8 +346,7 @@ test.fixme("form submits to correct url", async ({ createDriver }) => {
 // --- submitting the Form
 
 test("submit triggers when clicking save/submit button", async ({ createDriver }) => {
-  const driver = await createDriver(
-    `
+  const driver = await createDriver(`
     <Form data="{{ name: 'John' }}" submitUrl="/test" submitMethod="post">
       <FormItem bindTo="name" />
     </Form>`,
@@ -424,6 +422,7 @@ test("user cannot submit with clientside errors present", async ({ createDriver 
       <FormItem bindTo="name" required="true" />
     </Form>`);
   // The onSubmit event should have been triggered if not for the client error of an empty required field
+  await driver.submitForm("click");
   await expect.poll(driver.testState).toEqual(null);
 });
 
