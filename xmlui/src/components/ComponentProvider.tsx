@@ -142,14 +142,15 @@ import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
 import { ThemeDefinition } from "@abstractions/ThemingDefs";
+import {animationComponentRenderer} from "@components/Animation/Animation";
 
 /**
- * The framework has a specialized component concept, the "property holder 
- * component." These components only hold property values but do not render 
- * anything. The framework processes each of them in a particular way. 
- * 
- * The property holder components must be registered along with other 
- * components, as apps may use them in their markup. The following constant 
+ * The framework has a specialized component concept, the "property holder
+ * component." These components only hold property values but do not render
+ * anything. The framework processes each of them in a particular way.
+ *
+ * The property holder components must be registered along with other
+ * components, as apps may use them in their markup. The following constant
  * values declare renderer functions for the built-in property holders.
  */
 const dataSourcePropHolder = createPropHolderComponent("DataSource");
@@ -158,7 +159,7 @@ const textNodeCDataPropHolder = createPropHolderComponent("TextNodeCData");
 
 /**
  * Applications can contribute to the registry with their custom (third-party)
- * and application-specific components and others. This type holds the 
+ * and application-specific components and others. This type holds the
  * definitions of these extra artifacts.
  */
 export type ContributesDefinition = {
@@ -184,9 +185,9 @@ export type ContributesDefinition = {
 };
 
 /**
- * This class implements the registry that holds the components available 
- * in xmlui. Any component in this registry can be used in the xmlui markup. 
- * An error is raised when the markup processor does not find a particular 
+ * This class implements the registry that holds the components available
+ * in xmlui. Any component in this registry can be used in the xmlui markup.
+ * An error is raised when the markup processor does not find a particular
  * component within the registry.
  */
 export class ComponentRegistry {
@@ -195,7 +196,7 @@ export class ComponentRegistry {
 
   // --- The pool of available theme variable names
   private themeVars = new Set<string>();
-  
+
   // --- Default theme variable values collected from the registered components
   private defaultThemeVars = {};
 
@@ -206,9 +207,9 @@ export class ComponentRegistry {
   private loaders = new Map<string, LoaderRenderer<any>>();
 
   /**
-   * The component constructor registers all xmlui core components, so each 
-   * registry instance incorporates the framework's core. It also receives a 
-   * `contributes` argument with information about accompanying (app-specific) 
+   * The component constructor registers all xmlui core components, so each
+   * registry instance incorporates the framework's core. It also receives a
+   * `contributes` argument with information about accompanying (app-specific)
    * components that come with a particular app using the registry.
    * @param contributes Information about the components that come with the app
    * @param componentManager Optional manager object that receives a notification
@@ -403,6 +404,7 @@ export class ComponentRegistry {
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
       this.registerComponentRenderer(breakoutComponentRenderer);
+      this.registerComponentRenderer(animationComponentRenderer);
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
@@ -486,7 +488,7 @@ export class ComponentRegistry {
   }
 
   /**
-   * This method retrieves the registry entry of a component registered 
+   * This method retrieves the registry entry of a component registered
    * with the specified key.
    * @param componentName The unique ID of the component
    * @returns The component registry entry, if found; otherwise, undefined.
@@ -496,7 +498,7 @@ export class ComponentRegistry {
   }
 
   /**
-   * This method retrieves the registry entry of an action registered 
+   * This method retrieves the registry entry of an action registered
    * with the specified key.
    * @param actionType The unique ID of the action
    * @returns The action registry entry, if found; otherwise, undefined.
@@ -506,7 +508,7 @@ export class ComponentRegistry {
   }
 
   /**
-   * This method retrieves the registry entry of a loader registered with the 
+   * This method retrieves the registry entry of a loader registered with the
    * specified key.
    * @param type The unique ID of the loader
    * @returns The loader registry entry, if found; otherwise, undefined.
@@ -516,7 +518,7 @@ export class ComponentRegistry {
   }
 
   /**
-   * This method checks whether a component with the specified key is 
+   * This method checks whether a component with the specified key is
    * registered in the component registry.
    * @param componentName The unique ID of the component
    * @returns True if the component is registered; otherwise, false.
@@ -529,7 +531,7 @@ export class ComponentRegistry {
     );
   }
 
-  // --- Registers a renderable component using its renderer function 
+  // --- Registers a renderable component using its renderer function
   // --- and metadata
   private registerComponentRenderer = ({
     type,
@@ -604,8 +606,8 @@ type ComponentProviderProps = {
 };
 
 /**
- * This React component provides a context in which components can access the 
- * component registry. The component ensures that child components are not 
+ * This React component provides a context in which components can access the
+ * component registry. The component ensures that child components are not
  * rendered before the component registry is initialized.
  */
 export function ComponentProvider({
