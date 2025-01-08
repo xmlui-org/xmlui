@@ -10,7 +10,7 @@ import type {
   CompoundComponentDef,
 } from "@abstractions/ComponentDefs";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import RootComponent from "@components-core/RootComponent";
+import AppRoot from "@components-core/AppRoot";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { TreeNode } from "@components-core/abstractions/treeAbstractions";
 import { Icon } from "@components/Icon/IconNative";
@@ -47,7 +47,7 @@ export {
   parseScssVar,
   startApp,
   useTheme, //TODO REMOVE
-  RootComponent, //TODO remove, playground uses it
+  AppRoot, //TODO remove, playground uses it
   ErrorBoundary, //TODO remove, playground uses it
   Icon, // TODO REMOVE from export
   Stack, // TODO REMOVE from export

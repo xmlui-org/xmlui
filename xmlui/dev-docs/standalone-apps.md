@@ -53,7 +53,7 @@ When the app is successfully loaded, `StandaloneApp` delegates the responsibilit
 
 ```xml
 <ApiInterceptorProvider>
-  <RootComponent />
+  <AppRoot />
 </ApiInterceptorProvider>
 ```
 
