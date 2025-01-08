@@ -1,5 +1,5 @@
 import { labelPositionValues } from "@components/abstractions";
-import { FormDriver } from "@components/Form/Form.spec";
+import { FormDriver } from "@components/Form/FormDriver";
 import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, ComponentDriver, createTestWithDriver, createTestWithDrivers } from "@testing/fixtures";
 
