@@ -23,6 +23,7 @@ export const ImageMd = createMetadata({
       `This property sets a preferred aspect ratio for the image, which will be used in the ` +
         `calculation of auto sizes and some other layout functions.`,
     ),
+    animation: d(`The animation object to be applied to the component`),
   },
   events: {
     click: dClick(COMP),
@@ -42,6 +43,7 @@ export const imageComponentRenderer = createComponentRenderer(
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
         aspectRatio={extractValue(node.props.aspectRatio)}
         layout={layoutCss}
+        animation={extractValue(node.props.animation)}
       />
     );
   },

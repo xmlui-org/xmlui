@@ -59,8 +59,6 @@ export const Tabs = ({
             key={index}
             value={`${index}`}
             className={styles.tabsContent}
-            forceMount
-            hidden={`${index}` === currentTab}
           >
             {tab.content}
           </RTabs.Content>
