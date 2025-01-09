@@ -33,6 +33,7 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn, RenderChildFn } from "@abstractions/RendererDefs";
 import { useEvent } from "@components-core/utils/misc";
 import classnames from "classnames";
+import type { FieldOrderBy, ScrollAnchoring } from "@components/abstractions";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
@@ -72,7 +73,6 @@ const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
   );
 };
 
-type FieldOrderBy = { field: string; direction: "asc" | "desc" };
 type OrderBy = FieldOrderBy | Array<FieldOrderBy>;
 
 enum RowType {
@@ -224,7 +224,7 @@ type DynamicHeightListProps = {
   groupBy?: string;
   orderBy?: OrderBy;
   availableGroups?: string[];
-  scrollAnchor?: "top" | "bottom";
+  scrollAnchor?: ScrollAnchoring;
   requestFetchPrevPage?: () => any;
   requestFetchNextPage?: () => any;
   selectedIndex?: number;
