@@ -242,3 +242,13 @@ export type ValidationResult = {
   status: ValidationStatus;
   message?: string;
 };
+
+// --- scroll anchoring
+export const scrollAnchoringValues = ["top", "bottom"] as const;
+export const scrollAnchoringNames = [...scrollAnchoringValues];
+export type ScrollAnchoring = (typeof scrollAnchoringValues)[number];
+
+// --- ordering
+export const orderingValues = ["asc", "desc"] as const;
+type OrderingDirection = (typeof orderingValues)[number];
+export type FieldOrderBy = { field: string; direction: OrderingDirection };

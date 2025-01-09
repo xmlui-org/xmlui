@@ -5,6 +5,7 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { DynamicHeightList, MemoizedSection } from "./ListNative";
 import { dComponent } from "@components/metadata-helpers";
+import { scrollAnchoringValues } from "@components/abstractions";
 
 const COMP = "List";
 
@@ -31,11 +32,14 @@ export const ListMd = createMetadata({
     ),
     limit: d(`This property limits the number of items displayed in the \`${COMP}\`.`),
     scrollAnchor: d(
-      `This property pins the scroll position to either the \`top\` or the \`bottom\` of the list.`,
+      `This property pins the scroll position to a specified location of the list. Available values are shown below.`,
+      scrollAnchoringValues,
+      "string",
+      "top",
     ),
     groupBy: d(
-      `This property set which attribute of the data is used to group the list items. ` +
-        `If the attribute does not appear in the data items, it will be ignored.`,
+      `This property sets which attribute of the data is used to group the list items. ` +
+        `If the attribute does not appear in the data, it will be ignored.`,
     ),
     orderBy: d(
       `This property enables the ordering of list items by specifying an attribute in the data.`,
@@ -75,7 +79,7 @@ export const ListMd = createMetadata({
       `This property adds a list of default groups for the \`${COMP}\` and displays the group ` +
         `headers in the specified order. If the data contains group headers not in this list, ` +
         `those headers are also displayed (after the ones in this list); however, their order ` +
-        `is indeterministic.`,
+        `is not deterministic.`,
     ),
     hideEmptyGroups: d(
       "This boolean property indicates if empty groups should be hidden (no header and footer are displayed).",
