@@ -126,12 +126,6 @@ orderingValues.forEach((order) => {
   );
 });
 
-test.skip(
-  "no grouping if groupBy set to nonexistent attribute",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
-);
-
 // --- --- availableGroups
 
 test.skip(
