@@ -8,6 +8,8 @@ interface DecoratorProps {
 
   // --- If true, only the ref'd child will have the attributes added
   allowOnlyRefdChild?: boolean;
+
+  // --- Callback function to be called when the target component is mounted
   onTargetMounted?: () => void;
 
   // --- The component to decorate
@@ -15,14 +17,17 @@ interface DecoratorProps {
 }
 
 /**
- * This component decorates a React element's DOM node (through a React ref) with the specified
- * attributes. We use this component to add test IDs to particular components.
+ * This component decorates the DOM element of a component with a set of 
+ * attributes. We use this feature to assign helper attributes to the app's 
+ * xmlui component nodes for testing, debugging, and other development-related
+ * purposes.
  */
 const ComponentDecorator = forwardRef((props: DecoratorProps, forwardedRef) => {
   const [parentElement, setParentElement] = useState<HTMLElement | null>(null);
   const { onTargetMounted } = props;
 
-  // --- We wrap the component in a `Fragment`, if it has a parent element; otherwise, we use a `div`
+  // --- We wrap the component in a React.Fragment, if it has a parent element; 
+  // --- otherwise, we use a `div`
   const Wrapper = parentElement ? React.Fragment : "div";
 
   const ref = useRef<HTMLDivElement>(null);
