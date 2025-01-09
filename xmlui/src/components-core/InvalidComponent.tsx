@@ -5,28 +5,22 @@ import type { ComponentDef } from "@abstractions/ComponentDefs";
 import styles from "./InvalidComponent.module.scss";
 import { EMPTY_ARRAY } from "@components-core/constants";
 
-/**
- * Represents the properties of InvalidComponent
- */
+// --- Represents the properties of InvalidComponent
 type Props = {
-  /**
-   * Errors found while validating component prperties
-   */
+  // -- Errors found while validating component prperties
   errors?: string[];
 
-  /**
-   * The definition of the component validated
-   */
+  // -- The definition of the component validated
   node: ComponentDef;
 
-  /**
-   * Component children to render with the error message
-   */
+  // --- Component children to render with the error message
   children: React.ReactNode;
 };
 
 /**
- * The function renders a message that includes issues found when rendering a particular component
+ * This component displays run time errors found while the rendering engine
+ * runs. If it finds an issue that hinders regular operation, it renders this
+ * component instead of the faulty one.
  */
 function InvalidComponent({ errors = EMPTY_ARRAY, node, children }: Props) {
   return (

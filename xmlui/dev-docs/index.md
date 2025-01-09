@@ -5,3 +5,5 @@ This article helps you understand the implementation details of xmlui so that yo
 - [React Fundamentals](./react-fundamentals.md)
 - [Standalone Apps](./standalone-apps.md)
 - [`AppRoot`](./AppRoot.md)
+- ...
+- [Helper Components](./helper-components)
