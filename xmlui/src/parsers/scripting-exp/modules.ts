@@ -1,5 +1,11 @@
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
-import type { FunctionDeclaration, Statement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import {
+  T_FUNCTION_DECLARATION,
+  T_IMPORT_DECLARATION,
+  T_VAR_STATEMENT,
+  type FunctionDeclaration,
+  type Statement,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
@@ -44,7 +50,7 @@ export function parseScriptModule(
   moduleName: string,
   source: string,
   moduleResolver: ModuleResolver,
-  restrictiveMode = true
+  restrictiveMode = true,
 ): ScriptModule | ModuleErrors {
   // --- Keep track of parsed modules to avoid circular references
   const parsedModules = new Map<string, ScriptModule>();
@@ -58,7 +64,7 @@ export function parseScriptModule(
     moduleName: string,
     source: string,
     moduleResolver: ModuleResolver,
-    topLevel = false
+    topLevel = false,
   ): ScriptModule | null | undefined {
     // --- Do not parse the same module twice
     if (parsedModules.has(moduleName)) {
@@ -96,9 +102,9 @@ export function parseScriptModule(
       if (topLevel) {
         // --- Restrict top-level statements
         switch (stmt.type) {
-          case "VarS":
-          case "FuncD":
-          case "ImportD":
+          case T_VAR_STATEMENT:
+          case T_FUNCTION_DECLARATION:
+          case T_IMPORT_DECLARATION:
             break;
           default:
             if (restrictiveMode) {
@@ -108,15 +114,15 @@ export function parseScriptModule(
         }
       } else {
         switch (stmt.type) {
-          case "VarS":
+          case T_VAR_STATEMENT:
             addErrorMessage("W027", stmt);
             break;
-          case "FuncD":
+          case T_FUNCTION_DECLARATION:
             if (restrictiveMode && !stmt.exp) {
               addErrorMessage("W029", stmt);
             }
             break;
-          case "ImportD":
+          case T_IMPORT_DECLARATION:
             break;
           default:
             if (restrictiveMode) {
@@ -131,7 +137,7 @@ export function parseScriptModule(
     const functions: Record<string, FunctionDeclaration> = {};
     const exports: Record<string, FunctionDeclaration> = {};
     statements
-      .filter((stmt) => stmt.type === "FuncD")
+      .filter((stmt) => stmt.type === T_FUNCTION_DECLARATION)
       .forEach((stmt) => {
         const func = stmt as FunctionDeclaration;
         if (functions[func.id.name]) {
@@ -162,7 +168,7 @@ export function parseScriptModule(
     const imports: Record<string, FunctionDeclaration> = {};
     for (let i = 0; i < statements.length; i++) {
       const stmt = statements[i];
-      if (stmt.type !== "ImportD") {
+      if (stmt.type !== T_IMPORT_DECLARATION) {
         continue;
       }
 
@@ -211,7 +217,9 @@ export function parseScriptModule(
     function addErrorMessage(code: ErrorCodes, stmt: Statement, ...args: any[]): void {
       let errorText = errorMessages[code];
       if (args) {
-        args.forEach((o, idx) => (errorText = errorText.replaceAll(`{${idx}}`, args[idx].toString())));
+        args.forEach(
+          (o, idx) => (errorText = errorText.replaceAll(`{${idx}}`, args[idx].toString())),
+        );
       }
       errors.push({
         code,

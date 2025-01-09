@@ -4,6 +4,8 @@ import {
   CompoundPropertyValue,
   SingleExpressionValue,
   SinglePropertyValue,
+  T_BINARY_EXPRESSION,
+  T_OBJECT_LITERAL,
 } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { Parser } from "@parsers/scripting/Parser";
 
@@ -203,7 +205,7 @@ describe("Parameter property parsing", () => {
     // --- Assert
     const expr = (segments as SingleExpressionValue).expr;
     expect(segments.type).equal("SEV");
-    expect(expr.type).equal("BinaryE");
+    expect(expr.type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse single expression #2", () => {
@@ -214,7 +216,7 @@ describe("Parameter property parsing", () => {
     expect(segments.type).equal("CPV");
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts[0]).equal("abc ");
-    expect((parts[1] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse single expression #3", () => {
@@ -224,7 +226,7 @@ describe("Parameter property parsing", () => {
     // --- Assert
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts[0]).equal("abc ");
-    expect((parts[1] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
     expect(parts[2]).equal(" def");
   });
 
@@ -234,7 +236,7 @@ describe("Parameter property parsing", () => {
 
     // --- Assert
     expect(segments.type).equal("SEV");
-    expect((segments as any).expr.type).equal("OLitE");
+    expect((segments as any).expr.type).equal(T_OBJECT_LITERAL);
   });
 
   it("Parse single expression #5", () => {
@@ -243,7 +245,7 @@ describe("Parameter property parsing", () => {
 
     // --- Assert
     expect(segments.type).equal("SEV");
-    expect((segments as any).expr.type).equal("OLitE");
+    expect((segments as any).expr.type).equal(T_OBJECT_LITERAL);
   });
 
   it("Parse single expression #6", () => {
@@ -252,7 +254,7 @@ describe("Parameter property parsing", () => {
 
     // --- Assert
     expect(segments.type).equal("SEV");
-    expect((segments as any).expr.type).equal("OLitE");
+    expect((segments as any).expr.type).equal(T_OBJECT_LITERAL);
   });
 
   it("Parse single expression #6", () => {
@@ -261,7 +263,7 @@ describe("Parameter property parsing", () => {
 
     // --- Assert
     expect(segments.type).equal("SEV");
-    expect((segments as any).expr.type).equal("OLitE");
+    expect((segments as any).expr.type).equal(T_OBJECT_LITERAL);
   });
 
   it("Parse multiple expression #1", () => {
@@ -272,8 +274,8 @@ describe("Parameter property parsing", () => {
     expect(segments.type).equal("CPV");
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(2);
-    expect((parts[0] as any).type).equal("BinaryE");
-    expect((parts[1] as any).type).equal("BinaryE");
+    expect((parts[0] as any).type).equal(T_BINARY_EXPRESSION);
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse multiple expression #2", () => {
@@ -285,8 +287,8 @@ describe("Parameter property parsing", () => {
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(3);
     expect(parts[0]).equal("{");
-    expect((parts[1] as any).type).equal("BinaryE");
-    expect((parts[2] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
+    expect((parts[2] as any).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse multiple expression #3", () => {
@@ -297,8 +299,8 @@ describe("Parameter property parsing", () => {
     expect(segments.type).equal("CPV");
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(2);
-    expect((parts[0] as any).type).equal("BinaryE");
-    expect((parts[1] as any).type).equal("OLitE");
+    expect((parts[0] as any).type).equal(T_BINARY_EXPRESSION);
+    expect((parts[1] as any).type).equal(T_OBJECT_LITERAL);
   });
 
   it("Parse multiple expression #4", () => {
@@ -310,8 +312,8 @@ describe("Parameter property parsing", () => {
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(3);
     expect(parts[0]).equal("abc");
-    expect((parts[1] as any).type).equal("BinaryE");
-    expect((parts[2] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
+    expect((parts[2] as any).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse multiple expression #5", () => {
@@ -323,9 +325,9 @@ describe("Parameter property parsing", () => {
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(4);
     expect(parts[0]).equal("abc");
-    expect((parts[1] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
     expect(parts[2]).equal("def");
-    expect((parts[3] as any).type).equal("BinaryE");
+    expect((parts[3] as any).type).equal(T_BINARY_EXPRESSION);
   });
 
   it("Parse multiple expression #6", () => {
@@ -337,9 +339,9 @@ describe("Parameter property parsing", () => {
     const parts = (segments as CompoundPropertyValue).parts;
     expect(parts.length).equal(5);
     expect(parts[0]).equal("abc");
-    expect((parts[1] as any).type).equal("BinaryE");
+    expect((parts[1] as any).type).equal(T_BINARY_EXPRESSION);
     expect(parts[2]).equal("def");
-    expect((parts[3] as any).type).equal("BinaryE");
+    expect((parts[3] as any).type).equal(T_BINARY_EXPRESSION);
     expect(parts[4]).equal("ghi");
   });
 
@@ -350,6 +352,6 @@ describe("Parameter property parsing", () => {
 
     // --- Assert
     expect(segments.type).equal("SEV");
-    expect((segments as any).expr.type).equal("BinaryE");
+    expect((segments as any).expr.type).equal(T_BINARY_EXPRESSION);
   });
 });

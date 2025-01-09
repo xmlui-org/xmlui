@@ -2,7 +2,7 @@ import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContex
 import type { BlockScope } from "@abstractions/scripting/BlockScope";
 import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
 import type { LoopScope } from "@abstractions/scripting/LoopScope";
-import type { ArrowExpression, FunctionDeclaration, LoopStatement, Statement, TryStatement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { T_EMPTY_STATEMENT, T_FUNCTION_DECLARATION, type ArrowExpression, type FunctionDeclaration, type LoopStatement, type Statement, type TryStatement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { TryScope } from "@abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";
@@ -64,7 +64,7 @@ export function guard(statement: Statement): StatementWithInfo {
 
 // --- Create a closing statement that removes the block scope
 export function closing(): StatementWithInfo {
-  return { statement: { type: "EmptyS" }, execInfo: { removeBlockScope: true } };
+  return { statement: { type: T_EMPTY_STATEMENT }, execInfo: { removeBlockScope: true } };
 }
 
 // --- Create a list of body statements according to the specified loop statement and scope
@@ -188,7 +188,7 @@ export function hoistFunctionDeclarations(thread: LogicalThreadExp, statements: 
     throw new Error("Missing block scope");
   }
   statements
-    .filter((stmt) => stmt.type === "FuncD")
+    .filter((stmt) => stmt.type === T_FUNCTION_DECLARATION)
     .forEach((stmt) => {
       const funcDecl = stmt as FunctionDeclaration;
 

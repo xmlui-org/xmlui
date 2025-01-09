@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { ArrowExpressionStatement, ExpressionStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { ArrowExpressionStatement, ExpressionStatement, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 
 describe("Function proxies", () => {
@@ -25,7 +25,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -54,7 +54,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -81,7 +81,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -115,7 +115,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -139,7 +139,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -162,7 +162,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
@@ -185,7 +185,7 @@ describe("Function proxies", () => {
     });
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
