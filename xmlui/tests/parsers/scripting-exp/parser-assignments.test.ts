@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { BinaryExpression, AssignmentExpression } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { BinaryExpression, AssignmentExpression, T_ASSIGNMENT_EXPRESSION, T_IDENTIFIER, T_BINARY_EXPRESSION, T_LITERAL } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - assignment expressions", () => {
   it("Assignment with binary expression", () => {
@@ -14,12 +14,12 @@ describe("Parser - assignment expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("AsgnE");
+    expect(expr.type).equal(T_ASSIGNMENT_EXPRESSION);
     const asgn = expr as AssignmentExpression;
-    expect(asgn.leftValue.type).equal("IdE");
-    expect(asgn.expr.type).equal("BinaryE");
+    expect(asgn.leftValue.type).equal(T_IDENTIFIER);
+    expect(asgn.expr.type).equal(T_BINARY_EXPRESSION);
     const bExpr = asgn.expr as BinaryExpression;
-    expect(bExpr.left.type).equal("LitE");
-    expect(bExpr.right.type).equal("IdE");
+    expect(bExpr.left.type).equal(T_LITERAL);
+    expect(bExpr.right.type).equal(T_IDENTIFIER);
   });
 });

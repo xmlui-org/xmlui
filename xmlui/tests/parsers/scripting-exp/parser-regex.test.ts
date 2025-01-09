@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { ConstStatement, Literal } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { ConstStatement, Literal, T_CONST_STATEMENT, T_LITERAL } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - regex literals", () => {
   it("null", () => {
@@ -14,7 +14,7 @@ describe("Parser - regex literals", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("LitE");
+    expect(expr.type).equal(T_LITERAL);
   });
 
   const regExpCases = [
@@ -88,7 +88,7 @@ describe("Parser - regex literals", () => {
       const parser = new Parser(regExp.toString());
       const result = parser.parseExpr()!;
 
-      expect(result.type).toBe("LitE");
+      expect(result.type).toBe(T_LITERAL);
       const literal = result as Literal;
       expect(literal.value instanceof RegExp).equal(true);
       expect(literal.value).toStrictEqual(regExp);
@@ -100,7 +100,7 @@ describe("Parser - regex literals", () => {
 
       expect(result.length).toBe(1);
       const stmt = result[0] as ConstStatement;
-      expect(stmt.decls[0].expr!.type).equal("LitE");
+      expect(stmt.decls[0].expr!.type).equal(T_LITERAL);
       const literal = stmt.decls[0].expr as Literal;
       expect(literal.value instanceof RegExp).equal(true);
       expect(literal.value).toStrictEqual(regExp);
@@ -111,7 +111,7 @@ describe("Parser - regex literals", () => {
       const result = parser.parseStatements()!;
 
       expect(result.length).toBe(1);
-      expect(result[0].type).toBe("ConstS");
+      expect(result[0].type).toBe(T_CONST_STATEMENT);
     });
   });
 });

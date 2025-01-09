@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { BinaryExpression } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { BinaryExpression, T_BINARY_EXPRESSION, T_CALCULATED_MEMBER_ACCESS_EXPRESSION, T_CONDITIONAL_EXPRESSION, T_FUNCTION_INVOCATION_EXPRESSION, T_IDENTIFIER, T_LITERAL, T_MEMBER_ACCESS_EXPRESSION, T_SEQUENCE_EXPRESSION, T_UNARY_EXPRESSION } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - Binary operations", () => {
   const binaryOpCases = [
@@ -39,24 +39,24 @@ describe("Parser - Binary operations", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(expr.type).equal("BinaryE");
+      expect(expr.type).equal(T_BINARY_EXPRESSION);
       const binary = expr as BinaryExpression;
       expect(binary.op).equal(c.op);
     });
   });
 
   const binaryLeftOperandCases = [
-    { src: "a+b", op: "+", exp: "IdE" },
-    { src: "a+(b+c)", op: "+", exp: "IdE" },
-    { src: "a+b+c", op: "+", exp: "BinaryE" },
-    { src: "a+b*c", op: "+", exp: "IdE" },
-    { src: "!a+b", op: "+", exp: "UnaryE" },
-    { src: "a.c+b", op: "+", exp: "MembE" },
-    { src: "a[c]+b", op: "+", exp: "CMembE" },
-    { src: "(a ? b : c)+b", op: "+", exp: "CondE" },
-    { src: "123+b", op: "+", exp: "LitE" },
-    { src: "a(b,c)+b", op: "+", exp: "InvokeE" },
-    { src: "(123, 1+c)+b", op: "+", exp: "SeqE" },
+    { src: "a+b", op: "+", exp: T_IDENTIFIER },
+    { src: "a+(b+c)", op: "+", exp: T_IDENTIFIER },
+    { src: "a+b+c", op: "+", exp: T_BINARY_EXPRESSION },
+    { src: "a+b*c", op: "+", exp: T_IDENTIFIER },
+    { src: "!a+b", op: "+", exp: T_UNARY_EXPRESSION },
+    { src: "a.c+b", op: "+", exp: T_MEMBER_ACCESS_EXPRESSION },
+    { src: "a[c]+b", op: "+", exp: T_CALCULATED_MEMBER_ACCESS_EXPRESSION },
+    { src: "(a ? b : c)+b", op: "+", exp: T_CONDITIONAL_EXPRESSION },
+    { src: "123+b", op: "+", exp: T_LITERAL },
+    { src: "a(b,c)+b", op: "+", exp: T_FUNCTION_INVOCATION_EXPRESSION },
+    { src: "(123, 1+c)+b", op: "+", exp: T_SEQUENCE_EXPRESSION },
   ];
   binaryLeftOperandCases.forEach((c) => {
     it(`Binary (left operand): ${c.src}`, () => {
@@ -69,7 +69,7 @@ describe("Parser - Binary operations", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(expr.type).equal("BinaryE");
+      expect(expr.type).equal(T_BINARY_EXPRESSION);
       const binary = expr as BinaryExpression;
       expect(binary.op).equal(c.op);
       expect(binary.left.type).equal(c.exp);
@@ -77,18 +77,18 @@ describe("Parser - Binary operations", () => {
   });
 
   const binaryRightOperandCases = [
-    { src: "a+b", op: "+", exp: "IdE" },
-    { src: "a+(b+c)", op: "+", exp: "BinaryE" },
-    { src: "a+b+c", op: "+", exp: "IdE" },
-    { src: "a+b*c", op: "+", exp: "BinaryE" },
-    { src: "a*b+c", op: "+", exp: "IdE" },
-    { src: "a+!b", op: "+", exp: "UnaryE" },
-    { src: "a+b.c", op: "+", exp: "MembE" },
-    { src: "a+b[c]", op: "+", exp: "CMembE" },
-    { src: "a +(a ? b : c)", op: "+", exp: "CondE" },
-    { src: "b+123", op: "+", exp: "LitE" },
-    { src: "b+a(b,c)", op: "+", exp: "InvokeE" },
-    { src: "b+(123, 1+c)", op: "+", exp: "SeqE" },
+    { src: "a+b", op: "+", exp: T_IDENTIFIER },
+    { src: "a+(b+c)", op: "+", exp: T_BINARY_EXPRESSION },
+    { src: "a+b+c", op: "+", exp: T_IDENTIFIER },
+    { src: "a+b*c", op: "+", exp: T_BINARY_EXPRESSION },
+    { src: "a*b+c", op: "+", exp: T_IDENTIFIER },
+    { src: "a+!b", op: "+", exp: T_UNARY_EXPRESSION },
+    { src: "a+b.c", op: "+", exp: T_MEMBER_ACCESS_EXPRESSION },
+    { src: "a+b[c]", op: "+", exp: T_CALCULATED_MEMBER_ACCESS_EXPRESSION },
+    { src: "a +(a ? b : c)", op: "+", exp: T_CONDITIONAL_EXPRESSION },
+    { src: "b+123", op: "+", exp: T_LITERAL },
+    { src: "b+a(b,c)", op: "+", exp: T_FUNCTION_INVOCATION_EXPRESSION },
+    { src: "b+(123, 1+c)", op: "+", exp: T_SEQUENCE_EXPRESSION },
   ];
   binaryRightOperandCases.forEach((c) => {
     it(`Binary (left operand): ${c.src}`, () => {
@@ -101,7 +101,7 @@ describe("Parser - Binary operations", () => {
       // --- Assert
       expect(expr).not.equal(null);
       if (!expr) return;
-      expect(expr.type).equal("BinaryE");
+      expect(expr.type).equal(T_BINARY_EXPRESSION);
       const binary = expr as BinaryExpression;
       expect(binary.op).equal(c.op);
       expect(binary.right.type).equal(c.exp);

@@ -1,22 +1,44 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
-import type {
-  ArrayLiteral,
-  ArrowExpression,
-  AssignmentExpression,
-  BinaryExpression,
-  CalculatedMemberAccessExpression,
-  ConditionalExpression,
-  Expression,
-  FunctionInvocationExpression,
-  MemberAccessExpression,
-  ObjectLiteral,
-  PostfixOpExpression,
-  PrefixOpExpression,
-  SequenceExpression,
-  Statement,
-  UnaryExpression,
-  VarDeclaration,
+import {
+  T_ARRAY_LITERAL,
+  T_ARROW_EXPRESSION,
+  T_ASSIGNMENT_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_DESTRUCTURE,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_UNARY_EXPRESSION,
+  T_VAR_DECLARATION,
+  type ArrayLiteral,
+  type ArrowExpression,
+  type AssignmentExpression,
+  type BinaryExpression,
+  type CalculatedMemberAccessExpression,
+  type ConditionalExpression,
+  type Expression,
+  type FunctionInvocationExpression,
+  type MemberAccessExpression,
+  type ObjectLiteral,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
+  type SequenceExpression,
+  type Statement,
+  type UnaryExpression,
+  type VarDeclaration,
 } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "@abstractions/scripting/BlockScope";
 
@@ -107,7 +129,7 @@ export function executeArrowExpressionSync(
   ...args: any[]
 ): Promise<any> {
   // --- Just an extra safety check
-  if (expr.type !== "ArrowE") {
+  if (expr.type !== T_ARROW_EXPRESSION) {
     throw new Error("executeArrowExpression expects an 'ArrowExpression' object.");
   }
 
@@ -149,44 +171,44 @@ function evalBindingExpressionTree(
 
   // --- Process the expression according to its type
   switch (expr.type) {
-    case "LitE":
+    case T_LITERAL:
       return evalLiteral(thisStack, expr, thread);
 
-    case "IdE":
+    case T_IDENTIFIER:
       return evalIdentifier(thisStack, expr, evalContext, thread);
 
-    case "MembE":
+    case T_MEMBER_ACCESS_EXPRESSION:
       return evalMemberAccess(evaluator, thisStack, expr, evalContext, thread);
 
-    case "CMembE":
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
       return evalCalculatedMemberAccess(evaluator, thisStack, expr, evalContext, thread);
 
-    case "SeqE":
+    case T_SEQUENCE_EXPRESSION:
       return evalSequence(evaluator, thisStack, expr, evalContext, thread);
 
-    case "ALitE":
+    case T_ARRAY_LITERAL:
       return evalArrayLiteral(evaluator, thisStack, expr, evalContext, thread);
 
-    case "OLitE":
+    case T_OBJECT_LITERAL:
       return evalObjectLiteral(evaluator, thisStack, expr, evalContext, thread);
 
-    case "UnaryE":
+    case T_UNARY_EXPRESSION:
       return evalUnary(evaluator, thisStack, expr, evalContext, thread);
 
-    case "BinaryE":
+    case T_BINARY_EXPRESSION:
       return evalBinary(evaluator, thisStack, expr, evalContext, thread);
 
-    case "CondE":
+    case T_CONDITIONAL_EXPRESSION:
       return evalConditional(evaluator, thisStack, expr, evalContext, thread);
 
-    case "AsgnE":
+    case T_ASSIGNMENT_EXPRESSION:
       return evalAssignment(evaluator, thisStack, expr, evalContext, thread);
 
-    case "PrefE":
-    case "PostfE":
+    case T_PREFIX_OP_EXPRESSION:
+    case T_POSTFIX_OP_EXPRESSION:
       return evalPreOrPost(evaluator, thisStack, expr, evalContext, thread);
 
-    case "InvokeE":
+    case T_FUNCTION_INVOCATION_EXPRESSION:
       // --- Special sync handling
       const funcResult = evalFunctionInvocation(evaluator, thisStack, expr, evalContext, thread);
       if (isPromise(funcResult)) {
@@ -194,11 +216,11 @@ function evalBindingExpressionTree(
       }
       return funcResult;
 
-    case "ArrowE":
+    case T_ARROW_EXPRESSION:
       // --- Special sync handling
       return evalArrow(thisStack, expr, thread);
 
-    case "SpreadE":
+    case T_SPREAD_EXPRESSION:
       throw new Error("Cannot use spread expression (...) with the current intermediate value.");
 
     default:
@@ -264,7 +286,7 @@ function evalArrayLiteral(
 ): any {
   const value: any[] = [];
   for (const item of expr.items) {
-    if (item.type === "SpreadE") {
+    if (item.type === T_SPREAD_EXPRESSION) {
       const spreadArray = evaluator(thisStack, item.expr, evalContext, thread);
       thisStack.pop();
       if (!Array.isArray(spreadArray)) {
@@ -313,10 +335,10 @@ function evalObjectLiteral(
     // --- We're using key/[value] pairs
     let key: any;
     switch (prop[0].type) {
-      case "LitE":
+      case T_LITERAL:
         key = prop[0].value;
         break;
-      case "IdE":
+      case T_IDENTIFIER:
         key = prop[0].name;
         break;
       default:
@@ -439,7 +461,7 @@ function evalFunctionInvocation(
   let implicitContextObject: any = null;
 
   // --- Check for contexted object
-  if (expr.obj.type === "MembE" && expr.obj.obj.type === "IdE") {
+  if (expr.obj.type === T_MEMBER_ACCESS_EXPRESSION && expr.obj.obj.type === T_IDENTIFIER) {
     const hostObject = evaluator(thisStack, expr.obj.obj, evalContext, thread);
     functionObj = evalMemberAccessCore(thisStack, expr.obj, evalContext, thread);
     if (hostObject?._SUPPORT_IMPLICIT_CONTEXT) {
@@ -463,7 +485,7 @@ function evalFunctionInvocation(
       ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true }))
     );
     functionObj = createArrowFunction(evaluator, functionObj as ArrowExpression, evalContext);
-  } else if (expr.obj.type === "ArrowE") {
+  } else if (expr.obj.type === T_ARROW_EXPRESSION) {
     // --- We delay evaluating expression values. We pass the argument names as the first parameter, and then
     // --- all parameter expressions
     functionArgs.push(expr.obj.args, evalContext, thread, ...expr.arguments.map((a) => ({ ...a, _EXPRESSION_: true })));
@@ -471,14 +493,14 @@ function evalFunctionInvocation(
     // --- We evaluate the argument values to pass to a JavaScript function
     for (let i = 0; i < expr.arguments.length; i++) {
       const arg = expr.arguments[i];
-      if (arg.type === "SpreadE") {
+      if (arg.type === T_SPREAD_EXPRESSION) {
         const funcArg = evaluator([], arg.expr, evalContext, thread);
         if (!Array.isArray(funcArg)) {
           throw new Error("Spread operator within a function invocation expects an array operand.");
         }
         functionArgs.push(...funcArg);
       } else {
-        if (arg.type === "ArrowE") {
+        if (arg.type === T_ARROW_EXPRESSION) {
           const funcArg = createArrowFunction(evaluator, arg, evalContext);
           const wrappedFunc = (...args: any[]) => funcArg(arg.args, evalContext, thread, ...args);
           functionArgs.push(wrappedFunc);
@@ -576,16 +598,16 @@ function createArrowFunction(
       const argSpec = argSpecs[i];
       let decl: VarDeclaration | undefined;
       switch (argSpec.type) {
-        case "IdE": {
+        case T_IDENTIFIER: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.name,
           } as VarDeclaration;
           break;
         }
-        case "Destr": {
+        case T_DESTRUCTURE: {
           decl = {
-            type: "VarD",
+            type: T_VAR_DECLARATION,
             id: argSpec.id,
             aDestr: argSpec.aDestr,
             oDestr: argSpec.oDestr,
@@ -610,19 +632,19 @@ function createArrowFunction(
     let statements: Statement[];
 
     switch (expr.statement.type) {
-      case "EmptyS":
+      case T_EMPTY_STATEMENT:
         statements = [];
         break;
-      case "ExprS":
+      case T_EXPRESSION_STATEMENT:
         // --- Create a new thread for the call
         statements = [
           {
-            type: "RetS",
+            type: T_RETURN_STATEMENT,
             expr: expr.statement.expr,
           },
         ];
         break;
-      case "BlockS":
+      case T_BLOCK_STATEMENT:
         // --- Create a new thread for the call
         statements = expr.statement.stmts;
         break;

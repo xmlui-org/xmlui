@@ -1,6 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { ConstStatement, FunctionDeclaration } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { ConstStatement, FunctionDeclaration, T_BLOCK_STATEMENT, T_FUNCTION_DECLARATION } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - export statement", () => {
   it("Exported function", () => {
@@ -14,11 +14,11 @@ describe("Parser - export statement", () => {
     // --- Assert
     expect(stmts.length).equal(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).equal("FuncD");
+    expect(stmt.type).equal(T_FUNCTION_DECLARATION);
     expect(stmt.exp).equal(true);
     expect(stmt.id.name).equal("myFunc");
     expect(stmt.args.length).equal(0);
-    expect(stmt.stmt.type).equal("BlockS");
+    expect(stmt.stmt.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("Export fails with let", () => {

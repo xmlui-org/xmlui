@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { ArrowExpressionStatement, ExpressionStatement } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { ArrowExpressionStatement, ExpressionStatement, T_ARROW_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 import buildProxy from "@components-core/container/buildProxy";
@@ -1166,7 +1166,7 @@ describe("Process statements (sync)", () => {
 
     const statements = parseStatements(source);
     const arrowStmt = {
-      type: "ArrowS",
+      type: T_ARROW_EXPRESSION_STATEMENT,
       expr: (statements[0] as ExpressionStatement).expr
     } as ArrowExpressionStatement;
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolveIdentifiers } from "@components-core/script-runner-exp/id-resolution";
 import { parsePropertyValue } from "@parsers/scripting-exp/property-parsing";
 import { Parser } from "@parsers/scripting-exp/Parser";
+import { T_FUNCTION_DECLARATION, T_IDENTIFIER } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("ID resolution", () => {
   it("PropertyValue does not extend scope", () => {
@@ -545,7 +546,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect((scope.topLevelNames["myId"] as any).type).toBe("IdE");
+    expect((scope.topLevelNames["myId"] as any).type).toBe(T_IDENTIFIER);
   });
 
   it("Var statements extends scope #2", () => {
@@ -556,7 +557,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(2);
-    expect((scope.topLevelNames["myId"] as any).type).toBe("IdE");
+    expect((scope.topLevelNames["myId"] as any).type).toBe(T_IDENTIFIER);
     expect(scope.topLevelNames["myGlobal"]).toBe(true);
   });
 
@@ -568,8 +569,8 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(2);
-    expect((scope.topLevelNames["myId"] as any).type).toBe("IdE");
-    expect((scope.topLevelNames["myGlobal"] as any).type).toBe("IdE");
+    expect((scope.topLevelNames["myId"] as any).type).toBe(T_IDENTIFIER);
+    expect((scope.topLevelNames["myGlobal"] as any).type).toBe(T_IDENTIFIER);
   });
 
   it("If extends scope #1", () => {
@@ -744,7 +745,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect((scope.topLevelNames["myId"] as any).type).toBe("IdE");
+    expect((scope.topLevelNames["myId"] as any).type).toBe(T_IDENTIFIER);
   });
 
   it("For..in does not extend scope #2", () => {
@@ -808,7 +809,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect((scope.topLevelNames["myId"] as any).type).toBe("IdE");
+    expect((scope.topLevelNames["myId"] as any).type).toBe(T_IDENTIFIER);
   });
 
   it("For..of does not extend scope #2", () => {
@@ -970,7 +971,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect((scope.topLevelNames["myFunc"] as any).type).toBe("FuncD");
+    expect((scope.topLevelNames["myFunc"] as any).type).toBe(T_FUNCTION_DECLARATION);
   });
 
   it("Function arg does not extend scope #2", () => {
@@ -981,7 +982,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(1);
-    expect((scope.topLevelNames["myFunc"] as any).type).toBe("FuncD");
+    expect((scope.topLevelNames["myFunc"] as any).type).toBe(T_FUNCTION_DECLARATION);
   });
 
   it("Function body extends scope #3", () => {
@@ -992,7 +993,7 @@ describe("ID resolution", () => {
 
     // --- Assert
     expect(Object.keys(scope.topLevelNames).length).toBe(2);
-    expect((scope.topLevelNames["myFunc"] as any).type).toBe("FuncD");
+    expect((scope.topLevelNames["myFunc"] as any).type).toBe(T_FUNCTION_DECLARATION);
     expect(scope.topLevelNames["myOther"]).toBe(true);
   });
 
