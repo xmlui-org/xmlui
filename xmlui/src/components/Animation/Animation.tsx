@@ -9,10 +9,13 @@ export const AnimationMd = createMetadata({
   description: ``,
   props: {
     animation: d(`The animation object to be applied to the component`),
+    animateWhenInView: d(
+      `Indicates whether the animation should start when the component is in view`,
+    ),
   },
   events: {
     started: d(`Event fired when the animation starts`),
-    stopped: d(`Event fired when the animation stops`)
+    stopped: d(`Event fired when the animation stops`),
   },
   apis: {
     start: d(`Starts the animation`),
@@ -29,6 +32,7 @@ export const animationComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         animation={extractValue(node.props.animation)}
         onStop={lookupEventHandler("stopped")}
+        animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
       >
         {renderChild(node.children)}
       </Animation>

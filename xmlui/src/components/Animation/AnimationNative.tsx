@@ -9,6 +9,7 @@ export type AnimationProps = {
   animation: object;
   registerComponentApi?: RegisterComponentApiFn;
   onStop?: () => void;
+  animateWhenInView?: boolean;
 };
 
 export const Animation = ({
@@ -16,6 +17,7 @@ export const Animation = ({
   registerComponentApi,
   animation,
   onStop,
+  animateWhenInView,
 }: AnimationProps) => {
   useEffect(() => {
     console.log("animation");
@@ -30,8 +32,13 @@ export const Animation = ({
       console.log("onRest");
       onStop?.();
     },
-  }),
-/*  { rootMargin: '-40% 0%' }*/
+  }));
+
+  const [ref, animationStyles] = useInView(
+    () => ({
+      ...animation,
+    }),
+    { rootMargin: "-40% 0%" },
   );
 
   const startAnimation = useCallback(() => {
@@ -53,9 +60,19 @@ export const Animation = ({
     });
   }, [registerComponentApi, startAnimation, stopAnimation]);
 
-  return (
+  return animateWhenInView ? (
     <animated.div
-/*      ref={ref}*/
+      ref={ref}
+      style={{
+        width: "auto",
+        height: "auto",
+        ...animationStyles,
+      }}
+    >
+      {children}
+    </animated.div>
+  ) : (
+    <animated.div
       style={{
         width: "auto",
         height: "auto",
