@@ -31,7 +31,7 @@ export const SliderMd = createMetadata({
       10,
     ),
     rangeHighlight: d(
-      `This booleaThis property indicates if you want to highlight a specific part of the input range.`,
+      `This property indicates if you want to highlight a specific part of the input range.`,
       [
         { value: "none", description: "No highlight (default)" },
         {
