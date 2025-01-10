@@ -12,6 +12,7 @@ export type AnimationProps = {
   onStop?: () => void;
   animateWhenInView?: boolean;
   duration?: number;
+  once?: boolean;
 };
 
 export const Animation = ({
@@ -21,17 +22,15 @@ export const Animation = ({
   onStop,
   animateWhenInView,
   duration = 500,
+  once = false,
 }: AnimationProps) => {
-  useEffect(() => {
-    console.log("animation");
-  }, []);
-
   const [settings, setSettings] = useState(animation);
 
   const [springs, api] = useSpring(() => ({
     ...settings,
     config: {
       duration,
+      once,
     },
     onStart: () => {},
     onRest: () => {
@@ -43,11 +42,13 @@ export const Animation = ({
     () => ({
       ...settings,
     }),
-    { rootMargin: "-40% 0%" },
+    {
+      rootMargin: "-40% 0%",
+      once,
+    },
   );
 
   const startAnimation = useCallback(() => {
-    console.log("startAnimation");
     api.start(settings);
     return () => {
       api.stop();
@@ -79,8 +80,8 @@ export const Animation = ({
   ) : (
     <animated.div
       style={{
-        width: "100%",
-        height: "100%",
+        width: "fit-content",
+        height: "fit-content",
         ...springs,
       }}
     >

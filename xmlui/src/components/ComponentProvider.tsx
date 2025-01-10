@@ -144,7 +144,7 @@ import type StandaloneComponentManager from "../components-core/StandaloneCompon
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import {
   animationComponentRenderer,
-  fadeInAnimationRenderer, slideFromLeftAnimationRenderer,
+  fadeInAnimationRenderer, slideInAnimationRenderer,
 } from "@components/Animation/Animation";
 
 /**
@@ -414,7 +414,7 @@ export class ComponentRegistry {
 
     this.registerComponentRenderer(animationComponentRenderer);
     this.registerComponentRenderer(fadeInAnimationRenderer);
-    this.registerComponentRenderer(slideFromLeftAnimationRenderer);
+    this.registerComponentRenderer(slideInAnimationRenderer);
 
 
     // --- Added after tabler-clone review
