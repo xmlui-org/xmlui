@@ -19,6 +19,7 @@ export const RangeMd = createMetadata({
     `(**NOT IMPLEMENTED YET**) The \`${COMP}\` component allows you to select a numeric range (lower ` +
     `and upper boundary values) between the complete range specified by minimum and maximum values.`,
   props: {
+    initialValue: d(""),
     minValue: d(
       `This property specifies the minimum value of the entire value domain to select the lower ` +
         `and upper boundary range values.`,
@@ -49,7 +50,7 @@ export const RangeMd = createMetadata({
     ),
     complementary: d(
       `This boolean property specifies whether the range is complementary to the selected ` +
-        `boundaries (\`true\`) or not (\`false\`). The value of this property is indicated visually.`,
+        `set of values (\`true\`) or not (\`false\`). The value of this property is indicated visually.`,
       null,
       "boolean",
       false,
