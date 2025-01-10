@@ -1,4 +1,4 @@
-import { animated, useSpring } from "@react-spring/web";
+import { animated, useSpring, useInView } from "@react-spring/web";
 import type React from "react";
 import { useCallback } from "react";
 import { useEffect } from "react";
@@ -8,15 +8,31 @@ export type AnimationProps = {
   children?: React.ReactNode;
   animation: object;
   registerComponentApi?: RegisterComponentApiFn;
+  onStop?: () => void;
 };
 
-export const Animation = ({ children, registerComponentApi, animation }: AnimationProps) => {
+export const Animation = ({
+  children,
+  registerComponentApi,
+  animation,
+  onStop,
+}: AnimationProps) => {
+  useEffect(() => {
+    console.log("animation");
+  }, []);
+
   const [springs, api] = useSpring(() => ({
-    from: { x: 0 },
+    ...animation,
     onStart: () => {
       console.log("onStart");
     },
-  }));
+    onRest: () => {
+      console.log("onRest");
+      onStop?.();
+    },
+  }),
+/*  { rootMargin: '-40% 0%' }*/
+  );
 
   const startAnimation = useCallback(() => {
     console.log("startAnimation");
@@ -39,9 +55,10 @@ export const Animation = ({ children, registerComponentApi, animation }: Animati
 
   return (
     <animated.div
+/*      ref={ref}*/
       style={{
-        width: "fit-content",
-        height: "fit-content",
+        width: "auto",
+        height: "auto",
         ...springs,
       }}
     >

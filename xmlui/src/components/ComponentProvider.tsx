@@ -404,11 +404,13 @@ export class ComponentRegistry {
       this.registerComponentRenderer(bookmarkComponentRenderer);
       this.registerComponentRenderer(tableOfContentsRenderer);
       this.registerComponentRenderer(breakoutComponentRenderer);
-      this.registerComponentRenderer(animationComponentRenderer);
     }
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
     this.registerComponentRenderer(apiCallRenderer);
+
+    this.registerComponentRenderer(animationComponentRenderer);
+
 
     // --- Added after tabler-clone review
     this.registerCompoundComponentRenderer(pageHeaderRenderer);
