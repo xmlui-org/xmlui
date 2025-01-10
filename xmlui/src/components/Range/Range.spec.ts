@@ -69,14 +69,6 @@ test.skip(
 );
 
 test.skip(
-  "longer array than 2 items only uses first and last items",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {
-    // input: [1, 2, 3, 4]
-  },
-);
-
-test.skip(
   "lower value is correctly displayed",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ createDriver }) => {
