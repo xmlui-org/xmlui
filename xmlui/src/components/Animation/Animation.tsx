@@ -45,6 +45,7 @@ export const animationComponentRenderer = createComponentRenderer(
         registerComponentApi={registerComponentApi}
         animation={extractValue(node.props.animation)}
         onStop={lookupEventHandler("stopped")}
+        duration={extractValue.asOptionalNumber(node.props.duration)}
         animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
       >
         {renderChild(node.children)}
