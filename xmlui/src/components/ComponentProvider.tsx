@@ -141,8 +141,11 @@ import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
-import { ThemeDefinition } from "@abstractions/ThemingDefs";
-import {animationComponentRenderer} from "@components/Animation/Animation";
+import type { ThemeDefinition } from "@abstractions/ThemingDefs";
+import {
+  animationComponentRenderer,
+  fadeInAnimationRenderer, slideFromLeftAnimationRenderer,
+} from "@components/Animation/Animation";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -410,6 +413,8 @@ export class ComponentRegistry {
     this.registerComponentRenderer(apiCallRenderer);
 
     this.registerComponentRenderer(animationComponentRenderer);
+    this.registerComponentRenderer(fadeInAnimationRenderer);
+    this.registerComponentRenderer(slideFromLeftAnimationRenderer);
 
 
     // --- Added after tabler-clone review

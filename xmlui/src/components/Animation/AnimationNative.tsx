@@ -1,5 +1,6 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
 import type React from "react";
+import { useState } from "react";
 import { useCallback } from "react";
 import { useEffect } from "react";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
@@ -10,6 +11,7 @@ export type AnimationProps = {
   registerComponentApi?: RegisterComponentApiFn;
   onStop?: () => void;
   animateWhenInView?: boolean;
+  duration?: number;
 };
 
 export const Animation = ({
@@ -18,36 +20,39 @@ export const Animation = ({
   animation,
   onStop,
   animateWhenInView,
+  duration = 500,
 }: AnimationProps) => {
   useEffect(() => {
     console.log("animation");
   }, []);
 
+  const [settings, setSettings] = useState(animation);
+
   const [springs, api] = useSpring(() => ({
-    ...animation,
-    onStart: () => {
-      console.log("onStart");
+    ...settings,
+    config: {
+      duration,
     },
+    onStart: () => {},
     onRest: () => {
-      console.log("onRest");
       onStop?.();
     },
   }));
 
   const [ref, animationStyles] = useInView(
     () => ({
-      ...animation,
+      ...settings,
     }),
     { rootMargin: "-40% 0%" },
   );
 
   const startAnimation = useCallback(() => {
     console.log("startAnimation");
-    api.start(animation);
+    api.start(settings);
     return () => {
       api.stop();
     };
-  }, [animation, api]);
+  }, [api, settings]);
 
   const stopAnimation = useCallback(() => {
     api.stop();
@@ -58,7 +63,7 @@ export const Animation = ({
       start: startAnimation,
       stop: stopAnimation,
     });
-  }, [registerComponentApi, startAnimation, stopAnimation]);
+  }, [registerComponentApi, startAnimation]);
 
   return animateWhenInView ? (
     <animated.div
@@ -74,8 +79,8 @@ export const Animation = ({
   ) : (
     <animated.div
       style={{
-        width: "auto",
-        height: "auto",
+        width: "100%",
+        height: "100%",
         ...springs,
       }}
     >
