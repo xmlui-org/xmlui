@@ -51,7 +51,7 @@ type FormControlType =
   | "switch";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
-  checkbox: "right",
+  checkbox: "end",
 };
 
 type Props = {

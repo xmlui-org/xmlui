@@ -1,5 +1,5 @@
 import type React from "react";
-import { CSSProperties, useCallback, useEffect, useRef } from "react";
+import { type CSSProperties, useCallback, useEffect, useRef } from "react";
 import styles from "./FileInput.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import { Button } from "@components/Button/ButtonNative";

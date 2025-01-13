@@ -22,7 +22,7 @@ $themeVars: ();
     justify-content: center;
   }
 
-  &.right {
+  &.end {
     flex-direction: row-reverse;
     align-items: center;
     justify-content: start;
@@ -35,7 +35,7 @@ $themeVars: ();
     justify-content: center;
   }
 
-  &.left {
+  &.start {
     flex-direction: row;
     align-items: center;
     justify-content: start;

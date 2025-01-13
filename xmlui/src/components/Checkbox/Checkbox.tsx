@@ -34,7 +34,7 @@ export const CheckboxMd = createMetadata({
   props: {
     indeterminate: dIndeterminate(),
     label: dLabel(),
-    labelPosition: dLabelPosition("right"),
+    labelPosition: dLabelPosition("end"),
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     required: dRequired(),
