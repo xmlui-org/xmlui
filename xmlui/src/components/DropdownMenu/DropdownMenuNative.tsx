@@ -1,4 +1,4 @@
-import { CSSProperties, forwardRef, ReactNode } from "react";
+import { type CSSProperties, forwardRef, type ReactNode } from "react";
 import { useEffect, useState } from "react";
 import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 
@@ -116,7 +116,7 @@ export function MenuItem({
   iconPosition = "start",
   active = false,
 }: MenuItemProps) {
-  const iconToLeft = iconPosition === "left" || iconPosition === "start";
+  const iconToStart = iconPosition === "start";
 
   return (
     <ReactDropdownMenu.Item
@@ -129,9 +129,9 @@ export function MenuItem({
         onClick(event);
       }}
     >
-      {iconToLeft && icon}
+      {iconToStart && icon}
       <div className={styles.wrapper}>{label ?? children}</div>
-      {!iconToLeft && icon}
+      {!iconToStart && icon}
     </ReactDropdownMenu.Item>
   );
 }

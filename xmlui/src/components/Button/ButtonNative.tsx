@@ -48,7 +48,7 @@ export const Button = React.forwardRef(function Button(
     id,
     type = defaultButtonType,
     icon,
-    iconPosition = "left",
+    iconPosition = "start",
     contentPosition = "center",
     orientation = "horizontal",
     variant = "solid",
@@ -78,7 +78,7 @@ export const Button = React.forwardRef(function Button(
     }
   }, [autoFocus]);
 
-  const iconToLeft = iconPosition === "left" || iconPosition === "start";
+  const iconToLeft = iconPosition === "start";
 
   return (
     <button
