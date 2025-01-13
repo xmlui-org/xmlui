@@ -142,6 +142,7 @@ import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
 import { ThemeDefinition } from "@abstractions/ThemingDefs";
+import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 
 /**
  * The framework has a specialized component concept, the "property holder 
@@ -424,6 +425,7 @@ export class ComponentRegistry {
     this.registerComponentRenderer(rangeComponentRenderer);
     this.registerComponentRenderer(sliderComponentRenderer);
     this.registerComponentRenderer(buttonGroupComponentRenderer);
+    this.registerComponentRenderer(backdropComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);

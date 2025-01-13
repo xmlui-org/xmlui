@@ -89,6 +89,7 @@ import { CarouselMd } from "./Carousel/Carousel";
 import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { OptionMd } from "@components/Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
+import { BackdropMd } from "./Backdrop/Backdrop";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -99,6 +100,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
+  Backdrop: BackdropMd,
   Badge: BadgeMd,
   BarChart: BarChartMd,
   Bookmark: BookmarkMd,

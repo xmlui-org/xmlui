@@ -40,7 +40,7 @@ Example:
 <App xmlns:AcmeComp="component-ns:AcmeCompany.Xmlui.Components" >
   <!-- ... -->
   <VStack>
-    <AcmeComp:DataGrid url="/api/services">
+    <AcmeComp:DataGrid url="/api/services" />
     <ContactPanel title="Contact us!" />
   </VStack>
 <App>
