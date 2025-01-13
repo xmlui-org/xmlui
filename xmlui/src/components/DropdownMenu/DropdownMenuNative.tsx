@@ -116,7 +116,7 @@ export function MenuItem({
   iconPosition = "start",
   active = false,
 }: MenuItemProps) {
-  const iconToLeft = iconPosition === "start";
+  const iconToStart = iconPosition === "start";
 
   return (
     <ReactDropdownMenu.Item
@@ -129,9 +129,9 @@ export function MenuItem({
         onClick(event);
       }}
     >
-      {iconToLeft && icon}
+      {iconToStart && icon}
       <div className={styles.wrapper}>{label ?? children}</div>
-      {!iconToLeft && icon}
+      {!iconToStart && icon}
     </ReactDropdownMenu.Item>
   );
 }
