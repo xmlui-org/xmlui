@@ -10,7 +10,7 @@ export const ChangeListenerMd = createMetadata({
     `\`${COMP}\` is a functional component (it renders no UI) to trigger an action when a ` +
     `particular value (component property, state, etc.) changes.`,
   props: {
-    listenTo: d(`Value to the changes of which this component listens`),
+    listenTo: d(`Value to the changes of which this component listens.`),
     throttleWaitInMs: d(
       `This variable sets a throttling time (in milliseconds) to apply when executing the \`didChange\` ` +
         `event handler. All changes within that throttling time will only fire the \`didChange\` event once.`,
