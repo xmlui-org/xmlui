@@ -141,6 +141,7 @@ import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
 import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
+import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import {
   animationComponentRenderer,
@@ -433,6 +434,7 @@ export class ComponentRegistry {
     this.registerComponentRenderer(rangeComponentRenderer);
     this.registerComponentRenderer(sliderComponentRenderer);
     this.registerComponentRenderer(buttonGroupComponentRenderer);
+    this.registerComponentRenderer(backdropComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerComponentRenderer(chartRenderer);
