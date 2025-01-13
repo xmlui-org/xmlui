@@ -1,12 +1,22 @@
 import { labelPositionValues } from "@components/abstractions";
 import { FormDriver } from "@components/Form/FormDriver";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver, createTestWithDrivers } from "@testing/fixtures";
+import {
+  expect,
+  ComponentDriver,
+  createTestWithDriver,
+  createTestWithDrivers,
+} from "@testing/fixtures";
+import { check } from "yargs";
 
 class FormItemDriver extends ComponentDriver {
   // Need to check for input type
   async fillField(value: any) {
     await this.locator.getByRole("textbox").fill(value);
+  }
+
+  get input() {
+    return this.locator.locator("input", {});
   }
 }
 
@@ -29,10 +39,69 @@ const types = [
 ];
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test.skip("label show for formItem", () => {});
-  test.skip("enabled=false is disabled", () => {});
-  test.skip("can check type=checkbox formItem", () => {});
-  test.skip("maxValue invalidates oversized input for number", async ({ createDriver }) => {});
+  test2("label show for formItem", async ({ initTestBed, createDriver }) => {
+    const source = `
+        <Form >
+          <FormItem testId="form-item" label="test-label" />
+        </Form>`;
+
+    await initTestBed(source);
+    const driver = await createDriver(FormItemDriver, "form-item");
+    await expect(driver.component).toHaveText("test-label");
+  });
+  test2("enabled=false is disabled", async ({ initTestBed, createDriver }) => {
+    const source = `
+      <Form>
+        <FormItem testId="form-item" enabled=false/>
+      </Form>`;
+
+    await initTestBed(source);
+    const driver = await createDriver(FormItemDriver, "form-item");
+    await expect(driver.input).toBeDisabled();
+  });
+
+  // using a label breaks the testId. Could use a locator insted.
+  test2(
+    "WITH DRIVER can check type=checkbox formItem",
+    async ({ page, initTestBed, createDriver }) => {
+      // const source = `
+      // <Form>
+      //   <FormItem type=checkbox testId="form-item" label="hello" />
+      // </Form>`;
+      const source = `
+      <Form>
+        <FormItem type=checkbox testId="form-item" />
+      </Form>`;
+
+      await initTestBed(source);
+      const driver = await createDriver(FormItemDriver, "form-item");
+      // const driver = await createDriver(FormItemDriver, page.getByRole("checkbox"));
+      await expect(driver.component).not.toBeChecked();
+      await driver.component.check();
+      await expect(driver.component).toBeChecked();
+    },
+  );
+
+  // or could allow ourselves not to use drivers where they aren't necesary.
+  test2("can check type=checkbox formItem", async ({ page, initTestBed, createDriver }) => {
+    const source = `
+        <Form>
+          <FormItem type=checkbox testId="form-item" label=hithere/>
+        </Form>`;
+
+    await initTestBed(source);
+    const checkbox = page.getByRole("checkbox");
+
+    await expect(checkbox).not.toBeChecked();
+    await checkbox.check();
+    await expect(checkbox).toBeChecked();
+  });
+
+  test.skip(
+    "maxValue invalidates oversized input for number",
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {},
+  );
 });
 
 /* types
@@ -48,71 +117,113 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 'textarea'
 */
 
-test.skip("type 'checkbox' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("checkbox");
-});
+test.skip(
+  "type 'checkbox' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("checkbox");
+  },
+);
 
-test.skip("type 'datePicker' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("application");
-});
+test.skip(
+  "type 'datePicker' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("application");
+  },
+);
 
-test.skip("type 'file' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("button");
-});
+test.skip(
+  "type 'file' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("button");
+  },
+);
 
-test.skip("type 'integer' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  // expect(driver.component).toHaveRole("spinbutton")
-});
+test.skip(
+  "type 'integer' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    // expect(driver.component).toHaveRole("spinbutton")
+  },
+);
 
-test.skip("type 'number' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  // expect(driver.component).toHaveRole("spinbutton")
-});
+test.skip(
+  "type 'number' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    // expect(driver.component).toHaveRole("spinbutton")
+  },
+);
 
-test.skip("type 'radioGroup' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("radiogroup");
-});
+test.skip(
+  "type 'radioGroup' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("radiogroup");
+  },
+);
 
-test.skip("type 'select' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("combobox");
-});
+test.skip(
+  "type 'select' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("combobox");
+  },
+);
 
-test.skip("type 'switch' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("switch");
-});
+test.skip(
+  "type 'switch' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("switch");
+  },
+);
 
-test.skip("type 'text' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("textbox");
-});
+test.skip(
+  "type 'text' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("textbox");
+  },
+);
 
-test.skip("type 'textarea' renders right aria role", async ({ createDriver }) => {
-  const driver = await createDriver(`future markup here`);
-  //expect(driver.component).toHaveRole("textbox");
-});
+test.skip(
+  "type 'textarea' renders right aria role",
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`future markup here`);
+    //expect(driver.component).toHaveRole("textbox");
+  },
+);
 
 // NOTE: Shouldn't we show validation messages for fields without a label?
 test.skip(
-  "not setting label does not show validation messages when invalid",
+  "not setting label should show validation messages when invalid",
   SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
-  async ({ createDriver }) => {}
+  async ({ createDriver }) => {},
 );
 
 test.skip(
   "validation message shows when field is invalid",
   SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
-  async ({ createDriver }) => {}
+  async ({ createDriver }) => {},
 );
 
-test2("only run other validations if required field is filled", async ({ initTestBed, createDriver }) => {
-  await initTestBed(`
+test2(
+  "only run other validations if required field is filled",
+  async ({ initTestBed, createDriver }) => {
+    await initTestBed(`
     <Form testId="testForm" data="{{ name: '' }}" onSubmit="testState = true">
       <FormItem
         testId="testField"
@@ -122,23 +233,23 @@ test2("only run other validations if required field is filled", async ({ initTes
         lengthInvalidMessage="Name is too short!"
         required="true"
         requiredInvalidMessage="This field is required" />
-    </Form>`
-  );
-  const formDriver = await createDriver(FormDriver, "testForm");
-  const formItemDriver = await createDriver(FormItemDriver, "testField");
+    </Form>`);
+    const formDriver = await createDriver(FormDriver, "testForm");
+    const formItemDriver = await createDriver(FormItemDriver, "testField");
 
-  // Step 1: Submit form without filling in required field to trigger validation display
-  await formDriver.submitForm();
+    // Step 1: Submit form without filling in required field to trigger validation display
+    await formDriver.submitForm();
 
-  await expect(formItemDriver.component).toHaveText(/This field is required/);
-  await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
+    await expect(formItemDriver.component).toHaveText(/This field is required/);
+    await expect(formItemDriver.component).not.toHaveText(/Name is too short!/);
 
-  // Step 2: Fill input field with less than 3 chars to trigger minLength validation
-  await formItemDriver.fillField("Bo");
+    // Step 2: Fill input field with less than 3 chars to trigger minLength validation
+    await formItemDriver.fillField("Bo");
 
-  await expect(formItemDriver.component).not.toHaveText(/This field is required/);
-  await expect(formItemDriver.component).toHaveText(/Name is too short!/);
-});
+    await expect(formItemDriver.component).not.toHaveText(/This field is required/);
+    await expect(formItemDriver.component).toHaveText(/Name is too short!/);
+  },
+);
 
 test2("other validations run if field is not required", async ({ initTestBed, createDriver }) => {
   await initTestBed(`
@@ -151,8 +262,7 @@ test2("other validations run if field is not required", async ({ initTestBed, cr
         lengthInvalidMessage="Name is too short!"
         required="false"
         requiredInvalidMessage="This field is required" />
-    </Form>`
-  );
+    </Form>`);
   const formDriver = await createDriver(FormDriver, "testForm");
   const formItemDriver = await createDriver(FormItemDriver, "testField");
 
@@ -163,28 +273,48 @@ test2("other validations run if field is not required", async ({ initTestBed, cr
 });
 
 types.forEach((testCase) => {
-  test.skip(`autofocus for type '${testCase}' works`, async ({ createDriver }) => {});
+  test.skip(
+    `autofocus for type '${testCase}' works`,
+    SKIP_REASON.TO_BE_IMPLEMENTED(),
+    async ({ createDriver }) => {},
+  );
 });
 
-test.skip(`customValidationsDebounce delays validation`, async ({ createDriver }) => {});
+test.skip(
+  `customValidationsDebounce delays validation`,
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {},
+);
 
 // Enabled should be tested inside each input component
 
 // forEach
-test.skip(`initialValue is recognisable without bindTo`, async ({ createDriver }) => {});
+test.skip(
+  `initialValue is recognisable without bindTo`,
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {},
+);
 
 // forEach
-test.skip(`initialValue is recognisable with undefined bindTo value`, async ({
-  createDriver,
-}) => {});
+test.skip(
+  `initialValue is recognisable with undefined bindTo value`,
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {},
+);
 
 // forEach
-test.skip(`initialValue is recognisable with null bindTo value`, async ({ createDriver }) => {});
+test.skip(
+  `initialValue is recognisable with null bindTo value`,
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {},
+);
 
 // forEach
-test.skip(`initialValue is NOT recognisable with valid bindTo value`, async ({
-  createDriver,
-}) => {});
+test.skip(
+  `initialValue is NOT recognisable with valid bindTo value`,
+  SKIP_REASON.TO_BE_IMPLEMENTED(),
+  async ({ createDriver }) => {},
+);
 
 // forEach
 test.skip("form's data value is updated when bound to FormItem", async ({ createDriver }) => {});

@@ -180,12 +180,12 @@ export function createTestWithDrivers() {
  */
 async function getOnlyFirstLocator(page: Page, testId: string) {
   const locators = page.getByTestId(testId);
-  if ((await locators.count()) > 1) {
-    console.error(
-      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
-    );
-    return locators.first();
-  }
+  // if ((await locators.count()) > 1) {
+  //   console.error(
+  //     `More than one element found with testId: ${testId}! Ignoring all but the first.`,
+  //   );
+  //   return locators.first();
+  // }
   return locators;
 }
 
