@@ -3,7 +3,7 @@ import type React from "react";
 import { useState } from "react";
 import { useCallback } from "react";
 import { useEffect } from "react";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import { RegisterComponentApiFn } from "xmlui";
 
 export type AnimationProps = {
   children?: React.ReactNode;
