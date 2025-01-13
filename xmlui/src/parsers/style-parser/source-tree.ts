@@ -115,6 +115,12 @@ export interface ZIndexNode extends BaseNode {
   value: number | string;
 }
 
+export interface ZoomNode extends BaseNode {
+  type: "Zoom";
+  value: number | string;
+  unit?: string;
+}
+
 export interface ScrollingNode extends BaseNode {
   type: "Scrolling";
   value: string;
@@ -174,6 +180,7 @@ export type StyleNode =
   | TextTransformNode
   | OrientationNode
   | ZIndexNode
+  | ZoomNode
   | BooleanNode
   | CursorNode
   | TextAlignNode;

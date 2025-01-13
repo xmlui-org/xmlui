@@ -486,6 +486,9 @@ export const styleKeywords: Record<string, StyleTokenType> = {
   text: StyleTokenType.UserSelect,
   contain: StyleTokenType.UserSelect,
 
+  // --- Other tokens
+  reset: StyleTokenType.Reset,
+
   // --- Color codes
   transparent: StyleTokenType.ColorName,
 
