@@ -1,24 +1,52 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import scrollIntoView from "scroll-into-view-if-needed";
 
+// --- Stores the information about a particular heading to be displeyed in the TOC.
 type HeadingItem = {
+  // --- The id of the heading.
   id: string;
+
+  // --- Heading level
   level: number;
+
+  // --- Heading thext to display in the TOC.
   text: string;
+
+  // --- Reference to the anchor element.
   anchor: HTMLAnchorElement | null;
 };
 
+// --- The context object that is used to store the hierarchy of headings.
 interface ITableOfContentsContext {
+  // --- The list of headings in the TOC
   headings: HeadingItem[];
+
+  // --- This method allows adding a new heading to the TOC.
   registerHeading: (headingItem: HeadingItem) => void;
+
+  // --- This flag indicates whether the intersection observer is enabled.
   observeIntersection: boolean;
+
+  // --- This method allows enabling or disabling the intersection
   setObserveIntersection: (observe: boolean) => void;
+
+  // --- The id of the currently active anchor.
   activeAnchorId: string | null;
+
+  // --- This method allows setting the id of the active anchor.
   setActiveAnchorId: (id: string) => void;
 }
 
+/**
+ * Several components work together to represent the hierarchy of a particular
+ * app page as a TOC. This React component provides a context for storing this 
+ * hierarchy information.
+ */
 export const TableOfContentsContext = createContext<ITableOfContentsContext | null>(null);
 
+/**
+ * This provider component injects the specified children into the TOC context.
+ */
 export function TableOfContentsProvider({ children }: { children: React.ReactNode }) {
   const [headings, setHeadings] = useState<Record<string, HeadingItem>>({});
   const [observeIntersection, setObserveIntersection] = useState<boolean>(false);
@@ -114,6 +142,7 @@ export function TableOfContentsProvider({ children }: { children: React.ReactNod
 
   return <TableOfContentsContext.Provider value={contextValue}>{children}</TableOfContentsContext.Provider>;
 }
+
 
 export function useTableOfContents() {
   const context = useContext(TableOfContentsContext);

@@ -10,14 +10,17 @@ import { Button } from "@components/Button/ButtonNative";
 import Icon from "@components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
 
+// --- The context object that is used to store the inspector information.
 interface IInspectorContext {
+  // --- The list of source files for the components.
   sources?: Record<string, string>;
   attach: (node: ComponentDef, uid: symbol, inspectId: string) => void;
   detach: (uid: symbol, inspectId: string) => void;
   refresh: (inspectId: string) => void;
 }
 
-export const InspectorContext = createContext<IInspectorContext | null>(null);
+// --- The context object that is used to store the inspector information.
+const InspectorContext = createContext<IInspectorContext | null>(null);
 
 export function InspectorProvider({
   children,

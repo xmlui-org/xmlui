@@ -30,22 +30,23 @@ type State = {
 };
 
 /**
- * This component serves as an error boundary; it catches any errors within the nested components
+ * This component serves as an error boundary; it catches any errors within 
+ * the nested components
  */
 export class ErrorBoundary extends React.Component<Props, State> {
-  /**
-   * We start with "no error" state
-   */
-  public state: State = {
+  
+  // --- We start with "no error" state
+  state: State = {
     hasError: false,
     error: null
   };
 
   /**
-   * This method is used to implement the Error Boundaries for the React application. It is invoked if some error
-   * occurs during the rendering phase of any lifecycle methods or any children components.
+   * This method implements the Error Boundaries for the React application.
+   * It is invoked if errors occur during the rendering phase of any lifecycle
+   * methods or children components.
    */
-  public static getDerivedStateFromError (error: Error): State {
+  static getDerivedStateFromError (error: Error): State {
     // --- Update state so the next render will show the fallback UI.
     return { hasError: true, error };
   }
@@ -55,12 +56,13 @@ export class ErrorBoundary extends React.Component<Props, State> {
    * @param error Error object
    * @param errorInfo Extra information about the error
    */
-  public componentDidCatch (error: Error, errorInfo: ErrorInfo) {
+  componentDidCatch (error: Error, errorInfo: ErrorInfo) {
     console.error("Uncaught error:", error, errorInfo, this.props.location);
   }
 
   /**
-   * Whenever the `restoreOnChangeOf` property of this component instance changes, we reset the state to "no error".
+   * Whenever the `restoreOnChangeOf` property of this component instance
+   * changes, we reset the state to "no error".
    * @param prevProps Previous property values
    * @param prevState Previous state
    * @param snapshot Optional snapshot (not used in this component)
@@ -73,7 +75,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
     }
   }
 
-  public render () {
+  render () {
     return this.state.hasError ? (
         <div className={styles.errorOverlay}>
           <div className={styles.title}>

@@ -41,8 +41,6 @@ export function isContainerLike(node: ComponentDef) {
     node.vars ||
     node.uses ||
     node.contextVars ||
-    // TODO: Check if this is needed
-    // node.props?.uses !== undefined ||
     node.functions ||
     node.scriptCollected
   );

@@ -14,6 +14,41 @@ import {
   UnaryExpression,
   ObjectLiteral,
   BinaryExpression,
+  T_UNARY_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_SEQUENCE_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_ARRAY_LITERAL,
+  T_OBJECT_LITERAL,
+  T_ASSIGNMENT_EXPRESSION,
+  T_ARROW_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_POSTFIX_OP_EXPRESSION,
+  T_VAR_DECLARATION,
+  T_REACTIVE_VAR_DECLARATION,
+  T_SWITCH_CASE,
+  T_BLOCK_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_LET_STATEMENT,
+  T_CONST_STATEMENT,
+  T_VAR_STATEMENT,
+  T_IF_STATEMENT,
+  T_RETURN_STATEMENT,
+  T_WHILE_STATEMENT,
+  T_DO_WHILE_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_FOR_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_SWITCH_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  T_LITERAL,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 export function simplifyExpression(expr?: Expression): Expression | undefined {
@@ -28,12 +63,12 @@ export function simplifyExpression(expr?: Expression): Expression | undefined {
   function simplify(expr?: Expression): Expression | undefined {
     if (!expr) return expr;
     switch (expr.type) {
-      case "UnaryE": {
+      case T_UNARY_EXPRESSION: {
         const simplified = simplifyUnaryExpression(expr);
         if (simplified !== expr) return simplified;
         return updateExpr(expr, { expr: simplifyExpression(expr.expr) });
       }
-      case "BinaryE": {
+      case T_BINARY_EXPRESSION: {
         const simplified = simplifyBinaryExpression(expr);
         if (simplified !== expr) return simplified;
         return updateExpr(expr, {
@@ -41,66 +76,63 @@ export function simplifyExpression(expr?: Expression): Expression | undefined {
           right: simplifyExpression(expr.right),
         });
       }
-      case "SeqE":
+      case T_SEQUENCE_EXPRESSION:
         return updateExpr(expr, {
           exprs: simplifyExpressionList(expr.exprs),
         });
-      case "CondE":
+      case T_CONDITIONAL_EXPRESSION:
         // TODO: Check for constant expressions and evaluate them
         return updateExpr(expr, {
           cond: simplifyExpression(expr.cond),
           thenE: simplifyExpression(expr.thenE),
           elseE: simplifyExpression(expr.elseE),
         });
-      case "InvokeE":
+      case T_FUNCTION_INVOCATION_EXPRESSION:
         return updateExpr(expr, {
           obj: simplifyExpression(expr.obj),
           arguments: simplifyExpressionList(expr.arguments),
         });
-      case "MembE":
+      case T_MEMBER_ACCESS_EXPRESSION:
         return updateExpr(expr, {
           obj: simplifyExpression(expr.obj),
         });
-      case "CMembE":
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
         return updateExpr(expr, {
           obj: simplifyExpression(expr.obj),
           member: simplifyExpression(expr.member),
         });
-      case "SpreadE":
+      case T_SPREAD_EXPRESSION:
         return updateExpr(expr, {
           expr: simplifyExpression(expr.expr),
         });
-      case "ALitE":
+      case T_ARRAY_LITERAL:
         return updateExpr(expr, {
           items: simplifyExpressionList(expr.items),
         });
-      case "OLitE":
+      case T_OBJECT_LITERAL:
         return updateExpr(expr, simplifyObjectLiteral(expr));
-      case "AsgnE":
+      case T_ASSIGNMENT_EXPRESSION:
         return updateExpr(expr, {
           leftValue: simplifyExpression(expr.leftValue),
           expr: simplifyExpression(expr.expr),
         });
-      case "ArrowE":
+      case T_ARROW_EXPRESSION:
         return updateExpr(expr, {
           args: simplifyExpressionList(expr.args),
           statement: simplifyStatement(expr.statement),
         });
-      case "PrefE":
-        return updateExpr(expr, {
+      case T_PREFIX_OP_EXPRESSION:
+        case T_POSTFIX_OP_EXPRESSION:
+          return updateExpr(expr, {
           expr: simplifyExpression(expr.expr),
         });
-      case "PostfE":
-        return updateExpr(expr, {
-          expr: simplifyExpression(expr.expr),
-        });
-      case "VarD":
+      case T_VAR_DECLARATION:
         return simplifyVarDeclaration(expr);
-      case "RVarD":
+      case T_REACTIVE_VAR_DECLARATION:
         return updateExpr(expr, {
           expr: simplifyExpression(expr.expr),
         });
-      case "SwitchC":
+      case T_SWITCH_CASE:
         return updateExpr(expr, {
           caseE: simplifyExpression(expr.caseE),
           stmts: simplifyStatementList(expr.stmts),
@@ -128,80 +160,80 @@ export function simplifyStatement(stmt?: Statement): Statement | undefined {
   function simplify(stmt?: Statement): Statement | undefined {
     if (!stmt) return stmt;
     switch (stmt.type) {
-      case "BlockS":
+      case T_BLOCK_STATEMENT:
         return updateStmt(stmt, {
           stmts: simplifyStatementList(stmt.stmts),
         });
-      case "ExprS":
+      case T_EXPRESSION_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
         });
-      case "ArrowS":
+      case T_ARROW_EXPRESSION_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr) as ArrowExpression,
         });
-      case "LetS":
-      case "ConstS":
+      case T_LET_STATEMENT:
+      case T_CONST_STATEMENT:
         return updateStmt(stmt, {
           decls: simplifyVarDeclarationList(stmt.decls) as VarDeclaration[],
         });
-      case "VarS":
+      case T_VAR_STATEMENT:
         return updateStmt(stmt, {
           decls: simplifyExpressionList(stmt.decls) as ReactiveVarDeclaration[],
         });
-      case "IfS":
+      case T_IF_STATEMENT:
         return updateStmt(stmt, {
           cond: simplifyExpression(stmt.cond),
           thenB: simplifyStatement(stmt.thenB)!,
           elseB: simplifyStatement(stmt.elseB),
         });
-      case "RetS":
+      case T_RETURN_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
         });
-      case "WhileS":
+      case T_WHILE_STATEMENT:
         return updateStmt(stmt, {
           cond: simplifyExpression(stmt.cond),
           body: simplifyStatement(stmt.body)!,
         });
-      case "DoWS":
+      case T_DO_WHILE_STATEMENT:
         return updateStmt(stmt, {
           cond: simplifyExpression(stmt.cond),
           body: simplifyStatement(stmt.body)!,
         });
-      case "ThrowS":
+      case T_THROW_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
         });
-      case "TryS":
+      case T_TRY_STATEMENT:
         return updateStmt(stmt, {
           tryB: simplifyStatement(stmt.tryB)! as BlockStatement,
           catchB: simplifyStatement(stmt.catchB) as BlockStatement,
           finallyB: simplifyStatement(stmt.finallyB) as BlockStatement,
         });
-      case "ForS":
+      case T_FOR_STATEMENT:
         return updateStmt(stmt, {
           init: simplifyStatement(stmt.init) as ExpressionStatement | LetStatement,
           cond: simplifyExpression(stmt.cond),
           upd: simplifyExpression(stmt.upd),
           body: simplifyStatement(stmt.body)!,
         });
-      case "ForInS":
+      case T_FOR_IN_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
           body: simplifyStatement(stmt.body)!,
         });
-      case "ForOfS":
+      case T_FOR_OF_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
           body: simplifyStatement(stmt.body)!,
         });
-      case "SwitchS":
+      case T_SWITCH_STATEMENT:
         return updateStmt(stmt, {
           expr: simplifyExpression(stmt.expr),
           cases: simplifyExpressionList(stmt.cases) as SwitchCase[],
         });
-      case "FuncD":
+      case T_FUNCTION_DECLARATION:
         return updateStmt(stmt, {
           args: simplifyExpressionList(stmt.args),
           stmt: simplifyStatement(stmt.stmt)! as BlockStatement,
@@ -285,7 +317,7 @@ function updateStmt<T extends Statement>(stmt: T, props: Partial<T>): T {
 }
 
 function simplifyUnaryExpression(unary: UnaryExpression): Expression {
-  if (unary.expr.type === "LitE") {
+  if (unary.expr.type === T_LITERAL) {
     let newValue = unary.expr.value;
     try {
       switch (unary.op) {
@@ -313,7 +345,7 @@ function simplifyUnaryExpression(unary: UnaryExpression): Expression {
 }
 
 function simplifyBinaryExpression(binary: BinaryExpression): Expression {
-  if (binary.left.type === "LitE" && binary.right.type === "LitE") {
+  if (binary.left.type === T_LITERAL && binary.right.type === T_LITERAL) {
     let newValue: any = undefined;
     try {
       switch (binary.op) {
@@ -388,23 +420,23 @@ function simplifyBinaryExpression(binary: BinaryExpression): Expression {
       // --- Intentionally ignored. In case of error, we keep the original value
     }
     if (newValue !== undefined) {
-      return deepFreeze({ type: "LitE", value: newValue });
+      return deepFreeze({ type: T_LITERAL, value: newValue });
     }
-  } else if (binary.op === "+" && binary.left.type === "LitE" && binary.left.value === 0) {
+  } else if (binary.op === "+" && binary.left.type === T_LITERAL && binary.left.value === 0) {
     return binary.right;
-  } else if (binary.op === "+" && binary.right.type === "LitE" && binary.right.value === 0) {
+  } else if (binary.op === "+" && binary.right.type === T_LITERAL && binary.right.value === 0) {
     return binary.left;
-  } else if (binary.op === "-" && binary.right.type === "LitE" && binary.right.value === 0) {
+  } else if (binary.op === "-" && binary.right.type === T_LITERAL && binary.right.value === 0) {
     return binary.left;
-  } else if (binary.op === "*" && binary.left.type === "LitE" && binary.left.value === 1) {
+  } else if (binary.op === "*" && binary.left.type === T_LITERAL && binary.left.value === 1) {
     return binary.right;
-  } else if (binary.op === "*" && binary.right.type === "LitE" && binary.right.value === 1) {
+  } else if (binary.op === "*" && binary.right.type === T_LITERAL && binary.right.value === 1) {
     return binary.left;
-  } else if (binary.op === "*" && binary.right.type === "LitE" && binary.right.value === 0) {
+  } else if (binary.op === "*" && binary.right.type === T_LITERAL && binary.right.value === 0) {
     return deepFreeze({ type: "LitE", value: 0 });
-  } else if (binary.op === "*" && binary.left.type === "LitE" && binary.left.value === 0) {
+  } else if (binary.op === "*" && binary.left.type === T_LITERAL && binary.left.value === 0) {
     return deepFreeze({ type: "LitE", value: 0 });
-  } else if (binary.op === "/" && binary.right.type === "LitE" && binary.right.value === 1) {
+  } else if (binary.op === "/" && binary.right.type === T_LITERAL && binary.right.value === 1) {
     return binary.left;
   }
   return binary;

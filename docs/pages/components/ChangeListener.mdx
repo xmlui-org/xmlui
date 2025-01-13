@@ -10,29 +10,29 @@ import { Callout } from "nextra/components";
 
 ### `listenTo`
 
-Value to the changes of which this component listens
+Value to the changes of which this component listens.
 
-The following sample demonstrates using this property. Every time the user clicks the button, it adds a new random number to a list. The `ChangeListener` component watches the changes in the list's length. Whenever that value changes, the `didChange` event recalculates the sum of numbers in `list`.
+The following sample demonstrates using this property. Every time the user clicks the button, a counter is incremented. The `ChangeListener` component watches the counter's value. Whenever it changes, the component fires the `didChange` event, which stores whether the new counter value is even into the `isEven` variable.
 
 ```ueml copy
-<App var.list="{[]}" var.toDisplay="{0}">
-  <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+<App var.counter="{0}" var.isEven="{false}">
+  <Button label="Increment counter" onClick="{counter++}" />
   <ChangeListener
-    listenTo="{list.length}"
-    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
-  <Text>{toDisplay.toFixed(4)}</Text>
+    listenTo="{counter}"
+    onDidChange="isEven = counter % 2 == 0" />
+  <Text>Counter is {counter} which {isEven? "is": "isn't"} even.</Text>
 </App>
 ```
 
 <Playground
   name="Example: listenTo"
   app={`
-    <App var.list="{[]}" var.toDisplay="{0}">
-      <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
+    <App var.counter="{0}" var.isEven="{false}">
+      <Button label="Increment counter" onClick="{counter++}" />
       <ChangeListener
-        listenTo="{list.length}"
-        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
-      <Text>{toDisplay.toFixed(4)}</Text>
+        listenTo="{counter}"
+        onDidChange="isEven = counter % 2 == 0" />
+      <Text>Counter is {counter} which {isEven? "is": "isn't"} even.</Text>
     </App>
   `}
 />
@@ -41,36 +41,39 @@ The following sample demonstrates using this property. Every time the user click
 
 This variable sets a throttling time (in milliseconds) to apply when executing the `didChange` event handler. All changes within that throttling time will only fire the `didChange` event once.
 
-The following example works like the previous one (in the `listen` prop's description). However, the user can reset or set the throttling time to 3 seconds. You can observe that while the throttling time is 3 seconds, multiple button clicks will refresh the accumulated value once within 3 seconds.
+The following example works like the previous one (in the `listen` prop's description). However, the user can reset or set the throttling time to 3 seconds. You can observe that while the throttling time is 3 seconds, the counter increments on every click, but `isEven` only refreshes once within 3 seconds.
 
 ```ueml copy
-<App var.list="{[]}" var.toDisplay="{0}" var.throttle="{0}">
+<App var.counter="{0}" var.isEven="{false}" var.throttle="{0}">
   <HStack>
-    <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
-    <Button label="Reset throttling" onClick="throttle = 0" />
+    <Button label="Increment counter" onClick="{counter++}" />
     <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
+    <Button label="Reset throttling" onClick="throttle = 0" />
   </HStack>
+
   <ChangeListener
-    listenTo="{list.length}"
+    listenTo="{counter}"
     throttleWaitInMs="{throttle}"
-    onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
-  <Text>{toDisplay.toFixed(4)}</Text>
+    onDidChange="isEven = counter % 2 == 0" />
+  <Text>Counter is {counter} which {isEven? "is": "isn't"} even.</Text>
 </App>
 ```
+
 <Playground
     name="Example: listenTo"
     app={`
-    <App var.list="{[]}" var.toDisplay="{0}" var.throttle="{0}">
+    <App var.counter="{0}" var.isEven="{false}" var.throttle="{0}">
       <HStack>
-        <Button label="Add new random item to a list" onClick="{list.push(Math.random())}" />
-        <Button label="Reset throttling" onClick="throttle = 0" />
+        <Button label="Increment counter" onClick="{counter++}" />
         <Button label="Set 3 sec throttling" onClick="throttle = 3000" />
+        <Button label="Reset throttling" onClick="throttle = 0" />
       </HStack>
+
       <ChangeListener
-        listenTo="{list.length}"
+        listenTo="{counter}"
         throttleWaitInMs="{throttle}"
-        onDidChange="toDisplay = list.reduce((a, b) => a+b, 0)" />
-      <Text>{toDisplay.toFixed(4)}</Text>
+        onDidChange="isEven = counter % 2 == 0" />
+      <Text>Counter is {counter} which {isEven? "is": "isn't"} even.</Text>
     </App>
   `}
 />
