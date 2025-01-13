@@ -105,18 +105,18 @@ Indicates the minimum width a particular column can have.
 
 ### `pinTo`
 
-This property allows the column to be pinned to the `left` or right `edge` of the table.
+This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.
 
-This property allows the column to be pinned to the `left` or right `edge` of the table.
+Available values: `start`, `end`
 
-```ueml copy /pinTo="left"/ /pinTo="right"/
+```ueml copy /pinTo="start"/ /pinTo="end"/
 <App>
   <Table data='{[...]}' height="100%">
-    <Column bindTo="id" width="50" pinTo="left" />
+    <Column bindTo="id" width="50" pinTo="start" />
     <Column bindTo="name" width="500" />
     <Column bindTo="quantity" width="300" />
     <Column bindTo="unit" width="300"/>
-    <Column bindTo="category" width="100" pinTo="right"/>
+    <Column bindTo="category" width="100" pinTo="end"/>
   </Table>
 </App>
 ```
@@ -127,11 +127,11 @@ Scroll the table contents horizontally to see how the pinned columns are display
   app={`
     <App>
       <Table data='{${JSON.stringify(data, null, 2)}}' height="100%">
-        <Column bindTo="id" width="50" pinTo="left" />
+        <Column bindTo="id" width="50" pinTo="start" />
         <Column bindTo="name" width="500" />
         <Column bindTo="quantity" width="300" />
         <Column bindTo="unit" width="300"/>
-        <Column bindTo="category" width="100" pinTo="right"/>
+        <Column bindTo="category" width="100" pinTo="end"/>
       </Table>
     </App>
   `}
