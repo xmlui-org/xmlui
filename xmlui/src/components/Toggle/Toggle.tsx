@@ -48,7 +48,7 @@ export const Toggle = forwardRef(function Toggle ({
   indeterminate = false,
   className,
   label,
-  labelPosition = "right",
+  labelPosition = "start",
   labelWidth,
   labelBreak,
   required,
