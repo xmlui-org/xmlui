@@ -25,6 +25,9 @@ import { getColor } from "@components-core/utils/css-utils";
 import { useColors } from "@components-core/utils/hooks";
 import type { ComponentRendererDef, RendererContext } from "@abstractions/RendererDefs";
 import { parseScssVar } from "@components-core/theming/themeVars";
+import {RegisterComponentApiFn} from "@abstractions/RendererDefs";
+
+
 
 export type {
   ThemeDefinition,
@@ -35,9 +38,11 @@ export type {
   StandaloneAppDescription,
   StandaloneJsonConfig,
   ApiInterceptorDefinition,
+  RegisterComponentApiFn,
   //TODO review from here (added for playground)
   TreeNode, //TODO REMOVE
   RendererContext,
+
 };
 export {
   StandaloneApp,
