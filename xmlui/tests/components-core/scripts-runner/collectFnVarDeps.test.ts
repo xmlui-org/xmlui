@@ -24,6 +24,21 @@ it("simple #2", () => {
   });
 });
 
+
+it("simple #3", () => {
+  const fnDeps = {
+    fn1: ["fn2", "var1", "var2"],
+    fn2: ["var1", "var3", "fn3"],
+    fn3: ["var4"]
+  };
+
+  expect(collectFnVarDeps(fnDeps)).deep.eq({
+    fn1: ["var1", "var3", "var4", "var2"],
+    fn2: ["var1", "var3", "var4"],
+    fn3: ["var4"]
+  });
+});
+
 it("circular (fn1 -> fn2 -> fn1)", () => {
   const fnDeps = {
     fn1: ["fn2"],

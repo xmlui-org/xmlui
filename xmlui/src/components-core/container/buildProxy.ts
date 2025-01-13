@@ -1,5 +1,5 @@
 // The type of action we can use with a proxy
-export type ProxyAction = "set" | "unset"
+export type ProxyAction = "set" | "unset";
 
 // Proxy operation callback parameters
 export type ProxyCallbackArgs = {
@@ -16,9 +16,10 @@ export type ProxyCallbackArgs = {
  * collect the changes within the localContext so that we can refresh the UI according to them.
  */
 function buildProxy(
-    proxyTarget: any, 
-    callback: (changeInfo: ProxyCallbackArgs) => void, 
-    tree: Array<string | symbol> = []): any {
+  proxyTarget: any,
+  callback: (changeInfo: ProxyCallbackArgs) => void,
+  tree: Array<string | symbol> = [],
+): any {
   // --- We identify a particular (deep) localContext property by its full path; this function create the path
   const getPath = (prop: string | symbol) => tree.concat(prop).join(".");
 
@@ -38,7 +39,7 @@ function buildProxy(
       ) {
         //just to make sure that accessing the proxied objects' field gets the same reference every time
         //  e.g. this wouldn't be true otherwise: proxiedObject['field'] === proxiedObject['field']
-        if(!proxiedValues.has(value)){
+        if (!proxiedValues.has(value)) {
           proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
         }
         return proxiedValues.get(value);
@@ -58,7 +59,7 @@ function buildProxy(
         newValue: value,
         previousValue: Reflect.get(target, prop, receiver),
       });
-      
+
       // --- Execute the change.
       // --- Note, any error raised in the callback will prevent from changing the property value
       return Reflect.set(target, prop, value, receiver);
@@ -67,7 +68,7 @@ function buildProxy(
     deleteProperty: function (target, prop) {
       // --- Invoke the callback function to delete a property
       callback({ action: "unset", path: getPath(prop), pathArray: tree.concat(prop), target });
-      
+
       // --- Execute the change
       // --- Note, any error raised in the callback will prevent from deleting the property value
       return Reflect.deleteProperty(target, prop);
