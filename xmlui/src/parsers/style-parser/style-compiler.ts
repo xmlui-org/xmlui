@@ -166,6 +166,8 @@ export function compileLayout(
   if (zIndex) css.zIndex = zIndex;
   const opacity = compileOpacity("opacity", layoutProps) as any;
   if (opacity) css.opacity = opacity;
+  const zoom = compileZoom("zoom", layoutProps) as any;
+  if (zoom) css.zoom = zoom;
 
   // --- Compile typography
   const color = compileColor("color", layoutProps);
@@ -351,13 +353,23 @@ export function compileLayout(
     );
   }
 
-  // --- Compiles a size definition into a CSS size property
+  // --- Compiles an opacity definition into a CSS opacity property
   function compileOpacity(propName: string, layoutProps: LayoutProps): string | undefined {
     return compile(
       propName,
       layoutProps,
       (p) => p.parseOpacity(),
       (n) => `${n.value}${n.unit}`,
+    );
+  }
+
+  // --- Compiles an opacity definition into a CSS opacity property
+  function compileZoom(propName: string, layoutProps: LayoutProps): string | undefined {
+    return compile(
+      propName,
+      layoutProps,
+      (p) => p.parseZoom(),
+      (n) => `${n.value}${n.unit ?? ""}`,
     );
   }
 
@@ -788,4 +800,5 @@ export type LayoutProps = {
 
   // --- Other
   cursor?: string;
+  zoom?: string | number;
 };

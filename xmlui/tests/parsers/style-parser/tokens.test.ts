@@ -16,6 +16,7 @@ describe("Parser - Binary operations", () => {
     { src: "%", token: StyleTokenType.Percentage },
     { src: "/", token: StyleTokenType.Slash },
     { src: "none", token: StyleTokenType.None },
+    { src: "reset", token: StyleTokenType.Reset },
   ];
 
   simpleTokens.forEach((s) =>

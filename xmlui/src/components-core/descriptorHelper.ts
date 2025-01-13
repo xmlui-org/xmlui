@@ -65,4 +65,5 @@ export const layoutOptionKeys = [
   "right",
   "bottom",
   "left",
+  "zoom",
 ];
