@@ -7,4 +7,6 @@ This article helps you understand the implementation details of xmlui so that yo
 - [Standalone Apps](./standalone-apps.md)
 - [`AppRoot`](./AppRoot.md)
 - ...
+- [Component Rendering](./component-rendering.md)
+- ...
 - [Helper Components](./helper-components)
