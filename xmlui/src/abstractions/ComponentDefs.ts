@@ -185,11 +185,14 @@ interface Scriptable {
 
 type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
 
-// A generic validation function that retrieves either a hint (the validation argument has
-// issues) or undefined (the argument is valid).
+// --- A generic validation function that retrieves either a hint (the 
+// --- validation argument has issues) or undefined (the argument is valid).
 type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 
-// You can describe the available values of a property using this type.
+/**
+ * This type represents the description of a property value, which can be a string, a number, 
+ * or an object with a value and a description. This type is used in the metadata of a component.
+ */
 export type PropertyValueDescription =
   | string
   | number
@@ -198,31 +201,62 @@ export type PropertyValueDescription =
       description: string;
     };
 
+/**
+ * Components have properties, events, context values, and exposed API
+ * endpoints, each holding metadata the rendering engine uses at run time.
+ * This type defines the structure of such metadata.
+ */
 export type ComponentPropertyMetadata = {
-  // The markdown description to explain the property in the inspector view
+  /**
+   * This field defines the description explaining the property. You can use
+   * markdown, as the UI may display this value.
+   */
   readonly description: string;
 
-  // The value type of the property
+  /**
+   * This field defines the type of the property. The rendering engine uses this
+   * information to validate the property value.
+   */
   readonly valueType?: PropertyValueType;
 
-  // What are the available values of this property?
+  /**
+   * This field defines the available values of the property. The rendering engine
+   * uses this information to validate the property value.
+   */
   readonly availableValues?: readonly PropertyValueDescription[];
 
-  // The default property value (if there is any)
+  /**
+   * This field defines the default value of the property. The rendering engine uses
+   * this information to set the default value of the property.
+   */
   defaultValue?: any;
 
-  // The function that tests if the current property value is valid
+  /**
+   * This field defines a validation function that the rendering engine uses to validate
+   * the property value. The function returns one or more hinst if the property value is
+   * invalid.
+   */
   isValid?: IsValidFunction<any>;
 
-  // Indicates that a particular property is internal and should not be exposed in the
-  // documentation
+  /**
+   * Indicates that a particular property is internal and should not be exposed in the
+   * documentation
+   */
   isInternal?: boolean;
 };
 
+/**
+ * Components have metadata that the rendering engine uses to render the 
+ * component. This type defines the structure of such metadata.
+ * 
+ * The type has generic parameters to ensure that type-checking works with 
+ * the metadata defined here in concert with the renderer object using the 
+ * same metadata type.
+ */
 export type ComponentMetadata<
   TProps extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TEvents extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
-  TContextVars extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
+  TContextValues extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // The current status of the component. By default, it is "stable".
@@ -241,7 +275,7 @@ export type ComponentMetadata<
   events?: TEvents;
 
   // Description of component context variables
-  contextVars?: TContextVars;
+  contextVars?: TContextValues;
 
   // Description of component APIs
   apis?: TApis;
@@ -326,9 +360,8 @@ export function d(
   return { description, availableValues, valueType, defaultValue, isValid };
 }
 
-
 export interface ParentRenderContext {
   renderChild: RenderChildFn;
   children?: ComponentDef[];
-  props?: Record<string, any>
+  props?: Record<string, any>;
 }
