@@ -24,6 +24,7 @@ import type {
   ThemeIdDescriptor,
   UserSelectNode,
   ZIndexNode,
+  ZoomNode,
 } from "./source-tree";
 import { styleErrorMessages, StyleParserError } from "./errors";
 import { StyleInputStream } from "./StyleInputStream";
@@ -158,6 +159,51 @@ export class StyleParser {
     // --- Done.
     return this.createNode<SizeNode>(
       "Size",
+      {
+        value,
+        unit,
+      },
+      startToken
+    );
+  }
+
+  /**
+   * Parses a Zoom value
+   */
+  parseZoom(): ZoomNode | null {
+    const startToken = this._lexer.peek();
+    const themeIdNode = this.tryThemeId<ZoomNode>();
+    if (themeIdNode) return themeIdNode;
+
+    if (startToken.text === "reset" || startToken.text === "normal") {
+      this._lexer.get();
+      return this.createNode<ZoomNode>(
+        "Zoom",
+        {
+          value: startToken.text,
+        },
+        startToken
+      );
+    }
+
+    const value = this.getNumber();
+    if (value === null) return null;
+
+    // --- Get the unit
+    let unit = "";
+    const unitToken = this._lexer.peek(true);
+    if (unitToken.text === "%") {
+      unit = this._lexer.get(true).text;
+    } else if (unitToken.type === StyleTokenType.Ws) {
+      this._lexer.get(true);
+    } else if (unitToken.type !== StyleTokenType.Eof) {
+      this.reportError("S016", unitToken);
+      return null;
+    }
+
+    // --- Done.
+    return this.createNode<ZoomNode>(
+      "Zoom",
       {
         value,
         unit,

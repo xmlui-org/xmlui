@@ -15,6 +15,7 @@ export const enum StyleTokenType {
   Comma,
   Slash,
 
+  Reset,
   None,
   UserSelect,
   SizeUnit,

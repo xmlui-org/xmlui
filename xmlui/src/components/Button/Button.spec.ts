@@ -9,7 +9,7 @@ import { expect as fixtureExpect, ComponentDriver, createTestWithDriver } from "
 import {
   alignmentOptionValues,
   buttonTypeValues,
-  iconPositionValues,
+  type IconPosition,
 } from "@components/abstractions";
 
 // --- Setup
@@ -251,23 +251,24 @@ test("renders if icon is not found and label is present", async ({ createDriver 
 
 // --- --- iconPosition
 
-// TODO: These test require some work: iconPosition=left/right/start/end + with label, without label, with children
+// TODO: These tests require some work: iconPosition=start/end + with label, without label, with children
 // 1. The idea of testing positioning this way can be challenged: it may be too specific
 // 2. The logic is not final since getters are used differently because async functions,
 //    the calculation may be too verbose or should be restructured
-// 3. RTL, LTR are not implemented yet, but should be incorporated in the tests without too much work
-//    (use placeholders, omit if needed, need to separate code differently)
+
+const iconPositionCases: { position: string; value: IconPosition }[] = [
+  { position: "left (ltr)", value: "start" },
+  { position: "right (rtl)", value: "end" },
+];
 
 // With label
-const iconPositions = iconPositionValues.filter((pos) => pos !== "start" && pos !== "end");
-
-iconPositions.forEach((pos) => {
+iconPositionCases.forEach(({ position, value }) => {
   test.skip(
-    `iconPosition=${pos} places icon on ${pos} of label`,
+    `iconPosition=${value} places icon on ${position} of label`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
     async ({ createDriver }) => {
       const driver = await createDriver(
-        `<Button icon="test" label="hello" iconPosition="${pos}" />`,
+        `<Button icon="test" label="hello" iconPosition="${value}" />`,
         {
           resources: {
             "icon.test": "resources/bell.svg",
@@ -275,23 +276,23 @@ iconPositions.forEach((pos) => {
         },
       );
       const buttonDimensions = await getFullRectangle(driver.button);
-      const contentStart = pixelStrToNum(
+      /* const contentStart = pixelStrToNum(
         buttonDimensions[pos] + (await getElementStyle(driver.button, `padding-${pos}`)),
       );
       const iconStart = (await getFullRectangle(driver.getFirstNonTextNode()))[pos];
 
-      expect(contentStart).toEqualWithTolerance(iconStart);
+      expect(contentStart).toEqualWithTolerance(iconStart); */
     },
   );
 });
 
 // Without label
-iconPositions.forEach((pos) => {
+iconPositionCases.forEach(({ position, value }) => {
   test.skip(
-    `iconPosition=${pos} places icon on ${pos}`,
+    `iconPosition=${value} places icon on ${position}`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
     async ({ createDriver }) => {
-      const driver = await createDriver(`<Button icon="test" iconPosition="${pos}" />`, {
+      const driver = await createDriver(`<Button icon="test" iconPosition="${value}" />`, {
         resources: {
           "icon.test": "resources/bell.svg",
         },
@@ -303,13 +304,13 @@ iconPositions.forEach((pos) => {
 });
 
 // With children instead of label
-iconPositions.forEach((pos) => {
+iconPositionCases.forEach(({ position, value }) => {
   test.skip(
-    `iconPosition=${pos} places icon on ${pos} of children`,
+    `iconPosition=${value} places icon on ${position} of children`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
     async ({ createDriver }) => {
       const driver = await createDriver(
-        `<Button icon="test" label="hello" iconPosition="${pos}" />`,
+        `<Button icon="test" label="hello" iconPosition="${value}" />`,
         {
           resources: {
             "icon.test": "resources/bell.svg",

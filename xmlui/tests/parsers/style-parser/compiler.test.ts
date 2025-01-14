@@ -1452,5 +1452,16 @@ describe("Style compiler", () => {
     }),
   );
 
+  const zoomCases = ["0", "1", "12.3", "50%", "25%", "reset", "normal"];
+
+  // --- zoom
+  zoomCases.forEach((c) =>
+    it(`zoom: ${c}`, () => {
+      const result = compileLayout({ zoom: c });
+      expect(result.cssProps?.zoom).equal(c);
+      expect(result.issues).equal(undefined);
+    }),
+  );
+
 
 });

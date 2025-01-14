@@ -599,3 +599,26 @@ These values control whether the user can select text.
 |`all`| The content of the component shall be selected atomically: If a selection would contain part of the component, then the selection must contain the entire component, including all its children. If a double-click or context-click occurs in sub-components, the highest ancestor with this value will be selected. |
 |`contains`| Enables selection to start within the component; however, the selection will be contained by the bounds of that component. |
 
+## Zoom Values [#zoom]
+
+The value of the `zoom` property controls the magnification level of a component:
+
+|Value|Description|
+|-|-|
+|`normal`| Render the element at its normal size; equal to `1`. |
+|`reset`| This resets the value to zoom: 1 and prevents the element from being (de)magnified if the user applies non-pinch-based zooming (e.g., by pressing Ctrl—or Ctrl+ keyboard shortcuts) to the document. |
+| percentage value| `100%` is equivalent to normal. Values larger than `100%` zoom in. Values smaller than `100%` zoom out. |
+| number | Equivalent to the corresponding percentage (`1.0` = `100%` = `normal`). Values larger than `1.0` zoom in. Values smaller than `1.0` zoom out. |
+
+<Playground
+    name="Setting zoom"
+    app={`
+  <App>
+    <HStack>
+      <Card zoom="0.75" width="150px" title="Hello!" subtitle="zoom: '0.75' " height="fit-content"/>
+      <Card width="150px" title="Hello!" subtitle="zoom: 'normal'" height="fit-content"/>
+      <Card zoom="200%" width="150px" title="Hello!" subtitle="zoom: '200%'" height="fit-content"/>
+    </HStack>
+  </App>
+  `}
+/>

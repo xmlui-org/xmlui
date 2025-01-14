@@ -23,8 +23,11 @@ export const ColumnMd = createMetadata({
         `(\`true\`) or not (\`false\`).`,
     ),
     pinTo: d(
-      `This property allows the column to be pinned to the \`left\` or right \`edge\` ` +
-        `of the table.`,
+      `This property allows the column to be pinned to ` +
+       `the \`left\` (left-to-right writing style) or \`right\` (left-to-right writing style) edge ` +
+        `of the table. If the writing style is right-to-left, the locations are switched.`,
+      ["left", "right"],
+      "string",
     ),
     canResize: d(
       `This property indicates whether the user can resize the column. If set to ` +
