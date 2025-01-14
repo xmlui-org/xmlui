@@ -16,6 +16,7 @@ $componentName: "TextBox";
   border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
   border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
   font-size: createThemeVar("Input:font-size-#{$componentName}-#{$variantName}");
+  padding: createThemeVar("Input:padding-#{$componentName}-#{$variantName}");
 
   background-color: createThemeVar("Input:color-bg-#{$componentName}-#{$variantName}");
   box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
@@ -56,7 +57,6 @@ $componentName: "TextBox";
   display: flex;
   align-items: center;
   gap: t.$space-2;
-  padding: t.$space-2;
   width: 100%;
   border-style: solid;
   border-width: 1px;

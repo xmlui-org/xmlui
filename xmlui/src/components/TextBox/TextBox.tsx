@@ -73,6 +73,7 @@ export const TextBoxMd = createMetadata({
     "color-bg-Input--disabled": "$color-bg--disabled",
     "thickness-border-Input": "1px",
     "min-height-Input": "39px",
+    "padding-Input": "$space-2",
     "style-border-Input": "solid",
     "color-border-Input--disabled": "$color-border--disabled",
     "color-text-Input--disabled": "$color-text--disabled",
