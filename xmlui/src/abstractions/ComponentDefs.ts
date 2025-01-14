@@ -13,9 +13,6 @@ export interface ComponentDefCore {
   // Unique identifier of a component-like object
   uid?: string;
 
-  // Optional namespace of the component
-  namespace?: string;
-
   // An optional identifier we use for e2e tests; it does not influence the rendering of a component.
   testId?: string;
 
