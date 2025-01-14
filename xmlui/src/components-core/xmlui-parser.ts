@@ -64,6 +64,33 @@ export function xmlUiMarkupToComponent(
 /** returns a component definition containing the errors.
  * It is a component and a compound component definition at the same time,
  * so that it can be used to render the errors for a compound component as well*/
+export function errReportMessage(message: string) {
+  function makeComponent() {
+    const comp: ComponentDef = {
+      type: "VStack",
+      props: { padding: "$padding-normal", gap: 0 },
+      children: [
+        {
+          type: "H1",
+          props: {
+            value: message,
+            padding: "$padding-normal",
+            backgroundColor: "$color-error",
+            color: "white",
+          },
+        },
+      ],
+    };
+    return comp;
+  }
+  const comp = makeComponent() as any;
+  comp.component = makeComponent();
+  return comp;
+}
+
+/** returns a component definition containing the errors.
+ * It is a component and a compound component definition at the same time,
+ * so that it can be used to render the errors for a compound component as well*/
 export function errReportComponent(
   errors: ErrorWithLineColInfo[],
   fileName: number | string,

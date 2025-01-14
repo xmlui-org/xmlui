@@ -19,14 +19,38 @@ import {
   closing,
   guard,
 } from "./process-statement-common";
-import type {
-  ArrayDestructure,
-  AssignmentExpression,
-  Identifier,
-  Literal,
-  ObjectDestructure,
-  Statement,
-  VarDeclaration,
+import {
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_ASSIGNMENT_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONST_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_DO_WHILE_STATEMENT,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_FOR_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  T_IDENTIFIER,
+  T_IF_STATEMENT,
+  T_IMPORT_DECLARATION,
+  T_LET_STATEMENT,
+  T_LITERAL,
+  T_RETURN_STATEMENT,
+  T_SWITCH_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_VAR_STATEMENT,
+  T_WHILE_STATEMENT,
+  type ArrayDestructure,
+  type AssignmentExpression,
+  type Identifier,
+  type Literal,
+  type ObjectDestructure,
+  type Statement,
+  type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type {
   StatementRunTimeInfo,
@@ -180,7 +204,7 @@ function processStatement(
 
   // --- Process the statement according to its type
   switch (statement.type) {
-    case "ImportD":
+    case T_IMPORT_DECLARATION:
       // TODO: Implement module imports
       // // --- Get module information
       // const thisModule = statement.module;
@@ -215,21 +239,21 @@ function processStatement(
       // }
       break;
 
-    case "FuncD":
+    case T_FUNCTION_DECLARATION:
       // --- Function declarations are already hoisted, nothing to do
       break;
 
-    case "VarS":
+    case T_VAR_STATEMENT:
       if (thread !== evalContext.mainThread) {
         throw new Error("'var' declarations are not allowed within functions");
       }
       break;
 
-    case "EmptyS":
+    case T_EMPTY_STATEMENT:
       // --- Nothing to do
       break;
 
-    case "BlockS":
+    case T_BLOCK_STATEMENT:
       // --- No statement, nothing to process
       if (statement.stmts.length === 0) break;
 
@@ -248,7 +272,7 @@ function processStatement(
       ]);
       break;
 
-    case "ExprS":
+    case T_EXPRESSION_STATEMENT:
       // --- Just evaluate it
       const statementValue = evalBinding(statement.expr, evalContext, thread);
       if (thread.blocks && thread.blocks.length !== 0) {
@@ -256,7 +280,7 @@ function processStatement(
       }
       break;
 
-    case "ArrowS":
+    case T_ARROW_EXPRESSION_STATEMENT:
       // --- Compile the arrow expression
       const arrowFuncValue = executeArrowExpressionSync(
         statement.expr,
@@ -269,7 +293,7 @@ function processStatement(
       }
       break;
 
-    case "LetS": {
+    case T_LET_STATEMENT: {
       // --- Create a new variable in the innermost scope
       const block = innermostBlockScope(thread);
       if (!block) {
@@ -279,7 +303,7 @@ function processStatement(
       break;
     }
 
-    case "ConstS": {
+    case T_CONST_STATEMENT: {
       // --- Create a new variable in the innermost scope
       const block = innermostBlockScope(thread);
       if (!block) {
@@ -289,7 +313,7 @@ function processStatement(
       break;
     }
 
-    case "IfS":
+    case T_IF_STATEMENT:
       // --- Evaluate the condition
       const condition = !!evalBinding(statement.cond, evalContext, thread);
       if (condition) {
@@ -299,7 +323,7 @@ function processStatement(
       }
       break;
 
-    case "RetS": {
+    case T_RETURN_STATEMENT: {
       // --- Check if return is valid here
       let blockScope = innermostBlockScope(thread);
       if (blockScope === undefined) {
@@ -332,7 +356,7 @@ function processStatement(
       break;
     }
 
-    case "WhileS": {
+    case T_WHILE_STATEMENT: {
       // --- Create or get the loop's scope (guard is falsy for the first execution)
       let loopScope = execInfo.guard ? innermostLoopScope(thread) : createLoopScope(thread);
 
@@ -347,7 +371,7 @@ function processStatement(
       break;
     }
 
-    case "DoWS": {
+    case T_DO_WHILE_STATEMENT: {
       if (!execInfo.guard) {
         // --- First loop execution (do-while is a post-test loop)
         toUnshift = provideLoopBody(createLoopScope(thread), statement, thread.breakLabelValue);
@@ -365,7 +389,7 @@ function processStatement(
       break;
     }
 
-    case "ContS": {
+    case T_CONTINUE_STATEMENT: {
       // --- Search for the innermost non-switch loop scope, release the switch scopes
       if (!thread.loops || thread.loops.length === 0) {
         throw new Error("Missing loop scope");
@@ -403,7 +427,7 @@ function processStatement(
       break;
     }
 
-    case "BrkS": {
+    case T_BREAK_STATEMENT: {
       const loopScope = innermostLoopScope(thread);
       if (loopScope === undefined) {
         throw new Error("Missing loop scope");
@@ -435,7 +459,7 @@ function processStatement(
       break;
     }
 
-    case "ForS":
+    case T_FOR_STATEMENT:
       if (!execInfo.guard) {
         // --- Init the loop with a new scope
         createLoopScope(thread, 1);
@@ -460,7 +484,7 @@ function processStatement(
 
           if (statement.upd) {
             const updateStmt: StatementWithInfo = {
-              statement: { type: "ExprS", expr: statement.upd },
+              statement: { type: T_EXPRESSION_STATEMENT, expr: statement.upd },
             };
             toUnshift = mapStatementsToQueueItems([
               { statement: statement.body },
@@ -485,7 +509,7 @@ function processStatement(
       }
       break;
 
-    case "ForInS":
+    case T_FOR_IN_STATEMENT:
       if (!execInfo.guard) {
         // --- Get the object keys
         const keyedObject = evalBinding(statement.expr, evalContext, thread);
@@ -517,14 +541,14 @@ function processStatement(
           switch (statement.varB) {
             case "none": {
               const assigmentExpr: AssignmentExpression = {
-                type: "AsgnE",
+                type: T_ASSIGNMENT_EXPRESSION,
                 leftValue: {
-                  type: "IdE",
+                  type: T_IDENTIFIER,
                   name: statement.id.name,
                 } as Identifier,
                 op: "=",
                 expr: {
-                  type: "LitE",
+                  type: T_LITERAL,
                   value: propValue,
                 } as Literal,
               } as AssignmentExpression;
@@ -568,7 +592,7 @@ function processStatement(
       }
       break;
 
-    case "ForOfS":
+    case T_FOR_OF_STATEMENT:
       if (!execInfo.guard) {
         // --- Get the object keys
         const iteratorObject = evalBinding(statement.expr, evalContext, thread);
@@ -606,14 +630,14 @@ function processStatement(
         switch (statement.varB) {
           case "none": {
             const assigmentExpr: AssignmentExpression = {
-              type: "AsgnE",
+              type: T_ASSIGNMENT_EXPRESSION,
               leftValue: {
-                type: "IdE",
+                type: T_IDENTIFIER,
                 name: statement.id.name,
               } as Identifier,
               op: "=",
               expr: {
-                type: "LitE",
+                type: T_LITERAL,
                 value: propValue,
               } as Literal,
             } as AssignmentExpression;
@@ -653,11 +677,11 @@ function processStatement(
       }
       break;
 
-    case "ThrowS": {
+    case T_THROW_STATEMENT: {
       throw new ThrowStatementError(evalBinding(statement.expr, evalContext, thread));
     }
 
-    case "TryS": {
+    case T_TRY_STATEMENT: {
       if (!execInfo.guard) {
         // --- Execute the try block
         toUnshift = provideTryBody(thread, createTryScope(thread, statement));
@@ -768,7 +792,7 @@ function processStatement(
       break;
     }
 
-    case "SwitchS": {
+    case T_SWITCH_STATEMENT: {
       // --- Create or get the loop's scope (guard is falsy for the first execution)
       if (execInfo.guard) {
         // --- Complete the switch

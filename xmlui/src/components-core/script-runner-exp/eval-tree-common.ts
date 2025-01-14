@@ -1,17 +1,21 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { LogicalThreadExp, ValueResult } from "@abstractions/scripting/LogicalThreadExp";
-import type {
-  ArrowExpression,
-  AssignmentExpression,
-  BinaryExpression,
-  CalculatedMemberAccessExpression,
-  Expression,
-  Identifier,
-  Literal,
-  MemberAccessExpression,
-  PostfixOpExpression,
-  PrefixOpExpression,
-  UnaryExpression,
+import {
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_IDENTIFIER,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  type ArrowExpression,
+  type AssignmentExpression,
+  type BinaryExpression,
+  type CalculatedMemberAccessExpression,
+  type Expression,
+  type Identifier,
+  type Literal,
+  type MemberAccessExpression,
+  type PostfixOpExpression,
+  type PrefixOpExpression,
+  type UnaryExpression,
 } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "@abstractions/scripting/BlockScope";
 
@@ -148,12 +152,12 @@ export function getRootIdScope(
   thread?: LogicalThreadExp
 ): { type: IdentifierScope | undefined, name: string } | null {
   switch (expr.type) {
-    case "IdE":
+    case T_IDENTIFIER:
       const idScope = getIdentifierScope(expr, evalContext, thread);
       return { type: idScope.type, name: expr.name };
-    case "MembE":
+    case T_MEMBER_ACCESS_EXPRESSION:
       return getRootIdScope(expr.obj, evalContext, thread);
-    case "CMembE":
+    case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
       return getRootIdScope(expr.obj, evalContext, thread);
   }
   return null;
@@ -368,7 +372,7 @@ export function evalAssignmentCore(
   }
 
   // --- Check for const value
-  if (expr.leftValue.type === "IdE") {
+  if (expr.leftValue.type === T_IDENTIFIER) {
     if (isConstVar(expr.leftValue.name, thread)) {
       throw new Error("A const variable cannot be modified");
     }
@@ -448,7 +452,7 @@ export function evalPreOrPostCore(
   }
 
   // --- Check for const value
-  if (expr.expr.type === "IdE") {
+  if (expr.expr.type === T_IDENTIFIER) {
     if (isConstVar(expr.expr.name, thread)) {
       // --- We cannot modify a const value
       throw new Error("A const variable cannot be modified");
@@ -457,10 +461,10 @@ export function evalPreOrPostCore(
 
   const value =
     expr.op === "++"
-      ? expr.type === "PrefE"
+      ? expr.type === T_PREFIX_OP_EXPRESSION
         ? ++operand.valueScope[operand.valueIndex]
         : operand.valueScope[operand.valueIndex]++
-      : expr.type === "PrefE"
+      : expr.type === T_PREFIX_OP_EXPRESSION
       ? --operand.valueScope[operand.valueIndex]
       : operand.valueScope[operand.valueIndex]--;
 

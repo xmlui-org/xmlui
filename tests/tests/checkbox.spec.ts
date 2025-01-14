@@ -62,17 +62,17 @@ test("label", async ({ page }) => {
 
 test("labelPosition", async ({ page }) => {
   const labelTop = "Top label";
-  const labelRight = "Right label";
+  const labelStart = "Right label (ltr)";
   const labelBottom = "Bottom label";
-  const labelLeft = "Left label";
+  const labelEnd = "Left label (ltr)";
 
   await initApp(page, {
     entryPoint: `
       <VStack margin="1rem" gap="0.8rem">
         <Checkbox testId="checkTop" label="${labelTop}" labelPosition="top" />
-        <Checkbox testId="checkRight" label="${labelRight}" labelPosition="right" />
+        <Checkbox testId="checkRight" label="${labelEnd}" labelPosition="end" />
         <Checkbox testId="checkBottom" label="${labelBottom}" labelPosition="bottom" />
-        <Checkbox testId="checkLeft" label="${labelLeft}" labelPosition="left" />
+        <Checkbox testId="checkLeft" label="${labelStart}" labelPosition="start" />
       </VStack>
       `,
   });
@@ -80,14 +80,14 @@ test("labelPosition", async ({ page }) => {
   const { bottom: labelTopPosBottom } = await getFullRectangle(page.getByText(labelTop, { exact: true }));
   const { top: checkTopPosTop } = await getFullRectangle(page.getByLabel(labelTop, { exact: true }));
 
-  const { left: labelRightPosLeft } = await getFullRectangle(page.getByText(labelRight, { exact: true }));
-  const { right: checkRightPosRight } = await getFullRectangle(page.getByLabel(labelRight, { exact: true }));
+  const { left: labelRightPosLeft } = await getFullRectangle(page.getByText(labelEnd, { exact: true }));
+  const { right: checkRightPosRight } = await getFullRectangle(page.getByLabel(labelEnd, { exact: true }));
 
   const { top: labelBottomPosTop } = await getFullRectangle(page.getByText(labelBottom, { exact: true }));
   const { bottom: checkBottomPosBottom } = await getFullRectangle(page.getByLabel(labelBottom, { exact: true }));
 
-  const { right: labelLeftPosRight } = await getFullRectangle(page.getByText(labelLeft, { exact: true }));
-  const { left: checkLeftPosLeft } = await getFullRectangle(page.getByLabel(labelLeft, { exact: true }));
+  const { right: labelLeftPosRight } = await getFullRectangle(page.getByText(labelStart, { exact: true }));
+  const { left: checkLeftPosLeft } = await getFullRectangle(page.getByLabel(labelStart, { exact: true }));
 
   expect(labelTopPosBottom).toBeLessThan(checkTopPosTop);
   expect(labelRightPosLeft).toBeGreaterThan(checkRightPosRight);

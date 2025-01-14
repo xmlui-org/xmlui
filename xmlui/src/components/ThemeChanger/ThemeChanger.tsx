@@ -129,13 +129,13 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
       <>
         <DropdownMenu triggerTemplate={<Button variant="ghost" icon={<Icon name="palette" />} />}>
           <MenuItem
-            iconPosition="right"
+            iconPosition="end"
             icon={activeThemeTone === "light" ? <Icon name={"checkmark"} /> : ""}
             label="Light"
             onClick={() => setActiveThemeTone("light")}
           />
           <MenuItem
-            iconPosition="right"
+            iconPosition="end"
             icon={activeThemeTone === "dark" ? <Icon name={"checkmark"} /> : ""}
             label="Dark"
             onClick={() => setActiveThemeTone("dark")}

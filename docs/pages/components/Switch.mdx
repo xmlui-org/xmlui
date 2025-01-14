@@ -103,14 +103,14 @@ Default value: `false`.
 
 Places the label at the given position of the component.
 
-Default value: `"right"`.
+Default value: `"end"`.
 
 Available values:
 
 | Value | Description |
 | --- | --- |
-| `left` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `right` | The right side of the input (left-to-right) or the left side of the input (right-to-left) **(default)** |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) **(default)** |
 | `top` | The top of the input |
 | `bottom` | The bottom of the input |
 
@@ -118,9 +118,9 @@ Available values:
 ```ueml copy
 <App>
   <Switch label="Top label" labelPosition="top" initialValue="true" />
-  <Switch label="Right label" labelPosition="right" initialValue="true" />
+  <Switch label="End label" labelPosition="end" initialValue="true" />
   <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
-  <Switch label="Left label" labelPosition="left" initialValue="true" />
+  <Switch label="Start label" labelPosition="start" initialValue="true" />
 </App>
 ```
 
@@ -129,9 +129,9 @@ Available values:
   app={`
     <App>
       <Switch label="Top label" labelPosition="top" initialValue="true" />
-      <Switch label="Right label" labelPosition="right" initialValue="true" />
+      <Switch label="End label" labelPosition="end" initialValue="true" />
       <Switch label="Bottom label" labelPosition="bottom" initialValue="true" />
-      <Switch label="Left label" labelPosition="left" initialValue="true" />
+      <Switch label="Start label" labelPosition="start" initialValue="true" />
     </App>
   `}
 />

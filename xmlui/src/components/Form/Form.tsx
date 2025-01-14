@@ -18,10 +18,11 @@ export const FormMd = createMetadata({
       `This property allows defining a custom component to display the buttons at the bottom of the form.`,
     ),
     itemLabelPosition: d(
-      `This property sets the position of the item labels within the form. The default ` +
-        `value is \`top\`. Individual \`FormItem\` instances can override this property.`,
+      `This property sets the position of the item labels within the form.` +
+        `Individual \`FormItem\` instances can override this property.`,
       labelPositionMd,
       "string",
+      "top",
     ),
     itemLabelWidth: d(
       `This property sets the width of the item labels within the form. Individual ` +

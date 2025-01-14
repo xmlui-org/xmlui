@@ -1,10 +1,10 @@
 {
   "name": "xmlui",
-  "version": "0.7.7",
+  "version": "0.7.9",
   "sideEffects": false,
   "scripts": {
     "start-test-bed": "cd src/testing/infrastructure && xmlui start",
-    "build:test-bed": "cd src/testing/infrastructure && xmlui build",
+    "build:test-bed": "cd src/testing/infrastructure && xmlui build --build-mode=INLINE_ALL --withHostingMetaFiles",
     "build:bin": "tsc -p tsconfig.bin.json",
     "build:xmlui": "vite build --mode lib",
     "build:xmlui-standalone": "vite build --mode standalone",

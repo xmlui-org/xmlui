@@ -71,7 +71,7 @@ export const ButtonMd = createMetadata({
       `This optional string determines the location of the icon in the ${COMP}.`,
       iconPositionMd,
       "string",
-      "left",
+      "start",
     ),
     contentPosition: d(
       `This optional value determines how the label and icon (or nested children) should be placed` +

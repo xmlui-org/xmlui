@@ -35,5 +35,5 @@ const componentSource = `
 
 export const trendLabelRenderer: CompoundComponentRendererInfo = {
   compoundComponentDef: compoundComponentDefFromSource(COMP, componentSource),
-  hints: TrendLabelMd,
+  metadata: TrendLabelMd,
 };

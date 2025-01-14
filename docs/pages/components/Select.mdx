@@ -8,7 +8,8 @@ Provides a dropdown with a list of options to choose from.
 
 The component provides context values with which you can access some internal properties:
 
-- `$item`: This context variable acts as a template for an item in the list.
+- `$item`: This property represents the value of an item in the dropdown list.
+- `$itemContext`: This property provides a `removeItem` method to delete the particular value from the selection.
 
 
 ## Using `Select`
@@ -48,10 +49,6 @@ If the `label` is not specified `value` is shown.
 If this property is set to `true`, the component gets the focus automatically when displayed.
 
 Default value: `false`.
-
-### `badgeTemplate`
-
-This property enables the customization of badges.
 
 ### `dropdownHeight`
 
@@ -206,8 +203,8 @@ Available values:
 
 | Value | Description |
 | --- | --- |
-| `left` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
-| `right` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
+| `start` | The left side of the input (left-to-right) or the right side of the input (right-to-left) |
+| `end` | The right side of the input (left-to-right) or the left side of the input (right-to-left) |
 | `top` | The top of the input **(default)** |
 | `bottom` | The bottom of the input |
 
@@ -262,19 +259,23 @@ Default value: `false`.
   `}
 />
 
-### `optionTemplate`
+### `optionLabelTemplate`
 
-This property enables the customization of list items. To access the attributes of a list item use the `$item` context variable.
+This property allows replacing the default template to display an option in the dropdown list.
 
-```ueml copy
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`. 
+
+```ueml copy {3-9} /optionLabelTemplate/
 <App>
-  <Select>
-    <property name="optionTemplate">
-      <HStack verticalAlignment="center" gap="$space-0_5">
-        <Icon name="info" />
-        <Text value="{$item.label}" variant="strong" />
+  <Select initialValue="{0}" placeholder="Select..." searchable>
+    <property name="optionLabelTemplate">
+      <HStack 
+        horizontalPadding="$padding-tight" 
+        border="2px dotted $color-primary-500">
+        <Text>{$item.label}</Text>
       </HStack>
     </property>
+    <Option value="{0}" label="zero"/>
     <Option value="opt1" label="first"/>
     <Option value="opt2" label="second"/>
     <Option value="opt3" label="third"/>
@@ -283,17 +284,19 @@ This property enables the customization of list items. To access the attributes 
 ```
 
 <Playground
-    name="Example: optionTemplate"
-    height={200}
-    app={`
+  name="Example: optionLabelTemplate"
+  height={300}
+  app={`
     <App>
-      <Select>
-        <property name="optionTemplate">
-          <HStack verticalAlignment="center" gap="$space-0_5">
-            <Icon name="info" />
-            <Text value="{$item.label}" variant="strong" />
+      <Select initialValue="{0}" placeholder="Select..." searchable>
+        <property name="optionLabelTemplate">
+          <HStack 
+            horizontalPadding="$padding-tight" 
+            border="2px dotted $color-primary-500">
+            <Text>{$item.label}</Text>
           </HStack>
         </property>
+        <Option value="{0}" label="zero"/>
         <Option value="opt1" label="first"/>
         <Option value="opt2" label="second"/>
         <Option value="opt3" label="third"/>
@@ -373,6 +376,64 @@ Available values:
       <Select validationStatus="warning" />
       <Select validationStatus="error" />
     </App>
+  `}
+/>
+
+### `valueTemplate`
+
+This property allows replacing the default template to display a selected value when multiple selections (`multiSelect` is `true`) are enabled.
+
+In the template definition, you can use the `$item` context property to access the particular item's `label` and `value`.  The `$itemContext` property provides a `removeItem` method to delete a value from the current selection.
+
+```ueml copy {3-15} /valueTemplate/
+<App>
+  <Select initialValue="{0}" placeholder="Select..." multiSelect>
+    <property name="valueTemplate">
+      <HStack 
+        paddingLeft="$padding-tight" 
+        border="2px dotted $color-primary-500"              
+        verticalAlignment="center">
+        <Text>{$item.label}</Text>
+        <Button 
+          variant="ghost"
+          icon="close" 
+          size="xs" 
+          onClick="$itemContext.removeItem()"/>
+      </HStack>
+    </property>
+    <Option value="{0}" label="zero"/>
+    <Option value="opt1" label="first"/>
+    <Option value="opt2" label="second"/>
+    <Option value="opt3" label="third"/>
+  </Select>
+</App>  
+```
+
+<Playground
+  name="Example: valueTemplate"
+  height={300}
+  app={`
+    <App>
+      <Select initialValue="{0}" placeholder="Select..." multiSelect>
+        <property name="valueTemplate">
+          <HStack 
+            paddingLeft="$padding-tight" 
+            border="2px dotted $color-primary-500"              
+            verticalAlignment="center">
+            <Text>{$item.label}</Text>
+            <Button 
+              variant="ghost"
+              icon="close" 
+              size="xs" 
+              onClick="$itemContext.removeItem()"/>
+          </HStack>
+        </property>
+        <Option value="{0}" label="zero"/>
+        <Option value="opt1" label="first"/>
+        <Option value="opt2" label="second"/>
+        <Option value="opt3" label="third"/>
+      </Select>
+    </App>  
   `}
 />
 

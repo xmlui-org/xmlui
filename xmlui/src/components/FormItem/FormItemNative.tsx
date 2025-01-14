@@ -51,7 +51,7 @@ type FormControlType =
   | "switch";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
-  checkbox: "right",
+  checkbox: "end",
 };
 
 type Props = {
@@ -312,45 +312,43 @@ export const FormItem = memo(function FormItem({
   const [animateContainerRef] = useAutoAnimate({ duration: 100 });
 
   return (
-    <>
-      <ItemWithLabel
-        labelPosition={labelPositionValue}
-        label={label}
-        labelWidth={labelWidthValue}
-        labelBreak={labelBreakValue}
-        enabled={isEnabled}
-        required={validations.required}
-        validationInProgress={validationResult?.partial}
-        onFocus={onFocus}
-        onBlur={onBlur}
-        style={style}
-        validationResult={
-          <div ref={animateContainerRef}>
-            {isHelperTextShown &&
-              validationResult?.validations.map((singleValidation, i) => (
-                <Fragment key={i}>
-                  {singleValidation.isValid && singleValidation.validMessage && (
-                    <HelperText
-                      text={singleValidation.validMessage}
-                      status={"valid"}
-                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                    />
-                  )}
-                  {!singleValidation.isValid && singleValidation.invalidMessage && (
-                    <HelperText
-                      text={singleValidation.invalidMessage}
-                      status={singleValidation.severity}
-                      style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
-                    />
-                  )}
-                </Fragment>
-              ))}
-          </div>
-        }
-      >
-        {formControl}
-      </ItemWithLabel>
-    </>
+    <ItemWithLabel
+      labelPosition={labelPositionValue}
+      label={label}
+      labelWidth={labelWidthValue}
+      labelBreak={labelBreakValue}
+      enabled={isEnabled}
+      required={validations.required}
+      validationInProgress={validationResult?.partial}
+      onFocus={onFocus}
+      onBlur={onBlur}
+      style={style}
+      validationResult={
+        <div ref={animateContainerRef}>
+          {isHelperTextShown &&
+            validationResult?.validations.map((singleValidation, i) => (
+              <Fragment key={i}>
+                {singleValidation.isValid && !!singleValidation.validMessage && (
+                  <HelperText
+                    text={singleValidation.validMessage}
+                    status={"valid"}
+                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                  />
+                )}
+                {!singleValidation.isValid && !!singleValidation.invalidMessage && (
+                  <HelperText
+                    text={singleValidation.invalidMessage}
+                    status={singleValidation.severity}
+                    style={{ opacity: singleValidation.stale ? 0.5 : undefined }}
+                  />
+                )}
+              </Fragment>
+            ))}
+        </div>
+      }
+    >
+      {formControl}
+    </ItemWithLabel>
   );
 });
 

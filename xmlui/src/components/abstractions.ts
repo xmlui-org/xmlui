@@ -164,15 +164,13 @@ export const orientationOptionMd: PropertyValueDescription[] = [
 ] as const;
 
 // --- Available icon positions
-export const iconPositionValues = ["left", "right", "start", "end"] as const;
+export const iconPositionValues = ["start", "end"] as const;
 export const iconPositionNames = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
 export const iconPositionMd: PropertyValueDescription[] = [
-  { value: "left", description: "The icon will appear on the left side" },
-  { value: "right", description: "The icon will appear on the right side" },
   { value: "start", description: "The icon will appear at the start (left side when the left-to-right direction is set)" },
   { value: "end", description: "The icon will appear at the end (right side when the left-to-right direction is set)" },
-]
+];
 
 // --- Available status colors
 const statusColorValues = [
@@ -210,13 +208,12 @@ export const placementMd: PropertyValueDescription[] = [
 ] as const;
 
 // --- Available label positions
-export const labelPositionValues = ["top", "right", "left", "bottom"] as const;
+export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
 export const labelPositionNames = [...labelPositionValues];
 export type LabelPosition = (typeof labelPositionValues)[number];
-// TODO: need to add RTL to replace left and right with start and end
 export const labelPositionMd: PropertyValueDescription[] = [
-  { value: "left", description: "The left side of the input (left-to-right) or the right side of the input (right-to-left)" },
-  { value: "right", description: "The right side of the input (left-to-right) or the left side of the input (right-to-left)" },
+  { value: "start", description: "The left side of the input (left-to-right) or the right side of the input (right-to-left)" },
+  { value: "end", description: "The right side of the input (left-to-right) or the left side of the input (right-to-left)" },
   { value: "top", description: "The top of the input" },
   { value: "bottom", description: "The bottom of the input" },
 ] as const;
@@ -242,3 +239,13 @@ export type ValidationResult = {
   status: ValidationStatus;
   message?: string;
 };
+
+// --- scroll anchoring
+export const scrollAnchoringValues = ["top", "bottom"] as const;
+export const scrollAnchoringNames = [...scrollAnchoringValues];
+export type ScrollAnchoring = (typeof scrollAnchoringValues)[number];
+
+// --- ordering
+export const orderingValues = ["asc", "desc"] as const;
+type OrderingDirection = (typeof orderingValues)[number];
+export type FieldOrderBy = { field: string; direction: OrderingDirection };

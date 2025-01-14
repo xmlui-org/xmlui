@@ -17,7 +17,7 @@ import type {
   LookupSyncFnInner,
 } from "@abstractions/ActionDefs";
 
-import { useComponentRegistry } from "@components/ViewComponentRegistryContext";
+import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { ContainerActionKind } from "./abstractions/containers";
 import { createValueExtractor } from "@components-core/container/valueExtractor";
 import { useReferenceTrackedApi } from "@components-core/utils/hooks";

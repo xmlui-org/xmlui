@@ -1,13 +1,51 @@
 import { get } from "lodash-es";
 
 import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
-import type {
-  ArrayDestructure,
-  Expression,
-  ObjectDestructure,
-  PropertyValue,
-  Statement,
-  VarDeclaration,
+import {
+  T_ARRAY_LITERAL,
+  T_ARROW_EXPRESSION,
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_ASSIGNMENT_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_CONST_STATEMENT,
+  T_DESTRUCTURE,
+  T_DO_WHILE_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_FOR_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_IDENTIFIER,
+  T_IF_STATEMENT,
+  T_IMPORT_DECLARATION,
+  T_LET_STATEMENT,
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_OBJECT_DESTRUCTURE,
+  T_OBJECT_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_PREFIX_OP_EXPRESSION,
+  T_RETURN_STATEMENT,
+  T_SEQUENCE_EXPRESSION,
+  T_SPREAD_EXPRESSION,
+  T_SWITCH_CASE,
+  T_SWITCH_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_UNARY_EXPRESSION,
+  T_VAR_DECLARATION,
+  T_VAR_STATEMENT,
+  T_WHILE_STATEMENT,
+  type ArrayDestructure,
+  type Expression,
+  type ObjectDestructure,
+  type PropertyValue,
+  type Statement,
+  type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 /**
@@ -18,7 +56,7 @@ import type {
 export function resolveIdentifiers(
   code: PropertyValue | Expression | Statement | Statement[],
   referenceTrackedApis: Record<string, any> = {},
-  scope?: ResolutionScope
+  scope?: ResolutionScope,
 ): ResolutionScope {
   if (!scope) {
     scope = {
@@ -71,7 +109,7 @@ export function resolveIdentifiers(
 
     switch (expr.type) {
       // --- Here happens the ID resolution
-      case "IdE":
+      case T_IDENTIFIER:
         // --- Check if the identifier is a local variable
         const local = isLocal(blockScopes, expr.name);
         if (!local) {
@@ -81,55 +119,55 @@ export function resolveIdentifiers(
         return;
 
       // --- Visit expressions recursively
-      case "UnaryE":
-      case "PrefE":
-      case "PostfE":
+      case T_UNARY_EXPRESSION:
+      case T_PREFIX_OP_EXPRESSION:
+      case T_POSTFIX_OP_EXPRESSION:
         visitNode(expr.expr);
         return;
 
-      case "BinaryE":
+      case T_BINARY_EXPRESSION:
         visitNode(expr.left);
         visitNode(expr.right);
         return;
 
-      case "CondE":
+      case T_CONDITIONAL_EXPRESSION:
         visitNode(expr.cond);
         visitNode(expr.thenE);
         visitNode(expr.elseE);
         return;
 
-      case "SeqE":
+      case T_SEQUENCE_EXPRESSION:
         for (const subExpr of expr.exprs) {
           visitNode(subExpr);
         }
         return;
 
-      case "InvokeE":
+      case T_FUNCTION_INVOCATION_EXPRESSION:
         visitNode(expr.obj);
         for (const arg of expr.arguments) {
           visitNode(arg);
         }
         return;
 
-      case "MembE":
+      case T_MEMBER_ACCESS_EXPRESSION:
         visitNode(expr.obj);
         return;
 
-      case "CMembE":
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
         visitNode(expr.obj);
         visitNode(expr.member);
         return;
 
-      case "ALitE":
+      case T_ARRAY_LITERAL:
         for (const item of expr.items) {
           visitNode(item);
         }
         return;
 
-      case "OLitE":
+      case T_OBJECT_LITERAL:
         for (const prop of expr.props) {
           if (Array.isArray(prop)) {
-            if (prop[0].type !== "IdE") {
+            if (prop[0].type !== T_IDENTIFIER) {
               visitNode(prop[0]);
             }
             visitNode(prop[1]);
@@ -139,16 +177,16 @@ export function resolveIdentifiers(
         }
         return;
 
-      case "SpreadE":
+      case T_SPREAD_EXPRESSION:
         visitNode(expr.expr);
         return;
 
-      case "AsgnE":
+      case T_ASSIGNMENT_EXPRESSION:
         visitNode(expr.leftValue);
         visitNode(expr.expr);
         return;
 
-      case "ArrowE": {
+      case T_ARROW_EXPRESSION: {
         const funcScope = new Set<string>();
         blockScopes.push(funcScope);
         processDeclarations(funcScope, expr.args);
@@ -158,11 +196,11 @@ export function resolveIdentifiers(
       }
 
       // --- Visit statements recursively
-      case "ExprS":
+      case T_EXPRESSION_STATEMENT:
         visitNode(expr.expr);
         return;
 
-      case "BlockS":
+      case T_BLOCK_STATEMENT:
         blockScopes.push(new Set<string>());
         for (const stmt of expr.stmts) {
           visitNode(stmt);
@@ -170,8 +208,8 @@ export function resolveIdentifiers(
         blockScopes.pop();
         return;
 
-      case "LetS":
-      case "ConstS":
+      case T_LET_STATEMENT:
+      case T_CONST_STATEMENT:
         const block = getInnermost(blockScopes);
         processDeclarations(block, expr.decls);
         expr.decls.forEach((decl) => {
@@ -179,7 +217,7 @@ export function resolveIdentifiers(
         });
         return;
 
-      case "VarS":
+      case T_VAR_STATEMENT:
         expr.decls.forEach((decl) => {
           if (!scope) return;
           scope.topLevelNames[decl.id.name] = decl.id;
@@ -189,27 +227,27 @@ export function resolveIdentifiers(
         });
         return;
 
-      case "IfS":
+      case T_IF_STATEMENT:
         visitNode(expr.cond);
         visitNode(expr.thenB);
         visitNode(expr.elseB);
         return;
 
-      case "RetS":
+      case T_RETURN_STATEMENT:
         visitNode(expr.expr);
         return;
 
-      case "WhileS":
+      case T_WHILE_STATEMENT:
         visitNode(expr.cond);
         visitNode(expr.body);
         return;
 
-      case "DoWS":
+      case T_DO_WHILE_STATEMENT:
         visitNode(expr.cond);
         visitNode(expr.body);
         return;
 
-      case "ForS":
+      case T_FOR_STATEMENT:
         blockScopes.push(new Set<string>());
         visitNode(expr.init);
         visitNode(expr.cond);
@@ -218,8 +256,8 @@ export function resolveIdentifiers(
         blockScopes.pop();
         return;
 
-      case "ForInS":
-      case "ForOfS": {
+      case T_FOR_IN_STATEMENT:
+      case T_FOR_OF_STATEMENT: {
         const forScope = new Set<string>();
         blockScopes.push(forScope);
         if (expr.varB !== "none") {
@@ -233,14 +271,14 @@ export function resolveIdentifiers(
         return;
       }
 
-      case "SwitchS":
+      case T_SWITCH_STATEMENT:
         visitNode(expr.expr);
         for (const caseClause of expr.cases) {
           visitNode(caseClause);
         }
         return;
 
-      case "SwitchC":
+      case T_SWITCH_CASE:
         if (expr.stmts) {
           visitNode(expr.caseE);
           for (const stmt of expr.stmts) {
@@ -249,11 +287,11 @@ export function resolveIdentifiers(
         }
         return;
 
-      case "ThrowS":
+      case T_THROW_STATEMENT:
         visitNode(expr.expr);
         return;
 
-      case "TryS": {
+      case T_TRY_STATEMENT: {
         visitNode(expr.tryB);
         const catchScope = new Set<string>();
         blockScopes.push(catchScope);
@@ -263,7 +301,7 @@ export function resolveIdentifiers(
         return;
       }
 
-      case "FuncD": {
+      case T_FUNCTION_DECLARATION: {
         // --- Check if the identifier is a local variable
         const local = isLocal(blockScopes, expr.id.name);
         if (!local) {
@@ -279,7 +317,7 @@ export function resolveIdentifiers(
         blockScopes.pop();
         return;
       }
-      case "ImportD":
+      case T_IMPORT_DECLARATION:
         for (const item of expr.imports) {
           visitNode(item.id);
         }
@@ -330,24 +368,24 @@ export function resolveIdentifiers(
       }
 
       switch (program.type) {
-        case "BlockS":
+        case T_BLOCK_STATEMENT:
           blockScopes.push(new Set<string>());
           deps = collectDependencies(program.stmts);
           blockScopes.pop();
           break;
 
-        case "ExprS":
+        case T_EXPRESSION_STATEMENT:
           deps = collectDependencies(program.expr);
           break;
 
-        case "ArrowS":
+        case T_ARROW_EXPRESSION_STATEMENT:
           blockScopes.push(new Set<string>());
           deps = collectDependencies(program.expr);
           blockScopes.pop();
           break;
 
-        case "LetS":
-        case "ConstS":
+        case T_LET_STATEMENT:
+        case T_CONST_STATEMENT:
           const block = getInnermost(blockScopes);
           processDeclarations(block, program.decls);
           program.decls.forEach((decl) => {
@@ -357,7 +395,7 @@ export function resolveIdentifiers(
           });
           break;
 
-        case "IfS":
+        case T_IF_STATEMENT:
           deps = collectDependencies(program.cond);
           deps = deps.concat(collectDependencies(program.thenB));
           if (program.elseB) {
@@ -365,23 +403,23 @@ export function resolveIdentifiers(
           }
           break;
 
-        case "RetS":
+        case T_RETURN_STATEMENT:
           if (program.expr) {
             deps = collectDependencies(program.expr);
           }
           break;
 
-        case "WhileS":
+        case T_WHILE_STATEMENT:
           deps = collectDependencies(program.cond);
           deps = deps.concat(collectDependencies(program.body));
           break;
 
-        case "DoWS":
+        case T_DO_WHILE_STATEMENT:
           deps = collectDependencies(program.cond);
           deps = deps.concat(collectDependencies(program.body));
           break;
 
-        case "ForS":
+        case T_FOR_STATEMENT:
           blockScopes.push(new Set<string>());
           if (program.init) {
             deps.concat(collectDependencies([program.init]));
@@ -396,8 +434,8 @@ export function resolveIdentifiers(
           blockScopes.pop();
           break;
 
-        case "ForInS":
-        case "ForOfS": {
+        case T_FOR_IN_STATEMENT:
+        case T_FOR_OF_STATEMENT: {
           const forScope = new Set<string>();
           blockScopes.push(forScope);
           if (program.varB !== "none") {
@@ -413,11 +451,11 @@ export function resolveIdentifiers(
           break;
         }
 
-        case "ThrowS":
+        case T_THROW_STATEMENT:
           deps = collectDependencies(program.expr);
           break;
 
-        case "TryS":
+        case T_TRY_STATEMENT:
           deps = collectDependencies(program.tryB);
           if (program.catchB) {
             const catchScope = new Set<string>();
@@ -433,7 +471,7 @@ export function resolveIdentifiers(
           }
           break;
 
-        case "SwitchS":
+        case T_SWITCH_STATEMENT:
           deps = collectDependencies(program.expr);
           program.cases.forEach((c) => {
             if (c.caseE) {
@@ -445,7 +483,7 @@ export function resolveIdentifiers(
           });
           break;
 
-        case "FuncD": {
+        case T_FUNCTION_DECLARATION: {
           const funcScope = new Set<string>();
           blockScopes.push(funcScope);
           processDeclarations(funcScope, program.args);
@@ -454,16 +492,16 @@ export function resolveIdentifiers(
           return funcDeps;
         }
 
-        case "IdE":
+        case T_IDENTIFIER:
           // --- Any non-block-scoped variable is a dependency to return
           return isLocal(blockScopes, program.name) ? [] : [program.name];
 
-        case "MembE":
+        case T_MEMBER_ACCESS_EXPRESSION:
           // --- Check for a simple member-access chain. If it exist, add the member to the chain with the "." syntax
           const memberChain = traverseMemberAccessChain(program);
           return memberChain ? [memberChain] : collectDependencies(program.obj);
 
-        case "CMembE":
+        case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
           // --- Check for a simple member-access chain. If it exist, add the member to the chain with the "[]" syntax
           const calcMemberChain = traverseMemberAccessChain(program);
           if (calcMemberChain) {
@@ -472,27 +510,33 @@ export function resolveIdentifiers(
           let calcDeps = collectDependencies(program.obj);
           return calcDeps.concat(collectDependencies(program.member));
 
-        case "SeqE":
+        case T_SEQUENCE_EXPRESSION:
           let sequenceDeps: string[] = [];
           program.exprs.forEach((expr) => {
             sequenceDeps = sequenceDeps.concat(collectDependencies(expr));
           });
           return sequenceDeps;
 
-        case "InvokeE":
+        case T_FUNCTION_INVOCATION_EXPRESSION:
           let uncDeps: string[] = [];
           program.arguments?.forEach((arg) => {
             uncDeps = uncDeps.concat(collectDependencies(arg));
           });
-          if (program.obj.type === "MembE") {
+          if (program.obj.type === T_MEMBER_ACCESS_EXPRESSION) {
             const caller = program.obj;
-            if (caller.obj.type === "IdE") {
-              if (typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) === "function") {
+            if (caller.obj.type === T_IDENTIFIER) {
+              if (
+                typeof get(referenceTrackedApis, `${caller.obj.name}.${caller.member}`) ===
+                "function"
+              ) {
                 uncDeps.push(`${caller.obj.name}.${caller.member}`);
               } else {
                 uncDeps.push(`${caller.obj.name}`);
               }
-            } else if (caller.obj.type === "MembE" || caller.obj.type === "CMembE") {
+            } else if (
+              caller.obj.type === T_MEMBER_ACCESS_EXPRESSION ||
+              caller.obj.type === T_CALCULATED_MEMBER_ACCESS_EXPRESSION
+            ) {
               uncDeps = uncDeps.concat(collectDependencies(caller.obj));
             } else {
               uncDeps = uncDeps.concat(collectDependencies(caller));
@@ -502,7 +546,7 @@ export function resolveIdentifiers(
           }
           return uncDeps;
 
-        case "ArrowE": {
+        case T_ARROW_EXPRESSION: {
           // --- Process the current arguments
           const funcScope = new Set<string>();
           blockScopes.push(funcScope);
@@ -512,16 +556,16 @@ export function resolveIdentifiers(
             const argSpec = argSpecs[i];
             let decl: VarDeclaration | undefined;
             switch (argSpec.type) {
-              case "IdE": {
+              case T_IDENTIFIER: {
                 decl = {
-                  type: "VarD",
+                  type: T_VAR_DECLARATION,
                   id: argSpec.name,
                 };
                 break;
               }
-              case "Destr": {
+              case T_DESTRUCTURE: {
                 decl = {
-                  type: "VarD",
+                  type: T_VAR_DECLARATION,
                   id: argSpec.id,
                   aDestr: argSpec.aDestr,
                   oDestr: argSpec.oDestr,
@@ -544,7 +588,7 @@ export function resolveIdentifiers(
           return arrowDeps;
         }
 
-        case "OLitE":
+        case T_OBJECT_LITERAL:
           let objectDeps: string[] = [];
           program.props.forEach((prop) => {
             if (Array.isArray(prop)) {
@@ -555,7 +599,7 @@ export function resolveIdentifiers(
           });
           return objectDeps;
 
-        case "ALitE":
+        case T_ARRAY_LITERAL:
           let arrayDeps: string[] = [];
           program.items.forEach((expr) => {
             if (expr) {
@@ -564,31 +608,31 @@ export function resolveIdentifiers(
           });
           return arrayDeps;
 
-        case "UnaryE":
+        case T_UNARY_EXPRESSION:
           return collectDependencies(program.expr);
 
-        case "PrefE":
+        case T_PREFIX_OP_EXPRESSION:
           return collectDependencies(program.expr);
 
-        case "PostfE":
+        case T_POSTFIX_OP_EXPRESSION:
           return collectDependencies(program.expr);
 
-        case "BinaryE":
+        case T_BINARY_EXPRESSION:
           return collectDependencies(program.left).concat(collectDependencies(program.right));
 
-        case "AsgnE":
+        case T_ASSIGNMENT_EXPRESSION:
           return collectDependencies(program.expr);
 
-        case "CondE":
+        case T_CONDITIONAL_EXPRESSION:
           return collectDependencies(program.cond).concat(
             collectDependencies(program.thenE),
-            collectDependencies(program.elseE)
+            collectDependencies(program.elseE),
           );
 
-        case "VarD":
+        case T_VAR_DECLARATION:
           return collectDependencies(program.expr!);
 
-        case "SpreadE":
+        case T_SPREAD_EXPRESSION:
           return collectDependencies(program.expr);
       }
 
@@ -601,20 +645,20 @@ export function resolveIdentifiers(
   // --- if the chain is not simple
   function traverseMemberAccessChain(expr: Expression): string | null {
     switch (expr.type) {
-      case "MembE":
+      case T_MEMBER_ACCESS_EXPRESSION:
         const memberChain = traverseMemberAccessChain(expr.obj);
         return memberChain ? `${memberChain}.${expr.member}` : null;
-      case "CMembE":
+      case T_CALCULATED_MEMBER_ACCESS_EXPRESSION:
         let value: string | null = null;
-        if (expr.member.type === "LitE") {
+        if (expr.member.type === T_LITERAL) {
           value = `'${expr.member.value?.toString() ?? null}'`;
-        } else if (expr.member.type === "IdE") {
+        } else if (expr.member.type === T_IDENTIFIER) {
           value = expr.member.name;
         }
         if (!value) break;
         const calcMemberChain = traverseMemberAccessChain(expr.obj);
         return calcMemberChain ? `${calcMemberChain}[${value}]` : null;
-      case "IdE":
+      case T_IDENTIFIER:
         return isLocal(blockScopes, expr.name) ? null : expr.name;
     }
     return null;
@@ -626,16 +670,16 @@ function processDeclarations(block: Set<string>, declarations: Expression[]): vo
   for (let i = 0; i < declarations.length; i++) {
     const decl = declarations[i];
     switch (decl.type) {
-      case "VarD":
+      case T_VAR_DECLARATION:
         visitDeclaration(block, decl);
         break;
-      case "ADestr":
+      case T_DESTRUCTURE:
         if (decl.aDestr) visitArrayDestruct(block, decl.aDestr);
         break;
-      case "ODestr":
+      case T_OBJECT_DESTRUCTURE:
         if (decl.oDestr) visitObjectDestruct(block, decl.oDestr);
         break;
-      case "IdE":
+      case T_IDENTIFIER:
         block.add(decl.name);
         break;
     }

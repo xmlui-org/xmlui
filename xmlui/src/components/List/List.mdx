@@ -8,14 +8,14 @@ import data from "./doc-resources/list-component-data.js";
 
 In the following examples all use the same list of data which looks like so:
 
-| Id   | Name    | Quantity | Unit   | Category   |
-| :--- | :------ | :------- | :----- | :--------- |
-| 0    | Apples  | 5        | pieces | fruits     |
-| 1    | Bananas | 6        | pieces | fruits     |
-| 2    | Carrots | 100      | grams  | vegetables |
-| 3    | Spinach | 1        | bunch  | vegetables |
-| 4    | Milk    | 10       | liter  | diary      |
-| 5    | Cheese  | 200      | grams  | diary      |
+| Id   | Name    | Quantity | Unit   | Category   | Key  |
+| :--- | :------ | :------- | :----- | :--------- | :--- |
+| 0    | Apples  | 5        | pieces | fruits     | 5    |
+| 1    | Bananas | 6        | pieces | fruits     | 4    |
+| 2    | Carrots | 100      | grams  | vegetables | 3    |
+| 3    | Spinach | 1        | bunch  | vegetables | 2    |
+| 4    | Milk    | 10       | liter  | diary      | 1    |
+| 5    | Cheese  | 200      | grams  | diary      | 0    |
 
 The data is provided as JSON.
 
@@ -180,7 +180,7 @@ and either a [`groupHeaderTemplate`](#groupHeaderTemplate) or a [`groupFooterTem
 
 Note how in the example below the `$item` is used to access the `name`, `quantity` and `unit` attributes.
 
-```ueml copy {2-12}
+```ueml copy {3-14}
 <App>
   <List data='{[...]}'>
     <property name="itemTemplate">
@@ -344,11 +344,11 @@ or a [`groupFooterTemplate`](#groupFooterTemplate) needs to be provided.
 
 The structure of `$group` in a `groupFooterTemplate` is the following:
 
-| Attribute    | Description                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
-| items | The items filtered from the original data list that fall into this section.                                   |
-| key   | The attribute name to section by provided via `groupBy`                                                     |
+| Attribute | Description                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
+| items     | The items filtered from the original data list that fall into this section.                                   |
+| key       | The attribute name to section by provided via `groupBy`                                                       |
 
 This example displays a separator line in the groups' footer:
 
@@ -396,13 +396,13 @@ This example displays a separator line in the groups' footer:
 
 The structure of `$group` in a `groupHeaderTemplate` is the following:
 
-| Attribute    | Description                                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------------------------- |
-| id           | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`. |
-| items | The items filtered from the original data list that fall into this section.                                   |
-| key   | The attribute name to section by provided via `groupBy`                                                     |
+| Attribute | Description                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| id        | Unique identifier for the section. It is commonly generated from the attribute name provided via `groupBy`.   |
+| items     | The items filtered from the original data list that fall into this section.                                   |
+| key       | The attribute name to section by provided via `groupBy`                                                       |
 
-```ueml copy {2-6}
+```ueml copy {3-7}
 <App>
   <List data='{[...]}' groupBy="category">
     <property name="groupHeaderTemplate">
@@ -472,50 +472,201 @@ The structure of `$group` in a `groupHeaderTemplate` is the following:
 
 %-PROP-END
 
-%-PROP-START scrollPaddingEnd
+%-PROP-START availableGroups
 
-Adds padding to the bottom of the list which is also included in the scroll area.
-
-```ueml {2}
+```ueml {5}
 <App>
   <List
-    scrollPaddingEnd="20"
-    scrollAnchor="bottom"
-    data='{[...]}'/>
+    data="{[...]}"
+    groupBy="category"
+    availableGroups="{['fruits', 'vegetables']}">
+    <property name="groupHeaderTemplate">
+      <Stack>
+        <Text variant="subtitle" value="{$group.key}" />
+      </Stack>
+    </property>  
+  </List>
 </App>
 ```
 
 <Playground
-  name="Example: scrollAnchor"
+  name="Example: availableGroups"
   height={400}
   app={`
     <App>
-      <List
-        scrollPaddingEnd="20"
-        scrollAnchor="bottom"
-        data='{${JSON.stringify(data, null, 2)}}'/>
+      <List availableGroups="{['fruits', 'vegetables']}" groupBy="category" data='{${JSON.stringify(data, null, 2)}}'>
+        <property name="groupHeaderTemplate">
+          <Stack>
+            <Text variant="subtitle" value="{$group.key}" />
+          </Stack>
+        </property>  
+      </List>
     </App>
   `}
 />
 
 %-PROP-END
 
-%-PROP-START scrollPaddingStart
+%-PROP-START borderCollapse
 
-Adds padding to the top of the list which is also included in the scroll area.
+Note how the `List` on the right has different borders:
 
-```ueml /scrollPaddingStart="20"/
+```ueml /borderCollapse/
 <App>
-  <List scrollPaddingStart="20" data='{${JSON.stringify(data, null, 2)}}' />
+  <HStack>
+    <List data="{[...]}" groupBy="category" borderCollapse="false" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+    <List data="{[...]}" groupBy="category" borderCollapse="true" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
 </App>
 ```
 
 <Playground
-  name="Example: scrollPaddingStart"
+  name="Example: borderCollapse"
   height={400}
   app={`
     <App>
-      <List scrollPaddingStart="20" data='{${JSON.stringify(data, null, 2)}}' />
+      <HStack>
+        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" borderCollapse="false" width="$space-48">
+        <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" borderCollapse="true" width="$space-48">
+          <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+      </HStack>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START groupsInitiallyExpanded
+
+Note how the groups in the right `List` are expanded by default:
+
+```ueml {3, 10}
+<App>
+  <HStack gap="$space-2">
+    <List data="{[...]}" groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+    <List data="{[...]}" groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: groupsInitiallyExpanded"
+  height={400}
+  app={`
+    <App>
+      <HStack gap="$space-2"> 
+        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" groupsInitiallyExpanded="false" width="$space-48">
+          <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+        <List data='{${JSON.stringify(data, null, 2)}}' groupBy="category" groupsInitiallyExpanded="true" width="$space-48">
+          <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+      </HStack>
+    </App>
+  `}
+/>
+
+%-PROP-END
+
+%-PROP-START hideEmptyGroups
+
+Note how the `meats` category is not displayed in the right `List`:
+
+```ueml {7, 19}
+<App>
+  <HStack gap="$space-2">
+    <List
+      data="{[...]}"
+      defaultGroups="{['meats']}"
+      groupBy="category"
+      hideEmptyGroups="false"
+      width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+    <List
+      data="{[...]}"
+      defaultGroups="{['meats']}"
+      groupBy="category"
+      hideEmptyGroups="true"
+      width="$space-48">
+      <property name="groupHeaderTemplate">
+        <Stack>
+          <Text variant="subtitle" value="{$group.key}" />
+        </Stack>
+      </property>
+    </List>
+  </HStack>
+</App>
+```
+
+<Playground
+  name="Example: hideEmptyGroups"
+  height={400}
+  app={`
+    <App>
+      <HStack gap="$space-2">
+        <List data='{${JSON.stringify(data, null, 2)}}' defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="false" width="$space-48">
+          <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+        <List data='{${JSON.stringify(data, null, 2)}}' defaultGroups="{['meats']}" groupBy="category" hideEmptyGroups="true" width="$space-48">
+          <property name="groupHeaderTemplate">
+            <Stack>
+              <Text variant="subtitle" value="{$group.key}" />
+            </Stack>
+          </property>
+        </List>
+      </HStack>
     </App>
   `}
 />

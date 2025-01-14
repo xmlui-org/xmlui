@@ -1,54 +1,49 @@
 name: e2e Tests
 
-concurrency:  # Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time.
+concurrency: # Concurrency ensures that only a single job or workflow using the same concurrency group will run at a time.
   group: e2e-testing
   cancel-in-progress: true
 
-
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    - name: cache node modules
-      uses: actions/cache@v3
-      with:
-        path: '**/node_modules'
-        key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-    - name: Install dependencies
-      run: npm ci
-    - name: Store Playwright's Version
-      working-directory: tests
-      run: |
-        PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
-        echo "Playwright's Version: $PLAYWRIGHT_VERSION"
-        echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
-    - name: Cache Playwright Browsers for Playwright's Version
-      id: cache-playwright-browsers
-      uses: actions/cache@v3
-      with:
-        path: ~/.cache/ms-playwright
-        key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
-    - name: build test bed
-      working-directory: tests
-      run: npm run build
-    - name: Install Playwright Browsers
-      working-directory: tests
-      if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      working-directory: tests
-      run: npm run test
-    - uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: playwright-report
-        path: tests/playwright-report/
-        retention-days: 30
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: "npm"
+      - name: Install dependencies
+        run: npm ci --prefer-offline
+      - name: Store Playwright's Version
+        working-directory: tests
+        run: |
+          PLAYWRIGHT_VERSION=$(npm ls @playwright/test | grep @playwright | sed 's/.*@//' | sort | head -n 1)
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: build test bed
+        working-directory: tests
+        run: npm run build
+      - name: Install Playwright Browsers
+        working-directory: tests
+        if: steps.cache-playwright-browsers.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        working-directory: tests
+        run: npm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: tests/playwright-report/
+          retention-days: 30

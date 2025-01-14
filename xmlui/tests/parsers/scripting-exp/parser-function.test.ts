@@ -1,7 +1,7 @@
 import { describe, expect, assert, it } from "vitest";
 
 import { Parser } from "@parsers/scripting-exp/Parser";
-import { Destructure, FunctionDeclaration, Identifier, SpreadExpression } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Destructure, FunctionDeclaration, Identifier, SpreadExpression, T_BLOCK_STATEMENT, T_DESTRUCTURE, T_FUNCTION_DECLARATION, T_IDENTIFIER, T_SPREAD_EXPRESSION } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - function declarations", () => {
   it("No param", () => {
@@ -15,10 +15,10 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(0);
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single param", () => {
@@ -32,12 +32,12 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("IdE");
+    expect(stmt.args[0].type).toEqual(T_IDENTIFIER);
     expect((stmt.args[0] as Identifier).name).toEqual("v");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("multiple params", () => {
@@ -51,14 +51,14 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(2);
-    expect(stmt.args[0].type).toEqual("IdE");
+    expect(stmt.args[0].type).toEqual(T_IDENTIFIER);
     expect((stmt.args[0] as Identifier).name).toEqual("v");
-    expect(stmt.args[1].type).toEqual("IdE");
+    expect(stmt.args[1].type).toEqual(T_IDENTIFIER);
     expect((stmt.args[1] as Identifier).name).toEqual("w");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single object destructure #1", () => {
@@ -72,14 +72,14 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).oDestr!.length).toEqual(2);
     expect((stmt.args[0] as Destructure).oDestr![0].id).toEqual("x");
     expect((stmt.args[0] as Destructure).oDestr![1].id).toEqual("y");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single object destructure #2", () => {
@@ -93,15 +93,15 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).oDestr!.length).toEqual(2);
     expect((stmt.args[0] as Destructure).oDestr![0].id).toEqual("x");
     expect((stmt.args[0] as Destructure).oDestr![1].id).toEqual("y");
     expect((stmt.args[0] as Destructure).oDestr![1].alias).toEqual("q");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single object destructure #3", () => {
@@ -115,15 +115,15 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).oDestr![0].id).toEqual("x");
     expect((stmt.args[0] as Destructure).oDestr![1].oDestr!.length).toEqual(2);
     expect((stmt.args[0] as Destructure).oDestr![1].oDestr![0].id).toEqual("v");
     expect((stmt.args[0] as Destructure).oDestr![1].oDestr![1].id).toEqual("w");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single array destructure #1", () => {
@@ -137,14 +137,14 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).aDestr!.length).toEqual(2);
     expect((stmt.args[0] as Destructure).aDestr![0].id).toEqual("x");
     expect((stmt.args[0] as Destructure).aDestr![1].id).toEqual("y");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single array destructure #2", () => {
@@ -158,15 +158,15 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).aDestr!.length).toEqual(3);
     expect((stmt.args[0] as Destructure).aDestr![0].id).toEqual("x");
     expect((stmt.args[0] as Destructure).aDestr![1].id).toEqual(undefined);
     expect((stmt.args[0] as Destructure).aDestr![2].id).toEqual("y");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Complex destructure #1", () => {
@@ -180,20 +180,20 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(2);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).aDestr!.length).toEqual(3);
     expect((stmt.args[0] as Destructure).aDestr![0].id).toEqual("a");
     expect((stmt.args[0] as Destructure).aDestr![1].id).toEqual(undefined);
     expect((stmt.args[0] as Destructure).aDestr![2].id).toEqual("b");
-    expect(stmt.args[1].type).toEqual("Destr");
+    expect(stmt.args[1].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[1] as Destructure).oDestr!.length).toEqual(2);
     expect((stmt.args[1] as Destructure).oDestr![0].id).toEqual("c");
     expect((stmt.args[1] as Destructure).oDestr![1].id).toEqual("y");
     expect((stmt.args[1] as Destructure).oDestr![1].alias).toEqual("d");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Complex destructure #2", () => {
@@ -207,22 +207,22 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(3);
-    expect(stmt.args[0].type).toEqual("Destr");
+    expect(stmt.args[0].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[0] as Destructure).aDestr!.length).toEqual(3);
     expect((stmt.args[0] as Destructure).aDestr![0].id).toEqual("a");
     expect((stmt.args[0] as Destructure).aDestr![1].id).toEqual(undefined);
     expect((stmt.args[0] as Destructure).aDestr![2].id).toEqual("b");
-    expect(stmt.args[1].type).toEqual("Destr");
+    expect(stmt.args[1].type).toEqual(T_DESTRUCTURE);
     expect((stmt.args[1] as Destructure).oDestr!.length).toEqual(2);
     expect((stmt.args[1] as Destructure).oDestr![0].id).toEqual("c");
     expect((stmt.args[1] as Destructure).oDestr![1].id).toEqual("y");
     expect((stmt.args[1] as Destructure).oDestr![1].alias).toEqual("d");
-    expect(stmt.args[2].type).toEqual("IdE");
+    expect(stmt.args[2].type).toEqual(T_IDENTIFIER);
     expect((stmt.args[2] as Identifier).name).toEqual("e");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Single rest param", () => {
@@ -236,13 +236,13 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(1);
-    expect(stmt.args[0].type).toEqual("SpreadE");
+    expect(stmt.args[0].type).toEqual(T_SPREAD_EXPRESSION);
     const spread = stmt.args[0] as SpreadExpression;
     expect((spread.expr as Identifier).name).toEqual("v");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Multiple params with rest", () => {
@@ -256,15 +256,15 @@ describe("Parser - function declarations", () => {
     // --- Assert
     expect(stmts.length).toEqual(1);
     const stmt = stmts[0] as FunctionDeclaration;
-    expect(stmt.type).toEqual("FuncD");
+    expect(stmt.type).toEqual(T_FUNCTION_DECLARATION);
     expect(stmt.id.name).toEqual("myFunc");
     expect(stmt.args.length).toEqual(2);
-    expect(stmt.args[0].type).toEqual("IdE");
+    expect(stmt.args[0].type).toEqual(T_IDENTIFIER);
     expect((stmt.args[0] as Identifier).name).toEqual("v");
-    expect(stmt.args[1].type).toEqual("SpreadE");
+    expect(stmt.args[1].type).toEqual(T_SPREAD_EXPRESSION);
     const spread = stmt.args[1] as SpreadExpression;
     expect((spread.expr as Identifier).name).toEqual("w");
-    expect(stmt.stmt.type).toEqual("BlockS");
+    expect(stmt.stmt.type).toEqual(T_BLOCK_STATEMENT);
   });
 
   it("Fails with rest params #1", () => {

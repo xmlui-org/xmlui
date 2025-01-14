@@ -8,6 +8,11 @@ import {
   FunctionInvocationExpression,
   Identifier,
   SpreadExpression,
+  T_ARROW_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_LET_STATEMENT,
 } from "@abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - arrow expressions", () => {
@@ -22,10 +27,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(0);
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single param", () => {
@@ -39,11 +44,11 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Identifier).name).equal("v");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single (param)", () => {
@@ -57,11 +62,11 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Identifier).name).equal("v");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   const invalidLeftCases = [
@@ -99,12 +104,12 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(2);
     expect((arrowExpr.args[0] as Identifier).name).equal("v");
     expect((arrowExpr.args[1] as Identifier).name).equal("w");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Block statement #1", () => {
@@ -118,15 +123,15 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(2);
     expect((arrowExpr.args[0] as Identifier).name).equal("v");
     expect((arrowExpr.args[1] as Identifier).name).equal("w");
-    expect(arrowExpr.statement.type).equal("BlockS");
+    expect(arrowExpr.statement.type).equal(T_BLOCK_STATEMENT);
     const stmts = arrowExpr.statement as BlockStatement;
     expect(stmts.stmts.length).equal(1);
-    expect(stmts.stmts[0].type).equal("ExprS");
+    expect(stmts.stmts[0].type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Block statement #2", () => {
@@ -140,16 +145,16 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(2);
     expect((arrowExpr.args[0] as Identifier).name).equal("v");
     expect((arrowExpr.args[1] as Identifier).name).equal("w");
-    expect(arrowExpr.statement.type).equal("BlockS");
+    expect(arrowExpr.statement.type).equal(T_BLOCK_STATEMENT);
     const stmts = arrowExpr.statement as BlockStatement;
     expect(stmts.stmts.length).equal(2);
-    expect(stmts.stmts[0].type).equal("LetS");
-    expect(stmts.stmts[1].type).equal("ExprS");
+    expect(stmts.stmts[0].type).equal(T_LET_STATEMENT);
+    expect(stmts.stmts[1].type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Block statement #3", () => {
@@ -163,10 +168,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(0);
-    expect(arrowExpr.statement.type).equal("BlockS");
+    expect(arrowExpr.statement.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("Block statement #4", () => {
@@ -190,10 +195,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
-    expect(arrowExpr.statement.type).equal("BlockS");
+    expect(arrowExpr.statement.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("Arrow function invocation #1", () => {
@@ -207,10 +212,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("InvokeE");
+    expect(expr.type).equal(T_FUNCTION_INVOCATION_EXPRESSION);
     const funcExpr = expr as FunctionInvocationExpression;
     expect(funcExpr.arguments.length).equal(0);
-    expect(funcExpr.obj.type).equal("ArrowE");
+    expect(funcExpr.obj.type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Arrow function invocation #2", () => {
@@ -224,10 +229,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("InvokeE");
+    expect(expr.type).equal(T_FUNCTION_INVOCATION_EXPRESSION);
     const funcExpr = expr as FunctionInvocationExpression;
     expect(funcExpr.arguments.length).equal(2);
-    expect(funcExpr.obj.type).equal("ArrowE");
+    expect(funcExpr.obj.type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Arrow function invocation #2", () => {
@@ -241,10 +246,10 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("InvokeE");
+    expect(expr.type).equal(T_FUNCTION_INVOCATION_EXPRESSION);
     const funcExpr = expr as FunctionInvocationExpression;
     expect(funcExpr.arguments.length).equal(2);
-    expect(funcExpr.obj.type).equal("ArrowE");
+    expect(funcExpr.obj.type).equal(T_ARROW_EXPRESSION);
   });
 
   it("Single object destructure #1", () => {
@@ -258,12 +263,12 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Destructure).oDestr![0].id).equal("x");
     expect((arrowExpr.args[0] as Destructure).oDestr![1].id).equal("y");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single object destructure #2", () => {
@@ -277,13 +282,13 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Destructure).oDestr![0].id).equal("x");
     expect((arrowExpr.args[0] as Destructure).oDestr![1].id).equal("y");
     expect((arrowExpr.args[0] as Destructure).oDestr![1].alias).equal("q");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single object destructure #3", () => {
@@ -297,13 +302,13 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Destructure).oDestr![0].id).equal("x");
     expect((arrowExpr.args[0] as Destructure).oDestr![1].oDestr![0].id).equal("v");
     expect((arrowExpr.args[0] as Destructure).oDestr![1].oDestr![1].id).equal("w");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single array destructure #1", () => {
@@ -317,12 +322,12 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Destructure).aDestr![0].id).equal("x");
     expect((arrowExpr.args[0] as Destructure).aDestr![1].id).equal("y");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single array destructure #2", () => {
@@ -336,13 +341,13 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     expect((arrowExpr.args[0] as Destructure).aDestr![0].id).equal("x");
     expect((arrowExpr.args[0] as Destructure).aDestr![1].id).equal(undefined);
     expect((arrowExpr.args[0] as Destructure).aDestr![2].id).equal("y");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Complex destructure #1", () => {
@@ -356,7 +361,7 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(2);
     expect((arrowExpr.args[0] as Destructure).aDestr![0].id).equal("a");
@@ -365,7 +370,7 @@ describe("Parser - arrow expressions", () => {
     expect((arrowExpr.args[1] as Destructure).oDestr![0].id).equal("c");
     expect((arrowExpr.args[1] as Destructure).oDestr![1].id).equal("y");
     expect((arrowExpr.args[1] as Destructure).oDestr![1].alias).equal("d");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Complex destructure #2", () => {
@@ -379,7 +384,7 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(3);
     expect((arrowExpr.args[0] as Destructure).aDestr![0].id).equal("a");
@@ -388,7 +393,7 @@ describe("Parser - arrow expressions", () => {
     expect((arrowExpr.args[1] as Destructure).oDestr![0].id).equal("c");
     expect((arrowExpr.args[1] as Destructure).oDestr![1].id).equal("y");
     expect((arrowExpr.args[2] as Identifier).name).equal("e");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Single rest param", () => {
@@ -402,12 +407,12 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(1);
     const spread = arrowExpr.args[0] as SpreadExpression;
     expect((spread.expr as Identifier).name).equal("v");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Multiple rest param", () => {
@@ -421,14 +426,14 @@ describe("Parser - arrow expressions", () => {
     // --- Assert
     expect(expr).not.equal(null);
     if (!expr) return;
-    expect(expr.type).equal("ArrowE");
+    expect(expr.type).equal(T_ARROW_EXPRESSION);
     const arrowExpr = expr as ArrowExpression;
     expect(arrowExpr.args.length).equal(2);
     const id = arrowExpr.args[0] as Identifier;
     expect(id.name).equal("v");
     const spread = arrowExpr.args[1] as SpreadExpression;
     expect((spread.expr as Identifier).name).equal("w");
-    expect(arrowExpr.statement.type).equal("ExprS");
+    expect(arrowExpr.statement.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Fails with rest params #1", () => {

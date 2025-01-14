@@ -16,12 +16,13 @@ import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSou
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 
 import "../index.scss";
-import RootComponent from "@components-core/RootComponent";
+import AppRoot from "@components-core/AppRoot";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import {
   errReportComponent,
+  errReportMessage,
   errReportModuleErrors,
   errReportScriptError,
   xmlUiMarkupToComponent,
@@ -38,7 +39,7 @@ import {
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
-import StandaloneComponentManager from "../StandaloneComponentManager";
+import StandaloneComponentManager from "./StandaloneComponentManager";
 import { builtInThemes } from "@components-core/theming/ThemeProvider";
 
 const MAIN_FILE = "Main." + componentFileExtension;
@@ -61,16 +62,19 @@ type StandaloneAppProps = {
 
   // --- Custom components to be added
   components?: ComponentRendererDef[];
+
+  // --- The object responsible for managing the standalone components
   componentManager?: StandaloneComponentManager;
 };
 
 /**
- * This React component represents a standalone app connected with its
- * environment. It uses the XMLUI RootComponent wrapped into an ApiInterceptor.
- * The standalone application can display itself within a React app and use an
- * optional API interceptor.
+ * This React component represents a standalone app that implements a web
+ * application with xmlui components. A StandaloneApp instance uses a
+ * AppRoot wrapped into an ApiInterceptor.
  *
- * See the `startApp` function for more details
+ * AppRoot is responsible for rendering the app (using an internal
+ * representation); ApiInterceptor can emulate some backend functionality
+ * running in the browser.
  */
 function StandaloneApp({
   appDef,
@@ -78,16 +82,20 @@ function StandaloneApp({
   debugEnabled = true,
   runtime,
   components: customComponents,
-  componentManager
+  componentManager,
 }: StandaloneAppProps) {
   const servedFromSingleFile = useMemo(() => {
     return typeof window !== "undefined" && window.location.href.startsWith("file");
   }, []);
 
+  // --- Fetch all files constituting the standalone app, including components,
+  // --- themes, and other artifacts. Display the app version numbers in the
+  // --- console.
   const standaloneApp = useStandalone(appDef, runtime, componentManager);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
+    // --- Problems found, the standalone app cannot run
     return null;
   }
 
@@ -105,27 +113,32 @@ function StandaloneApp({
     sources,
   } = standaloneApp;
 
+  // --- The app may use a mocked API already defined in `window.XMLUI_MOCK_API`
+  // --- or within the standalone app's definition, in `apiInterceptor`.
   const mockedApi =
     // @ts-ignore
     typeof window !== "undefined" && window.XMLUI_MOCK_API ? window.XMLUI_MOCK_API : apiInterceptor;
 
+  // --- Components can be decorated with test IDs used in end-to-end tests.
+  // --- This flag checks the environment if the app runs in E2E test mode.
   const shouldDecorateWithTestId =
     decorateComponentsWithTestId ||
-      // @ts-ignore
+    // @ts-ignore
     (typeof window !== "undefined" ? window.XMLUI_MOCK_TEST_ID : false);
 
+  // --- An app can turn off the default hash routing.
   const useHashBasedRouting = appGlobals?.useHashBasedRouting ?? true;
 
   return (
     <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
-      <RootComponent
+      <AppRoot
         servedFromSingleFile={servedFromSingleFile}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
         node={entryPoint!}
         standalone={true}
         debugEnabled={debugEnabled}
         // @ts-ignore
-        baseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
+        routerBaseName={typeof window !== "undefined" ? window.__PUBLIC_PATH || "" : ""}
         globalProps={{
           name: name,
           ...(appGlobals || {}),
@@ -146,17 +159,35 @@ function StandaloneApp({
   );
 }
 
+// --- This type represents the parsed structure of a component markup of
+// --- code-behind file (for further processing)
 type ParsedResponse = {
+  // --- The component definition (it may be a compound component)
   component?: ComponentDef | CompoundComponentDef;
+
+  // --- The optional code-behind source code of the component
   codeBehind?: CollectedDeclarations;
+
+  // --- The optional source code of the component (for debugging or learning purposes)
   src?: string;
+
+  // --- The optional file name of the component (for debugging or learning purposes)
   file?: string;
+
+  // --- The flag indicating if the component has errors
   hasError?: boolean;
 };
 
-// --- Parses the response of a component markup file
+/**
+ * This function parses the response of a fetch retrieving the contents of a
+ * component markup file.
+ * @param response The response coming from the fetch
+ * @returns If parsing is successful, it returns the parsed response containing
+ * the component definition. Otherwise, it returns a component definition that
+ * displays the errors.
+ */
 async function parseComponentMarkupResponse(response: Response): Promise<ParsedResponse> {
-  if(!response.ok){
+  if (!response.ok) {
     throw new Error(`Failed to fetch ${response.url}`);
   }
   const code = await response.text();
@@ -179,9 +210,16 @@ async function parseComponentMarkupResponse(response: Response): Promise<ParsedR
   };
 }
 
-// --- Parses the response of a code-behind file
+/**
+ * This function parses the response of a fetch retrieving the contents of a
+ * code-behind file.
+ * @param response The response coming from the fetch
+ * @returns If parsing is successful, it returns the parsed response containing
+ * the code-behind declarations. Otherwise, it returns a component definition that
+ * displays the errors.
+ */
 async function parseCodeBehindResponse(response: Response): Promise<ParsedResponse> {
-  if(!response.ok){
+  if (!response.ok) {
     throw new Error(`Failed to fetch ${response.url}`);
   }
   const code = await response.text();
@@ -214,6 +252,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
     };
   }
 
+  // --- Remove the code-behind tokens from the tree shrinking the tree
   removeCodeBehindTokensFromTree(codeBehind);
   return {
     codeBehind: codeBehind,
@@ -372,7 +411,7 @@ function resolveRuntime(runtime: Record<string, any>): StandaloneAppDescription 
 function mergeAppDefWithRuntime(
   resolvedRuntime: StandaloneAppDescription,
   standaloneAppDef: StandaloneAppDescription | undefined,
-) {
+): StandaloneAppDescription {
   if (!standaloneAppDef) {
     return resolvedRuntime;
   }
@@ -390,7 +429,7 @@ function mergeAppDefWithRuntime(
  * @param url The URL to fetch the source file from
  * @returns The source file contents response
  */
-async function fetchWithoutCache(url: string) {
+async function fetchWithoutCache(url: string): Promise<Response> {
   return fetch(normalizePath(url), {
     headers: {
       "Cache-Control": "no-cache, no-store",
@@ -403,13 +442,14 @@ async function fetchWithoutCache(url: string) {
  * standalone app. It runs every time an app source file changes.
  * @param standaloneAppDef The standalone app description
  * @param runtime The pre-compiled runtime environment
- * @returns The prepared StandaloneAppDescription
+ * @returns The prepared StandaloneAppDescription if the collection is
+ * successful; otherwise, null.
  */
 function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
-  componentManager?: StandaloneComponentManager
-) {
+  componentManager?: StandaloneComponentManager,
+): StandaloneAppDescription | null {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
     const resolvedRuntime = resolveRuntime(runtime);
@@ -477,9 +517,22 @@ function useStandalone(
       }
 
       // --- Fetch the main file
-      const entryPointPromise = fetchWithoutCache(MAIN_FILE).then((value) =>
-        parseComponentMarkupResponse(value),
-      );
+      const entryPointPromise = new Promise(async (resolve) => {
+        try {
+          const resp = await fetchWithoutCache(MAIN_FILE);
+          if (resp.ok) {
+            resolve(parseComponentMarkupResponse(resp));
+          } else {
+            resolve({
+              component: errReportMessage(`Failed to load the main component (${MAIN_FILE})`),
+              file: MAIN_FILE,
+              hasError: true,
+            });
+          }
+        } catch (e) {
+          resolve(null);
+        }
+      }) as any;
 
       // --- Fetch the main code-behind file (if any)
       const entryPointCodeBehindPromise = new Promise(async (resolve) => {
@@ -498,6 +551,8 @@ function useStandalone(
         const configResponse = await fetchWithoutCache(CONFIG_FILE);
         config = await configResponse.json();
       } catch (e) {}
+
+      // --- Fetch the themes according to the configuration
       const themePromises = config?.themes?.map((themePath) => {
         return fetchWithoutCache(themePath).then((value) =>
           value.json(),
@@ -572,13 +627,18 @@ function useStandalone(
         scriptError: loadedEntryPointCodeBehind?.moduleErrors,
       };
 
-
       const defaultTheme = (entryPointWithCodeBehind as ComponentDef).props?.defaultTheme;
-      //we try to test if the default theme is not a built-in theme, nor a theme that is already loaded
-      // AND is not a binding expression. If it's all true, we try to load it from the themes folder
-      if(defaultTheme && typeof defaultTheme === 'string' && !defaultTheme.includes("{")){
-        if(!builtInThemes.find(theme=> theme.id === defaultTheme) && !themes.find(theme=> theme.id === defaultTheme)){
-          themes.push(await fetchWithoutCache(`themes/${defaultTheme}.json`).then((value) => value.json()));
+      // --- We test whether the default theme is not from a binding
+      // --- expression and is not a built-in theme already loaded. If so,
+      // --- we load it from the `themes` folder.
+      if (defaultTheme && typeof defaultTheme === "string" && !defaultTheme.includes("{")) {
+        if (
+          !builtInThemes.find((theme) => theme.id === defaultTheme) &&
+          !themes.find((theme) => theme.id === defaultTheme)
+        ) {
+          themes.push(
+            await fetchWithoutCache(`themes/${defaultTheme}.json`).then((value) => value.json()),
+          );
         }
       }
 
@@ -601,16 +661,18 @@ function useStandalone(
           };
         });
 
-      // --- We may have components that are not in the configuration file. We need to load them
-      // --- and their code-behinds. First, we collect the components to load.
+      // --- We may have components that are not in the configuration file.
+      // --- We need to load them and their code-behinds. First, we collect
+      // --- the components to load.
       let componentsToLoad = collectMissingComponents(
         entryPointWithCodeBehind,
         componentsWithCodeBehinds,
         undefined,
-        componentManager
+        componentManager,
       );
 
-      // --- Try to load the components referenced in the markup, collect those that failed
+      // --- Try to load the components referenced in the markup, collect
+      // --- those that failed
       const componentsFailedToLoad = new Set();
       while (componentsToLoad.size > 0) {
         const componentPromises = [...componentsToLoad].map(async (componentPath) => {
@@ -624,9 +686,7 @@ function useStandalone(
             const componentCodeBehindPromise = new Promise(async (resolve) => {
               try {
                 const codeBehindWrapper = await parseCodeBehindResponse(
-                  await fetchWithoutCache(
-                    `components/${componentPath}.${codeBehindFileExtension}`,
-                  ),
+                  await fetchWithoutCache(`components/${componentPath}.${codeBehindFileExtension}`),
                 );
                 if (codeBehindWrapper.hasError) {
                   errorComponents.push(codeBehindWrapper.component as ComponentDef);
@@ -677,7 +737,7 @@ function useStandalone(
           entryPointWithCodeBehind,
           componentsWithCodeBehinds,
           componentsFailedToLoad,
-          componentManager
+          componentManager,
         );
       }
 
@@ -704,7 +764,7 @@ function useStandalone(
 }
 
 /**
- * Collect the missing components renferenced by any part of the app
+ * Collect the missing components referenced by any part of the app
  * @param entryPoint The app's main markup
  * @param components The component markups
  * @param componentsFailedToLoad The components that failed to load here
@@ -714,10 +774,13 @@ function collectMissingComponents(
   entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
-  componentManager?: StandaloneComponentManager
+  componentManager?: StandaloneComponentManager,
 ) {
   // --- Add the discovered compound components to the registry
-  const componentRegistry = new ComponentRegistry({ compoundComponents: components }, componentManager);
+  const componentRegistry = new ComponentRegistry(
+    { compoundComponents: components },
+    componentManager,
+  );
 
   // --- Check the xmlui markup. This check will find all unloaded components
   const result = checkXmlUiMarkup(entryPoint as ComponentDef, components, {
@@ -753,11 +816,11 @@ function collectMissingComponents(
 function usePrintVersionNumber(standaloneApp: StandaloneAppDescription | null) {
   const logged = useRef(false);
   useEffect(() => {
-    if(logged.current){
+    if (logged.current) {
       return;
     }
     logged.current = true;
-    let log = `XMLUI version: ${process.env.VITE_XMLUI_VERSION || 'dev'}`;
+    let log = `XMLUI version: ${process.env.VITE_XMLUI_VERSION || "dev"}`;
     if (standaloneApp?.name) {
       log += `; ${standaloneApp.name} version: ${process.env.VITE_APP_VERSION || "dev"}`;
     }
@@ -775,7 +838,11 @@ let contentRoot: Root | null = null;
  * @param components The related component's runtime representation
  * @returns The content's root element
  */
-export function startApp(runtime: any, components: ComponentRendererDef[] | undefined, componentManager: StandaloneComponentManager) {
+export function startApp(
+  runtime: any,
+  components: ComponentRendererDef[] | undefined,
+  componentManager: StandaloneComponentManager,
+) {
   let rootElement: HTMLElement | null = document.getElementById("root");
   if (!rootElement) {
     rootElement = document.createElement("div");
@@ -785,7 +852,9 @@ export function startApp(runtime: any, components: ComponentRendererDef[] | unde
   if (!contentRoot) {
     contentRoot = ReactDOM.createRoot(rootElement);
   }
-  contentRoot.render(<StandaloneApp runtime={runtime} components={components} componentManager={componentManager}/>);
+  contentRoot.render(
+    <StandaloneApp runtime={runtime} components={components} componentManager={componentManager} />,
+  );
   return contentRoot;
 }
 

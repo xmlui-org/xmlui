@@ -23,6 +23,9 @@ export const TabsMd = createMetadata({
     ),
     tabTemplate: dComponent(`This property declares the template for the clickable tab area.`),
   },
+  apis: {
+    next: d(`This method selects the next tab.`),
+  },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-${COMP}`]: "$color-bg-primary",
@@ -33,9 +36,14 @@ export const TabsMd = createMetadata({
     [`color-bg-trigger-${COMP}`]: "$color-bg-primary",
     light: {
       [`color-bg-trigger-${COMP}--hover`]: "$color-primary-50",
+      [`color-bg-list-${COMP}`]: "$color-primary-50",
+      [`color-text-trigge-r${COMP}`]: "$color-primary-100",
     },
     dark: {
       [`color-bg-trigger-${COMP}--hover`]: "$color-primary-800",
+      [`color-bg-list-${COMP}`]: "$color-primary-800",
+      [`color-text-trigge-r${COMP}`]: "$color-primary-100",
+
     },
   },
 });
@@ -43,7 +51,7 @@ export const TabsMd = createMetadata({
 export const tabsComponentRenderer = createComponentRenderer(
   COMP,
   TabsMd,
-  ({ extractValue, node, renderChild, layoutCss }) => {
+  ({ extractValue, node, renderChild, layoutCss, registerComponentApi }) => {
     return (
       <Tabs
         style={layoutCss}
@@ -60,6 +68,7 @@ export const tabsComponentRenderer = createComponentRenderer(
         }
         activeTab={extractValue(node.props?.activeTab)}
         orientation={extractValue(node.props?.orientation)}
+        registerComponentApi={registerComponentApi}
       >
         {renderChild(node.children)}
       </Tabs>

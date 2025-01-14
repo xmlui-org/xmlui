@@ -66,8 +66,8 @@ export function ItemWithLabel({
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
           [styles.bottom]: labelPosition === "bottom",
-          [styles.left]: labelPosition === "left",
-          [styles.right]: labelPosition === "right",
+          [styles.start]: labelPosition === "start",
+          [styles.end]: labelPosition === "end",
           [styles.shrinkToLabel]: shrinkToLabel,
         })}
         onFocus={onFocus}

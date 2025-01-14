@@ -17,7 +17,7 @@ import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Splitter";
 
-const splitterMd = createMetadata({
+const baseSplitterMd = createMetadata({
   description:
     `The \`${COMP}\` component divides a container (such as a window, panel, pane, etc.) ` +
     `into two resizable sections.`,
@@ -59,9 +59,9 @@ const splitterMd = createMetadata({
 });
 
 export const SplitterMd = {
-  ...splitterMd,
+  ...baseSplitterMd,
   props: {
-    ...splitterMd.props,
+    ...baseSplitterMd.props,
     orientation: d(
       `Sets whether the \`Splitter\` divides the container horizontally and lays out the ` +
         `section on top of each other (\`vertical\`), or vertically by placing the sections ` +
@@ -70,8 +70,8 @@ export const SplitterMd = {
   },
 };
 
-export const HSplitterMd = { ...splitterMd, specializedFrom: COMP };
-export const VSplitterMd = { ...splitterMd, specializedFrom: COMP };
+export const HSplitterMd = { ...baseSplitterMd, specializedFrom: COMP };
+export const VSplitterMd = { ...baseSplitterMd, specializedFrom: COMP };
 
 type SplitterComponentDef = ComponentDef<typeof SplitterMd>;
 type VSplitterComponentDef = ComponentDef<typeof VSplitterMd>;

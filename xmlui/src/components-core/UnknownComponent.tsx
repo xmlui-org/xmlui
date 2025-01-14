@@ -1,8 +1,8 @@
 import styles from "./UnknownComponent.module.scss";
 
 /**
- * This React component renders an error message telling that a particular component type is not registered.
- * @param message Message to display
+ * When the rendering engine finds an unknown (unregistered) component in the
+ * markup, it renders this component and names the unregistered.
  */
 function UnknownComponent ({ message }: { message: string }) {
   return (

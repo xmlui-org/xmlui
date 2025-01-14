@@ -13,6 +13,31 @@ import {
   LetStatement,
   ReturnStatement,
   SwitchStatement,
+  T_ARRAY_LITERAL,
+  T_BINARY_EXPRESSION,
+  T_BLOCK_STATEMENT,
+  T_BREAK_STATEMENT,
+  T_CONST_STATEMENT,
+  T_CONTINUE_STATEMENT,
+  T_DO_WHILE_STATEMENT,
+  T_EMPTY_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+  T_FOR_IN_STATEMENT,
+  T_FOR_OF_STATEMENT,
+  T_FOR_STATEMENT,
+  T_IDENTIFIER,
+  T_IF_STATEMENT,
+  T_LET_STATEMENT,
+  T_LITERAL,
+  T_POSTFIX_OP_EXPRESSION,
+  T_RETURN_STATEMENT,
+  T_SPREAD_EXPRESSION,
+  T_SWITCH_STATEMENT,
+  T_THROW_STATEMENT,
+  T_TRY_STATEMENT,
+  T_UNARY_EXPRESSION,
+  T_VAR_STATEMENT,
+  T_WHILE_STATEMENT,
   ThrowStatement,
   TryStatement,
   VarStatement,
@@ -42,7 +67,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("EmptyS");
+    expect(stmts[0].type).equal(T_EMPTY_STATEMENT);
   });
 
   it("Multiple empty statement", () => {
@@ -55,29 +80,29 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(2);
-    expect(stmts[0].type).equal("EmptyS");
-    expect(stmts[1].type).equal("EmptyS");
+    expect(stmts[0].type).equal(T_EMPTY_STATEMENT);
+    expect(stmts[1].type).equal(T_EMPTY_STATEMENT);
   });
 
   const exprStmts = [
-    { expr: "(a + b)", top: "BinaryE" },
-    { expr: "myId", top: "IdE" },
-    { expr: "+myId", top: "UnaryE" },
-    { expr: "-myId", top: "UnaryE" },
-    { expr: "~myId", top: "UnaryE" },
-    { expr: "[1, 2, 3]", top: "ALitE" },
-    { expr: "!myId", top: "UnaryE" },
-    { expr: "...[1, 2, 3]", top: "SpreadE" },
-    { expr: "123", top: "LitE" },
-    { expr: "0x123", top: "LitE" },
-    { expr: "0b00_11", top: "LitE" },
-    { expr: "true", top: "LitE" },
-    { expr: "false", top: "LitE" },
-    { expr: "Infinity", top: "LitE" },
-    { expr: "typeof a", top: "UnaryE" },
-    { expr: "$item", top: "IdE" },
-    { expr: "null", top: "LitE" },
-    { expr: "undefined", top: "LitE" },
+    { expr: "(a + b)", top: T_BINARY_EXPRESSION },
+    { expr: "myId", top: T_IDENTIFIER },
+    { expr: "+myId", top: T_UNARY_EXPRESSION },
+    { expr: "-myId", top: T_UNARY_EXPRESSION },
+    { expr: "~myId", top: T_UNARY_EXPRESSION },
+    { expr: "[1, 2, 3]", top: T_ARRAY_LITERAL },
+    { expr: "!myId", top: T_UNARY_EXPRESSION },
+    { expr: "...[1, 2, 3]", top: T_SPREAD_EXPRESSION },
+    { expr: "123", top: T_LITERAL },
+    { expr: "0x123", top: T_LITERAL },
+    { expr: "0b00_11", top: T_LITERAL },
+    { expr: "true", top: T_LITERAL },
+    { expr: "false", top: T_LITERAL },
+    { expr: "Infinity", top: T_LITERAL },
+    { expr: "typeof a", top: T_UNARY_EXPRESSION },
+    { expr: "$item", top: T_IDENTIFIER },
+    { expr: "null", top: T_LITERAL },
+    { expr: "undefined", top: T_LITERAL },
   ];
   exprStmts.forEach((st, idx) => {
     it(`Statement #${idx + 1}: ${st.expr}`, () => {
@@ -90,7 +115,7 @@ describe("Parser - statements", () => {
       // --- Assert
       expect(isDeepFrozen(stmts)).equal(true);
       expect(stmts?.length).equal(1);
-      expect(stmts?.[0].type).equal("ExprS");
+      expect(stmts?.[0].type).equal(T_EXPRESSION_STATEMENT);
       const exprStmt = stmts?.[0] as ExpressionStatement;
       expect(exprStmt.expr.type).equal(st.top);
     });
@@ -106,7 +131,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("LetS");
+    expect(stmts[0].type).equal(T_LET_STATEMENT);
     const letStmt = stmts[0] as LetStatement;
     expect(letStmt.decls.length).equal(1);
     expect(letStmt.decls[0].id).equal("x");
@@ -122,12 +147,12 @@ describe("Parser - statements", () => {
 
     // --- Assert
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("LetS");
+    expect(stmts[0].type).equal(T_LET_STATEMENT);
     const letStmt = stmts[0] as LetStatement;
     expect(letStmt.decls.length).equal(1);
     expect(letStmt.decls[0].id).equal("x");
     expect(letStmt.decls[0].expr).not.equal(null);
-    expect(letStmt.decls[0].expr!.type).equal("LitE");
+    expect(letStmt.decls[0].expr!.type).equal(T_LITERAL);
   });
 
   it("Let statement - with '$'", () => {
@@ -153,12 +178,12 @@ describe("Parser - statements", () => {
 
     // --- Assert
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ConstS");
+    expect(stmts[0].type).equal(T_CONST_STATEMENT);
     const constStmt = stmts[0] as ConstStatement;
     expect(constStmt.decls.length).equal(1);
     expect(constStmt.decls[0].id).equal("x");
     expect(constStmt.decls[0].expr).not.equal(null);
-    expect(constStmt.decls[0].expr!.type).equal("LitE");
+    expect(constStmt.decls[0].expr!.type).equal(T_LITERAL);
   });
 
   it("Const statement with '$'", () => {
@@ -185,15 +210,15 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ConstS");
+    expect(stmts[0].type).equal(T_CONST_STATEMENT);
     const constStmt = stmts[0] as ConstStatement;
     expect(constStmt.decls.length).equal(2);
     expect(constStmt.decls[0].id).equal("x");
     expect(constStmt.decls[0].expr).not.equal(null);
-    expect(constStmt.decls[0].expr!.type).equal("LitE");
+    expect(constStmt.decls[0].expr!.type).equal(T_LITERAL);
     expect(constStmt.decls[1].id).equal("y");
     expect(constStmt.decls[1].expr).not.equal(null);
-    expect(constStmt.decls[1].expr!.type).equal("LitE");
+    expect(constStmt.decls[1].expr!.type).equal(T_LITERAL);
   });
 
   it("Var statement with '$'", () => {
@@ -220,12 +245,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("VarS");
+    expect(stmts[0].type).equal(T_VAR_STATEMENT);
     const constStmt = stmts[0] as VarStatement;
     expect(constStmt.decls.length).equal(1);
     expect(constStmt.decls[0].id.name).equal("x");
     expect(constStmt.decls[0].expr).not.equal(null);
-    expect(constStmt.decls[0].expr!.type).equal("LitE");
+    expect(constStmt.decls[0].expr!.type).equal(T_LITERAL);
   });
 
   it("Var statement #2", () => {
@@ -238,15 +263,15 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("VarS");
+    expect(stmts[0].type).equal(T_VAR_STATEMENT);
     const constStmt = stmts[0] as VarStatement;
     expect(constStmt.decls.length).equal(2);
     expect(constStmt.decls[0].id.name).equal("x");
     expect(constStmt.decls[0].expr).not.equal(null);
-    expect(constStmt.decls[0].expr!.type).equal("LitE");
+    expect(constStmt.decls[0].expr!.type).equal(T_LITERAL);
     expect(constStmt.decls[1].id.name).equal("y");
     expect(constStmt.decls[1].expr).not.equal(null);
-    expect(constStmt.decls[1].expr!.type).equal("LitE");
+    expect(constStmt.decls[1].expr!.type).equal(T_LITERAL);
   });
 
   it("Block statement - empty", () => {
@@ -259,7 +284,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(0);
   });
@@ -274,10 +299,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(1);
-    expect(blockStmt.stmts[0].type).equal("EmptyS");
+    expect(blockStmt.stmts[0].type).equal(T_EMPTY_STATEMENT);
   });
 
   it("Block statement - single #1", () => {
@@ -290,10 +315,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(1);
-    expect(blockStmt.stmts[0].type).equal("ExprS");
+    expect(blockStmt.stmts[0].type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Block statement - single #2", () => {
@@ -306,10 +331,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(1);
-    expect(blockStmt.stmts[0].type).equal("LetS");
+    expect(blockStmt.stmts[0].type).equal(T_LET_STATEMENT);
   });
 
   it("Block statement - multiple #1", () => {
@@ -322,11 +347,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(2);
-    expect(blockStmt.stmts[0].type).equal("ExprS");
-    expect(blockStmt.stmts[1].type).equal("LetS");
+    expect(blockStmt.stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+    expect(blockStmt.stmts[1].type).equal(T_LET_STATEMENT);
   });
 
   it("Block statement - multiple #2", () => {
@@ -339,15 +364,15 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BlockS");
+    expect(stmts[0].type).equal(T_BLOCK_STATEMENT);
     const blockStmt = stmts[0] as BlockStatement;
     expect(blockStmt.stmts.length).equal(2);
-    expect(blockStmt.stmts[0].type).equal("ExprS");
-    expect(blockStmt.stmts[1].type).equal("BlockS");
+    expect(blockStmt.stmts[0].type).equal(T_EXPRESSION_STATEMENT);
+    expect(blockStmt.stmts[1].type).equal(T_BLOCK_STATEMENT);
     const nested = blockStmt.stmts[1] as BlockStatement;
     expect(nested.stmts.length).equal(2);
-    expect(nested.stmts[0].type).equal("LetS");
-    expect(nested.stmts[1].type).equal("ExprS");
+    expect(nested.stmts[0].type).equal(T_LET_STATEMENT);
+    expect(nested.stmts[1].type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("If statement - single then no else", () => {
@@ -360,10 +385,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("ExprS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_EXPRESSION_STATEMENT);
     expect(blockStmt.elseB).equal(null);
   });
 
@@ -377,10 +402,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("BlockS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_BLOCK_STATEMENT);
     expect(blockStmt.elseB).equal(null);
   });
 
@@ -394,11 +419,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("BlockS");
-    expect(blockStmt.elseB!.type).equal("ExprS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_BLOCK_STATEMENT);
+    expect(blockStmt.elseB!.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("If statement - block then block else", () => {
@@ -411,11 +436,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("BlockS");
-    expect(blockStmt.elseB!.type).equal("BlockS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_BLOCK_STATEMENT);
+    expect(blockStmt.elseB!.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("If statement - single then block else", () => {
@@ -428,11 +453,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("ExprS");
-    expect(blockStmt.elseB!.type).equal("BlockS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_EXPRESSION_STATEMENT);
+    expect(blockStmt.elseB!.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("If statement - single then single else", () => {
@@ -445,11 +470,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("IfS");
+    expect(stmts[0].type).equal(T_IF_STATEMENT);
     const blockStmt = stmts[0] as IfStatement;
-    expect(blockStmt.cond.type).equal("LitE");
-    expect(blockStmt.thenB.type).equal("ExprS");
-    expect(blockStmt.elseB!.type).equal("ExprS");
+    expect(blockStmt.cond.type).equal(T_LITERAL);
+    expect(blockStmt.thenB.type).equal(T_EXPRESSION_STATEMENT);
+    expect(blockStmt.elseB!.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("Return statement - no expression", () => {
@@ -462,7 +487,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("RetS");
+    expect(stmts[0].type).equal(T_RETURN_STATEMENT);
     const returnStmt = stmts[0] as ReturnStatement;
     expect(returnStmt.expr).equal(undefined);
   });
@@ -477,9 +502,9 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("RetS");
+    expect(stmts[0].type).equal(T_RETURN_STATEMENT);
     const returnStmt = stmts[0] as ReturnStatement;
-    expect(returnStmt.expr!.type).equal("LitE");
+    expect(returnStmt.expr!.type).equal(T_LITERAL);
   });
 
   it("Break statement", () => {
@@ -492,7 +517,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("BrkS");
+    expect(stmts[0].type).equal(T_BREAK_STATEMENT);
   });
 
   it("Continue statement", () => {
@@ -505,7 +530,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ContS");
+    expect(stmts[0].type).equal(T_CONTINUE_STATEMENT);
   });
 
   it("while statement - empty body", () => {
@@ -518,10 +543,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("WhileS");
+    expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("EmptyS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("while statement - single statement body", () => {
@@ -534,10 +559,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("WhileS");
+    expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("BrkS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_BREAK_STATEMENT);
   });
 
   it("while statement - block body", () => {
@@ -550,14 +575,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("WhileS");
+    expect(stmts[0].type).equal(T_WHILE_STATEMENT);
     const whileStmt = stmts[0] as WhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("BlockS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_BLOCK_STATEMENT);
     const blockStmt = whileStmt.body as BlockStatement;
     expect(blockStmt.stmts.length).equal(2);
-    expect(blockStmt.stmts[0].type).equal("LetS");
-    expect(blockStmt.stmts[1].type).equal("BrkS");
+    expect(blockStmt.stmts[0].type).equal(T_LET_STATEMENT);
+    expect(blockStmt.stmts[1].type).equal(T_BREAK_STATEMENT);
   });
 
   it("do-while statement - empty body", () => {
@@ -570,10 +595,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("DoWS");
+    expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("EmptyS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("do-while statement - single statement body", () => {
@@ -586,10 +611,10 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("DoWS");
+    expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("BrkS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_BREAK_STATEMENT);
   });
 
   it("do-while statement - block body", () => {
@@ -602,14 +627,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("DoWS");
+    expect(stmts[0].type).equal(T_DO_WHILE_STATEMENT);
     const whileStmt = stmts[0] as DoWhileStatement;
-    expect(whileStmt.cond.type).equal("BinaryE");
-    expect(whileStmt.body.type).equal("BlockS");
+    expect(whileStmt.cond.type).equal(T_BINARY_EXPRESSION);
+    expect(whileStmt.body.type).equal(T_BLOCK_STATEMENT);
     const blockStmt = whileStmt.body as BlockStatement;
     expect(blockStmt.stmts.length).equal(2);
-    expect(blockStmt.stmts[0].type).equal("LetS");
-    expect(blockStmt.stmts[1].type).equal("BrkS");
+    expect(blockStmt.stmts[0].type).equal(T_LET_STATEMENT);
+    expect(blockStmt.stmts[1].type).equal(T_BREAK_STATEMENT);
   });
 
   it("for loop - no declaration, no body", () => {
@@ -622,12 +647,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
     expect(forStmt.init).equal(undefined);
     expect(forStmt.cond).equal(undefined);
     expect(forStmt.upd).equal(undefined);
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for loop - no init, no condition, no body", () => {
@@ -640,12 +665,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
     expect(forStmt.init).equal(undefined);
     expect(forStmt.cond).equal(undefined);
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for loop - no init, no body", () => {
@@ -658,12 +683,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
     expect(forStmt.init).equal(undefined);
-    expect(forStmt.cond!.type).equal("BinaryE");
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.cond!.type).equal(T_BINARY_EXPRESSION);
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for loop - expr init, no body", () => {
@@ -676,12 +701,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
-    expect(forStmt.init!.type).equal("ExprS");
-    expect(forStmt.cond!.type).equal("BinaryE");
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.init!.type).equal(T_EXPRESSION_STATEMENT);
+    expect(forStmt.cond!.type).equal(T_BINARY_EXPRESSION);
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for loop - let init, no body", () => {
@@ -694,12 +719,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
-    expect(forStmt.init!.type).equal("LetS");
-    expect(forStmt.cond!.type).equal("BinaryE");
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.init!.type).equal(T_LET_STATEMENT);
+    expect(forStmt.cond!.type).equal(T_BINARY_EXPRESSION);
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for loop - let init with '$'", () => {
@@ -726,12 +751,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
-    expect(forStmt.init!.type).equal("LetS");
-    expect(forStmt.cond!.type).equal("BinaryE");
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("ExprS");
+    expect(forStmt.init!.type).equal(T_LET_STATEMENT);
+    expect(forStmt.cond!.type).equal(T_BINARY_EXPRESSION);
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_EXPRESSION_STATEMENT);
   });
 
   it("for loop - block statement body", () => {
@@ -744,12 +769,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForS");
+    expect(stmts[0].type).equal(T_FOR_STATEMENT);
     const forStmt = stmts[0] as ForStatement;
-    expect(forStmt.init!.type).equal("LetS");
-    expect(forStmt.cond!.type).equal("BinaryE");
-    expect(forStmt.upd!.type).equal("PostfE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.init!.type).equal(T_LET_STATEMENT);
+    expect(forStmt.cond!.type).equal(T_BINARY_EXPRESSION);
+    expect(forStmt.upd!.type).equal(T_POSTFIX_OP_EXPRESSION);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("Throw statement - with expression", () => {
@@ -762,9 +787,9 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ThrowS");
+    expect(stmts[0].type).equal(T_THROW_STATEMENT);
     const throwStmt = stmts[0] as ThrowStatement;
-    expect(throwStmt.expr!.type).equal("LitE");
+    expect(throwStmt.expr!.type).equal(T_LITERAL);
   });
 
   it("Try statement - with catch", () => {
@@ -777,11 +802,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("TryS");
+    expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
-    expect(tryStmt.tryB.stmts[0].type).equal("LetS");
+    expect(tryStmt.tryB.stmts[0].type).equal(T_LET_STATEMENT);
     expect(tryStmt.catchV).equal(undefined);
-    expect(tryStmt.catchB!.stmts[0].type).equal("RetS");
+    expect(tryStmt.catchB!.stmts[0].type).equal(T_RETURN_STATEMENT);
     expect(tryStmt.finallyB).equal(undefined);
   });
 
@@ -795,11 +820,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("TryS");
+    expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
-    expect(tryStmt.tryB.stmts[0].type).equal("LetS");
+    expect(tryStmt.tryB.stmts[0].type).equal(T_LET_STATEMENT);
     expect(tryStmt.catchV!.name).equal("err");
-    expect(tryStmt.catchB!.stmts[0].type).equal("RetS");
+    expect(tryStmt.catchB!.stmts[0].type).equal(T_RETURN_STATEMENT);
     expect(tryStmt.finallyB).equal(undefined);
   });
 
@@ -813,12 +838,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("TryS");
+    expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
-    expect(tryStmt.tryB.stmts[0].type).equal("LetS");
+    expect(tryStmt.tryB.stmts[0].type).equal(T_LET_STATEMENT);
     expect(tryStmt.catchV).equal(undefined);
     expect(tryStmt.catchB).equal(undefined);
-    expect(tryStmt.finallyB!.stmts[0].type).equal("RetS");
+    expect(tryStmt.finallyB!.stmts[0].type).equal(T_RETURN_STATEMENT);
   });
 
   it("Try statement - with catch and finally", () => {
@@ -831,12 +856,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("TryS");
+    expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
-    expect(tryStmt.tryB.stmts[0].type).equal("LetS");
+    expect(tryStmt.tryB.stmts[0].type).equal(T_LET_STATEMENT);
     expect(tryStmt.catchV).equal(undefined);
-    expect(tryStmt.catchB!.stmts[0].type).equal("RetS");
-    expect(tryStmt.finallyB!.stmts[0].type).equal("BrkS");
+    expect(tryStmt.catchB!.stmts[0].type).equal(T_RETURN_STATEMENT);
+    expect(tryStmt.finallyB!.stmts[0].type).equal(T_BREAK_STATEMENT);
   });
 
   it("Try statement - with catch, catch variable, and finally", () => {
@@ -849,12 +874,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("TryS");
+    expect(stmts[0].type).equal(T_TRY_STATEMENT);
     const tryStmt = stmts[0] as TryStatement;
-    expect(tryStmt.tryB.stmts[0].type).equal("LetS");
+    expect(tryStmt.tryB.stmts[0].type).equal(T_LET_STATEMENT);
     expect(tryStmt.catchV!.name).equal("err");
-    expect(tryStmt.catchB!.stmts[0].type).equal("RetS");
-    expect(tryStmt.finallyB!.stmts[0].type).equal("BrkS");
+    expect(tryStmt.catchB!.stmts[0].type).equal(T_RETURN_STATEMENT);
+    expect(tryStmt.finallyB!.stmts[0].type).equal(T_BREAK_STATEMENT);
   });
 
   it("Switch statement - empty", () => {
@@ -867,7 +892,7 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(0);
   });
@@ -885,11 +910,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(1);
     const swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(0);
   });
 
@@ -907,11 +932,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(1);
     const swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
   });
 
@@ -930,11 +955,11 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(1);
     const swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
   });
 
@@ -954,14 +979,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(2);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(0);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
   });
 
@@ -981,14 +1006,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(2);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(0);
   });
 
@@ -1009,14 +1034,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(2);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
   });
 
@@ -1038,17 +1063,17 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(3);
     let swcCase = swcStmt.cases[0];
     expect(swcCase.caseE).equal(undefined);
     expect(swcCase.stmts!.length).equal(0);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[2];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
   });
 
@@ -1070,17 +1095,17 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(3);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases![1];
     expect(swcCase.caseE).equal(undefined);
     expect(swcCase.stmts!.length).equal(0);
     swcCase = swcStmt.cases![2];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
   });
 
@@ -1102,14 +1127,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(3);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(0);
     swcCase = swcStmt.cases[2];
     expect(swcCase.caseE).equal(undefined);
@@ -1134,14 +1159,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(3);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
     swcCase = swcStmt.cases[2];
     expect(swcCase.caseE).equal(undefined);
@@ -1169,14 +1194,14 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("SwitchS");
+    expect(stmts[0].type).equal(T_SWITCH_STATEMENT);
     const swcStmt = stmts[0] as SwitchStatement;
     expect(swcStmt.cases.length).equal(3);
     let swcCase = swcStmt.cases[0];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(2);
     swcCase = swcStmt.cases[1];
-    expect(swcCase.caseE!.type).equal("LitE");
+    expect(swcCase.caseE!.type).equal(T_LITERAL);
     expect(swcCase.stmts!.length).equal(1);
     swcCase = swcStmt.cases[2];
     expect(swcCase.caseE).equal(undefined);
@@ -1219,12 +1244,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("none");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..in loop - 'let' binding, no body", () => {
@@ -1237,12 +1262,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("let");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..in loop - 'let' binding with '$'", () => {
@@ -1269,12 +1294,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("const");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..in loop - 'const' binding with '$'", () => {
@@ -1301,12 +1326,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("none");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("for..in loop - 'let' binding, body", () => {
@@ -1319,12 +1344,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("let");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("for..in loop - 'const' binding, body", () => {
@@ -1337,12 +1362,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForInS");
+    expect(stmts[0].type).equal(T_FOR_IN_STATEMENT);
     const forStmt = stmts[0] as ForInStatement;
     expect(forStmt.varB).equal("const");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("for..of loop - no var binding, no body", () => {
@@ -1355,12 +1380,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("none");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..of loop - 'let' binding, no body", () => {
@@ -1373,12 +1398,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("let");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..of loop - 'let' binding with '$'", () => {
@@ -1405,12 +1430,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("const");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("EmptyS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_EMPTY_STATEMENT);
   });
 
   it("for..of loop - 'const' binding with '$'", () => {
@@ -1437,12 +1462,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("none");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("for..of loop - 'let' binding, body", () => {
@@ -1455,12 +1480,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("let");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 
   it("for..of loop - 'const' binding, body", () => {
@@ -1473,12 +1498,12 @@ describe("Parser - statements", () => {
     // --- Assert
     expect(isDeepFrozen(stmts)).equal(true);
     expect(stmts.length).equal(1);
-    expect(stmts[0].type).equal("ForOfS");
+    expect(stmts[0].type).equal(T_FOR_OF_STATEMENT);
     const forStmt = stmts[0] as ForOfStatement;
     expect(forStmt.varB).equal("const");
     expect(forStmt.id.name).equal("myVar");
-    expect(forStmt.expr.type).equal("IdE");
-    expect(forStmt.body.type).equal("BlockS");
+    expect(forStmt.expr.type).equal(T_IDENTIFIER);
+    expect(forStmt.body.type).equal(T_BLOCK_STATEMENT);
   });
 });
 

@@ -4,6 +4,7 @@ import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "@components/IconRegistryContext";
 import classnames from "@components-core/utils/classnames";
 import { useResourceUrl, useTheme } from "@components-core/theming/ThemeContext";
+import { toCssVar } from "../../parsers/style-parser/StyleParser";
 
 export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   children?: React.ReactNode;
@@ -73,6 +74,9 @@ function useCustomIconUrl(iconName?: string) {
 }
 
 function mapSizeToIconPack(size: string) {
+  if (/^\$[a-zA-Z0-9_$-]+$/g.test(size)) {
+    return toCssVar(size);
+  }
   return (
     {
       xs: "0.75em",

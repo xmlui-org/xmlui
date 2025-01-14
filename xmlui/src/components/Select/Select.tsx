@@ -46,10 +46,12 @@ export const SelectMd = createMetadata({
     labelWidth: dLabelWidth(COMP),
     labelBreak: dLabelBreak(COMP),
     optionLabelTemplate: dComponent(
-      `This property enables the customization of list items. To access the attributes of ` +
-        `a list item use the \`$item\` context variable.`,
+      `This property allows replacing the default template to display an option in the dropdown list.`,
     ),
-    valueTemplate: dComponent(`This property enables the customization of the value.`),
+    valueTemplate: dComponent(
+      `This property allows replacing the default template to display a selected value when ` +
+        `multiple selections (\`multiSelect\` is \`true\`) are enabled.`,
+    ),
     dropdownHeight: d("This property sets the height of the dropdown list."),
     emptyListTemplate: d(
       `This optional property provides the ability to customize what is displayed when the ` +
@@ -69,7 +71,10 @@ export const SelectMd = createMetadata({
     value: dValue(),
   },
   contextVars: {
-    $item: d(`This context variable acts as a template for an item in the list.`),
+    $item: d(`This property represents the value of an item in the dropdown list.`),
+    $itemContext: d(
+      `This property provides a \`removeItem\` method to delete the particular value from the selection.`,
+    ),
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
@@ -158,7 +163,7 @@ export const selectComponentRenderer = createComponentRenderer(
                 return (
                   <MemoizedItem
                     contextVars={{
-                      $context: { removeItem },
+                      $itemContext: { removeItem },
                     }}
                     node={node.props.valueTemplate}
                     item={item}
