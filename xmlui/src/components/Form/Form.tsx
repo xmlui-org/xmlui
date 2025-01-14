@@ -33,6 +33,7 @@ export const FormMd = createMetadata({
         `lines if it would overflow the available label width. Individual \`FormItem\` ` +
         `instances can override this property.`,
     ),
+    keepModalOpenOnSubmit: d("This property prevents the modal from closing when the form is submitted."),
     data: d(
       `This property sets the initial value of the form's data structure. The form infrastructure ` +
         `uses this value to set the initial state of form items within the form.`,
