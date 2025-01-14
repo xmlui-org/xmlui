@@ -140,6 +140,7 @@ _TBD_
 ### Style Management with Smart Theme Variables
 
 The rendering engine uses CSS variables (through the `var()` function) as the cornerstone of component style management. Each native component establishes (most of) its CSS style settings using this indirection:
-The CSS styles that affect a component's fundamental behavior (such as using a flex container, setting rendering orientations, positioning, etc.) are hard-coded in the component's style declaration.
-CSS variables define the CSS styles that can be influenced through component properties or are intended to support theming.
+- The CSS styles that affect a component's fundamental behavior (such as using a flex container, setting rendering orientations, positioning, etc.) are hard-coded in the component's style declaration.
+- CSS variables define the CSS styles that can be influenced through component properties or are intended to support theming.
+
 The xmlui theming system entirely hides CSS (including style names and CSS variable resolution) with hierarchical theme variables.
