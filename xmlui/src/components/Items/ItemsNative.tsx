@@ -24,9 +24,10 @@ export function Items({
     return reverse ? [...normalizedItems].reverse() : normalizedItems;
   }, [items, reverse]);
 
-  if (!itemsToRender) {
+  if (!itemsToRender || !Array.isArray(itemsToRender)) {
     return null;
   }
+
   return (
     <>
       {itemsToRender.map((item, index) =>

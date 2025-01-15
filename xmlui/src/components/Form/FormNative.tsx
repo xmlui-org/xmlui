@@ -80,7 +80,7 @@ const formReducer = produce((state: FormState, action: ContainerAction | FormAct
   }
   switch (action.type) {
     case FormActionKind.FIELD_INITIALIZED: {
-      if(!state.interactionFlags[uid].isDirty){
+      if (!state.interactionFlags[uid].isDirty) {
         setByPath(state.subject, uid, action.payload.value);
       }
       break;
@@ -230,6 +230,7 @@ type Props = {
   itemLabelBreak?: boolean;
   itemLabelWidth?: string;
   itemLabelPosition?: string; // type LabelPosition
+  keepModalOpenOnSubmit?: boolean;
 };
 
 const Form = forwardRef(function (
@@ -253,6 +254,7 @@ const Form = forwardRef(function (
     itemLabelBreak = true,
     itemLabelWidth,
     itemLabelPosition = "top",
+    keepModalOpenOnSubmit = false,
   }: Props,
   ref: ForwardedRef<HTMLFormElement>,
 ) {
@@ -316,14 +318,17 @@ const Form = forwardRef(function (
         passAsDefaultBody: true,
       });
       dispatch(formSubmitted());
-      requestModalFormClose();
+
+      if (!keepModalOpenOnSubmit) {
+        requestModalFormClose();
+      }
       // we only reset the form automatically if the initial value is empty ()
       if (initialValue === EMPTY_OBJECT) {
         flushSync(() => {
           doReset();
         });
       }
-      if(prevFocused && typeof (prevFocused as HTMLElement).focus === "function"){
+      if (prevFocused && typeof (prevFocused as HTMLElement).focus === "function") {
         (prevFocused as HTMLElement).focus();
       }
     } catch (e: any) {
@@ -372,17 +377,18 @@ const Form = forwardRef(function (
     onReset?.();
   });
 
-  const cancelButton = cancelLabel === "" ? null : (
-    <Button
-      key="cancel"
-      type="button"
-      themeColor={"secondary"}
-      variant={"ghost"}
-      onClick={doCancel}
-    >
-      {cancelLabel}
-    </Button>
-  );
+  const cancelButton =
+    cancelLabel === "" ? null : (
+      <Button
+        key="cancel"
+        type="button"
+        themeColor={"secondary"}
+        variant={"ghost"}
+        onClick={doCancel}
+      >
+        {cancelLabel}
+      </Button>
+    );
   const submitButton = useMemo(
     () => (
       <Button key="submit" type={"submit"} disabled={!isEnabled}>
@@ -490,6 +496,7 @@ export function FormWithContextVar({
 
   return (
     <Form
+      keepModalOpenOnSubmit={extractValue.asOptionalBoolean(node.props.keepModalOpenOnSubmit)}
       itemLabelPosition={extractValue.asOptionalString(node.props.itemLabelPosition)}
       itemLabelBreak={extractValue.asOptionalBoolean(node.props.itemLabelBreak)}
       itemLabelWidth={extractValue.asOptionalString(node.props.itemLabelWidth)}
