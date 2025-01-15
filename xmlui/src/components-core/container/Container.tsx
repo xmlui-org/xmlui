@@ -5,6 +5,7 @@ import React, {
   isValidElement,
   memo,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
   useReducer,
@@ -89,6 +90,8 @@ import {
 } from "@components-core/utils/hooks";
 import { LoaderComponent } from "@components-core/LoaderComponent";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
+import { DebugViewContext } from "@components-core/DebugViewProvider";
+import { StateViewer } from "@components/StateViewer/StateViewerNative";
 
 /**
  * This function signature is used whenever the engine wants to sign that an object's field (property),
@@ -614,7 +617,9 @@ const MemoizedContainer = memo(
 
     const thisUidInfoRef = useRef({});
     const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
-
+    const debugContext = useContext(DebugViewContext);
+    const stateViewProps = debugContext?.stateView;
+    const showContainer = stateViewProps && debugContext.displayStateView;
     return (
       <Fragment
         key={
@@ -623,27 +628,61 @@ const MemoizedContainer = memo(
             : undefined
         }
       >
-        {renderLoaders({
-          uidInfo,
-          uidInfoRef,
-          loaders: node.loaders,
-          componentState,
-          memoedVarsRef,
-          //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
-          dispatch: apiBoundContainer ? containerDispatch : dispatch,
-          registerComponentApi: apiBoundContainer
-            ? containerRegisterComponentApi
-            : registerComponentApi,
-          appContext,
-          lookupAction,
-          lookupSyncCallback,
-          cleanup,
-        })}
-        {stableRenderChild(
-          node.children,
-          layoutContextRef?.current,
-          parentRenderContext,
-          uidInfoRef,
+        {showContainer && (
+          <StateViewer
+            state={componentState}
+            showBoundary={stateViewProps?.showBoundary}
+            blink={stateViewProps?.blink}
+          >
+            {renderLoaders({
+              uidInfo,
+              uidInfoRef,
+              loaders: node.loaders,
+              componentState,
+              memoedVarsRef,
+              //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
+              dispatch: apiBoundContainer ? containerDispatch : dispatch,
+              registerComponentApi: apiBoundContainer
+                ? containerRegisterComponentApi
+                : registerComponentApi,
+              appContext,
+              lookupAction,
+              lookupSyncCallback,
+              cleanup,
+            })}
+            {stableRenderChild(
+              node.children,
+              layoutContextRef?.current,
+              parentRenderContext,
+              uidInfoRef,
+            )}
+          </StateViewer>
+        )}
+        {!showContainer && (
+          <>
+            {renderLoaders({
+              uidInfo,
+              uidInfoRef,
+              loaders: node.loaders,
+              componentState,
+              memoedVarsRef,
+              //if it's an api bound container, we always use this container, otherwise use the parent if it's an implicit one
+              dispatch: apiBoundContainer ? containerDispatch : dispatch,
+              registerComponentApi: apiBoundContainer
+                ? containerRegisterComponentApi
+                : registerComponentApi,
+              appContext,
+              lookupAction,
+              lookupSyncCallback,
+              cleanup,
+            })}
+            {stableRenderChild(
+              node.children,
+              layoutContextRef?.current,
+              parentRenderContext,
+              uidInfoRef,
+            )}
+          </>
         )}
       </Fragment>
     );
@@ -963,6 +1002,7 @@ const ComponentContainer = memo(
     ref,
   ) {
     const enhancedNode = useMemo(() => getWrappedWithContainer(node), [node]);
+
     return (
       <ErrorBoundary node={node} location={"container"}>
         <MemoizedErrorProneContainer
