@@ -79,7 +79,7 @@ type StandaloneAppProps = {
 function StandaloneApp({
   appDef,
   decorateComponentsWithTestId,
-  debugEnabled = true,
+  debugEnabled = false,
   runtime,
   components: customComponents,
   componentManager,
