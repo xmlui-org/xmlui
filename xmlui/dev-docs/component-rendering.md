@@ -2,16 +2,14 @@
 
 ## How Native React Components Are Used
 
-The framework cannot directly use native React components. They must be wrapped with a unique component that acts as a bridge between xmlui and React. 
+The framework cannot directly use native React components. They must be wrapped with a unique component that acts as a bridge between xmlui and React.
 
 ### Bridge to React
 
 This bridging is done with the help of a component renderer function:
 
 ```ts
-type ComponentRendererFn<T extends ComponentDef> = (
-  context: RendererContext<T>,
-) => ReactNode;
+type ComponentRendererFn<T extends ComponentDef> = (context: RendererContext<T>) => ReactNode;
 ```
 
 This function gets an object, a `RendererContext` with properties and methods that provide the bridge, and returns a `ReactNode` representing the native React component to display. The renderer function can access the component's definition (its internal representation extracted from the markup), translate, and pass the component's properties to the native React component.
@@ -25,10 +23,10 @@ function createComponentRenderer<TMd extends ComponentMetadata>(
   type: string,
   metadata: TMd,
   renderer: ComponentRendererFn<ComponentDef<TMd>>,
-): ComponentRendererDef
+): ComponentRendererDef;
 ```
 
-The function receives a unique name for the component (`type`), its metadata, and the renderer function. The return value is an object (`ComponentRenderDef`) that the engine's component registry can consume. 
+The function receives a unique name for the component (`type`), its metadata, and the renderer function. The return value is an object (`ComponentRenderDef`) that the engine's component registry can consume.
 
 Here is an example that prepares the `NoResult` xmlui component for the registry:
 
@@ -39,7 +37,7 @@ export const noResultComponentRenderer = createComponentRenderer(
   ({ node, extractValue, layoutCss }) => {
     return (
       <NoResult
-        label={extractValue.asDisplayText(node.props.label 
+        label={extractValue.asDisplayText(node.props.label
           || node.children || "No results found")}
         icon={node.props.icon}
         hideIcon={extractValue.asOptionalBoolean(node.props.hideIcon)}
@@ -86,6 +84,7 @@ export const NoResultMd = createMetadata({
 Here, `createMetadata` is a simple helper function that considers its input as (partial) metadata and prepares it for the framework's use.
 
 Creating a new xmlui component that can be used with the framework contains these steps:
+
 1. Create a native React component as the backing for the xmlui component. This React component should implement the functionality of the xmlui component. You can use an existing React component (obtain it from a package).
 2. Declare the component's metadata with `createMetadata`.
 3. Declare the component renderer with `createComponentRenderer` and pass the component's unique ID and metadata to it.
@@ -93,6 +92,7 @@ Creating a new xmlui component that can be used with the framework contains thes
 ### Component Metadata
 
 Metadata is an indispensable part of component rendering. The bridge between the xmlui and the React domains cannot be created without this metadata information. Besides compile-time checks, metadata is used for several other purposes:
+
 - Automated component documentation generation
 - Markup compilation checks (is the markup correct?)
 - Development tools may display component information
@@ -107,10 +107,11 @@ type ComponentMetadata<
   TApis extends Record<string, ComponentPropertyMetadata> = Record<string, any>,
 > = {
   // --- Properties omitted for brevity, learn about them later
-}
+};
 ```
 
 The `ComponentMetadata` generic type has four type parameters, which define the metadata sections unique for a particular component:
+
 - `TProps`: The component's properties
 - `TEvent`: The events the component supports with event handlers
 - `TContextValues`: The collection of context values (such as `$item` for `List`) to be put into the documentation
@@ -125,7 +126,7 @@ As the definition shows, each metadata section is a hash object collecting `Comp
 - `status`. This property describes the development status of a particular component. This property is used for documentation (we do not document immature components, as they are considered unsupported in production).
 - `description`. This property provides a concise definition (purpose) of the component
 - `shortDescription`. A shorter (one-short-line-on-the-screen) definition of the component for visual tools
-- `props`:  The component's properties (`TProps` is inferred from this property)
+- `props`: The component's properties (`TProps` is inferred from this property)
 - `events`: The supported event handlers (`TEvents` is inferred from this property)
 - `contextVars`. The context values the component offers (`TContextValues` is inferred from this property)
 - `apis`. The exposed methods the component offers to invoke through the component instance ID (`TApis` is inferred from this property)
@@ -133,8 +134,8 @@ As the definition shows, each metadata section is a hash object collecting `Comp
 - `opaque`. If this property is set to `true,` the component does not render any React component (with a DOM node) on its own; only its children may.
 - `themeVars`. This string list contains the theme variable names the property uses to establish its themeable appearance.
 - `defaultThemeVars`. This hash object contains the default values of particular theme variables. The current definition enables the definition of tone-specific theme variables here, putting their hash objects into the `light` and `dark` properties.
-- `toneSpecificThemeVars`. This hash object allows the definition of tone-specific theme variables separately from - `defaultThemeVars`. *This property seems to be ready for removal.*
-- `allowArbitraryProps`. When this property is set to true, the component markup should accept *any* property names, even if some of them are not used.
+- `toneSpecificThemeVars`. This hash object allows the definition of tone-specific theme variables separately from - `defaultThemeVars`. _This property seems to be ready for removal._
+- `allowArbitraryProps`. When this property is set to true, the component markup should accept _any_ property names, even if some of them are not used.
 - `specializedFrom`. If the component is specialized from another (such as `VStack` is a specialization of `Stack`), this property holds the name of the parent component. This value is used only for document generation purposes.
 - `docFolder`. This property is used for document generation. If a component's additional (non-metadata-described) documentation is not within the folder matching the component's ID, this property defines the appropriate folder.
 
@@ -150,7 +151,7 @@ type ComponentPropertyMetadata = {
   defaultValue?: any;
   isValid?: IsValidFunction<any>;
   isInternal?: boolean;
-}
+};
 ```
 
 This type declares these properties:
@@ -180,5 +181,42 @@ export const NoResultMd = createMetadata({
 
 The `metadata-helpers.ts` file contains many helper functions for describing property metadata. Using them allows for consistency in the property metadata definition.
 
+## The Renderer Context
 
+As discussed previously, a particular xmlui component registers its renderer function to create its corresponding native React component.
+
+```ts
+type ComponentRendererFn<T extends ComponentDef> = (context: RendererContext<T>) => ReactNode;
+```
+
+The renderer function accepts a `RendererContext` object with the data the function may need to create the native React component:
+
+```ts
+interface RendererContext<TMd extends ComponentMetadata> extends ComponentRendererContextBase<TMd> {
+  // --- Properties omitted for brevity, learn about them later
+}
+```
+
+### Renderer Context Definitions
+
+The engine utilizes several renderer contexts, `RendererContext` being just one of them, tuned to create the bridge between xmlui and React components. Its core definition, `ComponentRendererContextBase`, contains these properties:
+
+- `node`. This property holds the component's definition (internal representation) to render.
+- `state`. This hash object represents the state of the container in which the component is being rendered.
+- `appContext`. Optional. This object injects a collection of global functions and properties (e.g., date and object processing utilities, information about the current theme and viewport, etc.) that the framework provides for the scripts running within the component.
+- `renderChild`. A function the component can use to render its child components (recursively).
+- `layoutContext`. Optional. This property contains an object with properties to query the current layout (in which the component is rendered) and an optional helper function that allows wrapping the already rendered children in a native React component. For example, the layout context can tell that child components are rendered in a horizontal stack, so their width should fit the content. They should fill the entire viewport width if rendered in a vertical stack.
+
+`RendererContext` extends its base with these properties:
+
+- `uid`. The unique identifier of the component instance. If the component defines an identifier (with the `id` attribute in its markup), that value; otherwise, the framework assigns a unique symbol to it.
+- `updateState`. The component can use this function to update its state (with the reducer pattern) stored in the state container where it is rendered.
+- `extractValue`. When a component wants to access a property value (which may contain a binding expression to evaluate), it must use this function to get the current value.
+- `extractResource`. The components that want to use external resources (such as an image, icon, etc.) must use this function to obtain the particular resource. Resources may be theme-dependent; this function resolves them accordingly.
+- `lookupEventHandler`. When a component responds to an event, this function creates that event handler. The function's return value can be assigned to a native React event handler.
+- `registerComponentApi`. Components may expose an API that other components can use through the component instance ID. This function can register that API with the component.
+- `lookupAction`. The framework has a concept of [actions](./glossary.md#action). This function looks up an action by its unique name within the framework's action registry.
+- `lookupSyncCallback`. Some components may contain properties with callback functions (such as `rowDisabledPredicate` in a `Table`). This function creates a sync function from the current property value (e.g., transforming an arrow expression or a function declaration text to its internal representation). This function can be safely called back from a native React component.
+- `layoutCss`. This property holds the component's [layout properties](./glossary.md#layout-properties), which can be represented in a `React.CSSProperties` object.
+- `layoutNonCss`: Some component layout properties, such as `orientation,` cannot have an unambiguous CSS style pair. These properties are collected into a hash object with their values and put into `layoutNonCss`.
 
