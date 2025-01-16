@@ -68,10 +68,6 @@ import {
 } from "./statement-queue";
 import { reportEngineError } from "@components-core/reportEngineError";
 
-type OnStatementCompletedCallback =
-  | ((evalContext: BindingTreeEvaluationContext, completedStatement: Statement) => Promise<void>)
-  | undefined;
-
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(
   statements: Statement[],
