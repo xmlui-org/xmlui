@@ -23,7 +23,11 @@ $themeVars: ();
   background-position: center center;
   background-size: cover;
   object-fit: cover;
-  position: relative
+  position: relative;
+  padding: t.$space-4;
+  gap: t.$space-4;
+  display: flex;
+  flex-direction: column;
 }
 
 .deviceIphone14Pro {
@@ -46,7 +50,7 @@ $themeVars: ();
   border-radius: 49px;
   height: 100%;
   width: 100%;
-  padding-top: 44px;
+  padding-top: calc(44px + #{t.$space-4});
 }
 
 .deviceIphone14Pro .deviceStripe::after, .deviceIphone14Pro .deviceStripe::before {
