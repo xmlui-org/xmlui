@@ -1025,9 +1025,8 @@ const ComponentContainer = memo(
 
 // Represents the context in which the React component belonging to a particular component definition
 // is rendered
-interface RenderChildContext extends InnerRendererContext {
+interface ChildRendererContext extends InnerRendererContext {
   stateFieldPartChanged: StateFieldPartChangedFn;
-  layoutContext?: LayoutContext;
   cleanup: ComponentCleanupFn;
 }
 
@@ -1046,7 +1045,7 @@ function renderChild({
   memoedVarsRef,
   cleanup,
   uidInfoRef,
-}: RenderChildContext): ReactNode {
+}: ChildRendererContext): ReactNode {
   // --- Render only visible components
   if (!shouldKeep(node.when, state, appContext)) {
     return null;
@@ -1235,7 +1234,7 @@ const Node = memo(
       cleanup,
       uidInfoRef,
       ...rest
-    }: RenderChildContext & { resolvedKey: string },
+    }: ChildRendererContext & { resolvedKey: string },
     ref,
   ) {
     //pref, this way

@@ -486,7 +486,7 @@ type AppWrapperProps = {
   // --- Apps can provide their custom (third-party) components, themes,
   // --- resources (and, in the future, other artifacts) used in the
   // --- application code and markup. This property contains these artifacts.
-  contributes: ContributesDefinition;
+  contributes?: ContributesDefinition;
 
   // --- Apps can define global configuration values (connection strings,
   // --- titles, names, etc.) used within the app through the `appGlobals`
