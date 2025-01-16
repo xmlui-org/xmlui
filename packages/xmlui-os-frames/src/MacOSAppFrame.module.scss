@@ -107,6 +107,8 @@ $themeVars: ();
   font-size: 1rem;
   display: flex;
   overflow-y: auto;
+  padding: t.$space-4;
+  gap: t.$space-4;
 }
 
 // --- We export the theme variables to add them to the component renderer

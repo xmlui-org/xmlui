@@ -76,6 +76,7 @@ export function ItemWithLabel({
         {label && (
           <label
             htmlFor={inputId}
+            onClick={()=>document.getElementById(inputId).focus()}
             style={{
               ...labelStyle,
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
