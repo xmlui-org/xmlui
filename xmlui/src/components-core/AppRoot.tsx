@@ -46,6 +46,8 @@ import {
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
 import StandaloneComponentManager from "./StandaloneComponentManager";
+import { DebugViewContext } from "./DebugViewProvider";
+import { version } from "../../package.json";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -119,6 +121,7 @@ function AppContent({
   debugEnabled,
 }: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [displayStateView, setDisplayStateView] = useState(!!globalProps?.debug?.stateView);
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
@@ -152,6 +155,12 @@ function AppContent({
         ThemeToneKeys[(ThemeToneKeys.indexOf(activeThemeTone) + 1) % ThemeToneKeys.length],
       );
     }
+
+    // --- Alt + Ctrl + Shift + S toggles the current state view
+    if (event.code === "KeyS" && event.altKey && event.ctrlKey && event.shiftKey) {
+      console.log("TOGGLE STATE VIEW");
+      setDisplayStateView(!displayStateView);
+    }
   });
 
   // --- We use the state variables to store the current media query values
@@ -172,7 +181,7 @@ function AppContent({
     return match ? `${parseInt(match[1]) - 0.02}px` : "0";
   };
 
-  // --- Whenever the size of the viewport changes, we update the values 
+  // --- Whenever the size of the viewport changes, we update the values
   // --- related to viewport size
   const observer = useRef<ResizeObserver>();
   useIsomorphicLayoutEffect(() => {
@@ -197,7 +206,7 @@ function AppContent({
     };
   }, [root, observer, trackContainerHeight]);
 
-  // --- Whenever the application root DOM object or the active theme changes, we sync 
+  // --- Whenever the application root DOM object or the active theme changes, we sync
   // --- with the theme variable values (because we can't use css var in media queries)
   useIsomorphicLayoutEffect(() => {
     const mwPhone = getComputedStyle(root!).getPropertyValue(getVarKey("media-max-width-phone"));
@@ -340,6 +349,9 @@ function AppContent({
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
+      // --- Engine-related
+      version,
+      
       // --- Actions namespace
       Actions,
 
@@ -444,11 +456,15 @@ function AppContent({
   const memoedVars = useRef<MemoedVars>(new Map());
 
   return (
-    <AppContext.Provider value={appContextValue}>
-      <AppStateContext.Provider value={appStateContextValue}>
-        {renderRoot(rootContainer, memoedVars)}
-      </AppStateContext.Provider>
-    </AppContext.Provider>
+    <DebugViewContext.Provider
+      value={{ displayStateView, stateView: globalProps?.debug?.stateView, setDisplayStateView }}
+    >
+      <AppContext.Provider value={appContextValue}>
+        <AppStateContext.Provider value={appStateContextValue}>
+          {renderRoot(rootContainer, memoedVars)}
+        </AppStateContext.Provider>
+      </AppContext.Provider>
+    </DebugViewContext.Provider>
   );
 }
 
