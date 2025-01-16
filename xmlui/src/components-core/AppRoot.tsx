@@ -47,6 +47,7 @@ import {
 import { InspectorProvider } from "@components-core/InspectorContext";
 import StandaloneComponentManager from "./StandaloneComponentManager";
 import { DebugViewContext } from "./DebugViewProvider";
+import { version } from "../../package.json";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -348,6 +349,9 @@ function AppContent({
   // --- We assemble the app context object form the collected information
   const appContextValue = useMemo(() => {
     const ret: AppContextObject = {
+      // --- Engine-related
+      version,
+      
       // --- Actions namespace
       Actions,
 
