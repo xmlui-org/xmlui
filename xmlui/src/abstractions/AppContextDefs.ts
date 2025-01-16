@@ -21,6 +21,11 @@ export type AppContextObject = {
   [x: string]: unknown;
 
   // ==============================================================================================
+  // Engine-realated
+
+  version: string;
+
+  // ==============================================================================================
   // Actions namespace
 
   Actions: Record<string, ActionFunction>;
