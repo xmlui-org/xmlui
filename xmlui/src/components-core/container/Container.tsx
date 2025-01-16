@@ -72,7 +72,7 @@ import {
 } from "@components-core/utils/misc";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import ComponentBed from "@components-core/Component";
+import ComponentBed from "@components-core/ComponentBed";
 import { EMPTY_ARRAY, EMPTY_OBJECT, noop } from "@components-core/constants";
 import { parseHandlerCode, prepareHandlerStatements } from "@components-core/utils/statementUtils";
 import { useLocation, useNavigate, useParams, useSearchParams } from "@remix-run/react";
@@ -1030,6 +1030,9 @@ interface ChildRendererContext extends InnerRendererContext {
   cleanup: ComponentCleanupFn;
 }
 
+/**
+ * 
+ */
 function renderChild({
   node,
   state,
@@ -1051,13 +1054,17 @@ function renderChild({
     return null;
   }
 
-  //we render text children here, because if we render it through a Slot,
-  // it would be a React Element, and we would lose the text content
-  //  for example, this wouldn't work:
+  // --- There is a special case for rendering text. If we have a Slot with a 
+  // --- single text node child, we want to render that in the context of the 
+  // --- parent component. Otherwise, we would not be able to render this:
+  //
   //  <Component name='MyComponent'>
-  //      <Markdown><Slot/></Markdown>
+  //    <Markdown><Slot/></Markdown>
   //  </Component>
-  //  and then <MyComponent>hey lorem ipsum</MyComponent>
+  //
+  //  and then 
+  //  
+  // <MyComponent>hey lorem ipsum</MyComponent>
 
   if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
     if (
@@ -1080,7 +1087,7 @@ function renderChild({
 
   const key = extractParam(state, node.uid, appContext, true);
   return (
-    <CompnentBridge
+    <ComponentBridge
       key={key}
       resolvedKey={key}
       node={node}
@@ -1215,7 +1222,7 @@ function transformNodeWithRawDataProp(node) {
   return node;
 }
 
-const CompnentBridge = memo(
+const ComponentBridge = memo(
   forwardRef(function ComponentBridge(
     {
       node,

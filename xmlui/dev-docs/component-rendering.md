@@ -269,5 +269,7 @@ As you learned, the rendering engine's entry point is the `renderRoot()` functio
 
 When `renderRoot()` calls `renderChild(),` the context it passes contains the app's definition and all others with their default (empty or no-op) values.
 
+### The `renderChild` function
 
+0
 
