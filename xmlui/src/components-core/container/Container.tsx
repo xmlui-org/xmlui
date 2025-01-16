@@ -72,7 +72,7 @@ import {
 } from "@components-core/utils/misc";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import Component from "@components-core/Component";
+import ComponentBed from "@components-core/Component";
 import { EMPTY_ARRAY, EMPTY_OBJECT, noop } from "@components-core/constants";
 import { parseHandlerCode, prepareHandlerStatements } from "@components-core/utils/statementUtils";
 import { useLocation, useNavigate, useParams, useSearchParams } from "@remix-run/react";
@@ -1080,7 +1080,7 @@ function renderChild({
 
   const key = extractParam(state, node.uid, appContext, true);
   return (
-    <Node
+    <CompnentBridge
       key={key}
       resolvedKey={key}
       node={node}
@@ -1215,8 +1215,8 @@ function transformNodeWithRawDataProp(node) {
   return node;
 }
 
-const Node = memo(
-  forwardRef(function Node(
+const CompnentBridge = memo(
+  forwardRef(function ComponentBridge(
     {
       node,
       state,
@@ -1239,7 +1239,7 @@ const Node = memo(
   ) {
     //pref, this way
     const stableLayoutContext = useRef(layoutContext);
-    stableLayoutContext.current = layoutContext;
+    //stableLayoutContext.current = layoutContext;
 
     // console.log("uidInfoRef", uidInfoRef);
     const nodeWithTransformedLoaders = useMemo(() => {
@@ -1286,7 +1286,7 @@ const Node = memo(
       );
     } else {
       renderedChild = (
-        <Component
+        <ComponentBed
           onUnmount={cleanup}
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}

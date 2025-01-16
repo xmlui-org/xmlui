@@ -246,7 +246,7 @@ interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
 - `lookupAction`. This function looks up an action by its unique name within the component node using the action.
 - `memoedVarsRef`. This property refers to the map of the memoized variables available within the component being rendered. 
 - `parentRenderContext`. This property accepts the context of the current component's parent (e.g., the parent component's properties, the definition of its children, and the function that renders the children). The component may use this information for its rendering purposes.
-- `uiIdInfoRef`. ???
+- `uiIdInfoRef`. Components working with data instantiate some internal components (so-called loaders) to manage data fetching asynchronously. This property is a reference to the map holding the loaders already instantiated. The engine uses this map to avoid duplicated loaders.
 
 When rendering a particular child component, the engine uses a rendering context with some extra properties:
 
@@ -268,4 +268,6 @@ As you learned, the rendering engine's entry point is the `renderRoot()` functio
 `renderRoot()` invokes the `renderChild()` function, which expects a `RenderChildContext` argument. `renderChild()` is the rendering engine's jolly-joker function; it implements all the nitty-gritty details that make the engine so powerful.
 
 When `renderRoot()` calls `renderChild(),` the context it passes contains the app's definition and all others with their default (empty or no-op) values.
+
+
 
