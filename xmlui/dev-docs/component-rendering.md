@@ -271,5 +271,5 @@ When `renderRoot()` calls `renderChild(),` the context it passes contains the ap
 
 ### The `renderChild` function
 
-0
+
 

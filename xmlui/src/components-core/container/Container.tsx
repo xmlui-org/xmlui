@@ -1087,7 +1087,7 @@ function renderChild({
 
   const key = extractParam(state, node.uid, appContext, true);
   return (
-    <ComponentBridge
+    <ComponentNode
       key={key}
       resolvedKey={key}
       node={node}
@@ -1222,8 +1222,11 @@ function transformNodeWithRawDataProp(node) {
   return node;
 }
 
-const ComponentBridge = memo(
-  forwardRef(function ComponentBridge(
+/**
+ * ...
+ */
+const ComponentNode = memo(
+  forwardRef(function ComponentNode(
     {
       node,
       state,
