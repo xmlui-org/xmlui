@@ -707,7 +707,6 @@ async function evalFunctionInvocationAsync(
     thisStack.push(returnValue);
     return returnValue;
   } catch (err) {
-    console.log(typeof functionObj, functionObj);
     throw err;
   }
 }

@@ -51,7 +51,10 @@ export function reportEngineError(error: Error | string, errorToThrow?: any): vo
     helperMessage += `%cThe error handler associated with the parsed code did not run.%c`;
     colors = ["color: red", "color: inherited", "color: red", "color: inherited", "color: orange", "color: inherited"];
   } else if (error instanceof StatementExecutionError) {
-    helperMessage += `%cError while executing code: ${error.message}%c\n\n${error.source}`;
+    helperMessage += `%cError while executing code: ${error.message}%c`;
+    if (error.source) {
+      helperMessage += `\n\n${error.source}`;
+    }
     colors = ["color: red", "color: inherited"];
   } else if (error instanceof ThrowStatementError) {
     helperMessage += `A 'throw' statement executed:\n\n%c${error.message}%c\n\n${error.errorObject}`;

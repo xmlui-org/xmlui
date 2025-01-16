@@ -1,3 +1,13 @@
+import { StatementExecutionError } from "@components-core/EngineError";
+
+type ProxyInfo = {
+  // --- The replacement for the original function
+  proxyFn: Function;
+
+  // --- Validate if the proxy function can be used; return the error message
+  validator?: (context: any) => string | null;
+};
+
 /**
  * Gets a proxy function for one that does not support async operations
  * @param fn Function to replace with a proxy
@@ -6,24 +16,31 @@
  * @return The proxy, if found; otherwise the original function
  */
 export function getAsyncProxy(fn: Function, origArgs: any[], context: any): Function {
-  const proxyFn = asyncProxies.get(fn);
-  if (!proxyFn) return fn;
+  const proxyInfo = asyncProxies.get(fn);
+  if (!proxyInfo) return fn;
 
+  if (proxyInfo.validator) {
+    const message = proxyInfo.validator(origArgs);
+    if (message) {
+      throw new StatementExecutionError(message);
+    }
+  }
   origArgs.unshift(context);
-  return proxyFn;
+  return proxyInfo.proxyFn;
 }
 
 // Async implementations for JavaScript functions that do not support async arguments
-const asyncProxies = new Map<Function, Function>();
-asyncProxies.set(Array.prototype.filter, asyncFilter);
-asyncProxies.set(Array.prototype.forEach, asyncForEach);
-asyncProxies.set(Array.prototype.map, asyncMap);
-asyncProxies.set(Array.prototype.every, asyncEvery);
-asyncProxies.set(Array.prototype.findIndex, asyncFindIndex);
-asyncProxies.set(Array.prototype.find, asyncFind);
-asyncProxies.set(Array.prototype.flatMap, asyncFlatMap);
-asyncProxies.set(Array.prototype.some, asyncSome);
-asyncProxies.set(Array.prototype.sort, asyncSort);
+const asyncProxies = new Map<Function, ProxyInfo>();
+asyncProxies.set(Array.prototype.filter, { proxyFn: asyncFilter });
+asyncProxies.set(Array.prototype.forEach, { proxyFn: asyncForEach });
+asyncProxies.set(Array.prototype.map, { proxyFn: asyncMap });
+asyncProxies.set(Array.prototype.every, { proxyFn: asyncEvery });
+asyncProxies.set(Array.prototype.findIndex, { proxyFn: asyncFindIndex });
+asyncProxies.set(Array.prototype.find, { proxyFn: asyncFind });
+asyncProxies.set(Array.prototype.flatMap, { proxyFn: asyncFlatMap });
+asyncProxies.set(Array.prototype.some, { proxyFn: asyncSome });
+asyncProxies.set(Array.prototype.sort, { proxyFn: asyncSort });
+asyncProxies.set(Array.prototype.toSorted, { proxyFn: asyncToSorted });
 
 // The async implementation of Array.prototype.some
 async function asyncSome(arr: any[], predicate: (...args: any[]) => boolean) {
@@ -79,9 +96,15 @@ async function asyncFlatMap(arr: any[], predicate: (...args: any[]) => boolean) 
 
 type AsyncCompareFn = (a: any, b: any) => Promise<number>;
 
+function asyncSort() {
+  throw new Error(
+    "The script engine does not support the sort() method as it " +
+    "sorts an array in-place. Use the toSorted() function instead."
+  );
+}
+
 // Recursively sorts an array using an async comparison function (merge sort).
-async function asyncSort(array: any[], compareFn: AsyncCompareFn): Promise<any[]> {
-  console.log('asyncSort');
+async function asyncToSorted(array: any[], compareFn: AsyncCompareFn): Promise<any[]> {
   if (array.length <= 1) {
     return array;
   }
@@ -92,8 +115,8 @@ async function asyncSort(array: any[], compareFn: AsyncCompareFn): Promise<any[]
 
   // Sort the left and right halves
   const [sortedLeft, sortedRight] = await Promise.all([
-    asyncSort(left, compareFn),
-    asyncSort(right, compareFn),
+    asyncToSorted(left, compareFn),
+    asyncToSorted(right, compareFn),
   ]);
 
   // Merge the results
