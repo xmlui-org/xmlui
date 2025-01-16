@@ -180,7 +180,12 @@ export function PageableLoader({
     // });
     if (status === "success" && (prevData !== data || prevPageInfo !== pageInfo)) {
       loaderLoaded(data, pageInfo);
-      onLoaded?.(data);
+      //we do this to push the onLoaded callback to the next event loop.
+      // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
+      // access to the latest loader value
+      setTimeout(()=>{
+        onLoaded?.(data);
+      }, 0);
     } else if (status === "error" && prevError !== error) {
       loaderError(error);
     }
