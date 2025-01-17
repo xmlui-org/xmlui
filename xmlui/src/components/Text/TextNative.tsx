@@ -109,7 +109,7 @@ export const variantOptionsMd: TextPropertyValueDescription[] = [
   { value: "tableheading", description: "Indicates that the text is a table heading" },
   { value: "title", description: "Indicates that the text is the title of some other content" },
   { value: "var", description: "Represents the name of a variable in a mathematical expression" },
-] as const;
+];
 
 const AbbreviationKeys = ["title"] as const;
 type Abbreviation = {

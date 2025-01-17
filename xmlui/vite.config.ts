@@ -54,6 +54,7 @@ export default ({ mode }) => {
         entry: [path.resolve("src", "index.ts")],
         name: "xmlui",
         fileName: "xmlui",
+        formats: ["es"]
       };
     }
   }
@@ -99,7 +100,7 @@ export default ({ mode }) => {
     },
     plugins:
       mode === "metadata"
-        ? [dts({ rollupTypes: true })]
+        ? []
         : [react(), svgr(), ViteYaml(), libInjectCss(), dts({ rollupTypes: true })],
   });
 };

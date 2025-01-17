@@ -43,7 +43,7 @@ export const LinkTargetMd: PropertyValueDescription[] = [
     value: "_top",
     description: "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
   }
-] as const;
+];
 
 /**
  * Describes the common properties of a link component types.
@@ -94,7 +94,7 @@ export const viewportSizeMd: PropertyValueDescription[] = [
   { value: "lg", description: "Large devices (e.g., a laptop)" },
   { value: "xl", description: 'Extra large devices (e.g., a standard 20" monitor)' },
   { value: "xxl", description: 'Extra extra large devices (e.g., a large 29" monitor)' },
-] as const;
+];
 export const viewportSizeNames = Object.keys(viewportSizeMd);
 
 // --- Available button sizes
@@ -103,7 +103,7 @@ export const sizeMd: PropertyValueDescription[] = [
   { value: "sm", description: "Small button" },
   { value: "md", description: "Medium button" },
   { value: "lg", description: "Large button" },
-] as const;
+];
 const sizeValues = Object.keys(sizeMd);
 export const sizeNames = [...sizeValues];
 export type ComponentSize = (typeof sizeValues)[number];
@@ -116,7 +116,7 @@ export const buttonThemeMd: PropertyValueDescription[] = [
   { value: "attention", description: "Attention state theme color" },
   { value: "primary", description: "Primary theme color" },
   { value: "secondary", description: "Secondary theme color" },
-] as const;
+];
 
 // --- Available button types
 export const buttonTypeValues = ["button", "submit", "reset"] as const;
@@ -126,7 +126,7 @@ export const buttonTypesMd: PropertyValueDescription[] = [
   { value: "button", description: "Regular behavior that only executes logic if explicitly determined." },
   { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
   { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
-] as const;
+];
 export const defaultButtonType = "button";
 
 // --- Available button variants
@@ -137,7 +137,7 @@ export const buttonVariantMd: PropertyValueDescription[] = [
   { value: "solid", description: "A button with a border and a filled background." },
   { value: "outlined", description: "The button is displayed with a border and a transparent background." },
   { value: "ghost", description: "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked." },
-] as const;
+];
 
 // --- Available button aria attributes
 const buttonAriaValues = ["aria-controls", "aria-expanded", "aria-disabled", "aria-label"] as const;
@@ -152,7 +152,7 @@ export const alignmentOptionMd: PropertyValueDescription[] = [
   { value: "center", description: "Place the content in the middle" },
   { value: "start", description: "Justify the content to the left (to the right if in right-to-left)" },
   { value: "end", description: "Justify the content to the right (to the left if in right-to-left)" },
-] as const;
+];
 
 // --- Available orientation options
 const orientationOptionValues = ["horizontal", "vertical"] as const;
@@ -161,7 +161,7 @@ export type OrientationOptions = (typeof orientationOptionValues)[number];
 export const orientationOptionMd: PropertyValueDescription[] = [
   { value: "horizontal", description: "The component will fill the available space horizontally" },
   { value: "vertical", description: "The component will fill the available space vertically" },
-] as const;
+];
 
 // --- Available icon positions
 export const iconPositionValues = ["start", "end"] as const;
@@ -194,7 +194,7 @@ export const statusColorMd: PropertyValueDescription[] = [
   { value: "info", description: "Info theme color, \"info\" icon" },
   { value: "light", description: "Light theme color, no default icon" },
   { value: "dark", description: "Dark theme color, no default icon" },
-] as const;
+];
 
 // --- Available placements
 const placementValues = ["start", "end", "top", "bottom"] as const;
@@ -205,7 +205,7 @@ export const placementMd: PropertyValueDescription[] = [
   { value: "end", description: "The right side of the window (left-to-right) or the left side of the window (right-to-left)" },
   { value: "top", description: "The top of the window" },
   { value: "bottom", description: "The bottom of the window" },
-] as const;
+];
 
 // --- Available label positions
 export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
@@ -216,7 +216,7 @@ export const labelPositionMd: PropertyValueDescription[] = [
   { value: "end", description: "The right side of the input (left-to-right) or the left side of the input (right-to-left)" },
   { value: "top", description: "The top of the input" },
   { value: "bottom", description: "The bottom of the input" },
-] as const;
+];
 
 // --- Available trigger positions
 const triggerPositionValues = ["start", "end"] as const;
@@ -232,7 +232,7 @@ export const validationStatusMd: PropertyValueDescription[] = [
   { value: "valid", description: "Visual indicator for an input that is accepted" },
   { value: "warning", description: "Visual indicator for an input that produced a warning" },
   { value: "error", description: "Visual indicator for an input that produced an error" },
-] as const;
+];
 
 // --- The validation result of a particular component
 export type ValidationResult = {
