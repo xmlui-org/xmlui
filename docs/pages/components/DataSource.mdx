@@ -56,6 +56,10 @@ This property sets the request body to the value provided here without any conve
 
 The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process. With this property, you can define a selector that extracts the data from the response body.
 
+### `transformResult`
+
+This property accepts a transformation function that receives the data coming from the backend after it has been through the evaluation of the optional `resultSelector` property. The function gets the entire result set and can transform it. The `DataSource` component `value` property will return the data from this function.
+
 ### `url`
 
 This property represents the URL to fetch the data.
