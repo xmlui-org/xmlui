@@ -14,6 +14,7 @@ test.skip("Items does not render html on its own",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ createDriver }) => {
   // Place empty Items in the app and check that it does not render html
+  // How: parent of Items has no children
 });
 
 test.skip("data property renders children",

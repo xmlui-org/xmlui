@@ -12,7 +12,7 @@ class SplitterDriver extends ComponentDriver {}
 const test = createTestWithDriver(SplitterDriver);
 
 test.skip(
-  "Splitter renders correctly",
+  "Splitter renders & is visible",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ createDriver }) => {},
 );

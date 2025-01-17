@@ -98,16 +98,16 @@ class ButtonDriver extends ComponentDriver {
 
   // NOTE: Added because we can set an icon via the icon prop as well as child
   getFirstIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(0);
+    return this.locator.locator("> svg").or(this.locator.locator("> img")).first();
   }
 
   // NOTE: Added because we can set an icon via the icon prop as well as child
   getLastIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(-1);
+    return this.locator.locator("> svg").or(this.locator.locator("> img")).last();
   }
 
   getFirstNonTextNode() {
-    return this.locator.locator("> *").nth(0);
+    return this.locator.locator("> *").first();
   }
 }
 

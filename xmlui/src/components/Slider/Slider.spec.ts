@@ -10,6 +10,15 @@ class SliderDriver extends ComponentDriver {}
 
 const test = createTestWithDriver(SliderDriver);
 
+test.skip(
+  "component renders & is visible",
+  SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`<Slider />`);
+    await expect(driver.component).toBeVisible();
+  },
+);
+
 // --- initialValue
 
 test.skip(
