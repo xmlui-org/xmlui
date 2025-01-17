@@ -56,6 +56,12 @@ export const DataSourceMd = createMetadata({
         `the UI cannot (or does not intend) to process. With this property, you can define ` +
         `a selector that extracts the data from the response body.`,
     ),
+    transformResult: d(
+      "This property accepts a transformation function that receives the data coming from " +
+        "the backend after it has been through the evaluation of the optional \`resultSelector\` " + 
+        "property. The function gets the entire result set and can transform it. The " + 
+        "\`DataSource\` component `value` property will return the data from this function.",
+    ),
     prevPageSelector: d(
       `When using \`${COMP}\` with paging, the response may contain information about the ` +
         `previous and next page. This property defines the selector that extracts the ` +

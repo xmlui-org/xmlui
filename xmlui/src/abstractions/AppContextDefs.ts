@@ -174,6 +174,22 @@ export type AppContextObject = {
   smartFormatDateTime: (date: string | Date) => string | undefined;
 
   // ==============================================================================================
+  // Math Utilities
+
+  /**
+   * This function calculates the average of the specified values and returns it.
+   * @param values Values to calculate the average
+   * @param decimals Number of decimal places to round the result
+   */
+  avg: (values: number[], decimals?: number) => number;
+
+  /**
+   * This function calculates the sum of the specified values and returns it.
+   * @param values Values to calculate the sum
+   */
+  sum: (values: number[]) => number;
+  
+  // ==============================================================================================
   // File Utilities
 
   /**

@@ -107,16 +107,16 @@ Indicates the minimum width a particular column can have.
 
 This property allows the column to be pinned to the `left` (left-to-right writing style) or `right` (left-to-right writing style) edge of the table. If the writing style is right-to-left, the locations are switched.
 
-Available values: `start`, `end`
+Available values: `left`, `right`
 
-```ueml copy /pinTo="start"/ /pinTo="end"/
+```ueml copy /pinTo="left"/ /pinTo="right"/
 <App>
   <Table data='{[...]}' height="100%">
-    <Column bindTo="id" width="50" pinTo="start" />
+    <Column bindTo="id" width="50" pinTo="left" />
     <Column bindTo="name" width="500" />
     <Column bindTo="quantity" width="300" />
     <Column bindTo="unit" width="300"/>
-    <Column bindTo="category" width="100" pinTo="end"/>
+    <Column bindTo="category" width="100" pinTo="right"/>
   </Table>
 </App>
 ```
