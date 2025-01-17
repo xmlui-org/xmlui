@@ -72,7 +72,7 @@ import {
 } from "@components-core/utils/misc";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import Component from "@components-core/Component";
+import ComponentBed from "@components-core/ComponentBed";
 import { EMPTY_ARRAY, EMPTY_OBJECT, noop } from "@components-core/constants";
 import { parseHandlerCode, prepareHandlerStatements } from "@components-core/utils/statementUtils";
 import { useLocation, useNavigate, useParams, useSearchParams } from "@remix-run/react";
@@ -1025,12 +1025,14 @@ const ComponentContainer = memo(
 
 // Represents the context in which the React component belonging to a particular component definition
 // is rendered
-interface RenderChildContext extends InnerRendererContext {
+interface ChildRendererContext extends InnerRendererContext {
   stateFieldPartChanged: StateFieldPartChangedFn;
-  layoutContext?: LayoutContext;
   cleanup: ComponentCleanupFn;
 }
 
+/**
+ * 
+ */
 function renderChild({
   node,
   state,
@@ -1046,19 +1048,23 @@ function renderChild({
   memoedVarsRef,
   cleanup,
   uidInfoRef,
-}: RenderChildContext): ReactNode {
+}: ChildRendererContext): ReactNode {
   // --- Render only visible components
   if (!shouldKeep(node.when, state, appContext)) {
     return null;
   }
 
-  //we render text children here, because if we render it through a Slot,
-  // it would be a React Element, and we would lose the text content
-  //  for example, this wouldn't work:
+  // --- There is a special case for rendering text. If we have a Slot with a 
+  // --- single text node child, we want to render that in the context of the 
+  // --- parent component. Otherwise, we would not be able to render this:
+  //
   //  <Component name='MyComponent'>
-  //      <Markdown><Slot/></Markdown>
+  //    <Markdown><Slot/></Markdown>
   //  </Component>
-  //  and then <MyComponent>hey lorem ipsum</MyComponent>
+  //
+  //  and then 
+  //  
+  // <MyComponent>hey lorem ipsum</MyComponent>
 
   if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
     if (
@@ -1081,7 +1087,7 @@ function renderChild({
 
   const key = extractParam(state, node.uid, appContext, true);
   return (
-    <Node
+    <ComponentNode
       key={key}
       resolvedKey={key}
       node={node}
@@ -1216,8 +1222,11 @@ function transformNodeWithRawDataProp(node) {
   return node;
 }
 
-const Node = memo(
-  forwardRef(function Node(
+/**
+ * ...
+ */
+const ComponentNode = memo(
+  forwardRef(function ComponentNode(
     {
       node,
       state,
@@ -1235,12 +1244,12 @@ const Node = memo(
       cleanup,
       uidInfoRef,
       ...rest
-    }: RenderChildContext & { resolvedKey: string },
+    }: ChildRendererContext & { resolvedKey: string },
     ref,
   ) {
     //pref, this way
     const stableLayoutContext = useRef(layoutContext);
-    stableLayoutContext.current = layoutContext;
+    //stableLayoutContext.current = layoutContext;
 
     // console.log("uidInfoRef", uidInfoRef);
     const nodeWithTransformedLoaders = useMemo(() => {
@@ -1287,7 +1296,7 @@ const Node = memo(
       );
     } else {
       renderedChild = (
-        <Component
+        <ComponentBed
           onUnmount={cleanup}
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}

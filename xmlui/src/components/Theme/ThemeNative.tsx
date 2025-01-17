@@ -12,6 +12,7 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
+import { getVarKey } from "@components-core/theming/themeVars";
 
 function getClassName(css: string) {
   return `theme-${calculateHash(css)}`;
@@ -83,11 +84,13 @@ export function Theme({
   const { css, className, rangeClassName, fromClass, toClass } = useMemo(() => {
     const vars = { ...themeCssVars, "color-scheme": themeTone };
     // const vars = themeCssVars;
-    const css = Object.entries(vars)
+    let css = Object.entries(vars)
       .map(([key, value]) => {
         return key + ":" + value + ";";
       })
       .join(" ");
+
+    css += `font-family: var(${getVarKey("font-family")});`;
     const className = getClassName(css);
     const fromClass = `${className}-from`;
     const toClass = `${className}-to`;

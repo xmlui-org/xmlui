@@ -83,7 +83,7 @@ function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldSkip: bo
  * current rendering context). The modified version uses a stable reference to the layout context
  * and provides a cleanup function (`onUnmount`) to call when the component is about to be disposed.
  */
-const Component = forwardRef(function Component(
+const ComponentBed = forwardRef(function ComponentBed(
   {
     node,
     state,
@@ -433,4 +433,4 @@ function componentStateChanged(uid: symbol, state: any) {
   };
 }
 
-export default Component;
+export default ComponentBed;

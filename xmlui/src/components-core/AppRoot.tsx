@@ -48,6 +48,7 @@ import { InspectorProvider } from "@components-core/InspectorContext";
 import StandaloneComponentManager from "./StandaloneComponentManager";
 import { DebugViewContext } from "./DebugViewProvider";
 import { version } from "../../package.json";
+import { mathFunctions } from "./appContext/math-function";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -367,6 +368,9 @@ function AppContent({
       // --- Date-related
       ...dateFunctions,
 
+      // --- Math-related
+      ...mathFunctions,
+
       // --- File Utilities
       formatFileSizeInBytes,
       getFileExtension,
@@ -486,7 +490,7 @@ type AppWrapperProps = {
   // --- Apps can provide their custom (third-party) components, themes,
   // --- resources (and, in the future, other artifacts) used in the
   // --- application code and markup. This property contains these artifacts.
-  contributes: ContributesDefinition;
+  contributes?: ContributesDefinition;
 
   // --- Apps can define global configuration values (connection strings,
   // --- titles, names, etc.) used within the app through the `appGlobals`

@@ -15,6 +15,7 @@ import { createDraft, finishDraft } from "immer";
 import { useAppContext } from "@components-core/AppContext";
 import { usePrevious } from "@components-core/utils/hooks";
 import type {QueryFunction} from "@tanstack/query-core/src/types";
+import { flushSync } from "react-dom";
 
 /**
  * The properties of the Loader component
@@ -110,7 +111,12 @@ export function Loader({
   useLayoutEffect(() => {
     if (status === "success" && data !== prevData) {
       loaderLoaded(data);
-      onLoaded?.(data);
+      //we do this to push the onLoaded callback to the next event loop.
+      // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
+      // access to the latest loader value
+      setTimeout(()=>{
+        onLoaded?.(data);
+      }, 0);
     } else if (status === "error" && error !== prevError) {
       loaderError(error);
     }

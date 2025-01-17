@@ -42,6 +42,7 @@ import { processDeclarations, processStatementQueue } from "./process-statement-
 import { isBannedFunction } from "./bannedFunctions";
 import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { rest } from "lodash-es";
+import { getSyncProxy } from "./syncProxy";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -527,6 +528,10 @@ function evalFunctionInvocation(
   // --- We use context for "this"
   const currentContext = thisStack.length > 0 ? thisStack.pop() : evalContext.localContext;
 
+  // --- We need to use proxies for JavaScript functions (such as Array.prototype.sort) using
+  // --- in-place changes on DataSource values
+  functionObj = getSyncProxy(functionObj, functionArgs, currentContext);
+  
   // --- Now, invoke the function
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)

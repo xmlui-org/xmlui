@@ -183,12 +183,12 @@ export const TextArea = ({
   // --- Handle the Enter key press
   const handleEnter = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (enterSubmits && e.key.toLowerCase() === "enter" && !e.shiftKey) {
+      if (e.currentTarget.form && enterSubmits && e.key.toLowerCase() === "enter" && !e.shiftKey) {
         // -- Do not generate a new line
         e.preventDefault();
         e.currentTarget.form?.requestSubmit();
       }
-      if (escResets && e.key.toLowerCase() === "escape" && !e.shiftKey) {
+      if (e.currentTarget.form && escResets && e.key.toLowerCase() === "escape" && !e.shiftKey) {
         e.preventDefault();
         e.currentTarget.form?.reset();
       }
@@ -210,7 +210,6 @@ export const TextArea = ({
     value: controlled ? value || "" : undefined,
     disabled: !enabled,
     autoFocus,
-    id: id,
     name: id,
     placeholder,
     required,

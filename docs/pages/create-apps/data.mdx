@@ -407,6 +407,292 @@ Pop out this example in the playground and check what happens when you change or
   `}
 />
 
+### Selecting the Result [#select-result]
+
+Sometimes, the response of a data fetch operation contains extra information that we do not consider part of the data. With the `resultSelector` property of a DataSource, you can declare the segment of the response to be taken into account as the actual data.
+
+For example, let's assume we have this response:
+
+```json
+{
+  "info": [
+    {"name": "New York", "population": 8336817},
+    {"name": "Los Angeles", "population": 3979576},
+    {"name": "Chicago", "population": 2693976},
+    {"name": "Houston", "population": 2320268},
+    {"name": "Phoenix", "population": 1680992},
+  ],
+  "meta": {
+    "total": 10,
+    "page": 1,
+    "per_page": 10
+  }
+}
+```
+
+The actual data is in the "info" property; "meta" is additional, and we do not want to display it. We can tighten the response to the actual data with `resultSelector`:
+
+```ueml copy /resultSelector="info"/
+<App>
+  <DataSource id='cities' url='/api/cities' resultSelector="info" />
+  <VStack>
+    <H3>Cities</H3>
+    <Table data="{cities}">
+      <Column header="Name" bindTo="name" />
+      <Column header="Population" bindTo="population" />
+    </Table>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: Using resultSelector"
+  api={{
+    initialize: `
+      $state.cities = {
+        "info": [
+          {"name": "New York", "population": 8336817},
+          {"name": "Los Angeles", "population": 3979576},
+          {"name": "Chicago", "population": 2693976},
+          {"name": "Houston", "population": 2320268},
+          {"name": "Phoenix", "population": 1680992},
+        ],
+        "meta": {
+          "total": 10,
+          "page": 1,
+          "per_page": 10
+        }
+      };
+    `,
+    operations: {
+      'get-cities': {
+        method: 'get',
+        url: '/api/cities',
+        handler: `
+          return $state.cities;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='cities' url='/api/cities' resultSelector="info" />
+      <VStack>
+        <H3>Cities</H3>
+        <Table data="{cities}">
+          <Column header="Name" bindTo="name" />
+          <Column header="Population" bindTo="population" />
+        </Table>
+      </VStack>
+    </App>
+  `}
+/>
+
+### Transforming the Result in the Displaying Component [#transform-data-1]
+
+An intuitive option is to transform the data retrieved from a `DataSource` in the component displaying the data.
+
+The following example orders a list of friends' data by descending age:
+
+```ueml copy /friends.value.toSorted((a, b) => b.age - a.age)/
+<App>
+  <DataSource id='friends' url='/api/friends' />
+  <VStack>
+    <H3>My Friens:</H3>
+    <Items data="{friends.value.toSorted((a, b) => b.age - a.age)}">
+      <H4>{$item.age}: {$item.name}</H4>
+    </Items>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: Transforming data in the displaying component"
+  api={{
+    initialize: `
+      $state.friends = [
+        { name: "Eve", age: 45 },
+        { name: "Charlie", age: 35 },
+        { name: "Alice", age: 25 },
+        { name: "Bob", age: 30 },
+        { name: "Frank", age: 50 },
+        { name: "David", age: 40 },
+      ]
+    `,
+    operations: {
+      'get-friends': {
+        method: 'get',
+        url: '/api/friends',
+        handler: `
+          return $state.friends;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource id='friends' url='/api/friends' />
+      <VStack>
+        <H3>My Friens:</H3>
+        <Items data="{friends.value.toSorted((a, b) => b.age - a.age)}">
+          <H4>{$item.age}: {$item.name}</H4>
+        </Items>
+      </VStack>
+    </App>
+  `}
+/>
+
+<Callout type="info" emoji="📔">
+  Though this technique is seducing, you must apply the transform in every component that intends to display the data. Should you change that transform (let's say from descending to ascending order), you should maintain each occurrence.
+</Callout>
+
+### Transforming the Result with `transformResult` [#transform-data-2]
+
+`DataSource` has a `transformResult` property you can use to define a data transforms operation.
+
+Let's assume we have this hotel review information retrieved from the backend:
+
+```json
+[
+  { "hotel": "Golden Beach Hotel", "reviews": [5, 3, 3, 4] },
+  { "hotel": "Sunset Hotel", "reviews": [2, 3, 3, 4, 4, 4, 5] },
+  { "hotel": "Blue Lagoon Hotel", "reviews": [5, 5, 5, 5] },
+  { "hotel": "Green Garden Hotel", "reviews": [1, 2, 3, 2, 2] }
+]
+```
+
+We are interested in the average value of reviews. With `transformResult`, we can transform the entire resultset and add a new field to each hotel row with the average review points:
+
+```ueml copy {5}
+<App>
+  <DataSource 
+    id='reviews' 
+    url='/api/reviews' 
+    transformResult="{(data) => data.map(d => ({...d, avg: avg(d.reviews, 2)}))}" />
+  <VStack>
+  <H3>Reviews</H3>
+  <Table data="{reviews}">
+    <Column header="Hotel" bindTo="hotel" />
+    <Column header="#of Reviews" bindTo="reviews.length" />
+    <Column header="Avg Review" bindTo="avg" />
+  </Table>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: Using transformResult"
+  api={{
+    initialize: `
+      $state.reviews = [
+        { "hotel": "Golden Beach Hotel", reviews: [5, 3, 3, 4] },
+        { "hotel": "Sunset Hotel", reviews: [2, 3, 3, 4, 4, 4, 5] },
+        { "hotel": "Blue Lagoon Hotel", reviews: [5, 5, 5, 5] },
+        { "hotel": "Green Garden Hotel", reviews: [1, 2, 3, 2, 2] }
+      ];
+    `,
+    operations: {
+      'get-cities': {
+        method: 'get',
+        url: '/api/reviews',
+        handler: `
+          return $state.reviews;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <DataSource 
+        id='reviews' url='/api/reviews' 
+        transformResult="{(data) => data.map(d => ({...d, avg: avg(d.reviews, 2)}))}" />
+      <VStack>
+      <H3>Reviews</H3>
+      <Table data="{reviews}">
+        <Column header="Hotel" bindTo="hotel" />
+        <Column header="#of Reviews" bindTo="reviews.length" />
+        <Column header="Avg Review" bindTo="avg" />
+      </Table>
+      </VStack>
+    </App>
+  `}
+/>
+
+### Transforming the Result via a Helper Variable [#transform-data-3]
+
+You can introduce a new (declarative) variable and define its value as a transformation of the DataSource value. Let's assume we have reviews about cafes and want to display them in descending order, the cafe with the best review at the top.
+
+Let's declare the `sortedReviews` variable in code-behind:
+
+```js
+var sortedReviews = reviews.value
+  .map(c => ({...c, avg: avg(c.reviews, 2)}))
+  .toSorted((a, b) => b.avg - a.avg);
+```
+
+<Callout type="info" emoji="📔">
+  XMLUI does not allow you to invoke a JavaScript array's `sort()` function, as that sorts the data in place. Use the `toSorted()` function with the same signature, which creates a new array with sorted data.
+</Callout>
+
+Due to XMLUI's reactive nature, `sortedReviews` is evaluated every time the data is fetched (as `reviews.value` changes). In the `Table` component's `data` property, you refer to the `sortedReviews` variable to ensure the transformed value is displayed.
+
+```ueml copy /sortedReviews/
+<App>
+  <DataSource 
+    id='reviews' url='/api/cafe-reviews'  />
+  <VStack>
+  <H3>Reviews</H3>
+  <Table data="{sortedReviews}">
+    <Column header="Cafe" bindTo="cafe" />
+    <Column header="#of Reviews" bindTo="reviews.length" />
+    <Column header="Avg Review" bindTo="avg" />
+  </Table>
+  </VStack>
+</App>
+```
+
+<Playground
+  name="Example: Transforming data via a helper variable"
+  api={{
+    initialize: `
+      $state.cafes = [
+        { "cafe": "Golden Beach Hotel", reviews: [5, 3, 3, 4] },
+        { "cafe": "Sunset Hotel", reviews: [2, 3, 3, 4, 4, 4, 5] },
+        { "cafe": "Blue Lagoon Hotel", reviews: [5, 5, 5, 5] },
+        { "cafe": "Green Garden Hotel", reviews: [1, 2, 3, 2, 2] }
+      ];
+    `,
+    operations: {
+      'get-cities': {
+        method: 'get',
+        url: '/api/cafe-reviews',
+        handler: `
+          return $state.cafes;
+        `,
+      },
+    }
+  }}
+  app={`
+    <App>
+      <script>
+        var sortedReviews = reviews.value
+          .map(c => ({...c, avg: avg(c.reviews, 2)}))
+          .toSorted((a, b) => b.avg - a.avg);
+      </script>
+      <DataSource 
+        id='reviews' url='/api/cafe-reviews'  />
+      <VStack>
+      <H3>Reviews</H3>
+      <Table data="{sortedReviews}">
+        <Column header="Cafe" bindTo="cafe" />
+        <Column header="#of Reviews" bindTo="reviews.length" />
+        <Column header="Avg Review" bindTo="avg" />
+      </Table>
+      </VStack>
+    </App>
+  `}
+/>
+
 ## Persisting Data [#persisting-data]
 
 In contrast to fetching data, where the framework can be smart about when to initiate the data fetch operation, persisting data requires an explicit user (or system) trigger to invoke a related API endpoint.

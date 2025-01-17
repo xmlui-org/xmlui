@@ -15,7 +15,7 @@ $themeVars: ();
   border-width: createThemeVar('thickness-border-Button-#{$colorScheme}-solid');
   border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid');
   border-style: createThemeVar('style-border-Button-#{$colorScheme}-solid');
-  background-color: createThemeVar('color-bg-Button-#{$colorScheme}-solid');
+  background: createThemeVar('color-bg-Button-#{$colorScheme}-solid');
   color: createThemeVar('color-text-Button-#{$colorScheme}-solid');
   box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-solid');
 
@@ -30,20 +30,21 @@ $themeVars: ();
   &:not([disabled]) {
     &:hover {
       border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid--hover');
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-solid--hover');
       color: createThemeVar('color-text-Button-#{$colorScheme}-solid--hover');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-solid--hover');
     }
 
     &:active {
       border-color: createThemeVar('color-border-Button-#{$colorScheme}-solid--active');
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-solid--active');
       color: createThemeVar('color-text-Button-#{$colorScheme}-solid--active');
+      box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-solid--active');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-solid--active');
     }
   }
 
   &:disabled {
     cursor: not-allowed;
-    background-color: createThemeVar('color-bg-Button--disabled');
+    background: createThemeVar('color-bg-Button--disabled');
     color: createThemeVar('color-text-Button--disabled');
     border-color: createThemeVar('color-border-Button--disabled');
   }
@@ -59,7 +60,7 @@ $themeVars: ();
   border-style: createThemeVar('style-border-Button-#{$colorScheme}-outlined');
   color: createThemeVar('color-text-Button-#{$colorScheme}-outlined');
   box-shadow: createThemeVar('shadow-Button-#{$colorScheme}-outlined');
-  background-color: transparent;
+  background: transparent;
 
   &:focus-visible {
     outline-width: createThemeVar('thickness-outline-Button-#{$colorScheme}-outlined--focus');
@@ -71,13 +72,13 @@ $themeVars: ();
   &:not([disabled]) {
     &:hover {
       border-color: createThemeVar('color-border-Button-#{$colorScheme}-outlined--hover');
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--hover');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--hover');
       color: createThemeVar('color-text-Button-#{$colorScheme}-outlined--hover');
     }
 
     &:active {
       border-color: createThemeVar('color-border-Button-#{$colorScheme}-outlined--active');
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--active');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-outlined--active');
       color: createThemeVar('color-text-Button-#{$colorScheme}-outlined--active');
     }
   }
@@ -97,7 +98,7 @@ $themeVars: ();
   border-width: createThemeVar('thickness-border-Button-#{$colorScheme}-ghost');
   border-color: transparent;
   border-style: solid;
-  background-color: transparent;
+  background: transparent;
   color: createThemeVar('color-text-Button-#{$colorScheme}-ghost');
 
   &:focus-visible {
@@ -109,12 +110,12 @@ $themeVars: ();
 
   &:not([disabled]) {
     &:hover {
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--hover');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--hover');
       color: createThemeVar('color-text-Button-#{$colorScheme}-ghost--hover');
     }
 
     &:active {
-      background-color: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--active');
+      background: createThemeVar('color-bg-Button-#{$colorScheme}-ghost--active');
       color: createThemeVar('color-text-Button-#{$colorScheme}-ghost--active');
     }
   }
@@ -129,11 +130,12 @@ $themeVars: ();
 .button {
   width: createThemeVar("width-Button");
   height: createThemeVar("height-Button");
+  line-height: normal;
   min-width: 0;
   padding: 0;
   margin: 0;
   border-style: solid;
-  transition: color 0.2s, background-color 0.2s;
+  transition: color 0.2s, background 0.2s;
   user-select: none;
   cursor: pointer;
   display: flex;
@@ -156,19 +158,19 @@ $themeVars: ();
   &.buttonHorizontal {
     flex-direction: row;
     &.xs {
-      padding: createThemeVar("padding-vertical-xs-Button") createThemeVar("padding-horizontal-xs-Button");
+      padding: createThemeVar("padding-vertical-Button-xs") createThemeVar("padding-horizontal-Button-xs");
     }
 
     &.sm {
-      padding: createThemeVar("padding-vertical-sm-Button") createThemeVar("padding-horizontal-sm-Button");
+      padding: createThemeVar("padding-vertical-Button-sm") createThemeVar("padding-horizontal-Button-sm");
     }
 
     &.md {
-      padding: createThemeVar("padding-vertical-md-Button") createThemeVar("padding-horizontal-md-Button");
+      padding: createThemeVar("padding-vertical-Button-md") createThemeVar("padding-horizontal-Button-md");
     }
 
     &.lg {
-      padding: createThemeVar("padding-vertical-lg-Button") createThemeVar("padding-horizontal-lg-Button");
+      padding: createThemeVar("padding-vertical-Button-lg") createThemeVar("padding-horizontal-Button-lg");
     }
   }
 

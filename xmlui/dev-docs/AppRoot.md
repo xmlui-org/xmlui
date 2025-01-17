@@ -80,14 +80,16 @@ With these steps, `AppRoot` ensures that the app uses the theme infrastructure a
 ```xml
 <AppContext.Provider>
   <AppStateContext.Provider>
-    {renderRoot(rootContainer, ...)}
+    {renderRoot(rootContainer, memoedVars)}
   </AppStateContext.Provider>
  </AppContext.Provider>
 ```
 
-To display the application and implement its behavior, `AppContent` invokes the `renderRoot` function, which returns a `ReactNode` object representing the running app as a React component.
+To display the application and implement its behavior, `AppContent` invokes the `renderRoot` function. `renderRoot` receives two parameters:
+- The first parameter is the app definition wrapped into the root `Container` component (as the `AppRoot` component already prepared it).
+- Second, a reference to an empty map of memoized reactive variables (the root object does not define any reactive variables for the app)
 
-To display the application and implement its behavior, `AppContent` invokes the `renderRoot` function. `renderRoot` receives the app definition wrapped into the root `Container` component (as the `AppRoot` component already prepared it). It returns a `ReactNode` object representing the running app as a React component.
+The function returns a `ReactNode` object representing the running app as a React component.
 
 ## Implementation Details
 

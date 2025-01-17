@@ -1,5 +1,14 @@
 # Component Rendering
 
+You can use xmlui in two ways:
+- You create a standalone app (the entire app is created with xmlui)
+- You inject an xmlui-based partial view into an existing web page.
+Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
+
+`AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components).
+
+`AppRoot` expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine. 
+
 ## How Native React Components Are Used
 
 The framework cannot directly use native React components. They must be wrapped with a unique component that acts as a bridge between xmlui and React.
@@ -219,4 +228,48 @@ The engine utilizes several renderer contexts, `RendererContext` being just one 
 - `lookupSyncCallback`. Some components may contain properties with callback functions (such as `rowDisabledPredicate` in a `Table`). This function creates a sync function from the current property value (e.g., transforming an arrow expression or a function declaration text to its internal representation). This function can be safely called back from a native React component.
 - `layoutCss`. This property holds the component's [layout properties](./glossary.md#layout-properties), which can be represented in a `React.CSSProperties` object.
 - `layoutNonCss`: Some component layout properties, such as `orientation,` cannot have an unambiguous CSS style pair. These properties are collected into a hash object with their values and put into `layoutNonCss`.
+
+The engine uses another rendering context for its internal operation:
+
+```ts
+interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
+  extends ComponentRendererContextBase<T> {
+    // --- Properties omitted for brevity, learn about them later
+  }
+```
+
+`InnerRendererContext` adds extra properties to `ComponentRendererContextBase`:
+
+- `dispatch`. This function is a dispatcher that changes the state of a particular container following the redux style by dispatching a state-changing action.
+- `registerComponentApi`. Components may expose an API that other components can use through the component instance ID. This function can register that API with the internal ID of the component instance.
+- `lookupSyncCallback`. This function creates a sync callback function from the current property value using the internal ID of the component instance.
+- `lookupAction`. This function looks up an action by its unique name within the component node using the action.
+- `memoedVarsRef`. This property refers to the map of the memoized variables available within the component being rendered. 
+- `parentRenderContext`. This property accepts the context of the current component's parent (e.g., the parent component's properties, the definition of its children, and the function that renders the children). The component may use this information for its rendering purposes.
+- `uiIdInfoRef`. Components working with data instantiate some internal components (so-called loaders) to manage data fetching asynchronously. This property is a reference to the map holding the loaders already instantiated. The engine uses this map to avoid duplicated loaders.
+
+When rendering a particular child component, the engine uses a rendering context with some extra properties:
+
+```ts
+interface ChildRendererContext extends InnerRendererContext {
+  // --- Properties omitted for brevity, learn about them later
+}
+```
+
+`ChildRendererContext` adds extra properties to `InnerRendererContext`:
+- `stateFieldPartChanged`. This state stored in a container can be a compound object (arrays, hash objects, and their combinations). With this function, a child component can sign that a part of this state object (or the entire object) has changed.
+- `cleanup`. This method can be called when the rendered React component is unmounted for optional cleanup activities.
+
+
+## The Rendering Flow
+
+As you learned, the rendering engine's entry point is the `renderRoot()` function. When `AppRoot` invokes this function, it ensures that the app's root is wrapped with a top-level state container representing the app state. 
+
+`renderRoot()` invokes the `renderChild()` function, which expects a `RenderChildContext` argument. `renderChild()` is the rendering engine's jolly-joker function; it implements all the nitty-gritty details that make the engine so powerful.
+
+When `renderRoot()` calls `renderChild(),` the context it passes contains the app's definition and all others with their default (empty or no-op) values.
+
+### The `renderChild` function
+
+
 
