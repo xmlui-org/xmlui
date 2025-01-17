@@ -1,91 +1,93 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import type React from "react";
-import { useState } from "react";
+import React, { Children, forwardRef, useMemo } from "react";
 import { useCallback } from "react";
 import { useEffect } from "react";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 export type AnimationProps = {
-    children?: React.ReactNode;
-    animation: object;
-    registerComponentApi?: RegisterComponentApiFn;
-    onStop?: () => void;
-    animateWhenInView?: boolean;
-    duration?: number;
-    once?: boolean;
+  children?: React.ReactNode;
+  animation: any;
+  registerComponentApi?: RegisterComponentApiFn;
+  onStop?: () => void;
+  onStart?: () => void;
+  animateWhenInView?: boolean;
+  duration?: number;
+  once?: boolean;
 };
 
 export const Animation = ({
-                              children,
-                              registerComponentApi,
-                              animation,
-                              onStop,
-                              animateWhenInView,
-                              duration = 500,
-                              once = false,
-                          }: AnimationProps) => {
-    const [settings, setSettings] = useState(animation);
+  children,
+  registerComponentApi,
+  animation,
+  duration = 500,
+  onStop,
+  onStart,
+  animateWhenInView = false,
+  once = false,
+}: AnimationProps) => {
+  const animationSettings = useMemo(
+    () => ({
+      from: animation.from,
+      to: animation.to,
+      config: {
+        ...animation.config,
+        duration,
+      },
+    }),
+    [animation],
+  );
 
-    const [springs, api] = useSpring(() => ({
-        ...settings,
-        config: {
-            duration,
-            once,
-        },
-        onStart: () => {},
-        onRest: () => {
-            onStop?.();
-        },
-    }));
+  const [springs, api] = useSpring(
+    () => ({
+      ...animationSettings,
+      onStart,
+      onRest: onStop,
+      once,
+    }),
+    [animationSettings, once, onStart, onStop],
+  );
 
-    const [ref, animationStyles] = useInView(
-        () => ({
-            ...settings,
-        }),
-        {
-            rootMargin: "-40% 0%",
-            once,
-        },
+  const [ref, animationStyles] = useInView(() => animationSettings, {
+    rootMargin: "-40% 0%",
+    onStart,
+    onRest: onStop,
+    once,
+  });
+
+  const startAnimation = useCallback(() => {
+    api.start(animation);
+    return () => {
+      api.stop();
+    };
+  }, [api]);
+
+  const stopAnimation = useCallback(() => {
+    api.stop();
+  }, [api]);
+
+  useEffect(() => {
+    registerComponentApi?.({
+      start: startAnimation,
+      stop: stopAnimation,
+    });
+  }, [registerComponentApi, startAnimation]);
+
+  const Components = Children.map(children, (child) => {
+    return animated(
+      forwardRef(function InlineComponentDef(props, ref) {
+        return React.isValidElement(child) ? (
+          React.cloneElement(child, { ...props, ref })
+        ) : (
+          <>{child}</>
+        );
+      }),
     );
+  });
 
-    const startAnimation = useCallback(() => {
-        api.start(settings);
-        return () => {
-            api.stop();
-        };
-    }, [api, settings]);
-
-    const stopAnimation = useCallback(() => {
-        api.stop();
-    }, [api]);
-
-    useEffect(() => {
-        registerComponentApi?.({
-            start: startAnimation,
-            stop: stopAnimation,
-        });
-    }, [registerComponentApi, startAnimation]);
-
-    return animateWhenInView ? (
-        <animated.div
-            ref={ref}
-            style={{
-                width: "auto",
-                height: "auto",
-                ...animationStyles,
-            }}
-        >
-            {children}
-        </animated.div>
-    ) : (
-        <animated.div
-            style={{
-                width: "fit-content",
-                height: "fit-content",
-                ...springs,
-            }}
-        >
-            {children}
-        </animated.div>
-    );
+  return Components.map((Component, index) => {
+    if (animateWhenInView) {
+      return <Component style={animationStyles} ref={ref} key={index} />;
+    }
+    return <Component style={springs} key={index} />;
+  });
 };

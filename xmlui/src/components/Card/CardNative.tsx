@@ -1,6 +1,6 @@
 import styles from "./Card.module.scss";
 import classnames from "@components-core/utils/classnames";
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, ReactNode} from "react";
 import { forwardRef } from "react";
 import { Avatar } from "@components/Avatar/AvatarNative";
 import { LocalLink } from "@components/Link/LinkNative";
