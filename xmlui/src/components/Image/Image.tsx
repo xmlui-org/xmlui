@@ -42,7 +42,7 @@ export const imageComponentRenderer = createComponentRenderer(
         fit={extractValue(node.props.fit)}
         lazyLoad={extractValue.asOptionalBoolean(node.props.lazyLoad)}
         aspectRatio={extractValue(node.props.aspectRatio)}
-        layout={layoutCss}
+        style={layoutCss}
         animation={extractValue(node.props.animation)}
       />
     );

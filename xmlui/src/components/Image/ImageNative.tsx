@@ -1,8 +1,7 @@
 import styles from "./Image.module.scss";
-import {CSSProperties, HTMLAttributes, useEffect} from "react";
+import {CSSProperties, HTMLAttributes} from "react";
 import { forwardRef } from "react";
 import classnames from "@components-core/utils/classnames";
-import { animated, useSpring } from '@react-spring/web'
 
 // =====================================================================================================================
 // React Image component implementation
@@ -11,27 +10,20 @@ type Props = {
   src?: string;
   alt?: string;
   fit?: "cover" | "contain";
-  layout?: CSSProperties;
+  style?: CSSProperties;
   lazyLoad?: boolean;
   aspectRatio?: string;
   animation?: object;
 } & Pick<HTMLAttributes<HTMLImageElement>, "onClick">;
 
 export const Image = forwardRef(function Img(
-  { src, alt, fit = "contain", layout, onClick, aspectRatio, lazyLoad, animation }: Props,
+  { src, alt, fit = "contain", style, onClick, aspectRatio, lazyLoad }: Props,
   ref,
 ) {
 
-  const [animationStyles, api] = useSpring(() => animation);
 
-  useEffect(() => {
-    api.start(animation);
-    return () => {
-      api.stop();
-    };
-  }, [animation, api]);
   return (
-    <animated.img
+    <img
       src={src}
       ref={ref as any}
       alt={alt}
@@ -39,7 +31,7 @@ export const Image = forwardRef(function Img(
       className={classnames(styles.img, {
         [styles.clickable]: !!onClick,
       })}
-      style={{ objectFit: fit, boxShadow: "none", ...layout, aspectRatio: aspectRatio, ...animationStyles }}
+      style={{ objectFit: fit, boxShadow: "none", ...style, aspectRatio: aspectRatio }}
       onClick={onClick}
     />
   );
