@@ -25,7 +25,7 @@ export const Animation = ({
   animateWhenInView = false,
   once = false,
 }: AnimationProps) => {
-  const animationSettings = useMemo(
+  const animationSettings = useMemo<any>(
     () => ({
       from: animation.from,
       to: animation.to,
@@ -33,24 +33,19 @@ export const Animation = ({
         ...animation.config,
         duration,
       },
-    }),
-    [animation],
-  );
-
-  const [springs, api] = useSpring(
-    () => ({
-      ...animationSettings,
       onStart,
       onRest: onStop,
       once,
     }),
-    [animationSettings, once, onStart, onStop],
+    [animation, duration, onStart, onStop, once],
   );
+
+  const [springs, api] = useSpring(() => ({
+    ...animationSettings,
+  }));
 
   const [ref, animationStyles] = useInView(() => animationSettings, {
     rootMargin: "-40% 0%",
-    onStart,
-    onRest: onStop,
     once,
   });
 
@@ -76,7 +71,7 @@ export const Animation = ({
     return animated(
       forwardRef(function InlineComponentDef(props, ref) {
         return React.isValidElement(child) ? (
-          React.cloneElement(child, { ...props, ref })
+          React.cloneElement(child, { ...props, ref } as any)
         ) : (
           <>{child}</>
         );

@@ -8,5 +8,7 @@ export const Logo = ({ style }: { style?: CSSProperties }) => {
     return null;
   }
   //width auto for safari
-  return <Image src={logoUrl} alt={"Logo"} layout={{ width: 'auto', boxShadow: "none", ...style }} />;
+  return (
+    <Image src={logoUrl} alt={"Logo"} style={{ width: "auto", boxShadow: "none", ...style }} />
+  );
 };
