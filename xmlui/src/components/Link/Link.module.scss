@@ -11,6 +11,7 @@ $color-text-Link: createThemeVar("color-text-Link");
 $color-text-Link--active: createThemeVar("color-text-Link--active");
 $color-text-Link--hover: createThemeVar("color-text-Link--hover");
 $color-text-Link--hover--active: createThemeVar("color-text-Link--hover--active");
+$font-family-Link: createThemeVar("font-family-Link");
 $font-size-Link: createThemeVar("font-size-Link");
 $font-weight-Link: createThemeVar("font-weight-Link");
 $font-weight-Link--active: createThemeVar("font-weight-Link--active");
@@ -25,6 +26,7 @@ $gap-icon-Link: createThemeVar("gap-icon-Link");
 .container {
   flex-shrink: 0;
   color: $color-text-Link;
+  font-family: $font-family-Link;
   font-weight: $font-weight-Link;
   font-size: $font-size-Link;
   cursor: pointer;
