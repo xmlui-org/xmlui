@@ -271,5 +271,60 @@ When `renderRoot()` calls `renderChild(),` the context it passes contains the ap
 
 ### The `renderChild` function
 
+This function checks the component definition for exceptional that come from these rendering engine features:
+
+**1. Rendering a `Slot`**
+
+The `Slot` component is a placeholder within a compound component and marks the place where the children should be transposed from their client. Assume we have this compound component:
+
+```xml
+<Component name="MyComponent">
+  <VStack backgroundColor="red" color="white">
+    <Slot />
+  </VStack>
+</Component>
+```
+
+Let's use this component from the app like this:
+
+```xml
+<App var.myValue="42">
+  <MyComponent>The truth is {myValue}</MyComponent>
+</App>
+```
+
+When we render `MyComponent`, its `Slot` should be replaced by the rendered value of `The truth is {myValue}`. However, at the moment of rendering, we are in the context of `MyComponent`, where `myValue` has no meaning; it was declared in the parent's context.
+
+So,  whenever a `Slot` is rendered, its content must be rendered in the context of the parent (where the slot's content comes from).
+
+**2. Rendering text nodes**
+
+When the markup contains text within an opening and closing tag, like here, during the markup parsing and transformation phase, it is wrapped into a `TextNode` virtual component.
+
+Source markup:
+
+```xml
+<Stack>
+  Hello, my name is {myName}
+  <Icon name="arrowright">
+</Stack>
+```
+
+Transformed markup:
+
+```xml
+<Stack>
+  <TextNode>Hello, my name is {myName}<TextNode>
+  <Icon name="arrowright">
+</Stack>
+```
+
+`TextNode` is virtual; this name does not have an xmlui component. The rendering engine automatically renders the appropriate text for this node. The same is true for `TextNodeCData`. 
+
+
+
+
+
+
 
 
