@@ -72,6 +72,7 @@ $border-bottom-NavPanel: createThemeVar("border-bottom-AppHeader");
     }
     .navPanelWrapper {
       border-bottom: $border-bottom-NavPanel;
+      justify-content: end;
     }
   }
 
