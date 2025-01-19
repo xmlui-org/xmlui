@@ -49,6 +49,7 @@ $themeVars: ();
   .inputLabel {
     display: flex;
     color: createThemeVar("color-text-FormItemLabel");
+    font-family: createThemeVar("font-family-FormItemLabel");
     font-size: createThemeVar("font-size-FormItemLabel");
     font-weight: createThemeVar("font-weight-FormItemLabel");
     font-style: createThemeVar("font-style-FormItemLabel");
