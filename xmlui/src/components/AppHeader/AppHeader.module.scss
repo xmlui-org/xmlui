@@ -16,6 +16,7 @@ $themeVars: t.appendBorderVars($themeVars, $component) !global;
 // --- Other
 $padding-horizontal-AppHeader: createThemeVar("padding-horizontal-#{$component}");
 $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
+$align-content-AppHeader: createThemeVar("align-content-#{$component}");
 
 .header {
   position: relative;
@@ -55,6 +56,7 @@ $width-logo-AppHeader: createThemeVar("width-logo-#{$component}");
   height: 100%;
   align-items: center;
   gap: var(--stack-gap-default);
+  justify-content: $align-content-AppHeader;
 }
 
 .logoAndTitle {

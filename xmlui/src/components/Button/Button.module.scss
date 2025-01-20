@@ -9,6 +9,7 @@ $themeVars: ();
 
 // --- CSS properties of solid buttons with the specified color scheme
 @mixin solid($colorScheme){
+  font-family: createThemeVar('font-family-Button-#{$colorScheme}-solid');
   font-size: createThemeVar('font-size-Button-#{$colorScheme}-solid');
   font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-solid');
   border-radius: createThemeVar('radius-Button-#{$colorScheme}-solid');
@@ -52,6 +53,7 @@ $themeVars: ();
 
 // --- CSS properties of outlined buttons with the specified color scheme
 @mixin outlined($colorScheme){
+  font-family: createThemeVar('font-family-Button-#{$colorScheme}-outlined');
   font-size: createThemeVar('font-size-Button-#{$colorScheme}-outlined');
   font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-outlined');
   border-radius: createThemeVar('radius-Button-#{$colorScheme}-outlined');
@@ -92,6 +94,7 @@ $themeVars: ();
 
 // --- CSS properties of ghost buttons with the specified color scheme
 @mixin ghost($colorScheme){
+  font-family: createThemeVar('font-family-Button-#{$colorScheme}-ghost');
   font-size: createThemeVar('font-size-Button-#{$colorScheme}-ghost');
   font-weight: createThemeVar('font-weight-Button-#{$colorScheme}-ghost');
   border-radius: createThemeVar('radius-Button-#{$colorScheme}-ghost');

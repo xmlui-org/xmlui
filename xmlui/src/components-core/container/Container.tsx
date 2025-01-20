@@ -1031,7 +1031,19 @@ interface ChildRendererContext extends InnerRendererContext {
 }
 
 /**
+ * This function is the jolly-joker of the rendering process. It renders a child component
+ * based on the specified context, which contains the component's definition, the current state,
+ * and other necessary information.
  * 
+ * The function checks a few special cases:
+ * - <Slot> with a single text node child: it renders the text in the context of the parent component.
+ * - CDATA text nodes: it renders the text as is without parsing it.
+ * - TextNode: it extracts the text from the node and renders it.
+ * 
+ * In other cases, it extracts the component's ID and renders the component as a <ComponentNode>.
+ * 
+ * As this function passes itself as a renderChild function to the <ComponentNode>, it can render
+ * nested components recursively.
  */
 function renderChild({
   node,
@@ -1064,8 +1076,7 @@ function renderChild({
   //
   //  and then 
   //  
-  // <MyComponent>hey lorem ipsum</MyComponent>
-
+  //  <MyComponent>hey lorem ipsum</MyComponent>
   if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
     if (
       parentRenderContext.children[0].type === "TextNodeCData" ||
@@ -1074,17 +1085,21 @@ function renderChild({
       return parentRenderContext.renderChild(parentRenderContext.children);
     }
   }
-  // --- We do not parse text nodes specified with CDATA
+
+  // --- We do not parse text nodes specified with CDATA to avoid whitespace collapsing
   const nodeValue = (node.props as any)?.value;
   if (node.type === "TextNodeCData") {
     return nodeValue ?? "";
   }
 
+  // --- A TextNode value may contain nexted expressions, so we extract it.
   if (node.type === "TextNode") {
-    // --- Special conversion: "&nbsp;" is converted to a non-breaking space
     return extractParam(state, nodeValue, appContext, true);
   }
 
+  // --- In other cases, we extract the component ID, and then render the component.
+  // --- A component's ID is generally a string with identifier syntax. However, some
+  // --- internal components have IDs with expressions, so we evaluate them.
   const key = extractParam(state, node.uid, appContext, true);
   return (
     <ComponentNode
@@ -1223,7 +1238,7 @@ function transformNodeWithRawDataProp(node) {
 }
 
 /**
- * ...
+ * The ComponentNode it the outermost React component wrapping an xmlui component.
  */
 const ComponentNode = memo(
   forwardRef(function ComponentNode(
@@ -1279,7 +1294,6 @@ const ComponentNode = memo(
 
     let renderedChild = null;
     if (isContainerLike(nodeWithTransformedDatasourceProp)) {
-      // console.log("ContainerLike", { nodeWithTransformedDatasourceProp, state });
       renderedChild = (
         <ComponentContainer
           resolvedKey={resolvedKey}
