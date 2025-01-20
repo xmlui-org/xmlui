@@ -1,13 +1,14 @@
 # Component Rendering
 
 You can use xmlui in two ways:
+
 - You create a standalone app (the entire app is created with xmlui)
 - You inject an xmlui-based partial view into an existing web page.
-Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
+  Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
 
 `AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components).
 
-`AppRoot` expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine. 
+`AppRoot` expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine.
 
 ## How Native React Components Are Used
 
@@ -234,8 +235,8 @@ The engine uses another rendering context for its internal operation:
 ```ts
 interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
   extends ComponentRendererContextBase<T> {
-    // --- Properties omitted for brevity, learn about them later
-  }
+  // --- Properties omitted for brevity, learn about them later
+}
 ```
 
 `InnerRendererContext` adds extra properties to `ComponentRendererContextBase`:
@@ -244,7 +245,7 @@ interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
 - `registerComponentApi`. Components may expose an API that other components can use through the component instance ID. This function can register that API with the internal ID of the component instance.
 - `lookupSyncCallback`. This function creates a sync callback function from the current property value using the internal ID of the component instance.
 - `lookupAction`. This function looks up an action by its unique name within the component node using the action.
-- `memoedVarsRef`. This property refers to the map of the memoized variables available within the component being rendered. 
+- `memoedVarsRef`. This property refers to the map of the memoized variables available within the component being rendered.
 - `parentRenderContext`. This property accepts the context of the current component's parent (e.g., the parent component's properties, the definition of its children, and the function that renders the children). The component may use this information for its rendering purposes.
 - `uiIdInfoRef`. Components working with data instantiate some internal components (so-called loaders) to manage data fetching asynchronously. This property is a reference to the map holding the loaders already instantiated. The engine uses this map to avoid duplicated loaders.
 
@@ -257,13 +258,13 @@ interface ChildRendererContext extends InnerRendererContext {
 ```
 
 `ChildRendererContext` adds extra properties to `InnerRendererContext`:
+
 - `stateFieldPartChanged`. This state stored in a container can be a compound object (arrays, hash objects, and their combinations). With this function, a child component can sign that a part of this state object (or the entire object) has changed.
 - `cleanup`. This method can be called when the rendered React component is unmounted for optional cleanup activities.
 
-
 ## The Rendering Flow
 
-As you learned, the rendering engine's entry point is the `renderRoot()` function. When `AppRoot` invokes this function, it ensures that the app's root is wrapped with a top-level state container representing the app state. 
+As you learned, the rendering engine's entry point is the `renderRoot()` function. When `AppRoot` invokes this function, it ensures that the app's root is wrapped with a top-level state container representing the app state.
 
 `renderRoot()` invokes the `renderChild()` function, which expects a `RenderChildContext` argument. `renderChild()` is the rendering engine's jolly-joker function; it implements all the nitty-gritty details that make the engine so powerful.
 
@@ -271,7 +272,7 @@ When `renderRoot()` calls `renderChild(),` the context it passes contains the ap
 
 ### The `renderChild` function
 
-This function checks the component definition for exceptional that come from these rendering engine features:
+This function checks the component definition for special arrangements that come from these rendering engine features:
 
 **1. Rendering a `Slot`**
 
@@ -293,13 +294,13 @@ Let's use this component from the app like this:
 </App>
 ```
 
-When we render `MyComponent`, its `Slot` should be replaced by the rendered value of `The truth is {myValue}`. However, at the moment of rendering, we are in the context of `MyComponent`, where `myValue` has no meaning; it was declared in the parent's context.
+When the engine renders `MyComponent`, its `Slot` should be replaced with the rendered value of `The truth is {myValue}`. However, at that moment, the expression is in the context of `MyComponent` where `myValue` has no meaning; it was declared in the parent's context.
 
 So,  whenever a `Slot` is rendered, its content must be rendered in the context of the parent (where the slot's content comes from).
 
 **2. Rendering text nodes**
 
-When the markup contains text within an opening and closing tag, like here, during the markup parsing and transformation phase, it is wrapped into a `TextNode` virtual component.
+When the markup contains text within an opening and closing tag, like here, during the markup parsing and transformation phase, it is wrapped into a `TextNode` virtual component:
 
 Source markup:
 
@@ -319,12 +320,21 @@ Transformed markup:
 </Stack>
 ```
 
-`TextNode` is virtual; this name does not have an xmlui component. The rendering engine automatically renders the appropriate text for this node. The same is true for `TextNodeCData`. 
+`TextNode` is virtual; this name does not have an xmlui component. The rendering engine automatically renders the appropriate text for this node.
 
+Besides `TextNode`, `TextNodeCData` (from a CDATA node in the markup) is also a virtual component with the same behavior.
 
+Due to these rendering engine features (special handling of `Slot`, `TextNode`, and `TextNodeCData` ), `renderChild` differentiates the following cases:
+1. The component is a `Slot` with a single `TextNode` or `TextNodeCData`. The rendered output is a text evaluated in the parent context.
+2. The component is a `TextNodeCData`. The output is the component value without any change (the purpose of CDATA is to preserve each character as it is).
+3. The component is a `TextNode`. The output is the text evaluated in the current rendering context.
+4. In other cases, `renderChild` returns a `ComponentNode` React component.
 
+### `ComponentNode`
 
+This React component's primary responsibility is to decide whether the wrapped xmlui component should be rendered as it is or wrapped into a container that manages its state.
 
-
-
+The only usage of `ComponentNode` is in `renderChild`, which passes a `key` and a `resolvedKey` property to `ComponentNode`:
+- `key`: This property is the traditional `key` property of React, used to distinguish individual component items within a list (React optimizes the DOM updates with this property's help).
+- `resolvedKey`: This internal property allows debugging containers (within the rendering engine development). It comprises the IDs of components in the current container chain and may generate console log messages.
 
