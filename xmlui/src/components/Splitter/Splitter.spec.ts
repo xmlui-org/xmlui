@@ -5,14 +5,15 @@
  */
 
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { ComponentDriver } from "@testing/ComponentDrivers";
+import { expect, createTestWithDriver } from "@testing/fixtures";
 
 class SplitterDriver extends ComponentDriver {}
 
 const test = createTestWithDriver(SplitterDriver);
 
 test.skip(
-  "Splitter renders correctly",
+  "Splitter renders & is visible",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ createDriver }) => {},
 );

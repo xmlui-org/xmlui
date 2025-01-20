@@ -5,12 +5,13 @@ import {
   pixelStrToNum,
   SKIP_REASON,
 } from "@testing/component-test-helpers";
-import { expect as fixtureExpect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { expect as fixtureExpect, createTestWithDrivers } from "@testing/fixtures";
 import {
   alignmentOptionValues,
   buttonTypeValues,
   type IconPosition,
 } from "@components/abstractions";
+import { ButtonDriver } from "@testing/ComponentDrivers";
 
 // --- Setup
 
@@ -23,7 +24,7 @@ const expect = fixtureExpect.extend({
    *
    * ```js
    * const driver = await createDriver(`<Button label="hello" />`);
-   * await expect(driver.button).toHaveLabel("hello"); // true
+   * await expect(driver.component).toHaveLabel("hello"); // true
    * ```
    *
    * @param expected Expected string label
@@ -65,76 +66,31 @@ const expect = fixtureExpect.extend({
   },
 });
 
-class ButtonDriver extends ComponentDriver {
-  get button() {
-    return this.locator;
-  }
-
-  // Ensure we either get rtl or ltr strings - Pending approval
-  /* async getWritingDirection() {
-    // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/dir
-    const attribute = await this.locator.getAttribute("dir");
-    if (attribute && attribute !== "auto") return attribute as "rtl" | "ltr";
-    const style = await this.locator.evaluate((element) => window.getComputedStyle(element).direction);
-    // Default is ltr: https://developer.mozilla.org/en-US/docs/Web/CSS/direction#values
-    return style === "rtl" ? "rtl" : "ltr";
-  } */
-
-  // NOTE: It may be prudent to target the text nodes and wrap them in a Locator-like, very basic class
-  // to better handle them and provide supporting methods such as dimensions (via getClientRects?)
-  // Source: https://developer.mozilla.org/en-US/docs/Web/API/Element/getClientRects
-  async getTextNodes() {
-    return await this.locator.evaluate((element) =>
-      [...element.childNodes]
-        .filter((e) => e.nodeType === Node.TEXT_NODE && e.textContent.trim())
-        .map((e) => e.textContent.trim()),
-    );
-  }
-
-  // NOTE: Accounts for the icon being passed as a child as well
-  getIcons() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img"));
-  }
-
-  // NOTE: Added because we can set an icon via the icon prop as well as child
-  getFirstIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(0);
-  }
-
-  // NOTE: Added because we can set an icon via the icon prop as well as child
-  getLastIcon() {
-    return this.locator.locator("> svg").or(this.locator.locator("> img")).nth(-1);
-  }
-
-  getFirstNonTextNode() {
-    return this.locator.locator("> *").nth(0);
-  }
-}
-
-const test = createTestWithDriver(ButtonDriver);
+const test = createTestWithDrivers();
 
 // --- Props
 
 // --- --- label
 
-test("renders and is visible", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button label="hello" />`);
-  await expect(driver.button).toBeVisible();
+test("Button renders and is visible", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button label="hello" />`);
+  await expect((await createButtonDriver()).component).toBeVisible();
 });
 
-test("renders ASCII text in label", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button label="hello" />`);
-  await expect(driver.button).toHaveText("hello");
+test("renders ASCII text in label", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button label="hello" />`);
+  await expect((await createButtonDriver()).component).toHaveText("hello");
 });
 
-test("renders Unicode text in label", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button label="😀" />`);
-  await expect(driver.button).toHaveText("😀");
+test("renders Unicode text in label", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button label="😀" />`);
+  await expect((await createButtonDriver()).component).toHaveText("😀");
 });
 
-test("renders without label, icon or children", async ({ createDriver }) => {
+test("renders without label, icon or children", async ({ initTestBed, createButtonDriver }) => {
   // We could get the sum of vertical paddings, margins and comp height to get the expected height
-  const driver = await createDriver(`<Button height="20px" />`);
+  await initTestBed(`<Button height="20px" />`);
+  const driver = await createButtonDriver();
   const { width, height } = await driver.getComponentSize();
 
   // These should be comp height >= button vertical paddings
@@ -157,21 +113,24 @@ test("renders without label, icon or children", async ({ createDriver }) => {
     SKIP_REASON.UNSURE(
       "Need to talk this through, ex. the function throws an error, the rest just don't render",
     ),
-    async ({ createDriver }) => {
-      const driver = await createDriver(`<Button label="${type.value}" />`);
-      await expect(driver.button).not.toBeAttached();
+    async ({ initTestBed, createButtonDriver }) => {
+      await initTestBed(`<Button label="${type.value}" />`);
+      await expect((await createButtonDriver()).component).not.toBeAttached();
     },
   );
 });
 
-test("text node as children are same as setting label", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button>hello</Button>`);
-  await expect(driver.button).toHaveExplicitLabel("hello");
+test("text node as children are same as setting label", async ({
+  initTestBed,
+  createButtonDriver,
+}) => {
+  await initTestBed(`<Button>hello</Button>`);
+  await expect((await createButtonDriver()).component).toHaveExplicitLabel("hello");
 });
 
-test("ignores label property if children present", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button label="hello">world</Button>`);
-  await expect(driver.button).toHaveExplicitLabel("world");
+test("ignores label property if children present", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button label="hello">world</Button>`);
+  await expect((await createButtonDriver()).component).toHaveExplicitLabel("world");
 });
 
 // TODO
@@ -180,9 +139,9 @@ test.skip(
   SKIP_REASON.TO_BE_IMPLEMENTED(
     "Flesh out these tests by adding child targeting locators or targeting the children as a whole as a black box",
   ),
-  async ({ createDriver }) => {
-    const driver = await createDriver(`<Button label="hello"><Text>world</Text></Button>`);
-    await expect(driver.button).not.toHaveExplicitLabel("hello");
+  async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button label="hello"><Text>world</Text></Button>`);
+    await expect((await createButtonDriver()).component).not.toHaveExplicitLabel("hello");
   },
 );
 
@@ -190,42 +149,42 @@ test.skip(
 test.skip(
   "renders XMLUI Complex component as child",
   SKIP_REASON.TO_BE_IMPLEMENTED("See skip reason in test above"),
-  async ({ createDriver }) => {
-    const driver = await createDriver(
-      `<Button label="hello"><Card title="Button">Content</Card></Button>`,
-    );
-    await expect(driver.button).toHaveText("world");
+  async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button label="hello"><Card title="Button">Content</Card></Button>`);
+    await expect((await createButtonDriver()).component).toHaveText("world");
   },
 );
 
 // --- --- icon
 
-test("can render icon", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test" />`, {
+test("can render icon", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button icon="test" />`, {
     resources: {
       "icon.test": "resources/bell.svg",
     },
   });
+  await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
+});
+
+test("renders icon and label", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button icon="test" label="hello" />`, {
+    resources: {
+      "icon.test": "resources/bell.svg",
+    },
+  });
+  const driver = await createButtonDriver();
+
+  await expect(driver.component).toHaveText("hello");
   await expect(driver.getFirstIcon()).toBeVisible();
 });
 
-test("renders icon and label", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test" label="hello" />`, {
+test("renders icon if children present", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button icon="test">Hello World</Button>`, {
     resources: {
       "icon.test": "resources/bell.svg",
     },
   });
-  await expect(driver.button).toHaveText("hello");
-  await expect(driver.getFirstIcon()).toBeVisible();
-});
-
-test("renders icon if children present", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="test">Hello World</Button>`, {
-    resources: {
-      "icon.test": "resources/bell.svg",
-    },
-  });
-  await expect(driver.getFirstIcon()).toBeVisible();
+  await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
 });
 
 [
@@ -237,16 +196,24 @@ test("renders icon if children present", async ({ createDriver }) => {
   { label: "array", value: [] },
   { label: "function", value: () => {} },
 ].forEach((type) => {
-  test(`does not render icon if icon is of type ${type.label}`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button icon="${type.value}" />`);
-    await expect(driver.getFirstIcon()).not.toBeAttached();
+  test(`does not render icon if icon is of type ${type.label}`, async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(`<Button icon="${type.value}" />`);
+    await expect((await createButtonDriver()).getFirstIcon()).not.toBeAttached();
   });
 });
 
-test("renders if icon is not found and label is present", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button icon="_" label="hello" />`);
+test("renders if icon is not found and label is present", async ({
+  initTestBed,
+  createButtonDriver,
+}) => {
+  await initTestBed(`<Button icon="_" label="hello" />`);
+  const driver = await createButtonDriver();
+
   await expect(driver.getFirstIcon()).not.toBeAttached();
-  await expect(driver.button).toHaveText("hello");
+  await expect(driver.component).toHaveText("hello");
 });
 
 // --- --- iconPosition
@@ -266,18 +233,17 @@ iconPositionCases.forEach(({ position, value }) => {
   test.skip(
     `iconPosition=${value} places icon on ${position} of label`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ createDriver }) => {
-      const driver = await createDriver(
-        `<Button icon="test" label="hello" iconPosition="${value}" />`,
-        {
-          resources: {
-            "icon.test": "resources/bell.svg",
-          },
+    async ({ initTestBed, createButtonDriver }) => {
+      await initTestBed(`<Button icon="test" label="hello" iconPosition="${value}" />`, {
+        resources: {
+          "icon.test": "resources/bell.svg",
         },
-      );
-      const buttonDimensions = await getFullRectangle(driver.button);
+      });
+
+      const driver = await createButtonDriver();
+      const buttonDimensions = await getFullRectangle(driver.component);
       /* const contentStart = pixelStrToNum(
-        buttonDimensions[pos] + (await getElementStyle(driver.button, `padding-${pos}`)),
+        buttonDimensions[pos] + (await getElementStyle(driver.component, `padding-${pos}`)),
       );
       const iconStart = (await getFullRectangle(driver.getFirstNonTextNode()))[pos];
 
@@ -291,14 +257,14 @@ iconPositionCases.forEach(({ position, value }) => {
   test.skip(
     `iconPosition=${value} places icon on ${position}`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ createDriver }) => {
-      const driver = await createDriver(`<Button icon="test" iconPosition="${value}" />`, {
+    async ({ initTestBed, createButtonDriver }) => {
+      await initTestBed(`<Button icon="test" iconPosition="${value}" />`, {
         resources: {
           "icon.test": "resources/bell.svg",
         },
       });
 
-      await expect(driver.button).toBeAttached();
+      await expect((await createButtonDriver()).component).toBeAttached();
     },
   );
 });
@@ -308,17 +274,14 @@ iconPositionCases.forEach(({ position, value }) => {
   test.skip(
     `iconPosition=${value} places icon on ${position} of children`,
     SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-    async ({ createDriver }) => {
-      const driver = await createDriver(
-        `<Button icon="test" label="hello" iconPosition="${value}" />`,
-        {
-          resources: {
-            "icon.test": "resources/bell.svg",
-          },
+    async ({ initTestBed, createButtonDriver }) => {
+      await initTestBed(`<Button icon="test" label="hello" iconPosition="${value}" />`, {
+        resources: {
+          "icon.test": "resources/bell.svg",
         },
-      );
+      });
 
-      await expect(driver.button).toBeAttached();
+      await expect((await createButtonDriver()).component).toBeAttached();
     },
   );
 });
@@ -326,8 +289,11 @@ iconPositionCases.forEach(({ position, value }) => {
 // --- --- contentPosition
 
 alignmentOptionValues.forEach((pos) => {
-  test(`label and icon is positioned to the ${pos}`, async ({ createDriver }) => {
-    const driver = await createDriver(
+  test(`label and icon is positioned to the ${pos}`, async ({
+    initTestBed,
+    createButtonDriver,
+  }) => {
+    await initTestBed(
       `<Button width="100%" icon="test" label="hello" contentPosition="${pos}" />`,
       {
         resources: {
@@ -335,36 +301,36 @@ alignmentOptionValues.forEach((pos) => {
         },
       },
     );
-    await expect(driver.button).toHaveCSS("justify-content", pos);
+    await expect((await createButtonDriver()).component).toHaveCSS("justify-content", pos);
   });
 });
 
 // --- --- type
 
 buttonTypeValues.forEach((type) => {
-  test(`type="${type}" is reflected in html`, async ({ createDriver }) => {
-    const driver = await createDriver(`<Button type="${type}" />`);
-    await expect(driver.button).toHaveAttribute("type", type);
+  test(`type="${type}" is reflected in html`, async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button type="${type}" />`);
+    await expect((await createButtonDriver()).component).toHaveAttribute("type", type);
   });
 });
 
 // --- --- enabled
 
-test("has enabled state", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button enabled="true" />`);
-  await expect(driver.button).toBeEnabled();
+test("has enabled state", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button enabled="true" />`);
+  await expect((await createButtonDriver()).component).toBeEnabled();
 });
 
-test("has disabled state", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button enabled="false" />`);
-  await expect(driver.button).toBeDisabled();
+test("has disabled state", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button enabled="false" />`);
+  await expect((await createButtonDriver()).component).toBeDisabled();
 });
 
 // --- --- autoFocus
 
-test("focuses component if autoFocus is set", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button autoFocus="{true}" />`);
-  await expect(driver.button).toBeFocused();
+test("focuses component if autoFocus is set", async ({ initTestBed, createButtonDriver }) => {
+  await initTestBed(`<Button autoFocus="{true}" />`);
+  await expect((await createButtonDriver()).component).toBeFocused();
 });
 
 // --- --- variant & themeColor
@@ -377,13 +343,13 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
     test.skip(
       `themeColor "${themeColor}" is applied for variant "${variant}"`,
       SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-      async ({ createDriver }) => {},
+      async ({ initTestBed, createButtonDriver }) => {},
     );
     ["disabled", "hover", "active", "focused"].forEach((state) => {
       test.skip(
         `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
         SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-        async ({ createDriver }) => {},
+        async ({ initTestBed, createButtonDriver }) => {},
       );
     });
   });
@@ -397,71 +363,85 @@ test("focuses component if autoFocus is set", async ({ createDriver }) => {
   test.skip(
     `compare size "${size}" with default size`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ createDriver }) => {},
+    async ({ initTestBed, createButtonDriver }) => {},
   );
 });
 
 // --- Events
 
-test("testState initializes to default value", async ({ createDriver }) => {
-  const driver = await createDriver(`<Fragment />`);
-  await expect.poll(driver.testState).toEqual(null);
+test("testState initializes to default value", async ({ initTestBed }) => {
+  const getState = (await initTestBed(`<Fragment />`)).testState;
+  await expect.poll(getState).toEqual(null);
 });
 
 // --- --- click
 
-test("click event fires", async ({ createDriver }) => {
+test("click event fires", async ({ initTestBed, createButtonDriver }) => {
   // test for event doing actually what is defined, e.g. change label text, write to console, etc.
-  const driver = await createDriver(`<Button onClick="testState = true" />`);
-  await driver.click();
-  await expect.poll(driver.testState).toEqual(true);
+  const testStateDriver = await initTestBed(`<Button onClick="testState = true" />`);
+  await (await createButtonDriver()).click();
+  await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
 // --- --- gotFocus
 
-test("is focused & gotFocus event fires", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button onGotFocus="testState = true" />`);
-  await driver.focus();
+test("is focused & gotFocus event fires", async ({ initTestBed, createButtonDriver }) => {
+  const testStateDriver = await initTestBed(`<Button onGotFocus="testState = true" />`);
+  const driver = await createButtonDriver();
 
-  await expect(driver.button).toBeFocused();
-  await expect.poll(driver.testState).toEqual(true);
+  await driver.focus();
+  await expect(driver.component).toBeFocused();
+  await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-test("gotFocus event does not fire if disabled", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button enabled="false" onGotFocus="testState = true" />`);
-  await driver.focus();
+test("gotFocus event does not fire if disabled", async ({ initTestBed, createButtonDriver }) => {
+  const testStateDriver = await initTestBed(
+    `<Button enabled="false" onGotFocus="testState = true" />`,
+  );
+  const driver = await createButtonDriver();
 
+  await driver.focus();
   // testState remains unchanged
-  await expect(driver.button).not.toBeFocused();
-  await expect.poll(driver.testState).toEqual(null);
+  await expect(driver.component).not.toBeFocused();
+  await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
 // --- --- lostFocus
 
-test("lostFocus event fires & is not focused", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button onLostFocus="testState = true" />`);
+test("lostFocus event fires & is not focused", async ({ initTestBed, createButtonDriver }) => {
+  const testStateDriver = await initTestBed(`<Button onLostFocus="testState = true" />`);
+  const driver = await createButtonDriver();
+
   await driver.focus();
   await driver.blur();
 
-  await expect(driver.button).not.toBeFocused();
-  await expect.poll(driver.testState).toEqual(true);
+  await expect(driver.component).not.toBeFocused();
+  await expect.poll(testStateDriver.testState).toEqual(true);
 });
 
-test("cannot emit lostFocus event if not focused before", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button onLostFocus="testState = true" />`);
+test("cannot emit lostFocus event if not focused before", async ({
+  initTestBed,
+  createButtonDriver,
+}) => {
+  const testStateDriver = await initTestBed(`<Button onLostFocus="testState = true" />`);
+  const driver = await createButtonDriver();
+
   await driver.blur();
-
-  await expect.poll(driver.testState).toEqual(null);
+  await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
-test("lostFocus event does not fire if disabled", async ({ createDriver }) => {
-  const driver = await createDriver(`<Button enabled="false" onLostFocus="testState = true" />`);
+test("lostFocus event does not fire if disabled", async ({ initTestBed, createButtonDriver }) => {
+  const testStateDriver = await initTestBed(
+    `<Button enabled="false" onLostFocus="testState = true" />`,
+  );
+  const driver = await createButtonDriver();
+
   await driver.focus();
   await driver.blur();
 
   // testState remains unchanged
-  await expect(driver.button).not.toBeFocused();
-  await expect.poll(driver.testState).toEqual(null);
+  await expect(driver.component).not.toBeFocused();
+  await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
 // --- Should be added to tests regarding the framework loading mechanism:

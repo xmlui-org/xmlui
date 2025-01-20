@@ -1,5 +1,6 @@
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { expect, createTestWithDriver } from "@testing/fixtures";
 import { initComponent } from "@testing/component-test-helpers";
+import { ComponentDriver } from "@testing/ComponentDrivers";
 
 class SelectDriver extends ComponentDriver {
   async selectOption(value: string) {

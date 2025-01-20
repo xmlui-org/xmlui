@@ -1,4 +1,4 @@
-import { ComponentDriver } from "@testing/fixtures";
+import { ComponentDriver } from "@testing/ComponentDrivers";
 
 type SubmitTrigger = "click" | "keypress";
 type MockExternalApiOptions = {

@@ -4,11 +4,21 @@
 
 import { orderingValues, scrollAnchoringValues, validationStatusValues } from "@components/abstractions";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { ComponentDriver } from "@testing/ComponentDrivers";
+import { expect, createTestWithDriver } from "@testing/fixtures";
 
 class SliderDriver extends ComponentDriver {}
 
 const test = createTestWithDriver(SliderDriver);
+
+test.skip(
+  "component renders & is visible",
+  SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
+  async ({ createDriver }) => {
+    const driver = await createDriver(`<Slider />`);
+    await expect(driver.component).toBeVisible();
+  },
+);
 
 // --- initialValue
 
