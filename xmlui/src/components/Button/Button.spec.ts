@@ -5,13 +5,12 @@ import {
   pixelStrToNum,
   SKIP_REASON,
 } from "@testing/component-test-helpers";
-import { expect as fixtureExpect, createTestWithDrivers } from "@testing/fixtures";
+import { expect as fixtureExpect, test } from "@testing/fixtures";
 import {
   alignmentOptionValues,
   buttonTypeValues,
   type IconPosition,
 } from "@components/abstractions";
-import { ButtonDriver } from "@testing/ComponentDrivers";
 
 // --- Setup
 
@@ -65,8 +64,6 @@ const expect = fixtureExpect.extend({
     };
   },
 });
-
-const test = createTestWithDrivers();
 
 // --- Props
 

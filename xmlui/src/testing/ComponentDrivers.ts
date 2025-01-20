@@ -18,7 +18,7 @@ export type ComponentDriverParams = {
 export class ComponentDriver {
   protected readonly locator: Locator;
   page: Page;
-  
+
   // TODO: REMOVE
   protected readonly testStateLocator: Locator;
 
@@ -122,3 +122,9 @@ export class ButtonDriver extends ComponentDriver {
     return this.locator.locator("> *").first();
   }
 }
+
+// --- Avatar
+
+export class AvatarDriver extends ComponentDriver {}
+
+// --- 

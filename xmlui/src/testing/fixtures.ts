@@ -4,9 +4,7 @@ import { initComponent } from "./component-test-helpers";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { Page } from "playwright-core";
-import { type ComponentDriver, type ComponentDriverParams, ButtonDriver, TestStateDriver } from "./ComponentDrivers";
-
-export { test } from "@playwright/test";
+import { type ComponentDriver, type ComponentDriverParams, AvatarDriver, ButtonDriver, TestStateDriver } from "./ComponentDrivers";
 
 export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
   DriverClass: T,
@@ -57,22 +55,8 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
   });
 }
 
-type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
-
-type TestDriverExtenderProps = {
-  testStateViewTestId: string;
-  baseComponentTestId: string;
-  initTestBed: (
-    source: string,
-    description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-  ) => Promise<TestStateDriver>;
-  createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
-    driverClass: T,
-    testId?: string,
-  ) => Promise<InstanceType<T>>;
-  createButtonDriver: ComponentDriverMethod<ButtonDriver>;
-};
-
+// TODO: Remove export
+// export const test = baseTest.extend(...);
 export function createTestWithDrivers() {
   // NOTE: the base Playwright test can be extended with fixture methods as well as any other language constructs we deem useful
   return baseTest.extend<TestDriverExtenderProps>({
@@ -134,8 +118,15 @@ export function createTestWithDrivers() {
         return createDriver(ButtonDriver, testId);
       });
     },
+    createAvatarDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(AvatarDriver, testId);
+      });
+    },
   });
 }
+
+export const test = createTestWithDrivers();
 
 /**
  * Writes an error in the console to indicate if multiple elements have the same testId
@@ -197,3 +188,23 @@ export const expect = baseExpect.extend({
     };
   },
 });
+
+
+// --- Types
+
+type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
+
+type TestDriverExtenderProps = {
+  testStateViewTestId: string;
+  baseComponentTestId: string;
+  initTestBed: (
+    source: string,
+    description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+  ) => Promise<TestStateDriver>;
+  createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
+    driverClass: T,
+    testId?: string,
+  ) => Promise<InstanceType<T>>;
+  createButtonDriver: ComponentDriverMethod<ButtonDriver>;
+  createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
+};
