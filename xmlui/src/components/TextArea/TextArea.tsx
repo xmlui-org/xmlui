@@ -30,7 +30,7 @@ export const resizeOptionsMd: PropertyValueDescription[] = [
   { value: "horizontal", description: "Can only resize horizontally" },
   { value: "vertical", description: "Can only resize vertically" },
   { value: "both", description: "Can resize in both dimensions" },
-] as const;
+];
 
 export const TextAreaMd = createMetadata({
   status: "experimental",
