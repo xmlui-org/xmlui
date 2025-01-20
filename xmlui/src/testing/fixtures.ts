@@ -1,70 +1,12 @@
-import type { Locator } from "@playwright/test";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { expect as baseExpect, test as baseTest } from "@playwright/test";
 import { initComponent } from "./component-test-helpers";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { Page } from "playwright-core";
+import { type ComponentDriver, type ComponentDriverParams, ButtonDriver, TestStateDriver } from "./ComponentDrivers";
 
 export { test } from "@playwright/test";
-
-async function getElementSize(locator: Locator) {
-  const dimensions = await locator.evaluate((element) => [
-    element.clientWidth,
-    element.clientHeight,
-  ]);
-  return { width: dimensions[0] ?? 0, height: dimensions[1] ?? 0 } as const;
-}
-
-export type ComponentDriverParams = {
-  locator: Locator;
-  testStateLocator: Locator;
-  page: Page;
-};
-
-export class ComponentDriver {
-  protected readonly locator: Locator;
-  protected readonly testStateLocator: Locator;
-  page: Page;
-
-  constructor({ locator, testStateLocator, page }: ComponentDriverParams) {
-    this.locator = locator;
-    this.testStateLocator = testStateLocator;
-    this.page = page;
-  }
-
-  get component() {
-    return this.locator;
-  }
-
-  // NOTE: methods must be created using the arrow function notation.
-  // Otherwise, the "this" will not be correctly bound to the class instance when destructuring.
-
-  click = async (options?: { timeout?: number }) => {
-    await this.locator.click(options);
-  };
-
-  focus = async (options?: { timeout?: number }) => {
-    await this.locator.focus(options);
-  };
-
-  blur = async (options?: { timeout?: number }) => {
-    await this.locator.blur(options);
-  };
-
-  getComponentSize = async () => {
-    return getElementSize(this.locator);
-  };
-
-  /** returns an async function that can query the test state */
-  get testState() {
-    return async () => {
-      const text = await this.testStateLocator.textContent();
-      const testState = text === "undefined" ? undefined : JSON.parse(text!);
-      return testState;
-    };
-  }
-}
 
 export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
   DriverClass: T,
@@ -115,38 +57,29 @@ export function createTestWithDriver<T extends new (...args: ComponentDriverPara
   });
 }
 
+type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
+
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
+  baseComponentTestId: string;
   initTestBed: (
     source: string,
     description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-  ) => Promise<void>;
+  ) => Promise<TestStateDriver>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
-    testId: string,
+    testId?: string,
   ) => Promise<InstanceType<T>>;
+  createButtonDriver: ComponentDriverMethod<ButtonDriver>;
 };
 
 export function createTestWithDrivers() {
   // NOTE: the base Playwright test can be extended with fixture methods as well as any other language constructs we deem useful
   return baseTest.extend<TestDriverExtenderProps>({
+    baseComponentTestId: "test-id-component",
     testStateViewTestId: "test-state-view-testid",
 
-    createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
-      { page, testStateViewTestId },
-      use,
-    ) => {
-      await use(async (driverClass: T, testId: string) => {
-        const locator = await getOnlyFirstLocator(page, testId);
-        return new driverClass({
-          locator,
-          testStateLocator: page.getByTestId(testStateViewTestId),
-          page: page,
-        });
-      });
-    },
-
-    initTestBed: async ({ page, testStateViewTestId }, use) => {
+    initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
       await use(
         async (
           source: string,
@@ -168,9 +101,38 @@ export function createTestWithDrivers() {
             throw { errors };
           }
           const entryPoint = component as ComponentDef;
+
+          if (source !== "" && entryPoint.children) {
+            const sourceBaseComponent = entryPoint.children[0];
+            if (!sourceBaseComponent.testId) {
+              sourceBaseComponent.testId = baseComponentTestId;
+            }
+          }
           await initComponent(page, { ...description, entryPoint });
+          return new TestStateDriver(page.getByTestId(testStateViewTestId));
         },
       );
+    },
+
+    createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
+      { page, baseComponentTestId, testStateViewTestId },
+      use,
+    ) => {
+      await use(async (driverClass: T, testId?: string) => {
+        const locator = await getOnlyFirstLocator(page, testId ?? baseComponentTestId);
+        return new driverClass({
+          locator,
+          page,
+          
+          testStateLocator: page.getByTestId(testStateViewTestId),
+        });
+      });
+    },
+
+    createButtonDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(ButtonDriver, testId);
+      });
     },
   });
 }

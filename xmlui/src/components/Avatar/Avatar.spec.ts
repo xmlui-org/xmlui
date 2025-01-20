@@ -1,4 +1,5 @@
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures"
+import { ComponentDriver } from "@testing/ComponentDrivers";
+import { expect, createTestWithDriver } from "@testing/fixtures"
 // --- Setup
 
 class AvatarDriver extends ComponentDriver {

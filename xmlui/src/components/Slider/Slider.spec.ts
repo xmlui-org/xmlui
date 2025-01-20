@@ -4,7 +4,8 @@
 
 import { orderingValues, scrollAnchoringValues, validationStatusValues } from "@components/abstractions";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { ComponentDriver } from "@testing/ComponentDrivers";
+import { expect, createTestWithDriver } from "@testing/fixtures";
 
 class SliderDriver extends ComponentDriver {}
 

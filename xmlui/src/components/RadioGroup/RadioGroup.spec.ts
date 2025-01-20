@@ -1,6 +1,7 @@
 import { labelPositionValues, validationStatusValues } from "@components/abstractions";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { ComponentDriver, createTestWithDriver } from "@testing/fixtures";
+import { ComponentDriver } from "@testing/ComponentDrivers";
+import { createTestWithDriver } from "@testing/fixtures";
 
 // --- Setup
 
