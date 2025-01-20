@@ -92,7 +92,7 @@ describe("Xmlui transform - child elements", () => {
       <Stack>
         This is a text segment before a Button component.
         <Button label="I'm a non-functional Button"/>
-        This is a text segment after a Button and before an Icon 
+        This is a text segment after a Button and before an Icon
         <Icon name='user' />
       </Stack>
     `) as ComponentDef;
@@ -241,14 +241,16 @@ describe("Xmlui transform - child elements", () => {
     expect((cd.props! as any).other).equal("234");
   });
 
-  it("implicit props namespace is ignored (yet)", () => { 
+  it("implicit props namespace is ignored (yet)", () => {
     const cd = transformSource("<Stack ns1.ns:myProp='123'/>") as ComponentDef;
     expect(cd.type).equal("Stack");
-    expect((cd.props).myProp).equal("123");
+    expect(cd.props.myProp).equal("123");
   });
 
   it("prop with name/value attr works #1", () => {
-    const cd = transformSource("<Stack><property name='myProp' value='123'/></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><property name='myProp' value='123'/></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     expect((cd.props! as any).myProp).equal("123");
   });
@@ -266,7 +268,9 @@ describe("Xmlui transform - child elements", () => {
   });
 
   it("prop with name and text works #1", () => {
-    const cd = transformSource("<Stack><property name='myProp'>123</property></Stack>") as ComponentDef;
+    const cd = transformSource(
+      "<Stack><property name='myProp'>123</property></Stack>",
+    ) as ComponentDef;
     expect(cd.type).equal("Stack");
     const prop = (cd.props! as any).myProp;
     expect(prop.type).equal("TextNode");
@@ -780,7 +784,7 @@ describe("Xmlui transform - child elements", () => {
     const cd = transformSource(`
       <Stack>
         <property name="myProp">
-          <!-- comment -->  
+          <!-- comment -->
           <field name="x">
             <field name="p1" value="1" />
             <field name="p2">2</field>
@@ -813,23 +817,23 @@ describe("Xmlui transform - child elements", () => {
     const cd = transformSource(`
       <Stack>
         <property name="myProp">
-          <!-- comment -->  
+          <!-- comment -->
           <field name="x">
-            <!-- comment -->  
+            <!-- comment -->
             <field name="p1" value="1" />
-            <!-- comment -->  
+            <!-- comment -->
             <field name="p2">2</field>
             <field name="nx">
-              <!-- comment -->  
+              <!-- comment -->
               <item>
-                <!-- comment -->  
+                <!-- comment -->
                 <field name="a1" value="a" />
                 <field name="b1">b</field>
               </item>
               <item>
                 <field name="a1" value="c" />
                 <field name="b1">d</field>
-                <!-- comment -->  
+                <!-- comment -->
               </item>
             </field>
           </field>
@@ -1157,6 +1161,53 @@ describe("Xmlui transform - child elements", () => {
         end: source.indexOf("<Button/>") + "<Button/>".length,
         fileId: FILE_ID,
       },
+    });
+  });
+
+  describe("namespaces", () => {
+    it("xmlns namespace applied to component", () => {
+      const cd = transformSource(
+        `<App xmlns:TestNamespace="component-ns:Test.Components" />`,
+      ) as ComponentDef;
+      expect(cd.namespaces.TestNamespace).toEqual("Test.Components");
+    });
+
+    it("xmlns namespace 'component-ns' is optional", () => {
+      const cd = transformSource(`<App xmlns:TestNamespace="Test.Components" />`) as ComponentDef;
+      expect(cd.namespaces.TestNamespace).toEqual("Test.Components");
+    });
+
+    it("namespace resolved in children", () => {
+      const cd = transformSource(`
+        <App xmlns:TestNamespace="Test.Components" >
+            <TestNamespace:DataGrid />
+        </App>
+        `) as ComponentDef;
+      expect(cd.children[0].type).toEqual("Test.Components.DataGrid");
+    });
+
+    it("overridden namespace resolved in children", () => {
+      const cd = transformSource(`
+        <App xmlns:TestNamespace="Test.Components" >
+            <Stack xmlns:TestNamespace="Overridden.Namespace" >
+                <TestNamespace:DataGrid />
+            </Stack>
+        </App>
+        `) as ComponentDef;
+      expect(cd.children[0].children[0].type).toEqual("Overridden.Namespace.DataGrid");
+    });
+
+    it("errors on refering to unknown namespace", () => {
+      try {
+        const cd = transformSource(`
+          <App xmlns:TestNamespace="Test.Components" >
+              <NonExistant:DataGrid />
+          </App>
+          `) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T027");
+      }
     });
   });
 });

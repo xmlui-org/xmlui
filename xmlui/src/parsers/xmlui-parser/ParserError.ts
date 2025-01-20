@@ -59,7 +59,12 @@ export type ErrorCodes =
   | "T021"
   | "T022"
   | "T023"
-  | "T024";
+  | "T024"
+  | "T025"
+  | "T026"
+  | "T027"
+  | "T028"
+  | "T029";
 
 // Error message type description
 type ErrorText = Record<ErrorCodes, string>;
@@ -106,4 +111,9 @@ export const errorMessages: ErrorText = {
   T022: "The 'script' tag must not have any attribute",
   T023: "A 'script' tag cannot nest other child nodes, only text",
   T024: "Cannot put a reusable component definitions into a slot",
+  T025: "Duplicate xmlns found: '{0}'",
+  T026: "The top level component's name cannot have a namespace",
+  T027: "Cannot resolve namespace '{0}'. It was not defined in any of the ancestor components",
+  T028: "Namespace value {0} cannot have multiple ':' (colon) in it",
+  T029: "Incorrect scheme specified before ':' (colon) in namespace {0}. Delete it to get the default '{1}'.",
 };
