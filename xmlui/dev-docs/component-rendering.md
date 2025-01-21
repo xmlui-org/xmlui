@@ -296,7 +296,7 @@ Let's use this component from the app like this:
 
 When the engine renders `MyComponent`, its `Slot` should be replaced with the rendered value of `The truth is {myValue}`. However, at that moment, the expression is in the context of `MyComponent` where `myValue` has no meaning; it was declared in the parent's context.
 
-So,  whenever a `Slot` is rendered, its content must be rendered in the context of the parent (where the slot's content comes from).
+So, whenever a `Slot` is rendered, its content must be rendered in the context of the parent (where the slot's content comes from).
 
 **2. Rendering text nodes**
 
@@ -325,6 +325,7 @@ Transformed markup:
 Besides `TextNode`, `TextNodeCData` (from a CDATA node in the markup) is also a virtual component with the same behavior.
 
 Due to these rendering engine features (special handling of `Slot`, `TextNode`, and `TextNodeCData` ), `renderChild` differentiates the following cases:
+
 1. The component is a `Slot` with a single `TextNode` or `TextNodeCData`. The rendered output is a text evaluated in the parent context.
 2. The component is a `TextNodeCData`. The output is the component value without any change (the purpose of CDATA is to preserve each character as it is).
 3. The component is a `TextNode`. The output is the text evaluated in the current rendering context.
@@ -332,9 +333,50 @@ Due to these rendering engine features (special handling of `Slot`, `TextNode`, 
 
 ### `ComponentNode`
 
-This React component's primary responsibility is to decide whether the wrapped xmlui component should be rendered as it is or wrapped into a container that manages its state.
+The primary responsibility of this React component is to prepare it to work in the XMLUI environment and connect the particular component with the engine's state management and data handling operations.
 
 The only usage of `ComponentNode` is in `renderChild`, which passes a `key` and a `resolvedKey` property to `ComponentNode`:
+
 - `key`: This property is the traditional `key` property of React, used to distinguish individual component items within a list (React optimizes the DOM updates with this property's help).
 - `resolvedKey`: This internal property allows debugging containers (within the rendering engine development). It comprises the IDs of components in the current container chain and may generate console log messages.
 
+`ComponentNode` is implemented with React's `forwardRef`. The native implementations of xmlui components use third-party component libraries, which heavily build on React component references, as they need to manipulate the shadow DOM (radix ui, animations, etc):
+
+```ts
+const ComponentNode = memo(
+  forwardRef(function ComponentNode(
+    {
+      // --- Omitted for simplicity
+      ...rest
+    }: ChildRendererContext & { resolvedKey: string },
+    ref,
+  ) {
+    // --- Implemetation omitted
+  }),
+);
+```
+
+`ComponentNode` examines the definition of the component to check if there are some chores to do; it may transform the original representation. The engine executes these steps:
+
+1. It extends the component definition with all bells and whistles required by handling data, provided the component or its children utilize any data-related operation. This process is described in detail [here](./data-sources.md).
+2. If the particular component (after the previous step) requires a container (state management) for its (and children's) rendering, the engine wraps it into a container using the `ComponentContainer` React component. You can read more about state management with containers [here](./state-management.md).
+3. Otherwise, the component does not need its separate container (and so it will use a container up to its parent chain); the engine wraps it into a `ComponentBed` React component.
+
+### `ComponentBed`
+
+The `ComponentBed` receives a modified rendering context (derived from `InnerRendererContext`), including the component definition already prepared for state and data management.
+
+This component translates xmlui concepts (such as running an event handler, exposing component APIs, extraction resources, and many more) to their corresponding React concepts. After translation, it renders the particular component (including its children) and post-processes the result.
+
+The translation contains these chores:
+
+1. If the component definition does not have properties or events, it is replaced with stable references to an empty object to avoid continuous tests against the `undefined` value for the `props` and `events` component definition values.
+2. It ensures running the `onUnmount` renderer context function to clean up after the component when React disposes of it.
+3. When the component exposes an API, it is registered with the component instance.
+4. It prepares a state updater function that executes component instance state changes associated with the component instance.
+5. It prepares an action update function that retrieves a particular action bound to the component instance. 
+6. It prepares a value extractor function to evaluate property and variable values containing expressions.
+7. `ComponentBed` prepares a function that can invoke scripts synchronously and another one to invoke event handlers asynchronously.
+8. 
+
+> `ComponentBed` memoizes the helper values and functions it uses for rendering; it uses the `useMemo`, `useCallback`, and custom hooks with a similar approach heavily. 

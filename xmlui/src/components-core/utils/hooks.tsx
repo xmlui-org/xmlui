@@ -149,7 +149,8 @@ export function useOnMount(onMount: any) {
 
 /**
  * This hook memoizes the specified value. It uses a shallow comparison with the previously
- * stored value when checking for changes. So, while a shallow comparison shows equality, it returns with the memoized value.
+ * stored value when checking for changes. So, while a shallow comparison shows equality, 
+ * it returns with the memoized value.
  * @param value Value to memoize
  */
 export function useShallowCompareMemoize<T extends Record<any, any> | undefined>(value: T) {

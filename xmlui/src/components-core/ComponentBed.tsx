@@ -1,7 +1,7 @@
 import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type {ComponentMetadata, ParentRenderContext} from "@abstractions/ComponentDefs";
+import type { ComponentMetadata, ParentRenderContext } from "@abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -32,7 +32,7 @@ import { layoutOptionKeys } from "@components-core/descriptorHelper";
 import { compileLayout } from "../parsers/style-parser/style-compiler";
 
 // --- The available properties of Component
-type ComponentProps = Omit<InnerRendererContext, "layoutContext"> & {
+type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
 };
@@ -99,11 +99,11 @@ const ComponentBed = forwardRef(function ComponentBed(
     onUnmount,
     uidInfoRef,
     ...rest
-  }: ComponentProps,
+  }: ComponentBedProps,
   ref: React.ForwardedRef<any>,
 ) {
-  // --- Memoizes the node object with a safe version that contains empty objects for props and events
-  // --- were they no props or events defined
+  // --- Make sure the component definition has `props` and `events` properties 
+  // --- (even if they are empty)
   const safeNode = useMemo(() => {
     return {
       ...node,
@@ -115,18 +115,15 @@ const ComponentBed = forwardRef(function ComponentBed(
   // --- Each component receives a unique identifier
   const uid = useMemo(() => Symbol(safeNode.uid), [safeNode.uid]);
 
-  // --- Takes care the component cleanup function is called when the component is about to be disposed
+  // --- Takes care the component cleanup function is called when the component 
+  // --- is about to be disposed
   useEffect(() => {
     return () => {
       onUnmount(uid);
     };
   }, [onUnmount, uid]);
 
-  const componentRegistry = useComponentRegistry();
-  const { getResourceUrl, themeVars } = useTheme();
-
-  const { inspectId, refreshInspection } = useInspector(safeNode, uid);
-  // --- Memoizes component API registration
+  // --- Obtain a function to register the component API
   const memoedRegisterComponentApi: RegisterComponentApiFn = useCallback(
     (api) => {
       registerComponentApi(uid, api);
@@ -134,7 +131,7 @@ const ComponentBed = forwardRef(function ComponentBed(
     [registerComponentApi, uid],
   );
 
-  // --- Memoizes the state update function
+  // --- Obtain a function to update the component state
   const memoedUpdateState = useCallback(
     (componentState: any) => {
       dispatch(componentStateChanged(uid, componentState));
@@ -142,7 +139,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     [dispatch, uid],
   );
 
-  // --- Memoizes the action resolution by action definition value
+  // --- Obtain a function to lookup an action by its name, which is bound 
+  // --- to this component instance
   const memoedLookupAction: LookupAsyncFn = useCallback(
     (action, actionOptions) => {
       return lookupAction(action, uid, actionOptions);
@@ -153,12 +151,12 @@ const ComponentBed = forwardRef(function ComponentBed(
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
-  // --- Memoizes the value extractor object
+  // --- Obtain a function to extract the value of a property (from an expression)
   const valueExtractor = useMemo(() => {
     return createValueExtractor(state, appContext, referenceTrackedApi, memoedVarsRef);
   }, [appContext, memoedVarsRef, referenceTrackedApi, state]);
 
-  // --- Memoizes the lookupSyncCallback function's call
+  // --- Obtain a function that can execute a script synchronously
   const memoedLookupSyncCallback: LookupSyncFn = useCallback(
     (action) => {
       return lookupSyncCallback(valueExtractor(action), uid);
@@ -166,7 +164,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     [lookupSyncCallback, uid, valueExtractor],
   );
 
-  // --- Memoizes event handler resolution by event name
+  // --- Obtain a function that can lookup an event handler, which is bound to a
+  // --- particular event of this component instance
   const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
     (eventName, actionOptions) => {
       const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
@@ -175,8 +174,10 @@ const ComponentBed = forwardRef(function ComponentBed(
     [lookupAction, safeNode.events, uid],
   );
 
+  // --- Use the current theme to obtain resources and collect theme variables
+  const { getResourceUrl, themeVars } = useTheme();
 
-  // --- Memoizes the resource URL extraction function
+  // --- Obtain a function that can extract a resource URL from a logical URL
   const extractResourceUrl = useCallback(
     (url?: string) => {
       const extractedUrl = valueExtractor(url);
@@ -186,13 +187,15 @@ const ComponentBed = forwardRef(function ComponentBed(
   );
 
   // --- Obtain the component renderer and descriptor from the component registry
-  const { renderer, descriptor, isCompoundComponent } =
-    componentRegistry.lookupComponentRenderer(safeNode.type) || {};
-
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
-    (children, lc, pRenderContext) => {
-      return renderChild(children, lc, pRenderContext || parentRenderContext, uidInfoRef);
+    (children, layoutContext, pRenderContext) => {
+      return renderChild(
+        children,
+        layoutContext,
+        pRenderContext || parentRenderContext,
+        uidInfoRef,
+      );
     },
     [renderChild, parentRenderContext, uidInfoRef],
   );
@@ -206,11 +209,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
-  const mouseEventHandlers = useMouseEventHandlers(
-    memoedLookupEventHandler,
-    descriptor?.nonVisual || isApiBound,
-  );
 
+  // --- Collect and compile the layout property values
   const { cssProps, nonCssProps } = useMemo(() => {
     const resolvedLayoutProps: Record<string, any> = {};
     layoutOptionKeys.forEach((key) => {
@@ -224,6 +224,7 @@ const ComponentBed = forwardRef(function ComponentBed(
     });
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, themeVars, valueExtractor]);
 
+  // --- Does this memoization make sense?
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
   const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
 
@@ -243,6 +244,15 @@ const ComponentBed = forwardRef(function ComponentBed(
       />
     );
   }
+
+  const componentRegistry = useComponentRegistry();
+  const { renderer, descriptor, isCompoundComponent } =
+    componentRegistry.lookupComponentRenderer(safeNode.type) || {};
+
+  const mouseEventHandlers = useMouseEventHandlers(
+    memoedLookupEventHandler,
+    descriptor?.nonVisual || isApiBound,
+  );
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
@@ -264,7 +274,7 @@ const ComponentBed = forwardRef(function ComponentBed(
       layoutCss: stableLayoutCss,
       layoutNonCss: stableLayoutNonCss,
       layoutContext: layoutContextRef?.current,
-      uid
+      uid,
     };
 
     if (safeNode.type === "Slot") {
@@ -280,6 +290,8 @@ const ComponentBed = forwardRef(function ComponentBed(
       // --- Render the component using the renderer function obtained from the component registry
       renderedNode = renderer(rendererContext);
     }
+
+    const { inspectId, refreshInspection } = useInspector(safeNode, uid);
 
     // --- Components may have a `testId` property for E2E testing purposes. Inject the value of `testId`
     // --- into the DOM object of the rendered React component.

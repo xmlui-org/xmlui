@@ -531,22 +531,35 @@ const MemoizedContainer = memo(
       delete fnsRef.current[uid];
     });
 
+    // --- The container wraps the `renderChild` function to provide that to the child components
     const stableRenderChild: RenderChildFn = useCallback(
       (childNode, lc, pRenderContext, uidInfoRef) => {
+        // TODO: Check if this is a valid use case
         if (typeof childNode === "string") {
           throw Error("should be resolved for now");
         }
+
+        // --- Make children an array if it's not
         const children = isArray(childNode) ? childNode : [childNode];
 
         if (!children || !children.length) {
+          // --- No child, nothing to render
           return null;
         }
+
+        // --- If there are multiple children, we need to add a `key` to each of them
         const wrapWithFragment = children.length > 1;
+
+        // --- Render each child
         const renderedChildren = children.map((child, childIndex) => {
           if (!child) {
+            // --- No child, nothing to render: Should not happen
             return undefined;
           }
 
+          // --- Invoke the jolly-joker `renderChild` function to render the child. Note that
+          // --- in ithe context, we pass the `stableRenderChild` function, so the child can
+          // --- render its children recursively.
           const renderedChild = renderChild({
             node: child,
             state: componentState,
@@ -563,29 +576,44 @@ const MemoizedContainer = memo(
             cleanup,
             uidInfoRef,
           });
+
           if (renderedChild === undefined) {
+            // --- No displayable child, nothing to render
             return undefined;
           }
+
+          // --- Let's process the rendered child
           let rendered = renderedChild;
+          const key = `${childIndex}_${child.uid}`;
+
           if (wrapWithFragment) {
+            // --- Add the `key` attribute to the child
             if (React.isValidElement(renderedChild)) {
-              rendered = React.cloneElement(renderedChild, {
-                key: `${childIndex}_${child.uid}`,
-              });
+              // --- React can display this element                  
+              rendered = React.cloneElement(renderedChild, { key });
             } else {
-              //e.g. simple text nodes
-              rendered = <Fragment key={`${childIndex}_${child.uid}`}>{renderedChild}</Fragment>;
+              // --- A simple text node (or alike). We need to wrap it in a `Fragment`
+              rendered = <Fragment key={key}>{renderedChild}</Fragment>;
             }
           }
+
+          // --- Done.
           return rendered;
         });
+
+        // --- At this point we have a React node for each child
         if (renderedChildren.length === 1) {
+          // --- If we have a single (and valid React element) child, we compose its 
+          // --- `ref` with the parent's `ref`. This allows the parent to access the child's
+          // --- DOM node. Otherwise, we use the child as is.
           return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
             ? React.cloneElement(renderedChildren[0], {
                 ref: composeRefs(ref, (renderedChildren[0] as any).ref),
               } as any)
             : renderedChildren[0];
         }
+
+        // --- Done.
         return renderedChildren;
       },
       [
@@ -1034,14 +1062,14 @@ interface ChildRendererContext extends InnerRendererContext {
  * This function is the jolly-joker of the rendering process. It renders a child component
  * based on the specified context, which contains the component's definition, the current state,
  * and other necessary information.
- * 
+ *
  * The function checks a few special cases:
  * - <Slot> with a single text node child: it renders the text in the context of the parent component.
  * - CDATA text nodes: it renders the text as is without parsing it.
  * - TextNode: it extracts the text from the node and renders it.
- * 
+ *
  * In other cases, it extracts the component's ID and renders the component as a <ComponentNode>.
- * 
+ *
  * As this function passes itself as a renderChild function to the <ComponentNode>, it can render
  * nested components recursively.
  */
@@ -1066,16 +1094,16 @@ function renderChild({
     return null;
   }
 
-  // --- There is a special case for rendering text. If we have a Slot with a 
-  // --- single text node child, we want to render that in the context of the 
+  // --- There is a special case for rendering text. If we have a Slot with a
+  // --- single text node child, we want to render that in the context of the
   // --- parent component. Otherwise, we would not be able to render this:
   //
   //  <Component name='MyComponent'>
   //    <Markdown><Slot/></Markdown>
   //  </Component>
   //
-  //  and then 
-  //  
+  //  and then
+  //
   //  <MyComponent>hey lorem ipsum</MyComponent>
   if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
     if (
@@ -1262,11 +1290,11 @@ const ComponentNode = memo(
     }: ChildRendererContext & { resolvedKey: string },
     ref,
   ) {
-    //pref, this way
+    // --- We pass the layout context to the child components, so we need to
+    // --- make sure that it is stable
     const stableLayoutContext = useRef(layoutContext);
-    //stableLayoutContext.current = layoutContext;
 
-    // console.log("uidInfoRef", uidInfoRef);
+    // --- Transform the various data sources within the xmlui component definition
     const nodeWithTransformedLoaders = useMemo(() => {
       let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
       transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);

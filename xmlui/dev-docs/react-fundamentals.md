@@ -143,5 +143,7 @@ export default FilterableList;
 
 ### `useCallback`
 
-_TBD_
+This React hook lets you cache a function definition between re-renders. We use this hook heavily in xmlui, as our components may have callback functions running xmlui scripts and expressions. For example, the `click` event handler of an xmlui `Button` component caches the event handler code to execute via `useCallback`.
+
+
 
