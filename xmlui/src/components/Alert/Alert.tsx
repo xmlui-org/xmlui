@@ -46,10 +46,6 @@ export const AlertMd = createMetadata({
   },
 });
 
-export const alertComponentRenderer = createComponentRenderer(
-  COMP,
-  AlertMd,
-  ({}) => {
-    return <Alert />;
-  },
-);
+export const alertComponentRenderer = createComponentRenderer(COMP, AlertMd, ({ layoutCss }) => {
+  return <Alert />;
+});
