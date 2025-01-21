@@ -213,7 +213,7 @@ export const Select = forwardRef(function Select(
     labelBreak,
     required = false,
   }: SelectProps,
-  ref,
+  ref: React.ForwardedRef<HTMLDivElement>,
 ) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);

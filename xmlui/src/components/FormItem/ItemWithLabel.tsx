@@ -1,4 +1,4 @@
-import {CSSProperties, forwardRef, ReactNode} from "react";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { Children, useId } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./FormItem.module.scss";
@@ -26,23 +26,26 @@ type ItemWithLabelProps = {
 
 const numberRegex = /^[0-9]+$/;
 
-export const ItemWithLabel = forwardRef(function ItemWithLabel({
-  id,
-  labelPosition = "top",
-  style,
-  label,
-  labelBreak = true,
-  labelWidth,
-  enabled = true,
-  required = false,
-  children,
-  validationInProgress = false,
-  shrinkToLabel = false,
-  onFocus,
-  onBlur,
-  labelStyle,
-  validationResult,
-}: ItemWithLabelProps, ref) {
+export const ItemWithLabel = forwardRef(function ItemWithLabel(
+  {
+    id,
+    labelPosition = "top",
+    style,
+    label,
+    labelBreak = true,
+    labelWidth,
+    enabled = true,
+    required = false,
+    children,
+    validationInProgress = false,
+    shrinkToLabel = false,
+    onFocus,
+    onBlur,
+    labelStyle,
+    validationResult,
+  }: ItemWithLabelProps,
+  ref: ForwardedRef<HTMLDivElement>,
+) {
   const generatedId = useId();
   const inputId = id || generatedId;
   if (label === undefined) {
@@ -76,11 +79,11 @@ export const ItemWithLabel = forwardRef(function ItemWithLabel({
         {label && (
           <label
             htmlFor={inputId}
-            onClick={()=>document.getElementById(inputId).focus()}
+            onClick={() => document.getElementById(inputId).focus()}
             style={{
               ...labelStyle,
               width: labelWidth && numberRegex.test(labelWidth) ? `${labelWidth}px` : labelWidth,
-              flexShrink: (labelWidth !== undefined) ? 0 : undefined,
+              flexShrink: labelWidth !== undefined ? 0 : undefined,
             }}
             className={classnames(styles.inputLabel, {
               [styles.required]: required,

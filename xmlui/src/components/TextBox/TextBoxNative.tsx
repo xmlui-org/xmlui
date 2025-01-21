@@ -1,6 +1,6 @@
 import type { ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import {CSSProperties, forwardRef} from "react";
+import { CSSProperties, ForwardedRef, forwardRef } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./TextBox.module.scss";
@@ -67,7 +67,7 @@ export const TextBox = forwardRef(function TextBox(
     labelBreak,
     required,
   }: Props,
-  ref
+  ref: ForwardedRef<HTMLDivElement>,
 ) {
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
