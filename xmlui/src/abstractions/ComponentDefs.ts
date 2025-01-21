@@ -17,6 +17,13 @@ export interface ComponentDefCore {
   testId?: string;
 
   /**
+   * A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" /> syntax
+   * these are used later to resolve the `type` of the componentDef.
+   * <KEY:Button/> will have type `VALUE.Button` (joined with a "." (dot) )
+   */
+  namespaces?: Record<string, string>;
+
+  /**
    * Though components manage their state internally, the app logic may require user state management.
    * Components may have user *variables*, which the UI logic uses to manage the application state.
    * This property holds the variables (name and value pairs) associated with this component definition.
@@ -129,6 +136,13 @@ export interface CompoundComponentDef extends Scriptable {
   vars?: Record<string, any>;
 
   /**
+   * A component can define namespaces on it, with the <ComponentName xmlns:KEY="VALUE" /> syntax
+   * these are used later to resolve the `type` of the componentDef.
+   * <KEY:Button/> will have type `VALUE.Button` (joined with a "." (dot) )
+   */
+  namespaces?: Record<string, string>;
+
+  /**
    * Arbitrary debug information that can be attached to a component definition.
    * Current usage:
    * - `debug: { source: { start: number, end: number } }` Ther start and end positions of of the source
@@ -185,12 +199,12 @@ interface Scriptable {
 
 type PropertyValueType = "boolean" | "string" | "number" | "any" | "ComponentDef";
 
-// --- A generic validation function that retrieves either a hint (the 
+// --- A generic validation function that retrieves either a hint (the
 // --- validation argument has issues) or undefined (the argument is valid).
 type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 
 /**
- * This type represents the description of a property value, which can be a string, a number, 
+ * This type represents the description of a property value, which can be a string, a number,
  * or an object with a value and a description. This type is used in the metadata of a component.
  */
 export type PropertyValueDescription =
@@ -246,11 +260,11 @@ export type ComponentPropertyMetadata = {
 };
 
 /**
- * Components have metadata that the rendering engine uses to render the 
+ * Components have metadata that the rendering engine uses to render the
  * component. This type defines the structure of such metadata.
- * 
- * The type has generic parameters to ensure that type-checking works with 
- * the metadata defined here in concert with the renderer object using the 
+ *
+ * The type has generic parameters to ensure that type-checking works with
+ * the metadata defined here in concert with the renderer object using the
  * same metadata type.
  */
 export type ComponentMetadata<

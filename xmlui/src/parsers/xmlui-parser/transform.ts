@@ -8,7 +8,8 @@ import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
-import { GetText } from "./parser";
+import { Stack } from "../..";
+import type { GetText } from "./parser";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -17,6 +18,8 @@ const propAttrs = ["name", "value"];
 
 const CDATA_PREFIX_LEN = 9;
 const CDATA_POSTFIX_LEN = 3;
+const NAMESPACE_SCHEME_COMPONENT = "component-ns";
+const MY_COMPONENTS_NAMESPACE = "My";
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -47,19 +50,20 @@ export function nodeToComponentDef(
   }
 
   const preppedElement = prepNode(element);
-  const name = getTagName(element);
+  const name = getComponentName(element);
   if (!UCRegex.test(name)) {
     reportError("T002");
     return null;
   }
   const usesStack: Map<string, string>[] = [];
+  const namespaceStack: Map<string, string>[] = [];
   return transformSingleElement(usesStack, preppedElement);
 
   function transformSingleElement(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
-    const name = getTagName(node);
+    const name = getNamespaceResolvedComponentName(node);
     const attrs = getAttributes(node).map(segmentAttr);
     let component: ComponentDef | CompoundComponentDef;
     if (name === COMPOUND_COMP_ID) {
@@ -76,7 +80,7 @@ export function nodeToComponentDef(
 
       // --- Get "method" attributes
       let api: Record<string, any> | undefined;
-      const apiAttrs = attrs.filter((attr) => refersToApi(attr.startSegment));
+      const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
       if (apiAttrs.length > 0) {
         api = {};
         apiAttrs.forEach((attr) => {
@@ -97,7 +101,8 @@ export function nodeToComponentDef(
       const children = getChildNodes(node);
       // --- Check for nested component
       const nestedCompound = children.find(
-        (child) => child.kind === SyntaxKind.ElementNode && getTagName(child) === COMPOUND_COMP_ID,
+        (child) =>
+          child.kind === SyntaxKind.ElementNode && getComponentName(child) === COMPOUND_COMP_ID,
       );
       if (nestedCompound) {
         reportError("T006");
@@ -106,7 +111,7 @@ export function nodeToComponentDef(
 
       // --- Get the single component definition
       const nestedComponents = children.filter(
-        (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(child)),
+        (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child)),
       );
       if (nestedComponents.length === 0) {
         nestedComponents.push(createTextNodeElement(""));
@@ -116,7 +121,7 @@ export function nodeToComponentDef(
       const nestedVars: Node[] = [];
       for (let child of children) {
         if (child.kind === SyntaxKind.ElementNode) {
-          const childName = getTagName(child);
+          const childName = getComponentName(child);
           if (childName === "var") {
             nestedVars.push(child);
           } else if (!UCRegex.test(childName)) {
@@ -205,6 +210,7 @@ export function nodeToComponentDef(
 
     const attributes = getAttributes(element);
 
+    namespaceStack.push(new Map());
     // --- Process attributes
     attributes.forEach((attr: Node) => {
       // --- Process the attribute
@@ -238,7 +244,7 @@ export function nodeToComponentDef(
         return;
       }
 
-      const childName = getTagName(child);
+      const childName = getComponentName(child);
       if (isCompound && child.kind === SyntaxKind.ElementNode && UCRegex.test(childName)) {
         // --- This is the single nested component definition of a compound component,
         // --- it is already processed
@@ -344,6 +350,8 @@ export function nodeToComponentDef(
       }
     });
 
+    namespaceStack.pop();
+
     if (!comp.script || comp.script.trim().length === 0) {
       // --- No (or whitespace only) script
       return;
@@ -354,7 +362,12 @@ export function nodeToComponentDef(
     try {
       // --- We parse the module file to catch parsing errors
       parser.parseStatements();
-      comp.scriptCollected = collectCodeBehindFromSource("Main", comp.script, moduleResolver, (a) => a);
+      comp.scriptCollected = collectCodeBehindFromSource(
+        "Main",
+        comp.script,
+        moduleResolver,
+        (a) => a,
+      );
     } catch (err) {
       if (parser.errors && parser.errors.length > 0) {
         comp.scriptError = parser.errors;
@@ -371,12 +384,17 @@ export function nodeToComponentDef(
   }
 
   function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
-    const { startSegment, name, value } = segmentAttr(attr);
+    const { namespace, startSegment, name, value } = segmentAttr(attr);
+
+    if (namespace === "xmlns") {
+      const nsKey = startSegment === undefined ? name : startSegment + name;
+      return addToNamespaces(namespaceStack, comp, nsKey, value);
+    }
 
     const isCompound = !isComponent(comp);
     // --- Handle single-word attributes
     if (isCompound) {
-      if (startSegment && !refersToApi(startSegment) && startSegment !== "var") {
+      if (startSegment && startSegment !== "method" && startSegment !== "var") {
         reportError("T021");
         return;
       }
@@ -390,12 +408,6 @@ export function nodeToComponentDef(
       if (!startSegment && name) {
         reportError("T021", name);
       }
-      return;
-    }
-
-    // --- Do not allow segmented attribute names
-    if (name.indexOf(".") >= 0) {
-      reportError("T007", name);
       return;
     }
 
@@ -414,7 +426,7 @@ export function nodeToComponentDef(
         if (startSegment === "var") {
           comp.vars ??= {};
           comp.vars[name] = value;
-        } else if (refersToApi(startSegment)) {
+        } else if (startSegment === "method") {
           comp.api ??= {};
           comp.api[name] = value;
         } else if (startSegment === "event") {
@@ -445,7 +457,7 @@ export function nodeToComponentDef(
       }
 
       if (child.kind !== SyntaxKind.ElementNode) return;
-      const childName = getTagName(child);
+      const childName = getComponentName(child);
       // --- The only element names we accept are "field" or "item"
       if (childName !== "field" && childName !== "item") {
         reportError("T016");
@@ -493,14 +505,14 @@ export function nodeToComponentDef(
     element: Node,
     allowName = true,
   ): { name?: string; value: any } | null {
-    const elementName = getTagName(element);
+    const elementName = getComponentName(element);
     // --- Accept only "name", "value"
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c)),
     );
     const nestedElements = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c)),
     );
     const attributes = getAttributes(element).map(segmentAttr);
 
@@ -673,13 +685,48 @@ export function nodeToComponentDef(
     comp.uses ??= valueAttr.value.split(",").map((v) => v.trim());
   }
 
-  function getTagName(node: Node) {
+  function getComponentName(node: Node) {
     const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
-    const name = nameTokens[nameTokens.length - 1];
-    return getText(name);
+    const name = getText(nameTokens.at(-1));
+    return name;
   }
 
-  function segmentAttr(attr: Node) {
+  function getNamespaceResolvedComponentName(node: Node) {
+    const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
+    const name = getText(nameTokens.at(-1));
+
+    if (nameTokens.length === 1) {
+      return name;
+    }
+
+    const namespace = getText(nameTokens[0]);
+    if (namespace === MY_COMPONENTS_NAMESPACE) {
+      return name;
+    }
+
+    if (namespaceStack.length === 0) {
+      reportError("T026");
+    }
+
+    let resolvedNamespace = undefined;
+    for (let i = namespaceStack.length - 1; i >= 0; --i) {
+      resolvedNamespace = namespaceStack[i].get(namespace);
+      if (resolvedNamespace !== undefined) {
+        break;
+      }
+    }
+    if (resolvedNamespace === undefined) {
+      reportError("T027", namespace);
+    }
+    return resolvedNamespace + "." + name;
+  }
+
+  function segmentAttr(attr: Node): {
+    namespace?: string;
+    startSegment?: string;
+    name: string;
+    value: string;
+  } {
     let key = attr.children![0];
     const hasNamespace = key.children!.length === 3;
     let namespace: undefined | string;
@@ -703,7 +750,7 @@ export function nodeToComponentDef(
     }
     const valueText = getText(attr.children![2]);
     const value = valueText.substring(1, valueText.length - 1);
-    return { startSegment, name, value };
+    return { namespace, startSegment, name, value };
   }
 
   function parseEscapeCharactersInAttrValues(attrs: Node[]) {
@@ -718,10 +765,10 @@ export function nodeToComponentDef(
 
   function prepNode(node: Node): Node {
     const childNodes: TransformNode[] = getChildNodes(node);
-    const tagName = getTagName(node);
+    const tagName = getComponentName(node);
     const hasComponentName = UCRegex.test(tagName);
     const shouldUseTextNodeElement = hasComponentName || tagName === "property";
-    const shouldCollapseWhitespace = tagName !== "event" && !refersToApi(tagName);
+    const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
     const attrs = getAttributes(node);
 
     desugarKeyOnlyAttrs(attrs);
@@ -772,15 +819,15 @@ export function nodeToComponentDef(
     }
 
     const helperNodes = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getTagName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c)),
     );
     const otherNodes = childNodes.filter(
       (c) =>
         c.kind !== SyntaxKind.ElementNode ||
-        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c))),
+        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c))),
     );
     const hasComponentChild = otherNodes.some(
-      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getTagName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c)),
     );
 
     if (hasScriptChild && hasComponentChild) {
@@ -1119,11 +1166,10 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
   }
   return {
     ...node,
-    children: [
-      ...node.children!.slice(0, childrenListIdx),
-      { ...node.children![childrenListIdx], children: newChildren },
-      ...node.children!.slice(childrenListIdx),
-    ],
+    children: node.children.with(childrenListIdx, {
+      ...node.children![childrenListIdx],
+      children: newChildren,
+    }),
   };
 }
 
@@ -1150,8 +1196,37 @@ function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
   }
 }
 
-/** Temporarily using 'method' as an alias to 'api'.
- * In the future, 'api' may be completely removed.*/
-function refersToApi(word: string): boolean {
-  return word === "method";
+function addToNamespaces(
+  namespaceStack: Map<string, string>[],
+  comp: ComponentDef | CompoundComponentDef,
+  nsKey: string,
+  value: string,
+) {
+  let nsCommaSeparated = value.split(":");
+  if (nsCommaSeparated.length > 2) {
+    return reportError("T028", value);
+  }
+
+  let nsValue = value;
+  if (nsCommaSeparated.length === 2) {
+    if (nsCommaSeparated[0] != NAMESPACE_SCHEME_COMPONENT) {
+      return reportError("T029", value, NAMESPACE_SCHEME_COMPONENT);
+    }
+    nsValue = nsCommaSeparated[1];
+  }
+
+  if (nsKey === MY_COMPONENTS_NAMESPACE) {
+    return reportError("T030", MY_COMPONENTS_NAMESPACE);
+  }
+  if (!UCRegex.test(nsKey)) {
+    return reportError("T031", nsKey);
+  }
+  const compNamespaces = namespaceStack[namespaceStack.length - 1];
+  if (compNamespaces.has(nsKey)) {
+    return reportError("T025", nsKey);
+  }
+  compNamespaces.set(nsKey, nsValue);
+
+  comp.namespaces ??= {};
+  comp.namespaces[nsKey] = nsValue;
 }
