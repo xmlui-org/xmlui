@@ -11,22 +11,15 @@ async function getElementSize(locator: Locator) {
 export type ComponentDriverParams = {
   locator: Locator;
   page: Page;
-  // TODO: REMOVE
-  testStateLocator: Locator
 };
 
 export class ComponentDriver {
   protected readonly locator: Locator;
   page: Page;
 
-  // TODO: REMOVE
-  protected readonly testStateLocator: Locator;
-
-  constructor({ locator, page, testStateLocator }: ComponentDriverParams) {
+  constructor({ locator, page }: ComponentDriverParams) {
     this.locator = locator;
     this.page = page;
-    // TODO: REMOVE
-    this.testStateLocator = testStateLocator;
   }
 
   get component() {
@@ -51,15 +44,6 @@ export class ComponentDriver {
   getComponentSize = async () => {
     return getElementSize(this.locator);
   };
-
-  // TODO: REMOVE
-  get testState() {
-    return async () => {
-      const text = await this.testStateLocator.textContent();
-      const testState = text === "undefined" ? undefined : JSON.parse(text!);
-      return testState;
-    };
-  }
 }
 
 export class TestStateDriver {
