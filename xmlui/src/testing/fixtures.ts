@@ -23,182 +23,126 @@ import {
   TestStateDriver,
 } from "./ComponentDrivers";
 
-export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
-  DriverClass: T,
-) {
-  return baseTest.extend<{
-    createDriver: (
-      source: string,
-      description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-    ) => Promise<InstanceType<T>>;
-  }>({
-    createDriver: async ({ page }, use) => {
-      await use(
-        async (
-          source: string,
-          description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-        ) => {
-          const testStateViewTestId = "test-state-view-testid";
-          const { errors, component } = xmlUiMarkupToComponent(`
-            <Fragment var.testState="{null}">
-              ${source}
-              <Stack width="0" height="0">
-                <Text
-                  testId="${testStateViewTestId}"
-                  value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
-              </Stack>
-            </Fragment>
-          `);
+export const test = baseTest.extend<TestDriverExtenderProps>({
+  // NOTE: the base Playwright test can be extended with fixture methods
+  // as well as any other language constructs we deem useful
+  baseComponentTestId: "test-id-component",
+  testStateViewTestId: "test-state-view-testid",
 
-          if (errors.length > 0) {
-            throw { errors };
+  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
+    await use(
+      async (
+        source: string,
+        description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+      ) => {
+        // --- Initialize XMLUI App
+        const { errors, component } = xmlUiMarkupToComponent(`
+          <Fragment var.testState="{null}">
+            ${source}
+            <Stack width="0" height="0">
+              <Text
+                testId="${testStateViewTestId}"
+                value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
+            </Stack>
+          </Fragment>
+        `);
+
+        if (errors.length > 0) {
+          throw { errors };
+        }
+        const entryPoint = component as ComponentDef;
+
+        if (source !== "" && entryPoint.children) {
+          const sourceBaseComponent = entryPoint.children[0];
+          if (!sourceBaseComponent.testId) {
+            sourceBaseComponent.testId = baseComponentTestId;
           }
+        }
+        await initComponent(page, { ...description, entryPoint });
+        return new TestStateDriver(page.getByTestId(testStateViewTestId));
+      },
+    );
+  },
 
-          const entryPoint = component as ComponentDef;
-          const componentTestId = "test-id-component";
-          const componentToTest = entryPoint.children![0];
-          componentToTest.testId ??= componentTestId;
+  createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
+    { page, baseComponentTestId, testStateViewTestId },
+    use,
+  ) => {
+    await use(async (driverClass: T, testId?: string) => {
+      const locator = await getOnlyFirstLocator(page, testId ?? baseComponentTestId);
+      return new driverClass({
+        locator,
+        page,
+      });
+    });
+  },
 
-          await initComponent(page, { ...description, entryPoint });
-
-          return new DriverClass({
-            locator: page.getByTestId(componentToTest.testId!),
-            testStateLocator: page.getByTestId(testStateViewTestId),
-            page: page,
-          });
-        },
-      );
-    },
-  });
-}
-
-// TODO: Remove export
-// export const test = baseTest.extend(...);
-export function createTestWithDrivers() {
-  // NOTE: the base Playwright test can be extended with fixture methods as well as any other language constructs we deem useful
-  return baseTest.extend<TestDriverExtenderProps>({
-    baseComponentTestId: "test-id-component",
-    testStateViewTestId: "test-state-view-testid",
-
-    initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
-      await use(
-        async (
-          source: string,
-          description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-        ) => {
-          // --- Initialize XMLUI App
-          const { errors, component } = xmlUiMarkupToComponent(`
-            <Fragment var.testState="{null}">
-              ${source}
-              <Stack width="0" height="0">
-                <Text
-                  testId="${testStateViewTestId}"
-                  value="{ typeof testState === 'undefined' ? 'undefined' : JSON.stringify(testState) }"/>
-              </Stack>
-            </Fragment>
-          `);
-
-          if (errors.length > 0) {
-            throw { errors };
-          }
-          const entryPoint = component as ComponentDef;
-
-          if (source !== "" && entryPoint.children) {
-            const sourceBaseComponent = entryPoint.children[0];
-            if (!sourceBaseComponent.testId) {
-              sourceBaseComponent.testId = baseComponentTestId;
-            }
-          }
-          await initComponent(page, { ...description, entryPoint });
-          return new TestStateDriver(page.getByTestId(testStateViewTestId));
-        },
-      );
-    },
-
-    createDriver: async <T extends new (...args: ComponentDriverParams[]) => any>(
-      { page, baseComponentTestId, testStateViewTestId },
-      use,
-    ) => {
-      await use(async (driverClass: T, testId?: string) => {
-        const locator = await getOnlyFirstLocator(page, testId ?? baseComponentTestId);
-        return new driverClass({
-          locator,
-          page,
-
-          testStateLocator: page.getByTestId(testStateViewTestId),
-        });
-      });
-    },
-
-    createButtonDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(ButtonDriver, testId);
-      });
-    },
-    createAvatarDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(AvatarDriver, testId);
-      });
-    },
-    createFormDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(FormDriver, testId);
-      });
-    },
-    createFormItemDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(FormItemDriver, testId);
-      });
-    },
-    createSplitterDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(SplitterDriver, testId);
-      });
-    },
-    createMarkdownDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(MarkdownDriver, testId);
-      });
-    },
-    createItemsDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(ItemsDriver, testId);
-      });
-    },
-    createSliderDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(SliderDriver, testId);
-      });
-    },
-    createRangeDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(RangeDriver, testId);
-      });
-    },
-    createSelectDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(SelectDriver, testId);
-      });
-    },
-    createRadioGroupDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(RadioGroupDriver, testId);
-      });
-    },
-    createNumberBoxDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(NumberBoxDriver, testId);
-      });
-    },
-    createListDriver: async ({ createDriver }, use) => {
-      await use(async (testId?: string) => {
-        return createDriver(ListDriver, testId);
-      });
-    },
-  });
-}
-
-export const test = createTestWithDrivers();
+  createButtonDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(ButtonDriver, testId);
+    });
+  },
+  createAvatarDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(AvatarDriver, testId);
+    });
+  },
+  createFormDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(FormDriver, testId);
+    });
+  },
+  createFormItemDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(FormItemDriver, testId);
+    });
+  },
+  createSplitterDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(SplitterDriver, testId);
+    });
+  },
+  createMarkdownDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(MarkdownDriver, testId);
+    });
+  },
+  createItemsDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(ItemsDriver, testId);
+    });
+  },
+  createSliderDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(SliderDriver, testId);
+    });
+  },
+  createRangeDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(RangeDriver, testId);
+    });
+  },
+  createSelectDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(SelectDriver, testId);
+    });
+  },
+  createRadioGroupDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(RadioGroupDriver, testId);
+    });
+  },
+  createNumberBoxDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(NumberBoxDriver, testId);
+    });
+  },
+  createListDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(ListDriver, testId);
+    });
+  },
+});
 
 /**
  * Writes an error in the console to indicate if multiple elements have the same testId
