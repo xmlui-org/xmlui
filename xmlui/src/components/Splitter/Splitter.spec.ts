@@ -5,17 +5,12 @@
  */
 
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { ComponentDriver } from "@testing/ComponentDrivers";
-import { expect, createTestWithDriver } from "@testing/fixtures";
-
-class SplitterDriver extends ComponentDriver {}
-
-const test = createTestWithDriver(SplitterDriver);
+import { expect, test } from "@testing/fixtures";
 
 test.skip(
   "Splitter renders & is visible",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- orientation
@@ -23,13 +18,13 @@ test.skip(
 test.skip(
   "orientation=horizontal renders primary and secondary from left to right",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "orientation=vertical renders primary and secondary from top to bottom",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- swapped
@@ -43,7 +38,7 @@ test.skip(
   test.skip(
     `swapped=${swapped} & orientation=${orientation} renders ${what}`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ createDriver }) => {},
+    async ({ initTestBed }) => {},
   );
 })
 
@@ -52,7 +47,7 @@ test.skip(
 test.skip(
   "splitterTemplate renders correctly",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- initialPrimarySize
@@ -60,7 +55,7 @@ test.skip(
 test.skip(
   "initialPrimarySize sets the initial size of the primary section",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- minPrimarySize
@@ -68,13 +63,13 @@ test.skip(
 test.skip(
   "minPrimarySize sets the minimum size of the primary section",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "if initialPrimarySize < minPrimarySize then initial primary size is set to minPrimarySize",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- maxPrimarySize
@@ -82,13 +77,13 @@ test.skip(
 test.skip(
   "maxPrimarySize sets the maximum size of the primary section",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "if initialPrimarySize < maxPrimarySize then initial primary size is set to maxPrimarySize",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- floating
@@ -96,13 +91,13 @@ test.skip(
 test.skip(
   "floating=false shows resizer handle only on hover",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "floating=true shows resizer handle all the time",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- enabled
@@ -110,13 +105,13 @@ test.skip(
 test.skip(
   "enabled=true enables the component",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "enabled=false disables the component",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- onResize
@@ -124,11 +119,11 @@ test.skip(
 test.skip(
   "onResize is called when splitter is resized",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "onResize is not called when splitter is disabled & resized",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );

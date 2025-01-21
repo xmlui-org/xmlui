@@ -2,21 +2,16 @@
  * Testing Notes: the Driver needs to account for the correct positioning of the indicators on the slider
  */
 
-import { orderingValues, scrollAnchoringValues, validationStatusValues } from "@components/abstractions";
+import { validationStatusValues } from "@components/abstractions";
 import { SKIP_REASON } from "@testing/component-test-helpers";
-import { ComponentDriver } from "@testing/ComponentDrivers";
-import { expect, createTestWithDriver } from "@testing/fixtures";
-
-class SliderDriver extends ComponentDriver {}
-
-const test = createTestWithDriver(SliderDriver);
+import { expect, test } from "@testing/fixtures";
 
 test.skip(
   "component renders & is visible",
   SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
-  async ({ createDriver }) => {
-    const driver = await createDriver(`<Slider />`);
-    await expect(driver.component).toBeVisible();
+  async ({ initTestBed, createSliderDriver }) => {
+    await initTestBed(`<Slider />`);
+    await expect((await createSliderDriver()).component).toBeVisible();
   },
 );
 
@@ -25,7 +20,7 @@ test.skip(
 test.skip(
   "providing initialValue sets value of field",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 [
@@ -37,7 +32,7 @@ test.skip(
   test.skip(
     `accept value type: ${label}`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ createDriver }) => {},
+    async ({ initTestBed }) => {},
   );
 });
 
@@ -51,29 +46,28 @@ test.skip(
   test.skip(
     `reject value type: ${label}`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ createDriver }) => {},
+    async ({ initTestBed }) => {},
   );
 });
-
 
 // --- minValue
 
 test.skip(
   "minValue sets the lower bound",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "minValue cannot be larger than maxValue",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "value cannot be lower than minValue",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {
+  async ({ initTestBed }) => {
     // set value to lower than minValue
     // test that value is automatically set to minValue
   },
@@ -84,19 +78,19 @@ test.skip(
 test.skip(
   "maxValue sets the upper bound",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "maxValue cannot be smaller than minValue",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "value cannot be larger than maxValue",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {
+  async ({ initTestBed }) => {
     // set value to higher than maxValue
     // test that value is automatically set to minValue
   },
@@ -107,19 +101,19 @@ test.skip(
 test.skip(
   "rangeHighlight=none disables highlighting on the range",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "rangeHighlight=lower sets highlighting from minValue to value",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "rangeHighlight=upper sets highlighting from value to maxValue",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- enabled
@@ -127,13 +121,13 @@ test.skip(
 test.skip(
   "enabled=true enables the control",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "enabled=false disables the control",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- required
@@ -141,7 +135,7 @@ test.skip(
 test.skip(
   "making field required shows a visual indicator",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- readOnly
@@ -149,7 +143,7 @@ test.skip(
 test.skip(
   "readOnly disables setting the range slider",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- validationStatus
@@ -159,7 +153,7 @@ validationStatuses.forEach((status) => {
   test.skip(
     `validation status ${status} is applied correctly`,
     SKIP_REASON.TO_BE_IMPLEMENTED(),
-    async ({ createDriver }) => {
+    async ({ initTestBed }) => {
       // indicator color matches the one specified in current theme
     },
   );
@@ -170,13 +164,13 @@ validationStatuses.forEach((status) => {
 test.skip(
   "onDidChange is called on input change",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "onDidChange is not called if field is disabled",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- gotFocus
@@ -184,13 +178,13 @@ test.skip(
 test.skip(
   "gotFocus event fires on focusing the field",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "gotFocus is not called if field is disabled",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- lostFocus
@@ -198,13 +192,13 @@ test.skip(
 test.skip(
   "lostFocus event fires on blurring the field",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "lostFocus is not called if field is disabled",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- focus (api)
@@ -212,13 +206,13 @@ test.skip(
 test.skip(
   "focus() focuses the field",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "focus() does nothing if field is disabled",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- value (api)
@@ -226,7 +220,7 @@ test.skip(
 test.skip(
   "value returns current input value",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 // --- setValue (api)
@@ -234,17 +228,17 @@ test.skip(
 test.skip(
   "setValue updates input value",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "setValue does not update input if field is disabled",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
 
 test.skip(
   "setValue does not update input if value is invalid",
   SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ createDriver }) => {},
+  async ({ initTestBed }) => {},
 );
