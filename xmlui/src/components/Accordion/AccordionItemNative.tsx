@@ -1,4 +1,12 @@
-import { type ReactNode, useEffect, useId, useMemo, useState } from "react";
+import {
+  ForwardedRef,
+  forwardRef,
+  type ReactNode,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+} from "react";
 import { useAccordionContext } from "@components/Accordion/AccordionContext";
 import styles from "@components/Accordion/Accordion.module.scss";
 import Icon from "@components/Icon/IconNative";
@@ -24,15 +32,14 @@ type Props = {
   content: ReactNode;
 
   initiallyExpanded?: boolean;
+
+  style?: React.CSSProperties;
 };
 
-export function AccordionItemComponent({
-  id,
-  header,
-  headerRenderer = defaultRenderer,
-  content,
-  initiallyExpanded,
-}: Props) {
+export const AccordionItemComponent = forwardRef(function AccordionItemComponent(
+  { id, header, headerRenderer = defaultRenderer, content, initiallyExpanded, style }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const generatedId = useId();
   const itemId = useMemo(() => (id ? `${id}` : generatedId), [id, generatedId]);
   const triggerId = useMemo(() => `trigger_${itemId}`, [itemId]);
@@ -70,7 +77,7 @@ export function AccordionItemComponent({
   }, [triggerId, unRegister]);
 
   return (
-    <RAccordion.Item key={itemId} value={itemId} className={styles.item}>
+    <RAccordion.Item key={itemId} value={itemId} className={styles.item} ref={forwardedRef} style={style}>
       <RAccordion.Header className={styles.header}>
         <RAccordion.Trigger
           id={`trigger_${itemId}`}
@@ -99,4 +106,4 @@ export function AccordionItemComponent({
       </RAccordion.Content>
     </RAccordion.Item>
   );
-}
+});

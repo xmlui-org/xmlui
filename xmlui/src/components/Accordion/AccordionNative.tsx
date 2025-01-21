@@ -1,11 +1,12 @@
 import * as RAccordion from "@radix-ui/react-accordion";
 import { AccordionContext } from "@components/Accordion/AccordionContext";
 import styles from "./Accordion.module.scss";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { forwardRef, useCallback, useEffect, useMemo, useState, ForwardedRef } from "react";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 type Props = {
+  style?: React.CSSProperties;
   children?: React.ReactNode;
   triggerPosition?: "start" | "end";
   collapsedIcon?: string;
@@ -16,16 +17,20 @@ type Props = {
   onDisplayDidChange?: (changedValue: string[]) => void;
 };
 
-export const AccordionComponent = ({
-  children,
-  hideIcon = false,
-  expandedIcon,
-  collapsedIcon = "chevrondown",
-  triggerPosition = "end",
-  onDisplayDidChange = noop,
-  registerComponentApi,
-  rotateExpanded = "180deg",
-}: Props) => {
+export const AccordionComponent = forwardRef(function AccordionComponent(
+  {
+    style,
+    children,
+    hideIcon = false,
+    expandedIcon,
+    collapsedIcon = "chevrondown",
+    triggerPosition = "end",
+    onDisplayDidChange = noop,
+    registerComponentApi,
+    rotateExpanded = "180deg",
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [itemElements, setItemElements] = useState<Set<string>>(new Set());
 
@@ -137,6 +142,8 @@ export const AccordionComponent = ({
   return (
     <AccordionContext.Provider value={contextValue}>
       <RAccordion.Root
+        style={style}
+        ref={forwardedRef}
         value={expandedItems}
         type="multiple"
         className={styles.root}
@@ -146,4 +153,4 @@ export const AccordionComponent = ({
       </RAccordion.Root>
     </AccordionContext.Provider>
   );
-};
+});
