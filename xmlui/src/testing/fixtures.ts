@@ -4,7 +4,24 @@ import { initComponent } from "./component-test-helpers";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { Page } from "playwright-core";
-import { type ComponentDriver, type ComponentDriverParams, AvatarDriver, ButtonDriver, TestStateDriver } from "./ComponentDrivers";
+import {
+  type ComponentDriver,
+  type ComponentDriverParams,
+  AvatarDriver,
+  ButtonDriver,
+  FormDriver,
+  FormItemDriver,
+  ItemsDriver,
+  ListDriver,
+  MarkdownDriver,
+  NumberBoxDriver,
+  RadioGroupDriver,
+  RangeDriver,
+  SelectDriver,
+  SliderDriver,
+  SplitterDriver,
+  TestStateDriver,
+} from "./ComponentDrivers";
 
 export function createTestWithDriver<T extends new (...args: ComponentDriverParams[]) => any>(
   DriverClass: T,
@@ -107,7 +124,7 @@ export function createTestWithDrivers() {
         return new driverClass({
           locator,
           page,
-          
+
           testStateLocator: page.getByTestId(testStateViewTestId),
         });
       });
@@ -121,6 +138,61 @@ export function createTestWithDrivers() {
     createAvatarDriver: async ({ createDriver }, use) => {
       await use(async (testId?: string) => {
         return createDriver(AvatarDriver, testId);
+      });
+    },
+    createFormDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(FormDriver, testId);
+      });
+    },
+    createFormItemDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(FormItemDriver, testId);
+      });
+    },
+    createSplitterDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(SplitterDriver, testId);
+      });
+    },
+    createMarkdownDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(MarkdownDriver, testId);
+      });
+    },
+    createItemsDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(ItemsDriver, testId);
+      });
+    },
+    createSliderDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(SliderDriver, testId);
+      });
+    },
+    createRangeDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(RangeDriver, testId);
+      });
+    },
+    createSelectDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(SelectDriver, testId);
+      });
+    },
+    createRadioGroupDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(RadioGroupDriver, testId);
+      });
+    },
+    createNumberBoxDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(NumberBoxDriver, testId);
+      });
+    },
+    createListDriver: async ({ createDriver }, use) => {
+      await use(async (testId?: string) => {
+        return createDriver(ListDriver, testId);
       });
     },
   });
@@ -189,7 +261,6 @@ export const expect = baseExpect.extend({
   },
 });
 
-
 // --- Types
 
 type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
@@ -207,4 +278,15 @@ type TestDriverExtenderProps = {
   ) => Promise<InstanceType<T>>;
   createButtonDriver: ComponentDriverMethod<ButtonDriver>;
   createAvatarDriver: ComponentDriverMethod<AvatarDriver>;
+  createFormDriver: ComponentDriverMethod<FormDriver>;
+  createFormItemDriver: ComponentDriverMethod<FormItemDriver>;
+  createSplitterDriver: ComponentDriverMethod<SplitterDriver>;
+  createMarkdownDriver: ComponentDriverMethod<MarkdownDriver>;
+  createItemsDriver: ComponentDriverMethod<ItemsDriver>;
+  createSliderDriver: ComponentDriverMethod<SliderDriver>;
+  createRangeDriver: ComponentDriverMethod<RangeDriver>;
+  createSelectDriver: ComponentDriverMethod<SelectDriver>;
+  createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
+  createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;
+  createListDriver: ComponentDriverMethod<ListDriver>;
 };
