@@ -8,8 +8,8 @@ import type { ArrowExpression } from "@abstractions/scripting/ScriptingSourceTre
  */
 export type LookupActionOptions = {
   /**
-   * If we pass down an event handler to a component, we should sign the error once, only in some 
-   * steps of the component chain. This property (by default, true) indicates this intention.
+   * This property (by default, true) indicates that any error should be signed while 
+   * executing an event handler. Set it to `false` to suppress error indication.
    */
   signError?: boolean;
 
@@ -25,6 +25,9 @@ export type LookupActionOptions = {
    */
   ephemeral?: boolean;
 
+  /**
+   * This property declares the script code to use as a default for a particular event handler.
+   */
   defaultHandler?: string;
 };
 
