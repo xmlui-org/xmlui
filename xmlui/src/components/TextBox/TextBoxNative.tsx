@@ -1,6 +1,6 @@
 import type { ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import type { CSSProperties } from "react";
+import {CSSProperties, forwardRef} from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./TextBox.module.scss";
@@ -38,34 +38,37 @@ type Props = {
   required?: boolean;
 };
 
-export const TextBox = ({
-  id,
-  type = "text",
-  value = "",
-  updateState = noop,
-  initialValue = "",
-  style,
-  maxLength,
-  enabled = true,
-  placeholder,
-  validationStatus = "none",
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  registerComponentApi,
-  startText,
-  startIcon,
-  endText,
-  endIcon,
-  autoFocus,
-  readOnly,
-  tabIndex,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-  required
-}: Props) => {
+export const TextBox = forwardRef(function TextBox(
+  {
+    id,
+    type = "text",
+    value = "",
+    updateState = noop,
+    initialValue = "",
+    style,
+    maxLength,
+    enabled = true,
+    placeholder,
+    validationStatus = "none",
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    registerComponentApi,
+    startText,
+    startIcon,
+    endText,
+    endIcon,
+    autoFocus,
+    readOnly,
+    tabIndex,
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+    required,
+  }: Props,
+  ref
+) {
   const inputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (autoFocus) {
@@ -140,6 +143,7 @@ export const TextBox = ({
       onFocus={onFocus}
       onBlur={onBlur}
       style={style}
+      ref={ref}
     >
       <div
         className={classnames(styles.inputRoot, {
@@ -175,4 +179,4 @@ export const TextBox = ({
       </div>
     </ItemWithLabel>
   );
-};
+});

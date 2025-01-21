@@ -15,6 +15,12 @@ export type AnimationProps = {
   once?: boolean;
 };
 
+const AnimatedComponent = animated(
+  forwardRef(function InlineComponentDef(props: any, ref) {
+    return React.cloneElement(props.children, { ...props, ref } as any);
+  }),
+);
+
 export const Animation = ({
   children,
   registerComponentApi,
@@ -45,7 +51,6 @@ export const Animation = ({
   }));
 
   const [ref, animationStyles] = useInView(() => animationSettings, {
-    rootMargin: "-40% 0%",
     once,
   });
 
@@ -67,22 +72,9 @@ export const Animation = ({
     });
   }, [registerComponentApi, startAnimation]);
 
-  const Components = Children.map(children, (child) => {
-    return animated(
-      forwardRef(function InlineComponentDef(props, ref) {
-        return React.isValidElement(child) ? (
-          React.cloneElement(child, { ...props, ref } as any)
-        ) : (
-          <>{child}</>
-        );
-      }),
-    );
-  });
-
-  return Components.map((Component, index) => {
-    if (animateWhenInView) {
-      return <Component style={animationStyles} ref={ref} key={index} />;
-    }
-    return <Component style={springs} key={index} />;
-  });
+  return Children.map(children, (child, index) => (
+    <AnimatedComponent style={animateWhenInView ? animationStyles : springs} key={index} ref={ref}>
+      {child}
+    </AnimatedComponent>
+  ));
 };

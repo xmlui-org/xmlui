@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, forwardRef, ReactNode } from "react";
 import React, {
   useCallback,
   useEffect,
@@ -42,6 +42,7 @@ import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react
 import { useEvent } from "@components-core/utils/misc";
 import { OptionContext, useOption } from "@components/Select/OptionContext";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];
@@ -73,37 +74,40 @@ type SelectProps = {
   labelBreak?: boolean;
 };
 
-function SimpleSelect(props: {
-  value: SingleValueType;
-  onValueChange: (selectedValue: SingleValueType) => void;
-  id: string;
-  style: React.CSSProperties;
-  onFocus: () => void;
-  onBlur: () => void;
-  enabled: boolean;
-  validationStatus: ValidationStatus;
-  triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
-  autoFocus: boolean;
-  placeholder: string;
-  height:
-    | "-moz-initial"
-    | "inherit"
-    | "initial"
-    | "revert"
-    | "revert-layer"
-    | "unset"
-    | "-moz-max-content"
-    | "-moz-min-content"
-    | "-webkit-fit-content"
-    | "auto"
-    | "fit-content"
-    | "max-content"
-    | "min-content"
-    | string
-    | number;
-  children: React.ReactNode;
-  options: Set<Option>;
-}) {
+const SimpleSelect = forwardRef(function SimpleSelect(
+  props: {
+    value: SingleValueType;
+    onValueChange: (selectedValue: SingleValueType) => void;
+    id: string;
+    style: React.CSSProperties;
+    onFocus: () => void;
+    onBlur: () => void;
+    enabled: boolean;
+    validationStatus: ValidationStatus;
+    triggerRef: (value: ((prevState: HTMLElement) => HTMLElement) | HTMLElement) => void;
+    autoFocus: boolean;
+    placeholder: string;
+    height:
+      | "-moz-initial"
+      | "inherit"
+      | "initial"
+      | "revert"
+      | "revert-layer"
+      | "unset"
+      | "-moz-max-content"
+      | "-moz-min-content"
+      | "-webkit-fit-content"
+      | "auto"
+      | "fit-content"
+      | "max-content"
+      | "min-content"
+      | string
+      | number;
+    children: React.ReactNode;
+    options: Set<Option>;
+  },
+  forwardedRef,
+) {
   const { root } = useTheme();
   const {
     enabled,
@@ -121,6 +125,8 @@ function SimpleSelect(props: {
     onFocus,
     options,
   } = props;
+
+  const ref = forwardedRef ? composeRefs(triggerRef, forwardedRef) : triggerRef;
 
   const stringValue = value + "";
   const onValChange = useCallback(
@@ -142,8 +148,12 @@ function SimpleSelect(props: {
           onFocus={onFocus}
           onBlur={onBlur}
           disabled={!enabled}
-          className={classnames(styles.selectTrigger, styles[validationStatus])}
-          ref={triggerRef}
+          className={classnames(styles.selectTrigger, {
+            [styles.error]: validationStatus === "error",
+            [styles.warning]: validationStatus === "warning",
+            [styles.valid]: validationStatus === "valid",
+          })}
+          ref={ref}
           autoFocus={autoFocus}
         >
           <div className={styles.selectValue}>
@@ -173,35 +183,38 @@ function SimpleSelect(props: {
       </SelectRoot>
     </OptionTypeProvider>
   );
-}
+});
 
-export function Select({
-  id,
-  initialValue,
-  value,
-  enabled = true,
-  placeholder,
-  updateState = noop,
-  validationStatus = "none",
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  registerComponentApi,
-  emptyListTemplate,
-  optionLabelRenderer,
-  valueRenderer,
-  layout,
-  dropdownHeight,
-  children,
-  autoFocus = false,
-  searchable = false,
-  multiSelect = false,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-  required = false,
-}: SelectProps) {
+export const Select = forwardRef(function Select(
+  {
+    id,
+    initialValue,
+    value,
+    enabled = true,
+    placeholder,
+    updateState = noop,
+    validationStatus = "none",
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    registerComponentApi,
+    emptyListTemplate,
+    optionLabelRenderer,
+    valueRenderer,
+    layout,
+    dropdownHeight,
+    children,
+    autoFocus = false,
+    searchable = false,
+    multiSelect = false,
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+    required = false,
+  }: SelectProps,
+  ref,
+) {
   const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
   const [open, setOpen] = useState(false);
   const [width, setWidth] = useState(0);
@@ -322,6 +335,7 @@ export function Select({
           <OptionTypeProvider Component={HiddenOption}>
             {children}
             <ItemWithLabel
+              ref={ref}
               labelPosition={labelPosition as any}
               label={label}
               labelWidth={labelWidth}
@@ -444,6 +458,7 @@ export function Select({
           </OptionTypeProvider>
         ) : (
           <SimpleSelect
+            ref={ref}
             value={value as SingleValueType}
             options={options}
             onValueChange={toggleOption}
@@ -464,7 +479,7 @@ export function Select({
       </OptionContext.Provider>
     </SelectContext.Provider>
   );
-}
+});
 
 export const ComboboxOption = (option: Option) => {
   const id = useId();

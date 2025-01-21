@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, forwardRef, ReactNode} from "react";
 import { Children, useId } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./FormItem.module.scss";
@@ -26,7 +26,7 @@ type ItemWithLabelProps = {
 
 const numberRegex = /^[0-9]+$/;
 
-export function ItemWithLabel({
+export const ItemWithLabel = forwardRef(function ItemWithLabel({
   id,
   labelPosition = "top",
   style,
@@ -42,12 +42,12 @@ export function ItemWithLabel({
   onBlur,
   labelStyle,
   validationResult,
-}: ItemWithLabelProps) {
+}: ItemWithLabelProps, ref) {
   const generatedId = useId();
   const inputId = id || generatedId;
   if (label === undefined) {
     return (
-      <Slot style={style} id={inputId} onFocus={onFocus} onBlur={onBlur}>
+      <Slot style={style} id={inputId} onFocus={onFocus} onBlur={onBlur} ref={ref}>
         {children}
       </Slot>
     );
@@ -61,7 +61,7 @@ export function ItemWithLabel({
     // });
   }
   return (
-    <div style={style}>
+    <div style={style} ref={ref}>
       <div
         className={classnames(styles.container, {
           [styles.top]: labelPosition === "top",
@@ -101,4 +101,4 @@ export function ItemWithLabel({
       {validationResult}
     </div>
   );
-}
+});
