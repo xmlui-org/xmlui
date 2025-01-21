@@ -1197,6 +1197,36 @@ describe("Xmlui transform - child elements", () => {
       expect(cd.children[0].children[0].type).toEqual("Overridden.Namespace.DataGrid");
     });
 
+    it("namespace 'My' is optional on top lvl componenet", () => {
+      const cd = transformSource(`<My:App/>`) as ComponentDef;
+      expect(cd.type).toEqual("App");
+    });
+
+    it("namespace 'My' is optional on nested componenet", () => {
+      const cd = transformSource(`<App><My:Data.Grid /></App>`) as ComponentDef;
+      expect(cd.children[0].type).toEqual("Data.Grid");
+    });
+
+    it("defining namespace with key 'My' errors", () => {
+      try {
+        const cd = transformSource(
+          `<App xmlns:My="anything"><My:DataGrid /></App>`,
+        ) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T030");
+      }
+    });
+
+    it("lowercase namespace key errors", () => {
+      try {
+        const cd = transformSource(`<App xmlns:testnamespace="anything" />`) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T031");
+      }
+    });
+
     it("errors on refering to unknown namespace", () => {
       try {
         const cd = transformSource(`
@@ -1207,6 +1237,48 @@ describe("Xmlui transform - child elements", () => {
         assert.fail("Exception expected");
       } catch (err) {
         expect(err.toString()).include("T027");
+      }
+    });
+
+    it("multiple colons in namespace value errors", () => {
+      try {
+        const cd = transformSource(`
+          <App xmlns:TestNamespace="component-ns:buttons-components:Test.Components" />
+          `) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T028");
+      }
+    });
+
+    it("unrecognised namespace scheme errors", () => {
+      try {
+        const cd = transformSource(`
+          <App xmlns:TestNamespace="NON-EXISTANT:Test.Components" />
+          `) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T029");
+      }
+    });
+
+    it("duplicate namespace key errors", () => {
+      try {
+        const cd = transformSource(`
+              <App xmlns:TestNamespace="first" xmlns:TestNamespace="second" />
+              `) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T025");
+      }
+    });
+
+    it("namespace on top lvl component errors", () => {
+      try {
+        const cd = transformSource(`<NonExistantNs:App />`) as ComponentDef;
+        assert.fail("Exception expected");
+      } catch (err) {
+        expect(err.toString()).include("T026");
       }
     });
   });

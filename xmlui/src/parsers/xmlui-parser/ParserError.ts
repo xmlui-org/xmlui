@@ -64,7 +64,9 @@ export type ErrorCodes =
   | "T026"
   | "T027"
   | "T028"
-  | "T029";
+  | "T029"
+  | "T030"
+  | "T031";
 
 // Error message type description
 type ErrorText = Record<ErrorCodes, string>;
@@ -116,4 +118,6 @@ export const errorMessages: ErrorText = {
   T027: "Cannot resolve namespace '{0}'. It was not defined in any of the ancestor components",
   T028: "Namespace value {0} cannot have multiple ':' (colon) in it",
   T029: "Incorrect scheme specified before ':' (colon) in namespace {0}. Delete it to get the default '{1}'.",
+  T030: "Cannot define reserved namespace: '{0}'",
+  T031: "Namespace '{0}' must start with an uppercase letter",
 };

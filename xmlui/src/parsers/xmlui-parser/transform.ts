@@ -19,6 +19,7 @@ const propAttrs = ["name", "value"];
 const CDATA_PREFIX_LEN = 9;
 const CDATA_POSTFIX_LEN = 3;
 const NAMESPACE_SCHEME_COMPONENT = "component-ns";
+const MY_COMPONENTS_NAMESPACE = "My";
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -386,30 +387,8 @@ export function nodeToComponentDef(
     const { namespace, startSegment, name, value } = segmentAttr(attr);
 
     if (namespace === "xmlns") {
-      let nsCommaSeparated = value.split(":");
-      if (nsCommaSeparated.length > 2) {
-        return reportError("T028", value);
-      }
-
-      let nsValue = value;
-      if (nsCommaSeparated.length === 2) {
-        if (nsCommaSeparated[0] != NAMESPACE_SCHEME_COMPONENT) {
-          return reportError("T029", value, NAMESPACE_SCHEME_COMPONENT);
-        } else {
-          nsValue = nsCommaSeparated[1];
-        }
-      }
-
-      let nsKey = startSegment === undefined ? name : startSegment + name;
-      const compNamespaces = namespaceStack[namespaceStack.length - 1];
-      if (compNamespaces.has(nsKey)) {
-        return reportError("T025", nsKey);
-      }
-      compNamespaces.set(nsKey, nsValue);
-
-      comp.namespaces ??= {};
-      comp.namespaces[nsKey] = nsValue;
-      return;
+      const nsKey = startSegment === undefined ? name : startSegment + name;
+      return addToNamespaces(namespaceStack, comp, nsKey, value);
     }
 
     const isCompound = !isComponent(comp);
@@ -721,6 +700,9 @@ export function nodeToComponentDef(
     }
 
     const namespace = getText(nameTokens[0]);
+    if (namespace === MY_COMPONENTS_NAMESPACE) {
+      return name;
+    }
 
     if (namespaceStack.length === 0) {
       reportError("T026");
@@ -739,7 +721,12 @@ export function nodeToComponentDef(
     return resolvedNamespace + "." + name;
   }
 
-  function segmentAttr(attr: Node) {
+  function segmentAttr(attr: Node): {
+    namespace?: string;
+    startSegment?: string;
+    name: string;
+    value: string;
+  } {
     let key = attr.children![0];
     const hasNamespace = key.children!.length === 3;
     let namespace: undefined | string;
@@ -1207,4 +1194,39 @@ function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
       attrValue.text = '"' + getText(attrValue) + '"';
     }
   }
+}
+
+function addToNamespaces(
+  namespaceStack: Map<string, string>[],
+  comp: ComponentDef | CompoundComponentDef,
+  nsKey: string,
+  value: string,
+) {
+  let nsCommaSeparated = value.split(":");
+  if (nsCommaSeparated.length > 2) {
+    return reportError("T028", value);
+  }
+
+  let nsValue = value;
+  if (nsCommaSeparated.length === 2) {
+    if (nsCommaSeparated[0] != NAMESPACE_SCHEME_COMPONENT) {
+      return reportError("T029", value, NAMESPACE_SCHEME_COMPONENT);
+    }
+    nsValue = nsCommaSeparated[1];
+  }
+
+  if (nsKey === MY_COMPONENTS_NAMESPACE) {
+    return reportError("T030", MY_COMPONENTS_NAMESPACE);
+  }
+  if (!UCRegex.test(nsKey)) {
+    return reportError("T031", nsKey);
+  }
+  const compNamespaces = namespaceStack[namespaceStack.length - 1];
+  if (compNamespaces.has(nsKey)) {
+    return reportError("T025", nsKey);
+  }
+  compNamespaces.set(nsKey, nsValue);
+
+  comp.namespaces ??= {};
+  comp.namespaces[nsKey] = nsValue;
 }
