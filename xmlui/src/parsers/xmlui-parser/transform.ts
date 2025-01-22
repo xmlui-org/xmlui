@@ -19,7 +19,7 @@ const propAttrs = ["name", "value"];
 const CDATA_PREFIX_LEN = 9;
 const CDATA_POSTFIX_LEN = 3;
 const NAMESPACE_SCHEME_COMPONENT = "component-ns";
-const MY_COMPONENTS_NAMESPACE = "My";
+const THIS_APP_NS = "app-ns";
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -700,9 +700,6 @@ export function nodeToComponentDef(
     }
 
     const namespace = getText(nameTokens[0]);
-    if (namespace === MY_COMPONENTS_NAMESPACE) {
-      return name;
-    }
 
     if (namespaceStack.length === 0) {
       reportError("T026");
@@ -717,6 +714,10 @@ export function nodeToComponentDef(
     }
     if (resolvedNamespace === undefined) {
       reportError("T027", namespace);
+    }
+
+    if (resolvedNamespace === THIS_APP_NS) {
+      return name;
     }
     return resolvedNamespace + "." + name;
   }
@@ -1166,10 +1167,11 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
   }
   return {
     ...node,
-    children: node.children.with(childrenListIdx, {
-      ...node.children![childrenListIdx],
-      children: newChildren,
-    }),
+    children: [
+      ...node.children!.slice(0, childrenListIdx),
+      { ...node.children![childrenListIdx], children: newChildren },
+      ...node.children!.slice(childrenListIdx),
+    ],
   };
 }
 
@@ -1215,9 +1217,6 @@ function addToNamespaces(
     nsValue = nsCommaSeparated[1];
   }
 
-  if (nsKey === MY_COMPONENTS_NAMESPACE) {
-    return reportError("T030", MY_COMPONENTS_NAMESPACE);
-  }
   if (!UCRegex.test(nsKey)) {
     return reportError("T031", nsKey);
   }

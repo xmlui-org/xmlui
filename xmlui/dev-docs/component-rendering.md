@@ -6,9 +6,7 @@ You can use xmlui in two ways:
 - You inject an xmlui-based partial view into an existing web page.
   Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
 
-`AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components).
-
-`AppRoot` expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine.
+`AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components). It expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine.
 
 ## How Native React Components Are Used
 
@@ -36,7 +34,7 @@ function createComponentRenderer<TMd extends ComponentMetadata>(
 ): ComponentRendererDef;
 ```
 
-The function receives a unique name for the component (`type`), its metadata, and the renderer function. The return value is an object (`ComponentRenderDef`) that the engine's component registry can consume.
+The function receives a unique name for the component (`type`), its metadata, and the renderer function. The return value is an object (`ComponentRenderDef`) that the engine's component registry stores.
 
 Here is an example that prepares the `NoResult` xmlui component for the registry:
 
@@ -91,9 +89,9 @@ export const NoResultMd = createMetadata({
 });
 ```
 
-Here, `createMetadata` is a simple helper function that considers its input as (partial) metadata and prepares it for the framework's use.
+Here, `createMetadata` is a helper function that considers its input as (partial) metadata and prepares it for the framework's use.
 
-Creating a new xmlui component that can be used with the framework contains these steps:
+Without creating the renderer function and the metadata, no xmlui component could work. Thus, creating a new xmlui component that can be used with the framework contains these steps so that the bridge between the xmlui and the React domains can be established:
 
 1. Create a native React component as the backing for the xmlui component. This React component should implement the functionality of the xmlui component. You can use an existing React component (obtain it from a package).
 2. Declare the component's metadata with `createMetadata`.
@@ -101,7 +99,7 @@ Creating a new xmlui component that can be used with the framework contains thes
 
 ### Component Metadata
 
-Metadata is an indispensable part of component rendering. The bridge between the xmlui and the React domains cannot be created without this metadata information. Besides compile-time checks, metadata is used for several other purposes:
+Metadata is an indispensable part of component rendering. The bridge between the xmlui and the React domains required this information. Besides compile-time checks, metadata is used for several other purposes:
 
 - Automated component documentation generation
 - Markup compilation checks (is the markup correct?)
@@ -125,7 +123,7 @@ The `ComponentMetadata` generic type has four type parameters, which define the 
 - `TProps`: The component's properties
 - `TEvent`: The events the component supports with event handlers
 - `TContextValues`: The collection of context values (such as `$item` for `List`) to be put into the documentation
-- `TApis`: The exposed methods of a component that are available for calling through the component instance's identifier.
+- `TApis`: The exposed methods of a component that are available for calling through the component instance's identifier (such as `setValue` for form items).
 
 As the definition shows, each metadata section is a hash object collecting `ComponentPropertyMetadata` instances.
 
@@ -333,7 +331,7 @@ Due to these rendering engine features (special handling of `Slot`, `TextNode`, 
 
 ### `ComponentNode`
 
-The primary responsibility of this React component is to prepare it to work in the XMLUI environment and connect the particular component with the engine's state management and data handling operations.
+This React component's primary responsibility is to prepare a particular component for use in the XMLUI environment. It connects the component with the engine's state management and data handling operations.
 
 The only usage of `ComponentNode` is in `renderChild`, which passes a `key` and a `resolvedKey` property to `ComponentNode`:
 
@@ -364,19 +362,81 @@ const ComponentNode = memo(
 
 ### `ComponentBed`
 
-The `ComponentBed` receives a modified rendering context (derived from `InnerRendererContext`), including the component definition already prepared for state and data management.
+This component receives a modified rendering context (derived from `InnerRendererContext`), including the component definition already prepared for state and data management. **`ComponentBed` is the little cog that translates xmlui concepts to their corresponding React concepts and assembles a rendering context to pass to `renderChild`.**
 
-This component translates xmlui concepts (such as running an event handler, exposing component APIs, extraction resources, and many more) to their corresponding React concepts. After translation, it renders the particular component (including its children) and post-processes the result.
+- `ComponentBed` memoizes the helper values and functions it uses for rendering; it uses the `useMemo`, `useCallback`, and custom hooks with a similar approach heavily. 
+- If the component does not have an explicit identifier (in the `id` attribute of the component markup), `ComponentBed` creates a JavaScript [Symbol](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Symbol) as the ID.
+- `ComponentBed` ensures the optional callback function passed via `onUnmount` is invoked when the component instance is dismounted. The state container uses this functionality to remove the state of a particular component instance when it has been disposed of.
 
-The translation contains these chores:
+The following list details how the particular properties of the renderer context are prepared:
 
-1. If the component definition does not have properties or events, it is replaced with stable references to an empty object to avoid continuous tests against the `undefined` value for the `props` and `events` component definition values.
-2. It ensures running the `onUnmount` renderer context function to clean up after the component when React disposes of it.
-3. When the component exposes an API, it is registered with the component instance.
-4. It prepares a state updater function that executes component instance state changes associated with the component instance.
-5. It prepares an action update function that retrieves a particular action bound to the component instance. 
-6. It prepares a value extractor function to evaluate property and variable values containing expressions.
-7. `ComponentBed` prepares a function that can invoke scripts synchronously and another one to invoke event handlers asynchronously.
-8. 
+- `uid`: The component instance identifier (either explicitly set or generated by `ComponentBed`).
+- `node`: The component definition is fixed. It is replaced with stable references to an empty object if it does not have properties or events. This action avoids continuous tests against the `undefined` value for the `props` and `events` component definition values.
+- `id`: The explicit component id if the component markup declares it, or the one generated by `ComponentBed`.
+- `updateState`: Changes in the component instance's state occur by invoking a state updater function. `ComponentBed` uses the `dispatch` function received in its rendering context parameter to change the state via a `componentStateChanged` action. Learn more about it [here](./state-management.md#updating-component-state).
+- `appContext`: `ComponentBed` forwards the `appContext` instance received.
+- `extractValue`: When resolving component properties, the engine may need to [evaluate expressions](./expression-evaluation.md). `ComponentBed prepares a value extractor function to carry out this evaluation.
+- `lookupAction`: Some internal actions associated with the component (for example, fetching or modifying data) are described with xmlui scripts, which must be converted into an asynchronously invokable function. `ComponentBed` prepares a function that can retrieve an invokable function from a particular named action. 
+- `lookupSyncCallback`: Components may contain properties that describe callback functions. For example, a `Table` can define a predicate (`rowDisabledPredicate`) to sign whether a particular row should be displayed as disabled. Such predicates are defined as expressions and are processed synchronously. `ComponentBed` prepares a function that can turn a script into a synchronously invokable function.
+- `lookupEventHandler`: Event handlers are also transformed into asynchronously invokable functions (like in `lookupSyncCallback`). They are bound to a particular event and have some extra internal administration compared to actions. `ComponentBed prepares a function to transform the script of a particular event handler.
+- `extractResourceUrl`: `ComponentBed` uses the current theme context to obtain the function that resolves a logical URL to a physical URL. The logical URL can be an expression evaluated before the resolution.
+- `renderChild`: `ComponentBed` creates a wrapped version of the `renderChild` received in its input. This version would replace an undefined parent rendering context with the current component instance's parent renderer context.
+- `registerComponentApi`: `ComponentBed` ensures that the (either explicitly set or generated) component instance ID is passed to the `registerComponentApi` function received in the input renderer context.
+- `layoutCss`: It compiles the layout properties representable as CSS style properties into an object to pass into any React component's `style` property.
+- `layoutNonCss`: It compiles the layout properties not representable as CSS style properties (such as `orientation`) into an object (`NonCssLayoutProps`) that React components can further process to create CSS properties.
+- `layoutContext`: `ComponentBed` passes the layout context instance it receives. As the input parameter is a `MutableRefObject`, all children within a particular parent may receive the same layout context instance.
 
-> `ComponentBed` memoizes the helper values and functions it uses for rendering; it uses the `useMemo`, `useCallback`, and custom hooks with a similar approach heavily. 
+Besides translating the xmlui domain concepts into React concepts, `ComponentBed` preprocesses the component passed for rendering:
+
+1. If that is an API-bound component, `ComponentBed` delegates the rendering to an `ApiBoundComponent` React component. As of this writing, the following components are API-bound (this list may expand in future xmlui releases):
+  - `DataSource`
+  - `DataSourceRef`
+  - `APICall`
+  - `FileDownload`
+  - `FileUpload`
+2. If the current component is a `Slot` instance, `ComponentBed` translates it to a `SlotItem` React component, ensuring that the children transposed from the parent (they replace `Slot`) use the parent's rendering context for expression evaluation. Learn more about this process [here](reusable-components.md).
+3. If the particular component is not in the xmlui component registry, `ComponentBed` renders an `UnknownComponent` instance and skips processing the children.
+4. The rendering engine can run in unique modes (for development or tooling purposes). In these modes, 
+  - `ComponentBed` may decorate the shadow DOM of the rendered component instance with attributes and carry out special actions when the component has been mounted.
+  - In end-to-end testing mode (used during development), the component nodes may be decorated with a `data-testid` attribute to let the E2E test find the DOM node belonging to the rendered component.
+  - In inspection mode (used for tooling purposes), `ComponentBed` may decorate the corresponding DOM element with the `data-inspectId` attribute. Modal dialogs may be modified to allow the inspection to display its own modal dialog (e.g., with the source code of the inspected component).
+  - `ComponentBed` uses the `ComponentDecorator` React component to help with these transforms.
+
+After all these preparations and transformations, `ComponentBed` invokes the rendering function (`renderChild` with the appropriate rendering context).
+
+Should the rendering raise an error, `ComponentBed` will retrieve an `InvalidComponent` instance to display the particular error.
+
+## Rendering Summary
+
+These are the types, functions, virtual xmlui and React components that undertake responsibility for translating an xmlui component (and its children) into a hierarchy of React components:
+
+| React Component | Category | Responsibility |
+|-|-|-| 
+| `ApiBoundComponent` | React component | ... |
+| `APICall` | Virtual component | ... |
+| `AppRoot` | Reac component | ... |
+| `ChildRendererContext` | Types | ... |
+| `ComponentBed` | React component| Translates xmlui concepts to their corresponding React concepts and assembles a rendering context to pass to `renderChild` |
+| `ComponentDecorator` | React component | ... |
+| `ComponentNode` | React component | This React component's primary responsibility is to prepare a particular component for use in the XMLUI environment. It connects the component with the engine's state management and data handling operations. |
+| `ComponentMetadata` | Type | ... |
+| `ComponentPropertyMetadata` | Types | ... |
+| `ComponentRenderDef` | Type | ... |
+| `ComponentRendererContextBase` | Type | ... |
+| `ComponentRendererFn` | Type | ... |
+| `createComponentRenderer()` | Function | ... |
+| `createMetadata()` | Function | ... |
+| `DataSource` | Virtual component | ... |
+| `DataSourceRef` | Virtual component | ... |
+| `FileDownload` | Virtual component | ... |
+| `FileUpload` | Virtual component | ... |
+| `InnerRendererContext` | Type | ... |
+| `InvalidComponent` | React component | ... |
+| `renderChild()` | Function | ... |
+| `RendererContext` | Type | ... |
+| `renderRoot()` | Function | ... |
+| `Slot` | Virtual component | ... |
+| `SlotItem` | React component | ... |
+| `TextNode` | Virtual component | Translates a text node in the xmlui markup into a string representing the text. |
+| `TextNodeCData` | Virtual component | Translates a CDATA node in the xmlui markup into a string representing the text (preserving all source text characters). |
+| `UnknownComponent` | type | ... |

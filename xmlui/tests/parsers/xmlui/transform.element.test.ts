@@ -1197,25 +1197,9 @@ describe("Xmlui transform - child elements", () => {
       expect(cd.children[0].children[0].type).toEqual("Overridden.Namespace.DataGrid");
     });
 
-    it("namespace 'My' is optional on top lvl componenet", () => {
-      const cd = transformSource(`<My:App/>`) as ComponentDef;
-      expect(cd.type).toEqual("App");
-    });
-
-    it("namespace 'My' is optional on nested componenet", () => {
-      const cd = transformSource(`<App><My:Data.Grid /></App>`) as ComponentDef;
-      expect(cd.children[0].type).toEqual("Data.Grid");
-    });
-
-    it("defining namespace with key 'My' errors", () => {
-      try {
-        const cd = transformSource(
-          `<App xmlns:My="anything"><My:DataGrid /></App>`,
-        ) as ComponentDef;
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString()).include("T030");
-      }
+    it("namespace value 'app-ns' isn't included in component's type", () => {
+      const cd = transformSource(`<App xmlns:My="app-ns"><My:DataGrid /></App>`) as ComponentDef;
+      expect(cd.children[0].type).equal("DataGrid");
     });
 
     it("lowercase namespace key errors", () => {
