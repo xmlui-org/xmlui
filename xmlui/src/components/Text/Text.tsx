@@ -127,7 +127,7 @@ export const textComponentRenderer = createComponentRenderer(
       <Text
         variant={extractValue(variant)}
         maxLines={extractValue.asOptionalNumber(maxLines)}
-        layout={layoutCss}
+        style={layoutCss}
         preserveLinebreaks={extractValue.asOptionalBoolean(preserveLinebreaks, false)}
         ellipses={extractValue.asOptionalBoolean(ellipses, true)}
         {...variantSpecificProps}
