@@ -1,6 +1,6 @@
 import styles from "./Card.module.scss";
 import classnames from "@components-core/utils/classnames";
-import {CSSProperties, ReactNode} from "react";
+import { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import { Avatar } from "@components/Avatar/AvatarNative";
 import { LocalLink } from "@components/Link/LinkNative";
@@ -35,14 +35,14 @@ export const Card = forwardRef(function Card(
     showAvatar = !!avatarUrl || false,
     onClick,
   }: Props,
-  ref,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const titleProps: Partial<HeadingProps> = {
     level: "h2",
   };
   return (
     <div
-      ref={ref as any}
+      ref={forwardedRef}
       className={classnames(styles.wrapper, {
         [styles.isClickable]: !!onClick,
         [styles.vertical]: orientation === "vertical",
@@ -64,7 +64,7 @@ export const Card = forwardRef(function Card(
             ) : title ? (
               <Heading {...titleProps}>{title}</Heading>
             ) : null}
-              {subtitle !== undefined && <Text variant="small">{subtitle}</Text>}
+            {subtitle !== undefined && <Text variant="small">{subtitle}</Text>}
           </Stack>
         </Stack>
       )}

@@ -1,5 +1,6 @@
 import classnames from "@components-core/utils/classnames";
 import styles from "./Badge.module.scss";
+import { ForwardedRef, forwardRef } from "react";
 
 const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];
@@ -15,10 +16,17 @@ type Props = {
   color?: string | BadgeColors;
 };
 
-export const Badge = ({ children, color, variant = "badge" }: Props) => {
+export const Badge = forwardRef(function Badge(
+  { children, color, variant = "badge" }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
     <div
-      className={classnames({ [styles.badge]: variant === "badge", [styles.pill]: variant === "pill" })}
+      ref={forwardedRef}
+      className={classnames({
+        [styles.badge]: variant === "badge",
+        [styles.pill]: variant === "pill",
+      })}
       style={
         color
           ? typeof color === "string"
@@ -30,4 +38,4 @@ export const Badge = ({ children, color, variant = "badge" }: Props) => {
       {children}
     </div>
   );
-};
+});
