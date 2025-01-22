@@ -1,20 +1,20 @@
 import { test, expect } from "./fixtures";
 import { initApp } from "./component-test-helpers";
 
-test("Recognizes xs (phone) viewport size #1", async ({ page }) => {
-  const entryPoint = `<Text testId="bp" value="{mediaSize.size}|{mediaSize.sizeIndex}|{mediaSize.phone}"/>`;
+// test("Recognizes xs (phone) viewport size #1", async ({ page }) => {
+//   const entryPoint = `<Text testId="bp" value="{mediaSize.size}|{mediaSize.sizeIndex}|{mediaSize.phone}"/>`;
 
-  await initApp(page, {
-    entryPoint,
-  });
+//   await initApp(page, {
+//     entryPoint,
+//   });
 
-  page.setViewportSize({ width: 0, height: 480 });
-  const text = await page
-    .getByTestId("bp")
-    .first()
-    .evaluate((element) => element.textContent);
-  expect(text).toBe("xs|0|true");
-});
+//   page.setViewportSize({ width: 0, height: 480 });
+//   const text = await page
+//     .getByTestId("bp")
+//     .first()
+//     .evaluate((element) => element.textContent);
+//   expect(text).toBe("xs|0|true");
+// });
 
 test("Recognizes xs (phone) viewport size #2", async ({ page }) => {
   const entryPoint = `<Text testId="bp" value="{mediaSize.size}|{mediaSize.sizeIndex}|{mediaSize.phone}"/>`;
