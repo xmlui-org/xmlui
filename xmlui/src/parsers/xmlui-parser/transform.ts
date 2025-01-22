@@ -1166,10 +1166,11 @@ function withNewChildNodes(node: Node, newChildren: Node[]) {
   }
   return {
     ...node,
-    children: node.children.with(childrenListIdx, {
-      ...node.children![childrenListIdx],
-      children: newChildren,
-    }),
+    children: [
+      ...node.children!.slice(0, childrenListIdx),
+      { ...node.children![childrenListIdx], children: newChildren },
+      ...node.children!.slice(childrenListIdx),
+    ],
   };
 }
 
