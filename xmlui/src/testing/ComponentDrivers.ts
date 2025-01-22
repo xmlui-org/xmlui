@@ -194,6 +194,7 @@ export class FormItemDriver extends ComponentDriver {
   }
   
   // TODO: Need to check for input type
+  // TODO: Remove this method and use input.fill directly
   async fillField(value: any) {
     await this.input.fill(value);
   }
@@ -233,7 +234,28 @@ export class RadioGroupDriver extends ComponentDriver {}
 
 // --- NumberBox
 
-export class NumberBoxDriver extends ComponentDriver {}
+export class NumberBoxDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("input");
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+
+  get spinnerUpButton() {
+    return this.component.locator("button").and(this.component.locator("[data-spinner='up']"));
+  }
+
+  get spinnerDownButton() {
+    return this.component.locator("button").and(this.component.locator("[data-spinner='down']"));
+  }
+}
 
 // --- List
 
