@@ -102,7 +102,7 @@ const ComponentBed = forwardRef(function ComponentBed(
   }: ComponentBedProps,
   ref: React.ForwardedRef<any>,
 ) {
-  // --- Make sure the component definition has `props` and `events` properties 
+  // --- Make sure the component definition has `props` and `events` properties
   // --- (even if they are empty)
   const safeNode = useMemo(() => {
     return {
@@ -115,7 +115,7 @@ const ComponentBed = forwardRef(function ComponentBed(
   // --- Each component receives a unique identifier
   const uid = useMemo(() => Symbol(safeNode.uid), [safeNode.uid]);
 
-  // --- Takes care the component cleanup function is called when the component 
+  // --- Takes care the component cleanup function is called when the component
   // --- is about to be disposed
   useEffect(() => {
     return () => {
@@ -139,15 +139,6 @@ const ComponentBed = forwardRef(function ComponentBed(
     [dispatch, uid],
   );
 
-  // --- Obtain a function to lookup an action by its name, which is bound 
-  // --- to this component instance
-  const memoedLookupAction: LookupAsyncFn = useCallback(
-    (action, actionOptions) => {
-      return lookupAction(action, uid, actionOptions);
-    },
-    [lookupAction, uid],
-  );
-
   // --- Get the tracked APIs of the compomnent
   const referenceTrackedApi = useReferenceTrackedApi(state);
 
@@ -162,6 +153,15 @@ const ComponentBed = forwardRef(function ComponentBed(
       return lookupSyncCallback(valueExtractor(action), uid);
     },
     [lookupSyncCallback, uid, valueExtractor],
+  );
+
+  // --- Obtain a function to lookup an action by its name, which is bound
+  // --- to this component instance
+  const memoedLookupAction: LookupAsyncFn = useCallback(
+    (action, actionOptions) => {
+      return lookupAction(action, uid, actionOptions);
+    },
+    [lookupAction, uid],
   );
 
   // --- Obtain a function that can lookup an event handler, which is bound to a
@@ -224,7 +224,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     });
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, themeVars, valueExtractor]);
 
-  // --- Does this memoization make sense?
+  // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to
+  // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
   const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
 
