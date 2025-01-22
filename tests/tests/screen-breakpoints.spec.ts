@@ -4,7 +4,7 @@ import { initApp } from "./component-test-helpers";
 test("Recognizes xs (phone) viewport size #1", async ({ page }) => {
   const entryPoint = `<Text testId="bp" value="{mediaSize.size}|{mediaSize.sizeIndex}|{mediaSize.phone}"/>`;
 
-  await page.setViewportSize({ width: 0, height: 480 });
+  await page.setViewportSize({ width: 180, height: 480 });
   await initApp(page, {
     entryPoint,
   });
