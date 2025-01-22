@@ -9,8 +9,6 @@ import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
 import { ScriptParserErrorMessage } from "@abstractions/scripting/ScriptParserError";
 import { ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
-import { k } from "vitest/dist/reporters-LqC_WI4d";
-import { keyBy } from "lodash-es";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;
