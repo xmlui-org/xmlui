@@ -124,7 +124,7 @@ export const selectComponentRenderer = createComponentRenderer(
     return (
       <Select
         multiSelect={extractValue.asOptionalBoolean(node.props.multiSelect)}
-        layout={layoutCss}
+        style={layoutCss}
         updateState={updateState}
         searchable={extractValue.asOptionalBoolean(node.props.searchable)}
         initialValue={extractValue(node.props.initialValue)}

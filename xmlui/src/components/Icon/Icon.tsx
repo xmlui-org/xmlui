@@ -37,7 +37,7 @@ export const iconComponentRenderer = createComponentRenderer(
       <Icon
         name={extractValue.asOptionalString(node.props.name)}
         size={extractValue(node.props.size)}
-        layout={layoutCss}
+        style={layoutCss}
         fallback={extractValue.asOptionalString(node.props.fallback)}
       />
     );

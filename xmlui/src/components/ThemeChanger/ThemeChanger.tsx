@@ -154,11 +154,11 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
               <Text variant="strong" layout={{ marginBottom: "1rem" }}>
                 Set theme
               </Text>
-              <Stack orientation={"vertical"} layout={{ width: "100%", overflow: "scroll" }}>
+              <Stack orientation={"vertical"} style={{ width: "100%", overflow: "scroll" }}>
                 <Stack
                   orientation={"horizontal"}
                   verticalAlignment={"center"}
-                  layout={{ gap: ".5rem", flexWrap: "wrap" }}
+                  style={{ gap: ".5rem", flexWrap: "wrap" }}
                 >
                   {availableThemeIds.map((themeUid: any) => (
                     <Button
@@ -168,7 +168,7 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
                       themeColor="primary"
                       onClick={() => setActiveThemeId(themeUid)}
                     >
-                      <Stack layout={{ width: "100%" }}>
+                      <Stack style={{ width: "100%" }}>
                         {renderPreview(themeUid)}
                         <Text>{themeUid}</Text>
                       </Stack>
@@ -176,7 +176,7 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
                   ))}
                 </Stack>
               </Stack>
-              <Stack orientation={"vertical"} layout={{ minHeight: "fit-content" }}>
+              <Stack orientation={"vertical"} style={{ minHeight: "fit-content" }}>
                 <Text variant="strong" layout={{ marginBottom: "1rem" }}>
                   Set tone
                 </Text>
@@ -185,7 +185,7 @@ export const themeChangerButtonComponentRenderer = createComponentRenderer(
                   value={activeThemeTone}
                   onDidChange={(value: any) => setActiveThemeTone(value)}
                 >
-                  <Stack layout={{ gap: "1rem" }} orientation={"horizontal"}>
+                  <Stack style={{ gap: "1rem" }} orientation={"horizontal"}>
                     <RadioGroupOption label="Light" value="light" />
                     <RadioGroupOption label="Dark" value="dark" />
                   </Stack>

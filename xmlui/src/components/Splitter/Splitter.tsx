@@ -103,7 +103,7 @@ function renderSplitter({
   }
   return (
     <Splitter
-      layout={layoutCss}
+      style={layoutCss}
       swapped={extractValue.asOptionalBoolean(node.props?.swapped)}
       orientation={orientation}
       splitterTemplate={renderChild(node.props?.splitterTemplate)}

@@ -1,5 +1,5 @@
 import { Link } from "@remix-run/react";
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useMemo } from "react";
 import styles from "./Link.module.scss";
 import classnames from "@components-core/utils/classnames";
@@ -22,7 +22,10 @@ type Props = {
   style?: CSSProperties;
 };
 
-export const LocalLink = ({ to, children, icon, active, onClick, target, disabled, style }: Props) => {
+export const LocalLink = forwardRef(function LocalLink(
+  { to, children, icon, active, onClick, target, disabled, style }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const iconLink = !!icon && !children;
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
@@ -32,6 +35,7 @@ export const LocalLink = ({ to, children, icon, active, onClick, target, disable
 
   return (
     <Node
+      ref={forwardedRef as any}
       to={smartTo as To} //TODO illesg
       style={style}
       target={target}
@@ -50,4 +54,4 @@ export const LocalLink = ({ to, children, icon, active, onClick, target, disable
       {children}
     </Node>
   );
-};
+});

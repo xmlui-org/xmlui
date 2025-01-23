@@ -14,10 +14,10 @@ export function Adornment({ iconName, text, className }: AdornmentProps) {
     <>
       {iconName || text ? (
         <div className={classnames(styles.wrapper, className)}>
-          <Icon name={iconName} layout={{ color: "inherit" }} />
+          <Icon name={iconName} style={{ color: "inherit" }} />
           {text && (
             <div style={{ display: "flex", userSelect: "none" }}>
-              <Text layout={{ fontSize: "inherit" }}>{text}</Text>
+              <Text style={{ fontSize: "inherit" }}>{text}</Text>
             </div>
           )}
         </div>

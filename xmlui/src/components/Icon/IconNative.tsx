@@ -17,7 +17,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const Icon = forwardRef(function Icon({ name, fallback, layout, className, ...restProps }: IconBaseProps, ref) {
+export const Icon = forwardRef(function Icon({ name, fallback, style, className, ...restProps }: IconBaseProps, ref) {
   const iconRenderer = useFindIconRenderer(name, fallback);
 
   const computedSize = typeof restProps?.size === "string" ? mapSizeToIconPack(restProps.size) : restProps?.size;
@@ -31,7 +31,7 @@ export const Icon = forwardRef(function Icon({ name, fallback, layout, className
     width: width,
     height: height,
     style: {
-      ...layout,
+      ...style,
       "--icon-width": width,
       "--icon-height": height,
     },

@@ -1,6 +1,13 @@
 import { type ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import React, { type CSSProperties, useCallback, useEffect, useRef } from "react";
+import React, {
+  type CSSProperties,
+  ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./NumberBox.module.scss";
 import { noop } from "@components-core/constants";
@@ -47,38 +54,41 @@ type Props = {
   labelBreak?: boolean;
 };
 
-export const NumberBox = ({
-  id,
-  value,
-  initialValue,
-  style,
-  enabled = true,
-  placeholder,
-  validationStatus = "none",
-  hasSpinBox = true,
-  step,
-  integersOnly = false,
-  zeroOrPositive = false,
-  min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
-  max = NUMBERBOX_MAX_VALUE,
-  maxLength,
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  registerComponentApi,
-  startText,
-  startIcon,
-  endText,
-  endIcon,
-  autoFocus,
-  readOnly,
-  required,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-}: Props) => {
+export const NumberBox = forwardRef(function NumberBox(
+  {
+    id,
+    value,
+    initialValue,
+    style,
+    enabled = true,
+    placeholder,
+    validationStatus = "none",
+    hasSpinBox = true,
+    step,
+    integersOnly = false,
+    zeroOrPositive = false,
+      min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
+      max = NUMBERBOX_MAX_VALUE,
+    maxLength,
+    updateState = noop,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    registerComponentApi,
+    startText,
+    startIcon,
+    endText,
+    endIcon,
+    autoFocus,
+    readOnly,
+    required,
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
   min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
 
@@ -348,6 +358,7 @@ export const NumberBox = ({
 
   return (
     <ItemWithLabel
+      ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}
@@ -426,7 +437,7 @@ export const NumberBox = ({
       </div>
     </ItemWithLabel>
   );
-};
+});
 
 function applyStep(
   valueStrRep: string,

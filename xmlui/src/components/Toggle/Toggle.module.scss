@@ -38,7 +38,7 @@ $themeVars: ();
     border-color: createThemeVar("Input:color-border-checked-#{$componentName}");
     background-color: createThemeVar("Input:color-bg-checked-#{$componentName}");
   }
-  
+
   &:checked:disabled {
     background-color: createThemeVar("Input:color-bg-#{$componentName}--disabled");
     border-color: createThemeVar("Input:color-border-#{$componentName}--disabled");
@@ -113,7 +113,7 @@ $themeVars: ();
   }
 
   @include checkedState("Checkbox");
-  
+
   &:indeterminate {
     background-color: createThemeVar("Input:color-bg-checked-Checkbox");
     border-color: createThemeVar("Input:color-border-checked-Checkbox");
@@ -178,7 +178,7 @@ $themeVars: ();
     outline-style: createThemeVar('Input:style-outline-Switch--focus');
     outline-offset: createThemeVar('Input:offset-outline-Switch--focus');
   }
-  
+
   &:checked::before {
     transform: translateX(calc(100% - 4px));
   }

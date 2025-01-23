@@ -136,7 +136,7 @@ function renderStack({
       reverse={extractValue(node.props?.reverse)}
       hoverContainer={extractValue(node.props?.hoverContainer)}
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
-      layout={layoutCss}
+      style={layoutCss}
       onMount={lookupEventHandler("mounted")}
     >
       {renderChild(node.children, {

@@ -7,7 +7,7 @@ import { OrientationOptions } from "@components/abstractions";
 
 type SplitterProps = {
   children: React.ReactNode[] | React.ReactNode;
-  layout?: React.CSSProperties;
+  style?: React.CSSProperties;
   splitterTemplate?: React.ReactNode;
   orientation?: OrientationOptions;
   floating?: boolean;
@@ -24,7 +24,7 @@ export const Splitter = ({
   maxPrimarySize = "100%",
   orientation = "vertical",
   children,
-  layout,
+  style,
   swapped = false,
   floating = false,
   splitterTemplate,
@@ -159,7 +159,7 @@ export const Splitter = ({
         [styles.horizontal]: orientation === "horizontal",
         [styles.vertical]: orientation === "vertical",
       })}
-      style={layout}
+      style={style}
     >
       {React.Children.count(children) > 1 ? (
         <>

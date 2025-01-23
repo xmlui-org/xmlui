@@ -1,6 +1,6 @@
 import { Icon } from "@components/Icon/IconNative";
 import styles from "./NoResult.module.scss";
-import { CSSProperties } from "react";
+import { CSSProperties, ForwardedRef, forwardRef } from "react";
 
 type Props = {
   label: string;
@@ -9,12 +9,14 @@ type Props = {
   style?: CSSProperties;
 };
 
-export const NoResult = ({ label, icon, hideIcon = false, style }: Props) => {
+export const NoResult = forwardRef(function NoResult(
+  { label, icon, hideIcon = false, style }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <div className={styles.wrapper} style={style}>
+    <div className={styles.wrapper} style={style} ref={forwardedRef}>
       {!hideIcon && <Icon name={icon ?? "noresult"} className={styles.icon} />}
       {label}
     </div>
   );
-};
-
+});

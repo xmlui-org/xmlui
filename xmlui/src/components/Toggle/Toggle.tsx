@@ -1,4 +1,4 @@
-import React, {type CSSProperties, forwardRef, useCallback, useEffect} from "react";
+import React, {type CSSProperties, ForwardedRef, forwardRef, useCallback, useEffect} from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
@@ -7,7 +7,7 @@ import type { ValidationStatus } from "@components/abstractions";
 import type { LabelPosition } from "@components/abstractions";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
 import { useEvent } from "@components-core/utils/misc";
-import {composeRefs} from "@radix-ui/react-compose-refs";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type ToggleProps = {
   id?: string;
@@ -32,40 +32,44 @@ type ToggleProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const Toggle = forwardRef(function Toggle ({
-  id,
-  initialValue = false,
-  value = false,
-  enabled = true,
-  style,
-  readOnly,
-  validationStatus = "none",
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  variant = "checkbox",
-  indeterminate = false,
-  className,
-  label,
-  labelPosition = "start",
-  labelWidth,
-  labelBreak,
-  required,
-  registerComponentApi
-}: ToggleProps, forwardedRef) {
+export const Toggle = forwardRef(function Toggle(
+  {
+    id,
+    initialValue = false,
+    value = false,
+    enabled = true,
+    style,
+    readOnly,
+    validationStatus = "none",
+    updateState = noop,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    variant = "checkbox",
+    indeterminate = false,
+    className,
+    label,
+    labelPosition = "start",
+    labelWidth,
+    labelBreak,
+    required,
+    registerComponentApi,
+  }: ToggleProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const innerRef = React.useRef<HTMLInputElement | null>(null);
-  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
-
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
 
-  const updateValue = useCallback((value: boolean) => {
-    if (innerRef.current?.checked === value) return;
-    updateState({ value });
-    onDidChange(value);
-  }, [onDidChange, updateState]);
+  const updateValue = useCallback(
+    (value: boolean) => {
+      if (innerRef.current?.checked === value) return;
+      updateState({ value });
+      onDidChange(value);
+    },
+    [onDidChange, updateState],
+  );
 
   const onInputChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +79,7 @@ export const Toggle = forwardRef(function Toggle ({
       updateState({ value: event.target.checked });
       onDidChange(event.target.checked);
     },
-    [onDidChange, readOnly, updateState]
+    [onDidChange, readOnly, updateState],
   );
 
   const handleOnFocus = useCallback(() => {
@@ -93,22 +97,24 @@ export const Toggle = forwardRef(function Toggle ({
   }, [indeterminate]);
 
   const focus = useCallback(() => {
+      console.log("kakakaka", innerRef.current)
     innerRef.current?.focus();
   }, []);
 
-  const setValue = useEvent((newValue)=>{
+  const setValue = useEvent((newValue) => {
     updateValue(newValue);
   });
 
   useEffect(() => {
     registerComponentApi?.({
       focus,
-      setValue
+      setValue,
     });
   }, [focus, registerComponentApi, setValue]);
 
   return (
     <ItemWithLabel
+      ref={forwardedRef}
       id={id}
       label={label}
       style={style}
@@ -119,11 +125,11 @@ export const Toggle = forwardRef(function Toggle ({
       enabled={enabled}
       shrinkToLabel={true}
       labelStyle={{ pointerEvents: readOnly ? "none" : undefined }}
-        // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
-        // --- By setting pointerEvents we kind of 'disable' the label click, too
+      // --- For some reason if it's an indeterminate checkbox, the label click still clears the indeterminate flag.
+      // --- By setting pointerEvents we kind of 'disable' the label click, too
     >
       <input
-        ref={ref}
+        ref={innerRef}
         type="checkbox"
         role={variant}
         checked={value}

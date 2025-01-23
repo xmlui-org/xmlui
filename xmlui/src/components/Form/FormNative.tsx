@@ -429,7 +429,7 @@ const Form = forwardRef(function (
           isInitiallyOpen={true}
           title={"Are you sure want to move forward?"}
         >
-          <Stack orientation={"vertical"} layout={{ gap: "0.5rem" }}>
+          <Stack orientation={"vertical"} style={{ gap: "0.5rem" }}>
             <Text>
               The following warnings were found during validation. Please make sure you are willing
               to move forward despite these issues.
@@ -438,7 +438,7 @@ const Form = forwardRef(function (
               generalValidationResults={formState.generalValidationResults}
               fieldValidationResults={formState.validationResults}
             />
-            <Stack orientation={"horizontal"} horizontalAlignment={"end"} layout={{ gap: "1em" }}>
+            <Stack orientation={"horizontal"} horizontalAlignment={"end"} style={{ gap: "1em" }}>
               <Button
                 variant={"ghost"}
                 themeColor={"secondary"}
@@ -464,14 +464,14 @@ export function FormWithContextVar({
   node,
   renderChild,
   extractValue,
-  layoutCss,
+  style,
   lookupEventHandler,
   registerComponentApi,
 }: {
   node: FormComponentDef;
   renderChild: RenderChildFn;
   extractValue: ValueExtractor;
-  layoutCss: CSSProperties;
+  style: CSSProperties;
   lookupEventHandler: LookupEventHandlerFn<typeof FormMd>;
   registerComponentApi: RegisterComponentApiFn;
 }) {
@@ -503,7 +503,7 @@ export function FormWithContextVar({
       formState={formState}
       dispatch={dispatch}
       id={node.uid}
-      style={layoutCss}
+      style={style}
       cancelLabel={extractValue(node.props.cancelLabel)}
       saveLabel={extractValue(node.props.saveLabel)}
       saveInProgressLabel={extractValue(node.props.saveInProgressLabel)}

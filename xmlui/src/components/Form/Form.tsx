@@ -112,7 +112,7 @@ export const formComponentRenderer = createComponentRenderer(
         renderChild={renderChild}
         extractValue={extractValue}
         lookupEventHandler={lookupEventHandler as any}
-        layoutCss={layoutCss}
+        style={layoutCss}
         registerComponentApi={registerComponentApi}
       />
     );
