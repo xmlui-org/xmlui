@@ -1,9 +1,19 @@
-type Props = {};
+import { CSSProperties, ForwardedRef, forwardRef } from "react";
 
-export const Slider = ({}: Props) => {
+type Props = {
+  style?: CSSProperties;
+};
+
+export const Slider = forwardRef(function Slider(
+  { style }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <div style={{ backgroundColor: "orangered", color: "white", padding: 2 }}>
+    <div
+      ref={forwardedRef}
+      style={{ backgroundColor: "orangered", color: "white", padding: 2, ...style }}
+    >
       Slider component is not implemented yet
     </div>
   );
-};
+});

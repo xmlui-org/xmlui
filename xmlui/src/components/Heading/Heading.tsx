@@ -215,7 +215,7 @@ function renderHeading({ node, extractValue, layoutCss, level, renderChild }: Re
       maxLines={extractValue.asOptionalNumber(node.props.maxLines)}
       preserveLinebreaks={extractValue.asOptionalBoolean(node.props.preserveLinebreaks, false)}
       ellipses={extractValue.asOptionalBoolean(node.props.ellipses, true)}
-      layout={layoutCss}
+      style={layoutCss}
     >
       {extractValue.asDisplayText(node.props.value) || renderChild(node.children)}
     </Heading>

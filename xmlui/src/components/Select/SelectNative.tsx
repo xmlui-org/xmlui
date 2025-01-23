@@ -1,4 +1,4 @@
-import { CSSProperties, forwardRef, ReactNode } from "react";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import React, {
   useCallback,
   useEffect,
@@ -56,7 +56,7 @@ type SelectProps = {
   optionLabelRenderer?: (item: Option) => ReactNode;
   valueRenderer?: (item: Option, removeItem: () => void) => ReactNode;
   emptyListTemplate?: ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   onDidChange?: (newValue: ValueType) => void;
   dropdownHeight?: CSSProperties["height"];
   validationStatus?: ValidationStatus;
@@ -201,7 +201,7 @@ export const Select = forwardRef(function Select(
     emptyListTemplate,
     optionLabelRenderer,
     valueRenderer,
-    layout,
+    style,
     dropdownHeight,
     children,
     autoFocus = false,
@@ -344,7 +344,7 @@ export const Select = forwardRef(function Select(
               enabled={enabled}
               onFocus={onFocus}
               onBlur={onBlur}
-              style={layout}
+              style={style}
             >
               <Popover open={open} onOpenChange={setOpen} modal={false}>
                 <PopoverTrigger asChild>
@@ -463,7 +463,7 @@ export const Select = forwardRef(function Select(
             options={options}
             onValueChange={toggleOption}
             id={id}
-            style={layout}
+            style={style}
             onFocus={onFocus}
             onBlur={onBlur}
             enabled={enabled}
@@ -481,7 +481,10 @@ export const Select = forwardRef(function Select(
   );
 });
 
-export const ComboboxOption = (option: Option) => {
+export const ComboboxOption = forwardRef(function Combobox(
+  option: Option,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const id = useId();
   const { label, value, enabled = true, keywords } = option;
   const { value: selectedValue, onChange, multi, optionLabelRenderer } = useSelect();
@@ -491,6 +494,7 @@ export const ComboboxOption = (option: Option) => {
   return (
     <CmdItem
       id={id}
+      ref={forwardedRef}
       key={id}
       disabled={!enabled}
       value={value}
@@ -505,7 +509,7 @@ export const ComboboxOption = (option: Option) => {
       {selected && <Icon name="checkmark" />}
     </CmdItem>
   );
-};
+});
 
 export function HiddenOption(option: Option) {
   const { onOptionRemove, onOptionAdd } = useOption();

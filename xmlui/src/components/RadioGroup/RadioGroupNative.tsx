@@ -1,6 +1,8 @@
 import React, {
   createContext,
   type CSSProperties,
+  ForwardedRef,
+  forwardRef,
   useCallback,
   useContext,
   useEffect,
@@ -29,7 +31,7 @@ type RadioGroupProps = {
   initialValue?: string;
   value?: string;
   enabled?: boolean;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   validationStatus?: ValidationStatus;
   label?: string;
   labelPosition?: string;
@@ -44,24 +46,28 @@ type RadioGroupProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const RadioGroup = ({
-  id,
-  value = "",
-  initialValue = "",
-  enabled = true,
-  validationStatus = "none",
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-  required = false,
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  children,
-  registerComponentApi,
-}: RadioGroupProps) => {
+export const RadioGroup = forwardRef(function RadioGroup(
+  {
+    id,
+    value = "",
+    initialValue = "",
+    enabled = true,
+    validationStatus = "none",
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+    required = false,
+    updateState = noop,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    children,
+    registerComponentApi,
+    style,
+  }: RadioGroupProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const [focused, setFocused] = React.useState(false);
 
   // --- Initialize the related field with the input's initial value
@@ -114,6 +120,7 @@ export const RadioGroup = ({
 
   return (
     <ItemWithLabel
+      ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}
@@ -122,6 +129,7 @@ export const RadioGroup = ({
       enabled={enabled}
       onFocus={onFocus}
       onBlur={onBlur}
+      style={style}
     >
       <OptionTypeProvider Component={RadioGroupOption}>
         <RadioGroupValidationStatusContext.Provider value={contextValue}>
@@ -143,7 +151,7 @@ export const RadioGroup = ({
       </OptionTypeProvider>
     </ItemWithLabel>
   );
-};
+});
 
 export const RadioGroupOption = ({ value, label, enabled = true }: Option) => {
   const id = useId();
