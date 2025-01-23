@@ -299,15 +299,21 @@ export function normalizePath(url?: string): string | undefined {
   if (!url) {
     return undefined;
   }
-  if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")) {
+  if (url.startsWith("http://") || url.startsWith("https://")) {
     return url;
   }
   if (typeof window === "undefined") {
     return url;
   }
   // @ts-ignore
-  const prefix = ensureTrailingSlashForUrl(window.__PUBLIC_PATH) || "";
-  return `${prefix}${url}`;
+  const prefix = window.__PUBLIC_PATH || "";
+  if(!prefix){
+    return url;
+  }
+  const prefixWithoutTrailingSlash = prefix.endsWith("/") ? prefix.slice(0, -1) : prefix;
+  const urlWithoutLeadingSlash = url.startsWith("/") ? url.slice(1) : url;
+
+  return `${prefixWithoutTrailingSlash}/${urlWithoutLeadingSlash}`;
 }
 
 export function isComponentDefChildren(
