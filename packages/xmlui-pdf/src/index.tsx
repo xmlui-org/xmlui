@@ -15,7 +15,13 @@ const PdfMd = createMetadata({
     "gap-pages-Pdf": "$space-4",
   }
 });
-
-export default createComponentRenderer(COMP, PdfMd, ({ node, extractValue }) => {
+const PdfComponent = createComponentRenderer(COMP, PdfMd, ({ node, extractValue }) => {
   return <LazyPdf src={extractValue(node.props.src)} />;
 });
+
+export default {
+  namespace: "XMLUIExtensions",
+  components: [
+    PdfComponent
+  ]
+}

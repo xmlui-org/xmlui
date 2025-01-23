@@ -1,11 +1,11 @@
 import { startApp } from "@components-core/StandaloneApp";
-import StandaloneComponentManager from "./components-core/StandaloneComponentManager";
+import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";
 import * as all from "./index";
 
-const Xmlui = new StandaloneComponentManager();
+const Xmlui = new StandaloneExtensionManager();
 
 document.addEventListener('DOMContentLoaded', function() {
   if(!document.getElementById("root")){

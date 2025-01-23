@@ -140,14 +140,15 @@ import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/Ton
 import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
-import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
+import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import {
   animationComponentRenderer,
   fadeInAnimationRenderer,
-  slideInAnimationRenderer
+  slideInAnimationRenderer,
 } from "@components/Animation/Animation";
+import type { Extension } from "@abstractions/ExtensionDefs";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -172,11 +173,6 @@ export type ContributesDefinition = {
    * Native xmlui components that come with the app.
    */
   components?: ComponentRendererDef[];
-
-  /**
-   * Action functions that come with the app.
-   */
-  actions?: ActionRendererDef[];
 
   /**
    * Application-specific compound components that come with the app.
@@ -217,14 +213,14 @@ export class ComponentRegistry {
    * `contributes` argument with information about accompanying (app-specific)
    * components that come with a particular app using the registry.
    * @param contributes Information about the components that come with the app
-   * @param componentManager Optional manager object that receives a notification
+   * @param extensionManager Optional manager object that receives a notification
    * about component registrations
    */
   constructor(
     contributes: ContributesDefinition = {},
-    private readonly componentManager?: StandaloneComponentManager,
+    private readonly extensionManager?: StandaloneExtensionManager,
   ) {
-    this.componentManager = componentManager;
+    this.extensionManager = extensionManager;
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerComponentRenderer(stackComponentRenderer);
       this.registerComponentRenderer(vStackComponentRenderer);
@@ -456,16 +452,12 @@ export class ComponentRegistry {
     this.registerActionFn(navigateAction);
     this.registerActionFn(timedAction);
 
-    contributes.actions?.forEach((actionRenderer) => {
-      this.registerActionFn(actionRenderer);
-    });
-
     this.registerLoaderRenderer(apiLoaderRenderer);
     this.registerLoaderRenderer(externalDataLoaderRenderer);
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
-    this.componentManager?.subscribeToRegistrations(this.registerComponentRenderer);
+    this.extensionManager?.subscribeToRegistrations(this.extensionRegistered);
   }
 
   /**
@@ -540,13 +532,21 @@ export class ComponentRegistry {
     );
   }
 
+  private extensionRegistered = (extension: Extension) => {
+    extension.components.forEach((c) => {
+      if ("type" in c) {
+        //we handle just the js components for now
+        this.registerComponentRenderer({
+          ...c,
+          type: extension.namespace + "." + c.type,
+        });
+      }
+    });
+  };
+
   // --- Registers a renderable component using its renderer function
   // --- and metadata
-  private registerComponentRenderer = ({
-    type,
-    renderer,
-    metadata,
-  }: ComponentRendererDef) => {
+  private registerComponentRenderer = ({ type, renderer, metadata }: ComponentRendererDef) => {
     this.pool.set(type, { renderer, descriptor: metadata });
     if (metadata?.themeVars) {
       Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
@@ -598,7 +598,7 @@ export class ComponentRegistry {
    * component provider is unmounted (HMR).
    */
   destroy() {
-    this.componentManager?.unSubscribeFromRegistrations(this.registerComponentRenderer);
+    this.extensionManager?.unSubscribeFromRegistrations(this.extensionRegistered);
   }
 }
 
@@ -611,7 +611,7 @@ type ComponentProviderProps = {
   contributes: ContributesDefinition;
 
   // --- The component manager instance used to manage components
-  componentManager?: StandaloneComponentManager;
+  extensionManager?: StandaloneExtensionManager;
 };
 
 /**
@@ -622,19 +622,19 @@ type ComponentProviderProps = {
 export function ComponentProvider({
   children,
   contributes,
-  componentManager,
+  extensionManager,
 }: ComponentProviderProps) {
   const [componentRegistry, setComponentRegistry] = useState(
-    () => new ComponentRegistry(contributes, componentManager),
+    () => new ComponentRegistry(contributes, extensionManager),
   );
   // --- Make sure the component registry is updated when the contributes or
   // --- component manager changes (e.g., due to HMR).
   useEffect(() => {
     setComponentRegistry((prev) => {
       prev.destroy();
-      return new ComponentRegistry(contributes, componentManager);
+      return new ComponentRegistry(contributes, extensionManager);
     });
-  }, [componentManager, contributes]);
+  }, [extensionManager, contributes]);
 
   return (
     <ComponentRegistryContext.Provider value={componentRegistry}>
