@@ -1,4 +1,4 @@
-import type { ReactNode} from "react";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 
 import type { SetupWorker } from "msw/browser";
@@ -6,19 +6,19 @@ import type { ApiInterceptorDefinition } from "@components-core/interception/abs
 
 import { ApiInterceptorContext } from "./useApiInterceptorContext";
 import type { IApiInterceptorContext } from "@abstractions/AppContextDefs";
-import { ensureLeadingSlashForUrl } from "@components-core/utils/misc";
+import { normalizePath } from "@components-core/utils/misc";
 
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({
   interceptor,
   children,
   apiWorker,
-  useHashBasedRouting
+  useHashBasedRouting,
 }: {
   interceptor?: ApiInterceptorDefinition;
   children: ReactNode;
   apiWorker?: SetupWorker;
-  useHashBasedRouting?: boolean
+  useHashBasedRouting?: boolean;
 }) {
   const [initialized, setInitialized] = useState(!interceptor);
 
@@ -37,13 +37,14 @@ export function ApiInterceptorProvider({
             interceptorWorker = await createApiInterceptorWorker(interceptor, apiWorker);
             // if the apiWorker comes from the outside, we don't handle the lifecycle here
             if (!apiWorker) {
-              const workerFileName = process.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js";
+              const workerFileLocation = normalizePath(
+                process.env.VITE_MOCK_WORKER_LOCATION || "mockServiceWorker.js",
+              );
               await interceptorWorker.start({
                 onUnhandledRequest: "bypass",
                 quiet: true,
                 serviceWorker: {
-                  //TODO use __PUBLIC_PATH
-                  url: !useHashBasedRouting ? ensureLeadingSlashForUrl(workerFileName) : workerFileName,
+                  url: workerFileLocation,
                 },
               });
             }

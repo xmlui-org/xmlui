@@ -46,9 +46,10 @@ import {
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
 import StandaloneComponentManager from "./StandaloneComponentManager";
-import { DebugViewContext } from "./DebugViewProvider";
+import { DebugViewContext, DebugViewProvider, useDebugView } from "./DebugViewProvider";
 import { version } from "../../package.json";
 import { mathFunctions } from "./appContext/math-function";
+import { OffCanvas } from "@components/OffCanvas/OffCanvasNative";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -122,7 +123,7 @@ function AppContent({
   debugEnabled,
 }: AppContentProps) {
   const [loggedInUser, setLoggedInUser] = useState(null);
-  const [displayStateView, setDisplayStateView] = useState(!!globalProps?.debug?.stateView);
+  const debugView = useDebugView();
   const componentRegistry = useComponentRegistry();
   const navigate = useNavigate();
   const { confirm } = useConfirm();
@@ -159,8 +160,7 @@ function AppContent({
 
     // --- Alt + Ctrl + Shift + S toggles the current state view
     if (event.code === "KeyS" && event.altKey && event.ctrlKey && event.shiftKey) {
-      console.log("TOGGLE STATE VIEW");
-      setDisplayStateView(!displayStateView);
+      debugView.setDisplayStateView(!debugView.displayStateView);
     }
   });
 
@@ -352,7 +352,7 @@ function AppContent({
     const ret: AppContextObject = {
       // --- Engine-related
       version,
-      
+
       // --- Actions namespace
       Actions,
 
@@ -460,15 +460,11 @@ function AppContent({
   const memoedVars = useRef<MemoedVars>(new Map());
 
   return (
-    <DebugViewContext.Provider
-      value={{ displayStateView, stateView: globalProps?.debug?.stateView, setDisplayStateView }}
-    >
-      <AppContext.Provider value={appContextValue}>
-        <AppStateContext.Provider value={appStateContextValue}>
-          {renderRoot(rootContainer, memoedVars)}
-        </AppStateContext.Provider>
-      </AppContext.Provider>
-    </DebugViewContext.Provider>
+    <AppContext.Provider value={appContextValue}>
+      <AppStateContext.Provider value={appStateContextValue}>
+        {renderRoot(rootContainer, memoedVars)}
+      </AppStateContext.Provider>
+    </AppContext.Provider>
   );
 }
 
@@ -611,7 +607,7 @@ const AppWrapper = ({
         <QueryClientProvider client={queryClient}>
           {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
           {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={baseName}>{dynamicChildren}</Router>
+            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
           )}
           {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
@@ -673,24 +669,26 @@ function AppRoot({
 
   return (
     <ComponentProvider contributes={contributes} componentManager={componentManager}>
-      <AppWrapper
-        resourceMap={resourceMap}
-        apiInterceptor={apiInterceptor}
-        node={rootNode as ComponentLike}
-        contributes={contributes}
-        resources={resources}
-        routerBaseName={routerBaseName}
-        decorateComponentsWithTestId={decorateComponentsWithTestId}
-        debugEnabled={debugEnabled}
-        defaultTheme={defaultTheme}
-        defaultTone={defaultTone}
-        globalProps={globalProps}
-        standalone={standalone}
-        trackContainerHeight={trackContainerHeight}
-        previewMode={previewMode}
-        servedFromSingleFile={servedFromSingleFile}
-        sources={sources}
-      />
+      <DebugViewProvider debugConfig={globalProps?.debug}>
+        <AppWrapper
+          resourceMap={resourceMap}
+          apiInterceptor={apiInterceptor}
+          node={rootNode as ComponentLike}
+          contributes={contributes}
+          resources={resources}
+          routerBaseName={routerBaseName}
+          decorateComponentsWithTestId={decorateComponentsWithTestId}
+          debugEnabled={debugEnabled}
+          defaultTheme={defaultTheme}
+          defaultTone={defaultTone}
+          globalProps={globalProps}
+          standalone={standalone}
+          trackContainerHeight={trackContainerHeight}
+          previewMode={previewMode}
+          servedFromSingleFile={servedFromSingleFile}
+          sources={sources}
+        />
+      </DebugViewProvider>
     </ComponentProvider>
   );
 }
