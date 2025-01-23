@@ -404,7 +404,7 @@ export const NumberBox = ({
               themeColor={"secondary"}
               tabIndex={-1}
               className={styles.spinnerButton}
-              disabled={!enabled}
+              disabled={!enabled || readOnly}
               ref={upButton}
             >
               <Icon name="chevronup" size="sm" />
@@ -416,7 +416,7 @@ export const NumberBox = ({
               variant={"ghost"}
               themeColor={"secondary"}
               className={styles.spinnerButton}
-              disabled={!enabled}
+              disabled={!enabled || readOnly}
               ref={downButton}
             >
               <Icon name="chevrondown" size="sm" />
