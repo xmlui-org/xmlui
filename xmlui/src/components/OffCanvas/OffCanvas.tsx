@@ -19,6 +19,13 @@ export const OffCanvasMd = createMetadata({
     `from the side of the screen. It helps display additional content or navigation without disrupting ` +
     `the main interface.`,
   props: {
+    title: d("This property sets the title of the component.", null, "string"),
+    isInitiallyOpen: d(
+      "This property indicates if the component is initially open.",
+      null,
+      "boolean",
+      false,
+    ),
     enableBackdrop: d(
       `This property indicates if the backdrop is enabled when the component is displayed. When the ` +
         `backdrop is not enabled, clicking outside \`OffCanvas\` will not close it.`,
@@ -62,6 +69,13 @@ export const OffCanvasMd = createMetadata({
   },
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
+    "width-OffCanvas": "600px",
+    "padding-OffCanvas": "$padding-tight",
+    "padding-vertical-OffCanvas": "$padding-tight",
+    "padding-horizontal-OffCanvas": "$padding-normal",
+    "color-bg-OffCanvas": "$color-bg",
+    "shadow-horizontal-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
+    "shadow-vertical-OffCanvas": "0 2px 10px rgba(0, 0, 0, 0.2)",
     light: {},
     dark: {},
   },
@@ -70,7 +84,16 @@ export const OffCanvasMd = createMetadata({
 export const offCanvasComponentRenderer = createComponentRenderer(
   COMP,
   OffCanvasMd,
-  ({}) => {
-    return <OffCanvas />;
+  ({ node, extractValue, lookupEventHandler, renderChild, layoutCss }) => {
+    return (
+      <OffCanvas
+        style={layoutCss}
+        title={extractValue(node.props.title)}
+        isInitiallyOpen={extractValue.asOptionalBoolean(node.props.isInitiallyOpen, false)}
+        placement={extractValue(node.props.placement)}
+      >
+        {renderChild(node.children)}
+      </OffCanvas>
+    );
   },
 );
