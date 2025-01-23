@@ -42,8 +42,8 @@ export const ModalDialogMd = createMetadata({
         `where \`modalId\` refers to a \`ModalDialog\` component.`,
     ),
     open: d(
-      "This method imperatively opens the modal dialog. You can pass an arbitrary number " + 
-      "of parameters to the method. In the \`ModalDialog\` instance, you can access those " + 
+      "This method imperatively opens the modal dialog. You can pass an arbitrary number " +
+      "of parameters to the method. In the \`ModalDialog\` instance, you can access those " +
       "with the \`$paramq` and \`$params\` context values.",
     ),
   },
@@ -103,7 +103,7 @@ export const modalViewComponentRenderer = createComponentRenderer(
         />
       );
     }
-    
+
     return (
       <ModalDialog
         style={layoutCss}

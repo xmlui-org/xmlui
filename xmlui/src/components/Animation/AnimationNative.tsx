@@ -1,7 +1,6 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, { Children, forwardRef, useMemo } from "react";
+import React, {Children, forwardRef, useEffect, useMemo} from "react";
 import { useCallback } from "react";
-import { useEffect } from "react";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 
 export type AnimationProps = {
@@ -17,7 +16,8 @@ export type AnimationProps = {
 
 const AnimatedComponent = animated(
   forwardRef(function InlineComponentDef(props: any, ref) {
-    return React.cloneElement(props.children, { ...props, ref } as any);
+    const { children, style } = props;
+    return React.cloneElement(children, { style, ref });
   }),
 );
 
@@ -70,7 +70,7 @@ export const Animation = ({
       start: startAnimation,
       stop: stopAnimation,
     });
-  }, [registerComponentApi, startAnimation]);
+  }, [registerComponentApi, startAnimation, stopAnimation]);
 
   return Children.map(children, (child, index) => (
     <AnimatedComponent style={animateWhenInView ? animationStyles : springs} key={index} ref={ref}>

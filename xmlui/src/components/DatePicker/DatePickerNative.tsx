@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { CSSProperties, forwardRef, isValidElement, useRef } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { DayPicker } from "react-day-picker";
@@ -12,6 +12,7 @@ import { noop } from "@components-core/constants";
 import classnames from "@components-core/utils/classnames";
 import styles from "./DatePicker.module.scss";
 import { useEvent } from "@components-core/utils/misc";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type Props = {
   id?: string;
@@ -21,7 +22,7 @@ type Props = {
   enabled?: boolean;
   placeholder?: string;
   updateState?: UpdateStateFn;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   onDidChange?: (newValue: string | { from: string; to: string }) => void;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -80,30 +81,35 @@ const parseDate = (dateString?: string) => {
   return undefined;
 };
 
-export const DatePicker = ({
-  id,
-  initialValue,
-  value,
-  mode = "single",
-  enabled = true,
-  placeholder,
-  updateState = noop,
-  validationStatus = "none",
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  dateFormat = "MM/dd/yyyy", // Default dateFormat
-  showWeekNumber = false,
-  weekStartsOn = WeekDays.Sunday,
-  fromDate,
-  toDate,
-  disabledDates = [],
-  registerComponentApi,
-}: Props) => {
+export const DatePicker = forwardRef(function DatePicker(
+  {
+    id,
+    initialValue,
+    value,
+    mode = "single",
+    enabled = true,
+    placeholder,
+    updateState = noop,
+    validationStatus = "none",
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    dateFormat = "MM/dd/yyyy", // Default dateFormat
+    showWeekNumber = false,
+    weekStartsOn = WeekDays.Sunday,
+    fromDate,
+    toDate,
+    disabledDates = [],
+    style,
+    registerComponentApi,
+  }: Props,
+  forwardedRef: React.Ref<HTMLButtonElement>,
+) {
   const _weekStartsOn = weekStartsOn >= 0 && weekStartsOn <= 6 ? weekStartsOn : WeekDays.Sunday;
   const [isButtonFocused, setIsButtonFocused] = useState(false);
   const [isMenuFocused, setIsMenuFocused] = useState(false);
-  const [referenceElement, setReferenceElement] = useState<HTMLElement | null>(null);
+  const referenceElement = useRef<HTMLButtonElement>(null);
+  const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const selected: any = useMemo(() => {
     if (mode === "single" && typeof value === "string") {
@@ -158,8 +164,8 @@ export const DatePicker = ({
 
   // Register component API for external interactions
   const focus = useCallback(() => {
-    referenceElement?.focus();
-  }, [referenceElement]);
+    referenceElement?.current?.focus();
+  }, [referenceElement?.current]);
 
   const setValue = useEvent((newValue: string) => {
     const parsedDate = parseDate(newValue);
@@ -216,9 +222,10 @@ export const DatePicker = ({
     <ReactDropdownMenu.Root open={open} onOpenChange={setOpen} modal={false}>
       <ReactDropdownMenu.Trigger asChild>
         <button
-          ref={setReferenceElement}
           disabled={!enabled}
           id={id}
+          ref={ref}
+          style={style}
           className={classnames(styles.datePicker, {
             [styles.disabled]: !enabled,
             [styles.error]: validationStatus === "error",
@@ -272,4 +279,4 @@ export const DatePicker = ({
       </ReactDropdownMenu.Portal>
     </ReactDropdownMenu.Root>
   );
-};
+});

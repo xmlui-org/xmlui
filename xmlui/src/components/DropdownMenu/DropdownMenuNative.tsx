@@ -18,7 +18,7 @@ type DropdownMenuProps = {
   children?: ReactNode;
   label?: string;
   registerComponentApi?: RegisterComponentApiFn;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   alignment?: "start" | "center" | "end";
   onWillOpen?: () => Promise<boolean | undefined>;
   disabled?: boolean;
@@ -34,7 +34,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
     children,
     label,
     registerComponentApi,
-    layout,
+    style,
     onWillOpen,
     alignment = "start",
     disabled = false,
@@ -86,7 +86,7 @@ export const DropdownMenu = forwardRef(function DropdownMenu(
       <ReactDropdownMenu.Portal container={root}>
         <ReactDropdownMenu.Content
           align={alignment}
-          style={layout}
+          style={style}
           className={styles.DropdownMenuContent}
         >
           {children}

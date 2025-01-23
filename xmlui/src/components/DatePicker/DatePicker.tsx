@@ -80,7 +80,7 @@ export const datePickerComponentRenderer = createComponentRenderer(
   }) => {
     return (
       <DatePicker
-        layout={layoutCss}
+        style={layoutCss}
         mode={extractValue(node.props?.mode)}
         value={state?.value}
         initialValue={extractValue(node.props.initialValue)}

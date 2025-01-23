@@ -1,9 +1,19 @@
-type Props = {};
+import { ForwardedRef, forwardRef } from "react";
 
-export const Alert = ({}: Props) => {
+type Props = {
+  style?: React.CSSProperties;
+};
+
+export const Alert = forwardRef(function Alert(
+  { style }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   return (
-    <div style={{ backgroundColor: "orangered", color: "white", padding: 2 }}>
+    <div
+      ref={forwardedRef}
+      style={{ backgroundColor: "orange", color: "white", padding: 2, ...style }}
+    >
       Alert component is not implemented yet
     </div>
   );
-};
+});

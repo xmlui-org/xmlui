@@ -91,9 +91,10 @@ export const AccordionMd = createMetadata({
 export const accordionComponentRenderer = createComponentRenderer(
   COMP,
   AccordionMd,
-  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi }) => {
+  ({ node, renderChild, extractValue, lookupEventHandler, registerComponentApi, layoutCss }) => {
     return (
       <AccordionComponent
+        style={layoutCss}
         triggerPosition={extractValue(node.props?.triggerPosition)}
         collapsedIcon={extractValue(node.props.collapsedIcon)}
         expandedIcon={extractValue(node.props.expandedIcon)}
