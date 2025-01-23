@@ -72,7 +72,7 @@ const ValidationDisplay = ({ heading, issues = EMPTY_ARRAY, severity = "error", 
       })}
       style={{ paddingTop: !onClose ? "0.5rem" : undefined }}
     >
-      <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "0.5rem" }}>
+      <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "0.5rem" }}>
         <Icon className={styles.heading} name={severity} size="md" />
         <div className={styles.heading}>
           <Text>{heading}</Text>

@@ -1,4 +1,4 @@
-import React, { type CSSProperties, forwardRef, useCallback, useEffect } from "react";
+import React, {type CSSProperties, ForwardedRef, forwardRef, useCallback, useEffect} from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
@@ -55,11 +55,9 @@ export const Toggle = forwardRef(function Toggle(
     required,
     registerComponentApi,
   }: ToggleProps,
-  forwardedRef,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const innerRef = React.useRef<HTMLInputElement | null>(null);
-  const ref = forwardedRef ? composeRefs(innerRef, forwardedRef) : innerRef;
-
   useEffect(() => {
     updateState({ value: initialValue }, { initial: true });
   }, [initialValue, updateState]);
@@ -99,6 +97,7 @@ export const Toggle = forwardRef(function Toggle(
   }, [indeterminate]);
 
   const focus = useCallback(() => {
+      console.log("kakakaka", innerRef.current)
     innerRef.current?.focus();
   }, []);
 
@@ -115,7 +114,7 @@ export const Toggle = forwardRef(function Toggle(
 
   return (
     <ItemWithLabel
-      ref={ref}
+      ref={forwardedRef}
       id={id}
       label={label}
       style={style}
@@ -130,6 +129,7 @@ export const Toggle = forwardRef(function Toggle(
       // --- By setting pointerEvents we kind of 'disable' the label click, too
     >
       <input
+        ref={innerRef}
         type="checkbox"
         role={variant}
         checked={value}
