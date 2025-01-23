@@ -611,7 +611,7 @@ const AppWrapper = ({
         <QueryClientProvider client={queryClient}>
           {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
           {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={baseName}>{dynamicChildren}</Router>
+            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
           )}
           {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
