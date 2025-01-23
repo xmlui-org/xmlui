@@ -14,14 +14,14 @@ type StateTransition = {
 }
 
 // --- This type represents the shape of the debug configuration stored in the app's global properties.
-type DebugConfiguration = {
+interface DebugConfiguration {
   displayStateView?: boolean;
   stateViewOptions?: StateViewOptions;
   collectStateTransitions?: boolean;
 }
 
 // --- Represents the context for the debug view.
-type DebugViewContext = DebugConfiguration & {
+export interface IDebugViewContext extends DebugConfiguration {
   // --- Debug tools window
   showDebugToolsWindow: boolean;
   openDebugToolsWindow: () => void;
@@ -36,7 +36,7 @@ type DebugViewContext = DebugConfiguration & {
   stopCollectingStateTransitions: () => void;
 }
 
-export const DebugViewContext = createContext<DebugViewContext | null>(null);
+export const DebugViewContext = createContext<IDebugViewContext | null>(null);
 
 type Props = {
   children: React.ReactNode;
@@ -66,7 +66,7 @@ export function DebugViewProvider({ children, debugConfig }: Props) {
     setCollectStateTransitions(false);
   };
 
-  const contextValue: DebugViewContext = {
+  const contextValue: IDebugViewContext = {
     showDebugToolsWindow,
     openDebugToolsWindow,
     closeDebugToolsWindow,
