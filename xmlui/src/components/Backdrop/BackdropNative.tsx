@@ -12,11 +12,11 @@ export const Backdrop = forwardRef(function Backdrop(
   { style, children, overlayTemplate, backgroundColor = "black", opacity = "0.1" }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
-  const styleWithoutDims = { width: undefined };
+  const styleWithoutDims = { ...style, width: undefined };
   return (
     <div
       className={styles.backdropContainer}
-      style={{ width: style.width ?? "fit-content", ...style }}
+      style={{ width: style.width ?? "fit-content" }}
       ref={forwardedRef}
     >
       {children}

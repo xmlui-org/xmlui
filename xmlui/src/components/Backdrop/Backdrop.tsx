@@ -5,7 +5,6 @@ import styles from "./Backdrop.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Backdrop } from "./BackdropNative";
-import { over } from "lodash-es";
 import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Backdrop";
