@@ -412,31 +412,38 @@ These are the types, functions, virtual xmlui and React components that undertak
 
 | React Component | Category | Responsibility |
 |-|-|-| 
-| `ApiBoundComponent` | React component | ... |
-| `APICall` | Virtual component | ... |
-| `AppRoot` | Reac component | ... |
-| `ChildRendererContext` | Types | ... |
-| `ComponentBed` | React component| Translates xmlui concepts to their corresponding React concepts and assembles a rendering context to pass to `renderChild` |
-| `ComponentDecorator` | React component | ... |
+| `ApiBoundComponent` | React component | Binds API data to the component, ensuring the wrapped component is refreshed when the API-bound operation changes the component state. |
+| `APICall` | Virtual component | Handles the request-response protocol of an API call. |
+| `AppRoot` | React component | This component receives the internal representation of the app markup and code and executes the app accordingly. |
+| `ChildRendererContext` | Types | Provides context for rendering child components. |
+| `ComponentBed` | React component | Translates xmlui concepts to their corresponding React concepts and assembles a rendering context to pass to `renderChild`. |
+| `ComponentDecorator` | React component | Decorates the corresponding DOM element of a component with attributes used in development and tooling context. |
 | `ComponentNode` | React component | This React component's primary responsibility is to prepare a particular component for use in the XMLUI environment. It connects the component with the engine's state management and data handling operations. |
-| `ComponentMetadata` | Type | ... |
-| `ComponentPropertyMetadata` | Types | ... |
-| `ComponentRenderDef` | Type | ... |
-| `ComponentRendererContextBase` | Type | ... |
-| `ComponentRendererFn` | Type | ... |
-| `createComponentRenderer()` | Function | ... |
-| `createMetadata()` | Function | ... |
-| `DataSource` | Virtual component | ... |
-| `DataSourceRef` | Virtual component | ... |
-| `FileDownload` | Virtual component | ... |
-| `FileUpload` | Virtual component | ... |
-| `InnerRendererContext` | Type | ... |
-| `InvalidComponent` | React component | ... |
-| `renderChild()` | Function | ... |
-| `RendererContext` | Type | ... |
-| `renderRoot()` | Function | ... |
-| `Slot` | Virtual component | ... |
-| `SlotItem` | React component | ... |
+| `ComponentMetadata` | Type | Defines metadata for components, including properties, events, context values, APIs, and theming (and others) for compile time and run time purposes. |
+| `ComponentPropertyMetadata` | Types | Describes the metadata for individual component properties. |
+| `ComponentRenderDef` | Type | Specifies the rendering definition for a component, including its metadata and rendering function. |
+| `ComponentRendererContextBase` | Type | Provides the base context for rendering components. |
+| `ComponentRendererFn` | Type | Defines the signature of the function that creates a React component according to its rendering context. |
+| `createComponentRenderer()` | Function | Helper function to create a renderer for a component based on its metadata and render definition. |
+| `createMetadata()` | Function | Helper function to create component metadata. |
+| `DataSource` | Virtual component | Manages the request-response protocol for data fetching. |
+| `DataSourceRef` | Virtual component | Similar to `DataSource`, it ensures that string-returning data fetch operations do not fire data fetch again. |
+| `FileDownload` | Virtual component | Handles file download operations within the application. |
+| `FileUpload` | Virtual component | Handles file upload operations within the application. |
+| `InnerRendererContext` | Type | Provides an internally used context for rendering components. |
+| `InvalidComponent` | React component | Renders an error-displaying UI for a component when the renderer raises an error. |
+| `renderChild()` | Function | Renders a child component within the given context. |
+| `RendererContext` | Type | Provides the context for rendering components (used by `renderChild()`). |
+| `renderRoot()` | Function | Renders the root component of the application. |
+| `Slot` | Virtual component | Defines a placeholder for dynamically rendered content. |
+| `SlotItem` | React component | Transposes component children into a slot within a custom component. |
 | `TextNode` | Virtual component | Translates a text node in the xmlui markup into a string representing the text. |
 | `TextNodeCData` | Virtual component | Translates a CDATA node in the xmlui markup into a string representing the text (preserving all source text characters). |
-| `UnknownComponent` | type | ... |
+| `UnknownComponent` | Type | Represents an unknown or unrecognized component type. |
+
+## Implementation Details
+
+Start with these functions and types to get acquainted with the implementation details:
+- `renderChild()` function
+- `ComponentNode`
+- `ComponentBed`
