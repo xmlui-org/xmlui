@@ -1,4 +1,11 @@
-import {CSSProperties, Dispatch, forwardRef, ReactNode, SetStateAction} from "react";
+import {
+  CSSProperties,
+  Dispatch,
+  ForwardedRef,
+  forwardRef,
+  ReactNode,
+  SetStateAction,
+} from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 import styles from "./FlowLayout.module.scss";
 import classnames from "@components-core/utils/classnames";
@@ -30,9 +37,14 @@ const FlowLayoutContext = createContext<IFlowLayoutContext>({
   setNumberOfChildren: noop,
 });
 
-export const FlowItemBreak = ({force}: {force?: boolean}) => <div className={classnames(styles.break, {[styles.forceBreak]: force})} />;
+export const FlowItemBreak = ({ force }: { force?: boolean }) => (
+  <div className={classnames(styles.break, { [styles.forceBreak]: force })} />
+);
 
-export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, forceBreak, ...restProps }: FlowItemProps, ref: any) {
+export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
+  { children, forceBreak, ...restProps }: FlowItemProps,
+  ref: any,
+) {
   const { rowGap, columnGap, setNumberOfChildren } = useContext(FlowLayoutContext);
   useIsomorphicLayoutEffect(() => {
     setNumberOfChildren((prev) => prev + 1);
@@ -52,10 +64,14 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, f
     flex,
   } = useMemo(() => {
     return (
-      compileLayout({ width: _width, maxWidth: _maxWidth, minWidth: _minWidth }, activeTheme.themeVars, {
-        type: "Stack",
-        orientation: "horizontal",
-      }).cssProps || {}
+      compileLayout(
+        { width: _width, maxWidth: _maxWidth, minWidth: _minWidth },
+        activeTheme.themeVars,
+        {
+          type: "Stack",
+          orientation: "horizontal",
+        },
+      ).cssProps || {}
     );
   }, [_maxWidth, _minWidth, _width, activeTheme.themeVars]);
 
@@ -95,12 +111,16 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper({ children, f
   }
   return (
     <>
-      <div style={{ ...outerWrapperStyle, paddingRight: _columnGap }} className={classnames(styles.flowItem, {
-        [styles.starSized]: isStarSizing
-      })} ref={ref}>
+      <div
+        style={{ ...outerWrapperStyle, paddingRight: _columnGap }}
+        className={classnames(styles.flowItem, {
+          [styles.starSized]: isStarSizing,
+        })}
+        ref={ref}
+      >
         {children}
       </div>
-      {isStarSizing && <FlowItemBreak/>}
+      {isStarSizing && <FlowItemBreak />}
     </>
   );
 });
@@ -112,8 +132,10 @@ type FlowLayoutProps = {
   children: ReactNode;
 };
 
-export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps) {
-
+export const FlowLayout = forwardRef(function FlowLayout(
+  { style, columnGap = 0, rowGap = 0, children }: FlowLayoutProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const safeColumnGap = numberOfChildren === 1 ? 0 : columnGap;
 
@@ -121,11 +143,14 @@ export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowL
   const _rowGap = getSizeString(rowGap);
   const _columnGap = getSizeString(safeColumnGap);
 
-  const innerStyle = useMemo(() => ({
-    // We put a negative margin on the container to fill the space for the row's last columnGap
-    marginRight: `calc(-1 * ${_columnGap})`,
-    marginBottom: `calc(-1 * ${_rowGap})`,
-  }), [_columnGap, _rowGap]);
+  const innerStyle = useMemo(
+    () => ({
+      // We put a negative margin on the container to fill the space for the row's last columnGap
+      marginRight: `calc(-1 * ${_columnGap})`,
+      marginBottom: `calc(-1 * ${_rowGap})`,
+    }),
+    [_columnGap, _rowGap],
+  );
 
   const flowLayoutContextValue = useMemo(() => {
     return {
@@ -136,7 +161,7 @@ export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowL
   }, [_columnGap, _rowGap]);
   return (
     <FlowLayoutContext.Provider value={flowLayoutContextValue}>
-      <div style={style}>
+      <div style={style} ref={forwardedRef}>
         <div className={styles.outer}>
           <div className={classnames(styles.flowContainer, styles.horizontal)} style={innerStyle}>
             {children}
@@ -145,5 +170,4 @@ export function FlowLayout({ style, columnGap = 0, rowGap = 0, children }: FlowL
       </div>
     </FlowLayoutContext.Provider>
   );
-}
-
+});

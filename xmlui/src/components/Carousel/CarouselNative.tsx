@@ -2,11 +2,13 @@ import * as React from "react";
 import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
-import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
+import {CSSProperties, ForwardedRef, forwardRef, useCallback, useEffect, useRef, useState} from "react";
 import Icon from "@components/Icon/IconNative";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import Autoplay from "embla-carousel-autoplay";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+
 
 type CarouselApi = UseEmblaCarouselType[1];
 
@@ -26,7 +28,7 @@ export type CarouselProps = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const CarouselComponent = ({
+export const CarouselComponent = forwardRef(function CarouselComponent({
   orientation = "horizontal",
   children,
   style,
@@ -39,11 +41,14 @@ export const CarouselComponent = ({
   prevIcon,
   nextIcon,
   registerComponentApi,
-}: CarouselProps) => {
-  const ref = useRef(null);
+}: CarouselProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
+  const referenceElement = useRef(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [plugins, setPlugins] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
+
+  const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
+
   const [carouselRef, api] = useEmblaCarousel(
     {
       axis: orientation === "horizontal" ? "x" : "y",
@@ -162,8 +167,8 @@ export const CarouselComponent = ({
   }, [api, onSelect]);
 
   useEffect(() => {
-    if (ref?.current) {
-      ref.current.addEventListener("keydown", handleKeyDown);
+    if (referenceElement?.current) {
+      referenceElement.current.addEventListener("keydown", handleKeyDown);
     }
   }, [ref, handleKeyDown]);
 
@@ -218,4 +223,4 @@ export const CarouselComponent = ({
       )}
     </div>
   );
-};
+});

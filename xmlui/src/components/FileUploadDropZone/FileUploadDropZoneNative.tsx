@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from "react";
+import {CSSProperties, ForwardedRef, forwardRef, ReactNode} from "react";
 import { useCallback, useEffect } from "react";
 import * as dropzone from "react-dropzone";
 import { Icon } from "@components/Icon/IconNative";
@@ -24,7 +24,7 @@ type Props = {
   disabled?: boolean;
 };
 
-export function FileUploadDropZone({
+export const FileUploadDropZone = forwardRef(function FileUploadDropZone({
   children,
   onUpload = asyncNoop,
   uid = "fileUploadDialog",
@@ -33,7 +33,7 @@ export function FileUploadDropZone({
   allowPaste = true,
   text = "Drop files here",
   disabled = false,
-}: Props) {
+}: Props, forwardedRef: ForwardedRef<HTMLDivElement>) {
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) {
@@ -97,7 +97,7 @@ export function FileUploadDropZone({
   }, [doOpen, registerComponentApi, uid]);
 
   return (
-    <div {...getRootProps()} style={style} className={styles.wrapper} onPaste={handleOnPaste}>
+    <div {...getRootProps()} style={style} className={styles.wrapper} onPaste={handleOnPaste} ref={forwardedRef}>
       <input {...getInputProps()} />
       {children}
       {isDragActive && (
@@ -108,4 +108,4 @@ export function FileUploadDropZone({
       )}
     </div>
   );
-}
+});

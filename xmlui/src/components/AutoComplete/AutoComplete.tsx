@@ -19,7 +19,6 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
-  dInternal,
 } from "@components/metadata-helpers";
 import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
 
@@ -112,7 +111,7 @@ export const autoCompleteComponentRenderer = createComponentRenderer(
     return (
       <AutoComplete
         multi={extractValue.asOptionalBoolean(node.props.multi)}
-        layout={layoutCss}
+        style={layoutCss}
         updateState={updateState}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}

@@ -1,6 +1,8 @@
 import React, {
   type ChangeEventHandler,
   type CSSProperties,
+  ForwardedRef,
+  forwardRef,
   type TextareaHTMLAttributes,
   useCallback,
   useEffect,
@@ -59,37 +61,40 @@ type Props = {
   labelBreak?: boolean;
 };
 
-export const TextArea = ({
-  id,
-  value = "",
-  placeholder = "",
-  required = false,
-  readOnly = false,
-  allowCopy = true,
-  updateState = noop,
-  validationStatus,
-  autoFocus = false,
-  initialValue = "",
-  resize,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  controlled = true,
-  enterSubmits = true,
-  escResets,
-  style,
-  registerComponentApi,
-  autoSize,
-  maxRows,
-  minRows,
-  maxLength,
-  rows = 2,
-  enabled = true,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-}: Props) => {
+export const TextArea = forwardRef(function TextArea(
+  {
+    id,
+    value = "",
+    placeholder = "",
+    required = false,
+    readOnly = false,
+    allowCopy = true,
+    updateState = noop,
+    validationStatus,
+    autoFocus = false,
+    initialValue = "",
+    resize,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    controlled = true,
+    enterSubmits = true,
+    escResets,
+    style,
+    registerComponentApi,
+    autoSize,
+    maxRows,
+    minRows,
+    maxLength,
+    rows = 2,
+    enabled = true,
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLTextAreaElement>,
+) {
   // --- The component is initially unfocused
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [cursorPosition, setCursorPosition] = useState(null);
@@ -228,6 +233,7 @@ export const TextArea = ({
   if (resize === "both" || resize === "horizontal" || resize === "vertical") {
     return (
       <ItemWithLabel
+        ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -251,6 +257,7 @@ export const TextArea = ({
   if (autoSize || !isNil(maxRows) || !isNil(minRows)) {
     return (
       <ItemWithLabel
+        ref={forwardedRef as any}
         labelPosition={labelPosition as any}
         label={label}
         labelWidth={labelWidth}
@@ -274,6 +281,7 @@ export const TextArea = ({
 
   return (
     <ItemWithLabel
+      ref={forwardedRef as any}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}
@@ -287,4 +295,4 @@ export const TextArea = ({
       <textarea {...textareaProps} rows={rows} />
     </ItemWithLabel>
   );
-};
+});

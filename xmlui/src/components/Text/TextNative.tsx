@@ -132,7 +132,7 @@ type TextProps = {
   maxLines?: number;
   preserveLinebreaks?: boolean;
   ellipses?: boolean;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   [variantSpecificProps: string]: any;
 };
 
@@ -141,7 +141,7 @@ export const Text = forwardRef(function Text(
     uid,
     variant,
     maxLines = 0,
-    layout,
+    style,
     children,
     preserveLinebreaks,
     ellipses = true,
@@ -172,7 +172,7 @@ export const Text = forwardRef(function Text(
           },
         ])}
         style={{
-          ...layout,
+          ...style,
           ...getMaxLinesStyle(maxLines),
         }}
       >

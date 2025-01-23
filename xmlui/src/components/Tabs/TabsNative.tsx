@@ -1,4 +1,12 @@
-import { type CSSProperties, type ReactNode, useEffect, useState } from "react";
+import {
+  type CSSProperties,
+  ForwardedRef,
+  forwardRef,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import * as RTabs from "@radix-ui/react-tabs";
 import styles from "./Tabs.module.scss";
 import { TabContext, useTabContextValue } from "@components/Tabs/TabContext";
@@ -14,28 +22,34 @@ type Props = {
   registerComponentApi?: RegisterComponentApiFn;
 };
 
-export const Tabs = ({
-  activeTab = 0,
-  orientation = "vertical",
-  tabRenderer,
-  style,
-  children,
-  registerComponentApi,
-}: Props) => {
+export const Tabs = forwardRef(function Tabs(
+  {
+    activeTab = 0,
+    orientation = "vertical",
+    tabRenderer,
+    style,
+    children,
+    registerComponentApi,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const { tabItems, tabContextValue } = useTabContextValue();
-  const [currentTab, setCurrentTab] = useState(`${activeTab}`);
+  const [activeIndex, setActiveIndex] = useState(activeTab);
+  const currentTab = useMemo(() => {
+    return tabItems[activeIndex]?.id;
+  }, [activeIndex]);
 
   useEffect(() => {
     const _activeTab = activeTab - 1;
     const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
     const _newActiveTab = _activeTab < 0 ? 0 : _activeTab > maxIndex ? maxIndex : _activeTab;
-    setCurrentTab(`${_newActiveTab}`);
+    setActiveIndex(_newActiveTab);
   }, [tabItems, activeTab]);
 
   const next = useEvent(() => {
     const nextIndex = parseInt(currentTab) + 1;
     const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
-    setCurrentTab(`${nextIndex > maxIndex ? 0 : nextIndex}`);
+    setActiveIndex(nextIndex > maxIndex ? 0 : nextIndex);
   });
 
   useEffect(() => {
@@ -46,36 +60,32 @@ export const Tabs = ({
 
   return (
     <TabContext.Provider value={tabContextValue}>
-      {children}
       <RTabs.Root
+        ref={forwardedRef}
         className={styles.tabs}
         value={`${currentTab}`}
         onValueChange={(tab) => {
-          setCurrentTab(tab);
+          setActiveIndex(tabItems.findIndex((item) => item.id === tab));
         }}
         orientation={orientation}
         style={style}
       >
         <RTabs.List className={styles.tabsList}>
-          {tabItems.map((tab, index) =>
+          {tabItems.map((tab) =>
             tabRenderer ? (
-              <RTabs.Trigger key={index} value={`${index}`}>
-                {tabRenderer({ label: tab.label, isActive: `${index}` === currentTab })}
+              <RTabs.Trigger key={tab.id} value={tab.id}>
+                {tabRenderer({ label: tab.label, isActive: tab.id === currentTab })}
               </RTabs.Trigger>
             ) : (
-              <RTabs.Trigger className={styles.tabTrigger} key={index} value={`${index}`}>
+              <RTabs.Trigger className={styles.tabTrigger} key={tab.id} value={tab.id}>
                 {tab.label}
               </RTabs.Trigger>
             ),
           )}
           <div className={styles.filler} data-orientation={orientation} />
         </RTabs.List>
-        {tabItems.map((tab, index) => (
-          <RTabs.Content key={index} value={`${index}`} className={styles.tabsContent}>
-            {tab.content}
-          </RTabs.Content>
-        ))}
+        {children}
       </RTabs.Root>
     </TabContext.Provider>
   );
-};
+});

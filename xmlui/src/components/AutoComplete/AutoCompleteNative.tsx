@@ -1,5 +1,5 @@
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import type { CSSProperties, ReactNode } from "react";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useId } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Option, ValidationStatus } from "@components/abstractions";
@@ -20,6 +20,7 @@ import { AutoCompleteContext, useAutoComplete } from "@components/AutoComplete/A
 import { OptionContext, useOption } from "@components/Select/OptionContext";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type AutoCompleteProps = {
   id?: string;
@@ -30,7 +31,7 @@ type AutoCompleteProps = {
   updateState?: UpdateStateFn;
   optionRenderer?: (item: any) => ReactNode;
   emptyListTemplate?: ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
   onDidChange?: (newValue: string | string[]) => void;
   validationStatus?: ValidationStatus;
   onFocus?: () => void;
@@ -66,26 +67,29 @@ export function useDebounce<T>(value: T, delay?: number): T {
   return debouncedValue;
 }
 
-export function AutoComplete({
-  id,
-  initialValue,
-  value,
-  enabled = true,
-  placeholder,
-  updateState = noop,
-  validationStatus = "none",
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  registerComponentApi,
-  optionRenderer = defaultRenderer,
-  emptyListTemplate,
-  layout,
-  children,
-  autoFocus = false,
-  dropdownHeight,
-  multi = false,
-}: AutoCompleteProps) {
+export const AutoComplete = forwardRef(function AutoComplete(
+  {
+    id,
+    initialValue,
+    value,
+    enabled = true,
+    placeholder,
+    updateState = noop,
+    validationStatus = "none",
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    registerComponentApi,
+    optionRenderer = defaultRenderer,
+    emptyListTemplate,
+    style,
+    children,
+    autoFocus = false,
+    dropdownHeight,
+    multi = false,
+  }: AutoCompleteProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null); // Added this
@@ -238,11 +242,12 @@ export function AutoComplete({
             }}
           >
             <div
+              ref={forwardedRef}
               onClick={() => {
                 if (!enabled) return;
                 inputRef?.current?.focus();
               }}
-              style={layout}
+              style={style}
               className={classnames(styles.badgeListWrapper, styles[validationStatus], {
                 [styles.disabled]: !enabled,
                 [styles.focused]: document.activeElement === inputRef.current,
@@ -356,7 +361,7 @@ export function AutoComplete({
       </OptionTypeProvider>
     </AutoCompleteContext.Provider>
   );
-}
+});
 
 function CreatableItem() {
   const { value, options, inputValue, onChange } = useAutoComplete();
