@@ -99,7 +99,7 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
             <Stack
               orientation="horizontal"
               horizontalAlignment="end"
-              layout={{ width: "100%", gap: "1em" }}
+              style={{ width: "100%", gap: "1em" }}
               ref={buttonsRef}
             >
               <Button variant="ghost" themeColor="secondary" size="sm" onClick={handleCancel}>

@@ -1,19 +1,24 @@
 import styles from "./TableOfContents.module.scss";
-import { CSSProperties, useEffect, useRef } from "react";
+import {CSSProperties, ForwardedRef, forwardRef, useEffect, useRef} from "react";
 import classnames from "classnames";
 import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type Props = {
-  layout?: CSSProperties;
+  style?: CSSProperties;
   smoothScrolling?: boolean;
 };
 
-export const TableOfContents = ({ layout, smoothScrolling }: Props) => {
+export const TableOfContents = forwardRef(function TableOfContents(
+  { style, smoothScrolling }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const tocRef = useRef<HTMLDivElement>(null);
   const { headings, setObserveIntersection, activeAnchorId, setActiveAnchorId } =
     useTableOfContents();
+  const ref = forwardedRef ? composeRefs(tocRef, forwardedRef) : tocRef;
 
   useEffect(() => {
     setObserveIntersection(true);
@@ -35,7 +40,7 @@ export const TableOfContents = ({ layout, smoothScrolling }: Props) => {
   }, [activeAnchorId, headings]);
 
   return (
-    <div className={styles.nav} ref={tocRef} style={layout}>
+    <div className={styles.nav} ref={ref} style={style}>
       <ul className={styles.list}>
         {headings.map((value) => (
           <li
@@ -75,4 +80,4 @@ export const TableOfContents = ({ layout, smoothScrolling }: Props) => {
       </ul>
     </div>
   );
-};
+});

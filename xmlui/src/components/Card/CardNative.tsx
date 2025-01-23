@@ -52,7 +52,7 @@ export const Card = forwardRef(function Card(
       onClick={onClick}
     >
       {[title, subtitle, avatarUrl, showAvatar].some(Boolean) && (
-        <Stack orientation="horizontal" verticalAlignment="center" layout={{ gap: "1rem" }}>
+        <Stack orientation="horizontal" verticalAlignment="center" style={{ gap: "1rem" }}>
           {showAvatar && <Avatar url={avatarUrl} name={title} />}
           <Stack orientation="vertical">
             {linkTo ? (
