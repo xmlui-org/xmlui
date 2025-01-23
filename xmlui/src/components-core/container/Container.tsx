@@ -90,7 +90,7 @@ import {
 } from "@components-core/utils/hooks";
 import { LoaderComponent } from "@components-core/LoaderComponent";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
-import { DebugViewContext } from "@components-core/DebugViewProvider";
+import { DebugViewContext, useDebugView } from "@components-core/DebugViewProvider";
 import { StateViewer } from "@components/StateViewer/StateViewerNative";
 
 /**
@@ -645,8 +645,8 @@ const MemoizedContainer = memo(
 
     const thisUidInfoRef = useRef({});
     const uidInfoRef = node.uses === undefined ? parentUidInfoRef : thisUidInfoRef;
-    const debugContext = useContext(DebugViewContext);
-    const stateViewProps = debugContext?.stateView;
+    const debugContext = useDebugView();
+    const stateViewProps = debugContext?.stateViewOptions;
     const showContainer = stateViewProps && debugContext.displayStateView;
     return (
       <Fragment
@@ -1721,7 +1721,7 @@ interface LoaderRenderContext {
   memoedVarsRef: MutableRefObject<MemoedVars>;
 }
 
-export function renderLoaders({
+function renderLoaders({
   uidInfo,
   uidInfoRef,
   loaders = EMPTY_ARRAY,
