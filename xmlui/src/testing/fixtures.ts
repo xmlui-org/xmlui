@@ -21,6 +21,7 @@ import {
   SliderDriver,
   SplitterDriver,
   TestStateDriver,
+  TextBoxDriver,
 } from "./ComponentDrivers";
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -137,6 +138,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(NumberBoxDriver, testId);
     });
   },
+  createTextBoxDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(TextBoxDriver, testId);
+    });
+  },
   createListDriver: async ({ createDriver }, use) => {
     await use(async (testId?: string) => {
       return createDriver(ListDriver, testId);
@@ -232,5 +238,6 @@ type TestDriverExtenderProps = {
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
   createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;
+  createTextBoxDriver: ComponentDriverMethod<TextBoxDriver>;
   createListDriver: ComponentDriverMethod<ListDriver>;
 };

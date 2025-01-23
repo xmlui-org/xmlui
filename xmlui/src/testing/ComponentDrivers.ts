@@ -257,6 +257,23 @@ export class NumberBoxDriver extends ComponentDriver {
   }
 }
 
+// --- TextBox
+
+export class TextBoxDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("input");
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+}
+
 // --- List
 
 export class ListDriver extends ComponentDriver {}
