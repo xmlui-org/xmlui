@@ -26,8 +26,8 @@
         }
       ]
     },
-    "apiTag": {
-      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)",
+    "methodTag": {
+      "begin": "(<)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },
@@ -42,7 +42,7 @@
         { "include": "#valueAttributeScriptInside" },
         { "include": "#attribute" },
         {
-          "begin": "(?<!/|(?:/\\s*(?:api|method))\\s*)>",
+          "begin": "(?<!/|(?:/\\s*(?:method))\\s*)>",
           "beginCaptures": {
             "0": {
               "name": "punctuation.definition.tag.xmlui"
@@ -55,7 +55,7 @@
           },
           "contentName": "meta.embedded.block.javascript",
           "patterns": [{ "include": "source.js" }],
-          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method|api)(?=\\s*>)"
+          "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(method)(?=\\s*>)"
         }
       ],
       "end": "/?>"
@@ -87,7 +87,11 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#componentTag" },
+            { "include": "source.js" }
+          ],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(event)(?=\\s*>)"
         }
       ],
@@ -120,7 +124,11 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#componentTag" },
+            { "include": "source.js" }
+          ],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(field)(?=\\s*>)"
         }
       ],
@@ -153,7 +161,11 @@
             "2": { "name": "keyword.operator.namespace.xmlui" },
             "3": { "name": "entity.name.tag.localname.xmlui" }
           },
-          "patterns": [{ "include": "#comments" }, { "include": "#componentTag" }, { "include": "source.js" }],
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#componentTag" },
+            { "include": "source.js" }
+          ],
           "end": "(</)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)(item)(?=\\s*>)"
         }
       ],
@@ -177,7 +189,7 @@
         { "include": "#eventTag" },
         { "include": "#fieldTag" },
         { "include": "#itemTag" },
-        { "include": "#apiTag" },
+        { "include": "#methodTag" },
         { "include": "#propOrVarTag" }
       ]
     },
@@ -212,7 +224,11 @@
       "patterns": [{ "include": "source.js" }]
     },
     "textWithBindingExpr": {
-      "patterns": [{ "include": "#escapeCharacter" }, { "include": "#entity" }, { "include": "#bindingExpr" }]
+      "patterns": [
+        { "include": "#escapeCharacter" },
+        { "include": "#entity" },
+        { "include": "#bindingExpr" }
+      ]
     },
     "propOrVarTag": {
       "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:var)|(?:property)|(?:prop))",
@@ -238,7 +254,11 @@
       "endCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" }
       },
-      "patterns": [{ "include": "#comments" }, { "include": "#eventHandler" }, { "include": "#attribute" }]
+      "patterns": [
+        { "include": "#comments" },
+        { "include": "#eventHandler" },
+        { "include": "#attribute" }
+      ]
     },
     "quotedStringJsInside": {
       "begin": "\"|'|`",
@@ -275,7 +295,7 @@
     "attribute": {
       "patterns": [
         {
-          "begin": "(?:^|\\s+)([a-zA-Z$_][-\\w.$]*(?::[a-zA-Z$_][-\\w.$]*)?)(\\s*=)(\\s*['\"`])",
+          "begin": "(?:^|\\s+)([a-zA-Z$_][-\\w.$]*(?::[a-zA-Z$_][-\\w.$]*)?)(\\s*=\\s*)(['\"`])",
           "end": "\\3",
           "beginCaptures": {
             "1": { "name": "entity.other.attribute-name.localname.xmlui" },
@@ -326,4 +346,3 @@
     }
   }
 }
-
