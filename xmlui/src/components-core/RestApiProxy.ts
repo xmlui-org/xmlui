@@ -19,7 +19,7 @@ interface FileChunk {
 }
 
 export type ApiOperationDef = {
-  method: "get" | "post" | "put" | "delete";
+  method: "get" | "post" | "put" | "delete" | "patch" | "head" | "options" | "trace" | "connect";
   url: string;
   rawBody?: any;
   body?: any;
