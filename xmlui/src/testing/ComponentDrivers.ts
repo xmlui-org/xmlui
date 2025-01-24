@@ -274,6 +274,27 @@ export class TextBoxDriver extends ComponentDriver {
   }
 }
 
+// --- TextArea
+
+export class TextAreaDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("textarea").or(this.component).last();
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+}
+
 // --- List
 
 export class ListDriver extends ComponentDriver {}
+
+// --- Text
+
+export class TextDriver extends ComponentDriver {}
