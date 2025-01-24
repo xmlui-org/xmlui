@@ -1202,6 +1202,31 @@ describe("Xmlui transform - child elements", () => {
       expect(cd.children[0].type).equal("DataGrid");
     });
 
+    it("namespace key with dot is unmodified", () => {
+      const cd = transformSource(
+        `<App xmlns:My.Ns="Test-value"><My.Ns:DataGrid /></App>`,
+      ) as ComponentDef;
+      expect(cd.children[0].type).equal("Test-value.DataGrid");
+    });
+
+    it("namespace resolves within in compound component", () => {
+      const cd = transformSource(
+        `<Component name="ABC" xmlns:Ns="Test-value"><Ns:DataGrid /></Component>`,
+      ) as CompoundComponentDef;
+      expect((cd.component as ComponentDef).type).equal("Test-value.DataGrid");
+    });
+
+    it("namespace resolves deeper within in compound component", () => {
+      const cd = transformSource(`
+        <Component name="TestComponent" xmlns:XMLUIExtenions="component-ns:XMLUIExtensions">
+          <Stack backgroundColor="lightgreen">
+            <XMLUIExtenions:Pdf/>
+          </Stack>
+        </Component>
+        `) as CompoundComponentDef;
+      expect((cd.component as ComponentDef).children[0].type).equal("XMLUIExtensions.Pdf");
+    });
+
     it("lowercase namespace key errors", () => {
       try {
         const cd = transformSource(`<App xmlns:testnamespace="anything" />`) as ComponentDef;

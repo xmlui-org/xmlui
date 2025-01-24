@@ -138,10 +138,19 @@ export function nodeToComponentDef(
         element = nestedComponents[0];
       }
 
+      namespaceStack.push(new Map());
+      // --- Get collect namespace attributes
+      const nsAttrs = attrs
+        .filter((attr) => attr.namespace === "xmlns")
+        .forEach((attr) => {
+          addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
+        });
+
       let nestedComponent: ComponentDef = transformSingleElement(
         usesStack,
         element,
       )! as ComponentDef;
+      namespaceStack.pop();
 
       component = {
         name: compoundName.value,
@@ -384,10 +393,9 @@ export function nodeToComponentDef(
   }
 
   function collectAttribute(comp: ComponentDef | CompoundComponentDef, attr: Node) {
-    const { namespace, startSegment, name, value } = segmentAttr(attr);
+    const { namespace, startSegment, name, value, unsegmentedName: nsKey } = segmentAttr(attr);
 
     if (namespace === "xmlns") {
-      const nsKey = startSegment === undefined ? name : startSegment + name;
       return addToNamespaces(namespaceStack, comp, nsKey, value);
     }
 
@@ -725,8 +733,9 @@ export function nodeToComponentDef(
   function segmentAttr(attr: Node): {
     namespace?: string;
     startSegment?: string;
-    name: string;
+    name?: string;
     value: string;
+    unsegmentedName: string;
   } {
     let key = attr.children![0];
     const hasNamespace = key.children!.length === 3;
@@ -734,12 +743,13 @@ export function nodeToComponentDef(
     if (hasNamespace) {
       namespace = getText(key.children![0]);
     }
-    let name = getText(key.children![key.children!.length - 1]);
-    const segments = name.split(".");
+    let unsegmentedName = getText(key.children![key.children!.length - 1]);
+    const segments = unsegmentedName.split(".");
     if (segments.length > 2) {
       reportError("T007", attr, key);
     }
 
+    let name: string | undefined;
     let startSegment: string | undefined;
 
     if (segments.length === 2) {
@@ -748,10 +758,13 @@ export function nodeToComponentDef(
       if (name.trim() === "") {
         reportError("T007", attr, name);
       }
+    } else {
+      //TODO: remove asigning name when name === unsegmentedName. It is there for backwards compat
+      name = unsegmentedName;
     }
     const valueText = getText(attr.children![2]);
     const value = valueText.substring(1, valueText.length - 1);
-    return { namespace, startSegment, name, value };
+    return { namespace, startSegment, name, value, unsegmentedName };
   }
 
   function parseEscapeCharactersInAttrValues(attrs: Node[]) {
@@ -1200,7 +1213,7 @@ function desugarQuotelessAttrs(attrs: Node[], getText: GetText) {
 
 function addToNamespaces(
   namespaceStack: Map<string, string>[],
-  comp: ComponentDef | CompoundComponentDef,
+  comp: any,
   nsKey: string,
   value: string,
 ) {
