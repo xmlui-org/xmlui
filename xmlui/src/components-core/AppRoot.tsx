@@ -46,10 +46,9 @@ import {
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
 import StandaloneComponentManager from "./StandaloneComponentManager";
-import { DebugViewContext, DebugViewProvider, useDebugView } from "./DebugViewProvider";
+import { DebugViewProvider, useDebugView } from "./DebugViewProvider";
 import { version } from "../../package.json";
 import { mathFunctions } from "./appContext/math-function";
-import { OffCanvas } from "@components/OffCanvas/OffCanvasNative";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
