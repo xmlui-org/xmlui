@@ -9,6 +9,7 @@ type StateViewOptions = {
 // --- Represents a state transition.
 type StateTransition = {
   action: string;
+  uid?: string;
   prevState: any;
   nextState: any;
 }
@@ -46,7 +47,7 @@ type Props = {
 export function DebugViewProvider({ children, debugConfig }: Props) {
   const [showDebugToolsWindow, setShowDebugToolsWindow] = useState(false);
   const [displayStateView, setDisplayStateView] = useState(!!debugConfig?.displayStateView);
-  const [collectStateTransitions, setCollectStateTransitions] = useState(false);
+  const [collectStateTransitions, setCollectStateTransitions] = useState(!!debugConfig?.collectStateTransitions);
   const [stateTransitions, setStateTransitions] = useState<StateTransition[]>([]);
 
   const openDebugToolsWindow = () => {
