@@ -2,7 +2,7 @@ import { type ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import React, {
   type CSSProperties,
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   useCallback,
   useEffect,
@@ -403,7 +403,6 @@ export const NumberBox = forwardRef(function NumberBox(
           autoFocus={autoFocus}
           maxLength={maxLength}
           required={required}
-          aria-required={required}
         />
         <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
         {hasSpinBox && (

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { useComposedRef } from "./useComposedRef";
 
 const noop = () => {};

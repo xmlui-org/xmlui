@@ -1,7 +1,7 @@
 import React, {
   type ChangeEventHandler,
   type CSSProperties,
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   type TextareaHTMLAttributes,
   useCallback,
@@ -250,7 +250,9 @@ export const TextArea = forwardRef(function TextArea(
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
-        />
+/*           readOnly={readOnly}
+          required={required}
+ */        />
       </ItemWithLabel>
     );
   }
