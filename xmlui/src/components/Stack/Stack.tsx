@@ -6,9 +6,9 @@ import { createComponentRenderer } from "@components-core/renderers";
 import { isComponentDefChildren } from "@components-core/utils/misc";
 import { NotAComponentDefError } from "@components-core/EngineError";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
+import type { RenderChildFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
-import { dClick } from "@components/metadata-helpers";
+import { dClick, dMouseEnter, dMouseLeave } from "@components/metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack } from "./StackNative";
 
 const COMP = "Stack";
@@ -34,6 +34,8 @@ const stackMd = createMetadata({
   },
   events: {
     click: dClick(COMP),
+    mouseEnter: dMouseEnter(),
+    mouseLeave: dMouseLeave(),
     mounted: d("Reserved for future use"),
   },
   themeVars: parseScssVar(styles.themeVars),
@@ -109,6 +111,7 @@ type RenderStackPars = {
     eventName: keyof NonNullable<StackComponentDef["events"]>,
   ) => AsyncFunction | undefined;
   renderChild: RenderChildFn;
+  updateState: UpdateStateFn;
   orientation?: string;
   horizontalAlignment?: string;
   verticalAlignment?: string;
@@ -120,6 +123,7 @@ function renderStack({
   extractValue,
   layoutCss,
   lookupEventHandler,
+  updateState,
   renderChild,
   orientation = layoutNonCss.orientation || DEFAULT_ORIENTATION,
   horizontalAlignment = layoutNonCss.horizontalAlignment,
@@ -138,6 +142,7 @@ function renderStack({
       visibleOnHover={extractValue(node.props?.visibleOnHover)}
       style={layoutCss}
       onMount={lookupEventHandler("mounted")}
+      updateState={updateState}
     >
       {renderChild(node.children, {
         type: "Stack",
@@ -150,7 +155,15 @@ function renderStack({
 export const stackComponentRenderer = createComponentRenderer(
   COMP,
   StackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    layoutNonCss,
+    lookupEventHandler,
+    updateState
+  }) => {
     return renderStack({
       node,
       layoutNonCss,
@@ -158,6 +171,7 @@ export const stackComponentRenderer = createComponentRenderer(
       layoutCss,
       lookupEventHandler,
       renderChild,
+      updateState
     });
   },
 );
@@ -165,7 +179,15 @@ export const stackComponentRenderer = createComponentRenderer(
 export const vStackComponentRenderer = createComponentRenderer(
   "VStack",
   VStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    layoutNonCss,
+    lookupEventHandler,
+    updateState
+  }) => {
     return renderStack({
       node,
       layoutNonCss,
@@ -174,6 +196,7 @@ export const vStackComponentRenderer = createComponentRenderer(
       lookupEventHandler,
       renderChild,
       orientation: "vertical",
+      updateState
     });
   },
 );
@@ -181,7 +204,15 @@ export const vStackComponentRenderer = createComponentRenderer(
 export const hStackComponentRenderer = createComponentRenderer(
   "HStack",
   HStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    layoutNonCss,
+    lookupEventHandler,
+    updateState,
+  }) => {
     return renderStack({
       node,
       layoutNonCss,
@@ -190,6 +221,7 @@ export const hStackComponentRenderer = createComponentRenderer(
       lookupEventHandler,
       renderChild,
       orientation: "horizontal",
+      updateState
     });
   },
 );
@@ -197,7 +229,16 @@ export const hStackComponentRenderer = createComponentRenderer(
 export const cvStackComponentRenderer = createComponentRenderer(
   "CVStack",
   CVStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    layoutNonCss,
+    lookupEventHandler,
+    registerComponentApi,
+    updateState
+  }) => {
     return renderStack({
       node,
       layoutNonCss,
@@ -208,6 +249,7 @@ export const cvStackComponentRenderer = createComponentRenderer(
       orientation: "vertical",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      updateState
     });
   },
 );
@@ -215,7 +257,16 @@ export const cvStackComponentRenderer = createComponentRenderer(
 export const chStackComponentRenderer = createComponentRenderer(
   "CHStack",
   CHStackMd,
-  ({ node, extractValue, renderChild, layoutCss, layoutNonCss, lookupEventHandler }) => {
+  ({
+    node,
+    extractValue,
+    renderChild,
+    layoutCss,
+    layoutNonCss,
+    lookupEventHandler,
+    registerComponentApi,
+    updateState
+  }) => {
     return renderStack({
       node,
       layoutNonCss,
@@ -226,6 +277,7 @@ export const chStackComponentRenderer = createComponentRenderer(
       orientation: "horizontal",
       horizontalAlignment: "center",
       verticalAlignment: "center",
+      updateState
     });
   },
 );

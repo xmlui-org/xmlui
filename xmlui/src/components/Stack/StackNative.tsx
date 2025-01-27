@@ -1,4 +1,8 @@
-import { type CSSProperties, type ReactNode, type Ref } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  type Ref,
+} from "react";
 import { forwardRef } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./Stack.module.scss";
@@ -17,7 +21,10 @@ type Props = {
   reverse?: boolean;
   hoverContainer?: boolean;
   visibleOnHover?: boolean;
+  updateState?: any;
   onClick?: any;
+  onMouseEnter?: any;
+  onMouseLeave?: any;
   onMount?: any;
 };
 
@@ -35,6 +42,7 @@ export const Stack = forwardRef(function Stack(
     reverse,
     hoverContainer,
     visibleOnHover,
+    updateState,
     onClick,
     onMount,
     ...rest
@@ -47,6 +55,7 @@ export const Stack = forwardRef(function Stack(
     horizontalAlignment,
     verticalAlignment,
   );
+
   return (
     <div
       {...rest}

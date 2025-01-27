@@ -14,6 +14,18 @@ export function dClick(comp: string): ComponentPropertyMetadata {
   };
 }
 
+export function dMouseEnter(): ComponentPropertyMetadata {
+  return {
+    description: `This event is triggered when the mouse enters the client area of the component.`,
+  };
+}
+
+export function dMouseLeave(): ComponentPropertyMetadata {
+  return {
+    description: `This event is triggered when the mouse leaves the client area of the component.`,
+  };
+}
+
 export function dGotFocus(comp: string): ComponentPropertyMetadata {
   return {
     description: `This event is triggered when the ${comp} has received the focus.`,

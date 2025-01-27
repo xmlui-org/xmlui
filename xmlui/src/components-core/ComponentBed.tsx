@@ -1,7 +1,7 @@
-import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
+import type { MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentMetadata, ParentRenderContext } from "@abstractions/ComponentDefs";
+import type { ParentRenderContext } from "@abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -30,50 +30,13 @@ import { useInspector } from "@components-core/InspectorContext";
 import { SlotItem } from "@components/slot-helpers";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
 import { compileLayout } from "../parsers/style-parser/style-compiler";
+import { useMouseEventHandlers } from "./event-handlers";
 
 // --- The available properties of Component
 type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
 };
-
-function useEventHandler<TMd extends ComponentMetadata>(
-  eventName: string,
-  lookupEvent: LookupEventHandlerFn<TMd>,
-  shouldSkip: boolean,
-) {
-  const onEvent = shouldSkip
-    ? undefined
-    : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
-  const eventHandler: EventHandler<any> = useCallback(
-    (event) => {
-      if (onEvent) {
-        event.stopPropagation();
-        onEvent(event);
-      }
-    },
-    [onEvent],
-  );
-  return !onEvent ? undefined : eventHandler;
-}
-
-function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldSkip: boolean) {
-  const onClick = useEventHandler("click", lookupEvent, shouldSkip);
-  const onMouseLeave = useEventHandler("mouseLeave", lookupEvent, shouldSkip);
-  const onMouseEnter = useEventHandler("mouseEnter", lookupEvent, shouldSkip);
-  const onDoubleClick = useEventHandler("doubleClick", lookupEvent, shouldSkip);
-
-  if (shouldSkip) {
-    return EMPTY_OBJECT;
-  }
-
-  return {
-    onClick,
-    onMouseLeave,
-    onMouseEnter,
-    onDoubleClick,
-  };
-}
 
 /**
  * This component's primary responsibility is to transform a particular component definition
@@ -164,28 +127,6 @@ const ComponentBed = forwardRef(function ComponentBed(
     [lookupAction, uid],
   );
 
-  // --- Obtain a function that can lookup an event handler, which is bound to a
-  // --- particular event of this component instance
-  const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
-    (eventName, actionOptions) => {
-      const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
-      return lookupAction(action, uid, { eventName, ...actionOptions });
-    },
-    [lookupAction, safeNode.events, uid],
-  );
-
-  // --- Use the current theme to obtain resources and collect theme variables
-  const { getResourceUrl, themeVars } = useTheme();
-
-  // --- Obtain a function that can extract a resource URL from a logical URL
-  const extractResourceUrl = useCallback(
-    (url?: string) => {
-      const extractedUrl = valueExtractor(url);
-      return getResourceUrl(extractedUrl);
-    },
-    [getResourceUrl, valueExtractor],
-  );
-
   // --- Obtain the component renderer and descriptor from the component registry
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
@@ -200,6 +141,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     [renderChild, parentRenderContext, uidInfoRef],
   );
 
+  // --- Collect the API-bound properties and events of the component to decide
+  // --- whether to use the `ApiBoundComponent` or the regular component renderer
   const apiBoundProps = useMemo(
     () => getApiBoundItems(safeNode.props, "DataSource", "DataSourceRef"),
     [safeNode.props],
@@ -209,6 +152,35 @@ const ComponentBed = forwardRef(function ComponentBed(
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
+
+  // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
+  // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
+  if (isApiBound) {
+    return (
+      <ApiBoundComponent
+        uid={uid}
+        renderChild={memoedRenderChild}
+        node={safeNode}
+        key={safeNode.uid}
+        apiBoundEvents={apiBoundEvents}
+        apiBoundProps={apiBoundProps}
+        layoutContextRef={layoutContextRef}
+        parentRendererContext={parentRenderContext}
+      />
+    );
+  }
+
+  // --- Use the current theme to obtain resources and collect theme variables
+  const { getResourceUrl, themeVars } = useTheme();
+
+  // --- Obtain a function that can extract a resource URL from a logical URL
+  const extractResourceUrl = useCallback(
+    (url?: string) => {
+      const extractedUrl = valueExtractor(url);
+      return getResourceUrl(extractedUrl);
+    },
+    [getResourceUrl, valueExtractor],
+  );
 
   // --- Collect and compile the layout property values
   const { cssProps, nonCssProps } = useMemo(() => {
@@ -229,29 +201,23 @@ const ComponentBed = forwardRef(function ComponentBed(
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
   const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
 
-  // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
-  // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
-  if (isApiBound) {
-    return (
-      <ApiBoundComponent
-        uid={uid}
-        renderChild={memoedRenderChild}
-        node={safeNode}
-        key={safeNode.uid}
-        apiBoundEvents={apiBoundEvents}
-        apiBoundProps={apiBoundProps}
-        layoutContextRef={layoutContextRef}
-        parentRendererContext={parentRenderContext}
-      />
-    );
-  }
-
   const componentRegistry = useComponentRegistry();
   const { renderer, descriptor, isCompoundComponent } =
     componentRegistry.lookupComponentRenderer(safeNode.type) || {};
 
+  // --- Obtain a function that can lookup an event handler, which is bound to a
+  // --- particular event of this component instance
+  const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
+    (eventName, actionOptions) => {
+      const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
+      return lookupAction(action, uid, { eventName, ...actionOptions });
+    },
+    [lookupAction, safeNode.events, uid],
+  );
+
   const mouseEventHandlers = useMouseEventHandlers(
     memoedLookupEventHandler,
+    memoedUpdateState,
     descriptor?.nonVisual || isApiBound,
   );
 
@@ -290,6 +256,12 @@ const ComponentBed = forwardRef(function ComponentBed(
 
       // --- Render the component using the renderer function obtained from the component registry
       renderedNode = renderer(rendererContext);
+      renderedNode = cloneElement(
+        renderedNode as ReactElement,
+        {
+          ...mergeProps({ ...(renderedNode as ReactElement).props, ...mouseEventHandlers }, rest),
+        } as any,
+      );
     }
 
     const { inspectId, refreshInspection } = useInspector(safeNode, uid);
@@ -311,7 +283,6 @@ const ComponentBed = forwardRef(function ComponentBed(
       // --- Use `ComponentDecorator` to inject the `data-testid` attribute into the component.
       const testId = safeNode.testId || safeNode.uid;
       const resolvedUid = extractParam(state, testId, appContext, true);
-
       renderedNode = (
         <ComponentDecorator
           attr={{ "data-testid": resolvedUid, "data-inspectId": inspectId }}
