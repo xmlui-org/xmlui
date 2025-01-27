@@ -232,7 +232,7 @@ test.skip(
 // --- --- onDidChange
 
 test("onDidChange is called on input change", async ({ initTestBed, createTextBoxDriver }) => {
-  const testStateDriver = await initTestBed(`<TextBox onDidChange="testState = 'test'" />`);
+  const { testStateDriver } = await initTestBed(`<TextBox onDidChange="testState = 'test'" />`);
   const driver = await createTextBoxDriver();
   await driver.field.fill("a");
 
@@ -243,7 +243,7 @@ test("onDidChange function changes are properly reflected", async ({
   initTestBed,
   createTextBoxDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextBox onDidChange="(value) => testState = value" />`,
   );
   const driver = await createTextBoxDriver();
@@ -257,7 +257,7 @@ test("onDidChange is not called if field is disabled", async ({
   initTestBed,
   createTextBoxDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextBox enabled="false" onDidChange="testState = 'test'" />`,
   );
   const driver = await createTextBoxDriver();
@@ -271,7 +271,7 @@ test("onDidChange is not called if field is disabled", async ({
 // --- --- gotFocus
 
 test("gotFocus event fires on focusing the field", async ({ initTestBed, createTextBoxDriver }) => {
-  const testStateDriver = await initTestBed(`<TextBox onGotFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<TextBox onGotFocus="testState = true" />`);
   const driver = await createTextBoxDriver();
 
   await driver.focus();
@@ -283,7 +283,7 @@ test.skip(
   "gotFocus is not called if field is disabled",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createTextBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<TextBox enabled="false" onGotFocus="testState = true" />`,
     );
     const driver = await createTextBoxDriver();
@@ -300,7 +300,7 @@ test.skip(
   "lostFocus event fires when field is blured",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createTextBoxDriver }) => {
-    const testStateDriver = await initTestBed(`<TextBox onLostFocus="testState = true" />`);
+    const { testStateDriver } = await initTestBed(`<TextBox onLostFocus="testState = true" />`);
     const driver = await createTextBoxDriver();
 
     await driver.focus();
@@ -315,7 +315,7 @@ test.skip(
   "lostFocus is called after gotFocus",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createTextBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
     );
     const driver = await createTextBoxDriver();
@@ -332,7 +332,7 @@ test.skip(
   "lostFocus is not called before gotFocus",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createTextBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
     );
     const driver = await createTextBoxDriver();

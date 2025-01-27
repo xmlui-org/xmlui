@@ -435,7 +435,7 @@ test.skip(
 // --- --- onDidChange
 
 test("onDidChange is called on input change", async ({ initTestBed, createNumberBoxDriver }) => {
-  const testStateDriver = await initTestBed(`<NumberBox onDidChange="testState = 'test'" />`);
+  const { testStateDriver } = await initTestBed(`<NumberBox onDidChange="testState = 'test'" />`);
   const driver = await createNumberBoxDriver();
   await driver.field.fill("1");
 
@@ -446,7 +446,7 @@ test("onDidChange function changes are properly reflected", async ({
   initTestBed,
   createNumberBoxDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<NumberBox onDidChange="(value) => testState = value" />`,
   );
   const driver = await createNumberBoxDriver();
@@ -460,7 +460,7 @@ test("onDidChange is not called if field is disabled", async ({
   initTestBed,
   createNumberBoxDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<NumberBox enabled="false" onDidChange="testState = 'test'" />`,
   );
   const driver = await createNumberBoxDriver();
@@ -477,7 +477,7 @@ test("gotFocus event fires on focusing the field", async ({
   initTestBed,
   createNumberBoxDriver,
 }) => {
-  const testStateDriver = await initTestBed(`<NumberBox onGotFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<NumberBox onGotFocus="testState = true" />`);
   const driver = await createNumberBoxDriver();
 
   await driver.focus();
@@ -489,7 +489,7 @@ test.skip(
   "gotFocus is not called if field is disabled",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createNumberBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<NumberBox enabled="false" onGotFocus="testState = true" />`,
     );
     const driver = await createNumberBoxDriver();
@@ -506,7 +506,7 @@ test.skip(
   "lostFocus event fires when field is blured",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createNumberBoxDriver }) => {
-    const testStateDriver = await initTestBed(`<NumberBox onLostFocus="testState = true" />`);
+    const { testStateDriver } = await initTestBed(`<NumberBox onLostFocus="testState = true" />`);
     const driver = await createNumberBoxDriver();
 
     await driver.focus();
@@ -521,7 +521,7 @@ test.skip(
   "lostFocus is called after gotFocus",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createNumberBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<NumberBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
     );
     const driver = await createNumberBoxDriver();
@@ -538,7 +538,7 @@ test.skip(
   "lostFocus is not called before gotFocus",
   SKIP_REASON.XMLUI_BUG(),
   async ({ initTestBed, createNumberBoxDriver }) => {
-    const testStateDriver = await initTestBed(
+    const { testStateDriver } = await initTestBed(
       `<NumberBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
     );
     const driver = await createNumberBoxDriver();

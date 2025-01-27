@@ -144,13 +144,19 @@ test("readOnly is not editable", async ({ initTestBed, createTextAreaDriver }) =
   await expect(driver.field).not.toBeEditable();
 });
 
-test.skip(
-  "readOnly lets user copy from input field",
-  SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(
-    "Need to implement permission grants in initTestBed for the current browser context",
-  ),
-  async ({ initTestBed }) => {},
-);
+test("readOnly lets user copy from input field", async ({ initTestBed, createTextAreaDriver }) => {
+  const { clipboard } = await initTestBed(
+    `<TextArea initialValue="test" readOnly="{true}" />`,
+    {},
+    { browserPermissions: ["clipboard-read", "clipboard-write"] },
+  );
+  const driver = await createTextAreaDriver();
+
+  await clipboard.copyFrom(driver);
+  const clipboardContent = await clipboard.getContent();
+
+  await expect(driver.field).toHaveValue(clipboardContent);
+});
 
 // --- --- enabled
 
@@ -233,7 +239,7 @@ test.skip(
 // --- --- onDidChange
 
 test("onDidChange is called on input change", async ({ initTestBed, createTextAreaDriver }) => {
-  const testStateDriver = await initTestBed(`<TextArea onDidChange="testState = 'test'" />`);
+  const { testStateDriver } = await initTestBed(`<TextArea onDidChange="testState = 'test'" />`);
   const driver = await createTextAreaDriver();
   await driver.field.fill("a");
 
@@ -244,7 +250,7 @@ test("onDidChange function changes are properly reflected", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextArea onDidChange="(value) => testState = value" />`,
   );
   const driver = await createTextAreaDriver();
@@ -259,7 +265,7 @@ test("onDidChange is not called if field is disabled", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextArea enabled="false" onDidChange="testState = 'test'" />`,
   );
   const driver = await createTextAreaDriver();
@@ -276,7 +282,7 @@ test("gotFocus event fires on focusing the field", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const testStateDriver = await initTestBed(`<TextArea onGotFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<TextArea onGotFocus="testState = true" />`);
   const driver = await createTextAreaDriver();
 
   await driver.focus();
@@ -288,7 +294,7 @@ test("gotFocus is not called if field is disabled", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextArea enabled="false" onGotFocus="testState = true" />`,
   );
   const driver = await createTextAreaDriver();
@@ -304,7 +310,7 @@ test("lostFocus event fires when field is blured", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const testStateDriver = await initTestBed(`<TextArea onLostFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<TextArea onLostFocus="testState = true" />`);
   const driver = await createTextAreaDriver();
 
   await driver.focus();
@@ -315,7 +321,7 @@ test("lostFocus event fires when field is blured", async ({
 });
 
 test("lostFocus is called after gotFocus", async ({ initTestBed, createTextAreaDriver }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextArea onGotFocus="testState = false" onLostFocus="testState = true" />`,
   );
   const driver = await createTextAreaDriver();
@@ -328,7 +334,7 @@ test("lostFocus is called after gotFocus", async ({ initTestBed, createTextAreaD
 });
 
 test("lostFocus is not called before gotFocus", async ({ initTestBed, createTextAreaDriver }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<TextArea onGotFocus="testState = false" onLostFocus="testState = true" />`,
   );
   const driver = await createTextAreaDriver();
@@ -363,9 +369,7 @@ test("focus() focuses the field", async ({
   await expect(textareaDriver.field).toBeFocused();
 });
 
-test(
-  "focus() does nothing if field is disabled",
-async ({
+test("focus() does nothing if field is disabled", async ({
   initTestBed,
   createButtonDriver,
   createTextAreaDriver,
@@ -384,7 +388,11 @@ async ({
 
 // --- --- value
 
-test("value returns current input value", async ({ initTestBed, createTextAreaDriver, createTextDriver }) => {
+test("value returns current input value", async ({
+  initTestBed,
+  createTextAreaDriver,
+  createTextDriver,
+}) => {
   await initTestBed(`
     <Fragment>
       <TextArea id="textarea" initialValue="hello world" />
@@ -399,36 +407,54 @@ test("value returns current input value", async ({ initTestBed, createTextAreaDr
 
 // --- --- setValue
 
-test(
-  "setValue updates input value",
-  async ({ initTestBed, createButtonDriver, createTextAreaDriver }) => {
-    await initTestBed(`
+test("setValue updates input value", async ({
+  initTestBed,
+  createButtonDriver,
+  createTextAreaDriver,
+}) => {
+  await initTestBed(`
       <Fragment>
         <TextArea id="textarea" />
         <Button testId="button" onClick="textarea.setValue('test')" />
       </Fragment>`);
-    const buttonDriver = await createButtonDriver("button");
-    const textareaDriver = await createTextAreaDriver("textarea");
-  
-    await buttonDriver.click();
-    await expect(textareaDriver.field).toContainText("test");
-  },
-);
+  const buttonDriver = await createButtonDriver("button");
+  const textareaDriver = await createTextAreaDriver("textarea");
 
-test(
-  "setValue does not update input if field is disabled",
-  // We are not sure of the behaviour - need to talk through with team
-  async ({ initTestBed, createButtonDriver, createTextAreaDriver }) => {
-    await initTestBed(`
+  await buttonDriver.click();
+  await expect(textareaDriver.field).toContainText("test");
+});
+
+test("setValue does not update input if field is disabled", // We are not sure of the behaviour - need to talk through with team
+async ({ initTestBed, createButtonDriver, createTextAreaDriver }) => {
+  await initTestBed(`
       <Fragment>
         <TextArea id="textarea" enabled="false" />
         <Button testId="button" onClick="textarea.setValue('test')" />
       </Fragment>`);
-    const buttonDriver = await createButtonDriver("button");
-    const textareaDriver = await createTextAreaDriver("textarea");
-  
-    await buttonDriver.click();
-    // await expect(textareaDriver.field).toBeEmpty();
-    await expect(textareaDriver.field).toContainText("test");
-  },
-);
+  const buttonDriver = await createButtonDriver("button");
+  const textareaDriver = await createTextAreaDriver("textarea");
+
+  await buttonDriver.click();
+  // await expect(textareaDriver.field).toBeEmpty();
+  await expect(textareaDriver.field).toContainText("test");
+});
+
+// --- input tests
+
+test("copying from clipboard to field pastes correct content", async ({
+  initTestBed,
+  createTextAreaDriver,
+}) => {
+  const { clipboard } = await initTestBed(
+    `<TextArea />`,
+    {},
+    { browserPermissions: ["clipboard-read", "clipboard-write"] },
+  );
+  const driver = await createTextAreaDriver();
+
+  await clipboard.write("test");
+  const clipboardContent = await clipboard.getContent();
+
+  await clipboard.pasteTo(driver);
+  await expect(driver.field).toHaveValue(clipboardContent);
+});

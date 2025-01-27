@@ -367,7 +367,7 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createButton
 // --- Events
 
 test("testState initializes to default value", async ({ initTestBed }) => {
-  const getState = (await initTestBed(`<Fragment />`)).testState;
+  const getState = (await initTestBed(`<Fragment />`)).testStateDriver.testState;
   await expect.poll(getState).toEqual(null);
 });
 
@@ -375,7 +375,7 @@ test("testState initializes to default value", async ({ initTestBed }) => {
 
 test("click event fires", async ({ initTestBed, createButtonDriver }) => {
   // test for event doing actually what is defined, e.g. change label text, write to console, etc.
-  const testStateDriver = await initTestBed(`<Button onClick="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<Button onClick="testState = true" />`);
   await (await createButtonDriver()).click();
   await expect.poll(testStateDriver.testState).toEqual(true);
 });
@@ -383,7 +383,7 @@ test("click event fires", async ({ initTestBed, createButtonDriver }) => {
 // --- --- gotFocus
 
 test("is focused & gotFocus event fires", async ({ initTestBed, createButtonDriver }) => {
-  const testStateDriver = await initTestBed(`<Button onGotFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<Button onGotFocus="testState = true" />`);
   const driver = await createButtonDriver();
 
   await driver.focus();
@@ -392,7 +392,7 @@ test("is focused & gotFocus event fires", async ({ initTestBed, createButtonDriv
 });
 
 test("gotFocus event does not fire if disabled", async ({ initTestBed, createButtonDriver }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<Button enabled="false" onGotFocus="testState = true" />`,
   );
   const driver = await createButtonDriver();
@@ -406,7 +406,7 @@ test("gotFocus event does not fire if disabled", async ({ initTestBed, createBut
 // --- --- lostFocus
 
 test("lostFocus event fires & is not focused", async ({ initTestBed, createButtonDriver }) => {
-  const testStateDriver = await initTestBed(`<Button onLostFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<Button onLostFocus="testState = true" />`);
   const driver = await createButtonDriver();
 
   await driver.focus();
@@ -420,7 +420,7 @@ test("cannot emit lostFocus event if not focused before", async ({
   initTestBed,
   createButtonDriver,
 }) => {
-  const testStateDriver = await initTestBed(`<Button onLostFocus="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<Button onLostFocus="testState = true" />`);
   const driver = await createButtonDriver();
 
   await driver.blur();
@@ -428,7 +428,7 @@ test("cannot emit lostFocus event if not focused before", async ({
 });
 
 test("lostFocus event does not fire if disabled", async ({ initTestBed, createButtonDriver }) => {
-  const testStateDriver = await initTestBed(
+  const { testStateDriver } = await initTestBed(
     `<Button enabled="false" onLostFocus="testState = true" />`,
   );
   const driver = await createButtonDriver();

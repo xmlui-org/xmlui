@@ -33,6 +33,10 @@ export class ComponentDriver {
     await this.locator.click(options);
   };
 
+  dblclick = async (options?: { timeout?: number }) => {
+    await this.locator.dblclick(options);
+  };
+
   focus = async (options?: { timeout?: number }) => {
     await this.locator.focus(options);
   };
