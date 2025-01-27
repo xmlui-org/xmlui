@@ -250,9 +250,7 @@ export const TextArea = forwardRef(function TextArea(
           maxRows={maxRows}
           minRows={minRows}
           rows={rows}
-/*           readOnly={readOnly}
-          required={required}
- */        />
+        />
       </ItemWithLabel>
     );
   }

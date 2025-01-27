@@ -251,7 +251,8 @@ test("onDidChange function changes are properly reflected", async ({
   // delay: 100 is approx as fast as a human can type
   await driver.field.pressSequentially("test", { delay: 100 });
 
-  await expect.poll(testStateDriver.testState).toBe(driver.field.inputValue());
+  const value = await driver.field.inputValue();
+  await expect.poll(testStateDriver.testState).toBe(value);
 });
 
 test("onDidChange is not called if field is disabled", async ({
@@ -392,8 +393,8 @@ test("value returns current input value", async ({ initTestBed, createTextAreaDr
   const textDriver = await createTextDriver("text");
   const textareaDriver = await createTextAreaDriver("textarea");
 
-  const textareaValue = await textareaDriver.field.inputValue();
-  await expect(textDriver.component).toHaveText(textareaValue);
+  const value = await textareaDriver.field.inputValue();
+  await expect(textDriver.component).toHaveText(value);
 });
 
 // --- --- setValue
