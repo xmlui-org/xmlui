@@ -92,12 +92,12 @@ test("Max 3 initials", async ({ initTestBed, createAvatarDriver }) => {
 // });
 
 test("testState initializes to default value", async ({ initTestBed }) => {
-  const testStateDriver = await initTestBed(`<Fragment />`);
+  const { testStateDriver } = await initTestBed(`<Fragment />`);
   await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
 test("click works", async ({ initTestBed, createAvatarDriver }) => {
-  const testStateDriver = await initTestBed(`<Avatar name="Molly Dough" onClick="testState = true" />`);
+  const { testStateDriver } = await initTestBed(`<Avatar name="Molly Dough" onClick="testState = true" />`);
   const driver = await createAvatarDriver();
 
   await driver.click();

@@ -1,4 +1,4 @@
-import React, {type CSSProperties, ForwardedRef, forwardRef, useCallback, useEffect} from "react";
+import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
@@ -134,8 +134,10 @@ export const Toggle = forwardRef(function Toggle(
         role={variant}
         checked={value}
         disabled={!enabled}
+        required={required}
         readOnly={readOnly}
         aria-readonly={readOnly}
+        aria-checked={value}
         onChange={onInputChange}
         onFocus={handleOnFocus}
         onBlur={handleOnBlur}
@@ -146,7 +148,6 @@ export const Toggle = forwardRef(function Toggle(
           [styles.warning]: validationStatus === "warning",
           [styles.valid]: validationStatus === "valid",
         })}
-        aria-checked={value}
       />
     </ItemWithLabel>
   );
