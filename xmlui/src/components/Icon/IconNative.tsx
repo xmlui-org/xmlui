@@ -13,7 +13,7 @@ export interface IconBaseProps extends React.SVGAttributes<SVGElement> {
   size?: string;
   isInline?: boolean;
   fallback?: string;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

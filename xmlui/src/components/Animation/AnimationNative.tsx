@@ -25,7 +25,7 @@ export const Animation = ({
   children,
   registerComponentApi,
   animation,
-  duration = 500,
+  duration,
   onStop,
   onStart,
   animateWhenInView = false,
