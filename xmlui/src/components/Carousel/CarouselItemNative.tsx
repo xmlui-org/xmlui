@@ -7,7 +7,7 @@ import { useIsSlideActive } from "@components/Carousel/CarouselContext";
 type Props = {
   content?: ReactNode;
   style?: React.CSSProperties;
-  index: number;
+  index?: number;
 };
 
 export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
