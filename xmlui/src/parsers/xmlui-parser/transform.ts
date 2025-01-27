@@ -63,8 +63,13 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
+    if (!UCRegex.test(getComponentName(node))) {
+      reportError("T002");
+      return null;
+    }
     const name = getNamespaceResolvedComponentName(node);
     const attrs = getAttributes(node).map(segmentAttr);
+
     let component: ComponentDef | CompoundComponentDef;
     if (name === COMPOUND_COMP_ID) {
       // --- Validate component name
@@ -181,12 +186,6 @@ export function nodeToComponentDef(
       const nodeClone: Node = withNewChildNodes(node, childrenToCollect);
       collectTraits(usesStack, component, nodeClone);
       return component;
-    }
-
-    // --- Not a reusable component
-    if (!UCRegex.test(name)) {
-      reportError("T002");
-      return null;
     }
 
     component = {
@@ -1230,9 +1229,6 @@ function addToNamespaces(
     nsValue = nsCommaSeparated[1];
   }
 
-  if (!UCRegex.test(nsKey)) {
-    return reportError("T031", nsKey);
-  }
   const compNamespaces = namespaceStack[namespaceStack.length - 1];
   if (compNamespaces.has(nsKey)) {
     return reportError("T025", nsKey);
