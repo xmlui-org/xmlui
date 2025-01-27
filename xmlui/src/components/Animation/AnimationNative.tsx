@@ -16,8 +16,8 @@ export type AnimationProps = {
 
 const AnimatedComponent = animated(
   forwardRef(function InlineComponentDef(props: any, ref) {
-    const { children, style } = props;
-    return React.cloneElement(children, { style, ref });
+    const { children, ...rest } = props;
+    return React.cloneElement(children, { ...rest, ref });
   }),
 );
 
@@ -25,7 +25,7 @@ export const Animation = ({
   children,
   registerComponentApi,
   animation,
-  duration = 500,
+  duration,
   onStop,
   onStart,
   animateWhenInView = false,
