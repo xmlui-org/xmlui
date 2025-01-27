@@ -296,59 +296,69 @@ test.skip(
 
 // --- --- lostFocus
 
-test.skip("lostFocus event fires when field is blured", SKIP_REASON.XMLUI_BUG(), async ({ initTestBed, createTextBoxDriver }) => {
-  const testStateDriver = await initTestBed(`<TextBox onLostFocus="testState = true" />`);
-  const driver = await createTextBoxDriver();
+test.skip(
+  "lostFocus event fires when field is blured",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createTextBoxDriver }) => {
+    const testStateDriver = await initTestBed(`<TextBox onLostFocus="testState = true" />`);
+    const driver = await createTextBoxDriver();
 
-  await driver.focus();
-  await driver.blur();
+    await driver.focus();
+    await driver.blur();
 
-  await expect(driver.field).not.toBeFocused();
-  await expect.poll(testStateDriver.testState).toEqual(true);
-});
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
+);
 
-test.skip("lostFocus is called after gotFocus", SKIP_REASON.XMLUI_BUG(), async ({ initTestBed, createTextBoxDriver }) => {
-  const testStateDriver = await initTestBed(
-    `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
-  );
-  const driver = await createTextBoxDriver();
+test.skip(
+  "lostFocus is called after gotFocus",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createTextBoxDriver }) => {
+    const testStateDriver = await initTestBed(
+      `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
+    );
+    const driver = await createTextBoxDriver();
 
-  await driver.focus();
-  await driver.blur();
+    await driver.focus();
+    await driver.blur();
 
-  await expect(driver.field).not.toBeFocused();
-  await expect.poll(testStateDriver.testState).toEqual(true);
-});
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
+);
 
-test.skip("lostFocus is not called before gotFocus", SKIP_REASON.XMLUI_BUG(), async ({ initTestBed, createTextBoxDriver }) => {
-  const testStateDriver = await initTestBed(
-    `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
-  );
-  const driver = await createTextBoxDriver();
+test.skip(
+  "lostFocus is not called before gotFocus",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createTextBoxDriver }) => {
+    const testStateDriver = await initTestBed(
+      `<TextBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
+    );
+    const driver = await createTextBoxDriver();
 
-  await driver.focus();
-  await expect(driver.field).toBeFocused();
-  await expect.poll(testStateDriver.testState).toEqual(false);
+    await driver.focus();
+    await expect(driver.field).toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(false);
 
-  await driver.blur();
-  await expect(driver.field).not.toBeFocused();
-  await expect.poll(testStateDriver.testState).toEqual(true);
-});
+    await driver.blur();
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
+);
 
 // --- api
 
 // --- --- focus
 
-test.skip("focus() focuses the field", 
-  SKIP_REASON.XMLUI_BUG(),
-  async ({
+test("focus() focuses the field", async ({
   initTestBed,
   createButtonDriver,
   createTextBoxDriver,
 }) => {
   await initTestBed(`
     <Fragment>
-      <TextArea id="textbox" />
+      <TextBox id="textbox" />
       <Button testId="button" onClick="textbox.focus()" />
     </Fragment>`);
   const buttonDriver = await createButtonDriver("button");
@@ -358,9 +368,7 @@ test.skip("focus() focuses the field",
   await expect(textboxDriver.field).toBeFocused();
 });
 
-test.skip("focus() does nothing if field is disabled",
-  SKIP_REASON.XMLUI_BUG(),
-  async ({
+test("focus() does nothing if field is disabled", async ({
   initTestBed,
   createButtonDriver,
   createTextBoxDriver,
@@ -398,37 +406,37 @@ test("value returns current input value", async ({
 
 // --- --- setValue
 
-test.skip("setValue updates input value",
+test.skip(
+  "setValue updates input value",
   SKIP_REASON.XMLUI_BUG(),
-  async ({
-  initTestBed,
-  createButtonDriver,
-  createTextBoxDriver,
-}) => {
-  await initTestBed(`
+  async ({ initTestBed, createButtonDriver, createTextBoxDriver }) => {
+    await initTestBed(`
     <Fragment>
       <TextBox id="textbox" />
       <Button testId="button" onClick="textbox.setValue('test')" />
     </Fragment>`);
-  const buttonDriver = await createButtonDriver("button");
-  const textboxDriver = await createTextBoxDriver("textbox");
+    const buttonDriver = await createButtonDriver("button");
+    const textboxDriver = await createTextBoxDriver("textbox");
 
-  await buttonDriver.click();
-  await expect(textboxDriver.component).toHaveText("test");
-});
+    await buttonDriver.click();
+    await expect(textboxDriver.component).toHaveText("test");
+  },
+);
 
-test.skip("setValue does not update input if field is disabled",
+test.skip(
+  "setValue does not update input if field is disabled",
   SKIP_REASON.UNSURE("We are not sure of the behaviour"),
-async ({ initTestBed, createButtonDriver, createTextBoxDriver }) => {
-  await initTestBed(`
+  async ({ initTestBed, createButtonDriver, createTextBoxDriver }) => {
+    await initTestBed(`
       <Fragment>
-        <TextArea id="textbox" enabled="false" />
+        <TextBox id="textbox" enabled="false" />
         <Button testId="button" onClick="textbox.setValue('test')" />
       </Fragment>`);
-  const buttonDriver = await createButtonDriver("button");
-  const textboxDriver = await createTextBoxDriver("textbox");
+    const buttonDriver = await createButtonDriver("button");
+    const textboxDriver = await createTextBoxDriver("textbox");
 
-  await buttonDriver.click();
-  // await expect(textboxDriver.field).toBeEmpty();
-  await expect(textboxDriver.field).toHaveText("test");
-});
+    await buttonDriver.click();
+    // await expect(textboxDriver.field).toBeEmpty();
+    await expect(textboxDriver.field).toHaveText("test");
+  },
+);

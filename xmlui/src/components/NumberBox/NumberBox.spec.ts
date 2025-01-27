@@ -434,82 +434,216 @@ test.skip(
 
 // --- --- onDidChange
 
-test.skip(
-  "onDidChange is called on input change",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("onDidChange is called on input change", async ({ initTestBed, createNumberBoxDriver }) => {
+  const testStateDriver = await initTestBed(`<NumberBox onDidChange="testState = 'test'" />`);
+  const driver = await createNumberBoxDriver();
+  await driver.field.fill("1");
 
-test.skip(
-  "onDidChange is not called if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  await expect.poll(testStateDriver.testState).toBe("test");
+});
+
+test("onDidChange function changes are properly reflected", async ({
+  initTestBed,
+  createNumberBoxDriver,
+}) => {
+  const testStateDriver = await initTestBed(
+    `<NumberBox onDidChange="(value) => testState = value" />`,
+  );
+  const driver = await createNumberBoxDriver();
+  // delay: 100 is approx as fast as a human can type
+  await driver.field.pressSequentially("123", { delay: 100 });
+
+  await expect.poll(testStateDriver.testState).toBe(await driver.field.inputValue());
+});
+
+test("onDidChange is not called if field is disabled", async ({
+  initTestBed,
+  createNumberBoxDriver,
+}) => {
+  const testStateDriver = await initTestBed(
+    `<NumberBox enabled="false" onDidChange="testState = 'test'" />`,
+  );
+  const driver = await createNumberBoxDriver();
+
+  // Note: we can't test directly to .fill because the field is disabled
+  // and fill throws an error: can't find locator.
+  await driver.field.pressSequentially("1");
+  await expect.poll(testStateDriver.testState).toBe(null);
+});
 
 // --- --- gotFocus
 
-test.skip(
-  "gotFocus event fires on focusing the field",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("gotFocus event fires on focusing the field", async ({
+  initTestBed,
+  createNumberBoxDriver,
+}) => {
+  const testStateDriver = await initTestBed(`<NumberBox onGotFocus="testState = true" />`);
+  const driver = await createNumberBoxDriver();
+
+  await driver.focus();
+  await expect(driver.field).toBeFocused();
+  await expect.poll(testStateDriver.testState).toEqual(true);
+});
 
 test.skip(
-  "onFocus is not called if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
+  "gotFocus is not called if field is disabled",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createNumberBoxDriver }) => {
+    const testStateDriver = await initTestBed(
+      `<NumberBox enabled="false" onGotFocus="testState = true" />`,
+    );
+    const driver = await createNumberBoxDriver();
+
+    await driver.focus();
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(null);
+  },
 );
 
 // --- --- lostFocus
 
 test.skip(
-  "lostFocus event fires on blurring the field",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
+  "lostFocus event fires when field is blured",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createNumberBoxDriver }) => {
+    const testStateDriver = await initTestBed(`<NumberBox onLostFocus="testState = true" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.focus();
+    await driver.blur();
+
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
 );
 
 test.skip(
-  "lostFocus is not called if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
+  "lostFocus is called after gotFocus",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createNumberBoxDriver }) => {
+    const testStateDriver = await initTestBed(
+      `<NumberBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
+    );
+    const driver = await createNumberBoxDriver();
+
+    await driver.focus();
+    await driver.blur();
+
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
+);
+
+test.skip(
+  "lostFocus is not called before gotFocus",
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createNumberBoxDriver }) => {
+    const testStateDriver = await initTestBed(
+      `<NumberBox onGotFocus="testState = false" onLostFocus="testState = true" />`,
+    );
+    const driver = await createNumberBoxDriver();
+
+    await driver.focus();
+    await expect(driver.field).toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(false);
+
+    await driver.blur();
+    await expect(driver.field).not.toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  },
 );
 
 // --- api
 
 // --- --- focus
 
-test.skip(
-  "focus() focuses the field",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("focus() focuses the field", async ({
+  initTestBed,
+  createButtonDriver,
+  createNumberBoxDriver,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <NumberBox id="numberbox" />
+      <Button testId="button" onClick="numberbox.focus()" />
+    </Fragment>`);
+  const buttonDriver = await createButtonDriver("button");
+  const numberboxDriver = await createNumberBoxDriver("numberbox");
 
-test.skip(
-  "focus() does nothing if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+  await buttonDriver.click();
+  await expect(numberboxDriver.field).toBeFocused();
+});
+
+test("focus() does nothing if field is disabled", async ({
+  initTestBed,
+  createButtonDriver,
+  createNumberBoxDriver,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <NumberBox id="numberbox" enabled="false" />
+      <Button testId="button" onClick="numberbox.focus()" />
+    </Fragment>`);
+  const buttonDriver = await createButtonDriver("button");
+  const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+  await buttonDriver.click();
+  await expect(numberboxDriver.field).not.toBeFocused();
+});
 
 // --- --- value
 
-test.skip(
-  "value returns current input value",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
-);
+test("value returns current input value", async ({
+  initTestBed,
+  createNumberBoxDriver,
+  createTextDriver,
+}) => {
+  await initTestBed(`
+    <Fragment>
+      <NumberBox id="numberbox" initialValue="123" />
+      <Text testId="text" value="{numberbox.value}" />
+    </Fragment>`);
+  const textDriver = await createTextDriver("text");
+  const numberboxDriver = await createNumberBoxDriver("numberbox");
 
+  const value = await numberboxDriver.field.inputValue();
+  await expect(textDriver.component).toHaveText(value);
+});
 // --- --- setValue
 
 test.skip(
   "setValue updates input value",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
+  SKIP_REASON.XMLUI_BUG(),
+  async ({ initTestBed, createButtonDriver, createNumberBoxDriver }) => {
+    await initTestBed(`
+    <Fragment>
+      <NumberBox id="numberbox" />
+      <Button testId="button" onClick="numberbox.setValue('test')" />
+    </Fragment>`);
+    const buttonDriver = await createButtonDriver("button");
+    const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+    await buttonDriver.click();
+    await expect(numberboxDriver.component).toHaveText("test");
+  },
 );
 
 test.skip(
   "setValue does not update input if field is disabled",
-  SKIP_REASON.TO_BE_IMPLEMENTED(),
-  async ({ initTestBed }) => {},
+  SKIP_REASON.UNSURE("We are not sure of the behaviour"),
+  async ({ initTestBed, createButtonDriver, createNumberBoxDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox id="numberbox" enabled="false" />
+        <Button testId="button" onClick="numberbox.setValue('test')" />
+      </Fragment>`);
+    const buttonDriver = await createButtonDriver("button");
+    const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+    await buttonDriver.click();
+    // await expect(numberboxDriver.field).toBeEmpty();
+    await expect(numberboxDriver.field).toHaveText("test");
+  },
 );
 
 test.skip(
