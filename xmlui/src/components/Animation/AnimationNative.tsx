@@ -1,5 +1,5 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import React, {Children, forwardRef, useEffect, useMemo} from "react";
+import React, { Children, forwardRef, useEffect, useImperativeHandle, useMemo } from "react";
 import { useCallback } from "react";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 

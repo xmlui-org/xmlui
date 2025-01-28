@@ -16,7 +16,7 @@ import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import Autoplay from "embla-carousel-autoplay";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { CarouselContext } from "@components/Carousel/CarouselContext";
+import { CarouselContext, useCarouselContextValue } from "@components/Carousel/CarouselContext";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
@@ -35,10 +35,6 @@ export type CarouselProps = {
   keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
   duration?: number;
-};
-
-const Item = function InlineComponentDef(props: any) {
-  return React.cloneElement(props.children, { ...props });
 };
 
 export const CarouselComponent = forwardRef(function CarouselComponent(
@@ -63,7 +59,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [activeSlide, setActiveSlide] = useState(0);
   const [plugins, setPlugins] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
-
+  const { carouselContextValue, carouselItems } = useCarouselContextValue();
   const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const [carouselRef, api] = useEmblaCarousel(
@@ -174,11 +170,10 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     if (!api) {
       return;
     }
-
     onSelect(api);
     api.on("init", onSelect);
+    api.on("reInit", onSelect);
     api.on("select", onSelect);
-
     return () => {
       api?.off("select", onSelect);
     };
@@ -191,7 +186,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   }, [ref, handleKeyDown]);
 
   return (
-    <CarouselContext.Provider value={{ activeSlide }}>
+    <CarouselContext.Provider value={carouselContextValue}>
       <div
         style={style}
         ref={ref}
@@ -207,9 +202,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               [styles.vertical]: orientation === "vertical",
             })}
           >
-            {React.Children.map(children, (child, index) => (
-              <Item index={index}>{child}</Item>
-            ))}
+            {children}
           </div>
         </div>
         {controls && (
@@ -229,7 +222,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         )}
         {indicators && (
           <div className={styles.indicators}>
-            {React.Children.map(children, (_, index) => (
+            {carouselItems.map((_, index) => (
               <button
                 key={index}
                 type="button"
