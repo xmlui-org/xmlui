@@ -216,6 +216,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
 
 // --- E2E
 
+// --- props
+
 // --- placeholder
 
 test("placeholder is hidden if input field is filled", async ({
@@ -365,6 +367,8 @@ test.skip(
   SKIP_REASON.TO_BE_IMPLEMENTED(),
   async ({ initTestBed }) => {},
 );
+
+// --- events
 
 // --- onDidChange
 
