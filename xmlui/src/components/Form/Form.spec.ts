@@ -69,7 +69,7 @@ test("setting buttonRowTemplate without buttons still runs submit on Enter", asy
   initTestBed,
   createFormDriver,
 }) => {
-  const testStateDriver = await initTestBed(`
+  const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
       <property name="buttonRowTemplate">
         <Fragment />
@@ -422,7 +422,7 @@ test("user cannot submit with clientside errors present", async ({
   initTestBed,
   createFormDriver,
 }) => {
-  const testStateDriver = await initTestBed(`
+  const { testStateDriver } = await initTestBed(`
     <Form onSubmit="testState = true">
       <FormItem bindTo="name" required="true" />
     </Form>

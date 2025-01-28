@@ -11,23 +11,23 @@ import { Image } from "@components/Image/ImageNative";
 type MarkdownProps = {
   removeIndents?: boolean;
   children: ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 };
 
-export const Markdown = memo(function Markdown({ removeIndents = false, children, layout }: MarkdownProps) {
+export const Markdown = memo(function Markdown({ removeIndents = false, children, style }: MarkdownProps) {
   if (typeof children !== "string") {
     return null;
   }
 
   children = removeIndents ? removeTextIndents(children) : children;
-  const textLayoutToUse = {textAlign: layout?.textAlign};
+  const textLayoutToUse = {textAlign: style?.textAlign};
 
   return (
     <ReactMarkdown
       components={{
         h1({ id, children }) {
           return (
-            <Heading uid={id} layout={textLayoutToUse} level="h1" sx={{ lineHeight: "initial" }}>
+            <Heading uid={id} style={textLayoutToUse} level="h1" sx={{ lineHeight: "initial" }}>
               {children}
             </Heading>
           );
@@ -68,7 +68,7 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
           );
         },
         p({ id, children }) {
-          return <Text uid={id} layout={textLayoutToUse}>{children}</Text>;
+          return <Text uid={id} style={textLayoutToUse}>{children}</Text>;
         },
         code({ id, children }) {
           return (
@@ -100,16 +100,16 @@ export const Markdown = memo(function Markdown({ removeIndents = false, children
           );
         },
         blockquote({ children }) {
-          return <Blockquote layout={textLayoutToUse}>{children}</Blockquote>;
+          return <Blockquote style={textLayoutToUse}>{children}</Blockquote>;
         },
         ol({ children }) {
-          return <OrderedList layout={textLayoutToUse}>{children}</OrderedList>;
+          return <OrderedList style={textLayoutToUse}>{children}</OrderedList>;
         },
         ul({ children }) {
-          return <UnorderedList layout={textLayoutToUse}>{children}</UnorderedList>;
+          return <UnorderedList style={textLayoutToUse}>{children}</UnorderedList>;
         },
         li({ children }) {
-          return <ListItem layout={textLayoutToUse}>{children}</ListItem>;
+          return <ListItem style={textLayoutToUse}>{children}</ListItem>;
         },
         // This needs a parser plugin for the ~ and ~~ signs that are available via react-markdown-gfm
         // or we implement our own parser?
@@ -154,36 +154,36 @@ const HorizontalRule = () => {
 
 type BlockquoteProps = {
   children: React.ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 };
 
-const Blockquote = ({ children, layout }: BlockquoteProps) => {
-  return <blockquote className={styles.blockquote} style={layout} >{children}</blockquote>;
+const Blockquote = ({ children, style }: BlockquoteProps) => {
+  return <blockquote className={styles.blockquote} style={style} >{children}</blockquote>;
 };
 
 type UnorderedListProps = {
   children: React.ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 };
 
-const UnorderedList = ({ children, layout }: UnorderedListProps) => {
-  return <ul className={styles.unorderedList} style={layout}>{children}</ul>;
+const UnorderedList = ({ children, style }: UnorderedListProps) => {
+  return <ul className={styles.unorderedList} style={style}>{children}</ul>;
 };
 
 type OrderedListProps = {
   children: React.ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 };
 
-const OrderedList = ({ children, layout }: OrderedListProps) => {
-  return <ol className={styles.orderedList} style={layout}>{children}</ol>;
+const OrderedList = ({ children, style }: OrderedListProps) => {
+  return <ol className={styles.orderedList} style={style}>{children}</ol>;
 };
 
 type ListItemProps = {
   children: React.ReactNode;
-  layout?: CSSProperties;
+  style?: CSSProperties;
 };
 
-const ListItem = ({ children, layout }: ListItemProps) => {
-  return <li className={styles.listItem} style={layout}>{children}</li>;
+const ListItem = ({ children, style }: ListItemProps) => {
+  return <li className={styles.listItem} style={style}>{children}</li>;
 };

@@ -47,7 +47,7 @@ export const markdownComponentRenderer = createComponentRenderer(
     const content = extractValue.asString(node.props.content);
     return (
       <Markdown
-        layout={layoutCss}
+        style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, false)}
       >
         {content || renderChild(node.children)}

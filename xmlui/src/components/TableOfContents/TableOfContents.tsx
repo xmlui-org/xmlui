@@ -8,9 +8,9 @@ const COMP = "TableOfContents";
 
 export const TableOfContentsMd = createMetadata({
   status: "experimental",
-  description: 
-    `The \`${COMP}\` component collects headings and bookmarks within the current page ` + 
-    `and displays them in a tree representing their hierarchy. When you select an item ` + 
+  description:
+    `The \`${COMP}\` component collects headings and bookmarks within the current page ` +
+    `and displays them in a tree representing their hierarchy. When you select an item ` +
     `in this tree, the component navigates the page to the selected position.`,
   props: {
     smoothScrolling: d(
@@ -73,7 +73,7 @@ export const tableOfContentsRenderer = createComponentRenderer(
   ({ layoutCss, node, extractValue }) => {
     return (
       <TableOfContents
-        layout={layoutCss}
+        style={layoutCss}
         smoothScrolling={extractValue.asOptionalBoolean(node.props?.smoothScrolling)}
       />
     );

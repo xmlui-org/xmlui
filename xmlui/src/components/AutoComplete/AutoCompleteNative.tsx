@@ -20,7 +20,6 @@ import { AutoCompleteContext, useAutoComplete } from "@components/AutoComplete/A
 import { OptionContext, useOption } from "@components/Select/OptionContext";
 import classnames from "classnames";
 import { useEvent } from "@components-core/utils/misc";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 
 type AutoCompleteProps = {
   id?: string;

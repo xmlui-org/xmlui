@@ -33,6 +33,10 @@ export class ComponentDriver {
     await this.locator.click(options);
   };
 
+  dblclick = async (options?: { timeout?: number }) => {
+    await this.locator.dblclick(options);
+  };
+
   focus = async (options?: { timeout?: number }) => {
     await this.locator.focus(options);
   };
@@ -194,6 +198,7 @@ export class FormItemDriver extends ComponentDriver {
   }
   
   // TODO: Need to check for input type
+  // TODO: Remove this method and use input.fill directly
   async fillField(value: any) {
     await this.input.fill(value);
   }
@@ -233,8 +238,67 @@ export class RadioGroupDriver extends ComponentDriver {}
 
 // --- NumberBox
 
-export class NumberBoxDriver extends ComponentDriver {}
+export class NumberBoxDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("input");
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+
+  get spinnerUpButton() {
+    return this.component.locator("button").and(this.component.locator("[data-spinner='up']"));
+  }
+
+  get spinnerDownButton() {
+    return this.component.locator("button").and(this.component.locator("[data-spinner='down']"));
+  }
+}
+
+// --- TextBox
+
+export class TextBoxDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("input");
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+}
+
+// --- TextArea
+
+export class TextAreaDriver extends ComponentDriver {
+
+  get field() {
+    return this.component.locator("textarea").or(this.component).last();
+  }
+
+  get label() {
+    return this.component.locator('label');
+  }
+
+  get placeholder() {
+    return this.field.getAttribute("placeholder");
+  }
+}
 
 // --- List
 
 export class ListDriver extends ComponentDriver {}
+
+// --- Text
+
+export class TextDriver extends ComponentDriver {}

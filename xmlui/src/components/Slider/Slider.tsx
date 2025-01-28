@@ -5,7 +5,14 @@ import styles from "./Slider.module.scss";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
 import { Slider } from "./SliderNative";
-import { dDidChange, dFocus, dGotFocus, dLostFocus, dSetValueApi, dValue } from "@components/metadata-helpers";
+import {
+  dDidChange,
+  dFocus,
+  dGotFocus,
+  dLostFocus,
+  dSetValueApi,
+  dValue,
+} from "@components/metadata-helpers";
 
 const COMP = "Slider";
 
@@ -70,6 +77,6 @@ export const sliderComponentRenderer = createComponentRenderer(
   COMP,
   SliderMd,
   ({ node, extractValue, lookupEventHandler, layoutCss }) => {
-    return <Slider />;
+    return <Slider style={layoutCss} />;
   },
 );

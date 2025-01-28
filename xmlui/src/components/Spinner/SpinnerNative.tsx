@@ -1,5 +1,5 @@
 import styles from "./Spinner.module.scss";
-import type { CSSProperties } from "react";
+import { CSSProperties, ForwardedRef, forwardRef } from "react";
 import { useEffect, useState } from "react";
 
 interface SpinnerProps {
@@ -9,7 +9,10 @@ interface SpinnerProps {
 }
 
 // source https://loading.io/css/
-export function Spinner({ delay = 400, fullScreen = false, style }: SpinnerProps) {
+export const Spinner = forwardRef(function Spinner(
+  { delay = 400, fullScreen = false, style }: SpinnerProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const [pastDelay, setPastDelay] = useState(delay === 0);
 
   useEffect(() => {
@@ -23,12 +26,12 @@ export function Spinner({ delay = 400, fullScreen = false, style }: SpinnerProps
 
   const spinner = (
     <>
-        <div className={styles["lds-ring"]} style={style}>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
+      <div className={styles["lds-ring"]} style={style} ref={forwardedRef}>
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
+      </div>
     </>
   );
 
@@ -40,4 +43,4 @@ export function Spinner({ delay = 400, fullScreen = false, style }: SpinnerProps
     }
     return spinner;
   }
-}
+});

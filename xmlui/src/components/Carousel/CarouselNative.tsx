@@ -2,13 +2,21 @@ import * as React from "react";
 import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
-import {CSSProperties, ForwardedRef, forwardRef, useCallback, useEffect, useRef, useState} from "react";
+import {
+  CSSProperties,
+  ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Icon from "@components/Icon/IconNative";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import Autoplay from "embla-carousel-autoplay";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-
+import { CarouselContext } from "@components/Carousel/CarouselContext";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
@@ -26,22 +34,31 @@ export type CarouselProps = {
   onDisplayDidChange?: (activeSlide: number) => void;
   keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
+  duration?: number;
 };
 
-export const CarouselComponent = forwardRef(function CarouselComponent({
-  orientation = "horizontal",
-  children,
-  style,
-  indicators = true,
-  onDisplayDidChange = noop,
-  autoplay = false,
-  controls = true,
-  loop = false,
-  startIndex = 0,
-  prevIcon,
-  nextIcon,
-  registerComponentApi,
-}: CarouselProps, forwardedRef: ForwardedRef<HTMLDivElement>) {
+const Item = function InlineComponentDef(props: any) {
+  return React.cloneElement(props.children, { ...props });
+};
+
+export const CarouselComponent = forwardRef(function CarouselComponent(
+  {
+    orientation = "horizontal",
+    children,
+    style,
+    indicators = true,
+    onDisplayDidChange = noop,
+    autoplay = false,
+    controls = true,
+    loop = false,
+    startIndex = 0,
+    prevIcon,
+    nextIcon,
+    duration,
+    registerComponentApi,
+  }: CarouselProps,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const referenceElement = useRef(null);
   const [activeSlide, setActiveSlide] = useState(0);
   const [plugins, setPlugins] = useState([]);
@@ -54,6 +71,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent({
       axis: orientation === "horizontal" ? "x" : "y",
       loop,
       startIndex,
+      duration,
     },
     plugins,
   );
@@ -158,7 +176,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent({
     }
 
     onSelect(api);
-    api.on("reInit", onSelect);
+    api.on("init", onSelect);
     api.on("select", onSelect);
 
     return () => {
@@ -173,54 +191,58 @@ export const CarouselComponent = forwardRef(function CarouselComponent({
   }, [ref, handleKeyDown]);
 
   return (
-    <div
-      style={style}
-      ref={ref}
-      className={classnames(styles.carousel)}
-      role="region"
-      tabIndex={-1}
-      aria-roledescription="carousel"
-    >
-      <div ref={carouselRef} className={styles.carouselContentWrapper}>
-        <div
-          className={classnames(styles.carouselContent, {
-            [styles.horizontal]: orientation === "horizontal",
-            [styles.vertical]: orientation === "vertical",
-          })}
-        >
-          {children}
+    <CarouselContext.Provider value={{ activeSlide }}>
+      <div
+        style={style}
+        ref={ref}
+        className={classnames(styles.carousel)}
+        role="region"
+        tabIndex={-1}
+        aria-roledescription="carousel"
+      >
+        <div ref={carouselRef} className={styles.carouselContentWrapper}>
+          <div
+            className={classnames(styles.carouselContent, {
+              [styles.horizontal]: orientation === "horizontal",
+              [styles.vertical]: orientation === "vertical",
+            })}
+          >
+            {React.Children.map(children, (child, index) => (
+              <Item index={index}>{child}</Item>
+            ))}
+          </div>
         </div>
-      </div>
-      {controls && (
-        <div className={styles.controls}>
-          {autoplay && (
-            <button className={styles.controlButton} onClick={toggleAutoplay}>
-              {isPlaying ? <Icon name={"pause"} /> : <Icon name={"play"} />}
+        {controls && (
+          <div className={styles.controls}>
+            {autoplay && (
+              <button className={styles.controlButton} onClick={toggleAutoplay}>
+                {isPlaying ? <Icon name={"pause"} /> : <Icon name={"play"} />}
+              </button>
+            )}
+            <button className={styles.controlButton} disabled={!canScrollPrev} onClick={scrollPrev}>
+              <Icon name={prevIconName} />
             </button>
-          )}
-          <button className={styles.controlButton} disabled={!canScrollPrev} onClick={scrollPrev}>
-            <Icon name={prevIconName} />
-          </button>
-          <button className={styles.controlButton} onClick={scrollNext} disabled={!canScrollNext}>
-            <Icon name={nextIconName} />
-          </button>
-        </div>
-      )}
-      {indicators && (
-        <div className={styles.indicators}>
-          {React.Children.map(children, (_, index) => (
-            <button
-              key={index}
-              type="button"
-              onClick={() => scrollTo(index)}
-              className={classnames(styles.indicator, {
-                [styles.active]: index === activeSlide,
-              })}
-              aria-current={index === activeSlide}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+            <button className={styles.controlButton} onClick={scrollNext} disabled={!canScrollNext}>
+              <Icon name={nextIconName} />
+            </button>
+          </div>
+        )}
+        {indicators && (
+          <div className={styles.indicators}>
+            {React.Children.map(children, (_, index) => (
+              <button
+                key={index}
+                type="button"
+                onClick={() => scrollTo(index)}
+                className={classnames(styles.indicator, {
+                  [styles.active]: index === activeSlide,
+                })}
+                aria-current={index === activeSlide}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </CarouselContext.Provider>
   );
 });

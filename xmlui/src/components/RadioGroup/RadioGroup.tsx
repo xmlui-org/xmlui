@@ -93,7 +93,7 @@ export const radioGroupRenderer = createComponentRenderer(
     return (
       <RadioGroup
         enabled={extractValue.asOptionalBoolean(node.props.enabled)}
-        layout={layoutCss}
+        style={layoutCss}
         initialValue={extractValue(node.props.initialValue)}
         value={state?.value}
         updateState={updateState}

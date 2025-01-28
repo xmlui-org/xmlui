@@ -21,6 +21,9 @@ import {
   SliderDriver,
   SplitterDriver,
   TestStateDriver,
+  TextAreaDriver,
+  TextBoxDriver,
+  TextDriver,
 } from "./ComponentDrivers";
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
@@ -29,11 +32,12 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   baseComponentTestId: "test-id-component",
   testStateViewTestId: "test-state-view-testid",
 
-  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
+  initTestBed: async ({ browser, page, baseComponentTestId, testStateViewTestId }, use) => {
     await use(
       async (
         source: string,
         description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
+        contextOptions?: ContextOptions,
       ) => {
         // --- Initialize XMLUI App
         const { errors, component } = xmlUiMarkupToComponent(`
@@ -58,8 +62,17 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             sourceBaseComponent.testId = baseComponentTestId;
           }
         }
+
+        browser.contexts().forEach(async (context) => {
+          await context.clearPermissions();
+          await context.grantPermissions(contextOptions?.browserPermissions ?? []);
+        });
+
         await initComponent(page, { ...description, entryPoint });
-        return new TestStateDriver(page.getByTestId(testStateViewTestId));
+        return {
+          testStateDriver: new TestStateDriver(page.getByTestId(testStateViewTestId)),
+          clipboard: new Clipboard(page),
+        };
       },
     );
   },
@@ -137,9 +150,24 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(NumberBoxDriver, testId);
     });
   },
+  createTextBoxDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(TextBoxDriver, testId);
+    });
+  },
+  createTextAreaDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(TextAreaDriver, testId);
+    });
+  },
   createListDriver: async ({ createDriver }, use) => {
     await use(async (testId?: string) => {
       return createDriver(ListDriver, testId);
+    });
+  },
+  createTextDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(TextDriver, testId);
     });
   },
 });
@@ -205,9 +233,49 @@ export const expect = baseExpect.extend({
   },
 });
 
+class Clipboard {
+  private page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async getContent() {
+    const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
+    return handle.jsonValue();
+  }
+
+  async write(text: string) {
+    await this.page.evaluate((text) => navigator.clipboard.writeText(text), text);
+  }
+
+  async clear() {
+    await this.page.evaluate(() => navigator.clipboard.writeText(""));
+  }
+
+  /**
+   * Performs a focus on the given driver element, then copies the contents to the clipboard
+   * @param driver 
+   */
+  async copyFrom(driver: ComponentDriver) {
+    await driver.focus();
+    await driver.dblclick()
+    await this.page.keyboard.press('Control+c');
+  }
+
+  async pasteTo(driver: ComponentDriver) {
+    await driver.focus();
+    await this.page.keyboard.press('Control+v');
+  }
+}
+
 // --- Types
 
 type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
+
+type ContextOptions = {
+  browserPermissions?: string[];
+};
 
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
@@ -215,7 +283,8 @@ type TestDriverExtenderProps = {
   initTestBed: (
     source: string,
     description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-  ) => Promise<TestStateDriver>;
+    contextOptions?: ContextOptions,
+  ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
     testId?: string,
@@ -232,5 +301,8 @@ type TestDriverExtenderProps = {
   createSelectDriver: ComponentDriverMethod<SelectDriver>;
   createRadioGroupDriver: ComponentDriverMethod<RadioGroupDriver>;
   createNumberBoxDriver: ComponentDriverMethod<NumberBoxDriver>;
+  createTextBoxDriver: ComponentDriverMethod<TextBoxDriver>;
+  createTextAreaDriver: ComponentDriverMethod<TextAreaDriver>;
   createListDriver: ComponentDriverMethod<ListDriver>;
+  createTextDriver: ComponentDriverMethod<TextDriver>;
 };

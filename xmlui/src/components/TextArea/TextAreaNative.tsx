@@ -1,7 +1,7 @@
 import React, {
   type ChangeEventHandler,
   type CSSProperties,
-  ForwardedRef,
+  type ForwardedRef,
   forwardRef,
   type TextareaHTMLAttributes,
   useCallback,

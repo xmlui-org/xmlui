@@ -1,6 +1,6 @@
 import type { ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { CSSProperties, ForwardedRef, forwardRef } from "react";
+import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./TextBox.module.scss";
@@ -154,9 +154,7 @@ export const TextBox = forwardRef(function TextBox(
           [styles.valid]: validationStatus === "valid",
         })}
         tabIndex={-1}
-        onFocus={() => {
-          inputRef.current?.focus();
-        }}
+        onFocus={focus}
       >
         <Adornment text={startText} iconName={startIcon} className={styles.adornment} />
         <input
@@ -173,7 +171,8 @@ export const TextBox = forwardRef(function TextBox(
           ref={inputRef}
           readOnly={readOnly}
           autoFocus={autoFocus}
-          tabIndex={tabIndex}
+          tabIndex={enabled ? tabIndex : -1}
+          required={required}
         />
         <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
       </div>

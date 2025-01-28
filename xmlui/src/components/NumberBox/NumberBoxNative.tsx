@@ -1,6 +1,13 @@
 import { type ValidationStatus } from "@components/abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import React, { type CSSProperties, useCallback, useEffect, useRef } from "react";
+import React, {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import classnames from "@components-core/utils/classnames";
 import styles from "./NumberBox.module.scss";
 import { noop } from "@components-core/constants";
@@ -9,16 +16,10 @@ import { Adornment } from "@components/Input/InputAdornment";
 import { Button } from "@components/Button/ButtonNative";
 import { useEvent } from "@components-core/utils/misc";
 import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import { clamp, DECIMAL_SEPARATOR, DEFAULT_STEP, EXPONENTIAL_SEPARATOR, FLOAT_REGEXP, INT_REGEXP, isEmptyLike, mapToRepresentation, NUMBERBOX_MAX_VALUE, toUsableNumber } from "./numberbox-abstractions";
 
 // =====================================================================================================================
 // React NumberBox component definition
-
-const MAX_VALUE = 999999999999999;
-const DECIMAL_SEPARATOR = ".";
-const EXPONENTIAL_SEPARATOR = "e";
-const INT_REGEXP = /^-?\d+$/;
-const FLOAT_REGEXP = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/;
-const DEFAULT_STEP = 1;
 
 type Props = {
   id?: string;
@@ -53,40 +54,43 @@ type Props = {
   labelBreak?: boolean;
 };
 
-export const NumberBox = ({
-  id,
-  value,
-  initialValue,
-  style,
-  enabled = true,
-  placeholder,
-  validationStatus = "none",
-  hasSpinBox = true,
-  step,
-  integersOnly = false,
-  zeroOrPositive = false,
-  min = zeroOrPositive ? 0 : -MAX_VALUE,
-  max = MAX_VALUE,
-  maxLength,
-  updateState = noop,
-  onDidChange = noop,
-  onFocus = noop,
-  onBlur = noop,
-  registerComponentApi,
-  startText,
-  startIcon,
-  endText,
-  endIcon,
-  autoFocus,
-  readOnly,
-  required,
-  label,
-  labelPosition,
-  labelWidth,
-  labelBreak,
-}: Props) => {
+export const NumberBox = forwardRef(function NumberBox(
+  {
+    id,
+    value,
+    initialValue,
+    style,
+    enabled = true,
+    placeholder,
+    validationStatus = "none",
+    hasSpinBox = true,
+    step,
+    integersOnly = false,
+    zeroOrPositive = false,
+      min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
+      max = NUMBERBOX_MAX_VALUE,
+    maxLength,
+    updateState = noop,
+    onDidChange = noop,
+    onFocus = noop,
+    onBlur = noop,
+    registerComponentApi,
+    startText,
+    startIcon,
+    endText,
+    endIcon,
+    autoFocus,
+    readOnly,
+    required,
+    label,
+    labelPosition,
+    labelWidth,
+    labelBreak,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   // Ensure the provided minimum is not smaller than the 0 if zeroOrPositive is set to true
-  min = Math.max(zeroOrPositive ? 0 : -MAX_VALUE, min);
+  min = Math.max(zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE, min);
 
   // Step must be an integer since floating point arithmetic needs a deeper dive.
   const _step = toUsableNumber(step, true) ?? DEFAULT_STEP;
@@ -354,6 +358,7 @@ export const NumberBox = ({
 
   return (
     <ItemWithLabel
+      ref={forwardedRef}
       labelPosition={labelPosition as any}
       label={label}
       labelWidth={labelWidth}
@@ -397,28 +402,31 @@ export const NumberBox = ({
           ref={inputRef}
           autoFocus={autoFocus}
           maxLength={maxLength}
+          required={required}
         />
         <Adornment text={endText} iconName={endIcon} className={styles.adornment} />
         {hasSpinBox && (
           <div className={styles.spinnerBox}>
             <Button
+              data-spinner="up"
               type="button"
               variant={"ghost"}
               themeColor={"secondary"}
               tabIndex={-1}
               className={styles.spinnerButton}
-              disabled={!enabled}
+              disabled={!enabled || readOnly}
               ref={upButton}
             >
               <Icon name="chevronup" size="sm" />
             </Button>
             <Button
+              data-spinner="down"
               type="button"
               tabIndex={-1}
               variant={"ghost"}
               themeColor={"secondary"}
               className={styles.spinnerButton}
-              disabled={!enabled}
+              disabled={!enabled || readOnly}
               ref={downButton}
             >
               <Icon name="chevrondown" size="sm" />
@@ -428,7 +436,7 @@ export const NumberBox = ({
       </div>
     </ItemWithLabel>
   );
-};
+});
 
 function applyStep(
   valueStrRep: string,
@@ -441,74 +449,7 @@ function applyStep(
   if (isEmptyLike(currentValue)) {
     return;
   }
-  const newValue = clamp(currentValue + step, min, max);
-  return newValue;
-}
-
-/**
- * Check whether the input value is a usable number for operations.
- * Passes if it's of type number or a non-empty string that evaluates to a number.
- */
-function isUsableFloat(value: string | number | empty) {
-  if (typeof value === "string" && value.length > 0) {
-    return !Number.isNaN(+value) && naiveFloatBounding(value);
-  }
-  return typeof value === "number";
-}
-
-// TEMP
-// Rounding and arithmetic with large floats is a hassle if loss of precision is apparent.
-// Just bound the incoming floating point value to the max value available.
-// This is an edge case but makes it so that we stay consistent and can do arithmetic with the spinner box.
-function naiveFloatBounding(value: string) {
-  const integerPart = value.split(".")[0];
-  return Math.abs(Number.parseInt(integerPart)) <= MAX_VALUE;
-}
-
-/**
- * Check whether the input value is a usable integer for operations.
- * Passes if it's of type number and is an integer
- * or a non-empty string that evaluates to an integer.
- */
-function isUsableInteger(value: string | number | empty) {
-  if (
-    typeof value === "string" &&
-    value.length > 0 &&
-    ![EXPONENTIAL_SEPARATOR, DECIMAL_SEPARATOR].some((item) => value.includes(item))
-  ) {
-    return Number.isSafeInteger(+value);
-  } else if (typeof value === "number") {
-    return Number.isSafeInteger(value);
-  }
-  return false;
-}
-
-function toUsableNumber(value: string | number | empty, isInteger = false): number | empty {
-  const isUsable = isInteger ? isUsableInteger : isUsableFloat;
-  if (!isUsable(value)) return null;
-
-  if (typeof value === "string") {
-    value = isInteger ? Number.parseInt(value) : +value;
-  }
-
-  return value;
-}
-
-function mapToRepresentation(value: string | number | empty) {
-  if (typeof value === "string") return value;
-  if (typeof value === "number") return value.toString();
-  return "";
-}
-
-function clamp(value: number, min: number, max: number) {
-  let clamped = value;
-  if (value < min) clamped = min;
-  if (value > max) clamped = max;
-  return clamped;
-}
-
-function isEmptyLike(value: string | number | empty): value is empty {
-  return typeof value === "undefined" || value === null || value === "";
+  return clamp(currentValue + step, min, max);
 }
 
 function useLongPress(elementRef: HTMLElement | null, action: () => void, delay: number = 500) {
@@ -553,5 +494,3 @@ function useLongPress(elementRef: HTMLElement | null, action: () => void, delay:
     };
   }, [elementRef, action, delay]);
 }
-
-type empty = null | undefined;
