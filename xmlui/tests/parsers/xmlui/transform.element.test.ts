@@ -1210,9 +1210,21 @@ describe("Xmlui transform - child elements", () => {
       expect(cd.children[0].children[0].type).toEqual("Overridden.Namespace.DataGrid");
     });
 
-    it("namespace value 'app-ns' isn't included in component's type", () => {
+    it("namespace value 'app-ns' resolves to a unique prefix", () => {
       const cd = transformSource(`<App xmlns:My="app-ns"><My:DataGrid /></App>`) as ComponentDef;
-      expect(cd.children[0].type).equal("DataGrid");
+      expect(cd.children[0].type).equal("#app-ns.DataGrid");
+    });
+
+    it("namespace value 'core-ns' resolves to a unique prefix", () => {
+      const cd = transformSource(`<App xmlns:My="core-ns"><My:DataGrid /></App>`) as ComponentDef;
+      expect(cd.children[0].type).equal("#xmlui-core-ns.DataGrid");
+    });
+
+    it("namespace value 'componenet-ns' resolves to the namespace key", () => {
+      const cd = transformSource(
+        `<App xmlns:TestingNs="component-ns"><TestingNs:DataGrid /></App>`,
+      ) as ComponentDef;
+      expect(cd.children[0].type).equal("TestingNs.DataGrid");
     });
 
     it("namespace key with dot is unmodified", () => {
@@ -1263,6 +1275,15 @@ describe("Xmlui transform - child elements", () => {
     });
 
     describe("handled errors", () => {
+      it("errors on namespace value includeing '#'", () => {
+        try {
+          const cd = transformSource(`<App xmlns:TestNamespace="#something" />`) as ComponentDef;
+          assert.fail("Exception expected");
+        } catch (err) {
+          expect(err.toString()).include("T028");
+        }
+      });
+
       it("errors on refering to unknown namespace", () => {
         try {
           const cd = transformSource(`

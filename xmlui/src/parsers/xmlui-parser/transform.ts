@@ -18,8 +18,11 @@ const propAttrs = ["name", "value"];
 
 const CDATA_PREFIX_LEN = 9;
 const CDATA_POSTFIX_LEN = 3;
-const NAMESPACE_SCHEME_COMPONENT = "component-ns";
-const THIS_APP_NS = "app-ns";
+const COMPONENT_NAMESPACE_SCHEME = "component-ns";
+const APP_NS_KEY = "app-ns";
+const APP_NS_VALUE = "#app-ns";
+const CORE_NS_KEY = "core-ns";
+const CORE_NS_VALUE = "#xmlui-core-ns";
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -723,9 +726,6 @@ export function nodeToComponentDef(
       reportError("T027", namespace);
     }
 
-    if (resolvedNamespace === THIS_APP_NS) {
-      return name;
-    }
     return resolvedNamespace + "." + name;
   }
 
@@ -1218,15 +1218,31 @@ function addToNamespaces(
 ) {
   let nsCommaSeparated = value.split(":");
   if (nsCommaSeparated.length > 2) {
-    return reportError("T028", value);
+    return reportError("T028", value, "Namespace cannot contain multiple ':' (colon).");
   }
 
   let nsValue = value;
   if (nsCommaSeparated.length === 2) {
-    if (nsCommaSeparated[0] != NAMESPACE_SCHEME_COMPONENT) {
-      return reportError("T029", value, NAMESPACE_SCHEME_COMPONENT);
+    if (nsCommaSeparated[0] != COMPONENT_NAMESPACE_SCHEME) {
+      return reportError("T029", value, COMPONENT_NAMESPACE_SCHEME);
     }
     nsValue = nsCommaSeparated[1];
+  }
+
+  if (nsValue.includes("#")) {
+    return reportError("T028", nsValue, "Namespace cannot contain character '#'.");
+  }
+
+  switch (nsValue) {
+    case COMPONENT_NAMESPACE_SCHEME:
+      nsValue = nsKey;
+      break;
+    case APP_NS_KEY:
+      nsValue = APP_NS_VALUE;
+      break;
+    case CORE_NS_KEY:
+      nsValue = CORE_NS_VALUE;
+      break;
   }
 
   const compNamespaces = namespaceStack[namespaceStack.length - 1];
