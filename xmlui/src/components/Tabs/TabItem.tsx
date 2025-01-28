@@ -7,7 +7,7 @@ const COMP = "TabItem";
 
 export const TabItemMd = createMetadata({
   description:
-    `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` + 
+    `\`${COMP}\` is a non-visual component describing a tab. Tabs component may use nested ` +
     `${COMP} instances from which the user can select.`,
   props: {
     label: dLabel(),
@@ -20,7 +20,9 @@ export const tabItemComponentRenderer = createComponentRenderer(
   (rendererContext) => {
     const { node, renderChild, extractValue } = rendererContext;
     return (
-      <TabItemComponent label={extractValue(node.props.label)} content={renderChild(node.children)} />
+      <TabItemComponent label={extractValue(node.props.label)}>
+        {renderChild(node.children)}
+      </TabItemComponent>
     );
   },
 );

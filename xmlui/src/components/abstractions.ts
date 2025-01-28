@@ -21,7 +21,8 @@ export type Accordion = {
 
 export type Tab = {
   label: string;
-  content: ReactNode;
+  children?: ReactNode;
+  style?: CSSProperties;
 };
 
 export const LinkTargetNames = ["_self", "_blank", "_parent", "_top"] as const;

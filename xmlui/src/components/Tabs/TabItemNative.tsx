@@ -5,7 +5,7 @@ import { Content } from "@radix-ui/react-tabs";
 import { useTabContext } from "@components/Tabs/TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(
-  props: Tab,
+  { children, label, style }: Tab,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
@@ -13,10 +13,11 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
 
   useEffect(() => {
     register({
-      ...props,
+      children,
+      label,
       id,
     });
-  }, [id, props, register]);
+  }, [id, children, label, register]);
 
   useEffect(() => {
     return () => {
@@ -25,8 +26,14 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   }, [id, unRegister]);
 
   return (
-    <Content key={id} value={id} className={styles.tabsContent} ref={forwardedRef}>
-      {props.content}
+    <Content
+      key={id}
+      value={id}
+      className={styles.tabsContent}
+      ref={forwardedRef}
+      style={style}
+    >
+      {children}
     </Content>
   );
 });

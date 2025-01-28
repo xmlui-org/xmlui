@@ -24,7 +24,7 @@ type Props = {
 
 export const Tabs = forwardRef(function Tabs(
   {
-    activeTab = 0,
+    activeTab = 1,
     orientation = "vertical",
     tabRenderer,
     style,
@@ -37,7 +37,7 @@ export const Tabs = forwardRef(function Tabs(
   const [activeIndex, setActiveIndex] = useState(activeTab);
   const currentTab = useMemo(() => {
     return tabItems[activeIndex]?.id;
-  }, [activeIndex]);
+  }, [activeIndex, tabItems]);
 
   useEffect(() => {
     const _activeTab = activeTab - 1;
@@ -47,7 +47,7 @@ export const Tabs = forwardRef(function Tabs(
   }, [tabItems, activeTab]);
 
   const next = useEvent(() => {
-    const nextIndex = parseInt(currentTab) + 1;
+    const nextIndex = tabItems.findIndex(item => item.id === currentTab) + 1;
     const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
     setActiveIndex(nextIndex > maxIndex ? 0 : nextIndex);
   });
