@@ -40,13 +40,12 @@ test("placeholder is hidden if input field is filled", async ({
   { label: "undefined", value: "'{undefined}'", toExpect: "" },
   { label: "null", value: "'{null}'", toExpect: "" },
   { label: "empty string", value: "''", toExpect: "" },
-  { label: "string", value: "'test'", toExpect: "'test'" },
+  { label: "string", value: "'test'", toExpect: "test" },
   { label: "integer", value: "'{1}'", toExpect: "1" },
   { label: "float", value: "'{1.2}'", toExpect: "1.2" },
-  { label: "string that resolves to integer", value: "'1'", toExpect: "1" },
-  { label: "string that resolves to float", value: "'1.2'", toExpect: "1.2" },
+  { label: "boolean", value: "'{true}'", toExpect: "true" },
 ].forEach(({ label, value, toExpect }) => {
-  test.skip(`setting initialValue to ${label} sets value of field`, async ({
+  test(`setting initialValue to ${label} sets value of field`, async ({
     initTestBed,
     createTextBoxDriver,
   }) => {
