@@ -12,14 +12,24 @@ type SlotItemProps = {
   layoutContext?: LayoutContext;
 };
 
+/**
+ * This React component wraps the slot content defined in a parent component into a container.
+ * This container may contain context values pushed from a compound component back to
+ * the parent.
+ */
 export const SlotItem = memo(
   ({ node, renderChild, layoutContext, slotProps = EMPTY_OBJECT }: SlotItemProps) => {
     const shallowMemoedSlotProps = useShallowCompareMemoize(slotProps);
+
+    // --- Transform all Slot properties into context values so that they can be 
+    // --- used in the slot content (in the parent component)
     const nodeWithItem = useMemo(() => {
       const templateProps = {};
       Object.entries(shallowMemoedSlotProps).forEach(([key, value]) => {
         templateProps["$" + key] = value;
       });
+
+      // --- Create a container for the slot content with the cotext values
       return {
         type: "Container",
         contextVars: templateProps,
@@ -27,6 +37,7 @@ export const SlotItem = memo(
       } as ContainerComponentDef;
     }, [node, shallowMemoedSlotProps]);
 
+    // --- Render the slot content
     return <>{renderChild(nodeWithItem, layoutContext)}</>;
   },
 );

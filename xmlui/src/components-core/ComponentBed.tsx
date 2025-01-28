@@ -1,7 +1,7 @@
-import type { EventHandler, MutableRefObject, ReactElement, ReactNode } from "react";
+import type { MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ComponentMetadata, ParentRenderContext } from "@abstractions/ComponentDefs";
+import type { ParentRenderContext } from "@abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
@@ -27,53 +27,16 @@ import { useReferenceTrackedApi, useShallowCompareMemoize } from "./utils/hooks"
 import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
 import { ContainerActionKind } from "./abstractions/containers";
 import { useInspector } from "@components-core/InspectorContext";
-import { SlotItem } from "@components/slot-helpers";
+import { SlotItem } from "@components/SlotItem";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
 import { compileLayout } from "../parsers/style-parser/style-compiler";
+import { useMouseEventHandlers } from "./event-handlers";
 
 // --- The available properties of Component
 type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
 };
-
-function useEventHandler<TMd extends ComponentMetadata>(
-  eventName: string,
-  lookupEvent: LookupEventHandlerFn<TMd>,
-  shouldSkip: boolean,
-) {
-  const onEvent = shouldSkip
-    ? undefined
-    : lookupEvent(eventName as keyof NonNullable<TMd["events"]>);
-  const eventHandler: EventHandler<any> = useCallback(
-    (event) => {
-      if (onEvent) {
-        event.stopPropagation();
-        onEvent(event);
-      }
-    },
-    [onEvent],
-  );
-  return !onEvent ? undefined : eventHandler;
-}
-
-function useMouseEventHandlers(lookupEvent: LookupEventHandlerFn, shouldSkip: boolean) {
-  const onClick = useEventHandler("click", lookupEvent, shouldSkip);
-  const onMouseLeave = useEventHandler("mouseLeave", lookupEvent, shouldSkip);
-  const onMouseEnter = useEventHandler("mouseEnter", lookupEvent, shouldSkip);
-  const onDoubleClick = useEventHandler("doubleClick", lookupEvent, shouldSkip);
-
-  if (shouldSkip) {
-    return EMPTY_OBJECT;
-  }
-
-  return {
-    onClick,
-    onMouseLeave,
-    onMouseEnter,
-    onDoubleClick,
-  };
-}
 
 /**
  * This component's primary responsibility is to transform a particular component definition
@@ -134,7 +97,13 @@ const ComponentBed = forwardRef(function ComponentBed(
   // --- Obtain a function to update the component state
   const memoedUpdateState = useCallback(
     (componentState: any) => {
-      dispatch(componentStateChanged(uid, componentState));
+      dispatch({
+        type: ContainerActionKind.COMPONENT_STATE_CHANGED,
+        payload: {
+          uid,
+          state: componentState,
+        },
+      });
     },
     [dispatch, uid],
   );
@@ -164,28 +133,6 @@ const ComponentBed = forwardRef(function ComponentBed(
     [lookupAction, uid],
   );
 
-  // --- Obtain a function that can lookup an event handler, which is bound to a
-  // --- particular event of this component instance
-  const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
-    (eventName, actionOptions) => {
-      const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
-      return lookupAction(action, uid, { eventName, ...actionOptions });
-    },
-    [lookupAction, safeNode.events, uid],
-  );
-
-  // --- Use the current theme to obtain resources and collect theme variables
-  const { getResourceUrl, themeVars } = useTheme();
-
-  // --- Obtain a function that can extract a resource URL from a logical URL
-  const extractResourceUrl = useCallback(
-    (url?: string) => {
-      const extractedUrl = valueExtractor(url);
-      return getResourceUrl(extractedUrl);
-    },
-    [getResourceUrl, valueExtractor],
-  );
-
   // --- Obtain the component renderer and descriptor from the component registry
   // --- Memoizes the renderChild function
   const memoedRenderChild: RenderChildFn = useCallback(
@@ -200,6 +147,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     [renderChild, parentRenderContext, uidInfoRef],
   );
 
+  // --- Collect the API-bound properties and events of the component to determine
+  // --- if the component should be wrapped in an `ApiBoundComponent`
   const apiBoundProps = useMemo(
     () => getApiBoundItems(safeNode.props, "DataSource", "DataSourceRef"),
     [safeNode.props],
@@ -209,6 +158,56 @@ const ComponentBed = forwardRef(function ComponentBed(
     [safeNode.events],
   );
   const isApiBound = apiBoundProps.length > 0 || apiBoundEvents.length > 0;
+
+  // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
+  // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
+  if (isApiBound) {
+    return (
+      <ApiBoundComponent
+        uid={uid}
+        renderChild={memoedRenderChild}
+        node={safeNode}
+        key={safeNode.uid}
+        apiBoundEvents={apiBoundEvents}
+        apiBoundProps={apiBoundProps}
+        layoutContextRef={layoutContextRef}
+        parentRendererContext={parentRenderContext}
+      />
+    );
+  }
+
+  // --- Obtain the component renderer and descriptor from the component registry
+  const componentRegistry = useComponentRegistry();
+  const { renderer, descriptor, isCompoundComponent } =
+    componentRegistry.lookupComponentRenderer(safeNode.type) || {};
+
+  // --- Obtain a function that can lookup an event handler, which is bound to a
+  // --- particular event of this component instance
+  const memoedLookupEventHandler: LookupEventHandlerFn = useCallback(
+    (eventName, actionOptions) => {
+      const action = safeNode.events?.[eventName] || actionOptions?.defaultHandler;
+      return lookupAction(action, uid, { eventName, ...actionOptions });
+    },
+    [lookupAction, safeNode.events, uid],
+  );
+
+  // --- Set up the mouse event handlers for the component
+  const mouseEventHandlers = useMouseEventHandlers(
+    memoedLookupEventHandler,
+    descriptor?.nonVisual || isApiBound,
+  );
+
+  // --- Use the current theme to obtain resources and collect theme variables
+  const { getResourceUrl, themeVars } = useTheme();
+
+  // --- Obtain a function that can extract a resource URL from a logical URL
+  const extractResourceUrl = useCallback(
+    (url?: string) => {
+      const extractedUrl = valueExtractor(url);
+      return getResourceUrl(extractedUrl);
+    },
+    [getResourceUrl, valueExtractor],
+  );
 
   // --- Collect and compile the layout property values
   const { cssProps, nonCssProps } = useMemo(() => {
@@ -228,32 +227,6 @@ const ComponentBed = forwardRef(function ComponentBed(
   // --- memoize them using shallow comparison to avoid unnecessary re-renders.
   const stableLayoutCss = useShallowCompareMemoize(cssProps);
   const stableLayoutNonCss = useShallowCompareMemoize(nonCssProps);
-
-  // --- API-bound components provide helpful behavior out of the box, such as transforming API-bound
-  // --- events and properties. This extra functionality is implemented in `ApiBoundComponent`.
-  if (isApiBound) {
-    return (
-      <ApiBoundComponent
-        uid={uid}
-        renderChild={memoedRenderChild}
-        node={safeNode}
-        key={safeNode.uid}
-        apiBoundEvents={apiBoundEvents}
-        apiBoundProps={apiBoundProps}
-        layoutContextRef={layoutContextRef}
-        parentRendererContext={parentRenderContext}
-      />
-    );
-  }
-
-  const componentRegistry = useComponentRegistry();
-  const { renderer, descriptor, isCompoundComponent } =
-    componentRegistry.lookupComponentRenderer(safeNode.type) || {};
-
-  const mouseEventHandlers = useMouseEventHandlers(
-    memoedLookupEventHandler,
-    descriptor?.nonVisual || isApiBound,
-  );
 
   // --- No special behavior, let's render the component according to its definition.
   let renderedNode: ReactNode = null;
@@ -279,6 +252,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     };
 
     if (safeNode.type === "Slot") {
+      // --- Transpose the children from the parent component to the slot in
+      // --- the compound component
       renderedNode = slotRenderer(rendererContext, parentRenderContext);
     } else {
       if (!renderer) {
@@ -351,8 +326,8 @@ const ComponentBed = forwardRef(function ComponentBed(
     );
   }
 
-  // --- If we have a single React node with forwarded reference, let's merge the "rest"
-  // --- properties with it.
+  // --- If we have a single React node with forwarded reference, or mouse events
+  // --- let's merge the "rest" properties with it.
   if ((ref || !isEmpty(mouseEventHandlers)) && renderedNode && React.isValidElement(renderedNode)) {
     // --- For radix UI/accessibility, read more here:
     // --- https://www.radix-ui.com/primitives/docs/guides/composition
@@ -367,51 +342,94 @@ const ComponentBed = forwardRef(function ComponentBed(
   return React.isValidElement(renderedNode) ? renderedNode : <>{renderedNode}</>;
 });
 
+/**
+ * This function renders the content of a slot. If the slot is named, it looks for a template
+ * in the parent component to render. If the template is not found, it renders the default content
+ * of the slot.
+ */
 function slotRenderer(
   { node, extractValue, renderChild, lookupAction, layoutContext }: RendererContext<any>,
   parentRenderContext?: ParentRenderContext,
 ) {
-  if (!parentRenderContext) {
-    return undefined;
-  }
-  const templateName = extractValue(node.props.name);
-  if (templateName === undefined) {
-    return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
-  } else {
-    let slotProps;
-    if (!isEmpty(node.props)) {
-      slotProps = {};
-      Object.keys(node.props).forEach((key) => {
-        if (key !== "name") {
-          let extractedValue = extractValue(node.props[key], true);
-          if (extractedValue?._ARROW_EXPR_) {
-            extractedValue = lookupAction(extractedValue);
-          }
-          slotProps[key] = extractedValue;
-        }
-      });
-    }
+  // --- Get the template name from the slot
+  const templateName = extractValue.asOptionalString(node.props.name);
 
-    if (parentRenderContext.props[templateName]) {
-      return (
-        <SlotItem
-          node={parentRenderContext.props[templateName]}
-          renderChild={parentRenderContext.renderChild}
-          slotProps={slotProps}
-          layoutContext={layoutContext}
-        />
-      );
+  if (templateName && !templateName.endsWith("Template")) {
+    return (
+      <InvalidComponent
+        node={node}
+        errors={[
+          `Slot name '${templateName}' is not valid. ` +
+            "A named slot should use a name ending with 'Template'.",
+        ]}
+      />
+    );
+  }
+
+  let slotProps: any = null;
+  if (!isEmpty(node.props)) {
+    slotProps = {};
+    Object.keys(node.props).forEach((key) => {
+      if (key !== "name") {
+        let extractedValue = extractValue(node.props[key], true);
+        if (extractedValue?._ARROW_EXPR_) {
+          extractedValue = lookupAction(extractedValue);
+        }
+        slotProps[key] = extractedValue;
+      }
+    });
+  }
+
+  if (parentRenderContext) {
+    // --- We may use a named slot to get the content from the parent
+    if (templateName === undefined) {
+      // --- The slot is not named
+      if (!slotProps) {
+        // --- simply render the children from the parent
+        return parentRenderContext.renderChild(parentRenderContext.children, layoutContext);
+      } else {
+        // --- The slot has properties; let's render the children with the slot properties
+        return (
+          <SlotItem
+            node={parentRenderContext.children}
+            renderChild={parentRenderContext.renderChild}
+            slotProps={slotProps}
+            layoutContext={layoutContext}
+          />
+        );
+      }
     } else {
-      return (
-        <SlotItem
-          node={node.children}
-          renderChild={renderChild}
-          slotProps={slotProps}
-          layoutContext={layoutContext}
-        />
-      );
+      // --- We have a named slot with optional other properties; let's collect them
+      if (parentRenderContext.props[templateName]) {
+        // --- The parent provides a template to put into the slot. Let's use
+        // --- the parent's context to render the slot content.
+        return (
+          <SlotItem
+            node={parentRenderContext.props[templateName]}
+            renderChild={parentRenderContext.renderChild}
+            slotProps={slotProps}
+            layoutContext={layoutContext}
+          />
+        );
+      }
     }
   }
+
+  if (node.props?.name?.endsWith("Template")) {
+    // --- The parent does not provide a template for the slot. Let's render
+    // --- the slot's default children.
+    return (
+      <SlotItem
+        node={node.children}
+        renderChild={renderChild}
+        slotProps={slotProps}
+        layoutContext={layoutContext}
+      />
+    );
+  }
+
+  // --- We do not render the named slots with names not ending with "Template"
+  return undefined;
 }
 
 /**
@@ -434,16 +452,6 @@ function getApiBoundItems(items: Record<string, any> | undefined, ...type: strin
     }
   }
   return ret;
-}
-
-function componentStateChanged(uid: symbol, state: any) {
-  return {
-    type: ContainerActionKind.COMPONENT_STATE_CHANGED,
-    payload: {
-      uid,
-      state,
-    },
-  };
 }
 
 export default ComponentBed;
