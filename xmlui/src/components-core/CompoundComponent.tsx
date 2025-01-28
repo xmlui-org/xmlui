@@ -11,17 +11,17 @@ import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
 import { EMPTY_ARRAY } from "@components-core/constants";
 
-type CompoundComponentProps<T extends ComponentDef> = {
+type CompoundComponentProps = {
   // Definition of the `component` part of the compound component
   compound: ComponentDef;
   // The API of the compound component
   api?: Record<string, string>;
   scriptCollected?: CollectedDeclarations;
-} & RendererContext<T>;
+} & RendererContext;
 
 // Acts as a bridge between a compound component definition and its renderer.
 export const CompoundComponent = forwardRef(
-  <T extends ComponentDef>(
+  (
     {
       node,
       lookupSyncCallback,
@@ -34,7 +34,7 @@ export const CompoundComponent = forwardRef(
       layoutContext,
       uid,
       updateState,
-    }: CompoundComponentProps<T>,
+    }: CompoundComponentProps,
     forwardedRef: React.ForwardedRef<any>,
   ) => {
     // --- Extract property values (resolve binding expressions)
@@ -119,7 +119,7 @@ export const CompoundComponent = forwardRef(
     }, [node.props]);
 
     const memoedParentRenderContext = useMemo(() => {
-      if ((!node.children || node.children.length === 0) && !hasTemplateProps) {
+      if (!hasTemplateProps && (!node.children || node.children.length === 0)) {
         return undefined;
       }
       return {
@@ -142,4 +142,6 @@ export const CompoundComponent = forwardRef(
     return React.isValidElement(ret) ? ret : <>{ret}</>;
   },
 );
+
+// --- Display a name for the component in developer tools
 CompoundComponent.displayName = "CompoundComponent";

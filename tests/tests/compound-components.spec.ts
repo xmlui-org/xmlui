@@ -72,6 +72,179 @@ test("ChildSlot rendered in compound components", async ({ page }) => {
   await expect(page.getByText(EXPECTED_TEXT_CHILDREN, { exact: true })).toBeVisible();
 });
 
+test("Default slot rendered in compound components", async ({ page }) => {
+  const EXPECTED_DEFAULT_SLOT = "Default slot content";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="myTemplate">
+          <Text>${EXPECTED_DEFAULT_SLOT}</Text>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_DEFAULT_SLOT, { exact: true })).toBeVisible();
+});
+
+test("Default slot not rendered in compound components with no 'Template' slot", async ({ page }) => {
+  const EXPECTED_DEFAULT_SLOT = "Default slot content";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="my">
+          <Text>${EXPECTED_DEFAULT_SLOT}</Text>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText("'Template'", { exact: false })).toBeVisible();
+});
+
+test("Default slot overwritten in compound components #1", async ({ page }) => {
+  const EXPECTED_DEFAULT_SLOT = "Default slot content";
+  const EXPECTED_OVERRIDE = "This is an override";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="myTemplate">
+          <Text>${EXPECTED_DEFAULT_SLOT}</Text>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="myTemplate">
+          <Text>${EXPECTED_OVERRIDE}</Text>
+        </property>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_OVERRIDE, { exact: true })).toBeVisible();
+});
+
+test("Multiple default slots rendered in compound components", async ({ page }) => {
+  const EXPECTED_DEFAULT_SLOT = "Default slot content";
+  const EXPECTED_DEFAULT_OTHER_SLOT = "Default other slot content";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="defaultTemplate">
+          <Text>${EXPECTED_DEFAULT_SLOT}</Text>
+        </Slot>
+        <Slot name="otherTemplate">
+          <Text>${EXPECTED_DEFAULT_OTHER_SLOT}</Text>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_DEFAULT_SLOT, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_DEFAULT_OTHER_SLOT, { exact: true })).toBeVisible();
+});
+
+test("Slot context value works #1", async ({ page }) => {
+  const EXPECTED_CONTEXT_VALUE = "123";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="myTemplate" myValue="{123}">
+          <Text>Dummy default text</Text>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="myTemplate">
+          <Text>{$myValue}</Text>
+        </property>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_CONTEXT_VALUE, { exact: true })).toBeVisible();
+});
+
+test("Slot context value works #2", async ({ page }) => {
+  const EXPECTED_CONTEXT_VALUE = "123";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="myTemplate" myValue="{123}" />
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="myTemplate">
+          <Text>{$myValue}</Text>
+        </property>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_CONTEXT_VALUE, { exact: true })).toBeVisible();
+});
+
+test("Slot context value works #3", async ({ page }) => {
+  const EXPECTED_VALUE = "123hello!";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="myTemplate" myValue1="{123}" myValue2="hello!" />
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="myTemplate">
+          <Text>{$myValue1}{$myValue2}</Text>
+        </property>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: true })).toBeVisible();
+});
+
+test("Slot context value works #4", async ({ page }) => {
+  const EXPECTED_VALUE = "123hello!";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot myValue1="{123}" myValue2="hello!" />
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <Text>{$myValue1}{$myValue2}</Text>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: true })).toBeVisible();
+});
+
 test("$this works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `

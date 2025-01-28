@@ -32,12 +32,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   baseComponentTestId: "test-id-component",
   testStateViewTestId: "test-state-view-testid",
 
-  initTestBed: async ({ browser, page, baseComponentTestId, testStateViewTestId }, use) => {
+  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
     await use(
       async (
         source: string,
         description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-        contextOptions?: ContextOptions,
       ) => {
         // --- Initialize XMLUI App
         const { errors, component } = xmlUiMarkupToComponent(`
@@ -62,11 +61,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             sourceBaseComponent.testId = baseComponentTestId;
           }
         }
-
-        browser.contexts().forEach(async (context) => {
-          await context.clearPermissions();
-          await context.grantPermissions(contextOptions?.browserPermissions ?? []);
-        });
 
         await initComponent(page, { ...description, entryPoint });
         return {
@@ -273,17 +267,12 @@ class Clipboard {
 
 type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
 
-type ContextOptions = {
-  browserPermissions?: string[];
-};
-
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
   baseComponentTestId: string;
   initTestBed: (
     source: string,
     description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-    contextOptions?: ContextOptions,
   ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
