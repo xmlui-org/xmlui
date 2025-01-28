@@ -14,7 +14,7 @@ import type {ComponentApi} from "@components-core/container/ContainerComponentDe
 /**
  * This interface defines the renderer context for the exposed components of the XMLUI framework.
  */
-export interface RendererContext<TMd extends ComponentMetadata>
+export interface RendererContext<TMd extends ComponentMetadata = ComponentMetadata>
   extends ComponentRendererContextBase<TMd> {
   /**
    * The unique identifier of the component instance

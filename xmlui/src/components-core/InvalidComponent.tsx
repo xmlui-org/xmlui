@@ -14,7 +14,7 @@ type Props = {
   node: ComponentDef;
 
   // --- Component children to render with the error message
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 /**
