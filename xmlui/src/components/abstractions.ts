@@ -41,8 +41,9 @@ export const LinkTargetMd: PropertyValueDescription[] = [
   },
   {
     value: "_top",
-    description: "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
-  }
+    description:
+      "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
+  },
 ];
 
 /**
@@ -123,9 +124,20 @@ export const buttonTypeValues = ["button", "submit", "reset"] as const;
 export const buttonTypeNames = [...buttonTypeValues];
 export type ButtonType = (typeof buttonTypeValues)[number];
 export const buttonTypesMd: PropertyValueDescription[] = [
-  { value: "button", description: "Regular behavior that only executes logic if explicitly determined." },
-  { value: "submit", description: "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component." },
-  { value: "reset", description: "Resets all the controls to their initial values. Using it is ill advised for UX reasons." },
+  {
+    value: "button",
+    description: "Regular behavior that only executes logic if explicitly determined.",
+  },
+  {
+    value: "submit",
+    description:
+      "The button submits the form data to the server. This is the default for buttons in a Form or NativeForm component.",
+  },
+  {
+    value: "reset",
+    description:
+      "Resets all the controls to their initial values. Using it is ill advised for UX reasons.",
+  },
 ];
 export const defaultButtonType = "button";
 
@@ -135,8 +147,15 @@ export const buttonVariantNames = [...buttonVariantValues];
 export type ButtonVariant = (typeof buttonVariantValues)[number];
 export const buttonVariantMd: PropertyValueDescription[] = [
   { value: "solid", description: "A button with a border and a filled background." },
-  { value: "outlined", description: "The button is displayed with a border and a transparent background." },
-  { value: "ghost", description: "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked." },
+  {
+    value: "outlined",
+    description: "The button is displayed with a border and a transparent background.",
+  },
+  {
+    value: "ghost",
+    description:
+      "A button with no border and fill. Only the label is visible; the background is colored when hovered or clicked.",
+  },
 ];
 
 // --- Available button aria attributes
@@ -150,8 +169,14 @@ export const alignmentOptionNames = [...alignmentOptionValues];
 export type AlignmentOptions = (typeof alignmentOptionValues)[number];
 export const alignmentOptionMd: PropertyValueDescription[] = [
   { value: "center", description: "Place the content in the middle" },
-  { value: "start", description: "Justify the content to the left (to the right if in right-to-left)" },
-  { value: "end", description: "Justify the content to the right (to the left if in right-to-left)" },
+  {
+    value: "start",
+    description: "Justify the content to the left (to the right if in right-to-left)",
+  },
+  {
+    value: "end",
+    description: "Justify the content to the right (to the left if in right-to-left)",
+  },
 ];
 
 // --- Available orientation options
@@ -168,8 +193,16 @@ export const iconPositionValues = ["start", "end"] as const;
 export const iconPositionNames = [...iconPositionValues];
 export type IconPosition = (typeof iconPositionValues)[number];
 export const iconPositionMd: PropertyValueDescription[] = [
-  { value: "start", description: "The icon will appear at the start (left side when the left-to-right direction is set)" },
-  { value: "end", description: "The icon will appear at the end (right side when the left-to-right direction is set)" },
+  {
+    value: "start",
+    description:
+      "The icon will appear at the start (left side when the left-to-right direction is set)",
+  },
+  {
+    value: "end",
+    description:
+      "The icon will appear at the end (right side when the left-to-right direction is set)",
+  },
 ];
 
 // --- Available status colors
@@ -188,10 +221,10 @@ export type StatusColor = (typeof statusColorValues)[number];
 export const statusColorMd: PropertyValueDescription[] = [
   { value: "primary", description: "Primary theme color, no default icon" },
   { value: "secondary", description: "Secondary theme color, no default icon" },
-  { value: "success", description: "Success theme color, \"success\" icon" },
-  { value: "danger", description: "Warning theme color, \"warning\" icon" },
-  { value: "warning", description: "Danger theme color, \"danger\" icon" },
-  { value: "info", description: "Info theme color, \"info\" icon" },
+  { value: "success", description: 'Success theme color, "success" icon' },
+  { value: "danger", description: 'Warning theme color, "warning" icon' },
+  { value: "warning", description: 'Danger theme color, "danger" icon' },
+  { value: "info", description: 'Info theme color, "info" icon' },
   { value: "light", description: "Light theme color, no default icon" },
   { value: "dark", description: "Dark theme color, no default icon" },
 ];
@@ -201,8 +234,16 @@ const placementValues = ["start", "end", "top", "bottom"] as const;
 export const placementNames = [...placementValues];
 export type Placement = (typeof placementValues)[number];
 export const placementMd: PropertyValueDescription[] = [
-  { value: "start", description: "The left side of the window (left-to-right) or the right side of the window (right-to-left)" },
-  { value: "end", description: "The right side of the window (left-to-right) or the left side of the window (right-to-left)" },
+  {
+    value: "start",
+    description:
+      "The left side of the window (left-to-right) or the right side of the window (right-to-left)",
+  },
+  {
+    value: "end",
+    description:
+      "The right side of the window (left-to-right) or the left side of the window (right-to-left)",
+  },
   { value: "top", description: "The top of the window" },
   { value: "bottom", description: "The bottom of the window" },
 ];
@@ -212,8 +253,16 @@ export const labelPositionValues = ["top", "start", "end", "bottom"] as const;
 export const labelPositionNames = [...labelPositionValues];
 export type LabelPosition = (typeof labelPositionValues)[number];
 export const labelPositionMd: PropertyValueDescription[] = [
-  { value: "start", description: "The left side of the input (left-to-right) or the right side of the input (right-to-left)" },
-  { value: "end", description: "The right side of the input (left-to-right) or the left side of the input (right-to-left)" },
+  {
+    value: "start",
+    description:
+      "The left side of the input (left-to-right) or the right side of the input (right-to-left)",
+  },
+  {
+    value: "end",
+    description:
+      "The right side of the input (left-to-right) or the left side of the input (right-to-left)",
+  },
   { value: "top", description: "The top of the input" },
   { value: "bottom", description: "The bottom of the input" },
 ];
@@ -249,3 +298,142 @@ export type ScrollAnchoring = (typeof scrollAnchoringValues)[number];
 export const orderingValues = ["asc", "desc"] as const;
 type OrderingDirection = (typeof orderingValues)[number];
 export type FieldOrderBy = { field: string; direction: OrderingDirection };
+
+// --- text variants
+const TextVariantKeys = [
+  "abbr", // use <abbr>
+  "cite", // use <cite>
+  "code", // use <code>
+  "codefence", // use uniquely styled <![CDATA[
+  "deleted", // use <del>
+  "inserted", // use <ins>
+  "keyboard", // use <kbd>,
+  "marked", // use <mark>
+  "sample", // use <samp>
+  "sub", // use <sub>
+  "sup", // use <sup>
+  "var", // use <var>
+  "strong", // use <strong> element for content that is of greater importance (used in Markdown)
+  "em", // use <em> element changes the meaning of a sentence - as spoken emphasis does (used in Markdown)
+  "mono", // use monospace font with <![CDATA[
+  "title", // Title text in the particular context
+  "subtitle", // Subtitle text in the particular context
+  "small", // Small text in the particular context
+  "caption", // Caption text in the particular context
+  "placeholder", // Placeholder text in the particular context
+  "paragraph", // use <p>
+  "subheading", // use a H6 with some specific defaults
+  "tableheading", // use a H3 with some specific defaults
+  "secondary", // use a secondary text style
+] as const;
+export type TextVariant = (typeof TextVariantKeys)[number];
+type TextPropertyValueDescription = PropertyValueDescription & {
+  value: TextVariant;
+  description: string;
+};
+
+export const TextVariantElement: Record<TextVariant, TextVariantMapping> = {
+  abbr: "abbr",
+  cite: "cite",
+  code: "code",
+  codefence: "pre",
+  deleted: "del",
+  inserted: "ins",
+  keyboard: "kbd",
+  marked: "mark",
+  sample: "samp",
+  sub: "sub",
+  sup: "sup",
+  var: "var",
+  mono: "pre",
+  strong: "strong",
+  em: "em",
+  title: "span",
+  subtitle: "span",
+  small: "span",
+  caption: "span",
+  placeholder: "span",
+  paragraph: "p",
+  subheading: "h6",
+  tableheading: "h6",
+  secondary: "span",
+};
+
+type TextVariantMapping =
+  | "abbr"
+  | "cite"
+  | "code"
+  | "del"
+  | "ins"
+  | "kbd"
+  | "mark"
+  | "samp"
+  | "sub"
+  | "sup"
+  | "var"
+  | "pre"
+  | "strong"
+  | "em"
+  | "span"
+  | "p"
+  | "h6";
+
+export const variantOptionsMd: TextPropertyValueDescription[] = [
+  { value: "abbr", description: "Represents an abbreviation or acronym" },
+  { value: "caption", description: "Represents the caption (or title) of a table" },
+  { value: "cite", description: "Is used to mark up the title of a cited work" },
+  { value: "code", description: "Represents a line of code" },
+  {
+    value: "codefence",
+    description: "Handles the display of code blocks if combined with a `code` variant",
+  },
+  { value: "deleted", description: "Represents text that has been deleted" },
+  { value: "em", description: "Marks text to stress emphasis" },
+  {
+    value: "inserted",
+    description: "Represents a range of text that has been added to a document",
+  },
+  {
+    value: "keyboard",
+    description:
+      "Represents a span of text denoting textual user input from a keyboard or voice input",
+  },
+  {
+    value: "marked",
+    description: "Represents text which is marked or highlighted for reference or notation",
+  },
+  { value: "mono", description: "Text using a mono style font family" },
+  { value: "paragraph", description: "Represents a paragraph" },
+  {
+    value: "placeholder",
+    description: "Text that is mostly used as the placeholder style in input controls",
+  },
+  { value: "sample", description: "Represents sample (or quoted) output from a computer program" },
+  { value: "secondary", description: "Represents a bit dimmed secondary text" },
+  { value: "small", description: "Represents side-comments and small print" },
+  { value: "sub", description: "Specifies inline text as subscript" },
+  { value: "strong", description: "Contents have strong importance" },
+  { value: "subheading", description: "Indicates that the text is the subtitle in a heading" },
+  {
+    value: "subtitle",
+    description: "Indicates that the text is the subtitle of some other content",
+  },
+  { value: "sup", description: "Specifies inline text as superscript" },
+  { value: "tableheading", description: "Indicates that the text is a table heading" },
+  { value: "title", description: "Indicates that the text is the title of some other content" },
+  { value: "var", description: "Represents the name of a variable in a mathematical expression" },
+];
+
+const AbbreviationKeys = ["title"] as const;
+type Abbreviation = {
+  title?: string;
+};
+
+const InsertedKeys = ["cite", "dateTime"] as const;
+type Inserted = {
+  cite?: string;
+  dateTime?: string;
+};
+
+export const VariantPropsKeys = [...AbbreviationKeys, ...InsertedKeys] as const;
+export type VariantProps = Abbreviation | Inserted;
