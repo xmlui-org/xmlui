@@ -60,7 +60,7 @@ const expect = fixtureExpect.extend({
   },
 });
 
-// --- Smoke E2E
+// --- Smoke
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Button renders and is visible", async ({ initTestBed, createButtonDriver }) => {
@@ -144,6 +144,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await expect.poll(testStateDriver.testState).toEqual(true);
   });
 });
+
+// --- E2E
 
 // --- label
 
