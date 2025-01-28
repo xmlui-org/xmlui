@@ -34,6 +34,8 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
     serviceWorkers: "allow",
+    /* Grants specified permissions to the browser context. */
+    permissions: ['clipboard-read', 'clipboard-write'],
   },
 
   retries: process.env.CI ? 2 : 1,

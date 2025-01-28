@@ -145,11 +145,7 @@ test("readOnly is not editable", async ({ initTestBed, createTextAreaDriver }) =
 });
 
 test("readOnly lets user copy from input field", async ({ initTestBed, createTextAreaDriver }) => {
-  const { clipboard } = await initTestBed(
-    `<TextArea initialValue="test" readOnly="{true}" />`,
-    {},
-    { browserPermissions: ["clipboard-read", "clipboard-write"] },
-  );
+  const { clipboard } = await initTestBed(`<TextArea initialValue="test" readOnly="{true}" />`);
   const driver = await createTextAreaDriver();
 
   await clipboard.copyFrom(driver);
@@ -445,11 +441,7 @@ test("copying from clipboard to field pastes correct content", async ({
   initTestBed,
   createTextAreaDriver,
 }) => {
-  const { clipboard } = await initTestBed(
-    `<TextArea />`,
-    {},
-    { browserPermissions: ["clipboard-read", "clipboard-write"] },
-  );
+  const { clipboard } = await initTestBed(`<TextArea />`);
   const driver = await createTextAreaDriver();
 
   await clipboard.write("test");
