@@ -121,10 +121,6 @@ export const slideInAnimationRenderer = createComponentRenderer(
   },
 );
 
-const animations = {
-    animationComponentRenderer,
-    fadeInAnimationRenderer,
-    slideInAnimationRenderer
-}
+const animations = [animationComponentRenderer, fadeInAnimationRenderer, slideInAnimationRenderer];
 
 export default animations;
