@@ -1117,7 +1117,14 @@ function renderChild({
       parentRenderContext.children[0].type === "TextNodeCData" ||
       parentRenderContext.children[0].type === "TextNode"
     ) {
-      return parentRenderContext.renderChild(parentRenderContext.children);
+      parentRenderContext.children = [ {
+        type: "Text",
+        props: {
+          value: parentRenderContext.children[0].props.value,
+        }
+      }];
+      console.log("special", JSON.stringify(parentRenderContext.children));
+      //return parentRenderContext.renderChild(parentRenderContext.children);
     }
   }
 

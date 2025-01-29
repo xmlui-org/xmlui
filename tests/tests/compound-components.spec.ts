@@ -245,6 +245,51 @@ test("Slot context value works #4", async ({ page }) => {
   await expect(page.getByText(EXPECTED_VALUE, { exact: true })).toBeVisible();
 });
 
+test("Default slot content rendered #1", async ({ page }) => {
+  const EXPECTED_VALUE = "Hello";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot>
+          Hello
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom />
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: true })).toBeVisible();
+});
+
+test("Default slot content rendered #2", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Hello";
+  const EXPECTED_VALUE2 = "Hi";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Slot name="otherTemplate">
+            Hello
+          </Slot>
+          <Slot />
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        Hi
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: false })).toBeVisible();
+});
+
 test("$this works in compound components", async ({ page }) => {
   await initApp(page, {
     components: `

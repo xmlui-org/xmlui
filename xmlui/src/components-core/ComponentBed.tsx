@@ -415,14 +415,15 @@ function slotRenderer(
     }
   }
 
-  if (node.props?.name?.endsWith("Template")) {
+  // --- No parent context, render the default slot content
+  if (node.children && node.children.length > 0) {
     // --- The parent does not provide a template for the slot. Let's render
     // --- the slot's default children.
     return (
       <SlotItem
         node={node.children}
         renderChild={renderChild}
-        slotProps={slotProps}
+        slotProps={slotProps ?? EMPTY_OBJECT}
         layoutContext={layoutContext}
       />
     );
