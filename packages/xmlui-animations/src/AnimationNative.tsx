@@ -1,59 +1,66 @@
 import { animated, useSpring, useInView } from "@react-spring/web";
-import type React from "react";
-import { useState } from "react";
+import React, { Children, forwardRef, useEffect, useMemo, useState } from "react";
 import { useCallback } from "react";
-import { useEffect } from "react";
-import { RegisterComponentApiFn } from "xmlui";
+import type { RegisterComponentApiFn } from "xmlui";
 
 export type AnimationProps = {
   children?: React.ReactNode;
-  animation: object;
+  animation: any;
   registerComponentApi?: RegisterComponentApiFn;
   onStop?: () => void;
+  onStart?: () => void;
   animateWhenInView?: boolean;
   duration?: number;
   once?: boolean;
 };
 
+const AnimatedComponent = animated(
+  forwardRef(function InlineComponentDef(props: any, ref) {
+    const { children, ...rest } = props;
+    return React.cloneElement(children, { ...rest, ref });
+  }),
+);
+
 export const Animation = ({
   children,
   registerComponentApi,
   animation,
+  duration,
   onStop,
-  animateWhenInView,
-  duration = 500,
+  onStart,
+  animateWhenInView = false,
   once = false,
 }: AnimationProps) => {
-  const [settings, setSettings] = useState(animation);
-
-  const [springs, api] = useSpring(() => ({
-    ...settings,
-    config: {
-      duration,
-      once,
-    },
-    onStart: () => {},
-    onRest: () => {
-      onStop?.();
-    },
-  }));
-
-  const [ref, animationStyles] = useInView(
+  const [_animation] = useState(animation);
+  const animationSettings = useMemo<any>(
     () => ({
-      ...settings,
-    }),
-    {
-      rootMargin: "-40% 0%",
+      from: _animation.from,
+      to: _animation.to,
+      config: {
+        ..._animation.config,
+        duration,
+      },
+      onStart: () => onStart,
+      onRest: onStop,
       once,
-    },
+    }),
+    [_animation.config, _animation.from, _animation.to, duration, onStart, onStop, once],
   );
 
+  const [springs, api] = useSpring(() => ({
+    ...animationSettings,
+  }));
+
+  const [ref, animationStyles] = useInView(() => animationSettings, {
+    once,
+  });
+
   const startAnimation = useCallback(() => {
-    api.start(settings);
+    api.start(_animation);
     return () => {
       api.stop();
     };
-  }, [api, settings]);
+  }, [_animation, api]);
 
   const stopAnimation = useCallback(() => {
     api.stop();
@@ -64,28 +71,21 @@ export const Animation = ({
       start: startAnimation,
       stop: stopAnimation,
     });
-  }, [registerComponentApi, startAnimation]);
+  }, [registerComponentApi, startAnimation, stopAnimation]);
 
-  return animateWhenInView ? (
-    <animated.div
-      ref={ref}
-      style={{
-        width: "auto",
-        height: "auto",
-        ...animationStyles,
-      }}
-    >
-      {children}
-    </animated.div>
-  ) : (
-    <animated.div
-      style={{
-        width: "fit-content",
-        height: "fit-content",
-        ...springs,
-      }}
-    >
-      {children}
-    </animated.div>
-  );
+  const content = useMemo(() => {
+    return Children.map(children, (child, index) =>
+      animateWhenInView ? (
+        <AnimatedComponent style={animationStyles} key={index} ref={ref}>
+          {child}
+        </AnimatedComponent>
+      ) : (
+        <AnimatedComponent style={springs} key={index}>
+          {child}
+        </AnimatedComponent>
+      ),
+    );
+  }, [animateWhenInView, animationStyles, children, ref, springs]);
+
+  return content;
 };
