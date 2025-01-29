@@ -307,8 +307,7 @@ test("Default slot content rendered #3", async ({ page }) => {
     `,
   });
 
-  await expect(page.getByText(EXPECTED_VALUE1, { exact: true })).toBeVisible();
-  await expect(page.getByText(EXPECTED_VALUE2, { exact: false })).toBeVisible();
+  await expect(page.getByText(`${EXPECTED_VALUE1} ${EXPECTED_VALUE2}`, { exact: true })).toBeVisible();
 });
 
 test("Markdown with a single slot", async ({ page }) => {
@@ -552,6 +551,47 @@ ${EXPECTED_VALUE3}
   await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
   await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
   await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
+});
+
+test("Slot with no 'Template' suffix", async ({ page }) => {
+  const EXPECTED_VALUE = "error";
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot name="titleTemp">
+          Howdy!
+        </Slot>    
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: false })).toBeVisible();
+});
+
+
+test("Markdown slot with no 'Template' suffix", async ({ page }) => {
+  const EXPECTED_VALUE = "component problems";
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Markdown>
+          <Slot name="titleTemp">
+            Howdy!
+          </Slot>    
+        </Markdown>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: false })).toBeVisible();
 });
 
 test("$this works in compound components", async ({ page }) => {

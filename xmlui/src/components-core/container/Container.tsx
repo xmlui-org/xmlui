@@ -93,6 +93,7 @@ import type { AppContextObject } from "@abstractions/AppContextDefs";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { StateViewer } from "@components/StateViewer/StateViewerNative";
 import { createContainerReducer } from "./reducer";
+import InvalidComponent from "@components-core/InvalidComponent";
 
 /**
  * This function signature is used whenever the engine wants to sign that an object's field (property),
@@ -1112,16 +1113,26 @@ function renderChild({
     return extractParam(state, nodeValue, appContext, true);
   }
 
-  // --- Rendering a Slot requires some preparations, as TextNode and 
-  // --- TextNodeCData are virtual nodes. Also, slots may have default templates 
-  // --- to render when no slot children are specified. The following section 
+  // --- Rendering a Slot requires some preparations, as TextNode and
+  // --- TextNodeCData are virtual nodes. Also, slots may have default templates
+  // --- to render when no slot children are specified. The following section
   // --- handles these cases.
   if (node.type === "Slot") {
     // --- Check for special Slot cases
-    let slotChildren: ComponentDef[];
-    if (node.props?.name) {
+    let slotChildren: ComponentDef | ComponentDef[];
+    const templateName = node.props?.name;
+    console.log("templateName", templateName);
+    if (templateName) {
+      // --- Let's check the validity of the slot name
+      if (!templateName.endsWith("Template")) {
+        throw new Error(
+          `Slot name '${templateName}' is not valid. ` +
+            "A named slot should use a name ending with 'Template'.",
+        );
+      }
+
       // --- Named slot: use a template property from the parent component
-      slotChildren = parentRenderContext?.props?.[node.props.name];
+      slotChildren = parentRenderContext?.props?.[templateName];
     } else {
       // --- Children slot: use the children of the parent component
       slotChildren = parentRenderContext?.children;
@@ -1132,19 +1143,16 @@ function renderChild({
       slotChildren = node.children;
     }
 
-    // --- Check for the virtual nodes. At this point, parentRendererContext is
-    // --- undefined when the parent does not provide slot children. In this case,
-    // --- the ComponentBed component will render the default slot template.
-    if (slotChildren?.length === 1 && parentRenderContext) {
-      if (slotChildren[0].type === "TextNodeCData") {
-        // --- Preserve the CDATA text and render it in the parent context
-        return parentRenderContext.renderChild(slotChildren);
-      } else if (slotChildren[0].type === "TextNode") {
-        // --- Little hack to avoid two TextNode components merged into one
-        return parentRenderContext.renderChild({
-          type: "Text",
-          props: { value: slotChildren[0].props?.value },
-        });
+    if (slotChildren) {
+      const toRender = Array.isArray(slotChildren) ? slotChildren : [slotChildren];
+      // --- Check for the virtual nodes. At this point, parentRendererContext is
+      // --- undefined when the parent does not provide slot children. In this case,
+      // --- the ComponentBed component will render the default slot template.
+      if (toRender.length === 1 && parentRenderContext) {
+        if (toRender[0].type === "TextNodeCData" || toRender[0].type === "TextNode") {
+          // --- Preserve the text and render it in the parent context
+          return parentRenderContext.renderChild(toRender);
+        }
       }
     }
   }
