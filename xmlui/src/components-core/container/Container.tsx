@@ -1101,43 +1101,6 @@ function renderChild({
     return null;
   }
 
-  // --- There is a special case for rendering text. If we have a Slot with a
-  // --- single text node child, we want to render that in the context of the
-  // --- parent component. Otherwise, we would not be able to render this:
-  //
-  //  <Component name='MyComponent'>
-  //    <Markdown><Slot/></Markdown>
-  //  </Component>
-  //
-  //  and then
-  //
-  //  <MyComponent>hey lorem ipsum</MyComponent>
-  if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
-    console.log("node", node, parentRenderContext?.children);
-    if (parentRenderContext.children[0].type === "TextNodeCData") {
-      // parentRenderContext.children = [
-      //   {
-      //     type: "Text",
-      //     props: {
-      //       value: parentRenderContext.children[0].props.value,
-      //     },
-      //   },
-      // ];
-      return parentRenderContext.renderChild(parentRenderContext.children);
-    } else if (parentRenderContext.children[0].type === "TextNode") {
-      parentRenderContext.children = [
-        {
-          type: "Text",
-          props: {
-            value: parentRenderContext.children[0].props.value,
-          },
-        },
-      ];
-      console.log("special", JSON.stringify(parentRenderContext.children));
-      //return parentRenderContext.renderChild(parentRenderContext.children);
-    }
-  }
-
   // --- We do not parse text nodes specified with CDATA to avoid whitespace collapsing
   const nodeValue = (node.props as any)?.value;
   if (node.type === "TextNodeCData") {
@@ -1149,10 +1112,48 @@ function renderChild({
     return extractParam(state, nodeValue, appContext, true);
   }
 
+  // --- Rendering a Slot requires some preparations, as TextNode and 
+  // --- TextNodeCData are virtual nodes. Also, slots may have default templates 
+  // --- to render when no slot children are specified. The following section 
+  // --- handles these cases.
+  if (node.type === "Slot") {
+    // --- Check for special Slot cases
+    let slotChildren: ComponentDef[];
+    if (node.props?.name) {
+      // --- Named slot: use a template property from the parent component
+      slotChildren = parentRenderContext?.props?.[node.props.name];
+    } else {
+      // --- Children slot: use the children of the parent component
+      slotChildren = parentRenderContext?.children;
+    }
+
+    if (!slotChildren) {
+      // --- No children to render, let's try the default slot template (if there is any)
+      slotChildren = node.children;
+    }
+
+    // --- Check for the virtual nodes. At this point, parentRendererContext is
+    // --- undefined when the parent does not provide slot children. In this case,
+    // --- the ComponentBed component will render the default slot template.
+    if (slotChildren?.length === 1 && parentRenderContext) {
+      if (slotChildren[0].type === "TextNodeCData") {
+        // --- Preserve the CDATA text and render it in the parent context
+        return parentRenderContext.renderChild(slotChildren);
+      } else if (slotChildren[0].type === "TextNode") {
+        // --- Little hack to avoid two TextNode components merged into one
+        return parentRenderContext.renderChild({
+          type: "Text",
+          props: { value: slotChildren[0].props?.value },
+        });
+      }
+    }
+  }
+
   // --- In other cases, we extract the component ID, and then render the component.
   // --- A component's ID is generally a string with identifier syntax. However, some
   // --- internal components have IDs with expressions, so we evaluate them.
   const key = extractParam(state, node.uid, appContext, true);
+
   return (
     <ComponentNode
       key={key}

@@ -353,7 +353,6 @@ function slotRenderer(
 ) {
   // --- Get the template name from the slot
   const templateName = extractValue.asOptionalString(node.props.name);
-
   if (templateName && !templateName.endsWith("Template")) {
     return (
       <InvalidComponent

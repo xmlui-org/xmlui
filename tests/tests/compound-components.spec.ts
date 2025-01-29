@@ -265,6 +265,27 @@ test("Default slot content rendered #1", async ({ page }) => {
 });
 
 test("Default slot content rendered #2", async ({ page }) => {
+  const EXPECTED_VALUE = "Hello";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Slot>
+          <![CDATA[
+          Hello
+          ]]>
+        </Slot>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom />
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE, { exact: true })).toBeVisible();
+});
+
+test("Default slot content rendered #3", async ({ page }) => {
   const EXPECTED_VALUE1 = "Hello";
   const EXPECTED_VALUE2 = "Hi";
 
@@ -288,6 +309,249 @@ test("Default slot content rendered #2", async ({ page }) => {
 
   await expect(page.getByText(EXPECTED_VALUE1, { exact: true })).toBeVisible();
   await expect(page.getByText(EXPECTED_VALUE2, { exact: false })).toBeVisible();
+});
+
+test("Markdown with a single slot", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Hello, world!";
+  const EXPECTED_VALUE2 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Markdown>
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <![CDATA[
+## ${EXPECTED_VALUE1}
+
+${EXPECTED_VALUE2}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+});
+
+test("Markdown with multiple slots", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Hello, world!";
+  const EXPECTED_VALUE2 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Markdown>
+            <Slot />
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <![CDATA[
+## ${EXPECTED_VALUE1}
+
+${EXPECTED_VALUE2}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  const bodyText = await page.locator('body').innerText();
+  expect(bodyText).toBe(`${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}\n${EXPECTED_VALUE1}\n${EXPECTED_VALUE2}`);
+});
+
+test("Markdown with a single+default slot", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Howdy!";
+  const EXPECTED_VALUE2 = "Hello, world!";
+  const EXPECTED_VALUE3 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Slot name="titleTemplate">
+            ${EXPECTED_VALUE1}
+          </Slot>    
+          <Markdown>
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <![CDATA[
+## ${EXPECTED_VALUE2}
+
+${EXPECTED_VALUE3}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
+});
+
+test("Markdown with a named+child #1", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Greetings!";
+  const EXPECTED_VALUE2 = "Hello, world!";
+  const EXPECTED_VALUE3 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Slot name="titleTemplate">
+            Howdy!
+          </Slot>    
+          <Markdown>
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="titleTemplate">
+          ${EXPECTED_VALUE1}
+        </property>
+        <![CDATA[
+## ${EXPECTED_VALUE2}
+
+${EXPECTED_VALUE3}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
+});
+
+test("Markdown with a named+child #2", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Greetings!";
+  const EXPECTED_VALUE2 = "Hello, world!";
+  const EXPECTED_VALUE3 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Slot name="titleTemplate">
+            Howdy!
+          </Slot>    
+          <Markdown>
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="titleTemplate">
+          <![CDATA[
+            ${EXPECTED_VALUE1}
+          ]]>
+        </property>
+        <![CDATA[
+## ${EXPECTED_VALUE2}
+
+${EXPECTED_VALUE3}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
+});
+
+test("Markdown with a named+child #3", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Greetings!";
+  const EXPECTED_VALUE2 = "Hello, world!";
+  const EXPECTED_VALUE3 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <VStack>
+          <Slot name="titleTemplate">
+            Howdy!
+          </Slot>    
+          <Markdown>
+            <Slot />
+          </Markdown>
+        </VStack>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="titleTemplate">
+          <![CDATA[
+            ${EXPECTED_VALUE1}
+          ]]>
+        </property>
+        <![CDATA[
+## ${EXPECTED_VALUE2}
+
+${EXPECTED_VALUE3}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
+});
+
+test("Markdown with a named+child #4", async ({ page }) => {
+  const EXPECTED_VALUE1 = "Greetings!";
+  const EXPECTED_VALUE2 = "Hello, world!";
+  const EXPECTED_VALUE3 = "Here I am";
+
+  await initApp(page, {
+    components: `
+      <Component name="Custom">
+        <Markdown>
+          <Slot name="titleTemplate">
+            Howdy!
+          </Slot>    
+          <Slot />
+        </Markdown>
+      </Component>
+    `,
+    entryPoint: `
+      <Custom>
+        <property name="titleTemplate">
+          ${EXPECTED_VALUE1}
+        </property>
+        <![CDATA[
+## ${EXPECTED_VALUE2}
+
+${EXPECTED_VALUE3}
+        ]]>
+      </Custom>
+    `,
+  });
+
+  await expect(page.getByText(EXPECTED_VALUE1, { exact: false })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE2, { exact: true })).toBeVisible();
+  await expect(page.getByText(EXPECTED_VALUE3, { exact: true })).toBeVisible();
 });
 
 test("$this works in compound components", async ({ page }) => {
