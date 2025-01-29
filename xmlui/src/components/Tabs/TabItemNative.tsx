@@ -1,4 +1,5 @@
-import { ForwardedRef, forwardRef, useEffect, useId } from "react";
+import type { ForwardedRef} from "react";
+import { forwardRef, useEffect, useId } from "react";
 import type { Tab } from "@components/abstractions";
 import styles from "@components/Tabs/Tabs.module.scss";
 import { Content } from "@radix-ui/react-tabs";
@@ -9,7 +10,7 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   const id = useId();
-  const { register, unRegister } = useTabContext();
+  const { register, unRegister, activeTabId } = useTabContext();
 
   useEffect(() => {
     register({
@@ -24,6 +25,8 @@ export const TabItemComponent = forwardRef(function TabItemComponent(
       unRegister(id);
     };
   }, [id, unRegister]);
+
+  if (activeTabId !== id) return null;
 
   return (
     <Content
