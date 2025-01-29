@@ -326,6 +326,7 @@ export type AppContextObject = {
   findByField: (arr: any[], field: string, value: any) => any;
   readonly DateUtils: Record<string, any>;
   readonly embed: { isInIFrame: boolean };
+  distinct: (arr: any[]) => any[];
 };
 
 export type MediaBreakpointType = "xs" | "sm" | "md" | "lg" | "xl" | "xxl";
