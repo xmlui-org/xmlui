@@ -22,6 +22,12 @@ export const AppStateMd = createMetadata({
         `undesired initialization.`,
     ),
   },
+  apis: {
+    update: d(
+      "This method updates the application state object bound to the `AppState` instance. The " +
+        "function's single argument is an object that specifies the new state value.",
+    ),
+  },
   nonVisual: true,
 });
 
