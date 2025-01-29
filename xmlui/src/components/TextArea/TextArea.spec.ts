@@ -9,7 +9,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await initTestBed(`<TextArea />`);
     const driver = await createTextAreaDriver();
 
-    await expect(driver.component).toBeVisible();
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
   });
 
   // --- initialValue
@@ -175,7 +176,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const textareaDriver = await createTextAreaDriver("textarea");
 
     await buttonDriver.click();
-    await expect(textareaDriver.field).toContainText("test");
+    await expect(textareaDriver.field).toHaveText("test");
   });
 
   // --- focus
@@ -485,5 +486,5 @@ test("setValue does not update input if field is disabled", async ({
 
   await buttonDriver.click();
   // await expect(textareaDriver.field).toBeEmpty();
-  await expect(textareaDriver.field).toContainText("test");
+  await expect(textareaDriver.field).toHaveText("test");
 });

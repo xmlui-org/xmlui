@@ -10,7 +10,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await initTestBed(`<NumberBox />`);
     const driver = await createNumberBoxDriver();
 
-    await expect(driver.component).toBeVisible();
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
   });
 
   // --- placeholder

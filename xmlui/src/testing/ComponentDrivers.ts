@@ -1,12 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
-
-async function getElementSize(locator: Locator) {
-  const dimensions = await locator.evaluate((element) => [
-    element.clientWidth,
-    element.clientHeight,
-  ]);
-  return { width: dimensions[0] ?? 0, height: dimensions[1] ?? 0 } as const;
-}
+import { getElementStyles } from "./component-test-helpers";
 
 export type ComponentDriverParams = {
   locator: Locator;
@@ -15,7 +8,7 @@ export type ComponentDriverParams = {
 
 export class ComponentDriver {
   protected readonly locator: Locator;
-  page: Page;
+  protected readonly page: Page;
 
   constructor({ locator, page }: ComponentDriverParams) {
     this.locator = locator;
@@ -24,6 +17,40 @@ export class ComponentDriver {
 
   get component() {
     return this.locator;
+  }
+
+  /**
+   * Gets the html tag name of the final rendered component
+   */
+  async getComponentTagName() {
+    return this.locator.evaluate(el => el.tagName.toLowerCase());
+  };
+
+  /**
+   * Retrieves the bounding rectangle of the component including margins and padding
+   * added to the dimensions.
+   */
+  async getComponentBounds() {
+    const boundingRect = await this.locator.evaluate((element) => element.getBoundingClientRect());
+    const margins = await getElementStyles(this.locator, [
+      "margin-left",
+      "margin-right",
+      "margin-top",
+      "margin-bottom",
+    ]);
+    const marginLeft = parseFloat(margins["margin-left"]);
+    const marginRight = parseFloat(margins["margin-right"]);
+    const marginTop = parseFloat(margins["margin-top"]);
+    const marginBottom = parseFloat(margins["margin-bottom"]);
+  
+    const width = boundingRect.width + marginLeft + marginRight;
+    const height = boundingRect.height + marginTop + marginBottom;
+    const left = boundingRect.left - marginLeft;
+    const right = boundingRect.right + marginRight;
+    const top = boundingRect.top - marginTop;
+    const bottom = boundingRect.bottom + marginBottom;
+    
+    return { width, height, left, right, top, bottom };
   }
 
   // NOTE: methods must be created using the arrow function notation.
@@ -43,10 +70,6 @@ export class ComponentDriver {
 
   blur = async (options?: { timeout?: number }) => {
     await this.locator.blur(options);
-  };
-
-  getComponentSize = async () => {
-    return getElementSize(this.locator);
   };
 }
 
@@ -302,3 +325,23 @@ export class ListDriver extends ComponentDriver {}
 // --- Text
 
 export class TextDriver extends ComponentDriver {}
+
+// --- Heading
+
+export class HeadingDriver extends ComponentDriver {}
+
+// --- Icon
+
+export class IconDriver extends ComponentDriver {}
+
+// --- Stack
+
+export class StackDriver extends ComponentDriver {}
+
+// --- HStack
+
+export class HStackDriver extends StackDriver {}
+
+// --- VStack
+
+export class VStackDriver extends StackDriver {}
