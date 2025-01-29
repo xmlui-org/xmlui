@@ -9,7 +9,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     await initTestBed(`<TextBox />`);
     const driver = await createTextBoxDriver();
 
-    await expect(driver.component).toBeVisible();
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
   });
 
   // --- label

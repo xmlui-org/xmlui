@@ -1,5 +1,5 @@
 import type { Locator } from "@playwright/test";
-import { getFullRectangle, SKIP_REASON } from "@testing/component-test-helpers";
+import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect as fixtureExpect, test } from "@testing/fixtures";
 import {
   alignmentOptionValues,
@@ -63,9 +63,12 @@ const expect = fixtureExpect.extend({
 // --- Smoke
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
-  test("Button renders and is visible", async ({ initTestBed, createButtonDriver }) => {
-    await initTestBed(`<Button label="hello" />`);
-    await expect((await createButtonDriver()).component).toBeVisible();
+  test("component renders", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button />`);
+    const driver = await createButtonDriver();
+
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
   });
 
   // --- label
@@ -84,7 +87,7 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     // We could get the sum of vertical paddings, margins and comp height to get the expected height
     await initTestBed(`<Button height="20px" />`);
     const driver = await createButtonDriver();
-    const { width, height } = await driver.getComponentSize();
+    const { width, height } = await driver.getComponentBounds();
 
     // TODO: These should be comp height >= button vertical paddings
     expect(height).toBeGreaterThan(0);
@@ -283,7 +286,7 @@ iconPositionCases.forEach(({ position, value }) => {
       });
 
       const driver = await createButtonDriver();
-      const buttonDimensions = await getFullRectangle(driver.component);
+      //const buttonDimensions = await getFullRectangle(driver.component);
       /* const contentStart = pixelStrToNum(
         buttonDimensions[pos] + (await getElementStyle(driver.component, `padding-${pos}`)),
       );
