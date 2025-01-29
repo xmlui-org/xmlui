@@ -1,5 +1,4 @@
 import { TextVariantElement } from "@components/abstractions";
-import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, test } from "@testing/fixtures";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
@@ -47,6 +46,18 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
     const driver = await createTextDriver();
 
     await expect(driver.component).toHaveText(expected);
+  });
+
+  test("child overrides value", async ({ initTestBed, createTextDriver }) => {
+    const EXPECTED = "this test text is the value of the heading";
+    await initTestBed(`
+      <Text value="${EXPECTED}">
+        This is a child
+      </Text>
+    `);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveText(EXPECTED);
   });
 
   // --- maxLines
@@ -162,7 +173,6 @@ please do not break it!"
 Object.entries(TextVariantElement).forEach(([variant, htmlElement]) => {
   test(
     `variant=${variant} renders the HTML element: ${htmlElement}`,
-    SKIP_REASON.TO_BE_IMPLEMENTED(),
     async ({ initTestBed, createTextDriver }) => {
       await initTestBed(`<Text variant=${variant} />`);
       const driver = await createTextDriver();
