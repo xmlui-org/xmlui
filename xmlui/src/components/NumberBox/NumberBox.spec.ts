@@ -3,26 +3,233 @@ import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, test } from "@testing/fixtures";
 import { NUMBERBOX_MAX_VALUE } from "./numberbox-abstractions";
 
-// --- props
+// --- Smoke
 
-test("NumberBox is rendered", async ({ initTestBed, createNumberBoxDriver }) => {
-  await initTestBed(`<NumberBox />`);
-  const driver = await createNumberBoxDriver();
+test.describe("smoke tests", { tag: "@smoke" }, () => {
+  test("NumberBox is rendered", async ({ initTestBed, createNumberBoxDriver }) => {
+    await initTestBed(`<NumberBox />`);
+    const driver = await createNumberBoxDriver();
 
-  await expect(driver.component).toBeVisible();
+    await expect(driver.component).toBeVisible();
+  });
+
+  // --- placeholder
+
+  test("placeholder appears if input field is empty", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox placeholder="123" />`);
+    const driver = await createNumberBoxDriver();
+
+    expect(await driver.placeholder).toBe("123");
+  });
+
+  // --- initialValue
+
+  // correct types: number, undefined, null, string that resolves to a VALID number
+  [
+    { label: "integer", value: "'{1}'", toExpect: "1" },
+    { label: "float", value: "'{1.2}'", toExpect: "1.2" },
+    { label: "undefined", value: "'{undefined}'", toExpect: "" },
+    { label: "null", value: "'{null}'", toExpect: "" },
+    { label: "empty string", value: "''", toExpect: "" },
+    { label: "string that resolves to integer", value: "'1'", toExpect: "1" },
+    { label: "string that resolves to float", value: "'1.2'", toExpect: "1.2" },
+  ].forEach(({ label, value, toExpect }) => {
+    test(`setting initialValue to ${label} sets value of field`, async ({
+      initTestBed,
+      createNumberBoxDriver,
+    }) => {
+      await initTestBed(`<NumberBox initialValue=${value} />`);
+      const driver = await createNumberBoxDriver();
+
+      await expect(driver.field).toHaveValue(toExpect);
+    });
+  });
+
+  // --- label
+
+  test("label is rendered if provided", async ({ initTestBed, createNumberBoxDriver }) => {
+    await initTestBed(`<NumberBox label="Input Field Label" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.label).toHaveText("Input Field Label");
+  });
+
+  // --- required
+
+  test("empty required Numberbox shows visual indicator", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox label="test" required="{true}" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.label).toContainText("*");
+    await expect(driver.field).toHaveAttribute("required");
+  });
+
+  // --- enabled
+
+  test("disabled input field stops user interaction for field", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox enabled="false" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.field).toBeDisabled();
+  });
+
+  test("disabled input field stops user interaction for spinbox", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`<NumberBox enabled="false" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.spinnerUpButton).toBeDisabled();
+    await expect(driver.spinnerDownButton).toBeDisabled();
+  });
+
+  // --- readOnly
+
+  test("readOnly is not editable", async ({ initTestBed, createNumberBoxDriver }) => {
+    await initTestBed(`<NumberBox readOnly="{true}" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.field).not.toBeEditable();
+  });
+
+  test("readOnly disables the spinbox", async ({ initTestBed, createNumberBoxDriver }) => {
+    await initTestBed(`<NumberBox readOnly="{true}" />`);
+    const driver = await createNumberBoxDriver();
+
+    await expect(driver.spinnerUpButton).toBeDisabled();
+    await expect(driver.spinnerDownButton).toBeDisabled();
+  });
+
+  // --- onDidChange
+
+  test("onDidChange is called on input change", async ({ initTestBed, createNumberBoxDriver }) => {
+    const { testStateDriver } = await initTestBed(`<NumberBox onDidChange="testState = 'test'" />`);
+    const driver = await createNumberBoxDriver();
+    await driver.field.fill("1");
+
+    await expect.poll(testStateDriver.testState).toBe("test");
+  });
+
+  // --- gotFocus
+
+  test("gotFocus event fires on focusing the field", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    const { testStateDriver } = await initTestBed(`<NumberBox onGotFocus="testState = true" />`);
+    const driver = await createNumberBoxDriver();
+
+    await driver.focus();
+    await expect(driver.field).toBeFocused();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
+
+  // --- lostFocus
+
+  test.skip(
+    "lostFocus event fires when field is blured",
+    SKIP_REASON.XMLUI_BUG(),
+    async ({ initTestBed, createNumberBoxDriver }) => {
+      const { testStateDriver } = await initTestBed(`<NumberBox onLostFocus="testState = true" />`);
+      const driver = await createNumberBoxDriver();
+
+      await driver.focus();
+      await driver.blur();
+
+      await expect(driver.field).not.toBeFocused();
+      await expect.poll(testStateDriver.testState).toEqual(true);
+    },
+  );
+
+  // --- value
+
+  test("value returns current input value", async ({
+    initTestBed,
+    createNumberBoxDriver,
+    createTextDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox id="numberbox" initialValue="123" />
+        <Text testId="text" value="{numberbox.value}" />
+      </Fragment>`);
+    const textDriver = await createTextDriver("text");
+    const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+    const value = await numberboxDriver.field.inputValue();
+    await expect(textDriver.component).toHaveText(value);
+  });
+
+  // --- setValue
+
+  test.skip(
+    "setValue updates input value",
+    SKIP_REASON.XMLUI_BUG(),
+    async ({ initTestBed, createButtonDriver, createNumberBoxDriver }) => {
+      await initTestBed(`
+        <Fragment>
+          <NumberBox id="numberbox" />
+          <Button testId="button" onClick="numberbox.setValue('test')" />
+        </Fragment>`);
+      const buttonDriver = await createButtonDriver("button");
+      const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+      await buttonDriver.click();
+      await expect(numberboxDriver.component).toHaveText("test");
+    },
+  );
+
+  // --- focus
+
+  test("focus() focuses the field", async ({
+    initTestBed,
+    createButtonDriver,
+    createNumberBoxDriver,
+  }) => {
+    await initTestBed(`
+      <Fragment>
+        <NumberBox id="numberbox" />
+        <Button testId="button" onClick="numberbox.focus()" />
+      </Fragment>`);
+    const buttonDriver = await createButtonDriver("button");
+    const numberboxDriver = await createNumberBoxDriver("numberbox");
+
+    await buttonDriver.click();
+    await expect(numberboxDriver.field).toBeFocused();
+  });
+
+  // --- input tests
+
+  test("copying from clipboard to field pastes correct content", async ({
+    initTestBed,
+    createNumberBoxDriver,
+  }) => {
+    const { clipboard } = await initTestBed(`<NumberBox />`);
+    const driver = await createNumberBoxDriver();
+
+    await clipboard.write("123");
+    const clipboardContent = await clipboard.getContent();
+
+    await clipboard.pasteTo(driver);
+    await expect(driver.field).toHaveValue(clipboardContent);
+  });
 });
 
-// --- --- placeholder
+// --- E2E
 
-test("placeholder appears if input field is empty", async ({
-  initTestBed,
-  createNumberBoxDriver,
-}) => {
-  await initTestBed(`<NumberBox placeholder="123" />`);
-  const driver = await createNumberBoxDriver();
+// --- Props
 
-  expect(await driver.placeholder).toBe("123");
-});
+// --- placeholder
 
 test("placeholder is hidden if input field is filled", async ({
   initTestBed,
@@ -36,28 +243,7 @@ test("placeholder is hidden if input field is filled", async ({
   await expect(driver.field).toHaveValue("456");
 });
 
-// --- --- initialValue
-
-// correct types: number, undefined, null, string that resolves to a VALID number
-[
-  { label: "integer", value: "'{1}'", toExpect: "1" },
-  { label: "float", value: "'{1.2}'", toExpect: "1.2" },
-  { label: "undefined", value: "'{undefined}'", toExpect: "" },
-  { label: "null", value: "'{null}'", toExpect: "" },
-  { label: "empty string", value: "''", toExpect: "" },
-  { label: "string that resolves to integer", value: "'1'", toExpect: "1" },
-  { label: "string that resolves to float", value: "'1.2'", toExpect: "1.2" },
-].forEach(({ label, value, toExpect }) => {
-  test(`setting initialValue to ${label} sets value of field`, async ({
-    initTestBed,
-    createNumberBoxDriver,
-  }) => {
-    await initTestBed(`<NumberBox initialValue=${value} />`);
-    const driver = await createNumberBoxDriver();
-
-    await expect(driver.field).toHaveValue(toExpect);
-  });
-});
+// --- initialValue
 
 [
   { label: "boolean", value: "'{true}'" },
@@ -67,11 +253,11 @@ test("placeholder is hidden if input field is filled", async ({
   { label: "empty object", value: {} },
   { label: "object", value: { a: 1, b: "hi" } },
   { label: "function", value: () => {} },
-  { label: "NaN", value: NaN }, // <- Not sure about this one
+  { label: "NaN", value: NaN },
 ].forEach(({ label, value }) => {
   test.skip(
     `setting initialValue to ${label} throws error`,
-    SKIP_REASON.XMLUI_BUG(),
+    SKIP_REASON.UNSURE("Some input case handlings need to be discussed, such as NaN"),
     async ({ initTestBed, createNumberBoxDriver }) => {
       await initTestBed(`<NumberBox initialValue=${value} />`);
       const driver = await createNumberBoxDriver();
@@ -103,14 +289,7 @@ test.skip(
   },
 );
 
-// --- --- label
-
-test("label is rendered if provided", async ({ initTestBed, createNumberBoxDriver }) => {
-  await initTestBed(`<NumberBox label="Input Field Label" />`);
-  const driver = await createNumberBoxDriver();
-
-  await expect(driver.label).toHaveText("Input Field Label");
-});
+// --- label
 
 test("empty string label is not rendered", async ({ initTestBed, createNumberBoxDriver }) => {
   await initTestBed(`<NumberBox label="" initialValue="" />`);
@@ -130,7 +309,7 @@ test("clicking on the label focuses input field", async ({
   await expect(driver.field).toBeFocused();
 });
 
-// --- --- labelPosition
+// --- labelPosition
 
 labelPositionValues.forEach((pos) => {
   test.skip(
@@ -140,79 +319,30 @@ labelPositionValues.forEach((pos) => {
   );
 });
 
-// --- --- labelWidth TODO?
+// --- labelWidth TODO?
 
-// --- --- labelBreak TODO?
+// --- labelBreak TODO?
 
-// --- --- autoFocus
+// --- autoFocus
 
 test("focuses component if autoFocus is set", async ({ initTestBed, createNumberBoxDriver }) => {
   await initTestBed(`<NumberBox autoFocus="{true}" />`);
   await expect((await createNumberBoxDriver()).field).toBeFocused();
 });
 
-// --- --- required
+// --- readOnly
 
-test("empty required Numberbox shows visual indicator", async ({
-  initTestBed,
-  createNumberBoxDriver,
-}) => {
-  await initTestBed(`<NumberBox label="test" required="{true}" />`);
+test("readOnly lets user copy from input field", async ({ initTestBed, createNumberBoxDriver }) => {
+  const { clipboard } = await initTestBed(`<NumberBox initialValue="test" readOnly="{true}" />`);
   const driver = await createNumberBoxDriver();
 
-  await expect(driver.label).toContainText("*");
-  await expect(driver.field).toHaveAttribute("required");
+  await clipboard.copyFrom(driver);
+  const clipboardContent = await clipboard.getContent();
+
+  await expect(driver.field).toHaveValue(clipboardContent);
 });
 
-// --- --- readOnly
-
-test("readOnly is not editable", async ({ initTestBed, createNumberBoxDriver }) => {
-  await initTestBed(`<NumberBox readOnly="{true}" />`);
-  const driver = await createNumberBoxDriver();
-
-  await expect(driver.field).not.toBeEditable();
-});
-
-test("readOnly disables the spinbox", async ({ initTestBed, createNumberBoxDriver }) => {
-  await initTestBed(`<NumberBox readOnly="{true}" />`);
-  const driver = await createNumberBoxDriver();
-
-  await expect(driver.spinnerUpButton).toBeDisabled();
-  await expect(driver.spinnerDownButton).toBeDisabled();
-});
-
-test.skip(
-  "readOnly lets user copy from input field",
-  SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(
-    "Need to implement permission grants in initTestBed for the current browser context",
-  ),
-  async ({ initTestBed }) => {},
-);
-
-// --- --- enabled
-
-test("disabled input field stops user interaction for field", async ({
-  initTestBed,
-  createNumberBoxDriver,
-}) => {
-  await initTestBed(`<NumberBox enabled="false" />`);
-  const driver = await createNumberBoxDriver();
-
-  await expect(driver.field).toBeDisabled();
-});
-
-test("disabled input field stops user interaction for spinbox", async ({
-  initTestBed,
-  createNumberBoxDriver,
-}) => {
-  await initTestBed(`<NumberBox enabled="false" />`);
-  const driver = await createNumberBoxDriver();
-
-  await expect(driver.spinnerUpButton).toBeDisabled();
-  await expect(driver.spinnerDownButton).toBeDisabled();
-});
-
-// --- --- startText
+// --- startText
 
 test.skip(
   "startText is rendered at the start of the field",
@@ -225,7 +355,7 @@ test.skip(
   },
 );
 
-// --- --- startIcon
+// --- startIcon
 
 test.skip(
   "startIcon is rendered at the start of the field",
@@ -235,7 +365,7 @@ test.skip(
   },
 );
 
-// --- --- endText
+// --- endText
 
 test.skip(
   "endText is rendered at the end of the field",
@@ -245,7 +375,7 @@ test.skip(
   },
 );
 
-// --- --- endIcon
+// --- endIcon
 
 test.skip(
   "endIcon is rendered at the end of the field",
@@ -255,7 +385,7 @@ test.skip(
   },
 );
 
-// --- --- validationStatus
+// --- validationStatus
 
 const validationStatuses = validationStatusValues.filter((v) => v !== "none");
 validationStatuses.forEach((status) => {
@@ -268,7 +398,7 @@ validationStatuses.forEach((status) => {
   );
 });
 
-// --- --- maxLength
+// --- maxLength
 
 test.skip(
   "maxLength caps the length of the input",
@@ -276,7 +406,7 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- hasSpinBox
+// --- hasSpinBox
 
 test.skip(
   "renders spinbox if set to true",
@@ -338,7 +468,7 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- step
+// --- step
 
 test.skip(
   "setting valid integer step adds that value to input",
@@ -374,7 +504,7 @@ test.skip(
   );
 });
 
-// --- --- integersOnly
+// --- integersOnly
 
 test.skip(
   "integersOnly limits input to integers",
@@ -382,7 +512,7 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- zeroOrPositive
+// --- zeroOrPositive
 
 test.skip(
   "zeroOrPositive limits input to non-negative numbers and zero",
@@ -402,7 +532,7 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- minValue
+// --- minValue
 
 test.skip(
   "minValue limits input to numbers greater than or equal to minValue",
@@ -416,7 +546,7 @@ test.skip(
   async ({ initTestBed }) => {},
 );
 
-// --- --- maxValue
+// --- maxValue
 
 test.skip(
   "maxValue limits input to numbers less than or equal to maxValue",
@@ -432,15 +562,7 @@ test.skip(
 
 // --- events
 
-// --- --- onDidChange
-
-test("onDidChange is called on input change", async ({ initTestBed, createNumberBoxDriver }) => {
-  const { testStateDriver } = await initTestBed(`<NumberBox onDidChange="testState = 'test'" />`);
-  const driver = await createNumberBoxDriver();
-  await driver.field.fill("1");
-
-  await expect.poll(testStateDriver.testState).toBe("test");
-});
+// --- onDidChange
 
 test("onDidChange function changes are properly reflected", async ({
   initTestBed,
@@ -471,19 +593,7 @@ test("onDidChange is not called if field is disabled", async ({
   await expect.poll(testStateDriver.testState).toBe(null);
 });
 
-// --- --- gotFocus
-
-test("gotFocus event fires on focusing the field", async ({
-  initTestBed,
-  createNumberBoxDriver,
-}) => {
-  const { testStateDriver } = await initTestBed(`<NumberBox onGotFocus="testState = true" />`);
-  const driver = await createNumberBoxDriver();
-
-  await driver.focus();
-  await expect(driver.field).toBeFocused();
-  await expect.poll(testStateDriver.testState).toEqual(true);
-});
+// --- gotFocus
 
 test.skip(
   "gotFocus is not called if field is disabled",
@@ -500,22 +610,7 @@ test.skip(
   },
 );
 
-// --- --- lostFocus
-
-test.skip(
-  "lostFocus event fires when field is blured",
-  SKIP_REASON.XMLUI_BUG(),
-  async ({ initTestBed, createNumberBoxDriver }) => {
-    const { testStateDriver } = await initTestBed(`<NumberBox onLostFocus="testState = true" />`);
-    const driver = await createNumberBoxDriver();
-
-    await driver.focus();
-    await driver.blur();
-
-    await expect(driver.field).not.toBeFocused();
-    await expect.poll(testStateDriver.testState).toEqual(true);
-  },
-);
+// --- lostFocus
 
 test.skip(
   "lostFocus is called after gotFocus",
@@ -555,24 +650,7 @@ test.skip(
 
 // --- api
 
-// --- --- focus
-
-test("focus() focuses the field", async ({
-  initTestBed,
-  createButtonDriver,
-  createNumberBoxDriver,
-}) => {
-  await initTestBed(`
-    <Fragment>
-      <NumberBox id="numberbox" />
-      <Button testId="button" onClick="numberbox.focus()" />
-    </Fragment>`);
-  const buttonDriver = await createButtonDriver("button");
-  const numberboxDriver = await createNumberBoxDriver("numberbox");
-
-  await buttonDriver.click();
-  await expect(numberboxDriver.field).toBeFocused();
-});
+// --- focus
 
 test("focus() does nothing if field is disabled", async ({
   initTestBed,
@@ -591,42 +669,7 @@ test("focus() does nothing if field is disabled", async ({
   await expect(numberboxDriver.field).not.toBeFocused();
 });
 
-// --- --- value
-
-test("value returns current input value", async ({
-  initTestBed,
-  createNumberBoxDriver,
-  createTextDriver,
-}) => {
-  await initTestBed(`
-    <Fragment>
-      <NumberBox id="numberbox" initialValue="123" />
-      <Text testId="text" value="{numberbox.value}" />
-    </Fragment>`);
-  const textDriver = await createTextDriver("text");
-  const numberboxDriver = await createNumberBoxDriver("numberbox");
-
-  const value = await numberboxDriver.field.inputValue();
-  await expect(textDriver.component).toHaveText(value);
-});
-// --- --- setValue
-
-test.skip(
-  "setValue updates input value",
-  SKIP_REASON.XMLUI_BUG(),
-  async ({ initTestBed, createButtonDriver, createNumberBoxDriver }) => {
-    await initTestBed(`
-    <Fragment>
-      <NumberBox id="numberbox" />
-      <Button testId="button" onClick="numberbox.setValue('test')" />
-    </Fragment>`);
-    const buttonDriver = await createButtonDriver("button");
-    const numberboxDriver = await createNumberBoxDriver("numberbox");
-
-    await buttonDriver.click();
-    await expect(numberboxDriver.component).toHaveText("test");
-  },
-);
+// --- setValue
 
 test.skip(
   "setValue does not update input if field is disabled",
