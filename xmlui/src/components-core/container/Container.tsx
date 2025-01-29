@@ -590,7 +590,7 @@ const MemoizedContainer = memo(
           if (wrapWithFragment) {
             // --- Add the `key` attribute to the child
             if (React.isValidElement(renderedChild)) {
-              // --- React can display this element                  
+              // --- React can display this element
               rendered = React.cloneElement(renderedChild, { key });
             } else {
               // --- A simple text node (or alike). We need to wrap it in a `Fragment`
@@ -604,7 +604,7 @@ const MemoizedContainer = memo(
 
         // --- At this point we have a React node for each child
         if (renderedChildren.length === 1) {
-          // --- If we have a single (and valid React element) child, we compose its 
+          // --- If we have a single (and valid React element) child, we compose its
           // --- `ref` with the parent's `ref`. This allows the parent to access the child's
           // --- DOM node. Otherwise, we use the child as is.
           return ref && renderedChildren[0] && isValidElement(renderedChildren[0])
@@ -1113,16 +1113,26 @@ function renderChild({
   //
   //  <MyComponent>hey lorem ipsum</MyComponent>
   if (node.type === "Slot" && parentRenderContext?.children?.length === 1) {
-    if (
-      parentRenderContext.children[0].type === "TextNodeCData" ||
-      parentRenderContext.children[0].type === "TextNode"
-    ) {
-      parentRenderContext.children = [ {
-        type: "Text",
-        props: {
-          value: parentRenderContext.children[0].props.value,
-        }
-      }];
+    console.log("node", node, parentRenderContext?.children);
+    if (parentRenderContext.children[0].type === "TextNodeCData") {
+      // parentRenderContext.children = [
+      //   {
+      //     type: "Text",
+      //     props: {
+      //       value: parentRenderContext.children[0].props.value,
+      //     },
+      //   },
+      // ];
+      return parentRenderContext.renderChild(parentRenderContext.children);
+    } else if (parentRenderContext.children[0].type === "TextNode") {
+      parentRenderContext.children = [
+        {
+          type: "Text",
+          props: {
+            value: parentRenderContext.children[0].props.value,
+          },
+        },
+      ];
       console.log("special", JSON.stringify(parentRenderContext.children));
       //return parentRenderContext.renderChild(parentRenderContext.children);
     }
