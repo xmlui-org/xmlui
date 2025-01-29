@@ -7,10 +7,12 @@ type TabItem = Tab & { id: string };
 export const TabContext = createContext({
   register: (tabItem: TabItem) => {},
   unRegister: (id: string) => {},
+  activeTabId: "",
 });
 
 export function useTabContextValue() {
   const [tabItems, setTabItems] = useState(EMPTY_ARRAY);
+  const [activeTabId, setActiveTabId] = useState<string>("");
   const tabContextValue = useMemo(() => {
     return {
       register: (column: TabItem) => {
@@ -32,8 +34,10 @@ export function useTabContextValue() {
           }),
         );
       },
+      activeTabId,
+      setActiveTabId,
     };
-  }, [setTabItems]);
+  }, [activeTabId]);
 
   return {
     tabItems,

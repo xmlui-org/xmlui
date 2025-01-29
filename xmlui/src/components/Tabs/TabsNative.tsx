@@ -1,6 +1,6 @@
+import type { ForwardedRef } from "react";
 import {
   type CSSProperties,
-  ForwardedRef,
   forwardRef,
   type ReactNode,
   useEffect,
@@ -37,19 +37,27 @@ export const Tabs = forwardRef(function Tabs(
   const [activeIndex, setActiveIndex] = useState(activeTab);
   const currentTab = useMemo(() => {
     return tabItems[activeIndex]?.id;
-  }, [activeIndex]);
+  }, [activeIndex, tabItems]);
 
   useEffect(() => {
-    const _activeTab = activeTab - 1;
-    const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
-    const _newActiveTab = _activeTab < 0 ? 0 : _activeTab > maxIndex ? maxIndex : _activeTab;
-    setActiveIndex(_newActiveTab);
-  }, [tabItems, activeTab]);
+    tabContextValue.setActiveTabId(currentTab);
+  }, [currentTab, tabContextValue]);
+
+  useEffect(() => {
+    if (activeTab !== undefined) {
+      setActiveIndex(() => {
+        const maxIndex = tabItems.length - 1;
+        const newIndex = activeTab - 1;
+        return newIndex < 0 ? 0 : newIndex > maxIndex ? maxIndex : newIndex;
+      });
+    }
+  }, [activeTab, tabItems.length]);
 
   const next = useEvent(() => {
-    const nextIndex = parseInt(currentTab) + 1;
-    const maxIndex = tabItems.length > 0 ? tabItems.length - 1 : 0;
-    setActiveIndex(nextIndex > maxIndex ? 0 : nextIndex);
+    setActiveIndex((prevIndex) => {
+      const maxIndex = tabItems.length - 1;
+      return prevIndex >= maxIndex ? 0 : prevIndex + 1;
+    });
   });
 
   useEffect(() => {
@@ -65,7 +73,11 @@ export const Tabs = forwardRef(function Tabs(
         className={styles.tabs}
         value={`${currentTab}`}
         onValueChange={(tab) => {
-          setActiveIndex(tabItems.findIndex((item) => item.id === tab));
+          const newIndex = tabItems.findIndex((item) => item.id === tab);
+          if (newIndex !== activeIndex) {
+            tabContextValue.setActiveTabId(tab);
+            setActiveIndex(newIndex);
+          }
         }}
         orientation={orientation}
         style={style}
