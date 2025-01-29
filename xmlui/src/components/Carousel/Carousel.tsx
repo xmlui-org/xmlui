@@ -64,9 +64,9 @@ export const CarouselMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-control-${COMP}`]: "$color-primary",
-    [`color-text-control-${COMP}`]: "$color-primary",
+    [`color-text-control-${COMP}`]: "$color-text",
     [`color-bg-control-hover-${COMP}`]: "$color-primary",
-    [`color-text-control-hover-${COMP}`]: "$color-primary",
+    [`color-text-control-hover-${COMP}`]: "$color-text",
     [`color-bg-control-active-${COMP}`]: "$color-primary",
     [`color-bg-control-disabled-${COMP}`]: "$color-surface-200",
     [`color-text-control-disabled-${COMP}`]: "$color-text-disabled",

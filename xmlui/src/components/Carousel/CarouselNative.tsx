@@ -153,7 +153,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         }
       }
     },
-    [scrollPrev, scrollNext],
+    [orientation, scrollPrev, scrollNext],
   );
 
   useEffect(() => {
@@ -187,6 +187,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 
   return (
     <CarouselContext.Provider value={carouselContextValue}>
+      {children}
       <div
         style={style}
         ref={ref}
@@ -202,7 +203,18 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               [styles.vertical]: orientation === "vertical",
             })}
           >
-            {children}
+            {carouselItems.map((item, index) => (
+                <div
+                    key={item.id}
+                    role="group"
+                    aria-roledescription="slide"
+                    className={classnames(styles.carouselItem)}
+                >
+                  <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
+                    {index === activeSlide ? item.children : null}
+                  </div>
+                </div>
+            ))}
           </div>
         </div>
         {controls && (

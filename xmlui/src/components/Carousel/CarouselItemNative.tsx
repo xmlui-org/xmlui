@@ -23,7 +23,7 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
       ref: forwardedRef,
       id,
     });
-  }, [id, children, style, register]);
+  }, [id, children, style, register, forwardedRef]);
 
   useEffect(() => {
     return () => {
@@ -31,16 +31,5 @@ export const CarouselItemComponent = forwardRef(function CarouselItemComponent(
     };
   }, [id, unRegister]);
 
-  return (
-    <div
-      key={id}
-      role="group"
-      aria-roledescription="slide"
-      className={classnames(styles.carouselItem)}
-    >
-      <div className={styles.innerWrapper} ref={forwardedRef} style={style}>
-        {children}
-      </div>
-    </div>
-  );
+  return null;
 });
