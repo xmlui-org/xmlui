@@ -1,7 +1,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { isEqual } from "lodash-es";
 
-import type { ComponentApi, ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ComponentApi, ContainerState } from "@components-core/rendering/ContainerComponent";
 import {ColorDef, getColor} from "./css-utils";
 
 import { shallowCompare, useEvent } from "@components-core/utils/misc";

@@ -5,7 +5,7 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "@components-core/abstractions/LoaderRenderer";
-import type { ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ContainerState } from "@components-core/rendering/ContainerComponent";
 import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 
 import { Loader } from "./Loader";

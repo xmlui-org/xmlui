@@ -2,8 +2,8 @@
 import { ComponentDef } from "@abstractions/ComponentDefs";
 import { InnerRendererContext } from "@components-core/abstractions/ComponentRenderer";
 import { ComponentHarness } from "./ComponentHarness";
-import { StateFieldPartChangedFn } from "@components-core/container/Container";
-import { ComponentCleanupFn } from "@components-core/container/ContainerComponentDef";
+import { StateFieldPartChangedFn } from "./ContainerComponent";
+import { ComponentCleanupFn } from "@components-core/rendering/ContainerComponent";
 import { shouldKeep, extractParam } from "@components-core/utils/extractParam";
 import { ReactNode } from "react";
 

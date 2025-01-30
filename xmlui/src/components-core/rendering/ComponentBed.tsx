@@ -18,7 +18,7 @@ import { extractParam } from "../utils/extractParam";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { mergeProps } from "@components-core/utils/mergeProps";
 import ComponentDecorator from "@components-core/ComponentDecorator";
-import { createValueExtractor } from "@components-core/container/valueExtractor";
+import { createValueExtractor } from "@components-core/rendering/valueExtractor";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";

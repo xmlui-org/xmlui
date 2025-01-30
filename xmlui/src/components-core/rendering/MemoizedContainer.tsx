@@ -6,9 +6,9 @@ import { Statement, ArrowExpression, ArrowExpressionStatement } from "@abstracti
 import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/ComponentRenderer";
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { useAppContext } from "@components-core/AppContext";
-import buildProxy from "@components-core/container/buildProxy";
-import { StateFieldPartChangedFn } from "@components-core/container/Container";
-import { ComponentCleanupFn, ContainerComponentDef, RegisterComponentApiFnInner } from "@components-core/container/ContainerComponentDef";
+import { buildProxy } from "@components-core/rendering/buildProxy";
+import { StateFieldPartChangedFn } from "./ContainerComponent";
+import { ComponentCleanupFn, ContainerComponentDef, RegisterComponentApiFnInner } from "@components-core/rendering/ContainerComponent";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";

@@ -1,10 +1,9 @@
 import { forwardRef, memo, RefObject, useMemo, useRef } from "react";
-import ComponentBed from "@components-core/rendering/ComponentBed";
+import ComponentBed from "./ComponentBed";
 import { extractParam } from "@components-core/utils/extractParam";
 import { ComponentDef } from "@abstractions/ComponentDefs";
 import { ChildRendererContext } from "./renderChild";
-import { ContainerComponentDef, isContainerLike } from "@components-core/container/ContainerComponentDef";
-import { ComponentContainer } from "@components-core/container/Container";
+import { ComponentContainer, ContainerComponentDef, isContainerLike } from "./ContainerComponent";
 
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.

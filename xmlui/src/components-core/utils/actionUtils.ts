@@ -1,4 +1,4 @@
-import type { ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ContainerState } from "@components-core/rendering/ContainerComponent";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 
 import { DataLoaderQueryKeyGenerator } from "@components-core/utils/DataLoaderQueryKeyGenerator";

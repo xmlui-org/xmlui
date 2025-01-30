@@ -1,6 +1,6 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { memo, useMemo } from "react";
-import type { ContainerComponentDef } from "@components-core/container/ContainerComponentDef";
+import type { ContainerComponentDef } from "@components-core/rendering/ContainerComponent";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import { useShallowCompareMemoize } from "@components-core/utils/hooks";

@@ -1,7 +1,7 @@
 import React from "react";
 import { isPlainObject } from "lodash-es";
 
-import type { ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ContainerState } from "@components-core/rendering/ContainerComponent";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 
 import { parseParameterString } from "@components-core/script-runner/ParameterParser";

@@ -9,7 +9,7 @@ import { enableMapSet } from "immer";
 
 import type { ComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
 import type { MemoedVars } from "./abstractions/ComponentRenderer";
-import type { ContainerComponentDef } from "./container/ContainerComponentDef";
+import type { ContainerComponentDef } from "./rendering/ContainerComponent";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import type { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
 import type { ThemeTone } from "@components-core/theming/abstractions";

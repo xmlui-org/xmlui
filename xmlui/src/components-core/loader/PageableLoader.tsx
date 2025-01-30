@@ -4,7 +4,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
 
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ContainerState } from "@components-core/rendering/ContainerComponent";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,

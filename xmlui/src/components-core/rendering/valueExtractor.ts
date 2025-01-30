@@ -2,7 +2,7 @@ import type { MutableRefObject } from "react";
 import memoizeOne from "memoize-one";
 import { isPlainObject, isString } from "lodash-es";
 
-import type { ComponentApi, ContainerState } from "@components-core/container/ContainerComponentDef";
+import type { ComponentApi, ContainerState } from "@components-core/rendering/ContainerComponent";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { MemoedVars } from "@components-core/abstractions/ComponentRenderer";
 

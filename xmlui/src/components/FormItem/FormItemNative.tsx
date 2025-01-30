@@ -29,7 +29,7 @@ import { useEvent } from "@components-core/utils/misc";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { DatePicker } from "@components/DatePicker/DatePickerNative";
 import { getByPath } from "@components/Form/FormNative";
-import { asOptionalBoolean } from "@components-core/container/valueExtractor";
+import { asOptionalBoolean } from "@components-core/rendering/valueExtractor";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type { FormItemMd } from "./FormItem";
 import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";

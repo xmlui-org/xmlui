@@ -15,7 +15,7 @@ export type ProxyCallbackArgs = {
  * Use this function to build a JavaScript proxy for localContext objects. The responsibility of the proxy is to
  * collect the changes within the localContext so that we can refresh the UI according to them.
  */
-function buildProxy(
+export function buildProxy(
   proxyTarget: any,
   callback: (changeInfo: ProxyCallbackArgs) => void,
   tree: Array<string | symbol> = [],
@@ -75,5 +75,3 @@ function buildProxy(
     },
   });
 }
-
-export default buildProxy;
