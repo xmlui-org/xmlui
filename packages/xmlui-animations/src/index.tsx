@@ -13,6 +13,9 @@ export const AnimationMd = createMetadata({
     ),
     duration: d(`The duration of the animation in milliseconds`),
     once: d(`Indicates whether the animation should only run once`),
+    reverse: d(`Indicates whether the animation should run in reverse`),
+    loop: d(`Indicates whether the animation should loop`),
+    delay: d(`The delay before the animation starts in milliseconds`),
   },
   events: {
     started: d(`Event fired when the animation starts`),
@@ -56,6 +59,9 @@ export const animationComponentRenderer = createComponentRenderer(
         duration={extractValue.asOptionalNumber(node.props.duration)}
         animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
         once={extractValue.asOptionalBoolean(node.props.once)}
+        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
+        loop={extractValue.asOptionalBoolean(node.props.loop)}
+        delay={extractValue.asOptionalNumber(node.props.delay)}
       >
         {renderChild(node.children)}
       </Animation>
@@ -78,6 +84,9 @@ export const fadeInAnimationRenderer = createComponentRenderer(
         onStop={lookupEventHandler("stopped")}
         onStart={lookupEventHandler("started")}
         animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
+        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
+        loop={extractValue.asOptionalBoolean(node.props.loop)}
+        delay={extractValue.asOptionalNumber(node.props.delay)}
       >
         {renderChild(node.children)}
       </Animation>
@@ -114,6 +123,9 @@ export const slideInAnimationRenderer = createComponentRenderer(
         onStop={lookupEventHandler("stopped")}
         onStart={lookupEventHandler("started")}
         animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
+        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
+        loop={extractValue.asOptionalBoolean(node.props.loop)}
+        delay={extractValue.asOptionalNumber(node.props.delay)}
       >
         {renderChild(node.children)}
       </Animation>

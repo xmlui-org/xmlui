@@ -11,7 +11,10 @@ export type AnimationProps = {
   onStart?: () => void;
   animateWhenInView?: boolean;
   duration?: number;
+  reverse?: boolean;
+  loop?: boolean;
   once?: boolean;
+  delay?: number;
 };
 
 const AnimatedComponent = animated(
@@ -28,10 +31,17 @@ export const Animation = ({
   duration,
   onStop,
   onStart,
+  delay = 0,
   animateWhenInView = false,
+  reverse = false,
+  loop = false,
   once = false,
 }: AnimationProps) => {
   const [_animation] = useState(animation);
+  const [toggle, setToggle] = useState(false);
+  const [reset, setReset] = useState(false);
+  const [count, setCount] = useState(0);
+  const times = 1;
   const animationSettings = useMemo<any>(
     () => ({
       from: _animation.from,
@@ -40,16 +50,49 @@ export const Animation = ({
         ..._animation.config,
         duration,
       },
-      onStart: () => onStart,
-      onRest: onStop,
-      once,
+      delay,
+      loop,
+      reset,
+      reverse: toggle,
+      onRest: () => {
+        onStop?.();
+        if (loop) {
+          if (reverse) {
+            setCount(count + 1);
+            setToggle(!toggle);
+          }
+          setReset(true);
+        } else {
+          if (reverse && count < times) {
+            setCount(count + 1);
+            setToggle(!toggle);
+          }
+        }
+      },
+      onStart: () => onStart?.(),
     }),
-    [_animation.config, _animation.from, _animation.to, duration, onStart, onStop, once],
+    [
+      _animation.config,
+      _animation.from,
+      _animation.to,
+      count,
+      delay,
+      duration,
+      loop,
+      onStart,
+      onStop,
+      reset,
+      reverse,
+      toggle,
+    ],
   );
 
-  const [springs, api] = useSpring(() => ({
-    ...animationSettings,
-  }));
+  const [springs, api] = useSpring(
+    () => ({
+      ...animationSettings,
+    }),
+    [animationSettings],
+  );
 
   const [ref, animationStyles] = useInView(() => animationSettings, {
     once,
@@ -72,6 +115,15 @@ export const Animation = ({
       stop: stopAnimation,
     });
   }, [registerComponentApi, startAnimation, stopAnimation]);
+
+  /*  const transitions = useTransition(children, {
+                                                                initial: { opacity: 0 },
+                                                                from: { opacity: 0 },
+                                                                enter: { opacity: 1 },
+                                                                leave: { opacity: 0 },
+                                                                config: {duration: 3000},
+                                                                exitBeforeEnter: true,
+                                                              })*/
 
   const content = useMemo(() => {
     return Children.map(children, (child, index) =>
