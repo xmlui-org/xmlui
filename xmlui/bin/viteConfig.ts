@@ -26,6 +26,7 @@ export function getViteConfig({
         "@core": path.resolve(__dirname, "../src/core"),
         "@components-core": path.resolve(__dirname, "../src/components-core"),
         "@components": path.resolve(__dirname, "../src/components"),
+        "@parsers": path.resolve(__dirname, "../src/parsers"),
       },
     },
     base: withRelativeRoot ? "" : undefined,
