@@ -1,11 +1,10 @@
-import type { Dispatch, MutableRefObject, ReactNode, RefObject, SetStateAction } from "react";
+import type { Dispatch, MutableRefObject, RefObject, SetStateAction } from "react";
 import React, {
   forwardRef,
   Fragment,
   isValidElement,
   memo,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
   useReducer,
@@ -27,7 +26,6 @@ import type { BindingTreeEvaluationContext } from "@components-core/script-runne
 import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
 import type {
   ContainerDispatcher,
-  InnerRendererContext,
   MemoedVars,
 } from "../abstractions/ComponentRenderer";
 import type {
@@ -37,7 +35,6 @@ import type {
   ContainerState,
   RegisterComponentApiFnInner,
 } from "./ContainerComponentDef";
-import { isContainerLike } from "./ContainerComponentDef";
 import type { ProxyAction } from "./buildProxy";
 import buildProxy from "./buildProxy";
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
@@ -46,20 +43,9 @@ import type {
   LookupAsyncFnInner,
   LookupSyncFnInner,
 } from "@abstractions/ActionDefs";
-import type { ContainerAction } from "@components-core/abstractions/containers";
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 
-import {
-  cloneDeep,
-  isArray,
-  isEmpty,
-  isPlainObject,
-  keyBy,
-  merge,
-  pick,
-  setWith,
-  unset,
-} from "lodash-es";
+import { cloneDeep, isArray, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import { extractParam, shouldKeep } from "@components-core/utils/extractParam";
 import {
@@ -72,7 +58,6 @@ import {
 } from "@components-core/utils/misc";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
 import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import ComponentBed from "@components-core/ComponentBed";
 import { EMPTY_ARRAY, EMPTY_OBJECT, noop } from "@components-core/constants";
 import { parseHandlerCode, prepareHandlerStatements } from "@components-core/utils/statementUtils";
 import { useLocation, useNavigate, useParams, useSearchParams } from "@remix-run/react";
@@ -93,39 +78,18 @@ import type { AppContextObject } from "@abstractions/AppContextDefs";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { StateViewer } from "@components/StateViewer/StateViewerNative";
 import { createContainerReducer } from "./reducer";
-import InvalidComponent from "@components-core/InvalidComponent";
+import { renderChild } from "@components-core/rendering/renderChild";
 
 /**
  * This function signature is used whenever the engine wants to sign that an object's field (property),
  * which is part of the container state, has changed.
  */
-type StateFieldPartChangedFn = (
+export type StateFieldPartChangedFn = (
   path: string[],
   value: any,
   target: string,
   action: ProxyAction,
 ) => void;
-
-// This function renders the entire component tree starting from the root component. As it works recursively,
-// all child components will be rendered, including the wrapping containers
-export function renderRoot(
-  node: ComponentDef,
-  memoedVarsRef: MutableRefObject<MemoedVars>,
-): ReactNode {
-  return renderChild({
-    node,
-    state: EMPTY_OBJECT,
-    dispatch: noop,
-    appContext: undefined,
-    lookupAction: noop,
-    lookupSyncCallback: noop,
-    registerComponentApi: noop,
-    renderChild: noop,
-    stateFieldPartChanged: noop,
-    cleanup: noop,
-    memoedVarsRef,
-  });
-}
 
 type ContainerProps = {
   resolvedKey?: string;
@@ -216,14 +180,10 @@ const MemoizedContainer = memo(
         options: LookupActionOptions | undefined,
         ...eventArgs: any[]
       ) => {
-        // console.log({
-        //   source,
-        //   componentUid,
-        //   options,
-        //   eventArgs,
-        //   state: stateRef.current,
-        //   "$this": stateRef.current[componentUid]
-        // });
+        // --- Check if the event handler can sign its lifecycle state
+        const canSignEventLifecycle = () =>
+          componentUid.description !== undefined && options?.eventName !== undefined;
+
         let changes: Array<any> = [];
         const getComponentStateClone = () => {
           changes.length = 0;
@@ -293,8 +253,16 @@ const MemoizedContainer = memo(
           if (!statements?.length) {
             return;
           }
-          if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerStarted(componentUid.description, options.eventName));
+
+          if (canSignEventLifecycle()) {
+            // --- Sign the event handler has been started
+            dispatch({
+              type: ContainerActionKind.EVENT_HANDLER_STARTED,
+              payload: {
+                uid: componentUid.description,
+                eventName: options.eventName,
+              },
+            });
           }
           let mainThreadBlockingRuns = 0;
           await processStatementQueueAsync(
@@ -359,8 +327,15 @@ const MemoizedContainer = memo(
             },
           );
 
-          if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerCompleted(componentUid.description, options.eventName));
+          if (canSignEventLifecycle()) {
+            // --- Sign the event handler has successfully completed
+            dispatch({
+              type: ContainerActionKind.EVENT_HANDLER_COMPLETED,
+              payload: {
+                uid: componentUid.description,
+                eventName: options.eventName,
+              },
+            });
           }
 
           if (evalContext.mainThread?.blocks?.length) {
@@ -373,8 +348,15 @@ const MemoizedContainer = memo(
           if (options?.signError !== false) {
             appContext.signError(e as Error);
           }
-          if (canSignEventLifecycle(componentUid.description, options?.eventName)) {
-            dispatch(eventHandlerError(componentUid.description, options.eventName, e));
+          if (canSignEventLifecycle()) {
+            dispatch({
+              type: ContainerActionKind.EVENT_HANDLER_ERROR,
+              payload: {
+                uid: componentUid.description,
+                eventName: options.eventName,
+                error: e,
+              },
+            });
           }
           throw e;
         }
@@ -917,7 +899,16 @@ const MemoizedErrorProneContainer = memo(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
         if (key in componentStateRef.current || key in resolvedLocalVars) {
-          dispatch(statePartChanged(pathArray, newValue, target, action));
+          // --- Sign that a state field (or a part of it) has changed
+          dispatch({
+            type: ContainerActionKind.STATE_PART_CHANGED,
+            payload: {
+              path: pathArray,
+              value: newValue,
+              target,
+              actionType: action,
+            },
+          });
         } else {
           if (!node.uses || node.uses.includes(key)) {
             parentStateFieldPartChanged(pathArray, newValue, target, action);
@@ -960,6 +951,55 @@ type ComponentDefWithContainerUid = ComponentDef & {
   // --- If true, the component is bound to an API container
   apiBoundContainer?: boolean;
 };
+
+type ComponentContainerProps = {
+  resolvedKey?: string;
+  node: ContainerComponentDef;
+  parentState: ContainerState;
+  parentStateFieldPartChanged: StateFieldPartChangedFn;
+  parentRegisterComponentApi: RegisterComponentApiFnInner;
+  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
+  parentDispatch: ContainerDispatcher;
+  parentRenderContext?: ParentRenderContext;
+  uidInfoRef?: RefObject<Record<string, any>>;
+};
+
+export const ComponentContainer = memo(
+  forwardRef(function ComponentContainer(
+    {
+      resolvedKey,
+      node,
+      parentState,
+      parentStateFieldPartChanged,
+      parentRegisterComponentApi,
+      layoutContextRef,
+      parentRenderContext,
+      parentDispatch,
+      uidInfoRef,
+    }: ComponentContainerProps,
+    ref,
+  ) {
+    const enhancedNode = useMemo(() => getWrappedWithContainer(node), [node]);
+
+    return (
+      <ErrorBoundary node={node} location={"container"}>
+        <MemoizedErrorProneContainer
+          parentStateFieldPartChanged={parentStateFieldPartChanged}
+          resolvedKey={resolvedKey}
+          node={enhancedNode as any}
+          parentState={parentState}
+          layoutContextRef={layoutContextRef}
+          parentRenderContext={parentRenderContext}
+          isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
+          parentRegisterComponentApi={parentRegisterComponentApi}
+          parentDispatch={parentDispatch}
+          ref={ref}
+          uidInfoRef={uidInfoRef}
+        />
+      </ErrorBoundary>
+    );
+  }),
+);
 
 /**
  * Wraps the specified component node with a container
@@ -1010,390 +1050,6 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
   } as ContainerComponentDef;
 };
 
-type ComponentContainerProps = {
-  resolvedKey?: string;
-  node: ContainerComponentDef;
-  parentState: ContainerState;
-  parentStateFieldPartChanged: StateFieldPartChangedFn;
-  parentRegisterComponentApi: RegisterComponentApiFnInner;
-  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
-  parentDispatch: ContainerDispatcher;
-  parentRenderContext?: ParentRenderContext;
-  uidInfoRef?: RefObject<Record<string, any>>;
-};
-
-const ComponentContainer = memo(
-  forwardRef(function ComponentContainer(
-    {
-      resolvedKey,
-      node,
-      parentState,
-      parentStateFieldPartChanged,
-      parentRegisterComponentApi,
-      layoutContextRef,
-      parentRenderContext,
-      parentDispatch,
-      uidInfoRef,
-    }: ComponentContainerProps,
-    ref,
-  ) {
-    const enhancedNode = useMemo(() => getWrappedWithContainer(node), [node]);
-
-    return (
-      <ErrorBoundary node={node} location={"container"}>
-        <MemoizedErrorProneContainer
-          parentStateFieldPartChanged={parentStateFieldPartChanged}
-          resolvedKey={resolvedKey}
-          node={enhancedNode as any}
-          parentState={parentState}
-          layoutContextRef={layoutContextRef}
-          parentRenderContext={parentRenderContext}
-          isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
-          parentRegisterComponentApi={parentRegisterComponentApi}
-          parentDispatch={parentDispatch}
-          ref={ref}
-          uidInfoRef={uidInfoRef}
-        />
-      </ErrorBoundary>
-    );
-  }),
-);
-
-// Represents the context in which the React component belonging to a particular component definition
-// is rendered
-interface ChildRendererContext extends InnerRendererContext {
-  stateFieldPartChanged: StateFieldPartChangedFn;
-  cleanup: ComponentCleanupFn;
-}
-
-/**
- * This function is the jolly-joker of the rendering process. It renders a child component
- * based on the specified context, which contains the component's definition, the current state,
- * and other necessary information.
- *
- * The function checks a few special cases:
- * - <Slot> with a single text node child: it renders the text in the context of the parent component.
- * - CDATA text nodes: it renders the text as is without parsing it.
- * - TextNode: it extracts the text from the node and renders it.
- *
- * In other cases, it extracts the component's ID and renders the component as a <ComponentNode>.
- *
- * As this function passes itself as a renderChild function to the <ComponentNode>, it can render
- * nested components recursively.
- */
-function renderChild({
-  node,
-  state,
-  dispatch,
-  appContext,
-  lookupAction,
-  lookupSyncCallback,
-  registerComponentApi,
-  renderChild,
-  stateFieldPartChanged,
-  layoutContext,
-  parentRenderContext,
-  memoedVarsRef,
-  cleanup,
-  uidInfoRef,
-}: ChildRendererContext): ReactNode {
-  // --- Render only visible components
-  if (!shouldKeep(node.when, state, appContext)) {
-    return null;
-  }
-
-  // --- We do not parse text nodes specified with CDATA to avoid whitespace collapsing
-  const nodeValue = (node.props as any)?.value;
-  if (node.type === "TextNodeCData") {
-    return nodeValue ?? "";
-  }
-
-  // --- A TextNode value may contain nexted expressions, so we extract it.
-  if (node.type === "TextNode") {
-    return extractParam(state, nodeValue, appContext, true);
-  }
-
-  // --- Rendering a Slot requires some preparations, as TextNode and
-  // --- TextNodeCData are virtual nodes. Also, slots may have default templates
-  // --- to render when no slot children are specified. The following section
-  // --- handles these cases.
-  if (node.type === "Slot") {
-    // --- Check for special Slot cases
-    let slotChildren: ComponentDef | ComponentDef[];
-    const templateName = node.props?.name;
-    console.log("templateName", templateName);
-    if (templateName) {
-      // --- Let's check the validity of the slot name
-      if (!templateName.endsWith("Template")) {
-        throw new Error(
-          `Slot name '${templateName}' is not valid. ` +
-            "A named slot should use a name ending with 'Template'.",
-        );
-      }
-
-      // --- Named slot: use a template property from the parent component
-      slotChildren = parentRenderContext?.props?.[templateName];
-    } else {
-      // --- Children slot: use the children of the parent component
-      slotChildren = parentRenderContext?.children;
-    }
-
-    if (!slotChildren) {
-      // --- No children to render, let's try the default slot template (if there is any)
-      slotChildren = node.children;
-    }
-
-    if (slotChildren) {
-      const toRender = Array.isArray(slotChildren) ? slotChildren : [slotChildren];
-      // --- Check for the virtual nodes. At this point, parentRendererContext is
-      // --- undefined when the parent does not provide slot children. In this case,
-      // --- the ComponentBed component will render the default slot template.
-      if (toRender.length === 1 && parentRenderContext) {
-        if (toRender[0].type === "TextNodeCData" || toRender[0].type === "TextNode") {
-          // --- Preserve the text and render it in the parent context
-          return parentRenderContext.renderChild(toRender);
-        }
-      }
-    }
-  }
-
-  // --- In other cases, we extract the component ID, and then render the component.
-  // --- A component's ID is generally a string with identifier syntax. However, some
-  // --- internal components have IDs with expressions, so we evaluate them.
-  const key = extractParam(state, node.uid, appContext, true);
-
-  return (
-    <ComponentNode
-      key={key}
-      resolvedKey={key}
-      node={node}
-      cleanup={cleanup}
-      stateFieldPartChanged={stateFieldPartChanged}
-      memoedVarsRef={memoedVarsRef}
-      state={state}
-      dispatch={dispatch}
-      appContext={appContext}
-      lookupAction={lookupAction}
-      lookupSyncCallback={lookupSyncCallback}
-      registerComponentApi={registerComponentApi}
-      renderChild={renderChild}
-      layoutContext={layoutContext}
-      parentRenderContext={parentRenderContext}
-      uidInfoRef={uidInfoRef}
-    />
-  );
-}
-
-function transformNodeWithChildDatasource(node: ComponentDef) {
-  let didResolve = false;
-  let loaders = node.loaders;
-  let children: Array<ComponentDef> | undefined = undefined;
-  node.children?.forEach((child) => {
-    if (child?.type === "DataSource") {
-      didResolve = true;
-      if (!loaders) {
-        loaders = [];
-      }
-      loaders.push({
-        uid: child.uid!,
-        type: "DataLoader",
-        props: child.props,
-        events: child.events,
-        when: child.when,
-      });
-    } else {
-      if (!children) {
-        children = [];
-      }
-      children.push(child);
-    }
-  });
-  if (didResolve) {
-    return {
-      ...node,
-      children,
-      loaders,
-    };
-  }
-  return node;
-}
-
-function transformNodeWithDataSourceRefProp(
-  node: ComponentDef,
-  uidInfoRef: RefObject<Record<string, any>>,
-) {
-  if (!node.props) {
-    return node;
-  }
-  let ret = { ...node };
-  let resolved = false;
-  Object.entries(node.props).forEach(([key, value]) => {
-    let uidInfoForDatasource;
-    try {
-      uidInfoForDatasource = extractParam(uidInfoRef.current, value);
-    } catch (e) {}
-
-    if (uidInfoForDatasource?.type === "loader") {
-      resolved = true;
-      ret = {
-        ...ret,
-        props: {
-          ...ret.props,
-          [key]: {
-            type: "DataSourceRef",
-            uid: uidInfoForDatasource.uid,
-          },
-        },
-      };
-    }
-  });
-  if (resolved) {
-    return ret;
-  }
-  return node;
-}
-
-function transformNodeWithDataProp(
-  node: ComponentDef,
-  resolvedDataPropIsString: boolean,
-  uidInfoRef: RefObject<Record<string, any>>,
-) {
-  if (
-    !node.props?.__DATA_RESOLVED &&
-    node.props &&
-    "data" in node.props &&
-    resolvedDataPropIsString
-  ) {
-    //we skip the transformation if the data prop is a binding expression for a loader value
-    if (extractParam(uidInfoRef.current, node.props.data) === "loaderValue") {
-      return node;
-    }
-    return {
-      ...node,
-      props: {
-        ...node.props,
-        data: {
-          type: "DataSource",
-          props: {
-            url: node.props.data,
-          },
-        },
-      },
-    };
-  }
-  return node;
-}
-
-function transformNodeWithRawDataProp(node) {
-  if (node.props && "raw_data" in node.props) {
-    return {
-      ...node,
-      props: {
-        ...node.props,
-        __DATA_RESOLVED: true,
-        data: node.props.raw_data,
-      },
-    };
-  }
-  return node;
-}
-
-/**
- * The ComponentNode it the outermost React component wrapping an xmlui component.
- */
-const ComponentNode = memo(
-  forwardRef(function ComponentNode(
-    {
-      node,
-      state,
-      dispatch,
-      appContext,
-      lookupAction,
-      lookupSyncCallback,
-      registerComponentApi,
-      renderChild,
-      stateFieldPartChanged,
-      layoutContext,
-      parentRenderContext,
-      memoedVarsRef,
-      resolvedKey,
-      cleanup,
-      uidInfoRef,
-      ...rest
-    }: ChildRendererContext & { resolvedKey: string },
-    ref,
-  ) {
-    // --- We pass the layout context to the child components, so we need to
-    // --- make sure that it is stable
-    const stableLayoutContext = useRef(layoutContext);
-
-    // --- Transform the various data sources within the xmlui component definition
-    const nodeWithTransformedLoaders = useMemo(() => {
-      let transformed = transformNodeWithChildDatasource(node); //if we have an DataSource child, we transform it to a loader on the node
-      transformed = transformNodeWithDataSourceRefProp(transformed, uidInfoRef);
-      transformed = transformNodeWithRawDataProp(transformed);
-      return transformed;
-    }, [node, uidInfoRef]);
-
-    const resolvedDataPropIsString = useMemo(() => {
-      const resolvedDataProp = extractParam(
-        state,
-        nodeWithTransformedLoaders.props?.data,
-        appContext,
-        true,
-      );
-      return typeof resolvedDataProp === "string";
-    }, [appContext, nodeWithTransformedLoaders.props?.data, state]);
-
-    const nodeWithTransformedDatasourceProp = useMemo(() => {
-      return transformNodeWithDataProp(
-        nodeWithTransformedLoaders,
-        resolvedDataPropIsString,
-        uidInfoRef,
-      );
-    }, [nodeWithTransformedLoaders, resolvedDataPropIsString, uidInfoRef]);
-
-    let renderedChild = null;
-    if (isContainerLike(nodeWithTransformedDatasourceProp)) {
-      renderedChild = (
-        <ComponentContainer
-          resolvedKey={resolvedKey}
-          node={nodeWithTransformedDatasourceProp as ContainerComponentDef}
-          parentState={state}
-          parentDispatch={dispatch}
-          layoutContextRef={stableLayoutContext}
-          parentRenderContext={parentRenderContext}
-          parentStateFieldPartChanged={stateFieldPartChanged}
-          parentRegisterComponentApi={registerComponentApi}
-          uidInfoRef={uidInfoRef}
-          ref={ref}
-        />
-      );
-    } else {
-      renderedChild = (
-        <ComponentBed
-          onUnmount={cleanup}
-          memoedVarsRef={memoedVarsRef}
-          node={nodeWithTransformedDatasourceProp}
-          state={state}
-          dispatch={dispatch}
-          appContext={appContext}
-          lookupAction={lookupAction}
-          lookupSyncCallback={lookupSyncCallback}
-          registerComponentApi={registerComponentApi}
-          renderChild={renderChild}
-          parentRenderContext={parentRenderContext}
-          layoutContextRef={stableLayoutContext}
-          ref={ref}
-          uidInfoRef={uidInfoRef}
-          {...rest}
-        />
-      );
-    }
-
-    return renderedChild;
-  }),
-);
 // Extracts the `state` property values defined in a component definition's `uses` property. It uses the specified
 // `appContext` when resolving the state values.
 function extractScopedState(
@@ -1596,63 +1252,6 @@ function useVars(
   }, [appContext, componentState, fnDeps, memoedVars, referenceTrackedApi, vars]);
 
   return useShallowCompareMemoize(resolvedVars);
-}
-
-// --- Tests if a particular component (`componentUid`) can sign event (with `eventName`)
-// --- life cycle changes
-function canSignEventLifecycle(componentUid: string | undefined, eventName: string | undefined) {
-  return componentUid !== undefined && eventName !== undefined;
-}
-
-// Signs that a particular component (`uid`) has started running an event handler
-// for the event with `eventName`.
-export function eventHandlerStarted(uid: string, eventName: string) {
-  return {
-    type: ContainerActionKind.EVENT_HANDLER_STARTED,
-    payload: {
-      uid,
-      eventName,
-    },
-  };
-}
-
-// Signs that a particular component (`uid`) has completed running an event handler
-// for the event with `eventName`.
-export function eventHandlerCompleted(uid: string, eventName: string) {
-  return {
-    type: ContainerActionKind.EVENT_HANDLER_COMPLETED,
-    payload: {
-      uid,
-      eventName,
-    },
-  };
-}
-
-// Signs that a particular component (`uid`) has received an error while running an event handler
-// for the event with `eventName`.
-export function eventHandlerError(uid: string, eventName: string, error: any) {
-  return {
-    type: ContainerActionKind.EVENT_HANDLER_ERROR,
-    payload: {
-      uid,
-      eventName,
-      error,
-    },
-  };
-}
-
-// Signs that a particular state part (`path`) has been changed to a new `value` on a `target` object
-// when executing an `action`.
-export function statePartChanged(path: string[], value: any, target: any, action: ProxyAction) {
-  return {
-    type: ContainerActionKind.STATE_PART_CHANGED,
-    payload: {
-      path,
-      value,
-      target,
-      actionType: action,
-    },
-  };
 }
 
 interface LoaderRenderContext {

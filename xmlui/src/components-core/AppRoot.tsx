@@ -17,9 +17,8 @@ import type { IAppStateContext } from "@components/App/AppStateContext";
 
 import { ErrorBoundary } from "./ErrorBoundary";
 import ThemeProvider from "@components-core//theming/ThemeProvider";
-import { renderRoot } from "./container/Container";
 import { delay, formatFileSizeInBytes, getFileExtension } from "@components-core/utils/misc";
-import { EMPTY_OBJECT } from "@components-core/constants";
+import { EMPTY_OBJECT, noop } from "@components-core/constants";
 import { IconProvider } from "@components/IconProvider";
 import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
 import { AppContext } from "@components-core/AppContext";
@@ -49,6 +48,7 @@ import StandaloneComponentManager from "./StandaloneComponentManager";
 import { DebugViewProvider, useDebugView } from "./DebugViewProvider";
 import { version } from "../../package.json";
 import { mathFunctions } from "./appContext/math-function";
+import { renderChild } from "./rendering/renderChild";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -456,12 +456,25 @@ function AppContent({
     };
   }, [appState, registerAppState, update]);
 
-  const memoedVars = useRef<MemoedVars>(new Map());
+  const memoedVarsRef = useRef<MemoedVars>(new Map());
+  const renderedRoot = renderChild({
+    node: rootContainer,
+    state: EMPTY_OBJECT,
+    dispatch: noop,
+    appContext: undefined,
+    lookupAction: noop,
+    lookupSyncCallback: noop,
+    registerComponentApi: noop,
+    renderChild: noop,
+    stateFieldPartChanged: noop,
+    cleanup: noop,
+    memoedVarsRef,
+  });
 
   return (
     <AppContext.Provider value={appContextValue}>
       <AppStateContext.Provider value={appStateContextValue}>
-        {renderRoot(rootContainer, memoedVars)}
+        {renderedRoot}
       </AppStateContext.Provider>
     </AppContext.Provider>
   );
@@ -606,7 +619,9 @@ const AppWrapper = ({
         <QueryClientProvider client={queryClient}>
           {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
           {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+            <Router basename={Router === HashRouter ? undefined : baseName}>
+              {dynamicChildren}
+            </Router>
           )}
           {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>

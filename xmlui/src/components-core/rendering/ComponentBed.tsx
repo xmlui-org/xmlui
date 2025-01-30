@@ -11,10 +11,10 @@ import type {
 } from "@abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
 
-import UnknownComponent from "./UnknownComponent";
-import InvalidComponent from "./InvalidComponent";
+import UnknownComponent from "../UnknownComponent";
+import InvalidComponent from "../InvalidComponent";
 import { isEmpty, isPlainObject } from "lodash-es";
-import { extractParam } from "./utils/extractParam";
+import { extractParam } from "../utils/extractParam";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { mergeProps } from "@components-core/utils/mergeProps";
 import ComponentDecorator from "@components-core/ComponentDecorator";
@@ -23,14 +23,14 @@ import { EMPTY_OBJECT } from "@components-core/constants";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
-import { useReferenceTrackedApi, useShallowCompareMemoize } from "./utils/hooks";
-import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
-import { ContainerActionKind } from "./abstractions/containers";
+import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
+import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
+import { ContainerActionKind } from "../abstractions/containers";
 import { useInspector } from "@components-core/InspectorContext";
 import { SlotItem } from "@components/SlotItem";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
-import { compileLayout } from "../parsers/style-parser/style-compiler";
-import { useMouseEventHandlers } from "./event-handlers";
+import { compileLayout } from "../../parsers/style-parser/style-compiler";
+import { useMouseEventHandlers } from "../event-handlers";
 
 // --- The available properties of Component
 type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
