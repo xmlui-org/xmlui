@@ -19,7 +19,7 @@ export const ComponentHarness = memo(
       lookupSyncCallback,
       registerComponentApi,
       renderChild,
-      stateFieldPartChanged,
+      statePartChanged,
       layoutContext,
       parentRenderContext,
       memoedVarsRef,
@@ -70,7 +70,7 @@ export const ComponentHarness = memo(
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}
-          parentStateFieldPartChanged={stateFieldPartChanged}
+          parentStateFieldPartChanged={statePartChanged}
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}

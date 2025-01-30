@@ -5,10 +5,10 @@ import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/C
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { collectFnVarDeps } from "@components-core/rendering/collectFnVarDeps";
-import { ContainerComponentDef, RegisterComponentApiFnInner, ComponentApi, StateFieldPartChangedFn } from "./ContainerComponent";
+import { ContainerComponentDef, RegisterComponentApiFnInner, ComponentApi, StatePartChangedFn } from "./ContainerComponent";
 import { createContainerReducer } from "@components-core/rendering/reducer";
 import { useDebugView } from "@components-core/DebugViewProvider";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
+import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { collectVariableDependencies } from "@components-core/script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "@components-core/utils/hooks";
 import produce from "immer";
@@ -28,7 +28,7 @@ import { pickFromObject, shallowCompare } from "@components-core/utils/misc";
 type ErrorProneContainerProps = {
   node: ContainerComponentDef;
   parentState: ContainerState;
-  parentStateFieldPartChanged: StateFieldPartChangedFn;
+  parentStateFieldPartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   resolvedKey?: string;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
@@ -178,7 +178,7 @@ export const MemoizedErrorProneContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
-    const stateFieldPartChanged: StateFieldPartChangedFn = useCallback(
+    const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
         if (key in componentStateRef.current || key in resolvedLocalVars) {
@@ -211,7 +211,7 @@ export const MemoizedErrorProneContainer = memo(
           parentDispatch={parentDispatch}
           setVersion={setVersion}
           version={version}
-          stateFieldPartChanged={stateFieldPartChanged}
+          statePartChanged={statePartChanged}
           registerComponentApi={registerComponentApi}
           parentRegisterComponentApi={parentRegisterComponentApi}
           layoutContextRef={layoutContextRef}

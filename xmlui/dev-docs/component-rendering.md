@@ -257,7 +257,7 @@ interface ChildRendererContext extends InnerRendererContext {
 
 `ChildRendererContext` adds extra properties to `InnerRendererContext`:
 
-- `stateFieldPartChanged`. This state stored in a container can be a compound object (arrays, hash objects, and their combinations). With this function, a child component can sign that a part of this state object (or the entire object) has changed.
+- `statePartChanged`. This state stored in a container can be a compound object (arrays, hash objects, and their combinations). With this function, a child component can sign that a part of this state object (or the entire object) has changed.
 - `cleanup`. This method can be called when the rendered React component is unmounted for optional cleanup activities.
 
 ## The Rendering Flow

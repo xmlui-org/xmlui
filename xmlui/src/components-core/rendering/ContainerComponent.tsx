@@ -2,46 +2,64 @@ import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentD
 import { LayoutContext } from "@abstractions/RendererDefs";
 import { ContainerDispatcher } from "@components-core/abstractions/ComponentRenderer";
 import { ProxyAction } from "@components-core/rendering/buildProxy";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
+import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { forwardRef, memo, MutableRefObject, RefObject, useMemo } from "react";
 import { MemoizedErrorProneContainer } from "./MemoizedErrorProneContainer";
 
-// Represents a container component. A container provides optional actions, loaders to implement its behavior and stores
-// state the child components can access.
+/**
+ * This type is the internal representation of a container component, which manages the state of its children.
+ */
 export interface ContainerComponentDef extends ComponentDef {
   type: "Container";
+
+  // --- The unique identifier of the container
   containerUid?: symbol;
+
+  // --- The context values this container provides to its children
   contextVars?: Record<string, any>;
+
+  // --- If true, this is an API-bound container
   apiBoundContainer?: boolean;
 }
 
 /**
- * We store the state application state in a hierarchical structure of containers. This type represents
- * the state within a single container stored as key and value pairs.
+ * We store the state application state in a hierarchical structure of 
+ * containers. This type represents the state within a single container 
+ * stored as key and value pairs.
  */
 export type ContainerState = Record<string | symbol, any>;
 
 /**
- * Components can provide an API that other components can invoke (using the host component ID). This
- * type defines the shape of a hash object that stores the API endpoints.
+ * Components can provide an API that other components can invoke (using 
+ * the host component ID). This type defines the shape of a hash object that 
+ * stores the API endpoints.
  */
 export type ComponentApi = Record<string, ((...args: any[]) => any) | boolean>;
 
-// Function signature to register a component API
-
 /**
- * This function registers a component API that the core components can invoke. The function takes
- * the component UID and the API object as arguments.
+ * This type declares that function's signature, which registers an exposed 
+ * component method (API endpoint).
  */
 export type RegisterComponentApiFnInner = (componentUid: symbol, api: ComponentApi) => void;
 
+/**
+ * This type declares that function's signature, which runs a clean-up activity.
+ */
 export type ComponentCleanupFn = (uid: symbol) => void;
 
-// Tests if the particular component definition needs to be wrapped with an inline container
+/**
+ * This function checks if a particular component needs a wrapping container to 
+ * manage its internal state, which is closed from its external context but 
+ * available to its children.
+ * @param node The component definition node to check
+ * @returns Tru, if the component needs a wrapping container
+ */
 export function isContainerLike(node: ComponentDef) {
   if (node.type === "Container") {
     return true;
   }
+
+  // --- If any of the following properties have a value, we need a container
   return !!(
     node.loaders ||
     node.vars ||
@@ -53,30 +71,29 @@ export function isContainerLike(node: ComponentDef) {
 }
 
 /**
- * This function signature is used whenever the engine wants to sign that an object's field (property),
- * which is part of the container state, has changed.
+ * This type is that function's signature, which signs that an entire 
+ * state variable or its nested part has been changed.
  */
-export type StateFieldPartChangedFn = (
+export type StatePartChangedFn = (
+  // --- String representing the component path ("a.b", "a.b[3].c", etc.)
   path: string[],
+
+  // --- The new value of the changed part
   value: any,
+
+  // --- The target component that has changed (along the path)
   target: string,
+
+  // --- Type of change
   action: ProxyAction,
 ) => void;
 
-// --- A component definition with optional container properties
-type ComponentDefWithContainerUid = ComponentDef & {
-  // --- The unique identifier of the container that wraps this component
-  containerUid?: symbol;
-
-  // --- If true, the component is bound to an API container
-  apiBoundContainer?: boolean;
-};
-
-type ComponentContainerProps = {
+// --- Properties of the ComponentContainer component
+type Props = {
   resolvedKey?: string;
   node: ContainerComponentDef;
   parentState: ContainerState;
-  parentStateFieldPartChanged: StateFieldPartChangedFn;
+  parentStateFieldPartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
@@ -84,6 +101,11 @@ type ComponentContainerProps = {
   uidInfoRef?: RefObject<Record<string, any>>;
 };
 
+/**
+ * This component is a container that manages the state of its children. It 
+ * provides a context for the children to access the state and the API of the 
+ * parent component.
+ */
 export const ComponentContainer = memo(
   forwardRef(function ComponentContainer(
     {
@@ -96,21 +118,23 @@ export const ComponentContainer = memo(
       parentRenderContext,
       parentDispatch,
       uidInfoRef,
-    }: ComponentContainerProps,
+    }: Props,
     ref,
   ) {
-    const enhancedNode = useMemo(() => getWrappedWithContainer(node), [node]);
+
+    // --- Make sure the component node is wrapped with a container
+    const containerizedNode = useMemo(() => getWrappedWithContainer(node), [node]);
 
     return (
       <ErrorBoundary node={node} location={"container"}>
         <MemoizedErrorProneContainer
           parentStateFieldPartChanged={parentStateFieldPartChanged}
           resolvedKey={resolvedKey}
-          node={enhancedNode as any}
+          node={containerizedNode as any}
           parentState={parentState}
           layoutContextRef={layoutContextRef}
           parentRenderContext={parentRenderContext}
-          isImplicit={node.type !== "Container" && enhancedNode.uses === undefined} //in this case it's an auto-wrapped component
+          isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
           ref={ref}
@@ -126,7 +150,7 @@ export const ComponentContainer = memo(
  * @param node The component node to wrap
  * @returns A "Container" node
  */
-const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
+const getWrappedWithContainer = (node: ContainerComponentDef) => {
   if (node.type === "Container") {
     // --- Already wrapped
     return node;
@@ -164,7 +188,6 @@ const getWrappedWithContainer = (node: ComponentDefWithContainerUid) => {
     contextVars: node.contextVars,
     props: {
       debug: (node.props as any)?.debug,
-      // debug: true,
     },
     children: [wrappedNode],
   } as ContainerComponentDef;

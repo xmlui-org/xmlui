@@ -15,7 +15,7 @@ import type { AppContextObject, MediaBreakpointType } from "@abstractions/AppCon
 import type { ThemeTone } from "@components-core/theming/abstractions";
 import type { IAppStateContext } from "@components/App/AppStateContext";
 
-import { ErrorBoundary } from "./ErrorBoundary";
+import { ErrorBoundary } from "./rendering/ErrorBoundary";
 import ThemeProvider from "@components-core//theming/ThemeProvider";
 import { delay, formatFileSizeInBytes, getFileExtension } from "@components-core/utils/misc";
 import { EMPTY_OBJECT, noop } from "@components-core/constants";
@@ -466,7 +466,7 @@ function AppContent({
     lookupSyncCallback: noop,
     registerComponentApi: noop,
     renderChild: noop,
-    stateFieldPartChanged: noop,
+    statePartChanged: noop,
     cleanup: noop,
     memoedVarsRef,
   });

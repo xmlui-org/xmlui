@@ -7,7 +7,7 @@ import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/C
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { useAppContext } from "@components-core/AppContext";
 import { buildProxy } from "@components-core/rendering/buildProxy";
-import { StateFieldPartChangedFn } from "./ContainerComponent";
+import { StatePartChangedFn } from "./ContainerComponent";
 import { ComponentCleanupFn, ContainerComponentDef, RegisterComponentApiFnInner } from "@components-core/rendering/ContainerComponent";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
@@ -36,7 +36,7 @@ type ContainerProps = {
   dispatch: ContainerDispatcher;
   setVersion: Dispatch<SetStateAction<number>>;
   version: number;
-  stateFieldPartChanged: StateFieldPartChangedFn;
+  statePartChanged: StatePartChangedFn;
   registerComponentApi: RegisterComponentApiFnInner;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
@@ -58,7 +58,7 @@ export const MemoizedContainer = memo(
       resolvedKey,
       version,
       setVersion,
-      stateFieldPartChanged,
+      statePartChanged,
       registerComponentApi: containerRegisterComponentApi,
       parentRegisterComponentApi,
       layoutContextRef,
@@ -211,7 +211,7 @@ export const MemoizedContainer = memo(
               if (changes.length) {
                 mainThreadBlockingRuns = 0;
                 changes.forEach((change) => {
-                  stateFieldPartChanged(
+                  statePartChanged(
                     change.pathArray,
                     cloneDeep(change.newValue),
                     change.target,
@@ -491,7 +491,7 @@ export const MemoizedContainer = memo(
             lookupSyncCallback,
             registerComponentApi,
             renderChild: stableRenderChild,
-            stateFieldPartChanged,
+            statePartChanged: statePartChanged,
             layoutContext: lc,
             parentRenderContext: pRenderContext,
             memoedVarsRef,
@@ -545,7 +545,7 @@ export const MemoizedContainer = memo(
         lookupAction,
         lookupSyncCallback,
         registerComponentApi,
-        stateFieldPartChanged,
+        statePartChanged,
         memoedVarsRef,
         cleanup,
         ref,

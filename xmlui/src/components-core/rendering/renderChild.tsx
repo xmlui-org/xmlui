@@ -2,15 +2,17 @@
 import { ComponentDef } from "@abstractions/ComponentDefs";
 import { InnerRendererContext } from "@components-core/abstractions/ComponentRenderer";
 import { ComponentHarness } from "./ComponentHarness";
-import { StateFieldPartChangedFn } from "./ContainerComponent";
+import { StatePartChangedFn } from "./ContainerComponent";
 import { ComponentCleanupFn } from "@components-core/rendering/ContainerComponent";
 import { shouldKeep, extractParam } from "@components-core/utils/extractParam";
 import { ReactNode } from "react";
 
-// Represents the context in which the React component belonging to a particular component definition
-// is rendered
+/** 
+ * This type represents the context in which the React component belonging to a 
+ * particular component definition is rendered with the `renderChild()` function.
+ */
 export interface ChildRendererContext extends InnerRendererContext {
-  stateFieldPartChanged: StateFieldPartChangedFn;
+  statePartChanged: StatePartChangedFn;
   cleanup: ComponentCleanupFn;
 }
 
@@ -38,7 +40,7 @@ export function renderChild({
   lookupSyncCallback,
   registerComponentApi,
   renderChild,
-  stateFieldPartChanged,
+  statePartChanged,
   layoutContext,
   parentRenderContext,
   memoedVarsRef,
@@ -116,7 +118,7 @@ export function renderChild({
       resolvedKey={key}
       node={node}
       cleanup={cleanup}
-      stateFieldPartChanged={stateFieldPartChanged}
+      statePartChanged={statePartChanged}
       memoedVarsRef={memoedVarsRef}
       state={state}
       dispatch={dispatch}

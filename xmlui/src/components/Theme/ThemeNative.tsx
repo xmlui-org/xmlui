@@ -9,7 +9,7 @@ import { createPortal } from "react-dom";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "@components-core/theming/abstractions";
 import type { LayoutContext } from "@abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "@components-core/constants";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
+import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
 import type { RenderChildFn } from "@abstractions/RendererDefs";
 import { getVarKey } from "@components-core/theming/themeVars";
