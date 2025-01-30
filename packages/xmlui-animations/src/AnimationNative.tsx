@@ -116,15 +116,6 @@ export const Animation = ({
     });
   }, [registerComponentApi, startAnimation, stopAnimation]);
 
-  /*  const transitions = useTransition(children, {
-                                                                initial: { opacity: 0 },
-                                                                from: { opacity: 0 },
-                                                                enter: { opacity: 1 },
-                                                                leave: { opacity: 0 },
-                                                                config: {duration: 3000},
-                                                                exitBeforeEnter: true,
-                                                              })*/
-
   const content = useMemo(() => {
     return Children.map(children, (child, index) =>
       animateWhenInView ? (
