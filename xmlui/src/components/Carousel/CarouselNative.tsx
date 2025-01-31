@@ -2,21 +2,14 @@ import * as React from "react";
 import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
-import {
-  CSSProperties,
-  ForwardedRef,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { CSSProperties, ForwardedRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import Icon from "@components/Icon/IconNative";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import Autoplay from "embla-carousel-autoplay";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { CarouselContext } from "@components/Carousel/CarouselContext";
+import { CarouselContext, useCarouselContextValue } from "@components/Carousel/CarouselContext";
 
 type CarouselApi = UseEmblaCarouselType[1];
 
@@ -34,11 +27,9 @@ export type CarouselProps = {
   onDisplayDidChange?: (activeSlide: number) => void;
   keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
-  duration?: number;
-};
-
-const Item = function InlineComponentDef(props: any) {
-  return React.cloneElement(props.children, { ...props });
+  transitionDuration?: number;
+  autoplayInterval?: number;
+  stopAutoplayOnInteraction?: boolean;
 };
 
 export const CarouselComponent = forwardRef(function CarouselComponent(
@@ -54,7 +45,9 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     startIndex = 0,
     prevIcon,
     nextIcon,
-    duration,
+    transitionDuration,
+    autoplayInterval = 5000,
+    stopAutoplayOnInteraction = true,
     registerComponentApi,
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -63,7 +56,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [activeSlide, setActiveSlide] = useState(0);
   const [plugins, setPlugins] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
-
+  const { carouselContextValue, carouselItems } = useCarouselContextValue();
   const ref = forwardedRef ? composeRefs(referenceElement, forwardedRef) : referenceElement;
 
   const [carouselRef, api] = useEmblaCarousel(
@@ -71,7 +64,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
       axis: orientation === "horizontal" ? "x" : "y",
       loop,
       startIndex,
-      duration,
+      duration: transitionDuration,
     },
     plugins,
   );
@@ -81,9 +74,14 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 
   useEffect(() => {
     if (autoplay) {
-      setPlugins([Autoplay()]);
+      setPlugins([
+        Autoplay({
+          delay: autoplayInterval,
+          stopOnInteraction: stopAutoplayOnInteraction,
+        }),
+      ]);
     }
-  }, [autoplay]);
+  }, [autoplayInterval, autoplay, stopAutoplayOnInteraction]);
 
   const toggleAutoplay = useCallback(() => {
     const autoplay = api?.plugins()?.autoplay;
@@ -114,18 +112,21 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-  const onSelect = React.useCallback((api: CarouselApi) => {
-    if (!api) {
-      return;
-    }
+  const onSelect = React.useCallback(
+    (api: CarouselApi) => {
+      if (!api) {
+        return;
+      }
 
-    const activeIndex = api.selectedScrollSnap();
-    onDisplayDidChange(activeIndex);
-    setActiveSlide(activeIndex);
+      const activeIndex = api.selectedScrollSnap();
+      onDisplayDidChange(activeIndex);
+      setActiveSlide(activeIndex);
 
-    setCanScrollPrev(api.canScrollPrev());
-    setCanScrollNext(api.canScrollNext());
-  }, []);
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    },
+    [onDisplayDidChange],
+  );
 
   const scrollPrev = useCallback(() => {
     if (api) {
@@ -157,7 +158,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         }
       }
     },
-    [scrollPrev, scrollNext],
+    [orientation, scrollPrev, scrollNext],
   );
 
   useEffect(() => {
@@ -174,11 +175,10 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     if (!api) {
       return;
     }
-
     onSelect(api);
     api.on("init", onSelect);
+    api.on("reInit", onSelect);
     api.on("select", onSelect);
-
     return () => {
       api?.off("select", onSelect);
     };
@@ -191,7 +191,8 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   }, [ref, handleKeyDown]);
 
   return (
-    <CarouselContext.Provider value={{ activeSlide }}>
+    <CarouselContext.Provider value={carouselContextValue}>
+      {children}
       <div
         style={style}
         ref={ref}
@@ -207,8 +208,17 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               [styles.vertical]: orientation === "vertical",
             })}
           >
-            {React.Children.map(children, (child, index) => (
-              <Item index={index}>{child}</Item>
+            {carouselItems.map((item, index) => (
+              <div
+                key={item.id}
+                role="group"
+                aria-roledescription="slide"
+                className={classnames(styles.carouselItem)}
+              >
+                <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
+                  {index === activeSlide ? item.children : null}
+                </div>
+              </div>
             ))}
           </div>
         </div>
@@ -229,7 +239,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
         )}
         {indicators && (
           <div className={styles.indicators}>
-            {React.Children.map(children, (_, index) => (
+            {carouselItems.map((_, index) => (
               <button
                 key={index}
                 type="button"

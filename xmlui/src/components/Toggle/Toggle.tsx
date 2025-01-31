@@ -97,7 +97,6 @@ export const Toggle = forwardRef(function Toggle(
   }, [indeterminate]);
 
   const focus = useCallback(() => {
-      console.log("kakakaka", innerRef.current)
     innerRef.current?.focus();
   }, []);
 

@@ -2,7 +2,8 @@ import styles from "./Text.module.scss";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { parseScssVar } from "@components-core/theming/themeVars";
-import { Text, variantOptionsMd, type VariantProps, VariantPropsKeys } from "./TextNative";
+import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "@components/abstractions";
+import { Text } from "./TextNative";
 
 const COMP = "Text";
 
@@ -18,7 +19,7 @@ export const TextMd = createMetadata({
     variant: d(
       `Optional string value that provides named presets for text variants with a ` +
         `unique combination of font style, weight, size, color and other parameters.`,
-      variantOptionsMd
+      variantOptionsMd,
     ),
     maxLines: d(
       `This property determines the maximum number of lines the component can wrap to. ` +

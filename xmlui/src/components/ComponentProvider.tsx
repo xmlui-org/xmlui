@@ -143,11 +143,6 @@ import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComp
 import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
-import {
-  animationComponentRenderer,
-  fadeInAnimationRenderer,
-  slideInAnimationRenderer,
-} from "@components/Animation/Animation";
 import type { Extension } from "@abstractions/ExtensionDefs";
 
 /**
@@ -409,10 +404,6 @@ export class ComponentRegistry {
     this.registerComponentRenderer(themeComponentRenderer);
     this.registerComponentRenderer(appStateComponentRenderer);
     this.registerComponentRenderer(apiCallRenderer);
-
-    this.registerComponentRenderer(animationComponentRenderer);
-    this.registerComponentRenderer(fadeInAnimationRenderer);
-    this.registerComponentRenderer(slideInAnimationRenderer);
 
     // --- Added after tabler-clone review
     this.registerCompoundComponentRenderer(pageHeaderRenderer);

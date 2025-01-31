@@ -498,6 +498,13 @@ export function findByField(arr: any[], field: string, value: any): any{
   return (arr ?? []).find(item => item[field || ""] === value);
 }
 
+export function distinct<T>(arr: T[]): T[] {
+  if (!Array.isArray(arr) || !arr || !arr.length) {
+    return [];
+  }
+  return Array.from(new Set(arr));
+}
+
 // from here: https://github.com/lodash/lodash/issues/4815
 /**
  * Throttles an async function in a way that can be awaited.

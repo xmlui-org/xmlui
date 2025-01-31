@@ -9,7 +9,30 @@ on:
   schedule:
     - cron: "39 1 * * *"
 jobs:
+  check-commit:
+    runs-on: ubuntu-latest
+    outputs:
+      should_test: ${{ steps.check.outputs.should_test }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: check
+        name: Determine if the commit has been tested already
+        run: |
+          current_time_epoch=$(date +%s)
+          last_commit_time_epoch=$(git log -1 --format=%ct)
+          one_day_epoch=$((60 * 60 * 24))
+          threshold_time=$((last_commit_time_epoch + one_day_epoch))
+
+          if [ $current_time_epoch -gt $threshold_time ]; then
+              echo "Last commit is older than 24 hours, skipping tests"
+              echo "should_test=false" >> $GITHUB_OUTPUT
+          else
+              echo "Last commit is within the last 24 hours, will not skip tests"
+              echo "should_test=true" >> $GITHUB_OUTPUT
+          fi
   test:
+    needs: check-commit
+    if: needs.check-commit.outputs.should_test == 'true'
     timeout-minutes: 60
     runs-on: ubuntu-latest
     steps:

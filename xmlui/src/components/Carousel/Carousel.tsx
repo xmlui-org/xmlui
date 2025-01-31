@@ -45,6 +45,9 @@ export const CarouselMd = createMetadata({
       null,
       "0",
     ),
+    transitionDuration: d("This property specifies the duration of the transition between slides."),
+    autoplayInterval: d("This property specifies the interval between autoplay transitions."),
+    stopAutoplayOnInteraction: d("This property indicates whether autoplay stops on interaction."),
     prevIcon: d("This property specifies the icon to display for the previous control."),
     nextIcon: d("This property specifies the icon to display for the next control."),
     keyboard: d("This property indicates whether the carousel responds to keyboard events."),
@@ -64,9 +67,9 @@ export const CarouselMd = createMetadata({
   themeVars: parseScssVar(styles.themeVars),
   defaultThemeVars: {
     [`color-bg-control-${COMP}`]: "$color-primary",
-    [`color-text-control-${COMP}`]: "$color-primary",
+    [`color-text-control-${COMP}`]: "$color-text",
     [`color-bg-control-hover-${COMP}`]: "$color-primary",
-    [`color-text-control-hover-${COMP}`]: "$color-primary",
+    [`color-text-control-hover-${COMP}`]: "$color-text",
     [`color-bg-control-active-${COMP}`]: "$color-primary",
     [`color-bg-control-disabled-${COMP}`]: "$color-surface-200",
     [`color-text-control-disabled-${COMP}`]: "$color-text-disabled",
@@ -94,6 +97,11 @@ export const carouselComponentRenderer = createComponentRenderer(
     return (
       <CarouselComponent
         style={layoutCss}
+        stopAutoplayOnInteraction={extractValue.asOptionalBoolean(
+          node.props?.stopAutoplayOnInteraction,
+        )}
+        autoplayInterval={extractValue.asOptionalNumber(node.props?.autoplayInterval)}
+        transitionDuration={extractValue.asOptionalNumber(node.props?.transitionDuration)}
         indicators={extractValue.asOptionalBoolean(node.props?.indicators)}
         controls={extractValue.asOptionalBoolean(node.props?.controls)}
         orientation={extractValue(node.props?.orientation)}

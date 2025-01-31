@@ -295,12 +295,13 @@
     "attribute": {
       "patterns": [
         {
-          "begin": "(?:^|\\s+)([a-zA-Z$_][-\\w.$]*(?::[a-zA-Z$_][-\\w.$]*)?)(\\s*=\\s*)(['\"`])",
-          "end": "\\3",
+          "begin": "(?:^|\\s+)((?:[a-zA-Z$_][-\\w.$]*:)?)([a-zA-Z$_][-\\w.$]*)(\\s*=\\s*)(['\"`])",
+          "end": "\\4",
           "beginCaptures": {
-            "1": { "name": "entity.other.attribute-name.localname.xmlui" },
-            "2": { "name": "keyword.operator.xmlui" },
-            "3": { "name": "string.xmlui" }
+            "1": { "name": "keyword.operator.namespace.xmlui" },
+            "2": { "name": "entity.other.attribute-name.localname.xmlui" },
+            "3": { "name": "keyword.operator.xmlui" },
+            "4": { "name": "string.xmlui" }
           },
           "endCaptures": {
             "0": { "name": "string.xmlui" }
@@ -309,16 +310,21 @@
           "patterns": [{ "include": "#textWithBindingExpr" }]
         },
         {
-          "match": "(?:^|\\s+)([a-zA-Z$_][-\\w.$]*(?::[a-zA-Z$_][-\\w.$]*)?)(\\s*=\\s*)([a-zA-Z$_][-\\w.$]*)",
+          "match": "(?:^|\\s+)((?:[a-zA-Z$_][-\\w.$]*:)?)([a-zA-Z$_][-\\w.$]*)(\\s*=\\s*)([a-zA-Z$_][-\\w.$]*)",
           "captures": {
-            "1": { "name": "entity.other.attribute-name.localname.xmlui" },
-            "2": { "name": "keyword.operator.xmlui" },
-            "3": { "name": "string.xmlui" }
+            "1": { "name": "keyword.operator.namespace.xmlui" },
+            "2": { "name": "entity.other.attribute-name.localname.xmlui" },
+            "3": { "name": "keyword.operator.xmlui" },
+            "4": { "name": "string.xmlui" }
           }
         },
         {
-          "match": "([a-zA-Z$_][-\\w.$]*(?::[a-zA-Z$_][-\\w.$]*)?)",
-          "name": "entity.other.attribute-name.localname.xmlui"
+          "match": "(?:^|\\s+)((?:[a-zA-Z$_][-\\w.$]*:)?)([a-zA-Z$_][-\\w.$]*)",
+          "name": "entity.other.attribute-name.localname.xmlui",
+          "captures": {
+            "1": { "name": "keyword.operator.namespace.xmlui" },
+            "2": { "name": "entity.other.attribute-name.localname.xmlui" }
+          }
         }
       ]
     },

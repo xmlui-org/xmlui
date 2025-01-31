@@ -7,7 +7,7 @@ import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, test } from "@testing/fixtures";
 
 test.skip(
-  "component renders & is visible",
+  "component renders",
   SKIP_REASON.NOT_IMPLEMENTED_XMLUI(),
   async ({ initTestBed, createSliderDriver }) => {
     await initTestBed(`<Slider />`);

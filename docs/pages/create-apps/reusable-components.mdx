@@ -299,6 +299,184 @@ This sample injects children into `MyStack`:
   `}
 />
 
+### Default Slot Content
+
+<Callout type="info" emoji="💡">
+The `Slot` may display default content when the reusable component instance does not define children.
+</Callout>
+
+In this example, `Slot` declares a default view:
+
+```ueml copy {3}
+<Component name="MyGreeting">
+  <Slot>
+    <H2>Hi There!</H2>
+  </Slot>
+</Component>
+```
+
+The following sample displays two `MyGreeting` instances. The first does not define children (content for `Slot`); the second does:
+
+```ueml copy
+<App>
+  <MyGreeting />
+  <MyGreeting>
+    <H1>Howdy!</H1>
+  </MyGreeting>
+</App>
+```
+
+The engine renders the first `MyGreeting` instance with the default content, the second with the content defined in the instance:
+
+<Playground
+  name="Example: Default slot"
+  horizontal={true}
+  components={[`
+    <Component name="MyGreeting">
+      <Slot>
+        <H2>Hi There!</H2>
+      </Slot>
+    </Component>
+  `,
+    ]}
+  app={`
+    <App>
+      <MyGreeting />
+      <MyGreeting>
+        <H1>Howdy!</H1>
+      </MyGreeting>
+    </App>
+  `}
+/>
+
+### Slot Context values
+
+<Callout type="info" emoji="💡">
+The `Slot` in a reusable component may define arbitrary properties it passes as context values to the children of the particular reusable component instance. 
+</Callout>
+
+The following component, `RandomNumberDisplay`, generates a random number between its `minValue` and `maxValue` properties and delegates displaying that number to its consumer.
+
+```ueml copy /number="{randomNumber}"/
+<Component name="RandomNumberDisplay">
+  <var 
+    name="randomNumber" 
+    value="{Math.floor(Math.random() * ($props.maxValue - $props.minValue)) + $props.minValue}" />
+  <Slot number="{randomNumber}"/>
+</Component>
+```
+
+Here, the app uses `RandomNumberDisplay` to generate a number between 10 and 19, which it displays in a shaded box with 4 times zoom. The app receives the random number passed to the `number` property within the component declaration of `RandomNumberDisplay` in the `$number` context value.
+
+```ueml copy {3-7} /$number/
+<App>
+  <RandomNumberDisplay minValue="{10}" maxValue="{20}">
+    <CHStack 
+      width="200px" 
+      height="100px" backgroundColor="cyan">
+      <Text zoom="4">[{$number}]</Text>
+    </CHStack>
+  </RandomNumberDisplay>
+</App>
+```
+
+<Playground
+  name="Example: Slot context values"
+  horizontal={true}
+  components={[`
+    <Component name="RandomNumberDisplay">
+      <var 
+        name="randomNumber" 
+        value="{Math.floor(Math.random() * ($props.maxValue - $props.minValue)) + $props.minValue}" />
+      <Slot number="{randomNumber}"/>
+    </Component>
+  `,
+    ]}
+  app={`
+    <App>
+      <RandomNumberDisplay minValue="{10}" maxValue="{20}">
+        <CHStack 
+          width="200px" 
+          height="100px" backgroundColor="cyan">
+          <Text zoom="4">[{$number}]</Text>
+        </CHStack>
+      </RandomNumberDisplay>
+    </App>
+  `}
+/>
+
+### Named Slots
+
+A reusable component may define named `Slot` elements (each having a unique `name` property). The reusable component instance can provide separate content for these named slots. Slot names should end with the `Template` suffix; otherwise, the rendering engine raises an error.
+
+In the following example, `FancyCard` has a named slot (`titleTemplate`) with default slot content and a `title` context value, which wraps the title in several asterisks:
+
+```ueml copy {4-6}
+<Component name="FancyCard">
+  <VStack border="2px solid orangered" padding="$padding-loose">
+    <var name="fancyTitle" value="*** {$props.title} ***" />
+    <Slot name="titleTemplate" title="{fancyTitle}">
+      <H1>{fancyTitle}</H1>
+    </Slot>
+    <VStack backgroundColor="blanchedalmond" padding="$padding-loose">
+      <Slot />
+    </VStack>
+  </VStack>
+</Component>
+```
+
+The app uses two instances of `FancyCard`. The first does not have a definition for the `titleTemplate`; the engine uses the default content declared in `FancyCard`. The second instance has template content that renders the title in a shaded box. This template content uses the asterisk-wrapped title via the `$title` context value.
+
+```ueml copy {6-10}
+<App>
+  <FancyCard title="Demo Card #1">
+    This is my fancy card content #1
+  </FancyCard>
+  <FancyCard title="Demo Card #2">
+    <property name="titleTemplate">
+      <VStack padding="$padding-tight" backgroundColor="lightblue">
+        <H1>{$title}</H1>
+      </VStack>
+    </property>
+    This is my fancy card content #2
+  </FancyCard>
+</App>
+```
+
+<Playground
+  name="Example: Slot context values"
+  horizontal={true}
+  components={[`
+    <Component name="FancyCard">
+      <VStack border="2px solid orangered" padding="$padding-loose">
+        <var name="fancyTitle" value="*** {$props.title} ***" />
+        <Slot name="titleTemplate" title="{fancyTitle}">
+          <H1>{fancyTitle}</H1>
+        </Slot>
+        <VStack backgroundColor="blanchedalmond" padding="$padding-loose">
+          <Slot />
+        </VStack>
+      </VStack>
+    </Component>
+  `,
+    ]}
+  app={`
+    <App>
+      <FancyCard title="Demo Card #1">
+        This is my fancy card content #1
+      </FancyCard>
+      <FancyCard title="Demo Card #2">
+        <property name="titleTemplate">
+          <VStack padding="$padding-tight" backgroundColor="lightblue">
+            <H1>{$title}</H1>
+          </VStack>
+        </property>
+        This is my fancy card content #2
+      </FancyCard>
+    </App>
+  `}
+/>
+
 ## Reusable Components in Layout Containers
 
 When you use reusable components with layout containers wrapping them, displaying a particular markup is not always obvious. The reusable components may nest other layout containers. As you do not see these nested containers from the markup directly, sometimes you may not understand immediately a particular component arrangement.

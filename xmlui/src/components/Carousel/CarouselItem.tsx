@@ -1,4 +1,4 @@
-import { createMetadata} from "@abstractions/ComponentDefs";
+import { createMetadata } from "@abstractions/ComponentDefs";
 import { createComponentRenderer } from "@components-core/renderers";
 import { CarouselItemComponent } from "@components/Carousel/CarouselItemNative";
 
@@ -11,9 +11,6 @@ export const carouselItemComponentRenderer = createComponentRenderer(
   CarouselItemMd,
   (rendererContext) => {
     const { node, renderChild } = rendererContext;
-    return <CarouselItemComponent content={renderChild(node.children, {
-        type: "Stack",
-        orientation: "vertical",
-    })} />;
+    return <CarouselItemComponent>{renderChild(node.children)}</CarouselItemComponent>;
   },
 );

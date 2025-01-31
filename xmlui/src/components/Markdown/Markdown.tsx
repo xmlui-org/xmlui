@@ -44,13 +44,21 @@ export const markdownComponentRenderer = createComponentRenderer(
   COMP,
   MarkdownMd,
   ({ node, extractValue, renderChild, layoutCss }) => {
-    const content = extractValue.asString(node.props.content);
+    let renderedChildren = extractValue.asString(node.props.content);
+    if (!renderedChildren) {
+      (node.children ?? []).forEach((child) => {
+        const renderedChild = renderChild(child);
+        if (typeof renderedChild === "string") {
+          renderedChildren += renderedChild;
+        }
+      });
+    }
     return (
       <Markdown
         style={layoutCss}
         removeIndents={extractValue.asOptionalBoolean(node.props.removeIndents, false)}
       >
-        {content || renderChild(node.children)}
+        {renderedChildren}
       </Markdown>
     );
   },

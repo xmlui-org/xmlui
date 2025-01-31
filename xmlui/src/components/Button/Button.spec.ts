@@ -1,10 +1,5 @@
 import type { Locator } from "@playwright/test";
-import {
-  getElementStyle,
-  getFullRectangle,
-  pixelStrToNum,
-  SKIP_REASON,
-} from "@testing/component-test-helpers";
+import { SKIP_REASON } from "@testing/component-test-helpers";
 import { expect as fixtureExpect, test } from "@testing/fixtures";
 import {
   alignmentOptionValues,
@@ -65,35 +60,97 @@ const expect = fixtureExpect.extend({
   },
 });
 
-// --- Props
+// --- Smoke
 
-// --- --- label
+test.describe("smoke tests", { tag: "@smoke" }, () => {
+  test("component renders", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button />`);
+    const driver = await createButtonDriver();
 
-test("Button renders and is visible", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button label="hello" />`);
-  await expect((await createButtonDriver()).component).toBeVisible();
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
+  });
+
+  // --- label
+
+  test("renders ASCII text in label", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button label="hello" />`);
+    await expect((await createButtonDriver()).component).toHaveText("hello");
+  });
+
+  test("renders Unicode text in label", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button label="😀" />`);
+    await expect((await createButtonDriver()).component).toHaveText("😀");
+  });
+
+  test("renders without label, icon or children", async ({ initTestBed, createButtonDriver }) => {
+    // We could get the sum of vertical paddings, margins and comp height to get the expected height
+    await initTestBed(`<Button height="20px" />`);
+    const driver = await createButtonDriver();
+    const { width, height } = await driver.getComponentBounds();
+
+    // TODO: These should be comp height >= button vertical paddings
+    expect(height).toBeGreaterThan(0);
+    expect(width).toBeGreaterThan(0);
+  });
+
+  // --- icon
+
+  test("can render icon", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button icon="test" />`, {
+      resources: {
+        "icon.test": "resources/bell.svg",
+      },
+    });
+    await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
+  });
+
+  // --- enabled
+
+  test("has enabled state", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button enabled="true" />`);
+    await expect((await createButtonDriver()).component).toBeEnabled();
+  });
+
+  test("has disabled state", async ({ initTestBed, createButtonDriver }) => {
+    await initTestBed(`<Button enabled="false" />`);
+    await expect((await createButtonDriver()).component).toBeDisabled();
+  });
+
+  // --- variant & themeColor
+
+  // TODO: add theme variable tests - a Solid Button has specific background, border, font colors, size, etc.
+  // import from abstractions: buttonVariantMd
+  // import from abstractions: buttonThemeMd
+  ["solid", "outlined", "ghost"].forEach((variant) => {
+    ["primary", "secondary", "attention"].forEach((themeColor) => {
+      test.skip(
+        `themeColor "${themeColor}" is applied for variant "${variant}"`,
+        SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+        async ({ initTestBed, createButtonDriver }) => {},
+      );
+      ["disabled", "hover", "active", "focused"].forEach((state) => {
+        test.skip(
+          `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
+          SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
+          async ({ initTestBed, createButtonDriver }) => {},
+        );
+      });
+    });
+  });
+
+  // --- click
+
+  test("click event fires", async ({ initTestBed, createButtonDriver }) => {
+    const { testStateDriver } = await initTestBed(`<Button onClick="testState = true" />`);
+    await (await createButtonDriver()).click();
+    await expect.poll(testStateDriver.testState).toEqual(true);
+  });
 });
 
-test("renders ASCII text in label", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button label="hello" />`);
-  await expect((await createButtonDriver()).component).toHaveText("hello");
-});
+// --- E2E
 
-test("renders Unicode text in label", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button label="😀" />`);
-  await expect((await createButtonDriver()).component).toHaveText("😀");
-});
-
-test("renders without label, icon or children", async ({ initTestBed, createButtonDriver }) => {
-  // We could get the sum of vertical paddings, margins and comp height to get the expected height
-  await initTestBed(`<Button height="20px" />`);
-  const driver = await createButtonDriver();
-  const { width, height } = await driver.getComponentSize();
-
-  // These should be comp height >= button vertical paddings
-  expect(height).toBeGreaterThan(0);
-  expect(width).toBeGreaterThan(0);
-});
+// --- label
 
 // TODO
 [
@@ -152,16 +209,7 @@ test.skip(
   },
 );
 
-// --- --- icon
-
-test("can render icon", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button icon="test" />`, {
-    resources: {
-      "icon.test": "resources/bell.svg",
-    },
-  });
-  await expect((await createButtonDriver()).getFirstIcon()).toBeVisible();
-});
+// --- icon
 
 test("renders icon and label", async ({ initTestBed, createButtonDriver }) => {
   await initTestBed(`<Button icon="test" label="hello" />`, {
@@ -213,7 +261,7 @@ test("renders if icon is not found and label is present", async ({
   await expect(driver.component).toHaveText("hello");
 });
 
-// --- --- iconPosition
+// --- iconPosition
 
 // TODO: These tests require some work: iconPosition=start/end + with label, without label, with children
 // 1. The idea of testing positioning this way can be challenged: it may be too specific
@@ -238,7 +286,7 @@ iconPositionCases.forEach(({ position, value }) => {
       });
 
       const driver = await createButtonDriver();
-      const buttonDimensions = await getFullRectangle(driver.component);
+      //const buttonDimensions = await getFullRectangle(driver.component);
       /* const contentStart = pixelStrToNum(
         buttonDimensions[pos] + (await getElementStyle(driver.component, `padding-${pos}`)),
       );
@@ -283,7 +331,7 @@ iconPositionCases.forEach(({ position, value }) => {
   );
 });
 
-// --- --- contentPosition
+// --- contentPosition
 
 alignmentOptionValues.forEach((pos) => {
   test(`label and icon is positioned to the ${pos}`, async ({
@@ -302,7 +350,7 @@ alignmentOptionValues.forEach((pos) => {
   });
 });
 
-// --- --- type
+// --- type
 
 buttonTypeValues.forEach((type) => {
   test(`type="${type}" is reflected in html`, async ({ initTestBed, createButtonDriver }) => {
@@ -311,48 +359,14 @@ buttonTypeValues.forEach((type) => {
   });
 });
 
-// --- --- enabled
-
-test("has enabled state", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button enabled="true" />`);
-  await expect((await createButtonDriver()).component).toBeEnabled();
-});
-
-test("has disabled state", async ({ initTestBed, createButtonDriver }) => {
-  await initTestBed(`<Button enabled="false" />`);
-  await expect((await createButtonDriver()).component).toBeDisabled();
-});
-
-// --- --- autoFocus
+// --- autoFocus
 
 test("focuses component if autoFocus is set", async ({ initTestBed, createButtonDriver }) => {
   await initTestBed(`<Button autoFocus="{true}" />`);
   await expect((await createButtonDriver()).component).toBeFocused();
 });
 
-// --- --- variant & themeColor
-
-// TODO: add theme variable tests - a Solid Button has specific background, border, font colors, size, etc.
-// import from abstractions: buttonVariantMd
-// import from abstractions: buttonThemeMd
-["solid", "outlined", "ghost"].forEach((variant) => {
-  ["primary", "secondary", "attention"].forEach((themeColor) => {
-    test.skip(
-      `themeColor "${themeColor}" is applied for variant "${variant}"`,
-      SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-      async ({ initTestBed, createButtonDriver }) => {},
-    );
-    ["disabled", "hover", "active", "focused"].forEach((state) => {
-      test.skip(
-        `${state} state for themeColor "${themeColor}" is applied for variant "${variant}"`,
-        SKIP_REASON.TEST_INFRA_NOT_IMPLEMENTED(),
-        async ({ initTestBed, createButtonDriver }) => {},
-      );
-    });
-  });
-});
-
-// --- --- size
+// --- size
 
 // TODO: add size tests
 // Relative testing is acceptable for now - basis of the test is the default size
@@ -364,23 +378,12 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createButton
   );
 });
 
-// --- Events
-
 test("testState initializes to default value", async ({ initTestBed }) => {
   const getState = (await initTestBed(`<Fragment />`)).testStateDriver.testState;
   await expect.poll(getState).toEqual(null);
 });
 
-// --- --- click
-
-test("click event fires", async ({ initTestBed, createButtonDriver }) => {
-  // test for event doing actually what is defined, e.g. change label text, write to console, etc.
-  const { testStateDriver } = await initTestBed(`<Button onClick="testState = true" />`);
-  await (await createButtonDriver()).click();
-  await expect.poll(testStateDriver.testState).toEqual(true);
-});
-
-// --- --- gotFocus
+// --- gotFocus
 
 test("is focused & gotFocus event fires", async ({ initTestBed, createButtonDriver }) => {
   const { testStateDriver } = await initTestBed(`<Button onGotFocus="testState = true" />`);
@@ -403,7 +406,7 @@ test("gotFocus event does not fire if disabled", async ({ initTestBed, createBut
   await expect.poll(testStateDriver.testState).toEqual(null);
 });
 
-// --- --- lostFocus
+// --- lostFocus
 
 test("lostFocus event fires & is not focused", async ({ initTestBed, createButtonDriver }) => {
   const { testStateDriver } = await initTestBed(`<Button onLostFocus="testState = true" />`);

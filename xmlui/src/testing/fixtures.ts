@@ -11,6 +11,9 @@ import {
   ButtonDriver,
   FormDriver,
   FormItemDriver,
+  HeadingDriver,
+  HStackDriver,
+  IconDriver,
   ItemsDriver,
   ListDriver,
   MarkdownDriver,
@@ -20,11 +23,117 @@ import {
   SelectDriver,
   SliderDriver,
   SplitterDriver,
+  StackDriver,
   TestStateDriver,
   TextAreaDriver,
   TextBoxDriver,
   TextDriver,
+  VStackDriver,
 } from "./ComponentDrivers";
+
+// -----------------------------------------------------------------
+// --- Utility
+
+/**
+ * Writes an error in the console to indicate if multiple elements have the same testId
+ */
+async function getOnlyFirstLocator(page: Page, testId: string) {
+  const locators = page.getByTestId(testId);
+  if ((await locators.count()) > 1) {
+    console.error(
+      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
+    );
+    return locators.first();
+  }
+  return locators;
+}
+
+// -----------------------------------------------------------------
+// --- Extending Expect
+
+export const expect = baseExpect.extend({
+  /**
+   * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
+   * Used to compare element dimensions on different platforms because of half pixel rendering.
+   *
+   * **Usage**
+   *
+   * ```js
+   * const value = 8;
+   * expect(value).toEqualWithTolerance(10, 2); // true
+   * ```
+   *
+   * @param expected Expected value
+   * @param tolerance Tolerance value, **default is 1**
+   */
+  toEqualWithTolerance(provided: number, expected: number, tolerance: number = 1) {
+    const assertionName = "toEqualWithTolerance";
+    let pass = false;
+
+    if (provided >= expected - (tolerance || 0) && provided <= expected + (tolerance || 0)) {
+      pass = true;
+    }
+
+    const message = pass
+      ? () =>
+          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
+          "\n\n" +
+          `Expected: ${this.isNot ? "not" : ""}${this.utils.printExpected(expected)}\n` +
+          `Received: ${this.utils.printReceived(provided)}`
+      : () =>
+          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
+          "\n\n" +
+          `Expected: ${this.utils.printExpected(expected)}\n` +
+          `Received: ${this.utils.printReceived(provided)}`;
+
+    return {
+      message,
+      pass,
+      name: assertionName,
+      expected,
+      actual: undefined,
+    };
+  },
+});
+
+class Clipboard {
+  private page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async getContent() {
+    const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
+    return handle.jsonValue();
+  }
+
+  async write(text: string) {
+    await this.page.evaluate((text) => navigator.clipboard.writeText(text), text);
+  }
+
+  async clear() {
+    await this.page.evaluate(() => navigator.clipboard.writeText(""));
+  }
+
+  /**
+   * Performs a focus on the given driver element, then copies the contents to the clipboard
+   * @param driver 
+   */
+  async copyFrom(driver: ComponentDriver) {
+    await driver.focus();
+    await driver.dblclick()
+    await this.page.keyboard.press('Control+c');
+  }
+
+  async pasteTo(driver: ComponentDriver) {
+    await driver.focus();
+    await this.page.keyboard.press('Control+v');
+  }
+}
+
+// -----------------------------------------------------------------
+// --- TestBed and Driver Fixtures
 
 export const test = baseTest.extend<TestDriverExtenderProps>({
   // NOTE: the base Playwright test can be extended with fixture methods
@@ -32,12 +141,11 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
   baseComponentTestId: "test-id-component",
   testStateViewTestId: "test-state-view-testid",
 
-  initTestBed: async ({ browser, page, baseComponentTestId, testStateViewTestId }, use) => {
+  initTestBed: async ({ page, baseComponentTestId, testStateViewTestId }, use) => {
     await use(
       async (
         source: string,
         description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-        contextOptions?: ContextOptions,
       ) => {
         // --- Initialize XMLUI App
         const { errors, component } = xmlUiMarkupToComponent(`
@@ -62,11 +170,6 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
             sourceBaseComponent.testId = baseComponentTestId;
           }
         }
-
-        browser.contexts().forEach(async (context) => {
-          await context.clearPermissions();
-          await context.grantPermissions(contextOptions?.browserPermissions ?? []);
-        });
 
         await initComponent(page, { ...description, entryPoint });
         return {
@@ -170,112 +273,36 @@ export const test = baseTest.extend<TestDriverExtenderProps>({
       return createDriver(TextDriver, testId);
     });
   },
-});
-
-/**
- * Writes an error in the console to indicate if multiple elements have the same testId
- */
-async function getOnlyFirstLocator(page: Page, testId: string) {
-  const locators = page.getByTestId(testId);
-  if ((await locators.count()) > 1) {
-    console.error(
-      `More than one element found with testId: ${testId}! Ignoring all but the first.`,
-    );
-    return locators.first();
-  }
-  return locators;
-}
-
-// -----------------------------------------------------------------
-
-export const expect = baseExpect.extend({
-  /**
-   * Compares two numbers with an optional tolerance value. If the tolerance is set to 0 the comparator acts as `toEqual`.
-   * Used to compare element dimensions on different platforms because of half pixel rendering.
-   *
-   * **Usage**
-   *
-   * ```js
-   * const value = 8;
-   * expect(value).toEqualWithTolerance(10, 2); // true
-   * ```
-   *
-   * @param expected Expected value
-   * @param tolerance Tolerance value, **default is 1**
-   */
-  toEqualWithTolerance(provided: number, expected: number, tolerance: number = 1) {
-    const assertionName = "toEqualWithTolerance";
-    let pass = false;
-
-    if (provided >= expected - (tolerance || 0) && provided <= expected + (tolerance || 0)) {
-      pass = true;
-    }
-
-    const message = pass
-      ? () =>
-          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.isNot ? "not" : ""}${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(provided)}`
-      : () =>
-          this.utils.matcherHint(assertionName, provided, expected, { isNot: this.isNot }) +
-          "\n\n" +
-          `Expected: ${this.utils.printExpected(expected)}\n` +
-          `Received: ${this.utils.printReceived(provided)}`;
-
-    return {
-      message,
-      pass,
-      name: assertionName,
-      expected,
-      actual: undefined,
-    };
+  createHeadingDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(HeadingDriver, testId);
+    });
+  },
+  createIconDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(IconDriver, testId);
+    });
+  },
+  createStackDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(StackDriver, testId);
+    });
+  },
+  createHStackDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(HStackDriver, testId);
+    });
+  },
+  createVStackDriver: async ({ createDriver }, use) => {
+    await use(async (testId?: string) => {
+      return createDriver(VStackDriver, testId);
+    });
   },
 });
-
-class Clipboard {
-  private page: Page;
-
-  constructor(page: Page) {
-    this.page = page;
-  }
-
-  async getContent() {
-    const handle = await this.page.evaluateHandle(() => navigator.clipboard.readText());
-    return handle.jsonValue();
-  }
-
-  async write(text: string) {
-    await this.page.evaluate((text) => navigator.clipboard.writeText(text), text);
-  }
-
-  async clear() {
-    await this.page.evaluate(() => navigator.clipboard.writeText(""));
-  }
-
-  /**
-   * Performs a focus on the given driver element, then copies the contents to the clipboard
-   * @param driver 
-   */
-  async copyFrom(driver: ComponentDriver) {
-    await driver.focus();
-    await driver.dblclick()
-    await this.page.keyboard.press('Control+c');
-  }
-
-  async pasteTo(driver: ComponentDriver) {
-    await driver.focus();
-    await this.page.keyboard.press('Control+v');
-  }
-}
 
 // --- Types
 
 type ComponentDriverMethod<T extends ComponentDriver> = (testId?: string) => Promise<T>;
-
-type ContextOptions = {
-  browserPermissions?: string[];
-};
 
 type TestDriverExtenderProps = {
   testStateViewTestId: string;
@@ -283,7 +310,6 @@ type TestDriverExtenderProps = {
   initTestBed: (
     source: string,
     description?: Omit<Partial<StandaloneAppDescription>, "entryPoint">,
-    contextOptions?: ContextOptions,
   ) => Promise<{ testStateDriver: TestStateDriver, clipboard: Clipboard }>;
   createDriver: <T extends new (...args: ComponentDriverParams[]) => any>(
     driverClass: T,
@@ -305,4 +331,9 @@ type TestDriverExtenderProps = {
   createTextAreaDriver: ComponentDriverMethod<TextAreaDriver>;
   createListDriver: ComponentDriverMethod<ListDriver>;
   createTextDriver: ComponentDriverMethod<TextDriver>;
+  createHeadingDriver: ComponentDriverMethod<HeadingDriver>;
+  createIconDriver: ComponentDriverMethod<IconDriver>;
+  createStackDriver: ComponentDriverMethod<StackDriver>;
+  createHStackDriver: ComponentDriverMethod<HStackDriver>;
+  createVStackDriver: ComponentDriverMethod<VStackDriver>;
 };

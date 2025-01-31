@@ -1,13 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
 
-async function getElementSize(locator: Locator) {
-  const dimensions = await locator.evaluate((element) => [
-    element.clientWidth,
-    element.clientHeight,
-  ]);
-  return { width: dimensions[0] ?? 0, height: dimensions[1] ?? 0 } as const;
-}
-
 export type ComponentDriverParams = {
   locator: Locator;
   page: Page;
@@ -15,7 +7,7 @@ export type ComponentDriverParams = {
 
 export class ComponentDriver {
   protected readonly locator: Locator;
-  page: Page;
+  protected readonly page: Page;
 
   constructor({ locator, page }: ComponentDriverParams) {
     this.locator = locator;
@@ -24,6 +16,56 @@ export class ComponentDriver {
 
   get component() {
     return this.locator;
+  }
+
+  /**
+   * Gets the html tag name of the final rendered component
+   */
+  async getComponentTagName() {
+    return this.component.evaluate((el) => el.tagName.toLowerCase());
+  }
+
+  async getStyles(style: string | string[]) {
+    style = Array.isArray(style) ? style : [style];
+    return this.component.evaluate(
+      (element, styles) =>
+        Object.fromEntries(
+          styles.map((styleName) => [
+            styleName,
+            window.getComputedStyle(element).getPropertyValue(styleName),
+          ]),
+        ),
+      style,
+    );
+  }
+
+  /**
+   * Retrieves the bounding rectangle of the component including margins and padding
+   * added to the dimensions.
+   */
+  async getComponentBounds() {
+    const boundingRect = await this.component.evaluate((element) =>
+      element.getBoundingClientRect(),
+    );
+    const margins = await this.getStyles([
+      "margin-left",
+      "margin-right",
+      "margin-top",
+      "margin-bottom",
+    ]);
+    const marginLeft = parseFloat(margins["margin-left"]);
+    const marginRight = parseFloat(margins["margin-right"]);
+    const marginTop = parseFloat(margins["margin-top"]);
+    const marginBottom = parseFloat(margins["margin-bottom"]);
+
+    const width = boundingRect.width + marginLeft + marginRight;
+    const height = boundingRect.height + marginTop + marginBottom;
+    const left = boundingRect.left - marginLeft;
+    const right = boundingRect.right + marginRight;
+    const top = boundingRect.top - marginTop;
+    const bottom = boundingRect.bottom + marginBottom;
+
+    return { width, height, left, right, top, bottom };
   }
 
   // NOTE: methods must be created using the arrow function notation.
@@ -43,10 +85,6 @@ export class ComponentDriver {
 
   blur = async (options?: { timeout?: number }) => {
     await this.locator.blur(options);
-  };
-
-  getComponentSize = async () => {
-    return getElementSize(this.locator);
   };
 }
 
@@ -121,7 +159,6 @@ export class SplitterDriver extends ComponentDriver {}
 
 // --- Form
 
-
 type SubmitTrigger = "click" | "keypress";
 type MockExternalApiOptions = {
   status?: number;
@@ -191,18 +228,16 @@ export class FormDriver extends ComponentDriver {
 // --- FormItem
 
 export class FormItemDriver extends ComponentDriver {
-
   // TODO, TEMP: get input under FormItem
   get input() {
     return this.locator.locator("input");
   }
-  
+
   // TODO: Need to check for input type
   // TODO: Remove this method and use input.fill directly
   async fillField(value: any) {
     await this.input.fill(value);
   }
-
 }
 
 // --- Markdown
@@ -215,7 +250,7 @@ export class MarkdownDriver extends ComponentDriver {
 
 export class ItemsDriver extends ComponentDriver {}
 
-// --- Slider 
+// --- Slider
 
 export class SliderDriver extends ComponentDriver {}
 
@@ -239,13 +274,12 @@ export class RadioGroupDriver extends ComponentDriver {}
 // --- NumberBox
 
 export class NumberBoxDriver extends ComponentDriver {
-
   get field() {
     return this.component.locator("input");
   }
 
   get label() {
-    return this.component.locator('label');
+    return this.component.locator("label");
   }
 
   get placeholder() {
@@ -264,13 +298,12 @@ export class NumberBoxDriver extends ComponentDriver {
 // --- TextBox
 
 export class TextBoxDriver extends ComponentDriver {
-
   get field() {
     return this.component.locator("input");
   }
 
   get label() {
-    return this.component.locator('label');
+    return this.component.locator("label");
   }
 
   get placeholder() {
@@ -281,13 +314,12 @@ export class TextBoxDriver extends ComponentDriver {
 // --- TextArea
 
 export class TextAreaDriver extends ComponentDriver {
-
   get field() {
     return this.component.locator("textarea").or(this.component).last();
   }
 
   get label() {
-    return this.component.locator('label');
+    return this.component.locator("label");
   }
 
   get placeholder() {
@@ -302,3 +334,23 @@ export class ListDriver extends ComponentDriver {}
 // --- Text
 
 export class TextDriver extends ComponentDriver {}
+
+// --- Heading
+
+export class HeadingDriver extends ComponentDriver {}
+
+// --- Icon
+
+export class IconDriver extends ComponentDriver {}
+
+// --- Stack
+
+export class StackDriver extends ComponentDriver {}
+
+// --- HStack
+
+export class HStackDriver extends StackDriver {}
+
+// --- VStack
+
+export class VStackDriver extends StackDriver {}

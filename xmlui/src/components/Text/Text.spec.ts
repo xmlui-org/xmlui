@@ -1,0 +1,274 @@
+import { TextVariantElement } from "@components/abstractions";
+import { expect, test } from "@testing/fixtures";
+
+test.describe("smoke tests", { tag: "@smoke" }, () => {
+  test("component renders", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`<Text />`);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toBeAttached();
+    await expect(driver.component).toBeEmpty();
+  });
+
+  // --- value
+
+  // correct types: string, undefined, null, number, boolean -> everything will be coerced to strings
+  [
+    { label: "undefined", value: "'{undefined}'", toExpect: "" },
+    { label: "null", value: "'{null}'", toExpect: "" },
+    { label: "empty string", value: "''", toExpect: "" },
+    { label: "string", value: "'test'", toExpect: "test" },
+    { label: "integer", value: "'{1}'", toExpect: "1" },
+    { label: "float", value: "'{1.2}'", toExpect: "1.2" },
+    { label: "boolean", value: "'{true}'", toExpect: "true" },
+    { label: "empty object", value: "'{{}}'", toExpect: {}.toString() },
+    { label: "object", value: "\"{{ a: 1, b: 'hi' }}\"", toExpect: { a: 1, b: "hi" }.toString() },
+    { label: "empty array", value: "'{[]}'", toExpect: "" },
+    { label: "array", value: "'{[1, 2, 3]}'", toExpect: [1, 2, 3].toString() },
+  ].forEach(({ label, value, toExpect }) => {
+    test(`setting value to ${label} sets value of field`, async ({
+      initTestBed,
+      createTextDriver,
+    }) => {
+      await initTestBed(`<Text value=${value} />`);
+      const driver = await createTextDriver();
+
+      await expect(driver.component).toHaveText(toExpect);
+    });
+  });
+
+  test("setting value prop has no whitespace collapsing", async ({
+    initTestBed,
+    createTextDriver,
+  }) => {
+    const expected = "test        content";
+    await initTestBed(`<Text value="${expected}" />`);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveText(expected);
+  });
+
+  test("child overrides value", async ({ initTestBed, createTextDriver }) => {
+    const EXPECTED = "this test text is the value of the heading";
+    await initTestBed(`
+      <Text value="${EXPECTED}">
+        This is a child
+      </Text>
+    `);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveText(EXPECTED);
+  });
+
+  // --- maxLines
+
+  test('maxLines="2" cuts off long text', async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="textShort" width="200">Short</Text>
+        <Text testId="textLong" width="200" maxLines="2">
+          Though this long text does not fit into a single line, please do not break it!
+        </Text>
+      </Fragment>
+    `);
+    const shortText = await createTextDriver("textShort");
+    const longText = await createTextDriver("textLong");
+
+    const { height: heightTextShort } = await shortText.getComponentBounds();
+    const { height: heightTextLong } = await longText.getComponentBounds();
+
+    expect(heightTextLong).toEqual(heightTextShort * 2);
+  });
+
+  // --- preserveLinebreaks
+
+  test("preserve line breaks", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+    <Fragment>
+      <Text testId="textShort">Short</Text>
+      <Text testId="textLong" preserveLinebreaks="true"
+        value="Though this long 
+text does not fit into a single line,
+please do not break it!"
+      />
+    </Fragment>
+    `);
+    const { height: heightTextShort } = await (
+      await createTextDriver("textShort")
+    ).getComponentBounds();
+    const { height: heightTextLong } = await (
+      await createTextDriver("textLong")
+    ).getComponentBounds();
+
+    expect(heightTextLong).toEqual(heightTextShort * 3);
+  });
+
+  // --- ellipses
+
+  test("ellipses in long text", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="textShort" width="200">Short</Text>
+        <Text testId="textLong" width="200" maxLines="1">
+          Though this long text does not fit into a single line, please do not break it!
+        </Text>
+      </Fragment>
+    `);
+    const shortTextDriver = await createTextDriver("textShort");
+    const longTextDriver = await createTextDriver("textLong");
+
+    const { height: heightTextShort } = await shortTextDriver.getComponentBounds();
+    const { height: heightTextLong } = await longTextDriver.getComponentBounds();
+
+    expect(heightTextShort).toEqual(heightTextLong);
+    await expect(longTextDriver.component).toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  test("no ellipses long text", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Fragment>
+        <Text testId="textShort" width="200">Short</Text>
+        <Text testId="textLong" width="200" maxLines="1" ellipses="false">
+          Though this long text does not fit into a single line, please do not break it!
+        </Text>
+      </Fragment>
+    `);
+    const shortTextDriver = await createTextDriver("textShort");
+    const longTextDriver = await createTextDriver("textLong");
+
+    const { height: heightTextShort } = await shortTextDriver.getComponentBounds();
+    const { height: heightTextLong } = await longTextDriver.getComponentBounds();
+
+    expect(heightTextShort).toEqual(heightTextLong);
+    await expect(longTextDriver.component).not.toHaveCSS("text-overflow", "ellipsis");
+  });
+
+  // --- implicit text
+
+  test("XMLUI renders implicit text in components", async ({ initTestBed, createStackDriver }) => {
+    const expected = "test content";
+    await initTestBed(`<Stack>${expected}</Stack>`);
+    const driver = await createStackDriver();
+
+    await expect(driver.component).toHaveText(expected);
+  });
+
+  test("nested text whitespace collapsing", async ({ initTestBed, createTextDriver }) => {
+    await initTestBed(`
+      <Text>
+      test      content
+          here
+      </Text>
+    `);
+    const driver = await createTextDriver();
+
+    await expect(driver.component).toHaveText("test content here");
+  });
+});
+
+// --- Props
+
+// --- variant
+
+Object.entries(TextVariantElement).forEach(([variant, htmlElement]) => {
+  test(
+    `variant=${variant} renders the HTML element: ${htmlElement}`,
+    async ({ initTestBed, createTextDriver }) => {
+      await initTestBed(`<Text variant=${variant} />`);
+      const driver = await createTextDriver();
+
+      const tagName = await driver.getComponentTagName();
+      expect(tagName).toEqual(htmlElement);
+    },
+  );
+});
+
+// --- Other Tests
+
+// --- formatting
+
+test("non-breaking space", async ({ initTestBed, createTextDriver }) => {
+  const content = "4 spaces here [&nbsp;&nbsp;&nbsp;&nbsp;], &amp;nbsp; written out.";
+  const expected = "4 spaces here [    ], &nbsp; written out.";
+
+  await initTestBed(`<Text>${content}</Text>`);
+  const driver = await createTextDriver();
+
+  await expect(driver.component).toHaveText(expected);
+});
+
+test("break long text", async ({ initTestBed, createTextDriver }) => {
+  await initTestBed(`
+    <Fragment>
+      <Text testId="textShort" width="200">Short</Text>
+      <Text testId="textLong" width="200">
+        This long text does not fit into a viewport with a 200-pixel width.
+      </Text>
+    </Fragment>
+  `);
+  const shortText = await createTextDriver("textShort");
+  const longText = await createTextDriver("textLong");
+
+  await expect(longText.component).toBeVisible();
+
+  const { height: heightTextShort } = await shortText.getComponentBounds();
+  const { height: heightTextLong } = await longText.getComponentBounds();
+
+  expect(heightTextShort).toBeLessThan(heightTextLong);
+});
+
+// --- inside layout
+
+test("Text is inline in HStack", async ({ initTestBed, createTextDriver, createIconDriver }) => {
+  await initTestBed(`
+    <HStack>
+      <Text testId="text0" >Show me a trash</Text>
+      <Icon testId="icon0"  name="trash"/>
+      <Text testId="text1" >icon!</Text>
+    </HStack>
+  `);
+  const { top: topText0 } = await (await createTextDriver("text0")).getComponentBounds();
+  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
+  const { top: topText1 } = await (await createTextDriver("text1")).getComponentBounds();
+
+  expect(topText0).toEqual(topIcon0);
+  expect(topIcon0).toEqual(topText1);
+});
+
+test("Text is block in VStack", async ({ initTestBed, createTextDriver, createIconDriver }) => {
+  await initTestBed(`
+    <VStack>
+      <Text testId="text0" >Show me a trash</Text>
+      <Icon testId="icon0"  name="trash"/>
+      <Text testId="text1" >icon!</Text>
+    </VStack>
+  `);
+  const { top: topText0 } = await (await createTextDriver("text0")).getComponentBounds();
+  const { top: topIcon0 } = await (await createIconDriver("icon0")).getComponentBounds();
+  const { top: topText1 } = await (await createTextDriver("text1")).getComponentBounds();
+
+  expect(topText0).toBeLessThan(topIcon0);
+  expect(topIcon0).toBeLessThan(topText1);
+});
+
+test("Text overflows container dimensions", async ({
+  initTestBed,
+  createVStackDriver,
+  createTextDriver,
+}) => {
+  const widthLayoutExpected = 300;
+  const widthTextExpected = 400;
+  await initTestBed(`
+    <VStack height="40" width="${widthLayoutExpected}" border="1px solid red">
+      <Text testId="text" width="${widthTextExpected}">
+        This text sets its size explicitly bigger than its container.
+        As it does not fit into the container's viewport, it overflows.
+      </Text>
+    </VStack>
+  `);
+  const { width: widthLayout } = await (await createVStackDriver()).getComponentBounds();
+  const { width: widthText } = await (await createTextDriver("text")).getComponentBounds();
+
+  expect(widthText).toEqual(widthTextExpected);
+  expect(widthLayout).toEqual(widthLayoutExpected);
+});

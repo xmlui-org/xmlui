@@ -1,11 +1,7 @@
-import type { BrowserContext, Locator, Page } from "@playwright/test";
-// import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
+import type { Locator, Page } from "@playwright/test";
 import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
 import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-// import type { Comdef } from "@abstractions/ComponentDefs";
-// import type { ThemeDefinition } from "@abstractions";
-// import type { ThemeDefinition } from "@components-core";
 
 type EntryPoint = string | ComponentDef;
 type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {
@@ -125,7 +121,10 @@ export async function getStyle(page: Page, testId: string, style: string) {
   const locator = page.getByTestId(testId);
   return await getElementStyle(locator, style);
 }
-
+/**
+ * Provides annotations for skipped tests and the ability to specify a reason.
+ * Use it via the SKIP_REASON exported variable.
+ */
 class TestSkipReason {
   private addAnnotation(type: string, description?: string) {
     return {
@@ -166,4 +165,19 @@ class TestSkipReason {
   }
 }
 
+/**
+ * Provides annotations for skipped tests and the ability to specify a reason.
+ * 
+ * Usage:
+ * 
+ * ```ts
+ * import { SKIP_REASON } from "./tests/component-test-helpers";
+ * 
+ * test.skip(
+ *   "test name",
+ *   SKIP_REASON.NOT_IMPLEMENTED_XMLUI("This test is not implemented in xmlui")
+ *   async ({}) => {},
+ * );
+ * ```
+ */
 export const SKIP_REASON = new TestSkipReason();

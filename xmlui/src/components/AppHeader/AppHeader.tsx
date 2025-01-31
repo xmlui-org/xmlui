@@ -7,7 +7,7 @@ import { parseScssVar } from "@components-core/theming/themeVars";
 import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
 import { dComponent } from "@components/metadata-helpers";
-import {SlotItem} from "@components/slot-helpers";
+import {SlotItem} from "@components/SlotItem";
 
 const COMP = "AppHeader";
 
