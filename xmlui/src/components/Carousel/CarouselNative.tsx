@@ -192,7 +192,6 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 
   return (
     <CarouselContext.Provider value={carouselContextValue}>
-      {children}
       <div
         style={style}
         ref={ref}
@@ -208,18 +207,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               [styles.vertical]: orientation === "vertical",
             })}
           >
-            {carouselItems.map((item, index) => (
-              <div
-                key={item.id}
-                role="group"
-                aria-roledescription="slide"
-                className={classnames(styles.carouselItem)}
-              >
-                <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
-                  {item.children}
-                </div>
-              </div>
-            ))}
+            {children}
           </div>
         </div>
         {controls && (
