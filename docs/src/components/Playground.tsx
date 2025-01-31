@@ -1,5 +1,4 @@
 import React, { useEffect, useId, useMemo, useReducer } from "react";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import {
   appDescriptionInitialized,
@@ -15,6 +14,7 @@ import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
 import { Header } from "@/src/components/Header";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
+import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
 
 type PlaygroundProps = {
   name: string;

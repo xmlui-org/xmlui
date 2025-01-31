@@ -1,4 +1,3 @@
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import AppRoot from "@components-core/AppRoot";
 import React, { useRef, useEffect, useMemo } from "react";
 import { usePlayground } from "@/src/hooks/usePlayground";
@@ -9,6 +8,7 @@ import styles from "./Preview.module.scss";
 import { errReportComponent, xmlUiMarkupToComponent } from "@src/components-core/xmlui-parser";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { useApiWorkerContext } from "@/src/components/ApiWorkerContext";
+import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);
