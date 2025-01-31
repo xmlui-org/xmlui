@@ -3,7 +3,7 @@ import { Animation } from "./AnimationNative";
 
 const COMP = "Animation";
 
-export const AnimationMd = createMetadata({
+const AnimationMd = createMetadata({
   status: "in progress",
   description: ``,
   props: {
@@ -27,13 +27,13 @@ export const AnimationMd = createMetadata({
   },
 });
 
-export const FadeInAnimationMd = createMetadata({
+const FadeInAnimationMd = createMetadata({
   ...AnimationMd,
   specializedFrom: COMP,
   description: `The \`${COMP}\` component represents an animation that fades in the content.`,
 });
 
-export const SlideInAnimationMd = createMetadata({
+const SlideInAnimationMd = createMetadata({
   ...AnimationMd,
   specializedFrom: COMP,
   description: `The \`${COMP}\` component represents an animation that slides in the content from the left.`,
@@ -46,7 +46,7 @@ export const SlideInAnimationMd = createMetadata({
   },
 });
 
-export const animationComponentRenderer = createComponentRenderer(
+const animationComponentRenderer = createComponentRenderer(
   COMP,
   AnimationMd,
   ({ registerComponentApi, renderChild, node, extractValue, lookupEventHandler }) => {
@@ -69,7 +69,7 @@ export const animationComponentRenderer = createComponentRenderer(
   },
 );
 
-export const fadeInAnimationRenderer = createComponentRenderer(
+const fadeInAnimationRenderer = createComponentRenderer(
   "FadeInAnimation",
   FadeInAnimationMd,
   ({ node, renderChild, extractValue, registerComponentApi, lookupEventHandler }) => {
@@ -94,7 +94,7 @@ export const fadeInAnimationRenderer = createComponentRenderer(
   },
 );
 
-export const slideInAnimationRenderer = createComponentRenderer(
+const slideInAnimationRenderer = createComponentRenderer(
   "SlideInAnimation",
   SlideInAnimationMd,
   ({ node, renderChild, extractValue, registerComponentApi, lookupEventHandler }) => {
@@ -133,6 +133,7 @@ export const slideInAnimationRenderer = createComponentRenderer(
   },
 );
 
-const animations = [animationComponentRenderer, fadeInAnimationRenderer, slideInAnimationRenderer];
-
-export default animations;
+export default {
+  namespace: "XMLUIExtensions",
+  components: [animationComponentRenderer, fadeInAnimationRenderer, slideInAnimationRenderer]
+}

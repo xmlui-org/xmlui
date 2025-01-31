@@ -222,6 +222,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   try {
     parser.parseStatements();
   } catch (e) {
+    // throw new Error(`Failed to fetch ${response.url}`);
     if (parser.errors.length > 0) {
       return {
         component: errReportScriptError(parser.errors[0], response.url),
@@ -798,12 +799,13 @@ function collectMissingComponents(
 
   componentRegistry.destroy();
 
-  // --- Collect all missing components.Omit the components that failed to load
+  // --- Collect all missing components.
+  // Omit the components that failed to load and the ones that are not in #app-ns namespace
   return new Set(
     result
       .filter((r) => r.code === "M001")
-      .map((r) => r.args[0])
-      .filter((comp) => !componentsFailedToLoad.has(comp)),
+      .map((r) => r.args[0].replace("#app-ns.", ""))
+      .filter((comp) => !componentsFailedToLoad.has(comp) && !comp.includes(".")),
   );
 }
 

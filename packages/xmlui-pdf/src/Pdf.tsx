@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { forwardRef, useState } from "react";
 import styles from "./Pdf.module.scss";
 import { Document, Page, pdfjs } from "react-pdf";
 import workerUrl from "pdfjs-dist/build/pdf.worker.min.mjs?url";
@@ -14,7 +14,7 @@ interface Props {
   src: string;
 }
 
-const Pdf = ({ src }: Props) => {
+const Pdf = forwardRef(({ src }: Props, ref) => {
   const [numPages, setNumPages] = useState<number | null>(null)
 
   function onLoadSuccess({numPages}: {numPages: number}) {
@@ -23,12 +23,12 @@ const Pdf = ({ src }: Props) => {
 
 
   return (
-    <Document file={src} onLoadSuccess={onLoadSuccess} className={styles.document}>
+    <Document file={src} onLoadSuccess={onLoadSuccess} className={styles.document} inputRef={ref as any}>
       {Array.from(new Array(numPages), (_, index) => (
         <Page key={index+1} pageNumber={index + 1} loading="" className={styles.page} />
       ))}
     </Document>
   );
-};
+});
 
 export default Pdf;
