@@ -45,7 +45,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     startIndex = 0,
     prevIcon,
     nextIcon,
-    transitionDuration,
+    transitionDuration = 25,
     autoplayInterval = 5000,
     stopAutoplayOnInteraction = true,
     registerComponentApi,
@@ -216,7 +216,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
                 className={classnames(styles.carouselItem)}
               >
                 <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
-                  {index === activeSlide ? item.children : null}
+                  {item.children}
                 </div>
               </div>
             ))}
