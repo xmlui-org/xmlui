@@ -45,6 +45,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     startIndex = 0,
     prevIcon,
     nextIcon,
+    transitionDuration = 25,
     autoplayInterval = 5000,
     stopAutoplayOnInteraction = true,
     registerComponentApi,
@@ -63,7 +64,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
       axis: orientation === "horizontal" ? "x" : "y",
       loop,
       startIndex,
-      duration: 25,
+      duration: transitionDuration,
     },
     plugins,
   );
@@ -215,7 +216,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
                 className={classnames(styles.carouselItem)}
               >
                 <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
-                    {item.children}
+                  {item.children}
                 </div>
               </div>
             ))}
