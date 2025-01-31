@@ -207,7 +207,7 @@ export const MemoizedContainer = memo(
             statements,
             evalContext,
             undefined,
-            async (evalContext, completedStatement) => {
+            async (evalContext) => {
               if (changes.length) {
                 mainThreadBlockingRuns = 0;
                 changes.forEach((change) => {

@@ -128,7 +128,7 @@ export const ComponentContainer = memo(
     return (
       <ErrorBoundary node={node} location={"container"}>
         <MemoizedErrorProneContainer
-          parentStateFieldPartChanged={parentStateFieldPartChanged}
+          parentStatePartChanged={parentStateFieldPartChanged}
           resolvedKey={resolvedKey}
           node={containerizedNode as any}
           parentState={parentState}
@@ -180,8 +180,7 @@ const getWrappedWithContainer = (node: ContainerComponentDef) => {
     functions: node.functions,
     scriptCollected: node.scriptCollected,
     scriptError: node.scriptError,
-    // TODO: it seems so that we need only node.uses, but we have to check it
-    uses: node.uses, // || node.props?.uses?.split(",").map((txt: string) => txt.trim()),
+    uses: node.uses,
     api: node.api,
     containerUid: "containerUid" in node && node.containerUid,
     apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,

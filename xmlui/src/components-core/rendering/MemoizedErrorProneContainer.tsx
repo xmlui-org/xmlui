@@ -1,7 +1,12 @@
-import { ParentRenderContext } from "@abstractions/ComponentDefs";
-import { ContainerState } from "@abstractions/ContainerDefs";
-import { LayoutContext } from "@abstractions/RendererDefs";
-import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/ComponentRenderer";
+import produce from "immer";
+import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
+import memoizeOne from "memoize-one";
+
+import type { ParentRenderContext } from "@abstractions/ComponentDefs";
+import type { ContainerState } from "@abstractions/ContainerDefs";
+import type { LayoutContext } from "@abstractions/RendererDefs";
+import type { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/ComponentRenderer";
+
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { collectFnVarDeps } from "@components-core/rendering/collectFnVarDeps";
@@ -11,24 +16,22 @@ import { useDebugView } from "@components-core/DebugViewProvider";
 import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { collectVariableDependencies } from "@components-core/script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "@components-core/utils/hooks";
-import produce from "immer";
-import { cloneDeep, isEmpty, isPlainObject, merge, pick } from "lodash-es";
 import { MutableRefObject, RefObject, memo, forwardRef, useState, useRef, useMemo, useReducer, useCallback } from "react";
 import { MemoizedContainer } from "./MemoizedContainer";
 import { useParams, useSearchParams } from "@remix-run/react";
 import { CodeDeclaration, ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
 import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
 import { useAppContext } from "@components-core/AppContext";
-import memoizeOne from "memoize-one";
 import { parseParameterString } from "@components-core/script-runner/ParameterParser";
 import { evalBinding } from "@components-core/script-runner/eval-tree-sync";
 import { extractParam } from "@components-core/utils/extractParam";
 import { pickFromObject, shallowCompare } from "@components-core/utils/misc";
 
-type ErrorProneContainerProps = {
+// --- Properties of the MemoizedErrorProneContainer component
+type Props = {
   node: ContainerComponentDef;
   parentState: ContainerState;
-  parentStateFieldPartChanged: StatePartChangedFn;
+  parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   resolvedKey?: string;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
@@ -41,19 +44,19 @@ type ErrorProneContainerProps = {
 // A React component that wraps a view container into an error boundary
 // (it's a named function inside the memo, this way it will be visible with that name in the react devtools)
 export const MemoizedErrorProneContainer = memo(
-  forwardRef(function ErrorProneContainer(
+  forwardRef(function MemoizedErrorProneContainer(
     {
       node,
       parentState,
       resolvedKey,
-      parentStateFieldPartChanged,
+      parentStatePartChanged,
       parentRegisterComponentApi,
       layoutContextRef,
       parentRenderContext,
       isImplicit,
       parentDispatch,
       uidInfoRef,
-    }: ErrorProneContainerProps,
+    }: Props,
     ref,
   ) {
     const [version, setVersion] = useState(0);
@@ -194,11 +197,11 @@ export const MemoizedErrorProneContainer = memo(
           });
         } else {
           if (!node.uses || node.uses.includes(key)) {
-            parentStateFieldPartChanged(pathArray, newValue, target, action);
+            parentStatePartChanged(pathArray, newValue, target, action);
           }
         }
       },
-      [resolvedLocalVars, node.uses, parentStateFieldPartChanged],
+      [resolvedLocalVars, node.uses, parentStatePartChanged],
     );
 
     return (

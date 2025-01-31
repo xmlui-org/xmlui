@@ -128,6 +128,10 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         prevState,
         nextState,
       };
+
+      // TODO: Logging to the console is a temporary solution. We should use a proper 
+      // logging mechanism. Nonetheless, this works only with state transition logging
+      // enabled (which is disabled by default).
       console.log("Transition", loggedTransition);
       if (debugView.stateTransitions) {
         if (debugView.stateTransitions.length >= MAX_STATE_TRANSITION_LENGTH) {
