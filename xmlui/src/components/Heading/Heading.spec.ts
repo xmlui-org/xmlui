@@ -1,4 +1,4 @@
-import { SKIP_REASON } from "@testing/component-test-helpers";
+import { pixelStrToNum, SKIP_REASON } from "@testing/component-test-helpers";
 import { expect, test } from "@testing/fixtures";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
@@ -48,24 +48,59 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   });
 
   test("child overrides value", async ({ initTestBed, createHeadingDriver }) => {
-    const EXPECTED = "this test text is the value of the heading";
+    const expected = "this test text is the value of the heading";
     await initTestBed(`
-      <Heading value="${EXPECTED}">
+      <Heading value="${expected}">
         This is a child
       </Heading>
     `);
     const driver = await createHeadingDriver();
 
-    await expect(driver.component).toHaveText(EXPECTED);
+    await expect(driver.component).toHaveText(expected);
   });
 
   // --- comparisons
 
-  test.skip(`h1 is larger than h2, h3, h4, h5, h6`, SKIP_REASON.TO_BE_IMPLEMENTED(), async ({ initTestBed }) => {
-    // font-size is not reliable enough, we (also) need to check the bounding rectangle of the rendered texts
+  async function sizeComparisonSetup(initTestBed: any, createHeadingDriver: any) {
+    await initTestBed(`
+      <Fragment>
+        <Heading level="h1" testId="heading1">Test</Heading>
+        <Heading level="h2" testId="heading2">Test</Heading>
+        <Heading level="h3" testId="heading3">Test</Heading>
+        <Heading level="h4" testId="heading4">Test</Heading>
+        <Heading level="h5" testId="heading5">Test</Heading>
+        <Heading level="h6" testId="heading6">Test</Heading>
+      </Fragment>
+    `);
+    const headings = [
+      await createHeadingDriver("heading1"),
+      await createHeadingDriver("heading2"),
+      await createHeadingDriver("heading3"),
+      await createHeadingDriver("heading4"),
+      await createHeadingDriver("heading5"),
+      await createHeadingDriver("heading6"),
+    ];
 
-    //const fontSizeH1 = pixelStrToNum(await getElementStyle(page.getByTestId("h1"), "font-size"));
-    //expect(fontSizeH1).toBeGreaterThan(fontSizeH2);
+    const headingSizes = await Promise.all(headings.map(async (heading) => {
+      const { width, height } = await heading.getComponentBounds();
+      return { width, height };
+    }));
+
+    return headingSizes;
+  }
+  // NOTE: we don't explicitly test h6, since all other headings have tested for its size
+  ["h1", "h2", "h3", "h4", "h5"].forEach((level, idx) => {
+    test(`compare ${level} size to other levels`, async ({ initTestBed, createHeadingDriver }) => {
+      const headingSizes = await sizeComparisonSetup(initTestBed, createHeadingDriver);
+  
+      for (let i = idx + 1; i < headingSizes.length; i++) {
+        console.log(`${level} width: ${headingSizes[idx].width} and height: ${headingSizes[idx].height}`);
+        console.log(`compared to h${i + 1} width: ${headingSizes[i].width} and height: ${headingSizes[i].height}`);
+        
+        expect(headingSizes[idx].width).toBeGreaterThanOrEqual(headingSizes[i].width);
+        expect(headingSizes[idx].height).toBeGreaterThanOrEqual(headingSizes[i].height);
+      }
+    });
   });
 
   [
@@ -235,7 +270,7 @@ test("Heading is inline in HStack", async ({ initTestBed, createHeadingDriver, c
   await initTestBed(`
     <HStack>
       <Heading testId="heading0" >Show me a trash</Heading>
-      <Icon testId="icon0"  name="trash"/>
+      <Icon testId="icon0" name="trash"/>
       <Heading testId="heading1" >icon!</Heading>
     </HStack>
   `);
@@ -251,7 +286,7 @@ test("Heading is block in VStack", async ({ initTestBed, createHeadingDriver, cr
   await initTestBed(`
     <VStack>
       <Heading testId="heading0" >Show me a trash</Heading>
-      <Icon testId="icon0"  name="trash"/>
+      <Icon testId="icon0" name="trash"/>
       <Heading testId="heading1" >icon!</Heading>
     </VStack>
   `);
