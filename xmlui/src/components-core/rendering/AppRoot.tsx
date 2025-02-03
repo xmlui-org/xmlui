@@ -5,9 +5,9 @@ import { enableMapSet } from "immer";
 import type { ComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
 import { resetErrors } from "@components-core/reportEngineError";
 import { ComponentProvider } from "@components/ComponentProvider";
-import StandaloneComponentManager from "../StandaloneComponentManager";
 import { DebugViewProvider } from "../DebugViewProvider";
 import { AppWrapper, AppWrapperProps } from "./AppWrapper";
+import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();
@@ -48,8 +48,8 @@ export function AppRoot({
   servedFromSingleFile,
   resourceMap,
   sources,
-  componentManager,
-}: AppWrapperProps & { componentManager?: StandaloneComponentManager }) {
+  extensionManager,
+}: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -78,7 +78,7 @@ export function AppRoot({
   resetErrors();
 
   return (
-    <ComponentProvider contributes={contributes} componentManager={componentManager}>
+    <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <DebugViewProvider debugConfig={globalProps?.debug}>
         <AppWrapper
           resourceMap={resourceMap}
