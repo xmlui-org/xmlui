@@ -1,12 +1,15 @@
 # Component Rendering
 
+Read this article to get acquainted with the rendering flow. When you go through, you will understand the pivotal concepts of the xmlui rendering engine and identify the primary components responsible for them.
+
 You can use xmlui in two ways:
 
 - You create a standalone app (the entire app is created with xmlui)
 - You inject an xmlui-based partial view into an existing web page.
-  Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
+  
+Independently of which method to use, the rendering engine starts its job when the browser is about to render the [`AppRoot`](./AppRoot.md) react component.
 
-`AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components). It expects the app's internal representation as its input (along with several other optional properties). Internally, it invokes the `renderRoot()` function passing the app definition. You can consider `renderRoot()` as the entry point to the rendering engine.
+`AppRoot` is a gateway between the xmlui domain (where an app's internal representation comes from markup and code-behind files) and the React domain (where an app works with React components). It expects the app's internal representation as input (along with several other optional properties). Internally, it invokes the `renderChild()` function passing the app definition. You can consider `renderChild()` as the entry point to the rendering engine.
 
 ## How Native React Components Are Used
 
@@ -24,7 +27,7 @@ This function gets an object, a `RendererContext` with properties and methods th
 
 `ComponentRenderFn` has a type parameter. This parameter is used only for type safety. It is passed in the renderer function as the type parameter of the `context` parameter. Behind the scenes, using TypeScript's type-checking features, this type parameter allows the compiler to carry out strict type checks.
 
-We never use a component renderer function directly. When defining the bridge, we apply the `createComponentRenderer` function, which has the following signature:
+We never use a component renderer function directly. When defining the bridge, we apply the `createComponentRenderer` helper function, which has the following signature:
 
 ```ts
 function createComponentRenderer<TMd extends ComponentMetadata>(
@@ -97,9 +100,11 @@ Without creating the renderer function and the metadata, no xmlui component coul
 2. Declare the component's metadata with `createMetadata`.
 3. Declare the component renderer with `createComponentRenderer` and pass the component's unique ID and metadata to it.
 
+> Note: Instead of creating a native React component in Step 1, you can create a `CompoundComponent` using xmlui markup. Nonetheless, you should harness it with metadata and create a renderer function. For now, just ignore this alternative.
+
 ### Component Metadata
 
-Metadata is an indispensable part of component rendering. The bridge between the xmlui and the React domains required this information. Besides compile-time checks, metadata is used for several other purposes:
+Metadata is an indispensable part of component rendering. The bridge between the xmlui and the React domains requires this information. Besides compile-time checks, metadata is used for several other purposes:
 
 - Automated component documentation generation
 - Markup compilation checks (is the markup correct?)
@@ -131,21 +136,23 @@ As the definition shows, each metadata section is a hash object collecting `Comp
 
 `ComponentMetadata` has these properties (each is optional):
 
-- `status`. This property describes the development status of a particular component. This property is used for documentation (we do not document immature components, as they are considered unsupported in production).
-- `description`. This property provides a concise definition (purpose) of the component
-- `shortDescription`. A shorter (one-short-line-on-the-screen) definition of the component for visual tools
-- `props`: The component's properties (`TProps` is inferred from this property)
-- `events`: The supported event handlers (`TEvents` is inferred from this property)
-- `contextVars`. The context values the component offers (`TContextValues` is inferred from this property)
-- `apis`. The exposed methods the component offers to invoke through the component instance ID (`TApis` is inferred from this property)
-- `nonVisual`. Indicates that a particular component does not render any visual element on its own (Default: `false`)
-- `opaque`. If this property is set to `true,` the component does not render any React component (with a DOM node) on its own; only its children may.
-- `themeVars`. This string list contains the theme variable names the property uses to establish its themeable appearance.
-- `defaultThemeVars`. This hash object contains the default values of particular theme variables. The current definition enables the definition of tone-specific theme variables here, putting their hash objects into the `light` and `dark` properties.
-- `toneSpecificThemeVars`. This hash object allows the definition of tone-specific theme variables separately from - `defaultThemeVars`. _This property seems to be ready for removal._
-- `allowArbitraryProps`. When this property is set to true, the component markup should accept _any_ property names, even if some of them are not used.
-- `specializedFrom`. If the component is specialized from another (such as `VStack` is a specialization of `Stack`), this property holds the name of the parent component. This value is used only for document generation purposes.
-- `docFolder`. This property is used for document generation. If a component's additional (non-metadata-described) documentation is not within the folder matching the component's ID, this property defines the appropriate folder.
+| Property | Description |
+|-|-|
+| `status` | This property describes the development status of a particular component and is used for documentation (we do not document immature components, as they are considered unsupported in production). |
+| `description` | This property provides a concise definition (purpose) of the component. |
+| `shortDescription` | A shorter (one-short-line-on-the-screen) definition of the component for visual tools. |
+| `props` | The component's properties (`TProps` is inferred from this property). |
+| `events` | The supported event handlers (`TEvents` is inferred from this property). |
+| `contextVars` | The context values the component offers (`TContextValues` is inferred from this property). |
+| `apis` | The exposed methods the component offers to invoke through the component instance ID (`TApis` is inferred from this property). |
+| `nonVisual` | Indicates that a particular component does not render any visual element on its own (Default: `false`) |
+| `opaque` | If this property is set to `true,` the component does not render any React component (with a DOM node) on its own; only its children may. |
+| `themeVars` | This string list contains the theme variable names the property uses to establish its themeable appearance. |
+| `defaultThemeVars` | This hash object contains the default values of particular theme variables. The current definition enables the definition of tone-specific theme variables here, putting their hash objects into the `light` and `dark` properties. |
+| `toneSpecificThemeVars` | This hash object allows the definition of tone-specific theme variables separately from `defaultThemeVars`. (_This property seems to be ready for removal._)
+| `allowArbitraryProps` | When this property is set to true, the component markup should accept _any_ property names, even if some of them are not used. |
+| `specializedFrom` | If the component is specialized from another (such as `VStack` is a specialization of `Stack`), this property holds the name of the parent component. This value is used only for document generation purposes |
+| `docFolder` | This property is used for document generation. If a component's additional (non-metadata-described) documentation is not within the folder matching the component's ID, this property defines the appropriate folder. |
 
 ### Property Metadata
 

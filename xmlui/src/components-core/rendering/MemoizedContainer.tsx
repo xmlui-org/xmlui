@@ -135,7 +135,6 @@ export const MemoizedContainer = memo(
             changes.push(changeInfo);
           });
         };
-
         const evalAppContext = {
           ...appContext,
           getThemeVar,
@@ -170,7 +169,7 @@ export const MemoizedContainer = memo(
 
         try {
           // --- Prepare the event handler to an arrow expression statement
-          let statements;
+          let statements: Statement[];
           if (typeof source === "string") {
             if (!parsedStatementsRef.current[source]) {
               parsedStatementsRef.current[source] = prepareHandlerStatements(

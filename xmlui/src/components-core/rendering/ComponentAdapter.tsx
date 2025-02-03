@@ -46,7 +46,7 @@ type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
  * current rendering context). The modified version uses a stable reference to the layout context
  * and provides a cleanup function (`onUnmount`) to call when the component is about to be disposed.
  */
-const ComponentBed = forwardRef(function ComponentBed(
+const ComponentAdapter = forwardRef(function ComponentAdapter(
   {
     node,
     state,
@@ -454,4 +454,4 @@ function getApiBoundItems(items: Record<string, any> | undefined, ...type: strin
   return ret;
 }
 
-export default ComponentBed;
+export default ComponentAdapter;

@@ -10,7 +10,7 @@ import type {
   CompoundComponentDef,
 } from "@abstractions/ComponentDefs";
 import { createMetadata, d } from "@abstractions/ComponentDefs";
-import AppRoot from "@components-core/AppRoot";
+import AppRoot from "@components-core/rendering/AppRoot";
 import { createComponentRenderer } from "@components-core/renderers";
 import type { TreeNode } from "@components-core/abstractions/treeAbstractions";
 import { Icon } from "@components/Icon/IconNative";

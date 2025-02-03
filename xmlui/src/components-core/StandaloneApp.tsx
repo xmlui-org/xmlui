@@ -16,7 +16,7 @@ import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSou
 import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 
 import "../index.scss";
-import AppRoot from "@components-core/AppRoot";
+import AppRoot from "@components-core/rendering/AppRoot";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";

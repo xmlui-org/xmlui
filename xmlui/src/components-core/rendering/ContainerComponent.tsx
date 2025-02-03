@@ -93,7 +93,7 @@ type Props = {
   resolvedKey?: string;
   node: ContainerComponentDef;
   parentState: ContainerState;
-  parentStateFieldPartChanged: StatePartChangedFn;
+  parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
@@ -112,7 +112,7 @@ export const ComponentContainer = memo(
       resolvedKey,
       node,
       parentState,
-      parentStateFieldPartChanged,
+      parentStatePartChanged,
       parentRegisterComponentApi,
       layoutContextRef,
       parentRenderContext,
@@ -128,7 +128,7 @@ export const ComponentContainer = memo(
     return (
       <ErrorBoundary node={node} location={"container"}>
         <MemoizedErrorProneContainer
-          parentStatePartChanged={parentStateFieldPartChanged}
+          parentStatePartChanged={parentStatePartChanged}
           resolvedKey={resolvedKey}
           node={containerizedNode as any}
           parentState={parentState}

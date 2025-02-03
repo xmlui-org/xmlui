@@ -1,7 +1,7 @@
 
 import { ComponentDef } from "@abstractions/ComponentDefs";
 import { InnerRendererContext } from "@components-core/abstractions/ComponentRenderer";
-import { ComponentHarness } from "./ComponentHarness";
+import { ComponentWrapper } from "./ComponentWrapper";
 import { StatePartChangedFn } from "./ContainerComponent";
 import { ComponentCleanupFn } from "@components-core/rendering/ContainerComponent";
 import { shouldKeep, extractParam } from "@components-core/utils/extractParam";
@@ -113,7 +113,7 @@ export function renderChild({
   const key = extractParam(state, node.uid, appContext, true);
 
   return (
-    <ComponentHarness
+    <ComponentWrapper
       key={key}
       resolvedKey={key}
       node={node}

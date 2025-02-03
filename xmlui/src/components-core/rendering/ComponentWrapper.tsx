@@ -1,5 +1,5 @@
 import { forwardRef, memo, RefObject, useMemo, useRef } from "react";
-import ComponentBed from "./ComponentBed";
+import ComponentAdapter from "./ComponentAdapter";
 import { extractParam } from "@components-core/utils/extractParam";
 import { ComponentDef } from "@abstractions/ComponentDefs";
 import { ChildRendererContext } from "./renderChild";
@@ -8,8 +8,8 @@ import { ComponentContainer, ContainerComponentDef, isContainerLike } from "./Co
 /**
  * The ComponentNode it the outermost React component wrapping an xmlui component.
  */
-export const ComponentHarness = memo(
-  forwardRef(function ComponentHarness(
+export const ComponentWrapper = memo(
+  forwardRef(function ComponentWrapper(
     {
       node,
       state,
@@ -70,7 +70,7 @@ export const ComponentHarness = memo(
           parentDispatch={dispatch}
           layoutContextRef={stableLayoutContext}
           parentRenderContext={parentRenderContext}
-          parentStateFieldPartChanged={statePartChanged}
+          parentStatePartChanged={statePartChanged}
           parentRegisterComponentApi={registerComponentApi}
           uidInfoRef={uidInfoRef}
           ref={ref}
@@ -78,7 +78,7 @@ export const ComponentHarness = memo(
       );
     } else {
       renderedChild = (
-        <ComponentBed
+        <ComponentAdapter
           onUnmount={cleanup}
           memoedVarsRef={memoedVarsRef}
           node={nodeWithTransformedDatasourceProp}
