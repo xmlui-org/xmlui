@@ -140,9 +140,10 @@ import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/Ton
 import { apiCallRenderer } from "@components/APICall/APICall";
 import { optionComponentRenderer } from "@components/Option/Option";
 import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
-import type StandaloneComponentManager from "../components-core/StandaloneComponentManager";
+import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
+import type { Extension } from "@abstractions/ExtensionDefs";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -167,11 +168,6 @@ export type ContributesDefinition = {
    * Native xmlui components that come with the app.
    */
   components?: ComponentRendererDef[];
-
-  /**
-   * Action functions that come with the app.
-   */
-  actions?: ActionRendererDef[];
 
   /**
    * Application-specific compound components that come with the app.
@@ -212,234 +208,241 @@ export class ComponentRegistry {
    * `contributes` argument with information about accompanying (app-specific)
    * components that come with a particular app using the registry.
    * @param contributes Information about the components that come with the app
-   * @param componentManager Optional manager object that receives a notification
+   * @param extensionManager Optional manager object that receives a notification
    * about component registrations
    */
   constructor(
     contributes: ContributesDefinition = {},
-    private readonly componentManager?: StandaloneComponentManager,
+    private readonly extensionManager?: StandaloneExtensionManager,
   ) {
-    this.componentManager = componentManager;
+    this.extensionManager = extensionManager;
+
+
+    // we register these first, so that core components with the same name can override them (without namespace)
+    contributes.components?.forEach((renderer) => {
+      this.registerAppComponent(renderer);
+    });
+    contributes.compoundComponents?.forEach((def) => {
+      this.registerAppComponent({ compoundComponentDef: def });
+    });
+
+
+
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
-      this.registerComponentRenderer(stackComponentRenderer);
-      this.registerComponentRenderer(vStackComponentRenderer);
-      this.registerComponentRenderer(hStackComponentRenderer);
-      this.registerComponentRenderer(cvStackComponentRenderer);
-      this.registerComponentRenderer(chStackComponentRenderer);
+      this.registerCoreComponent(stackComponentRenderer);
+      this.registerCoreComponent(vStackComponentRenderer);
+      this.registerCoreComponent(hStackComponentRenderer);
+      this.registerCoreComponent(cvStackComponentRenderer);
+      this.registerCoreComponent(chStackComponentRenderer);
     }
 
-    this.registerComponentRenderer(SlotHolder);
-    this.registerComponentRenderer(dataSourcePropHolder);
-    this.registerComponentRenderer(textNodePropHolder);
-    this.registerComponentRenderer(textNodeCDataPropHolder);
+    this.registerCoreComponent(SlotHolder);
+    this.registerCoreComponent(dataSourcePropHolder);
+    this.registerCoreComponent(textNodePropHolder);
+    this.registerCoreComponent(textNodeCDataPropHolder);
     if (process.env.VITE_USED_COMPONENTS_SpaceFiller !== "false") {
-      this.registerComponentRenderer(spaceFillerComponentRenderer);
+      this.registerCoreComponent(spaceFillerComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_Textarea !== "false") {
-      this.registerComponentRenderer(textAreaComponentRenderer);
+      this.registerCoreComponent(textAreaComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_AppHeader !== "false") {
-      this.registerComponentRenderer(appHeaderComponentRenderer);
+      this.registerCoreComponent(appHeaderComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Footer !== "false") {
-      this.registerComponentRenderer(footerRenderer);
+      this.registerCoreComponent(footerRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Logo !== "false") {
-      this.registerComponentRenderer(logoComponentRenderer);
+      this.registerCoreComponent(logoComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NavLink !== "false") {
-      this.registerComponentRenderer(navLinkComponentRenderer);
+      this.registerCoreComponent(navLinkComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NavGroup !== "false") {
-      this.registerComponentRenderer(navGroupComponentRenderer);
+      this.registerCoreComponent(navGroupComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Link !== "false") {
-      this.registerComponentRenderer(localLinkComponentRenderer);
+      this.registerCoreComponent(localLinkComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Form !== "false") {
-      this.registerComponentRenderer(formComponentRenderer);
-      this.registerComponentRenderer(formItemComponentRenderer);
+      this.registerCoreComponent(formComponentRenderer);
+      this.registerCoreComponent(formItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Tree !== "false") {
-      this.registerComponentRenderer(treeComponentRenderer);
+      this.registerCoreComponent(treeComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Button !== "false") {
-      this.registerComponentRenderer(buttonComponentRenderer);
+      this.registerCoreComponent(buttonComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Checkbox !== "false") {
-      this.registerComponentRenderer(checkboxComponentRenderer);
+      this.registerCoreComponent(checkboxComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Switch !== "false") {
-      this.registerComponentRenderer(switchComponentRenderer);
+      this.registerCoreComponent(switchComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Heading !== "false") {
-      this.registerComponentRenderer(headingComponentRenderer);
-      this.registerComponentRenderer(h1ComponentRenderer);
-      this.registerComponentRenderer(h2ComponentRenderer);
-      this.registerComponentRenderer(h3ComponentRenderer);
-      this.registerComponentRenderer(h4ComponentRenderer);
-      this.registerComponentRenderer(h5ComponentRenderer);
-      this.registerComponentRenderer(h6ComponentRenderer);
+      this.registerCoreComponent(headingComponentRenderer);
+      this.registerCoreComponent(h1ComponentRenderer);
+      this.registerCoreComponent(h2ComponentRenderer);
+      this.registerCoreComponent(h3ComponentRenderer);
+      this.registerCoreComponent(h4ComponentRenderer);
+      this.registerCoreComponent(h5ComponentRenderer);
+      this.registerCoreComponent(h6ComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Text !== "false") {
-      this.registerComponentRenderer(textComponentRenderer);
+      this.registerCoreComponent(textComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Fragment !== "false") {
-      this.registerComponentRenderer(fragmentComponentRenderer);
+      this.registerCoreComponent(fragmentComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Table !== "false") {
-      this.registerComponentRenderer(tableComponentRenderer);
-      this.registerComponentRenderer(columnComponentRenderer);
+      this.registerCoreComponent(tableComponentRenderer);
+      this.registerCoreComponent(columnComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_List !== "false") {
-      this.registerComponentRenderer(dynamicHeightListComponentRenderer);
+      this.registerCoreComponent(dynamicHeightListComponentRenderer);
     }
 
     if (process.env.VITE_USED_COMPONENTS_App !== "false") {
-      this.registerComponentRenderer(appRenderer);
+      this.registerCoreComponent(appRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NavPanel !== "false") {
-      this.registerComponentRenderer(navPanelRenderer);
+      this.registerCoreComponent(navPanelRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Pages !== "false") {
-      this.registerComponentRenderer(pagesRenderer);
-      this.registerComponentRenderer(pageRenderer);
+      this.registerCoreComponent(pagesRenderer);
+      this.registerCoreComponent(pageRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Redirect !== "false") {
-      this.registerComponentRenderer(redirectRenderer);
+      this.registerCoreComponent(redirectRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_StickyBox !== "false") {
-      this.registerComponentRenderer(stickyBoxComponentRenderer);
+      this.registerCoreComponent(stickyBoxComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Badge !== "false") {
-      this.registerComponentRenderer(badgeComponentRenderer);
+      this.registerCoreComponent(badgeComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Avatar !== "false") {
-      this.registerComponentRenderer(avatarComponentRenderer);
+      this.registerCoreComponent(avatarComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_ContentSeparator !== "false") {
-      this.registerComponentRenderer(contentSeparatorComponentRenderer);
+      this.registerCoreComponent(contentSeparatorComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Card !== "false") {
-      this.registerComponentRenderer(cardComponentRenderer);
+      this.registerCoreComponent(cardComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FlowLayout !== "false") {
-      this.registerComponentRenderer(flowLayoutComponentRenderer);
+      this.registerCoreComponent(flowLayoutComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_ModalDialog !== "false") {
-      this.registerComponentRenderer(modalViewComponentRenderer);
+      this.registerCoreComponent(modalViewComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_NoResult !== "false") {
-      this.registerComponentRenderer(noResultComponentRenderer);
+      this.registerCoreComponent(noResultComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Option !== "false") {
-      this.registerComponentRenderer(optionComponentRenderer);
+      this.registerCoreComponent(optionComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_TabItem !== "false") {
-      this.registerComponentRenderer(tabItemComponentRenderer);
+      this.registerCoreComponent(tabItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_AccordionItem !== "false") {
-      this.registerComponentRenderer(accordionItemComponentRenderer);
+      this.registerCoreComponent(accordionItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_CarouselItem !== "false") {
-      this.registerComponentRenderer(carouselItemComponentRenderer);
+      this.registerCoreComponent(carouselItemComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_FileUploadDropZone !== "false") {
-      this.registerComponentRenderer(fileUploadDropZoneComponentRenderer);
+      this.registerCoreComponent(fileUploadDropZoneComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Icon !== "false") {
-      this.registerComponentRenderer(iconComponentRenderer);
+      this.registerCoreComponent(iconComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Items !== "false") {
-      this.registerComponentRenderer(itemsComponentRenderer);
+      this.registerCoreComponent(itemsComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_SelectionStore !== "false") {
-      this.registerComponentRenderer(selectionStoreComponentRenderer);
+      this.registerCoreComponent(selectionStoreComponentRenderer);
     }
     if (process.env.VITE_USED_COMPONENTS_Image !== "false") {
-      this.registerComponentRenderer(imageComponentRenderer);
+      this.registerCoreComponent(imageComponentRenderer);
     }
 
     if (process.env.VITE_USER_COMPONENTS_XmluiCodeHightlighter !== "false") {
-      this.registerComponentRenderer(codeComponentRenderer);
+      this.registerCoreComponent(codeComponentRenderer);
     }
 
     if (process.env.VITE_USER_COMPONENTS_Markdown !== "false") {
-      this.registerComponentRenderer(markdownComponentRenderer);
+      this.registerCoreComponent(markdownComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
       //TODO, if it proves to be a working solution, make these components skippable, too
-      this.registerComponentRenderer(pageMetaTitleComponentRenderer);
-      this.registerComponentRenderer(progressBarComponentRenderer);
-      this.registerComponentRenderer(splitterComponentRenderer);
-      this.registerComponentRenderer(vSplitterComponentRenderer);
-      this.registerComponentRenderer(hSplitterComponentRenderer);
-      this.registerComponentRenderer(queueComponentRenderer);
-      this.registerComponentRenderer(positionedContainerComponentRenderer);
-      this.registerComponentRenderer(changeListenerComponentRenderer);
-      this.registerComponentRenderer(realTimeAdapterComponentRenderer);
-      this.registerComponentRenderer(textBoxComponentRenderer);
-      this.registerComponentRenderer(passwordInputComponentRenderer);
-      this.registerComponentRenderer(emojiSelectorRenderer);
-      this.registerComponentRenderer(numberBoxComponentRenderer);
-      this.registerComponentRenderer(hoverCardComponentRenderer);
-      this.registerComponentRenderer(radioGroupRenderer);
-      this.registerComponentRenderer(fileInputRenderer);
-      this.registerComponentRenderer(datePickerComponentRenderer);
-      this.registerComponentRenderer(spinnerComponentRenderer);
-      this.registerComponentRenderer(selectComponentRenderer);
-      this.registerComponentRenderer(autoCompleteComponentRenderer);
-      this.registerComponentRenderer(dropdownMenuComponentRenderer);
-      this.registerComponentRenderer(themeChangerButtonComponentRenderer);
-      this.registerComponentRenderer(toneChangerButtonComponentRenderer);
-      this.registerCompoundComponentRenderer(formSectionRenderer);
-      this.registerComponentRenderer(dropdownMenuComponentRenderer);
-      this.registerComponentRenderer(menuItemRenderer);
-      this.registerComponentRenderer(subMenuItemRenderer);
-      this.registerComponentRenderer(menuSeparatorRenderer);
-      this.registerComponentRenderer(tabsComponentRenderer);
-      this.registerComponentRenderer(bookmarkComponentRenderer);
-      this.registerComponentRenderer(tableOfContentsRenderer);
-      this.registerComponentRenderer(breakoutComponentRenderer);
+      this.registerCoreComponent(pageMetaTitleComponentRenderer);
+      this.registerCoreComponent(progressBarComponentRenderer);
+      this.registerCoreComponent(splitterComponentRenderer);
+      this.registerCoreComponent(vSplitterComponentRenderer);
+      this.registerCoreComponent(hSplitterComponentRenderer);
+      this.registerCoreComponent(queueComponentRenderer);
+      this.registerCoreComponent(positionedContainerComponentRenderer);
+      this.registerCoreComponent(changeListenerComponentRenderer);
+      this.registerCoreComponent(realTimeAdapterComponentRenderer);
+      this.registerCoreComponent(textBoxComponentRenderer);
+      this.registerCoreComponent(passwordInputComponentRenderer);
+      this.registerCoreComponent(emojiSelectorRenderer);
+      this.registerCoreComponent(numberBoxComponentRenderer);
+      this.registerCoreComponent(hoverCardComponentRenderer);
+      this.registerCoreComponent(radioGroupRenderer);
+      this.registerCoreComponent(fileInputRenderer);
+      this.registerCoreComponent(datePickerComponentRenderer);
+      this.registerCoreComponent(spinnerComponentRenderer);
+      this.registerCoreComponent(selectComponentRenderer);
+      this.registerCoreComponent(autoCompleteComponentRenderer);
+      this.registerCoreComponent(dropdownMenuComponentRenderer);
+      this.registerCoreComponent(themeChangerButtonComponentRenderer);
+      this.registerCoreComponent(toneChangerButtonComponentRenderer);
+      this.registerCoreComponent(formSectionRenderer);
+      this.registerCoreComponent(dropdownMenuComponentRenderer);
+      this.registerCoreComponent(menuItemRenderer);
+      this.registerCoreComponent(subMenuItemRenderer);
+      this.registerCoreComponent(menuSeparatorRenderer);
+      this.registerCoreComponent(tabsComponentRenderer);
+      this.registerCoreComponent(bookmarkComponentRenderer);
+      this.registerCoreComponent(tableOfContentsRenderer);
+      this.registerCoreComponent(breakoutComponentRenderer);
     }
-    this.registerComponentRenderer(themeComponentRenderer);
-    this.registerComponentRenderer(appStateComponentRenderer);
-    this.registerComponentRenderer(apiCallRenderer);
+    this.registerCoreComponent(themeComponentRenderer);
+    this.registerCoreComponent(appStateComponentRenderer);
+    this.registerCoreComponent(apiCallRenderer);
 
     // --- Added after tabler-clone review
-    this.registerCompoundComponentRenderer(pageHeaderRenderer);
-    this.registerCompoundComponentRenderer(trendLabelRenderer);
-    this.registerCompoundComponentRenderer(iconInfoCardRenderer);
-    this.registerCompoundComponentRenderer(tableHeaderRenderer);
-    this.registerCompoundComponentRenderer(toolbarRenderer);
-    this.registerCompoundComponentRenderer(toolbarButtonRenderer);
+    this.registerCoreComponent(pageHeaderRenderer);
+    this.registerCoreComponent(trendLabelRenderer);
+    this.registerCoreComponent(iconInfoCardRenderer);
+    this.registerCoreComponent(tableHeaderRenderer);
+    this.registerCoreComponent(toolbarRenderer);
+    this.registerCoreComponent(toolbarButtonRenderer);
 
     // --- New Bootstrap-inspired components
-    this.registerComponentRenderer(carouselComponentRenderer);
-    this.registerComponentRenderer(accordionComponentRenderer);
-    this.registerComponentRenderer(alertComponentRenderer);
-    this.registerComponentRenderer(offCanvasComponentRenderer);
-    this.registerComponentRenderer(rangeComponentRenderer);
-    this.registerComponentRenderer(sliderComponentRenderer);
-    this.registerComponentRenderer(buttonGroupComponentRenderer);
-    this.registerComponentRenderer(backdropComponentRenderer);
+    this.registerCoreComponent(carouselComponentRenderer);
+    this.registerCoreComponent(accordionComponentRenderer);
+    this.registerCoreComponent(alertComponentRenderer);
+    this.registerCoreComponent(offCanvasComponentRenderer);
+    this.registerCoreComponent(rangeComponentRenderer);
+    this.registerCoreComponent(sliderComponentRenderer);
+    this.registerCoreComponent(buttonGroupComponentRenderer);
+    this.registerCoreComponent(backdropComponentRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
-      this.registerComponentRenderer(chartRenderer);
-      this.registerComponentRenderer(pieChartComponentRenderer);
-      this.registerComponentRenderer(barChartComponentRenderer);
-      this.registerComponentRenderer(mapComponentRenderer);
+      this.registerCoreComponent(chartRenderer);
+      this.registerCoreComponent(pieChartComponentRenderer);
+      this.registerCoreComponent(barChartComponentRenderer);
+      this.registerCoreComponent(mapComponentRenderer);
     }
 
-    contributes.components?.forEach((renderer) => {
-      this.registerComponentRenderer(renderer);
-    });
-    contributes.compoundComponents?.forEach((def) => {
-      this.registerCompoundComponentRenderer({ compoundComponentDef: def });
-    });
+
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);
@@ -447,16 +450,12 @@ export class ComponentRegistry {
     this.registerActionFn(navigateAction);
     this.registerActionFn(timedAction);
 
-    contributes.actions?.forEach((actionRenderer) => {
-      this.registerActionFn(actionRenderer);
-    });
-
     this.registerLoaderRenderer(apiLoaderRenderer);
     this.registerLoaderRenderer(externalDataLoaderRenderer);
     this.registerLoaderRenderer(mockLoaderRenderer);
     this.registerLoaderRenderer(dataLoaderRenderer);
 
-    this.componentManager?.subscribeToRegistrations(this.registerComponentRenderer);
+    this.extensionManager?.subscribeToRegistrations(this.extensionRegistered);
   }
 
   /**
@@ -531,14 +530,41 @@ export class ComponentRegistry {
     );
   }
 
+  private extensionRegistered = (extension: Extension) => {
+    extension.components.forEach((c) => {
+      if ("type" in c) {
+        //we handle just the js components for now
+        this.registerComponentRenderer(c, extension.namespace);
+      }
+    });
+  };
+
+
+  private registerCoreComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+    const coreNamespaces = ["#xmlui-core-ns", ""];
+    if("compoundComponentDef" in component){
+      this.registerCompoundComponentRenderer(component, ...coreNamespaces);
+    } else {
+      this.registerComponentRenderer(component, ...coreNamespaces);
+    }
+  }
+
+  private registerAppComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+    const appNamespaces = ["#app-ns", ""];
+    if("compoundComponentDef" in component){
+      this.registerCompoundComponentRenderer(component, ...appNamespaces);
+    } else {
+      this.registerComponentRenderer(component, ...appNamespaces);
+    }
+  }
+
   // --- Registers a renderable component using its renderer function
   // --- and metadata
-  private registerComponentRenderer = ({
-    type,
-    renderer,
-    metadata,
-  }: ComponentRendererDef) => {
-    this.pool.set(type, { renderer, descriptor: metadata });
+  private registerComponentRenderer = ({ type, renderer, metadata }: ComponentRendererDef, ...namespaces: string[]) => {
+    const component = { renderer, descriptor: metadata };
+    namespaces.forEach((ns) => {
+      this.pool.set((ns ? (ns + ".") : "") + type, component);
+    });
     if (metadata?.themeVars) {
       Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
     }
@@ -551,8 +577,9 @@ export class ComponentRegistry {
   private registerCompoundComponentRenderer({
     compoundComponentDef,
     metadata,
-  }: CompoundComponentRendererInfo) {
-    this.pool.set(compoundComponentDef.name, {
+  }: CompoundComponentRendererInfo, ...namespaces: string[]) {
+    const component = {
+      type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
         return (
           <CompoundComponent
@@ -564,13 +591,10 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-    });
-    if (metadata?.themeVars) {
-      Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
-    }
-    if (metadata?.defaultThemeVars) {
-      merge(this.defaultThemeVars, metadata?.defaultThemeVars);
-    }
+      metadata
+    };
+
+    this.registerComponentRenderer(component, ...namespaces);
   }
 
   // --- Registers an action function using its definition
@@ -589,7 +613,7 @@ export class ComponentRegistry {
    * component provider is unmounted (HMR).
    */
   destroy() {
-    this.componentManager?.unSubscribeFromRegistrations(this.registerComponentRenderer);
+    this.extensionManager?.unSubscribeFromRegistrations(this.extensionRegistered);
   }
 }
 
@@ -602,7 +626,7 @@ type ComponentProviderProps = {
   contributes: ContributesDefinition;
 
   // --- The component manager instance used to manage components
-  componentManager?: StandaloneComponentManager;
+  extensionManager?: StandaloneExtensionManager;
 };
 
 /**
@@ -613,19 +637,19 @@ type ComponentProviderProps = {
 export function ComponentProvider({
   children,
   contributes,
-  componentManager,
+  extensionManager,
 }: ComponentProviderProps) {
   const [componentRegistry, setComponentRegistry] = useState(
-    () => new ComponentRegistry(contributes, componentManager),
+    () => new ComponentRegistry(contributes, extensionManager),
   );
   // --- Make sure the component registry is updated when the contributes or
   // --- component manager changes (e.g., due to HMR).
   useEffect(() => {
     setComponentRegistry((prev) => {
       prev.destroy();
-      return new ComponentRegistry(contributes, componentManager);
+      return new ComponentRegistry(contributes, extensionManager);
     });
-  }, [componentManager, contributes]);
+  }, [extensionManager, contributes]);
 
   return (
     <ComponentRegistryContext.Provider value={componentRegistry}>

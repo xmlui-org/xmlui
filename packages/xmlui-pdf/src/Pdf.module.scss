@@ -14,7 +14,7 @@ $gap-pages-Pdf: createThemeVar("gap-pages-Pdf");
   display: flex;
   flex-direction: column;
   gap: $gap-pages-Pdf;
-  align-items: center;
+  width: fit-content;
 }
 
 .page{

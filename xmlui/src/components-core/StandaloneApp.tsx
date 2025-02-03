@@ -8,12 +8,11 @@ import type {
 } from "@components-core/abstractions/standalone";
 import type {
   ComponentDef,
-  CompoundComponentDef,
   ComponentLike,
+  CompoundComponentDef,
 } from "@abstractions/ComponentDefs";
 import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
-import type { ComponentRendererDef } from "@abstractions/RendererDefs";
 
 import "../index.scss";
 import AppRoot from "@components-core/AppRoot";
@@ -29,8 +28,8 @@ import {
 } from "@components-core/xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
-  componentFileExtension,
   codeBehindFileExtension,
+  componentFileExtension,
 } from "../parsers/xmlui-parser/fileExtensions";
 import { Parser } from "../parsers/scripting/Parser";
 import {
@@ -39,8 +38,9 @@ import {
 } from "../parsers/scripting/code-behind-collect";
 import { ComponentRegistry } from "@components/ComponentProvider";
 import { checkXmlUiMarkup } from "@components-core/markup-check";
-import StandaloneComponentManager from "./StandaloneComponentManager";
+import StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { builtInThemes } from "@components-core/theming/ThemeProvider";
+import type { Extension } from "@abstractions/ExtensionDefs";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;
@@ -60,11 +60,8 @@ type StandaloneAppProps = {
   // --- The runtime environment of the standalone app (for pre-compiled apps)
   runtime?: any;
 
-  // --- Custom components to be added
-  components?: ComponentRendererDef[];
-
   // --- The object responsible for managing the standalone components
-  componentManager?: StandaloneComponentManager;
+  extensionManager?: StandaloneExtensionManager;
 };
 
 /**
@@ -81,8 +78,7 @@ function StandaloneApp({
   decorateComponentsWithTestId,
   debugEnabled = false,
   runtime,
-  components: customComponents,
-  componentManager,
+  extensionManager,
 }: StandaloneAppProps) {
   const servedFromSingleFile = useMemo(() => {
     return typeof window !== "undefined" && window.location.href.startsWith("file");
@@ -91,7 +87,7 @@ function StandaloneApp({
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
-  const standaloneApp = useStandalone(appDef, runtime, componentManager);
+  const standaloneApp = useStandalone(appDef, runtime, extensionManager);
   usePrintVersionNumber(standaloneApp);
 
   if (!standaloneApp) {
@@ -148,10 +144,9 @@ function StandaloneApp({
         resources={resources}
         resourceMap={resourceMap}
         sources={sources}
-        componentManager={componentManager}
+        extensionManager={extensionManager}
         contributes={{
           compoundComponents: components,
-          components: customComponents,
           themes,
         }}
       />
@@ -227,6 +222,7 @@ async function parseCodeBehindResponse(response: Response): Promise<ParsedRespon
   try {
     parser.parseStatements();
   } catch (e) {
+    // throw new Error(`Failed to fetch ${response.url}`);
     if (parser.errors.length > 0) {
       return {
         component: errReportScriptError(parser.errors[0], response.url),
@@ -448,7 +444,7 @@ async function fetchWithoutCache(url: string): Promise<Response> {
 function useStandalone(
   standaloneAppDef: StandaloneAppDescription | undefined,
   runtime: Record<string, any> = EMPTY_OBJECT,
-  componentManager?: StandaloneComponentManager,
+  extensionManager?: StandaloneExtensionManager,
 ): StandaloneAppDescription | null {
   const [standaloneApp, setStandaloneApp] = useState<StandaloneAppDescription | null>(() => {
     // --- Initialize the standalone app
@@ -668,7 +664,7 @@ function useStandalone(
         entryPointWithCodeBehind,
         componentsWithCodeBehinds,
         undefined,
-        componentManager,
+        extensionManager,
       );
 
       // --- Try to load the components referenced in the markup, collect
@@ -737,7 +733,7 @@ function useStandalone(
           entryPointWithCodeBehind,
           componentsWithCodeBehinds,
           componentsFailedToLoad,
-          componentManager,
+          extensionManager,
         );
       }
 
@@ -774,12 +770,12 @@ function collectMissingComponents(
   entryPoint: ComponentDef | CompoundComponentDef,
   components: any[],
   componentsFailedToLoad = new Set(),
-  componentManager?: StandaloneComponentManager,
+  extensionManager?: StandaloneExtensionManager,
 ) {
   // --- Add the discovered compound components to the registry
   const componentRegistry = new ComponentRegistry(
     { compoundComponents: components },
-    componentManager,
+    extensionManager,
   );
 
   // --- Check the xmlui markup. This check will find all unloaded components
@@ -803,12 +799,13 @@ function collectMissingComponents(
 
   componentRegistry.destroy();
 
-  // --- Collect all missing components.Omit the components that failed to load
+  // --- Collect all missing components.
+  // Omit the components that failed to load and the ones that are not in #app-ns namespace
   return new Set(
     result
       .filter((r) => r.code === "M001")
-      .map((r) => r.args[0])
-      .filter((comp) => !componentsFailedToLoad.has(comp)),
+      .map((r) => r.args[0].replace("#app-ns.", ""))
+      .filter((comp) => !componentsFailedToLoad.has(comp) && !comp.includes(".")),
   );
 }
 
@@ -838,11 +835,13 @@ let contentRoot: Root | null = null;
  * @param components The related component's runtime representation
  * @returns The content's root element
  */
+
 export function startApp(
   runtime: any,
-  components: ComponentRendererDef[] | undefined,
-  componentManager: StandaloneComponentManager,
+  extensions: Extension[] | Extension = [],
+  extensionManager: StandaloneExtensionManager = new StandaloneExtensionManager(),
 ) {
+  extensionManager.registerExtension(extensions);
   let rootElement: HTMLElement | null = document.getElementById("root");
   if (!rootElement) {
     rootElement = document.createElement("div");
@@ -852,9 +851,7 @@ export function startApp(
   if (!contentRoot) {
     contentRoot = ReactDOM.createRoot(rootElement);
   }
-  contentRoot.render(
-    <StandaloneApp runtime={runtime} components={components} componentManager={componentManager} />,
-  );
+  contentRoot.render(<StandaloneApp runtime={runtime} extensionManager={extensionManager} />);
   return contentRoot;
 }
 

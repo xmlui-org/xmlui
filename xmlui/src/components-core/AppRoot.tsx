@@ -13,7 +13,9 @@ import type { ContainerComponentDef } from "./container/ContainerComponentDef";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import type { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
 import type { ThemeTone } from "@components-core/theming/abstractions";
+import { ThemeToneKeys } from "@components-core/theming/abstractions";
 import type { IAppStateContext } from "@components/App/AppStateContext";
+import { AppStateContext } from "@components/App/AppStateContext";
 
 import { ErrorBoundary } from "./ErrorBoundary";
 import ThemeProvider from "@components-core//theming/ThemeProvider";
@@ -30,22 +32,21 @@ import { useThemes } from "@components-core/theming/ThemeContext";
 import { dateFunctions } from "./appContext/date-functions";
 import { miscellaneousUtils } from "./appContext/misc-utils";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
-import { ThemeToneKeys } from "@components-core/theming/abstractions";
-import { ComponentProvider, ContributesDefinition } from "@components/ComponentProvider";
+import type { ContributesDefinition } from "@components/ComponentProvider";
+import { ComponentProvider } from "@components/ComponentProvider";
 import {
   ConfirmationModalContextProvider,
   useConfirm,
 } from "@components/ModalDialog/ConfirmationModalContextProvider";
-import { AppStateContext } from "@components/App/AppStateContext";
 import {
   useDocumentKeydown,
-  useIsomorphicLayoutEffect,
-  useMediaQuery,
   useIsInIFrame,
+  useIsomorphicLayoutEffect,
   useIsWindowFocused,
+  useMediaQuery,
 } from "./utils/hooks";
 import { InspectorProvider } from "@components-core/InspectorContext";
-import StandaloneComponentManager from "./StandaloneComponentManager";
+import type StandaloneExtensionManager from "./StandaloneExtensionManager";
 import { DebugViewProvider, useDebugView } from "./DebugViewProvider";
 import { version } from "../../package.json";
 import { mathFunctions } from "./appContext/math-function";
@@ -606,7 +607,9 @@ const AppWrapper = ({
         <QueryClientProvider client={queryClient}>
           {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
           {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
-            <Router basename={Router === HashRouter ? undefined : baseName}>{dynamicChildren}</Router>
+            <Router basename={Router === HashRouter ? undefined : baseName}>
+              {dynamicChildren}
+            </Router>
           )}
           {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
@@ -637,8 +640,8 @@ function AppRoot({
   servedFromSingleFile,
   resourceMap,
   sources,
-  componentManager,
-}: AppWrapperProps & { componentManager?: StandaloneComponentManager }) {
+  extensionManager,
+}: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -667,7 +670,7 @@ function AppRoot({
   resetErrors();
 
   return (
-    <ComponentProvider contributes={contributes} componentManager={componentManager}>
+    <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <DebugViewProvider debugConfig={globalProps?.debug}>
         <AppWrapper
           resourceMap={resourceMap}
