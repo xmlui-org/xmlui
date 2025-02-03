@@ -50,6 +50,8 @@ export function AppRoot({
   sources,
   extensionManager,
 }: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
+
+  
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
