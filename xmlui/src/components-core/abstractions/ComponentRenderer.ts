@@ -1,4 +1,4 @@
-import type {Dispatch, MutableRefObject, RefObject} from "react";
+import type { Dispatch, MutableRefObject, RefObject } from "react";
 import type { ContainerAction } from "@components-core/abstractions/containers";
 import type {
   ComponentApi,
@@ -8,14 +8,15 @@ import type {
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
 import type { CodeDeclaration } from "@abstractions/scripting/ScriptingSourceTree";
-import type {ComponentMetadata, ParentRenderContext} from "@abstractions/ComponentDefs";
+import type { ComponentMetadata, ParentRenderContext } from "@abstractions/ComponentDefs";
 import type { ComponentRendererContextBase } from "@abstractions/RendererDefs";
 
 /**
  * This interface defines the renderer context for the XMLUI core framework components. Its implementations
  * are used only within the component core.
  */
-export interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata> extends ComponentRendererContextBase<T> {
+export interface InnerRendererContext<T extends ComponentMetadata = ComponentMetadata>
+  extends ComponentRendererContextBase<T> {
   /**
    * The dispatcher function to change the state of the component
    */
@@ -43,7 +44,7 @@ export interface InnerRendererContext<T extends ComponentMetadata = ComponentMet
 
   parentRenderContext?: ParentRenderContext;
 
-  uidInfoRef?: RefObject<Record<string, any>>
+  uidInfoRef?: RefObject<Record<string, any>>;
 }
 
 /**
@@ -60,7 +61,7 @@ export type MemoedVars = Map<
   {
     getDependencies: (
       value: string | CodeDeclaration,
-      referenceTrackedApi: Record<string, ComponentApi>
+      referenceTrackedApi: Record<string, ComponentApi>,
     ) => Array<string>;
     obtainValue: (
       expression: any,
@@ -68,7 +69,7 @@ export type MemoedVars = Map<
       appContext: AppContextObject | undefined,
       strict: boolean | undefined,
       stateDeps: Record<string, any>,
-      appContextDeps: Record<string, any>
+      appContextDeps: Record<string, any>,
     ) => any;
   }
 >;

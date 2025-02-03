@@ -11,8 +11,8 @@ import type {
 } from "@abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
 
-import UnknownComponent from "../UnknownComponent";
-import InvalidComponent from "../InvalidComponent";
+import UnknownComponent from "./UnknownComponent";
+import InvalidComponent from "./InvalidComponent";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { extractParam } from "../utils/extractParam";
 import { useTheme } from "@components-core/theming/ThemeContext";
@@ -33,7 +33,7 @@ import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useMouseEventHandlers } from "../event-handlers";
 
 // --- The available properties of Component
-type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
+type Props = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
 };
@@ -62,7 +62,7 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
     onUnmount,
     uidInfoRef,
     ...rest
-  }: ComponentBedProps,
+  }: Props,
   ref: React.ForwardedRef<any>,
 ) {
   // --- Make sure the component definition has `props` and `events` properties
