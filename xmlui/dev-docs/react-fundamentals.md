@@ -145,5 +145,9 @@ export default FilterableList;
 
 This React hook lets you cache a function definition between re-renders. We use this hook heavily in xmlui, as our components may have callback functions running xmlui scripts and expressions. For example, the `click` event handler of an xmlui `Button` component caches the event handler code to execute via `useCallback`.
 
+### `useTransition`
 
+In React, the `useTransition` hook marks state updates as non-urgent, allowing React to keep the UI responsive while handling slow state updates. It helps improve performance by deferring less critical updates without blocking immediate user interactions.
+
+We use this hook in the xmlui container infrastructure to suppress the state change updates while a statement runs. Generally, a running statement may generate several state changes in a nick of time. Instead of firing many updates, we wait while the statement completes and handle all changes in a single UI refresh cycle.
 

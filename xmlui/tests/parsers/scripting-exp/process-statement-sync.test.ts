@@ -3,7 +3,7 @@ import { describe, expect, it, assert } from "vitest";
 import { ArrowExpressionStatement, ExpressionStatement, T_ARROW_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
 import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import buildProxy from "@components-core/container/buildProxy";
+import { buildProxy } from "@components-core/rendering/buildProxy";
 
 describe("Process statements (sync)", () => {
   it("expression statement #1", () => {

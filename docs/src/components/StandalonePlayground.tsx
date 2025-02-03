@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
+import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
 import "@src/index.scss";
 import { useToast } from "@/src/hooks/useToast";
 import {

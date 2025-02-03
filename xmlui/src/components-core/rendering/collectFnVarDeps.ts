@@ -2,7 +2,7 @@
  * This function collects all the dependencies of a function in a flat list 
  * (no circular deps).
  * @param fnDeps The dependencies of the functions. Each key is a function name
- * and the value is an array of the dependencies.
+ * and the value is an array of variables the function depends on.
  * @returns The flat dependencies of the functions.
  * 
  * Example:
@@ -31,7 +31,7 @@ export function collectFnVarDeps(fnDeps: Record<string, string[]> = {}): Record<
     const ret: Array<string> = [];
     fnDeps[depKey].forEach((key) => {
       if (visitedPath.has(key)) {
-        //we already walked here, skip this one (avoid infinite loops for circular deps)
+        // --- We already walked here, avoid infinite loops for circular deps
         return;
       }
       visitedPath.add(key);

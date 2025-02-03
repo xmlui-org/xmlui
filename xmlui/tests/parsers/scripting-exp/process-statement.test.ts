@@ -2,7 +2,7 @@ import { describe, expect, it, assert } from "vitest";
 
 import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import buildProxy from "@components-core/container/buildProxy";
+import { buildProxy } from "@components-core/rendering/buildProxy";
 
 describe("Process statements", () => {
   it("expression statement #1", async () => {

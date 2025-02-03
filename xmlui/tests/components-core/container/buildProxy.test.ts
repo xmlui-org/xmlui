@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import buildProxy, { ProxyCallbackArgs } from "@components-core/container/buildProxy";
+import { buildProxy , ProxyCallbackArgs } from "@components-core/rendering/buildProxy";
 
 describe("proxy", () => {
   it("buildProxy keeps proxied reference on get", async () => {

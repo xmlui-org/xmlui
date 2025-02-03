@@ -14,26 +14,26 @@ import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { isEmpty, isPlainObject } from "lodash-es";
-import { extractParam } from "./utils/extractParam";
+import { extractParam } from "../utils/extractParam";
 import { useTheme } from "@components-core/theming/ThemeContext";
 import { mergeProps } from "@components-core/utils/mergeProps";
 import ComponentDecorator from "@components-core/ComponentDecorator";
-import { createValueExtractor } from "@components-core/container/valueExtractor";
+import { createValueExtractor } from "@components-core/rendering/valueExtractor";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
-import { useReferenceTrackedApi, useShallowCompareMemoize } from "./utils/hooks";
-import type { InnerRendererContext } from "./abstractions/ComponentRenderer";
-import { ContainerActionKind } from "./abstractions/containers";
+import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
+import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
+import { ContainerActionKind } from "../abstractions/containers";
 import { useInspector } from "@components-core/InspectorContext";
 import { SlotItem } from "@components/SlotItem";
 import { layoutOptionKeys } from "@components-core/descriptorHelper";
-import { compileLayout } from "../parsers/style-parser/style-compiler";
-import { useMouseEventHandlers } from "./event-handlers";
+import { compileLayout } from "../../parsers/style-parser/style-compiler";
+import { useMouseEventHandlers } from "../event-handlers";
 
 // --- The available properties of Component
-type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
+type Props = Omit<InnerRendererContext, "layoutContext"> & {
   layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   onUnmount: (uid: symbol) => void;
 };
@@ -46,7 +46,7 @@ type ComponentBedProps = Omit<InnerRendererContext, "layoutContext"> & {
  * current rendering context). The modified version uses a stable reference to the layout context
  * and provides a cleanup function (`onUnmount`) to call when the component is about to be disposed.
  */
-const ComponentBed = forwardRef(function ComponentBed(
+const ComponentAdapter = forwardRef(function ComponentAdapter(
   {
     node,
     state,
@@ -62,7 +62,7 @@ const ComponentBed = forwardRef(function ComponentBed(
     onUnmount,
     uidInfoRef,
     ...rest
-  }: ComponentBedProps,
+  }: Props,
   ref: React.ForwardedRef<any>,
 ) {
   // --- Make sure the component definition has `props` and `events` properties
@@ -454,4 +454,4 @@ function getApiBoundItems(items: Record<string, any> | undefined, ...type: strin
   return ret;
 }
 
-export default ComponentBed;
+export default ComponentAdapter;

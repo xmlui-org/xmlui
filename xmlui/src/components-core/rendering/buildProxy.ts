@@ -12,15 +12,17 @@ export type ProxyCallbackArgs = {
 };
 
 /**
- * Use this function to build a JavaScript proxy for localContext objects. The responsibility of the proxy is to
- * collect the changes within the localContext so that we can refresh the UI according to them.
+ * Use this function to build a JavaScript proxy for localContext objects. The 
+ * responsibility of the proxy is to collect the changes within the localContext 
+ * so that we can refresh the UI according to them.
  */
-function buildProxy(
+export function buildProxy(
   proxyTarget: any,
   callback: (changeInfo: ProxyCallbackArgs) => void,
   tree: Array<string | symbol> = [],
 ): any {
-  // --- We identify a particular (deep) localContext property by its full path; this function create the path
+  // --- We identify a particular (deep) localContext property by its full path; 
+  // --- this function creates the path
   const getPath = (prop: string | symbol) => tree.concat(prop).join(".");
 
   const proxiedValues = new WeakMap();
@@ -29,7 +31,8 @@ function buildProxy(
     get: function (target, prop, receiver) {
       const value = Reflect.get(target, prop, receiver);
 
-      // --- Create proxies only for writable objects and arrays, except arrow function expressions.
+      // --- Create proxies only for writable objects and arrays, except arrow 
+      // --- function expressions.
       if (
         value &&
         !value._ARROW_EXPR_ &&
@@ -37,8 +40,9 @@ function buildProxy(
         typeof value === "object" &&
         ["Array", "Object"].includes(value.constructor.name)
       ) {
-        //just to make sure that accessing the proxied objects' field gets the same reference every time
-        //  e.g. this wouldn't be true otherwise: proxiedObject['field'] === proxiedObject['field']
+        // --- Just to make sure that accessing the proxied objects' field gets 
+        // --- the same reference every time. e.g. this wouldn't be true otherwise: 
+        // --- proxiedObject['field'] === proxiedObject['field']
         if (!proxiedValues.has(value)) {
           proxiedValues.set(value, buildProxy(value, callback, tree.concat(prop)));
         }
@@ -75,5 +79,3 @@ function buildProxy(
     },
   });
 }
-
-export default buildProxy;

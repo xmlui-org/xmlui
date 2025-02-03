@@ -1,6 +1,7 @@
 import { ContainerState } from "@abstractions/ContainerDefs";
 import { ContainerAction, ContainerActionKind } from "@components-core/abstractions/containers";
 import { IDebugViewContext } from "@components-core/DebugViewProvider";
+import { af } from "date-fns/locale";
 import produce from "immer";
 import { cloneDeep, isPlainObject, keyBy, setWith, unset } from "lodash-es";
 
@@ -18,6 +19,7 @@ export function createContainerReducer(debugView: IDebugViewContext) {
 
   // --- The reducer function
   return produce((state: ContainerState, action: ContainerAction) => {
+    console.log("Reducer", action);
     // --- Check if the action has an appropriate uid
     const { uid } = action.payload;
     if (uid === undefined && action.type !== ContainerActionKind.STATE_PART_CHANGED) {
@@ -128,6 +130,10 @@ export function createContainerReducer(debugView: IDebugViewContext) {
         prevState,
         nextState,
       };
+
+      // TODO: Logging to the console is a temporary solution. We should use a proper 
+      // logging mechanism. Nonetheless, this works only with state transition logging
+      // enabled (which is disabled by default).
       console.log("Transition", loggedTransition);
       if (debugView.stateTransitions) {
         if (debugView.stateTransitions.length >= MAX_STATE_TRANSITION_LENGTH) {

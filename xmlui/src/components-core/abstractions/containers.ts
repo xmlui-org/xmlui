@@ -17,13 +17,19 @@ export const enum ContainerActionKind {
 export interface ContainerAction {
   type: ContainerActionKind;
   // Potential improvement: Try to specify the type with more details
-  payload:
-    | {
-        uid?: any;
-        data?: any;
-        error?: any;
-        value?: any;
-      }
-    | any;
+  payload: {
+    uid?: any;
+    data?: any;
+    error?: any;
+    value?: any;
+    byId?: any;
+    inProgress?: any;
+    loaded?: any;
+    pageInfo?: any;
+    path?: any;
+    target?: any;
+    actionType?: any;
+    state?: any;
+    eventName?: any;
+  };
 }
-

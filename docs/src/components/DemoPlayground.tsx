@@ -1,5 +1,4 @@
 import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
-import { ErrorBoundary } from "@components-core/ErrorBoundary";
 import "@src/index.scss";
 import {
   appDescriptionInitialized,
@@ -14,6 +13,7 @@ import { Header } from "@/src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
 import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 import type { ThemeDefinition } from "@components-core/theming/abstractions";
+import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
 
 type DemoPlaygroundProps = {
   name: string;

@@ -8,7 +8,7 @@ import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type {
   ContainerState,
   RegisterComponentApiFnInner,
-} from "@components-core/container/ContainerComponentDef";
+} from "@components-core/rendering/ContainerComponent";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type {
   LookupAsyncFn,
@@ -19,7 +19,7 @@ import type {
 
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { ContainerActionKind } from "./abstractions/containers";
-import { createValueExtractor } from "@components-core/container/valueExtractor";
+import { createValueExtractor } from "@components-core/rendering/valueExtractor";
 import { useReferenceTrackedApi } from "@components-core/utils/hooks";
 import { AppContextObject } from "@abstractions/AppContextDefs";
 
