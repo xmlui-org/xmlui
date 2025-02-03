@@ -1,0 +1,35 @@
+import { createComponentRenderer, createMetadata, d } from "xmlui";
+import { Animation } from "./AnimationNative";
+import { AnimationMd } from "./index";
+
+const COMP = "FadeInAnimation";
+
+export const FadeInAnimationMd = createMetadata({
+  specializedFrom: "Animation",
+  description: `The \`${COMP}\` component represents an animation that fades in the content.`,
+});
+
+export const fadeInAnimationRenderer = createComponentRenderer(
+  "FadeInAnimation",
+  FadeInAnimationMd,
+  ({ node, renderChild, extractValue, registerComponentApi, lookupEventHandler }) => {
+    return (
+      <Animation
+        registerComponentApi={registerComponentApi}
+        animation={{
+          from: { opacity: 0 },
+          to: { opacity: 1 },
+        }}
+        duration={extractValue.asOptionalNumber(node.props.duration)}
+        onStop={lookupEventHandler("stopped")}
+        onStart={lookupEventHandler("started")}
+        animateWhenInView={extractValue.asOptionalBoolean(node.props.animateWhenInView)}
+        reverse={extractValue.asOptionalBoolean(node.props.reverse)}
+        loop={extractValue.asOptionalBoolean(node.props.loop)}
+        delay={extractValue.asOptionalNumber(node.props.delay)}
+      >
+        {renderChild(node.children)}
+      </Animation>
+    );
+  },
+);
