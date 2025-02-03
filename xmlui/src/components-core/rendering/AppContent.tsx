@@ -6,7 +6,13 @@ import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useConfirm } from "@components/ModalDialog/ConfirmationModalContextProvider";
 import { useThemes } from "@components-core/theming/ThemeContext";
-import { useDocumentKeydown, useIsInIFrame, useIsomorphicLayoutEffect, useIsWindowFocused, useMediaQuery } from "@components-core/utils/hooks";
+import {
+  useDocumentKeydown,
+  useIsInIFrame,
+  useIsomorphicLayoutEffect,
+  useIsWindowFocused,
+  useMediaQuery,
+} from "@components-core/utils/hooks";
 import { ThemeToneKeys } from "@components-core/theming/abstractions";
 import { getVarKey } from "@components-core/theming/themeVars";
 import { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
@@ -437,4 +443,3 @@ const DateUtils = {
 function signError(error: Error | string) {
   toast.error(typeof error === "string" ? error : error.message || "Something went wrong");
 }
-

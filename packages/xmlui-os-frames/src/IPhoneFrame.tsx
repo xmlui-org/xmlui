@@ -1,11 +1,13 @@
 import styles from "./IPhoneFrame.module.scss";
 import classNames from "classnames";
+import type { ReactNode } from "react";
+import { forwardRef } from "react";
 
-export function IPhoneFrame({ children }) {
+export const IPhoneFrame = forwardRef(({ children }: {children: ReactNode}, ref) => {
   return (
     // simple wrapper, in case if it's in a flowlayout (the device width/height could be overwritten otherwise), temp
     <div>
-      <div className={classNames(styles.device, styles.deviceIphone14Pro)}>
+      <div className={classNames(styles.device, styles.deviceIphone14Pro)} ref={ref as any}>
         <div className={styles.deviceFrame}>
           <div className={styles.deviceScreen}>
             {children}
@@ -21,4 +23,4 @@ export function IPhoneFrame({ children }) {
       </div>
     </div>
   );
-}
+});

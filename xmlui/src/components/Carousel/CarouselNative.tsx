@@ -2,15 +2,8 @@ import * as React from "react";
 import classnames from "@components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
-import {
-  CSSProperties,
-  ForwardedRef,
-  forwardRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import type { CSSProperties, ForwardedRef } from "react";
+import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
 import Icon from "@components/Icon/IconNative";
 import { noop } from "@components-core/constants";
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
@@ -34,7 +27,9 @@ export type CarouselProps = {
   onDisplayDidChange?: (activeSlide: number) => void;
   keyboard?: boolean;
   registerComponentApi?: RegisterComponentApiFn;
-  duration?: number;
+  transitionDuration?: number;
+  autoplayInterval?: number;
+  stopAutoplayOnInteraction?: boolean;
 };
 
 export const CarouselComponent = forwardRef(function CarouselComponent(
@@ -50,7 +45,9 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
     startIndex = 0,
     prevIcon,
     nextIcon,
-    duration,
+    transitionDuration = 25,
+    autoplayInterval = 5000,
+    stopAutoplayOnInteraction = true,
     registerComponentApi,
   }: CarouselProps,
   forwardedRef: ForwardedRef<HTMLDivElement>,
@@ -67,7 +64,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
       axis: orientation === "horizontal" ? "x" : "y",
       loop,
       startIndex,
-      duration,
+      duration: transitionDuration,
     },
     plugins,
   );
@@ -77,9 +74,14 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 
   useEffect(() => {
     if (autoplay) {
-      setPlugins([Autoplay()]);
+      setPlugins([
+        Autoplay({
+          delay: autoplayInterval,
+          stopOnInteraction: stopAutoplayOnInteraction,
+        }),
+      ]);
     }
-  }, [autoplay]);
+  }, [autoplayInterval, autoplay, stopAutoplayOnInteraction]);
 
   const toggleAutoplay = useCallback(() => {
     const autoplay = api?.plugins()?.autoplay;
@@ -110,18 +112,21 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 
-  const onSelect = React.useCallback((api: CarouselApi) => {
-    if (!api) {
-      return;
-    }
+  const onSelect = React.useCallback(
+    (api: CarouselApi) => {
+      if (!api) {
+        return;
+      }
 
-    const activeIndex = api.selectedScrollSnap();
-    onDisplayDidChange(activeIndex);
-    setActiveSlide(activeIndex);
+      const activeIndex = api.selectedScrollSnap();
+      onDisplayDidChange(activeIndex);
+      setActiveSlide(activeIndex);
 
-    setCanScrollPrev(api.canScrollPrev());
-    setCanScrollNext(api.canScrollNext());
-  }, []);
+      setCanScrollPrev(api.canScrollPrev());
+      setCanScrollNext(api.canScrollNext());
+    },
+    [onDisplayDidChange],
+  );
 
   const scrollPrev = useCallback(() => {
     if (api) {
@@ -187,7 +192,6 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
 
   return (
     <CarouselContext.Provider value={carouselContextValue}>
-      {children}
       <div
         style={style}
         ref={ref}
@@ -203,18 +207,7 @@ export const CarouselComponent = forwardRef(function CarouselComponent(
               [styles.vertical]: orientation === "vertical",
             })}
           >
-            {carouselItems.map((item, index) => (
-                <div
-                    key={item.id}
-                    role="group"
-                    aria-roledescription="slide"
-                    className={classnames(styles.carouselItem)}
-                >
-                  <div className={styles.innerWrapper} ref={item.ref} style={item.style}>
-                    {index === activeSlide ? item.children : null}
-                  </div>
-                </div>
-            ))}
+            {children}
           </div>
         </div>
         {controls && (

@@ -1,8 +1,10 @@
 import styles from "./MacOSAppFrame.module.scss";
+import type { ReactNode } from "react";
+import { forwardRef } from "react";
 
-export function MacOSAppFrame({ children }) {
+export const MacOSAppFrame = forwardRef(({ children }: { children: ReactNode }, ref)=> {
   return (
-    <section role="application" className={styles.app} tabIndex={-1}>
+    <section role="application" className={styles.app} tabIndex={-1} ref={ref as any}>
       <div className={styles.appButtons}>
         <div className={styles.appButtonsInner}>
           <button className={`${styles.close} ${styles.button}`}>
@@ -43,4 +45,4 @@ export function MacOSAppFrame({ children }) {
       </section>
     </section>
   );
-}
+});
