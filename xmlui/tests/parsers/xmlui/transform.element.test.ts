@@ -1099,6 +1099,24 @@ describe("Xmlui transform - child elements", () => {
         },
       });
     });
+
+    it("Compound component cannot nest another one", () => {
+      try {
+        const cd = transformSource(`
+          <Component name="A">
+            <Stack>
+              <Component name="B">
+                <Button />
+              </Component>
+            </Stack>
+          </Component>
+          `) as CompoundComponentDef;
+        assert.fail("Exception expected");
+      }
+      catch (err){
+        expect(err.toString()).include("T006");
+      }
+    });
   });
   describe("debug info", () => {
     it("Compound component debug info nested with vars", () => {
