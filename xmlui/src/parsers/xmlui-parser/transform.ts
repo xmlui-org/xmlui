@@ -39,25 +39,9 @@ export function nodeToComponentDef(
   const getText = (node: TransformNode) => {
     return node.text ?? originalGetText(node);
   };
-  // --- Check that the nodes contains exactly only a single component root element before the EoF token
-  if (node.children!.length !== 2) {
-    reportError("T001");
-    return null;
-  }
 
-  // --- Ensure it's a component
-  const element = node.children![0];
-  if (element.kind !== SyntaxKind.ElementNode) {
-    reportError("T001");
-    return null;
-  }
-
+  const element = getTopLvlElement(node, getText)
   const preppedElement = prepNode(element);
-  const name = getComponentName(element);
-  if (!UCRegex.test(name)) {
-    reportError("T002");
-    return null;
-  }
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
   return transformSingleElement(usesStack, preppedElement);
@@ -66,11 +50,11 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
-    if (!UCRegex.test(getComponentName(node))) {
+    if (!UCRegex.test(getComponentName(node, getText))) {
       reportError("T002");
       return null;
     }
-    const name = getNamespaceResolvedComponentName(node);
+    const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
     const attrs = getAttributes(node).map(segmentAttr);
 
     let component: ComponentDef | CompoundComponentDef;
@@ -110,7 +94,7 @@ export function nodeToComponentDef(
       // --- Check for nested component
       const nestedCompound = children.find(
         (child) =>
-          child.kind === SyntaxKind.ElementNode && getComponentName(child) === COMPOUND_COMP_ID,
+          child.kind === SyntaxKind.ElementNode && getComponentName(child, getText) === COMPOUND_COMP_ID,
       );
       if (nestedCompound) {
         reportError("T006");
@@ -119,7 +103,7 @@ export function nodeToComponentDef(
 
       // --- Get the single component definition
       const nestedComponents = children.filter(
-        (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child)),
+        (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child, getText)),
       );
       if (nestedComponents.length === 0) {
         nestedComponents.push(createTextNodeElement(""));
@@ -129,7 +113,7 @@ export function nodeToComponentDef(
       const nestedVars: Node[] = [];
       for (let child of children) {
         if (child.kind === SyntaxKind.ElementNode) {
-          const childName = getComponentName(child);
+          const childName = getComponentName(child, getText);
           if (childName === "var") {
             nestedVars.push(child);
           } else if (!UCRegex.test(childName)) {
@@ -255,7 +239,7 @@ export function nodeToComponentDef(
         return;
       }
 
-      const childName = getComponentName(child);
+      const childName = getComponentName(child, getText);
       if (isCompound && child.kind === SyntaxKind.ElementNode && UCRegex.test(childName)) {
         // --- This is the single nested component definition of a compound component,
         // --- it is already processed
@@ -467,7 +451,7 @@ export function nodeToComponentDef(
       }
 
       if (child.kind !== SyntaxKind.ElementNode) return;
-      const childName = getComponentName(child);
+      const childName = getComponentName(child, getText);
       // --- The only element names we accept are "field" or "item"
       if (childName !== "field" && childName !== "item") {
         reportError("T016");
@@ -515,14 +499,14 @@ export function nodeToComponentDef(
     element: Node,
     allowName = true,
   ): { name?: string; value: any } | null {
-    const elementName = getComponentName(element);
+    const elementName = getComponentName(element, getText);
     // --- Accept only "name", "value"
     const childNodes = getChildNodes(element);
     const nestedComponents = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
     );
     const nestedElements = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c, getText)),
     );
     const attributes = getAttributes(element).map(segmentAttr);
 
@@ -695,40 +679,6 @@ export function nodeToComponentDef(
     comp.uses ??= valueAttr.value.split(",").map((v) => v.trim());
   }
 
-  function getComponentName(node: Node) {
-    const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
-    const name = getText(nameTokens.at(-1));
-    return name;
-  }
-
-  function getNamespaceResolvedComponentName(node: Node) {
-    const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
-    const name = getText(nameTokens.at(-1));
-
-    if (nameTokens.length === 1) {
-      return name;
-    }
-
-    const namespace = getText(nameTokens[0]);
-
-    if (namespaceStack.length === 0) {
-      reportError("T026");
-    }
-
-    let resolvedNamespace = undefined;
-    for (let i = namespaceStack.length - 1; i >= 0; --i) {
-      resolvedNamespace = namespaceStack[i].get(namespace);
-      if (resolvedNamespace !== undefined) {
-        break;
-      }
-    }
-    if (resolvedNamespace === undefined) {
-      reportError("T027", namespace);
-    }
-
-    return resolvedNamespace + "." + name;
-  }
-
   function segmentAttr(attr: Node): {
     namespace?: string;
     startSegment?: string;
@@ -778,7 +728,7 @@ export function nodeToComponentDef(
 
   function prepNode(node: Node): Node {
     const childNodes: TransformNode[] = getChildNodes(node);
-    const tagName = getComponentName(node);
+    const tagName = getComponentName(node, getText);
     const hasComponentName = UCRegex.test(tagName);
     const shouldUseTextNodeElement = hasComponentName || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
@@ -832,15 +782,15 @@ export function nodeToComponentDef(
     }
 
     const helperNodes = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c, getText)),
     );
     const otherNodes = childNodes.filter(
       (c) =>
         c.kind !== SyntaxKind.ElementNode ||
-        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c))),
+        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText))),
     );
     const hasComponentChild = otherNodes.some(
-      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c)),
+      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
     );
 
     if (hasScriptChild && hasComponentChild) {
@@ -1253,4 +1203,57 @@ function addToNamespaces(
 
   comp.namespaces ??= {};
   comp.namespaces[nsKey] = nsValue;
+}
+
+function getTopLvlElement(node: Node, getText: GetText): Node{
+  // --- Check that the nodes contains exactly only a single component root element before the EoF token
+  if (node.children!.length !== 2) {
+    reportError("T001");
+  }
+
+  // --- Ensure it's a component
+  const element = node.children![0];
+  if (element.kind !== SyntaxKind.ElementNode) {
+    reportError("T001");
+  }
+
+  const name = getComponentName(element, getText);
+  if (!UCRegex.test(name)) {
+    reportError("T002");
+  }
+  return element;
+}
+
+function getComponentName(node: Node, getText: GetText) {
+  const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
+  const name = getText(nameTokens.at(-1));
+  return name;
+}
+
+function getNamespaceResolvedComponentName(node: Node, getText: GetText, namespaceStack: Map<string, string>[]) {
+  const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
+  const name = getText(nameTokens.at(-1));
+
+  if (nameTokens.length === 1) {
+    return name;
+  }
+
+  const namespace = getText(nameTokens[0]);
+
+  if (namespaceStack.length === 0) {
+    reportError("T026");
+  }
+
+  let resolvedNamespace = undefined;
+  for (let i = namespaceStack.length - 1; i >= 0; --i) {
+    resolvedNamespace = namespaceStack[i].get(namespace);
+    if (resolvedNamespace !== undefined) {
+      break;
+    }
+  }
+  if (resolvedNamespace === undefined) {
+    reportError("T027", namespace);
+  }
+
+  return resolvedNamespace + "." + name;
 }
