@@ -44,9 +44,9 @@ export function nodeToComponentDef(
   const preppedElement = prepNode(element);
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
-  return transformSingleElement(usesStack, preppedElement);
+  return transformTopLvlElement(usesStack, preppedElement);
 
-  function transformSingleElement(
+  function transformTopLvlElement(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
@@ -54,128 +54,14 @@ export function nodeToComponentDef(
       reportError("T002");
       return null;
     }
+
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
-    const attrs = getAttributes(node).map(segmentAttr);
 
-    let component: ComponentDef | CompoundComponentDef;
     if (name === COMPOUND_COMP_ID) {
-      // --- Validate component name
-      const compoundName = attrs.find((attr) => attr.name === "name");
-      if (!compoundName) {
-        reportError("T003");
-        return null;
-      }
-      if (!UCRegex.test(compoundName.value)) {
-        reportError("T004");
-        return null;
-      }
-
-      // --- Get "method" attributes
-      let api: Record<string, any> | undefined;
-      const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
-      if (apiAttrs.length > 0) {
-        api = {};
-        apiAttrs.forEach((attr) => {
-          api![attr.name] = attr.value;
-        });
-      }
-
-      // --- Get "var" attributes
-      let vars: Record<string, any> | undefined;
-      const varsAttrs = attrs.filter((attr) => attr.startSegment === "var");
-      if (varsAttrs.length > 0) {
-        vars = {};
-        varsAttrs.forEach((attr) => {
-          vars![attr.name] = attr.value;
-        });
-      }
-
-      const children = getChildNodes(node);
-      // --- Check for nested component
-      const nestedCompound = children.find(
-        (child) =>
-          child.kind === SyntaxKind.ElementNode && getComponentName(child, getText) === COMPOUND_COMP_ID,
-      );
-      if (nestedCompound) {
-        reportError("T006");
-        return null;
-      }
-
-      // --- Get the single component definition
-      const nestedComponents = children.filter(
-        (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child, getText)),
-      );
-      if (nestedComponents.length === 0) {
-        nestedComponents.push(createTextNodeElement(""));
-      }
-
-      const childrenToCollect: Node[] = [];
-      const nestedVars: Node[] = [];
-      for (let child of children) {
-        if (child.kind === SyntaxKind.ElementNode) {
-          const childName = getComponentName(child, getText);
-          if (childName === "var") {
-            nestedVars.push(child);
-          } else if (!UCRegex.test(childName)) {
-            childrenToCollect.push(child);
-          }
-        }
-      }
-
-      // --- Should we wrap with a Fragment?
-      let element: Node;
-      if (nestedComponents.length > 1 || nestedVars.length > 0) {
-        element = wrapWithFragment([...nestedVars, ...nestedComponents]);
-      } else {
-        element = nestedComponents[0];
-      }
-
-      namespaceStack.push(new Map());
-      // --- Get collect namespace attributes
-      const nsAttrs = attrs
-        .filter((attr) => attr.namespace === "xmlns")
-        .forEach((attr) => {
-          addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
-        });
-
-      let nestedComponent: ComponentDef = transformSingleElement(
-        usesStack,
-        element,
-      )! as ComponentDef;
-      namespaceStack.pop();
-
-      component = {
-        name: compoundName.value,
-        component: nestedComponent,
-        debug: {
-          source: {
-            start: node.start,
-            end: node.end,
-            fileId,
-          },
-        },
-      };
-
-      if (api) {
-        component.api = api;
-      }
-      if (vars) {
-        nestedComponent.vars = { ...nestedComponent.vars, ...vars };
-      }
-      nestedComponent.debug = {
-        source: {
-          start: element.start,
-          end: element.end,
-          fileId,
-        },
-      };
-
-      const nodeClone: Node = withNewChildNodes(node, childrenToCollect);
-      collectTraits(usesStack, component, nodeClone);
-      return component;
+      return collectCompoundComponent(node);
     }
 
-    component = {
+    let component: ComponentDef = {
       type: name,
       debug: {
         source: {
@@ -190,6 +76,156 @@ export function nodeToComponentDef(
     collectTraits(usesStack, component, node);
     return component;
   }
+
+  function transformInnerElement(
+    usesStack: Map<string, string>[],
+    node: Node,
+  ): ComponentDef | CompoundComponentDef | null {
+    if (!UCRegex.test(getComponentName(node, getText))) {
+      reportError("T002");
+      return null;
+    }
+
+    const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
+
+    if (name === COMPOUND_COMP_ID) {
+      reportError("T006")
+    }
+
+    let component: ComponentDef = {
+      type: name,
+      debug: {
+        source: {
+          start: node.start,
+          end: node.end,
+          fileId,
+        },
+      },
+    };
+
+    // --- Done
+    collectTraits(usesStack, component, node);
+    return component;
+  }
+
+  function collectCompoundComponent(node: Node){
+
+    const attrs = getAttributes(node).map(segmentAttr);
+    // --- Validate component name
+    const compoundName = attrs.find((attr) => attr.name === "name");
+    if (!compoundName) {
+      reportError("T003");
+      return null;
+    }
+    if (!UCRegex.test(compoundName.value)) {
+      reportError("T004");
+      return null;
+    }
+
+    // --- Get "method" attributes
+    let api: Record<string, any> | undefined;
+    const apiAttrs = attrs.filter((attr) => attr.startSegment === "method");
+    if (apiAttrs.length > 0) {
+      api = {};
+      apiAttrs.forEach((attr) => {
+        api![attr.name] = attr.value;
+      });
+    }
+
+    // --- Get "var" attributes
+    let vars: Record<string, any> | undefined;
+    const varsAttrs = attrs.filter((attr) => attr.startSegment === "var");
+    if (varsAttrs.length > 0) {
+      vars = {};
+      varsAttrs.forEach((attr) => {
+        vars![attr.name] = attr.value;
+      });
+    }
+
+    const children = getChildNodes(node);
+    // --- Check for nested component
+    const nestedCompound = children.find(
+      (child) =>
+        child.kind === SyntaxKind.ElementNode && getComponentName(child, getText) === COMPOUND_COMP_ID,
+    );
+    if (nestedCompound) {
+      reportError("T006");
+      return null;
+    }
+
+    // --- Get the single component definition
+    const nestedComponents = children.filter(
+      (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child, getText)),
+    );
+    if (nestedComponents.length === 0) {
+      nestedComponents.push(createTextNodeElement(""));
+    }
+
+    const childrenToCollect: Node[] = [];
+    const nestedVars: Node[] = [];
+    for (let child of children) {
+      if (child.kind === SyntaxKind.ElementNode) {
+        const childName = getComponentName(child, getText);
+        if (childName === "var") {
+          nestedVars.push(child);
+        } else if (!UCRegex.test(childName)) {
+          childrenToCollect.push(child);
+        }
+      }
+    }
+
+    // --- Should we wrap with a Fragment?
+    let element: Node;
+    if (nestedComponents.length > 1 || nestedVars.length > 0) {
+      element = wrapWithFragment([...nestedVars, ...nestedComponents]);
+    } else {
+      element = nestedComponents[0];
+    }
+
+    namespaceStack.push(new Map());
+    // --- Get collect namespace attributes
+    const nsAttrs = attrs
+      .filter((attr) => attr.namespace === "xmlns")
+      .forEach((attr) => {
+        addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
+      });
+
+    let nestedComponent: ComponentDef = transformInnerElement(
+      usesStack,
+      element,
+    )! as ComponentDef;
+    namespaceStack.pop();
+
+    const component: CompoundComponentDef = {
+      name: compoundName.value,
+      component: nestedComponent,
+      debug: {
+        source: {
+          start: node.start,
+          end: node.end,
+          fileId,
+        },
+      },
+    };
+
+    if (api) {
+      component.api = api;
+    }
+    if (vars) {
+      nestedComponent.vars = { ...nestedComponent.vars, ...vars };
+    }
+    nestedComponent.debug = {
+      source: {
+        start: element.start,
+        end: element.end,
+        fileId,
+      },
+    };
+
+    const nodeClone: Node = withNewChildNodes(node, childrenToCollect);
+    collectTraits(usesStack, component, nodeClone);
+    return component;
+}
 
   /**
    * Collects component traits from attributes and child elements
@@ -249,8 +285,8 @@ export function nodeToComponentDef(
       // --- Element name starts with an uppercase letter
       if (UCRegex.test(childName) && !isCompound) {
         // --- This must be a child component
-        // maybe here or in the transformSingleElement function, after the compound comp check
-        const childComponent = transformSingleElement(usesStack, child);
+        // maybe here or in the transformInnerElement function, after the compound comp check
+        const childComponent = transformInnerElement(usesStack, child);
         if (childComponent) {
           if (!comp.children) {
             comp.children = [childComponent as ComponentDef];
@@ -545,7 +581,7 @@ export function nodeToComponentDef(
         return null;
       }
       // --- We expect a component definition here!
-      const nestedComps = nestedComponents.map((nc) => transformSingleElement(usesStack, nc));
+      const nestedComps = nestedComponents.map((nc) => transformInnerElement(usesStack, nc));
       return {
         name,
         value: nestedComps.length === 1 ? nestedComps[0] : nestedComps,
@@ -599,7 +635,7 @@ export function nodeToComponentDef(
       // --- Just for the sake of being sure...
       // if (loader.type !== "Element") return;
 
-      const loaderDef = transformSingleElement(usesStack, loader) as ComponentDef;
+      const loaderDef = transformInnerElement(usesStack, loader) as ComponentDef;
 
       // --- Get the uid value
       if (!loaderDef.uid) {
