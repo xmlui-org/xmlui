@@ -50,11 +50,6 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
-    if (!UCRegex.test(getComponentName(node, getText))) {
-      reportError("T002");
-      return null;
-    }
-
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
     if (name === COMPOUND_COMP_ID) {
@@ -81,11 +76,6 @@ export function nodeToComponentDef(
     usesStack: Map<string, string>[],
     node: Node,
   ): ComponentDef | CompoundComponentDef | null {
-    if (!UCRegex.test(getComponentName(node, getText))) {
-      reportError("T002");
-      return null;
-    }
-
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
     if (name === COMPOUND_COMP_ID) {
@@ -115,11 +105,9 @@ export function nodeToComponentDef(
     const compoundName = attrs.find((attr) => attr.name === "name");
     if (!compoundName) {
       reportError("T003");
-      return null;
     }
     if (!UCRegex.test(compoundName.value)) {
       reportError("T004");
-      return null;
     }
 
     // --- Get "method" attributes
@@ -143,15 +131,6 @@ export function nodeToComponentDef(
     }
 
     const children = getChildNodes(node);
-    // --- Check for nested component
-    const nestedCompound = children.find(
-      (child) =>
-        child.kind === SyntaxKind.ElementNode && getComponentName(child, getText) === COMPOUND_COMP_ID,
-    );
-    if (nestedCompound) {
-      reportError("T006");
-      return null;
-    }
 
     // --- Get the single component definition
     const nestedComponents = children.filter(
@@ -1269,6 +1248,10 @@ function getComponentName(node: Node, getText: GetText) {
 function getNamespaceResolvedComponentName(node: Node, getText: GetText, namespaceStack: Map<string, string>[]) {
   const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
   const name = getText(nameTokens.at(-1));
+
+  if (!UCRegex.test(name)) {
+    reportError("T002");
+  }
 
   if (nameTokens.length === 1) {
     return name;
