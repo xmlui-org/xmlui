@@ -3,14 +3,16 @@ import { basename, join, dirname, extname } from "path";
 import { existsSync } from "fs";
 import { unlink, readdir, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
-import { Logger, logger } from "./logger.mjs";
+import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { processDocfiles } from "./process-mdx.mjs";
 import { processError, createTable, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
 import loadConfig from "./input-handler.mjs";
 import { buildPagesMap } from "./build-pages-map.mjs";
 import { buildDownloadsMap } from "./build-downloads-map.mjs";
 
-logger.setLevels(Logger.levels.warning, Logger.levels.error);
+import { componentMetadata as osFramesMetadata } from "../../../packages/xmlui-os-frames/dist/xmlui-os-frames-metadata.js";
+
+logger.setLevels(LOGGER_LEVELS.warning, LOGGER_LEVELS.error);
 const acceptedStatuses = ["stable", "experimental", "deprecated", "in progress"];
 const defaultStatus = "stable";
 
@@ -38,9 +40,9 @@ try {
   throw error;
 }
 
-// --- Extend Metadata
+// --- Expand Metadata
 
-logger.info("Extending component metadata");
+logger.info("Transform & expand component metadata");
 
 const metadata = Object.entries(collectedComponentMetadata)
   .filter(([_, compData]) => {
@@ -73,7 +75,7 @@ const metadata = Object.entries(collectedComponentMetadata)
 // --- Clean Folder
 
 if (config.cleanFolder) {
-  logger.info(`Cleaning ${componentDocsFolderName}`);
+  logger.info(`Cleaning ${componentDocsFolderName} by removing all files and regenerating file link entries`);
   try {
     await removeAllFilesInFolder(componentDocsFolder);
 
