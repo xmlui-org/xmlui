@@ -55,6 +55,7 @@ export const barChartComponentRenderer = createComponentRenderer(
   ({ extractValue, node, layoutCss }) => {
     return (
       <Barchart1
+        style={layoutCss}
         data={extractValue(node.props?.data)}
         orientation={extractValue(node.props?.orientation)}
         indexBy={extractValue(node.props?.indexBy)}

@@ -1,12 +1,8 @@
-"use client";
-
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer} from "recharts";
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./Chart";
-import { Suspense, useMemo } from "react";
+import { useMemo } from "react";
 import { useColors } from "@components-core/utils/hooks";
-
-export const description = "A bar chart";
 
 export type BarChart1Props = {
   data: any[];
@@ -18,6 +14,7 @@ export type BarChart1Props = {
     color?: string;
     label?: string;
   }[];
+  style?: React.CSSProperties;
 };
 
 export default function Barchart1({
@@ -26,6 +23,7 @@ export default function Barchart1({
   indexBy,
   stacked = false,
   bars = [],
+  style,
 }: BarChart1Props) {
   const colors = useColors(
     {
@@ -62,61 +60,55 @@ export default function Barchart1({
   }, [colors, bars]);
 
   return (
-    <Suspense fallback={<span>Loading...</span>}>
-      <ChartContainer config={config}>
-        <BarChart
-          accessibilityLayer
-          data={data}
-          layout={orientation}
-          margin={{
-            left: -25,
-          }}
-        >
-          <CartesianGrid vertical={true} strokeDasharray="4 4" />
-          {orientation === "horizontal" ? (
-            <>
-              <XAxis
-                type="category"
-                dataKey={"label"}
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-                allowDataOverflow={false}
-              />
-              <YAxis
-                type="number"
-                dataKey="web"
-                axisLine={false}
-                tickLine={false}
-                allowDataOverflow={false}
-              />
-            </>
-          ) : (
-            <>
-              <XAxis type="number" dataKey="desktop" />
-              <YAxis
-                allowDataOverflow={false}
-                dataKey={indexBy}
-                type="category"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-              />
-            </>
-          )}
-          <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
-          {Object.keys(config).map((key, index) => (
-            <Bar
-              key={index}
-              label={config[key].label}
-              dataKey={key}
-              fill={config[key].color}
-              radius={stacked ? 0 : 8}
-              stackId={stacked && "stacked"}
-            />
-          ))}
-        </BarChart>
-      </ChartContainer>
-    </Suspense>
+      <ResponsiveContainer style={style}>
+        <ChartContainer config={config}>
+          <BarChart
+              accessibilityLayer
+              data={data}
+              layout={orientation}
+              margin={{
+                left: -25,
+              }}
+          >
+            <CartesianGrid vertical={true} strokeDasharray="3 3" />
+            {orientation === "horizontal" ? (
+                <>
+                  <XAxis
+                      type="category"
+                      dataKey={indexBy}
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                      allowDataOverflow={false}
+                  />
+                  <YAxis />
+                </>
+            ) : (
+                <>
+                  <XAxis />
+                  <YAxis
+                      allowDataOverflow={false}
+                      dataKey={"label"}
+                      type="category"
+                      tickLine={false}
+                      tickMargin={10}
+                      axisLine={false}
+                  />
+                </>
+            )}
+            <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
+            {Object.keys(config).map((key, index) => (
+                <Bar
+                    key={index}
+                    label={config[key].label}
+                    dataKey={key}
+                    fill={config[key].color}
+                    radius={stacked ? 0 : 8}
+                    stackId={stacked && "stacked"}
+                />
+            ))}
+          </BarChart>
+        </ChartContainer>
+      </ResponsiveContainer>
   );
 }
