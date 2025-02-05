@@ -111,7 +111,6 @@ import { dataLoaderRenderer } from "@components-core/loader/DataLoader";
 import { datePickerComponentRenderer } from "@components/DatePicker/DatePicker";
 import { redirectRenderer } from "@components/Redirect/Redirect";
 import { pieChartComponentRenderer } from "@components/PieChart/PieChart";
-import { barChartComponentRenderer } from "@components/BarChart/BarChart";
 import { mapComponentRenderer } from "@components/Map/Map";
 import { tabsComponentRenderer } from "@components/Tabs/Tabs";
 import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
@@ -440,7 +439,6 @@ export class ComponentRegistry {
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
       this.registerCoreComponent(pieChartComponentRenderer);
-      this.registerCoreComponent(barChartComponentRenderer);
       this.registerCoreComponent(mapComponentRenderer);
     }
 
