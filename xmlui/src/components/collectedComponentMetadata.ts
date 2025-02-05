@@ -73,7 +73,6 @@ import { TabItemMd } from "./Tabs/TabItem";
 import { FragmentMd } from "@components-core/Fragment";
 import { TreeMd } from "./Tree/TreeComponent";
 import { APICallMd } from "./APICall/APICall";
-import { BarChartMd } from "./BarChart/BarChart";
 import { ChartMd } from "./Chart/Chart";
 import { DataSourceMd } from "./DataSource/DataSource";
 import { FormSectionMd } from "./FormSection/FormSection";
@@ -103,7 +102,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Avatar: AvatarMd,
   Backdrop: BackdropMd,
   Badge: BadgeMd,
-  BarChart: BarChartMd,
   Bookmark: BookmarkMd,
   Breakout: BreakoutMd,
   Button: ButtonMd,
