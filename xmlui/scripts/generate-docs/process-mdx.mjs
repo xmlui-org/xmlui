@@ -11,7 +11,7 @@ import {
 } from "fs";
 import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
-import { logger, Logger } from "./logger.mjs";
+import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { createTable, processError, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
 
 // temp
@@ -208,7 +208,7 @@ function addImportsSection(data, component) {
         "Malformed import statement found in: ",
         component.displayName,
         "Skipping imports",
-        Logger.severity.warning,
+        LOGGER_LEVELS.warning,
       );
     }
     const importStatements = [];
@@ -397,12 +397,12 @@ function getSection(data, sectionRef, sectionId, transformer = (contents) => con
     if (!acceptSection(sectionId, sectionName)) {
       throw new ErrorWithSeverity(
         `Invalid section name and ID: ${sectionName} and ${sectionId}`,
-        Logger.severity.warning,
+        LOGGER_LEVELS.warning,
       );
     }
     const sectionHeader = SECTION_DIRECTIVE_MAP[sectionId];
     if (!sectionHeader) {
-      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, Logger.severity.warning);
+      throw new ErrorWithSeverity(`Unknown section ID: ${sectionId}`, LOGGER_LEVELS.warning);
     }
 
     const startDirective = `${DIRECTIVE_INDICATOR}${sectionHeader}-START${
@@ -507,12 +507,12 @@ function copyImports(imports) {
 
 function readFileContents(filePath) {
   if (!fileExists(filePath)) {
-    throw new ErrorWithSeverity(`File ${filePath} does not exist.`, Logger.severity.warning);
+    throw new ErrorWithSeverity(`File ${filePath} does not exist.`, LOGGER_LEVELS.warning);
   }
   if (isDirectory(filePath)) {
     throw new ErrorWithSeverity(
       `File ${filePath} is a directory, cannot be processed.`,
-      Logger.severity.warning,
+      LOGGER_LEVELS.warning,
     );
   }
 

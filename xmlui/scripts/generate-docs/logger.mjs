@@ -1,9 +1,3 @@
-export const LOGGER_LEVELS = {
-  ...Logger.severity,
-  all: "all",
-  none: "none",
-};
-
 /**
  * Logger class.
  * - severity indicates message importance
@@ -95,5 +89,12 @@ class Logger {
 
   _noop(...args) {}
 }
+
+export const LOGGER_LEVELS = {
+  ...Logger.severity,
+  all: "all",
+  none: "none",
+};
+
 // --- Usable logger instance
 export const logger = new Logger(LOGGER_LEVELS.all);
