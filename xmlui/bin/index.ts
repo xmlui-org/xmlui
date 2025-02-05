@@ -68,8 +68,8 @@ switch (script) {
     break;
   }
   case "start": {
-    const { port, withMock, withLegacyParser } = argv as any;
-    start({ port, withMock: getBoolArg(withMock), withLegacyParser: getBoolArg(withLegacyParser) });
+    const { port, withMock, withLegacyParser, proxy } = argv as any;
+    start({ port, withMock: getBoolArg(withMock), withLegacyParser: getBoolArg(withLegacyParser), proxy });
     break;
   }
   case "preview": {

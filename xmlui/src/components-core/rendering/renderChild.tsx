@@ -71,7 +71,7 @@ export function renderChild({
     // --- Check for special Slot cases
     let slotChildren: ComponentDef | ComponentDef[];
     const templateName = node.props?.name;
-    console.log("templateName", templateName);
+    // console.log("templateName", templateName);
     if (templateName) {
       // --- Let's check the validity of the slot name
       if (!templateName.endsWith("Template")) {
