@@ -30,15 +30,15 @@ import { pickFromObject, shallowCompare } from "@components-core/utils/misc";
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
   node: ContainerWrapperDef;
+  resolvedKey?: string;
   parentState: ContainerState;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
-  resolvedKey?: string;
-  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
-  parentRenderContext?: ParentRenderContext;
-  isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
+  parentRenderContext?: ParentRenderContext;
+  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
+  isImplicit?: boolean;
 };
 
 // A React component that wraps a view container into an error boundary
@@ -47,15 +47,15 @@ export const StateContainer = memo(
   forwardRef(function StateContainer(
     {
       node,
-      parentState,
       resolvedKey,
+      parentState,
       parentStatePartChanged,
       parentRegisterComponentApi,
-      layoutContextRef,
-      parentRenderContext,
-      isImplicit,
       parentDispatch,
+      parentRenderContext,
+      layoutContextRef,
       uidInfoRef,
+      isImplicit,
     }: Props,
     ref,
   ) {
@@ -183,6 +183,7 @@ export const StateContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
+
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];

@@ -90,14 +90,14 @@ export type StatePartChangedFn = (
 
 // --- Properties of the ComponentContainer component
 type Props = {
-  resolvedKey?: string;
   node: ContainerWrapperDef;
+  resolvedKey?: string;
   parentState: ContainerState;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
-  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
+  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
 };
 
@@ -109,14 +109,14 @@ type Props = {
 export const ContainerWrapper = memo(
   forwardRef(function ContainerWrapper(
     {
-      resolvedKey,
       node,
+      resolvedKey,
       parentState,
       parentStatePartChanged,
       parentRegisterComponentApi,
-      layoutContextRef,
-      parentRenderContext,
       parentDispatch,
+      parentRenderContext,
+      layoutContextRef,
       uidInfoRef,
     }: Props,
     ref,
@@ -128,17 +128,17 @@ export const ContainerWrapper = memo(
     return (
       <ErrorBoundary node={node} location={"container"}>
         <StateContainer
-          parentStatePartChanged={parentStatePartChanged}
-          resolvedKey={resolvedKey}
           node={containerizedNode as any}
+          resolvedKey={resolvedKey}
           parentState={parentState}
-          layoutContextRef={layoutContextRef}
-          parentRenderContext={parentRenderContext}
-          isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
+          parentStatePartChanged={parentStatePartChanged}
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
-          ref={ref}
+          parentRenderContext={parentRenderContext}
+          layoutContextRef={layoutContextRef}
           uidInfoRef={uidInfoRef}
+          isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
+          ref={ref}
         />
       </ErrorBoundary>
     );

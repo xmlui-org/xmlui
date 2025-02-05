@@ -30,8 +30,8 @@ import { AppContextObject } from "@abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "@components-core/constants";
 
 type Props = {
-  resolvedKey?: string;
   node: ContainerWrapperDef;
+  resolvedKey?: string;
   componentState: ContainerState;
   dispatch: ContainerDispatcher;
   setVersion: Dispatch<SetStateAction<number>>;
@@ -90,16 +90,20 @@ export const Container = memo(
     stateRef.current = componentState;
 
     const parsedStatementsRef = useRef<Record<string, Array<Statement> | null>>({});
-    const statementPromises = useRef<Map<string, any>>(new Map());
     const [_, startTransition] = useTransition();
     const mountedRef = useRef(true);
 
+    // --- This ref holds a map of promises for each statement execution that cause any state change.
+    const statementPromises = useRef<Map<string, any>>(new Map());
+
+    // --- Ensure that re-rendering because of version change resolves all pending statement promises.
     useIsomorphicLayoutEffect(() => {
       for (const resolve of statementPromises.current.values()) {
         resolve();
       }
     }, [version]);
 
+    // --- Ensure that component disposal resolves all pending statement promises.
     useEffect(() => {
       mountedRef.current = true;
       const leftPromises = statementPromises.current;
@@ -207,11 +211,9 @@ export const Container = memo(
             evalContext,
             undefined,
             async (evalContext) => {
-              console.log("STATEMENT QUEUE CALLBACK");
               if (changes.length) {
                 mainThreadBlockingRuns = 0;
                 changes.forEach((change) => {
-                  console.log("new value", change.newValue);
                   statePartChanged(
                     change.pathArray,
                     cloneDeep(change.newValue),

@@ -12,6 +12,7 @@ export const ComponentWrapper = memo(
   forwardRef(function ComponentWrapper(
     {
       node,
+      resolvedKey,
       state,
       dispatch,
       appContext,
@@ -23,7 +24,6 @@ export const ComponentWrapper = memo(
       layoutContext,
       parentRenderContext,
       memoedVarsRef,
-      resolvedKey,
       cleanup,
       uidInfoRef,
       ...rest
