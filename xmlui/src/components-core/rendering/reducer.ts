@@ -19,7 +19,6 @@ export function createContainerReducer(debugView: IDebugViewContext) {
 
   // --- The reducer function
   return produce((state: ContainerState, action: ContainerAction) => {
-    console.log("Reducer", action);
     // --- Check if the action has an appropriate uid
     const { uid } = action.payload;
     if (uid === undefined && action.type !== ContainerActionKind.STATE_PART_CHANGED) {
