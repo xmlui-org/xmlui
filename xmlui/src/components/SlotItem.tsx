@@ -1,6 +1,6 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { memo, useMemo } from "react";
-import type { ContainerComponentDef } from "@components-core/rendering/ContainerComponent";
+import type { ContainerWrapperDef } from "@components-core/rendering/ContainerWrapper";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import { useShallowCompareMemoize } from "@components-core/utils/hooks";
@@ -34,7 +34,7 @@ export const SlotItem = memo(
         type: "Container",
         contextVars: templateProps,
         children: Array.isArray(node) ? node : [node],
-      } as ContainerComponentDef;
+      } as ContainerWrapperDef;
     }, [node, shallowMemoedSlotProps]);
 
     // --- Render the slot content

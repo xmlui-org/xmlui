@@ -36,7 +36,6 @@ These components work together this way:
 
 - `node`: The root node of the application definition; the internal representation of the entire app to run
 - `previewMode`: Optional. If set to `true`, the app is displayed in preview mode (uses different routing and changes some aspects of browser integration).
-- `servedFromSingleFile`: Optional (perhaps obsolete). Indicates if the app is served from a single `index.html` file.
 - `routerBaseName`: Optional. The name is used as the base name in the router definition.
 - `contributes`: Apps can provide their custom (third-party) components, themes (and, in the future, other artifacts) used in the application code, and markup. This property contains these artifacts.
 - `globalProps`: Optional. Apps can define global configuration values (connection strings, titles, names, etc.) used within the app through the `appGlobals` property. This property contains the values to pass to `appGlobals`.

@@ -4,7 +4,7 @@ import type {
   ComponentApi,
   ContainerState,
   RegisterComponentApiFnInner,
-} from "@components-core/rendering/ContainerComponent";
+} from "@components-core/rendering/ContainerWrapper";
 import type { AppContextObject } from "@abstractions/AppContextDefs";
 import type { LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
 import type { CodeDeclaration } from "@abstractions/scripting/ScriptingSourceTree";

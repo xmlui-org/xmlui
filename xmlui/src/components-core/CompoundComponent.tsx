@@ -2,7 +2,7 @@ import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ContainerComponentDef } from "@components-core/rendering/ContainerComponent";
+import type { ContainerWrapperDef } from "@components-core/rendering/ContainerWrapper";
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 import type { RendererContext } from "@abstractions/RendererDefs";
 
@@ -57,7 +57,7 @@ export const CompoundComponent = forwardRef(
     const resolvedProps = useShallowCompareMemoize(resolvedPropsInner);
 
     // --- Wrap the `component` part with a container that manages the
-    const containerNode: ContainerComponentDef = useMemo(() => {
+    const containerNode: ContainerWrapperDef = useMemo(() => {
       const { loaders, vars, functions, scriptError, ...rest } = compound;
       return {
         type: "Container",

@@ -268,8 +268,8 @@ While the `renderChild()` function uses `RendererContext,` the engine uses other
 | `lookupSyncCallback` | This function creates a sync callback function from the current property value using the internal ID of the component instance. |
 | `lookupAction` | This function looks up an action by its unique name within the component node using the action. |
 | `memoedVarsRef` | This property refers to the map of the memoized variables available within the component being rendered. |
-| `parentRenderContext` | This property accepts the context of the current component's parent (e.g., the parent component's properties, the definition of its children, and the function that renders the children). The component may use this information for its rendering purposes. |
-| `uiIdInfoRef` | Components working with data instantiate some internal components (so-called loaders) to manage data fetching asynchronously. This property is a reference to the map holding the loaders already instantiated. The engine uses this map to avoid duplicated loaders |
+| `parentRenderContext` | This property accepts the context of the current component's parent (e.g., the parent component's properties, the definition of its children, and the function that renders the children). The component may use this information to transpose other components from the parent into a slot of a compound component. |
+| `uidInfoRef` | Components working with data instantiate some internal components (so-called loaders) to manage data fetching asynchronously. This property is a reference to the map holding the loaders already instantiated. The engine uses this map to avoid duplicated loaders. |
 
 `ChildRendererContext` adds extra properties to `InnerRendererContext`:
 
@@ -352,7 +352,7 @@ The following table details how the particular properties of the renderer contex
 | `registerComponentApi` | `ComponentBed` ensures that the (either explicitly set or generated) component instance ID is passed to the `registerComponentApi` function received in the input renderer context |
 | `layoutCss` | It compiles the layout properties representable as CSS style properties into an object to pass into any React component's `style` property. |
 | `layoutNonCss` | It compiles the layout properties not representable as CSS style properties (such as `orientation`) into an object (`NonCssLayoutProps`) that React components can further process to create CSS properties. |
-| `layoutContext` | `ComponentBed` passes the layout context instance it receives. As the input parameter is a `MutableRefObject`, all children within a particular parent may receive the same layout context instance. |
+| `layoutContext` | This property holds the layout context where the component should be rendered; for example, it tells the component is rendered in a horizontal stack. The component can execute its rendering strategy according to that context. As the input parameter is a `MutableRefObject`, all children within a particular parent may receive the same layout context instance. |
 
 Besides translating the xmlui domain concepts into React concepts, `ComponentAdapter` preprocesses the component passed for rendering:
 

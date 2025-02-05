@@ -27,9 +27,10 @@ export const queryClient = new QueryClient({
 });
 
 /**
- * This component runs the app in the context of the registered components
- * (including the core xmlui components and external ones passed to this
- * component.
+ * This component is responsible for running a pre-compiled xmlui app. It 
+ * receives the internal representation of the app markup and code (coming 
+ * from either code-behind files or inlined markup expressions) and executes 
+ * the app accordingly.
  */
 export function AppRoot({
   apiInterceptor,
@@ -45,13 +46,13 @@ export function AppRoot({
   trackContainerHeight,
   routerBaseName,
   previewMode,
-  servedFromSingleFile,
   resourceMap,
   sources,
   extensionManager,
 }: AppWrapperProps & { extensionManager?: StandaloneExtensionManager }) {
-
-  
+  // --- Make sure, the root node is wrapped in a `Theme` component. Also, 
+  // --- the root node must be wrapped in a `Container` component managing 
+  // --- the app's top-level state.
   const rootNode = useMemo(() => {
     const themedRoot =
       (node as ComponentDef).type === "Theme"
@@ -77,8 +78,11 @@ export function AppRoot({
     };
   }, [node]);
 
+  // --- Start with an error-free state
   resetErrors();
 
+  // --- Render the app providing a component registry (in which the engine finds a 
+  // --- component definition by its name). Ensure the app has a context for debugging.
   return (
     <ComponentProvider contributes={contributes} extensionManager={extensionManager}>
       <DebugViewProvider debugConfig={globalProps?.debug}>
@@ -97,12 +101,9 @@ export function AppRoot({
           standalone={standalone}
           trackContainerHeight={trackContainerHeight}
           previewMode={previewMode}
-          servedFromSingleFile={servedFromSingleFile}
           sources={sources}
         />
       </DebugViewProvider>
     </ComponentProvider>
   );
 }
-
-export default AppRoot;

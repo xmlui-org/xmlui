@@ -2,7 +2,7 @@ import {useCallback, useEffect, useLayoutEffect, useMemo} from "react";
 import { useQuery } from "@tanstack/react-query";
 
 import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { ContainerState } from "@components-core/rendering/ContainerComponent";
+import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,

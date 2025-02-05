@@ -4,12 +4,12 @@ import { ContainerDispatcher } from "@components-core/abstractions/ComponentRend
 import { ProxyAction } from "@components-core/rendering/buildProxy";
 import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { forwardRef, memo, MutableRefObject, RefObject, useMemo } from "react";
-import { MemoizedErrorProneContainer } from "./MemoizedErrorProneContainer";
+import { StateContainer } from "./StateContainer";
 
 /**
  * This type is the internal representation of a container component, which manages the state of its children.
  */
-export interface ContainerComponentDef extends ComponentDef {
+export interface ContainerWrapperDef extends ComponentDef {
   type: "Container";
 
   // --- The unique identifier of the container
@@ -91,7 +91,7 @@ export type StatePartChangedFn = (
 // --- Properties of the ComponentContainer component
 type Props = {
   resolvedKey?: string;
-  node: ContainerComponentDef;
+  node: ContainerWrapperDef;
   parentState: ContainerState;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
@@ -106,8 +106,8 @@ type Props = {
  * provides a context for the children to access the state and the API of the 
  * parent component.
  */
-export const ComponentContainer = memo(
-  forwardRef(function ComponentContainer(
+export const ContainerWrapper = memo(
+  forwardRef(function ContainerWrapper(
     {
       resolvedKey,
       node,
@@ -127,7 +127,7 @@ export const ComponentContainer = memo(
 
     return (
       <ErrorBoundary node={node} location={"container"}>
-        <MemoizedErrorProneContainer
+        <StateContainer
           parentStatePartChanged={parentStatePartChanged}
           resolvedKey={resolvedKey}
           node={containerizedNode as any}
@@ -150,7 +150,7 @@ export const ComponentContainer = memo(
  * @param node The component node to wrap
  * @returns A "Container" node
  */
-const getWrappedWithContainer = (node: ContainerComponentDef) => {
+const getWrappedWithContainer = (node: ContainerWrapperDef) => {
   if (node.type === "Container") {
     // --- Already wrapped
     return node;
@@ -182,12 +182,12 @@ const getWrappedWithContainer = (node: ContainerComponentDef) => {
     scriptError: node.scriptError,
     uses: node.uses,
     api: node.api,
-    containerUid: "containerUid" in node && node.containerUid,
-    apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
+    containerUid: node?.containerUid,
+    apiBoundContainer: node?.apiBoundContainer,
     contextVars: node.contextVars,
     props: {
       debug: (node.props as any)?.debug,
     },
     children: [wrappedNode],
-  } as ContainerComponentDef;
+  } as ContainerWrapperDef;
 };

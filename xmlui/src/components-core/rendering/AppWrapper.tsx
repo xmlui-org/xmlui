@@ -10,7 +10,7 @@ import ThemeProvider from "@components-core/theming/ThemeProvider";
 import { InspectorProvider } from "@components-core/InspectorContext";
 import { ConfirmationModalContextProvider } from "@components/ModalDialog/ConfirmationModalContextProvider";
 import { AppContent } from "./AppContent";
-import { ContainerComponentDef } from "./ContainerComponent";
+import { ContainerWrapperDef } from "./ContainerWrapper";
 import { BrowserRouter, HashRouter, MemoryRouter } from "react-router-dom";
 import React from "react";
 import { ErrorBoundary } from "./ErrorBoundary";
@@ -24,9 +24,6 @@ export type AppWrapperProps = {
   // --- If set to `true`, the app is displayed in preview mode (uses
   // --- different routing and changes some aspects of browser integration).
   previewMode?: boolean;
-
-  // --- (seems obsolete) Indicates if the app is served from a single `index.html` file.
-  servedFromSingleFile?: boolean;
 
   // --- The name used as the base name in the router definition
   routerBaseName?: string;
@@ -86,13 +83,13 @@ export type AppWrapperProps = {
 };
 
 /**
- * This React component is intended to be the root component in a browser window. It handles the application state
- * changes, routing, and theming, provides an error boundary, and handles a few other aspects.
+ * This component wraps the application into other layers of (nested) components
+ * that provide app functionality and services requiring unique interaction with
+ * the browser or the React environment.
  */
 export const AppWrapper = ({
   node,
   previewMode = false,
-  servedFromSingleFile = false,
   routerBaseName: baseName = "",
   contributes = EMPTY_OBJECT,
   globalProps,
@@ -107,13 +104,19 @@ export const AppWrapper = ({
   sources,
 }: AppWrapperProps) => {
   if (previewMode) {
-    //to prevent leaking the meta items to the parent document, if it lives in an iframe (e.g. docs)
+    // --- Prevent leaking the meta items to the parent document,
+    // --- if it lives in an iframe (e.g. docs)
     HelmetProvider.canUseDOM = false;
   }
 
+  // --- Set a few default properties
   const siteName = globalProps?.name || "XMLUI app";
   const useHashBasedRouting = globalProps?.useHashBasedRouting ?? true;
 
+  // --- The children of the AppWrapper component are the components that
+  // --- provide the app functionality and services. These components are
+  // --- wrapped in other components that provide the necessary environment
+  // --- for the app to run.
   const dynamicChildren = (
     <HelmetProvider>
       <Helmet defaultTitle={siteName} titleTemplate={`%s | ${siteName}`} />
@@ -128,7 +131,7 @@ export const AppWrapper = ({
           <InspectorProvider sources={sources}>
             <ConfirmationModalContextProvider>
               <AppContent
-                rootContainer={node as ContainerComponentDef}
+                rootContainer={node as ContainerWrapperDef}
                 routerBaseName={baseName}
                 globalProps={globalProps}
                 standalone={standalone}
@@ -143,23 +146,22 @@ export const AppWrapper = ({
     </HelmetProvider>
   );
 
-  const Router = previewMode
-    ? MemoryRouter
-    : servedFromSingleFile || useHashBasedRouting
-      ? HashRouter
-      : BrowserRouter;
+  // --- Select the router type for the app
+  const Router = previewMode ? MemoryRouter : useHashBasedRouting ? HashRouter : BrowserRouter;
 
   return (
     <React.StrictMode>
       <ErrorBoundary node={node} location={"root-outer"}>
         <QueryClientProvider client={queryClient}>
+          {/* No router in the REMIX environment */}
           {(typeof window === "undefined" || process.env.VITE_REMIX) && dynamicChildren}
+
+          {/* Wrap the app in a router in other cases */}
           {!(typeof window === "undefined" || process.env.VITE_REMIX) && (
             <Router basename={Router === HashRouter ? undefined : baseName}>
               {dynamicChildren}
             </Router>
           )}
-          {/*<ReactQueryDevtools initialIsOpen={true} />*/}
         </QueryClientProvider>
       </ErrorBoundary>
     </React.StrictMode>

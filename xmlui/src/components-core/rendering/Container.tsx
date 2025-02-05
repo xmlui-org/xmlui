@@ -7,8 +7,8 @@ import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/C
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { useAppContext } from "@components-core/AppContext";
 import { buildProxy } from "@components-core/rendering/buildProxy";
-import { StatePartChangedFn } from "./ContainerComponent";
-import { ComponentCleanupFn, ContainerComponentDef, RegisterComponentApiFnInner } from "@components-core/rendering/ContainerComponent";
+import { StatePartChangedFn } from "./ContainerWrapper";
+import { ComponentCleanupFn, ContainerWrapperDef, RegisterComponentApiFnInner } from "@components-core/rendering/ContainerWrapper";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
 import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
@@ -29,9 +29,9 @@ import { LoaderComponent } from "@components-core/LoaderComponent";
 import { AppContextObject } from "@abstractions/AppContextDefs";
 import { EMPTY_ARRAY } from "@components-core/constants";
 
-type ContainerProps = {
+type Props = {
   resolvedKey?: string;
-  node: ContainerComponentDef;
+  node: ContainerWrapperDef;
   componentState: ContainerState;
   dispatch: ContainerDispatcher;
   setVersion: Dispatch<SetStateAction<number>>;
@@ -48,8 +48,8 @@ type ContainerProps = {
 };
 
 // React component to display a view container and implement its behavior
-export const MemoizedContainer = memo(
-  forwardRef(function MemoizedContainer(
+export const Container = memo(
+  forwardRef(function Container(
     {
       node,
       componentState,
@@ -66,7 +66,7 @@ export const MemoizedContainer = memo(
       memoedVarsRef,
       isImplicit,
       uidInfoRef: parentUidInfoRef,
-    }: ContainerProps,
+    }: Props,
     ref,
   ) {
     const { apiBoundContainer } = node;
@@ -207,9 +207,11 @@ export const MemoizedContainer = memo(
             evalContext,
             undefined,
             async (evalContext) => {
+              console.log("STATEMENT QUEUE CALLBACK");
               if (changes.length) {
                 mainThreadBlockingRuns = 0;
                 changes.forEach((change) => {
+                  console.log("new value", change.newValue);
                   statePartChanged(
                     change.pathArray,
                     cloneDeep(change.newValue),
