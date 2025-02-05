@@ -362,7 +362,7 @@ export default class RestApiProxy {
       method: method,
       headers: aggregatedHeaders,
       signal: abortSignal,
-      body: requestBody,
+      body: requestBody
     };
     if (onUploadProgress) {
       console.log("Falling back to axios. Reason: onUploadProgress specified");

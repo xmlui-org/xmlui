@@ -277,7 +277,7 @@ export async function callApi(
   { resolveBindingExpressions }: ApiActionOptions = {},
 ) {
   const uid = typeof actionUid === "symbol" ? actionUid : Symbol(actionUid);
-  const stateContext = { ...params, ...state };
+  const stateContext = { ...state, ...params };
   if (!shouldKeep(when, stateContext, appContext)) {
     return;
   }

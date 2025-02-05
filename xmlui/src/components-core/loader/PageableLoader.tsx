@@ -230,23 +230,19 @@ export function PageableLoader({
       fetchNextPage: stableFetchNextPage,
       refetch,
       update: async (updater) => {
-        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<{
-          result: any[];
-          prevPageParam: any;
-          nextPageParam: any;
-        }>;
+        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
         if (!oldData) {
           //loader not loaded yet, we skip the update
           return;
         }
-        const originalFlatItems = oldData.pages.flatMap((d) => d.result);
+        const originalFlatItems = oldData.pages.flatMap((d) => d);
 
         const draft = createDraft(oldData);
         const flatItems = [];
         for (let i = 0; i < draft.pages.length; i++) {
           const page = draft.pages[i];
-          await updater(page.result);
-          flatItems.push(...page.result);
+          await updater(page);
+          flatItems.push(...page);
         }
 
         if (flatItems.length !== originalFlatItems.length) {
@@ -263,15 +259,11 @@ export function PageableLoader({
         // console.log("AFTER: ", appContext.queryClient?.getQueryData(queryId!));
       },
       addItem: async (element: any, indexToInsert?: number) => {
-        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<{
-          result: any[];
-          prevPageParam: any;
-          nextPageParam: any;
-        }>;
+        const oldData = appContext.queryClient?.getQueryData(queryId!) as InfiniteData<any[]>;
         const draft = createDraft(oldData);
 
         if (indexToInsert === undefined) {
-          draft.pages[draft.pages.length - 1].result.push(element);
+          draft.pages[draft.pages.length - 1].push(element);
         } else {
           throw new Error("not implemented");
           // TODO is should be something like this
