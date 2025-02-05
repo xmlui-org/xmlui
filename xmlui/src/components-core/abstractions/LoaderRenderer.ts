@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { ContainerDispatcher } from "./ComponentRenderer";
-import type { ContainerState } from "../rendering/ContainerComponent";
+import type { ContainerState } from "../rendering/ContainerWrapper";
 import type {LookupAsyncFn, LookupSyncFn} from "@abstractions/ActionDefs";
 import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
 import type { RegisterComponentApiFn, ValueExtractor } from "@abstractions/RendererDefs";

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { GlobalProps, queryClient } from "./AppRoot";
-import { ContainerComponentDef } from "./ContainerComponent";
+import { ContainerWrapperDef } from "./ContainerWrapper";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { useComponentRegistry } from "@components/ComponentRegistryContext";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -33,7 +33,7 @@ import { mathFunctions } from "@components-core/appContext/math-function";
 
 // --- The properties of the AppContent component
 type AppContentProps = {
-  rootContainer: ContainerComponentDef;
+  rootContainer: ContainerWrapperDef;
   routerBaseName: string;
   globalProps?: GlobalProps;
   standalone?: boolean;
@@ -213,7 +213,7 @@ export function AppContent({
   const location = useLocation();
   const lastHash = useRef("");
 
-  // listen to location change using useEffect with location as dependency
+  // --- Listen to location change using useEffect with location as dependency
   // https://jasonwatmore.com/react-router-v6-listen-to-location-route-change-without-history-listen
   useEffect(() => {
     if (location.hash) {

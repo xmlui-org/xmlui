@@ -4,12 +4,12 @@ import { ContainerDispatcher } from "@components-core/abstractions/ComponentRend
 import { ProxyAction } from "@components-core/rendering/buildProxy";
 import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { forwardRef, memo, MutableRefObject, RefObject, useMemo } from "react";
-import { MemoizedErrorProneContainer } from "./MemoizedErrorProneContainer";
+import { StateContainer } from "./StateContainer";
 
 /**
  * This type is the internal representation of a container component, which manages the state of its children.
  */
-export interface ContainerComponentDef extends ComponentDef {
+export interface ContainerWrapperDef extends ComponentDef {
   type: "Container";
 
   // --- The unique identifier of the container
@@ -90,14 +90,14 @@ export type StatePartChangedFn = (
 
 // --- Properties of the ComponentContainer component
 type Props = {
+  node: ContainerWrapperDef;
   resolvedKey?: string;
-  node: ContainerComponentDef;
   parentState: ContainerState;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
-  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   parentDispatch: ContainerDispatcher;
   parentRenderContext?: ParentRenderContext;
+  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
 };
 
@@ -106,17 +106,17 @@ type Props = {
  * provides a context for the children to access the state and the API of the 
  * parent component.
  */
-export const ComponentContainer = memo(
-  forwardRef(function ComponentContainer(
+export const ContainerWrapper = memo(
+  forwardRef(function ContainerWrapper(
     {
-      resolvedKey,
       node,
+      resolvedKey,
       parentState,
       parentStatePartChanged,
       parentRegisterComponentApi,
-      layoutContextRef,
-      parentRenderContext,
       parentDispatch,
+      parentRenderContext,
+      layoutContextRef,
       uidInfoRef,
     }: Props,
     ref,
@@ -127,18 +127,18 @@ export const ComponentContainer = memo(
 
     return (
       <ErrorBoundary node={node} location={"container"}>
-        <MemoizedErrorProneContainer
-          parentStatePartChanged={parentStatePartChanged}
-          resolvedKey={resolvedKey}
+        <StateContainer
           node={containerizedNode as any}
+          resolvedKey={resolvedKey}
           parentState={parentState}
-          layoutContextRef={layoutContextRef}
-          parentRenderContext={parentRenderContext}
-          isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
+          parentStatePartChanged={parentStatePartChanged}
           parentRegisterComponentApi={parentRegisterComponentApi}
           parentDispatch={parentDispatch}
-          ref={ref}
+          parentRenderContext={parentRenderContext}
+          layoutContextRef={layoutContextRef}
           uidInfoRef={uidInfoRef}
+          isImplicit={node.type !== "Container" && containerizedNode.uses === undefined} //in this case it's an auto-wrapped component
+          ref={ref}
         />
       </ErrorBoundary>
     );
@@ -150,7 +150,7 @@ export const ComponentContainer = memo(
  * @param node The component node to wrap
  * @returns A "Container" node
  */
-const getWrappedWithContainer = (node: ContainerComponentDef) => {
+const getWrappedWithContainer = (node: ContainerWrapperDef) => {
   if (node.type === "Container") {
     // --- Already wrapped
     return node;
@@ -182,12 +182,12 @@ const getWrappedWithContainer = (node: ContainerComponentDef) => {
     scriptError: node.scriptError,
     uses: node.uses,
     api: node.api,
-    containerUid: "containerUid" in node && node.containerUid,
-    apiBoundContainer: "apiBoundContainer" in node && node.apiBoundContainer,
+    containerUid: node?.containerUid,
+    apiBoundContainer: node?.apiBoundContainer,
     contextVars: node.contextVars,
     props: {
       debug: (node.props as any)?.debug,
     },
     children: [wrappedNode],
-  } as ContainerComponentDef;
+  } as ContainerWrapperDef;
 };

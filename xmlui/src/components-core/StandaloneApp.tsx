@@ -15,7 +15,7 @@ import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstra
 import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
 
 import "../index.scss";
-import AppRoot from "@components-core/rendering/AppRoot";
+import { AppRoot } from "@components-core/rendering/AppRoot";
 import { normalizePath } from "@components-core/utils/misc";
 import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
 import { EMPTY_OBJECT } from "@components-core/constants";
@@ -80,10 +80,6 @@ function StandaloneApp({
   runtime,
   extensionManager,
 }: StandaloneAppProps) {
-  const servedFromSingleFile = useMemo(() => {
-    return typeof window !== "undefined" && window.location.href.startsWith("file");
-  }, []);
-
   // --- Fetch all files constituting the standalone app, including components,
   // --- themes, and other artifacts. Display the app version numbers in the
   // --- console.
@@ -128,7 +124,6 @@ function StandaloneApp({
   return (
     <ApiInterceptorProvider interceptor={mockedApi} useHashBasedRouting={useHashBasedRouting}>
       <AppRoot
-        servedFromSingleFile={servedFromSingleFile}
         decorateComponentsWithTestId={shouldDecorateWithTestId}
         node={entryPoint!}
         standalone={true}

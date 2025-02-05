@@ -8,7 +8,7 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "@components-core/abstractions/LoaderRenderer";
-import type { ContainerState } from "@components-core/rendering/ContainerComponent";
+import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
 import type { LoaderDirections } from "@components-core/loader/PageableLoader";
 import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
 

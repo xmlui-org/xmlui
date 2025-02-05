@@ -8,7 +8,7 @@ import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
 import type {
   ContainerState,
   RegisterComponentApiFnInner,
-} from "@components-core/rendering/ContainerComponent";
+} from "@components-core/rendering/ContainerWrapper";
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import type {
   LookupAsyncFn,

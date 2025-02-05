@@ -10,14 +10,14 @@ import type { ContainerDispatcher, MemoedVars } from "@components-core/abstracti
 import { ContainerActionKind } from "@components-core/abstractions/containers";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import { collectFnVarDeps } from "@components-core/rendering/collectFnVarDeps";
-import { ContainerComponentDef, RegisterComponentApiFnInner, ComponentApi, StatePartChangedFn } from "./ContainerComponent";
+import { ContainerWrapperDef, RegisterComponentApiFnInner, ComponentApi, StatePartChangedFn } from "./ContainerWrapper";
 import { createContainerReducer } from "@components-core/rendering/reducer";
 import { useDebugView } from "@components-core/DebugViewProvider";
 import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
 import { collectVariableDependencies } from "@components-core/script-runner/visitors";
 import { useShallowCompareMemoize, useReferenceTrackedApi } from "@components-core/utils/hooks";
 import { MutableRefObject, RefObject, memo, forwardRef, useState, useRef, useMemo, useReducer, useCallback } from "react";
-import { MemoizedContainer } from "./MemoizedContainer";
+import { Container } from "./Container";
 import { useParams, useSearchParams } from "@remix-run/react";
 import { CodeDeclaration, ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
 import { PARSED_MARK_PROP } from "../../parsers/scripting/code-behind-collect";
@@ -29,33 +29,33 @@ import { pickFromObject, shallowCompare } from "@components-core/utils/misc";
 
 // --- Properties of the MemoizedErrorProneContainer component
 type Props = {
-  node: ContainerComponentDef;
+  node: ContainerWrapperDef;
+  resolvedKey?: string;
   parentState: ContainerState;
   parentStatePartChanged: StatePartChangedFn;
   parentRegisterComponentApi: RegisterComponentApiFnInner;
-  resolvedKey?: string;
-  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
-  parentRenderContext?: ParentRenderContext;
-  isImplicit?: boolean;
   parentDispatch: ContainerDispatcher;
+  parentRenderContext?: ParentRenderContext;
+  layoutContextRef: MutableRefObject<LayoutContext | undefined>;
   uidInfoRef?: RefObject<Record<string, any>>;
+  isImplicit?: boolean;
 };
 
 // A React component that wraps a view container into an error boundary
 // (it's a named function inside the memo, this way it will be visible with that name in the react devtools)
-export const MemoizedErrorProneContainer = memo(
-  forwardRef(function MemoizedErrorProneContainer(
+export const StateContainer = memo(
+  forwardRef(function StateContainer(
     {
       node,
-      parentState,
       resolvedKey,
+      parentState,
       parentStatePartChanged,
       parentRegisterComponentApi,
-      layoutContextRef,
-      parentRenderContext,
-      isImplicit,
       parentDispatch,
+      parentRenderContext,
+      layoutContextRef,
       uidInfoRef,
+      isImplicit,
     }: Props,
     ref,
   ) {
@@ -74,6 +74,7 @@ export const MemoizedErrorProneContainer = memo(
     const containerReducer = createContainerReducer(debugView);
     const [componentState, dispatch] = useReducer(containerReducer, EMPTY_OBJECT);
 
+    // --- The exposed APIs of components are also the part of the state.
     const [componentApis, setComponentApis] = useState<Record<symbol, ComponentApi>>(EMPTY_OBJECT);
 
     const componentStateWithApis = useShallowCompareMemoize(
@@ -155,6 +156,7 @@ export const MemoizedErrorProneContainer = memo(
       localVarsStateContextWithPreResolvedLocalVars,
       memoedVars,
     );
+
     const mergedWithVars = useMergedState(resolvedLocalVars, componentStateWithApis);
     const combinedState = useCombinedState(
       stateFromOutside,
@@ -181,6 +183,7 @@ export const MemoizedErrorProneContainer = memo(
     }, []);
 
     const componentStateRef = useRef(componentStateWithApis);
+
     const statePartChanged: StatePartChangedFn = useCallback(
       (pathArray, newValue, target, action) => {
         const key = pathArray[0];
@@ -206,7 +209,7 @@ export const MemoizedErrorProneContainer = memo(
 
     return (
       <ErrorBoundary node={node} location={"container"}>
-        <MemoizedContainer
+        <Container
           resolvedKey={resolvedKey}
           node={node}
           componentState={combinedState}

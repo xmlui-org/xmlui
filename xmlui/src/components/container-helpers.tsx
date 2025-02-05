@@ -1,6 +1,6 @@
 import type { ComponentDef } from "@abstractions/ComponentDefs";
 import { memo, useMemo } from "react";
-import type { ContainerComponentDef } from "@components-core/rendering/ContainerComponent";
+import type { ContainerWrapperDef } from "@components-core/rendering/ContainerWrapper";
 import { EMPTY_OBJECT } from "@components-core/constants";
 import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
 import { useShallowCompareMemoize } from "@components-core/utils/hooks";
@@ -38,7 +38,7 @@ export const MemoizedItem = memo(
             ...shallowMemoedContextVars,
           },
           children: Array.isArray(node) ? node : [node],
-        } as ContainerComponentDef;
+        } as ContainerWrapperDef;
       }
       return {
         type: "Container",
@@ -48,7 +48,7 @@ export const MemoizedItem = memo(
           ...shallowMemoedContextVars,
         },
         children: Array.isArray(node) ? node : [node],
-      } as ContainerComponentDef;
+      } as ContainerWrapperDef;
     }, [context, item, node, shallowMemoedContextVars]);
 
     return <>{renderChild(nodeWithItem, layoutContext)}</>;
