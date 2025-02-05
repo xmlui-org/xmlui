@@ -90,6 +90,7 @@ import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { OptionMd } from "@components/Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
+import { RawHtmlMd } from "./RawHtml/RawHtml";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -166,6 +167,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,
+  RawHtml: RawHtmlMd,
   SelectionStore: SelectionStoreMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,
