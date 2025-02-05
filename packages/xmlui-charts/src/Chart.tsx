@@ -1,9 +1,7 @@
-"use client";
-
 import * as React from "react";
 import * as RechartsPrimitive from "recharts";
-import classnames from "@components-core/utils/classnames";
-import styles from "@components/BarChart/Chart.module.scss";
+import styles from "./Chart.module.scss";
+import classnames from "classnames";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: "", dark: ".dark" } as const;
