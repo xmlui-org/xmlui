@@ -45,5 +45,5 @@ jobs:
         uses: azure/webapps-deploy@v2
         with:
           package: "docs/ui.zip"
-          app-name: xmlui-dev
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_WWW_DEV }}
+          app-name: xmlui-docs
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_XMLUI_DOCS }}
