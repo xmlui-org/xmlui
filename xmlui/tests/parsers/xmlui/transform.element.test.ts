@@ -108,21 +108,12 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("vars", () => {
-    it("vars fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><vars/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
-
     it("var fails with missing name attribute", () => {
       try {
         transformSource("<Stack><var/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -131,7 +122,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><var name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -194,21 +185,12 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Props
   describe("props", () => {
-    it("prop fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><propertys/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
-
     it("prop fails with invalid attribute", () => {
       try {
         transformSource("<Stack><property blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T011")).equal(true);
+        expect(err.toString()).includes("T011");
       }
     });
 
@@ -217,7 +199,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><property/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -226,7 +208,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><property name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -334,21 +316,12 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("event", () => {
-    it("events fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><events/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
-
     it("event fails with invalid attribute", () => {
       try {
         transformSource("<Stack><event blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T011")).equal(true);
+        expect(err.toString()).includes("T011");
       }
     });
 
@@ -363,7 +336,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -372,7 +345,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -381,7 +354,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><event name='onClick' value='doIt'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T008")).equal(true);
+        expect(err.toString()).includes("T008");
       }
     });
 
@@ -438,7 +411,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method blabla='123'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T011")).equal(true);
+        expect(err.toString()).includes("T011");
       }
     });
 
@@ -447,7 +420,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method></method></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -456,7 +429,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><method name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T012")).equal(true);
+        expect(err.toString()).includes("T012");
       }
     });
 
@@ -529,7 +502,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><uses x='a'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T015")).equal(true);
+        expect(err.toString()).includes("T015");
       }
     });
 
@@ -538,7 +511,7 @@ describe("Xmlui transform - child elements", () => {
         transformSource("<Stack><uses x='a' value='b'/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
-        expect(err.toString().includes("T015")).equal(true);
+        expect(err.toString()).includes("T015");
       }
     });
 
