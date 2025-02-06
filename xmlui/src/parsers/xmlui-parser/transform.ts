@@ -8,7 +8,6 @@ import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
-import { Stack } from "../..";
 import type { GetText } from "./parser";
 
 export const COMPOUND_COMP_ID = "Component";
@@ -23,6 +22,8 @@ const APP_NS_KEY = "app-ns";
 const APP_NS_VALUE = "#app-ns";
 const CORE_NS_KEY = "core-ns";
 const CORE_NS_VALUE = "#xmlui-core-ns";
+
+const helperTagNames = [ "property", "event", "var", "uses", "method", "loaders", "field" ];
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -262,7 +263,8 @@ export function nodeToComponentDef(
       }
 
       // --- Element name starts with an uppercase letter
-      if (UCRegex.test(childName) && !isCompound) {
+      const isComponentChild = UCRegex.test(childName) || !helperTagNames.includes(childName);
+      if (isComponentChild && !isCompound) {
         // --- This must be a child component
         // maybe here or in the transformInnerElement function, after the compound comp check
         const childComponent = transformInnerElement(usesStack, child);
@@ -744,7 +746,7 @@ export function nodeToComponentDef(
   function prepNode(node: Node): Node {
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getComponentName(node, getText);
-    const hasComponentName = UCRegex.test(tagName);
+    const hasComponentName = UCRegex.test(tagName) || !helperTagNames.includes(tagName);
     const shouldUseTextNodeElement = hasComponentName || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
     const attrs = getAttributes(node);
@@ -1233,9 +1235,9 @@ function getTopLvlElement(node: Node, getText: GetText): Node{
   }
 
   const name = getComponentName(element, getText);
-  if (!UCRegex.test(name)) {
-    reportError("T002");
-  }
+  // if (!UCRegex.test(name)) {
+  //   reportError("T002");
+  // }
   return element;
 }
 
@@ -1249,9 +1251,9 @@ function getNamespaceResolvedComponentName(node: Node, getText: GetText, namespa
   const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
   const name = getText(nameTokens.at(-1));
 
-  if (!UCRegex.test(name)) {
-    reportError("T002");
-  }
+  // if (!UCRegex.test(name)) {
+  //   reportError("T002");
+  // }
 
   if (nameTokens.length === 1) {
     return name;

@@ -3,6 +3,14 @@ import type { ComponentDef, CompoundComponentDef } from "@abstractions/Component
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - child elements", () => {
+  it("Lowercase letters are allowed", () => {
+    const cd = transformSource(
+      "<b>text here</b>",
+    ) as ComponentDef;
+    expect(cd.children![0].type).equal("TextNode");
+    expect((cd.children![0].props! as any).value).equal("text here");
+  });
+
   it("Comments ignored, whitespace collapsed", () => {
     const cd = transformSource(
       "<H1>  <!-- comment -->  <!-- --><!-- -->     text here</H1>",

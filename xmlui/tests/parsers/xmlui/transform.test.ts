@@ -12,14 +12,14 @@ describe("Ueml transform", () => {
     }
   });
 
-  it("Lowercase component fails", () => {
-    try {
-      transformSource("<stack />");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T002")).equal(true);
-    }
-  });
+  // it("Lowercase component fails", () => {
+  //   try {
+  //     transformSource("<stack />");
+  //     assert.fail("Exception expected");
+  //   } catch (err) {
+  //     expect(err.toString().includes("T002")).equal(true);
+  //   }
+  // });
 
   it.todo("Unmatched tag names", () => {
     try {

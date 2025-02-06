@@ -2,14 +2,14 @@ import { describe, expect, it, assert } from "vitest";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - errors", () => {
-  it("Invalid child node name in a component", () => {
-    try {
-      transformSource("<Stack><blabla /></Stack>");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T009")).equal(true);
-    }
-  });
+  // it("Invalid child node name in a component", () => {
+  //   try {
+  //     transformSource("<Stack><blabla /></Stack>");
+  //     assert.fail("Exception expected");
+  //   } catch (err) {
+  //     expect(err.toString().includes("T009")).equal(true);
+  //   }
+  // });
 
   it("Missing name in compound component", () => {
     try {

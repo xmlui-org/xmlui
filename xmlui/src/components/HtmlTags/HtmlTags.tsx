@@ -19,7 +19,7 @@ export const HtmlEMMd = createMetadata({
   events: {}
 });
 
-export const htmlEMTagRenderer = createComponentRenderer("EM", HtmlEMMd, ({ node, renderChild }) => {
+export const htmlEMTagRenderer = createComponentRenderer("em", HtmlEMMd, ({ node, renderChild }) => {
   return <em>{renderChild(node.children)}</em>;
 });
 
@@ -30,6 +30,6 @@ export const HtmlCodeMd = createMetadata({
   events: {}
 });
 
-export const htmlCodeTagRenderer = createComponentRenderer("CODE", HtmlCodeMd, ({ node, renderChild }) => {
+export const htmlCodeTagRenderer = createComponentRenderer("code", HtmlCodeMd, ({ node, renderChild }) => {
   return <code>{renderChild(node.children)}</code>;
 });
