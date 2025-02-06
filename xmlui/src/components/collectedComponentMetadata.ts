@@ -90,6 +90,7 @@ import { OptionMd } from "@components/Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
 import { RawHtmlMd } from "./RawHtml/RawHtml";
+import { HtmlBMd, HtmlCodeMd, HtmlEMMd } from "./HtmlTags/HtmlTags";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   Accordion: AccordionMd,
@@ -100,6 +101,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
+  b: HtmlBMd,
   Backdrop: BackdropMd,
   Badge: BadgeMd,
   Bookmark: BookmarkMd,
@@ -111,11 +113,13 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ChangeListener: ChangeListenerMd,
   Chart: ChartMd,
   Checkbox: CheckboxMd,
+  CODE: HtmlCodeMd,
   Column: ColumnMd,
   ContentSeparator: ContentSeparatorMd,
   DataSource: DataSourceMd,
   DatePicker: DatePickerMd,
   DropdownMenu: DropdownMenuMd,
+  EM: HtmlEMMd,
   Fragment: FragmentMd,
   MenuItem: MenuItemMd,
   SubMenuItem: SubMenuItemMd,
@@ -162,10 +166,10 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
+  RawHtml: RawHtmlMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,
-  RawHtml: RawHtmlMd,
   SelectionStore: SelectionStoreMd,
   SpaceFiller: SpaceFillerMd,
   Spinner: SpinnerMd,

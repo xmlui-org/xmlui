@@ -144,6 +144,7 @@ import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { Extension } from "@abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
+import { htmlBTagRenderer, htmlEMTagRenderer } from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -434,7 +435,10 @@ export class ComponentRegistry {
     this.registerCoreComponent(sliderComponentRenderer);
     this.registerCoreComponent(buttonGroupComponentRenderer);
     this.registerCoreComponent(backdropComponentRenderer);
+
     this.registerCoreComponent(rawHtmlComponentRenderer);
+    this.registerCoreComponent(htmlBTagRenderer);
+    this.registerCoreComponent(htmlEMTagRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
