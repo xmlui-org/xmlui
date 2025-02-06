@@ -144,7 +144,7 @@ import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { Extension } from "@abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
-import { htmlBTagRenderer, htmlCodeTagRenderer, htmlEMTagRenderer, htmlH1TagRenderer, htmlH2TagRenderer, htmlH3TagRenderer, htmlH4TagRenderer, htmlH5TagRenderer, htmlH6TagRenderer, htmlPreTagRenderer, htmlPTagRenderer } from "./HtmlTags/HtmlTags";
+import { htmlATagRenderer, htmlBTagRenderer, htmlCodeTagRenderer, htmlDivTagRenderer, htmlEMTagRenderer, htmlH1TagRenderer, htmlH2TagRenderer, htmlH3TagRenderer, htmlH4TagRenderer, htmlH5TagRenderer, htmlH6TagRenderer, htmlImgTagRenderer, htmlLiTagRenderer, htmlOlTagRenderer, htmlPreTagRenderer, htmlPTagRenderer, htmlSpanTagRenderer, htmlUlTagRenderer } from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -448,6 +448,14 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlEMTagRenderer);
     this.registerCoreComponent(htmlCodeTagRenderer);
     this.registerCoreComponent(htmlPreTagRenderer);
+    this.registerCoreComponent(htmlImgTagRenderer);
+    this.registerCoreComponent(htmlUlTagRenderer);
+    this.registerCoreComponent(htmlOlTagRenderer);
+    this.registerCoreComponent(htmlLiTagRenderer);
+    this.registerCoreComponent(htmlDivTagRenderer);
+    this.registerCoreComponent(htmlSpanTagRenderer);
+    this.registerCoreComponent(htmlATagRenderer);
+
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);

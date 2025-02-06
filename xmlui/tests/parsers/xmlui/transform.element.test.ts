@@ -116,14 +116,14 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("vars", () => {
-    it("vars fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><vars/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
+    // it("vars fails with compound component", () => {
+    //   try {
+    //     transformSource("<Component name='MyComp'><Stack /><vars/></Component>");
+    //     assert.fail("Exception expected");
+    //   } catch (err) {
+    //     expect(err.toString().includes("T009")).equal(true);
+    //   }
+    // });
 
     it("var fails with missing name attribute", () => {
       try {
@@ -202,14 +202,14 @@ describe("Xmlui transform - child elements", () => {
 
   // --- Props
   describe("props", () => {
-    it("prop fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><propertys/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
+    // it("prop fails with compound component", () => {
+    //   try {
+    //     transformSource("<Component name='MyComp'><Stack /><propertys/></Component>");
+    //     assert.fail("Exception expected");
+    //   } catch (err) {
+    //     expect(err.toString().includes("T009")).equal(true);
+    //   }
+    // });
 
     it("prop fails with invalid attribute", () => {
       try {
@@ -342,14 +342,14 @@ describe("Xmlui transform - child elements", () => {
   });
 
   describe("event", () => {
-    it("events fails with compound component", () => {
-      try {
-        transformSource("<Component name='MyComp'><Stack /><events/></Component>");
-        assert.fail("Exception expected");
-      } catch (err) {
-        expect(err.toString().includes("T009")).equal(true);
-      }
-    });
+    // it("events fails with compound component", () => {
+    //   try {
+    //     transformSource("<Component name='MyComp'><Stack /><events/></Component>");
+    //     assert.fail("Exception expected");
+    //   } catch (err) {
+    //     expect(err.toString().includes("T009")).equal(true);
+    //   }
+    // });
 
     it("event fails with invalid attribute", () => {
       try {

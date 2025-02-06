@@ -23,7 +23,7 @@ const APP_NS_VALUE = "#app-ns";
 const CORE_NS_KEY = "core-ns";
 const CORE_NS_VALUE = "#xmlui-core-ns";
 
-const helperTagNames = [ "property", "event", "var", "uses", "method", "loaders", "field" ];
+const helperTagNames = ["property", "event", "var", "uses", "method", "loaders", "field"];
 
 /** Nodes which got modified or added during transformation keep their own text,
  * since they are not present in the original source text */
@@ -41,7 +41,7 @@ export function nodeToComponentDef(
     return node.text ?? originalGetText(node);
   };
 
-  const element = getTopLvlElement(node, getText)
+  const element = getTopLvlElement(node, getText);
   const preppedElement = prepNode(element);
   const usesStack: Map<string, string>[] = [];
   const namespaceStack: Map<string, string>[] = [];
@@ -80,7 +80,7 @@ export function nodeToComponentDef(
     const name = getNamespaceResolvedComponentName(node, getText, namespaceStack);
 
     if (name === COMPOUND_COMP_ID) {
-      reportError("T006")
+      reportError("T006");
     }
 
     let component: ComponentDef = {
@@ -99,8 +99,7 @@ export function nodeToComponentDef(
     return component;
   }
 
-  function collectCompoundComponent(node: Node){
-
+  function collectCompoundComponent(node: Node) {
     const attrs = getAttributes(node).map(segmentAttr);
     // --- Validate component name
     const compoundName = attrs.find((attr) => attr.name === "name");
@@ -134,9 +133,13 @@ export function nodeToComponentDef(
     const children = getChildNodes(node);
 
     // --- Get the single component definition
-    const nestedComponents = children.filter(
-      (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child, getText)),
-    );
+    const nestedComponents = children.filter((child) => {
+      const compName = getComponentName(child, getText);
+      return (
+        child.kind === SyntaxKind.ElementNode &&
+        (UCRegex.test(getComponentName(child, getText)) || !helperTagNames.includes(compName))
+      );
+    });
     if (nestedComponents.length === 0) {
       nestedComponents.push(createTextNodeElement(""));
     }
@@ -148,7 +151,7 @@ export function nodeToComponentDef(
         const childName = getComponentName(child, getText);
         if (childName === "var") {
           nestedVars.push(child);
-        } else if (!UCRegex.test(childName)) {
+        } else if (!UCRegex.test(childName) || helperTagNames.includes(childName)) {
           childrenToCollect.push(child);
         }
       }
@@ -170,10 +173,7 @@ export function nodeToComponentDef(
         addToNamespaces(namespaceStack, element, attr.unsegmentedName, attr.value);
       });
 
-    let nestedComponent: ComponentDef = transformInnerElement(
-      usesStack,
-      element,
-    )! as ComponentDef;
+    let nestedComponent: ComponentDef = transformInnerElement(usesStack, element)! as ComponentDef;
     namespaceStack.pop();
 
     const component: CompoundComponentDef = {
@@ -205,7 +205,7 @@ export function nodeToComponentDef(
     const nodeClone: Node = withNewChildNodes(node, childrenToCollect);
     collectTraits(usesStack, component, nodeClone);
     return component;
-}
+  }
 
   /**
    * Collects component traits from attributes and child elements
@@ -357,7 +357,9 @@ export function nodeToComponentDef(
           return;
 
         default:
-          reportError("T009", childName);
+          if (isComponentChild && !isCompound) {
+            reportError("T009", childName);
+          }
           return;
       }
     });
@@ -1222,7 +1224,7 @@ function addToNamespaces(
   comp.namespaces[nsKey] = nsValue;
 }
 
-function getTopLvlElement(node: Node, getText: GetText): Node{
+function getTopLvlElement(node: Node, getText: GetText): Node {
   // --- Check that the nodes contains exactly only a single component root element before the EoF token
   if (node.children!.length !== 2) {
     reportError("T001");
@@ -1247,7 +1249,11 @@ function getComponentName(node: Node, getText: GetText) {
   return name;
 }
 
-function getNamespaceResolvedComponentName(node: Node, getText: GetText, namespaceStack: Map<string, string>[]) {
+function getNamespaceResolvedComponentName(
+  node: Node,
+  getText: GetText,
+  namespaceStack: Map<string, string>[],
+) {
   const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
   const name = getText(nameTokens.at(-1));
 
