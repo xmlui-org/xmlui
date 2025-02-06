@@ -14,22 +14,18 @@ import { useColors } from "xmlui";
 export type BarChartProps = {
   data: any[];
   layout?: "horizontal" | "vertical";
-  indexBy?: string;
+  nameKey?: string;
   stacked?: boolean;
-  bars?: {
-    key: string;
-    color?: string;
-    label?: string;
-  }[];
+  dataKeys?: string[];
   style?: React.CSSProperties;
 };
 
 export function BarChart({
   data = [],
   layout = "vertical",
-  indexBy,
+  nameKey,
   stacked = false,
-  bars = [],
+  dataKeys = [],
   style,
 }: BarChartProps) {
   const colors = useColors(
@@ -55,16 +51,16 @@ export function BarChart({
     const colorValues = Object.values(colors);
     return Object.assign(
       {},
-      ...bars.map((bar, index) => {
+      ...dataKeys.map((key, index) => {
         return {
-          [bar.key]: {
-            label: bar.label,
-            color: bar.color || colorValues[index % colorValues.length],
+          [key]: {
+            label: key,
+            color: colorValues[index % colorValues.length],
           },
         };
       }),
     );
-  }, [colors, bars]);
+  }, [colors, dataKeys]);
 
   return (
     <ResponsiveContainer style={style}>
@@ -75,19 +71,33 @@ export function BarChart({
             <>
               <XAxis type="number" axisLine={false} />
               <YAxis
-                dataKey={indexBy}
+                dataKey={nameKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
               />
             </>
           ) : (
             <>
               <XAxis
-                dataKey={indexBy}
+                dataKey={nameKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
               />
               <YAxis type="number" axisLine={false} />
             </>
@@ -96,7 +106,6 @@ export function BarChart({
           {Object.keys(config).map((key, index) => (
             <Bar
               key={index}
-              label={config[key].label}
               dataKey={key}
               fill={config[key].color}
               radius={stacked ? 0 : 8}

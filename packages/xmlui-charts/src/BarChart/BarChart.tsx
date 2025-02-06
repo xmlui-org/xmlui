@@ -10,7 +10,9 @@ export const BarChartMd = createMetadata({
       `This property is used to provide the component with data to display. The data itself needs ` +
         `to be an array of objects.`,
     ),
-    bars: d("key, color pairs - key is the key in the data, color is the color of the bar"),
+    dataKeys: d(
+      "This property specifies the keys in the data objects that should be used for rendering the bars.",
+    ),
     stacked: d(`This property determines how the bars are layed out.`),
     layout: d(
       `This property determines the orientation of the bar chart. The \`vertical\` variant ` +
@@ -18,7 +20,7 @@ export const BarChartMd = createMetadata({
         `The \`horizontal\` variant specifies the vertical axis as the primary and has the bars ` +
         `spread from top to bottom.`,
     ),
-    indexBy: d(`Determines which attribute groups the bars together.`),
+    nameKey: d("Specifies the key in the data objects that will be used to group bars together."),
   },
 });
 
@@ -31,8 +33,8 @@ export const barChartComponentRenderer = createComponentRenderer(
         style={layoutCss}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.layout)}
-        indexBy={extractValue(node.props?.indexBy)}
-        bars={extractValue(node.props?.bars)}
+        nameKey={extractValue(node.props?.nameKey)}
+        dataKeys={extractValue(node.props?.dataKeys)}
         stacked={extractValue(node.props?.stacked)}
       />
     );
