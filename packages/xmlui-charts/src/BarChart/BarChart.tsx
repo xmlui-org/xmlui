@@ -1,4 +1,4 @@
-import Barchart from "./BarChartNative";
+import { BarChart } from "./BarChartNative";
 import { createComponentRenderer, createMetadata, d } from "xmlui";
 
 const COMP = "BarChart";
@@ -27,7 +27,7 @@ export const barChartComponentRenderer = createComponentRenderer(
   BarChartMd,
   ({ extractValue, node, layoutCss }: any) => {
     return (
-      <Barchart
+      <BarChart
         style={layoutCss}
         data={extractValue(node.props?.data)}
         layout={extractValue(node.props?.layout)}

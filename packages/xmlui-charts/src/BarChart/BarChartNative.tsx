@@ -1,6 +1,13 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  Bar,
+  BarChart as RBarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./Chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 
@@ -17,7 +24,7 @@ export type BarChartProps = {
   style?: React.CSSProperties;
 };
 
-export default function Barchart({
+export function BarChart({
   data = [],
   layout = "vertical",
   indexBy,
@@ -62,7 +69,7 @@ export default function Barchart({
   return (
     <ResponsiveContainer style={style}>
       <ChartContainer config={config}>
-        <BarChart accessibilityLayer data={data} layout={layout}>
+        <RBarChart accessibilityLayer data={data} layout={layout}>
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
           {layout === "vertical" ? (
             <>
@@ -96,7 +103,7 @@ export default function Barchart({
               stackId={stacked ? "stacked" : undefined}
             />
           ))}
-        </BarChart>
+        </RBarChart>
       </ChartContainer>
     </ResponsiveContainer>
   );
