@@ -4,7 +4,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./Chart";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 
-export type BarChart1Props = {
+export type BarChartProps = {
   data: any[];
   layout?: "horizontal" | "vertical";
   indexBy?: string;
@@ -17,14 +17,14 @@ export type BarChart1Props = {
   style?: React.CSSProperties;
 };
 
-export default function Barchart1({
+export default function Barchart({
   data = [],
   layout = "vertical",
   indexBy,
   stacked = false,
   bars = [],
   style,
-}: BarChart1Props) {
+}: BarChartProps) {
   const colors = useColors(
     {
       name: "color-primary-500",

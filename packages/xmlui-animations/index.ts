@@ -6,6 +6,6 @@ startApp(runtime, [animations]);
 
 if (import.meta.hot) {
   import.meta.hot.accept((newModule) => {
-    startApp(newModule?.runtime);
+    startApp(newModule?.runtime, [animations]);
   });
 }
