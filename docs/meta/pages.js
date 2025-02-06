@@ -13,6 +13,7 @@ export const COMPONENT_APPHEADER = "/components/AppHeader";
 export const COMPONENT_APPSTATE = "/components/AppState";
 export const COMPONENT_AUTOCOMPLETE = "/components/AutoComplete";
 export const COMPONENT_AVATAR = "/components/Avatar";
+export const COMPONENT_B = "/components/B";
 export const COMPONENT_BACKDROP = "/components/Backdrop";
 export const COMPONENT_BADGE = "/components/Badge";
 export const COMPONENT_BOOKMARK = "/components/Bookmark";
