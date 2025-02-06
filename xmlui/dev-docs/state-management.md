@@ -214,13 +214,15 @@ This trait is significant as it means `StateContainer` keeps the state without r
 
 ### Resolving Issue #1
 
-The `Container` runs all event handler code asynchronously. Every event handler started uses a separate logical thread (remember, JavaScript is single-threaded). At the end of every instruction in a particular event handler, `Container` collects all changes since the previously executed instruction and initiates the corresponding state updates.
+The `Container` runs all event handler code asynchronously. Every event handler started uses a separate logical thread. At the same time, multiple event handlers may run on their logical threads; `Container` does not limit them. 
 
-The React engine schedules the updates for these changes; those do not happen synchronously but once, eventually. The engine may bundle multiple updates in a single update. When the React scheduler decides so, the state changes are committed, and (if required) the component is re-rendered.
+At the end of every instruction in a particular event handler, `Container` awaits an asynchronous completion step: it collects all changes since the previously executed instruction and initiates the corresponding state updates. While this step is pending, the code execution of the particular event handler is suspended.
 
 With an ingenious mechanism (you will learn about it soon), `Container` awaits (of course, asynchronously) while React completes the bundle of state updates, and `StateContainer` holds the modified state.
 
-Due to the async nature of this update at the end of each completed instruction, the JavaScript event loop has the opportunity to handle other events and, thus, keep the UI responsive.
+
+
+**Due to the async nature of this update at the end of each completed instruction, the JavaScript event loop has the opportunity to handle other events and, thus, keep the UI responsive.**
 
 ### Resolving Issue #2
 
@@ -228,11 +230,18 @@ The async code execution keeps the state of reactive variables in `StateContaine
 
 `Container` has an ingenious mechanism to provide this trait:
 
-1. It stores references (with `useRef`) to promises associated with completed event handler statements that cause state changes.
-2. When the `version` state (created with `useState`) changes, all pending event handler statement promises are resolved.
+- **Step 1**. It stores references (with `useRef`) to promises associated with completed event handler statements that cause state changes. Each statement has a unique ID, and Promises are mapped to the particular statement with this ID.
+- **Step 2**. When the `version` state (created with `useState`) changes, all pending event handler statement promises are resolved.
 
 When the event handler completes a statement, these steps ensure that the subsequent statement's execution awaits while the state changes are committed:
 
+- **Step 3**. The reducer function (with the `STATE_PART_CHANGED` action) updates the changes. A single instruction may initiate multiple state changes (but only ); in this case, the reducer is invoked for all of them. The React engine schedules the updates for these changes.
+- **Step 4**. `Container` adds a promise to the references mentioned in **Step 1**. This promise is mapped to the just completed statement.
+- **Step 5**. `Container` uses the `setVersion` function passed by `StateContainer` to increment the state version.
+- **Step 7**. `Container` awaits the promise created in **Step 4**. The previous steps (**Step 3 - Step5**) ran synchronously, so the JavaScript event loop had no opportunity to run the scheduled state updates. However, at this point, due to the awaiting, the event loop lets React carry out the updates. These set the new state (changes initiated in **Step 3**) and the new version (initiated in **Step 4**).
+- **Step 8**. The state changes are committed in `StateContainer`, which propagates these changes to `Container`; so `Container` is re-rendered. As the `version` changes (**Step 2**), `Container` resolves the pending promises (including the one created in **Step 4**). 
+- **Step 9**. 
+ 
 
 
 
