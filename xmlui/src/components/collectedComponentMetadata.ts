@@ -90,9 +90,43 @@ import { OptionMd } from "@components/Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
 import { RawHtmlMd } from "./RawHtml/RawHtml";
-import { HtmlBMd, HtmlCodeMd, HtmlEMMd } from "./HtmlTags/HtmlTags";
+import { HtmlAMd, HtmlBMd, HtmlCaptionMd, HtmlCodeMd, HtmlColgroupMd, HtmlColMd, HtmlDivMd, HtmlEMMd, HtmlH1Md, HtmlH2Md, HtmlH3Md, HtmlH4Md, HtmlH5Md, HtmlH6Md, HtmlImgMd, HtmlLiMd, HtmlOlMd, HtmlPMd, HtmlPreMd, HtmlSpanMd, HtmlTableMd, HtmlTbodyMd, HtmlTdMd, HtmlTfootMd, HtmlTheadMd, HtmlThMd, HtmlTrMd, HtmlUlMd } from "./HtmlTags/HtmlTags";
 
 export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
+  // --- HTML tags
+  a: HtmlAMd,
+  b: HtmlBMd,
+  caption: HtmlCaptionMd,
+  code: HtmlCodeMd,
+  col: HtmlColMd,
+  colgroup: HtmlColgroupMd,
+  em: HtmlEMMd,
+  div: HtmlDivMd,
+  h1: HtmlH1Md,
+  h2: HtmlH2Md,
+  h3: HtmlH3Md,
+  h4: HtmlH4Md,
+  h5: HtmlH5Md,
+  h6: HtmlH6Md,
+  img: HtmlImgMd,
+  li: HtmlLiMd,
+  ol: HtmlOlMd,
+  p: HtmlPMd,
+  pre: HtmlPreMd,
+  span: HtmlSpanMd,
+  table: HtmlTableMd,
+  tbody: HtmlTbodyMd,
+  td: HtmlTdMd,
+  tfoot: HtmlTfootMd,
+  th: HtmlThMd,
+  thead: HtmlTheadMd,
+  tr: HtmlTrMd,
+
+  ul: HtmlUlMd,
+
+
+
+  // --- Heavy xmlui components
   Accordion: AccordionMd,
   Alert: AlertMd,
   APICall: APICallMd,
@@ -101,7 +135,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   AppState: AppStateMd,
   AutoComplete: AutoCompleteMd,
   Avatar: AvatarMd,
-  b: HtmlBMd,
   Backdrop: BackdropMd,
   Badge: BadgeMd,
   Bookmark: BookmarkMd,

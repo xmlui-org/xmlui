@@ -144,7 +144,36 @@ import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { Extension } from "@abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
-import { htmlATagRenderer, htmlBTagRenderer, htmlCodeTagRenderer, htmlDivTagRenderer, htmlEMTagRenderer, htmlH1TagRenderer, htmlH2TagRenderer, htmlH3TagRenderer, htmlH4TagRenderer, htmlH5TagRenderer, htmlH6TagRenderer, htmlImgTagRenderer, htmlLiTagRenderer, htmlOlTagRenderer, htmlPreTagRenderer, htmlPTagRenderer, htmlSpanTagRenderer, htmlUlTagRenderer } from "./HtmlTags/HtmlTags";
+import {
+  htmlATagRenderer,
+  htmlBTagRenderer,
+  htmlCaptionTagRenderer,
+  htmlCodeTagRenderer,
+  htmlColgroupTagRenderer,
+  htmlColTagRenderer,
+  htmlDivTagRenderer,
+  htmlEMTagRenderer,
+  htmlH1TagRenderer,
+  htmlH2TagRenderer,
+  htmlH3TagRenderer,
+  htmlH4TagRenderer,
+  htmlH5TagRenderer,
+  htmlH6TagRenderer,
+  htmlImgTagRenderer,
+  htmlLiTagRenderer,
+  htmlOlTagRenderer,
+  htmlPreTagRenderer,
+  htmlPTagRenderer,
+  htmlSpanTagRenderer,
+  htmlTableTagRenderer,
+  htmlTbodyTagRenderer,
+  htmlTdTagRenderer,
+  htmlTfootTagRenderer,
+  htmlTheadTagRenderer,
+  htmlThTagRenderer,
+  htmlTrTagRenderer,
+  htmlUlTagRenderer,
+} from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -218,7 +247,6 @@ export class ComponentRegistry {
   ) {
     this.extensionManager = extensionManager;
 
-
     // we register these first, so that core components with the same name can override them (without namespace)
     contributes.components?.forEach((renderer) => {
       this.registerAppComponent(renderer);
@@ -226,8 +254,6 @@ export class ComponentRegistry {
     contributes.compoundComponents?.forEach((def) => {
       this.registerAppComponent({ compoundComponentDef: def });
     });
-
-
 
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerCoreComponent(stackComponentRenderer);
@@ -455,15 +481,22 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlDivTagRenderer);
     this.registerCoreComponent(htmlSpanTagRenderer);
     this.registerCoreComponent(htmlATagRenderer);
-
+    this.registerCoreComponent(htmlTableTagRenderer);
+    this.registerCoreComponent(htmlTheadTagRenderer);
+    this.registerCoreComponent(htmlTbodyTagRenderer);
+    this.registerCoreComponent(htmlTrTagRenderer);
+    this.registerCoreComponent(htmlThTagRenderer);
+    this.registerCoreComponent(htmlTdTagRenderer);
+    this.registerCoreComponent(htmlTfootTagRenderer);
+    this.registerCoreComponent(htmlCaptionTagRenderer);
+    this.registerCoreComponent(htmlColgroupTagRenderer);
+    this.registerCoreComponent(htmlColTagRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
       this.registerCoreComponent(pieChartComponentRenderer);
       this.registerCoreComponent(mapComponentRenderer);
     }
-
-
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);
@@ -560,31 +593,37 @@ export class ComponentRegistry {
     });
   };
 
-
-  private registerCoreComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerCoreComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const coreNamespaces = ["#xmlui-core-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...coreNamespaces);
     } else {
       this.registerComponentRenderer(component, ...coreNamespaces);
     }
-  }
+  };
 
-  private registerAppComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerAppComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const appNamespaces = ["#app-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...appNamespaces);
     } else {
       this.registerComponentRenderer(component, ...appNamespaces);
     }
-  }
+  };
 
   // --- Registers a renderable component using its renderer function
   // --- and metadata
-  private registerComponentRenderer = ({ type, renderer, metadata }: ComponentRendererDef, ...namespaces: string[]) => {
+  private registerComponentRenderer = (
+    { type, renderer, metadata }: ComponentRendererDef,
+    ...namespaces: string[]
+  ) => {
     const component = { renderer, descriptor: metadata };
     namespaces.forEach((ns) => {
-      this.pool.set((ns ? (ns + ".") : "") + type, component);
+      this.pool.set((ns ? ns + "." : "") + type, component);
     });
     if (metadata?.themeVars) {
       Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
@@ -595,10 +634,10 @@ export class ComponentRegistry {
   };
 
   // --- Registers a compound component using its definition and metadata
-  private registerCompoundComponentRenderer({
-    compoundComponentDef,
-    metadata,
-  }: CompoundComponentRendererInfo, ...namespaces: string[]) {
+  private registerCompoundComponentRenderer(
+    { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
+    ...namespaces: string[]
+  ) {
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
@@ -612,7 +651,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-      metadata
+      metadata,
     };
 
     this.registerComponentRenderer(component, ...namespaces);
