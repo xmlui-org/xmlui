@@ -35,7 +35,7 @@
   "overview-devs": "Overview",
   "component-devs": "Custom Components",
   "js-library-devs": "Using JS Libraries",
-  "extensibility-components": "Components",
+  "extension-components": "Extensions",
   "support": {
     "title": "Support and Community",
     "type": "separator"

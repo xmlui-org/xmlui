@@ -1,5 +1,3 @@
-import path from "path";
-import { fileURLToPath } from "url";
 import {
   existsSync,
   mkdirSync,
@@ -13,12 +11,6 @@ import { parse, join, basename, extname, sep, posix, relative } from "path";
 import { writeFileSync, readdirSync } from "fs";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { createTable, processError, ErrorWithSeverity, strBufferToLines } from "./utils.mjs";
-
-// temp
-const projectRootFolder = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../../");
-const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
-const examplesFolder = join(projectRootFolder, "docs", "component-samples");
-const outFolder = join(projectRootFolder, "docs", "pages", "components");
 
 // Note: string concatenation is the fastest using `+=` in Node.js
 
@@ -58,120 +50,137 @@ const sectionNames = {
   contextVars: "Context Values",
 };
 
-export function processDocfiles(metadata, importsToInject, relativeComponentFolderPath) {
-  // Check for docs already in the output folder
-  const docFiles = readdirSync(outFolder).filter((file) => extname(file) === ".mdx");
-  let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
-
-  metadata.forEach((component) => {
-    componentNames = processMdx(
-      component,
-      componentNames,
-      metadata,
-      importsToInject,
-      relativeComponentFolderPath,
-    );
-  });
-
-  // Write the _meta.json file
-  try {
-    const metaFileContents = Object.fromEntries(componentNames.sort().map((name) => [name, name]));
-    writeFileSync(join(outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
-  } catch (e) {
-    logger.error("Could not write _meta file: ", e?.message || "unknown error");
+export class MetadataProcessor {
+  constructor(
+    metadata,
+    importsToInject,
+    { sourceFolder, outFolder, examplesFolder, relativeComponentFolderPath },
+  ) {
+    this.metadata = metadata;
+    this.importsToInject = importsToInject;
+    this.sourceFolder = sourceFolder;
+    this.outFolder = outFolder;
+    this.examplesFolder = examplesFolder;
+    this.relativeComponentFolderPath = relativeComponentFolderPath;
   }
-}
 
-function processMdx(
-  component,
-  componentNames,
-  metadata,
-  importsToInject,
-  relativeComponentFolderPath,
-) {
-  let result = "";
-  let fileData = "";
+  processDocfiles() {
+    // Check for docs already in the output folder
+    const docFiles = readdirSync(this.outFolder).filter((file) => extname(file) === ".mdx");
+    let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
-  // descriptionRef is explicitly set to empty, which means there is no external doc file for this component
-  if (!!component.descriptionRef) {
+    this.metadata.forEach((component) => {
+      componentNames = this._processMdx(
+        component,
+        componentNames,
+        this.metadata,
+        this.importsToInject,
+        this.relativeComponentFolderPath,
+      );
+    });
+
+    // Write the _meta.json file
     try {
-      // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
-      fileData = readFileContents(join(sourceFolder, component.descriptionRef));
+      const metaFileContents = Object.fromEntries(
+        componentNames.sort().map((name) => [name, name]),
+      );
+      writeFileSync(join(this.outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+    } catch (e) {
+      logger.error("Could not write _meta file: ", e?.message || "unknown error");
+    }
+  }
+
+  _processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath) {
+    let result = "";
+    let fileData = "";
+
+    // descriptionRef is explicitly set to empty, which means there is no external doc file for this component
+    if (!!component.descriptionRef) {
+      try {
+        // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
+        fileData = readFileContents(join(this.sourceFolder, component.descriptionRef));
+      } catch (error) {
+        processError(error);
+      }
+    }
+
+    logger.info(`Processing ${component.displayName}...`);
+
+    const parent = findParent(metadata, component);
+
+    // TODO: add check to throw warning if parent is not found
+    // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
+
+    if (!!parent) {
+      result += importsToInject;
+
+      result += `# ${component.displayName}`;
+      result += appendArticleId(component.displayName);
+      result += "\n\n";
+
+      result += addComponentStatusDisclaimer(component.status);
+      result += addNonVisualDisclaimer(component.nonVisual);
+
+      result += addParentLinkLine(parent.displayName, relativeComponentFolderPath);
+
+      const siblings = findSiblings(metadata, component);
+      result += addSiblingLinkLine(siblings, relativeComponentFolderPath);
+
+      result += fileData || "There is no description for this component as of yet.";
+      result += `\n\n`;
+    } else {
+      logger.info("Processing imports section");
+
+      result += importsToInject;
+
+      const { buffer, copyFilePaths } = addImportsSection(
+        fileData,
+        component,
+        this.sourceFolder,
+        this.outFolder,
+        this.examplesFolder,
+      );
+      if (buffer) {
+        result += `${buffer}\n`;
+        copyImports(copyFilePaths);
+      }
+
+      result += `# ${component.displayName}`;
+      result += appendArticleId(component.displayName);
+      result += "\n\n";
+
+      result += addComponentStatusDisclaimer(component.status);
+      result += addNonVisualDisclaimer(component.nonVisual);
+
+      result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
+      result += "\n\n";
+
+      result += addPropsSection(fileData, component);
+      result += "\n\n";
+
+      result += addEventsSection(fileData, component);
+      result += "\n\n";
+
+      result += addApisSection(fileData, component);
+      result += "\n\n";
+
+      result += addStylesSection(fileData, component);
+      result += "\n";
+    }
+
+    try {
+      writeFileSync(join(this.outFolder, `${component.displayName}.mdx`), result);
+      componentNames.push(component.displayName);
     } catch (error) {
-      processError(error);
+      logger.error("Could not write mdx file: ", error?.message || "unknown error");
     }
+    return componentNames;
   }
-
-  logger.info(`Processing ${component.displayName}...`);
-
-  const parent = findParent(metadata, component);
-
-  // TODO: add check to throw warning if parent is not found
-  // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
-
-  if (!!parent) {
-    result += importsToInject;
-
-    result += `# ${component.displayName}`;
-    result += appendArticleId(component.displayName);
-    result += "\n\n";
-
-    result += addComponentStatusDisclaimer(component.status);
-    result += addNonVisualDisclaimer(component.nonVisual);
-
-    result += addParentLinkLine(parent.displayName, relativeComponentFolderPath);
-
-    const siblings = findSiblings(metadata, component);
-    result += addSiblingLinkLine(siblings, relativeComponentFolderPath);
-
-    result += fileData || "There is no description for this component as of yet.";
-    result += `\n\n`;
-  } else {
-    logger.info("Processing imports section");
-
-    result += importsToInject;
-
-    const { buffer, copyFilePaths } = addImportsSection(fileData, component);
-    if (buffer) {
-      result += `${buffer}\n`;
-      copyImports(copyFilePaths);
-    }
-
-    result += `# ${component.displayName}`;
-    result += appendArticleId(component.displayName);
-    result += "\n\n";
-
-    result += addComponentStatusDisclaimer(component.status);
-    result += addNonVisualDisclaimer(component.nonVisual);
-
-    result += combineDescriptionAndDescriptionRef(fileData, component, DESCRIPTION);
-    result += "\n\n";
-
-    result += addPropsSection(fileData, component);
-    result += "\n\n";
-
-    result += addEventsSection(fileData, component);
-    result += "\n\n";
-
-    result += addApisSection(fileData, component);
-    result += "\n\n";
-
-    result += addStylesSection(fileData, component);
-    result += "\n";
-  }
-
-  try {
-    writeFileSync(join(outFolder, `${component.displayName}.mdx`), result);
-    componentNames.push(component.displayName);
-  } catch (error) {
-    logger.error("Could not write mdx file: ", error?.message || "unknown error");
-  }
-  return componentNames;
 }
 
 // --- File & String Processing
 
-function addImportsSection(data, component) {
+function addImportsSection(data, component, sourceFolder, outFolder, examplesFolder) {
   // This array is used in the transformer function
   const copyFilePaths = [];
   const buffer = getSection(
@@ -350,8 +359,9 @@ function combineDescriptionAndDescriptionRef(
 
   if (sectionId === DESCRIPTION) {
     if (component.contextVars && Object.keys(component.contextVars ?? {}).length > 0) {
-      descriptionBuffer += "\n\nThe component provides context values with which you can access some internal properties:";
-      descriptionBuffer += "\n\n"
+      descriptionBuffer +=
+        "\n\nThe component provides context values with which you can access some internal properties:";
+      descriptionBuffer += "\n\n";
       Object.entries(component.contextVars)
         .sort()
         .forEach(([contextVarName, contextVar]) => {

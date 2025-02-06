@@ -1,5 +1,5 @@
 {
   "excludeComponentStatuses": ["in progress", "deprecated"],
   "cleanFolder": true,
-  "exportToJson": true
+  "exportToJson": false
 }
