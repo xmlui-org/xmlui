@@ -45,7 +45,6 @@ import { OffCanvasMd } from "@components/OffCanvas/OffCanvas";
 import { PageMetaTitleMd } from "@components/PageMetaTitle/PageMetaTitle";
 import { PageMd, PagesMd } from "@components/Pages/Pages";
 import { PdfMd } from "@components/Pdf/LazyPdf";
-import { PieChartMd } from "@components/PieChart/PieChart";
 import { PositionedContainerMd } from "@components/PositionedContainer/PositionedContainer";
 import { ProgressBarMd } from "@components/ProgressBar/ProgressBar";
 import { QueueMd } from "@components/Queue/Queue";
@@ -161,7 +160,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   PageHeader: PageHeaderMd,
   Pages: PagesMd,
   Pdf: PdfMd,
-  PieChart: PieChartMd,
   PositionedContainer: PositionedContainerMd,
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
