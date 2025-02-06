@@ -1,6 +1,6 @@
-import barChartComponentRenderer from "./BarChart";
-import pieChartComponentRenderer from "./PieChart";
-import lineChartComponentRenderer from "./LineChart";
+import { barChartComponentRenderer } from "./BarChart/BarChart";
+import { pieChartComponentRenderer } from "./PieChart/PieChart";
+import { lineChartComponentRenderer } from "./LineChart/LineChart";
 
 export default {
   namespace: "XMLUIExtensions",
