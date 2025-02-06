@@ -144,7 +144,7 @@ import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { Extension } from "@abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
-import { htmlBTagRenderer, htmlEMTagRenderer } from "./HtmlTags/HtmlTags";
+import { htmlBTagRenderer, htmlCodeTagRenderer, htmlEMTagRenderer, htmlH1TagRenderer, htmlH2TagRenderer, htmlH3TagRenderer, htmlH4TagRenderer, htmlH5TagRenderer, htmlH6TagRenderer, htmlPreTagRenderer, htmlPTagRenderer } from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -437,8 +437,17 @@ export class ComponentRegistry {
     this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(rawHtmlComponentRenderer);
+    this.registerCoreComponent(htmlH1TagRenderer);
+    this.registerCoreComponent(htmlH2TagRenderer);
+    this.registerCoreComponent(htmlH3TagRenderer);
+    this.registerCoreComponent(htmlH4TagRenderer);
+    this.registerCoreComponent(htmlH5TagRenderer);
+    this.registerCoreComponent(htmlH6TagRenderer);
+    this.registerCoreComponent(htmlPTagRenderer);
     this.registerCoreComponent(htmlBTagRenderer);
     this.registerCoreComponent(htmlEMTagRenderer);
+    this.registerCoreComponent(htmlCodeTagRenderer);
+    this.registerCoreComponent(htmlPreTagRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
