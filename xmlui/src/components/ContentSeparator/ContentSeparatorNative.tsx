@@ -1,6 +1,6 @@
 import styles from "./ContentSeparator.module.scss";
 import type { CSSProperties } from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "classnames";
 
 type ContentSeparatorProps = {
   size?: number | string;

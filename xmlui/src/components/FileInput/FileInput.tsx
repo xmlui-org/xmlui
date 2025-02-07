@@ -1,14 +1,14 @@
-import { Icon } from "@components/Icon/IconNative";
+import { Icon } from "../Icon/IconNative";
 import styles from "./FileInput.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import {
   buttonThemeNames,
   buttonVariantNames,
   iconPositionNames,
   sizeMd,
-} from "@components/abstractions";
+} from "../abstractions";
 import { FileInput, isFileArray } from "./FileInputNative";
 import {
   dAutoFocus,
@@ -26,7 +26,7 @@ import {
   dReadonly,
   dRequired,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../../components/metadata-helpers";
 
 const COMP = "FileInput";
 

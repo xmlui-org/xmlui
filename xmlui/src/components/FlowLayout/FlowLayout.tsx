@@ -1,9 +1,9 @@
 import styles from "./FlowLayout.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { isComponentDefChildren } from "@components-core/utils/misc";
-import { NotAComponentDefError } from "@components-core/EngineError";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { isComponentDefChildren } from "../../components-core/utils/misc";
+import { NotAComponentDefError } from "../../components-core/EngineError";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FlowItemBreak, FlowItemWrapper, FlowLayout } from "./FlowLayoutNative";
 
 const COMP = "FlowLayout";

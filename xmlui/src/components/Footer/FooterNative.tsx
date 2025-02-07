@@ -1,7 +1,7 @@
 import React, { ForwardedRef, forwardRef, ReactNode } from "react";
 import styles from "./Footer.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { useAppLayoutContext } from "@components/App/AppLayoutContext";
+import classnames from "../../components-core/utils/classnames";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // =====================================================================================================================
 // React Footer component implementation

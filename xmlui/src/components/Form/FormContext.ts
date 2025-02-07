@@ -1,8 +1,8 @@
 import { createContext, useContextSelector } from "use-context-selector";
 import type {Dispatch} from "react";
-import type { ContainerAction } from "@components-core/abstractions/containers";
-import type {FormAction} from "@components/Form/formActions";
-import type { LabelPosition } from "@components/abstractions";
+import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type {FormAction} from "../Form/formActions";
+import type { LabelPosition } from "../abstractions";
 
 export type InteractionFlags = {
   isDirty: boolean;

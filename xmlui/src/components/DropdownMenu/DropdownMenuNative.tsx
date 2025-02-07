@@ -4,14 +4,14 @@ import * as ReactDropdownMenu from "@radix-ui/react-dropdown-menu";
 
 import styles from "./DropdownMenu.module.scss";
 
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { IconPosition, ButtonVariant, ButtonThemeColor } from "@components/abstractions";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { IconPosition, ButtonVariant, ButtonThemeColor } from "../abstractions";
 
-import { Button } from "@components/Button/ButtonNative";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { Icon } from "@components/Icon/IconNative";
-import classnames from "@components-core/utils/classnames";
-import { noop } from "@components-core/constants";
+import { Button } from "../Button/ButtonNative";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Icon } from "../Icon/IconNative";
+import classnames from "../../components-core/utils/classnames";
+import { noop } from "../../components-core/constants";
 
 type DropdownMenuProps = {
   triggerTemplate?: ReactNode;

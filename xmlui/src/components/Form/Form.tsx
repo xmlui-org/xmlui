@@ -1,10 +1,10 @@
 import styles from "./Form.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { FormWithContextVar } from "./FormNative";
-import { dComponent, dInternal } from "@components/metadata-helpers";
-import { labelPositionMd } from "@components/abstractions";
+import { dComponent, dInternal } from "../metadata-helpers";
+import { labelPositionMd } from "../abstractions";
 
 const COMP = "Form";
 

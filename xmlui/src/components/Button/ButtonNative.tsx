@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 import {
   type ButtonType,
   type ButtonVariant,
@@ -11,7 +11,7 @@ import {
   type OrientationOptions,
   type ButtonAria,
   defaultButtonType,
-} from "@components/abstractions";
+} from "../abstractions";
 import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
 
 type Props = {

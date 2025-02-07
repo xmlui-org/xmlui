@@ -9,18 +9,18 @@ import {
 } from "react";
 import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
 import styles from "./Form.module.scss";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ContainerAction } from "@components-core/abstractions/containers";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ContainerAction } from "../../components-core/abstractions/containers";
 import produce from "immer";
 import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
 import { FormContext } from "./FormContext";
-import { Button } from "@components/Button/ButtonNative";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import type { GenericBackendError } from "@components-core/EngineError";
-import { ValidationSummary } from "@components/ValidationSummary/ValidationSummary";
-import { useEvent } from "@components-core/utils/misc";
-import { groupInvalidValidationResultsBySeverity } from "@components/FormItem/Validations";
-import { type FormAction, formReset } from "@components/Form/formActions";
+import { Button } from "../Button/ButtonNative";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import type { GenericBackendError } from "../../components-core/EngineError";
+import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
+import { useEvent } from "../../components-core/utils/misc";
+import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
+import { type FormAction, formReset } from "../Form/formActions";
 import {
   backendValidationArrived,
   FormActionKind,
