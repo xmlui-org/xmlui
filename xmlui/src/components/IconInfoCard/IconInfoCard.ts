@@ -22,11 +22,12 @@ const componentSource = `
   <Card height="{$props.height}" width="{$props.width}">
     <HStack verticalAlignment="center">
       <CHStack 
-        backgroundColor="{$props.iconBackgroundColor}"
+        backgroundColor="{$props.iconBackgroundColor}" 
+        color="white"
         width="$space-10"
         height="$space-10"
         radius="$radius">
-        <Icon name="{$props.iconName}" size="$space-6" />
+        <Icon name="{$props.iconName}" size="$space-6"  />
       </CHStack>
       <VStack gap="0">
         <Slot />
