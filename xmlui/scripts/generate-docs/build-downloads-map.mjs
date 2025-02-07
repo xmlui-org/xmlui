@@ -6,6 +6,11 @@ import { logger } from "./logger.mjs";
 const baseUrlCutoff = "files";
 const includedFileExtensions = [".zip"];
 
+/**
+ * Creates a file containing download link constants for downloadable files.
+ * @param {string} downloadsFolder The path to the downloads folder (use UNIX delimiters)
+ * @param {string} outFilePathAndName The path and name of the output file (use UNIX delimiters)
+ */
 export function buildDownloadsMap(downloadsFolder, outFilePathAndName) {
   const downloads = [];
   traverseDirectory({ name: "", path: downloadsFolder }, (item, _) => {

@@ -54,14 +54,13 @@ export class MetadataProcessor {
   constructor(
     metadata,
     importsToInject,
-    { sourceFolder, outFolder, examplesFolder, relativeComponentFolderPath },
+    { sourceFolder, outFolder, examplesFolder },
   ) {
     this.metadata = metadata;
     this.importsToInject = importsToInject;
     this.sourceFolder = sourceFolder;
     this.outFolder = outFolder;
     this.examplesFolder = examplesFolder;
-    this.relativeComponentFolderPath = relativeComponentFolderPath;
   }
 
   processDocfiles() {
@@ -70,13 +69,7 @@ export class MetadataProcessor {
     let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
 
     this.metadata.forEach((component) => {
-      componentNames = this._processMdx(
-        component,
-        componentNames,
-        this.metadata,
-        this.importsToInject,
-        this.relativeComponentFolderPath,
-      );
+      componentNames = this._processMdx(component, componentNames);
     });
 
     // Write the _meta.json file
@@ -90,7 +83,7 @@ export class MetadataProcessor {
     }
   }
 
-  _processMdx(component, componentNames, metadata, importsToInject, relativeComponentFolderPath) {
+  _processMdx(component, componentNames) {
     let result = "";
     let fileData = "";
 
@@ -106,13 +99,13 @@ export class MetadataProcessor {
 
     logger.info(`Processing ${component.displayName}...`);
 
-    const parent = findParent(metadata, component);
+    const parent = findParent(this.metadata, component);
 
     // TODO: add check to throw warning if parent is not found
     // TODO: add check to throw error if component display name is the same as its specializedFrom attribute value
 
     if (!!parent) {
-      result += importsToInject;
+      result += this.importsToInject;
 
       result += `# ${component.displayName}`;
       result += appendArticleId(component.displayName);
@@ -121,17 +114,17 @@ export class MetadataProcessor {
       result += addComponentStatusDisclaimer(component.status);
       result += addNonVisualDisclaimer(component.nonVisual);
 
-      result += addParentLinkLine(parent.displayName, relativeComponentFolderPath);
+      result += addParentLinkLine(parent.displayName, basename(this.outFolder));
 
-      const siblings = findSiblings(metadata, component);
-      result += addSiblingLinkLine(siblings, relativeComponentFolderPath);
+      const siblings = findSiblings(this.metadata, component);
+      result += addSiblingLinkLine(siblings, basename(this.outFolder));
 
       result += fileData || "There is no description for this component as of yet.";
       result += `\n\n`;
     } else {
       logger.info("Processing imports section");
 
-      result += importsToInject;
+      result += this.importsToInject;
 
       const { buffer, copyFilePaths } = addImportsSection(
         fileData,

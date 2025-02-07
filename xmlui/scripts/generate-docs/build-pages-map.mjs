@@ -12,6 +12,11 @@ import { logger } from "./logger.mjs";
 const pathCutoff = "pages";
 const includedFileExtensions = [".mdx", ".md"];
 
+/**
+ * Creates a file containing link constant variables to components/articles in the pages folder.
+ * @param {string} pagesFolder The path to the pages folder (use UNIX delimiters)
+ * @param {string} outFilePathAndName The path and name of the output file (use UNIX delimiters)
+ */
 export function buildPagesMap(pagesFolder, outFilePathAndName) {
   const pages = [];
   traverseDirectory({ name: "", path: pagesFolder }, (item, _) => {

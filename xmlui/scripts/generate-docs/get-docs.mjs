@@ -3,19 +3,15 @@ import { lstatSync } from "fs";
 import { unlink, readdir, readFile } from "fs/promises";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { processError, ErrorWithSeverity, convertPath } from "./utils.mjs";
-import {
-  DocsGenerator,
-  pagesFolder,
-  projectRootFolder,
-  scriptFolder,
-} from "./DocsGenerator.mjs";
+import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
+import { FOLDERS } from "./folders.mjs";
 
 // --- Main
 
 // --- --- Extensions
 
-const outFolder = join(projectRootFolder, "docs", "pages", "extension-components");
+/* const outFolder = join(projectRootFolder, "docs", "pages", "extension-components");
 const examplesFolder = join(projectRootFolder, "docs", "component-samples");
 
 const extensionsConfig = await loadConfig(join(scriptFolder, "extensions-config.json"));
@@ -28,25 +24,27 @@ const extensionGenerator = new DocsGenerator(test.metadata, {
 });
 
 if (extensionsConfig?.cleanFolder) {
-  await cleanFolder(join(pagesFolder, "extension-components"));
+  await cleanFolder(join(FOLDERS.pages, "extension-components"));
 }
-extensionGenerator.generateDocs(test.sourceFolder, outFolder, examplesFolder);
+extensionGenerator.generateDocs(); */
 
 // --- --- Components
-/* 
-const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
-const outFolder = join(projectRootFolder, "docs", "pages", "components");
-const examplesFolder = join(projectRootFolder, "docs", "component-samples");
 
-const componentsConfig = await loadConfig(join(scriptFolder, "components-config.json"));
-const metadataGenerator = new DocsGenerator(collectedComponentMetadata, {
-  excludeComponentStatuses: componentsConfig?.excludeComponentStatuses,
-});
+const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+const metadataGenerator = new DocsGenerator(
+  collectedComponentMetadata,
+  {
+    sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
+    outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+    examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+  },
+  { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
+);
 
 if (componentsConfig?.cleanFolder) {
-  await cleanFolder(join(pagesFolder, "extension-components"));
+  await cleanFolder(join(FOLDERS.pages, "components"));
 }
-metadataGenerator.generateDocs(sourceFolder, outFolder, examplesFolder);
+metadataGenerator.generateDocs();
 
 if (componentsConfig?.exportToJson) {
   await metadataGenerator.exportMetadataToJson();
@@ -54,7 +52,7 @@ if (componentsConfig?.exportToJson) {
 
 await metadataGenerator.generateComponentsSummary();
 await metadataGenerator.generateArticleAndDownloadsLinks();
- */
+
 // --- Helpers
 
 async function cleanFolder(folderToClean) {
