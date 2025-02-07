@@ -20,16 +20,16 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 import styles from "./NavGroup.module.scss";
-import { Icon } from "@components/Icon/IconNative";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { NavLink } from "@components/NavLink/NavLinkNative";
-import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { NavPanelContext } from "@components/NavPanel/NavPanelNative";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import classnames from "@components-core/utils/classnames";
-import { mergeProps } from "@components-core/utils/mergeProps";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { ComponentDef } from "@abstractions/ComponentDefs";
+import { Icon } from "../Icon/IconNative";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { NavLink } from "../NavLink/NavLinkNative";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { NavPanelContext } from "../NavPanel/NavPanelNative";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import classnames from "../../components-core/utils/classnames";
+import { mergeProps } from "../../components-core/utils/mergeProps";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 import { NavGroupMd } from "./NavGroup";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;

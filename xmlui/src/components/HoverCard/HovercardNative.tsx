@@ -1,6 +1,6 @@
 import React from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
-import { useTheme } from "@components-core/theming/ThemeContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 type Props = {
   triggerTemplate: React.ReactNode;

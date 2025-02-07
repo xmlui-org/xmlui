@@ -1,5 +1,5 @@
-import { Image } from "@components/Image/ImageNative";
-import { useLogoUrl } from "@components/AppHeader/AppHeaderNative";
+import { Image } from "../Image/ImageNative";
+import { useLogoUrl } from "../AppHeader/AppHeaderNative";
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
 
 export const Logo = forwardRef(function Logo(

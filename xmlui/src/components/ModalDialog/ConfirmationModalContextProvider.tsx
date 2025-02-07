@@ -1,8 +1,16 @@
-import React, { type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@components/Button/ButtonNative";
-import { Stack } from "@components/Stack/StackNative";
+import React, {
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { Button } from "../Button/ButtonNative";
+import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
-import { ButtonVariant, ButtonThemeColor } from "@components/abstractions";
+import { ButtonVariant, ButtonThemeColor } from "../abstractions";
 
 const ConfirmationModalContext = React.createContext({
   confirm: async (title: string, message?: string, actionLabel?: string) => false,
@@ -40,7 +48,8 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
   useEffect(() => {
     if (showConfirmationModal) {
       setTimeout(() => {
-        const focusable: NodeListOf<HTMLButtonElement> | undefined = buttonsRef.current?.querySelectorAll("button");
+        const focusable: NodeListOf<HTMLButtonElement> | undefined =
+          buttonsRef.current?.querySelectorAll("button");
         if (focusable) {
           focusable[focusable.length - 1].focus();
         }
@@ -48,26 +57,29 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
     }
   }, [showConfirmationModal]);
 
-  const handleShow = useCallback(async (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
-    if (typeof title === "string") {
-      setTitle(title);
-      setButtons([
-        {
-          label: actionLabel || "Ok",
-          value: true,
-        },
-      ]);
-      setMessage(message);
-    } else {
-      setTitle(title.title);
-      setButtons(title.buttons);
-      setMessage(title.message);
-    }
-    setShowConfirmationModal(true);
-    return new Promise<boolean>(function (resolve) {
-      resolver.current = resolve;
-    });
-  }, []);
+  const handleShow = useCallback(
+    async (title: string | ConfirmParams, message?: string, actionLabel?: string) => {
+      if (typeof title === "string") {
+        setTitle(title);
+        setButtons([
+          {
+            label: actionLabel || "Ok",
+            value: true,
+          },
+        ]);
+        setMessage(message);
+      } else {
+        setTitle(title.title);
+        setButtons(title.buttons);
+        setMessage(title.message);
+      }
+      setShowConfirmationModal(true);
+      return new Promise<boolean>(function (resolve) {
+        resolver.current = resolve;
+      });
+    },
+    [],
+  );
 
   const handleOk = useCallback((value: any) => {
     resolver.current && resolver.current(value);
@@ -106,22 +118,24 @@ export const ConfirmationModalContextProvider = ({ children }: Props) => {
                 Cancel
               </Button>
               {buttons.length > 1 ? <div style={{ flex: 1 }} /> : undefined}
-              {buttons.map(({ label, value, variant = "solid", themeColor = "attention" }, index) => {
-                return (
-                  <Button
-                    key={index}
-                    variant={variant}
-                    themeColor={themeColor}
-                    size="sm"
-                    type="submit"
-                    onClick={() => {
-                      handleOk(value);
-                    }}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
+              {buttons.map(
+                ({ label, value, variant = "solid", themeColor = "attention" }, index) => {
+                  return (
+                    <Button
+                      key={index}
+                      variant={variant}
+                      themeColor={themeColor}
+                      size="sm"
+                      type="submit"
+                      onClick={() => {
+                        handleOk(value);
+                      }}
+                    >
+                      {label}
+                    </Button>
+                  );
+                },
+              )}
             </Stack>
           }
         />

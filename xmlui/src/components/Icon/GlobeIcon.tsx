@@ -1,4 +1,3 @@
-import React from "react";
 import {MdOutlineLanguage} from "react-icons/md";
 import type {IconBaseProps} from "./IconNative";
 

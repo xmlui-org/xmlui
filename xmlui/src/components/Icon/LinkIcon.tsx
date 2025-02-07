@@ -1,4 +1,3 @@
-import React from "react";
 import {IoMdLink} from "react-icons/io";
 import type {IconBaseProps} from "./IconNative";
 

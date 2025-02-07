@@ -2,11 +2,11 @@ import { Link } from "@remix-run/react";
 import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useMemo } from "react";
 import styles from "./Link.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { Icon } from "@components/Icon/IconNative";
+import classnames from "../../components-core/utils/classnames";
+import { Icon } from "../Icon/IconNative";
 import type { To } from "react-router";
-import type { LinkTarget } from "@components/abstractions";
-import { createUrlWithQueryParams } from "@components/component-utils";
+import type { LinkTarget } from "../abstractions";
+import { createUrlWithQueryParams } from "../component-utils";
 
 // =====================================================================================================================
 // React Link component implementation

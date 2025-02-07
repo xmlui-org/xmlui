@@ -1,9 +1,9 @@
 import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { Navigate, Route, Routes, useParams } from "@remix-run/react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
-import type { LayoutContext, RenderChildFn, ValueExtractor } from "@abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import type { LayoutContext, RenderChildFn, ValueExtractor } from "../../abstractions/RendererDefs";
 import type { PageMd } from "./Pages";
 import styles from "./Pages.module.scss";
 import classnames from "classnames";

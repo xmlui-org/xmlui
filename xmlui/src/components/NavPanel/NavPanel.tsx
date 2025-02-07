@@ -1,10 +1,10 @@
 import styles from "./NavPanel.module.scss";
 import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { borderSubject } from "@components-core/theming/themes/base-utils";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { borderSubject } from "../../components-core/theming/themes/base-utils";
 import { NavPanel } from "./NavPanelNative";
-import { dComponent } from "@components/metadata-helpers";
+import { dComponent } from "../metadata-helpers";
 
 const COMP = "NavPanel";
 

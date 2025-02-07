@@ -1,9 +1,9 @@
 import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useContext, useEffect, useRef, useState } from "react";
 import styles from "./Heading.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { getMaxLinesStyle } from "@components-core/utils/css-utils";
-import { TableOfContentsContext } from "@components-core/TableOfContentsContext";
+import classnames from "classnames";
+import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
+import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 const HeadingLevelKeys = ["h1", "h2", "h3", "h4", "h5", "h6"] as const;

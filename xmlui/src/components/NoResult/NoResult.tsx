@@ -1,9 +1,9 @@
 import styles from "./NoResult.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { NoResult } from "./NoResultNative";
-import { dLabel } from "@components/metadata-helpers";
-import { createComponentRenderer } from "@components-core/renderers";
+import { dLabel } from "../metadata-helpers";
+import { createComponentRenderer } from "../../components-core/renderers";
 
 const COMP = "NoResult";
 

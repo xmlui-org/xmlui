@@ -7,12 +7,12 @@ import {
   type ValidationMode,
   type ValidationResult,
   type ValidationSeverity
-} from "@components/Form/FormContext";
+} from "../Form/FormContext";
 import { type Dispatch, useDeferredValue, useEffect, useMemo, useState } from "react";
-import { asyncThrottle } from "@components-core/utils/misc";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import { fieldValidated, type FormAction } from "@components/Form/formActions";
-import type { ContainerAction } from "@components-core/abstractions/containers";
+import { asyncThrottle } from "../../components-core/utils/misc";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import { fieldValidated, type FormAction } from "../Form/formActions";
+import type { ContainerAction } from "../../components-core/abstractions/containers";
 
 function isInputEmpty (value: any) {
   if (value === undefined || value === null || value === "") return true;

@@ -1,9 +1,9 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./Image.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Image } from "./ImageNative";
-import { dClick } from "@components/metadata-helpers";
+import { dClick } from "../metadata-helpers";
 
 const COMP = "Image";
 

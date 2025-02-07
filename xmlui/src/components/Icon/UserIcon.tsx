@@ -1,4 +1,3 @@
-import React from "react";
 import { FiUser } from "react-icons/fi";
 import type {IconBaseProps} from "./IconNative";
 

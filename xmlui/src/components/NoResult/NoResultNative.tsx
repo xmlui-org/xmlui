@@ -1,4 +1,4 @@
-import { Icon } from "@components/Icon/IconNative";
+import { Icon } from "../Icon/IconNative";
 import styles from "./NoResult.module.scss";
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
 
