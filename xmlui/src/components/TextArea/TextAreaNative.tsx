@@ -10,15 +10,15 @@ import React, {
   useState,
 } from "react";
 import styles from "./TextArea.module.scss";
-import classnames from "@components-core/utils/classnames";
-import type { ValidationStatus } from "@components/abstractions";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { noop } from "@components-core/constants";
+import classnames from "../../components-core/utils/classnames";
+import type { ValidationStatus } from "../abstractions";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
 import TextAreaResizable from "./TextAreaResizable";
 import TextareaAutosize from "react-textarea-autosize";
 import { isNil } from "lodash-es";
-import { useEvent } from "@components-core/utils/misc";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import { useEvent } from "../../components-core/utils/misc";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 export const resizeOptionKeys = ["horizontal", "vertical", "both"] as const;
 export type ResizeOptions = (typeof resizeOptionKeys)[number];

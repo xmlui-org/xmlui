@@ -1,8 +1,8 @@
-import { createComponentRenderer } from "@components-core/renderers";
-import { Toggle } from "@components/Toggle/Toggle";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import styles from "@components/Toggle/Toggle.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { Toggle } from "../Toggle/Toggle";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import styles from "../Toggle/Toggle.module.scss";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dClick,
@@ -21,7 +21,7 @@ import {
   dSetValueApi,
   dValidationStatus,
   dValueApi,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
 
 const COMP = "Switch";
 

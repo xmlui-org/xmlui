@@ -1,7 +1,7 @@
 import styles from "./TextArea.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d, type PropertyValueDescription } from "@abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { createMetadata, d, type PropertyValueDescription } from "../../abstractions/ComponentDefs";
 import { type ResizeOptions, TextArea } from "./TextAreaNative";
 import {
   dAutoFocus,
@@ -21,7 +21,7 @@ import {
   dRequired,
   dSetValueApi,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
 
 const COMP = "TextArea";
 

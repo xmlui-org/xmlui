@@ -3,20 +3,20 @@ import { useEffect, useState } from "react";
 import type {
   ComponentRendererDef,
   CompoundComponentRendererInfo,
-} from "@abstractions/RendererDefs";
+} from "../abstractions/RendererDefs";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
   hStackComponentRenderer,
   stackComponentRenderer,
   vStackComponentRenderer,
-} from "@components/Stack/Stack";
-import { spaceFillerComponentRenderer } from "@components/SpaceFiller/SpaceFiller";
-import { textAreaComponentRenderer } from "@components/TextArea/TextArea";
-import { navLinkComponentRenderer } from "@components/NavLink/NavLink";
-import { localLinkComponentRenderer } from "@components/Link/Link";
-import { treeComponentRenderer } from "@components/Tree/TreeComponent";
-import { buttonComponentRenderer } from "@components/Button/Button";
+} from "./Stack/Stack";
+import { spaceFillerComponentRenderer } from "./SpaceFiller/SpaceFiller";
+import { textAreaComponentRenderer } from "./TextArea/TextArea";
+import { navLinkComponentRenderer } from "./NavLink/NavLink";
+import { localLinkComponentRenderer } from "./Link/Link";
+import { treeComponentRenderer } from "./Tree/TreeComponent";
+import { buttonComponentRenderer } from "./Button/Button";
 import {
   h1ComponentRenderer,
   h2ComponentRenderer,
@@ -25,122 +25,122 @@ import {
   h5ComponentRenderer,
   h6ComponentRenderer,
   headingComponentRenderer,
-} from "@components/Heading/Heading";
-import { textComponentRenderer } from "@components/Text/Text";
-import { fragmentComponentRenderer } from "@components-core/Fragment";
-import { tableComponentRenderer } from "@components/Table/Table";
-import { stickyBoxComponentRenderer } from "@components/StickyBox/StickyBox";
-import { badgeComponentRenderer } from "@components/Badge/Badge";
-import { avatarComponentRenderer } from "@components/Avatar/Avatar";
-import { contentSeparatorComponentRenderer } from "@components/ContentSeparator/ContentSeparator";
-import { cardComponentRenderer } from "@components/Card/Card";
-import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
-import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
-import { noResultComponentRenderer } from "@components/NoResult/NoResult";
-import { fileUploadDropZoneComponentRenderer } from "@components/FileUploadDropZone/FileUploadDropZone";
-import { iconComponentRenderer } from "@components/Icon/Icon";
-import { itemsComponentRenderer } from "@components/Items/Items";
-import { selectionStoreComponentRenderer } from "@components/SelectionStore/SelectionStore";
-import { imageComponentRenderer } from "@components/Image/Image";
-import { pageMetaTitleComponentRenderer } from "@components/PageMetaTitle/PageMetaTitle";
-import { progressBarComponentRenderer } from "@components/ProgressBar/ProgressBar";
+} from "./Heading/Heading";
+import { textComponentRenderer } from "./Text/Text";
+import { fragmentComponentRenderer } from "../components-core/Fragment";
+import { tableComponentRenderer } from "./Table/Table";
+import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
+import { badgeComponentRenderer } from "./Badge/Badge";
+import { avatarComponentRenderer } from "./Avatar/Avatar";
+import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSeparator";
+import { cardComponentRenderer } from "./Card/Card";
+import { flowLayoutComponentRenderer } from "./FlowLayout/FlowLayout";
+import { modalViewComponentRenderer } from "./ModalDialog/ModalDialog";
+import { noResultComponentRenderer } from "./NoResult/NoResult";
+import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
+import { iconComponentRenderer } from "./Icon/Icon";
+import { itemsComponentRenderer } from "./Items/Items";
+import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
+import { imageComponentRenderer } from "./Image/Image";
+import { pageMetaTitleComponentRenderer } from "./PageMetaTitle/PageMetaTitle";
+import { progressBarComponentRenderer } from "./ProgressBar/ProgressBar";
 import {
   hSplitterComponentRenderer,
   splitterComponentRenderer,
   vSplitterComponentRenderer,
-} from "@components/Splitter/Splitter";
-import { queueComponentRenderer } from "@components/Queue/Queue";
-import { CompoundComponent } from "@components-core/CompoundComponent";
-import { dynamicHeightListComponentRenderer } from "@components/List/List";
-import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
-import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
-import { formItemComponentRenderer } from "@components/FormItem/FormItem";
+} from "./Splitter/Splitter";
+import { queueComponentRenderer } from "./Queue/Queue";
+import { CompoundComponent } from "../components-core/CompoundComponent";
+import { dynamicHeightListComponentRenderer } from "./List/List";
+import { positionedContainerComponentRenderer } from "./PositionedContainer/PositionedContainer";
+import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
+import { formItemComponentRenderer } from "./FormItem/FormItem";
 import {
   passwordInputComponentRenderer,
   textBoxComponentRenderer,
-} from "@components/TextBox/TextBox";
-import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/RealTimeAdapter";
-import { formComponentRenderer } from "@components/Form/Form";
-import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
-import { numberBoxComponentRenderer } from "@components/NumberBox/NumberBox";
-import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
-import { appRenderer } from "@components/App/App";
-import { navPanelRenderer } from "@components/NavPanel/NavPanel";
-import { pageRenderer, pagesRenderer } from "@components/Pages/Pages";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { footerRenderer } from "@components/Footer/Footer";
-import { navGroupComponentRenderer } from "@components/NavGroup/NavGroup";
-import { logoComponentRenderer } from "@components/Logo/Logo";
-import { radioGroupRenderer } from "@components/RadioGroup/RadioGroup";
-import { SlotHolder } from "@components-core/Slot";
-import { fileInputRenderer } from "@components/FileInput/FileInput";
-import { chartRenderer } from "@components/Chart/Chart";
-import { spinnerComponentRenderer } from "@components/Spinner/Spinner";
-import { markdownComponentRenderer } from "@components/Markdown/Markdown";
-import { selectComponentRenderer } from "@components/Select/Select";
-import { themeChangerButtonComponentRenderer } from "@components/ThemeChanger/ThemeChanger";
-import { formSectionRenderer } from "@components/FormSection/FormSection";
-import { checkboxComponentRenderer } from "@components/Checkbox/Checkbox";
-import { switchComponentRenderer } from "@components/Switch/Switch";
-import { appHeaderComponentRenderer } from "@components/AppHeader/AppHeader";
+} from "./TextBox/TextBox";
+import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
+import { formComponentRenderer } from "./Form/Form";
+import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
+import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
+import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
+import { appRenderer } from "./App/App";
+import { navPanelRenderer } from "./NavPanel/NavPanel";
+import { pageRenderer, pagesRenderer } from "./Pages/Pages";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import { footerRenderer } from "./Footer/Footer";
+import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
+import { logoComponentRenderer } from "./Logo/Logo";
+import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
+import { SlotHolder } from "../components-core/Slot";
+import { fileInputRenderer } from "./FileInput/FileInput";
+import { chartRenderer } from "./Chart/Chart";
+import { spinnerComponentRenderer } from "./Spinner/Spinner";
+import { markdownComponentRenderer } from "./Markdown/Markdown";
+import { selectComponentRenderer } from "./Select/Select";
+import { themeChangerButtonComponentRenderer } from "./ThemeChanger/ThemeChanger";
+import { formSectionRenderer } from "./FormSection/FormSection";
+import { checkboxComponentRenderer } from "./Checkbox/Checkbox";
+import { switchComponentRenderer } from "./Switch/Switch";
+import { appHeaderComponentRenderer } from "./AppHeader/AppHeader";
 import {
   dropdownMenuComponentRenderer,
   menuItemRenderer,
   menuSeparatorRenderer,
   subMenuItemRenderer,
-} from "@components/DropdownMenu/DropdownMenu";
-import { themeComponentRenderer } from "@components/Theme/Theme";
+} from "./DropdownMenu/DropdownMenu";
+import { themeComponentRenderer } from "./Theme/Theme";
 import { merge } from "lodash-es";
-import type { ComponentRegistryEntry } from "@components/ComponentRegistryContext";
-import { ComponentRegistryContext } from "@components/ComponentRegistryContext";
-import { columnComponentRenderer } from "@components/Column/Column";
-import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
-import { apiAction } from "@components-core/action/APICall";
-import { downloadAction } from "@components-core/action/FileDownloadAction";
-import { uploadAction } from "@components-core/action/FileUploadAction";
-import { navigateAction } from "@components-core/action/NavigateAction";
-import { timedAction } from "@components-core/action/TimedAction";
+import type { ComponentRegistryEntry } from "./ComponentRegistryContext";
+import { ComponentRegistryContext } from "./ComponentRegistryContext";
+import { columnComponentRenderer } from "./Column/Column";
+import type { ActionFunction, ActionRendererDef } from "../abstractions/ActionDefs";
+import { apiAction } from "../components-core/action/APICall";
+import { downloadAction } from "../components-core/action/FileDownloadAction";
+import { uploadAction } from "../components-core/action/FileUploadAction";
+import { navigateAction } from "../components-core/action/NavigateAction";
+import { timedAction } from "../components-core/action/TimedAction";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
-} from "@components-core/abstractions/LoaderRenderer";
-import { apiLoaderRenderer } from "@components-core/loader/ApiLoader";
-import { externalDataLoaderRenderer } from "@components-core/loader/ExternalDataLoader";
-import { mockLoaderRenderer } from "@components-core/loader/MockLoaderRenderer";
-import { dataLoaderRenderer } from "@components-core/loader/DataLoader";
-import { datePickerComponentRenderer } from "@components/DatePicker/DatePicker";
-import { redirectRenderer } from "@components/Redirect/Redirect";
-import { tabsComponentRenderer } from "@components/Tabs/Tabs";
-import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
-import { appStateComponentRenderer } from "@components/AppState/AppState";
+} from "../components-core/abstractions/LoaderRenderer";
+import { apiLoaderRenderer } from "../components-core/loader/ApiLoader";
+import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDataLoader";
+import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
+import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
+import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { redirectRenderer } from "./Redirect/Redirect";
+import { tabsComponentRenderer } from "./Tabs/Tabs";
+import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
+import { appStateComponentRenderer } from "./AppState/AppState";
 import { pageHeaderRenderer } from "./PageHeader/PageHeader";
 import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
 import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
 import { tableHeaderRenderer } from "./TableHeader/TableHeader";
 import { toolbarRenderer } from "./Toolbar/Toolbar";
 import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
-import { tableOfContentsRenderer } from "@components/TableOfContents/TableOfContents";
+import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
-import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
-import { tabItemComponentRenderer } from "@components/Tabs/TabItem";
+import { codeComponentRenderer } from "../components-core/XmluiCodeHighlighter";
+import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
-import { accordionItemComponentRenderer } from "@components/Accordion/AccordionItem";
+import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
-import { carouselComponentRenderer } from "@components/Carousel/Carousel";
-import { carouselItemComponentRenderer } from "@components/Carousel/CarouselItem";
-import { createPropHolderComponent } from "@components-core/renderers";
-import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
-import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
-import { apiCallRenderer } from "@components/APICall/APICall";
-import { optionComponentRenderer } from "@components/Option/Option";
-import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
-import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
+import { carouselComponentRenderer } from "./Carousel/Carousel";
+import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
+import { createPropHolderComponent } from "../components-core/renderers";
+import { breakoutComponentRenderer } from "./Breakout/Breakout";
+import { toneChangerButtonComponentRenderer } from "./ThemeChanger/ToneChangerButton";
+import { apiCallRenderer } from "./APICall/APICall";
+import { optionComponentRenderer } from "./Option/Option";
+import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
+import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
-import type { ThemeDefinition } from "@abstractions/ThemingDefs";
-import type { Extension } from "@abstractions/ExtensionDefs";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
+import type { Extension } from "../abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
 import {
   htmlAddressTagRenderer,

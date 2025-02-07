@@ -1,13 +1,13 @@
-import type { ValidationStatus } from "@components/abstractions";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import type { ValidationStatus } from "../abstractions";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { type CSSProperties, type ForwardedRef, forwardRef } from "react";
 import React, { useCallback, useEffect, useRef } from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 import styles from "./TextBox.module.scss";
-import { noop } from "@components-core/constants";
-import { Adornment } from "@components/Input/InputAdornment";
-import { useEvent } from "@components-core/utils/misc";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import { noop } from "../../components-core/constants";
+import { Adornment } from "../Input/InputAdornment";
+import { useEvent } from "../../components-core/utils/misc";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 type Props = {
   id?: string;

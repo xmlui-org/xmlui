@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useMemo } from "react";
 import styles from "./Splitter.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { noop } from "@components-core/constants";
-import { parseSize, toPercentage } from "@components/Splitter/utils";
-import { OrientationOptions } from "@components/abstractions";
+import classnames from "../../components-core/utils/classnames";
+import { noop } from "../../components-core/constants";
+import { parseSize, toPercentage } from "../Splitter/utils";
+import { OrientationOptions } from "../abstractions";
 
 type SplitterProps = {
   children: React.ReactNode[] | React.ReactNode;

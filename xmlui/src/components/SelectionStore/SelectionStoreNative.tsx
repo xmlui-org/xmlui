@@ -1,8 +1,8 @@
 import React, { type ReactNode, useLayoutEffect, useMemo, useState, useContext, useRef } from "react";
 import { isEqual, noop } from "lodash-es";
-import { useEvent } from "@components-core/utils/misc";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { EMPTY_ARRAY } from "@components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { EMPTY_ARRAY } from "../../components-core/constants";
 
 type SelectionStoreProps = {
   idKey?: string;

@@ -1,7 +1,7 @@
 import styles from "./RadioGroup.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { RadioGroup } from "./RadioGroupNative";
 import {
   dAutoFocus,
@@ -17,7 +17,7 @@ import {
   dReadonly,
   dRequired,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
 
 const COMP = "RadioGroup";
 const RGOption = `RadioGroupOption`;

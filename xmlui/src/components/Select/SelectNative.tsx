@@ -8,9 +8,9 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { Option, ValidationStatus } from "@components/abstractions";
-import { noop } from "@components-core/constants";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import type { Option, ValidationStatus } from "../abstractions";
+import { noop } from "../../components-core/constants";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import {
   Content as SelectContent,
   Icon as SelectIcon,
@@ -25,12 +25,12 @@ import {
   Value as SelectValue,
   Viewport as SelectViewport,
 } from "@radix-ui/react-select";
-import Icon from "@components/Icon/IconNative";
-import { SelectContext, useSelect } from "@components/Select/SelectContext";
+import Icon from "../Icon/IconNative";
+import { SelectContext, useSelect } from "../Select/SelectContext";
 import styles from "./Select.module.scss";
 import classnames from "classnames";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -39,9 +39,9 @@ import {
   CommandList as CmdList,
 } from "cmdk";
 import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import { useEvent } from "@components-core/utils/misc";
-import { OptionContext, useOption } from "@components/Select/OptionContext";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+import { useEvent } from "../../components-core/utils/misc";
+import { OptionContext, useOption } from "../Select/OptionContext";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 export type SingleValueType = string | number;

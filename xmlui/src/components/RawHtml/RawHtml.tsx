@@ -1,6 +1,6 @@
-import { createMetadata, d, PropertyValueDescription } from "@abstractions/ComponentDefs";
+import { createMetadata, d, PropertyValueDescription } from "../../abstractions/ComponentDefs";
 
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { RawHtml } from "./RawHtmlNative";
 
 const COMP = "RawHtml";

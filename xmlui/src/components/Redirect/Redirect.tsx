@@ -1,6 +1,6 @@
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { Navigate } from "@remix-run/react";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { To } from "react-router";
 import { createUrlWithQueryParams } from "../component-utils";
 

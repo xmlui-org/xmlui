@@ -1,10 +1,10 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import styles from "./Tabs.module.scss";
-import { MemoizedItem } from "@components/container-helpers";
-import { dComponent } from "@components/metadata-helpers";
+import { MemoizedItem } from "../container-helpers";
+import { dComponent } from "../metadata-helpers";
 import { Tabs } from "./TabsNative";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer } from "../../components-core/renderers";
 
 const COMP = "Tabs";
 

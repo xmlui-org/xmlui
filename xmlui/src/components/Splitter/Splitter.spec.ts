@@ -4,8 +4,8 @@
  * Edge cases, like the splitter being too small to be visible are also subject to be tested.
  */
 
-import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { expect, test } from "../../testing/fixtures";
 
 test.skip(
   "Splitter renders & is visible",
