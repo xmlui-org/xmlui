@@ -22,11 +22,11 @@ export const HtmlAMd = createMetadata({
 export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <a
         style={layoutCss}
-        href={extractResourceUrl(node.props.href)}
+        href={extractValue(node.props.href)}
         target={extractValue(node.props.target)}
         rel={extractValue(node.props.rel)}
         download={extractValue(node.props.download)}
@@ -76,14 +76,14 @@ export const HtmlAreaMd = createMetadata({
 export const htmlAreaTagRenderer = createComponentRenderer(
   "area",
   HtmlAreaMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <area
         style={layoutCss}
         alt={extractValue(node.props.alt)}
         coords={extractValue(node.props.coords)}
         download={extractValue(node.props.download)}
-        href={extractResourceUrl(node.props.href)}
+        href={extractValue(node.props.href)}
         hrefLang={extractValue(node.props.hrefLang)}
         referrerPolicy={extractValue(node.props.referrerPolicy)}
         rel={extractValue(node.props.rel)}
@@ -145,7 +145,7 @@ export const HtmlAudioMd = createMetadata({
 export const htmlAudioTagRenderer = createComponentRenderer(
   "audio",
   HtmlAudioMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <audio
         style={layoutCss}
@@ -155,7 +155,7 @@ export const htmlAudioTagRenderer = createComponentRenderer(
         loop={extractValue.asOptionalBoolean(node.props.loop, false)}
         muted={extractValue.asOptionalBoolean(node.props.muted, false)}
         preload={extractValue(node.props.preload)}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
       >
         {renderChild(node.children)}
       </audio>
@@ -273,14 +273,14 @@ export const HtmlButtonMd = createMetadata({
 export const htmlButtonTagRenderer = createComponentRenderer(
   "button",
   HtmlButtonMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <button
         style={layoutCss}
         autoFocus={extractValue.asOptionalBoolean(node.props.autoFocus, false)}
         disabled={extractValue.asOptionalBoolean(node.props.disabled, false)}
         form={extractValue(node.props.form)}
-        formAction={extractResourceUrl(node.props.formAction)}
+        formAction={extractValue(node.props.formAction)}
         formEncType={extractValue(node.props.formEncType)}
         formMethod={extractValue(node.props.formMethod)}
         formNoValidate={extractValue.asOptionalBoolean(node.props.formNoValidate, false)}
@@ -603,11 +603,11 @@ export const HtmlEmbedMd = createMetadata({
 export const htmlEmbedTagRenderer = createComponentRenderer(
   "embed",
   HtmlEmbedMd,
-  ({ node, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <embed
         style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         type={extractValue(node.props.type)}
         width={extractValue(node.props.width)}
         height={extractValue(node.props.height)}
@@ -707,12 +707,12 @@ export const HtmlFormMd = createMetadata({
 export const htmlFormTagRenderer = createComponentRenderer(
   "form",
   HtmlFormMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <form
         style={layoutCss}
         acceptCharset={extractValue(node.props.acceptCharset)}
-        action={extractResourceUrl(node.props.action)}
+        action={extractValue(node.props.action)}
         autoComplete={extractValue(node.props.autoComplete)}
         encType={extractValue(node.props.encType)}
         method={extractValue(node.props.method)}
@@ -869,11 +869,11 @@ export const HtmlIframeMd = createMetadata({
 export const htmlIframeTagRenderer = createComponentRenderer(
   "iframe",
   HtmlIframeMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <iframe
         style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         srcDoc={extractValue(node.props.srcDoc)}
         name={extractValue(node.props.name)}
         sandbox={extractValue(node.props.sandbox)}
@@ -909,14 +909,14 @@ export const HtmlImgMd = createMetadata({
 export const htmlImgTagRenderer = createComponentRenderer(
   "img",
   HtmlImgMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <img
         style={layoutCss}
         alt={extractValue(node.props.alt)}
         height={extractValue(node.props.height)}
         width={node.props.width}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         useMap={extractValue(node.props.useMap)}
         loading={extractValue(node.props.loading)}
         referrerPolicy={extractValue(node.props.referrerPolicy)}
@@ -960,7 +960,7 @@ export const HtmlInputMd = createMetadata({
 export const htmlInputTagRenderer = createComponentRenderer(
   "input",
   HtmlInputMd,
-  ({ node, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <input
         style={layoutCss}
@@ -1219,11 +1219,11 @@ export const HtmlObjectMd = createMetadata({
 export const htmlObjectTagRenderer = createComponentRenderer(
   "object",
   HtmlObjectMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <object
         style={layoutCss}
-        data={extractResourceUrl(node.props.data)}
+        data={extractValue(node.props.data)}
         type={extractValue(node.props.type)}
         name={extractValue(node.props.name)}
         form={extractValue(node.props.form)}
@@ -1550,11 +1550,11 @@ export const HtmlScriptMd = createMetadata({
 export const htmlScriptTagRenderer = createComponentRenderer(
   "script",
   HtmlScriptMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <script
         style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         type={extractValue(node.props.type)}
         async={extractValue.asOptionalBoolean(node.props.async, false)}
         defer={extractValue.asOptionalBoolean(node.props.defer, false)}
@@ -1649,11 +1649,11 @@ export const HtmlSourceMd = createMetadata({
 export const htmlSourceTagRenderer = createComponentRenderer(
   "source",
   HtmlSourceMd,
-  ({ node, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <source
         style={layoutCss}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         type={extractValue(node.props.type)}
         media={extractValue(node.props.media)}
         srcSet={extractValue(node.props.srcSet)}
@@ -2004,14 +2004,14 @@ export const HtmlTrackMd = createMetadata({
 export const htmlTrackTagRenderer = createComponentRenderer(
   "track",
   HtmlTrackMd,
-  ({ node, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, extractValue, layoutCss }) => {
     return (
       <track
         style={layoutCss}
         default={extractValue.asOptionalBoolean(node.props.default, false)}
         kind={extractValue(node.props.kind)}
         label={extractValue(node.props.label)}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         srcLang={extractValue(node.props.srcLang)}
       />
     );
@@ -2068,7 +2068,7 @@ export const HtmlVideoMd = createMetadata({
 export const htmlVideoTagRenderer = createComponentRenderer(
   "video",
   HtmlVideoMd,
-  ({ node, renderChild, extractValue, extractResourceUrl, layoutCss }) => {
+  ({ node, renderChild, extractValue, layoutCss }) => {
     return (
       <video
         style={layoutCss}
@@ -2077,9 +2077,9 @@ export const htmlVideoTagRenderer = createComponentRenderer(
         height={extractValue(node.props.height)}
         loop={extractValue.asOptionalBoolean(node.props.loop, false)}
         muted={extractValue.asOptionalBoolean(node.props.muted, false)}
-        poster={extractResourceUrl(node.props.poster)}
+        poster={extractValue(node.props.poster)}
         preload={extractValue(node.props.preload)}
-        src={extractResourceUrl(node.props.src)}
+        src={extractValue(node.props.src)}
         width={extractValue(node.props.width)}
       >
         {renderChild(node.children)}
