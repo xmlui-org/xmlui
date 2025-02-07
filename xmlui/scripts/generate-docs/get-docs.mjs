@@ -5,7 +5,6 @@ import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { processError, ErrorWithSeverity, convertPath } from "./utils.mjs";
 import {
   DocsGenerator,
-  outFolder,
   pagesFolder,
   projectRootFolder,
   scriptFolder,
@@ -16,20 +15,29 @@ import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 
 // --- --- Extensions
 
+const outFolder = join(projectRootFolder, "docs", "pages", "extension-components");
+const examplesFolder = join(projectRootFolder, "docs", "component-samples");
+
 const extensionsConfig = await loadConfig(join(scriptFolder, "extensions-config.json"));
 const packagesMetadata = await dynamicallyLoadExtensionPackages();
 
-const extensionGenerator = new DocsGenerator(packagesMetadata, {
+const test = packagesMetadata["xmlui-animations"];
+
+const extensionGenerator = new DocsGenerator(test.metadata, {
   excludeComponentStatuses: extensionsConfig?.excludeComponentStatuses,
 });
 
 if (extensionsConfig?.cleanFolder) {
   await cleanFolder(join(pagesFolder, "extension-components"));
 }
-extensionGenerator.generateDocs(outFolder);
+extensionGenerator.generateDocs(test.sourceFolder, outFolder, examplesFolder);
 
 // --- --- Components
 /* 
+const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
+const outFolder = join(projectRootFolder, "docs", "pages", "components");
+const examplesFolder = join(projectRootFolder, "docs", "component-samples");
+
 const componentsConfig = await loadConfig(join(scriptFolder, "components-config.json"));
 const metadataGenerator = new DocsGenerator(collectedComponentMetadata, {
   excludeComponentStatuses: componentsConfig?.excludeComponentStatuses,
@@ -38,7 +46,7 @@ const metadataGenerator = new DocsGenerator(collectedComponentMetadata, {
 if (componentsConfig?.cleanFolder) {
   await cleanFolder(join(pagesFolder, "extension-components"));
 }
-metadataGenerator.generateDocs(outFolder);
+metadataGenerator.generateDocs(sourceFolder, outFolder, examplesFolder);
 
 if (componentsConfig?.exportToJson) {
   await metadataGenerator.exportMetadataToJson();
@@ -105,6 +113,10 @@ async function dynamicallyLoadExtensionPackages() {
 
   const importedMetadata = {};
   for (let dir of packageDirectories) {
+    const extensionPackage = {
+      sourceFolder: join(extendedPackagesFolder, dir),
+      metadata: {},
+    }
     dir = join(extendedPackagesFolder, dir);
     try {
       const packageFolderDist = join(dir, "dist");
@@ -114,9 +126,10 @@ async function dynamicallyLoadExtensionPackages() {
         if (filePath.endsWith("-metadata.js")) {
           filePath = convertPath(relative(scriptFolder, filePath));
           const { componentMetadata } = await import(filePath);
-          importedMetadata[componentMetadata.name] = componentMetadata.metadata;
+          extensionPackage.metadata[componentMetadata.name] = componentMetadata.metadata;
         }
       }
+      importedMetadata[basename(dir)] = extensionPackage;
     } catch (error) {
       processError(error);
     }

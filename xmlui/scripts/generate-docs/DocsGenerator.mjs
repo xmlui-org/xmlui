@@ -4,7 +4,7 @@ import { existsSync } from "fs";
 import { unlink, readFile, writeFile } from "fs/promises";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
-import { MetadataProcessor } from "./process-mdx.mjs";
+import { MetadataProcessor } from "./MetadataProcessor.mjs";
 import {
   processError,
   createTable,
@@ -18,20 +18,26 @@ const acceptedStatuses = ["stable", "experimental", "deprecated", "in progress"]
 const defaultStatus = "stable";
 
 // TODO: get these variables from config
-export const scriptFolder = import.meta.dirname;
-export const projectRootFolder = join(dirname(fileURLToPath(import.meta.url)), "../../../");
-const docsFolderRoot = join(projectRootFolder, "docs");
-const metaFolder = join(docsFolderRoot, "meta");
-const pagesMapFile = join(metaFolder, "pages.js");
+export const scriptFolder = import.meta.dirname; // done
+export const projectRootFolder = join(dirname(fileURLToPath(import.meta.url)), "../../../"); // done
+const docsFolderRoot = join(projectRootFolder, "docs"); // done
+const metaFolder = join(docsFolderRoot, "meta");  // only used here by other paths
+const pagesMapFile = join(metaFolder, "pages.js");  // don't use
 export const pagesFolder = join(docsFolderRoot, "pages");
 const componentDocsFolder = join(pagesFolder, "components");
 const componentDocsFolderName = basename(componentDocsFolder);
 const fileResourceFolder = join(docsFolderRoot, "public", "resources", "files");
 const downloadsMapFile = join(metaFolder, "downloads.js");
 
-const sourceFolder = join(projectRootFolder, "xmlui", "src", "components");
-const examplesFolder = join(projectRootFolder, "docs", "component-samples");
-export const outFolder = join(projectRootFolder, "docs", "pages", "components");
+const folders = {
+  script: import.meta.dirname,
+  projectRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../"),
+  docsRoot: join(dirname(fileURLToPath(import.meta.url)), "../../../", "docs"),
+}
+folders.pages = join(docsRoot, "meta", "pages");
+folders.source = "";
+folders.output = "";
+
 
 export class DocsGenerator {
   metadata = [];
@@ -70,7 +76,7 @@ export class DocsGenerator {
       });
   }
 
-  generateDocs(sourceFolder, outFolder, examplesFolder) {
+  generateDocs(sourceFolder, outFolder, examplesFolder, componentDocsFolderName) {
     logger.info("Processing MDX files");
 
     // const pagesMapFileName = basename(pagesMapFile);
