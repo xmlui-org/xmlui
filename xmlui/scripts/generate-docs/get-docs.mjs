@@ -44,7 +44,9 @@ logger.info("Extending component metadata");
 
 const metadata = Object.entries(collectedComponentMetadata)
   .filter(([_, compData]) => {
-    return !config.excludeComponentStatuses.includes(compData.status?.toLowerCase());
+    return (
+      !config.excludeComponentStatuses.includes(compData.status?.toLowerCase())
+    );
   })
   .map(([compName, compData]) => {
     const displayName = compName;
@@ -59,15 +61,12 @@ const metadata = Object.entries(collectedComponentMetadata)
       componentFolder,
     };
 
-    const entries = addDescriptionRef(
-      extendedComponentData,
-      [
-        "props",
-        "events",
-        "apis",
-        "contextVars",
-      ],
-    );
+    const entries = addDescriptionRef(extendedComponentData, [
+      "props",
+      "events",
+      "apis",
+      "contextVars",
+    ]);
     return { ...extendedComponentData, ...entries };
   });
 
@@ -77,11 +76,11 @@ if (config.cleanFolder) {
   logger.info(`Cleaning ${componentDocsFolderName}`);
   try {
     await removeAllFilesInFolder(componentDocsFolder);
-    
+
     // recreate pages map file
     if (existsSync(pagesMapFile)) {
       await unlink(pagesMapFile);
-      await writeFile(pagesMapFile, "");  
+      await writeFile(pagesMapFile, "");
     }
     if (existsSync(downloadsMapFile)) {
       await unlink(downloadsMapFile);
@@ -97,7 +96,10 @@ if (config.cleanFolder) {
 if (config.exportToJson) {
   logger.info("Exporting metadata to JSON");
   try {
-    await writeFile(join(scriptFolder, "metadata.json"), JSON.stringify(collectedComponentMetadata, null, 2));
+    await writeFile(
+      join(scriptFolder, "metadata.json"),
+      JSON.stringify(collectedComponentMetadata, null, 2),
+    );
   } catch (error) {
     processError(error);
   }
@@ -108,8 +110,8 @@ if (config.exportToJson) {
 logger.info("Processing MDX files");
 
 const pagesMapFileName = basename(pagesMapFile);
-const importsToInject = `import { Callout } from "nextra/components";\n\n`
-  // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
+const importsToInject = `import { Callout } from "nextra/components";\n\n`;
+// + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(componentDocsFolder, pagesMapFile))}";\n\n`;
 processDocfiles(metadata, importsToInject, componentDocsFolderName);
 
 // --- Create Summary
@@ -176,17 +178,17 @@ async function createSummary(
       { value: "Status", style: "center" },
     ],
     rows: sortedMetadata
-    .filter((component) => {
-      const componentStatus = component.status ?? defaultStatus;
-      return !acceptedStatuses.includes(componentStatus) ? false : true;
-    })
-    .map((component) => {
-      return [
-        `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
-        component.description,
-        component.status ?? defaultStatus,
-      ];
-    }),
+      .filter((component) => {
+        const componentStatus = component.status ?? defaultStatus;
+        return !acceptedStatuses.includes(componentStatus) ? false : true;
+      })
+      .map((component) => {
+        return [
+          `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
+          component.description,
+          component.status ?? defaultStatus,
+        ];
+      }),
   });
 
   return beforeComponentsSection + "\n" + table + afterComponentsSection;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - regression", () => {
@@ -110,4 +110,13 @@ const b = 2;
     expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ")
   });
 
+  it("Component with html tag", () => {
+    const cd = transformSource(`
+    <Component name="MyComp">
+      <h1>Heading1 </h1>
+    </Component>
+    `) as CompoundComponentDef;
+    expect(cd.name).toBe("MyComp");
+    expect((cd.component as ComponentDef).type).toBe("h1");
+  });
 });

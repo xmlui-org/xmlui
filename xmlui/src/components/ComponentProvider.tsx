@@ -142,7 +142,107 @@ import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "@abstractions/ThemingDefs";
 import type { Extension } from "@abstractions/ExtensionDefs";
 import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
-import { htmlBTagRenderer, htmlEMTagRenderer } from "./HtmlTags/HtmlTags";
+import {
+  htmlAddressTagRenderer,
+  htmlAreaTagRenderer,
+  htmlArticleTagRenderer,
+  htmlAsideTagRenderer,
+  htmlATagRenderer,
+  htmlAudioTagRenderer,
+  htmlBdiTagRenderer,
+  htmlBdoTagRenderer,
+  htmlBlockquoteTagRenderer,
+  htmlBrTagRenderer,
+  htmlBTagRenderer,
+  htmlButtonTagRenderer,
+  htmlCanvasTagRenderer,
+  htmlCaptionTagRenderer,
+  htmlCiteTagRenderer,
+  htmlCodeTagRenderer,
+  htmlColgroupTagRenderer,
+  htmlColTagRenderer,
+  htmlDatalistTagRenderer,
+  htmlDataTagRenderer,
+  htmlDdTagRenderer,
+  htmlDelTagRenderer,
+  htmlDetailsTagRenderer,
+  htmlDfnTagRenderer,
+  htmlDialogTagRenderer,
+  htmlDivTagRenderer,
+  htmlDlTagRenderer,
+  htmlDtTagRenderer,
+  htmlEmbedTagRenderer,
+  htmlEMTagRenderer,
+  htmlFieldsetTagRenderer,
+  htmlFigcaptionTagRenderer,
+  htmlFigureTagRenderer,
+  htmlFooterTagRenderer,
+  htmlFormTagRenderer,
+  htmlH1TagRenderer,
+  htmlH2TagRenderer,
+  htmlH3TagRenderer,
+  htmlH4TagRenderer,
+  htmlH5TagRenderer,
+  htmlH6TagRenderer,
+  htmlHeaderTagRenderer,
+  htmlHrTagRenderer,
+  htmlIframeTagRenderer,
+  htmlImgTagRenderer,
+  htmlInputTagRenderer,
+  htmlInsTagRenderer,
+  htmlITagRenderer,
+  htmlKbdTagRenderer,
+  htmlLabelTagRenderer,
+  htmlLegendTagRenderer,
+  htmlLiTagRenderer,
+  htmlMainTagRenderer,
+  htmlMapTagRenderer,
+  htmlMarkTagRenderer,
+  htmlMenuTagRenderer,
+  htmlMeterTagRenderer,
+  htmlNavTagRenderer,
+  htmlObjectTagRenderer,
+  htmlOlTagRenderer,
+  htmlOptgroupTagRenderer,
+  htmlOptionTagRenderer,
+  htmlOutputTagRenderer,
+  htmlParamTagRenderer,
+  htmlPictureTagRenderer,
+  htmlPreTagRenderer,
+  htmlProgressTagRenderer,
+  htmlPTagRenderer,
+  htmlQTagRenderer,
+  htmlRpTagRenderer,
+  htmlRtTagRenderer,
+  htmlRubyTagRenderer,
+  htmlSampTagRenderer,
+  htmlScriptTagRenderer,
+  htmlSectionTagRenderer,
+  htmlSelectTagRenderer,
+  htmlSmallTagRenderer,
+  htmlSourceTagRenderer,
+  htmlSpanTagRenderer,
+  htmlSTagRenderer,
+  htmlStrongTagRenderer,
+  htmlSubTagRenderer,
+  htmlSummaryTagRenderer,
+  htmlSupTagRenderer,
+  htmlTableTagRenderer,
+  htmlTbodyTagRenderer,
+  htmlTdTagRenderer,
+  htmlTemplateTagRenderer,
+  htmlTextareaTagRenderer,
+  htmlTfootTagRenderer,
+  htmlTheadTagRenderer,
+  htmlThTagRenderer,
+  htmlTimeTagRenderer,
+  htmlTrackTagRenderer,
+  htmlTrTagRenderer,
+  htmlUlTagRenderer,
+  htmlUTagRenderer,
+  htmlVideoTagRenderer,
+  htmlWbrTagRenderer,
+} from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -216,7 +316,6 @@ export class ComponentRegistry {
   ) {
     this.extensionManager = extensionManager;
 
-
     // we register these first, so that core components with the same name can override them (without namespace)
     contributes.components?.forEach((renderer) => {
       this.registerAppComponent(renderer);
@@ -224,8 +323,6 @@ export class ComponentRegistry {
     contributes.compoundComponents?.forEach((def) => {
       this.registerAppComponent({ compoundComponentDef: def });
     });
-
-
 
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerCoreComponent(stackComponentRenderer);
@@ -435,8 +532,105 @@ export class ComponentRegistry {
     this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(rawHtmlComponentRenderer);
+    this.registerCoreComponent(htmlATagRenderer);
+    this.registerCoreComponent(htmlAddressTagRenderer);
+    this.registerCoreComponent(htmlAreaTagRenderer);
+    this.registerCoreComponent(htmlArticleTagRenderer);
+    this.registerCoreComponent(htmlAsideTagRenderer);
+    this.registerCoreComponent(htmlAudioTagRenderer);
     this.registerCoreComponent(htmlBTagRenderer);
+    this.registerCoreComponent(htmlBdiTagRenderer);
+    this.registerCoreComponent(htmlBdoTagRenderer);
+    this.registerCoreComponent(htmlBlockquoteTagRenderer);
+    this.registerCoreComponent(htmlBrTagRenderer);
+    this.registerCoreComponent(htmlButtonTagRenderer);
+    this.registerCoreComponent(htmlCanvasTagRenderer);
+    this.registerCoreComponent(htmlCaptionTagRenderer);
+    this.registerCoreComponent(htmlCiteTagRenderer);
+    this.registerCoreComponent(htmlCodeTagRenderer);
+    this.registerCoreComponent(htmlColTagRenderer);
+    this.registerCoreComponent(htmlColgroupTagRenderer);
+    this.registerCoreComponent(htmlDataTagRenderer);
+    this.registerCoreComponent(htmlDatalistTagRenderer);
+    this.registerCoreComponent(htmlDdTagRenderer);
+    this.registerCoreComponent(htmlDelTagRenderer);
+    this.registerCoreComponent(htmlDetailsTagRenderer);
+    this.registerCoreComponent(htmlDfnTagRenderer);
+    this.registerCoreComponent(htmlDialogTagRenderer);
+    this.registerCoreComponent(htmlDivTagRenderer);
+    this.registerCoreComponent(htmlDlTagRenderer);
+    this.registerCoreComponent(htmlDtTagRenderer);
     this.registerCoreComponent(htmlEMTagRenderer);
+    this.registerCoreComponent(htmlEmbedTagRenderer);
+    this.registerCoreComponent(htmlFieldsetTagRenderer);
+    this.registerCoreComponent(htmlFigcaptionTagRenderer);
+    this.registerCoreComponent(htmlFigureTagRenderer);
+    this.registerCoreComponent(htmlFooterTagRenderer);
+    this.registerCoreComponent(htmlFormTagRenderer);
+    this.registerCoreComponent(htmlH1TagRenderer);
+    this.registerCoreComponent(htmlH2TagRenderer);
+    this.registerCoreComponent(htmlH3TagRenderer);
+    this.registerCoreComponent(htmlH4TagRenderer);
+    this.registerCoreComponent(htmlH5TagRenderer);
+    this.registerCoreComponent(htmlH6TagRenderer);
+    this.registerCoreComponent(htmlHeaderTagRenderer);
+    this.registerCoreComponent(htmlHrTagRenderer);
+    this.registerCoreComponent(htmlITagRenderer);
+    this.registerCoreComponent(htmlIframeTagRenderer);
+    this.registerCoreComponent(htmlImgTagRenderer);
+    this.registerCoreComponent(htmlInputTagRenderer);
+    this.registerCoreComponent(htmlInsTagRenderer);
+    this.registerCoreComponent(htmlKbdTagRenderer);
+    this.registerCoreComponent(htmlLabelTagRenderer);
+    this.registerCoreComponent(htmlLegendTagRenderer);
+    this.registerCoreComponent(htmlLiTagRenderer);
+    this.registerCoreComponent(htmlMainTagRenderer);
+    this.registerCoreComponent(htmlMapTagRenderer);
+    this.registerCoreComponent(htmlMarkTagRenderer);
+    this.registerCoreComponent(htmlMenuTagRenderer);
+    this.registerCoreComponent(htmlMeterTagRenderer);
+    this.registerCoreComponent(htmlNavTagRenderer);
+    this.registerCoreComponent(htmlObjectTagRenderer);
+    this.registerCoreComponent(htmlOlTagRenderer);
+    this.registerCoreComponent(htmlOptgroupTagRenderer);
+    this.registerCoreComponent(htmlOptionTagRenderer);
+    this.registerCoreComponent(htmlOutputTagRenderer);
+    this.registerCoreComponent(htmlPTagRenderer);
+    this.registerCoreComponent(htmlParamTagRenderer);
+    this.registerCoreComponent(htmlPictureTagRenderer);
+    this.registerCoreComponent(htmlPreTagRenderer);
+    this.registerCoreComponent(htmlProgressTagRenderer);
+    this.registerCoreComponent(htmlQTagRenderer);
+    this.registerCoreComponent(htmlRpTagRenderer);
+    this.registerCoreComponent(htmlRtTagRenderer);
+    this.registerCoreComponent(htmlRubyTagRenderer);
+    this.registerCoreComponent(htmlSTagRenderer);
+    this.registerCoreComponent(htmlSampTagRenderer);
+    this.registerCoreComponent(htmlScriptTagRenderer);
+    this.registerCoreComponent(htmlSectionTagRenderer);
+    this.registerCoreComponent(htmlSelectTagRenderer);
+    this.registerCoreComponent(htmlSmallTagRenderer);
+    this.registerCoreComponent(htmlSourceTagRenderer);
+    this.registerCoreComponent(htmlSpanTagRenderer);
+    this.registerCoreComponent(htmlStrongTagRenderer);
+    this.registerCoreComponent(htmlSubTagRenderer);
+    this.registerCoreComponent(htmlSummaryTagRenderer);
+    this.registerCoreComponent(htmlSupTagRenderer);
+    this.registerCoreComponent(htmlTableTagRenderer);
+    this.registerCoreComponent(htmlTbodyTagRenderer);
+    this.registerCoreComponent(htmlTdTagRenderer);
+    this.registerCoreComponent(htmlTemplateTagRenderer);
+    this.registerCoreComponent(htmlTextareaTagRenderer);
+    this.registerCoreComponent(htmlTfootTagRenderer);
+    this.registerCoreComponent(htmlThTagRenderer);
+    this.registerCoreComponent(htmlTheadTagRenderer);
+    this.registerCoreComponent(htmlTimeTagRenderer);
+    this.registerCoreComponent(htmlTrTagRenderer);
+    this.registerCoreComponent(htmlTrackTagRenderer);
+    this.registerCoreComponent(htmlUTagRenderer);
+    this.registerCoreComponent(htmlUlTagRenderer);
+    this.registerCoreComponent(htmlVideoTagRenderer);
+    this.registerCoreComponent(htmlWbrTagRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
@@ -537,31 +731,37 @@ export class ComponentRegistry {
     });
   };
 
-
-  private registerCoreComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerCoreComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const coreNamespaces = ["#xmlui-core-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...coreNamespaces);
     } else {
       this.registerComponentRenderer(component, ...coreNamespaces);
     }
-  }
+  };
 
-  private registerAppComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerAppComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const appNamespaces = ["#app-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...appNamespaces);
     } else {
       this.registerComponentRenderer(component, ...appNamespaces);
     }
-  }
+  };
 
   // --- Registers a renderable component using its renderer function
   // --- and metadata
-  private registerComponentRenderer = ({ type, renderer, metadata }: ComponentRendererDef, ...namespaces: string[]) => {
+  private registerComponentRenderer = (
+    { type, renderer, metadata }: ComponentRendererDef,
+    ...namespaces: string[]
+  ) => {
     const component = { renderer, descriptor: metadata };
     namespaces.forEach((ns) => {
-      this.pool.set((ns ? (ns + ".") : "") + type, component);
+      this.pool.set((ns ? ns + "." : "") + type, component);
     });
     if (metadata?.themeVars) {
       Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
@@ -572,10 +772,10 @@ export class ComponentRegistry {
   };
 
   // --- Registers a compound component using its definition and metadata
-  private registerCompoundComponentRenderer({
-    compoundComponentDef,
-    metadata,
-  }: CompoundComponentRendererInfo, ...namespaces: string[]) {
+  private registerCompoundComponentRenderer(
+    { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
+    ...namespaces: string[]
+  ) {
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
@@ -589,7 +789,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-      metadata
+      metadata,
     };
 
     this.registerComponentRenderer(component, ...namespaces);
