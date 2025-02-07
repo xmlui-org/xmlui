@@ -1,30 +1,33 @@
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from "recharts";
+import {
+  Bar,
+  BarChart as RBarChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+} from "recharts";
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "./Chart";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
 import { useMemo } from "react";
 import { useColors } from "xmlui";
 
-export type BarChart1Props = {
+export type BarChartProps = {
   data: any[];
   layout?: "horizontal" | "vertical";
-  indexBy?: string;
+  nameKey?: string;
   stacked?: boolean;
-  bars?: {
-    key: string;
-    color?: string;
-    label?: string;
-  }[];
+  dataKeys?: string[];
   style?: React.CSSProperties;
 };
 
-export default function Barchart1({
+export function BarChart({
   data = [],
   layout = "vertical",
-  indexBy,
+  nameKey,
   stacked = false,
-  bars = [],
+  dataKeys = [],
   style,
-}: BarChart1Props) {
+}: BarChartProps) {
   const colors = useColors(
     {
       name: "color-primary-500",
@@ -48,39 +51,53 @@ export default function Barchart1({
     const colorValues = Object.values(colors);
     return Object.assign(
       {},
-      ...bars.map((bar, index) => {
+      ...dataKeys.map((key, index) => {
         return {
-          [bar.key]: {
-            label: bar.label,
-            color: bar.color || colorValues[index % colorValues.length],
+          [key]: {
+            label: key,
+            color: colorValues[index % colorValues.length],
           },
         };
       }),
     );
-  }, [colors, bars]);
+  }, [colors, dataKeys]);
 
   return (
     <ResponsiveContainer style={style}>
       <ChartContainer config={config}>
-        <BarChart accessibilityLayer data={data} layout={layout}>
+        <RBarChart accessibilityLayer data={data} layout={layout}>
           <CartesianGrid vertical={true} strokeDasharray="3 3" />
           {layout === "vertical" ? (
             <>
               <XAxis type="number" axisLine={false} />
               <YAxis
-                dataKey={indexBy}
+                dataKey={nameKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
               />
             </>
           ) : (
             <>
               <XAxis
-                dataKey={indexBy}
+                dataKey={nameKey}
                 type="category"
                 interval={"equidistantPreserveStart"}
                 tickLine={false}
+                tickFormatter={(value) => {
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
+                }}
               />
               <YAxis type="number" axisLine={false} />
             </>
@@ -89,14 +106,13 @@ export default function Barchart1({
           {Object.keys(config).map((key, index) => (
             <Bar
               key={index}
-              label={config[key].label}
               dataKey={key}
               fill={config[key].color}
               radius={stacked ? 0 : 8}
               stackId={stacked ? "stacked" : undefined}
             />
           ))}
-        </BarChart>
+        </RBarChart>
       </ChartContainer>
     </ResponsiveContainer>
   );
