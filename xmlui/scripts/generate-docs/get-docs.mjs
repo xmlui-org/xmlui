@@ -45,7 +45,6 @@ logger.info("Extending component metadata");
 const metadata = Object.entries(collectedComponentMetadata)
   .filter(([_, compData]) => {
     return (
-      !compData.isHtmlTag &&
       !config.excludeComponentStatuses.includes(compData.status?.toLowerCase())
     );
   })

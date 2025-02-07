@@ -942,7 +942,7 @@ export const HtmlInputMd = createMetadata({
     form: d("Specifies the form the input belongs to"),
     name: d("Specifies the name of the input"),
     list: d(
-      "Specifies the id of a <datalist> element that contains pre-defined options for the input",
+      "Specifies the id of a datalist element that contains pre-defined options for the input",
     ),
     max: d("Specifies the maximum value for an input"),
     maxLength: d("Specifies the maximum number of characters allowed in an input"),
