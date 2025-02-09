@@ -48,7 +48,7 @@ async function generateExtenionPackages() {
     const extensionPackagesMetafile = join(FOLDERS.pages, "extension-components", "_meta.json");
 
     const folderNames = Object.fromEntries(Object.keys(packagesMetadata).map((name) => {
-      return [name.split("-").map((n) => n[0].toUpperCase() + n.slice(1)).join(" "), name];
+      return [name, name.split("-").map((n) => n[0].toUpperCase() + n.slice(1)).join(" ")];
     }));
     if (existsSync(extensionPackagesMetafile)) {
       await unlink(extensionPackagesMetafile);      
