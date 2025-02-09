@@ -6,14 +6,14 @@ import {
   PlaygroundContext,
   playgroundReducer,
 } from "../state/store";
-import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "@/src/utils/helpers";
+import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "../../src/utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
-import { PlaygroundContent } from "@/src/components/PlaygroundContent";
-import { Header } from "@/src/components/Header";
+import { PlaygroundContent } from "../../src/components/PlaygroundContent";
+import { Header } from "../../src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
-import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
+import type { ApiInterceptorDefinition } from "../../../xmlui/src/components-core/interception/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 
 type DemoPlaygroundProps = {
   name: string;

@@ -5,7 +5,7 @@ import {
   alignmentOptionValues,
   buttonTypeValues,
   type IconPosition,
-} from "@components/abstractions";
+} from "../../components/abstractions";
 
 // --- Setup
 

@@ -26,26 +26,6 @@
     ],
     "noEmit": true,
     "jsx": "preserve",
-    "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@src/*": [
-        "../xmlui/src/*"
-      ],
-      "@abstractions/*": [
-        "../xmlui/src/abstractions/*"
-      ],
-      "@components-core/*": [
-        "../xmlui/src/components-core/*"
-      ],
-      "@components/*": [
-        "../xmlui/src/components/*"
-      ],
-      "@parsers/*": [
-        "../xmlui/src/components/parsers/*"
-      ]
-    },
     "incremental": true
   },
   "include": [

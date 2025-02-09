@@ -1,7 +1,7 @@
 import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
 import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
 import type { RendererContext } from "../abstractions/RendererDefs";

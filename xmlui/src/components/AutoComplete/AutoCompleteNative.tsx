@@ -1,9 +1,9 @@
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useId } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import type { Option, ValidationStatus } from "@components/abstractions";
-import { noop } from "@components-core/constants";
+import type { Option, ValidationStatus } from "../../components/abstractions";
+import { noop } from "../../components-core/constants";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -12,14 +12,14 @@ import {
   CommandItem as CmdItem,
   CommandList as CmdList,
 } from "cmdk";
-import styles from "@components/AutoComplete/AutoComplete.module.scss";
-import Icon from "@components/Icon/IconNative";
-import { HiddenOption } from "@components/Select/SelectNative";
-import OptionTypeProvider from "@components/Option/OptionTypeProvider";
-import { AutoCompleteContext, useAutoComplete } from "@components/AutoComplete/AutoCompleteContext";
-import { OptionContext, useOption } from "@components/Select/OptionContext";
+import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+import Icon from "../../components/Icon/IconNative";
+import { HiddenOption } from "../../components/Select/SelectNative";
+import OptionTypeProvider from "../../components/Option/OptionTypeProvider";
+import { AutoCompleteContext, useAutoComplete } from "../../components/AutoComplete/AutoCompleteContext";
+import { OptionContext, useOption } from "../../components/Select/OptionContext";
 import classnames from "classnames";
-import { useEvent } from "@components-core/utils/misc";
+import { useEvent } from "../../components-core/utils/misc";
 
 type AutoCompleteProps = {
   id?: string;

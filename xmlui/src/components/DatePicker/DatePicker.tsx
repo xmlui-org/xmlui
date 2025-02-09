@@ -15,7 +15,7 @@ import {
   dReadonly,
   dSetValueApi,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../../components/metadata-helpers";
 
 const COMP = "DatePicker";
 

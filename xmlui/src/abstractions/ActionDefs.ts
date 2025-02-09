@@ -1,7 +1,7 @@
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { AsyncFunction, SyncFunction } from "./FunctionDefs";
 import type { ContainerState } from "./ContainerDefs";
-import type { ArrowExpression } from "@abstractions/scripting/ScriptingSourceTree";
+import type { ArrowExpression } from "./scripting/ScriptingSourceTree";
 
 /**
  * This type represents the options to use for looking up actions.

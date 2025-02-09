@@ -1,4 +1,4 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { OurColumnMetadata } from "./TableContext";
 import { useTableContext } from "./TableContext";
 import { useCallback, useId, useLayoutEffect, useMemo } from "react";

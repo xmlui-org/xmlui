@@ -55,7 +55,7 @@ import {
   type ObjectDestructure,
   type Statement,
   type VarDeclaration,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import {
   QueueInfo,
   StatementQueue,

@@ -1,4 +1,4 @@
-import { editorStatusChanged, textChanged } from "@/src/state/store";
+import { editorStatusChanged, textChanged } from "../../src/state/store";
 import React, { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
 import { usePlayground } from "../hooks/usePlayground";

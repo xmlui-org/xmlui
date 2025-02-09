@@ -1,13 +1,13 @@
 import styles from "./AppHeader.module.scss";
 
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { borderSubject, paddingSubject } from "@components-core/theming/themes/base-utils";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { borderSubject, paddingSubject } from "../../components-core/theming/themes/base-utils";
 import { AppContextAwareAppHeader } from "./AppHeaderNative";
-import { dComponent } from "@components/metadata-helpers";
-import {SlotItem} from "@components/SlotItem";
+import { dComponent } from "../../components/metadata-helpers";
+import {SlotItem} from "../../components/SlotItem";
 
 const COMP = "AppHeader";
 

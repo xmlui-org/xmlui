@@ -44,11 +44,11 @@ import {
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-} from "@components-core/utils/hooks";
+} from "../../../src/components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { isThemeVarName } from "@components-core/theming/transformThemeVars";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import { useTheme } from "../../../src/components-core/theming/ThemeContext";
+import { isThemeVarName } from "../../../src/components-core/theming/transformThemeVars";
+import type { RegisterComponentApiFn } from "../../../src/abstractions/RendererDefs";
 
 // =====================================================================================================================
 // Helper types

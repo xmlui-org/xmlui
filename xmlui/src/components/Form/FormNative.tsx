@@ -27,18 +27,18 @@ import {
   formSubmitted,
   formSubmitting,
   triedToSubmit,
-} from "@components/Form/formActions";
-import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
-import { Text } from "@components/Text/TextNative";
-import { Stack } from "@components/Stack/StackNative";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
+} from "../../components/Form/formActions";
+import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
+import { Text } from "../../components/Text/TextNative";
+import { Stack } from "../../components/Stack/StackNative";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import type {
   LookupEventHandlerFn,
   RegisterComponentApiFn,
   ValueExtractor,
-} from "@abstractions/RendererDefs";
+} from "../../abstractions/RendererDefs";
 import type { FormMd } from "./Form";
-import { useModalFormClose } from "@components/ModalDialog/ModalVisibilityContext";
+import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
 import { flushSync } from "react-dom";
 
 const setByPath = (obj: any, path: string, val: any) => {

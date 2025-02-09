@@ -17,7 +17,7 @@ import {
   TryStatement,
   VarStatement,
   WhileStatement,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - statements", () => {
   it("Empty source", () => {

@@ -1,11 +1,11 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
 import styles from "./Backdrop.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Backdrop } from "./BackdropNative";
-import { dComponent } from "@components/metadata-helpers";
+import { dComponent } from "../../components/metadata-helpers";
 
 const COMP = "Backdrop";
 

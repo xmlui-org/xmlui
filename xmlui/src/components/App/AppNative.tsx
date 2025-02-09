@@ -1,22 +1,22 @@
 import React, { CSSProperties, ReactNode, useLayoutEffect } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { d, type ComponentDef } from "@abstractions/ComponentDefs";
+import { d, type ComponentDef } from "../../abstractions/ComponentDefs";
 import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 
 import styles from "./App.module.scss";
-import { useAppContext } from "@components-core/AppContext";
-import { Sheet, SheetContent } from "@components/App/Sheet";
-import { ScrollContext } from "@components-core/ScrollContext";
-import { useResizeObserver } from "@components-core/utils/hooks";
-import { useTheme, useThemes } from "@components-core/theming/ThemeContext";
+import { useAppContext } from "../../components-core/AppContext";
+import { Sheet, SheetContent } from "../../components/App/Sheet";
+import { ScrollContext } from "../../components-core/ScrollContext";
+import { useResizeObserver } from "../../components-core/utils/hooks";
+import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
 import type { JSX } from "react/jsx-runtime";
-import { AppContextAwareAppHeader } from "@components/AppHeader/AppHeaderNative";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { useScrollbarWidth } from "@components-core/utils/css-utils";
+import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNative";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { useScrollbarWidth } from "../../components-core/utils/css-utils";
 import { Helmet } from "react-helmet-async";
 
 type Props = {

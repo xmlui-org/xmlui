@@ -22,7 +22,7 @@ import {
   dSetValueApi,
   dValidationStatus,
   dValueApi,
-} from "@components/metadata-helpers";
+} from "../../components/metadata-helpers";
 
 const COMP = "Checkbox";
 

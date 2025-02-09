@@ -8,7 +8,7 @@ import {
   FunctionInvocationExpression,
   Identifier,
   SpreadExpression,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - function expressions", () => {
   it("No param", () => {

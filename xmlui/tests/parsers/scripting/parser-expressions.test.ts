@@ -6,7 +6,7 @@ import {
   MemberAccessExpression, PostfixOpExpression, PrefixOpExpression,
   SequenceExpression,
   SpreadExpression
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - miscellaneous expressions", () => {
   const sequenceCases = [
