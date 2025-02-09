@@ -3,19 +3,19 @@ import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
 
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
   TransformResultFn,
-} from "@components-core/abstractions/LoaderRenderer";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+} from "../abstractions/LoaderRenderer";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
-import { extractParam } from "@components-core/utils/extractParam";
-import { useAppContext } from "@components-core/AppContext";
-import { usePrevious } from "@components-core/utils/hooks";
+import { extractParam } from "../utils/extractParam";
+import { useAppContext } from "../AppContext";
+import { usePrevious } from "../utils/hooks";
 import type {QueryFunction} from "@tanstack/query-core/src/types";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";

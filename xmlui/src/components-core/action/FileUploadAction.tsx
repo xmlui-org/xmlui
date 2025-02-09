@@ -1,11 +1,11 @@
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
-import type { ApiActionOptions, UploadOperationDef } from "@components-core/RestApiProxy";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
+import type { ApiActionOptions, UploadOperationDef } from "../RestApiProxy";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 import { createAction } from "./actions";
-import RestApiProxy from "@components-core/RestApiProxy";
-import { extractParam } from "@components-core/utils/extractParam";
-import { invalidateQueries } from "@components-core/utils/actionUtils";
+import RestApiProxy from "../RestApiProxy";
+import { extractParam } from "../utils/extractParam";
+import { invalidateQueries } from "../utils/actionUtils";
 
 export interface UploadActionComponent extends ComponentDef {
   props: {

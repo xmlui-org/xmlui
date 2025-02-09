@@ -1,15 +1,15 @@
 import toast from "react-hot-toast";
 
-import type { ApiActionOptions, ApiOperationDef } from "@components-core/RestApiProxy";
-import RestApiProxy from "@components-core/RestApiProxy";
+import type { ApiActionOptions, ApiOperationDef } from "../RestApiProxy";
+import RestApiProxy from "../RestApiProxy";
 import type { QueryClient, QueryKey } from "@tanstack/react-query";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import type { ActionExecutionContext, LookupAsyncFnInner } from "@abstractions/ActionDefs";
-import { invalidateQueries } from "@components-core/utils/actionUtils";
-import { extractParam, shouldKeep } from "@components-core/utils/extractParam";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import type { ActionExecutionContext, LookupAsyncFnInner } from "../../abstractions/ActionDefs";
+import { invalidateQueries } from "../utils/actionUtils";
+import { extractParam, shouldKeep } from "../utils/extractParam";
 import { createDraft, finishDraft } from "immer";
-import { randomUUID } from "@components-core/utils/misc";
+import { randomUUID } from "../utils/misc";
 import { createAction } from "./actions";
 
 function findQueryKeysToUpdate(updates: string | string[], queryClient: QueryClient) {

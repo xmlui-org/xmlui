@@ -1,7 +1,7 @@
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 
 import { createAction } from "./actions";
-import { createUrlWithQueryParams } from "@components/component-utils";
+import { createUrlWithQueryParams } from "../../components/component-utils";
 
 function navigate({ navigate, location }: ActionExecutionContext, pathname: string | number, queryParams?: Record<string, any>) {
     // https://stackoverflow.com/questions/37385570/how-to-know-if-react-router-can-go-back-to-display-back-button-in-react-app

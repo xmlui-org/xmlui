@@ -1,33 +1,58 @@
-import { LookupActionOptions, LookupSyncFnInner, LookupAsyncFnInner } from "@abstractions/ActionDefs";
-import { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
-import { ContainerState } from "@abstractions/ContainerDefs";
-import { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
-import { Statement, ArrowExpression, ArrowExpressionStatement } from "@abstractions/scripting/ScriptingSourceTree";
-import { ContainerDispatcher, MemoedVars } from "@components-core/abstractions/ComponentRenderer";
-import { ContainerActionKind } from "@components-core/abstractions/containers";
-import { useAppContext } from "@components-core/AppContext";
-import { buildProxy } from "@components-core/rendering/buildProxy";
+import {
+  LookupActionOptions,
+  LookupSyncFnInner,
+  LookupAsyncFnInner,
+} from "../../abstractions/ActionDefs";
+import { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import { ContainerState } from "../../abstractions/ContainerDefs";
+import { LayoutContext, RenderChildFn } from "../../abstractions/RendererDefs";
+import {
+  Statement,
+  ArrowExpression,
+  ArrowExpressionStatement,
+} from "../../abstractions/scripting/ScriptingSourceTree";
+import { ContainerDispatcher, MemoedVars } from "../abstractions/ComponentRenderer";
+import { ContainerActionKind } from "../abstractions/containers";
+import { useAppContext } from "../AppContext";
+import { buildProxy } from "../rendering/buildProxy";
 import { StatePartChangedFn } from "./ContainerWrapper";
-import { ComponentCleanupFn, ContainerWrapperDef, RegisterComponentApiFnInner } from "@components-core/rendering/ContainerWrapper";
-import { useDebugView } from "@components-core/DebugViewProvider";
-import { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
-import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
-import { extractParam, shouldKeep } from "@components-core/utils/extractParam";
-import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
-import { useEvent, generatedId, capitalizeFirstLetter, delay } from "@components-core/utils/misc";
-import { prepareHandlerStatements, parseHandlerCode } from "@components-core/utils/statementUtils";
-import { StateViewer } from "@components/StateViewer/StateViewerNative";
+import {
+  ComponentCleanupFn,
+  ContainerWrapperDef,
+  RegisterComponentApiFnInner,
+} from "../rendering/ContainerWrapper";
+import { useDebugView } from "../DebugViewProvider";
+import { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import { processStatementQueueAsync } from "../script-runner/process-statement-async";
+import { processStatementQueue } from "../script-runner/process-statement-sync";
+import { extractParam, shouldKeep } from "../utils/extractParam";
+import { useIsomorphicLayoutEffect } from "../utils/hooks";
+import { useEvent, generatedId, capitalizeFirstLetter, delay } from "../utils/misc";
+import { prepareHandlerStatements, parseHandlerCode } from "../utils/statementUtils";
+import { StateViewer } from "../../components/StateViewer/StateViewerNative";
 import { cloneDeep, isArray } from "lodash-es";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import memoizeOne from "memoize-one";
-import React, { Dispatch, SetStateAction, MutableRefObject, RefObject, memo, forwardRef, useRef, useTransition, useEffect, useCallback, Fragment, isValidElement } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  MutableRefObject,
+  RefObject,
+  memo,
+  forwardRef,
+  useRef,
+  useTransition,
+  useEffect,
+  useCallback,
+  Fragment,
+  isValidElement,
+} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { renderChild } from "./renderChild";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { LoaderComponent } from "@components-core/LoaderComponent";
-import { AppContextObject } from "@abstractions/AppContextDefs";
-import { EMPTY_ARRAY } from "@components-core/constants";
+import { useTheme } from "../theming/ThemeContext";
+import { LoaderComponent } from "../LoaderComponent";
+import { AppContextObject } from "../../abstractions/AppContextDefs";
+import { EMPTY_ARRAY } from "../constants";
 
 type Props = {
   node: ContainerWrapperDef;

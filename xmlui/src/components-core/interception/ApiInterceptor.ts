@@ -9,12 +9,12 @@ import type {
   InterceptorOperationDef,
   RequestParams
 } from "./abstractions";
-import { Backend, CookieService, HeaderService } from "@components-core/interception/Backend";
-import { IndexedDb } from "@components-core/interception/IndexedDb";
-import { convertRequestParamPart } from "@components-core/utils/request-params";
-import { HttpError, HttpStatusCode } from "@components-core/interception/Errors";
-import { ThrowStatementError } from "@components-core/EngineError";
-import {InMemoryDb} from "@components-core/interception/InMemoryDb";
+import { Backend, CookieService, HeaderService } from "../interception/Backend";
+import { IndexedDb } from "../interception/IndexedDb";
+import { convertRequestParamPart } from "../utils/request-params";
+import { HttpError, HttpStatusCode } from "../interception/Errors";
+import { ThrowStatementError } from "../EngineError";
+import {InMemoryDb} from "../interception/InMemoryDb";
 
 function mergeHeaders(...sources: HeadersInit[]) {
   const result: Record<string, string> = {};

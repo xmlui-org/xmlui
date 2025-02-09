@@ -12,13 +12,13 @@ import type {
   PostfixOpExpression,
   PrefixOpExpression,
   UnaryExpression,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 
 import { customOperationsRegistry } from "./custom-operations-registry";
 import { isCustomUiData } from "./custom-ui-data";
 import { isConstVar } from "./eval-tree-async";
 import { CustomOperationType } from "./ICustomOperations";
-import { LogicalThread } from "@abstractions/scripting/LogicalThread";
+import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import { obtainClosures } from "../../parsers/scripting/modules";
 
 // --- Type guard to check for a Promise

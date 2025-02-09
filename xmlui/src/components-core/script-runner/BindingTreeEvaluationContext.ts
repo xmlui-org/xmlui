@@ -1,5 +1,5 @@
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 
 // This type represents the context in which binding expressions and statements should be evaluated
 export type BindingTreeEvaluationContext = {

@@ -6,15 +6,15 @@ import type {
   IDatabase,
   RequestParams,
 } from "./abstractions";
-import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
-import type { AuthService } from "@components-core/interception/ApiInterceptor";
+import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import type { AuthService } from "../interception/ApiInterceptor";
 
-import { delay } from "@components-core/utils/misc";
-import { runEventHandlerCode } from "@components-core/utils/statementUtils";
-import Errors from "@components-core/interception/Errors";
-import { dateFunctions } from "@components-core/appContext/date-functions";
-import { miscellaneousUtils } from "@components-core/appContext/misc-utils";
-import { getDate } from "@components-core/utils/date-utils";
+import { delay } from "../utils/misc";
+import { runEventHandlerCode } from "../utils/statementUtils";
+import Errors from "../interception/Errors";
+import { dateFunctions } from "../appContext/date-functions";
+import { miscellaneousUtils } from "../appContext/misc-utils";
+import { getDate } from "../utils/date-utils";
 
 // Use this backend environment as the default
 export const defaultBackendEnvironment: BackendEnvironment = {

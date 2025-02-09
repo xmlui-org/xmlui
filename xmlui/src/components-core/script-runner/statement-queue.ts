@@ -1,4 +1,4 @@
-import { Statement } from "@abstractions/scripting/ScriptingSourceTree";
+import { Statement } from "../../abstractions/scripting/ScriptingSourceTree";
 
 // An item of the queue we use for processing a statement
 export type StatementQueueItem = {

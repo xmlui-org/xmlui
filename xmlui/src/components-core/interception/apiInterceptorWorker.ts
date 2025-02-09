@@ -4,7 +4,7 @@ import { RequestHandler, http } from "msw";
 
 import type { ApiInterceptorDefinition } from "./abstractions";
 
-import { ApiInterceptor } from "@components-core/interception/ApiInterceptor";
+import { ApiInterceptor } from "../interception/ApiInterceptor";
 
 // Create handlers for the specified API interceptor
 function createHandlers(api: ApiInterceptor): RequestHandler[] {

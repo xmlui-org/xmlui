@@ -1,34 +1,34 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
 
-import type { ParentRenderContext } from "@abstractions/ComponentDefs";
+import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type {
   LayoutContext,
   LookupEventHandlerFn,
   RegisterComponentApiFn,
   RenderChildFn,
   RendererContext,
-} from "@abstractions/RendererDefs";
-import type { LookupAsyncFn, LookupSyncFn } from "@abstractions/ActionDefs";
+} from "../../abstractions/RendererDefs";
+import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
 import { isEmpty, isPlainObject } from "lodash-es";
 import { extractParam } from "../utils/extractParam";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { mergeProps } from "@components-core/utils/mergeProps";
-import ComponentDecorator from "@components-core/ComponentDecorator";
-import { createValueExtractor } from "@components-core/rendering/valueExtractor";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import { useComponentRegistry } from "@components/ComponentRegistryContext";
+import { useTheme } from "../theming/ThemeContext";
+import { mergeProps } from "../utils/mergeProps";
+import ComponentDecorator from "../ComponentDecorator";
+import { createValueExtractor } from "../rendering/valueExtractor";
+import { EMPTY_OBJECT } from "../constants";
+import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { ApiBoundComponent } from "@components-core/ApiBoundComponent";
+import { ApiBoundComponent } from "../ApiBoundComponent";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
 import { ContainerActionKind } from "../abstractions/containers";
-import { useInspector } from "@components-core/InspectorContext";
-import { SlotItem } from "@components/SlotItem";
-import { layoutOptionKeys } from "@components-core/descriptorHelper";
+import { useInspector } from "../InspectorContext";
+import { SlotItem } from "../../components/SlotItem";
+import { layoutOptionKeys } from "../descriptorHelper";
 import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useMouseEventHandlers } from "../event-handlers";
 
