@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform", () => {

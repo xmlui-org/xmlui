@@ -10,7 +10,7 @@ import {
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-import { ModuleResolver } from "@abstractions/scripting/modules";
+import { ModuleResolver } from "../../abstractions/scripting/modules";
 
 /**
  * Represents a parsed and resolved module

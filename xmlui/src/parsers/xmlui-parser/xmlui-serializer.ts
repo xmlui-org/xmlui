@@ -1,4 +1,4 @@
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { XmlUiAttribute, XmlUiComment, XmlUiElement, XmlUiFragment, XmlUiNode } from "./xmlui-tree";
 
 export const COMPOUND_COMP_ID = "Component";

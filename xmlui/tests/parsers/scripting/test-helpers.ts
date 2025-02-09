@@ -1,7 +1,7 @@
-import { Expression, Statement } from "@abstractions/scripting/ScriptingSourceTree";
-import { Parser } from "@parsers/scripting/Parser";
+import { Expression, Statement } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
-export function parseStatements (source: string): Statement[] {
+export function parseStatements(source: string): Statement[] {
   const wParser = new Parser(source);
   const tree = wParser.parseStatements();
   if (tree === null) {
@@ -11,7 +11,7 @@ export function parseStatements (source: string): Statement[] {
   return tree;
 }
 
-export function parseExpression (source: string): Expression {
+export function parseExpression(source: string): Expression {
   const wParser = new Parser(source);
   const tree = wParser.parseExpr();
   if (tree === null) {

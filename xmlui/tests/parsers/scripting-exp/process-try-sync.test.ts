@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
+import { processStatementQueue } from "../../../src/components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
 describe("Process try statements (sync)", () => {

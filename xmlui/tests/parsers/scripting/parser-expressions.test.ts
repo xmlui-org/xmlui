@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   FunctionInvocationExpression,
   MemberAccessExpression, PostfixOpExpression, PrefixOpExpression,

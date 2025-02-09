@@ -3,9 +3,9 @@ import { describe, expect, it } from "vitest";
 import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
-} from "@parsers/scripting/code-behind-collect";
+} from "../../../src/parsers/scripting/code-behind-collect";
 import { createEvalContext } from "./test-helpers";
-import { CollectedDeclarations, Expression } from "@abstractions/scripting/ScriptingSourceTree";
+import { CollectedDeclarations, Expression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 const ROOT_MODULE = "test";
 

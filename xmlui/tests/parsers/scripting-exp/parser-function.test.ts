@@ -1,7 +1,17 @@
 import { describe, expect, assert, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { Destructure, FunctionDeclaration, Identifier, SpreadExpression, T_BLOCK_STATEMENT, T_DESTRUCTURE, T_FUNCTION_DECLARATION, T_IDENTIFIER, T_SPREAD_EXPRESSION } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  Destructure,
+  FunctionDeclaration,
+  Identifier,
+  SpreadExpression,
+  T_BLOCK_STATEMENT,
+  T_DESTRUCTURE,
+  T_FUNCTION_DECLARATION,
+  T_IDENTIFIER,
+  T_SPREAD_EXPRESSION,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - function declarations", () => {
   it("No param", () => {

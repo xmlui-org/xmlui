@@ -1,6 +1,6 @@
 import { describe, expect, it, test } from "vitest";
-import { compileLayout } from "@parsers/style-parser/style-compiler";
-import { toCssVar } from "@parsers/style-parser/StyleParser";
+import { compileLayout } from "../../../src/parsers/style-parser/style-compiler";
+import { toCssVar } from "../../../src/parsers/style-parser/StyleParser";
 
 describe("Style compiler", () => {
   const sizeCases = [

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ComponentDef } from "@abstractions/ComponentDefs";
+import { ComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - no backslash escape", () => {

@@ -1,6 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
-import { Parser } from "@parsers/scripting/Parser";
-import { ImportDeclaration } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { ImportDeclaration } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - import statement", () => {
   it("Empty import", () => {

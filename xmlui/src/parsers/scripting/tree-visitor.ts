@@ -1,4 +1,4 @@
-import type { Statement, Expression } from "@abstractions/scripting/ScriptingSourceTree";
+import type { Statement, Expression } from "../../abstractions/scripting/ScriptingSourceTree";
 
 const unreachable = (_x: never) => {};
 

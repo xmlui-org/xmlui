@@ -1,8 +1,8 @@
 import { parseRegExpLiteral } from "@eslint-community/regexpp";
 
-import type { GenericToken } from "@parsers/common/GenericToken";
+import type { GenericToken } from "../common/GenericToken";
 
-import { InputStream } from "@parsers/common/InputStream";
+import { InputStream } from "../common/InputStream";
 import { TokenType } from "./TokenType";
 
 type Token = GenericToken<TokenType>;

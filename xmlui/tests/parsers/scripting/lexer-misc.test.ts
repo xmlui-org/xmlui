@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { Lexer } from "@parsers/scripting/Lexer";
-import { InputStream } from "@parsers/common/InputStream";
-import { TokenType } from "@abstractions/scripting/Token";
+import { Lexer } from "../../../src/parsers/scripting/Lexer";
+import { InputStream } from "../../../src/parsers/common/InputStream";
+import { TokenType } from "../../../src/abstractions/scripting/Token";
 
 describe("Lexer - miscellaneous", () => {
   it("Empty", () => {

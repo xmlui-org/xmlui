@@ -1,5 +1,5 @@
 import { expect, it } from "vitest";
-import { collectFnVarDeps } from "@components-core/rendering/collectFnVarDeps";
+import { collectFnVarDeps } from "../../../src/components-core/rendering/collectFnVarDeps";
 
 
 it("simple #1", () => {

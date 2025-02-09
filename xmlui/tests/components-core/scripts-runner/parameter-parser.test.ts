@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
-import { Parser } from "@parsers/scripting/Parser";
-import { parseParameterString } from "@components-core/script-runner/ParameterParser";
-import {Expression} from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { parseParameterString } from "../../../src/components-core/script-runner/ParameterParser";
+import { Expression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("ParameterParser", () => {
   it("Regression #1", () => {
@@ -12,7 +12,7 @@ describe("ParameterParser", () => {
       expect(err.toString()).toContain("5+}");
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("Regression #2", () => {
@@ -42,7 +42,7 @@ describe("ParameterParser", () => {
       expect(err.toString()).toContain("Unclosed");
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("Regression #5", () => {
@@ -54,7 +54,7 @@ describe("ParameterParser", () => {
       expect(err.toString()).toContain("Unclosed");
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("Test string works", () => {
@@ -187,7 +187,7 @@ describe("ParameterParser", () => {
       expect(err.toString()).toContain("Unclosed");
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("Parse single expression #1", () => {
@@ -364,6 +364,4 @@ describe("ParameterParser", () => {
     expect(segments[0].type).equal("expression");
     expect((segments[0].value as Expression).type).equal("BinaryE");
   });
-
-
 });

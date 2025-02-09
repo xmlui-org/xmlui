@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
-import { ConstStatement } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { ConstStatement } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - regex literals", () => {
   it("null", () => {
