@@ -1,8 +1,8 @@
 import { useEffect } from "react";
-import RestApiProxy from "@components-core/RestApiProxy";
-import { delay } from "@components-core/utils/misc";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
-import { useAppContext } from "@components-core/AppContext";
+import RestApiProxy from "../../components-core/RestApiProxy";
+import { delay } from "../../components-core/utils/misc";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import { useAppContext } from "../../components-core/AppContext";
 
 type Props = {
   url: any;

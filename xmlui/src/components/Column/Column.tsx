@@ -1,5 +1,5 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { Column } from "./ColumnNative";
 
 const COMP = "Column";

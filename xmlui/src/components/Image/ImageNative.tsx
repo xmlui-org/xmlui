@@ -1,7 +1,7 @@
 import styles from "./Image.module.scss";
 import {CSSProperties, HTMLAttributes} from "react";
 import { forwardRef } from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 
 // =====================================================================================================================
 // React Image component implementation

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { Lexer } from "@parsers/scripting-exp/Lexer";
-import { TokenType } from "@parsers/scripting-exp/TokenType";
-import { InputStream } from "@parsers/common/InputStream";
+import { Lexer } from "../../../src/parsers/scripting-exp/Lexer";
+import { TokenType } from "../../../src/parsers/scripting-exp/TokenType";
+import { InputStream } from "../../../src/parsers/common/InputStream";
 
 describe("Lexer - literal", () => {
   const literalCases = [

@@ -3,7 +3,8 @@
 export const XmluiScripGrammar: { id: string; config: any; language: any } = {
   id: "xmluiscript",
   config: {
-    wordPattern: /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
+    wordPattern:
+      /(-?\d*\.\d\w*)|([^\`\~\!\@\#\%\^\&\*\(\)\-\=\+\[\{\]\}\\\|\;\:\'\"\,\.\<\>\/\?\s]+)/g,
 
     comments: {
       lineComment: "//",
@@ -269,7 +270,10 @@ export const XmluiScripGrammar: { id: string; config: any; language: any } = {
 
       // We match regular expression quite precisely
       regexp: [
-        [/(\{)(\d+(?:,\d*)?)(\})/, ["regexp.escape.control", "regexp.escape.control", "regexp.escape.control"]],
+        [
+          /(\{)(\d+(?:,\d*)?)(\})/,
+          ["regexp.escape.control", "regexp.escape.control", "regexp.escape.control"],
+        ],
         [
           /(\[)(\^?)(?=(?:[^\]\\\/]|\\.)+)/,
           ["regexp.escape.control", { token: "regexp.escape.control", next: "@regexrange" }],
@@ -280,7 +284,10 @@ export const XmluiScripGrammar: { id: string; config: any; language: any } = {
         [/[^\\\/]/, "regexp"],
         [/@regexpesc/, "regexp.escape"],
         [/\\\./, "regexp.invalid"],
-        [/(\/)([dgimsuy]*)/, [{ token: "regexp", bracket: "@close", next: "@pop" }, "keyword.other"]],
+        [
+          /(\/)([dgimsuy]*)/,
+          [{ token: "regexp", bracket: "@close", next: "@pop" }, "keyword.other"],
+        ],
       ],
 
       regexrange: [

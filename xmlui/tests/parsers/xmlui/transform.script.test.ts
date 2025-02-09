@@ -1,6 +1,6 @@
-import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { Expression, ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
+import { describe, expect, it } from "vitest";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
+import { Expression, ModuleErrors } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - script", () => {

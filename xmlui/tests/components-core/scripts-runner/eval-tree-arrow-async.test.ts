@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { evalBindingAsync } from "@components-core/script-runner/eval-tree-async";
+import { evalBindingAsync } from "../../../src/components-core/script-runner/eval-tree-async";
 import {createEvalContext} from "./test-helpers";
-import { Parser } from "@parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("Evaluate arrow expressions", () => {
   it("Arrow #1", async () => {

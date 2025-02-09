@@ -1,13 +1,13 @@
 import styles from "./DropdownMenu.module.scss";
 
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { iconPositionMd, iconPositionNames } from "@components/abstractions";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { iconPositionMd, iconPositionNames } from "../abstractions";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { Icon } from "@components/Icon/IconNative";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { Icon } from "../Icon/IconNative";
 import { DropdownMenu, MenuItem, MenuSeparator, SubMenuItem } from "./DropdownMenuNative";
-import { dClick, dEnabled, dLabel, dTriggerTemplate } from "@components/metadata-helpers";
+import { dClick, dEnabled, dLabel, dTriggerTemplate } from "../metadata-helpers";
 
 const DDMCOMP = "DropdownMenu";
 

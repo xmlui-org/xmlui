@@ -2,7 +2,7 @@ import Dexie, { Table } from "dexie";
 
 import type { IDatabase, TableDescriptor } from "./abstractions";
 
-import { ReadOnlyCollection } from "@components-core/interception/ReadonlyCollection";
+import { ReadOnlyCollection } from "../interception/ReadonlyCollection";
 
 export class IndexedDb implements IDatabase {
   // private repository: Record<string, Array<any>>;

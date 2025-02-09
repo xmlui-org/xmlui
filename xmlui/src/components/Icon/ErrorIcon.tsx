@@ -1,4 +1,3 @@
-import React from "react";
 import {BiErrorCircle} from "react-icons/bi";
 import type {IconBaseProps} from "./IconNative";
 

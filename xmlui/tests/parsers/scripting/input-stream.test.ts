@@ -1,4 +1,4 @@
-import { InputStream } from "@parsers/common/InputStream";
+import { InputStream } from "../../../src/parsers/common/InputStream";
 import { describe, expect, it } from "vitest";
 
 describe("InputStream", () => {

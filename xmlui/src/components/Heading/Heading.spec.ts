@@ -1,5 +1,4 @@
-import { pixelStrToNum, SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("Heading is rendered", async ({ initTestBed, createHeadingDriver }) => {

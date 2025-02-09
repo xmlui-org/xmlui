@@ -1,7 +1,7 @@
-import { describe, expect, it, assert } from "vitest";
+import { describe, expect, it } from "vitest";
 
-import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
-import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner-exp/process-statement-async";
+import { processStatementQueue } from "../../../src/components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
 describe("Statement hooks", () => {
@@ -153,7 +153,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "assignment") {
@@ -178,7 +178,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "assignment") {
@@ -203,7 +203,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "assignment") {
@@ -228,7 +228,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "assignment") {
@@ -262,7 +262,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "pre-post") {
@@ -287,7 +287,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "pre-post") {
@@ -312,7 +312,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "pre-post") {
@@ -337,7 +337,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "pre-post") {
@@ -371,7 +371,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "function-call") {
@@ -396,7 +396,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onWillUpdate: (_scope, index, type) => {
           if (type === "function-call") {
@@ -421,7 +421,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "function-call") {
@@ -446,7 +446,7 @@ describe("Statement hooks", () => {
       const evalContext = createEvalContext({
         localContext: {
           x: {},
-          y: {}
+          y: {},
         },
         onDidUpdate: (_scope, index, type) => {
           if (type === "function-call") {
@@ -463,6 +463,4 @@ describe("Statement hooks", () => {
       expect(updated).toStrictEqual(c.exp);
     });
   });
-
-
 });

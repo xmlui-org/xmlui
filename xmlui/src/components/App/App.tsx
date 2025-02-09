@@ -1,10 +1,10 @@
-import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import { appLayoutMd } from "./AppLayoutContext";
 
 import styles from "./App.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { dComponent } from "@components/metadata-helpers";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dComponent } from "../../components/metadata-helpers";
 import { App } from "./AppNative";
 
 const COMP = "App";

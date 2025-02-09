@@ -1,4 +1,4 @@
-import type { PropertyValueDescription } from "@abstractions/ComponentDefs";
+import type { PropertyValueDescription } from "../abstractions/ComponentDefs";
 import type { CSSProperties, ReactNode } from "react";
 
 /**

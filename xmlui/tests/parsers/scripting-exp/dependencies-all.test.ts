@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { resolveIdentifiers } from "@components-core/script-runner-exp/id-resolution";
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { ResolutionScope } from "@parsers/scripting-exp/ResolutionScope";
+import { resolveIdentifiers } from "../../../src/components-core/script-runner-exp/id-resolution";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import { ResolutionScope } from "../../../src/parsers/scripting-exp/ResolutionScope";
 
 describe("Dependency resolution", () => {
   const stmtCases = [

@@ -1,5 +1,5 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -39,8 +39,8 @@ import {
   type Statement,
   type UnaryExpression,
   type VarDeclaration,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import { isBannedFunction } from "./bannedFunctions";
 import {

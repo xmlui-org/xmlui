@@ -1,7 +1,18 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { BinaryExpression, T_BINARY_EXPRESSION, T_CALCULATED_MEMBER_ACCESS_EXPRESSION, T_CONDITIONAL_EXPRESSION, T_FUNCTION_INVOCATION_EXPRESSION, T_IDENTIFIER, T_LITERAL, T_MEMBER_ACCESS_EXPRESSION, T_SEQUENCE_EXPRESSION, T_UNARY_EXPRESSION } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  BinaryExpression,
+  T_BINARY_EXPRESSION,
+  T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
+  T_CONDITIONAL_EXPRESSION,
+  T_FUNCTION_INVOCATION_EXPRESSION,
+  T_IDENTIFIER,
+  T_LITERAL,
+  T_MEMBER_ACCESS_EXPRESSION,
+  T_SEQUENCE_EXPRESSION,
+  T_UNARY_EXPRESSION,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - Binary operations", () => {
   const binaryOpCases = [

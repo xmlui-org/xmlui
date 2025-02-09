@@ -1,4 +1,4 @@
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 import styles from "./Badge.module.scss";
 import { ForwardedRef, forwardRef } from "react";
 

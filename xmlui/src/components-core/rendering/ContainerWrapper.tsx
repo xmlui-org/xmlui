@@ -1,8 +1,8 @@
-import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
-import { LayoutContext } from "@abstractions/RendererDefs";
-import { ContainerDispatcher } from "@components-core/abstractions/ComponentRenderer";
-import { ProxyAction } from "@components-core/rendering/buildProxy";
-import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
+import type { ComponentDef, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import { LayoutContext } from "../../abstractions/RendererDefs";
+import { ContainerDispatcher } from "../abstractions/ComponentRenderer";
+import { ProxyAction } from "../rendering/buildProxy";
+import { ErrorBoundary } from "../rendering/ErrorBoundary";
 import { forwardRef, memo, MutableRefObject, RefObject, useMemo } from "react";
 import { StateContainer } from "./StateContainer";
 

@@ -1,10 +1,10 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { CarouselComponent } from "./CarouselNative";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import styles from "@components/Carousel/Carousel.module.scss";
-import { dDidChange } from "@components/metadata-helpers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import styles from "./Carousel.module.scss";
+import { dDidChange } from "../metadata-helpers";
 
 const COMP = "Carousel";
 

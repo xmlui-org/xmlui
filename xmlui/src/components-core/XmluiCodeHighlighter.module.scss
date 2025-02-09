@@ -1,4 +1,4 @@
-@use "@components-core/theming/themes" as themes;
+@use "./theming/themes" as themes;
 
 .wrapper {
   --syntax-token-component: #cb5291;

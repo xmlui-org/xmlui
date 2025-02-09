@@ -1,5 +1,5 @@
-import { startApp } from "@components-core/StandaloneApp";
-import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
+import { startApp } from "./components-core/StandaloneApp";
+import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";

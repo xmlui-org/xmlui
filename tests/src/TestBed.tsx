@@ -1,7 +1,7 @@
 import type { StandaloneAppDescription } from "xmlui";
 import { StandaloneApp } from "xmlui";
 import "xmlui/index.scss";
-import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
+import type StandaloneExtensionManager from "../../xmlui/src/components-core/StandaloneExtensionManager";
 
 declare global {
   interface Window {

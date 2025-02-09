@@ -12,7 +12,7 @@ import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 import { getIdentifierScope } from "./eval-tree-common";
-import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 
 /**
  * Collects the name of local context variables the specified program depends on

@@ -1,15 +1,15 @@
 import * as React from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
 import type { CSSProperties, ForwardedRef } from "react";
 import { forwardRef, useCallback, useEffect, useRef, useState } from "react";
-import Icon from "@components/Icon/IconNative";
-import { noop } from "@components-core/constants";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import Icon from "../Icon/IconNative";
+import { noop } from "../../components-core/constants";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import Autoplay from "embla-carousel-autoplay";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { CarouselContext, useCarouselContextValue } from "@components/Carousel/CarouselContext";
+import { CarouselContext, useCarouselContextValue } from "./CarouselContext";
 
 type CarouselApi = UseEmblaCarouselType[1];
 

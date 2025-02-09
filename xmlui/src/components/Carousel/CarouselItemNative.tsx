@@ -1,9 +1,9 @@
 import type * as React from "react";
 import type { ForwardedRef, ReactNode } from "react";
 import { forwardRef, useEffect, useId } from "react";
-import { useCarousel } from "@components/Carousel/CarouselContext";
-import classnames from "@components-core/utils/classnames";
-import styles from "@components/Carousel/Carousel.module.scss";
+import { useCarousel } from "./CarouselContext";
+import classnames from "classnames";
+import styles from "./Carousel.module.scss";
 
 type Props = {
   children: ReactNode;

@@ -1,14 +1,13 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
 import type { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
-import type { ModuleResolver } from "@abstractions/scripting/modules";
+import type { ModuleResolver } from "../../abstractions/scripting/modules";
 
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
 import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
-import { Stack } from "../..";
 import type { GetText } from "./parser";
 
 export const COMPOUND_COMP_ID = "Component";

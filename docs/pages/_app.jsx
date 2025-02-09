@@ -1,6 +1,6 @@
 import "../styles/global.scss";
 import localFont from "next/font/local";
-import { ApiWorkerContextProvider } from "@/src/components/ApiWorkerContext";
+import { ApiWorkerContextProvider } from "../src/components/ApiWorkerContext";
 
 const myInter = localFont({
   src: [

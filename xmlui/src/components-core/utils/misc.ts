@@ -3,7 +3,7 @@ import type { ThrottleSettings } from "lodash-es";
 import { get, throttle } from "lodash-es";
 import { formatDistanceToNow } from "date-fns";
 
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 
 /**
  * Slice a single array into two based on a discriminator function.

@@ -1,11 +1,11 @@
 import {CSSProperties, ForwardedRef, forwardRef, ReactNode} from "react";
 import { useCallback, useEffect } from "react";
 import * as dropzone from "react-dropzone";
-import { Icon } from "@components/Icon/IconNative";
+import { Icon } from "../Icon/IconNative";
 import styles from "./FileUploadDropZone.module.scss";
-import { useEvent } from "@components-core/utils/misc";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import { asyncNoop } from "@components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { asyncNoop } from "../../components-core/constants";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;

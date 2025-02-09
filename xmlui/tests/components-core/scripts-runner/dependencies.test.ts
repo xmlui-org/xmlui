@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { collectVariableDependencies } from "@components-core/script-runner/visitors";
-import { Parser } from "@parsers/scripting/Parser";
+import { collectVariableDependencies } from "../../../src/components-core/script-runner/visitors";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 
 describe("collectVariableDependencies", () => {
   const stmtCases = [

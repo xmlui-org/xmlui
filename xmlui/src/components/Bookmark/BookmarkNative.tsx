@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useContext, useEffect, useRef } from "react";
-import { TableOfContentsContext } from "@components-core/TableOfContentsContext";
+import { TableOfContentsContext } from "../../components-core/TableOfContentsContext";
 
 type Props = {
   uid?: string;

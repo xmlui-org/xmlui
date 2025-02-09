@@ -1,6 +1,6 @@
 import React, { ErrorInfo, ReactNode } from "react";
 
-import type { ComponentLike } from "@abstractions/ComponentDefs";
+import type { ComponentLike } from "../../abstractions/ComponentDefs";
 
 import styles from "./ErrorBoundary.module.scss";
 

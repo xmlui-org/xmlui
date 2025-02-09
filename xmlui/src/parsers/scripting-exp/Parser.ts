@@ -1,5 +1,5 @@
 import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
-import type { GenericToken } from "@parsers/common/GenericToken";
+import type { GenericToken } from "../common/GenericToken";
 import {
   type ArrayDestructure,
   type ArrayLiteral,
@@ -98,10 +98,10 @@ import {
 
 import { Lexer } from "./Lexer";
 import { ParserError, errorMessages } from "./ParserError";
-import { InputStream } from "@parsers/common/InputStream";
+import { InputStream } from "../common/InputStream";
 import { tokenTraits } from "./TokenTrait";
 import { TokenType } from "./TokenType";
-import { deepFreeze } from "@parsers/common/utils";
+import { deepFreeze } from "../common/utils";
 
 type Token = GenericToken<TokenType>;
 

@@ -1,4 +1,4 @@
-import type { ComponentPropertyMetadata } from "@abstractions/ComponentDefs";
+import type { ComponentPropertyMetadata } from "../abstractions/ComponentDefs";
 import { labelPositionMd, orientationOptionMd, validationStatusMd } from "./abstractions";
 
 export function dInternal(description?: string): ComponentPropertyMetadata {

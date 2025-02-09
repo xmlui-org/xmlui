@@ -60,9 +60,9 @@ import type {
   ProcessOutcome,
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
-import type { LoopScope } from "@abstractions/scripting/LoopScope";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
-import { reportEngineError } from "@components-core/reportEngineError";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import { reportEngineError } from "../reportEngineError";
 import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 
 const SYNC_EVAL_TIMEOUT = 1000;

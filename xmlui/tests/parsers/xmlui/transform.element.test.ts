@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Xmlui transform - child elements", () => {
@@ -1085,8 +1085,7 @@ describe("Xmlui transform - child elements", () => {
           </Component>
           `) as CompoundComponentDef;
         assert.fail("Exception expected");
-      }
-      catch (err){
+      } catch (err) {
         expect(err.toString()).include("T006");
       }
     });

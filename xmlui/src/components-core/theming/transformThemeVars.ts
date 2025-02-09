@@ -1,6 +1,6 @@
 import Color from "color";
 
-import { HVar, parseHVar } from "@components-core/theming/hvar";
+import { HVar, parseHVar } from "../theming/hvar";
 
 
 export function isThemeVarName(varName: any){

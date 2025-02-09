@@ -51,13 +51,19 @@ export const UEMLGrammar: any = {
         { include: "@valueAttributeScriptInsideStart" },
         { include: "@attributeStart" },
         [/\/>/, "delimiter.angle", "@pop"],
-        [/(<\/)(event)(\s*>)/, ["delimiter.angle", "tag-event", { token: "delimiter.angle", next: "@pop" }]],
+        [
+          /(<\/)(event)(\s*>)/,
+          ["delimiter.angle", "tag-event", { token: "delimiter.angle", next: "@pop" }],
+        ],
         [/>/, { token: "delimiter.angle", next: "@eventTagContent" }],
       ],
       eventTagContent: [
         { include: "commentStart" },
         { include: "componentTagStart" },
-        [/[^<]/, { token: "@rematch", next: "@eventTagScriptContent", nextEmbedded: "xmluiscript" }],
+        [
+          /[^<]/,
+          { token: "@rematch", next: "@eventTagScriptContent", nextEmbedded: "xmluiscript" },
+        ],
         [/<\/event\s*>/, { token: "@rematch", next: "@pop" }],
       ],
       eventTagScriptContent: [
@@ -75,8 +81,18 @@ export const UEMLGrammar: any = {
         { include: "@valueAttributeScriptInsideStart" },
         { include: "@attributeStart" },
         [/\/>/, "delimiter.angle", "@pop"],
-        [/>/, { token: "delimiter.angle", next: "@methodTagScriptContent", nextEmbedded: "xmluiscript" }],
-        [/(<\/)(method)(\s*>)/, ["delimiter.angle", "tag-helper", { token: "delimiter.angle", next: "@pop" }]],
+        [
+          />/,
+          {
+            token: "delimiter.angle",
+            next: "@methodTagScriptContent",
+            nextEmbedded: "xmluiscript",
+          },
+        ],
+        [
+          /(<\/)(method)(\s*>)/,
+          ["delimiter.angle", "tag-helper", { token: "delimiter.angle", next: "@pop" }],
+        ],
       ],
       methodTagScriptContent: [
         [/<\/method\s*>/, { token: "@rematch", next: "@pop", nextEmbedded: "@pop" }],
@@ -93,8 +109,14 @@ export const UEMLGrammar: any = {
         { include: "@valueAttributeScriptInsideStart" },
         { include: "@attributeStart" },
         [/\/>/, "delimiter.angle", "@pop"],
-        [/>/, { token: "delimiter.angle", next: "@apiTagScriptContent", nextEmbedded: "xmluiscript" }],
-        [/(<\/)(api)(\s*>)/, ["delimiter.angle", "tag-helper", { token: "delimiter.angle", next: "@pop" }]],
+        [
+          />/,
+          { token: "delimiter.angle", next: "@apiTagScriptContent", nextEmbedded: "xmluiscript" },
+        ],
+        [
+          /(<\/)(api)(\s*>)/,
+          ["delimiter.angle", "tag-helper", { token: "delimiter.angle", next: "@pop" }],
+        ],
       ],
       apiTagScriptContent: [
         [/<\/api\s*>/, { token: "@rematch", next: "@pop", nextEmbedded: "@pop" }],
@@ -111,7 +133,11 @@ export const UEMLGrammar: any = {
               cases: {
                 "'": { token: "string", next: "@singleQuotedScript", nextEmbedded: "xmluiscript" },
                 '"': { token: "string", next: "@doubleQuotedScript", nextEmbedded: "xmluiscript" },
-                "`": { token: "string", next: "@backtickQuotedScript", nextEmbedded: "xmluiscript" },
+                "`": {
+                  token: "string",
+                  next: "@backtickQuotedScript",
+                  nextEmbedded: "xmluiscript",
+                },
               },
             },
           ],
@@ -166,7 +192,11 @@ export const UEMLGrammar: any = {
               cases: {
                 "'": { token: "string", next: "@singleQuotedScript", nextEmbedded: "xmluiscript" },
                 '"': { token: "string", next: "@doubleQuotedScript", nextEmbedded: "xmluiscript" },
-                "`": { token: "string", next: "@backtickQuotedScript", nextEmbedded: "xmluiscript" },
+                "`": {
+                  token: "string",
+                  next: "@backtickQuotedScript",
+                  nextEmbedded: "xmluiscript",
+                },
               },
             },
           ],
@@ -200,12 +230,27 @@ export const UEMLGrammar: any = {
             },
           ],
         ],
-        [/(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(@identifier)/, ["", "attribute", "operators", "string"]],
+        [
+          /(^|\s+)(@identifier(?::@identifier)?)(\s*=\s*)(@identifier)/,
+          ["", "attribute", "operators", "string"],
+        ],
         [/(^|\s+)(@identifier(?::@identifier)?)/, ["", "attribute"]],
       ],
-      singleQuotedString: [[/'/, "string", "@pop"], { include: "@textWithBindingExpr" }, [/[^']/, "string"]],
-      doubleQuotedString: [[/"/, "string", "@pop"], { include: "@textWithBindingExpr" }, [/[^"]/, "string"]],
-      backtickQuotedString: [[/`/, "string", "@pop"], { include: "@textWithBindingExpr" }, [/[^`]/, "string"]],
+      singleQuotedString: [
+        [/'/, "string", "@pop"],
+        { include: "@textWithBindingExpr" },
+        [/[^']/, "string"],
+      ],
+      doubleQuotedString: [
+        [/"/, "string", "@pop"],
+        { include: "@textWithBindingExpr" },
+        [/[^"]/, "string"],
+      ],
+      backtickQuotedString: [
+        [/`/, "string", "@pop"],
+        { include: "@textWithBindingExpr" },
+        [/[^`]/, "string"],
+      ],
       textWithBindingExpr: [
         { include: "@escapeCharacter" },
         { include: "@entity" },
@@ -216,7 +261,10 @@ export const UEMLGrammar: any = {
         [/[^}]+/, ""],
       ],
       cdataStart: [
-        [/(<!\[)(CDATA)(\[)/, ["delimiter.angle", "tag-cdata", { token: "delimiter.angle", next: "@cdata" }]],
+        [
+          /(<!\[)(CDATA)(\[)/,
+          ["delimiter.angle", "tag-cdata", { token: "delimiter.angle", next: "@cdata" }],
+        ],
       ],
       cdata: [
         [/]]>/, "delimiter.angle", "@pop"],

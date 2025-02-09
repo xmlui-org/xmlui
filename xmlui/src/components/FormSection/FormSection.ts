@@ -1,6 +1,6 @@
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
-import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { CompoundComponentRendererInfo } from "../../abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "../../components-core/utils/compound-utils";
 // --- We cannot use this with nextra
 // import componentSource from "./FormSection.xmlui?raw";
 

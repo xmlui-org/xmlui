@@ -1,6 +1,9 @@
 import { describe, expect, it, assert } from "vitest";
-import { Parser } from "@parsers/scripting/Parser";
-import { ConstStatement, LetStatement } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import {
+  ConstStatement,
+  LetStatement,
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - destructuring", () => {
   it("let, object, empty", () => {
@@ -51,7 +54,7 @@ describe("Parser - destructuring", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -313,7 +316,7 @@ describe("Parser - destructuring", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -378,7 +381,7 @@ describe("Parser - destructuring", () => {
     // --- Assert
     expect(stmts.length).equal(1);
     const lst = stmts[0] as LetStatement;
-    expect(lst.source).equal("let [a,,b,] = expr")
+    expect(lst.source).equal("let [a,,b,] = expr");
     expect(lst.declarations.length).equal(1);
     const decl = lst.declarations[0];
     expect(decl.arrayDestruct).not.equal(undefined);
@@ -538,7 +541,7 @@ describe("Parser - destructuring", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -552,7 +555,7 @@ describe("Parser - destructuring", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -567,7 +570,7 @@ describe("Parser - destructuring", () => {
     // --- Assert
     expect(stmts.length).equal(1);
     const lst = stmts[0] as ConstStatement;
-    expect(lst.source).equal("const {a, b: [,c]} = expr")
+    expect(lst.source).equal("const {a, b: [,c]} = expr");
     expect(lst.declarations.length).equal(1);
     const decl = lst.declarations[0];
     expect(decl.objectDestruct).not.equal(undefined);

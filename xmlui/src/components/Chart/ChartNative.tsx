@@ -2,7 +2,7 @@ import {CSSProperties, forwardRef} from "react";
 import React, { Suspense, useMemo } from "react";
 import type { ApexOptions } from "apexcharts";
 import styles from "./Chart.module.scss";
-import { useColors } from "@components-core/utils/hooks";
+import { useColors } from "../../components-core/utils/hooks";
 
 const ApexChart = React.lazy(() => import("react-apexcharts"));
 

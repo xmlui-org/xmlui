@@ -1,5 +1,5 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { LogicalThreadExp, ValueResult } from "@abstractions/scripting/LogicalThreadExp";
+import type { LogicalThreadExp, ValueResult } from "../../abstractions/scripting/LogicalThreadExp";
 import {
   T_CALCULATED_MEMBER_ACCESS_EXPRESSION,
   T_IDENTIFIER,
@@ -16,8 +16,8 @@ import {
   type PostfixOpExpression,
   type PrefixOpExpression,
   type UnaryExpression,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 // --- Get the cached expression value
 export function getExprValue(expr: Expression, thread: LogicalThreadExp): any {

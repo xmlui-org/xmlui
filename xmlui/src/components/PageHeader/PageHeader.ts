@@ -1,6 +1,6 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import type { CompoundComponentRendererInfo } from "@abstractions/RendererDefs";
-import { compoundComponentDefFromSource } from "@components-core/utils/compound-utils";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { CompoundComponentRendererInfo } from "../../abstractions/RendererDefs";
+import { compoundComponentDefFromSource } from "../../components-core/utils/compound-utils";
 // --- We cannot use this with nextra
 // import componentSource from "./PageHeader.xmlui?raw";
 

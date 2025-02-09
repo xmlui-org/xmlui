@@ -1,6 +1,5 @@
 import { createComponentRenderer, createMetadata, d } from "xmlui";
 import { Animation } from "./AnimationNative";
-import { AnimationMd } from "./index";
 
 const COMP = "FadeInAnimation";
 

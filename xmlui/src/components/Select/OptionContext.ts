@@ -1,4 +1,4 @@
-import type { Option } from "@components/abstractions";
+import type { Option } from "../abstractions";
 import { createContext, useContext } from "react";
 
 type OptionContextValue = {

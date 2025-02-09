@@ -1,11 +1,11 @@
 import styles from "./List.module.scss";
-import { MemoizedItem } from "@components/container-helpers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { MemoizedItem } from "../container-helpers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { DynamicHeightList, MemoizedSection } from "./ListNative";
-import { dComponent } from "@components/metadata-helpers";
-import { scrollAnchoringValues } from "@components/abstractions";
+import { dComponent } from "../metadata-helpers";
+import { scrollAnchoringValues } from "../abstractions";
 
 const COMP = "List";
 

@@ -1,6 +1,9 @@
 import { assert, describe, expect, it } from "vitest";
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { ImportDeclaration, T_IMPORT_DECLARATION } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  ImportDeclaration,
+  T_IMPORT_DECLARATION,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - import statement", () => {
   it("Empty import", () => {
@@ -32,7 +35,7 @@ describe("Parser - import statement", () => {
     const stmt = stmts[0] as ImportDeclaration;
     expect(stmt.type).toEqual(T_IMPORT_DECLARATION);
     expect(Object.keys(stmt.imports).length).toEqual(1);
-    expect(!!stmt.imports.find(item => item.id.name === "a")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "a")).toEqual(true);
     expect(stmt.moduleFile).toEqual("myModule");
   });
 
@@ -49,9 +52,9 @@ describe("Parser - import statement", () => {
     const stmt = stmts[0] as ImportDeclaration;
     expect(stmt.type).toEqual(T_IMPORT_DECLARATION);
     expect(Object.keys(stmt.imports).length).toEqual(3);
-    expect(!!stmt.imports.find(item => item.id.name === "a")).toEqual(true);
-    expect(!!stmt.imports.find(item => item.id.name === "b")).toEqual(true);
-    expect(!!stmt.imports.find(item => item.id.name === "c")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "a")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "b")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "c")).toEqual(true);
     expect(stmt.moduleFile).toEqual("myModule");
   });
 
@@ -68,7 +71,7 @@ describe("Parser - import statement", () => {
     const stmt = stmts[0] as ImportDeclaration;
     expect(stmt.type).toEqual(T_IMPORT_DECLARATION);
     expect(Object.keys(stmt.imports).length).toEqual(1);
-    expect(!!stmt.imports.find(item => item.id.name === "b")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "b")).toEqual(true);
     expect(stmt.moduleFile).toEqual("myModule");
   });
 
@@ -85,9 +88,9 @@ describe("Parser - import statement", () => {
     const stmt = stmts[0] as ImportDeclaration;
     expect(stmt.type).toEqual(T_IMPORT_DECLARATION);
     expect(Object.keys(stmt.imports).length).toEqual(3);
-    expect(!!stmt.imports.find(item => item.id.name === "b")).toEqual(true);
-    expect(!!stmt.imports.find(item => item.id.name === "d")).toEqual(true);
-    expect(!!stmt.imports.find(item => item.id.name === "f")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "b")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "d")).toEqual(true);
+    expect(!!stmt.imports.find((item) => item.id.name === "f")).toEqual(true);
     expect(stmt.moduleFile).toEqual("myModule");
   });
 

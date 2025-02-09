@@ -1,5 +1,4 @@
 import React, {useCallback, useContext, useEffect, useId} from "react";
-import { asyncNoop } from "@components-core/constants";
 
 interface IModalVisibilityContext {
   registerForm: (id: string) => void;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchThemeVar } from "@components-core/theming/hvar";
+import { matchThemeVar } from "../../../src/components-core/theming/hvar";
 
 describe("Generate HVar chain", () => {
   it("Input:color-bg-TextArea-default--hover", () => {

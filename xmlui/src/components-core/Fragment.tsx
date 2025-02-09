@@ -1,6 +1,6 @@
 import { Fragment } from "react";
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata } from "../abstractions/ComponentDefs";
+import { createComponentRenderer } from "./renderers";
 
 const COMP = "Fragment";
 export const FragmentMd = createMetadata({

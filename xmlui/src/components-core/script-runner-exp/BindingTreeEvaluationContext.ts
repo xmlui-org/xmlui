@@ -1,7 +1,7 @@
-import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
-import type { ArrowExpression, Statement } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
+import type { ArrowExpression, Statement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
 /**
  * A function that resolves a module name to the text of the module

@@ -1,9 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useReducer, useRef } from "react";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import toast from "react-hot-toast";
 import { isEqual } from "lodash-es";
-import { generatedId, useEvent } from "@components-core/utils/misc";
-import { useAppContext } from "@components-core/AppContext";
+import { generatedId, useEvent } from "../../components-core/utils/misc";
+import { useAppContext } from "../../components-core/AppContext";
 import produce from "immer";
 import {
   actionItemCompleted,
@@ -15,9 +15,9 @@ import {
   QueueAction,
   QueueActionKind,
   removeActionItem,
-} from "@components/Queue/queueActions";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import { usePrevious } from "@components-core/utils/hooks";
+} from "../Queue/queueActions";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import { usePrevious } from "../../components-core/utils/hooks";
 
 // =====================================================================================================================
 // React Queue component implementation

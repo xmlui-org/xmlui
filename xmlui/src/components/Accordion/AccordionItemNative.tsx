@@ -7,9 +7,9 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useAccordionContext } from "@components/Accordion/AccordionContext";
-import styles from "@components/Accordion/Accordion.module.scss";
-import Icon from "@components/Icon/IconNative";
+import { useAccordionContext } from "../../components/Accordion/AccordionContext";
+import styles from "../../components/Accordion/Accordion.module.scss";
+import Icon from "../../components/Icon/IconNative";
 import * as RAccordion from "@radix-ui/react-accordion";
 import classnames from "classnames";
 

@@ -1,8 +1,8 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import { ButtonMd } from "@components/Button/Button";
+import type { ComponentDef } from "../../../src/abstractions/ComponentDefs";
+import { ButtonMd } from "../../../src/components/Button/Button";
 import { transformSource } from "./xmlui";
-import { StackMd } from "@components/Stack/Stack";
+import { StackMd } from "../../../src/components/Stack/Stack";
 
 describe("Ueml transform - attributes", () => {
   it("Invalid attribute name fails #1", () => {

@@ -1,10 +1,10 @@
-import type {RegisterComponentApiFn, ValueExtractor} from "@abstractions/RendererDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import type {RegisterComponentApiFn, ValueExtractor} from "../../abstractions/RendererDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./TextBox.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import type { LookupActionOptions } from "@abstractions/ActionDefs";
-import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import type { LookupActionOptions } from "../../abstractions/ActionDefs";
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import {
   dAutoFocus,
   dDidChange,
@@ -27,7 +27,7 @@ import {
   dStartIcon,
   dStartText,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
 import { TextBox } from "./TextBoxNative";
 
 const COMP = "TextBox";

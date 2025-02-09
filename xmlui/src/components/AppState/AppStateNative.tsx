@@ -1,6 +1,6 @@
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
-import { useAppStateContextPart } from "@components/App/AppStateContext";
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { useIsomorphicLayoutEffect } from "../../components-core/utils/hooks";
+import { useAppStateContextPart } from "../../components/App/AppStateContext";
 
 export function AppState({
   bucket = "default",

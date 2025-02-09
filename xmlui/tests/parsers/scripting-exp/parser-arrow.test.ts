@@ -1,6 +1,6 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {
   ArrowExpression,
   BlockStatement,
@@ -13,7 +13,7 @@ import {
   T_EXPRESSION_STATEMENT,
   T_FUNCTION_INVOCATION_EXPRESSION,
   T_LET_STATEMENT,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - arrow expressions", () => {
   it("No param", () => {

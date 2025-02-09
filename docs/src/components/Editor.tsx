@@ -1,7 +1,7 @@
-import { editorStatusChanged, textChanged } from "@/src/state/store";
+import { editorStatusChanged, textChanged } from "../../src/state/store";
 import React, { startTransition, useCallback, useEffect, useMemo, useState } from "react";
 import { Editor as MonacoEditor, useMonaco } from "@monaco-editor/react";
-import { usePlayground } from "@/src/hooks/usePlayground";
+import { usePlayground } from "../hooks/usePlayground";
 import { UEMLGrammar } from "../../../xmlui/src/syntax/monaco/grammar.monacoLanguage";
 import { XmluiScripGrammar } from "../../../xmlui/src/syntax/monaco/xmluiscript.monacoLanguage";
 import xmluiLight from "../../../xmlui/src/syntax/monaco/xmlui-light";

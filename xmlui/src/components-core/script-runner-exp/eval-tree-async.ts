@@ -41,9 +41,9 @@ import {
   type Statement,
   type UnaryExpression,
   type VarDeclaration,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
-import type{ BlockScope } from "@abstractions/scripting/BlockScope";
-import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type{ BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 
 import {

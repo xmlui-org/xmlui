@@ -1,6 +1,6 @@
 import { CSSProperties, ReactNode } from "react";
 import styles from "./PositionedContainer.module.scss";
-import classnames from "@components-core/utils/classnames";
+import classnames from "../../components-core/utils/classnames";
 
 type Props = {
   children: ReactNode;

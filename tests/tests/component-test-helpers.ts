@@ -1,5 +1,5 @@
 import type { BrowserContext, Locator, Page } from "@playwright/test";
-import type { ComponentDefNew, StandaloneAppDescription } from "xmlui";
+import type { ComponentDef, CompoundComponentDef, StandaloneAppDescription } from "xmlui";
 import { xmlUiMarkupToComponent } from "../../xmlui/src/components-core/xmlui-parser";
 import type { ThemeDefinition } from "xmlui";
 
@@ -15,26 +15,31 @@ export type ThemeTestDesc = {
   dependsOnVars?: Record<string, string>;
 };
 
-function parseComponent(entryPoint: ComponentDefNew<any> | string) {
+function parseComponent(entryPoint: ComponentDef<any> | string) {
   if (typeof entryPoint === "string") {
     return xmlUiMarkupToComponent(entryPoint).component;
   }
   return entryPoint;
 }
 
-export async function initApp(page: Page, appDescription: UnparsedAppDescription, url: string = "/", resources = {}) {
+export async function initApp(
+  page: Page,
+  appDescription: UnparsedAppDescription,
+  url: string = "/",
+  resources = {},
+) {
   const { entryPoint, components } = appDescription;
 
   const _appDescription: StandaloneAppDescription = {
     ...appDescription,
     name: appDescription.name || "Test App",
-    entryPoint: parseComponent(entryPoint),
+    entryPoint: parseComponent(entryPoint as ComponentDef) as ComponentDef,
     resources,
-    components: !components
+    components: (!components
       ? undefined
       : Array.isArray(components)
-      ? components.map((comp) => parseComponent(comp))
-      : [parseComponent(components)],
+        ? components.map((comp) => parseComponent(comp as unknown as ComponentDef))
+        : [parseComponent(components)]) as CompoundComponentDef[],
   };
 
   await page.addInitScript((app) => {
@@ -44,17 +49,25 @@ export async function initApp(page: Page, appDescription: UnparsedAppDescription
   await page.goto(url);
 }
 
-export async function prepPage(co: BrowserContext, appDesc: StandaloneAppDescription, url: string = "/") {
+export async function prepPage(
+  co: BrowserContext,
+  appDesc: StandaloneAppDescription,
+  url: string = "/",
+) {
   const context = co;
   const page = await context.newPage();
   await initApp(page, appDesc, url);
   return page;
 }
 
-export async function initThemedApp(page: Page, entryPoint: EntryPoint, theme: Partial<ThemeDefinition>) {
+export async function initThemedApp(
+  page: Page,
+  entryPoint: EntryPoint,
+  theme: Partial<ThemeDefinition>,
+) {
   theme.id ??= "testTheme";
   theme.name ??= "Custom Test theme";
-  await initApp(page, { entryPoint, defaultTheme: theme.id, themes: [theme] });
+  await initApp(page, { entryPoint, defaultTheme: theme.id, themes: [theme as any] });
 }
 
 /**
@@ -76,7 +89,12 @@ export async function getBoundingRect(locator: Locator) {
 export async function getFullRectangle(locator: Locator) {
   const boundingRect = await locator.evaluate((element) => element.getBoundingClientRect());
 
-  const margins = await getElementStyles(locator, ["margin-left", "margin-right", "margin-top", "margin-bottom"]);
+  const margins = await getElementStyles(locator, [
+    "margin-left",
+    "margin-right",
+    "margin-top",
+    "margin-bottom",
+  ]);
   const marginLeft = parseFloat(margins["margin-left"]);
   const marginRight = parseFloat(margins["margin-right"]);
   const marginTop = parseFloat(margins["margin-top"]);
@@ -108,7 +126,10 @@ export function pixelStrToNum(pixelStr: string) {
 }
 
 export async function getElementStyle(locator: Locator, style: string) {
-  return locator.evaluate((element, style) => window.getComputedStyle(element).getPropertyValue(style), style);
+  return locator.evaluate(
+    (element, style) => window.getComputedStyle(element).getPropertyValue(style),
+    style,
+  );
 }
 
 /**
@@ -119,9 +140,12 @@ export async function getElementStyles(locator: Locator, styles: string[] = []) 
   return locator.evaluate(
     (element, styles) =>
       Object.fromEntries(
-        styles.map((styleName) => [styleName, window.getComputedStyle(element).getPropertyValue(styleName)])
+        styles.map((styleName) => [
+          styleName,
+          window.getComputedStyle(element).getPropertyValue(styleName),
+        ]),
       ),
-    styles
+    styles,
   );
 }
 

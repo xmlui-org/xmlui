@@ -1,8 +1,8 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import styles from "@components/AutoComplete/AutoComplete.module.scss";
-import { MemoizedItem } from "@components/container-helpers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+import { MemoizedItem } from "../../components/container-helpers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dPlaceholder,
   dInitialValue,
@@ -19,8 +19,8 @@ import {
   dFocus,
   dSetValueApi,
   dMulti,
-} from "@components/metadata-helpers";
-import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
+} from "../../components/metadata-helpers";
+import { AutoComplete } from "../../components/AutoComplete/AutoCompleteNative";
 
 const COMP = "AutoComplete";
 

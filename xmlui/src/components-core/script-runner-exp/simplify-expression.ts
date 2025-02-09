@@ -1,4 +1,4 @@
-import { deepFreeze } from "@parsers/common/utils";
+import { deepFreeze } from "../../parsers/common/utils";
 import {
   ArrowExpression,
   BlockStatement,

@@ -1,6 +1,6 @@
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
 
-import { delay as doDelay } from "@components-core/utils/misc";
+import { delay as doDelay } from "../utils/misc";
 import { createAction } from "./actions";
 
 async function delay(_executionContext: ActionExecutionContext, timeoutInMs: number, callback?: any) {

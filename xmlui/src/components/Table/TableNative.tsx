@@ -26,29 +26,29 @@ import {
 } from "@tanstack/react-table";
 import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
-import { Button } from "@components/Button/ButtonNative";
-import { Spinner } from "@components/Spinner/SpinnerNative";
-import classnames from "@components-core/utils/classnames";
+import { Button } from "../Button/ButtonNative";
+import { Spinner } from "../Spinner/SpinnerNative";
+import classnames from "../../components-core/utils/classnames";
 import useRowSelection from "./useRowSelection";
-import { Toggle } from "@components/Toggle/Toggle";
-import { Icon } from "@components/Icon/IconNative";
+import { Toggle } from "../Toggle/Toggle";
+import { Icon } from "../Icon/IconNative";
 import { observeElementOffset, useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { orderBy } from "lodash-es";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import { EMPTY_ARRAY } from "@components-core/constants";
-import { ScrollContext } from "@components-core/ScrollContext";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import { ScrollContext } from "../../components-core/ScrollContext";
 import { type OurColumnMetadata } from "../Column/TableContext";
-import { useEvent } from "@components-core/utils/misc";
+import { useEvent } from "../../components-core/utils/misc";
 import { flushSync } from "react-dom";
 import {
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-} from "@components-core/utils/hooks";
+} from "../../../src/components-core/utils/hooks";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { isThemeVarName } from "@components-core/theming/transformThemeVars";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import { useTheme } from "../../../src/components-core/theming/ThemeContext";
+import { isThemeVarName } from "../../../src/components-core/theming/transformThemeVars";
+import type { RegisterComponentApiFn } from "../../../src/abstractions/RendererDefs";
 
 // =====================================================================================================================
 // Helper types

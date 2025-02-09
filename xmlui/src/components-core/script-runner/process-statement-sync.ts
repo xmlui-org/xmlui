@@ -1,4 +1,4 @@
-import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
+import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
 import type {
   ArrayDestructure,
   AssignmentExpression,
@@ -9,16 +9,16 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { QueueInfo, StatementQueueItem, ProcessOutcome } from "./statement-queue";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import type { LogicalThread } from "@abstractions/scripting/LogicalThread";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 
 import {
   evalBinding,
   executeArrowExpressionSync,
-} from "@components-core/script-runner/eval-tree-sync";
+} from "../script-runner/eval-tree-sync";
 import {
   innermostBlockScope,
   innermostLoopScope,

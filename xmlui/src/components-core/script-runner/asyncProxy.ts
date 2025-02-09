@@ -1,4 +1,4 @@
-import { StatementExecutionError } from "@components-core/EngineError";
+import { StatementExecutionError } from "../EngineError";
 
 type ProxyInfo = {
   // --- The replacement for the original function

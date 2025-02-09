@@ -1,6 +1,10 @@
 import { assert, describe, expect, it } from "vitest";
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { ConstStatement, FunctionDeclaration, T_BLOCK_STATEMENT, T_FUNCTION_DECLARATION } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  FunctionDeclaration,
+  T_BLOCK_STATEMENT,
+  T_FUNCTION_DECLARATION,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - export statement", () => {
   it("Exported function", () => {

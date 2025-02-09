@@ -1,9 +1,9 @@
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useEffect } from "react";
-import { useEvent } from "@components-core/utils/misc";
-import type { ActionExecutionContext } from "@abstractions/ActionDefs";
-import { callApi } from "@components-core/action/APICall";
-import type { ApiActionComponent } from "@components/APICall/APICall";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ActionExecutionContext } from "../../abstractions/ActionDefs";
+import { callApi } from "../../components-core/action/APICall";
+import type { ApiActionComponent } from "../../components/APICall/APICall";
 
 interface Props {
   registerComponentApi: RegisterComponentApiFn;

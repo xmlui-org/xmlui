@@ -1,7 +1,7 @@
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./SpaceFiller.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { SpaceFiller } from "./SpaceFillerNative";
 
 const COMP = "SpaceFiller";

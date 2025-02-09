@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import {ReadOnlyCollection} from "@components-core/interception/ReadonlyCollection";
+import {ReadOnlyCollection} from "../../../src/components-core/interception/ReadonlyCollection";
 
 const numArray = [3,4,1,2,5];
 const strArray = ["beta", "delta", "alpha", "gamma", "charlie"]

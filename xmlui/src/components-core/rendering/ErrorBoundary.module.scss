@@ -1,4 +1,4 @@
-@use "@components-core/theming/themes" as themes;
+@use "../theming/themes" as themes;
 
 .errorOverlay{
   background-color: themes.$color-danger-500;

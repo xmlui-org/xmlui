@@ -1,4 +1,4 @@
-import { expect, test } from "@testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
 
 test("options with number type keeps number type - outside of forms", async ({ initTestBed, createSelectDriver }) => {
   const { testStateDriver } = await initTestBed(

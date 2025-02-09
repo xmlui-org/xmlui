@@ -1,4 +1,4 @@
-import {SingleValidationResult, ValidationResult} from "@components/Form/FormContext";
+import {SingleValidationResult, ValidationResult} from "../Form/FormContext";
 
 export enum FormActionKind {
     FIELD_LOST_FOCUS = "FormActionKind:FIELD_LOST_FOCUS",

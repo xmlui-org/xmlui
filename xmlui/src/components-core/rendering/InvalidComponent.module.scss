@@ -1,4 +1,4 @@
-@use "@components-core/theming/themes" as themes;
+@use "../theming/themes" as themes;
 
 .errorOverlay {
   background-color: rgba(255, 162, 162, 0.8);

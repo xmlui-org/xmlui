@@ -1,20 +1,20 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Fragment, memo, useCallback, useEffect, useMemo } from "react";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
   FormItemValidations,
   ValidateEventHandler,
   ValidationMode,
-} from "@components/Form/FormContext";
-import { useFormContextPart } from "@components/Form/FormContext";
-import { TextBox } from "@components/TextBox/TextBoxNative";
-import { Toggle } from "@components/Toggle/Toggle";
-import { FileInput } from "@components/FileInput/FileInputNative";
-import { NumberBox } from "@components/NumberBox/NumberBoxNative";
-import { Select } from "@components/Select/SelectNative";
-import { RadioGroup } from "@components/RadioGroup/RadioGroupNative";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { HelperText } from "@components/FormItem/HelperText";
+} from "../Form/FormContext";
+import { useFormContextPart } from "../Form/FormContext";
+import { TextBox } from "../TextBox/TextBoxNative";
+import { Toggle } from "../Toggle/Toggle";
+import { FileInput } from "../FileInput/FileInputNative";
+import { NumberBox } from "../NumberBox/NumberBoxNative";
+import { Select } from "../Select/SelectNative";
+import { RadioGroup } from "../RadioGroup/RadioGroupNative";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { HelperText } from "../FormItem/HelperText";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useValidation, useValidationDisplay } from "./Validations";
 import {
@@ -23,17 +23,17 @@ import {
   fieldInitialized,
   fieldLostFocus,
   fieldRemoved,
-} from "@components/Form/formActions";
-import { TextArea } from "@components/TextArea/TextAreaNative";
-import { useEvent } from "@components-core/utils/misc";
+} from "../Form/formActions";
+import { TextArea } from "../TextArea/TextAreaNative";
+import { useEvent } from "../../components-core/utils/misc";
 import { ItemWithLabel } from "./ItemWithLabel";
-import { DatePicker } from "@components/DatePicker/DatePickerNative";
-import { getByPath } from "@components/Form/FormNative";
-import { asOptionalBoolean } from "@components-core/rendering/valueExtractor";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import { DatePicker } from "../DatePicker/DatePickerNative";
+import { getByPath } from "../Form/FormNative";
+import { asOptionalBoolean } from "../../components-core/rendering/valueExtractor";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { FormItemMd } from "./FormItem";
-import { AutoComplete } from "@components/AutoComplete/AutoCompleteNative";
-import type { LabelPosition } from "@components/abstractions";
+import { AutoComplete } from "../AutoComplete/AutoCompleteNative";
+import type { LabelPosition } from "../abstractions";
 
 type FormControlType =
   | "text"

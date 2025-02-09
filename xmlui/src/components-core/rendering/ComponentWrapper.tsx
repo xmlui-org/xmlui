@@ -1,7 +1,7 @@
 import { forwardRef, memo, RefObject, useMemo, useRef } from "react";
 import ComponentAdapter from "./ComponentAdapter";
-import { extractParam } from "@components-core/utils/extractParam";
-import { ComponentDef } from "@abstractions/ComponentDefs";
+import { extractParam } from "../utils/extractParam";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
 import { ChildRendererContext } from "./renderChild";
 import { ContainerWrapper, ContainerWrapperDef, isContainerLike } from "./ContainerWrapper";
 

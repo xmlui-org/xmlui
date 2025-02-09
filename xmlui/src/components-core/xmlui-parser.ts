@@ -1,5 +1,5 @@
-import { ModuleResolver } from "@abstractions/scripting/modules";
-import { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import { ModuleResolver } from "../abstractions/scripting/modules";
+import { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 import { createXmlUiParser } from "../parsers/xmlui-parser/parser";
 import { nodeToComponentDef } from "../parsers/xmlui-parser/transform";
 import { DiagnosticCategory, ErrCodes } from "../parsers/xmlui-parser/diagnostics";
@@ -7,8 +7,8 @@ import type { GetText, Error as ParseError } from "../parsers/xmlui-parser/parse
 import { ParserError } from "../parsers/xmlui-parser/ParserError";
 import { SyntaxKind } from "../parsers/xmlui-parser/syntax-kind";
 import { Node } from "../parsers/xmlui-parser/syntax-node";
-import { ScriptParserErrorMessage } from "@abstractions/scripting/ScriptParserError";
-import { ModuleErrors } from "@abstractions/scripting/ScriptingSourceTree";
+import { ScriptParserErrorMessage } from "../abstractions/scripting/ScriptParserError";
+import { ModuleErrors } from "../abstractions/scripting/ScriptingSourceTree";
 
 interface ErrorWithLineColInfo extends ParseError {
   line: number;

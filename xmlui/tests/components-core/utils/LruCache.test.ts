@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { LRUCache } from "@components-core/utils/LruCache";
+import { LRUCache } from "../../../src/components-core/utils/LruCache";
 
 describe("LRUCache", () => {
   let lru: LRUCache;

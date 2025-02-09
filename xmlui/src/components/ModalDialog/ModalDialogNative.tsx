@@ -8,12 +8,12 @@ import React, {
   useState,
 } from "react";
 import styles from "./ModalDialog.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { Icon } from "@components/Icon/IconNative";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { Button } from "@components/Button/ButtonNative";
-import { useEvent } from "@components-core/utils/misc";
+import classnames from "../../components-core/utils/classnames";
+import { Icon } from "../Icon/IconNative";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Button } from "../Button/ButtonNative";
+import { useEvent } from "../../components-core/utils/misc";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";

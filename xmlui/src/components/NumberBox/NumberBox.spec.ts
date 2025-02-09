@@ -1,6 +1,6 @@
-import { labelPositionValues, validationStatusValues } from "@components/abstractions";
-import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import { labelPositionValues, validationStatusValues } from "../abstractions";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { expect, test } from "../../testing/fixtures";
 import { NUMBERBOX_MAX_VALUE } from "./numberbox-abstractions";
 
 // --- Smoke

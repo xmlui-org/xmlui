@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
-import { UnaryExpression } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { UnaryExpression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - unary expressions", () => {
   const unaryCases = [
@@ -16,8 +16,8 @@ describe("Parser - unary expressions", () => {
     { src: "-3.14", op: "-", exp: "LitE" },
     { src: "!0b1111", op: "!", exp: "LitE" },
     { src: "~0xa123", op: "~", exp: "LitE" },
-    { src: "typeof \"abc\"", op: "typeof", exp: "LitE" },
-    { src: "delete \"abc\"", op: "delete", exp: "LitE" },
+    { src: 'typeof "abc"', op: "typeof", exp: "LitE" },
+    { src: 'delete "abc"', op: "delete", exp: "LitE" },
 
     { src: "+!a", op: "+", exp: "UnaryE" },
     { src: "-!a", op: "-", exp: "UnaryE" },

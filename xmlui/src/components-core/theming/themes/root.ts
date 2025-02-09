@@ -1,4 +1,4 @@
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
+import type { ThemeDefinition } from "../abstractions";
 
 import { palette } from "./palette";
 

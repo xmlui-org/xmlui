@@ -1,9 +1,13 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { ArrowExpressionStatement, ExpressionStatement, T_ARROW_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { processStatementQueue } from "@components-core/script-runner-exp/process-statement-sync";
+import {
+  ArrowExpressionStatement,
+  ExpressionStatement,
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { processStatementQueue } from "../../../src/components-core/script-runner-exp/process-statement-sync";
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { buildProxy } from "@components-core/rendering/buildProxy";
+import { buildProxy } from "../../../src/components-core/rendering/buildProxy";
 
 describe("Process statements (sync)", () => {
   it("expression statement #1", () => {
@@ -11,8 +15,8 @@ describe("Process statements (sync)", () => {
     const source = "x = 3 * x;";
     const evalContext = createEvalContext({
       localContext: {
-        x: 1
-      }
+        x: 1,
+      },
     });
     const statements = parseStatements(source);
 
@@ -36,8 +40,8 @@ describe("Process statements (sync)", () => {
     const source = "let y";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -63,8 +67,8 @@ describe("Process statements (sync)", () => {
     const source = "let y = 3";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -89,7 +93,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 3, z = 2";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -116,8 +120,8 @@ describe("Process statements (sync)", () => {
     const source = "const y = 3";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -143,8 +147,8 @@ describe("Process statements (sync)", () => {
     const source = "const y = 3; y++";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -162,8 +166,8 @@ describe("Process statements (sync)", () => {
     const source = "const y = 3; y = 12";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -181,8 +185,8 @@ describe("Process statements (sync)", () => {
     const source = "let y = 3; x = 3 * y;";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -208,8 +212,8 @@ describe("Process statements (sync)", () => {
     const source = "let y = 3; { let z = 2 ; x = 3 * y + z; }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -235,8 +239,8 @@ describe("Process statements (sync)", () => {
     const source = "{ let y = 3; x = 3 * y; }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -260,8 +264,8 @@ describe("Process statements (sync)", () => {
     const source = "{ let y = 3; { let z = 2 ; x = 3 * y + z; } }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -285,8 +289,8 @@ describe("Process statements (sync)", () => {
     const source = "{ let y = 3; { let z = 2 ; { x = 3 * y + z; } } }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -310,8 +314,8 @@ describe("Process statements (sync)", () => {
     const source = "{ let y = 3; { let z = 2 ; { let z = 3; x = 3 * y + z; } } }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -335,8 +339,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) x = 3";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -360,8 +364,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) {x = 3}";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -385,8 +389,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) x = 3; else x = 2";
     const evalContext = createEvalContext({
       localContext: {
-        x: 1
-      }
+        x: 1,
+      },
     });
     const statements = parseStatements(source);
 
@@ -410,8 +414,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) x = 3; else { x = 2 }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 1
-      }
+        x: 1,
+      },
     });
     const statements = parseStatements(source);
 
@@ -435,8 +439,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) {x = 3;} else { x = 2 }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -460,8 +464,8 @@ describe("Process statements (sync)", () => {
     const source = "if (x === 0) {x = 3;} else { x = 2 }";
     const evalContext = createEvalContext({
       localContext: {
-        x: 1
-      }
+        x: 1,
+      },
     });
     const statements = parseStatements(source);
 
@@ -485,8 +489,8 @@ describe("Process statements (sync)", () => {
     const source = "while (x < 3) x++;";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -509,7 +513,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; while (x < 3) x++;";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -533,7 +537,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; while (x < 8) {let y = 2; x += y;}";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -557,7 +561,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; while (x < 18) {let y = 0; while (y < 3) {x += y; y++;} }";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -581,7 +585,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; while (true) {x++ ; if (x > 3) break;}";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -605,7 +609,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; while (true) {x++ ; if (x > 3) break;}; x++";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -629,7 +633,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; let x = 0; while (x < 6) {x++; if (x == 3) continue; y += x; }";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -654,8 +658,8 @@ describe("Process statements (sync)", () => {
     const source = "do x++; while (x < 3)";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -679,8 +683,8 @@ describe("Process statements (sync)", () => {
     const source = "do x++; while (x < 0)";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -704,8 +708,8 @@ describe("Process statements (sync)", () => {
     const source = "do { x++;} while (x < 3)";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -728,7 +732,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; do {let y = 2; x += y;} while (x < 8) ";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -752,7 +756,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; do {let y = 0; while (y < 3) {x += y; y++;} } while (x < 18)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -776,7 +780,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let x = 0; do {x++ ; if (x > 3) break;} while (true)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -800,7 +804,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; let x = 0; do {x++; if (x == 3) continue; y += x; } while (x < 6)";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -824,7 +828,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; for (let i = 0; i < 4; i++) y += i;";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -848,7 +852,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; for (let i = 0; i < 4; i++) {y += i;}";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -872,7 +876,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; for (let i = 0; i < 4; i++) { break; }; y++";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -896,7 +900,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; for (let i = 0, j = 0; i < 4; i++, j+=2) {y += i + j}";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -920,7 +924,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; let i = 0; for (; i < 4; i++) {y += i}";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -944,7 +948,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let y = 0; for (let i = 0; i < 10; i++) {if (i % 3 === 0) continue; y += i; }";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -968,7 +972,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "(() => {return 2})()";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -992,7 +996,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "let arr = () => {return 2}; let x = arr();";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -1014,9 +1018,10 @@ describe("Process statements (sync)", () => {
 
   it("Arrow function body #3", () => {
     // --- Arrange
-    const source = "let arr = (x, y) => { let sum = 0; for (let i = x; i <= y; i++) sum+= i; return sum }; arr(1, 5);";
+    const source =
+      "let arr = (x, y) => { let sum = 0; for (let i = x; i <= y; i++) sum+= i; return sum }; arr(1, 5);";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -1042,8 +1047,8 @@ describe("Process statements (sync)", () => {
       "let arr = (x, y) => { let sum = 0; for (let i = x; i <= y; i++) sum+= i; return sum }; z = arr(1, 5);";
     const evalContext = createEvalContext({
       localContext: {
-        z: 0
-      }
+        z: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1066,8 +1071,7 @@ describe("Process statements (sync)", () => {
 
   it("return #1", () => {
     // --- Arrange
-    const source =
-        "return 123";
+    const source = "return 123";
     const evalContext = createEvalContext({});
     const statements = parseStatements(source);
 
@@ -1092,8 +1096,8 @@ describe("Process statements (sync)", () => {
     const source = "x = 1; return 123; x = 2";
     const evalContext = createEvalContext({
       localContext: {
-        x: 0
-      }
+        x: 0,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1116,8 +1120,7 @@ describe("Process statements (sync)", () => {
 
   it("return #3", () => {
     // --- Arrange
-    const source =
-        "return";
+    const source = "return";
     const evalContext = createEvalContext({});
     const statements = parseStatements(source);
 
@@ -1141,7 +1144,7 @@ describe("Process statements (sync)", () => {
     // --- Arrange
     const source = "while (true);";
     const evalContext = createEvalContext({
-      localContext: {}
+      localContext: {},
     });
     const statements = parseStatements(source);
 
@@ -1161,13 +1164,13 @@ describe("Process statements (sync)", () => {
     const source = "(arg)=> { return arg + 2 }";
     const evalContext = createEvalContext({
       localContext: {},
-      eventArgs: [4]
+      eventArgs: [4],
     });
 
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
 
     // --- Act
@@ -1182,7 +1185,7 @@ describe("Process statements (sync)", () => {
     const source = "$x = 3";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": 0
+        $x: 0,
       }),
       // syncUpdateWithExternalStore: checkReadOnlyOnUpdate,
       // isReadOnlyVar: isReadOnlyField
@@ -1204,13 +1207,13 @@ describe("Process statements (sync)", () => {
     const source = "$x.a[0].y = 3";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": {
+        $x: {
           a: [
             {
-              y: 0
-            }
-          ]
-        }
+              y: 0,
+            },
+          ],
+        },
       }),
     });
     const statements = parseStatements(source);
@@ -1230,7 +1233,7 @@ describe("Process statements (sync)", () => {
     const source = "$x++";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": 0
+        $x: 0,
       }),
     });
     const statements = parseStatements(source);
@@ -1250,13 +1253,13 @@ describe("Process statements (sync)", () => {
     const source = "$x.a[0].y--";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": {
+        $x: {
           a: [
             {
-              y: 0
-            }
-          ]
-        }
+              y: 0,
+            },
+          ],
+        },
       }),
     });
     const statements = parseStatements(source);
@@ -1276,13 +1279,13 @@ describe("Process statements (sync)", () => {
     const source = "let n = $x; n.a[0].y++;";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": {
+        $x: {
           a: [
             {
-              y: 0
-            }
-          ]
-        }
+              y: 0,
+            },
+          ],
+        },
       }),
     });
     const statements = parseStatements(source);
@@ -1302,13 +1305,13 @@ describe("Process statements (sync)", () => {
     const source = "let n = $x; n.a[0].y += 3;";
     const evalContext = createEvalContext({
       localContext: getComponentStateClone({
-        "$x": {
+        $x: {
           a: [
             {
-              y: 0
-            }
-          ]
-        }
+              y: 0,
+            },
+          ],
+        },
       }),
     });
     const statements = parseStatements(source);
@@ -1328,8 +1331,8 @@ describe("Process statements (sync)", () => {
     const source = "let y; let res =''; for (y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1347,8 +1350,8 @@ describe("Process statements (sync)", () => {
     const source = "let y; let res =''; for (y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1366,8 +1369,8 @@ describe("Process statements (sync)", () => {
     const source = "let y; let res =''; for (y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1392,8 +1395,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1418,8 +1421,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1437,8 +1440,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (let y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1456,8 +1459,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (let y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1475,8 +1478,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (let y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1500,8 +1503,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1525,8 +1528,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1550,8 +1553,8 @@ describe("Process statements (sync)", () => {
     return res`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1569,8 +1572,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (const y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1588,8 +1591,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (const y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1607,8 +1610,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (const y in obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1632,8 +1635,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1657,8 +1660,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1682,8 +1685,8 @@ describe("Process statements (sync)", () => {
     return res`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: { one: "1", two: 2, three: 3 }
-      }
+        obj: { one: "1", two: 2, three: 3 },
+      },
     });
     const statements = parseStatements(source);
 
@@ -1691,7 +1694,7 @@ describe("Process statements (sync)", () => {
     try {
       processStatementQueue(statements, evalContext);
     } catch (err: any) {
-      expect(err.toString().includes("const")).equal(true)
+      expect(err.toString().includes("const")).equal(true);
       return;
     }
     assert.fail("Exception expected");
@@ -1702,8 +1705,8 @@ describe("Process statements (sync)", () => {
     const source = "for (y of obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: null
-      }
+        obj: null,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1711,10 +1714,10 @@ describe("Process statements (sync)", () => {
     try {
       processStatementQueue(statements, evalContext);
     } catch (err: any) {
-      expect(err.toString().includes("Iterator expected"))
+      expect(err.toString().includes("Iterator expected"));
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("for..of loop with not iterable #2", () => {
@@ -1722,8 +1725,8 @@ describe("Process statements (sync)", () => {
     const source = "for (y of obj) res += obj[y]; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: 123
-      }
+        obj: 123,
+      },
     });
     const statements = parseStatements(source);
 
@@ -1731,10 +1734,10 @@ describe("Process statements (sync)", () => {
     try {
       processStatementQueue(statements, evalContext);
     } catch (err: any) {
-      expect(err.toString().includes("Iterator expected"))
+      expect(err.toString().includes("Iterator expected"));
       return;
     }
-    assert.fail("Exception expected")
+    assert.fail("Exception expected");
   });
 
   it("for..of loop with 'none' var binding", () => {
@@ -1742,8 +1745,8 @@ describe("Process statements (sync)", () => {
     const source = "let y; let res =''; for (y of obj) res += y; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1768,8 +1771,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2 ,3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1794,8 +1797,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1813,8 +1816,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (let y of obj) res += y; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1838,8 +1841,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2 ,3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1863,8 +1866,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1888,8 +1891,8 @@ describe("Process statements (sync)", () => {
     return res`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1907,8 +1910,8 @@ describe("Process statements (sync)", () => {
     const source = "let res =''; for (const y of obj) res += y; return res";
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1932,8 +1935,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2 ,3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1957,8 +1960,8 @@ describe("Process statements (sync)", () => {
       return res;`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1982,8 +1985,8 @@ describe("Process statements (sync)", () => {
     return res`;
     const evalContext = createEvalContext({
       localContext: {
-        obj: [1, 2, 3]
-      }
+        obj: [1, 2, 3],
+      },
     });
     const statements = parseStatements(source);
 
@@ -1991,7 +1994,7 @@ describe("Process statements (sync)", () => {
     try {
       processStatementQueue(statements, evalContext);
     } catch (err: any) {
-      expect(err.toString().includes("const")).equal(true)
+      expect(err.toString().includes("const")).equal(true);
       return;
     }
     assert.fail("Exception expected");

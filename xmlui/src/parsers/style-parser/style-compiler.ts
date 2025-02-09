@@ -2,11 +2,11 @@ import { isEmpty } from "lodash-es";
 
 import type { CSSProperties } from "react";
 import type { StyleNode, ThemeIdDescriptor } from "./source-tree";
-import type { LayoutContext, NonCssLayoutProps } from "@abstractions/RendererDefs";
+import type { LayoutContext, NonCssLayoutProps } from "../../abstractions/RendererDefs";
 
-import { EMPTY_OBJECT } from "@components-core/constants";
+import { EMPTY_OBJECT } from "../../components-core/constants";
 import { StyleParser, toCssVar } from "./StyleParser";
-import type { MediaBreakpointType } from "@abstractions/AppContextDefs";
+import type { MediaBreakpointType } from "../../abstractions/AppContextDefs";
 
 // Property parsing issues
 type PropertyIssues = Record<string, string | undefined>;

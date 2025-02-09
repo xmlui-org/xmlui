@@ -1,6 +1,6 @@
-import { orderingValues, scrollAnchoringValues } from "@components/abstractions";
-import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import { orderingValues, scrollAnchoringValues } from "../abstractions";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { expect, test } from "../../testing/fixtures";
 
 // --- data & items
 

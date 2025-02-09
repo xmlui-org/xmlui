@@ -1,10 +1,10 @@
 import styles from "./Link.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { LocalLink } from "./LinkNative";
-import { dEnabled, dLabel } from "@components/metadata-helpers";
-import { LinkTargetMd } from "@components/abstractions";
+import { dEnabled, dLabel } from "../metadata-helpers";
+import { LinkTargetMd } from "../abstractions";
 
 const COMP = "Link";
 

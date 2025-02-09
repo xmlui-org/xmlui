@@ -40,8 +40,7 @@ import { Parser } from "../../parsers/scripting/Parser";
 import { ensureMainThread } from "./process-statement-common";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 import { isBannedFunction } from "./bannedFunctions";
-import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { rest } from "lodash-es";
+import { Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import { getSyncProxy } from "./syncProxy";
 
 // --- The type of function we use to evaluate a (partial) expression tree

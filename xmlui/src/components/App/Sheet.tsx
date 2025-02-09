@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import classnames from "@components-core/utils/classnames";
-import { Icon } from "@components/Icon/IconNative";
+import classnames from "../../components-core/utils/classnames";
+import { Icon } from "../../components/Icon/IconNative";
 import styles from "./Sheet.module.scss";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { useTheme } from "@components-core/theming/ThemeContext";
+import { useTheme } from "../../components-core/theming/ThemeContext";
 
 //based on this: https://ui.shadcn.com/docs/components/sheet
 

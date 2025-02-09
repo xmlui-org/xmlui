@@ -1,9 +1,9 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
-import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
-import type { LoopScope } from "@abstractions/scripting/LoopScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import { T_EMPTY_STATEMENT, T_FUNCTION_DECLARATION, type ArrowExpression, type FunctionDeclaration, type LoopStatement, type Statement, type TryStatement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import type { TryScope } from "@abstractions/scripting/TryScopeExp";
+import type { TryScope } from "../../abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";
 import { StatementQueueItem, StatementWithInfo, mapStatementsToQueueItems } from "./statement-queue";

@@ -1,14 +1,14 @@
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { XmlUiHelper } from "@src/parsers/xmlui-parser/xmlui-serializer";
-import { decompress } from "@/src/components/utils";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import type { PlaygroundState } from "@/src/state/store";
-import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
-import { XmlUiThemeDefinition } from "@components-core/theming/themes/xmlui";
-import type { XmlUiNode } from "@src/parsers/xmlui-parser/xmlui-tree";
+import type { ComponentDef, CompoundComponentDef } from "../../../xmlui/src/abstractions/ComponentDefs";
+import { XmlUiHelper } from "../../../xmlui/src/parsers/xmlui-parser/xmlui-serializer";
+import { decompress } from "../components/utils";
+import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { PlaygroundState } from "../state/store";
+import { SolidThemeDefinition } from "../../../xmlui/src/components-core/theming/themes/solid";
+import { XmlUiThemeDefinition } from "../../../xmlui/src/components-core/theming/themes/xmlui";
+import type { XmlUiNode } from "../../../xmlui/src/parsers/xmlui-parser/xmlui-tree";
 import JSZip from "jszip";
 import { saveAs } from "file-saver";
-import {normalizePath} from "@components-core/utils/misc";
+import {normalizePath} from "../../../xmlui/src/components-core/utils/misc";
 
 async function fetchWithoutCache(url: string) {
   return fetch(normalizePath(url), {

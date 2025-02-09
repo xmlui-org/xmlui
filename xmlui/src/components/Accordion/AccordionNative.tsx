@@ -1,9 +1,9 @@
 import * as RAccordion from "@radix-ui/react-accordion";
-import { AccordionContext } from "@components/Accordion/AccordionContext";
+import { AccordionContext } from "../../components/Accordion/AccordionContext";
 import styles from "./Accordion.module.scss";
 import { forwardRef, useCallback, useEffect, useMemo, useState, ForwardedRef } from "react";
-import { noop } from "@components-core/constants";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 
 type Props = {
   style?: React.CSSProperties;

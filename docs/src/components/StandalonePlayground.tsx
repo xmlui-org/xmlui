@@ -1,20 +1,20 @@
 import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
-import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
-import "@src/index.scss";
-import { useToast } from "@/src/hooks/useToast";
+import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
+import "../../../xmlui/src/index.scss";
+import { useToast } from "../hooks/useToast";
 import {
   appDescriptionInitialized,
   contentChanged,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
-} from "@/src/state/store";
-import { decompressData, INITIAL_PLAYGROUND_STATE } from "@/src/utils/helpers";
+} from "../state/store";
+import { decompressData, INITIAL_PLAYGROUND_STATE } from "../utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
-import { PlaygroundContent } from "@/src/components/PlaygroundContent";
-import { Header } from "@/src/components/Header";
+import { PlaygroundContent } from "../components/PlaygroundContent";
+import { Header } from "../components/Header";
 import styles from "./StandalonePlayground.module.scss";
-import { Spinner } from "@components/Spinner/SpinnerNative";
+import { Spinner } from "../../../xmlui/src/components/Spinner/SpinnerNative";
 
 export const StandalonePlayground = () => {
   const { showToast } = useToast();

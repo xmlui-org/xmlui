@@ -1,9 +1,9 @@
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 import { parseParameterString } from "./script-runner/ParameterParser";
 import { Parser } from "../parsers/scripting/Parser";
 import { layoutOptionKeys } from "./descriptorHelper";
-import { viewportSizeNames } from "@components/abstractions";
+import { viewportSizeNames } from "../components/abstractions";
 
 type IsValidFunction<T> = (propKey: string, propValue: T) => string | string[] | undefined | null;
 

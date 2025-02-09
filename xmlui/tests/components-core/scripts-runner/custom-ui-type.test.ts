@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isCustomUiData } from "@components-core/script-runner/custom-ui-data";
+import { isCustomUiData } from "../../../src/components-core/script-runner/custom-ui-data";
 
 describe("Custom UI types", () => {
     it("Type guard works for CustomUiData (true)", () => {

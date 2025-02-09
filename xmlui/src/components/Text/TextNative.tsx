@@ -3,10 +3,10 @@ import { forwardRef } from "react";
 import type React from "react";
 import { useMemo, useRef } from "react";
 import styles from "./Text.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { getMaxLinesStyle } from "@components-core/utils/css-utils";
+import classnames from "../../components-core/utils/classnames";
+import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { type TextVariant, TextVariantElement } from "@components/abstractions";
+import { type TextVariant, TextVariantElement } from "../abstractions";
 
 type TextProps = {
   uid?: string;

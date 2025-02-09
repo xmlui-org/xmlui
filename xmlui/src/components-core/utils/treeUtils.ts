@@ -1,6 +1,16 @@
-import { FlatTreeNode, TreeItem, TreeNode, UnPackedTreeData } from "@components-core/abstractions/treeAbstractions";
+import {
+  FlatTreeNode,
+  TreeItem,
+  TreeNode,
+  UnPackedTreeData,
+} from "../abstractions/treeAbstractions";
 
-export function flattenNode(node: TreeNode, depth: number, result: FlatTreeNode[], openedIds: string[]) {
+export function flattenNode(
+  node: TreeNode,
+  depth: number,
+  result: FlatTreeNode[],
+  openedIds: string[],
+) {
   const { children, uid } = node;
   const isExpanded = openedIds.includes(uid);
   result.push({
@@ -37,7 +47,7 @@ export function walkTree(treeData: TreeNode[], visit: (node: TreeNode) => void) 
 export function unPackTree(
   items: Array<TreeItem> = [],
   parentIds: Array<string> = [],
-  parentPath: Array<number> = []
+  parentPath: Array<number> = [],
 ): UnPackedTreeData {
   const treeData: Array<TreeNode> = [];
   let treeItemsById: Record<string, TreeNode> = {};

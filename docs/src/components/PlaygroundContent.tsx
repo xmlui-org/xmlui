@@ -1,8 +1,8 @@
-import { Preview } from "@/src/components/Preview";
-import { Editor } from "@/src/components/Editor";
-import { Splitter } from "@components/Splitter/SplitterNative";
-import styles from "@/src/components/PlaygroundContent.module.scss";
-import { usePlayground } from "@/src/hooks/usePlayground";
+import { Preview } from "../components/Preview";
+import { Editor } from "../components/Editor";
+import { Splitter } from "../../../xmlui/src/components/Splitter/SplitterNative";
+import styles from "../components/PlaygroundContent.module.scss";
+import { usePlayground } from "../hooks/usePlayground";
 import classnames from "classnames";
 import React from "react";
 
