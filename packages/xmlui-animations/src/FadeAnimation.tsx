@@ -7,6 +7,7 @@ export const FadeAnimationMd = createMetadata({
   status: "in progress",
   specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that fades the content.`,
+  descriptionRef: "",
 });
 
 export const fadeAnimationRenderer = createComponentRenderer(

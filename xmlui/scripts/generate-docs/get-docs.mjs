@@ -1,59 +1,73 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
-import { unlink, readdir, readFile } from "fs/promises";
+import { unlink, readdir, readFile, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { processError, ErrorWithSeverity, convertPath } from "./utils.mjs";
 import { DocsGenerator } from "./DocsGenerator.mjs";
 import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { FOLDERS } from "./folders.mjs";
+import { existsSync } from "fs";
 
 // --- Main
 
-// --- --- Extensions
-
-/* const outFolder = join(projectRootFolder, "docs", "pages", "extension-components");
-const examplesFolder = join(projectRootFolder, "docs", "component-samples");
-
-const extensionsConfig = await loadConfig(join(scriptFolder, "extensions-config.json"));
-const packagesMetadata = await dynamicallyLoadExtensionPackages();
-
-const test = packagesMetadata["xmlui-animations"];
-
-const extensionGenerator = new DocsGenerator(test.metadata, {
-  excludeComponentStatuses: extensionsConfig?.excludeComponentStatuses,
-});
-
-if (extensionsConfig?.cleanFolder) {
-  await cleanFolder(join(FOLDERS.pages, "extension-components"));
-}
-extensionGenerator.generateDocs(); */
-
-// --- --- Components
-
-const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
-const metadataGenerator = new DocsGenerator(
-  collectedComponentMetadata,
-  {
-    sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
-    outFolder: join(FOLDERS.docsRoot, "pages", "components"),
-    examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
-  },
-  { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
-);
-
-if (componentsConfig?.cleanFolder) {
-  await cleanFolder(join(FOLDERS.pages, "components"));
-}
-metadataGenerator.generateDocs();
-
-if (componentsConfig?.exportToJson) {
-  await metadataGenerator.exportMetadataToJson();
-}
-
-await metadataGenerator.generateComponentsSummary();
-await metadataGenerator.generateArticleAndDownloadsLinks();
+await generateExtenionPackages();
+await generateComponents();
 
 // --- Helpers
+
+async function generateExtenionPackages() {
+  const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
+  const packagesMetadata = await dynamicallyLoadExtensionPackages();
+  for (const packageName in packagesMetadata) {
+    //const test = packagesMetadata["xmlui-animations"];
+    const packageFolder = join(FOLDERS.pages, "extension-components", packageName);
+
+    if (!existsSync(packageFolder)) {
+      await mkdir(packageFolder, { recursive: true });
+    }
+
+    const extensionGenerator = new DocsGenerator(
+      packagesMetadata[packageName].metadata,
+      {
+        sourceFolder: packagesMetadata[packageName].sourceFolder,
+        outFolder: packageFolder,
+        examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+      },
+      { excludeComponentStatuses: extensionsConfig?.excludeComponentStatuses },
+    );
+
+    if (extensionsConfig?.cleanFolder) {
+      await cleanFolder(packageFolder);
+    }
+
+    extensionGenerator.generateDocs();
+  }
+}
+
+async function generateComponents() {
+  const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+  const metadataGenerator = new DocsGenerator(
+    collectedComponentMetadata,
+    {
+      sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
+      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+      examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+    },
+    { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
+  );
+
+  if (componentsConfig?.cleanFolder) {
+    await cleanFolder(join(FOLDERS.pages, "components"));
+  }
+  metadataGenerator.generateDocs();
+
+  if (componentsConfig?.exportToJson) {
+    await metadataGenerator.exportMetadataToJson();
+  }
+
+  await metadataGenerator.generateComponentsSummary();
+  await metadataGenerator.generateArticleAndDownloadsLinks();
+}
 
 async function cleanFolder(folderToClean) {
   logger.info(`Cleaning ${basename(folderToClean)} by removing previous doc files`);
@@ -102,7 +116,7 @@ async function loadConfig(configPath) {
 
 // TODO: We assume a lot here, need to make all the folders and filenames transparent
 async function dynamicallyLoadExtensionPackages() {
-  const extendedPackagesFolder = join(projectRootFolder, "packages");
+  const extendedPackagesFolder = join(FOLDERS.projectRoot, "packages");
   const packageDirectories = (await readdir(extendedPackagesFolder)).filter((entry) => {
     return (
       entry.startsWith("xmlui-") && lstatSync(join(extendedPackagesFolder, entry)).isDirectory()
@@ -114,7 +128,7 @@ async function dynamicallyLoadExtensionPackages() {
     const extensionPackage = {
       sourceFolder: join(extendedPackagesFolder, dir),
       metadata: {},
-    }
+    };
     dir = join(extendedPackagesFolder, dir);
     try {
       const packageFolderDist = join(dir, "dist");
@@ -122,9 +136,9 @@ async function dynamicallyLoadExtensionPackages() {
       for (const file of distContents) {
         let filePath = join(packageFolderDist, file);
         if (filePath.endsWith("-metadata.js")) {
-          filePath = convertPath(relative(scriptFolder, filePath));
+          filePath = convertPath(relative(FOLDERS.script, filePath));
           const { componentMetadata } = await import(filePath);
-          extensionPackage.metadata[componentMetadata.name] = componentMetadata.metadata;
+          extensionPackage.metadata = componentMetadata.metadata;
         }
       }
       importedMetadata[basename(dir)] = extensionPackage;

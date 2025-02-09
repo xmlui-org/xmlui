@@ -63,7 +63,7 @@ export class MetadataProcessor {
     this.examplesFolder = examplesFolder;
   }
 
-  processDocfiles() {
+  processDocfiles(writeMetaFile = true) {
     // Check for docs already in the output folder
     const docFiles = readdirSync(this.outFolder).filter((file) => extname(file) === ".mdx");
     let componentNames = docFiles.map((file) => basename(file, extname(file))) || [];
@@ -71,15 +71,17 @@ export class MetadataProcessor {
     this.metadata.forEach((component) => {
       componentNames = this._processMdx(component, componentNames);
     });
-
+    
     // Write the _meta.json file
-    try {
-      const metaFileContents = Object.fromEntries(
-        componentNames.sort().map((name) => [name, name]),
-      );
-      writeFileSync(join(this.outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
-    } catch (e) {
-      logger.error("Could not write _meta file: ", e?.message || "unknown error");
+    if (writeMetaFile) {
+      try {
+        const metaFileContents = Object.fromEntries(
+          componentNames.sort().map((name) => [name, name]),
+        );
+        writeFileSync(join(this.outFolder, "_meta.json"), JSON.stringify(metaFileContents, null, 2));
+      } catch (e) {
+        logger.error("Could not write _meta file: ", e?.message || "unknown error");
+      }
     }
   }
 
@@ -90,6 +92,7 @@ export class MetadataProcessor {
     // descriptionRef is explicitly set to empty, which means there is no external doc file for this component
     if (!!component.descriptionRef) {
       try {
+        console.log(component.descriptionRef)
         // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
         fileData = readFileContents(join(this.sourceFolder, component.descriptionRef));
       } catch (error) {

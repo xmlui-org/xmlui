@@ -6,6 +6,7 @@ const COMP = "SlideInAnimation";
 export const SlideInAnimationMd = createMetadata({
   specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that slides in the content from the left.`,
+  descriptionRef: "",
 });
 
 export const slideInAnimationRenderer = createComponentRenderer(

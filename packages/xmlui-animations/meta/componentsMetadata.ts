@@ -8,11 +8,11 @@ import { SlideInAnimationMd } from "../src/SlideInAnimation";
 export const componentMetadata = {
   name: "Animations",
   metadata: {
-    animation: AnimationMd,
-    fadeAnimation: FadeAnimationMd,
-    fadeInAnimation: FadeInAnimationMd,
-    fadeOutAnimation: FadeOutAnimationMd,
-    scaleAnimation: ScaleAnimationMd,
-    slideInAnimation: SlideInAnimationMd,
+    Animation: AnimationMd,
+    FadeAnimation: FadeAnimationMd,
+    FadeInAnimation: FadeInAnimationMd,
+    FadeOutAnimation: FadeOutAnimationMd,
+    ScaleAnimation: ScaleAnimationMd,
+    SlideInAnimation: SlideInAnimationMd,
   },
 };

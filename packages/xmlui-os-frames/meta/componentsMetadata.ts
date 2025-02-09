@@ -3,8 +3,8 @@ import { iphoneFrameMd, macAppFrameMd, windowsAppFrameMd } from "../src";
 export const componentMetadata = {
   name: "OSFrames",
   metadata: {
-    windowsAppFrame: windowsAppFrameMd,
-    macAppFrame: macAppFrameMd,
-    iphoneFrame: iphoneFrameMd,
+    WindowsAppFrame: windowsAppFrameMd,
+    MacAppFrame: macAppFrameMd,
+    IphoneFrame: iphoneFrameMd,
   },
 };

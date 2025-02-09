@@ -1,7 +1,6 @@
 import { basename, join } from "path";
 import { existsSync } from "fs";
 import { unlink, readFile, writeFile } from "fs/promises";
-import { collectedComponentMetadata } from "../../dist/xmlui-metadata.mjs";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { MetadataProcessor } from "./MetadataProcessor.mjs";
 import { processError, createTable, strBufferToLines } from "./utils.mjs";
@@ -29,7 +28,7 @@ export class DocsGenerator {
 
   expandMetadata(excludeComponentStatuses) {
     logger.info("Transforming & expanding component metadata");
-    this.metadata = Object.entries(collectedComponentMetadata)
+    this.metadata = Object.entries(this.metadata)
       .filter(([_, compData]) => {
         return !excludeComponentStatuses.includes(compData.status?.toLowerCase());
       })
@@ -56,7 +55,7 @@ export class DocsGenerator {
       });
   }
 
-  generateDocs() {
+  generateDocs(writeMetaFile) {
     logger.info("Processing MDX files");
 
     //const pagesMapFile = join(FOLDERS.pages, "pages.js");
@@ -65,7 +64,7 @@ export class DocsGenerator {
     // join(FOLDERS.pages, "components")
     // + `import ${pagesMapFileName.replace(extname(pagesMapFile), "")} from "${convertPath(relative(join(FOLDERS.pages, "components"), pagesMapFile))}";\n\n`;
     const metaProcessor = new MetadataProcessor(this.metadata, importsToInject, this.folders);
-    metaProcessor.processDocfiles();
+    metaProcessor.processDocfiles(writeMetaFile);
   }
 
   async exportMetadataToJson() {
@@ -73,7 +72,7 @@ export class DocsGenerator {
     try {
       await writeFile(
         join(FOLDERS.script, "metadata.json"),
-        JSON.stringify(collectedComponentMetadata, null, 2),
+        JSON.stringify(this.metadata, null, 2),
       );
     } catch (error) {
       processError(error);
