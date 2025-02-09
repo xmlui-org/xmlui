@@ -1,11 +1,11 @@
-import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
-import "@src/index.scss";
+import React, { useEffect, useId, useMemo, useReducer } from "react";
+// import "../index.scss";
 import {
   appDescriptionInitialized,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
-} from "@/src/state/store";
+} from "../state/store";
 import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "@/src/utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
 import { PlaygroundContent } from "@/src/components/PlaygroundContent";

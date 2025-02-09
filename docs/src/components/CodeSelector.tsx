@@ -1,10 +1,10 @@
 import React, { useMemo } from "react";
 import * as RadixSelect from "@radix-ui/react-select";
 import selectStyles from "./Select.module.scss";
-import { usePlayground } from "@/src/hooks/usePlayground";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import type { CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { contentChanged } from "@/src/state/store";
+import { usePlayground } from "../hooks/usePlayground";
+import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import type { CompoundComponentDef } from "../../../xmlui/src/abstractions/ComponentDefs";
+import { contentChanged } from "../state/store";
 import { HiChevronDown, HiChevronUp } from "react-icons/hi";
 
 export const SelectItem = React.forwardRef(

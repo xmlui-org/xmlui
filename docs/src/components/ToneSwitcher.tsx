@@ -1,6 +1,6 @@
-import { usePlayground } from "@/src/hooks/usePlayground";
-import { toneChanged } from "@/src/state/store";
-import styles from "@/src/components/Header.module.scss";
+import { usePlayground } from "../hooks/usePlayground";
+import { toneChanged } from "../state/store";
+import styles from "../components/Header.module.scss";
 import { LuMoon, LuSun } from "react-icons/lu";
 import { forwardRef } from "react";
 

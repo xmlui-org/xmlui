@@ -1,6 +1,6 @@
 import ReactDOM from "react-dom/client";
 import TestBed from "./TestBed";
-import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
+import StandaloneExtensionManager from "../../xmlui/src/components-core/StandaloneExtensionManager";
 
 const extensionManager = new StandaloneExtensionManager();
 

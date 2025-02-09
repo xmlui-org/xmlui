@@ -1,14 +1,14 @@
 import React, { useRef, useEffect, useMemo } from "react";
-import { usePlayground } from "@/src/hooks/usePlayground";
+import { usePlayground } from "../hooks/usePlayground";
 import ReactDOM, { Root } from "react-dom/client";
 import { CompoundComponentDef } from "xmlui";
-import { AppRoot } from "@components-core/rendering/AppRoot";
-import { ThemeTone } from "@components-core/theming/abstractions";
+import { AppRoot } from "../../../xmlui/src/components-core/rendering/AppRoot";
+import { ThemeTone } from "../../../xmlui/src/components-core/theming/abstractions";
 import styles from "./Preview.module.scss";
-import { errReportComponent, xmlUiMarkupToComponent } from "@src/components-core/xmlui-parser";
-import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
-import { useApiWorkerContext } from "@/src/components/ApiWorkerContext";
-import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
+import { errReportComponent, xmlUiMarkupToComponent } from "../../../xmlui/src/components-core/xmlui-parser";
+import { ApiInterceptorProvider } from "../../../xmlui/src/components-core/interception/ApiInterceptorProvider";
+import { useApiWorkerContext } from "../components/ApiWorkerContext";
+import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 
 export function Preview() {
   const rootRef = useRef<HTMLDivElement>(null);

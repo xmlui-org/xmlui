@@ -1,4 +1,4 @@
-import { usePlayground } from "@/src/hooks/usePlayground";
+import { usePlayground } from "../hooks/usePlayground";
 import { MdOutlinePalette } from "react-icons/md";
 import * as React from "react";
 import styles from "./ThemeSwitcher.module.scss";
@@ -6,7 +6,7 @@ import { useTheme } from "nextra-theme-docs";
 import classnames from "classnames";
 import * as RadixMenu from "@radix-ui/react-dropdown-menu";
 import { FiCheck } from "react-icons/fi";
-import { activeThemeChanged } from "@/src/state/store";
+import { activeThemeChanged } from "../state/store";
 import { forwardRef } from "react";
 
 export const ThemeSwitcher = forwardRef<HTMLButtonElement>((props, ref) => {

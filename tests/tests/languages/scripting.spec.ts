@@ -1,5 +1,5 @@
 import { expect, test } from "../fixtures";
-import { getFullRectangle, initApp } from "../component-test-helpers";
+import { initApp } from "../component-test-helpers";
 
 // =================================================================
 // The testes regarding overflow="scroll" are inside the stack tests
