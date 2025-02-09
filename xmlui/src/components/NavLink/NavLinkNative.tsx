@@ -3,7 +3,7 @@ import type React from "react";
 import { forwardRef, useContext, useMemo } from "react";
 import styles from "./NavLink.module.scss";
 import { NavLink as RrdNavLink } from "@remix-run/react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import type { LinkAria, LinkTarget } from "../abstractions";
 import type { To } from "react-router";
 import { getAppLayoutOrientation } from "../App/AppNative";

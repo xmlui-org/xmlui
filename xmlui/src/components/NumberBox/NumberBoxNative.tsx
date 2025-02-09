@@ -8,7 +8,7 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./NumberBox.module.scss";
 import { noop } from "../../components-core/constants";
 import { Icon } from "../Icon/IconNative";

@@ -2,7 +2,7 @@ import {type CSSProperties, forwardRef} from "react";
 import type React from "react";
 import styles from "./Icon.module.scss";
 import { useCustomSvgIconRenderer, useIconRegistry } from "../IconRegistryContext";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
 import { toCssVar } from "../../parsers/style-parser/StyleParser";
 

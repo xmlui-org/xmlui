@@ -1,6 +1,6 @@
 import type { CSSProperties, Ref } from "react";
 import { forwardRef } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 
 import styles from "./Avatar.module.scss";
 

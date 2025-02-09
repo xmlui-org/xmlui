@@ -10,7 +10,7 @@ import React, {
   useState,
 } from "react";
 import styles from "./TextArea.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import type { ValidationStatus } from "../abstractions";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";

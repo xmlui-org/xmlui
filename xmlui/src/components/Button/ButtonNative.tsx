@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import {
   type ButtonType,
   type ButtonVariant,

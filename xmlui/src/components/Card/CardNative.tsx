@@ -1,5 +1,5 @@
 import styles from "./Card.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { CSSProperties, ForwardedRef, ReactNode } from "react";
 import { forwardRef } from "react";
 import { Avatar } from "../Avatar/AvatarNative";

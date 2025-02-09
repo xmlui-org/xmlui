@@ -1,6 +1,6 @@
 import React, { forwardRef, type ReactNode, useRef } from "react";
 import styles from "./NavPanel.module.scss";
-import classnames from "../../../src/components-core/utils/classnames";
+import classnames from "classnames";
 import { Logo } from "../../../src/components/Logo/LogoNative";
 import { ScrollContext } from "../../../src/components-core/ScrollContext";
 import { useAppLayoutContext } from "../../../src/components/App/AppLayoutContext";

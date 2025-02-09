@@ -1,4 +1,4 @@
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./OffCanvas.module.scss";
 import { CSSProperties, useEffect, useState } from "react";
 

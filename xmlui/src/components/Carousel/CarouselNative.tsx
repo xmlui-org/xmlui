@@ -1,5 +1,5 @@
 import * as React from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import useEmblaCarousel, { type UseEmblaCarouselType } from "embla-carousel-react";
 import styles from "./Carousel.module.scss";
 import type { CSSProperties, ForwardedRef } from "react";

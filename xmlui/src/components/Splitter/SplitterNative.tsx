@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo } from "react";
 import styles from "./Splitter.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 import { parseSize, toPercentage } from "../Splitter/utils";
 import { OrientationOptions } from "../abstractions";

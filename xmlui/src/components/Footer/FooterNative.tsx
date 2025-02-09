@@ -1,6 +1,6 @@
 import React, { ForwardedRef, forwardRef, ReactNode } from "react";
 import styles from "./Footer.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 
 // =====================================================================================================================

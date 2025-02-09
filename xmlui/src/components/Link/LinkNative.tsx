@@ -2,7 +2,7 @@ import { Link } from "@remix-run/react";
 import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { useMemo } from "react";
 import styles from "./Link.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { Icon } from "../Icon/IconNative";
 import type { To } from "react-router";
 import type { LinkTarget } from "../abstractions";

@@ -1,5 +1,5 @@
 import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./Toggle.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";

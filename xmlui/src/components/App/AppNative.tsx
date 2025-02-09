@@ -5,7 +5,7 @@ import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
 import { AppLayoutContext } from "./AppLayoutContext";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 
 import styles from "./App.module.scss";
 import { useAppContext } from "../../components-core/AppContext";

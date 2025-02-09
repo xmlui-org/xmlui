@@ -3,7 +3,7 @@ import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import styles from "./Theme.module.scss";
 import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
 import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
 import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../components-core/theming/abstractions";
