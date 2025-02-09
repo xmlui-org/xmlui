@@ -1,12 +1,14 @@
 import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
 import classnames from "classnames";
+
 import styles from "./Toggle.module.scss";
+
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
 import type { ValidationStatus } from "../abstractions";
 import type { LabelPosition } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
-import { useEvent } from "../../components-core/utils/misc";
 
 type ToggleProps = {
   id?: string;

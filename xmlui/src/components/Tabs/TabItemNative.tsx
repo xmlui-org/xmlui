@@ -1,8 +1,10 @@
 import type { ForwardedRef} from "react";
 import { forwardRef, useEffect, useId } from "react";
-import type { Tab } from "../abstractions";
-import styles from "../Tabs/Tabs.module.scss";
 import { Content } from "@radix-ui/react-tabs";
+
+import styles from "../Tabs/Tabs.module.scss";
+
+import type { Tab } from "../abstractions";
 import { useTabContext } from "../Tabs/TabContext";
 
 export const TabItemComponent = forwardRef(function TabItemComponent(

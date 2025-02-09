@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+
 import type {
   ComponentRendererDef,
   CompoundComponentRendererInfo,
@@ -141,7 +142,6 @@ import type StandaloneExtensionManager from "../components-core/StandaloneExtens
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
 import type { ThemeDefinition } from "../abstractions/ThemingDefs";
 import type { Extension } from "../abstractions/ExtensionDefs";
-import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
 import {
   htmlAddressTagRenderer,
   htmlAreaTagRenderer,
@@ -531,7 +531,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(buttonGroupComponentRenderer);
     this.registerCoreComponent(backdropComponentRenderer);
 
-    this.registerCoreComponent(rawHtmlComponentRenderer);
     this.registerCoreComponent(htmlATagRenderer);
     this.registerCoreComponent(htmlAddressTagRenderer);
     this.registerCoreComponent(htmlAreaTagRenderer);

@@ -1,6 +1,7 @@
+import styles from "../Select/Select.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import styles from "../Select/Select.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dPlaceholder,
@@ -24,8 +25,8 @@ import {
   dValue,
   dComponent,
 } from "../metadata-helpers";
-import { Select } from "../Select/SelectNative";
 import { MemoizedItem } from "../container-helpers";
+import { Select } from "../Select/SelectNative";
 
 const COMP = "Select";
 

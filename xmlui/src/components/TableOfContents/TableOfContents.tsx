@@ -1,6 +1,7 @@
+import styles from "./TableOfContents.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import styles from "./TableOfContents.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { TableOfContents } from "./TableOfContentsNative";
 

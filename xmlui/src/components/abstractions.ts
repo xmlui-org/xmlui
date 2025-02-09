@@ -1,5 +1,5 @@
-import type { PropertyValueDescription } from "../abstractions/ComponentDefs";
 import type { CSSProperties, ReactNode } from "react";
+import type { PropertyValueDescription } from "../abstractions/ComponentDefs";
 
 /**
  * Several components offer a list of options to select from. This type describes such an option.

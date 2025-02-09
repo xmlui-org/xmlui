@@ -1,4 +1,5 @@
 import React, { useCallback, useContext, useLayoutEffect } from "react";
+
 import type { IconRegistry } from "./IconProvider";
 
 export const IconRegistryContext = React.createContext<IconRegistry | null>(null);

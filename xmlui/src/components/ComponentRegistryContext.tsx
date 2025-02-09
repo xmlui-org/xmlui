@@ -1,8 +1,9 @@
 import React, { useContext } from "react";
-import type { ComponentRegistry } from "./ComponentProvider";
+
 import type { ComponentRendererFn } from "../abstractions/RendererDefs";
 import { ComponentMetadata } from "../abstractions/ComponentDefs";
 
+import type { ComponentRegistry } from "./ComponentProvider";
 
 // A single registry entry
 export type ComponentRegistryEntry = {

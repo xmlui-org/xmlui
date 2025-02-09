@@ -1,9 +1,10 @@
-import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { memo, useMemo } from "react";
+
+import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type { ContainerWrapperDef } from "../components-core/rendering/ContainerWrapper";
+import { useShallowCompareMemoize } from "../components-core/utils/hooks";
 import { EMPTY_OBJECT } from "../components-core/constants";
 import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
-import { useShallowCompareMemoize } from "../components-core/utils/hooks";
 
 type SlotItemProps = {
   node: ComponentDef | Array<ComponentDef>;

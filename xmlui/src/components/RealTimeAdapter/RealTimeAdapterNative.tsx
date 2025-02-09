@@ -1,7 +1,8 @@
 import { useEffect } from "react";
+
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import RestApiProxy from "../../components-core/RestApiProxy";
 import { delay } from "../../components-core/utils/misc";
-import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import { useAppContext } from "../../components-core/AppContext";
 
 type Props = {

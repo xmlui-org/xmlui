@@ -1,5 +1,6 @@
-import type { Option } from "../abstractions";
 import { createContext, useContext } from "react";
+
+import type { Option } from "../abstractions";
 
 type OptionContextValue = {
   onOptionAdd: (option: Option) => void;
