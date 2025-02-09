@@ -8,10 +8,9 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
+import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type { LoaderDirections } from "../loader/PageableLoader";
-import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
-
 import { createLoaderRenderer } from "../renderers";
 import RestApiProxy from "../RestApiProxy";
 import { extractParam } from "../utils/extractParam";

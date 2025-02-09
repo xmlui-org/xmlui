@@ -1,7 +1,6 @@
 import { parseRegExpLiteral } from "@eslint-community/regexpp";
 
 import type { GenericToken } from "../common/GenericToken";
-
 import { InputStream } from "../common/InputStream";
 import { TokenType } from "./TokenType";
 

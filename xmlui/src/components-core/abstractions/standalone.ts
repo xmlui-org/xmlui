@@ -1,5 +1,5 @@
-import type { ApiInterceptorDefinition } from "../interception/abstractions";
 import type { CompoundComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
+import type { ApiInterceptorDefinition } from "../interception/abstractions";
 import type { ThemeDefinition } from "../theming/abstractions";
 
 // --- This type describes a standalone app

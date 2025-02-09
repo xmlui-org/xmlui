@@ -1,5 +1,7 @@
 import type { MutableRefObject, ReactElement, ReactNode } from "react";
 import React, { cloneElement, forwardRef, useCallback, useEffect, useMemo } from "react";
+import { isEmpty, isPlainObject } from "lodash-es";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ParentRenderContext } from "../../abstractions/ComponentDefs";
 import type {
@@ -11,9 +13,6 @@ import type {
 } from "../../abstractions/RendererDefs";
 import type { LookupAsyncFn, LookupSyncFn } from "../../abstractions/ActionDefs";
 
-import UnknownComponent from "./UnknownComponent";
-import InvalidComponent from "./InvalidComponent";
-import { isEmpty, isPlainObject } from "lodash-es";
 import { extractParam } from "../utils/extractParam";
 import { useTheme } from "../theming/ThemeContext";
 import { mergeProps } from "../utils/mergeProps";
@@ -21,7 +20,6 @@ import ComponentDecorator from "../ComponentDecorator";
 import { createValueExtractor } from "../rendering/valueExtractor";
 import { EMPTY_OBJECT } from "../constants";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 import { ApiBoundComponent } from "../ApiBoundComponent";
 import { useReferenceTrackedApi, useShallowCompareMemoize } from "../utils/hooks";
 import type { InnerRendererContext } from "../abstractions/ComponentRenderer";
@@ -31,6 +29,8 @@ import { SlotItem } from "../../components/SlotItem";
 import { layoutOptionKeys } from "../descriptorHelper";
 import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useMouseEventHandlers } from "../event-handlers";
+import UnknownComponent from "./UnknownComponent";
+import InvalidComponent from "./InvalidComponent";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
