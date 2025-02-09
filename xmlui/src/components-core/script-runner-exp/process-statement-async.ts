@@ -1,10 +1,10 @@
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { LoopScope } from "@abstractions/scripting/LoopScope";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 
-import { StatementExecutionError, ThrowStatementError } from "@components-core/EngineError";
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
-import { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
+import { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import {
   ensureMainThread,
   innermostBlockScope,
@@ -66,7 +66,7 @@ import {
   StatementRunTimeInfo,
   StatementWithInfo,
 } from "./statement-queue";
-import { reportEngineError } from "@components-core/reportEngineError";
+import { reportEngineError } from "../reportEngineError";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
-import styles from "@components/Stack/Stack.module.scss";
-import { capitalizeFirstLetter } from "@components-core/utils/misc";
+import styles from "../components/Stack/Stack.module.scss";
+import { capitalizeFirstLetter } from "./utils/misc";
 
 // This react hooks prepares CSS style values according to the CSS flex semantics to combine orientation,
 // horizontal, and vertical alignments.

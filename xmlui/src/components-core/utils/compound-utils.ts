@@ -1,5 +1,5 @@
-import { CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import { CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import { xmlUiMarkupToComponent } from "../xmlui-parser";
 
 export function compoundComponentDefFromSource(name: string, componentSource: string): CompoundComponentDef {
   const compoundComponentDef = xmlUiMarkupToComponent(componentSource).component as CompoundComponentDef;

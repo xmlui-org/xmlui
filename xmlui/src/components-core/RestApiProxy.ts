@@ -1,14 +1,14 @@
 import type { AxiosResponse } from "axios";
 import {isPlainObject, isUndefined, omitBy} from "lodash-es";
 
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { AppContextObject } from "../abstractions/AppContextDefs";
 import type { BindingTreeEvaluationContext } from "./script-runner/BindingTreeEvaluationContext";
 import type { ArrowExpressionStatement } from "../abstractions/scripting/ScriptingSourceTree";
 
-import { extractParam } from "@components-core/utils/extractParam";
-import { randomUUID } from "@components-core/utils/misc";
-import { GenericBackendError } from "@components-core/EngineError";
-import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
+import { extractParam } from "./utils/extractParam";
+import { randomUUID } from "./utils/misc";
+import { GenericBackendError } from "./EngineError";
+import { processStatementQueue } from "./script-runner/process-statement-sync";
 
 type OnProgressFn = (progressEvent: { loaded: number; total?: number; progress?: number }) => void;
 

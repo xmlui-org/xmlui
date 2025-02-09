@@ -1,13 +1,12 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { isEqual } from "lodash-es";
 
-import type { ComponentApi, ContainerState } from "@components-core/rendering/ContainerWrapper";
-import {ColorDef, getColor} from "./css-utils";
+import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
+import { ColorDef } from "./css-utils";
 
-import { shallowCompare, useEvent } from "@components-core/utils/misc";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import { getColors } from "./css-utils";
+import { shallowCompare, useEvent } from "../utils/misc";
+import { useTheme } from "../theming/ThemeContext";
+import { EMPTY_OBJECT } from "../constants";
 import Color from "color";
 
 /**
@@ -17,7 +16,7 @@ import Color from "color";
  */
 export const useResizeObserver = (
   element: React.MutableRefObject<Element | undefined | null>,
-  callback: ResizeObserverCallback
+  callback: ResizeObserverCallback,
 ) => {
   const current = element?.current;
   const observer = useRef<ResizeObserver>();
@@ -149,7 +148,7 @@ export function useOnMount(onMount: any) {
 
 /**
  * This hook memoizes the specified value. It uses a shallow comparison with the previously
- * stored value when checking for changes. So, while a shallow comparison shows equality, 
+ * stored value when checking for changes. So, while a shallow comparison shows equality,
  * it returns with the memoized value.
  * @param value Value to memoize
  */
@@ -186,7 +185,7 @@ export function useDeepCompareMemoize<T extends Record<any, any> | undefined>(va
 }
 
 export function useColors(...colorNames: (string | ColorDef)[]) {
-  const {getThemeVar} = useTheme();
+  const { getThemeVar } = useTheme();
   // const paramsRef = useRef(colorNames);
   // const { themeStyles } = useTheme();
   const colors = useMemo(() => {
@@ -202,7 +201,7 @@ export function useColors(...colorNames: (string | ColorDef)[]) {
     }
     return ret;
   }, [colorNames, getThemeVar]);
-  
+
   // useEffect(() => {
   //   setColors(getColors(...paramsRef.current));
   // }, [themeStyles]);
@@ -225,7 +224,7 @@ export function useReferenceTrackedApi(componentState: ContainerState) {
         }
       }
       return ret;
-    }, [componentState])
+    }, [componentState]),
   );
 }
 
@@ -233,4 +232,5 @@ export function useReferenceTrackedApi(componentState: ContainerState) {
  * This hook uses either useLayoutEffect or useEffect based on the environment
  * (client-side or server-side).
  */
-export const useIsomorphicLayoutEffect = typeof document !== "undefined" ? useLayoutEffect : useEffect;
+export const useIsomorphicLayoutEffect =
+  typeof document !== "undefined" ? useLayoutEffect : useEffect;

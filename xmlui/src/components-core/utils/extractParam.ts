@@ -1,12 +1,12 @@
 import React from "react";
 import { isPlainObject } from "lodash-es";
 
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 
-import { parseParameterString } from "@components-core/script-runner/ParameterParser";
-import { evalBinding } from "@components-core/script-runner/eval-tree-sync";
-import { LRUCache } from "@components-core/utils/LruCache";
+import { parseParameterString } from "../script-runner/ParameterParser";
+import { evalBinding } from "../script-runner/eval-tree-sync";
+import { LRUCache } from "../utils/LruCache";
 
 /**
  * Extract the value of the specified parameter from the given view container state

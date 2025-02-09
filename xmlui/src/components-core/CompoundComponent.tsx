@@ -2,14 +2,14 @@ import React, { forwardRef, isValidElement, useMemo } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
 
 import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { ContainerWrapperDef } from "@components-core/rendering/ContainerWrapper";
-import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
-import type { RendererContext } from "@abstractions/RendererDefs";
+import type { ContainerWrapperDef } from "./rendering/ContainerWrapper";
+import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
+import type { RendererContext } from "../abstractions/RendererDefs";
 
-import { useEvent } from "@components-core/utils/misc";
+import { useEvent } from "./utils/misc";
 import { useShallowCompareMemoize } from "./utils/hooks";
 import { isArray, isObject } from "lodash-es";
-import { EMPTY_ARRAY } from "@components-core/constants";
+import { EMPTY_ARRAY } from "./constants";
 
 type CompoundComponentProps = {
   // Definition of the `component` part of the compound component

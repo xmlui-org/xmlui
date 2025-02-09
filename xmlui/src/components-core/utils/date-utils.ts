@@ -1,5 +1,5 @@
 import { format, formatRelative, isThisWeek, isToday, isTomorrow, isYesterday } from "date-fns";
-import { humanReadableDateTimeTillNow } from "@components-core/utils/misc";
+import { humanReadableDateTimeTillNow } from "../utils/misc";
 
 export function isoDateString (date?: string) {
   return (!date ? new Date() : new Date(date)).toJSON();

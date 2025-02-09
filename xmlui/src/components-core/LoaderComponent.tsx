@@ -3,25 +3,25 @@ import { type MutableRefObject, useCallback, useEffect, useMemo } from "react";
 import type {
   ContainerDispatcher,
   MemoedVars,
-} from "@components-core/abstractions/ComponentRenderer";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+} from "./abstractions/ComponentRenderer";
+import type { RegisterComponentApiFn } from "../abstractions/RendererDefs";
 import type {
   ContainerState,
   RegisterComponentApiFnInner,
-} from "@components-core/rendering/ContainerWrapper";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+} from "./rendering/ContainerWrapper";
+import type { ComponentDef } from "../abstractions/ComponentDefs";
 import type {
   LookupAsyncFn,
   LookupAsyncFnInner,
   LookupSyncFn,
   LookupSyncFnInner,
-} from "@abstractions/ActionDefs";
+} from "../abstractions/ActionDefs";
 
-import { useComponentRegistry } from "@components/ComponentRegistryContext";
+import { useComponentRegistry } from "../components/ComponentRegistryContext";
 import { ContainerActionKind } from "./abstractions/containers";
-import { createValueExtractor } from "@components-core/rendering/valueExtractor";
-import { useReferenceTrackedApi } from "@components-core/utils/hooks";
-import { AppContextObject } from "@abstractions/AppContextDefs";
+import { createValueExtractor } from "./rendering/valueExtractor";
+import { useReferenceTrackedApi } from "./utils/hooks";
+import { AppContextObject } from "../abstractions/AppContextDefs";
 
 interface LoaderRendererContext {
   node: ComponentDef;

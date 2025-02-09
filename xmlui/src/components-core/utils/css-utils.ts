@@ -2,8 +2,8 @@ import type {CSSProperties} from "react";
 import { useEffect, useRef} from "react";
 import Color from "color";
 
-import { getVarKey } from "@components-core/theming/themeVars";
-import { EMPTY_OBJECT } from "@components-core/constants";
+import { getVarKey } from "../theming/themeVars";
+import { EMPTY_OBJECT } from "../constants";
 
 /**
  * Converts a string to its kebab-case representation

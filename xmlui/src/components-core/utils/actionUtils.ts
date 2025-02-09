@@ -1,8 +1,8 @@
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
 
-import { DataLoaderQueryKeyGenerator } from "@components-core/utils/DataLoaderQueryKeyGenerator";
-import { extractParam } from "@components-core/utils/extractParam";
+import { DataLoaderQueryKeyGenerator } from "../utils/DataLoaderQueryKeyGenerator";
+import { extractParam } from "../utils/extractParam";
 
 export async function invalidateQueries(
   invalidates: undefined | string | string[],

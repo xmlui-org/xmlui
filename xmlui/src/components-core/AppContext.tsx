@@ -1,6 +1,6 @@
 import { createContext, useContext } from "react";
 
-import type { AppContextObject } from "@abstractions/AppContextDefs";
+import type { AppContextObject } from "../abstractions/AppContextDefs";
 
 /**
  * Stores the object that holds the global functions and methods of xmlui.
