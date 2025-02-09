@@ -1,5 +1,6 @@
-import styles from "./InputLabel.module.scss";
 import classnames from "classnames";
+
+import styles from "./InputLabel.module.scss";
 
 // =====================================================================================================================
 // React component definition

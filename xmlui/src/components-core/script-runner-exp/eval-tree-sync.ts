@@ -1,4 +1,3 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import {
   T_ARRAY_LITERAL,
@@ -41,7 +40,8 @@ import {
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-
+import { Parser } from "../../parsers/scripting-exp/Parser";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import { isBannedFunction } from "./bannedFunctions";
 import {
   evalArrow,
@@ -58,7 +58,6 @@ import {
   isPromise,
   setExprValue,
 } from "./eval-tree-common";
-import { Parser } from "../../parsers/scripting-exp/Parser";
 import { ensureMainThread } from "./process-statement-common";
 import { processDeclarations, processStatementQueue } from "./process-statement-sync";
 

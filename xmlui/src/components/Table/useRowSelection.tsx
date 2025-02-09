@@ -1,9 +1,10 @@
 import { KeyboardEventHandler, useCallback, useEffect, useMemo, useState } from "react";
-import { useEvent } from "../../components-core/utils/misc";
 import { union, uniq } from "lodash-es";
+
+import { useEvent } from "../../components-core/utils/misc";
 import { EMPTY_ARRAY } from "../../components-core/constants";
-import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
 import { usePrevious } from "../../components-core/utils/hooks";
+import { useSelectionContext } from "../SelectionStore/SelectionStoreNative";
 
 /**
  * An interval of selected items

@@ -1,6 +1,8 @@
+import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
+import classnames from "classnames";
+
 import styles from "./Button.module.scss";
 
-import classnames from "classnames";
 import {
   type ButtonType,
   type ButtonVariant,
@@ -12,7 +14,6 @@ import {
   type ButtonAria,
   defaultButtonType,
 } from "../abstractions";
-import React, { type CSSProperties, useRef, useImperativeHandle, useEffect } from "react";
 
 type Props = {
   id?: string;

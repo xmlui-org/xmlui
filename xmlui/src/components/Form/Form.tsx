@@ -1,10 +1,11 @@
 import styles from "./Form.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { FormWithContextVar } from "./FormNative";
 import { dComponent, dInternal } from "../metadata-helpers";
 import { labelPositionMd } from "../abstractions";
+import { FormWithContextVar } from "./FormNative";
 
 const COMP = "Form";
 
@@ -33,7 +34,9 @@ export const FormMd = createMetadata({
         `lines if it would overflow the available label width. Individual \`FormItem\` ` +
         `instances can override this property.`,
     ),
-    keepModalOpenOnSubmit: d("This property prevents the modal from closing when the form is submitted."),
+    keepModalOpenOnSubmit: d(
+      "This property prevents the modal from closing when the form is submitted.",
+    ),
     data: d(
       `This property sets the initial value of the form's data structure. The form infrastructure ` +
         `uses this value to set the initial state of form items within the form.`,

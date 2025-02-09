@@ -1,24 +1,6 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import { evalBinding, executeArrowExpressionSync } from "./eval-tree-sync";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
-import {
-  innermostBlockScope,
-  innermostLoopScope,
-  createLoopScope,
-  provideLoopBody,
-  releaseLoopScope,
-  ensureMainThread,
-  innermostTryScope,
-  provideTryBody,
-  createTryScope,
-  provideCatchBody,
-  provideFinallyBody,
-  provideFinallyErrorBody,
-  hoistFunctionDeclarations,
-  toStatementItems,
-  closing,
-  guard,
-} from "./process-statement-common";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   T_ASSIGNMENT_EXPRESSION,
@@ -52,6 +34,28 @@ import {
   type Statement,
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { reportEngineError } from "../reportEngineError";
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
+import {
+  innermostBlockScope,
+  innermostLoopScope,
+  createLoopScope,
+  provideLoopBody,
+  releaseLoopScope,
+  ensureMainThread,
+  innermostTryScope,
+  provideTryBody,
+  createTryScope,
+  provideCatchBody,
+  provideFinallyBody,
+  provideFinallyErrorBody,
+  hoistFunctionDeclarations,
+  toStatementItems,
+  closing,
+  guard,
+} from "./process-statement-common";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { evalBinding, executeArrowExpressionSync } from "./eval-tree-sync";
 import type {
   StatementRunTimeInfo,
   StatementWithInfo,
@@ -60,10 +64,6 @@ import type {
   ProcessOutcome,
 } from "./statement-queue";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
-import type { LoopScope } from "../../abstractions/scripting/LoopScope";
-import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import { reportEngineError } from "../reportEngineError";
-import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 
 const SYNC_EVAL_TIMEOUT = 1000;
 

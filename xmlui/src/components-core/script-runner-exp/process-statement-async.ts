@@ -1,28 +1,6 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-
-import { StatementExecutionError, ThrowStatementError } from "../EngineError";
-import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
 import { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
-import {
-  ensureMainThread,
-  innermostBlockScope,
-  innermostLoopScope,
-  createLoopScope,
-  provideLoopBody,
-  releaseLoopScope,
-  provideTryBody,
-  createTryScope,
-  innermostTryScope,
-  provideFinallyBody,
-  provideCatchBody,
-  provideFinallyErrorBody,
-  hoistFunctionDeclarations,
-  closing,
-  toStatementItems,
-  guard,
-} from "./process-statement-common";
 import {
   T_ARROW_EXPRESSION_STATEMENT,
   T_ASSIGNMENT_EXPRESSION,
@@ -56,6 +34,8 @@ import {
   type Statement,
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
+import { reportEngineError } from "../reportEngineError";
 import {
   QueueInfo,
   StatementQueue,
@@ -66,7 +46,26 @@ import {
   StatementRunTimeInfo,
   StatementWithInfo,
 } from "./statement-queue";
-import { reportEngineError } from "../reportEngineError";
+import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import {
+  ensureMainThread,
+  innermostBlockScope,
+  innermostLoopScope,
+  createLoopScope,
+  provideLoopBody,
+  releaseLoopScope,
+  provideTryBody,
+  createTryScope,
+  innermostTryScope,
+  provideFinallyBody,
+  provideCatchBody,
+  provideFinallyErrorBody,
+  hoistFunctionDeclarations,
+  closing,
+  toStatementItems,
+  guard,
+} from "./process-statement-common";
 
 // --- Helper function to process the entire queue asynchronously
 export async function processStatementQueueAsync(

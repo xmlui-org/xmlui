@@ -7,12 +7,11 @@ import type {
   Statement,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-
-import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 import { getIdentifierScope } from "./eval-tree-common";
 import { Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import { ensureMainThread, innermostBlockScope } from "./process-statement-common";
 
 /**
  * Collects the name of local context variables the specified program depends on

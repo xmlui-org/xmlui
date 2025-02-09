@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { GlobalProps, queryClient } from "./AppRoot";
-import { ContainerWrapperDef } from "./ContainerWrapper";
-import { useDebugView } from "../DebugViewProvider";
+import { get } from "lodash-es";
+import toast from "react-hot-toast";
+import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
+
+import { version } from "../../../package.json";
+
+import { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
 import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
@@ -15,21 +19,19 @@ import {
 } from "../utils/hooks";
 import { ThemeToneKeys } from "../theming/abstractions";
 import { getVarKey } from "../theming/themeVars";
-import { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
 import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
 import { EMPTY_OBJECT, noop } from "../constants";
 import { AppStateContext, IAppStateContext } from "../../components/App/AppStateContext";
 import { MemoedVars } from "../abstractions/ComponentRenderer";
-import { renderChild } from "./renderChild";
-import { AppContext } from "../AppContext";
 import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
-import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
+import { useDebugView } from "../DebugViewProvider";
 import { miscellaneousUtils } from "../appContext/misc-utils";
-import { get } from "lodash-es";
-import toast from "react-hot-toast";
-import { version } from "../../../package.json";
 import { dateFunctions } from "../appContext/date-functions";
 import { mathFunctions } from "../appContext/math-function";
+import { AppContext } from "../AppContext";
+import { renderChild } from "./renderChild";
+import { GlobalProps, queryClient } from "./AppRoot";
+import { ContainerWrapperDef } from "./ContainerWrapper";
 
 // --- The properties of the AppContent component
 type AppContentProps = {

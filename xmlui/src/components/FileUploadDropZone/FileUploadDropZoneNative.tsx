@@ -1,11 +1,12 @@
-import {CSSProperties, ForwardedRef, forwardRef, ReactNode} from "react";
-import { useCallback, useEffect } from "react";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode, useCallback, useEffect } from "react";
 import * as dropzone from "react-dropzone";
-import { Icon } from "../Icon/IconNative";
+
 import styles from "./FileUploadDropZone.module.scss";
-import { useEvent } from "../../components-core/utils/misc";
+
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
 import { asyncNoop } from "../../components-core/constants";
+import { Icon } from "../Icon/IconNative";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;
@@ -24,16 +25,19 @@ type Props = {
   disabled?: boolean;
 };
 
-export const FileUploadDropZone = forwardRef(function FileUploadDropZone({
-  children,
-  onUpload = asyncNoop,
-  uid = "fileUploadDialog",
-  registerComponentApi,
-  style,
-  allowPaste = true,
-  text = "Drop files here",
-  disabled = false,
-}: Props, forwardedRef: ForwardedRef<HTMLDivElement>) {
+export const FileUploadDropZone = forwardRef(function FileUploadDropZone(
+  {
+    children,
+    onUpload = asyncNoop,
+    uid = "fileUploadDialog",
+    registerComponentApi,
+    style,
+    allowPaste = true,
+    text = "Drop files here",
+    disabled = false,
+  }: Props,
+  forwardedRef: ForwardedRef<HTMLDivElement>,
+) {
   const onDrop = useCallback(
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles.length) {
@@ -97,7 +101,13 @@ export const FileUploadDropZone = forwardRef(function FileUploadDropZone({
   }, [doOpen, registerComponentApi, uid]);
 
   return (
-    <div {...getRootProps()} style={style} className={styles.wrapper} onPaste={handleOnPaste} ref={forwardedRef}>
+    <div
+      {...getRootProps()}
+      style={style}
+      className={styles.wrapper}
+      onPaste={handleOnPaste}
+      ref={forwardedRef}
+    >
       <input {...getInputProps()} />
       {children}
       {isDragActive && (

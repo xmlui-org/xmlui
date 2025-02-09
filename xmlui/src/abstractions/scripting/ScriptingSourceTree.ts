@@ -1,7 +1,6 @@
 import type { ScriptParserErrorMessage } from "./ScriptParserError";
-
-import { BlockScope } from "./BlockScope";
-import { Token } from "./Token";
+import type { BlockScope } from "./BlockScope";
+import type { Token } from "./Token";
 
 // All binding expression tree node types
 type Node = Statement | Expression | SwitchCase;

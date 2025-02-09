@@ -1,6 +1,5 @@
 import { get } from "lodash-es";
 
-import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
 import {
   T_ARRAY_LITERAL,
   T_ARROW_EXPRESSION,
@@ -47,6 +46,7 @@ import {
   type Statement,
   type VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { ResolutionScope } from "../../parsers/scripting-exp/ResolutionScope";
 
 /**
  * Resolves identifier

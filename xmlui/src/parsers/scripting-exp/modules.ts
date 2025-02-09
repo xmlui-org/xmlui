@@ -1,4 +1,3 @@
-import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import {
   T_FUNCTION_DECLARATION,
   T_IMPORT_DECLARATION,
@@ -6,11 +5,11 @@ import {
   type FunctionDeclaration,
   type Statement,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-
+import { ModuleResolver } from "../../abstractions/scripting/modules";
+import type { ErrorCodes, ParserErrorMessage } from "./ParserError";
 import { Parser } from "./Parser";
 import { errorMessages } from "./ParserError";
 import { TokenType } from "./TokenType";
-import { ModuleResolver } from "../../abstractions/scripting/modules";
 
 /**
  * Represents a parsed and resolved module

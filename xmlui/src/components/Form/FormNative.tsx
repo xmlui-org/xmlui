@@ -8,19 +8,22 @@ import {
   useRef,
 } from "react";
 import { forwardRef, useEffect, useMemo, useReducer, useState } from "react";
-import styles from "./Form.module.scss";
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
-import type { ContainerAction } from "../../components-core/abstractions/containers";
+import { flushSync } from "react-dom";
 import produce from "immer";
-import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
-import { FormContext } from "./FormContext";
-import { Button } from "../Button/ButtonNative";
+
+import styles from "./Form.module.scss";
+
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type {
+  LookupEventHandlerFn,
+  RegisterComponentApiFn,
+  ValueExtractor,
+} from "../../abstractions/RendererDefs";
+import type { ContainerAction } from "../../components-core/abstractions/containers";
 import { EMPTY_OBJECT } from "../../components-core/constants";
 import type { GenericBackendError } from "../../components-core/EngineError";
-import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
 import { useEvent } from "../../components-core/utils/misc";
-import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
-import { type FormAction, formReset } from "../Form/formActions";
 import {
   backendValidationArrived,
   FormActionKind,
@@ -31,15 +34,14 @@ import {
 import { ModalDialog } from "../../components/ModalDialog/ModalDialogNative";
 import { Text } from "../../components/Text/TextNative";
 import { Stack } from "../../components/Stack/StackNative";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import type {
-  LookupEventHandlerFn,
-  RegisterComponentApiFn,
-  ValueExtractor,
-} from "../../abstractions/RendererDefs";
-import type { FormMd } from "./Form";
 import { useModalFormClose } from "../../components/ModalDialog/ModalVisibilityContext";
-import { flushSync } from "react-dom";
+import { Button } from "../Button/ButtonNative";
+import { ValidationSummary } from "../ValidationSummary/ValidationSummary";
+import { groupInvalidValidationResultsBySeverity } from "../FormItem/Validations";
+import { type FormAction, formReset } from "../Form/formActions";
+import type { FormMd } from "./Form";
+import type { InteractionFlags, SingleValidationResult, ValidationResult } from "./FormContext";
+import { FormContext } from "./FormContext";
 
 const setByPath = (obj: any, path: string, val: any) => {
   const keys = path.split(".");

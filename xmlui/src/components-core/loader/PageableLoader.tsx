@@ -2,8 +2,10 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from "react"
 import type { InfiniteData } from "@tanstack/react-query";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import produce, { createDraft, finishDraft } from "immer";
+import type { QueryFunction } from "@tanstack/query-core/src/types";
 
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { ContainerState } from "../rendering/ContainerWrapper";
 import type {
   LoaderErrorFn,
@@ -11,12 +13,9 @@ import type {
   LoaderLoadedFn,
   TransformResultFn,
 } from "../abstractions/LoaderRenderer";
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
-
 import { extractParam } from "../utils/extractParam";
 import { useAppContext } from "../AppContext";
 import { usePrevious } from "../utils/hooks";
-import type {QueryFunction} from "@tanstack/query-core/src/types";
 
 export type LoaderDirections = "FORWARD" | "BACKWARD" | "BIDIRECTIONAL";
 
@@ -56,42 +55,42 @@ export function PageableLoader({
   const thizRef = useRef(queryKey);
 
   const getPreviousPageParam = useCallback(
-      (firstPage: any) => {
-        let prevPageParam = undefined;
-        const prevPageSelector = loader.props.prevPageSelector;
-        if (prevPageSelector) {
-          prevPageParam = extractParam(
-              { $response: firstPage },
-              prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
-          );
-        }
-        if (!prevPageParam) {
-          return undefined;
-        }
-        return {
-          prevPageParam: prevPageParam,
-        };
-      },
-      [loader.props.prevPageSelector],
+    (firstPage: any) => {
+      let prevPageParam = undefined;
+      const prevPageSelector = loader.props.prevPageSelector;
+      if (prevPageSelector) {
+        prevPageParam = extractParam(
+          { $response: firstPage },
+          prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
+        );
+      }
+      if (!prevPageParam) {
+        return undefined;
+      }
+      return {
+        prevPageParam: prevPageParam,
+      };
+    },
+    [loader.props.prevPageSelector],
   );
   const getNextPageParam = useCallback(
-      (lastPage: any) => {
-        let nextPageParam = undefined;
-        const nextPageSelector = loader.props.nextPageSelector;
-        if (nextPageSelector) {
-          nextPageParam = extractParam(
-              { $response: lastPage },
-              nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`,
-          );
-        }
-        if (!nextPageParam) {
-          return undefined;
-        }
-        return {
-          nextPageParam: nextPageParam,
-        };
-      },
-      [loader.props.nextPageSelector],
+    (lastPage: any) => {
+      let nextPageParam = undefined;
+      const nextPageSelector = loader.props.nextPageSelector;
+      if (nextPageSelector) {
+        nextPageParam = extractParam(
+          { $response: lastPage },
+          nextPageSelector.startsWith("{") ? nextPageSelector : `{$response.${nextPageSelector}}`,
+        );
+      }
+      if (!nextPageParam) {
+        return undefined;
+      }
+      return {
+        nextPageParam: nextPageParam,
+      };
+    },
+    [loader.props.nextPageSelector],
   );
   const {
     data,
@@ -107,9 +106,12 @@ export function PageableLoader({
     fetchNextPage,
   } = useInfiniteQuery({
     queryKey,
-    queryFn: useCallback<QueryFunction>(async ({ signal, pageParam }) => {
-      return await loaderFn(signal, pageParam);
-    }, [loaderFn]),
+    queryFn: useCallback<QueryFunction>(
+      async ({ signal, pageParam }) => {
+        return await loaderFn(signal, pageParam);
+      },
+      [loaderFn],
+    ),
     select: useCallback(
       (data: any) => {
         let result = [];
@@ -127,7 +129,8 @@ export function PageableLoader({
       },
       [loader.props.resultSelector, transformResult],
     ),
-    getPreviousPageParam: loader.props.prevPageSelector === undefined ? undefined : getPreviousPageParam,
+    getPreviousPageParam:
+      loader.props.prevPageSelector === undefined ? undefined : getPreviousPageParam,
     getNextPageParam: loader.props.nextPageSelector === undefined ? undefined : getNextPageParam,
   });
 
@@ -183,7 +186,7 @@ export function PageableLoader({
       //we do this to push the onLoaded callback to the next event loop.
       // It works, because useLayoutEffect will run synchronously after the render, and the onLoaded callback will have
       // access to the latest loader value
-      setTimeout(()=>{
+      setTimeout(() => {
         onLoaded?.(data);
       }, 0);
     } else if (status === "error" && prevError !== error) {

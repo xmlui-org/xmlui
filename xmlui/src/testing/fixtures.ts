@@ -1,9 +1,9 @@
-import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { expect as baseExpect, test as baseTest } from "@playwright/test";
-import { initComponent } from "./component-test-helpers";
+import type { Page } from "playwright-core";
+
+import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
 import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
-import type { Page } from "playwright-core";
 import {
   type ComponentDriver,
   type ComponentDriverParams,
@@ -30,6 +30,7 @@ import {
   TextDriver,
   VStackDriver,
 } from "./ComponentDrivers";
+import { initComponent } from "./component-test-helpers";
 
 // -----------------------------------------------------------------
 // --- Utility

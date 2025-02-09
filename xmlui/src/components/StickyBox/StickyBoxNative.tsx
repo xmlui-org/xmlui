@@ -1,6 +1,7 @@
 import { CSSProperties, ReactNode } from "react";
-import styles from "./StickyBox.module.scss";
 import classnames from "classnames";
+
+import styles from "./StickyBox.module.scss";
 
 // =====================================================================================================================
 // React StickyBox component implementation

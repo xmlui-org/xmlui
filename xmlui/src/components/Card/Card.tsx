@@ -1,10 +1,11 @@
 import styles from "./Card.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Card, DEFAULT_ORIENTATION } from "./CardNative";
 import { dClick } from "../metadata-helpers";
 import { orientationOptionMd } from "../abstractions";
+import { Card, DEFAULT_ORIENTATION } from "./CardNative";
 
 const COMP = "Card";
 

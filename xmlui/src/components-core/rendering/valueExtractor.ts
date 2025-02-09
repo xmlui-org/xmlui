@@ -2,11 +2,10 @@ import type { MutableRefObject } from "react";
 import memoizeOne from "memoize-one";
 import { isPlainObject, isString } from "lodash-es";
 
-import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
 import type { AppContextObject } from "../../abstractions/AppContextDefs";
 import type { MemoedVars } from "../abstractions/ComponentRenderer";
-
 import { parseParameterString } from "../script-runner/ParameterParser";
+import type { ComponentApi, ContainerState } from "../rendering/ContainerWrapper";
 import { isPrimitive, pickFromObject, shallowCompare } from "../utils/misc";
 import { collectVariableDependencies } from "../script-runner/visitors";
 import { extractParam } from "../utils/extractParam";

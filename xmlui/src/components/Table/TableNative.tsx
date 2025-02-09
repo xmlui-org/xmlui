@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import { FiChevronLeft, FiChevronRight, FiChevronsLeft, FiChevronsRight } from "react-icons/fi";
 import type {
   CellContext,
@@ -24,31 +25,32 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import styles from "./Table.module.scss";
-import "./react-table-config.d.ts";
-import { Button } from "../Button/ButtonNative";
-import { Spinner } from "../Spinner/SpinnerNative";
-import classnames from "classnames";
-import useRowSelection from "./useRowSelection";
-import { Toggle } from "../Toggle/Toggle";
-import { Icon } from "../Icon/IconNative";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import { observeElementOffset, useVirtualizer, type Virtualizer } from "@tanstack/react-virtual";
 import { orderBy } from "lodash-es";
+import classnames from "classnames";
+
+import styles from "./Table.module.scss";
+
+import "./react-table-config.d.ts";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type { AsyncFunction } from "../../abstractions/FunctionDefs";
 import { EMPTY_ARRAY } from "../../components-core/constants";
 import { ScrollContext } from "../../components-core/ScrollContext";
-import { type OurColumnMetadata } from "../Column/TableContext";
 import { useEvent } from "../../components-core/utils/misc";
-import { flushSync } from "react-dom";
 import {
   useIsomorphicLayoutEffect,
   usePrevious,
   useResizeObserver,
-} from "../../../src/components-core/utils/hooks";
-import { composeRefs } from "@radix-ui/react-compose-refs";
-import { useTheme } from "../../../src/components-core/theming/ThemeContext";
-import { isThemeVarName } from "../../../src/components-core/theming/transformThemeVars";
-import type { RegisterComponentApiFn } from "../../../src/abstractions/RendererDefs";
+} from "../../components-core/utils/hooks";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { isThemeVarName } from "../../components-core/theming/transformThemeVars";
+import { Button } from "../Button/ButtonNative";
+import { Spinner } from "../Spinner/SpinnerNative";
+import { Toggle } from "../Toggle/Toggle";
+import { Icon } from "../Icon/IconNative";
+import { type OurColumnMetadata } from "../Column/TableContext";
+import useRowSelection from "./useRowSelection";
 
 // =====================================================================================================================
 // Helper types

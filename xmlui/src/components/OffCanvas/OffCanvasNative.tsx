@@ -1,6 +1,7 @@
-import classnames from "classnames";
-import styles from "./OffCanvas.module.scss";
 import { CSSProperties, useEffect, useState } from "react";
+import classnames from "classnames";
+
+import styles from "./OffCanvas.module.scss";
 
 type OffCanvasPlacement = "top" | "bottom" | "left" | "right";
 

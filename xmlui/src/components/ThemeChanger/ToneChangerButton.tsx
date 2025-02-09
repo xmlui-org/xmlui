@@ -1,7 +1,7 @@
 import { createMetadata } from "../../abstractions/ComponentDefs";
-import { Button } from "../Button/ButtonNative";
 import { useThemes } from "../../components-core/theming/ThemeContext";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { Button } from "../Button/ButtonNative";
 import { Icon } from "../Icon/IconNative";
 
 const COMP = "ToneChangerButton";

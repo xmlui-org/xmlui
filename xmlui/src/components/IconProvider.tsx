@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type React from "react";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { IconRegistryContext } from "./IconRegistryContext";
 import {
   FiAlertOctagon,
   FiCheckCircle,
@@ -49,6 +48,8 @@ import { RxExit, RxLightningBolt, RxOpenInNewWindow } from "react-icons/rx";
 import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { TfiReload } from "react-icons/tfi";
 import { HiOutlineCog, HiOutlineDuplicate } from "react-icons/hi";
+
+import { IconRegistryContext } from "./IconRegistryContext";
 import type { IconBaseProps } from "./Icon/IconNative";
 import { ApiIcon } from "./Icon/ApiIcon";
 import { AttachmentIcon } from "./Icon/Attach";

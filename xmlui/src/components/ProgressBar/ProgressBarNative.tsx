@@ -1,5 +1,6 @@
-import styles from "./ProgressBar.module.scss";
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
+
+import styles from "./ProgressBar.module.scss";
 
 interface Props {
   value: number;

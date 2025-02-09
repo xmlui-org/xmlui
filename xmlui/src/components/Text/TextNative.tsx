@@ -1,11 +1,12 @@
 import type { CSSProperties } from "react";
-import { forwardRef } from "react";
 import type React from "react";
-import { useMemo, useRef } from "react";
-import styles from "./Text.module.scss";
-import classnames from "classnames";
-import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
+import { forwardRef, useMemo, useRef } from "react";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import classnames from "classnames";
+
+import styles from "./Text.module.scss";
+
+import { getMaxLinesStyle } from "../../components-core/utils/css-utils";
 import { type TextVariant, TextVariantElement } from "../abstractions";
 
 type TextProps = {

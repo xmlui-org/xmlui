@@ -1,8 +1,8 @@
-import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./NumberBox.module.scss";
-import { parseScssVar } from "../../components-core/theming/themeVars";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
-import { NumberBox } from "./NumberBoxNative";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
   dDidChange,
@@ -27,6 +27,7 @@ import {
   dValidationStatus,
   dValue,
 } from "../metadata-helpers";
+import { NumberBox } from "./NumberBoxNative";
 
 const COMP = "NumberBox";
 

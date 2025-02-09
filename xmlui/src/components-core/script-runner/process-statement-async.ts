@@ -1,22 +1,20 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type {
   ArrayDestructure,
   AssignmentExpression,
-  ConstStatement,
   EmptyStatement,
   ExpressionStatement,
   Identifier,
-  LetStatement,
   Literal,
   ObjectDestructure,
   Statement,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { QueueInfo, StatementQueueItem, ProcessOutcome } from "./statement-queue";
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
+import { reportEngineError } from "../reportEngineError";
+import type { QueueInfo, StatementQueueItem, ProcessOutcome } from "./statement-queue";
 import { evalBindingAsync, executeArrowExpression } from "./eval-tree-async";
 import {
   ensureMainThread,
@@ -34,8 +32,7 @@ import {
   hoistFunctionDeclarations,
 } from "./process-statement-common";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
-import { StatementExecutionError, ThrowStatementError } from "../EngineError";
-import { reportEngineError } from "../reportEngineError";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 
 export type OnStatementCompletedCallback =
   | ((evalContext: BindingTreeEvaluationContext, completedStatement: Statement) => Promise<void>)

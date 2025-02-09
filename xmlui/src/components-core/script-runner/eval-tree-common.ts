@@ -1,5 +1,3 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { ICustomOperations } from "./ICustomOperations";
 import type {
   ArrowExpression,
   AssignmentExpression,
@@ -13,13 +11,14 @@ import type {
   PrefixOpExpression,
   UnaryExpression,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-
+import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
+import { obtainClosures } from "../../parsers/scripting/modules";
 import { customOperationsRegistry } from "./custom-operations-registry";
 import { isCustomUiData } from "./custom-ui-data";
 import { isConstVar } from "./eval-tree-async";
 import { CustomOperationType } from "./ICustomOperations";
-import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import { obtainClosures } from "../../parsers/scripting/modules";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import type { ICustomOperations } from "./ICustomOperations";
 
 // --- Type guard to check for a Promise
 export function isPromise(obj: any): obj is Promise<any> {

@@ -1,8 +1,8 @@
 import React from "react";
 
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
-
 import styles from "./InvalidComponent.module.scss";
+
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import { EMPTY_ARRAY } from "../constants";
 
 // --- Represents the properties of InvalidComponent

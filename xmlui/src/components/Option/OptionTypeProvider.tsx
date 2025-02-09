@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode } from "react";
 import React from "react";
+
 import type { Option } from "../abstractions";
 
 const OptionTypeContext = React.createContext<ComponentType<Option>>(null);

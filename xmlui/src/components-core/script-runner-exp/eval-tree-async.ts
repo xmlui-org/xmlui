@@ -45,7 +45,6 @@ import {
 import type{ BlockScope } from "../../abstractions/scripting/BlockScope";
 import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
 import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-
 import {
   processDeclarationsAsync,
   processStatementQueueAsync,

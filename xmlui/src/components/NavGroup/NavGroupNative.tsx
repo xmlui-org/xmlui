@@ -19,17 +19,19 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
+import classnames from "classnames";
+
 import styles from "./NavGroup.module.scss";
-import { Icon } from "../Icon/IconNative";
+
 import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { ComponentDef } from "../../abstractions/ComponentDefs";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import { mergeProps } from "../../components-core/utils/mergeProps";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { Icon } from "../Icon/IconNative";
 import { NavLink } from "../NavLink/NavLinkNative";
 import { useAppLayoutContext } from "../App/AppLayoutContext";
 import { NavPanelContext } from "../NavPanel/NavPanelNative";
-import { EMPTY_OBJECT } from "../../components-core/constants";
-import classnames from "classnames";
-import { mergeProps } from "../../components-core/utils/mergeProps";
-import { useTheme } from "../../components-core/theming/ThemeContext";
-import { ComponentDef } from "../../abstractions/ComponentDefs";
 import { NavGroupMd } from "./NavGroup";
 
 type NavGroupComponentDef = ComponentDef<typeof NavGroupMd>;

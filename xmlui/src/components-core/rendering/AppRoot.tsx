@@ -6,8 +6,8 @@ import type { ComponentDef, ComponentLike } from "../../abstractions/ComponentDe
 import { resetErrors } from "../reportEngineError";
 import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
-import { AppWrapper, AppWrapperProps } from "./AppWrapper";
 import StandaloneExtensionManager from "../StandaloneExtensionManager";
+import { AppWrapper, AppWrapperProps } from "./AppWrapper";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();

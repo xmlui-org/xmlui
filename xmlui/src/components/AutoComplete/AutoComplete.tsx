@@ -1,8 +1,9 @@
+import styles from "../../components/AutoComplete/AutoComplete.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import styles from "../../components/AutoComplete/AutoComplete.module.scss";
-import { MemoizedItem } from "../../components/container-helpers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { MemoizedItem } from "../../components/container-helpers";
 import {
   dPlaceholder,
   dInitialValue,

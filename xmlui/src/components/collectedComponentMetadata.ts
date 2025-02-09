@@ -88,7 +88,6 @@ import { ToneChangerButtonMd } from "./ThemeChanger/ToneChangerButton";
 import { OptionMd } from "./Option/Option";
 import { AutoCompleteMd } from "./AutoComplete/AutoComplete";
 import { BackdropMd } from "./Backdrop/Backdrop";
-import { RawHtmlMd } from "./RawHtml/RawHtml";
 import {
   HtmlAddressMd,
   HtmlAMd,
@@ -364,7 +363,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ProgressBar: ProgressBarMd,
   Queue: QueueMd,
   RadioGroup: RadioGroupMd,
-  RawHtml: RawHtmlMd,
   RealTimeAdapter: RealTimeAdapterMd,
   Redirect: RedirectMd,
   Select: SelectMd,

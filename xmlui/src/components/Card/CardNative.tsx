@@ -1,7 +1,8 @@
-import styles from "./Card.module.scss";
+import { CSSProperties, ForwardedRef, ReactNode, forwardRef } from "react";
 import classnames from "classnames";
-import { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef } from "react";
+
+import styles from "./Card.module.scss";
+
 import { Avatar } from "../Avatar/AvatarNative";
 import { LocalLink } from "../Link/LinkNative";
 import type { HeadingProps } from "../Heading/HeadingNative";

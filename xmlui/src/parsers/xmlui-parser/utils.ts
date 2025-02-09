@@ -1,5 +1,4 @@
 import type { Node } from "./syntax-node";
-
 import { GetText } from "./parser";
 import { SyntaxKind, getSyntaxKindStrRepr, isInnerNode } from "./syntax-kind";
 

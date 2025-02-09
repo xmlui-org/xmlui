@@ -1,8 +1,8 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
+import ReactMarkdown from "react-markdown";
 
 import styles from "./Markdown.module.scss";
 
-import ReactMarkdown from "react-markdown";
 import { Heading } from "../Heading/HeadingNative";
 import { Text } from "../Text/TextNative";
 import { LocalLink } from "../Link/LinkNative";

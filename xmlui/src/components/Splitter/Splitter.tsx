@@ -1,19 +1,21 @@
-import { createComponentRenderer } from "../../components-core/renderers";
 import type React from "react";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
-import { isComponentDefChildren } from "../../components-core/utils/misc";
-import { NotAComponentDefError } from "../../components-core/EngineError";
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+
 import styles from "./Splitter.module.scss";
-import { parseScssVar } from "../../components-core/theming/themeVars";
+
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type {
   NonCssLayoutProps,
   ValueExtractor,
   LookupEventHandlerFn,
 } from "../../abstractions/RendererDefs";
-import { Splitter } from "./SplitterNative";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { isComponentDefChildren } from "../../components-core/utils/misc";
+import { NotAComponentDefError } from "../../components-core/EngineError";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import type { OrientationOptions } from "../abstractions";
 import { dComponent } from "../metadata-helpers";
+import { Splitter } from "./SplitterNative";
 
 const COMP = "Splitter";
 

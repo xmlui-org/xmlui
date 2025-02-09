@@ -5,14 +5,13 @@ import type {
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
 } from "../abstractions/LoaderRenderer";
-import type { ContainerState } from "../rendering/ContainerWrapper";
 import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
-
-import { Loader } from "./Loader";
+import type { ContainerState } from "../rendering/ContainerWrapper";
 import { asyncWait } from "../utils/misc";
 import { extractParam } from "../utils/extractParam";
 import { createLoaderRenderer } from "../renderers";
 import { useAppContext } from "../AppContext";
+import { Loader } from "./Loader";
 
 type MockLoaderProps = {
   loader: MockLoaderDef;

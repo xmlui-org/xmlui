@@ -1,6 +1,7 @@
 import styles from "./ProfileMenu.module.scss";
-import { Avatar } from "../Avatar/AvatarNative";
+
 import { useThemes } from "../../components-core/theming/ThemeContext";
+import { Avatar } from "../Avatar/AvatarNative";
 import { DropdownMenu, MenuItem, MenuSeparator } from "../DropdownMenu/DropdownMenuNative";
 
 // =====================================================================================================================

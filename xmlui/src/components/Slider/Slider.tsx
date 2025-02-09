@@ -1,10 +1,8 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
-
 import styles from "./Slider.module.scss";
 
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Slider } from "./SliderNative";
 import {
   dDidChange,
   dFocus,
@@ -13,6 +11,7 @@ import {
   dSetValueApi,
   dValue,
 } from "../metadata-helpers";
+import { Slider } from "./SliderNative";
 
 const COMP = "Slider";
 

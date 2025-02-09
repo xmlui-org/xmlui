@@ -8,8 +8,8 @@ import type {
   DefaultToastOptions,
   Toast,
 } from "react-hot-toast";
-
 import type { ActionFunction } from "./ActionDefs";
+
 /**
  * This interface defines the properties and services of an app context that the application components can use when
  * implementing their behavior.
@@ -188,7 +188,7 @@ export type AppContextObject = {
    * @param values Values to calculate the sum
    */
   sum: (values: number[]) => number;
-  
+
   // ==============================================================================================
   // File Utilities
 

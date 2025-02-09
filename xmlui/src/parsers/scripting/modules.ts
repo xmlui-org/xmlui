@@ -13,16 +13,14 @@ import type {
   Statement,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { VisitorState } from "./tree-visitor";
-
-import { Parser } from "./Parser";
-
 import { TokenType } from "../../abstractions/scripting/Token";
-import { visitNode } from "./tree-visitor";
-import { errorMessages } from "./ParserError";
 import { ModuleResolver } from "../../abstractions/scripting/modules";
 import { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { VisitorState } from "./tree-visitor";
+import { visitNode } from "./tree-visitor";
+import { errorMessages } from "./ParserError";
+import { Parser } from "./Parser";
 
 /**
  * Checks if the result is a module error

@@ -1,5 +1,3 @@
-import { type ValidationStatus } from "../abstractions";
-import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import React, {
   type CSSProperties,
   type ForwardedRef,
@@ -9,13 +7,12 @@ import React, {
   useRef,
 } from "react";
 import classnames from "classnames";
+
 import styles from "./NumberBox.module.scss";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
-import { Icon } from "../Icon/IconNative";
-import { Adornment } from "../Input/InputAdornment";
-import { Button } from "../Button/ButtonNative";
 import { useEvent } from "../../components-core/utils/misc";
-import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import {
   clamp,
   DECIMAL_SEPARATOR,
@@ -28,6 +25,11 @@ import {
   NUMBERBOX_MAX_VALUE,
   toUsableNumber,
 } from "./numberbox-abstractions";
+import { type ValidationStatus } from "../abstractions";
+import { Icon } from "../Icon/IconNative";
+import { Adornment } from "../Input/InputAdornment";
+import { Button } from "../Button/ButtonNative";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 // =====================================================================================================================
 // React NumberBox component definition
