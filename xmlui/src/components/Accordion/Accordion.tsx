@@ -1,12 +1,17 @@
-import { createMetadata, d } from "../../abstractions/ComponentDefs";
-
 import styles from "./Accordion.module.scss";
 
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { AccordionComponent } from "./AccordionNative";
-import { dCollapse, dDidChange, dExpand, dExpanded, dFocus } from "../../components/metadata-helpers";
+import {
+  dCollapse,
+  dDidChange,
+  dExpand,
+  dExpanded,
+  dFocus,
+} from "../../components/metadata-helpers";
 import { triggerPositionNames } from "../../components/abstractions";
+import { AccordionComponent } from "./AccordionNative";
 
 const COMP = "Accordion";
 

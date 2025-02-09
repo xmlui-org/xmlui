@@ -10,12 +10,11 @@ import {
   iconPositionMd,
   defaultButtonType,
 } from "../abstractions";
-
-import { Icon } from "../Icon/IconNative";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
-import { Button } from "./ButtonNative";
 import { dClick, dGotFocus, dLostFocus } from "../../components/metadata-helpers";
+import { Icon } from "../Icon/IconNative";
+import { Button } from "./ButtonNative";
 
 const COMP = "Button";
 

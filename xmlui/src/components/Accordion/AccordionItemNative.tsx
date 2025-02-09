@@ -7,11 +7,13 @@ import {
   useMemo,
   useState,
 } from "react";
-import { useAccordionContext } from "../../components/Accordion/AccordionContext";
-import styles from "../../components/Accordion/Accordion.module.scss";
-import Icon from "../../components/Icon/IconNative";
 import * as RAccordion from "@radix-ui/react-accordion";
 import classnames from "classnames";
+
+import styles from "../../components/Accordion/Accordion.module.scss";
+
+import { useAccordionContext } from "../../components/Accordion/AccordionContext";
+import Icon from "../../components/Icon/IconNative";
 
 function defaultRenderer(header: string) {
   return <div>{header}</div>;

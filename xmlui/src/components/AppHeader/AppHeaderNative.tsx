@@ -3,15 +3,15 @@ import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
 
-import { Icon } from "../../components/Icon/IconNative";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
 import { EMPTY_OBJECT } from "../../components-core/constants";
+import { useAppContext } from "../../components-core/AppContext";
+import { Icon } from "../../components/Icon/IconNative";
 import { Logo } from "../../components/Logo/LogoNative";
 import { useAppLayoutContext } from "../../components/App/AppLayoutContext";
 import { Button } from "../../components/Button/ButtonNative";
-import { useResourceUrl, useTheme } from "../../components-core/theming/ThemeContext";
-import type { RenderChildFn } from "../../abstractions/RendererDefs";
 import { NavLink } from "../../components/NavLink/NavLinkNative";
-import { useAppContext } from "../../components-core/AppContext";
 
 type Props = {
   children?: ReactNode;

@@ -1,10 +1,11 @@
-import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
-import { appLayoutMd } from "./AppLayoutContext";
-
 import styles from "./App.module.scss";
+
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+
 import { dComponent } from "../../components/metadata-helpers";
+import { appLayoutMd } from "./AppLayoutContext";
 import { App } from "./AppNative";
 
 const COMP = "App";
