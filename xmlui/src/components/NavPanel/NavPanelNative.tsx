@@ -1,12 +1,14 @@
 import React, { forwardRef, type ReactNode, useRef } from "react";
-import styles from "./NavPanel.module.scss";
-import classnames from "classnames";
-import { Logo } from "../../../src/components/Logo/LogoNative";
-import { ScrollContext } from "../../../src/components-core/ScrollContext";
-import { useAppLayoutContext } from "../../../src/components/App/AppLayoutContext";
-import { getAppLayoutOrientation } from "../../../src/components/App/AppNative";
 import { composeRefs } from "@radix-ui/react-compose-refs";
-import { RenderChildFn } from "../../../src/abstractions/RendererDefs";
+import classnames from "classnames";
+
+import styles from "./NavPanel.module.scss";
+
+import { RenderChildFn } from "../../abstractions/RendererDefs";
+import { ScrollContext } from "../../components-core/ScrollContext";
+import { Logo } from "../Logo/LogoNative";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { getAppLayoutOrientation } from "../App/AppNative";
 
 interface INavPanelContext {
   inDrawer: boolean;

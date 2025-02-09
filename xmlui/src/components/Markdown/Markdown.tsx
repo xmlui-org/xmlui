@@ -1,6 +1,7 @@
+import styles from "./Markdown.module.scss";
+
 import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import styles from "./Markdown.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Markdown } from "./MarkdownNative";
 

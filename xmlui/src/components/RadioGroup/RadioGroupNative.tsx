@@ -9,13 +9,15 @@ import React, {
   useId,
   useMemo,
 } from "react";
+import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import classnames from "classnames";
+
 import styles from "./RadioGroup.module.scss";
+
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
-import type { Option, ValidationStatus } from "../abstractions";
-import * as InnerRadioGroup from "@radix-ui/react-radio-group";
 import { useEvent } from "../../components-core/utils/misc";
+import type { Option, ValidationStatus } from "../abstractions";
 import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 import OptionTypeProvider from "../Option/OptionTypeProvider";
 

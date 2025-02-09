@@ -7,10 +7,11 @@ import React, {
   useRef,
   useState,
 } from "react";
+
+import { ButtonVariant, ButtonThemeColor } from "../abstractions";
 import { Button } from "../Button/ButtonNative";
 import { Stack } from "../Stack/StackNative";
 import { Dialog } from "./Dialog";
-import { ButtonVariant, ButtonThemeColor } from "../abstractions";
 
 const ConfirmationModalContext = React.createContext({
   confirm: async (title: string, message?: string, actionLabel?: string) => false,

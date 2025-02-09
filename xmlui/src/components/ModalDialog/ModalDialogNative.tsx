@@ -7,15 +7,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import styles from "./ModalDialog.module.scss";
+import * as Dialog from "@radix-ui/react-dialog";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import classnames from "classnames";
-import { Icon } from "../Icon/IconNative";
+
+import styles from "./ModalDialog.module.scss";
+
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";
-import { Button } from "../Button/ButtonNative";
 import { useEvent } from "../../components-core/utils/misc";
-import { composeRefs } from "@radix-ui/react-compose-refs";
-import * as Dialog from "@radix-ui/react-dialog";
+import { Icon } from "../Icon/IconNative";
+import { Button } from "../Button/ButtonNative";
 import { ModalVisibilityContext } from "./ModalVisibilityContext";
 
 // =====================================================================================================================
@@ -61,7 +63,7 @@ export const ModalDialogFrame = React.forwardRef(
       <ModalStateContext.Provider value={modalContextStateValue}>
         {renderDialog({
           openParams,
-          ref
+          ref,
         })}
       </ModalStateContext.Provider>
     ) : null;
@@ -174,10 +176,7 @@ export const ModalDialog = React.forwardRef(
     }
 
     return (
-      <Dialog.Root
-        open={isOpen}
-        onOpenChange={(open) => (open ? doOpen() : doClose())}
-      >
+      <Dialog.Root open={isOpen} onOpenChange={(open) => (open ? doOpen() : doClose())}>
         <Dialog.Portal container={root}>
           {!fullScreen && <div className={styles.overlayBg} />}
           <Dialog.Overlay
