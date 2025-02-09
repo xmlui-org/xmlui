@@ -6,6 +6,7 @@ const COMP = "FadeOutAnimation";
 export const FadeOutAnimationMd = createMetadata({
   specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that fades out the content.`,
+  descriptionRef: "",
 });
 
 export const fadeOutAnimationRenderer = createComponentRenderer(

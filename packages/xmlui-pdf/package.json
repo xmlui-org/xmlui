@@ -5,11 +5,12 @@
   "type": "module",
   "scripts": {
     "start": "xmlui start",
-    "build:demo": "xmlui build",
     "preview": "xmlui preview",
+    "prepublishOnly": "npm run build",
     "build": "xmlui build-lib",
     "build-watch": "xmlui build-lib --watch",
-    "prepublishOnly": "npm run build"
+    "build:demo": "xmlui build",
+    "build:meta": "xmlui build-lib --mode=metadata"
   },
   "dependencies": {
     "pdfjs-dist": "^4.4.168",
