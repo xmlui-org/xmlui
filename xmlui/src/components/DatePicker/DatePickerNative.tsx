@@ -9,7 +9,7 @@ import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/R
 import type { ValidationStatus } from "../abstractions";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "../../components-core/constants";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./DatePicker.module.scss";
 import { useEvent } from "../../components-core/utils/misc";
 import { composeRefs } from "@radix-ui/react-compose-refs";

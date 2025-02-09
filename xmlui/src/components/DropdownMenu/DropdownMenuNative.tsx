@@ -10,7 +10,7 @@ import type { IconPosition, ButtonVariant, ButtonThemeColor } from "../abstracti
 import { Button } from "../Button/ButtonNative";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { Icon } from "../Icon/IconNative";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { noop } from "../../components-core/constants";
 
 type DropdownMenuProps = {

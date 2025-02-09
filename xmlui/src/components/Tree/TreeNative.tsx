@@ -10,7 +10,7 @@ import {
 import { FixedSizeList } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
 import styles from "./TreeComponent.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import type {
   FlatTreeNode,
   UnPackedTreeData,

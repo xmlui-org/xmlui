@@ -1,6 +1,6 @@
 import { type CSSProperties, type ReactNode, type Ref } from "react";
 import { forwardRef } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./Stack.module.scss";
 import { useContentAlignment } from "../../components-core/component-hooks";
 import { useOnMount } from "../../components-core/utils/hooks";

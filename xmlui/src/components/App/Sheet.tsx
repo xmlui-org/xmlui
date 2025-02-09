@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as SheetPrimitive from "@radix-ui/react-dialog";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { Icon } from "../../components/Icon/IconNative";
 import styles from "./Sheet.module.scss";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";

@@ -28,7 +28,7 @@ import styles from "./Table.module.scss";
 import "./react-table-config.d.ts";
 import { Button } from "../Button/ButtonNative";
 import { Spinner } from "../Spinner/SpinnerNative";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import useRowSelection from "./useRowSelection";
 import { Toggle } from "../Toggle/Toggle";
 import { Icon } from "../Icon/IconNative";

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 
 import styles from "./AppHeader.module.scss";
 

@@ -8,7 +8,7 @@ import {
 } from "react";
 import { createContext, useContext, useMemo, useState } from "react";
 import styles from "./FlowLayout.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useTheme } from "../../components-core/theming/ThemeContext";
 import { noop } from "lodash-es";

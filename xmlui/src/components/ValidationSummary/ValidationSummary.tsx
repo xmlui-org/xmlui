@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Stack } from "../Stack/StackNative";
 import {Icon} from "../Icon/IconNative";
 import { Text } from "../Text/TextNative";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./ValidationSummary.module.scss";
 import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
 import { Button } from "../Button/ButtonNative";

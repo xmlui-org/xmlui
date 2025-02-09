@@ -1,6 +1,6 @@
 import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import { Children, useId } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./FormItem.module.scss";
 import { Spinner } from "../Spinner/SpinnerNative";
 import { Slot } from "@radix-ui/react-slot";

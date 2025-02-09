@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import styles from "./ModalDialog.module.scss";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import { Icon } from "../Icon/IconNative";
 import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import { useTheme } from "../../components-core/theming/ThemeContext";

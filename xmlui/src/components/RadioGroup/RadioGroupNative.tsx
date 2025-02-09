@@ -9,7 +9,7 @@ import React, {
   useId,
   useMemo,
 } from "react";
-import classnames from "../../components-core/utils/classnames";
+import classnames from "classnames";
 import styles from "./RadioGroup.module.scss";
 import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
 import { noop } from "../../components-core/constants";
