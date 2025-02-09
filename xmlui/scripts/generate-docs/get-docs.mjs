@@ -1,5 +1,6 @@
 import { basename, join, extname, relative } from "path";
 import { lstatSync } from "fs";
+import { writeFileSync } from "fs";
 import { unlink, readdir, readFile, mkdir } from "fs/promises";
 import { logger, LOGGER_LEVELS } from "./logger.mjs";
 import { processError, ErrorWithSeverity, convertPath } from "./utils.mjs";
@@ -19,7 +20,6 @@ async function generateExtenionPackages() {
   const extensionsConfig = await loadConfig(join(FOLDERS.script, "extensions-config.json"));
   const packagesMetadata = await dynamicallyLoadExtensionPackages();
   for (const packageName in packagesMetadata) {
-    //const test = packagesMetadata["xmlui-animations"];
     const packageFolder = join(FOLDERS.pages, "extension-components", packageName);
 
     if (!existsSync(packageFolder)) {
@@ -41,6 +41,21 @@ async function generateExtenionPackages() {
     }
 
     extensionGenerator.generateDocs();
+  }
+
+  // generate a _meta.json for the folder names
+  try {
+    const extensionPackagesMetafile = join(FOLDERS.pages, "extension-components", "_meta.json");
+
+    const folderNames = Object.fromEntries(Object.keys(packagesMetadata).map((name) => {
+      return [name.split("-").map((n) => n[0].toUpperCase() + n.slice(1)).join(" "), name];
+    }));
+    if (existsSync(extensionPackagesMetafile)) {
+      await unlink(extensionPackagesMetafile);      
+    }
+    writeFileSync(extensionPackagesMetafile, JSON.stringify(folderNames, null, 2));
+  } catch (e) {
+    logger.error("Could not write _meta file: ", e?.message || "unknown error");
   }
 }
 
