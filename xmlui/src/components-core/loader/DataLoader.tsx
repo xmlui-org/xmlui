@@ -50,6 +50,16 @@ function DataLoader({
   }, [appContext, loader.props.queryParams, state]);
   const queryParams = useShallowCompareMemoize(queryParamsInner);
 
+  const bodyInner = useMemo(() => {
+    return extractParam(state, loader.props.body, appContext);
+  }, [appContext, loader.props.body, state]);
+  const body = useShallowCompareMemoize(bodyInner);
+
+  const rawBodyInner = useMemo(() => {
+    return extractParam(state, loader.props.rawBody, appContext);
+  }, [appContext, loader.props.rawBody, state]);
+  const rawBody = useShallowCompareMemoize(rawBodyInner);
+
   const pagingDirection: LoaderDirections | null = useMemo(() => {
     if (loader.props.prevPageSelector && loader.props.nextPageSelector) {
       return "BIDIRECTIONAL";
@@ -89,6 +99,8 @@ function DataLoader({
       url,
       queryParams,
       appContext?.appGlobals.apiUrl,
+      body,
+      rawBody
     ).asKey();
   }, [appContext?.appGlobals.apiUrl, queryParams, url]);
 

@@ -1,5 +1,5 @@
 import { isEqual } from "lodash-es";
-import { Query, QueryKey } from '@tanstack/react-query';
+import { Query, QueryKey } from "@tanstack/react-query";
 
 // base on this: https://tkdodo.eu/blog/effective-react-query-keys
 
@@ -13,26 +13,38 @@ export class DataLoaderQueryKeyGenerator {
   private readonly queryParams?: UrlQueryParamsPart;
   private key?: DataLoaderQueryKey;
 
-  constructor (url: UrlKeyPart, queryParams: UrlQueryParamsPart | undefined, apiUrl: string | undefined) {
+  constructor(
+    url: UrlKeyPart,
+    queryParams: UrlQueryParamsPart | undefined,
+    apiUrl: string | undefined,
+    body: any,
+    rawBody: any,
+  ) {
     this.url = url;
     this.queryParams = queryParams;
     this.key = [url];
-    if(queryParams){
+    if (queryParams) {
       this.key.push(queryParams);
     }
-    if(apiUrl){
+    if (apiUrl) {
       this.key.push(apiUrl);
+    }
+    if (body) {
+      this.key.push(body);
+    }
+    if (rawBody) {
+      this.key.push(rawBody);
     }
   }
 
-  asKey () {
+  asKey() {
     if (!this.key) {
       throw new Error("no key defined");
     }
     return this.key;
   }
 
-  asPredicate (): {
+  asPredicate(): {
     predicate: (query: Query<unknown, unknown, unknown, QueryKey>) => boolean;
   } {
     if (!this.key) {
@@ -41,8 +53,10 @@ export class DataLoaderQueryKeyGenerator {
     return {
       predicate: (query: Query<unknown, unknown, unknown, QueryKey>) => {
         const queryKey = query.queryKey as DataLoaderQueryKey;
-        return queryKey[0] === this.url && (!this.queryParams || isEqual(queryKey[1], this.queryParams));
-      }
+        return (
+          queryKey[0] === this.url && (!this.queryParams || isEqual(queryKey[1], this.queryParams))
+        );
+      },
     };
   }
 }
