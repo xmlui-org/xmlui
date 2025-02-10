@@ -68,7 +68,7 @@ export const LinkMd = createMetadata({
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
-  ({ node, extractValue, lookupEventHandler, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <LocalLink
         to={extractValue(node.props.to)}
