@@ -110,7 +110,7 @@ describe("Xmlui transform - child elements", () => {
   describe("vars", () => {
     it("var fails with missing name attribute", () => {
       try {
-        transformSource("<Stack><var/></Stack>");
+        transformSource("<Stack><variable/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
         expect(err.toString()).includes("T012");
@@ -119,7 +119,7 @@ describe("Xmlui transform - child elements", () => {
 
     it("var fails with empty name attribute", () => {
       try {
-        transformSource("<Stack><var name=''/></Stack>");
+        transformSource("<Stack><variable name=''/></Stack>");
         assert.fail("Exception expected");
       } catch (err) {
         expect(err.toString()).includes("T012");
@@ -133,7 +133,7 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("var with name/value attr works #1", () => {
-      const cd = transformSource("<Stack><var name='myVar' value='123'/></Stack>") as ComponentDef;
+      const cd = transformSource("<Stack><variable name='myVar' value='123'/></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).equal("123");
     });
@@ -141,8 +141,8 @@ describe("Xmlui transform - child elements", () => {
     it("var with name/value attr works #2", () => {
       const cd = transformSource(`
       <Stack>
-        <var name='myVar' value='123'/>
-        <var name='other' value='234'/>
+        <variable name='myVar' value='123'/>
+        <variable name='other' value='234'/>
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -151,7 +151,7 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("var with name and text works #1", () => {
-      const cd = transformSource("<Stack><var name='myVar'>123</var></Stack>") as ComponentDef;
+      const cd = transformSource("<Stack><variable name='myVar'>123</variable></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).equal("123");
     });
@@ -159,8 +159,8 @@ describe("Xmlui transform - child elements", () => {
     it("var with name and text works #2", () => {
       const cd = transformSource(`
       <Stack>
-        <var name='myVar'>123</var>
-        <var name="other">234</var>
+        <variable name='myVar'>123</variable>
+        <variable name="other">234</variable>
       </Stack>
     `) as ComponentDef;
       expect(cd.type).equal("Stack");
@@ -169,14 +169,14 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("vars with name results null", () => {
-      const cd = transformSource("<Stack><var name='myVar'/></Stack>") as ComponentDef;
+      const cd = transformSource("<Stack><variable name='myVar'/></Stack>") as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).equal(null);
     });
 
     it("var becomes array #1", () => {
       const cd = transformSource(
-        "<Stack><var name='myVar' value='123'/><var name='myVar' value='234'/></Stack>",
+        "<Stack><variable name='myVar' value='123'/><variable name='myVar' value='234'/></Stack>",
       ) as ComponentDef;
       expect(cd.type).equal("Stack");
       expect(cd.vars!.myVar).deep.equal(["123", "234"]);
@@ -838,7 +838,7 @@ describe("Xmlui transform - child elements", () => {
   describe("Compound components", () => {
     it("Compound component #1", () => {
       const cd = transformSource(`
-      <Component name='MyComp'><Stack /><var name="myVar" value="123" /></Component>
+      <Component name='MyComp'><Stack /><variable name="myVar" value="123" /></Component>
     `) as ComponentDef;
       expect(cd).toMatchObject({
         name: "MyComp",
@@ -861,7 +861,7 @@ describe("Xmlui transform - child elements", () => {
       <Component name='MyComp'>
         <Stack />
         <Text />
-        <var name="myVar" value="123" />
+        <variable name="myVar" value="123" />
       </Component>
     `) as ComponentDef;
       expect(cd).toMatchObject({
@@ -1010,7 +1010,7 @@ describe("Xmlui transform - child elements", () => {
 
     it("Compound component with vars #3", () => {
       const cd = transformSource(`
-      <Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>
+      <Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack /></Component>
     `) as ComponentDef;
       expect(cd).toMatchObject({
         name: "MyComp",
@@ -1062,7 +1062,7 @@ describe("Xmlui transform - child elements", () => {
     });
 
     it("Compound component debug info with vars", () => {
-      const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack /></Component>`;
+      const source = `<Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack /></Component>`;
       const cd = transformSource(source) as CompoundComponentDef;
       expect(cd.debug).toMatchObject({
         source: {
@@ -1092,7 +1092,7 @@ describe("Xmlui transform - child elements", () => {
   });
   describe("debug info", () => {
     it("Compound component debug info nested with vars", () => {
-      const source = `<Component name='MyComp' var.myValue="123"><var name="other" value="{false}" /><Stack var.myVar="hi" ><Button /></Stack></Component>`;
+      const source = `<Component name='MyComp' var.myValue="123"><variable name="other" value="{false}" /><Stack var.myVar="hi" ><Button /></Stack></Component>`;
       const cd = transformSource(source) as CompoundComponentDef;
 
       expect(cd.debug).toMatchObject({
@@ -1106,14 +1106,14 @@ describe("Xmlui transform - child elements", () => {
       const fragmentComp = cd.component as ComponentDef;
       expect(fragmentComp.debug).toMatchObject({
         source: {
-          start: source.indexOf('<var name="other"'),
+          start: source.indexOf('<variable name="other"'),
           end: source.indexOf("</Component"),
           fileId: 0,
         },
       });
 
       const stackComp = fragmentComp.children[0] as ComponentDef;
-      const beforeStack = '<var name="other" value="{false}" />';
+      const beforeStack = '<variable name="other" value="{false}" />';
       expect(stackComp.debug).toMatchObject({
         source: {
           start: source.indexOf(beforeStack) + beforeStack.length,

@@ -28,16 +28,16 @@ interface TransformNode extends Node {
   text?: string;
 }
 
-enum HelperNode {
-  property,
-  event,
-  var,
-  loaders,
-  uses,
-  method,
-  item,
-  field
-}
+const HelperNode = {
+  property: 'property',
+  event: 'event',
+  variable: 'variable',
+  loaders: 'loaders',
+  uses: 'uses',
+  method: 'method',
+  item: 'item',
+  field: 'field'
+} as const;
 
 export function nodeToComponentDef(
   node: Node,
@@ -129,7 +129,7 @@ export function nodeToComponentDef(
       });
     }
 
-    // --- Get "var" attributes
+    // --- Get var attributes
     let vars: Record<string, any> | undefined;
     const varsAttrs = attrs.filter((attr) => attr.startSegment === "var");
     if (varsAttrs.length > 0) {
@@ -153,7 +153,7 @@ export function nodeToComponentDef(
     for (let child of children) {
       if (child.kind === SyntaxKind.ElementNode) {
         const childName = getComponentName(child, getText);
-        if (childName === "var") {
+        if (childName === HelperNode.variable) {
           nestedVars.push(child);
         } else if (childName in HelperNode) {
           nonVarHelperNodes.push(child);
@@ -326,7 +326,7 @@ export function nodeToComponentDef(
           );
           return;
 
-        case "var":
+        case HelperNode.variable:
           collectElementHelper(
             usesStack,
             comp,
