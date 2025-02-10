@@ -95,7 +95,7 @@ describe("Ueml transform - errors", () => {
 
   it("Invalid attribute in var", () => {
     try {
-      transformSource("<Stack><var name='my' blabal='123'/></Stack>");
+      transformSource("<Stack><variable name='my' blabal='123'/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T011");
@@ -149,7 +149,7 @@ describe("Ueml transform - errors", () => {
 
   it("Name required in var #1", () => {
     try {
-      transformSource("<Stack><var /></Stack>");
+      transformSource("<Stack><variable/></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T012");
@@ -158,7 +158,7 @@ describe("Ueml transform - errors", () => {
 
   it("Name required in var #2", () => {
     try {
-      transformSource("<Stack><var name='' /></Stack>");
+      transformSource("<Stack><variable name='' /></Stack>");
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString()).includes("T012");
