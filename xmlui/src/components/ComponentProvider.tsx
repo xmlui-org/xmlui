@@ -216,7 +216,6 @@ import {
   htmlRtTagRenderer,
   htmlRubyTagRenderer,
   htmlSampTagRenderer,
-  htmlScriptTagRenderer,
   htmlSectionTagRenderer,
   htmlSelectTagRenderer,
   htmlSmallTagRenderer,
@@ -605,7 +604,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlRubyTagRenderer);
     this.registerCoreComponent(htmlSTagRenderer);
     this.registerCoreComponent(htmlSampTagRenderer);
-    this.registerCoreComponent(htmlScriptTagRenderer);
     this.registerCoreComponent(htmlSectionTagRenderer);
     this.registerCoreComponent(htmlSelectTagRenderer);
     this.registerCoreComponent(htmlSmallTagRenderer);
