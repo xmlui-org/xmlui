@@ -1,6 +1,8 @@
-import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
-import { ValueExtractor } from "../../abstractions/RendererDefs";
+import type { CSSProperties } from "react";
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
+import { LocalLink } from "../Link/LinkNative";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -11,12 +13,13 @@ export const HtmlAMd = createMetadata({
     target: d("Specifies where to open the linked document"),
     rel: d("Specifies the relationship between the current document and the linked document"),
     download: d("Indicates that the target will be downloaded when a user clicks on the hyperlink"),
-    hrefLang: d("Specifies the language of the linked document"),
+    hreflang: d("Specifies the language of the linked document"),
     type: d("Specifies the MIME type of the linked document"),
     ping: d(
       "Specifies a space-separated list of URLs to be notified if the user follows the hyperlink",
     ),
     referrerPolicy: d("Specifies the referrer policy for the element"),
+    disabled: d("Specifies that the link should be disabled"),
   },
 });
 
@@ -24,22 +27,17 @@ export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
+    console.log(node.props, layoutCss)
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <a
+      <LocalLink
+        to={extractValue(node.props.href)}
+        disabled={!extractValue.asOptionalBoolean(node.props.disabled, true)}
         style={layoutCss}
-        href={extractValue(node.props.href)}
-        target={extractValue(node.props.target)}
-        rel={extractValue(node.props.rel)}
-        download={extractValue(node.props.download)}
-        hrefLang={extractValue(node.props.hrefLang)}
-        type={extractValue(node.props.type)}
-        ping={extractValue(node.props.ping)}
-        referrerPolicy={extractValue(node.props.referrerPolicy)}
-        {...renderedProps}
+        {...cleanStyles(renderedProps, layoutCss)}
       >
         {renderChild(node.children)}
-      </a>
+      </LocalLink>
     );
   },
 );
@@ -2452,9 +2450,31 @@ export const htmlWbrTagRenderer = createComponentRenderer(
   },
 );
 
+// --- Utils
+
 function resolveProps(node: ComponentDef, extractValue: ValueExtractor) {
   return Object.keys(node.props).reduce((acc, propName) => {
     acc[propName] = extractValue(node.props[propName]);
     return acc;
   }, {});
+}
+
+/**
+ * Removes unnecessary style related properties so only layoutCss contains them.
+ * @param nodeProps properties to clean
+ * @param layoutCss which style properties to remove
+ * @returns only component-specific properties
+ */
+function cleanStyles(nodeProps: any, layoutCss: CSSProperties = {}) {
+  if (nodeProps.hasOwnProperty("style")) {
+    delete nodeProps["style"];
+  }
+  return removeEntries(nodeProps, layoutCss);
+}
+
+function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
+  const filterKeys = Object.keys(filterObj);
+  return Object.fromEntries(
+    Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key))
+  );
 }

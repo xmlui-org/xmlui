@@ -25,7 +25,7 @@ export type Tab = {
   style?: CSSProperties;
 };
 
-export const LinkTargetNames = ["_self", "_blank", "_parent", "_top"] as const;
+export const LinkTargetNames = ["_self", "_blank", "_parent", "_top", "_unfencedTop"] as const;
 export type LinkTarget = (typeof LinkTargetNames)[number];
 export const LinkTargetMd: PropertyValueDescription[] = [
   {
@@ -45,6 +45,11 @@ export const LinkTargetMd: PropertyValueDescription[] = [
     description:
       "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
   },
+  {
+    value: "_unfencedTop",
+    description:
+      "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
+  }
 ];
 
 /**
