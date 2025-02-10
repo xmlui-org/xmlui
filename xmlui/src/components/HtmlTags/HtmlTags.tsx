@@ -3,6 +3,7 @@ import { type ComponentDef, createMetadata, d } from "../../abstractions/Compone
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
 import { LocalLink } from "../Link/LinkNative";
+import { Heading } from "../Heading/HeadingNative";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -27,14 +28,13 @@ export const htmlATagRenderer = createComponentRenderer(
   "a",
   HtmlAMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    console.log(node.props, layoutCss)
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <LocalLink
         to={extractValue(node.props.href)}
         disabled={!extractValue.asOptionalBoolean(node.props.disabled, true)}
         style={layoutCss}
-        {...cleanStyles(renderedProps, layoutCss)}
+        {...renderedProps}
       >
         {renderChild(node.children)}
       </LocalLink>
@@ -877,11 +877,11 @@ export const htmlH1TagRenderer = createComponentRenderer(
   "h1",
   HtmlH1Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h1 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h1">
         {renderChild(node.children)}
-      </h1>
+      </Heading>
     );
   },
 );
@@ -896,18 +896,18 @@ export const htmlH2TagRenderer = createComponentRenderer(
   "h2",
   HtmlH2Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h2 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h2">
         {renderChild(node.children)}
-      </h2>
+      </Heading>
     );
   },
 );
 
 export const HtmlH3Md = createMetadata({
   status: "experimental",
-  description: "This component renders an HTML `h2` tag.",
+  description: "This component renders an HTML `h3` tag.",
   isHtmlTag: true,
 });
 
@@ -915,11 +915,11 @@ export const htmlH3TagRenderer = createComponentRenderer(
   "h3",
   HtmlH3Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h3 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h3">
         {renderChild(node.children)}
-      </h3>
+      </Heading>
     );
   },
 );
@@ -934,11 +934,11 @@ export const htmlH4TagRenderer = createComponentRenderer(
   "h4",
   HtmlH4Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h3 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h4">
         {renderChild(node.children)}
-      </h3>
+      </Heading>
     );
   },
 );
@@ -953,11 +953,11 @@ export const htmlH5TagRenderer = createComponentRenderer(
   "h5",
   HtmlH5Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h5 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h5">
         {renderChild(node.children)}
-      </h5>
+      </Heading>
     );
   },
 );
@@ -972,11 +972,11 @@ export const htmlH6TagRenderer = createComponentRenderer(
   "h6",
   HtmlH6Md,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <h6 style={layoutCss} {...renderedProps}>
+      <Heading style={layoutCss} {...renderedProps} level="h6">
         {renderChild(node.children)}
-      </h6>
+      </Heading>
     );
   },
 );
@@ -2452,9 +2452,18 @@ export const htmlWbrTagRenderer = createComponentRenderer(
 
 // --- Utils
 
-function resolveProps(node: ComponentDef, extractValue: ValueExtractor) {
+function resolveProps(
+  node: ComponentDef,
+  extractValue: ValueExtractor,
+  extractResourceUrl?: (url?: string) => string | undefined,
+  resourceProps?: string[],
+) {
   return Object.keys(node.props).reduce((acc, propName) => {
-    acc[propName] = extractValue(node.props[propName]);
+    if (resourceProps && resourceProps.includes(propName) && extractResourceUrl) {
+      acc[propName] = extractResourceUrl(node.props[propName]);
+    } else {
+      acc[propName] = extractValue(node.props[propName]);
+    }
     return acc;
   }, {});
 }
@@ -2474,7 +2483,5 @@ function cleanStyles(nodeProps: any, layoutCss: CSSProperties = {}) {
 
 function removeEntries(sourceObj: Record<string, any>, filterObj: Record<string, any>) {
   const filterKeys = Object.keys(filterObj);
-  return Object.fromEntries(
-    Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key))
-  );
+  return Object.fromEntries(Object.entries(sourceObj).filter(([key]) => !filterKeys.includes(key)));
 }
