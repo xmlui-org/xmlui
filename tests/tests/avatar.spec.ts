@@ -102,7 +102,7 @@ test("click", async ({ page }) => {
   const EXPECTED_TEXT = "this is a test text";
   const entryPoint = `
   <HStack gap="1rem" verticalAlignment="center">   
-    <var name="showTestText" value="{false}" />
+    <variable name="showTestText" value="{false}" />
     <Avatar testId="avatar" name="Molly Dough" onClick="showTestText = true" />
     <Text when="{showTestText}">${EXPECTED_TEXT}</Text>
   </HStack>
