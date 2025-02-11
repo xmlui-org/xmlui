@@ -445,7 +445,7 @@ This event is triggered when value of Select has changed.
 
 ```ueml copy /onDidChange="(newItem) => newValue = newItem"/
 <App>
-  <var name="newValue" value="" />
+  <variable name="newValue" value="" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
     <Option value="opt1" label="first"/>
@@ -460,7 +460,7 @@ This event is triggered when value of Select has changed.
     height={200}
     app={`
     <App>
-      <var name="newValue" value="" />
+      <variable name="newValue" value="" />
       <Text value="{newValue}" />
       <Select onDidChange="(newItem) => newValue = newItem">
         <Option value="opt1" label="first"/>
@@ -477,7 +477,7 @@ This event is triggered when the Select has received the focus.
 
 ```ueml copy {5-6}
 <App>
-  <var name="isFocused" value="{false}" />
+  <variable name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
   <Select
     onGotFocus="isFocused = true"
@@ -494,7 +494,7 @@ This event is triggered when the Select has received the focus.
     height={200}
     app={`
     <App>
-      <var name="isFocused" value="{false}" />
+      <variable name="isFocused" value="{false}" />
       <Text value="Input control is focused: {isFocused}" />
       <Select
         onGotFocus="isFocused = true"

@@ -2387,6 +2387,25 @@ export const htmlUlTagRenderer = createComponentRenderer(
   },
 );
 
+export const HtmlVarMd = createMetadata({
+  status: "experimental",
+  description: "This component renders an HTML `var` tag.",
+  isHtmlTag: true,
+});
+
+export const htmlVarTagRenderer = createComponentRenderer(
+  "var",
+  HtmlCodeMd,
+  ({ node, renderChild, extractValue, layoutCss }) => {
+    const renderedProps = resolveProps(node, extractValue);
+    return (
+      <var style={layoutCss} {...renderedProps}>
+        {renderChild(node.children)}
+      </var>
+    );
+  },
+);
+
 export const HtmlVideoMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `video` tag.",
