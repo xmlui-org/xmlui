@@ -86,8 +86,7 @@ export class DocsGenerator {
   async generateComponentsSummary(summarySectionName = "Components", summaryFileName) {
     logger.info("Creating Component Summary");
     try {
-      const sourceFolderName = basename(this.folders.sourceFolder);
-      const outFile = join(FOLDERS.pages, summaryFileName || `${sourceFolderName}.mdx`);
+      const outFile = join(FOLDERS.pages, summaryFileName || `${basename(this.folders.sourceFolder)}.mdx`);
       
       if (!existsSync(outFile)) {
         await writeFile(outFile, "");
@@ -96,11 +95,9 @@ export class DocsGenerator {
       const summary = await createSummary(
         this.metadata,
         outFile,
-        {
-          sectionName: summarySectionName,
-          componentFolder: sourceFolderName,
-          //excludeStatuses: ["in progress"],
-        },
+        this.folders.sourceFolder,
+        this.folders.outFolder,
+        summarySectionName,
       );
 
       await writeFile(outFile, summary);
@@ -137,13 +134,12 @@ export class DocsGenerator {
 async function createSummary(
   metadata,
   filename,
-  {
-    sectionName = "Components",
-    componentFolder = basename(this.folders.sourceFolder),
-    excludeStatuses = [],
-  },
+  componentsSourceFolder,
+  componentsOutFolder,
+  sectionName = "Components",
 ) {
   const buffer = await readFile(filename, "utf8");
+  const componentFolderName = basename(componentsSourceFolder);
 
   const lines = strBufferToLines(buffer);
   const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
@@ -176,8 +172,8 @@ async function createSummary(
       })
       .map((component) => {
         return [
-          !!component.descriptionRef
-            ? `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`
+          existsSync(join(componentsOutFolder, `${component.displayName}.mdx`))
+            ? `[${component.displayName}](./${componentFolderName}/${component.displayName}.mdx)`
             : component.displayName,
           component.description,
           component.status ?? defaultStatus,

@@ -22,7 +22,6 @@ await generateComponents(components);
 const packagesMetadata = await dynamicallyLoadExtensionPackages();
 await generateExtenionPackages(packagesMetadata);
 
-
 // --- Helpers
 
 async function generateExtenionPackages(metadata) {
