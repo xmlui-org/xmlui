@@ -26,6 +26,10 @@ export class DocsGenerator {
     this.expandMetadata(excludeComponentStatuses);
   }
 
+  /**
+   * Filters provided metadata, then adds further information possibly missing.
+   * @param {string[]} excludeComponentStatuses The status of the component to exclude, e.g. 'in progress' can be excluded
+   */
   expandMetadata(excludeComponentStatuses) {
     logger.info("Transforming & expanding component metadata");
     this.metadata = Object.entries(this.metadata)
