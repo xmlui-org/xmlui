@@ -25,7 +25,7 @@ export type Tab = {
   style?: CSSProperties;
 };
 
-export const LinkTargetNames = ["_self", "_blank", "_parent", "_top"] as const;
+export const LinkTargetNames = ["_self", "_blank", "_parent", "_top", "_unfencedTop"] as const;
 export type LinkTarget = (typeof LinkTargetNames)[number];
 export const LinkTargetMd: PropertyValueDescription[] = [
   {
@@ -45,6 +45,11 @@ export const LinkTargetMd: PropertyValueDescription[] = [
     description:
       "The topmost browsing context. The link will open in the full body of the window. If no ancestors, behaves as _self.",
   },
+  {
+    value: "_unfencedTop",
+    description:
+      "Allows embedded fenced frames to navigate the top-level frame, i.e. traversing beyond the root of the fenced frame."
+  }
 ];
 
 /**
@@ -313,7 +318,7 @@ const TextVariantKeys = [
   "sample", // use <samp>
   "sub", // use <sub>
   "sup", // use <sup>
-  "var", // use <var>
+  "var", // use <variable>
   "strong", // use <strong> element for content that is of greater importance (used in Markdown)
   "em", // use <em> element changes the meaning of a sentence - as spoken emphasis does (used in Markdown)
   "mono", // use monospace font with <![CDATA[

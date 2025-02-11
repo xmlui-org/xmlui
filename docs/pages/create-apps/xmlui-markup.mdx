@@ -562,7 +562,7 @@ This markup assigns a variable named `greeting` to the `Button` with the initial
 
 ```ueml /var./
 <Button label="Click me!">
-  <var name="greeting" value="Hello!">
+  <variable name="greeting" value="Hello!">
 </Button>
 ```
 
@@ -570,7 +570,7 @@ And similarly to `<property>`, XMLUI accepts nested text for the variable's init
 
 ```ueml /var./
 <Button label="Click me!">
-  <var name="greeting">Hello!</var>
+  <variable name="greeting">Hello!</variable>
 </Button>
 ```
 
@@ -583,17 +583,17 @@ And similarly to `<property>`, XMLUI accepts nested text for the variable's init
 ```ueml
 <!-- count is a string, "0" -->
 <Button label="Click me!">
-  <var name="count" value="0"/>
+  <variable name="count" value="0"/>
 </Button>
 
 <!-- count is a number, 0 -->
 <Button label="Click me!">
-  <var name="count" value="{0}"/>
+  <variable name="count" value="{0}"/>
 </Button>
 
 <!-- isOpen is a string, "true" -->
 <Button label="Click me!">
-  <var name="isOpen" value="true"/>
+  <variable name="isOpen" value="true"/>
 </Button>
 
 <!-- isOpen is a boolean, true -->
@@ -610,7 +610,7 @@ And similarly to `<property>`, XMLUI accepts nested text for the variable's init
 
 ```ueml /{x: 100, y: 40}/
 <Fragment>
-  <var name="origin" value="{{x: 100, y: 40}}"/>
+  <variable name="origin" value="{{x: 100, y: 40}}"/>
 </Fragment>
 ```
 
@@ -626,7 +626,7 @@ object literal defines a hash object with `x` and `y` properties.
 
 ```ueml copy /Component name="IncButton"/ /Component/
 <Component name="IncButton">
-  <var name="count" value="{0}"/>
+  <variable name="count" value="{0}"/>
   <Button label="Click to increment: {count}" onClick="count++"/>
 </Component>
 ```
@@ -665,7 +665,7 @@ With the `<method>` tag:
 
 ```ueml copy {3} /value="v => count = v"/ /setValue/
 <Component name="IncButton"
-  <var name="count" value="{0}"/>
+  <variable name="count" value="{0}"/>
   <method name="setValue" value="v => count = v"/>
   <Button label="Click to increment: {count}" onClick="count++"/>
 </Component>

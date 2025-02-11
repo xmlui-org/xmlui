@@ -216,7 +216,6 @@ import {
   htmlRtTagRenderer,
   htmlRubyTagRenderer,
   htmlSampTagRenderer,
-  htmlScriptTagRenderer,
   htmlSectionTagRenderer,
   htmlSelectTagRenderer,
   htmlSmallTagRenderer,
@@ -240,6 +239,7 @@ import {
   htmlTrTagRenderer,
   htmlUlTagRenderer,
   htmlUTagRenderer,
+  htmlVarTagRenderer,
   htmlVideoTagRenderer,
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
@@ -605,7 +605,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlRubyTagRenderer);
     this.registerCoreComponent(htmlSTagRenderer);
     this.registerCoreComponent(htmlSampTagRenderer);
-    this.registerCoreComponent(htmlScriptTagRenderer);
     this.registerCoreComponent(htmlSectionTagRenderer);
     this.registerCoreComponent(htmlSelectTagRenderer);
     this.registerCoreComponent(htmlSmallTagRenderer);
@@ -628,6 +627,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlTrackTagRenderer);
     this.registerCoreComponent(htmlUTagRenderer);
     this.registerCoreComponent(htmlUlTagRenderer);
+    this.registerCoreComponent(htmlVarTagRenderer);
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
 

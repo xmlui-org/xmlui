@@ -17,7 +17,7 @@ The following example shows a simple dialog with details about a user. This samp
 
 ```ueml copy /when="{isDialogShown}"/ /onClose="isDialogShown = false"/ /onClick="isDialogShown = true"/
 <App>
-  <var name="isDialogShown" value="{false}"/>
+  <variable name="isDialogShown" value="{false}"/>
   <ModalDialog
     when="{isDialogShown}"
     onClose="isDialogShown = false">
@@ -51,7 +51,7 @@ Do not forget to pop out the example below. To close an opened dialog, click any
   name="Example: Declarative approach"
   app={`
     <App>
-      <var name="isDialogShown" value="{false}"/>
+      <variable name="isDialogShown" value="{false}"/>
       <ModalDialog
         when="{isDialogShown}"
         onClose="isDialogShown = false">

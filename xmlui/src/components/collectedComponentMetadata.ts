@@ -162,7 +162,6 @@ import {
   HtmlRtMd,
   HtmlRubyMd,
   HtmlSampMd,
-  HtmlScriptMd,
   HtmlSectionMd,
   HtmlSelectMd,
   HtmlSmallMd,
@@ -187,6 +186,7 @@ import {
   HtmlUlMd,
   HtmlUMd,
   HtmlVideoMd,
+  HtmlVarMd,
   HtmlWbrMd,
 } from "./HtmlTags/HtmlTags";
 
@@ -266,7 +266,6 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   ruby: HtmlRubyMd,
   s: HtmlSMd,
   samp: HtmlSampMd,
-  script: HtmlScriptMd,
   section: HtmlSectionMd,
   select: HtmlSelectMd,
   small: HtmlSmallMd,
@@ -289,6 +288,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   track: HtmlTrackMd,
   u: HtmlUMd,
   ul: HtmlUlMd,
+  var: HtmlVarMd,
   video: HtmlVideoMd,
   wbr: HtmlWbrMd,
   // --- Heavy xmlui components

@@ -359,7 +359,7 @@ The following component, `RandomNumberDisplay`, generates a random number betwee
 
 ```ueml copy /number="{randomNumber}"/
 <Component name="RandomNumberDisplay">
-  <var 
+  <variable 
     name="randomNumber" 
     value="{Math.floor(Math.random() * ($props.maxValue - $props.minValue)) + $props.minValue}" />
   <Slot number="{randomNumber}"/>
@@ -385,7 +385,7 @@ Here, the app uses `RandomNumberDisplay` to generate a number between 10 and 19,
   horizontal={true}
   components={[`
     <Component name="RandomNumberDisplay">
-      <var 
+      <variable 
         name="randomNumber" 
         value="{Math.floor(Math.random() * ($props.maxValue - $props.minValue)) + $props.minValue}" />
       <Slot number="{randomNumber}"/>
@@ -414,7 +414,7 @@ In the following example, `FancyCard` has a named slot (`titleTemplate`) with de
 ```ueml copy {4-6}
 <Component name="FancyCard">
   <VStack border="2px solid orangered" padding="$padding-loose">
-    <var name="fancyTitle" value="*** {$props.title} ***" />
+    <variable name="fancyTitle" value="*** {$props.title} ***" />
     <Slot name="titleTemplate" title="{fancyTitle}">
       <H1>{fancyTitle}</H1>
     </Slot>
@@ -449,7 +449,7 @@ The app uses two instances of `FancyCard`. The first does not have a definition 
   components={[`
     <Component name="FancyCard">
       <VStack border="2px solid orangered" padding="$padding-loose">
-        <var name="fancyTitle" value="*** {$props.title} ***" />
+        <variable name="fancyTitle" value="*** {$props.title} ***" />
         <Slot name="titleTemplate" title="{fancyTitle}">
           <H1>{fancyTitle}</H1>
         </Slot>

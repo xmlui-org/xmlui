@@ -123,13 +123,13 @@ Variables are scoped; their name must be unique in the declaring scope. When you
 </App>
 ```
 
-**Declare a variable with the `<var>` helper tag and a nested value**
+**Declare a variable with the `<variable>` helper tag and a nested value**
 
 ```ueml copy {2-4} /name="myVar"/ /{myVar}/
 <App>
-  <var name="myVar">
+  <variable name="myVar">
     Hello, World!
-  </var>
+  </variable>
   <Text>{myVar}</Text> <!-- Displays: Hello, World! -->
 </App>
 ```
