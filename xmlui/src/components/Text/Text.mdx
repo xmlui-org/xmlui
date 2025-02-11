@@ -9,7 +9,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
 ```ueml copy
 <App>
   <Text
-    maxWidth="120"
+    maxWidth="120px"
     backgroundColor="cyan"
     color="black"
     value="A long text that will likely overflow"
@@ -22,7 +22,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
   app={`
   <App>
     <Text
-      maxWidth="120"
+      maxWidth="120px"
       backgroundColor="cyan"
       color="black"
       value="A long text that will likely overflow"
@@ -37,7 +37,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
 
 ```ueml copy /ellipses="false"/
 <App>
-  <VStack width="120">
+  <VStack width="120px">
     <Text
       backgroundColor="cyan"
       color="black"
@@ -59,7 +59,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
   name="Example: ellipses"
   app={`
   <App>
-    <VStack width="120">
+    <VStack width="120px">
       <Text
         backgroundColor="cyan"
         color="black"
@@ -86,7 +86,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
 <App>
   <HStack>
     <Text
-      width="200"
+      width="250px"
       backgroundColor="cyan"
       color="black"
       preserveLinebreaks="true"
@@ -94,10 +94,10 @@ You can learn more about this component in the [Working with Text](/learning/usi
       with several line breaks
               does not fit into a viewport with a 200-pixel width." />
     <Text
-      width="200"
+      width="250px"
       backgroundColor="cyan"
       color="black"
-      value="(do not preserve) This long text
+      value="(don't preserve) This long text
       with several line breaks
               does not fit into a viewport with a 200-pixel width." />
   </HStack>
@@ -110,7 +110,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
   <App>
     <HStack>
       <Text
-        width="250"
+        width="250px"
         backgroundColor="cyan"
         color="black"
         preserveLinebreaks="true"
@@ -118,7 +118,7 @@ You can learn more about this component in the [Working with Text](/learning/usi
         with several line breaks
                 does not fit into a viewport with a 200-pixel width." />
       <Text
-        width="250"
+        width="250px"
         backgroundColor="cyan"
         color="black"
         value="(don't preserve) This long text
@@ -162,39 +162,39 @@ You can learn more about this component in the [Working with Text](/learning/usi
   app={`
     <App>
       <HStack>
-        <Text width="150">default:</Text>
+        <Text width="150px">default:</Text>
         <Text>This is an example text</Text>
       </HStack>
       <HStack>
-        <Text width="150">paragraph:</Text>
+        <Text width="150px">paragraph:</Text>
         <Text variant="paragraph">This is an example paragraph</Text>
       </HStack>
       <HStack>
-        <Text width="150">abbr:</Text>
+        <Text width="150px">abbr:</Text>
         <Text variant="abbr">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">cite:</Text>
+        <Text width="150px">cite:</Text>
         <Text variant="cite">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">code:</Text>
+        <Text width="150px">code:</Text>
         <Text variant="code">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">codefence:</Text>
+        <Text width="150px">codefence:</Text>
         <Text variant="codefence">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">codefence + code:</Text>
+        <Text width="150px">codefence + code:</Text>
         <Text variant="codefence">
           <Text variant="code">
             This is an example text
@@ -202,117 +202,117 @@ You can learn more about this component in the [Working with Text](/learning/usi
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">deleted:</Text>
+        <Text width="150px">deleted:</Text>
         <Text variant="deleted">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">inserted:</Text>
+        <Text width="150px">inserted:</Text>
         <Text variant="inserted">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">keyboard:</Text>
+        <Text width="150px">keyboard:</Text>
         <Text variant="keyboard">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">marked:</Text>
+        <Text width="150px">marked:</Text>
         <Text variant="marked">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">sample:</Text>
+        <Text width="150px">sample:</Text>
         <Text variant="sample">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">sup:</Text>
+        <Text width="150px">sup:</Text>
         <Text>
           This is an example text
           <Text variant="sup">(with some additional text)</Text>
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">sub:</Text>
+        <Text width="150px">sub:</Text>
         <Text>
           This is an example text
           <Text variant="sub">(with some additional text)</Text>
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">var:</Text>
+        <Text width="150px">var:</Text>
         <Text variant="var">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">mono:</Text>
+        <Text width="150px">mono:</Text>
         <Text variant="mono">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">strong:</Text>
+        <Text width="150px">strong:</Text>
         <Text variant="strong">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">em:</Text>
+        <Text width="150px">em:</Text>
         <Text variant="em">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">title:</Text>
+        <Text width="150px">title:</Text>
         <Text variant="title">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">subtitle:</Text>
+        <Text width="150px">subtitle:</Text>
         <Text variant="subtitle">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">small:</Text>
+        <Text width="150px">small:</Text>
         <Text variant="small">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">caption:</Text>
+        <Text width="150px">caption:</Text>
         <Text variant="caption">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">placeholder:</Text>
+        <Text width="150px">placeholder:</Text>
         <Text variant="placeholder">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">subheading:</Text>
+        <Text width="150px">subheading:</Text>
         <Text variant="subheading">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">tableheading:</Text>
+        <Text width="150px">tableheading:</Text>
         <Text variant="tableheading">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">secondary:</Text>
+        <Text width="150px">secondary:</Text>
         <Text variant="secondary">
           This is an example text
         </Text>
@@ -364,17 +364,17 @@ with the following theme variables:
   app={`
     <App>
       <HStack>
-        <Text width="150">default:</Text>
+        <Text width="150px">default:</Text>
         <Text>This is an example text</Text>
       </HStack>
       <HStack>
-        <Text width="150">abbr:</Text>
+        <Text width="150px">abbr:</Text>
         <Text variant="abbr">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">cite:</Text>
+        <Text width="150px">cite:</Text>
         <Text variant="cite">
           This is an example text
         </Text>

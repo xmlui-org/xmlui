@@ -43,7 +43,7 @@ test("colorMap background", async ({ page }) => {
   const EXPECTED_BG_COLOR_REG = GREEN;
   const entryPoint = `
   <Stack>
-    <var name="simpleColorMap" value="{{ important: '${RED}', regular: '${GREEN}' }}" />
+    <variable name="simpleColorMap" value="{{ important: '${RED}', regular: '${GREEN}' }}" />
     <Badge testId="badgeImp" value="important" colorMap="{simpleColorMap}" />
     <Badge testId="badgeReg" value="regular" colorMap="{simpleColorMap}" />
   </Stack>
@@ -65,7 +65,7 @@ test("colorMap background and label", async ({ page }) => {
 
   const entryPoint = `
   <Stack>
-    <var name="simpleColorMap" value="{{ important: {label: '${EXPECTED_TEXT_COLOR_IMP}', background: '${EXPECTED_BG_COLOR_IMP}'}, regular: {label: '${EXPECTED_TEXT_COLOR_REG}', background: '${EXPECTED_BG_COLOR_REG}'} }}" />
+    <variable name="simpleColorMap" value="{{ important: {label: '${EXPECTED_TEXT_COLOR_IMP}', background: '${EXPECTED_BG_COLOR_IMP}'}, regular: {label: '${EXPECTED_TEXT_COLOR_REG}', background: '${EXPECTED_BG_COLOR_REG}'} }}" />
     <Badge testId="badgeImp" value="important" colorMap="{simpleColorMap}" />
     <Badge testId="badgeReg" value="regular" colorMap="{simpleColorMap}" />
   </Stack>

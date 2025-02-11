@@ -186,6 +186,7 @@ import {
   HtmlUlMd,
   HtmlUMd,
   HtmlVideoMd,
+  HtmlVarMd,
   HtmlWbrMd,
 } from "./HtmlTags/HtmlTags";
 
@@ -287,6 +288,7 @@ export const collectedComponentMetadata: Record<string, ComponentMetadata> = {
   track: HtmlTrackMd,
   u: HtmlUMd,
   ul: HtmlUlMd,
+  var: HtmlVarMd,
   video: HtmlVideoMd,
   wbr: HtmlWbrMd,
   // --- Heavy xmlui components

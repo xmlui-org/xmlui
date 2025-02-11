@@ -12,7 +12,6 @@ This is useful in two cases:
 
 <Playground
   name="Example: alt"
-  height={100}
   app={`
     <App>
       <Image src="cantFindIt.jpg" alt="This image depicts a wonderful scene not for human eyes" />
@@ -32,8 +31,14 @@ This is useful in two cases:
 ```ueml copy /fit/
 <App>
   <HStack padding="1rem" height="280px" gap="1rem">
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
+    <Image 
+      src="/resources/images/components/image/breakfast.jpg" 
+      fit="contain" 
+      width="240px" />
+    <Image 
+      src="/resources/images/components/image/breakfast.jpg" 
+      fit="cover" 
+      width="240px" />
   </HStack>
 </App>
 ```
@@ -63,13 +68,14 @@ The default value is eager (\`false\`).
 
 ```ueml copy
 <App>
-  <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" />
+  <Image 
+    src="/resources/images/components/image/breakfast.jpg" 
+    aspectRatio="200 / 150" />
 </App>
 ```
 
 <Playground
   name="Example: aspectRatio"
-  height={300}
   app={`
     <App>
       <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" />

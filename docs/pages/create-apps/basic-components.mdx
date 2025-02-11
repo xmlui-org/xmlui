@@ -729,7 +729,7 @@ The `Badge` is a text label that accepts a color map to define its background co
 
 ```ueml copy
 <App>
-  <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+  <variable name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
   Regular Badge
   <HStack>
     <Badge value="no mapped color" colorMap="{simpleColorMap}" />
@@ -751,7 +751,7 @@ The `Badge` is a text label that accepts a color map to define its background co
   name="Example: Using Badge"
   app={`
     <App>
-      <var name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
+      <variable name="simpleColorMap" value="{{ important: 'red', regular: 'blue', unimportant: 'black' }}" />
       Regular Badge
       <HStack>
         <Badge value="no mapped color" />
@@ -939,30 +939,6 @@ It functions as a container for a picture.
   `}
 />
 
-{/* <Callout type="info" emoji="💡">
-  How the Image component displays a picture can be affected by these properties: `fit`, `aspectRatio`.
-</Callout>
-
-
-```ueml copy
-<App>
-  <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
-  <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
-  <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" width="240px" />
-</App>
-```
-
-<Playground
-  name="Example: Sizing Images"
-  app={`
-  <App>
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="contain" width="240px" />
-    <Image src="/resources/images/components/image/breakfast.jpg" fit="cover" width="240px" />
-    <Image src="/resources/images/components/image/breakfast.jpg" aspectRatio="200 / 150" width="240px" />
-  </App>
-  `}
-/> */}
-
 See the <SmartLink href={COMPONENT_IMAGE}>Image component reference</SmartLink> to know more.
 
 ## ProgressBar
@@ -1025,8 +1001,8 @@ Use the buttons to toggle between the two `Spinners` in the demo app:
 
 ```ueml copy
 <App>
-  <var name="noDelay" value="{true}" />
-  <var name="yesDelay" value="{false}" />
+  <variable name="noDelay" value="{true}" />
+  <variable name="yesDelay" value="{false}" />
   <HStack>
     <Button
       label="No delay"
@@ -1045,8 +1021,8 @@ Use the buttons to toggle between the two `Spinners` in the demo app:
   height={200}
   app={`
     <App>
-      <var name="noDelay" value="{true}" />
-      <var name="yesDelay" value="{false}" />
+      <variable name="noDelay" value="{true}" />
+      <variable name="yesDelay" value="{false}" />
       <HStack>
         <Button
           label="No delay"

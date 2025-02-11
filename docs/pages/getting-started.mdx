@@ -197,7 +197,7 @@ Create a new file in the `components` folder named `MyBox.xmlui`, and copy this 
 ```ueml copy filename="components/MyBox.xmlui"
 <Component name="MyBox">
   <Stack 
-    padding="12"
+    padding="$padding-normal"
     borderColor="{$props.color}"
     borderThickness="8">
     {$props.label}
@@ -253,7 +253,7 @@ Extend the `MyBox` component to display a toast when the box is clicked.
 ```ueml copy filename="components/MyBox.xmlui" /onClick/ {6}
 <Component name="MyBox">
   <Stack 
-    padding="12"
+    padding="$padding-normal"
     borderColor="{$props.color}"
     borderThickness="8"
     onClick="toast('You clicked ' + $props.label)">

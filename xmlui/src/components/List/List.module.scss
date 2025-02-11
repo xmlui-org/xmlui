@@ -7,12 +7,33 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-.infoWrapper{
+.outerWrapper {
+  overflow: auto;
+  max-height: 100%;
+  overflow-anchor: none;
+
+  &.hasOutsideScroll {
+    overflow: initial
+  }
+}
+
+.innerWrapper{
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+
+  &.reverse{
+    justify-content: flex-end;
+  }
+}
+
+.infoWrapper {
   width: 100%;
   margin: 0 auto;
 }
 
-.loadingWrapper{
+.loadingWrapper {
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -27,31 +48,33 @@ $themeVars: ();
 }
 
 // --- We export the theme variables to add them to the component renderer
-:export{
+:export {
   themeVars: t.json-stringify($themeVars)
 }
 
-.borderCollapse{
-  &:not(.sectioned){
-    .row{
+.borderCollapse {
+  &:not(.sectioned) {
+    .row {
       //first row in the list (but not the last)
-      &:first-child:not(:last-child){
-        &>*{
+      &:first-child:not(:last-child) {
+        & > * {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
           border-bottom: 0;
         }
       }
+
       //last row in the list (but not the first)
-      &:last-child:not(:first-child){
-        &>*{
+      &:last-child:not(:first-child) {
+        & > * {
           border-top-left-radius: 0;
           border-top-right-radius: 0;
         }
       }
+
       //rows in the middle of the list
-      &:not(:first-child):not(:last-child){
-        &>*{
+      &:not(:first-child):not(:last-child) {
+        & > * {
           border-bottom-left-radius: 0;
           border-bottom-right-radius: 0;
           border-top-left-radius: 0;
@@ -61,10 +84,11 @@ $themeVars: ();
       }
     }
   }
-  &.sectioned{
+
+  &.sectioned {
     //.row after the section header (first row in a section)
-    .section+.row:not(:has(+.sectionFooter)){
-      &>*{
+    .section + .row:not(:has(+.sectionFooter)) {
+      & > * {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-bottom: 0;
@@ -72,16 +96,16 @@ $themeVars: ();
     }
 
     //.row before the sectionFooter (last row in a section)
-    .row:has(+.sectionFooter):not(.section + .row){
-      &>*{
+    .row:has(+.sectionFooter):not(.section + .row) {
+      & > * {
         border-top-left-radius: 0;
         border-top-right-radius: 0;
       }
     }
 
     //we select the rows that has .row as direct sibling, but not the first row of a section (rows in the middle of the section)
-    .row:has(+.row):not(.section + .row){
-      &>*{
+    .row:has(+.row):not(.section + .row) {
+      & > * {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
         border-top-left-radius: 0;

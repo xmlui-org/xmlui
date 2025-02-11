@@ -193,7 +193,7 @@ Use it as `onReady` when inlining it on the component.
 
 ```ueml copy /onReady="isAppReady = true"/
 <App onReady="isAppReady = true">
-  <var name="isAppReady" value="{false}"/>
+  <variable name="isAppReady" value="{false}"/>
   <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
 </App>
 ```
@@ -204,7 +204,7 @@ Use it as `onReady` when inlining it on the component.
   horizontal
   app={`
   <App onReady="isAppReady = true">
-    <var name="isAppReady" value="{false}"/>
+    <variable name="isAppReady" value="{false}"/>
     <Text value="{isAppReady ? 'App is ready' : 'Sadly, App is not ready'}" />
   </App>
   `}

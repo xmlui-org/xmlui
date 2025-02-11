@@ -210,7 +210,7 @@ See this in action in the following example:
 
 ```ueml copy
 <App>
-  <var name="myValue"
+  <variable name="myValue"
     value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
   <H3 value="{myValue}" />
   <H3>{myValue}</H3>
@@ -222,7 +222,7 @@ See this in action in the following example:
   horizontal
   app={`
     <App>
-      <var name="myValue"
+      <variable name="myValue"
         value="    Text   with   spaces to show   seconds: { getDate().getSeconds() }"/>
       <H3 value="{myValue}" />
       <H3>{myValue}</H3>
@@ -328,7 +328,7 @@ By default, a long text breaks into multiple lines (understanding word boundarie
 
 ```ueml copy
 <App>
-  <Text width="200" backgroundColor="olive">
+  <Text width="200px" backgroundColor="olive">
     This long text does not fit into a width constraint of 200 pixels.
   </Text>
 </App>
@@ -339,7 +339,7 @@ By default, a long text breaks into multiple lines (understanding word boundarie
   horizontal
   app={`
     <App>
-      <Text width="200" backgroundColor="goldenrod">
+      <Text width="200px" backgroundColor="goldenrod">
         This long text does not fit into a width constraint of 200 pixels.
       </Text>
     </App>
@@ -350,7 +350,7 @@ With very long words, where word boundaries do not work, the text is broken with
 
 ```ueml copy
 <App>
-  <Text width="200" backgroundColor="goldenrod">
+  <Text width="200px" backgroundColor="goldenrod">
     ThisLongTextDoesNotFitInTheGivenContrants of a 200 pixel width (and long words).
   </Text>
 </App>
@@ -361,7 +361,7 @@ With very long words, where word boundaries do not work, the text is broken with
   horizontal
   app={`
     <App>
-      <Text width="200" backgroundColor="goldenrod">
+      <Text width="200px" backgroundColor="goldenrod">
         ThisLongTextDoesNotFitInTheGivenContrants of a 200 pixel width (and long words).
       </Text>
     </App>
@@ -378,7 +378,7 @@ With very long words, where word boundaries do not work, the text is broken with
 ```ueml copy {5}
 <App>
   <Text
-    width="200"
+    width="200px"
     backgroundColor="goldenrod"
     maxLines="1">
     Though this long text does not fit into a single line, please do not break it!
@@ -392,7 +392,7 @@ With very long words, where word boundaries do not work, the text is broken with
   app={`
     <App>
       <Text
-        width="200"
+        width="200px"
         backgroundColor="goldenrod"
         maxLines="1">
         Though this long text does not fit into a single line, please do not break it!
@@ -408,7 +408,7 @@ With very long words, where word boundaries do not work, the text is broken with
 ```ueml copy {6}
 <App>
   <Text
-    width="200"
+    width="200px"
     backgroundColor="goldenrod"
     maxLines="1"
     ellipses="false">
@@ -423,7 +423,7 @@ With very long words, where word boundaries do not work, the text is broken with
   app={`
     <App>
       <Text
-        width="200"
+        width="200px"
         backgroundColor="goldenrod"
         maxLines="1"
         ellipses="false">
@@ -445,7 +445,7 @@ Otherwise, it will be cropped at the maximum specified. For example, the followi
 ```ueml copy {2}
 <App>
   <Text
-    width="200"
+    width="200px"
     backgroundColor="goldenrod"
     maxLines="2">
     This long text does not fit into a width constraint of 200 pixels, even with two lines.
@@ -459,7 +459,7 @@ Otherwise, it will be cropped at the maximum specified. For example, the followi
   app={`
     <App>
       <Text
-        width="200"
+        width="200px"
         backgroundColor="goldenrod"
         maxLines="2">
         This long text does not fit into a width constraint of 200 pixels, even with two lines.
@@ -532,7 +532,7 @@ The following example tries to contain a long text into a 200x60 pixel box:
 
 ```ueml copy
 <App>
-  <VStack width="200" height="60" backgroundColor="goldenrod" >
+  <VStack width="200px" height="60px" backgroundColor="goldenrod" >
     <Text>
       As its container width and height are fixed, this long text does not
       fit into it; it will overflow.
@@ -548,10 +548,9 @@ By perceiving the overflow, you can decide how to handle it.
 <Playground
   name="Example: Text Overflow"
   horizontal
-  height={160}
   app={`
     <App>
-      <VStack width="200" height="60" backgroundColor="goldenrod" >
+      <VStack width="200px" height="60px" backgroundColor="goldenrod" >
         <Text>
           As its container width and height are fixed, this long text does not
           fit into it; it will overflow.
@@ -576,7 +575,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 <App>
   <VStack
     verticalOverflow="hidden"
-    width="200" height="60" backgroundColor="goldenrod">
+    width="200px" height="60px" backgroundColor="goldenrod">
     <Text>
       As its container width and height are fixed, this long text does not
       fit into it; it will overflow.
@@ -592,7 +591,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
     <App>
       <VStack
         verticalOverflow="hidden"
-        width="200" height="60" backgroundColor="goldenrod">
+        width="200px" height="60px" backgroundColor="goldenrod">
         <Text>
           As its container width and height are fixed, this long text does not
           fit into it; it will overflow.
@@ -612,7 +611,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
 <App>
   <VStack
     verticalOverflow="scroll"
-    width="200" height="60" backgroundColor="goldenrod">
+    width="200px" height="60px" backgroundColor="goldenrod">
     <Text>
       As its container width and height are fixed, this long text does not
       fit into it; it will overflow.
@@ -628,7 +627,7 @@ Observe in the sample below, not the text, but how the `verticalOverflow` proper
     <App>
       <VStack
         verticalOverflow="scroll"
-        width="200" height="60" backgroundColor="goldenrod">
+        width="200px" height="60px" backgroundColor="goldenrod">
         <Text>
           As its container width and height are fixed, this long text does not
           fit into it; it will overflow.
@@ -648,9 +647,9 @@ The text accommodates the available space of the container if not specified othe
 
 ```ueml copy {4}
 <App>
-  <VStack height="40" width="300" backgroundColor="goldenrod">
+  <VStack height="40px" width="300px" backgroundColor="goldenrod">
     <Text
-      width="400"
+      width="400px"
       backgroundColor="silver" opacity="0.7">
       This text sets its size explicitly bigger than its container.
       As it does not fit into the space provided by its container - thus it overflows.
@@ -659,7 +658,7 @@ The text accommodates the available space of the container if not specified othe
 </App>
 ```
 
-Behind the semi-transparent background of the text, you can see its container in a blueish shade:
+Behind the semi-transparent background of the text, you can see its container in a silverish shade:
 
 <Playground
   name="Example: Explicit Text Dimensions"
@@ -667,9 +666,9 @@ Behind the semi-transparent background of the text, you can see its container in
   height={140}
   app={`
     <App>
-      <VStack height="40" width="300" backgroundColor="goldenrod">
+      <VStack height="40px" width="300px" backgroundColor="goldenrod">
         <Text
-          width="400"
+          width="400px"
           backgroundColor="silver" opacity="0.7">
           This text sets its size explicitly bigger than its container.
           As it does not fit into the space provided by its container - thus it overflows.
@@ -691,8 +690,8 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
 <App>
   <VStack
     horizontalOverflow="scroll"
-    height="60" width="300" backgroundColor="goldenrod">
-    <Text width="400" backgroundColor="silver" opacity="0.7">
+    height="60px" width="300px" backgroundColor="goldenrod">
+    <Text width="400px" backgroundColor="silver" opacity="0.7">
       This text sets its size explicitly bigger than its container.
       As it does not fit into the container, it overflows.
       However, its container supports horizontal scrolling so you can
@@ -713,8 +712,8 @@ Besides `verticalOverflow`, XMLUI containers provide another layout property, `h
     <App>
       <VStack
         horizontalOverflow="scroll"
-        height="60" width="300" backgroundColor="goldenrod">
-        <Text width="400" backgroundColor="silver" opacity="0.7">
+        height="60px" width="300px" backgroundColor="goldenrod">
+        <Text width="400px" backgroundColor="silver" opacity="0.7">
           This text sets its size explicitly bigger than its container.
           As it does not fit into the container, it overflows.
           However, its container supports horizontal scrolling so you can
@@ -743,33 +742,33 @@ See some of these styles below:
   app={`
     <App>
       <HStack>
-        <Text width="150">default:</Text>
+        <Text width="150px">default:</Text>
         <Text>This is an example text</Text>
       </HStack>
       <HStack>
-        <Text width="150">paragraph:</Text>
+        <Text width="150px">paragraph:</Text>
         <Text variant="paragraph">This is an example paragraph</Text>
       </HStack>
       <HStack>
-        <Text width="150">placeholder:</Text>
+        <Text width="150px">placeholder:</Text>
         <Text variant="placeholder">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">secondary:</Text>
+        <Text width="150px">secondary:</Text>
         <Text variant="secondary">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">code:</Text>
+        <Text width="150px">code:</Text>
         <Text variant="code">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">codefence + code:</Text>
+        <Text width="150px">codefence + code:</Text>
         <Text variant="codefence">
           <Text variant="code">
             This is an example text
@@ -777,45 +776,45 @@ See some of these styles below:
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">keyboard:</Text>
+        <Text width="150px">keyboard:</Text>
         <Text variant="keyboard">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">sup:</Text>
+        <Text width="150px">sup:</Text>
         <Text>
           This is an example text
           <Text variant="sup">(with some additional text)</Text>
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">sub:</Text>
+        <Text width="150px">sub:</Text>
         <Text>
           This is an example text
           <Text variant="sub">(with some additional text)</Text>
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">mono:</Text>
+        <Text width="150px">mono:</Text>
         <Text variant="mono">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">strong:</Text>
+        <Text width="150px">strong:</Text>
         <Text variant="strong">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">small:</Text>
+        <Text width="150px">small:</Text>
         <Text variant="small">
           This is an example text
         </Text>
       </HStack>
       <HStack>
-        <Text width="150">caption:</Text>
+        <Text width="150px">caption:</Text>
         <Text variant="caption">
           This is an example text
         </Text>

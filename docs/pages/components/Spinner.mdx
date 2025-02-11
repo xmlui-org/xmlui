@@ -39,8 +39,8 @@ Use the buttons to toggle between the two `Spinners`.
 
 ```ueml copy {8-9}
 <App>
-  <var name="noDelay" value="{true}" />
-  <var name="yesDelay" value="{false}" />
+  <variable name="noDelay" value="{true}" />
+  <variable name="yesDelay" value="{false}" />
   <HStack gap="$space-0_5">
     <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
     <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
@@ -55,8 +55,8 @@ Use the buttons to toggle between the two `Spinners`.
   height={180}
   app={`
     <App>
-      <var name="noDelay" value="{true}" />
-      <var name="yesDelay" value="{false}" />
+      <variable name="noDelay" value="{true}" />
+      <variable name="yesDelay" value="{false}" />
       <HStack gap="$space-0_5">
         <Button label="No delay" onClick="noDelay = true; yesDelay = false;" />
         <Button label="1000 ms delay" onClick="noDelay = false; yesDelay = true;" />
