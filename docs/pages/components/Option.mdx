@@ -6,6 +6,64 @@ import { Callout } from "nextra/components";
 
 
 
+## Using `Option`
+
+### With `Combobox`
+
+```ueml copy {4-6}
+<App>
+  <Text value="Selected ID: {myCombo.value}"/>
+  <Combobox id="myCombo">
+    <Option label="John, Smith" value="john" />
+    <Option label="Jane, Clint" value="jane" disabled="true" />
+    <Option label="Herbert, Frank" value="herbert" />
+  </Combobox>
+</App>
+```
+
+<Playground
+    name="Example: Option in a Combobox"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {myCombo.value}"/>
+      <Combobox id="myCombo">
+        <Option label="John, Smith" value="john" />
+        <Option label="Jane, Clint" value="jane" disabled="true" />
+        <Option label="Herbert, Frank" value="herbert" />
+      </Combobox>
+    </App>
+  `}
+/>
+
+### With `Select`
+
+```ueml copy {4-6}
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option label="John, Smith" value="john" />
+    <Option label="Jane, Clint" value="jane" />
+    <Option label="Herbert, Frank" value="herbert" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Option in a Select"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option label="John, Smith" value="john" />
+        <Option label="Jane, Clint" value="jane" />
+        <Option label="Herbert, Frank" value="herbert" />
+      </Select>
+    </App>
+  `}
+/>
+
 ## Properties
 
 ### `enabled`
@@ -18,9 +76,73 @@ Default value: `true`.
 
 This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
 
+<Callout type="info" emoji="📔">
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
+
+```ueml copy
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option />
+    <Option label="Vanilla" value="van"/>
+    <Option label="Chocolate" value="choc" />
+    <Option value="pist" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Using label"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option />
+        <Option label="Vanilla" value="van"/>
+        <Option label="Chocolate" value="choc" />
+        <Option value="pist" />
+      </Select>
+    </App>
+  `}
+/>
+
 ### `value`
 
 This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
+
+<Callout type="info" emoji="📔">
+    If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
+</Callout>
+
+```ueml copy
+<App>
+  <Text value="Selected ID: {mySelect.value}"/>
+  <Select id="mySelect">
+    <Option />
+    <Option label="Vanilla" />
+    <Option label="Chocolate" value="chocolate" />
+    <Option label="Pistachio" value="pistachio" />
+  </Select>
+</App>
+```
+
+<Playground
+    name="Example: Option in a Select"
+    height={260}
+    app={`
+    <App>
+      <Text value="Selected ID: {mySelect.value}"/>
+      <Select id="mySelect">
+        <Option />
+        <Option label="Vanilla" />
+        <Option label="Chocolate" value="chocolate" />
+        <Option label="Pistachio" value="pistachio" />
+      </Select>
+    </App>
+  `}
+/>
 
 ## Events
 
