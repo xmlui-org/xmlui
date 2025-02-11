@@ -141,6 +141,8 @@ async function createSummary(
   const buffer = await readFile(filename, "utf8");
   const componentFolderName = basename(componentsSourceFolder);
 
+  // The summary file may contain other sections than the summary table.
+  // Thus, we only (re)generate the section that contains the summary table - and look for the next section
   const lines = strBufferToLines(buffer);
   const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
   const componentSectionEndIdx = lines
