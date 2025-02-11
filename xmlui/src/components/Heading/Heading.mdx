@@ -71,8 +71,8 @@ For a visual example, see the component description.
 ```ueml copy
 <App>
   <H2
-    maxWidth="160"
-    backgroundColor="blue"
+    maxWidth="160px"
+    backgroundColor="cyan"
     value="A long heading text that will likely overflow" maxLines="2" />
 </App>
 ```
@@ -82,8 +82,8 @@ For a visual example, see the component description.
   app={`
     <App>
       <H2
-        maxWidth="160"
-        backgroundColor="blue"
+        maxWidth="160px"
+        backgroundColor="cyan"
         value="A long heading text that will likely overflow" maxLines="2" />
     </App>
   `}
@@ -97,15 +97,15 @@ For a visual example, see the component description.
 <App>
   <HStack>
     <H3
-      width="200"
-      backgroundColor="blue"
+      width="200px"
+      backgroundColor="cyan"
       preserveLinebreaks="true"
       value="(preserve) This long text
   with several line breaks
           does not fit into a viewport with a 200-pixel width." />
     <H3
-      width="200"
-      backgroundColor="blue"
+      width="200px"
+      backgroundColor="cyan"
       value="(do not preserve) This long text
   with several line breaks
           does not fit into a viewport with a 200-pixel width." />
@@ -121,15 +121,15 @@ You can observe the effect of using `preserveLinebreaks`:
     <App>
       <HStack>
         <H3
-          width="200"
-          backgroundColor="blue"
+          width="200px"
+          backgroundColor="cyan"
           preserveLinebreaks="true"
           value="(preserve) This long text
       with several line breaks
               does not fit into a viewport with a 200-pixel width." />
         <H3
-          width="200"
-          backgroundColor="blue"
+          width="200px"
+          backgroundColor="cyan"
           value="(do not preserve) This long text
       with several line breaks
               does not fit into a viewport with a 200-pixel width." />
@@ -149,15 +149,15 @@ Linebreaks are converted to spaces when nesting the text in the `Heading` compon
 
 ```ueml copy {4}
 <App>
-  <VStack width="200" gap="0.5rem">
+  <VStack width="200px">
     <H3
-      backgroundColor="blue"
+      backgroundColor="cyan"
       maxLines="1"
       ellipses="false">
       Though this long text does is about to crop!
     </H3>
     <H3
-      backgroundColor="blue"
+      backgroundColor="cyan"
       maxLines="1">
       Though this long text does is about to crop!
     </H3>
@@ -167,19 +167,18 @@ Linebreaks are converted to spaces when nesting the text in the `Heading` compon
 
 <Playground
   name="Example: ellipses"
-  height={100}
   horizontal
   app={`
     <App>
-      <VStack width="200" gap="0.5rem">
+      <VStack width="200px">
         <H3
-          backgroundColor="blue"
+          backgroundColor="cyan"
           maxLines="1"
           ellipses="false">
           Though this long text does is about to crop!
         </H3>
         <H3
-          backgroundColor="blue"
+          backgroundColor="cyan"
           maxLines="1">
           Though this long text does is about to crop!
         </H3>

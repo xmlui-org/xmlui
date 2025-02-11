@@ -7,7 +7,6 @@
 ```
 
 <Playground
-  height={120}
   name="Example: name"
   app={`
     <App>
@@ -33,7 +32,6 @@
 ```
 
 <Playground
-  height={160}
   name="Example: size"
   app={`
     <App>
@@ -59,7 +57,6 @@
 ```
 
 <Playground
-  height={130}
   name="Example: url"
   app={`
     <App>
@@ -73,21 +70,24 @@
 %-EVENT-START click
 
 ```ueml copy
-<HStack verticalAlignment="center">
-  <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+<App>
+  <HStack verticalAlignment="center">
+    <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
     Click the avatar!
-</HStack>
+  </HStack>
+</App>
 ```
 
 <Playground
   name="Example: click"
   app={`
-    <HStack gap="1rem" verticalAlignment="center" padding="$space-2">
-      <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
-      Click the avatar!
-    </HStack>
+    <App>
+      <HStack verticalAlignment="center">
+        <Avatar name="Molly Dough" size="md" onClick="window.alert('Avatar clicked')" />
+        Click the avatar!
+      </HStack>
+    </App>
   `}
-  height={108}
 />
 
 %-EVENT-END

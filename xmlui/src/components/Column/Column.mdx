@@ -94,11 +94,11 @@ Click on either the `Name` or the `Quantity` column headers to order the data by
 ```ueml copy /pinTo="left"/ /pinTo="right"/
 <App>
   <Table data='{[...]}' height="100%">
-    <Column bindTo="id" width="50" pinTo="left" />
-    <Column bindTo="name" width="500" />
-    <Column bindTo="quantity" width="300" />
-    <Column bindTo="unit" width="300"/>
-    <Column bindTo="category" width="100" pinTo="right"/>
+    <Column bindTo="id" width="50px" pinTo="left" />
+    <Column bindTo="name" width="500px" />
+    <Column bindTo="quantity" width="300px" />
+    <Column bindTo="unit" width="300px"/>
+    <Column bindTo="category" width="100px" pinTo="right"/>
   </Table>
 </App>
 ```
@@ -109,11 +109,11 @@ Scroll the table contents horizontally to see how the pinned columns are display
   app={`
     <App>
       <Table data='{${JSON.stringify(data, null, 2)}}' height="100%">
-        <Column bindTo="id" width="50" pinTo="start" />
-        <Column bindTo="name" width="500" />
-        <Column bindTo="quantity" width="300" />
-        <Column bindTo="unit" width="300"/>
-        <Column bindTo="category" width="100" pinTo="end"/>
+        <Column bindTo="id" width="50px" pinTo="start" />
+        <Column bindTo="name" width="500px" />
+        <Column bindTo="quantity" width="300px" />
+        <Column bindTo="unit" width="300px"/>
+        <Column bindTo="category" width="100px" pinTo="end"/>
       </Table>
     </App>
   `}
@@ -156,7 +156,7 @@ The following example sets the second column to an absolute size (size pixels), 
 <App>
   <Table data='{[...]}'>
     <Column bindTo="name" canResize="true" width="3*" />
-    <Column bindTo="quantity" width="100" minWidth="50px" maxWidth="500 px" />
+    <Column bindTo="quantity" width="100px" minWidth="50px" maxWidth="500px" />
     <Column bindTo="unit" width="*" />
   </Table>
 </App>
@@ -170,7 +170,7 @@ Check what happens when you resize table columns:
     <App>
       <Table data='{${JSON.stringify(data, null, 2)}}'>
         <Column bindTo="name" canResize="true" width="3*" />
-        <Column bindTo="quantity" width="100" minWidth="50px" maxWidth="500 px" />
+        <Column bindTo="quantity" width="100px" minWidth="50px" maxWidth="500px" />
         <Column bindTo="unit" width="*" />
       </Table>
     </App>

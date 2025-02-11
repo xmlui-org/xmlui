@@ -55,7 +55,10 @@ showing the modal in conjunction with an updated URL so that the opened state of
 <App height="100%" verticalAlignment="center" horizontalAlignment="center">
   <variable name="isDialogShown" value="{false}"/>
   <Button label="Open Dialog" onClick="isDialogShown = true" />
-  <ModalDialog when="{isDialogShown}" title="Example Dialog" onClose="isDialogShown = false" />
+  <ModalDialog 
+    when="{isDialogShown}" 
+    title="Example Dialog" 
+    onClose="isDialogShown = false" />
 </App>
 ```
 

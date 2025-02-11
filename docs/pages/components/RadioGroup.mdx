@@ -27,7 +27,7 @@ This property indicates whether the input accepts user actions (`true`) or not (
 ```ueml copy /enabled="false"/
 <App>
   <RadioGroup initialValue="first" enabled="false">
-    <HStack gap="1rem" padding="1rem">
+    <HStack padding="$space-normal">
       <Option label="First Item" value="first"/>
       <Option label="Second Item" value="second"/>
       <Option label="Third Item" value="third"/>
@@ -41,7 +41,7 @@ This property indicates whether the input accepts user actions (`true`) or not (
   app={`
     <App>
       <RadioGroup initialValue="first" enabled="false">
-        <HStack gap="1rem" padding="1rem">
+        <HStack padding="$space-normal">
           <Option label="First Item" value="first"/>
           <Option label="Second Item" value="second"/>
           <Option label="Third Item" value="third"/>
@@ -60,7 +60,7 @@ This property defines the initial value of the selected option within the group.
 ```ueml copy /initialValue="first"/
 <App>
   <RadioGroup initialValue="first">
-    <HStack gap="1rem" padding="1rem">
+    <HStack padding="$space-normal">
       <Option label="First Item" value="first"/>
       <Option label="Second Item" value="second"/>
       <Option label="Third Item" value="third"/>
@@ -74,7 +74,7 @@ This property defines the initial value of the selected option within the group.
   app={`
     <App>
       <RadioGroup initialValue="first">
-        <HStack gap="1rem" padding="1rem">
+        <HStack padding="$space-normal">
           <Option label="First Item" value="first"/>
           <Option label="Second Item" value="second"/>
           <Option label="Third Item" value="third"/>

@@ -532,11 +532,11 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
   <List data='{[...]}'>
     <property name="itemTemplate">
       <Card>
-        <HStack verticalAlignment="center" gap="0.5rem">
+        <HStack verticalAlignment="center">
           <Icon name="info" />
           <Text value="{$item.name}" variant="strong" />
         </HStack>
-        <HStack gap="0.5rem">
+        <HStack>
           <Text value="{$item.quantity}" />
           <Text value="{$item.unit}" variant="em" />
         </HStack>
@@ -554,11 +554,11 @@ Note how in the example below the `$item` is used to access the `name`, `quantit
       <List data='{${JSON.stringify(data, null, 2)}}'>
         <property name="itemTemplate">
           <Card>
-            <HStack verticalAlignment="center" gap="0.5rem">
+            <HStack verticalAlignment="center">
               <Icon name="info" />
               <Text value="{$item.name}" variant="strong" />
             </HStack>
-            <HStack gap="0.5rem">
+            <HStack>
               <Text value="{$item.quantity}" />
               <Text value="{$item.unit}" variant="em" />
             </HStack>
