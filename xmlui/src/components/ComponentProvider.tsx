@@ -239,6 +239,7 @@ import {
   htmlTrTagRenderer,
   htmlUlTagRenderer,
   htmlUTagRenderer,
+  htmlVarTagRenderer,
   htmlVideoTagRenderer,
   htmlWbrTagRenderer,
 } from "./HtmlTags/HtmlTags";
@@ -626,6 +627,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(htmlTrackTagRenderer);
     this.registerCoreComponent(htmlUTagRenderer);
     this.registerCoreComponent(htmlUlTagRenderer);
+    this.registerCoreComponent(htmlVarTagRenderer);
     this.registerCoreComponent(htmlVideoTagRenderer);
     this.registerCoreComponent(htmlWbrTagRenderer);
 

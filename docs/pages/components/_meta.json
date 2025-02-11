@@ -65,7 +65,6 @@
   "ProgressBar": "ProgressBar",
   "Queue": "Queue",
   "RadioGroup": "RadioGroup",
-  "RawHtml": "RawHtml",
   "RealTimeAdapter": "RealTimeAdapter",
   "Redirect": "Redirect",
   "Select": "Select",
@@ -166,7 +165,6 @@
   "ruby": "ruby",
   "s": "s",
   "samp": "samp",
-  "script": "script",
   "section": "section",
   "select": "select",
   "small": "small",
@@ -189,6 +187,7 @@
   "track": "track",
   "u": "u",
   "ul": "ul",
+  "var": "var",
   "video": "video",
   "wbr": "wbr"
 }
