@@ -126,7 +126,6 @@ import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
 import { codeComponentRenderer } from "../components-core/XmluiCodeHighlighter";
 import { tabItemComponentRenderer } from "./Tabs/TabItem";
-import { rangeComponentRenderer } from "./Range/Range";
 import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
@@ -526,7 +525,6 @@ export class ComponentRegistry {
     this.registerCoreComponent(accordionComponentRenderer);
     this.registerCoreComponent(alertComponentRenderer);
     this.registerCoreComponent(offCanvasComponentRenderer);
-    this.registerCoreComponent(rangeComponentRenderer);
     this.registerCoreComponent(sliderComponentRenderer);
     this.registerCoreComponent(buttonGroupComponentRenderer);
     this.registerCoreComponent(backdropComponentRenderer);
