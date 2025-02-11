@@ -318,7 +318,7 @@ const TextVariantKeys = [
   "sample", // use <samp>
   "sub", // use <sub>
   "sup", // use <sup>
-  "var", // use <var>
+  "var", // use <variable>
   "strong", // use <strong> element for content that is of greater importance (used in Markdown)
   "em", // use <em> element changes the meaning of a sentence - as spoken emphasis does (used in Markdown)
   "mono", // use monospace font with <![CDATA[

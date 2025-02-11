@@ -1,5 +1,5 @@
 <VStack>
-  <var name=dots value="" />
+  <variable name=dots value="" />
   <IncButton onIncremented="v => dots += ''.padStart(v, '.')" />
   <Text value={dots} />
 </VStack>
