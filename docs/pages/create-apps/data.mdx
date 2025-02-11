@@ -1196,7 +1196,7 @@ As the following sample demonstrates, a `List` can group its items according to 
       <Text when="{!$item.image}" width="*">No image available</Text>
     </HStack>
     <property name="groupHeaderTemplate">
-      <Card title="{$item.sectionKey}" />
+      <Card title="{$group.key}" />
     </property>
   </List>
 </App>  
@@ -1215,7 +1215,7 @@ As the following sample demonstrates, a `List` can group its items according to 
           <Text when="{!$item.image}" width="*">No image available</Text>
         </HStack>
         <property name="groupHeaderTemplate">
-          <Card title="{$item.sectionKey}" />
+          <Card title="{$group.key}" />
         </property>
       </List>
     </App>  
@@ -1236,10 +1236,10 @@ The following sample demonstrates using `Table`. You can use `Column` components
 ```ueml copy
 <App>
   <Table data="https://api.spacexdata.com/v4/rockets">
-    <Column header="Image" width="100">
+    <Column header="Image" width="100px">
       <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
     </Column>
-    <Column header="Name" bindTo="name" width="110">
+    <Column header="Name" bindTo="name" width="110px">
       <Text variant="strong">{$item.name}</Text>
     </Column>
     <Column header="Description" bindTo="description" width="*">
@@ -1254,10 +1254,10 @@ The following sample demonstrates using `Table`. You can use `Column` components
   app={`
     <App>
       <Table data="https://api.spacexdata.com/v4/rockets">
-        <Column header="Image" width="100">
+        <Column header="Image" width="100px">
           <Image height="80px" width="110px" fit="cover" src="{$item.flickr_images[0]}"/>
         </Column>
-        <Column header="Name" bindTo="name" width="110">
+        <Column header="Name" bindTo="name" width="110px">
           <Text variant="strong">{$item.name}</Text>
         </Column>
         <Column header="Description" bindTo="description" width="*">

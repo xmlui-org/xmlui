@@ -161,7 +161,6 @@ The following markup displays the first button's panel with the default theme an
       </HStack>
     </App>
     `}
-    height={100}
 />
 
 The next sample demonstrates that you can use the `tone` property of `Theme` to set a different tone for a UI patch.
@@ -190,7 +189,6 @@ The next sample demonstrates that you can use the `tone` property of `Theme` to 
       </Theme>
     </App>
   `}
-    height={200}
 />
 
 In addition to theme IDs and tones, you can modify particular theme variables, as the following sample demonstrates:
@@ -219,7 +217,6 @@ In addition to theme IDs and tones, you can modify particular theme variables, a
       </Theme>
     </App>
   `}
-    height={200}
 />
 
 ## Creating Themes
@@ -249,7 +246,6 @@ Let's assume you run this app with the default theme:
 <Playground
     fixedTheme={true}
     name="Simple app with the default theme"
-    height={180}
     horizontal
     app={myThemedApp}
 />
@@ -296,7 +292,6 @@ Now, your new theme displays the app in a light tone like this:
 <Playground
     fixedTheme={true}
     name="Simple app with the default theme"
-    height={240}
     horizontal
     app={`
     <Theme tone="light">
@@ -332,7 +327,6 @@ It also handles the dark tone:
 <Playground
     fixedTheme={true}
     name="Simple app with the default theme"
-    height={240}
     horizontal
     app={`
     <Theme tone="dark">
@@ -502,7 +496,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Gallery with the default theme"
-        height={400}
         app={gallery}/>
 
     Let's update the value of `color-primary`. This theme variable is at the top of the theme variable chain.
@@ -519,7 +512,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Changing 'color-primary'"
-        height={400}
         app={gallery}
         defaultTheme="sample"
         themes={[
@@ -564,7 +556,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Changing 'color-Button'"
-        height={400}
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -599,7 +590,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Changing 'color-Button-primary-solid'"
-        height={400}
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -629,7 +619,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Changing 'color-bg-Button--hover'"
-        height={400}
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -660,7 +649,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Changing 'color-bg-Button-primary-solid--hover'"
-        height={400}
         horizontal={true}
         app={gallery}
         defaultTheme="sample"
@@ -683,14 +671,14 @@ The `<propertyName>` segment should use lowercase letters and dashes.
 
     ```ueml {3,4}
     <Form id="driveForm" data="{{car: 'Toyota Celica', year: '1999'}}" padding=1em>
-    <FlowLayout paddingBottom=1em gap=1em>
-    <FormItem width="50%" label="Car Type" bindTo="car" autoFocus="true" type="text"/>
-    <FormItem width="50%" label="Year" bindTo="year" autoFocus="true" type="integer"/>
-</FlowLayout>
-</Form>
+      <FlowLayout paddingBottom=1em gap=1em>
+        <FormItem width="50%" label="Car Type" bindTo="car" autoFocus="true" type="text"/>
+        <FormItem width="50%" label="Year" bindTo="year" autoFocus="true" type="integer"/>
+      </FlowLayout>
+    </Form>
     ```
 
-    <Playground fixedTheme={true} name="Input components" height={200} horizontal={true} app={inputs}/>
+    <Playground fixedTheme={true} name="Input components" horizontal={true} app={inputs}/>
 
     If you want to change their border rounding while keeping other components, such as the buttons intact, you could
     create a derived theme like this:
@@ -700,9 +688,9 @@ The `<propertyName>` segment should use lowercase letters and dashes.
         "id": "rounded",
         "name": "Rounded theme",
         "themeVars": {
-        "radius-TextBox": "160px",
-        "radius-NumberBox": "160px"
-    }
+          "radius-TextBox": "160px",
+          "radius-NumberBox": "160px"
+      }
     }
     ```
 
@@ -711,7 +699,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Input components with theme #1"
-        height={200}
         horizontal={true}
         app={inputs}
         defaultTheme="rounded"
@@ -742,9 +729,9 @@ The `<propertyName>` segment should use lowercase letters and dashes.
         "id": "rounded",
         "name": "Rounded theme",
         "themeVars": {
-        "radius-Input": "160px",
-        "color-bg-Input": "papayawhip"
-    }
+          "radius-Input": "160px",
+          "color-bg-Input": "papayawhip"
+        }
     }
     ```
 
@@ -753,7 +740,6 @@ The `<propertyName>` segment should use lowercase letters and dashes.
     <Playground
         fixedTheme={true}
         name="Input components with theme #2"
-        height={200}
         horizontal={true}
         app={inputs}
         defaultTheme="rounded"

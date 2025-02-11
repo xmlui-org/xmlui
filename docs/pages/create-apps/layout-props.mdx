@@ -26,19 +26,19 @@ This code snippet renders a text:
       <Text>I'm a Text without explicit layout properties</Text>
     </App>
   `}
-  height={80}
 />
 
 This sample explicitly sets a few layout properties of Text:
 
 ```ueml copy
-<Text
-  backgroundColor="cyan"
-  width="320px"
-  horizontalMargin="48px"
-  verticalMargin="1rem">
-  "I'm a Text with explicit layout properties"
-</Text>
+<App>
+  <Text
+    backgroundColor="cyan"
+    width="320px"
+    padding="2rem">
+    I'm a Text with explicit layout properties
+  </Text>
+</App>
 ```
 
 <Playground
@@ -53,7 +53,6 @@ This sample explicitly sets a few layout properties of Text:
       </Text>
     </App>
   `}
-  height={160}
 />
 
 In this article, you will learn about available layout properties. Before treating them, learn how to use layout properties correctly to avoid unnecessary maintenance chores.
@@ -77,11 +76,11 @@ In the following example, all properties of the `HStack` and `CHStack` component
 ```ueml copy
 <App>
   <HStack height="100%">
-    <CHStack border="1px dotted blue" color="black" width="80" height="40">Black</CHStack>
-    <CHStack backgroundColor="red" color="white" width="80" height="40">Red</CHStack>
-    <CHStack backgroundColor="blue" color="white" width="80" height="40">Blue</CHStack>
-    <CHStack backgroundColor="purple" color="white" width="80" height="40">Purple</CHStack>
-    <CHStack backgroundColor="green" color="white" width="80" height="40">Green</CHStack>
+    <CHStack border="1px dotted blue" color="black" width="80px" height="40px">Black</CHStack>
+    <CHStack backgroundColor="red" color="white" width="80px" height="40px">Red</CHStack>
+    <CHStack backgroundColor="blue" color="white" width="80px" height="40px">Blue</CHStack>
+    <CHStack backgroundColor="purple" color="white" width="80px" height="40px">Purple</CHStack>
+    <CHStack backgroundColor="green" color="white" width="80px" height="40px">Green</CHStack>
   </HStack>
 </App>
 ```
@@ -91,16 +90,15 @@ Also, the `height` property of `HStack` is a layout property. However, its "100%
 <Playground
 
   name="Example: Styling with layout properties"
-  height={100}
   horizontal={true}
   app={`
     <App>
       <HStack height="100%">
-        <CHStack border="1px dotted blue" color="black" width="80" height="40">Black</CHStack>
-        <CHStack backgroundColor="red" color="white" width="80" height="40">Red</CHStack>
-        <CHStack backgroundColor="blue" color="white" width="80" height="40">Blue</CHStack>
-        <CHStack backgroundColor="purple" color="white" width="80" height="40">Purple</CHStack>
-        <CHStack backgroundColor="green" color="white" width="80" height="40">Green</CHStack>
+        <CHStack border="1px dotted blue" color="black" width="80px" height="40px">Black</CHStack>
+        <CHStack backgroundColor="red" color="white" width="80px" height="40px">Red</CHStack>
+        <CHStack backgroundColor="blue" color="white" width="80px" height="40px">Blue</CHStack>
+        <CHStack backgroundColor="purple" color="white" width="80px" height="40px">Purple</CHStack>
+        <CHStack backgroundColor="green" color="white" width="80px" height="40px">Green</CHStack>
       </HStack>
     </App>
   `}
@@ -120,7 +118,7 @@ To remove the pain of setting all `width` and `height` occurrences in the previo
     border="{$props.border}"
     backgroundColor="{$props.bgColor}"
     color="{$props.color}"
-    width="80" height="40">
+    width="80px" height="40px">
     <Slot />
   </CHStack>
 </Component>
@@ -148,7 +146,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
     border="{$props.border}"
     backgroundColor="{$props.bgColor}"
     color="{$props.color ?? 'white'}"
-    width="60" height="60">
+    width="60px" height="60px">
     <Slot />
   </CHStack>
 </Component>
@@ -157,7 +155,6 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
 <Playground
 
   name="Example: Styling with reusable components"
-  height={120}
   horizontal={true}
   components={[
     `
@@ -166,7 +163,7 @@ Let's assume, we need to change the dimensions from 80x40 to 60x60 pixels. Alter
         border="{$props.border}"
         backgroundColor="{$props.bgColor}"
         color="{$props.color ?? 'white'}"
-        width="60" height="60">
+        width="60px" height="60px">
         <Slot />
       </CHStack>
     </Component>
@@ -225,9 +222,7 @@ Changing the dimensions of `MyBox` is pretty straightforward by setting the appr
 ```
 
 <Playground
-
   name="Example: Reusable components with theme variables"
-  height={100}
   horizontal={true}
   defaultTheme="custom"
   themes={[
@@ -285,8 +280,6 @@ The dimension properties use <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SIZE}
 125mm
 ```
 
-By default (when the unit is omitted), XMLUI assumes pixels (`px`).
-
 The XMLUI percentage value is relative to the size of the viewport a parent container offers for a particular child element. Here is an example to demonstrate how percentage values are used:
 
 ```ueml copy
@@ -320,7 +313,6 @@ The XMLUI percentage value is relative to the size of the viewport a parent cont
     </HStack>
   </App>
   `}
-  height={160}
 />
 
 ### Component Width and Height [#component-width-height]
@@ -490,8 +482,8 @@ The engine defines several layout properties to set up the box model of a partic
 <App height="100%" backgroundColor="cyan">
   <VStack height="85%"
     backgroundColor="red"
-    margin="20"
-    padding="60"
+    margin="20px"
+    padding="60px"
     border="8px dashed blue">
     <VStack width="100%" height="100%" backgroundColor="green" />
   </VStack>
@@ -505,8 +497,8 @@ The engine defines several layout properties to set up the box model of a partic
     <App height="100%" backgroundColor="cyan">
       <VStack height="85%"
         backgroundColor="red"
-        margin="20"
-        padding="60"
+        margin="20p"
+        padding="60p"
         border="8px dashed blue">
         <VStack width="100%" height="100%" backgroundColor="green" />
       </VStack>
@@ -614,7 +606,6 @@ The engine supports these layout properties to set component colors:
       <H2 backgroundColor="green" color="white">The Power of Green Economy</H2>
     </App>
   `}
-  height={80}
 />
 
 ```ueml copy
@@ -634,7 +625,6 @@ The engine supports these layout properties to set component colors:
       </H2>
     </App>
   `}
-  height={80}
 />
 
 ### Font and Text Properties
@@ -684,7 +674,6 @@ Several properties allow you to set the appearance of text elements displayed in
       </Text>
     </App>
   `}
-  height={180}
 />
 
 ### Shadow
@@ -693,7 +682,7 @@ You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects
 
 ```ueml copy {2}
 <App>
-  <VStack width="200" padding="20" border="2px solid #202020"
+  <VStack width="200px" padding="20px" border="2px solid #202020"
     shadow="12px 12px 5px orangered" >
     <Text>This is a box with a shadow around it.</Text>
   </VStack>
@@ -704,13 +693,12 @@ You can add <SmartLink href={COMMON_VISUAL_PROPERTY_UNITS_SHADOW}>shadow effects
   name="Using shadow effect"
   app={`
     <App>
-      <VStack width="200" padding="20" border="2px solid #202020"
+      <VStack width="200px" padding="20px" border="2px solid #202020"
         shadow="12px 12px 5px orangered" >
         <Text>This is a box with a shadow around it.</Text>
       </VStack>
     </App>
   `}
-  height={160}
 />
 
 ## Other Layout Properties
@@ -732,10 +720,10 @@ This property sets the direction of text, table columns, and horizontal overflow
 
 ```ueml copy {6}
 <App>
-  <Text width="300" backgroundColor="cyan">
+  <Text width="300px" backgroundColor="cyan">
     This goes from left to right
   </Text>
-  <Text width="300" backgroundColor="cyan"
+  <Text width="300px" backgroundColor="cyan"
     direction="rtl">
     This goes from right to left
   </Text>
@@ -743,19 +731,18 @@ This property sets the direction of text, table columns, and horizontal overflow
 ```
 
 <Playground
-  name="Using shadow effect"
+  name="Using direction"
   app={`
     <App>
-      <Text width="300" backgroundColor="cyan">
+      <Text width="300px" backgroundColor="cyan">
         This goes from left to right
       </Text>
-      <Text width="300" backgroundColor="cyan"
+      <Text width="300px" backgroundColor="cyan"
         direction="rtl">
         This goes from right to left
       </Text>
     </App>
   `}
-  height={120}
 />
 
 

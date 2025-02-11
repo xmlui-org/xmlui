@@ -19,19 +19,19 @@ Position a child component within its parent to the start according to the curre
 ```ueml copy /horizontalAlignment/ /verticalAlignment/
 <App>
   <VStack>
-    <HStack width="300" backgroundColor="cyan"
+    <HStack width="300px" backgroundColor="cyan"
       horizontalAlignment="start">
       <Text>This is a text aligned to the start</Text>
     </HStack>
-    <HStack width="300" backgroundColor="cyan"
+    <HStack width="300px" backgroundColor="cyan"
       horizontalAlignment="center">
       <Text>This is a text aligned to the center</Text>
     </HStack>
-    <HStack width="300" backgroundColor="cyan"
+    <HStack width="300px" backgroundColor="cyan"
       horizontalAlignment="end">
       <Text>This is a text aligned to the end</Text>
     </HStack>
-    <VStack height="100"
+    <VStack height="100px"
       backgroundColor="cyan"
       verticalAlignment="end"
       horizontalAlignment="center">
@@ -48,19 +48,19 @@ Position a child component within its parent to the start according to the curre
     app={`
     <App>
       <VStack>
-        <HStack width="300" backgroundColor="cyan"
+        <HStack width="300px" backgroundColor="cyan"
           horizontalAlignment="start">
           <Text>This is a text aligned to the start</Text>
         </HStack>
-        <HStack width="300" backgroundColor="cyan"
+        <HStack width="300px" backgroundColor="cyan"
           horizontalAlignment="center">
           <Text>This is a text aligned to the center</Text>
         </HStack>
-        <HStack width="300" backgroundColor="cyan"
+        <HStack width="300px" backgroundColor="cyan"
           horizontalAlignment="end">
           <Text>This is a text aligned to the end</Text>
         </HStack>
-        <VStack height="100"
+        <VStack height="100px"
           backgroundColor="cyan"
           verticalAlignment="end"
           horizontalAlignment="center">
@@ -109,10 +109,10 @@ When you specify multiple radii, the first value determines the horizontal round
   app={`
     <App>
     <FlowLayout gap="8" padding="8">
-      <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px"><Text value="20px" /></CVStack>
-      <CVStack width="25%" height="64" border="solid 4px #202020" radius="20px 40px"><Text value="20px 40px" /></CVStack>
-      <CVStack width="25%" height="64" border="solid 4px #202020" radius="25% 20px"><Text value="25% 20px" /></CVStack>
-      <CVStack width="25%" height="64" border="solid 4px #202020" radius="50%"><Text value="50%" /></CVStack>
+      <CVStack width="25%" height="64px" border="solid 4px #202020" radius="20px"><Text value="20px" /></CVStack>
+      <CVStack width="25%" height="64px" border="solid 4px #202020" radius="20px 40px"><Text value="20px 40px" /></CVStack>
+      <CVStack width="25%" height="64px" border="solid 4px #202020" radius="25% 20px"><Text value="25% 20px" /></CVStack>
+      <CVStack width="25%" height="64px" border="solid 4px #202020" radius="50%"><Text value="50%" /></CVStack>
     </FlowLayout>
     </App>
   `}
@@ -138,14 +138,14 @@ The engine supports these border style values:
   app={`
     <App>
       <FlowLayout>
-        <CVStack width="25%" height="64" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
-        <CVStack width="25%" height="64" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
-        <CVStack width="25%" height="64" border="double 8px #202020"><Text value="double" /></CVStack>
-        <CVStack width="25%" height="64" border="groove 8px #202020"><Text value="groove" /></CVStack>
-        <CVStack width="25%" height="64" border="inset 8px #202020"><Text value="inset" /></CVStack>
-        <CVStack width="25%" height="64" border="outset 8px #202020"><Text value="outset" /></CVStack>
-        <CVStack width="25%" height="64" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
-        <CVStack width="25%" height="64" border="solid 8px #202020"><Text value="solid" /></CVStack>
+        <CVStack width="25%" height="64px" border="dashed 8px #202020"><Text value="dashed" /></CVStack>
+        <CVStack width="25%" height="64px" border="dotted 8px #202020"><Text value="dotted" /></CVStack>
+        <CVStack width="25%" height="64px" border="double 8px #202020"><Text value="double" /></CVStack>
+        <CVStack width="25%" height="64px" border="groove 8px #202020"><Text value="groove" /></CVStack>
+        <CVStack width="25%" height="64px" border="inset 8px #202020"><Text value="inset" /></CVStack>
+        <CVStack width="25%" height="64px" border="outset 8px #202020"><Text value="outset" /></CVStack>
+        <CVStack width="25%" height="64px" border="ridge 8px #202020"><Text value="ridge" /></CVStack>
+        <CVStack width="25%" height="64px" border="solid 8px #202020"><Text value="solid" /></CVStack>
       </FlowLayout>
     </App>
   `}
@@ -233,52 +233,52 @@ Move the mouse over the rectangles in the following example to check what the cu
     app={`
     <App>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="auto" border="solid 1 #202020">auto</CVStack>
-        <CVStack width="20%" height="36" cursor="default" border="solid 1 #202020">default</CVStack>
-        <CVStack width="20%" height="36" cursor="none" border="solid 1 #202020">none</CVStack>
+        <CVStack width="20%" height="36px" cursor="auto" border="solid 1 #202020">auto</CVStack>
+        <CVStack width="20%" height="36px" cursor="default" border="solid 1 #202020">default</CVStack>
+        <CVStack width="20%" height="36px" cursor="none" border="solid 1 #202020">none</CVStack>
       </FlowLayout>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="context-menu" border="solid 1 #202020">context-menu</CVStack>
-        <CVStack width="20%" height="36" cursor="help" border="solid 1 #202020">help</CVStack>
-        <CVStack width="20%" height="36" cursor="pointer" border="solid 1 #202020">pointer</CVStack>
-        <CVStack width="20%" height="36" cursor="progress" border="solid 1 #202020">progress</CVStack>
-        <CVStack width="20%" height="36" cursor="wait" border="solid 1 #202020">wait</CVStack>
+        <CVStack width="20%" height="36px" cursor="context-menu" border="solid 1 #202020">context-menu</CVStack>
+        <CVStack width="20%" height="36px" cursor="help" border="solid 1 #202020">help</CVStack>
+        <CVStack width="20%" height="36px" cursor="pointer" border="solid 1 #202020">pointer</CVStack>
+        <CVStack width="20%" height="36px" cursor="progress" border="solid 1 #202020">progress</CVStack>
+        <CVStack width="20%" height="36px" cursor="wait" border="solid 1 #202020">wait</CVStack>
       </FlowLayout>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="cell" border="solid 1 #202020">cell</CVStack>
-        <CVStack width="20%" height="36" cursor="crosshair" border="solid 1 #202020">crosshair</CVStack>
-        <CVStack width="20%" height="36" cursor="text" border="solid 1 #202020">text</CVStack>
-        <CVStack width="20%" height="36" cursor="vertical-text" border="solid 1 #202020">vertical-text</CVStack>
+        <CVStack width="20%" height="36px" cursor="cell" border="solid 1 #202020">cell</CVStack>
+        <CVStack width="20%" height="36px" cursor="crosshair" border="solid 1 #202020">crosshair</CVStack>
+        <CVStack width="20%" height="36px" cursor="text" border="solid 1 #202020">text</CVStack>
+        <CVStack width="20%" height="36px" cursor="vertical-text" border="solid 1 #202020">vertical-text</CVStack>
       </FlowLayout>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="alias" border="solid 1 #202020">alias</CVStack>
-        <CVStack width="20%" height="36" cursor="copy" border="solid 1 #202020">copy</CVStack>
-        <CVStack width="20%" height="36" cursor="move" border="solid 1 #202020">move</CVStack>
-        <CVStack width="20%" height="36" cursor="no-drop" border="solid 1 #202020">no-drop</CVStack>
-        <CVStack width="20%" height="36" cursor="not-allowed" border="solid 1 #202020">not-allowed</CVStack>
-        <CVStack width="20%" height="36" cursor="grab" border="solid 1 #202020">grab</CVStack>
-        <CVStack width="20%" height="36" cursor="grabbing" border="solid 1 #202020">grabbing</CVStack>
+        <CVStack width="20%" height="36px" cursor="alias" border="solid 1 #202020">alias</CVStack>
+        <CVStack width="20%" height="36px" cursor="copy" border="solid 1 #202020">copy</CVStack>
+        <CVStack width="20%" height="36px" cursor="move" border="solid 1 #202020">move</CVStack>
+        <CVStack width="20%" height="36px" cursor="no-drop" border="solid 1 #202020">no-drop</CVStack>
+        <CVStack width="20%" height="36px" cursor="not-allowed" border="solid 1 #202020">not-allowed</CVStack>
+        <CVStack width="20%" height="36px" cursor="grab" border="solid 1 #202020">grab</CVStack>
+        <CVStack width="20%" height="36px" cursor="grabbing" border="solid 1 #202020">grabbing</CVStack>
       </FlowLayout>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="alt-scroll" border="solid 1 #202020">all-scroll</CVStack>
-        <CVStack width="20%" height="36" cursor="col-resize" border="solid 1 #202020">col-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="row-resize" border="solid 1 #202020">row-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="n-resize" border="solid 1 #202020">n-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="e-resize" border="solid 1 #202020">e-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="s-resize" border="solid 1 #202020">s-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="w-resize" border="solid 1 #202020">w-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="ne-resize" border="solid 1 #202020">ne-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="nw-resize" border="solid 1 #202020">nw-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="se-resize" border="solid 1 #202020">se-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="sw-resize" border="solid 1 #202020">sw-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="ew-resize" border="solid 1 #202020">ew-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="ns-resize" border="solid 1 #202020">ns-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="nesw-resize" border="solid 1 #202020">nesw-resize</CVStack>
-        <CVStack width="20%" height="36" cursor="nwse-resize" border="solid 1 #202020">nwse-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="alt-scroll" border="solid 1 #202020">all-scroll</CVStack>
+        <CVStack width="20%" height="36px" cursor="col-resize" border="solid 1 #202020">col-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="row-resize" border="solid 1 #202020">row-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="n-resize" border="solid 1 #202020">n-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="e-resize" border="solid 1 #202020">e-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="s-resize" border="solid 1 #202020">s-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="w-resize" border="solid 1 #202020">w-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="ne-resize" border="solid 1 #202020">ne-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="nw-resize" border="solid 1 #202020">nw-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="se-resize" border="solid 1 #202020">se-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="sw-resize" border="solid 1 #202020">sw-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="ew-resize" border="solid 1 #202020">ew-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="ns-resize" border="solid 1 #202020">ns-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="nesw-resize" border="solid 1 #202020">nesw-resize</CVStack>
+        <CVStack width="20%" height="36px" cursor="nwse-resize" border="solid 1 #202020">nwse-resize</CVStack>
       </FlowLayout>
       <FlowLayout>
-        <CVStack width="20%" height="36" cursor="zoom-in" border="solid 1 #202020">zoom-in</CVStack>
-        <CVStack width="20%" height="36" cursor="zoom-out" border="solid 1 #202020">zoom-out</CVStack>
+        <CVStack width="20%" height="36px" cursor="zoom-in" border="solid 1 #202020">zoom-in</CVStack>
+        <CVStack width="20%" height="36px" cursor="zoom-out" border="solid 1 #202020">zoom-out</CVStack>
       </FlowLayout>
     </App>
   `}
@@ -421,35 +421,35 @@ When you prefix the shadow value with `inset`, it changes the shadow from an out
     name="Shadow Values"
     app={`
     <FlowLayout gap="24">
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="12px 12px 5px orangered" >
         <Text>12px 12px 5px orangered</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="inset 12px 12px 5px #808080" >
         <Text>inset 12px 12px 5px orangered</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="16px 8px green" >
         <Text>16px 8px green</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="-8px -6px green" >
         <Text>"inset 12px 12px 5px orangered"</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="16px 8px 12px blue" >
         <Text>16px 8px 12px blue</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="16px 8px 8px 4px blue" >
         <Text>16px 8px 8px 4px blue</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="12px 12px 5px orangered, inset 8px 6px green" >
         <Text>12px 12px 5px orangered, inset 8px 6px green</Text>
       </Stack>
-      <Stack margin="16" padding="16" border="2px solid #202020"
+      <Stack margin="16px" padding="16px" border="2px solid #202020"
         shadow="8px 4px 2px blue, -8px -6px green" >
         <Text>12px 12px 5px blue, -8px -6px green</Text>
       </Stack>    </FlowLayout>
@@ -507,7 +507,7 @@ This value sets the horizontal alignment of the inline-rendered content (e.g., t
 <Playground
     name="Text Alignment Values"
     app={`
-      <VStack gap="8" verticalMargin="8" verticalPadding="8" width="600" margin="auto" backgroundColor="#eee">
+      <VStack gap="8px" verticalMargin="8px" verticalPadding="8px" width="600px" margin="auto" backgroundColor="#eee">
         <Text textAlign="left">This is a long text with several words (left)</Text>
         <Text textAlign="right">This is a long text with several words (right)</Text>
         <Text textAlign="center">This is a long text with several words (center)</Text>
@@ -548,7 +548,7 @@ You can use these style values:
 <Playground
     name="Setting text properties"
     app={`
-  <VStack margin="8" gap="8">
+  <VStack margin="8px" gap="8px">
     <Text textDecoration="underline">underline</Text>
     <Text textDecoration="red wavy underline">red wavy underline</Text>
     <Text textDecoration="line-through">line-through</Text>
