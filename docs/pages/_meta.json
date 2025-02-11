@@ -26,6 +26,7 @@
     "type": "separator"
   },
   "components": "Components Library",
+  "lightweight-components": "Lightweight Components",
   "styles-and-themes": "Themes",
   "scripting": "Scripting and APIs",
   "extensibility": {

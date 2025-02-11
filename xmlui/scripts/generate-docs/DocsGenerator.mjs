@@ -83,20 +83,27 @@ export class DocsGenerator {
     }
   }
 
-  async generateComponentsSummary() {
+  async generateComponentsSummary(summarySectionName = "Components", summaryFileName) {
     logger.info("Creating Component Summary");
     try {
       const sourceFolderName = basename(this.folders.sourceFolder);
+      const outFile = join(FOLDERS.pages, summaryFileName || `${sourceFolderName}.mdx`);
+      
+      if (!existsSync(outFile)) {
+        await writeFile(outFile, "");
+      }
+
       const summary = await createSummary(
         this.metadata,
-        join(FOLDERS.pages, `${sourceFolderName}.mdx`),
+        outFile,
         {
-          sectionName: "Components",
+          sectionName: summarySectionName,
           componentFolder: sourceFolderName,
           //excludeStatuses: ["in progress"],
         },
       );
-      await writeFile(join(FOLDERS.pages, `${sourceFolderName}.mdx`), summary);
+
+      await writeFile(outFile, summary);
     } catch (error) {
       processError(error);
     }
@@ -169,7 +176,9 @@ async function createSummary(
       })
       .map((component) => {
         return [
-          `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
+          !!component.descriptionRef
+            ? `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`
+            : component.displayName,
           component.description,
           component.status ?? defaultStatus,
         ];
