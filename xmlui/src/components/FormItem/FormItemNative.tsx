@@ -35,6 +35,7 @@ import type { LabelPosition } from "../abstractions";
 import type { FormItemMd } from "./FormItem";
 import { ItemWithLabel } from "./ItemWithLabel";
 import { useValidation, useValidationDisplay } from "./Validations";
+import {Slider} from "../Slider/SliderNative";
 
 type FormControlType =
   | "text"
@@ -49,7 +50,8 @@ type FormControlType =
   | "datePicker"
   | "radioGroup"
   | "custom"
-  | "switch";
+  | "switch"
+  | "slider";
 
 const DEFAULT_LABEL_POSITIONS: Record<FormControlType | string, LabelPosition> = {
   checkbox: "end",
@@ -289,6 +291,21 @@ export const FormItem = memo(function FormItem({
           validationStatus={validationStatus}
           maxLength={maxTextLength ?? validations?.maxLength}
         />
+      );
+      break;
+    }
+    case "slider": {
+      formControl = (
+          <Slider
+              {...rest}
+              value={value}
+              updateState={onStateChange}
+              registerComponentApi={registerComponentApi}
+              enabled={isEnabled}
+              validationStatus={validationStatus}
+              min={validations.minValue}
+              max={validations.maxValue}
+          />
       );
       break;
     }

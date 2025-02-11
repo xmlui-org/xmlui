@@ -7,10 +7,91 @@ $themeVars: ();
   @return t.getThemeVar($themeVars, $componentVariable);
 }
 
-// TODO: Define styles here
+$componentName: "Slider";
+
+@mixin variant($variantName) {
+  border-radius: createThemeVar("Input:radius-#{$componentName}-#{$variantName}");
+  border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}");
+  border-width: createThemeVar("Input:thickness-border-#{$componentName}-#{$variantName}");
+  border-style: createThemeVar("Input:style-border-#{$componentName}-#{$variantName}");
+  box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}");
+
+  &:hover {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--hover");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--hover");
+  }
+
+  &:focus-within {
+    border-color: createThemeVar("Input:color-border-#{$componentName}-#{$variantName}--focus");
+    box-shadow: createThemeVar("Input:shadow-#{$componentName}-#{$variantName}--focus");
+  }
+}
+
+
+.sliderRoot {
+  position: relative;
+  display: flex;
+  width: 100%;
+  touch-action: none;
+  user-select: none;
+  align-items: center;
+}
+
+.sliderTrack {
+  position: relative;
+  height: 8px;
+  width: 100%;
+  flex-grow: 1;
+  overflow: hidden;
+  background-color: createThemeVar("Input:color-bg-track-#{$componentName}");
+
+  @include variant("default");
+
+  &.error {
+    @include variant("error");
+  }
+  &.warning {
+    @include variant("warning");
+  }
+  &.valid {
+    @include variant("success");
+  }
+
+  &[data-disabled] {
+    background-color: createThemeVar("Input:color-bg-track-#{$componentName}--disabled");
+  }
+}
+
+.sliderRange {
+  position: absolute;
+  height: 100%;
+  background-color: createThemeVar("Input:color-bg-range-#{$componentName}");
+  &[data-disabled] {
+    background-color: createThemeVar("Input:color-bg-range-#{$componentName}--disabled");
+  }
+}
+
+.sliderThumb {
+  display: block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: createThemeVar("Input:thickness-border-thumb-#{$componentName}") createThemeVar("Input:style-border-thumb-#{$componentName}") createThemeVar("Input:color-border-thumb-#{$componentName}");
+  background-color: createThemeVar("Input:color-bg-thumb-#{$componentName}");
+  transition: background-color 0.2s;
+  outline: none;
+}
+
+.sliderThumb:focus-visible {
+  box-shadow: createThemeVar("Input:shadow-thumb-#{$componentName}");
+}
+
+.sliderThumb:disabled {
+  pointer-events: none;
+  opacity: 0.5;
+}
 
 // --- We export the theme variables to add them to the component renderer
 :export {
-    themeVars: t.json-stringify($themeVars);
-  }
-  
+  themeVars: t.json-stringify($themeVars);
+}
