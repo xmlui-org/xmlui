@@ -73,7 +73,8 @@ switch (script) {
     break;
   }
   case "preview": {
-    preview();
+    const { proxy } = argv as any;
+    preview({proxy});
     break;
   }
   case "zip-dist": {

@@ -6,7 +6,7 @@ import { parseScssVar } from "../../components-core/theming/themeVars";
 import { MemoizedItem } from "../container-helpers";
 import { dComponent } from "../metadata-helpers";
 import { scrollAnchoringValues } from "../abstractions";
-import { DynamicHeightList, MemoizedSection } from "./ListNative";
+import { ListNative, MemoizedSection } from "./ListNative";
 
 const COMP = "List";
 
@@ -72,7 +72,6 @@ export const ListMd = createMetadata({
     idKey: d(
       `Denotes which attribute of an item acts as the ID or key of the item. Default is \`"id"\`.`,
     ),
-    selectedIndex: d(`This property scrolls to a specific item indicated by its index.`),
     groupsInitiallyExpanded: d(
       `This Boolean property defines whether the list groups are initially expanded.`,
     ),
@@ -107,7 +106,6 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     node,
     extractValue,
     renderChild,
-    lookupAction,
     layoutCss,
     layoutContext,
     lookupEventHandler,
@@ -116,7 +114,7 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
     const itemTemplate = node.props.itemTemplate || node.children;
     const hideEmptyGroups = extractValue.asOptionalBoolean(node.props.hideEmptyGroups, true);
     return (
-      <DynamicHeightList
+      <ListNative
         registerComponentApi={registerComponentApi}
         style={layoutCss}
         loading={extractValue.asOptionalBoolean(node.props.loading)}
@@ -130,19 +128,18 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         idKey={extractValue(node.props.idKey)}
         requestFetchPrevPage={lookupEventHandler("requestFetchPrevPage")}
         requestFetchNextPage={lookupEventHandler("requestFetchNextPage")}
-        selectedIndex={extractValue(node.props.selectedIndex)}
-        resetSelectedIndex={lookupAction(node.events?.resetSelectedIndex)}
         emptyListPlaceholder={renderChild(node.props.emptyListTemplate)}
         groupsInitiallyExpanded={extractValue.asOptionalBoolean(node.props.groupsInitiallyExpanded)}
         defaultGroups={extractValue(node.props.defaultGroups)}
         borderCollapse={extractValue.asOptionalBoolean(node.props.borderCollapse, true)}
         itemRenderer={
           itemTemplate &&
-          ((item) => {
+          ((item, key) => {
             return (
               <MemoizedItem
                 node={itemTemplate as any}
                 item={item}
+                key={key}
                 renderChild={renderChild}
                 layoutContext={layoutContext}
               />
@@ -151,11 +148,12 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         }
         sectionRenderer={
           node.props.groupBy
-            ? (item) =>
+            ? (item, key) =>
                 (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
                   <MemoizedSection
                     node={node.props.groupHeaderTemplate ?? ({ type: "Fragment" } as any)}
                     renderChild={renderChild}
+                    key={key}
                     item={item}
                   />
                 ) : null
@@ -163,12 +161,13 @@ export const dynamicHeightListComponentRenderer = createComponentRenderer(
         }
         sectionFooterRenderer={
           node.props.groupFooterTemplate
-            ? (item) =>
+            ? (item, key) =>
                 (item.items?.length ?? 0) > 0 || !hideEmptyGroups ? (
                   <MemoizedItem
                     node={node.props.groupFooterTemplate ?? ({ type: "Fragment" } as any)}
                     item={item}
                     renderChild={renderChild}
+                    key={key}
                     itemKey="$group"
                     contextKey="$group"
                   />

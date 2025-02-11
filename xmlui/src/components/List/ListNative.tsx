@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import React, {
+  createContext,
   forwardRef,
   useCallback,
   useContext,
@@ -9,9 +10,6 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { Range } from "@tanstack/react-virtual";
-import { defaultRangeExtractor, useVirtualizer } from "@tanstack/react-virtual";
-import { composeRefs } from "@radix-ui/react-compose-refs";
 import {
   get,
   groupBy as groupByFunc,
@@ -21,21 +19,23 @@ import {
   sortBy,
   uniq,
 } from "lodash-es";
-import classnames from "classnames";
-
-import styles from "./List.module.scss";
-
-import type { ComponentDef } from "../../abstractions/ComponentDefs";
 import type { RegisterComponentApiFn, RenderChildFn } from "../../abstractions/RendererDefs";
 import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
-import { usePrevious, useResizeObserver } from "../../components-core/utils/hooks";
-import { useEvent } from "../../components-core/utils/misc";
-import { ScrollContext } from "../../components-core/ScrollContext";
-import { MemoizedItem } from "../container-helpers";
 import type { FieldOrderBy, ScrollAnchoring } from "../abstractions";
 import { Card } from "../Card/CardNative";
-import { Text } from "../Text/TextNative";
+import type { CustomItemComponentProps, VListHandle } from "virtua";
+import { Virtualizer } from "virtua";
+import { usePrevious } from "../../components-core/utils/hooks";
+import { ScrollContext } from "../../components-core/ScrollContext";
+import { composeRefs } from "@radix-ui/react-compose-refs";
+import styles from "./List.module.scss";
+import classnames from "classnames";
+import { useEvent } from "../../components-core/utils/misc";
 import { Spinner } from "../Spinner/SpinnerNative";
+import { Text } from "../Text/TextNative";
+import { MemoizedItem } from "../container-helpers";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { CustomItemComponent } from "virtua/lib/react/types";
 
 interface IExpandableListContext {
   isExpanded: (id: any) => boolean;
@@ -46,34 +46,6 @@ export const ListContext = React.createContext<IExpandableListContext>({
   isExpanded: (id: any) => false,
   toggleExpanded: (id: any, isExpanded: boolean) => {},
 });
-
-const Item = ({ children, onHeightChanged, rowIndex, itemType }: any) => {
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  useResizeObserver(
-    ref,
-    useCallback(() => {
-      onHeightChanged?.(ref.current);
-    }, [onHeightChanged]),
-  );
-  return (
-    <div
-      ref={(divElement) => {
-        onHeightChanged?.(divElement);
-        ref.current = divElement;
-      }}
-      className={classnames({
-        [styles.row]: itemType === RowType.ITEM,
-        [styles.section]: itemType === RowType.SECTION,
-        [styles.sectionFooter]: itemType === RowType.SECTION_FOOTER,
-      })}
-      data-list-item-type={itemType}
-      data-index={rowIndex}
-    >
-      {children}
-    </div>
-  );
-};
 
 type OrderBy = FieldOrderBy | Array<FieldOrderBy>;
 
@@ -229,8 +201,6 @@ type DynamicHeightListProps = {
   scrollAnchor?: ScrollAnchoring;
   requestFetchPrevPage?: () => any;
   requestFetchNextPage?: () => any;
-  selectedIndex?: number;
-  resetSelectedIndex?: () => void;
   pageInfo?: PageInfo;
   idKey?: string;
   style?: CSSProperties;
@@ -241,8 +211,32 @@ type DynamicHeightListProps = {
   borderCollapse?: boolean;
 };
 
-// TODO check this out: https://github.com/TanStack/virtual/discussions/195#discussioncomment-11170421
-export const DynamicHeightList = forwardRef(function DynamicHeightList(
+// eslint-disable-next-line react/display-name
+const Item = forwardRef(
+  ({ children, style, index }: CustomItemComponentProps, forwardedRef: any) => {
+    const getItemType = useContext(ListItemTypeContext);
+    const itemType = getItemType(index) || RowType.ITEM;
+    return (
+      <div
+        style={style}
+        ref={forwardedRef}
+        className={classnames({
+          [styles.row]: itemType === RowType.ITEM,
+          [styles.section]: itemType === RowType.SECTION,
+          [styles.sectionFooter]: itemType === RowType.SECTION_FOOTER,
+        })}
+        data-list-item-type={itemType}
+        data-index={index}
+      >
+        {children}
+      </div>
+    );
+  },
+);
+
+const ListItemTypeContext = createContext<(index: number) => RowType>((index) => RowType.ITEM);
+
+export const ListNative = forwardRef(function DynamicHeightList(
   {
     items = EMPTY_ARRAY,
     itemRenderer = defaultItemRenderer,
@@ -256,8 +250,6 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     scrollAnchor = "top",
     requestFetchPrevPage = noop,
     requestFetchNextPage = noop,
-    selectedIndex,
-    resetSelectedIndex = noop,
     pageInfo,
     idKey = "id",
     style,
@@ -265,16 +257,21 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     groupsInitiallyExpanded = true,
     defaultGroups = EMPTY_ARRAY,
     registerComponentApi,
-    borderCollapse = true
+    borderCollapse = true,
   }: DynamicHeightListProps,
   ref,
 ) {
-  // The scrollable element for your list
+  const virtualizerRef = useRef<VListHandle>(null);
   const scrollRef = useContext(ScrollContext);
   const parentRef = useRef<HTMLDivElement | null>(null);
   const rootRef = ref ? composeRefs(parentRef, ref) : parentRef;
-  const rowsContainerRef = useRef<HTMLDivElement | null>(null);
-  const [suspendInfiniteLoad, setSuspendInfiniteLoad] = useState(scrollAnchor === "bottom");
+
+  const hasOutsideScroll =
+    scrollRef &&
+    style?.maxHeight === undefined &&
+    style?.height === undefined &&
+    style?.flex === undefined;
+  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
@@ -300,57 +297,70 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
     availableGroups,
   });
 
-  const hasOutsideScroll =
-    scrollRef &&
-    style?.maxHeight === undefined &&
-    style?.height === undefined &&
-    style?.flex === undefined;
-  const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
+  const isPrepend = useRef(false);
+  const prevRows = usePrevious(rows);
+  useLayoutEffect(() => {
+    if (prevRows?.length < rows.length) {
+      isPrepend.current = false;
+    }
+  }, [rows.length, prevRows?.length]);
 
-  const overscan = 5;
-  const rowVirtualizer = useVirtualizer<HTMLDivElement, HTMLDivElement>({
-    count: rows.length,
-    // paddingStart: scrollPaddingStart,
-    // paddingEnd: scrollPaddingEnd,
-    scrollMargin: !hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0,
-    getScrollElement: useCallback(() => {
-      return scrollElementRef.current;
-    }, [scrollElementRef]),
-    estimateSize: useCallback(() => {
-      return 10;
-    }, []),
-    rangeExtractor: useCallback((range: Range) => {
-      return defaultRangeExtractor(range);
-    }, []),
-    getItemKey: useCallback(
-      (index: number) => {
-        return rows[index][idKey] ?? index;
-      },
-      [idKey, rows],
-    ),
-    overscan: overscan,
-  });
+  const initiallyScrolledToBottom = useRef(false);
+  useEffect(() => {
+    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
+      initiallyScrolledToBottom.current = true;
+      virtualizerRef.current?.scrollToIndex(rows.length - 1);
+    }
+  }, [rows.length, scrollAnchor]);
 
-  const tryToScrollToIndex = useCallback(
-    (index: number, onFinished?: () => void) => {
-      // console.log("SCROLLING TO INDEX", index);
-      rowVirtualizer.scrollToIndex(index);
-      requestAnimationFrame(() => {
-        onFinished?.();
-      });
-    },
-    [rowVirtualizer],
-  );
+  const tryToFetchPrevPage = useCallback(() => {
+    if (
+      virtualizerRef.current &&
+      virtualizerRef.current.findStartIndex() < 10 &&
+      pageInfo &&
+      pageInfo.hasPrevPage &&
+      !pageInfo.isFetchingPrevPage
+    ) {
+      isPrepend.current = true;
+      requestFetchPrevPage();
+    }
+  }, [pageInfo, requestFetchPrevPage]);
+
+  const tryToFetchNextPage = useCallback(() => {
+    if (
+      virtualizerRef.current &&
+      virtualizerRef.current.findEndIndex() + 10 > rows.length &&
+      pageInfo &&
+      pageInfo.hasNextPage &&
+      !pageInfo.isFetchingNextPage
+    ) {
+      requestFetchNextPage();
+    }
+  }, [rows.length, pageInfo, requestFetchNextPage]);
+
+  const initiallyFetchedExtraPages = useRef(false);
+  useEffect(() => {
+    if (rows.length && !initiallyFetchedExtraPages.current) {
+      initiallyFetchedExtraPages.current = true;
+      tryToFetchPrevPage();
+    }
+  }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
+
+  const onScroll = useCallback(() => {
+    if (!virtualizerRef.current) return;
+    tryToFetchPrevPage();
+    tryToFetchNextPage();
+  }, [tryToFetchNextPage, tryToFetchPrevPage]);
 
   const scrollToBottom = useEvent(() => {
     if (rows.length) {
-      tryToScrollToIndex(rows.length - 1);
+      virtualizerRef.current.scrollToIndex(rows.length - 1);
     }
   });
 
   const scrollToTop = useEvent(() => {
     if (rows.length) {
-      tryToScrollToIndex(0);
+      virtualizerRef.current.scrollToIndex(0);
     }
   });
 
@@ -360,215 +370,64 @@ export const DynamicHeightList = forwardRef(function DynamicHeightList(
       scrollToTop,
     });
   }, [registerComponentApi, scrollToBottom, scrollToTop]);
+  const rowTypeContextValue = useCallback((index: number) => rows[index]._row_type, [rows]);
 
-  const virtualItems = rowVirtualizer.getVirtualItems();
-  const totalSize = rowVirtualizer.getTotalSize();
-
-  useEffect(() => {
-    if (selectedIndex && rowVirtualizer) {
-      const index = virtualItems.findIndex((item) => item.key === selectedIndex);
-      tryToScrollToIndex(index);
-      resetSelectedIndex();
-    }
-  }, [resetSelectedIndex, rowVirtualizer, selectedIndex, tryToScrollToIndex, virtualItems]);
-
-  const prevTotalSize = usePrevious(totalSize);
-  const firstRenderedItem = virtualItems[0];
-  const lastRenderedItem = virtualItems[virtualItems.length - 1];
-
-  const initiallyScrolledToBottom = useRef(false);
-  useLayoutEffect(() => {
-    if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
-      initiallyScrolledToBottom.current = true;
-      tryToScrollToIndex(rows.length - 1);
-    }
-  }, [rows.length, scrollAnchor, tryToScrollToIndex]);
-
-  // restore scroll position when total size changes
-  useLayoutEffect(() => {
-    if (
-      prevTotalSize &&
-      prevTotalSize !== totalSize &&
-      scrollAnchor === "bottom" //&&
-    ) {
-      const delta2 = totalSize - prevTotalSize;
-      setSuspendInfiniteLoad(true);
-      queueMicrotask(() => {
-        scrollElementRef.current!.scrollBy({ left: 0, top: delta2 });
-        // console.log("scrolled to", scrollElementRef.current.scrollTop);
-        setSuspendInfiniteLoad(false);
-      });
-    }
-  }, [
-    firstRenderedItem?.index,
-    prevTotalSize,
-    rowVirtualizer,
-    scrollAnchor,
-    scrollElementRef,
-    totalSize,
-  ]);
-
-  const suspendTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    // console.log({
-    //   suspendState: suspendInfiniteLoad,
-    //   pageInfo,
-    //   firstRenderedItem,
-    //   // visibleRange
-    // });
-
-    if (suspendInfiniteLoad) {
-      return;
-    }
-    if (!pageInfo) {
-      return;
-    }
-
-    if (!firstRenderedItem) {
-      return;
-    }
-
-    if (firstRenderedItem.index === 0 && pageInfo.hasPrevPage && !pageInfo.isFetchingPrevPage) {
-      (async () => {
-        setSuspendInfiniteLoad(true);
-        if (suspendTimerRef.current) {
-          clearTimeout(suspendTimerRef.current);
-        }
-        // console.log("fetching prev page START", pageInfo);
-        await requestFetchPrevPage();
-        // console.log("fetching prev page END", pageInfo);
-        suspendTimerRef.current = setTimeout(() => {
-          setSuspendInfiniteLoad(false);
-        }, 500);
-      })();
-    }
-  }, [firstRenderedItem, pageInfo, requestFetchPrevPage, suspendInfiniteLoad]);
-
-  useEffect(() => {
-    // console.log({
-    //   suspendState: suspendInfiniteLoad,
-    //   pageInfo,
-    //   lastRenderedItem,
-    //   itemsLength: items.length
-    //   // visibleRange
-    // });
-
-    if (suspendInfiniteLoad) {
-      return;
-    }
-    if (!pageInfo) {
-      return;
-    }
-
-    if (!lastRenderedItem) {
-      return;
-    }
-
-    if (
-      lastRenderedItem.index === items.length - 1 &&
-      pageInfo.hasNextPage &&
-      !pageInfo.isFetchingNextPage
-    ) {
-      (async () => {
-        setSuspendInfiniteLoad(true);
-        if (suspendTimerRef.current) {
-          clearTimeout(suspendTimerRef.current);
-        }
-        // console.log("fetching prev page START", pageInfo);
-        await requestFetchNextPage();
-        // console.log("fetching prev page END", pageInfo);
-        suspendTimerRef.current = setTimeout(() => {
-          setSuspendInfiniteLoad(false);
-        }, 500);
-      })();
-    }
-  }, [items.length, lastRenderedItem, pageInfo, requestFetchNextPage, suspendInfiniteLoad]);
-
-  const listContainerTransformY = !firstRenderedItem
-    ? 0
-    : firstRenderedItem.start - rowVirtualizer.options.scrollMargin;
   return (
-    <ListContext.Provider value={expandContextValue}>
-      <div
-        ref={rootRef}
-        className={styles.scrollParent}
-        style={{
-          overflow: hasOutsideScroll ? "initial" : "auto",
-          maxHeight: "100%",
-          ...style,
-        }}
-      >
-        {loading && virtualItems.length === 0 && (
-          <div className={styles.loadingWrapper}>
-            <Spinner />
-          </div>
-        )}
-        {!loading &&
-          virtualItems.length === 0 &&
-          (emptyListPlaceholder ?? (
-            <div className={styles.noRows}>
-              <Text>No data available</Text>
+    <ListItemTypeContext.Provider value={rowTypeContextValue}>
+      <ListContext.Provider value={expandContextValue}>
+        <div
+          ref={rootRef}
+          style={style}
+          className={classnames(styles.outerWrapper, {
+            [styles.hasOutsideScroll]: hasOutsideScroll,
+          })}
+        >
+          {loading && rows.length === 0 && (
+            <div className={styles.loadingWrapper}>
+              <Spinner />
             </div>
-          ))}
-        {/* The large inner element to hold all of the items */}
-        {((!loading && virtualItems.length > 0) || items.length > 0) && (
-          <div
-            ref={rowsContainerRef}
-            style={{
-              height: `${totalSize}px`,
-              width: "100%",
-              position: "relative",
-            }}
-          >
+          )}
+          {!loading &&
+            rows.length === 0 &&
+            (emptyListPlaceholder ?? (
+              <div className={styles.noRows}>
+                <Text>No data available</Text>
+              </div>
+            ))}
+          {!loading && rows.length > 0 && (
             <div
-              data-list-container={true}
-              className={classnames({
-                [styles.sectioned]: groupBy !== undefined,
+              className={classnames(styles.innerWrapper, {
+                [styles.reverse]: scrollAnchor === "bottom",
                 [styles.borderCollapse]: borderCollapse,
+                [styles.sectioned]: groupBy !== undefined,
               })}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                transform: `translateY(${listContainerTransformY}px)`,
-              }}
+              data-list-container={true}
             >
-              {virtualItems.map((virtualItem) => {
-                const item = rows[virtualItem.index];
-                let key = virtualItem.key;
-
-                let itemContent;
-                switch (item._row_type) {
-                  case RowType.SECTION:
-                    itemContent = sectionRenderer?.(item, item[idKey]) ?? null;
-                    key = `section_${key}`;
-                    break;
-                  case RowType.SECTION_FOOTER:
-                    itemContent = sectionFooterRenderer?.(item, item[idKey]);
-                    key = `section_footer_${key}`;
-                    break;
-                  default:
-                    itemContent = itemRenderer(item, item[idKey]) ?? null;
-                    break;
-                }
-                return (
-                  <Item
-                    key={key}
-                    onHeightChanged={rowVirtualizer.measureElement}
-                    rowIndex={virtualItem.index}
-                    itemType={item._row_type || RowType.ITEM}
-                  >
-                    {itemContent}
-                  </Item>
-                );
-              })}
+              <Virtualizer
+                ref={virtualizerRef}
+                scrollRef={scrollElementRef}
+                shift={isPrepend.current}
+                onScroll={onScroll}
+                startMargin={!hasOutsideScroll ? 0 : parentRef.current?.offsetTop || 0}
+                item={Item as CustomItemComponent}
+              >
+                {rows.map((row) => {
+                  const key = row[idKey];
+                  switch (row._row_type) {
+                    case RowType.SECTION:
+                      return sectionRenderer?.(row, key) || <div key={key} />;
+                    case RowType.SECTION_FOOTER:
+                      return sectionFooterRenderer?.(row, key) || <div key={key} />;
+                    default:
+                      return itemRenderer(row, key) || <div key={key} />;
+                  }
+                })}
+              </Virtualizer>
             </div>
-          </div>
-        )}
-      </div>
-    </ListContext.Provider>
+          )}
+        </div>
+      </ListContext.Provider>
+    </ListItemTypeContext.Provider>
   );
 });
 
