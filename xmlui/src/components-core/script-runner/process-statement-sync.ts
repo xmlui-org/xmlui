@@ -1,4 +1,3 @@
-import type { BindingTreeEvaluationContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
 import type {
   ArrayDestructure,
   AssignmentExpression,
@@ -9,16 +8,15 @@ import type {
   ObjectDestructure,
   Statement,
   VarDeclaration,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../abstractions/scripting/ScriptingSourceTree";
 import type { QueueInfo, StatementQueueItem, ProcessOutcome } from "./statement-queue";
 import type { LoopScope } from "../../abstractions/scripting/LoopScope";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-import type { LogicalThread } from "@abstractions/scripting/LogicalThread";
-
-import {
-  evalBinding,
-  executeArrowExpressionSync,
-} from "@components-core/script-runner/eval-tree-sync";
+import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
+import type { BindingTreeEvaluationContext } from "../script-runner/BindingTreeEvaluationContext";
+import { evalBinding, executeArrowExpressionSync } from "../script-runner/eval-tree-sync";
+import { reportEngineError } from "../reportEngineError";
+import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 import {
   innermostBlockScope,
   innermostLoopScope,
@@ -35,8 +33,6 @@ import {
   hoistFunctionDeclarations,
 } from "./process-statement-common";
 import { StatementQueue, mapStatementsToQueueItems, mapToItem } from "./statement-queue";
-import { reportEngineError } from "../reportEngineError";
-import { StatementExecutionError, ThrowStatementError } from "../EngineError";
 
 const SYNC_EVAL_TIMEOUT = 1000;
 

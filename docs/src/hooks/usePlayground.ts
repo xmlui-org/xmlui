@@ -1,5 +1,5 @@
 import {useContext} from "react";
-import {PlaygroundContext} from "@/src/state/store";
+import {PlaygroundContext} from "../state/store";
 
 export const usePlayground = () => {
     const context = useContext(PlaygroundContext);

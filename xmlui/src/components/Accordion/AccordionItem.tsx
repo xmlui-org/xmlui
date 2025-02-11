@@ -1,8 +1,8 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { AccordionItemComponent } from "@components/Accordion/AccordionItemNative";
-import { dComponent } from "@components/metadata-helpers";
-import { MemoizedItem } from "@components/container-helpers";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { dComponent } from "../../components/metadata-helpers";
+import { MemoizedItem } from "../../components/container-helpers";
+import { AccordionItemComponent } from "../../components/Accordion/AccordionItemNative";
 
 const COMP = "AccordionItem";
 

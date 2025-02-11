@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { SyntaxKind } from "@parsers/xmlui-parser/syntax-kind";
-import { createScanner } from "@parsers/xmlui-parser/scanner";
-import { DiagnosticCategory, DiagnosticMessage } from "@parsers/xmlui-parser/diagnostics";
-import { CharacterCodes } from "@parsers/xmlui-parser/CharacterCodes";
+import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
+import { createScanner } from "../../../src/parsers/xmlui-parser/scanner";
+import { DiagnosticCategory, DiagnosticMessage } from "../../../src/parsers/xmlui-parser/diagnostics";
+import { CharacterCodes } from "../../../src/parsers/xmlui-parser/CharacterCodes";
 
 describe("XMLUI scanner - tokens", () => {
   const miscCases = [

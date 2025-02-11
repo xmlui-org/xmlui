@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { Lexer } from "@parsers/scripting/Lexer";
-import { InputStream } from "@parsers/common/InputStream";
-import { Parser } from "@parsers/scripting/Parser";
-import { TokenType } from "@abstractions/scripting/Token";
-import { parsePropertyValue } from "@parsers/scripting-exp/property-parsing";
-import { parseParameterString } from "@components-core/script-runner/ParameterParser";
+import { Lexer } from "../../../src/parsers/scripting/Lexer";
+import { InputStream } from "../../../src/parsers/common/InputStream";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { TokenType } from "../../../src/abstractions/scripting/Token";
+import { parsePropertyValue } from "../../../src/parsers/scripting-exp/property-parsing";
 
 describe("Parser - regression", () => {
   it("Lexer 'toString'", () => {

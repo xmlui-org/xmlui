@@ -1,6 +1,6 @@
 import styles from "./Button.module.scss";
 
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 import {
   buttonThemeMd,
   alignmentOptionMd,
@@ -9,13 +9,12 @@ import {
   buttonTypesMd,
   iconPositionMd,
   defaultButtonType,
-} from "@components/abstractions";
-
-import { Icon } from "@components/Icon/IconNative";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+} from "../abstractions";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dClick, dGotFocus, dLostFocus } from "../../components/metadata-helpers";
+import { Icon } from "../Icon/IconNative";
 import { Button } from "./ButtonNative";
-import { dClick, dGotFocus, dLostFocus } from "@components/metadata-helpers";
 
 const COMP = "Button";
 

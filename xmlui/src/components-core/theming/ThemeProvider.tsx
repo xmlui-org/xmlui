@@ -17,19 +17,19 @@ import {
   generateButtonTones,
   resolveThemeVar,
 } from "./transformThemeVars";
-import { normalizePath } from "@components-core/utils/misc";
-import { matchThemeVar } from "@components-core/theming/hvar";
+import { normalizePath } from "../utils/misc";
+import { matchThemeVar } from "../theming/hvar";
 import {
   ThemeContext,
   ThemesContext,
-} from "@components-core/theming/ThemeContext";
-import themeVars, { getVarKey } from "@components-core/theming/themeVars";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
+} from "../theming/ThemeContext";
+import themeVars, { getVarKey } from "../theming/themeVars";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../constants";
 import {
   collectThemeChainByExtends,
   expandTheme,
-} from "@components-core/theming/extendThemeUtils";
-import { useComponentRegistry } from "@components/ComponentRegistryContext";
+} from "../theming/extendThemeUtils";
+import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import {
   XmlUiCyanThemeDefinition,
   XmlUiGrayThemeDefinition,
@@ -38,9 +38,9 @@ import {
   XmlUiPurpleThemeDefinition,
   XmlUiRedThemeDefinition,
   XmlUiThemeDefinition,
-} from "@components-core/theming/themes/xmlui";
-import { SolidThemeDefinition } from "@components-core/theming/themes/solid";
-import { useIsomorphicLayoutEffect } from "@components-core/utils/hooks";
+} from "../theming/themes/xmlui";
+import { SolidThemeDefinition } from "../theming/themes/solid";
+import { useIsomorphicLayoutEffect } from "../utils/hooks";
 
 export function useCompiledTheme(
   activeTheme: ThemeDefinition | undefined,

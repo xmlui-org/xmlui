@@ -1,32 +1,37 @@
 import { describe, expect, it } from "vitest";
 
 import { createEvalContext, parseStatements } from "./test-helpers";
-import { ArrowExpressionStatement, ExpressionStatement, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
+import {
+  ArrowExpressionStatement,
+  ExpressionStatement,
+  T_ARROW_EXPRESSION_STATEMENT,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner-exp/process-statement-async";
 
 describe("Function proxies", () => {
   it("Array.prototype.filter #1", async () => {
     // --- Arrange
-    const source = "(params)=> { return items.filter((item) => { return item.parentId === params.pathParams.nodeId});}";
+    const source =
+      "(params)=> { return items.filter((item) => { return item.parentId === params.pathParams.nodeId});}";
     const evalContext = createEvalContext({
       localContext: {
         items: [
           {
             name: "item1",
-            parentId: ""
+            parentId: "",
           },
           {
             name: "item2",
-            parentId: "my-parent-id"
-          }
-        ]
+            parentId: "my-parent-id",
+          },
+        ],
       },
-      eventArgs: [{ pathParams: { nodeId: "" } }]
+      eventArgs: [{ pathParams: { nodeId: "" } }],
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
@@ -46,23 +51,19 @@ describe("Function proxies", () => {
     }`;
     const evalContext = createEvalContext({
       localContext: {
-        items: [
-          2, 3
-        ]
+        items: [2, 3],
       },
-      eventArgs: []
+      eventArgs: [],
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
     const thread = evalContext.mainThread!;
-    expect(thread.blocks![0].returnValue).eql([
-      4, 6
-    ]);
+    expect(thread.blocks![0].returnValue).eql([4, 6]);
   });
 
   it("Array.prototype.map #1", async () => {
@@ -74,22 +75,18 @@ describe("Function proxies", () => {
     }`;
     const evalContext = createEvalContext({
       localContext: {
-        items: [
-          2, 3
-        ]
+        items: [2, 3],
       },
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
     const thread = evalContext.mainThread!;
-    expect(thread.blocks![0].returnValue).eql([
-      4, 6
-    ]);
+    expect(thread.blocks![0].returnValue).eql([4, 6]);
   });
 
   it("Array.prototype.every #1", async () => {
@@ -103,20 +100,20 @@ describe("Function proxies", () => {
         items: [
           {
             name: "item1",
-            parentId: ""
+            parentId: "",
           },
           {
             name: "item2",
-            parentId: "my-parent-id"
-          }
-        ]
+            parentId: "my-parent-id",
+          },
+        ],
       },
-      eventArgs: [{ pathParams: { nodeId: "" } }]
+      eventArgs: [{ pathParams: { nodeId: "" } }],
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
@@ -132,15 +129,13 @@ describe("Function proxies", () => {
     }`;
     const evalContext = createEvalContext({
       localContext: {
-        items: [
-          2, 6, 1
-        ]
+        items: [2, 6, 1],
       },
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
@@ -156,14 +151,14 @@ describe("Function proxies", () => {
     }`;
     const evalContext = createEvalContext({
       localContext: {
-        items: [1, 2, 3, 4, 5, 6]
+        items: [1, 2, 3, 4, 5, 6],
       },
-      eventArgs: [{ pathParams: { nodeId: "" } }]
+      eventArgs: [{ pathParams: { nodeId: "" } }],
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert
@@ -179,14 +174,14 @@ describe("Function proxies", () => {
     }`;
     const evalContext = createEvalContext({
       localContext: {
-        items: [5, 3, 2]
+        items: [5, 3, 2],
       },
-      eventArgs: [{ pathParams: { nodeId: "" } }]
+      eventArgs: [{ pathParams: { nodeId: "" } }],
     });
     const statements = parseStatements(source);
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: (statements[0] as ExpressionStatement).expr
+      expr: (statements[0] as ExpressionStatement).expr,
     } as ArrowExpressionStatement;
     await processStatementQueueAsync([arrowStmt], evalContext);
     // --- Assert

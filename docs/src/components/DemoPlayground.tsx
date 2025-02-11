@@ -1,19 +1,19 @@
-import React, { useEffect, useId, useMemo, useReducer, useState } from "react";
-import "@src/index.scss";
+import React, { useEffect, useId, useMemo, useReducer } from "react";
+// import "../index.scss";
 import {
   appDescriptionInitialized,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
-} from "@/src/state/store";
-import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "@/src/utils/helpers";
+} from "../state/store";
+import { INITIAL_PLAYGROUND_STATE, preprocessCode } from "../../src/utils/helpers";
 import { ToastProvider } from "@radix-ui/react-toast";
-import { PlaygroundContent } from "@/src/components/PlaygroundContent";
-import { Header } from "@/src/components/Header";
+import { PlaygroundContent } from "../../src/components/PlaygroundContent";
+import { Header } from "../../src/components/Header";
 import styles from "./StandalonePlayground.module.scss";
-import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
+import type { ApiInterceptorDefinition } from "../../../xmlui/src/components-core/interception/abstractions";
+import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 
 type DemoPlaygroundProps = {
   name: string;

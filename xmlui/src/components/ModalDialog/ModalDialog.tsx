@@ -1,9 +1,10 @@
 import styles from "./ModalDialog.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { paddingSubject } from "@components-core/theming/themes/base-utils";
-import { MemoizedItem } from "@components/container-helpers";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { paddingSubject } from "../../components-core/theming/themes/base-utils";
+import { MemoizedItem } from "../container-helpers";
 import { ModalDialog, ModalDialogFrame } from "./ModalDialogNative";
 
 const COMP = "ModalDialog";

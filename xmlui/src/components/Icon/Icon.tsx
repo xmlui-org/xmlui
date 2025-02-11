@@ -1,7 +1,7 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import styles from "./Icon.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import Icon from "./IconNative";
 
 const COMP = "Icon";

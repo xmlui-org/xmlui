@@ -19,13 +19,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@abstractions/*": ["../xmlui/src/abstractions/*"],
-      "@components/*": ["../xmlui/src/components/*"],
-      "@components-core/*": ["../xmlui/src/components-core/*"],
-      "@parsers/*": ["../xmlui/src/parsers/*"],
-    }
+    "jsx": "react-jsx"
   },
   "include": [
     "src",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { convertRequestParamPart } from "@components-core/utils/request-params"
+import { convertRequestParamPart } from "../../../src/components-core/utils/request-params"
 
 describe("Request parameter converter", () => {
     it("string to integer #1", () => {

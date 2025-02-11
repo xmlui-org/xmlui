@@ -1,13 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef } from "../abstractions/ComponentDefs";
 import { usePopper } from "react-popper";
 import { createPortal } from "react-dom";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import { ModalDialog } from "@components/ModalDialog/ModalDialogNative";
+import { useTheme } from "./theming/ThemeContext";
+import { ModalDialog } from "../components/ModalDialog/ModalDialogNative";
 import classnames from "classnames";
-import { XmluiCodeHighlighter } from "@components-core/XmluiCodeHighlighter";
-import { Button } from "@components/Button/ButtonNative";
-import Icon from "@components/Icon/IconNative";
+import { XmluiCodeHighlighter } from "./XmluiCodeHighlighter";
+import { Button } from "../components/Button/ButtonNative";
+import Icon from "../components/Icon/IconNative";
 import styles from "./InspectorButton.module.scss";
 
 // --- The context object that is used to store the inspector information.

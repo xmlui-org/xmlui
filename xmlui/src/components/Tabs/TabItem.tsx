@@ -1,7 +1,7 @@
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { TabItemComponent } from "./TabItemNative";
-import { dLabel } from "@components/metadata-helpers";
+import { dLabel } from "../metadata-helpers";
 
 const COMP = "TabItem";
 

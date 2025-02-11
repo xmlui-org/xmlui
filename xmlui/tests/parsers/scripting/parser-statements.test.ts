@@ -1,6 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   BlockStatement,
   ConstStatement,
@@ -17,7 +17,7 @@ import {
   TryStatement,
   VarStatement,
   WhileStatement,
-} from "@abstractions/scripting/ScriptingSourceTree";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - statements", () => {
   it("Empty source", () => {

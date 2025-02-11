@@ -1,8 +1,8 @@
-import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./DatePicker.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { DatePicker } from "./DatePickerNative";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dAutoFocus,
   dDidChange,
@@ -15,7 +15,8 @@ import {
   dReadonly,
   dSetValueApi,
   dValidationStatus,
-} from "@components/metadata-helpers";
+} from "../../components/metadata-helpers";
+import { DatePicker } from "./DatePickerNative";
 
 const COMP = "DatePicker";
 

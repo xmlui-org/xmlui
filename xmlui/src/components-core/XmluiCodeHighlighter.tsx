@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import type { HighlighterCore } from "@shikijs/core/types";
 import styles from "./XmluiCodeHighlighter.module.scss";
-import { useTheme } from "@components-core/theming/ThemeContext";
+import { useTheme } from "./theming/ThemeContext";
 import classnames from "classnames";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createComponentRenderer } from "./renderers";
 
 let highlighter: HighlighterCore | null = null;
 

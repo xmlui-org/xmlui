@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { evalBindingExpression } from "@components-core/script-runner/eval-tree-sync";
+import { evalBindingExpression } from "../../../src/components-core/script-runner/eval-tree-sync";
 import {createEvalContext} from "./test-helpers";
 
 describe("Evaluate function expressions", () => {

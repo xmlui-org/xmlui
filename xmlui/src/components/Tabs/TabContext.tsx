@@ -1,7 +1,8 @@
 import { createContext, useContext, useMemo, useState } from "react";
 import produce from "immer";
-import { EMPTY_ARRAY } from "@components-core/constants";
-import type { Tab } from "@components/abstractions";
+
+import { EMPTY_ARRAY } from "../../components-core/constants";
+import type { Tab } from "../abstractions";
 
 type TabItem = Tab & { id: string };
 export const TabContext = createContext({

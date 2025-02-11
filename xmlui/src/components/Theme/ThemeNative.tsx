@@ -1,18 +1,20 @@
 import { useId, useMemo, useState } from "react";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import styles from "./Theme.module.scss";
-import { useCompiledTheme } from "@components-core/theming/ThemeProvider";
-import { ThemeContext, useTheme, useThemes } from "@components-core/theming/ThemeContext";
-import classnames from "@components-core/utils/classnames";
 import { Helmet } from "react-helmet-async";
 import { createPortal } from "react-dom";
-import type { ThemeDefinition, ThemeScope, ThemeTone } from "@components-core/theming/abstractions";
-import type { LayoutContext } from "@abstractions/RendererDefs";
-import { EMPTY_OBJECT } from "@components-core/constants";
-import { ErrorBoundary } from "@components-core/rendering/ErrorBoundary";
+import classnames from "classnames";
+
+import styles from "./Theme.module.scss";
+
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { LayoutContext } from "../../abstractions/RendererDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { useCompiledTheme } from "../../components-core/theming/ThemeProvider";
+import { ThemeContext, useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import type { ThemeDefinition, ThemeScope, ThemeTone } from "../../components-core/theming/abstractions";
+import { getVarKey } from "../../components-core/theming/themeVars";
+import { EMPTY_OBJECT } from "../../components-core/constants";
+import { ErrorBoundary } from "../../components-core/rendering/ErrorBoundary";
 import { NotificationToast } from "./NotificationToast";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { getVarKey } from "@components-core/theming/themeVars";
 
 function getClassName(css: string) {
   return `theme-${calculateHash(css)}`;

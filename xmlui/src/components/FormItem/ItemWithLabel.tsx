@@ -1,10 +1,11 @@
-import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
-import { Children, useId } from "react";
-import classnames from "@components-core/utils/classnames";
-import styles from "./FormItem.module.scss";
-import { Spinner } from "@components/Spinner/SpinnerNative";
+import { CSSProperties, ForwardedRef, forwardRef, ReactNode, Children, useId } from "react";
+import classnames from "classnames";
 import { Slot } from "@radix-ui/react-slot";
-import type { LabelPosition } from "@components/abstractions";
+
+import styles from "./FormItem.module.scss";
+
+import type { LabelPosition } from "../abstractions";
+import { Spinner } from "../Spinner/SpinnerNative";
 
 type ItemWithLabelProps = {
   id?: string;

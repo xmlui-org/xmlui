@@ -20,15 +20,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
-    "paths": {
-      "@abstractions/*": ["./src/abstractions/*"],
-      "@core/*": ["./src/core/*"],
-      "@components-core/*": ["./src/components-core/*"],
-      "@components/*": ["./src/components/*"],
-      "@parsers/*": ["./src/parsers/*"],
-      "@testing/*": ["./src/testing/*"]
-    }
+    "jsx": "react-jsx"
   },
   "include": [
     "src",

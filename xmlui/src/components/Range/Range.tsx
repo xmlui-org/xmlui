@@ -1,11 +1,11 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
 
 import styles from "./Range.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dFocus, dGotFocus, dLostFocus } from "../metadata-helpers";
 import { Range } from "./RangeNative";
-import { dFocus, dGotFocus, dLostFocus } from "@components/metadata-helpers";
 
 const COMP = "Range";
 

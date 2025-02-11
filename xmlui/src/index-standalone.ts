@@ -1,8 +1,9 @@
-import { startApp } from "@components-core/StandaloneApp";
-import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 import React from "react";
 import jsxRuntime from "react/jsx-runtime";
 import ReactDOM from "react-dom";
+
+import { startApp } from "./components-core/StandaloneApp";
+import StandaloneExtensionManager from "./components-core/StandaloneExtensionManager";
 import * as all from "./index";
 
 const Xmlui = new StandaloneExtensionManager();

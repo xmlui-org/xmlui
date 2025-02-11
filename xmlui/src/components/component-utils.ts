@@ -1,6 +1,4 @@
-import { EMPTY_ARRAY } from "@components-core/constants";
 import { omitBy, isUndefined } from "lodash-es";
-import type { Option } from "./abstractions";
 
 /**
  * Maps a record of query params to a usable local URL path with the params appended at the end

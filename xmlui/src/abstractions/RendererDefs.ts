@@ -1,4 +1,5 @@
 import type {CSSProperties, ReactNode, RefObject} from "react";
+
 import type { AppContextObject } from "./AppContextDefs";
 import type {
   ComponentDef,
@@ -9,7 +10,7 @@ import type {
 import type { ContainerState } from "./ContainerDefs";
 import type { LookupActionOptions, LookupAsyncFn, LookupSyncFn } from "./ActionDefs";
 import type { AsyncFunction } from "./FunctionDefs";
-import type {ComponentApi} from "@components-core/rendering/ContainerWrapper";
+import type {ComponentApi} from "../components-core/rendering/ContainerWrapper";
 
 /**
  * This interface defines the renderer context for the exposed components of the XMLUI framework.

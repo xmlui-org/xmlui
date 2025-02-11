@@ -1,19 +1,19 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
 import styles from "./FormItem.module.scss";
-import type { FormItemValidations } from "@components/Form/FormContext";
-import { parseSeverity } from "./Validations";
-import { CustomFormItem, FormItem } from "./FormItemNative";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import type { FormItemValidations } from "../Form/FormContext";
 import {
   dAutoFocus,
   dEnabled,
   dInitialValue,
-  dInternal,
   dLabel,
   dLabelPosition,
   dRequired,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
+import { parseSeverity } from "./Validations";
+import { CustomFormItem, FormItem } from "./FormItemNative";
 
 const COMP = "FormItem";
 

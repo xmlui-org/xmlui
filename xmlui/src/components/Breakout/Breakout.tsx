@@ -1,7 +1,6 @@
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { Breakout } from "./BreakoutNative";
-
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
 
 const COMP = "Breakout";
 

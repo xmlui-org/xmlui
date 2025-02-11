@@ -1,4 +1,4 @@
-@use "@components-core/theming/themes.scss" as t;
+@use "./components-core/theming/themes.scss" as t;
 
 /************************/
 /*    Normalization     */
@@ -57,7 +57,7 @@ abbr:where([title]) {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-size: inherit;
+  // font-size: inherit;
   font-weight: inherit
 }
 
@@ -197,11 +197,11 @@ legend {
   padding: 0
 }
 
-ol, ul, menu {
-  margin: 0;
-  padding: 0;
-  list-style: none
-}
+// ol, ul, menu {
+//   margin: 0;
+//   padding: 0;
+//   list-style: none
+// }
 
 dialog {
   padding: 0

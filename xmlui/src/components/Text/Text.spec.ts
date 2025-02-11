@@ -1,5 +1,5 @@
-import { TextVariantElement } from "@components/abstractions";
-import { expect, test } from "@testing/fixtures";
+import { expect, test } from "../../testing/fixtures";
+import { TextVariantElement } from "../abstractions";
 
 test.describe("smoke tests", { tag: "@smoke" }, () => {
   test("component renders", async ({ initTestBed, createTextDriver }) => {

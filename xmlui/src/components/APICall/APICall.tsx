@@ -1,8 +1,8 @@
-import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import type { ApiOperationDef } from "../../components-core/RestApiProxy";
+import { dInternal } from "../../components/metadata-helpers";
 import { APICallNative } from "./APICallNative";
-import type { ApiOperationDef } from "@components-core/RestApiProxy";
-import { dInternal } from "@components/metadata-helpers";
 
 const COMP = "APICall";
 

@@ -1,5 +1,4 @@
 import type { StyleToken } from "./tokens";
-
 import { StyleInputStream } from "./StyleInputStream";
 import { StyleTokenType } from "./tokens";
 

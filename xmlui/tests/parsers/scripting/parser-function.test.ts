@@ -1,7 +1,12 @@
 import { describe, expect, assert, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
-import { Destructure, FunctionDeclaration, Identifier, SpreadExpression } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import {
+  Destructure,
+  FunctionDeclaration,
+  Identifier,
+  SpreadExpression,
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - function declarations", () => {
   it("No param", () => {
@@ -298,5 +303,4 @@ describe("Parser - function declarations", () => {
     }
     assert.fail("Exception expected");
   });
-
 });

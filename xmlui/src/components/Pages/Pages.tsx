@@ -1,6 +1,6 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { TableOfContentsProvider } from "@components-core/TableOfContentsContext";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { TableOfContentsProvider } from "../../components-core/TableOfContentsContext";
 import { Pages, RouteWrapper } from "./PagesNative";
 
 const PAGE = "Page";

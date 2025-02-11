@@ -48,11 +48,11 @@ import type {
   VarStatement,
   WhileStatement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { Token } from "@abstractions/scripting/Token";
+import type { Token } from "../../abstractions/scripting/Token";
 import type {
   ScriptParserErrorMessage,
   ScriptParsingErrorCodes,
-} from "@abstractions/scripting/ScriptParserError";
+} from "../../abstractions/scripting/ScriptParserError";
 
 import { TokenType } from "../../abstractions/scripting/Token";
 import { InputStream } from "../common/InputStream";

@@ -4,15 +4,14 @@ import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
-} from "@components-core/abstractions/LoaderRenderer";
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-
+} from "../abstractions/LoaderRenderer";
+import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
+import { removeNullProperties } from "../utils/misc";
+import { extractParam } from "../utils/extractParam";
+import { createLoaderRenderer } from "../renderers";
+import { useAppContext } from "../AppContext";
 import { Loader } from "./Loader";
-import { removeNullProperties } from "@components-core/utils/misc";
-import { extractParam } from "@components-core/utils/extractParam";
-import { createLoaderRenderer } from "@components-core/renderers";
-import { useAppContext } from "@components-core/AppContext";
 
 /**
  * Properties of the Data loader component

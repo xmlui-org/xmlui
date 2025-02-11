@@ -1,9 +1,24 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { ArrayLiteral, Expression, Identifier, Literal, ObjectLiteral, BinaryExpression, TemplateLiteralExpression, T_LITERAL, T_TEMPLATE_LITERAL_EXPRESSION, T_BINARY_EXPRESSION, T_IDENTIFIER, T_ARRAY_LITERAL, T_UNARY_EXPRESSION, T_OBJECT_DESTRUCTURE, T_OBJECT_LITERAL} from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { tokenTraits } from "@parsers/scripting-exp/TokenTrait";
-import { TokenType } from "@parsers/scripting-exp/TokenType";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  ArrayLiteral,
+  Expression,
+  Identifier,
+  Literal,
+  ObjectLiteral,
+  BinaryExpression,
+  TemplateLiteralExpression,
+  T_LITERAL,
+  T_TEMPLATE_LITERAL_EXPRESSION,
+  T_BINARY_EXPRESSION,
+  T_IDENTIFIER,
+  T_ARRAY_LITERAL,
+  T_UNARY_EXPRESSION,
+  T_OBJECT_LITERAL,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { tokenTraits } from "../../../src/parsers/scripting-exp/TokenTrait";
+import { TokenType } from "../../../src/parsers/scripting-exp/TokenType";
 
 describe("Parser - literals", () => {
   const boolCases = [
@@ -429,8 +444,20 @@ describe("Parser - literals", () => {
     { src: "{ abc: 123, }", len: 1, idx: 0, name: T_IDENTIFIER, val: T_LITERAL },
     { src: "{ abc: 123, 12: !a}", len: 2, idx: 0, name: T_IDENTIFIER, val: T_LITERAL },
     { src: "{ abc: 123, 12: !a}", len: 2, idx: 1, name: T_LITERAL, val: T_UNARY_EXPRESSION },
-    { src: "{ abc: { a: b }, 12: [a, b, c]}", len: 2, idx: 0, name: T_IDENTIFIER, val: T_OBJECT_LITERAL },
-    { src: "{ abc: { a: b }, 12: [a, b, c]}", len: 2, idx: 1, name: T_LITERAL, val: T_ARRAY_LITERAL },
+    {
+      src: "{ abc: { a: b }, 12: [a, b, c]}",
+      len: 2,
+      idx: 0,
+      name: T_IDENTIFIER,
+      val: T_OBJECT_LITERAL,
+    },
+    {
+      src: "{ abc: { a: b }, 12: [a, b, c]}",
+      len: 2,
+      idx: 1,
+      name: T_LITERAL,
+      val: T_ARRAY_LITERAL,
+    },
   ];
   objectCases.forEach((c) => {
     it(`Object literal: ${c.src}`, () => {
@@ -456,7 +483,11 @@ describe("Parser - literals", () => {
   });
 
   const allKeywords = Object.keys(tokenTraits)
-    .filter((k) => tokenTraits[k as unknown as TokenType].keywordLike && !tokenTraits[k as unknown as TokenType].expressionStart)
+    .filter(
+      (k) =>
+        tokenTraits[k as unknown as TokenType].keywordLike &&
+        !tokenTraits[k as unknown as TokenType].expressionStart,
+    )
     .map((tt) => TokenType[tt as unknown as TokenType]);
   allKeywords.forEach((kw) => {
     it(`Object literal with '${kw}'`, () => {
@@ -479,7 +510,4 @@ describe("Parser - literals", () => {
       expect(literal.value).equal(123);
     });
   });
-
-
-
 });

@@ -1,12 +1,11 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-
 import styles from "./OffCanvas.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { placementMd } from "../abstractions";
+import { dDidClose, dDidOpen } from "../metadata-helpers";
 import { OffCanvas } from "./OffCanvasNative";
-import { placementMd } from "@components/abstractions";
-import { dDidClose, dDidOpen } from "@components/metadata-helpers";
 
 const COMP = "OffCanvas";
 

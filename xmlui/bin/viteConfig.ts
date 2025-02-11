@@ -20,15 +20,6 @@ export function getViteConfig({
 }: ViteConfigData = {}) {
   return defineConfig({
     plugins: [react(), svgr(), ViteYaml(), ViteUeml({ withLegacyParser })],
-    resolve: {
-      alias: {
-        "@abstractions": path.resolve(__dirname, "../src/abstractions"),
-        "@core": path.resolve(__dirname, "../src/core"),
-        "@components-core": path.resolve(__dirname, "../src/components-core"),
-        "@components": path.resolve(__dirname, "../src/components"),
-        "@parsers": path.resolve(__dirname, "../src/parsers"),
-      },
-    },
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{

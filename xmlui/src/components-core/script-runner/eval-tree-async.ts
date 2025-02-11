@@ -21,10 +21,10 @@ import type {
   UnaryExpression,
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
-import type { ICustomOperations } from "./ICustomOperations";
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { ICustomOperations } from "./ICustomOperations";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 
 import {
   OnStatementCompletedCallback,

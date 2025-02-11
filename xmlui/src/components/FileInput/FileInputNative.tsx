@@ -1,22 +1,24 @@
 import type React from "react";
 import { type CSSProperties, useCallback, useEffect, useRef } from "react";
-import styles from "./FileInput.module.scss";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { Button } from "@components/Button/ButtonNative";
-import type { ValidationStatus } from "@components/abstractions";
-import { noop } from "@components-core/constants";
 import type { DropzoneRootProps } from "react-dropzone";
 import * as dropzone from "react-dropzone";
-import { useEvent } from "@components-core/utils/misc";
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
-import { TextBox } from "@components/TextBox/TextBoxNative";
+
+import styles from "./FileInput.module.scss";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
 import type {
   ButtonThemeColor,
   ButtonVariant,
   ComponentSize,
   IconPosition,
-} from "@components/abstractions";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
+} from "../abstractions";
+import { Button } from "../Button/ButtonNative";
+import { TextBox } from "../TextBox/TextBoxNative";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 // https://github.com/react-dropzone/react-dropzone/issues/1259
 const { useDropzone } = dropzone;

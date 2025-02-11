@@ -1,15 +1,16 @@
 import type { Dispatch, MutableRefObject, RefObject } from "react";
-import type { ContainerAction } from "@components-core/abstractions/containers";
+
+import type { AppContextObject } from "../../abstractions/AppContextDefs";
+import type { LookupAsyncFnInner, LookupSyncFnInner } from "../../abstractions/ActionDefs";
+import type { CodeDeclaration } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { ComponentMetadata, ParentRenderContext } from "../../abstractions/ComponentDefs";
+import type { ComponentRendererContextBase } from "../../abstractions/RendererDefs";
 import type {
   ComponentApi,
   ContainerState,
   RegisterComponentApiFnInner,
-} from "@components-core/rendering/ContainerWrapper";
-import type { AppContextObject } from "@abstractions/AppContextDefs";
-import type { LookupAsyncFnInner, LookupSyncFnInner } from "@abstractions/ActionDefs";
-import type { CodeDeclaration } from "@abstractions/scripting/ScriptingSourceTree";
-import type { ComponentMetadata, ParentRenderContext } from "@abstractions/ComponentDefs";
-import type { ComponentRendererContextBase } from "@abstractions/RendererDefs";
+} from "../rendering/ContainerWrapper";
+import type { ContainerAction } from "./containers";
 
 /**
  * This interface defines the renderer context for the XMLUI core framework components. Its implementations

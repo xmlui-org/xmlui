@@ -1,7 +1,7 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { dDidChange } from "../metadata-helpers";
 import { ChangeListener } from "./ChangeListenerNative";
-import { dDidChange } from "@components/metadata-helpers";
 
 const COMP = "ChangeListener";
 

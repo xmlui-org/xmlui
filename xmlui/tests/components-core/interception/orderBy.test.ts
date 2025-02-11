@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { orderBy } from "@components-core/utils/misc"
+import { orderBy } from "../../../src/components-core/utils/misc"
 
 const numArray = [3,4,1,2,5];
 const strArray = ["beta", "delta", "alpha", "gamma", "charlie"]

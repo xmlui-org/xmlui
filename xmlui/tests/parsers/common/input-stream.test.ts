@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { InputStream } from "@parsers/common/InputStream";
+import { InputStream } from "../../../src/parsers/common/InputStream";
 
 describe("InputStream", () => {
   it("Builds from string", () => {

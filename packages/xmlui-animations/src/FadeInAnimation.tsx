@@ -1,12 +1,12 @@
 import { createComponentRenderer, createMetadata, d } from "xmlui";
 import { Animation } from "./AnimationNative";
-import { AnimationMd } from "./index";
 
 const COMP = "FadeInAnimation";
 
 export const FadeInAnimationMd = createMetadata({
   specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that fades in the content.`,
+  descriptionRef: "",
 });
 
 export const fadeInAnimationRenderer = createComponentRenderer(

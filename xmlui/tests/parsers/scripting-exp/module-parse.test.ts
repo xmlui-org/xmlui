@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { ModuleErrors, ScriptModule, isModuleErrors, parseScriptModule } from "@parsers/scripting-exp/modules";
+import {
+  ModuleErrors,
+  ScriptModule,
+  isModuleErrors,
+  parseScriptModule,
+} from "../../../src/parsers/scripting-exp/modules";
 
 const ROOT_MODULE = "test";
 
@@ -367,6 +372,6 @@ function parseModule(source: string, modules: Record<string, string> = {}) {
   return parseScriptModule(
     ROOT_MODULE,
     source,
-    (parentModule: string, moduleName: string) => modules[moduleName] ?? null
+    (parentModule: string, moduleName: string) => modules[moduleName] ?? null,
   );
 }

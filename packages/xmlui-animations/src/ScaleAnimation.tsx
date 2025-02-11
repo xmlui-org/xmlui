@@ -7,6 +7,7 @@ export const ScaleAnimationMd = createMetadata({
   status: "in progress",
   specializedFrom: "Animation",
   description: `The \`${COMP}\` component represents an animation that scales the content.`,
+  descriptionRef: "",
   props: {
     from: d("The initial scale of the content."),
     to: d("The final scale of the content."),

@@ -1,5 +1,4 @@
-import React, {useCallback, useContext, useEffect, useId} from "react";
-import { asyncNoop } from "@components-core/constants";
+import React, { useCallback, useContext, useEffect, useId } from "react";
 
 interface IModalVisibilityContext {
   registerForm: (id: string) => void;
@@ -12,7 +11,8 @@ export const ModalVisibilityContext = React.createContext<IModalVisibilityContex
 
 export const useModalFormClose = () => {
   const id = useId();
-  const {registerForm, unRegisterForm, requestClose, amITheSingleForm} = useContext(ModalVisibilityContext) || {};
+  const { registerForm, unRegisterForm, requestClose, amITheSingleForm } =
+    useContext(ModalVisibilityContext) || {};
 
   useEffect(() => {
     if (registerForm) {
@@ -23,11 +23,11 @@ export const useModalFormClose = () => {
     }
   }, [id, registerForm, unRegisterForm]);
 
-  return useCallback(()=>{
-    if(!requestClose){
+  return useCallback(() => {
+    if (!requestClose) {
       return;
     }
-    if(!amITheSingleForm(id)){
+    if (!amITheSingleForm(id)) {
       return;
     }
     return requestClose();

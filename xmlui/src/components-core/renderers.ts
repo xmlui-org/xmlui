@@ -1,5 +1,5 @@
-import type { ComponentDef, ComponentMetadata } from "@abstractions/ComponentDefs";
-import type { ComponentRendererFn, ComponentRendererDef } from "@abstractions/RendererDefs";
+import type { ComponentDef, ComponentMetadata } from "../abstractions/ComponentDefs";
+import type { ComponentRendererFn, ComponentRendererDef } from "../abstractions/RendererDefs";
 import type { LoaderRenderer, LoaderRendererDef } from "./abstractions/LoaderRenderer";
 
 /**

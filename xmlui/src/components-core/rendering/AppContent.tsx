@@ -1,35 +1,37 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { GlobalProps, queryClient } from "./AppRoot";
-import { ContainerWrapperDef } from "./ContainerWrapper";
-import { useDebugView } from "@components-core/DebugViewProvider";
-import { useComponentRegistry } from "@components/ComponentRegistryContext";
+import { get } from "lodash-es";
+import toast from "react-hot-toast";
+import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
+
+import { version } from "../../../package.json";
+
+import { AppContextObject, MediaBreakpointType } from "../../abstractions/AppContextDefs";
+import { useComponentRegistry } from "../../components/ComponentRegistryContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useConfirm } from "@components/ModalDialog/ConfirmationModalContextProvider";
-import { useThemes } from "@components-core/theming/ThemeContext";
+import { useConfirm } from "../../components/ModalDialog/ConfirmationModalContextProvider";
+import { useThemes } from "../theming/ThemeContext";
 import {
   useDocumentKeydown,
   useIsInIFrame,
   useIsomorphicLayoutEffect,
   useIsWindowFocused,
   useMediaQuery,
-} from "@components-core/utils/hooks";
-import { ThemeToneKeys } from "@components-core/theming/abstractions";
-import { getVarKey } from "@components-core/theming/themeVars";
-import { AppContextObject, MediaBreakpointType } from "@abstractions/AppContextDefs";
-import { useApiInterceptorContext } from "@components-core/interception/useApiInterceptorContext";
-import { EMPTY_OBJECT, noop } from "@components-core/constants";
-import { AppStateContext, IAppStateContext } from "@components/App/AppStateContext";
-import { MemoedVars } from "@components-core/abstractions/ComponentRenderer";
+} from "../utils/hooks";
+import { ThemeToneKeys } from "../theming/abstractions";
+import { getVarKey } from "../theming/themeVars";
+import { useApiInterceptorContext } from "../interception/useApiInterceptorContext";
+import { EMPTY_OBJECT, noop } from "../constants";
+import { AppStateContext, IAppStateContext } from "../../components/App/AppStateContext";
+import { MemoedVars } from "../abstractions/ComponentRenderer";
+import { delay, formatFileSizeInBytes, getFileExtension } from "../utils/misc";
+import { useDebugView } from "../DebugViewProvider";
+import { miscellaneousUtils } from "../appContext/misc-utils";
+import { dateFunctions } from "../appContext/date-functions";
+import { mathFunctions } from "../appContext/math-function";
+import { AppContext } from "../AppContext";
 import { renderChild } from "./renderChild";
-import { AppContext } from "@components-core/AppContext";
-import { delay, formatFileSizeInBytes, getFileExtension } from "@components-core/utils/misc";
-import { differenceInMinutes, isSameDay, isThisYear, isToday } from "date-fns";
-import { miscellaneousUtils } from "@components-core/appContext/misc-utils";
-import { get } from "lodash-es";
-import toast from "react-hot-toast";
-import { version } from "../../../package.json";
-import { dateFunctions } from "@components-core/appContext/date-functions";
-import { mathFunctions } from "@components-core/appContext/math-function";
+import { GlobalProps, queryClient } from "./AppRoot";
+import { ContainerWrapperDef } from "./ContainerWrapper";
 
 // --- The properties of the AppContent component
 type AppContentProps = {

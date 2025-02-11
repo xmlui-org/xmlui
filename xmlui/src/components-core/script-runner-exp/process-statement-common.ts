@@ -1,12 +1,24 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { BlockScope } from "@abstractions/scripting/BlockScope";
-import type { LogicalThreadExp } from "@abstractions/scripting/LogicalThreadExp";
-import type { LoopScope } from "@abstractions/scripting/LoopScope";
-import { T_EMPTY_STATEMENT, T_FUNCTION_DECLARATION, type ArrowExpression, type FunctionDeclaration, type LoopStatement, type Statement, type TryStatement } from "../../abstractions/scripting/ScriptingSourceTreeExp";
-import type { TryScope } from "@abstractions/scripting/TryScopeExp";
+import type { BlockScope } from "../../abstractions/scripting/BlockScope";
+import type { LogicalThreadExp } from "../../abstractions/scripting/LogicalThreadExp";
+import type { LoopScope } from "../../abstractions/scripting/LoopScope";
+import {
+  T_EMPTY_STATEMENT,
+  T_FUNCTION_DECLARATION,
+  type ArrowExpression,
+  type FunctionDeclaration,
+  type LoopStatement,
+  type Statement,
+  type TryStatement,
+} from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import type { TryScope } from "../../abstractions/scripting/TryScopeExp";
 
 import { obtainClosures } from "./eval-tree-common";
-import { StatementQueueItem, StatementWithInfo, mapStatementsToQueueItems } from "./statement-queue";
+import {
+  StatementQueueItem,
+  StatementWithInfo,
+  mapStatementsToQueueItems,
+} from "./statement-queue";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
 
 export function innermostLoopScope(thread: LogicalThreadExp): LoopScope {
   if (!thread.loops || thread.loops.length === 0) {
@@ -48,7 +60,9 @@ export function releaseLoopScope(thread: LogicalThreadExp, skipContinuation = tr
     thread.loops?.pop();
   }
   if (thread.blocks) {
-    thread.blocks.length = skipContinuation ? loopScope.breakBlockDepth : loopScope.continueBlockDepth;
+    thread.blocks.length = skipContinuation
+      ? loopScope.breakBlockDepth
+      : loopScope.continueBlockDepth;
   }
 }
 
@@ -71,7 +85,7 @@ export function closing(): StatementWithInfo {
 export function provideLoopBody(
   loopScope: LoopScope,
   loopStatement: LoopStatement,
-  breakLabelValue: number | undefined
+  breakLabelValue: number | undefined,
 ): StatementQueueItem[] {
   // --- Stay in the loop, add the body and the guard condition
   const guardStatement = guard(loopStatement);
@@ -117,7 +131,10 @@ export function provideTryBody(thread: LogicalThreadExp, tryScope: TryScope): St
 }
 
 // --- Provide a body for the catch block
-export function provideCatchBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
+export function provideCatchBody(
+  thread: LogicalThreadExp,
+  tryScope: TryScope,
+): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 
@@ -136,7 +153,10 @@ export function provideCatchBody(thread: LogicalThreadExp, tryScope: TryScope): 
 }
 
 // --- Provide a body for the finally block
-export function provideFinallyBody(thread: LogicalThreadExp, tryScope: TryScope): StatementQueueItem[] {
+export function provideFinallyBody(
+  thread: LogicalThreadExp,
+  tryScope: TryScope,
+): StatementQueueItem[] {
   // --- Stay in the error handling block, add the body and the guard condition
   const guardStatement = guard(tryScope.statement);
 

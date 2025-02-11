@@ -8,10 +8,12 @@ import {
   useState,
 } from "react";
 import * as RTabs from "@radix-ui/react-tabs";
+
 import styles from "./Tabs.module.scss";
-import { TabContext, useTabContextValue } from "@components/Tabs/TabContext";
-import { useEvent } from "@components-core/utils/misc";
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
+import { useEvent } from "../../components-core/utils/misc";
+import { TabContext, useTabContextValue } from "../Tabs/TabContext";
 
 type Props = {
   activeTab?: number;

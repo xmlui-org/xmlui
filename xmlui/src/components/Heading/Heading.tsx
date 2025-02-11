@@ -1,10 +1,12 @@
 import type { CSSProperties } from "react";
+
 import styles from "./Heading.module.scss";
-import { createComponentRenderer } from "@components-core/renderers";
-import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
+
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { NonCssLayoutProps, ValueExtractor } from "../../abstractions/RendererDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { Heading, type HeadingLevel } from "./HeadingNative";
 
 const COMP = "Heading";

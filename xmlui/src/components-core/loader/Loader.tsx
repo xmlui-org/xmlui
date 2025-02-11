@@ -1,21 +1,19 @@
 import {useCallback, useEffect, useLayoutEffect, useMemo} from "react";
 import { useQuery } from "@tanstack/react-query";
+import { createDraft, finishDraft } from "immer";
+import type {QueryFunction} from "@tanstack/query-core/src/types";
 
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
   LoaderLoadedFn, TransformResultFn,
-} from "@components-core/abstractions/LoaderRenderer";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-
-import { extractParam } from "@components-core/utils/extractParam";
-import { createDraft, finishDraft } from "immer";
-import { useAppContext } from "@components-core/AppContext";
-import { usePrevious } from "@components-core/utils/hooks";
-import type {QueryFunction} from "@tanstack/query-core/src/types";
-import { flushSync } from "react-dom";
+} from "../abstractions/LoaderRenderer";
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
+import { extractParam } from "../utils/extractParam";
+import { useAppContext } from "../AppContext";
+import { usePrevious } from "../utils/hooks";
 
 /**
  * The properties of the Loader component

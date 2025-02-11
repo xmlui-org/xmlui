@@ -1,4 +1,4 @@
-import { expect, test } from "@testing/fixtures"
+import { expect, test } from "../../testing/fixtures"
 
 // --- Testing
 

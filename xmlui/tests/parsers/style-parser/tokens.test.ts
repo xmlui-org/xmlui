@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { StyleTokenType } from "@parsers/style-parser/tokens";
-import { StyleLexer } from "@parsers/style-parser/StyleLexer";
-import { StyleInputStream } from "@parsers/style-parser/StyleInputStream";
+import { StyleTokenType } from "../../../src/parsers/style-parser/tokens";
+import { StyleLexer } from "../../../src/parsers/style-parser/StyleLexer";
+import { StyleInputStream } from "../../../src/parsers/style-parser/StyleInputStream";
 
 describe("Parser - Binary operations", () => {
   const simpleTokens = [

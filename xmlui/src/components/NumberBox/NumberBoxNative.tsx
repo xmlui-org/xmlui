@@ -1,5 +1,3 @@
-import { type ValidationStatus } from "@components/abstractions";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
 import React, {
   type CSSProperties,
   type ForwardedRef,
@@ -8,15 +6,30 @@ import React, {
   useEffect,
   useRef,
 } from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "classnames";
+
 import styles from "./NumberBox.module.scss";
-import { noop } from "@components-core/constants";
-import { Icon } from "@components/Icon/IconNative";
-import { Adornment } from "@components/Input/InputAdornment";
-import { Button } from "@components/Button/ButtonNative";
-import { useEvent } from "@components-core/utils/misc";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
-import { clamp, DECIMAL_SEPARATOR, DEFAULT_STEP, EXPONENTIAL_SEPARATOR, FLOAT_REGEXP, INT_REGEXP, isEmptyLike, mapToRepresentation, NUMBERBOX_MAX_VALUE, toUsableNumber } from "./numberbox-abstractions";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import {
+  clamp,
+  DECIMAL_SEPARATOR,
+  DEFAULT_STEP,
+  EXPONENTIAL_SEPARATOR,
+  FLOAT_REGEXP,
+  INT_REGEXP,
+  isEmptyLike,
+  mapToRepresentation,
+  NUMBERBOX_MAX_VALUE,
+  toUsableNumber,
+} from "./numberbox-abstractions";
+import { type ValidationStatus } from "../abstractions";
+import { Icon } from "../Icon/IconNative";
+import { Adornment } from "../Input/InputAdornment";
+import { Button } from "../Button/ButtonNative";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 // =====================================================================================================================
 // React NumberBox component definition
@@ -67,8 +80,8 @@ export const NumberBox = forwardRef(function NumberBox(
     step,
     integersOnly = false,
     zeroOrPositive = false,
-      min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
-      max = NUMBERBOX_MAX_VALUE,
+    min = zeroOrPositive ? 0 : -NUMBERBOX_MAX_VALUE,
+    max = NUMBERBOX_MAX_VALUE,
     maxLength,
     updateState = noop,
     onDidChange = noop,

@@ -1,8 +1,9 @@
 import styles from "./Text.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "@components/abstractions";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { variantOptionsMd, type VariantProps, VariantPropsKeys } from "../abstractions";
 import { Text } from "./TextNative";
 
 const COMP = "Text";

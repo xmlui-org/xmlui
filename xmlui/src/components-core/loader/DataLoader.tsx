@@ -1,25 +1,24 @@
 import { useCallback, useMemo, useRef } from "react";
 import toast from "react-hot-toast";
 
-import type { RegisterComponentApiFn } from "@abstractions/RendererDefs";
+import type { RegisterComponentApiFn } from "../../abstractions/RendererDefs";
 import type {
   LoaderErrorFn,
   LoaderInProgressChangedFn,
   LoaderLoadedFn,
   TransformResultFn,
-} from "@components-core/abstractions/LoaderRenderer";
-import type { ContainerState } from "@components-core/rendering/ContainerWrapper";
-import type { LoaderDirections } from "@components-core/loader/PageableLoader";
-import { ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-
-import { createLoaderRenderer } from "@components-core/renderers";
-import RestApiProxy from "@components-core/RestApiProxy";
-import { extractParam } from "@components-core/utils/extractParam";
-import { DataLoaderQueryKeyGenerator } from "@components-core/utils/DataLoaderQueryKeyGenerator";
-import { PageableLoader } from "@components-core/loader/PageableLoader";
-import { Loader } from "@components-core/loader/Loader";
-import { useAppContext } from "@components-core/AppContext";
-import { useShallowCompareMemoize } from "@components-core/utils/hooks";
+} from "../abstractions/LoaderRenderer";
+import { ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { ContainerState } from "../rendering/ContainerWrapper";
+import type { LoaderDirections } from "../loader/PageableLoader";
+import { createLoaderRenderer } from "../renderers";
+import RestApiProxy from "../RestApiProxy";
+import { extractParam } from "../utils/extractParam";
+import { DataLoaderQueryKeyGenerator } from "../utils/DataLoaderQueryKeyGenerator";
+import { PageableLoader } from "../loader/PageableLoader";
+import { Loader } from "../loader/Loader";
+import { useAppContext } from "../AppContext";
+import { useShallowCompareMemoize } from "../utils/hooks";
 
 type LoaderProps = {
   loader: DataLoaderDef;
@@ -50,6 +49,16 @@ function DataLoader({
     return extractParam(state, loader.props.queryParams, appContext);
   }, [appContext, loader.props.queryParams, state]);
   const queryParams = useShallowCompareMemoize(queryParamsInner);
+
+  const bodyInner = useMemo(() => {
+    return extractParam(state, loader.props.body, appContext);
+  }, [appContext, loader.props.body, state]);
+  const body = useShallowCompareMemoize(bodyInner);
+
+  const rawBodyInner = useMemo(() => {
+    return extractParam(state, loader.props.rawBody, appContext);
+  }, [appContext, loader.props.rawBody, state]);
+  const rawBody = useShallowCompareMemoize(rawBodyInner);
 
   const pagingDirection: LoaderDirections | null = useMemo(() => {
     if (loader.props.prevPageSelector && loader.props.nextPageSelector) {
@@ -90,6 +99,8 @@ function DataLoader({
       url,
       queryParams,
       appContext?.appGlobals.apiUrl,
+      body,
+      rawBody
     ).asKey();
   }, [appContext?.appGlobals.apiUrl, queryParams, url]);
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { expandTheme } from "@components-core/theming/extendThemeUtils";
+import { expandTheme } from "../../../src/components-core/theming/extendThemeUtils";
 
 describe("expandTheme", () => {
   it("expandTheme removes color-border", () => {

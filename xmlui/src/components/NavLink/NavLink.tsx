@@ -1,10 +1,11 @@
 import styles from "./NavLink.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { Icon } from "@components/Icon/IconNative";
-import { parseScssVar } from "@components-core/theming/themeVars";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dClick, dEnabled, dLabel } from "../metadata-helpers";
+import { Icon } from "../Icon/IconNative";
 import { NavLink } from "./NavLinkNative";
-import { dClick, dEnabled, dLabel } from "@components/metadata-helpers";
 
 const COMP = "NavLink";
 

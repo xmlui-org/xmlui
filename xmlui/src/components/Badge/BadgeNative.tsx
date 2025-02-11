@@ -1,6 +1,7 @@
-import classnames from "@components-core/utils/classnames";
-import styles from "./Badge.module.scss";
 import { ForwardedRef, forwardRef } from "react";
+import classnames from "classnames";
+
+import styles from "./Badge.module.scss";
 
 const badgeVariantValues = ["badge", "pill"] as const;
 export type BadgeVariant = (typeof badgeVariantValues)[number];

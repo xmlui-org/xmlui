@@ -1,10 +1,11 @@
-import styles from "./TableOfContents.module.scss";
 import {CSSProperties, ForwardedRef, forwardRef, useEffect, useRef} from "react";
-import classnames from "classnames";
-import { useTableOfContents } from "@components-core/TableOfContentsContext";
 import { NavLink as RrdNavLink } from "@remix-run/react";
 import scrollIntoView from "scroll-into-view-if-needed";
 import { composeRefs } from "@radix-ui/react-compose-refs";
+import classnames from "classnames";
+
+import styles from "./TableOfContents.module.scss";
+import { useTableOfContents } from "../../components-core/TableOfContentsContext";
 
 type Props = {
   style?: CSSProperties;

@@ -1,23 +1,32 @@
-import React, { CSSProperties, ReactNode, useLayoutEffect } from "react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { d, type ComponentDef } from "@abstractions/ComponentDefs";
-import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
-import { AppLayoutContext } from "./AppLayoutContext";
+import {
+  CSSProperties,
+  ReactNode,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import type { JSX } from "react/jsx-runtime";
+import { Helmet } from "react-helmet-async";
 import { useLocation } from "@remix-run/react";
 import { noop } from "lodash-es";
-import classnames from "@components-core/utils/classnames";
+import classnames from "classnames";
 
 import styles from "./App.module.scss";
-import { useAppContext } from "@components-core/AppContext";
-import { Sheet, SheetContent } from "@components/App/Sheet";
-import { ScrollContext } from "@components-core/ScrollContext";
-import { useResizeObserver } from "@components-core/utils/hooks";
-import { useTheme, useThemes } from "@components-core/theming/ThemeContext";
-import type { JSX } from "react/jsx-runtime";
-import { AppContextAwareAppHeader } from "@components/AppHeader/AppHeaderNative";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import { useScrollbarWidth } from "@components-core/utils/css-utils";
-import { Helmet } from "react-helmet-async";
+
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { useAppContext } from "../../components-core/AppContext";
+import { ScrollContext } from "../../components-core/ScrollContext";
+import { useResizeObserver } from "../../components-core/utils/hooks";
+import { useTheme, useThemes } from "../../components-core/theming/ThemeContext";
+import { useScrollbarWidth } from "../../components-core/utils/css-utils";
+import { Sheet, SheetContent } from "../../components/App/Sheet";
+import { AppContextAwareAppHeader } from "../../components/AppHeader/AppHeaderNative";
+import type { AppLayoutType, IAppLayoutContext } from "./AppLayoutContext";
+import { AppLayoutContext } from "./AppLayoutContext";
 
 type Props = {
   children: ReactNode;

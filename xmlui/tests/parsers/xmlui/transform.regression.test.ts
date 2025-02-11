@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform - regression", () => {
@@ -19,7 +19,7 @@ describe("Ueml transform - regression", () => {
     `) as ComponentDef;
     expect(cd.type).equal("Table");
   });
-  
+
   it("Element with attribute comment #1", () => {
     const cd = transformSource(`
     <Table width="50%" <!-- height="100%" --> >
@@ -99,15 +99,24 @@ const b = 2;
 
   it("Var removes whitespaces", () => {
     const cd = transformSource(`
-    <Text><var name="myVar">
+    <Text><variable name="myVar">
 const a = 1;
 
 const b = 2;
-</var>
+</variable>
     </Text>
     `) as ComponentDef;
     expect(cd.type).equal("Text");
     expect(cd.vars!.myVar).toBe(" const a = 1; const b = 2; ")
   });
 
+  it("Component with html tag", () => {
+    const cd = transformSource(`
+    <Component name="MyComp">
+      <h1>Heading1 </h1>
+    </Component>
+    `) as CompoundComponentDef;
+    expect(cd.name).toBe("MyComp");
+    expect((cd.component as ComponentDef).type).toBe("h1");
+  });
 });

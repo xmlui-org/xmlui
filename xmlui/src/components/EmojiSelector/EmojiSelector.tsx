@@ -1,8 +1,8 @@
-import { createComponentRenderer } from "@components-core/renderers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { useTheme } from "@components-core/theming/ThemeContext";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { dAutoFocus } from "../metadata-helpers";
 import { EmojiSelector } from "./EmojiSelectorNative";
-import { dAutoFocus } from "@components/metadata-helpers";
 
 const COMP = "EmojiSelector";
 

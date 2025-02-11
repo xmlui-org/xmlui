@@ -1,10 +1,9 @@
 import { SetupWorker, setupWorker } from "msw/browser";
-import { isArray } from "lodash-es";
 import { RequestHandler, http } from "msw";
+import { isArray } from "lodash-es";
 
+import { ApiInterceptor } from "../interception/ApiInterceptor";
 import type { ApiInterceptorDefinition } from "./abstractions";
-
-import { ApiInterceptor } from "@components-core/interception/ApiInterceptor";
 
 // Create handlers for the specified API interceptor
 function createHandlers(api: ApiInterceptor): RequestHandler[] {

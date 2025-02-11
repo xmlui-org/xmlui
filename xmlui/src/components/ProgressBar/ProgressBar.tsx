@@ -1,7 +1,8 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./ProgressBar.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import { ProgressBar } from "./ProgressBarNative";
 
 const COMP = "ProgressBar";

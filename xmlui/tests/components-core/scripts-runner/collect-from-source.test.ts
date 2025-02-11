@@ -3,9 +3,9 @@ import { describe, expect, it, assert } from "vitest";
 import {
   collectCodeBehindFromSource,
   PARSED_MARK_PROP,
-} from "@parsers/scripting/code-behind-collect";
-import { CollectedDeclarations, Expression } from "@abstractions/scripting/ScriptingSourceTree";
-import { createEvalContext } from "@components-core/script-runner/BindingTreeEvaluationContext";
+} from "../../../src/parsers/scripting/code-behind-collect";
+import { CollectedDeclarations, Expression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
+import { createEvalContext } from "../../../src/components-core/script-runner/BindingTreeEvaluationContext";
 
 const ROOT_MODULE = "test";
 

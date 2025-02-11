@@ -1,11 +1,10 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-
 import styles from "./Alert.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { statusColorMd } from "../../components/abstractions";
 import { Alert } from "./AlertNative";
-import { statusColorMd } from "@components/abstractions";
 
 const COMP = "Alert";
 

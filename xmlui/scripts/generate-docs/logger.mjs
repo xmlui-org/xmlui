@@ -3,7 +3,7 @@
  * - severity indicates message importance
  * - levels control what messages will be logged
  */
-export class Logger {
+class Logger {
   // TODO: make class a singleton
   
   static severity = {
@@ -20,18 +20,12 @@ export class Logger {
     return Object.keys(Logger.severity).includes(severity);
   }
 
-  static levels = {
-    ...Logger.severity,
-    all: "all",
-    none: "none",
-  };
-
   isValidLevel(level) {
-    return Object.keys(Logger.levels).includes(level);
+    return Object.keys(LOGGER_LEVELS).includes(level);
   }
 
   defaultSeverity = Logger.severity.error;
-  defaultLogLevel = Logger.levels.all;
+  defaultLogLevel = LOGGER_LEVELS.all;
 
   setLevels(...levels) {
     levels = Array.from(new Set(levels));
@@ -47,10 +41,10 @@ export class Logger {
     this.warning = this._noop;
     this.error = this._noop;
 
-    if (validLevels.find((level) => level === Logger.levels.none)) {
+    if (validLevels.find((level) => level === LOGGER_LEVELS.none)) {
       return;
     }
-    if (validLevels.find((level) => level === Logger.levels.all)) {
+    if (validLevels.find((level) => level === LOGGER_LEVELS.all)) {
       this.info = this._logInfo;
       this.warning = this._logWarning;
       this.error = this._logError;
@@ -95,5 +89,12 @@ export class Logger {
 
   _noop(...args) {}
 }
+
+export const LOGGER_LEVELS = {
+  ...Logger.severity,
+  all: "all",
+  none: "none",
+};
+
 // --- Usable logger instance
-export const logger = new Logger(Logger.levels.all);
+export const logger = new Logger(LOGGER_LEVELS.all);

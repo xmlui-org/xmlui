@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { resolveIdentifiers } from "@components-core/script-runner-exp/id-resolution";
-import { parsePropertyValue } from "@parsers/scripting-exp/property-parsing";
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { T_FUNCTION_DECLARATION, T_IDENTIFIER } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { resolveIdentifiers } from "../../../src/components-core/script-runner-exp/id-resolution";
+import { parsePropertyValue } from "../../../src/parsers/scripting-exp/property-parsing";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  T_FUNCTION_DECLARATION,
+  T_IDENTIFIER,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("ID resolution", () => {
   it("PropertyValue does not extend scope", () => {
@@ -80,7 +83,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
 
   const binaryCases = [
@@ -119,7 +122,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
   binaryCases.forEach((c) =>
     it(`Binary op extends scope #2: ${c}`, () => {
@@ -131,7 +134,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
 
   it("Conditional op extends scope #1", () => {
@@ -374,7 +377,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
   asgnCases.forEach((c) =>
     it(`Assignment extends scope #2: ${c}`, () => {
@@ -386,7 +389,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
 
   const prePostCases = ["++", "--"];
@@ -400,7 +403,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
 
   prePostCases.forEach((c) =>
@@ -413,7 +416,7 @@ describe("ID resolution", () => {
       // --- Assert
       expect(Object.keys(scope.topLevelNames).length).toBe(1);
       expect(scope.topLevelNames["myId"]).toBe(true);
-    })
+    }),
   );
 
   it("Block extends top scope", () => {

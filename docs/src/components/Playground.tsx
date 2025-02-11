@@ -1,20 +1,20 @@
 import React, { useEffect, useId, useMemo, useReducer } from "react";
-import "@src/index.scss";
+import "../../../xmlui/src/index.scss";
 import {
   appDescriptionInitialized,
   optionsInitialized,
   PlaygroundContext,
   playgroundReducer,
   toneChanged,
-} from "@/src/state/store";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
-import {INITIAL_PLAYGROUND_STATE, preprocessCode} from "@/src/utils/helpers";
-import { PlaygroundContent } from "@/src/components/PlaygroundContent";
+} from "../state/store";
+import type { ThemeDefinition } from "../../../xmlui/src/components-core/theming/abstractions";
+import {INITIAL_PLAYGROUND_STATE, preprocessCode} from "../utils/helpers";
+import { PlaygroundContent } from "../components/PlaygroundContent";
 import { useTheme } from "nextra-theme-docs";
 import styles from "./Playground.module.scss";
-import { Header } from "@/src/components/Header";
-import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
-import { ErrorBoundary } from "@src/components-core/rendering/ErrorBoundary";
+import { Header } from "../components/Header";
+import type { ApiInterceptorDefinition } from "../../../xmlui/src/components-core/interception/abstractions";
+import { ErrorBoundary } from "../../../xmlui/src/components-core/rendering/ErrorBoundary";
 
 type PlaygroundProps = {
   name: string;

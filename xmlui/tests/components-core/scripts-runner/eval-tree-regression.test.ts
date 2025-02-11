@@ -1,10 +1,10 @@
 
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
-import { evalBinding } from "@components-core/script-runner/eval-tree-sync";
-import { parseParameterString } from "@components-core/script-runner/ParameterParser";
-import { Expression } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { evalBinding } from "../../../src/components-core/script-runner/eval-tree-sync";
+import { parseParameterString } from "../../../src/components-core/script-runner/ParameterParser";
+import { Expression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 import {createEvalContext} from "./test-helpers";
 
 describe("Evaluate binding expression tree", () => {

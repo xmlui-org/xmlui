@@ -1,6 +1,6 @@
-import { createMetadata } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { CarouselItemComponent } from "@components/Carousel/CarouselItemNative";
+import { createMetadata } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { CarouselItemComponent } from "./CarouselItemNative";
 
 const COMP = "CarouselItem";
 

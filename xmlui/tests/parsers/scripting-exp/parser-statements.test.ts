@@ -1,6 +1,6 @@
 import { assert, describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {
   BlockStatement,
   ConstStatement,
@@ -42,7 +42,7 @@ import {
   TryStatement,
   VarStatement,
   WhileStatement,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - statements", () => {
   it("Empty source", () => {
@@ -230,7 +230,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -736,7 +736,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -1279,7 +1279,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -1311,7 +1311,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -1415,7 +1415,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });
@@ -1447,7 +1447,7 @@ describe("Parser - statements", () => {
       wParser.parseStatements()!;
     } catch (err) {
       expect(wParser.errors[0].code).equal("W031");
-      return; 
+      return;
     }
     assert.fail("Exception expected");
   });

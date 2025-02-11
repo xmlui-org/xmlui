@@ -2,12 +2,12 @@ import { useMemo } from "react";
 import { QueryClient } from "@tanstack/react-query";
 import { enableMapSet } from "immer";
 
-import type { ComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
-import { resetErrors } from "@components-core/reportEngineError";
-import { ComponentProvider } from "@components/ComponentProvider";
+import type { ComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
+import { resetErrors } from "../reportEngineError";
+import { ComponentProvider } from "../../components/ComponentProvider";
 import { DebugViewProvider } from "../DebugViewProvider";
+import StandaloneExtensionManager from "../StandaloneExtensionManager";
 import { AppWrapper, AppWrapperProps } from "./AppWrapper";
-import StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
 
 // --- We want to enable the produce method of `immer` on Map objects
 enableMapSet();

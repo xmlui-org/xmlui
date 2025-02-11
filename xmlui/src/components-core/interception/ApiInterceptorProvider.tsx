@@ -1,12 +1,11 @@
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
-
 import type { SetupWorker } from "msw/browser";
-import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
 
+import type { IApiInterceptorContext } from "../../abstractions/AppContextDefs";
+import type { ApiInterceptorDefinition } from "../interception/abstractions";
+import { normalizePath } from "../utils/misc";
 import { ApiInterceptorContext } from "./useApiInterceptorContext";
-import type { IApiInterceptorContext } from "@abstractions/AppContextDefs";
-import { normalizePath } from "@components-core/utils/misc";
 
 // This React component injects the API interceptor into the application's context
 export function ApiInterceptorProvider({

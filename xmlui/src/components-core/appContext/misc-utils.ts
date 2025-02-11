@@ -1,6 +1,6 @@
 import { capitalize, defaultTo } from "lodash-es";
 
-import { distinct, findByField, pluralize, toHashObject } from "@components-core/utils/misc";
+import { distinct, findByField, pluralize, toHashObject } from "../utils/misc";
 
 export const miscellaneousUtils = {
   capitalize,

@@ -1,5 +1,3 @@
-import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
-import type { ICustomOperations } from "./ICustomOperations";
 import type { LogicalThread } from "../../abstractions/scripting/LogicalThread";
 import type {
   ArrayLiteral,
@@ -22,7 +20,14 @@ import type {
   VarDeclaration,
 } from "../../abstractions/scripting/ScriptingSourceTree";
 import type { BlockScope } from "../../abstractions/scripting/BlockScope";
-
+import { Identifier } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../parsers/scripting/Parser";
+import type { BindingTreeEvaluationContext } from "./BindingTreeEvaluationContext";
+import type { ICustomOperations } from "./ICustomOperations";
+import { ensureMainThread } from "./process-statement-common";
+import { processDeclarations, processStatementQueue } from "./process-statement-sync";
+import { isBannedFunction } from "./bannedFunctions";
+import { getSyncProxy } from "./syncProxy";
 import {
   evalArrow,
   evalAssignmentCore,
@@ -36,13 +41,6 @@ import {
   isPromise,
   evalTemplateLiteralCore,
 } from "./eval-tree-common";
-import { Parser } from "../../parsers/scripting/Parser";
-import { ensureMainThread } from "./process-statement-common";
-import { processDeclarations, processStatementQueue } from "./process-statement-sync";
-import { isBannedFunction } from "./bannedFunctions";
-import { Identifier } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { rest } from "lodash-es";
-import { getSyncProxy } from "./syncProxy";
 
 // --- The type of function we use to evaluate a (partial) expression tree
 type EvaluatorFunction = (
@@ -531,7 +529,7 @@ function evalFunctionInvocation(
   // --- We need to use proxies for JavaScript functions (such as Array.prototype.sort) using
   // --- in-place changes on DataSource values
   functionObj = getSyncProxy(functionObj, functionArgs, currentContext);
-  
+
   // --- Now, invoke the function
   const value = evalContext.options?.defaultToOptionalMemberAccess
     ? (functionObj as Function)?.call(currentContext, ...functionArgs)
@@ -566,7 +564,7 @@ function createArrowFunction(evaluator: EvaluatorFunction, expr: ArrowExpression
       functionBlock.vars[expr.name] = expr;
       functionBlock.constVars = new Set([expr.name]);
     }
-    
+
     // --- Assign argument values to names
     const arrowBlock: BlockScope = { vars: {} };
     workingThread.blocks ??= [];

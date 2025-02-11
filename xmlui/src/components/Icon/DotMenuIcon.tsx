@@ -1,4 +1,3 @@
-import React from "react";
 import type {IconBaseProps} from "./IconNative";
 import { IoEllipsisVertical } from "react-icons/io5";
 

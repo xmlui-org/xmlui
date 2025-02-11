@@ -1,9 +1,11 @@
-import type { ValidationStatus } from "@components/abstractions";
-import classnames from "@components-core/utils/classnames";
-import styles from "./HelperText.module.scss";
 import type { CSSProperties } from "react";
-import { WarningIcon } from "@components/Icon/WarningIcon";
-import { ErrorIcon } from "@components/Icon/ErrorIcon";
+import classnames from "classnames";
+
+import styles from "./HelperText.module.scss";
+
+import type { ValidationStatus } from "../abstractions";
+import { WarningIcon } from "../Icon/WarningIcon";
+import { ErrorIcon } from "../Icon/ErrorIcon";
 
 // =====================================================================================================================
 // React HelperText component implementation

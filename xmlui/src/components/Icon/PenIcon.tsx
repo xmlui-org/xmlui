@@ -1,4 +1,3 @@
-import React from "react";
 import {HiOutlinePencil} from 'react-icons/hi';
 import type {IconBaseProps} from "./IconNative";
 

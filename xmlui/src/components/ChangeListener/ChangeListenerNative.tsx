@@ -1,6 +1,6 @@
 import { useEffect, useMemo } from "react";
 import { isEqual, throttle } from "lodash-es";
-import { usePrevious } from "@components-core/utils/hooks";
+import { usePrevious } from "../../components-core/utils/hooks";
 
 // =====================================================================================================================
 // React ChangeListener component implementation

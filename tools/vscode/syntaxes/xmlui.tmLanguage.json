@@ -231,7 +231,7 @@
       ]
     },
     "propOrVarTag": {
-      "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:var)|(?:property)|(?:prop))",
+      "begin": "(</?)([a-zA-Z_][\\w\\.\\-]*?:)?((?:variable)|(?:property)|(?:prop))",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },
@@ -244,7 +244,7 @@
       "patterns": [{ "include": "#attribute" }, { "include": "#comments" }]
     },
     "componentTag": {
-      "begin": "(\\s*</?)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([A-Z][\\w\\.\\-]*)",
+      "begin": "(</?)((?:[a-zA-Z_][\\w\\.\\-]*?:)?)([a-zA-Z][\\w\\.\\-]*)",
       "beginCaptures": {
         "1": { "name": "punctuation.definition.tag.xmlui" },
         "2": { "name": "keyword.operator.namespace.xmlui" },

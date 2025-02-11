@@ -1,7 +1,7 @@
-import type { ApiInterceptorDefinition } from "@components-core/interception/abstractions";
-import { labelPositionValues } from "@components/abstractions";
-import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import type { ApiInterceptorDefinition } from "../../components-core/interception/abstractions";
+import { labelPositionValues } from "../abstractions";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { expect, test } from "../../testing/fixtures";
 
 // TODO: Copy over other tests to utilize this interceptor
 const crudInterceptor: ApiInterceptorDefinition = {

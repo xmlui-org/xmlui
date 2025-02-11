@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { compileLayout } from "@parsers/style-parser/style-compiler";
+import { compileLayout } from "../../../src/parsers/style-parser/style-compiler";
 
 type TestDescriptor = {
   category: string;

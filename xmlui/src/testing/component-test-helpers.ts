@@ -1,7 +1,8 @@
 import type { Locator, Page } from "@playwright/test";
-import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
-import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+
+import { xmlUiMarkupToComponent } from "../components-core/xmlui-parser";
+import type { StandaloneAppDescription } from "../components-core/abstractions/standalone";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
 
 type EntryPoint = string | ComponentDef;
 type UnparsedAppDescription = Omit<Partial<StandaloneAppDescription>, "entryPoint"> & {

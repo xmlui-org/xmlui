@@ -1,7 +1,7 @@
+import { CSSProperties, HTMLAttributes, forwardRef } from "react";
+import classnames from "classnames";
+
 import styles from "./Image.module.scss";
-import {CSSProperties, HTMLAttributes} from "react";
-import { forwardRef } from "react";
-import classnames from "@components-core/utils/classnames";
 
 // =====================================================================================================================
 // React Image component implementation
@@ -20,8 +20,6 @@ export const Image = forwardRef(function Img(
   { src, alt, fit = "contain", style, onClick, aspectRatio, lazyLoad }: Props,
   ref,
 ) {
-
-
   return (
     <img
       src={src}

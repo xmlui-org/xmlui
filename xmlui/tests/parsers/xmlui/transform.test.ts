@@ -1,5 +1,5 @@
 import { describe, expect, it, assert } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
 import { transformSource } from "./xmlui";
 
 describe("Ueml transform", () => {
@@ -9,15 +9,6 @@ describe("Ueml transform", () => {
       assert.fail("Exception expected");
     } catch (err) {
       expect(err.toString().includes("T001")).equal(true);
-    }
-  });
-
-  it("Lowercase component fails", () => {
-    try {
-      transformSource("<stack />");
-      assert.fail("Exception expected");
-    } catch (err) {
-      expect(err.toString().includes("T002")).equal(true);
     }
   });
 

@@ -1,6 +1,7 @@
-import { noop } from "@components-core/constants";
 import EmojiPicker, { EmojiStyle, Theme as EmojiPickerTheme } from "emoji-picker-react";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
+
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import { noop } from "../../components-core/constants";
 
 // =====================================================================================================================
 // React EmojiSelector component implementation

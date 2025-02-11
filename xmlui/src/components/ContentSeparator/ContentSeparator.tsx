@@ -1,8 +1,9 @@
 import styles from "./ContentSeparator.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { orientationOptionMd } from "@components/abstractions";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { orientationOptionMd } from "../abstractions";
 import { ContentSeparator } from "./ContentSeparatorNative";
 
 const COMP = "ContentSeparator";

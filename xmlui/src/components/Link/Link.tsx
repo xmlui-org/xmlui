@@ -1,10 +1,11 @@
 import styles from "./Link.module.scss";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dEnabled, dLabel } from "../metadata-helpers";
+import { LinkTargetMd } from "../abstractions";
 import { LocalLink } from "./LinkNative";
-import { dEnabled, dLabel } from "@components/metadata-helpers";
-import { LinkTargetMd } from "@components/abstractions";
 
 const COMP = "Link";
 
@@ -67,7 +68,7 @@ export const LinkMd = createMetadata({
 export const localLinkComponentRenderer = createComponentRenderer(
   COMP,
   LinkMd,
-  ({ node, extractValue, lookupEventHandler, renderChild, layoutCss }) => {
+  ({ node, extractValue, renderChild, layoutCss }) => {
     return (
       <LocalLink
         to={extractValue(node.props.to)}

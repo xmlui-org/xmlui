@@ -1,4 +1,4 @@
-import { orderBy } from "@components-core/utils/misc"
+import { orderBy } from "../utils/misc"
 
 export type GroupItem<K, V> = {
     key: K,

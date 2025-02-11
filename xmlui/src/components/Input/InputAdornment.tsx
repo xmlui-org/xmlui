@@ -1,7 +1,9 @@
-import { Icon } from "@components/Icon/IconNative";
-import { Text } from "../Text/TextNative";
+import classnames from "classnames";
+
 import styles from "./InputAdornment.module.scss";
-import classnames from "@components-core/utils/classnames";
+
+import { Icon } from "../Icon/IconNative";
+import { Text } from "../Text/TextNative";
 
 interface AdornmentProps {
   iconName?: string;

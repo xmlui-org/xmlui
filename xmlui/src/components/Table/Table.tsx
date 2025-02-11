@@ -1,20 +1,21 @@
-import styles from "./Table.module.scss";
-import "./react-table-config.d.ts";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { Table } from "./TableNative";
-import { dAutoFocus, dComponent } from "@components/metadata-helpers";
 import { useMemo, useRef, useState } from "react";
-import type { OurColumnMetadata } from "@components/Column/TableContext";
-import { TableContext } from "@components/Column/TableContext";
 import produce from "immer";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
+
+import styles from "./Table.module.scss";
+
+import "./react-table-config.d.ts";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import { dAutoFocus, dComponent } from "../metadata-helpers";
+import type { OurColumnMetadata } from "../Column/TableContext";
+import { TableContext } from "../Column/TableContext";
 import {
   StandaloneSelectionStore,
   useSelectionContext,
-} from "@components/SelectionStore/SelectionStoreNative";
-import { clear } from "console";
+} from "../SelectionStore/SelectionStoreNative";
+import { Table } from "./TableNative";
 
 const COMP = "Table";
 

@@ -1,7 +1,8 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import styles from "@components/Select/Select.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import styles from "../Select/Select.module.scss";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dPlaceholder,
   dInitialValue,
@@ -23,9 +24,9 @@ import {
   dLabelBreak,
   dValue,
   dComponent,
-} from "@components/metadata-helpers";
-import { Select } from "@components/Select/SelectNative";
-import { MemoizedItem } from "@components/container-helpers";
+} from "../metadata-helpers";
+import { MemoizedItem } from "../container-helpers";
+import { Select } from "../Select/SelectNative";
 
 const COMP = "Select";
 

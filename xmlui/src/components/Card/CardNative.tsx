@@ -1,13 +1,14 @@
+import { CSSProperties, ForwardedRef, ReactNode, forwardRef } from "react";
+import classnames from "classnames";
+
 import styles from "./Card.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { CSSProperties, ForwardedRef, ReactNode } from "react";
-import { forwardRef } from "react";
-import { Avatar } from "@components/Avatar/AvatarNative";
-import { LocalLink } from "@components/Link/LinkNative";
-import type { HeadingProps } from "@components/Heading/HeadingNative";
-import { Heading } from "@components/Heading/HeadingNative";
-import { Stack } from "@components/Stack/StackNative";
-import { Text } from "@components/Text/TextNative";
+
+import { Avatar } from "../Avatar/AvatarNative";
+import { LocalLink } from "../Link/LinkNative";
+import type { HeadingProps } from "../Heading/HeadingNative";
+import { Heading } from "../Heading/HeadingNative";
+import { Stack } from "../Stack/StackNative";
+import { Text } from "../Text/TextNative";
 
 export const DEFAULT_ORIENTATION = "vertical";
 

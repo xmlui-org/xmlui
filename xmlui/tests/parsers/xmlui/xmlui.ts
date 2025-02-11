@@ -1,11 +1,11 @@
-import { nodeToComponentDef } from "@parsers/xmlui-parser/transform";
+import { nodeToComponentDef } from "../../../src/parsers/xmlui-parser/transform";
 import type {
   ComponentDef,
   CompoundComponentDef,
-} from "@abstractions/ComponentDefs";
-import { createXmlUiParser, ParseResult } from "@parsers/xmlui-parser/parser";
-import type { GetText } from "@parsers/xmlui-parser/parser";
-import { toDbgString } from "@parsers/xmlui-parser/utils";
+} from "../../../src/abstractions/ComponentDefs";
+import { createXmlUiParser, ParseResult } from "../../../src/parsers/xmlui-parser/parser";
+import type { GetText } from "../../../src/parsers/xmlui-parser/parser";
+import { toDbgString } from "../../../src/parsers/xmlui-parser/utils";
 
 export function transformSource(
   source: string,

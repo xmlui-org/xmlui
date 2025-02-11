@@ -1,8 +1,8 @@
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
 import { MemoizedItem } from "../container-helpers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
+import { dComponent } from "../metadata-helpers";
 import { Items } from "./ItemsNative";
-import { dComponent } from "@components/metadata-helpers";
 
 const COMP = "Items";
 

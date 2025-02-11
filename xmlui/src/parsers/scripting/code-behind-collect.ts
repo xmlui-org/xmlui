@@ -7,9 +7,8 @@ import type {
   ScriptModule,
   Statement,
 } from "../../abstractions/scripting/ScriptingSourceTree";
+import type { ModuleResolver } from "../../abstractions/scripting/modules";
 import type { VisitorState } from "./tree-visitor";
-import type { ModuleResolver } from "@abstractions/scripting/modules";
-
 import { visitNode } from "./tree-visitor";
 import { isModuleErrors, obtainClosures, parseScriptModule } from "./modules";
 

@@ -1,4 +1,3 @@
-import { deepFreeze } from "@parsers/common/utils";
 import {
   ArrowExpression,
   BlockStatement,
@@ -50,6 +49,7 @@ import {
   T_FUNCTION_DECLARATION,
   T_LITERAL,
 } from "../../abstractions/scripting/ScriptingSourceTreeExp";
+import { deepFreeze } from "../../parsers/common/utils";
 
 export function simplifyExpression(expr?: Expression): Expression | undefined {
   let orig = expr;

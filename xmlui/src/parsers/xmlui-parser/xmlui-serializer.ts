@@ -1,5 +1,11 @@
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import type { XmlUiAttribute, XmlUiComment, XmlUiElement, XmlUiFragment, XmlUiNode } from "./xmlui-tree";
+import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type {
+  XmlUiAttribute,
+  XmlUiComment,
+  XmlUiElement,
+  XmlUiFragment,
+  XmlUiNode,
+} from "./xmlui-tree";
 
 export const COMPOUND_COMP_ID = "Component";
 export const UCRegex = /^[A-Z]/;
@@ -20,7 +26,9 @@ export class XmlUiHelper {
     return serializeFragment(fragment, 0);
 
     function serializeFragment(nodes: XmlUiNode[], depth: number): string {
-      return nodes.map((n) => serializeNode(n, depth)).join(options?.prettify ? "\n" + getIndent(depth) : "");
+      return nodes
+        .map((n) => serializeNode(n, depth))
+        .join(options?.prettify ? "\n" + getIndent(depth) : "");
     }
 
     function serializeNode(node: XmlUiNode, depth: number): string {
@@ -59,7 +67,7 @@ export class XmlUiHelper {
               elementStr.length +
               1 + // --- Space after
               attrTexts.join(" ").length + // --- Attributes total length
-              (hasChildren ? 1 : options?.useSpaceBeforeClose ?? false ? 3 : 2); // --- Closing token length
+              (hasChildren ? 1 : (options?.useSpaceBeforeClose ?? false) ? 3 : 2); // --- Closing token length
             if (nodeLength > (options?.lineLength ?? 80)) {
               // --- Too long, break attributes into new lines
               attrTexts.forEach((text) => {
@@ -80,10 +88,13 @@ export class XmlUiHelper {
 
           // --- Render the text
           if (node.text) {
-            const textContents = node.preserveSpaces ? serializeQuotedText(node.text) : serializeText(node.text);
+            const textContents = node.preserveSpaces
+              ? serializeQuotedText(node.text)
+              : serializeText(node.text);
             if (
               options?.prettify &&
-              elementStr.length + textContents.length + node.name.length + 3 > (options?.lineLength ?? 80)
+              elementStr.length + textContents.length + node.name.length + 3 >
+                (options?.lineLength ?? 80)
             ) {
               // --- break text
               elementStr += "\n" + getIndent(depth + 1) + textContents + "\n";
@@ -108,10 +119,10 @@ export class XmlUiHelper {
           // --- Render the closing tag
           elementStr += `${getIndent(depth)}</${node.name}>`;
         } else {
-          elementStr += (options?.useSpaceBeforeClose ?? false ? " " : "") + "/>";
+          elementStr += ((options?.useSpaceBeforeClose ?? false) ? " " : "") + "/>";
         }
       } else {
-        elementStr += (options?.useSpaceBeforeClose ?? false ? " " : "") + "/>";
+        elementStr += ((options?.useSpaceBeforeClose ?? false) ? " " : "") + "/>";
         if (node.text === "") {
           elementStr += `""</${nodeName()}>`;
         }
@@ -166,7 +177,10 @@ export class XmlUiHelper {
    * @param def Component definitions
    * @param options Transformation options
    */
-  transformComponentDefinition(def: ComponentDef | CompoundComponentDef, options?: XmlUiTransformOptions): XmlUiFragment {
+  transformComponentDefinition(
+    def: ComponentDef | CompoundComponentDef,
+    options?: XmlUiTransformOptions,
+  ): XmlUiFragment {
     return (def as any).type
       ? this.transformSimpleComponentDefinition(def as ComponentDef, options)
       : this.transformCompoundComponentDefinition(def as CompoundComponentDef, options);
@@ -190,7 +204,10 @@ export class XmlUiHelper {
    * @param def Component definition
    * @param options Transformation options
    */
-  private transformSimpleComponentDefinition(def: ComponentDef, options?: XmlUiTransformOptions): XmlUiFragment {
+  private transformSimpleComponentDefinition(
+    def: ComponentDef,
+    options?: XmlUiTransformOptions,
+  ): XmlUiFragment {
     const componentNode: XmlUiElement = {
       type: "XmlUiElement",
       name: def.type,
@@ -332,7 +349,7 @@ export class XmlUiHelper {
    */
   private transformCompoundComponentDefinition(
     def: CompoundComponentDef | string,
-    options?: XmlUiTransformOptions
+    options?: XmlUiTransformOptions,
   ): XmlUiFragment {
     if (typeof def === "string") {
       return {
@@ -341,7 +358,10 @@ export class XmlUiHelper {
       } as XmlUiElement;
     }
 
-    const nested: XmlUiFragment = this.transformSimpleComponentDefinition(def.component as ComponentDef, options);
+    const nested: XmlUiFragment = this.transformSimpleComponentDefinition(
+      def.component as ComponentDef,
+      options,
+    );
     const componentNode: XmlUiElement = {
       type: "XmlUiElement",
       name: COMPOUND_COMP_ID,
@@ -380,7 +400,7 @@ export class XmlUiHelper {
     nodeName: string,
     name: string | undefined,
     value: any,
-    options?: XmlUiTransformOptions
+    options?: XmlUiTransformOptions,
   ): XmlUiElement | null {
     // --- Do not transform undefined elements
     if (value === undefined) return null;
@@ -409,7 +429,8 @@ export class XmlUiHelper {
     // --- Simple value: use text or value attribute
     if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
       const strValue = typeof value === "string" ? value.toString() : `{${value.toString()}}`;
-      const preserveSpaces = attrBreakRegex.test(strValue) || strValue.trim().length != strValue.length;
+      const preserveSpaces =
+        attrBreakRegex.test(strValue) || strValue.trim().length != strValue.length;
       if (options?.preferTextToValue) {
         valueNode.text = strValue;
         valueNode.preserveSpaces = preserveSpaces;
@@ -474,14 +495,20 @@ export class XmlUiHelper {
    * @param value Value to transform
    * @param options Transformation options
    */
-  private transformObjectValue(name: string, value: any, options?: XmlUiTransformOptions): XmlUiNode {
+  private transformObjectValue(
+    name: string,
+    value: any,
+    options?: XmlUiTransformOptions,
+  ): XmlUiNode {
     const componentNode: XmlUiElement = {
       type: "XmlUiElement",
       name: name,
     };
 
     if (value) {
-      Object.keys(value).forEach((key) => this.addProperty(componentNode, key, value[key], options));
+      Object.keys(value).forEach((key) =>
+        this.addProperty(componentNode, key, value[key], options),
+      );
     }
     return componentNode;
   }
@@ -493,7 +520,12 @@ export class XmlUiHelper {
    * @param value Element value
    * @param options Transformation options
    */
-  private addProperty(element: XmlUiElement, name: string, value: any, options?: XmlUiTransformOptions): void {
+  private addProperty(
+    element: XmlUiElement,
+    name: string,
+    value: any,
+    options?: XmlUiTransformOptions,
+  ): void {
     switch (typeof value) {
       // --- We do not serialize undefined property values
       case "undefined":
@@ -545,7 +577,7 @@ export class XmlUiHelper {
     name: string,
     prefix: string,
     list: any[],
-    options?: XmlUiTransformOptions
+    options?: XmlUiTransformOptions,
   ): void {
     const nodeName = `${prefix ? prefix + "." : ""}${name}`;
     element.childNodes ??= [];

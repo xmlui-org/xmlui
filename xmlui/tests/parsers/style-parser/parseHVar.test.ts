@@ -1,5 +1,5 @@
-import {describe, expect, it, test} from "vitest";
-import { parseHVar } from "@components-core/theming/hvar";
+import {describe, expect, test} from "vitest";
+import { parseHVar } from "../../../src/components-core/theming/hvar";
 
 describe("Parse HVar", () => {
 

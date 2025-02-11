@@ -1,5 +1,4 @@
-import type { ComponentRendererDef } from "@abstractions/RendererDefs";
-import type { Extension } from "@abstractions/ExtensionDefs";
+import type { Extension } from "../abstractions/ExtensionDefs";
 
 type ExtensionRegisteredCallbackFn = (extension: Extension) => void;
 

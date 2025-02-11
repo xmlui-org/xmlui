@@ -1,9 +1,10 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { useOptionType } from "@components/Option/OptionTypeProvider";
-import type { Option } from "@components/abstractions";
 import { memo } from "react";
-import { dEnabled } from "@components/metadata-helpers";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import type { Option } from "../abstractions";
+import { dEnabled } from "../metadata-helpers";
+import { useOptionType } from "../Option/OptionTypeProvider";
 
 const COMP = "Option";
 

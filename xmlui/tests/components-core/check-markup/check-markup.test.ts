@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { checkXmlUiMarkup } from "@components-core/markup-check";
+import type { ComponentDef, CompoundComponentDef } from "../../../src/abstractions/ComponentDefs";
+import { checkXmlUiMarkup } from "../../../src/components-core/markup-check";
 import { createTestMetadataHandler } from "../test-metadata-handler";
-import { layoutOptionKeys } from "@components-core/descriptorHelper";
-import { xmlUiMarkupToComponent } from "@components-core/xmlui-parser";
+import { layoutOptionKeys } from "../../../src/components-core/descriptorHelper";
+import { xmlUiMarkupToComponent } from "../../../src/components-core/xmlui-parser";
 import { metadataHash } from "./metadata-hash";
-import { viewportSizeNames } from "@components/abstractions";
+import { viewportSizeNames } from "../../../src/components/abstractions";
 
 const metadataHandler = createTestMetadataHandler(metadataHash);
 

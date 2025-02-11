@@ -2,19 +2,19 @@ import { delay, HttpResponse } from "msw";
 import type { PathParams, StrictRequest } from "msw";
 import { isObject } from "lodash-es";
 
+import { Backend, CookieService, HeaderService } from "../interception/Backend";
+import { IndexedDb } from "../interception/IndexedDb";
+import { convertRequestParamPart } from "../utils/request-params";
+import { HttpError, HttpStatusCode } from "../interception/Errors";
+import { ThrowStatementError } from "../EngineError";
+import { InMemoryDb } from "../interception/InMemoryDb";
 import type {
   ApiInterceptorDefinition,
   AuthDefinition,
   IDatabase,
   InterceptorOperationDef,
-  RequestParams
+  RequestParams,
 } from "./abstractions";
-import { Backend, CookieService, HeaderService } from "@components-core/interception/Backend";
-import { IndexedDb } from "@components-core/interception/IndexedDb";
-import { convertRequestParamPart } from "@components-core/utils/request-params";
-import { HttpError, HttpStatusCode } from "@components-core/interception/Errors";
-import { ThrowStatementError } from "@components-core/EngineError";
-import {InMemoryDb} from "@components-core/interception/InMemoryDb";
 
 function mergeHeaders(...sources: HeadersInit[]) {
   const result: Record<string, string> = {};
@@ -70,12 +70,16 @@ export class AuthService {
   }
 }
 
-async function initDb(apiDef: ApiInterceptorDefinition){
+async function initDb(apiDef: ApiInterceptorDefinition) {
   switch (apiDef.type) {
     case "in-memory":
       return new InMemoryDb(apiDef.schemaDescriptor?.tables, apiDef.initialData, apiDef.config);
     default:
-      const indexedDb = new IndexedDb(apiDef.schemaDescriptor?.tables, apiDef.initialData, apiDef.config);
+      const indexedDb = new IndexedDb(
+        apiDef.schemaDescriptor?.tables,
+        apiDef.initialData,
+        apiDef.config,
+      );
       await indexedDb.initialize();
       return indexedDb;
   }
@@ -116,7 +120,7 @@ export class ApiInterceptor {
     operationId: string,
     req: StrictRequest<any>,
     cookies: Record<string, string | Array<string>>,
-    params: PathParams<string>
+    params: PathParams<string>,
   ) {
     if (this.backend === null) {
       throw new Error("Interceptor not initialized");
@@ -132,7 +136,7 @@ export class ApiInterceptor {
         const obj: any = {};
         for (const key of formData.keys()) {
           const all = formData.getAll(key);
-          if(all.length === 1){
+          if (all.length === 1) {
             obj[key] = all[0];
           } else {
             obj[key] = all;
@@ -154,7 +158,7 @@ export class ApiInterceptor {
         cookies: cookies,
         requestHeaders: Object.fromEntries(req.headers.entries()) || {},
       },
-      operation
+      operation,
     );
 
     //artificial delay for http requests
@@ -162,7 +166,12 @@ export class ApiInterceptor {
     const cookieService = new CookieService();
     const headerService = new HeaderService();
     try {
-      const ret = await this.backend.executeOperation(operationId, mappedParams, cookieService, headerService);
+      const ret = await this.backend.executeOperation(
+        operationId,
+        mappedParams,
+        cookieService,
+        headerService,
+      );
       const emptyBody = ret === undefined || ret === null;
       const successStatusCode =
         operation.successStatusCode ?? (emptyBody ? HttpStatusCode.NoContent : HttpStatusCode.Ok);
@@ -171,7 +180,10 @@ export class ApiInterceptor {
       if (ret instanceof File) {
         headers.append("Content-type", ret.type);
         headers.append("Content-Length", ret.size + "");
-        headers.append("Content-Disposition", `attachment; filename="${ret.name}"; filename*=utf-8''${ret.name}`);
+        headers.append(
+          "Content-Disposition",
+          `attachment; filename="${ret.name}"; filename*=utf-8''${ret.name}`,
+        );
         return HttpResponse.arrayBuffer(await ret.arrayBuffer(), {
           headers: headers,
           status: successStatusCode,
@@ -200,13 +212,16 @@ export class ApiInterceptor {
         {
           headers: cookieService.getCookieHeader(),
           status: HttpStatusCode.InternalServerError,
-        }
+        },
       );
     }
   }
 
   // Ensures that type path and query params are converted according to the operation definition
-  private convertRequestParams(params: RequestParams, operation: InterceptorOperationDef): RequestParams {
+  private convertRequestParams(
+    params: RequestParams,
+    operation: InterceptorOperationDef,
+  ): RequestParams {
     return {
       ...params,
       pathParams: convertRequestParamPart(params.pathParams, operation.pathParamTypes),

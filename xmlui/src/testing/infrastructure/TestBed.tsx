@@ -1,7 +1,7 @@
 // import { StandaloneApp } from "";
 // import type { StandaloneAppDescription } from "xmlui";
-import StandaloneApp from "@components-core/StandaloneApp";
-import type { StandaloneAppDescription } from "@components-core/abstractions/standalone";
+import StandaloneApp from "../../../src/components-core/StandaloneApp";
+import type { StandaloneAppDescription } from "../../../src/components-core/abstractions/standalone";
 import "xmlui/index.scss";
 
 declare global {

@@ -1,7 +1,12 @@
 import { describe, expect, it, assert } from "vitest";
 
-import { ArrowExpressionStatement, T_ARRAY_DESTRUCTURE, T_ARROW_EXPRESSION, T_ARROW_EXPRESSION_STATEMENT, T_EXPRESSION_STATEMENT } from "@abstractions/scripting/ScriptingSourceTreeExp";
-import { processStatementQueueAsync } from "@components-core/script-runner-exp/process-statement-async";
+import {
+  ArrowExpressionStatement,
+  T_ARROW_EXPRESSION,
+  T_ARROW_EXPRESSION_STATEMENT,
+  T_EXPRESSION_STATEMENT,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner-exp/process-statement-async";
 import { createEvalContext, parseStatements } from "./test-helpers";
 
 describe("Process statements", () => {
@@ -10,7 +15,7 @@ describe("Process statements", () => {
     const source = "(x, y) => 2 * x + y";
     const evalContext = createEvalContext({
       localContext: {},
-      eventArgs: [123, 1]
+      eventArgs: [123, 1],
     });
     const statements = parseStatements(source);
     if (
@@ -24,7 +29,7 @@ describe("Process statements", () => {
     // --- Act
     const arrowStmt = {
       type: T_ARROW_EXPRESSION_STATEMENT,
-      expr: statements[0].expr
+      expr: statements[0].expr,
     } as ArrowExpressionStatement;
     const diag = await processStatementQueueAsync([arrowStmt], evalContext);
 
@@ -46,7 +51,7 @@ describe("Process statements", () => {
     const source = "(() => {let z = 0; while(z < 3) {console.log(z); z++}})()";
     const evalContext = createEvalContext({
       localContext: {},
-      eventArgs: [123, 1]
+      eventArgs: [123, 1],
     });
     const statements = parseStatements(source);
     await processStatementQueueAsync(statements, evalContext);

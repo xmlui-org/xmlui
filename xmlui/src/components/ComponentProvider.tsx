@@ -1,22 +1,23 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+
 import type {
   ComponentRendererDef,
   CompoundComponentRendererInfo,
-} from "@abstractions/RendererDefs";
+} from "../abstractions/RendererDefs";
 import {
   chStackComponentRenderer,
   cvStackComponentRenderer,
   hStackComponentRenderer,
   stackComponentRenderer,
   vStackComponentRenderer,
-} from "@components/Stack/Stack";
-import { spaceFillerComponentRenderer } from "@components/SpaceFiller/SpaceFiller";
-import { textAreaComponentRenderer } from "@components/TextArea/TextArea";
-import { navLinkComponentRenderer } from "@components/NavLink/NavLink";
-import { localLinkComponentRenderer } from "@components/Link/Link";
-import { treeComponentRenderer } from "@components/Tree/TreeComponent";
-import { buttonComponentRenderer } from "@components/Button/Button";
+} from "./Stack/Stack";
+import { spaceFillerComponentRenderer } from "./SpaceFiller/SpaceFiller";
+import { textAreaComponentRenderer } from "./TextArea/TextArea";
+import { navLinkComponentRenderer } from "./NavLink/NavLink";
+import { localLinkComponentRenderer } from "./Link/Link";
+import { treeComponentRenderer } from "./Tree/TreeComponent";
+import { buttonComponentRenderer } from "./Button/Button";
 import {
   h1ComponentRenderer,
   h2ComponentRenderer,
@@ -25,126 +26,223 @@ import {
   h5ComponentRenderer,
   h6ComponentRenderer,
   headingComponentRenderer,
-} from "@components/Heading/Heading";
-import { textComponentRenderer } from "@components/Text/Text";
-import { fragmentComponentRenderer } from "@components-core/Fragment";
-import { tableComponentRenderer } from "@components/Table/Table";
-import { stickyBoxComponentRenderer } from "@components/StickyBox/StickyBox";
-import { badgeComponentRenderer } from "@components/Badge/Badge";
-import { avatarComponentRenderer } from "@components/Avatar/Avatar";
-import { contentSeparatorComponentRenderer } from "@components/ContentSeparator/ContentSeparator";
-import { cardComponentRenderer } from "@components/Card/Card";
-import { flowLayoutComponentRenderer } from "@components/FlowLayout/FlowLayout";
-import { modalViewComponentRenderer } from "@components/ModalDialog/ModalDialog";
-import { noResultComponentRenderer } from "@components/NoResult/NoResult";
-import { fileUploadDropZoneComponentRenderer } from "@components/FileUploadDropZone/FileUploadDropZone";
-import { iconComponentRenderer } from "@components/Icon/Icon";
-import { itemsComponentRenderer } from "@components/Items/Items";
-import { selectionStoreComponentRenderer } from "@components/SelectionStore/SelectionStore";
-import { imageComponentRenderer } from "@components/Image/Image";
-import { pageMetaTitleComponentRenderer } from "@components/PageMetaTitle/PageMetaTitle";
-import { progressBarComponentRenderer } from "@components/ProgressBar/ProgressBar";
+} from "./Heading/Heading";
+import { textComponentRenderer } from "./Text/Text";
+import { fragmentComponentRenderer } from "../components-core/Fragment";
+import { tableComponentRenderer } from "./Table/Table";
+import { stickyBoxComponentRenderer } from "./StickyBox/StickyBox";
+import { badgeComponentRenderer } from "./Badge/Badge";
+import { avatarComponentRenderer } from "./Avatar/Avatar";
+import { contentSeparatorComponentRenderer } from "./ContentSeparator/ContentSeparator";
+import { cardComponentRenderer } from "./Card/Card";
+import { flowLayoutComponentRenderer } from "./FlowLayout/FlowLayout";
+import { modalViewComponentRenderer } from "./ModalDialog/ModalDialog";
+import { noResultComponentRenderer } from "./NoResult/NoResult";
+import { fileUploadDropZoneComponentRenderer } from "./FileUploadDropZone/FileUploadDropZone";
+import { iconComponentRenderer } from "./Icon/Icon";
+import { itemsComponentRenderer } from "./Items/Items";
+import { selectionStoreComponentRenderer } from "./SelectionStore/SelectionStore";
+import { imageComponentRenderer } from "./Image/Image";
+import { pageMetaTitleComponentRenderer } from "./PageMetaTitle/PageMetaTitle";
+import { progressBarComponentRenderer } from "./ProgressBar/ProgressBar";
 import {
   hSplitterComponentRenderer,
   splitterComponentRenderer,
   vSplitterComponentRenderer,
-} from "@components/Splitter/Splitter";
-import { queueComponentRenderer } from "@components/Queue/Queue";
-import { CompoundComponent } from "@components-core/CompoundComponent";
-import { dynamicHeightListComponentRenderer } from "@components/List/List";
-import { positionedContainerComponentRenderer } from "@components/PositionedContainer/PositionedContainer";
-import { changeListenerComponentRenderer } from "@components/ChangeListener/ChangeListener";
-import { formItemComponentRenderer } from "@components/FormItem/FormItem";
+} from "./Splitter/Splitter";
+import { queueComponentRenderer } from "./Queue/Queue";
+import { CompoundComponent } from "../components-core/CompoundComponent";
+import { dynamicHeightListComponentRenderer } from "./List/List";
+import { positionedContainerComponentRenderer } from "./PositionedContainer/PositionedContainer";
+import { changeListenerComponentRenderer } from "./ChangeListener/ChangeListener";
+import { formItemComponentRenderer } from "./FormItem/FormItem";
 import {
   passwordInputComponentRenderer,
   textBoxComponentRenderer,
-} from "@components/TextBox/TextBox";
-import { realTimeAdapterComponentRenderer } from "@components/RealTimeAdapter/RealTimeAdapter";
-import { formComponentRenderer } from "@components/Form/Form";
-import { emojiSelectorRenderer } from "@components/EmojiSelector/EmojiSelector";
-import { numberBoxComponentRenderer } from "@components/NumberBox/NumberBox";
-import { hoverCardComponentRenderer } from "@components/HoverCard/HoverCard";
-import { appRenderer } from "@components/App/App";
-import { navPanelRenderer } from "@components/NavPanel/NavPanel";
-import { pageRenderer, pagesRenderer } from "@components/Pages/Pages";
-import type { ComponentDef, CompoundComponentDef } from "@abstractions/ComponentDefs";
-import { footerRenderer } from "@components/Footer/Footer";
-import { navGroupComponentRenderer } from "@components/NavGroup/NavGroup";
-import { logoComponentRenderer } from "@components/Logo/Logo";
-import { radioGroupRenderer } from "@components/RadioGroup/RadioGroup";
-import { SlotHolder } from "@components-core/Slot";
-import { fileInputRenderer } from "@components/FileInput/FileInput";
-import { chartRenderer } from "@components/Chart/Chart";
-import { spinnerComponentRenderer } from "@components/Spinner/Spinner";
-import { markdownComponentRenderer } from "@components/Markdown/Markdown";
-import { selectComponentRenderer } from "@components/Select/Select";
-import { themeChangerButtonComponentRenderer } from "@components/ThemeChanger/ThemeChanger";
-import { formSectionRenderer } from "@components/FormSection/FormSection";
-import { checkboxComponentRenderer } from "@components/Checkbox/Checkbox";
-import { switchComponentRenderer } from "@components/Switch/Switch";
-import { appHeaderComponentRenderer } from "@components/AppHeader/AppHeader";
+} from "./TextBox/TextBox";
+import { realTimeAdapterComponentRenderer } from "./RealTimeAdapter/RealTimeAdapter";
+import { formComponentRenderer } from "./Form/Form";
+import { emojiSelectorRenderer } from "./EmojiSelector/EmojiSelector";
+import { numberBoxComponentRenderer } from "./NumberBox/NumberBox";
+import { hoverCardComponentRenderer } from "./HoverCard/HoverCard";
+import { appRenderer } from "./App/App";
+import { navPanelRenderer } from "./NavPanel/NavPanel";
+import { pageRenderer, pagesRenderer } from "./Pages/Pages";
+import type { ComponentDef, CompoundComponentDef } from "../abstractions/ComponentDefs";
+import { footerRenderer } from "./Footer/Footer";
+import { navGroupComponentRenderer } from "./NavGroup/NavGroup";
+import { logoComponentRenderer } from "./Logo/Logo";
+import { radioGroupRenderer } from "./RadioGroup/RadioGroup";
+import { SlotHolder } from "../components-core/Slot";
+import { fileInputRenderer } from "./FileInput/FileInput";
+import { chartRenderer } from "./Chart/Chart";
+import { spinnerComponentRenderer } from "./Spinner/Spinner";
+import { markdownComponentRenderer } from "./Markdown/Markdown";
+import { selectComponentRenderer } from "./Select/Select";
+import { themeChangerButtonComponentRenderer } from "./ThemeChanger/ThemeChanger";
+import { formSectionRenderer } from "./FormSection/FormSection";
+import { checkboxComponentRenderer } from "./Checkbox/Checkbox";
+import { switchComponentRenderer } from "./Switch/Switch";
+import { appHeaderComponentRenderer } from "./AppHeader/AppHeader";
 import {
   dropdownMenuComponentRenderer,
   menuItemRenderer,
   menuSeparatorRenderer,
   subMenuItemRenderer,
-} from "@components/DropdownMenu/DropdownMenu";
-import { themeComponentRenderer } from "@components/Theme/Theme";
+} from "./DropdownMenu/DropdownMenu";
+import { themeComponentRenderer } from "./Theme/Theme";
 import { merge } from "lodash-es";
-import type { ComponentRegistryEntry } from "@components/ComponentRegistryContext";
-import { ComponentRegistryContext } from "@components/ComponentRegistryContext";
-import { columnComponentRenderer } from "@components/Column/Column";
-import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
-import { apiAction } from "@components-core/action/APICall";
-import { downloadAction } from "@components-core/action/FileDownloadAction";
-import { uploadAction } from "@components-core/action/FileUploadAction";
-import { navigateAction } from "@components-core/action/NavigateAction";
-import { timedAction } from "@components-core/action/TimedAction";
+import type { ComponentRegistryEntry } from "./ComponentRegistryContext";
+import { ComponentRegistryContext } from "./ComponentRegistryContext";
+import { columnComponentRenderer } from "./Column/Column";
+import type { ActionFunction, ActionRendererDef } from "../abstractions/ActionDefs";
+import { apiAction } from "../components-core/action/APICall";
+import { downloadAction } from "../components-core/action/FileDownloadAction";
+import { uploadAction } from "../components-core/action/FileUploadAction";
+import { navigateAction } from "../components-core/action/NavigateAction";
+import { timedAction } from "../components-core/action/TimedAction";
 import type {
   LoaderRenderer,
   LoaderRendererDef,
-} from "@components-core/abstractions/LoaderRenderer";
-import { apiLoaderRenderer } from "@components-core/loader/ApiLoader";
-import { externalDataLoaderRenderer } from "@components-core/loader/ExternalDataLoader";
-import { mockLoaderRenderer } from "@components-core/loader/MockLoaderRenderer";
-import { dataLoaderRenderer } from "@components-core/loader/DataLoader";
-import { datePickerComponentRenderer } from "@components/DatePicker/DatePicker";
-import { redirectRenderer } from "@components/Redirect/Redirect";
-import { pieChartComponentRenderer } from "@components/PieChart/PieChart";
-import { mapComponentRenderer } from "@components/Map/Map";
-import { tabsComponentRenderer } from "@components/Tabs/Tabs";
-import { bookmarkComponentRenderer } from "@components/Bookmark/Bookmark";
-import { appStateComponentRenderer } from "@components/AppState/AppState";
+} from "../components-core/abstractions/LoaderRenderer";
+import { apiLoaderRenderer } from "../components-core/loader/ApiLoader";
+import { externalDataLoaderRenderer } from "../components-core/loader/ExternalDataLoader";
+import { mockLoaderRenderer } from "../components-core/loader/MockLoaderRenderer";
+import { dataLoaderRenderer } from "../components-core/loader/DataLoader";
+import { datePickerComponentRenderer } from "./DatePicker/DatePicker";
+import { redirectRenderer } from "./Redirect/Redirect";
+import { tabsComponentRenderer } from "./Tabs/Tabs";
+import { bookmarkComponentRenderer } from "./Bookmark/Bookmark";
+import { appStateComponentRenderer } from "./AppState/AppState";
 import { pageHeaderRenderer } from "./PageHeader/PageHeader";
 import { trendLabelRenderer } from "./TrendLabel/TrendLabel";
 import { iconInfoCardRenderer } from "./IconInfoCard/IconInfoCard";
 import { tableHeaderRenderer } from "./TableHeader/TableHeader";
 import { toolbarRenderer } from "./Toolbar/Toolbar";
 import { toolbarButtonRenderer } from "./ToolbarButton/ToolbarButton";
-import { tableOfContentsRenderer } from "@components/TableOfContents/TableOfContents";
+import { tableOfContentsRenderer } from "./TableOfContents/TableOfContents";
 import { accordionComponentRenderer } from "./Accordion/Accordion";
 import { alertComponentRenderer } from "./Alert/Alert";
 import { offCanvasComponentRenderer } from "./OffCanvas/OffCanvas";
-import { codeComponentRenderer } from "@components-core/XmluiCodeHighlighter";
-import { tabItemComponentRenderer } from "@components/Tabs/TabItem";
+import { codeComponentRenderer } from "../components-core/XmluiCodeHighlighter";
+import { tabItemComponentRenderer } from "./Tabs/TabItem";
 import { rangeComponentRenderer } from "./Range/Range";
-import { accordionItemComponentRenderer } from "@components/Accordion/AccordionItem";
+import { accordionItemComponentRenderer } from "./Accordion/AccordionItem";
 import { sliderComponentRenderer } from "./Slider/Slider";
 import { buttonGroupComponentRenderer } from "./ButtonGroup/ButtonGroup";
-import { carouselComponentRenderer } from "@components/Carousel/Carousel";
-import { carouselItemComponentRenderer } from "@components/Carousel/CarouselItem";
-import { createPropHolderComponent } from "@components-core/renderers";
-import { breakoutComponentRenderer } from "@components/Breakout/Breakout";
-import { toneChangerButtonComponentRenderer } from "@components/ThemeChanger/ToneChangerButton";
-import { apiCallRenderer } from "@components/APICall/APICall";
-import { optionComponentRenderer } from "@components/Option/Option";
-import { autoCompleteComponentRenderer } from "@components/AutoComplete/AutoComplete";
-import type StandaloneExtensionManager from "@components-core/StandaloneExtensionManager";
+import { carouselComponentRenderer } from "./Carousel/Carousel";
+import { carouselItemComponentRenderer } from "./Carousel/CarouselItem";
+import { createPropHolderComponent } from "../components-core/renderers";
+import { breakoutComponentRenderer } from "./Breakout/Breakout";
+import { toneChangerButtonComponentRenderer } from "./ThemeChanger/ToneChangerButton";
+import { apiCallRenderer } from "./APICall/APICall";
+import { optionComponentRenderer } from "./Option/Option";
+import { autoCompleteComponentRenderer } from "./AutoComplete/AutoComplete";
+import type StandaloneExtensionManager from "../components-core/StandaloneExtensionManager";
 import { backdropComponentRenderer } from "./Backdrop/Backdrop";
-import type { ThemeDefinition } from "@abstractions/ThemingDefs";
-import type { Extension } from "@abstractions/ExtensionDefs";
-import { rawHtmlComponentRenderer } from "./RawHtml/RawHtml";
-import { htmlBTagRenderer, htmlEMTagRenderer } from "./HtmlTags/HtmlTags";
+import type { ThemeDefinition } from "../abstractions/ThemingDefs";
+import type { Extension } from "../abstractions/ExtensionDefs";
+import {
+  htmlAddressTagRenderer,
+  htmlAreaTagRenderer,
+  htmlArticleTagRenderer,
+  htmlAsideTagRenderer,
+  htmlATagRenderer,
+  htmlAudioTagRenderer,
+  htmlBdiTagRenderer,
+  htmlBdoTagRenderer,
+  htmlBlockquoteTagRenderer,
+  htmlBrTagRenderer,
+  htmlBTagRenderer,
+  htmlButtonTagRenderer,
+  htmlCanvasTagRenderer,
+  htmlCaptionTagRenderer,
+  htmlCiteTagRenderer,
+  htmlCodeTagRenderer,
+  htmlColgroupTagRenderer,
+  htmlColTagRenderer,
+  htmlDatalistTagRenderer,
+  htmlDataTagRenderer,
+  htmlDdTagRenderer,
+  htmlDelTagRenderer,
+  htmlDetailsTagRenderer,
+  htmlDfnTagRenderer,
+  htmlDialogTagRenderer,
+  htmlDivTagRenderer,
+  htmlDlTagRenderer,
+  htmlDtTagRenderer,
+  htmlEmbedTagRenderer,
+  htmlEMTagRenderer,
+  htmlFieldsetTagRenderer,
+  htmlFigcaptionTagRenderer,
+  htmlFigureTagRenderer,
+  htmlFooterTagRenderer,
+  htmlFormTagRenderer,
+  htmlH1TagRenderer,
+  htmlH2TagRenderer,
+  htmlH3TagRenderer,
+  htmlH4TagRenderer,
+  htmlH5TagRenderer,
+  htmlH6TagRenderer,
+  htmlHeaderTagRenderer,
+  htmlHrTagRenderer,
+  htmlIframeTagRenderer,
+  htmlImgTagRenderer,
+  htmlInputTagRenderer,
+  htmlInsTagRenderer,
+  htmlITagRenderer,
+  htmlKbdTagRenderer,
+  htmlLabelTagRenderer,
+  htmlLegendTagRenderer,
+  htmlLiTagRenderer,
+  htmlMainTagRenderer,
+  htmlMapTagRenderer,
+  htmlMarkTagRenderer,
+  htmlMenuTagRenderer,
+  htmlMeterTagRenderer,
+  htmlNavTagRenderer,
+  htmlObjectTagRenderer,
+  htmlOlTagRenderer,
+  htmlOptgroupTagRenderer,
+  htmlOptionTagRenderer,
+  htmlOutputTagRenderer,
+  htmlParamTagRenderer,
+  htmlPictureTagRenderer,
+  htmlPreTagRenderer,
+  htmlProgressTagRenderer,
+  htmlPTagRenderer,
+  htmlQTagRenderer,
+  htmlRpTagRenderer,
+  htmlRtTagRenderer,
+  htmlRubyTagRenderer,
+  htmlSampTagRenderer,
+  htmlSectionTagRenderer,
+  htmlSelectTagRenderer,
+  htmlSmallTagRenderer,
+  htmlSourceTagRenderer,
+  htmlSpanTagRenderer,
+  htmlSTagRenderer,
+  htmlStrongTagRenderer,
+  htmlSubTagRenderer,
+  htmlSummaryTagRenderer,
+  htmlSupTagRenderer,
+  htmlTableTagRenderer,
+  htmlTbodyTagRenderer,
+  htmlTdTagRenderer,
+  htmlTemplateTagRenderer,
+  htmlTextareaTagRenderer,
+  htmlTfootTagRenderer,
+  htmlTheadTagRenderer,
+  htmlThTagRenderer,
+  htmlTimeTagRenderer,
+  htmlTrackTagRenderer,
+  htmlTrTagRenderer,
+  htmlUlTagRenderer,
+  htmlUTagRenderer,
+  htmlVarTagRenderer,
+  htmlVideoTagRenderer,
+  htmlWbrTagRenderer,
+} from "./HtmlTags/HtmlTags";
 
 /**
  * The framework has a specialized component concept, the "property holder
@@ -218,7 +316,6 @@ export class ComponentRegistry {
   ) {
     this.extensionManager = extensionManager;
 
-
     // we register these first, so that core components with the same name can override them (without namespace)
     contributes.components?.forEach((renderer) => {
       this.registerAppComponent(renderer);
@@ -226,8 +323,6 @@ export class ComponentRegistry {
     contributes.compoundComponents?.forEach((def) => {
       this.registerAppComponent({ compoundComponentDef: def });
     });
-
-
 
     if (process.env.VITE_USED_COMPONENTS_Stack !== "false") {
       this.registerCoreComponent(stackComponentRenderer);
@@ -436,17 +531,109 @@ export class ComponentRegistry {
     this.registerCoreComponent(buttonGroupComponentRenderer);
     this.registerCoreComponent(backdropComponentRenderer);
 
-    this.registerCoreComponent(rawHtmlComponentRenderer);
+    this.registerCoreComponent(htmlATagRenderer);
+    this.registerCoreComponent(htmlAddressTagRenderer);
+    this.registerCoreComponent(htmlAreaTagRenderer);
+    this.registerCoreComponent(htmlArticleTagRenderer);
+    this.registerCoreComponent(htmlAsideTagRenderer);
+    this.registerCoreComponent(htmlAudioTagRenderer);
     this.registerCoreComponent(htmlBTagRenderer);
+    this.registerCoreComponent(htmlBdiTagRenderer);
+    this.registerCoreComponent(htmlBdoTagRenderer);
+    this.registerCoreComponent(htmlBlockquoteTagRenderer);
+    this.registerCoreComponent(htmlBrTagRenderer);
+    this.registerCoreComponent(htmlButtonTagRenderer);
+    this.registerCoreComponent(htmlCanvasTagRenderer);
+    this.registerCoreComponent(htmlCaptionTagRenderer);
+    this.registerCoreComponent(htmlCiteTagRenderer);
+    this.registerCoreComponent(htmlCodeTagRenderer);
+    this.registerCoreComponent(htmlColTagRenderer);
+    this.registerCoreComponent(htmlColgroupTagRenderer);
+    this.registerCoreComponent(htmlDataTagRenderer);
+    this.registerCoreComponent(htmlDatalistTagRenderer);
+    this.registerCoreComponent(htmlDdTagRenderer);
+    this.registerCoreComponent(htmlDelTagRenderer);
+    this.registerCoreComponent(htmlDetailsTagRenderer);
+    this.registerCoreComponent(htmlDfnTagRenderer);
+    this.registerCoreComponent(htmlDialogTagRenderer);
+    this.registerCoreComponent(htmlDivTagRenderer);
+    this.registerCoreComponent(htmlDlTagRenderer);
+    this.registerCoreComponent(htmlDtTagRenderer);
     this.registerCoreComponent(htmlEMTagRenderer);
+    this.registerCoreComponent(htmlEmbedTagRenderer);
+    this.registerCoreComponent(htmlFieldsetTagRenderer);
+    this.registerCoreComponent(htmlFigcaptionTagRenderer);
+    this.registerCoreComponent(htmlFigureTagRenderer);
+    this.registerCoreComponent(htmlFooterTagRenderer);
+    this.registerCoreComponent(htmlFormTagRenderer);
+    this.registerCoreComponent(htmlH1TagRenderer);
+    this.registerCoreComponent(htmlH2TagRenderer);
+    this.registerCoreComponent(htmlH3TagRenderer);
+    this.registerCoreComponent(htmlH4TagRenderer);
+    this.registerCoreComponent(htmlH5TagRenderer);
+    this.registerCoreComponent(htmlH6TagRenderer);
+    this.registerCoreComponent(htmlHeaderTagRenderer);
+    this.registerCoreComponent(htmlHrTagRenderer);
+    this.registerCoreComponent(htmlITagRenderer);
+    this.registerCoreComponent(htmlIframeTagRenderer);
+    this.registerCoreComponent(htmlImgTagRenderer);
+    this.registerCoreComponent(htmlInputTagRenderer);
+    this.registerCoreComponent(htmlInsTagRenderer);
+    this.registerCoreComponent(htmlKbdTagRenderer);
+    this.registerCoreComponent(htmlLabelTagRenderer);
+    this.registerCoreComponent(htmlLegendTagRenderer);
+    this.registerCoreComponent(htmlLiTagRenderer);
+    this.registerCoreComponent(htmlMainTagRenderer);
+    this.registerCoreComponent(htmlMapTagRenderer);
+    this.registerCoreComponent(htmlMarkTagRenderer);
+    this.registerCoreComponent(htmlMenuTagRenderer);
+    this.registerCoreComponent(htmlMeterTagRenderer);
+    this.registerCoreComponent(htmlNavTagRenderer);
+    this.registerCoreComponent(htmlObjectTagRenderer);
+    this.registerCoreComponent(htmlOlTagRenderer);
+    this.registerCoreComponent(htmlOptgroupTagRenderer);
+    this.registerCoreComponent(htmlOptionTagRenderer);
+    this.registerCoreComponent(htmlOutputTagRenderer);
+    this.registerCoreComponent(htmlPTagRenderer);
+    this.registerCoreComponent(htmlParamTagRenderer);
+    this.registerCoreComponent(htmlPictureTagRenderer);
+    this.registerCoreComponent(htmlPreTagRenderer);
+    this.registerCoreComponent(htmlProgressTagRenderer);
+    this.registerCoreComponent(htmlQTagRenderer);
+    this.registerCoreComponent(htmlRpTagRenderer);
+    this.registerCoreComponent(htmlRtTagRenderer);
+    this.registerCoreComponent(htmlRubyTagRenderer);
+    this.registerCoreComponent(htmlSTagRenderer);
+    this.registerCoreComponent(htmlSampTagRenderer);
+    this.registerCoreComponent(htmlSectionTagRenderer);
+    this.registerCoreComponent(htmlSelectTagRenderer);
+    this.registerCoreComponent(htmlSmallTagRenderer);
+    this.registerCoreComponent(htmlSourceTagRenderer);
+    this.registerCoreComponent(htmlSpanTagRenderer);
+    this.registerCoreComponent(htmlStrongTagRenderer);
+    this.registerCoreComponent(htmlSubTagRenderer);
+    this.registerCoreComponent(htmlSummaryTagRenderer);
+    this.registerCoreComponent(htmlSupTagRenderer);
+    this.registerCoreComponent(htmlTableTagRenderer);
+    this.registerCoreComponent(htmlTbodyTagRenderer);
+    this.registerCoreComponent(htmlTdTagRenderer);
+    this.registerCoreComponent(htmlTemplateTagRenderer);
+    this.registerCoreComponent(htmlTextareaTagRenderer);
+    this.registerCoreComponent(htmlTfootTagRenderer);
+    this.registerCoreComponent(htmlThTagRenderer);
+    this.registerCoreComponent(htmlTheadTagRenderer);
+    this.registerCoreComponent(htmlTimeTagRenderer);
+    this.registerCoreComponent(htmlTrTagRenderer);
+    this.registerCoreComponent(htmlTrackTagRenderer);
+    this.registerCoreComponent(htmlUTagRenderer);
+    this.registerCoreComponent(htmlUlTagRenderer);
+    this.registerCoreComponent(htmlVarTagRenderer);
+    this.registerCoreComponent(htmlVideoTagRenderer);
+    this.registerCoreComponent(htmlWbrTagRenderer);
 
     if (process.env.VITE_USED_COMPONENTS_Chart !== "false") {
       this.registerCoreComponent(chartRenderer);
-      this.registerCoreComponent(pieChartComponentRenderer);
-      this.registerCoreComponent(mapComponentRenderer);
     }
-
-
 
     this.registerActionFn(apiAction);
     this.registerActionFn(downloadAction);
@@ -543,31 +730,37 @@ export class ComponentRegistry {
     });
   };
 
-
-  private registerCoreComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerCoreComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const coreNamespaces = ["#xmlui-core-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...coreNamespaces);
     } else {
       this.registerComponentRenderer(component, ...coreNamespaces);
     }
-  }
+  };
 
-  private registerAppComponent = (component: ComponentRendererDef | CompoundComponentRendererInfo) =>{
+  private registerAppComponent = (
+    component: ComponentRendererDef | CompoundComponentRendererInfo,
+  ) => {
     const appNamespaces = ["#app-ns", ""];
-    if("compoundComponentDef" in component){
+    if ("compoundComponentDef" in component) {
       this.registerCompoundComponentRenderer(component, ...appNamespaces);
     } else {
       this.registerComponentRenderer(component, ...appNamespaces);
     }
-  }
+  };
 
   // --- Registers a renderable component using its renderer function
   // --- and metadata
-  private registerComponentRenderer = ({ type, renderer, metadata }: ComponentRendererDef, ...namespaces: string[]) => {
+  private registerComponentRenderer = (
+    { type, renderer, metadata }: ComponentRendererDef,
+    ...namespaces: string[]
+  ) => {
     const component = { renderer, descriptor: metadata };
     namespaces.forEach((ns) => {
-      this.pool.set((ns ? (ns + ".") : "") + type, component);
+      this.pool.set((ns ? ns + "." : "") + type, component);
     });
     if (metadata?.themeVars) {
       Object.keys(metadata.themeVars).forEach((key) => this.themeVars.add(key));
@@ -578,10 +771,10 @@ export class ComponentRegistry {
   };
 
   // --- Registers a compound component using its definition and metadata
-  private registerCompoundComponentRenderer({
-    compoundComponentDef,
-    metadata,
-  }: CompoundComponentRendererInfo, ...namespaces: string[]) {
+  private registerCompoundComponentRenderer(
+    { compoundComponentDef, metadata }: CompoundComponentRendererInfo,
+    ...namespaces: string[]
+  ) {
     const component = {
       type: compoundComponentDef.name,
       renderer: (rendererContext: any) => {
@@ -595,7 +788,7 @@ export class ComponentRegistry {
         );
       },
       isCompoundComponent: true,
-      metadata
+      metadata,
     };
 
     this.registerComponentRenderer(component, ...namespaces);

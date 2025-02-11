@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
-import { ConstStatement, Literal, T_CONST_STATEMENT, T_LITERAL } from "@abstractions/scripting/ScriptingSourceTreeExp";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
+import {
+  ConstStatement,
+  Literal,
+  T_CONST_STATEMENT,
+  T_LITERAL,
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - regex literals", () => {
   it("null", () => {

@@ -2,9 +2,9 @@
  * Testing Notes: the Driver needs to account for the correct positioning of the indicators on the slider
  */
 
-import { validationStatusValues } from "@components/abstractions";
-import { SKIP_REASON } from "@testing/component-test-helpers";
-import { expect, test } from "@testing/fixtures";
+import { validationStatusValues } from "../abstractions";
+import { SKIP_REASON } from "../../testing/component-test-helpers";
+import { expect, test } from "../../testing/fixtures";
 
 test.skip(
   "component renders",

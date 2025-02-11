@@ -1,6 +1,6 @@
-import { createComponentRenderer } from "@components-core/renderers";
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import type { ThemeTone } from "@components-core/theming/abstractions";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import type { ThemeTone } from "../../components-core/theming/abstractions";
 import { Theme } from "./ThemeNative";
 
 const COMP = "Theme";

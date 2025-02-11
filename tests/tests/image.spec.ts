@@ -43,7 +43,7 @@ test(`onClick event`, async ({ page }) => {
   await initApp(page, {
     entryPoint: `
     <HStack width="100px" gap="1rem" verticalAlignment="center">   
-      <var name="showTestText" value="{false}" />
+      <variable name="showTestText" value="{false}" />
       <Image onClick="showTestText = true" testId="img" src="${SRC_IMG}" />
       <Text when="{showTestText}">${EXPECTED_TEXT}</Text>
     </HStack>

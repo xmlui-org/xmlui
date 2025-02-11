@@ -1,8 +1,9 @@
+import type { Dispatch } from "react";
 import { createContext, useContextSelector } from "use-context-selector";
-import type {Dispatch} from "react";
-import type { ContainerAction } from "@components-core/abstractions/containers";
-import type {FormAction} from "@components/Form/formActions";
-import type { LabelPosition } from "@components/abstractions";
+
+import type { ContainerAction } from "../../components-core/abstractions/containers";
+import type { FormAction } from "../Form/formActions";
+import type { LabelPosition } from "../abstractions";
 
 export type InteractionFlags = {
   isDirty: boolean;
@@ -67,7 +68,7 @@ export type ValidateEventHandler = ((value: any) => Promise<ValidateFunctionResu
 
 type ValidateFunctionResult = boolean | SingleValidationResult | Array<SingleValidationResult>;
 
-export type ValidationMode = "errorLate"| "onChanged"| "onLostFocus";
+export type ValidationMode = "errorLate" | "onChanged" | "onLostFocus";
 
 export const FormContext = createContext<IFormContext>(undefined as unknown as IFormContext);
 

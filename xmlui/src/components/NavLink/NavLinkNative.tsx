@@ -1,15 +1,16 @@
 import type { CSSProperties, MouseEventHandler, ReactNode, Ref } from "react";
 import type React from "react";
 import { forwardRef, useContext, useMemo } from "react";
-import styles from "./NavLink.module.scss";
 import { NavLink as RrdNavLink } from "@remix-run/react";
-import classnames from "@components-core/utils/classnames";
-import type { LinkAria, LinkTarget } from "@components/abstractions";
 import type { To } from "react-router";
-import { getAppLayoutOrientation } from "@components/App/AppNative";
-import { useAppLayoutContext } from "@components/App/AppLayoutContext";
-import { NavPanelContext } from "@components/NavPanel/NavPanelNative";
-import { createUrlWithQueryParams } from "@components/component-utils";
+import classnames from "classnames";
+
+import styles from "./NavLink.module.scss";
+import type { LinkAria, LinkTarget } from "../abstractions";
+import { createUrlWithQueryParams } from "../component-utils";
+import { getAppLayoutOrientation } from "../App/AppNative";
+import { useAppLayoutContext } from "../App/AppLayoutContext";
+import { NavPanelContext } from "../NavPanel/NavPanelNative";
 
 type Props = {
   uid?: string;

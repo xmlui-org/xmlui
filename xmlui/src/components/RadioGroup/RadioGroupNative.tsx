@@ -9,15 +9,17 @@ import React, {
   useId,
   useMemo,
 } from "react";
-import classnames from "@components-core/utils/classnames";
-import styles from "./RadioGroup.module.scss";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { noop } from "@components-core/constants";
-import type { Option, ValidationStatus } from "@components/abstractions";
 import * as InnerRadioGroup from "@radix-ui/react-radio-group";
-import { useEvent } from "@components-core/utils/misc";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
-import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import classnames from "classnames";
+
+import styles from "./RadioGroup.module.scss";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { Option, ValidationStatus } from "../abstractions";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
 
 const RadioGroupValidationStatusContext = createContext<{
   value?: string;

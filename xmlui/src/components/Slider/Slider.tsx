@@ -1,10 +1,8 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-
 import styles from "./Slider.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import { Slider } from "./SliderNative";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
 import {
   dDidChange,
   dFocus,
@@ -12,7 +10,8 @@ import {
   dLostFocus,
   dSetValueApi,
   dValue,
-} from "@components/metadata-helpers";
+} from "../metadata-helpers";
+import { Slider } from "./SliderNative";
 
 const COMP = "Slider";
 

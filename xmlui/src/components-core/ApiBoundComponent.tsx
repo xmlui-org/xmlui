@@ -1,11 +1,11 @@
 import type { MutableRefObject } from "react";
 import React, { useMemo } from "react";
 
-import type { ComponentDef, ParentRenderContext } from "@abstractions/ComponentDefs";
-import type { LayoutContext, RenderChildFn } from "@abstractions/RendererDefs";
-import type { UploadActionComponent } from "@components-core/action/FileUploadAction";
-import type { DownloadActionComponent } from "@components-core/action/FileDownloadAction";
-import type { ApiActionComponent } from "@components/APICall/APICall";
+import type { ComponentDef, ParentRenderContext } from "../abstractions/ComponentDefs";
+import type { LayoutContext, RenderChildFn } from "../abstractions/RendererDefs";
+import type { UploadActionComponent } from "./action/FileUploadAction";
+import type { DownloadActionComponent } from "./action/FileDownloadAction";
+import type { ApiActionComponent } from "../components/APICall/APICall";
 
 type ApiBoundComponentProps = {
   uid: symbol;

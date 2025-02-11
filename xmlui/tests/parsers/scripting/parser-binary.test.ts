@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
-import { BinaryExpression } from "@abstractions/scripting/ScriptingSourceTree";
+import { Parser } from "../../../src/parsers/scripting/Parser";
+import { BinaryExpression } from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - Binary operations", () => {
   const binaryOpCases = [

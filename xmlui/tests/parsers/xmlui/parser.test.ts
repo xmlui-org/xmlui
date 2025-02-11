@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ErrCodes } from "@parsers/xmlui-parser/diagnostics";
-import { findTokenAtPos } from "@parsers/xmlui-parser/utils";
-import { SyntaxKind } from "@parsers/xmlui-parser/syntax-kind";
+import { ErrCodes } from "../../../src/parsers/xmlui-parser/diagnostics";
+import { findTokenAtPos } from "../../../src/parsers/xmlui-parser/utils";
+import { SyntaxKind } from "../../../src/parsers/xmlui-parser/syntax-kind";
 import { parseSource } from "./xmlui";
 
 describe("Xmlui parser", () => {

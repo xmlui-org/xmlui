@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { processStatementQueueAsync } from "@components-core/script-runner/process-statement-async";
+import { processStatementQueueAsync } from "../../../src/components-core/script-runner/process-statement-async";
 import {createEvalContext, parseStatements} from "./test-helpers";
-import { processStatementQueue } from "@components-core/script-runner/process-statement-sync";
+import { processStatementQueue } from "../../../src/components-core/script-runner/process-statement-sync";
 
 describe("Process functions", () => {
   it("Function async #1", async () => {

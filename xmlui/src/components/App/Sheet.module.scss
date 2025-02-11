@@ -1,4 +1,4 @@
-@use "@components-core/theming/themes" as t;
+@use "../../components-core/theming/themes" as t;
 
 //we do it with animations (instead of transitions) because: https://www.radix-ui.com/primitives/docs/guides/animation
 $reveal-anim-duration: 300ms;

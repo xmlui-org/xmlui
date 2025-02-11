@@ -1,7 +1,8 @@
 import styles from "./ProfileMenu.module.scss";
-import { Avatar } from "@components/Avatar/AvatarNative";
-import { useThemes } from "@components-core/theming/ThemeContext";
-import { DropdownMenu, MenuItem, MenuSeparator } from "@components/DropdownMenu/DropdownMenuNative";
+
+import { useThemes } from "../../components-core/theming/ThemeContext";
+import { Avatar } from "../Avatar/AvatarNative";
+import { DropdownMenu, MenuItem, MenuSeparator } from "../DropdownMenu/DropdownMenuNative";
 
 // =====================================================================================================================
 // Heading React component

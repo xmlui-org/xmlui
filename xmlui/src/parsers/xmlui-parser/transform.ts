@@ -1,14 +1,12 @@
 import type { ComponentDef, CompoundComponentDef } from "../../abstractions/ComponentDefs";
+import type { ModuleResolver } from "../../abstractions/scripting/modules";
+import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import type { Node } from "./syntax-node";
 import type { ErrorCodes } from "./ParserError";
-import type { ModuleResolver } from "@abstractions/scripting/modules";
-
 import { SyntaxKind } from "./syntax-kind";
 import { ParserError, errorMessages } from "./ParserError";
 import { Parser } from "../scripting/Parser";
-import { collectCodeBehindFromSource } from "../scripting/code-behind-collect";
 import { CharacterCodes } from "./CharacterCodes";
-import { Stack } from "../..";
 import type { GetText } from "./parser";
 
 export const COMPOUND_COMP_ID = "Component";
@@ -29,6 +27,17 @@ const CORE_NS_VALUE = "#xmlui-core-ns";
 interface TransformNode extends Node {
   text?: string;
 }
+
+const HelperNode = {
+  property: 'property',
+  event: 'event',
+  variable: 'variable',
+  loaders: 'loaders',
+  uses: 'uses',
+  method: 'method',
+  item: 'item',
+  field: 'field'
+} as const;
 
 export function nodeToComponentDef(
   node: Node,
@@ -120,7 +129,7 @@ export function nodeToComponentDef(
       });
     }
 
-    // --- Get "var" attributes
+    // --- Get var attributes
     let vars: Record<string, any> | undefined;
     const varsAttrs = attrs.filter((attr) => attr.startSegment === "var");
     if (varsAttrs.length > 0) {
@@ -134,21 +143,20 @@ export function nodeToComponentDef(
 
     // --- Get the single component definition
     const nestedComponents = children.filter(
-      (child) => child.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(child, getText)),
-    );
+      (child) => child.kind === SyntaxKind.ElementNode && !(getComponentName(child, getText) in HelperNode));
     if (nestedComponents.length === 0) {
       nestedComponents.push(createTextNodeElement(""));
     }
 
-    const childrenToCollect: Node[] = [];
+    const nonVarHelperNodes: Node[] = [];
     const nestedVars: Node[] = [];
     for (let child of children) {
       if (child.kind === SyntaxKind.ElementNode) {
         const childName = getComponentName(child, getText);
-        if (childName === "var") {
+        if (childName === HelperNode.variable) {
           nestedVars.push(child);
-        } else if (!UCRegex.test(childName)) {
-          childrenToCollect.push(child);
+        } else if (childName in HelperNode) {
+          nonVarHelperNodes.push(child);
         }
       }
     }
@@ -201,7 +209,7 @@ export function nodeToComponentDef(
       },
     };
 
-    const nodeClone: Node = withNewChildNodes(node, childrenToCollect);
+    const nodeClone: Node = withNewChildNodes(node, nonVarHelperNodes);
     collectTraits(usesStack, component, nodeClone);
     return component;
 }
@@ -255,14 +263,15 @@ export function nodeToComponentDef(
       }
 
       const childName = getComponentName(child, getText);
-      if (isCompound && child.kind === SyntaxKind.ElementNode && UCRegex.test(childName)) {
+      if (isCompound && child.kind === SyntaxKind.ElementNode && !(childName in HelperNode)) {
         // --- This is the single nested component definition of a compound component,
         // --- it is already processed
         return;
       }
 
       // --- Element name starts with an uppercase letter
-      if (UCRegex.test(childName) && !isCompound) {
+      if (!(childName in HelperNode) && !isCompound) {
+      // if (UCRegex.test(childName) && !isCompound) {
         // --- This must be a child component
         // maybe here or in the transformInnerElement function, after the compound comp check
         const childComponent = transformInnerElement(usesStack, child);
@@ -317,7 +326,7 @@ export function nodeToComponentDef(
           );
           return;
 
-        case "var":
+        case HelperNode.variable:
           collectElementHelper(
             usesStack,
             comp,
@@ -744,7 +753,7 @@ export function nodeToComponentDef(
   function prepNode(node: Node): Node {
     const childNodes: TransformNode[] = getChildNodes(node);
     const tagName = getComponentName(node, getText);
-    const hasComponentName = UCRegex.test(tagName);
+    const hasComponentName = !(tagName in HelperNode);
     const shouldUseTextNodeElement = hasComponentName || tagName === "property";
     const shouldCollapseWhitespace = tagName !== "event" && tagName !== "method";
     const attrs = getAttributes(node);
@@ -796,17 +805,20 @@ export function nodeToComponentDef(
       childNodes[i] = newChild;
     }
 
-    const helperNodes = childNodes.filter(
-      (c) => c.kind === SyntaxKind.ElementNode && !UCRegex.test(getComponentName(c, getText)),
-    );
-    const otherNodes = childNodes.filter(
-      (c) =>
-        c.kind !== SyntaxKind.ElementNode ||
-        (c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText))),
-    );
-    const hasComponentChild = otherNodes.some(
-      (c) => c.kind === SyntaxKind.ElementNode && UCRegex.test(getComponentName(c, getText)),
-    );
+    const helperNodes = [];
+    const otherNodes = [];
+    let hasComponentChild = false;
+    for (const child of childNodes) {
+      if (child.kind === SyntaxKind.ElementNode){
+        let compName: string = getComponentName(child, getText) ?? undefined;
+        if (compName in HelperNode){
+          helperNodes.push(child)
+          continue;
+        }
+        hasComponentChild = true;
+      }
+      otherNodes.push(child)
+    }
 
     if (hasScriptChild && hasComponentChild) {
       const fragment = wrapWithFragment(otherNodes);
@@ -1231,11 +1243,6 @@ function getTopLvlElement(node: Node, getText: GetText): Node{
   if (element.kind !== SyntaxKind.ElementNode) {
     reportError("T001");
   }
-
-  const name = getComponentName(element, getText);
-  if (!UCRegex.test(name)) {
-    reportError("T002");
-  }
   return element;
 }
 
@@ -1248,10 +1255,6 @@ function getComponentName(node: Node, getText: GetText) {
 function getNamespaceResolvedComponentName(node: Node, getText: GetText, namespaceStack: Map<string, string>[]) {
   const nameTokens = node.children!.find((c) => c.kind === SyntaxKind.TagNameNode)!.children!;
   const name = getText(nameTokens.at(-1));
-
-  if (!UCRegex.test(name)) {
-    reportError("T002");
-  }
 
   if (nameTokens.length === 1) {
     return name;

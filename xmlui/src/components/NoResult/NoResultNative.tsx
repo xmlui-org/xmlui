@@ -1,6 +1,8 @@
-import { Icon } from "@components/Icon/IconNative";
-import styles from "./NoResult.module.scss";
 import { CSSProperties, ForwardedRef, forwardRef } from "react";
+
+import styles from "./NoResult.module.scss";
+
+import { Icon } from "../Icon/IconNative";
 
 type Props = {
   label: string;

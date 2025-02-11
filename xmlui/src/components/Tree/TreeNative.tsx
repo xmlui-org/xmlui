@@ -9,13 +9,15 @@ import {
 } from "react";
 import { FixedSizeList } from "react-window";
 import AutoSizer from "react-virtualized-auto-sizer";
+import classnames from "classnames";
+
 import styles from "./TreeComponent.module.scss";
-import classnames from "@components-core/utils/classnames";
+
 import type {
   FlatTreeNode,
   UnPackedTreeData,
-} from "@components-core/abstractions/treeAbstractions";
-import { toFlatTree } from "@components-core/utils/treeUtils";
+} from "../../components-core/abstractions/treeAbstractions";
+import { toFlatTree } from "../../components-core/utils/treeUtils";
 
 type TreeRowProps = {
   index: number;

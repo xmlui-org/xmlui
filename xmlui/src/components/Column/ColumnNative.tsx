@@ -1,9 +1,10 @@
-import type { ComponentDef } from "@abstractions/ComponentDefs";
-import type { OurColumnMetadata } from "./TableContext";
-import { useTableContext } from "./TableContext";
 import { useCallback, useId, useLayoutEffect, useMemo } from "react";
-import { MemoizedItem } from "@components/container-helpers";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
+
+import type { ComponentDef } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import { MemoizedItem } from "../../components/container-helpers";
+import { useTableContext } from "./TableContext";
+import type { OurColumnMetadata } from "./TableContext";
 
 type Props = OurColumnMetadata & {
   nodeChildren?: ComponentDef[];

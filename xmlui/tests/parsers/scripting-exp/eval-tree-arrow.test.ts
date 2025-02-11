@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { evalBindingExpression } from "@components-core/script-runner-exp/eval-tree-sync";
-import {createEvalContext} from "./test-helpers";
+import { evalBindingExpression } from "../../../src/components-core/script-runner-exp/eval-tree-sync";
+import { createEvalContext } from "./test-helpers";
 
 describe("Evaluate arrow expressions", () => {
   it("Arrow #1", () => {
@@ -45,8 +45,8 @@ describe("Evaluate arrow expressions", () => {
     const source = "(x => (++x.h))(count)";
     const context = createEvalContext({
       localContext: {
-        count: { h: 3 }
-      }
+        count: { h: 3 },
+      },
     });
 
     // --- Act
@@ -61,8 +61,8 @@ describe("Evaluate arrow expressions", () => {
     const source = "(x => x += 2)(count)";
     const context = createEvalContext({
       localContext: {
-        count: 3
-      }
+        count: 3,
+      },
     });
 
     // --- Act
@@ -77,8 +77,8 @@ describe("Evaluate arrow expressions", () => {
     const source = "(x => x += 2)(count + 4)";
     const context = createEvalContext({
       localContext: {
-        count: 3
-      }
+        count: 3,
+      },
     });
 
     // --- Act
@@ -93,8 +93,8 @@ describe("Evaluate arrow expressions", () => {
     const source = "[1,2,3,4,5].filter(x => x % 2 === 0)[1]";
     const context = createEvalContext({
       localContext: {
-        count: 3
-      }
+        count: 3,
+      },
     });
 
     // --- Act
@@ -110,9 +110,9 @@ describe("Evaluate arrow expressions", () => {
     const context = createEvalContext({
       localContext: {
         containsArray: {
-          array: [5, 4, 3, 2, 1]
-        }
-      }
+          array: [5, 4, 3, 2, 1],
+        },
+      },
     });
 
     // --- Act
@@ -127,8 +127,8 @@ describe("Evaluate arrow expressions", () => {
     const source = "array.reduce((acc, item) => acc + item, 0)";
     const context = createEvalContext({
       localContext: {
-        array: [5, 4, 3, 2, 1]
-      }
+        array: [5, 4, 3, 2, 1],
+      },
     });
 
     // --- Act

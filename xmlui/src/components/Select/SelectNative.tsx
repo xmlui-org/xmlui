@@ -1,5 +1,8 @@
-import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
 import React, {
+  CSSProperties,
+  ForwardedRef,
+  forwardRef,
+  ReactNode,
   useCallback,
   useEffect,
   useId,
@@ -8,9 +11,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import type { Option, ValidationStatus } from "@components/abstractions";
-import { noop } from "@components-core/constants";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
+import { composeRefs } from "@radix-ui/react-compose-refs";
 import {
   Content as SelectContent,
   Icon as SelectIcon,
@@ -25,12 +26,7 @@ import {
   Value as SelectValue,
   Viewport as SelectViewport,
 } from "@radix-ui/react-select";
-import Icon from "@components/Icon/IconNative";
-import { SelectContext, useSelect } from "@components/Select/SelectContext";
-import styles from "./Select.module.scss";
-import classnames from "classnames";
-import { useTheme } from "@components-core/theming/ThemeContext";
-import OptionTypeProvider from "@components/Option/OptionTypeProvider";
+import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
 import {
   Command as Cmd,
   CommandEmpty as CmdEmpty,
@@ -38,11 +34,20 @@ import {
   CommandItem as CmdItem,
   CommandList as CmdList,
 } from "cmdk";
-import { Popover, PopoverContent, PopoverTrigger, Portal } from "@radix-ui/react-popover";
-import { useEvent } from "@components-core/utils/misc";
-import { OptionContext, useOption } from "@components/Select/OptionContext";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+import classnames from "classnames";
+
+import styles from "./Select.module.scss";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useTheme } from "../../components-core/theming/ThemeContext";
+import { useEvent } from "../../components-core/utils/misc";
+import type { Option, ValidationStatus } from "../abstractions";
+import Icon from "../Icon/IconNative";
+import { SelectContext, useSelect } from "../Select/SelectContext";
+import OptionTypeProvider from "../Option/OptionTypeProvider";
+import { OptionContext, useOption } from "../Select/OptionContext";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 export type SingleValueType = string | number;
 export type ValueType = SingleValueType | SingleValueType[];

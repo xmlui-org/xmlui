@@ -1,8 +1,7 @@
 import Dexie, { Table } from "dexie";
 
+import { ReadOnlyCollection } from "../interception/ReadonlyCollection";
 import type { IDatabase, TableDescriptor } from "./abstractions";
-
-import { ReadOnlyCollection } from "@components-core/interception/ReadonlyCollection";
 
 export class IndexedDb implements IDatabase {
   // private repository: Record<string, Array<any>>;
@@ -13,8 +12,8 @@ export class IndexedDb implements IDatabase {
 
   constructor(
     private tables: Array<TableDescriptor> | undefined,
-    private initialData: (Record<string, any[]> | (() => Promise<Record<string, any[]>>)) = {},
-    private config?: any
+    private initialData: Record<string, any[]> | (() => Promise<Record<string, any[]>>) = {},
+    private config?: any,
   ) {}
 
   private getDb() {
@@ -25,7 +24,8 @@ export class IndexedDb implements IDatabase {
   }
 
   public async initialize() {
-    const resolvedInitialData = typeof this.initialData === "function" ? await this.initialData() : this.initialData;
+    const resolvedInitialData =
+      typeof this.initialData === "function" ? await this.initialData() : this.initialData;
     const schema: Record<string, string> = {};
     const tableNames = new Set<string>();
     if (this.tables) {
@@ -50,22 +50,24 @@ export class IndexedDb implements IDatabase {
     }
 
     const targetVersion =
-      this.config?.version !== undefined && typeof this.config?.version === "number" ? this.config?.version : 1;
+      this.config?.version !== undefined && typeof this.config?.version === "number"
+        ? this.config?.version
+        : 1;
 
     const shouldInitializeData = await this.dropDbOnVersionChange(targetVersion);
 
     this.db = this.createDbInstance();
     this.db.version(targetVersion).stores(schema);
 
-    if(shouldInitializeData){
+    if (shouldInitializeData) {
       await Promise.all(
-          Object.entries(resolvedInitialData).map(async ([key, value]) => {
-            try {
-              await this.getDb().table(key).bulkAdd(value);
-            } catch (ignored) {
-              console.error(ignored);
-            }
-          })
+        Object.entries(resolvedInitialData).map(async ([key, value]) => {
+          try {
+            await this.getDb().table(key).bulkAdd(value);
+          } catch (ignored) {
+            console.error(ignored);
+          }
+        }),
       );
     }
 
@@ -180,11 +182,17 @@ async function createTableWrapper(table: Table): Promise<any> {
     single: async (predicate: (item: any) => Promise<boolean>) =>
       await new ReadOnlyCollection(await table.toArray()).single(predicate),
     singleOrDefault: async (predicate: (item: any) => Promise<boolean>, defValue?: any) => {
-      return await new ReadOnlyCollection(await table.toArray()).singleOrDefault(predicate, defValue);
+      return await new ReadOnlyCollection(await table.toArray()).singleOrDefault(
+        predicate,
+        defValue,
+      );
     },
-    where: async (predicate: (item: any) => Promise<boolean>) => new ReadOnlyCollection(await filteredData(predicate)),
-    whereAsArray: async (predicate: (item: any) => Promise<boolean>) => await filteredData(predicate),
-    orderBy: async (...mappers: any[]) => await new ReadOnlyCollection(await table.toArray()).orderBy(...mappers),
+    where: async (predicate: (item: any) => Promise<boolean>) =>
+      new ReadOnlyCollection(await filteredData(predicate)),
+    whereAsArray: async (predicate: (item: any) => Promise<boolean>) =>
+      await filteredData(predicate),
+    orderBy: async (...mappers: any[]) =>
+      await new ReadOnlyCollection(await table.toArray()).orderBy(...mappers),
     orderByAsArray: async (...mappers: any[]) =>
       await new ReadOnlyCollection(await table.toArray()).orderByAsArray(...mappers),
     groupBy: async (groupKey: (item: any) => Promise<any>) =>

@@ -1,14 +1,16 @@
 import type React from "react";
+
 import styles from "./Stack.module.scss";
-import { type ComponentDef, createMetadata, d } from "@abstractions/ComponentDefs";
-import type { AsyncFunction } from "@abstractions/FunctionDefs";
-import { createComponentRenderer } from "@components-core/renderers";
-import { isComponentDefChildren } from "@components-core/utils/misc";
-import { NotAComponentDefError } from "@components-core/EngineError";
-import { parseScssVar } from "@components-core/theming/themeVars";
-import type { RenderChildFn } from "@abstractions/RendererDefs";
-import type { NonCssLayoutProps, ValueExtractor } from "@abstractions/RendererDefs";
-import { dClick } from "@components/metadata-helpers";
+
+import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
+import type { RenderChildFn } from "../../abstractions/RendererDefs";
+import type { AsyncFunction } from "../../abstractions/FunctionDefs";
+import type { NonCssLayoutProps, ValueExtractor } from "../../abstractions/RendererDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { isComponentDefChildren } from "../../components-core/utils/misc";
+import { NotAComponentDefError } from "../../components-core/EngineError";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { dClick } from "../metadata-helpers";
 import { DEFAULT_ORIENTATION, Stack } from "./StackNative";
 
 const COMP = "Stack";

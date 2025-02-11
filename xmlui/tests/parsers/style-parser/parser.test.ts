@@ -1,7 +1,7 @@
 import { describe, expect, it, assert } from "vitest";
-import { StyleParser } from "@parsers/style-parser/StyleParser";
-import { styleKeywords } from "@parsers/style-parser/StyleLexer";
-import { StyleTokenType } from "@parsers/style-parser/tokens";
+import { StyleParser } from "../../../src/parsers/style-parser/StyleParser";
+import { styleKeywords } from "../../../src/parsers/style-parser/StyleLexer";
+import { StyleTokenType } from "../../../src/parsers/style-parser/tokens";
 
 describe("Style parser", () => {
   const sizeCases = [

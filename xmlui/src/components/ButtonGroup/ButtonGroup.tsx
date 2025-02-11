@@ -1,12 +1,11 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-
 import styles from "./ButtonGroup.module.scss";
 
-import { createComponentRenderer } from "@components-core/renderers";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { buttonThemeMd, buttonVariantMd } from "../abstractions";
+import { dOrientation } from "../metadata-helpers";
 import { ButtonGroup } from "./ButtonGroupNative";
-import { buttonThemeMd, buttonVariantMd } from "@components/abstractions";
-import { dOrientation } from "@components/metadata-helpers";
 
 const COMP = "ButtonGroup";
 

@@ -405,7 +405,7 @@ In the template definition, you can use the `$item` context property to access t
 
 ```ueml copy /onDidChange="(newItem) => newValue = newItem"/
 <App>
-  <var name="newValue" value="" />
+  <variable name="newValue" value="" />
   <Text value="{newValue}" />
   <Select onDidChange="(newItem) => newValue = newItem">
     <Option value="opt1" label="first"/>
@@ -420,7 +420,7 @@ In the template definition, you can use the `$item` context property to access t
     height={200}
     app={`
     <App>
-      <var name="newValue" value="" />
+      <variable name="newValue" value="" />
       <Text value="{newValue}" />
       <Select onDidChange="(newItem) => newValue = newItem">
         <Option value="opt1" label="first"/>
@@ -437,7 +437,7 @@ In the template definition, you can use the `$item` context property to access t
 
 ```ueml copy {5-6}
 <App>
-  <var name="isFocused" value="{false}" />
+  <variable name="isFocused" value="{false}" />
   <Text value="Input control is focused: {isFocused}" />
   <Select
     onGotFocus="isFocused = true"
@@ -454,7 +454,7 @@ In the template definition, you can use the `$item` context property to access t
     height={200}
     app={`
     <App>
-      <var name="isFocused" value="{false}" />
+      <variable name="isFocused" value="{false}" />
       <Text value="Input control is focused: {isFocused}" />
       <Select
         onGotFocus="isFocused = true"

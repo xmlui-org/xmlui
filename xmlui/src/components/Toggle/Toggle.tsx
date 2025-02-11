@@ -1,13 +1,14 @@
 import React, { type CSSProperties, type ForwardedRef, forwardRef, useCallback, useEffect } from "react";
-import classnames from "@components-core/utils/classnames";
+import classnames from "classnames";
+
 import styles from "./Toggle.module.scss";
-import type { RegisterComponentApiFn, UpdateStateFn } from "@abstractions/RendererDefs";
-import { noop } from "@components-core/constants";
-import type { ValidationStatus } from "@components/abstractions";
-import type { LabelPosition } from "@components/abstractions";
-import { ItemWithLabel } from "@components/FormItem/ItemWithLabel";
-import { useEvent } from "@components-core/utils/misc";
-import { composeRefs } from "@radix-ui/react-compose-refs";
+
+import type { RegisterComponentApiFn, UpdateStateFn } from "../../abstractions/RendererDefs";
+import { noop } from "../../components-core/constants";
+import { useEvent } from "../../components-core/utils/misc";
+import type { ValidationStatus } from "../abstractions";
+import type { LabelPosition } from "../abstractions";
+import { ItemWithLabel } from "../FormItem/ItemWithLabel";
 
 type ToggleProps = {
   id?: string;

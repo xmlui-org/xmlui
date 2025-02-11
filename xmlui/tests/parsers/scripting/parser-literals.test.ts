@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting/Parser";
+import { Parser } from "../../../src/parsers/scripting/Parser";
 import {
   ArrayLiteral,
   BinaryExpression,
@@ -8,8 +8,7 @@ import {
   Literal,
   ObjectLiteral,
   TemplateLiteralExpression,
-} from "@abstractions/scripting/ScriptingSourceTree";
-import exp from "constants";
+} from "../../../src/abstractions/scripting/ScriptingSourceTree";
 
 describe("Parser - literals", () => {
   const boolCases = [

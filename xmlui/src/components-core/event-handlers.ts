@@ -1,5 +1,5 @@
-import { ComponentMetadata } from "@abstractions/ComponentDefs";
-import { LookupEventHandlerFn } from "@abstractions/RendererDefs";
+import { ComponentMetadata } from "../abstractions/ComponentDefs";
+import { LookupEventHandlerFn } from "../abstractions/RendererDefs";
 import { EventHandler, useCallback } from "react";
 import { EMPTY_OBJECT } from "./constants";
 

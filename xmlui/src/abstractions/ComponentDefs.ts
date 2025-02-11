@@ -316,6 +316,9 @@ export type ComponentMetadata<
 
   // Contains the folder name if it does not match the component name
   docFolder?: string;
+
+  // Indicates that the component represent an HTML tag
+  isHtmlTag?: boolean;
 };
 
 export function createMetadata<

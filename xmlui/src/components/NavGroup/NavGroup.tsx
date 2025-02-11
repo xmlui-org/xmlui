@@ -1,11 +1,12 @@
-import { createMetadata, d } from "@abstractions/ComponentDefs";
-import { createComponentRenderer } from "@components-core/renderers";
 import styles from "./NavGroup.module.scss";
-import { Icon } from "@components/Icon/IconNative";
-import navLinkStyles from "@components/NavLink/NavLink.module.scss";
-import { parseScssVar } from "@components-core/theming/themeVars";
+import navLinkStyles from "../NavLink/NavLink.module.scss";
+
+import { createMetadata, d } from "../../abstractions/ComponentDefs";
+import { createComponentRenderer } from "../../components-core/renderers";
+import { parseScssVar } from "../../components-core/theming/themeVars";
+import { Icon } from "../Icon/IconNative";
+import { dLabel } from "../metadata-helpers";
 import { NavGroup } from "./NavGroupNative";
-import { dLabel } from "@components/metadata-helpers";
 
 const COMP = "NavGroup";
 

@@ -1,6 +1,6 @@
+import type { CompoundComponentDef, ComponentLike } from "../../abstractions/ComponentDefs";
 import type { ApiInterceptorDefinition } from "../interception/abstractions";
-import type { CompoundComponentDef, ComponentLike } from "@abstractions/ComponentDefs";
-import type { ThemeDefinition } from "@components-core/theming/abstractions";
+import type { ThemeDefinition } from "../theming/abstractions";
 
 // --- This type describes a standalone app
 export type StandaloneAppDescription = {

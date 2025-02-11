@@ -1,12 +1,20 @@
-import { Link } from "@remix-run/react";
-import { CSSProperties, ForwardedRef, forwardRef, ReactNode } from "react";
-import { useMemo } from "react";
-import styles from "./Link.module.scss";
-import classnames from "@components-core/utils/classnames";
-import { Icon } from "@components/Icon/IconNative";
+import {
+  type CSSProperties,
+  type ForwardedRef,
+  forwardRef,
+  type HTMLAttributeReferrerPolicy,
+  type ReactNode,
+  useMemo,
+} from "react";
 import type { To } from "react-router";
-import type { LinkTarget } from "@components/abstractions";
-import { createUrlWithQueryParams } from "@components/component-utils";
+import { Link } from "@remix-run/react";
+import classnames from "classnames";
+
+import styles from "./Link.module.scss";
+
+import type { LinkTarget } from "../abstractions";
+import { createUrlWithQueryParams } from "../component-utils";
+import { Icon } from "../Icon/IconNative";
 
 // =====================================================================================================================
 // React Link component implementation
@@ -18,14 +26,21 @@ type Props = {
   active?: boolean;
   disabled?: boolean;
   onClick?: () => void;
-  target?: LinkTarget;
   style?: CSSProperties;
-};
+} & Partial<
+  Pick<
+    HTMLAnchorElement,
+    "hreflang" | "rel" | "download" | "target" | "referrerPolicy" | "ping" | "type"
+  >
+>;
 
 export const LocalLink = forwardRef(function LocalLink(
-  { to, children, icon, active, onClick, target, disabled, style }: Props,
+  props: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
+  const { to, children, icon, active, onClick, target, disabled, style, ...anchorProps } =
+    specifyTypes(props);
+
   const iconLink = !!icon && !children;
   const smartTo = useMemo(() => {
     return createUrlWithQueryParams(to);
@@ -45,6 +60,7 @@ export const LocalLink = forwardRef(function LocalLink(
         [styles.active]: active,
         [styles.disabled]: disabled,
       })}
+      {...anchorProps}
     >
       {icon && (
         <div className={styles.iconWrapper}>
@@ -55,3 +71,15 @@ export const LocalLink = forwardRef(function LocalLink(
     </Node>
   );
 });
+
+/**
+ * Converts generic types to more specific ones.
+ */
+function specifyTypes(props: Props) {
+  const { target, referrerPolicy } = props;
+  return {
+    ...props,
+    target: target as LinkTarget,
+    referrerPolicy: referrerPolicy as HTMLAttributeReferrerPolicy,
+  };
+}

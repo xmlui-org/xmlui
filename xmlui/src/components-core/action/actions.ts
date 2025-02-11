@@ -1,4 +1,4 @@
-import type { ActionFunction, ActionRendererDef } from "@abstractions/ActionDefs";
+import type { ActionFunction, ActionRendererDef } from "../../abstractions/ActionDefs";
 
 /**
  * Creates an action renderer definition object that can be registered in the action registry.

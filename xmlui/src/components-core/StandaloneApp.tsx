@@ -5,27 +5,27 @@ import ReactDOM from "react-dom/client";
 import type {
   StandaloneAppDescription,
   StandaloneJsonConfig,
-} from "@components-core/abstractions/standalone";
+} from "./abstractions/standalone";
 import type {
   ComponentDef,
   ComponentLike,
   CompoundComponentDef,
-} from "@abstractions/ComponentDefs";
-import type { ThemeDefinition, ThemeTone } from "@components-core/theming/abstractions";
-import type { CollectedDeclarations } from "@abstractions/scripting/ScriptingSourceTree";
+} from "../abstractions/ComponentDefs";
+import type { ThemeDefinition, ThemeTone } from "./theming/abstractions";
+import type { CollectedDeclarations } from "../abstractions/scripting/ScriptingSourceTree";
 
 import "../index.scss";
-import { AppRoot } from "@components-core/rendering/AppRoot";
-import { normalizePath } from "@components-core/utils/misc";
-import { ApiInterceptorProvider } from "@components-core/interception/ApiInterceptorProvider";
-import { EMPTY_OBJECT } from "@components-core/constants";
+import { AppRoot } from "./rendering/AppRoot";
+import { normalizePath } from "./utils/misc";
+import { ApiInterceptorProvider } from "./interception/ApiInterceptorProvider";
+import { EMPTY_OBJECT } from "./constants";
 import {
   errReportComponent,
   errReportMessage,
   errReportModuleErrors,
   errReportScriptError,
   xmlUiMarkupToComponent,
-} from "@components-core/xmlui-parser";
+} from "./xmlui-parser";
 import { useIsomorphicLayoutEffect } from "./utils/hooks";
 import {
   codeBehindFileExtension,
@@ -36,11 +36,11 @@ import {
   collectCodeBehindFromSource,
   removeCodeBehindTokensFromTree,
 } from "../parsers/scripting/code-behind-collect";
-import { ComponentRegistry } from "@components/ComponentProvider";
-import { checkXmlUiMarkup } from "@components-core/markup-check";
+import { ComponentRegistry } from "../components/ComponentProvider";
+import { checkXmlUiMarkup } from "./markup-check";
 import StandaloneExtensionManager from "./StandaloneExtensionManager";
-import { builtInThemes } from "@components-core/theming/ThemeProvider";
-import type { Extension } from "@abstractions/ExtensionDefs";
+import { builtInThemes } from "./theming/ThemeProvider";
+import type { Extension } from "../abstractions/ExtensionDefs";
 
 const MAIN_FILE = "Main." + componentFileExtension;
 const MAIN_CODE_BEHIND_FILE = "Main." + codeBehindFileExtension;

@@ -1,14 +1,16 @@
 import { useMemo } from "react";
-import { Stack } from "@components/Stack/StackNative";
-import {Icon} from "@components/Icon/IconNative";
-import { Text } from "@components/Text/TextNative";
-import classnames from "@components-core/utils/classnames";
-import styles from "./ValidationSummary.module.scss";
-import { SpaceFiller } from "@components/SpaceFiller/SpaceFillerNative";
-import { Button } from "@components/Button/ButtonNative";
-import type { SingleValidationResult, ValidationResult, ValidationSeverity } from "@components/Form/FormContext";
-import { EMPTY_ARRAY, EMPTY_OBJECT } from "@components-core/constants";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
+import classnames from "classnames";
+
+import styles from "./ValidationSummary.module.scss";
+
+import { EMPTY_ARRAY, EMPTY_OBJECT } from "../../components-core/constants";
+import type { SingleValidationResult, ValidationResult, ValidationSeverity } from "../Form/FormContext";
+import { Stack } from "../Stack/StackNative";
+import {Icon} from "../Icon/IconNative";
+import { Text } from "../Text/TextNative";
+import { SpaceFiller } from "../SpaceFiller/SpaceFillerNative";
+import { Button } from "../Button/ButtonNative";
 
 export function ValidationSummary({
   fieldValidationResults = EMPTY_OBJECT,

@@ -1,14 +1,14 @@
-
-import { ComponentDef } from "@abstractions/ComponentDefs";
-import { InnerRendererContext } from "@components-core/abstractions/ComponentRenderer";
-import { ComponentWrapper } from "./ComponentWrapper";
-import { StatePartChangedFn } from "./ContainerWrapper";
-import { ComponentCleanupFn } from "@components-core/rendering/ContainerWrapper";
-import { shouldKeep, extractParam } from "@components-core/utils/extractParam";
 import { ReactNode } from "react";
 
-/** 
- * This type represents the context in which the React component belonging to a 
+import { ComponentDef } from "../../abstractions/ComponentDefs";
+import { InnerRendererContext } from "../abstractions/ComponentRenderer";
+import { ComponentCleanupFn } from "../rendering/ContainerWrapper";
+import { shouldKeep, extractParam } from "../utils/extractParam";
+import { ComponentWrapper } from "./ComponentWrapper";
+import { StatePartChangedFn } from "./ContainerWrapper";
+
+/**
+ * This type represents the context in which the React component belonging to a
  * particular component definition is rendered with the `renderChild()` function.
  */
 export interface ChildRendererContext extends InnerRendererContext {

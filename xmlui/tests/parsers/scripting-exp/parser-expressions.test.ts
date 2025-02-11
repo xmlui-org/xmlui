@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { Parser } from "@parsers/scripting-exp/Parser";
+import { Parser } from "../../../src/parsers/scripting-exp/Parser";
 import {
   FunctionInvocationExpression,
   MemberAccessExpression,
@@ -21,7 +21,7 @@ import {
   T_SEQUENCE_EXPRESSION,
   T_SPREAD_EXPRESSION,
   T_UNARY_EXPRESSION,
-} from "@abstractions/scripting/ScriptingSourceTreeExp";
+} from "../../../src/abstractions/scripting/ScriptingSourceTreeExp";
 
 describe("Parser - miscellaneous expressions", () => {
   const sequenceCases = [
