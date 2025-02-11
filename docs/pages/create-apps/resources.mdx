@@ -42,7 +42,9 @@ This is a fast way to add any static files to your project:
   <AppHeader>
     <H2>Using Resources Tutorial</H2>
   </AppHeader>  
-  <Image src="/resources/breakfast.jpg" fit="contain" width="240px" />
+  <Image 
+    src="/resources/breakfast.jpg" fit="contain" 
+    width="240px" />
 </App>
 ```
 
@@ -50,7 +52,6 @@ This is a fast way to add any static files to your project:
   name="Example: Using Resources Directly"
   previewOnly
   resources={{ logo: xmluiLogo }}
-  height={300}
   app={`
   <App
     name="Tutorial">
@@ -102,7 +103,6 @@ Finally, you can access newly added resources by their handles defined in the co
   previewOnly
   name="Example: Using Resources via Config"
   resources={{ logo: xmluiLogo }}
-  height={300}
   app={`
   <App
     name="Tutorial"

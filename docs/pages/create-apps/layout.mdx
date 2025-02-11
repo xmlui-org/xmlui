@@ -202,17 +202,16 @@ The following sample demonstrates it:
 
 <Playground
   name="Alignment"
-  height={260}
   horizontal={true}
   app={`
     <App>
       <HStack>
-        <VStack width="50%" border="2px dotted red" height="200" horizontalAlignment="end">
+        <VStack width="50%" border="2px dotted red" height="200px" horizontalAlignment="end">
           <Text>Item #1</Text>
           <Text>Item #2</Text>
           <Text>Item #3</Text>
         </VStack>
-        <VStack width="50%" border="2px dotted green" height="200" verticalAlignment="center">
+        <VStack width="50%" border="2px dotted green" height="200px" verticalAlignment="center">
           <Text>Item #1</Text>
           <Text>Item #2</Text>
           <Text>Item #3</Text>
@@ -283,7 +282,6 @@ The following sample shows how a `HStack` renders button children:
 
 <Playground
   name="Example: Layout containers use default gaps"
-  height={100}
   horizontal={true}
   app={`
     <App>
@@ -310,7 +308,6 @@ You can remove the gaps if you intend to omit them entirely:
 
 <Playground
   name="Example: Layout containers with no gaps"
-  height={100}
   horizontal={true}
   app={`
     <App>
@@ -346,7 +343,6 @@ The following sample demonstrated using them:
 
 <Playground
   name="Example: Layout containers with theme-controlled gaps"
-  height={150}
   horizontal={true}
   app={`
     <App>
@@ -395,7 +391,6 @@ This markup displays five boxes; the third is four times wider than the others.
 
 <Playground
   name="Example: Vertical stack (VStack)"
-  height={240}
   horizontal={true}
   app={`
     <App>
@@ -416,7 +411,6 @@ Observe that the content overflows the width of a single row, and the app displa
 
 <Playground
   name="Example: Horizontal stack (HStack)"
-  height={100}
   horizontal={true}
   app={`
     <App>
@@ -435,7 +429,6 @@ Observe that the content overflows the width of a single row, and the app displa
 
 <Playground
   name="Example: FlowLayout"
-  height={160}
   horizontal={true}
   app={`
     <App>
@@ -469,7 +462,6 @@ Check these examples:
 
 <Playground
   name="Example: VStack with implicit height"
-  height={80}
   app={`
     <VStack
       backgroundColor="cyan"
@@ -492,7 +484,6 @@ Check these examples:
 
 <Playground
   name="Example: VStack with *explicit* height"
-  height={180}
   app={`
     <VStack
       height="160px"
@@ -508,7 +499,7 @@ Check how the stack height changed (the cyan background) between the two example
 
 When you explicitly set the height of a layout container, and the content is taller, that will overflow from the container:
 
-```ueml copy /height="20px"/
+```ueml copy /height="40px"/
 <VStack height="40px" backgroundColor="cyan">
   <Text fontSize="3rem">This is some text within a Stack</Text>
 </VStack>
@@ -543,7 +534,6 @@ Check these examples:
 
 <Playground
   name="Example: VStack with implicit width"
-  height={80}
   app={`
     <VStack
       backgroundColor="cyan"
@@ -554,7 +544,7 @@ Check these examples:
   `}
 />
 
-```ueml copy /height="200px"/
+```ueml copy /width="400px"/
 <VStack
   width="400px"
   backgroundColor="cyan"
@@ -566,7 +556,6 @@ Check these examples:
 
 <Playground
   name="Example: VStack with *explicit* width"
-  height={100}
   app={`
     <VStack
       width="400px"
@@ -592,7 +581,6 @@ For example, when you use text, the content can be broken into multiple lines, l
 
 <Playground
   name="Example: VStack and text with *explicit* width"
-  height={160}
   app={`
     <VStack width="300px" backgroundColor="cyan">
       <Text fontSize="2rem">This is some text within a Stack</Text>
@@ -609,8 +597,7 @@ Other components, such as a box, may overflow horizontally:
 ```
 
 <Playground
-  name="Example: VStack and text with *explicit* width"
-  height={80}
+  name="Example: HStack with *explicit* width"
   app={`
     <VStack width="300px" backgroundColor="cyan">
       <HStack height="40px" border="2px solid red" width="400px"/>
@@ -640,22 +627,20 @@ Here are a few samples. The following aligns the children of an `HStack` horizon
 
 ```ueml copy /horizontalAlignment="center"/
 <HStack horizontalAlignment="center">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
 </HStack>
 ```
 
 <Playground
-
   name="HStack with centered contents"
-  height={80}
   horizontal={true}
   app={`
     <HStack horizontalAlignment="center">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
     </HStack>
   `}
 />
@@ -664,22 +649,21 @@ This sample aligns the children of a `VStack` horizontally to the end (right edg
 
 ```ueml copy /horizontalAlignment="end"/
 <VStack  horizontalAlignment="end">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
 </VStack>
 ```
 
 <Playground
 
   name="VStack with right-aligned contents"
-  height={180}
   horizontal={true}
   app={`
     <VStack  horizontalAlignment="end">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
     </VStack>
   `}
 />
@@ -688,22 +672,21 @@ This sample aligns the children of an `HStack` vertically in the center:
 
 ```ueml copy /verticalAlignment="center"/
 <HStack verticalAlignment="center">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="72" width="36" />
-  <Stack backgroundColor="blue" height="48" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="72px" width="36px" />
+  <Stack backgroundColor="blue" height="48px" width="36px" />
 </HStack>
 ```
 
 <Playground
 
   name="HStack with vertically centered contents"
-  height={110}
   horizontal={true}
   app={`
     <HStack verticalAlignment="center">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="72" width="36" />
-      <Stack backgroundColor="blue" height="48" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="72px" width="36px" />
+      <Stack backgroundColor="blue" height="48px" width="36px" />
     </HStack>
   `}
 />
@@ -720,22 +703,20 @@ See the following example for `HStack`:
 
 ```ueml copy /reverse="true"/
 <HStack reverse="true">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
 </HStack>
 ```
 
 <Playground
-
   name="Horizontal Stack with the reverse flag"
-  height={80}
   horizontal={true}
   app={`
     <HStack reverse="true">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
     </HStack>
   `}
 />
@@ -746,26 +727,23 @@ This example uses a `VStack`:
 
 ```ueml copy /reverse="true"/
 <VStack reverse="true">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
 </VStack>
 ```
 
 <Playground
-
   name="Vertical Stack with the reverse flag"
-  height={180}
   horizontal={true}
   app={`
     <VStack reverse="true">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
     </VStack>
   `}
 />
-
 
 ## VStack
 
@@ -786,7 +764,6 @@ The `H2` component has no explicit size, so its width is set to the width of the
 
 <Playground
   name="Example: VStack children width"
-  height={120}
   app={`
     <VStack>
       <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
@@ -812,7 +789,6 @@ Such a setup may cause overflow if the sum of percentages equals 100%, as the ga
 
 <Playground
   name="Example: VStack with percentage height (with gaps)"
-  height={240}
   app={`
     <VStack height="200px" border="4px dotted green">
       <Stack backgroundColor="cyan" height="50%" />
@@ -832,7 +808,6 @@ When the stack does not apply gaps, there is no overflow:
 
 <Playground
   name="Example: VStack with percentage height (no gaps)"
-  height={240}
   app={`
     <VStack gap="0" height="200px" border="4px dotted green">
       <Stack backgroundColor="cyan" height="50%" />
@@ -859,7 +834,6 @@ Such a configuration will not cause overflow. Here is a sample:
 
 <Playground
   name="Example: VStack with percentage height (with gaps)"
-  height={260}
   app={`
     <VStack height="240px" border="4px dotted green">
       <Stack backgroundColor="cyan" height="*" />
@@ -888,7 +862,6 @@ The `H2` component has no explicit size, so it's stretched to the viewport width
 
 <Playground
   name="Example: HStack children width"
-  height={80}
   app={`
     <HStack>
       <H2 backgroundColor="orangered">I'm a heading with colored background</H2>
@@ -934,7 +907,6 @@ When the stack does not apply gaps, there is no overflow:
 
 <Playground
   name="Example: HStack with percentage height (no gaps)"
-  height={240}
   app={`
     <HStack gap="0" border="4px dotted green" height="200px">
       <Stack backgroundColor="cyan" width="50%" />
@@ -961,7 +933,6 @@ Such a configuration will not cause overflow. Here is a sample:
 
 <Playground
   name="Example: VStack with percentage height (with gaps)"
-  height={100}
   app={`
     <HStack height="60px" border="4px dotted green">
       <Stack backgroundColor="cyan" width="*" />
@@ -981,23 +952,22 @@ In the following example, the fourth child does not fit in the first line entire
 
 ```ueml copy {2}
 <HStack>
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="40%" />
-  <Stack backgroundColor="blue" height="36" width="20%" />
-  <Stack backgroundColor="purple" height="36" width="30%" />
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="40%" />
+  <Stack backgroundColor="blue" height="36px" width="20%" />
+  <Stack backgroundColor="purple" height="36px" width="30%" />
 </HStack>
 ```
 
 <Playground
   name="Horizontal stack with overflow"
-  height={90}
   horizontal={true}
   app={`
     <HStack>
-      <Stack backgroundColor="red" height="36" width="25%" />
-      <Stack backgroundColor="green" height="36" width="40%" />
-      <Stack backgroundColor="blue" height="36" width="20%" />
-      <Stack backgroundColor="purple" height="36" width="30%" />
+      <Stack backgroundColor="red" height="36px" width="25%" />
+      <Stack backgroundColor="green" height="36px" width="40%" />
+      <Stack backgroundColor="blue" height="36px" width="20%" />
+      <Stack backgroundColor="purple" height="36px" width="30%" />
     </HStack>
   `}
 />
@@ -1006,23 +976,22 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 
 ```ueml copy {2} /wrapContent="true"/
 <HStack wrapContent="true">
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="40%" />
-  <Stack backgroundColor="blue" height="36" width="20%" />
-  <Stack backgroundColor="purple" height="36" width="30%" />
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="40%" />
+  <Stack backgroundColor="blue" height="36px" width="20%" />
+  <Stack backgroundColor="purple" height="36px" width="30%" />
 </HStack>
 ```
 
 <Playground
   name="Horizontal Stack with content wrapping"
-  height={120}
   horizontal={true}
   app={`
     <HStack wrapContent="true">
-      <Stack backgroundColor="red" height="36" width="25%" />
-      <Stack backgroundColor="green" height="36" width="40%" />
-      <Stack backgroundColor="blue" height="36" width="20%" />
-      <Stack backgroundColor="purple" height="36" width="30%" />
+      <Stack backgroundColor="red" height="36px" width="25%" />
+      <Stack backgroundColor="green" height="36px" width="40%" />
+      <Stack backgroundColor="blue" height="36px" width="20%" />
+      <Stack backgroundColor="purple" height="36px" width="30%" />
     </HStack>
   `}
 />
@@ -1037,21 +1006,20 @@ The following example shows how a the right-to-left reading direction renders th
 
 ```ueml copy {2} /direction="rtl"/
 <HStack direction="rtl">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
 </HStack>
 ```
 
 <Playground
   name="Horizontal Stack with right-to-left reading direction"
-  height={80}
   horizontal={true}
   app={`
     <HStack direction="rtl">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
     </HStack>
   `}
 />
@@ -1059,48 +1027,43 @@ The following example shows how a the right-to-left reading direction renders th
 The Stack has a property, `reverse`, which you can use to reverse the rendering order suggested by the current reading direction. While the `direction` value affects only the horizontal stack, the `reverse` value affects the vertical one, too.
 
 ```ueml copy {2}
-<Stack orientation="horizontal" padding="1rem" gap="1rem"
-  reverse="true">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
+<HStack padding="1rem" gap="1rem" reverse="true">
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
+</HStack>
 ```
 
 <Playground
   name="Horizontal Stack with the reverse flag"
-  height={100}
   horizontal={true}
   app={`
-    <Stack orientation="horizontal" padding="1rem" gap="1rem"
+    <HStack padding="1rem" gap="1rem"
       reverse="true">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
+    </HStack>
   `}
 />
 
 ```ueml copy {2}
-<Stack orientation="vertical" padding="1rem" gap="1rem"
-  reverse="true">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="36" />
-  <Stack backgroundColor="blue" height="36" width="36" />
-</Stack>
+<VStack padding="1rem" gap="1rem" reverse="true">
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="36px" />
+  <Stack backgroundColor="blue" height="36px" width="36px" />
+</VStack>
 ```
 
 <Playground
   name="Vertical Stack with the reverse flag"
-  height={200}
   horizontal={true}
   app={`
-    <Stack orientation="vertical" padding="1rem" gap="1rem"
-      reverse="true">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="36" />
-      <Stack backgroundColor="blue" height="36" width="36" />
-    </Stack>
+    <VStack padding="1rem" gap="1rem" reverse="true">
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="36px" />
+      <Stack backgroundColor="blue" height="36px" width="36px" />
+    </VStack>
   `}
 />
 
@@ -1111,52 +1074,48 @@ The Stack has a `wrapContent` property to start a new line (or column) when the 
 In the following example, the fourth child does not fit in the first line entirely, so it overflows:
 
 ```ueml copy {2}
-<Stack orientation="horizontal" padding="1rem" gap="1rem">
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="40%" />
-  <Stack backgroundColor="blue" height="36" width="20%" />
-  <Stack backgroundColor="purple" height="36" width="30%" />
-</Stack>
+<HStack padding="1rem" gap="1rem">
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="40%" />
+  <Stack backgroundColor="blue" height="36px" width="20%" />
+  <Stack backgroundColor="purple" height="36px" width="30%" />
+</HStack>
 ```
 
 <Playground
   name="Horizontal Stack with overflow"
-  height={110}
   horizontal={true}
   app={`
-    <Stack orientation="horizontal" padding="1rem" gap="1rem">
-      <Stack backgroundColor="red" height="36" width="25%" />
-      <Stack backgroundColor="green" height="36" width="40%" />
-      <Stack backgroundColor="blue" height="36" width="20%" />
-      <Stack backgroundColor="purple" height="36" width="30%" />
-    </Stack>
+    <HStack padding="1rem" gap="1rem">
+      <Stack backgroundColor="red" height="36px" width="25%" />
+      <Stack backgroundColor="green" height="36px" width="40%" />
+      <Stack backgroundColor="blue" height="36px" width="20%" />
+      <Stack backgroundColor="purple" height="36px" width="30%" />
+    </HStack>
   `}
 />
 
 By setting the `wrapContent` flag, the forth child gets into a new line:
 
 ```ueml copy {2}
-<Stack orientation="horizontal" padding="1rem" gap="1rem"
-  wrapContent="true">
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="40%" />
-  <Stack backgroundColor="blue" height="36" width="20%" />
-  <Stack backgroundColor="purple" height="36" width="30%" />
-</Stack>
+<HStack padding="1rem" gap="1rem" wrapContent="true">
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="40%" />
+  <Stack backgroundColor="blue" height="36px" width="20%" />
+  <Stack backgroundColor="purple" height="36px" width="30%" />
+</HStack>
 ```
 
 <Playground
   name="Horizontal Stack with content wrapping"
-  height={140}
   horizontal={true}
   app={`
-    <Stack orientation="horizontal" padding="1rem" gap="1rem"
-      wrapContent="true">
-      <Stack backgroundColor="red" height="36" width="25%" />
-      <Stack backgroundColor="green" height="36" width="40%" />
-      <Stack backgroundColor="blue" height="36" width="20%" />
-      <Stack backgroundColor="purple" height="36" width="30%" />
-    </Stack>
+    <HStack padding="1rem" gap="1rem" wrapContent="true">
+      <Stack backgroundColor="red" height="36px" width="25%" />
+      <Stack backgroundColor="green" height="36px" width="40%" />
+      <Stack backgroundColor="blue" height="36px" width="20%" />
+      <Stack backgroundColor="purple" height="36px" width="30%" />
+    </HStack>
   `}
 />
 
@@ -1179,22 +1138,21 @@ By setting the `wrapContent` flag, the forth child gets into a new line:
 Here is an example:
 
 ```ueml copy
-<CHStack height="100" width="200" backgroundColor="lightgray">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="72" width="36" />
-  <Stack backgroundColor="blue" height="48" width="36" />
+<CHStack height="100px" width="200px" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="72px" width="36px" />
+  <Stack backgroundColor="blue" height="48px" width="36px" />
 </CHStack>
 ```
 
 <Playground
   name="CHStack example"
-  height={120}
   horizontal={true}
   app={`
-    <CHStack height="100" width="200" backgroundColor="lightgray">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="72" width="36" />
-      <Stack backgroundColor="blue" height="48" width="36" />
+    <CHStack height="100px" width="200px" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="72px" width="36px" />
+      <Stack backgroundColor="blue" height="48px" width="36px" />
     </CHStack>
   `}
 />
@@ -1216,22 +1174,21 @@ Here is an example:
 Here is an example:
 
 ```ueml copy
-<CVStack height="200" width="100" backgroundColor="lightgray">
-  <Stack backgroundColor="red" height="36" width="36" />
-  <Stack backgroundColor="green" height="36" width="72" />
-  <Stack backgroundColor="blue" height="36" width="48" />
+<CVStack height="200px" width="100px" backgroundColor="lightgray">
+  <Stack backgroundColor="red" height="36px" width="36px" />
+  <Stack backgroundColor="green" height="36px" width="72px" />
+  <Stack backgroundColor="blue" height="36px" width="48px" />
 </CVStack>
 ```
 
 <Playground
   name="CVStack example"
-  height={220}
   horizontal={true}
   app={`
-    <CVStack height="200" width="100" backgroundColor="lightgray">
-      <Stack backgroundColor="red" height="36" width="36" />
-      <Stack backgroundColor="green" height="36" width="72" />
-      <Stack backgroundColor="blue" height="36" width="48" />
+    <CVStack height="200px" width="100px" backgroundColor="lightgray">
+      <Stack backgroundColor="red" height="36px" width="36px" />
+      <Stack backgroundColor="green" height="36px" width="72px" />
+      <Stack backgroundColor="blue" height="36px" width="48px" />
     </CVStack>
   `}
 />
@@ -1253,9 +1210,9 @@ The following sample demonstrates such a situation:
 
 ```ueml copy
 <HStack>
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="50%" />
-  <Stack backgroundColor="blue" height="36" width="25%" />
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="50%" />
+  <Stack backgroundColor="blue" height="36px" width="25%" />
 </HStack>
 ```
 
@@ -1265,9 +1222,9 @@ The following sample demonstrates such a situation:
   horizontal={true}
   app={`
       <HStack>
-        <Stack backgroundColor="red" height="36" width="25%" />
-        <Stack backgroundColor="green" height="36" width="50%" />
-        <Stack backgroundColor="blue" height="36" width="25%" />
+        <Stack backgroundColor="red" height="36px" width="25%" />
+        <Stack backgroundColor="green" height="36px" width="50%" />
+        <Stack backgroundColor="blue" height="36px" width="25%" />
       </HStack>
     `}
 />
@@ -1278,21 +1235,20 @@ The `FlowLayout` component handles this sizing issue by adjusting the child comp
 
 ```ueml copy
 <FlowLayout>
-  <Stack backgroundColor="red" height="36" width="25%" />
-  <Stack backgroundColor="green" height="36" width="50%" />
-  <Stack backgroundColor="blue" height="36" width="25%" />
+  <Stack backgroundColor="red" height="36px" width="25%" />
+  <Stack backgroundColor="green" height="36px" width="50%" />
+  <Stack backgroundColor="blue" height="36px" width="25%" />
 </FlowLayout>
 ```
 
 <Playground
   name="FlowLayout children with 100% combined widths"
-  height={80}
   horizontal={true}
   app={`
       <FlowLayout>
-        <Stack backgroundColor="red" height="36" width="25%" />
-        <Stack backgroundColor="green" height="36" width="50%" />
-        <Stack backgroundColor="blue" height="36" width="25%" />
+        <Stack backgroundColor="red" height="36px" width="25%" />
+        <Stack backgroundColor="green" height="36px" width="50%" />
+        <Stack backgroundColor="blue" height="36px" width="25%" />
       </FlowLayout>
   `}
 />
@@ -1307,9 +1263,9 @@ In the following sample, the red box is too wide. Nonetheless, the `FlowLayout` 
 
 ```ueml copy /width="1000000px"/
 <FlowLayout>
-  <Stack backgroundColor="red" height="36" width="1000000px" />
-  <Stack backgroundColor="green" height="36" width="50%" />
-  <Stack backgroundColor="blue" height="36" width="25%" />
+  <Stack backgroundColor="red" height="36px" width="1000000px" />
+  <Stack backgroundColor="green" height="36px" width="50%" />
+  <Stack backgroundColor="blue" height="36px" width="25%" />
 </FlowLayout>
 ```
 
@@ -1317,13 +1273,12 @@ Note how the extreme width of the first child is capped to the space available f
 
 <Playground
   name="FlowLayout with sum of 100% percentage widths"
-  height={150}
   horizontal={true}
   app={`
       <FlowLayout>
-        <Stack backgroundColor="red" height="36" width="1000000px" />
-        <Stack backgroundColor="green" height="36" width="50%" />
-        <Stack backgroundColor="blue" height="36" width="25%" />
+        <Stack backgroundColor="red" height="36px" width="1000000px" />
+        <Stack backgroundColor="green" height="36px" width="50%" />
+        <Stack backgroundColor="blue" height="36px" width="25%" />
       </FlowLayout>
   `}
 />
@@ -1338,20 +1293,19 @@ In a `Stack`, `SpaceFiller` pushes the children following it to the other end of
 
 ```ueml copy {3}
 <HStack>
-  <Stack width="36" height="36" backgroundColor="red" />
+  <Stack width="36px" height="36px" backgroundColor="red" />
   <SpaceFiller />
-  <Stack width="36" height="36" backgroundColor="blue" />
+  <Stack width="36px" height="36px" backgroundColor="blue" />
 </HStack>
 ```
 
 <Playground
   name="SpaceFiller in an HStack"
-  height={80}
   app={`
   <HStack>
-    <Stack width="36" height="36" backgroundColor="red" />
+    <Stack width="36px" height="36px" backgroundColor="red" />
     <SpaceFiller />
-    <Stack width="36" height="36" backgroundColor="blue" />
+    <Stack width="36px" height="36px" backgroundColor="blue" />
   </HStack>
   `}
 />
@@ -1360,22 +1314,21 @@ In a `FlowLayout`, `SpaceFiller` acts as a line break for a row. The children fo
 
 ```ueml copy {3}
 <FlowLayout>
-  <Stack width="20%" height="36" backgroundColor="red" />
+  <Stack width="20%" height="36px" backgroundColor="red" />
   <SpaceFiller />
-  <Stack width="20%" height="36" backgroundColor="green" />
-  <Stack width="20%" height="36" backgroundColor="blue" />
+  <Stack width="20%" height="36px" backgroundColor="green" />
+  <Stack width="20%" height="36px" backgroundColor="blue" />
 </FlowLayout>
 ```
 
 <Playground
   name="Example: in a FlowLayout"
-  height={120}
   app={`
   <FlowLayout>
-    <Stack width="20%" height="36" backgroundColor="red" />
+    <Stack width="20%" height="36px" backgroundColor="red" />
     <SpaceFiller />
-    <Stack width="20%" height="36" backgroundColor="green" />
-    <Stack width="20%" height="36" backgroundColor="blue" />
+    <Stack width="20%" height="36px" backgroundColor="green" />
+    <Stack width="20%" height="36px" backgroundColor="blue" />
   </FlowLayout>
   `}
 />
