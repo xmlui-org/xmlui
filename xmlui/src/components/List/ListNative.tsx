@@ -401,6 +401,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 [styles.borderCollapse]: borderCollapse,
                 [styles.sectioned]: groupBy !== undefined,
               })}
+              data-list-container={true}
             >
               <Virtualizer
                 ref={virtualizerRef}
