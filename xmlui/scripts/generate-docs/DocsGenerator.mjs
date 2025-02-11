@@ -83,20 +83,24 @@ export class DocsGenerator {
     }
   }
 
-  async generateComponentsSummary() {
+  async generateComponentsSummary(summarySectionName = "Components", summaryFileName) {
     logger.info("Creating Component Summary");
     try {
-      const sourceFolderName = basename(this.folders.sourceFolder);
+      const outFile = join(FOLDERS.pages, summaryFileName || `${basename(this.folders.sourceFolder)}.mdx`);
+      
+      if (!existsSync(outFile)) {
+        await writeFile(outFile, "");
+      }
+
       const summary = await createSummary(
         this.metadata,
-        join(FOLDERS.pages, `${sourceFolderName}.mdx`),
-        {
-          sectionName: "Components",
-          componentFolder: sourceFolderName,
-          //excludeStatuses: ["in progress"],
-        },
+        outFile,
+        this.folders.sourceFolder,
+        this.folders.outFolder,
+        summarySectionName,
       );
-      await writeFile(join(FOLDERS.pages, `${sourceFolderName}.mdx`), summary);
+
+      await writeFile(outFile, summary);
     } catch (error) {
       processError(error);
     }
@@ -130,13 +134,12 @@ export class DocsGenerator {
 async function createSummary(
   metadata,
   filename,
-  {
-    sectionName = "Components",
-    componentFolder = basename(this.folders.sourceFolder),
-    excludeStatuses = [],
-  },
+  componentsSourceFolder,
+  componentsOutFolder,
+  sectionName = "Components",
 ) {
   const buffer = await readFile(filename, "utf8");
+  const componentFolderName = basename(componentsSourceFolder);
 
   const lines = strBufferToLines(buffer);
   const componentSectionStartIdx = lines.findIndex((line) => line.includes(`## ${sectionName}`));
@@ -169,7 +172,9 @@ async function createSummary(
       })
       .map((component) => {
         return [
-          `[${component.displayName}](./${componentFolder}/${component.displayName}.mdx)`,
+          existsSync(join(componentsOutFolder, `${component.displayName}.mdx`))
+            ? `[${component.displayName}](./${componentFolderName}/${component.displayName}.mdx)`
+            : component.displayName,
           component.description,
           component.status ?? defaultStatus,
         ];

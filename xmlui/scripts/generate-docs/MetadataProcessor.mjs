@@ -92,7 +92,6 @@ export class MetadataProcessor {
     // descriptionRef is explicitly set to empty, which means there is no external doc file for this component
     if (!!component.descriptionRef) {
       try {
-        console.log(component.descriptionRef)
         // File sizes don't exceed 1 MB (most are 20-23 KB), so reading the contents of the files into memory is okay
         fileData = readFileContents(join(this.sourceFolder, component.descriptionRef));
       } catch (error) {
