@@ -97,6 +97,7 @@
     "shiki": "^1.14.1",
     "ts-node": "10.9.1",
     "use-context-selector": "1.4.1",
+    "virtua": "0.40.0",
     "vite-plugin-lib-inject-css": "1.3.0",
     "vite-plugin-svgr": "4.2.0",
     "yargs": "17.7.2"
