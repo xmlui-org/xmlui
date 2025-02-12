@@ -1,10 +1,4 @@
-import { Callout } from "nextra/components";
-
-# Option [#component-option]
-
-`Option` is a non-visual component describing a selection option. Other components (such as `Select`, `Combobox`, and others) may use nested `Option` instances from which the user can select.
-
-
+%-DESC-START
 
 ## Using `Option`
 
@@ -64,17 +58,9 @@ import { Callout } from "nextra/components";
   `}
 />
 
-## Properties
+%-DESC-END
 
-### `enabled`
-
-This boolean property value indicates whether the component responds to user events (`true`) or not (`false`).
-
-Default value: `true`.
-
-### `label`
-
-This property defines the text to display for the option. If `label` is not defined, `Option` will use the `value` as the label.
+%-PROP-START label
 
 <Callout type="info" emoji="📔">
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
@@ -108,9 +94,9 @@ This property defines the text to display for the option. If `label` is not defi
   `}
 />
 
-### `value`
+%-PROP-END
 
-This property defines the value of the option. If `value` is not defined, `Option` will use the `label` as the value.
+%-PROP-START value
 
 <Callout type="info" emoji="📔">
     If `Option` does not define any of the `label` or `value` properties, the option will not be rendered.
@@ -144,14 +130,4 @@ This property defines the value of the option. If `value` is not defined, `Optio
   `}
 />
 
-## Events
-
-This component does not have any events.
-
-## Exposed Methods
-
-This component does not expose any methods.
-
-## Styling
-
-This component does not have any styles.
+%-PROP-END

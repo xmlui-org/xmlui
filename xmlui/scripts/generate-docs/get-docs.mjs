@@ -15,11 +15,12 @@ import { existsSync } from "fs";
 const filterByProps = { isHtmlTag: true };
 const [components, lightweightComponents] = partitionMetadata(collectedComponentMetadata, filterByProps);
 
+await generateLightweightComponents(lightweightComponents);
+
 await generateComponents(components);
 
 const packagesMetadata = await dynamicallyLoadExtensionPackages();
 await generateExtenionPackages(packagesMetadata);
-
 
 // --- Helpers
 
@@ -75,12 +76,7 @@ async function generateComponents(metadata) {
       outFolder: join(FOLDERS.docsRoot, "pages", "components"),
       examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
     },
-    {
-      excludeComponentStatuses: componentsConfig?.excludeComponentStatuses,
-      filterByProps: {
-        isHtmlTag: true
-      },
-    },
+    { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
   );
 
   if (componentsConfig?.cleanFolder) {
@@ -96,8 +92,18 @@ async function generateComponents(metadata) {
   await metadataGenerator.generateArticleAndDownloadsLinks();
 }
 
-async function generateLightweightComponents() {
-
+async function generateLightweightComponents(metadata) {
+  const componentsConfig = await loadConfig(join(FOLDERS.script, "components-config.json"));
+  const metadataGenerator = new DocsGenerator(
+    metadata,
+    {
+      sourceFolder: join(FOLDERS.projectRoot, "xmlui", "src", "components"),
+      outFolder: join(FOLDERS.docsRoot, "pages", "components"),
+      examplesFolder: join(FOLDERS.docsRoot, "component-samples"),
+    },
+    { excludeComponentStatuses: componentsConfig?.excludeComponentStatuses },
+  );
+  await metadataGenerator.generateComponentsSummary("Lightweight Components", "lightweight-components.mdx");
 }
 
 async function cleanFolder(folderToClean) {
