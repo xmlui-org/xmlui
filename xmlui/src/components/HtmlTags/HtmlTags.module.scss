@@ -1,0 +1,184 @@
+@use "../../components-core/theming/themes" as t;
+// We are using this `meta` import here to call meta.get-function for calling specific
+// createThemeVar functions in mixins.
+// If we can use createThemeVar directly without creating derivatives, we can remove this import and function call.
+@use "sass:meta";
+
+@mixin borders($func, $element) {
+  $fn: meta.get-function($func);
+
+  border: meta.call($fn, "border-#{$element}");
+  border-radius: meta.call($fn, "border-radius-#{$element}");
+  border-color: meta.call($fn, "color-border-#{$element}");
+  border-width: meta.call($fn, "thickness-border-#{$element}");
+  border-style: meta.call($fn, "style-border-#{$element}");
+  border-top: meta.call($fn, "border-top-#{$element}");
+  border-right: meta.call($fn, "border-right-#{$element}");
+  border-bottom: meta.call($fn, "border-bottom-#{$element}");
+  border-left: meta.call($fn, "border-left-#{$element}");
+}
+
+@mixin paddings($func, $element) {
+  $fn: meta.get-function($func);
+
+  padding: meta.call($fn, "padding-#{$element}");
+  padding-block: meta.call($fn, "padding-vertical-#{$element}");
+  padding-inline: meta.call($fn, "padding-horizontal-#{$element}");
+}
+
+// --- table
+
+$themeVarsTable: ();
+@function createThemeVarTable($componentVariable) {
+  $themeVarsTable: t.appendThemeVar($themeVarsTable, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTable, $componentVariable);
+}
+
+$border-collapse-HtmlTable: createThemeVarTable("border-collapse-HtmlTable");
+$color-text-HtmlTable: createThemeVarTable("color-text-HtmlTable");
+$color-background-HtmlTable: createThemeVarTable("color-background-HtmlTable");
+$font-family-HtmlTable: createThemeVarTable("font-family-HtmlTable");
+$font-size-HtmlTable: createThemeVarTable("font-size-HtmlTable");
+$font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
+
+.htmlTable {
+  background-color: $color-background-HtmlTable;
+  color: $color-text-HtmlTable;
+  font-family: $font-family-HtmlTable;
+  font-size: $font-size-HtmlTable;
+  font-weight: $font-weight-HtmlTable;
+  // border-collapse: $border-collapse-HtmlTable, separate;
+  @include paddings("createThemeVarTable", "HtmlTable");
+  @include borders("createThemeVarTable", "HtmlTable");
+}
+
+// --- thead
+
+$themeVarsThead: ();
+@function createThemeVarThead($componentVariable) {
+  $themeVarsThead: t.appendThemeVar($themeVarsThead, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsThead, $componentVariable);
+}
+
+$color-background-HtmlThead: createThemeVarThead("color-background-HtmlThead");
+$color-text-HtmlThead: createThemeVarTable("color-text-HtmlThead");
+$font-weight-HtmlThead: createThemeVarThead("font-weight-HtmlThead");
+$font-size-HtmlThead: createThemeVarThead("font-size-HtmlThead");
+
+.htmlThead {
+  background-color: $color-background-HtmlThead;
+  color: $color-text-HtmlThead;
+  font-weight: $font-weight-HtmlThead;
+  font-size: $font-size-HtmlThead;
+  @include paddings("createThemeVarThead", "HtmlThead");
+  @include borders("createThemeVarThead", "HtmlThead");
+}
+
+// --- tbody
+
+$themeVarsTbody: ();
+@function createThemeVarTbody($componentVariable) {
+  $themeVarsTbody: t.appendThemeVar($themeVarsTbody, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTbody, $componentVariable);
+}
+
+$color-background-HtmlTbody: createThemeVarTbody("color-background-HtmlTbody");
+$color-text-HtmlTbody: createThemeVarTable("color-text-HtmlTbody");
+$text-alignment-HtmlTbody: createThemeVarTbody("text-alignment-HtmlTbody");
+$vertical-alignment-HtmlTbody: createThemeVarTbody("vertical-alignment-HtmlTbody");
+
+.htmlTbody {
+  background-color: $color-background-HtmlTbody;
+  color: $color-text-HtmlTbody;
+  text-align: $text-alignment-HtmlTbody;
+  vertical-align: $vertical-alignment-HtmlTbody;
+}
+
+// --- tfoot
+
+$themeVarsTfoot: ();
+@function createThemeVarTfoot($componentVariable) {
+  $themeVarsTfoot: t.appendThemeVar($themeVarsTfoot, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTfoot, $componentVariable);
+}
+
+$color-background-HtmlTfoot: createThemeVarTfoot("color-background-HtmlTfoot");
+$color-text-HtmlTfoot: createThemeVarTable("color-text-HtmlTfoot");
+
+.htmlTfoot {
+  background-color: $color-background-HtmlTfoot;
+  color: $color-text-HtmlTfoot;
+}
+
+// --- th
+
+$themeVarsTh: ();
+@function createThemeVar($componentVariable) {
+  $themeVarsTh: t.appendThemeVar($themeVarsTh, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTh, $componentVariable);
+}
+
+$color-background-HtmlTh: createThemeVarTfoot("color-background-HtmlTh");
+$color-text-HtmlTh: createThemeVarTable("color-text-HtmlTh");
+
+.htmlTh {
+  background-color: $color-background-HtmlTh;
+  color: $color-text-HtmlTh;
+  @include paddings("createThemeVarTfoot", "HtmlTh");
+  @include borders("createThemeVarTfoot", "HtmlTh");
+}
+
+// --- tr
+
+$themeVarsTr: ();
+@function createThemeVarTr($componentVariable) {
+  $themeVarsTr: t.appendThemeVar($themeVarsTr, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTr, $componentVariable);
+}
+
+$color-background-HtmlTr: createThemeVarTr("color-background-HtmlTr");
+$color-background-HtmlTr--hover: createThemeVarTr("color-background-HtmlTr--hover");
+$color-background-even-HtmlTr: createThemeVarTr("color-background-even-HtmlTr");
+$color-text-HtmlTr: createThemeVarTable("color-text-HtmlTr");
+$color-text-HtmlTr--hover: createThemeVarTable("color-text-HtmlTr--hover");
+
+.htmlTr {
+  background-color: $color-background-HtmlTr;
+  color: $color-text-HtmlTr;
+
+  &:nth-child(even) {
+    background-color: $color-background-even-HtmlTr;
+  }
+
+  &:hover {
+    background-color: $color-background-HtmlTr--hover;
+    color: $color-text-HtmlTr--hover;
+  }
+}
+
+// --- td
+
+$themeVarsTd: ();
+@function createThemeVarTd($componentVariable) {
+  $themeVarsTd: t.appendThemeVar($themeVarsTd, $componentVariable) !global;
+  @return t.getThemeVar($themeVarsTd, $componentVariable);
+}
+
+$color-background-HtmlTd: createThemeVarTd("color-background-HtmlTd");
+
+.htmlTd {
+  background-color: $color-background-HtmlTd;
+  @include paddings("createThemeVarTd", "HtmlTd");
+  @include borders("createThemeVarTd", "HtmlTd");
+}
+
+// --- We export the theme variables to add them to the component renderer
+:export {
+  themeVarsTable: t.json-stringify($themeVarsTable);
+  themeVarsThead: t.json-stringify($themeVarsThead);
+  themeVarsTbody: t.json-stringify($themeVarsTbody);
+  themeVarsTfoot: t.json-stringify($themeVarsTfoot);
+  themeVarsTh: t.json-stringify($themeVarsTh);
+  themeVarsTr: t.json-stringify($themeVarsTr);
+  themeVarsTd: t.json-stringify($themeVarsTd);
+}
