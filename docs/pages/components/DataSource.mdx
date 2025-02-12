@@ -16,9 +16,32 @@ This property sets the request body. The object you pass here will be serialized
 
 This property defines the message to display automatically when the data fetch operation has been completed.
 
+This property customizes the success message displayed in a toast after the finished API invocation. The `$result` context variable can refer to the response body. For example, you can use the following code snippet to display the first 100 characters in the completed operation's response body:
+
+```ueml copy
+ <DataSource
+  id="ds"
+  url="/api/shopping-list" 
+  completedNotificationMessage="Result: {JSON.stringify($result).substring(0, 100)}" />
+```
+
 ### `errorNotificationMessage`
 
 This property defines the message to display automatically when the data fetch operation results in an error.
+
+This property customizes the message displayed in a toast when the API invocation results in an error. The `$error.statusCode` context variable can refer to the response's status code, while `$error. details` to the response body. For example, you can use the following code snippet to display the status code and the details:
+
+```ueml copy
+ <DataSource
+  id="ds"
+  method="post"
+  url="/api/shopping-list" 
+  errorNotificationMessage="${error.statusCode}, {JSON.stringify($error.details)}" />
+```
+
+%-PROP-START resultSelector
+
+The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript array methods and operates on the full response body.
 
 ### `headers`
 
@@ -55,6 +78,8 @@ This property sets the request body to the value provided here without any conve
 ### `resultSelector`
 
 The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process. With this property, you can define a selector that extracts the data from the response body.
+
+The selector can be a simple dot notation path (e.g., `value.results`) or a JavaScript expression that processes the data (e.g., `results.filter(item => item.type === 'active')`). The selector has access to standard JavaScript array methods and operates on the full response body.
 
 ### `transformResult`
 
