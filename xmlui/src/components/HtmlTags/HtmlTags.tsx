@@ -2,11 +2,11 @@ import type { CSSProperties } from "react";
 import { type ComponentDef, createMetadata, d } from "../../abstractions/ComponentDefs";
 import type { ValueExtractor } from "../../abstractions/RendererDefs";
 import { createComponentRenderer } from "../../components-core/renderers";
-import { LocalLink } from "../Link/LinkNative";
-import { Heading } from "../Heading/HeadingNative";
-
 import styles from "./HtmlTags.module.scss";
 import { parseScssVar } from "../../components-core/theming/themeVars";
+import { LocalLink } from "../Link/LinkNative";
+import { Heading } from "../Heading/HeadingNative";
+import { Text } from "../Text/TextNative";
 
 export const HtmlAMd = createMetadata({
   status: "experimental",
@@ -1670,11 +1670,11 @@ export const htmlPreTagRenderer = createComponentRenderer(
   "pre",
   HtmlPreMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <pre style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="codefence">
         {renderChild(node.children)}
-      </pre>
+      </Text>
     );
   },
 );
@@ -1891,11 +1891,11 @@ export const htmlSmallTagRenderer = createComponentRenderer(
   "small",
   HtmlSmallMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <small style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="small">
         {renderChild(node.children)}
-      </small>
+      </Text>
     );
   },
 );
@@ -1963,11 +1963,11 @@ export const htmlStrongTagRenderer = createComponentRenderer(
   "strong",
   HtmlStrongMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <strong style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="strong">
         {renderChild(node.children)}
-      </strong>
+      </Text>
     );
   },
 );
@@ -1982,11 +1982,11 @@ export const htmlSubTagRenderer = createComponentRenderer(
   "sub",
   HtmlSubMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <sub style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="sub">
         {renderChild(node.children)}
-      </sub>
+      </Text>
     );
   },
 );
@@ -2044,6 +2044,9 @@ export const HtmlTableMd = createMetadata({
     rules: d("Specifies which rules to draw between cells"),
   },
   themeVars: parseScssVar(styles.themeVarsTable),
+  defaultThemeVars: {
+    [`border-collapse-HtmlTable`]: "collapse",
+  }
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(

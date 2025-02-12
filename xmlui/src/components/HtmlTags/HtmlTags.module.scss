@@ -47,7 +47,7 @@ $font-weight-HtmlTable: createThemeVarTable("font-weight-HtmlTable");
   font-family: $font-family-HtmlTable;
   font-size: $font-size-HtmlTable;
   font-weight: $font-weight-HtmlTable;
-  // border-collapse: $border-collapse-HtmlTable, separate;
+  border-collapse: $border-collapse-HtmlTable;
   @include paddings("createThemeVarTable", "HtmlTable");
   @include borders("createThemeVarTable", "HtmlTable");
 }
