@@ -34,6 +34,8 @@ type Props = {
   labelBreak?: boolean;
   required?: boolean;
   enabled?: boolean;
+  rangeStyle?: CSSProperties;
+  thumbStyle?: CSSProperties;
 };
 
 export const Slider = forwardRef(
@@ -62,6 +64,8 @@ export const Slider = forwardRef(
       validationStatus = "none",
       initialValue,
       minStepsBetweenThumbs,
+      rangeStyle,
+      thumbStyle,
     }: Props,
     forwardedRef: ForwardedRef<HTMLInputElement>,
   ) => {
@@ -155,17 +159,20 @@ export const Slider = forwardRef(
           value={localValue}
           autoFocus={autoFocus}
         >
-          <Track className={classnames(styles.sliderTrack, {
+          <Track
+            className={classnames(styles.sliderTrack, {
               [styles.disabled]: !enabled,
               [styles.readOnly]: readOnly,
               [styles.error]: validationStatus === "error",
               [styles.warning]: validationStatus === "warning",
               [styles.valid]: validationStatus === "valid",
-          })}>
-            <Range className={styles.sliderRange} />
+            })}
+          >
+            <Range className={styles.sliderRange} style={rangeStyle} />
           </Track>
-          <Thumb className={styles.sliderThumb} />
-          <Thumb className={styles.sliderThumb} />
+          {localValue?.map((_, index) => (
+            <Thumb key={index} className={styles.sliderThumb} style={thumbStyle} />
+          ))}
         </Root>
       </ItemWithLabel>
     );

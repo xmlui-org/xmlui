@@ -78,12 +78,10 @@ $componentName: "Slider";
   border-radius: 50%;
   border: createThemeVar("Input:thickness-border-thumb-#{$componentName}") createThemeVar("Input:style-border-thumb-#{$componentName}") createThemeVar("Input:color-border-thumb-#{$componentName}");
   background-color: createThemeVar("Input:color-bg-thumb-#{$componentName}");
+  box-shadow: createThemeVar("Input:shadow-thumb-#{$componentName}");
   transition: background-color 0.2s;
   outline: none;
-}
 
-.sliderThumb:focus-visible {
-  box-shadow: createThemeVar("Input:shadow-thumb-#{$componentName}");
 }
 
 .sliderThumb:disabled {
