@@ -1,7 +1,8 @@
 import { CSSProperties } from "react";
 import { LayoutContext, NonCssLayoutProps } from "../../abstractions/RendererDefs";
 import { EMPTY_OBJECT } from "../constants";
-import { isEmpty } from "lodash-es";
+import { isEmpty, merge } from "lodash-es";
+import { resolveValue } from "react-hot-toast";
 
 export const THEME_VAR_PREFIX = "xmlui";
 const themeVarCapturesRegex = /(\$[a-zA-Z][a-zA-Z0-9-]*)/g;
@@ -141,8 +142,8 @@ export function resolveLayoutProps(
 
   // --- Other
   collectCss("backgroundColor");
-  collectCss("background", "backgroundColor");
-  collectCss("shadow");
+  collectCss("background");
+  collectCss("shadow", "boxShadow");  
   collectCss("direction");
   collectCss("horizontalOverflow", "overflowX");
   collectCss("verticalOverflow", "overflowY");
@@ -161,7 +162,7 @@ export function resolveLayoutProps(
   if (canShrink) {
     result.cssProps.flexShrink = canShrink === "true" ? 1 : 0;
   }
-  
+
   // --- If we didn't set any props, return a referentially stable result
   if (isEmpty(result.cssProps) && isEmpty(result.nonCssProps) && isEmpty(result.issues)) {
     return defaultCompResult;
@@ -172,41 +173,83 @@ export function resolveLayoutProps(
 
   // --- Replaces all variable occurrences in the input string with the result of toCssVar
   function transformLayoutValue(prop: string): string {
-    let input = layoutProps[prop];
-    if (input == undefined) {
-      return;
+    const defValue = resolveSingleValue();
+    if (layoutContext?.mediaSize?.sizeIndex !== undefined) {
+      const sizeIndex = layoutContext.mediaSize?.sizeIndex;
+      const xsValue = resolveSingleValue("xs");
+      const smValue = resolveSingleValue("sm");
+      const mdValue = resolveSingleValue("md");
+      const lgValue = resolveSingleValue("lg");
+      const xlValue = resolveSingleValue("xl");
+      const xxlValue = resolveSingleValue("xxl");
+      let mergedValue: string;
+      switch (sizeIndex) {
+        case 0: // xs
+          mergedValue = xsValue ?? smValue ?? mdValue;
+          break;
+        case 1: // sm
+          mergedValue = smValue ?? mdValue;
+          break;
+        case 2: // md
+          mergedValue = mdValue;
+          break;
+        case 3: // lg
+          mergedValue = lgValue;
+          break;
+        case 4: // xl
+          mergedValue = xlValue ?? lgValue;
+          break;
+        case 5: // xxl
+          mergedValue = xxlValue ?? xlValue ?? lgValue;
+          break;
+      }
+      return mergedValue ?? defValue;
     }
-    if (typeof input === "string") {
-      input = input.trim();
-    } else {
-      input = input.toString();
-    }
+    return defValue;
 
-    // --- Evaluate
-    const value = input
-      ? (input as string).replace(themeVarCapturesRegex, (match: string) => toCssVar(match.trim()))
-      : undefined;
+    function resolveSingleValue(sizeTag = ""): string {
+      if (prop === "shadow") {
+        let x = 1;
+      }
+      const fullProp = sizeTag ? `${prop}-${sizeTag}` : prop;
+      let singleInput = layoutProps[fullProp];
+      if (singleInput == undefined) {
+        return;
+      }
+      if (typeof singleInput === "string") {
+        singleInput = singleInput.trim();
+      } else {
+        singleInput = singleInput.toString();
+      }
 
-    if (input !== value) {
-      // --- Theme variable replaced, do not check pattern validity
-      return value;
-    }
+      // --- Evaluate
+      const value = singleInput
+        ? (singleInput as string).replace(themeVarCapturesRegex, (match: string) =>
+            toCssVar(match.trim()),
+          )
+        : undefined;
 
-    // --- Check value validity
-    const propPatterns = layoutPatterns[prop];
-    if (!propPatterns || propPatterns.length === 0) {
-      return value;
-    }
-
-    for (const pattern of propPatterns) {
-      if (pattern.test(value)) {
+      if (singleInput !== value) {
+        // --- Theme variable replaced, do not check pattern validity
         return value;
       }
-    }
 
-    // --- Done
-    result.issues.add(prop);
-    return value;
+      // --- Check value validity
+      const propPatterns = layoutPatterns[prop];
+      if (!propPatterns || propPatterns.length === 0) {
+        return value;
+      }
+
+      for (const pattern of propPatterns) {
+        if (pattern.test(value)) {
+          return value;
+        }
+      }
+
+      // --- Done
+      result.issues.add(fullProp);
+      return value;
+    }
   }
 
   function collectNonCss(prop: string): void {
