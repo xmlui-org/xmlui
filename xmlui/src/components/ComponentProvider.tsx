@@ -27,6 +27,7 @@ import {
   h6ComponentRenderer,
   headingComponentRenderer,
 } from "./Heading/Heading";
+import  { helloComponentRenderer } from "./Hello/Hello";
 import { textComponentRenderer } from "./Text/Text";
 import { fragmentComponentRenderer } from "../components-core/Fragment";
 import { tableComponentRenderer } from "./Table/Table";
@@ -471,6 +472,10 @@ export class ComponentRegistry {
 
     if (process.env.VITE_USER_COMPONENTS_Markdown !== "false") {
       this.registerCoreComponent(markdownComponentRenderer);
+    }
+
+    if (process.env.VITE_USER_COMPONENTS_Hello !== "false") {
+      this.registerCoreComponent(helloComponentRenderer);
     }
 
     if (process.env.VITE_INCLUDE_REST_COMPONENTS !== "false") {
