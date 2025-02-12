@@ -672,26 +672,6 @@ Available values: `top` **(default)**, `bottom`
   `}
 />
 
-### `selectedIndex`
-
-This property scrolls to a specific item indicated by its index.
-
-```ueml /selectedIndex="5"/
-<App>
-  <List selectedIndex="5" data='{[...]}' />
-</App>
-```
-
-<Playground
-  name="Example: selectedIndex"
-  height={400}
-  app={`
-    <App>
-      <List selectedIndex="5" data='{${JSON.stringify(data, null, 2)}}' />
-    </App>
-  `}
-/>
-
 ## Events
 
 This component does not have any events.
