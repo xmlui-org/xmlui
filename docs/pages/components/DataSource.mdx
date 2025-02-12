@@ -54,7 +54,7 @@ This property sets the request body to the value provided here without any conve
 
 ### `resultSelector`
 
-The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process. With this property, you can define a selector that extracts the data from the response body.
+The response of a data-fetching query may include additional information that the UI cannot (or does not intend) to process.  With this property, you can define a selector that extracts data from the response body. The selector can be a simple dot notation path (e.g., "value.results") or a JavaScript expression that processes the data (e.g., "results.filter(item => item.type === 'active')"). The selector has access to standard JavaScript array methods and operates on the full response body.
 
 ### `transformResult`
 
