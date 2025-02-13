@@ -139,10 +139,14 @@ $color-background-HtmlTr--hover: createThemeVarTr("color-background-HtmlTr--hove
 $color-background-even-HtmlTr: createThemeVarTr("color-background-even-HtmlTr");
 $color-text-HtmlTr: createThemeVarTable("color-text-HtmlTr");
 $color-text-HtmlTr--hover: createThemeVarTable("color-text-HtmlTr--hover");
+$font-size-HtmlTr: createThemeVarTable("font-size-HtmlTr");
+$font-weight-HtmlTr: createThemeVarTable("font-weight-HtmlTr");
 
 .htmlTr {
   background-color: $color-background-HtmlTr;
   color: $color-text-HtmlTr;
+  font-weight: $font-weight-HtmlTr;
+  font-size: $font-size-HtmlTr;
   @include borders("createThemeVarTable", "HtmlTr");
 
   &:nth-child(even) {

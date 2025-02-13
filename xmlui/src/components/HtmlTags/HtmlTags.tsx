@@ -2412,9 +2412,9 @@ export const htmlVarTagRenderer = createComponentRenderer(
   ({ node, renderChild, extractValue, layoutCss }) => {
     const renderedProps = resolveProps(node, extractValue);
     return (
-      <var style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="var">
         {renderChild(node.children)}
-      </var>
+      </Text>
     );
   },
 );
