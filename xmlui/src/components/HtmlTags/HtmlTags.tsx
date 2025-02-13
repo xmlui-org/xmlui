@@ -45,6 +45,25 @@ export const htmlATagRenderer = createComponentRenderer(
   },
 );
 
+export const HtmlAbbrMd = createMetadata({
+  status: "experimental",
+  description: "This component renders an HTML `abbr` tag.",
+  isHtmlTag: true,
+});
+
+export const htmlAbbrTagRenderer = createComponentRenderer(
+  "abbr",
+  HtmlAbbrMd,
+  ({ node, renderChild, extractValue, layoutCss }) => {
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
+    return (
+      <Text style={layoutCss} {...renderedProps} variant="abbr">
+        {renderChild(node.children)}
+      </Text>
+    );
+  },
+);
+
 export const HtmlAddressMd = createMetadata({
   status: "experimental",
   description: "This component renders an HTML `address` tag.",
@@ -394,11 +413,11 @@ export const htmlCiteTagRenderer = createComponentRenderer(
   "cite",
   HtmlCiteMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <cite style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="cite">
         {renderChild(node.children)}
-      </cite>
+      </Text>
     );
   },
 );
@@ -413,7 +432,7 @@ export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = cleanStyles(resolveProps(node, extractValue));
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <Text style={layoutCss} {...renderedProps} variant="code">
         {renderChild(node.children)}
@@ -548,16 +567,17 @@ export const htmlDelTagRenderer = createComponentRenderer(
   "del",
   HtmlDelMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <del
+      <Text
         style={layoutCss}
         cite={extractValue(node.props.cite)}
         dateTime={extractValue(node.props.dateTime)}
         {...renderedProps}
+        variant="deleted"
       >
         {renderChild(node.children)}
-      </del>
+      </Text>
     );
   },
 );
@@ -700,11 +720,11 @@ export const htmlEMTagRenderer = createComponentRenderer(
   "em",
   HtmlEMMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <em style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="em">
         {renderChild(node.children)}
-      </em>
+      </Text>
     );
   },
 );
@@ -1201,16 +1221,17 @@ export const htmlInsTagRenderer = createComponentRenderer(
   "ins",
   HtmlInsMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <ins
+      <Text
         style={layoutCss}
         cite={extractValue(node.props.cite)}
         dateTime={extractValue(node.props.dateTime)}
         {...renderedProps}
+        variant="inserted"
       >
         {renderChild(node.children)}
-      </ins>
+      </Text>
     );
   },
 );
@@ -1225,11 +1246,11 @@ export const htmlKbdTagRenderer = createComponentRenderer(
   "kbd",
   HtmlKbdMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <kbd style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="keyboard">
         {renderChild(node.children)}
-      </kbd>
+      </Text>
     );
   },
 );
@@ -1352,11 +1373,11 @@ export const htmlMarkTagRenderer = createComponentRenderer(
   "mark",
   HtmlMarkMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <mark style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="marked">
         {renderChild(node.children)}
-      </mark>
+      </Text>
     );
   },
 );
@@ -1596,7 +1617,7 @@ export const htmlOutputTagRenderer = createComponentRenderer(
 
 export const HtmlPMd = createMetadata({
   status: "experimental",
-  description: "This component renders an HTML `h1` tag.",
+  description: "This component renders an HTML `p` tag.",
   isHtmlTag: true,
 });
 
@@ -1604,11 +1625,11 @@ export const htmlPTagRenderer = createComponentRenderer(
   "p",
   HtmlPMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <p style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="paragraph">
         {renderChild(node.children)}
-      </p>
+      </Text>
     );
   },
 );
@@ -1815,11 +1836,11 @@ export const htmlSampTagRenderer = createComponentRenderer(
   "samp",
   HtmlSampMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <samp style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="sample">
         {renderChild(node.children)}
-      </samp>
+      </Text>
     );
   },
 );
@@ -2020,11 +2041,11 @@ export const htmlSupTagRenderer = createComponentRenderer(
   "sup",
   HtmlSupMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
-      <sup style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="sup">
         {renderChild(node.children)}
-      </sup>
+      </Text>
     );
   },
 );

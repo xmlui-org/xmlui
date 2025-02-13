@@ -147,6 +147,7 @@ import {
   htmlArticleTagRenderer,
   htmlAsideTagRenderer,
   htmlATagRenderer,
+  htmlAbbrTagRenderer,
   htmlAudioTagRenderer,
   htmlBdiTagRenderer,
   htmlBdoTagRenderer,
@@ -534,6 +535,7 @@ export class ComponentRegistry {
     this.registerCoreComponent(backdropComponentRenderer);
 
     this.registerCoreComponent(htmlATagRenderer);
+    this.registerCoreComponent(htmlAbbrTagRenderer);
     this.registerCoreComponent(htmlAddressTagRenderer);
     this.registerCoreComponent(htmlAreaTagRenderer);
     this.registerCoreComponent(htmlArticleTagRenderer);
