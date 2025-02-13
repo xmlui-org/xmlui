@@ -4,11 +4,18 @@ import { LineChart } from "./LineChartNative";
 const COMP = "LineChart";
 
 export const LineChartMd = createMetadata({
-  description: "A pie chart component",
+  description: "A line chart component",
   props: {
-    data: d("The data to be displayed in the pie chart"),
-    dataKey: d("The key to use for the data"),
-    nameKey: d("The key to use for the name"),
+    data: d(
+      "The data to be displayed in the line chart. It should be an array of objects, where each object represents a data point.",
+    ),
+    dataKeys: d(
+      "This property specifies the keys in the data objects that should be used for rendering the lines.",
+    ),
+    nameKey: d("The key in the data objects used for labeling different data series."),
+    hideX: d(
+      "Determines whether the X-axis should be hidden. If set to true, the axis will not be displayed.",
+    ),
   },
 });
 
@@ -20,7 +27,7 @@ export const lineChartComponentRenderer = createComponentRenderer(
       <LineChart
         data={extractValue(node.props?.data)}
         style={layoutCss}
-        dataKey={extractValue(node.props?.dataKey)}
+        dataKeys={extractValue(node.props?.dataKeys)}
         nameKey={extractValue(node.props?.nameKey)}
         hideX={extractValue(node.props?.hideX)}
       />
