@@ -22,6 +22,7 @@ export const lineChartComponentRenderer = createComponentRenderer(
         style={layoutCss}
         dataKey={extractValue(node.props?.dataKey)}
         nameKey={extractValue(node.props?.nameKey)}
+        hideX={extractValue(node.props?.hideX)}
       />
     );
   },

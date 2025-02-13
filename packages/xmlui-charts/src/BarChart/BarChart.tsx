@@ -21,6 +21,10 @@ export const BarChartMd = createMetadata({
         `spread from top to bottom.`,
     ),
     nameKey: d("Specifies the key in the data objects that will be used to group bars together."),
+    hideX: d(""),
+    hideY: d(""),
+    hideTickX: d(""),
+    hideTickY: d(""),
   },
 });
 
@@ -35,7 +39,11 @@ export const barChartComponentRenderer = createComponentRenderer(
         layout={extractValue(node.props?.layout)}
         nameKey={extractValue(node.props?.nameKey)}
         dataKeys={extractValue(node.props?.dataKeys)}
-        stacked={extractValue(node.props?.stacked)}
+        stacked={extractValue.asOptionalBoolean(node.props?.stacked)}
+        hideX={extractValue.asOptionalBoolean(node.props?.hideX)}
+        hideY={extractValue.asOptionalBoolean(node.props?.hideY)}
+        hideTickX={extractValue.asOptionalBoolean(node.props?.hideTickX)}
+        hideTickY={extractValue.asOptionalBoolean(node.props?.hideTickY)}
       />
     );
   },

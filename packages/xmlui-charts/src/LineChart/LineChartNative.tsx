@@ -1,16 +1,17 @@
 import { CartesianGrid, Line, LineChart as RLineChart, XAxis, ResponsiveContainer } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "../utils/Chart";
 import { useColors } from "xmlui";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 export type LineChartProps = {
   data: any[];
   dataKey: string;
   nameKey: string;
   style?: React.CSSProperties;
+  hideX?: boolean;
 };
 
-export function LineChart({ data, dataKey, nameKey, style }: LineChartProps) {
+export function LineChart({ data, dataKey, nameKey, style, hideX = false }: LineChartProps) {
   const colors = useColors(
     {
       name: "color-primary-500",
@@ -47,6 +48,7 @@ export function LineChart({ data, dataKey, nameKey, style }: LineChartProps) {
             interval="preserveStartEnd"
             dataKey={nameKey}
             tickLine={false}
+            hide={hideX}
             axisLine={false}
             tickFormatter={(value) => {
               const date = new Date(value);
