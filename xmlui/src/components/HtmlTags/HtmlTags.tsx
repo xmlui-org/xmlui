@@ -413,11 +413,11 @@ export const htmlCodeTagRenderer = createComponentRenderer(
   "code",
   HtmlCodeMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue));
     return (
-      <code style={layoutCss} {...renderedProps}>
+      <Text style={layoutCss} {...renderedProps} variant="code">
         {renderChild(node.children)}
-      </code>
+      </Text>
     );
   },
 );
@@ -2044,9 +2044,6 @@ export const HtmlTableMd = createMetadata({
     rules: d("Specifies which rules to draw between cells"),
   },
   themeVars: parseScssVar(styles.themeVarsTable),
-  defaultThemeVars: {
-    [`border-collapse-HtmlTable`]: "collapse",
-  }
 });
 
 export const htmlTableTagRenderer = createComponentRenderer(
