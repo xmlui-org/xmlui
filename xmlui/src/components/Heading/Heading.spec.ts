@@ -135,8 +135,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test('maxLines="2" cuts off long text', async ({ initTestBed, createHeadingDriver }) => {
     await initTestBed(`
       <Fragment>
-        <Heading testId="headingShort" width="200">Short</Heading>
-        <Heading testId="headingLong" width="200" maxLines="2">
+        <Heading testId="headingShort" width="200px">Short</Heading>
+        <Heading testId="headingLong" width="200px" maxLines="2">
           Though this long text does not fit into a single line, please do not break it!
         </Heading>
       </Fragment>
@@ -246,8 +246,8 @@ test("non-breaking space", async ({ initTestBed, createHeadingDriver }) => {
 test("break long text", async ({ initTestBed, createHeadingDriver }) => {
   await initTestBed(`
     <Fragment>
-      <Heading testId="headingShort" width="200">Short</Heading>
-      <Heading testId="headingLong" width="200">
+      <Heading testId="headingShort" width="200px">Short</Heading>
+      <Heading testId="headingLong" width="200px">
         This long text does not fit into a viewport with a 200-pixel width.
       </Heading>
     </Fragment>
@@ -305,8 +305,8 @@ test("Heading overflows container dimensions", async ({
   const widthLayoutExpected = 300;
   const widthHeadingExpected = 400;
   await initTestBed(`
-    <VStack height="40" width="${widthLayoutExpected}" border="1px solid red">
-      <Heading testId="heading" width="${widthHeadingExpected}">
+    <VStack height="40" width="${widthLayoutExpected}px" border="1px solid red">
+      <Heading testId="heading" width="${widthHeadingExpected}px">
         This text sets its size explicitly bigger than its container.
         As it does not fit into the container's viewport, it overflows.
       </Heading>

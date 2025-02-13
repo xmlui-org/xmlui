@@ -65,8 +65,8 @@ test.describe("smoke tests", { tag: "@smoke" }, () => {
   test('maxLines="2" cuts off long text', async ({ initTestBed, createTextDriver }) => {
     await initTestBed(`
       <Fragment>
-        <Text testId="textShort" width="200">Short</Text>
-        <Text testId="textLong" width="200" maxLines="2">
+        <Text testId="textShort" width="200px">Short</Text>
+        <Text testId="textLong" width="200px" maxLines="2">
           Though this long text does not fit into a single line, please do not break it!
         </Text>
       </Fragment>
@@ -200,8 +200,8 @@ test("non-breaking space", async ({ initTestBed, createTextDriver }) => {
 test("break long text", async ({ initTestBed, createTextDriver }) => {
   await initTestBed(`
     <Fragment>
-      <Text testId="textShort" width="200">Short</Text>
-      <Text testId="textLong" width="200">
+      <Text testId="textShort" width="200px">Short</Text>
+      <Text testId="textLong" width="200px">
         This long text does not fit into a viewport with a 200-pixel width.
       </Text>
     </Fragment>
@@ -259,8 +259,8 @@ test("Text overflows container dimensions", async ({
   const widthLayoutExpected = 300;
   const widthTextExpected = 400;
   await initTestBed(`
-    <VStack height="40" width="${widthLayoutExpected}" border="1px solid red">
-      <Text testId="text" width="${widthTextExpected}">
+    <VStack height="40px" width="${widthLayoutExpected}px" border="1px solid red">
+      <Text testId="text" width="${widthTextExpected}px">
         This text sets its size explicitly bigger than its container.
         As it does not fit into the container's viewport, it overflows.
       </Text>
