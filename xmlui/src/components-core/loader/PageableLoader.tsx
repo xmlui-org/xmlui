@@ -60,7 +60,7 @@ export function PageableLoader({
       const prevPageSelector = loader.props.prevPageSelector;
       if (prevPageSelector) {
         prevPageParam = extractParam(
-          { $response: firstPage },
+          { $response: firstPage.filter(item => !item._optimisticValue) },
           prevPageSelector.startsWith("{") ? prevPageSelector : `{$response.${prevPageSelector}}`,
         );
       }
@@ -92,6 +92,10 @@ export function PageableLoader({
     },
     [loader.props.nextPageSelector],
   );
+
+  // useEffect(()=>{
+  //   console.log("TRANSFORM RESULT CHANGED", transformResult);
+  // }, [transformResult]);
   const {
     data,
     status,

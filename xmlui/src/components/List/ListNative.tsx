@@ -218,7 +218,7 @@ const Item = forwardRef(
     const itemType = getItemType(index) || RowType.ITEM;
     return (
       <div
-        style={style}
+        style={{ ...style, visibility: "visible" }}
         ref={forwardedRef}
         className={classnames({
           [styles.row]: itemType === RowType.ITEM,
@@ -273,6 +273,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
     style?.flex === undefined;
   const scrollElementRef = hasOutsideScroll ? scrollRef : parentRef;
 
+  const shouldStickToBottom = useRef(scrollAnchor === "bottom");
   const [expanded, setExpanded] = useState<Record<any, boolean>>(EMPTY_OBJECT);
   const toggleExpanded = useCallback((id: any, isExpanded: boolean) => {
     setExpanded((prev) => ({ ...prev, [id]: isExpanded }));
@@ -309,32 +310,64 @@ export const ListNative = forwardRef(function DynamicHeightList(
   useEffect(() => {
     if (rows.length && scrollAnchor === "bottom" && !initiallyScrolledToBottom.current) {
       initiallyScrolledToBottom.current = true;
-      virtualizerRef.current?.scrollToIndex(rows.length - 1);
+      requestAnimationFrame(() => {
+        virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+          align: "end",
+        });
+      });
     }
   }, [rows.length, scrollAnchor]);
 
+  useEffect(() => {
+    if (!virtualizerRef.current) return;
+    if (!shouldStickToBottom.current) return;
+    requestAnimationFrame(() => {
+      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+        align: "end",
+      });
+    });
+  }, [rows]);
+
+  const isFetchingPrevPage = useRef(false);
   const tryToFetchPrevPage = useCallback(() => {
     if (
       virtualizerRef.current &&
       virtualizerRef.current.findStartIndex() < 10 &&
       pageInfo &&
       pageInfo.hasPrevPage &&
-      !pageInfo.isFetchingPrevPage
+      !pageInfo.isFetchingPrevPage &&
+      !isFetchingPrevPage.current
     ) {
       isPrepend.current = true;
-      requestFetchPrevPage();
+      isFetchingPrevPage.current = true;
+      (async function doFetch() {
+        try {
+          await requestFetchPrevPage();
+        } finally {
+          isFetchingPrevPage.current = false;
+        }
+      })();
     }
   }, [pageInfo, requestFetchPrevPage]);
 
+  const isFetchingNextPage = useRef(false);
   const tryToFetchNextPage = useCallback(() => {
     if (
       virtualizerRef.current &&
       virtualizerRef.current.findEndIndex() + 10 > rows.length &&
       pageInfo &&
       pageInfo.hasNextPage &&
-      !pageInfo.isFetchingNextPage
+      !pageInfo.isFetchingNextPage &&
+      !isFetchingNextPage.current
     ) {
-      requestFetchNextPage();
+      isFetchingNextPage.current = true;
+      (async function doFetch() {
+        try {
+          await requestFetchNextPage();
+        } finally {
+          isFetchingNextPage.current = false;
+        }
+      })();
     }
   }, [rows.length, pageInfo, requestFetchNextPage]);
 
@@ -346,21 +379,31 @@ export const ListNative = forwardRef(function DynamicHeightList(
     }
   }, [rows.length, tryToFetchNextPage, tryToFetchPrevPage]);
 
-  const onScroll = useCallback(() => {
-    if (!virtualizerRef.current) return;
-    tryToFetchPrevPage();
-    tryToFetchNextPage();
-  }, [tryToFetchNextPage, tryToFetchPrevPage]);
+  const onScroll = useCallback(
+    (offset) => {
+      if (!virtualizerRef.current) return;
+      if (scrollAnchor === "bottom") {
+        // The sum may not be 0 because of sub-pixel value when browser's window.devicePixelRatio has decimal value
+        shouldStickToBottom.current =
+          offset - virtualizerRef.current.scrollSize + virtualizerRef.current.viewportSize >= -1.5;
+      }
+      tryToFetchPrevPage();
+      tryToFetchNextPage();
+    },
+    [scrollAnchor, tryToFetchNextPage, tryToFetchPrevPage],
+  );
 
   const scrollToBottom = useEvent(() => {
     if (rows.length) {
-      virtualizerRef.current.scrollToIndex(rows.length - 1);
+      virtualizerRef.current?.scrollToIndex(rows.length - 1, {
+        align: "end",
+      });
     }
   });
 
   const scrollToTop = useEvent(() => {
     if (rows.length) {
-      virtualizerRef.current.scrollToIndex(0);
+      virtualizerRef.current?.scrollToIndex(0);
     }
   });
 
@@ -394,7 +437,7 @@ export const ListNative = forwardRef(function DynamicHeightList(
                 <Text>No data available</Text>
               </div>
             ))}
-          {!loading && rows.length > 0 && (
+          {rows.length > 0 && (
             <div
               className={classnames(styles.innerWrapper, {
                 [styles.reverse]: scrollAnchor === "bottom",

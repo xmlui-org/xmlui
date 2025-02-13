@@ -1,4 +1,4 @@
-import { ForwardedRef, forwardRef } from "react";
+import { CSSProperties, ForwardedRef, forwardRef } from "react";
 import classnames from "classnames";
 
 import styles from "./Badge.module.scss";
@@ -15,10 +15,11 @@ type Props = {
   children?: React.ReactNode;
   variant?: BadgeVariant;
   color?: string | BadgeColors;
+  style?: CSSProperties;
 };
 
 export const Badge = forwardRef(function Badge(
-  { children, color, variant = "badge" }: Props,
+  { children, color, variant = "badge", style }: Props,
   forwardedRef: ForwardedRef<HTMLDivElement>,
 ) {
   return (
@@ -28,13 +29,14 @@ export const Badge = forwardRef(function Badge(
         [styles.badge]: variant === "badge",
         [styles.pill]: variant === "pill",
       })}
-      style={
-        color
+      style={{
+        ...(color
           ? typeof color === "string"
             ? { backgroundColor: color }
             : { backgroundColor: color.background, color: color.label }
-          : undefined
-      }
+          : {}),
+        ...style
+      }}
     >
       {children}
     </div>
