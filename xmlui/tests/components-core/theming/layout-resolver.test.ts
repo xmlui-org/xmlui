@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { resolveLayoutProps, toCssVar } from "../../../src/components-core/theming/layout-resolver";
 
 describe("Layout resolver", () => {
-  const THEME_ID = "$some-theme-id";
+  const THEME_ID = "$some-theme-id_x";
   const THEME_ID_VALUE = toCssVar(THEME_ID);
   const THEME_ID2 = "$some-theme-id2";
   const THEME_ID2_VALUE = toCssVar(THEME_ID2);
