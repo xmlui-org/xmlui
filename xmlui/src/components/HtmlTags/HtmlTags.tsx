@@ -2050,7 +2050,7 @@ export const htmlTableTagRenderer = createComponentRenderer(
   "table",
   HtmlTableMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <table
         style={layoutCss}
@@ -2082,7 +2082,7 @@ export const htmlTbodyTagRenderer = createComponentRenderer(
   "tbody",
   HtmlTbodyMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <tbody style={layoutCss} className={styles.htmlTbody} {...renderedProps}>
         {renderChild(node.children)}
@@ -2113,7 +2113,7 @@ export const htmlTdTagRenderer = createComponentRenderer(
   "td",
   HtmlTdMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <td
         style={layoutCss}
@@ -2217,7 +2217,7 @@ export const htmlTfootTagRenderer = createComponentRenderer(
   "tfoot",
   HtmlTfootMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <tfoot style={layoutCss} className={styles.htmlTfoot} {...renderedProps}>
         {renderChild(node.children)}
@@ -2247,7 +2247,7 @@ export const htmlThTagRenderer = createComponentRenderer(
   "th",
   HtmlThMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <th
         style={layoutCss}
@@ -2277,7 +2277,7 @@ export const htmlTheadTagRenderer = createComponentRenderer(
   "thead",
   HtmlTheadMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <thead style={layoutCss} className={styles.htmlThead} {...renderedProps}>
         {renderChild(node.children)}
@@ -2319,7 +2319,7 @@ export const htmlTrTagRenderer = createComponentRenderer(
   "tr",
   HtmlTrMd,
   ({ node, renderChild, extractValue, layoutCss }) => {
-    const renderedProps = resolveProps(node, extractValue);
+    const renderedProps = cleanStyles(resolveProps(node, extractValue), layoutCss);
     return (
       <tr style={layoutCss} className={styles.htmlTr} {...renderedProps}>
         {renderChild(node.children)}
