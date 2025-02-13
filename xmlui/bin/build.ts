@@ -85,9 +85,6 @@ type UEBuildOptions = {
   withMock?: boolean;
   withHostingMetaFiles?: boolean;
   withRelativeRoot?: boolean;
-
-  // --- Experimental options
-  withLegacyParser?: boolean;
 };
 
 export const build = async ({
@@ -96,7 +93,6 @@ export const build = async ({
   withMock = false,
   withHostingMetaFiles = false,
   withRelativeRoot = false,
-  withLegacyParser = false,
 }: UEBuildOptions) => {
   const flatDistUiPrefix = "ui_";
   console.log("Building with options:", {
@@ -105,7 +101,6 @@ export const build = async ({
     withMock,
     withHostingMetaFiles,
     withRelativeRoot,
-    withLegacyParser
   });
 
   await viteBuild({
@@ -113,13 +108,11 @@ export const build = async ({
       flatDist,
       withRelativeRoot,
       flatDistUiPrefix,
-      withLegacyParser,
     }),
     define: {
       "process.env.VITE_BUILD_MODE": JSON.stringify(buildMode),
       "process.env.VITE_DEV_MODE": false,
       "process.env.VITE_MOCK_ENABLED": withMock,
-      "process.env.VITE_LEGACY_PARSER": withLegacyParser,
       "process.env.VITE_APP_VERSION": JSON.stringify(process.env.VITE_APP_VERSION),
 
       "process.env.VITE_USED_COMPONENTS_App": JSON.stringify(process.env.VITE_USED_COMPONENTS_App),

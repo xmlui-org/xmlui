@@ -19,6 +19,7 @@ import { useTheme } from "../../components-core/theming/ThemeContext";
 import { normalizeCssValueForCalc, getSizeString } from "../../components-core/utils/css-utils";
 import { useIsomorphicLayoutEffect, useMediaQuery } from "../../components-core/utils/hooks";
 import { compileLayout } from "../../parsers/style-parser/style-compiler";
+import { resolveLayoutProps } from "../../components-core/theming/layout-resolver";
 
 type FlowItemProps = {
   children: ReactNode;
@@ -69,14 +70,24 @@ export const FlowItemWrapper = forwardRef(function FlowItemWrapper(
     flex,
   } = useMemo(() => {
     return (
-      compileLayout(
+      // --- New layout resolution
+      resolveLayoutProps(
         { width: _width, maxWidth: _maxWidth, minWidth: _minWidth },
-        activeTheme.themeVars,
         {
           type: "Stack",
           orientation: "horizontal",
         },
       ).cssProps || {}
+
+      // --- Old layout resolution
+      // compileLayout(
+      //   { width: _width, maxWidth: _maxWidth, minWidth: _minWidth },
+      //   activeTheme.themeVars,
+      //   {
+      //     type: "Stack",
+      //     orientation: "horizontal",
+      //   },
+      // ).cssProps || {}
     );
   }, [_maxWidth, _minWidth, _width, activeTheme.themeVars]);
 

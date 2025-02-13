@@ -15,7 +15,7 @@ import * as path from "path";
 import { errReportComponent, xmlUiMarkupToComponent } from "../src/components-core/xmlui-parser";
 
 export type PluginOptions = {
-  withLegacyParser?: boolean;
+  // --- Add plugin options here.
 };
 
 const xmluiExtension = new RegExp(`.${componentFileExtension}$`);

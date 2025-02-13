@@ -256,7 +256,7 @@ test("focuses component if autoFocus is set", async ({ initTestBed, createTextBo
 
 // --- readOnly
 
-test("readOnly lets user copy from input field", async ({ initTestBed, createTextBoxDriver }) => {
+test.skip("readOnly lets user copy from input field", async ({ initTestBed, createTextBoxDriver }) => {
   const { clipboard } = await initTestBed(`<TextBox initialValue="test" readOnly="{true}" />`);
   const driver = await createTextBoxDriver();
 

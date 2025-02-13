@@ -31,7 +31,7 @@ export default ({ mode }) => {
           VITE_USER_COMPONENTS_XmluiCodeHightlighter: "false",
           VITE_USED_COMPONENTS_Tree: "false",
           // VITE_USER_COMPONENTS_Inspect: "false",
-          VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`
+          VITE_XMLUI_VERSION: `${env.npm_package_version} (built ${new Date().toLocaleDateString("en-US")})`,
         },
       };
       break;
@@ -54,19 +54,13 @@ export default ({ mode }) => {
         entry: [path.resolve("src", "index.ts")],
         name: "xmlui",
         fileName: "xmlui",
-        formats: ["es"]
+        formats: ["es"],
       };
     }
   }
   return defineConfig({
     resolve: {
       alias: {
-        "@components": path.resolve(__dirname, "./src/components"),
-        "@components-core": path.resolve(__dirname, "./src/components-core"),
-        "@abstractions": path.resolve(__dirname, "./src/abstractions"),
-        "@core": path.resolve(__dirname, "./src/core"),
-        "@testing": path.resolve(__dirname, "./src/testing"),
-        "@parsers": path.resolve(__dirname, "./src/parsers"),
         lodash: "lodash-es",
       },
     },

@@ -31,6 +31,7 @@ import { compileLayout } from "../../parsers/style-parser/style-compiler";
 import { useMouseEventHandlers } from "../event-handlers";
 import UnknownComponent from "./UnknownComponent";
 import InvalidComponent from "./InvalidComponent";
+import { resolveLayoutProps } from "../theming/layout-resolver";
 
 // --- The available properties of Component
 type Props = Omit<InnerRendererContext, "layoutContext"> & {
@@ -217,10 +218,18 @@ const ComponentAdapter = forwardRef(function ComponentAdapter(
         resolvedLayoutProps[key] = valueExtractor(safeNode.props[key], true);
       }
     });
-    return compileLayout(resolvedLayoutProps, themeVars, {
+
+    // --- New layout property resolution
+    return resolveLayoutProps(resolvedLayoutProps, {
       ...layoutContextRef?.current,
       mediaSize: appContext.mediaSize,
     });
+
+    // --- Old layout property resolution
+    // return compileLayout(resolvedLayoutProps, themeVars, {
+    //   ...layoutContextRef?.current,
+    //   mediaSize: appContext.mediaSize,
+    // });
   }, [appContext.mediaSize, layoutContextRef, safeNode.props, themeVars, valueExtractor]);
 
   // --- As compileLayout generates new cssProps and nonCssProps objects every time, we need to

@@ -9,17 +9,15 @@ type ViteConfigData = {
   flatDist?: boolean;
   withRelativeRoot?: boolean;
   flatDistUiPrefix?: string;
-  withLegacyParser?: boolean;
 };
 
 export function getViteConfig({
   flatDist = false,
   withRelativeRoot = false,
   flatDistUiPrefix = "",
-  withLegacyParser = false,
 }: ViteConfigData = {}) {
   return defineConfig({
-    plugins: [react(), svgr(), ViteYaml(), ViteUeml({ withLegacyParser })],
+    plugins: [react(), svgr(), ViteYaml(), ViteUeml({})],
     base: withRelativeRoot ? "" : undefined,
     // experimental: {
     //   renderBuiltUrl: (filename, {type, hostType, hostId}) =>{

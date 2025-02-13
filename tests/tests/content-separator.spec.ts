@@ -18,7 +18,7 @@ test(`orientation: horizontal in VStack with width`, async ({ page }) => {
 
   await initApp(page, {
     entryPoint: `
-      <VStack width="${expectedWidthPx}">
+      <VStack width="${expectedWidthPx}px">
         <ContentSeparator testId="separator" orientation="horizontal" />
       </VStack>`,
   });
@@ -51,7 +51,7 @@ test(`orientation: vertical in HStack with height`, async ({ page }) => {
 
   await initApp(page, {
     entryPoint: `
-      <HStack height="${expectedHeightPx}">
+      <HStack height="${expectedHeightPx}px">
         <ContentSeparator testId="separator" orientation="vertical" />
       </HStack>`,
   });
