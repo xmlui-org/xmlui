@@ -145,6 +145,7 @@ $color-text-HtmlTr--hover: createThemeVarTable("color-text-HtmlTr--hover");
 .htmlTr {
   background-color: $color-background-HtmlTr;
   color: $color-text-HtmlTr;
+  @include borders("createThemeVarTable", "HtmlTr");
 
   &:nth-child(even) {
     background-color: $color-background-even-HtmlTr;
@@ -165,9 +166,13 @@ $themeVarsTd: ();
 }
 
 $color-background-HtmlTd: createThemeVarTd("color-background-HtmlTd");
+$text-align-HtmlTd: createThemeVarTd("text-align-HtmlTd");
+$vertical-align-HtmlTd: createThemeVarTd("vertical-align-HtmlTd");
 
 .htmlTd {
   background-color: $color-background-HtmlTd;
+  text-align: $text-align-HtmlTd;
+  vertical-align: $vertical-align-HtmlTd;
   @include paddings("createThemeVarTd", "HtmlTd");
   @include borders("createThemeVarTd", "HtmlTd");
 }
